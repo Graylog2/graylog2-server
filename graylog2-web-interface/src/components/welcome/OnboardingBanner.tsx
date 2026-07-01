@@ -17,20 +17,16 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
-import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { Alert, Button } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isAnyPermitted } from 'util/PermissionsMixin';
+import { REQUIRED_PERMISSIONS } from 'components/welcome/Constants';
 
 import IngestionSetupModal from './IngestionSetupModal';
 import useOnboardingEligibility from './hooks/useOnboardingEligibility';
 import useDismissOnboarding from './hooks/useDismissOnboarding';
-
-// `collectors:create` is a valid backend permission that is not (yet) part of the generated
-// `Permission` union, hence the assertion.
-const REQUIRED_PERMISSIONS = ['inputs:create', 'collectors:create'] as Array<Permission>;
 
 // Inline link button that matches the surrounding sentence instead of using a button-sized font.
 const InlineLink = styled(Button)`

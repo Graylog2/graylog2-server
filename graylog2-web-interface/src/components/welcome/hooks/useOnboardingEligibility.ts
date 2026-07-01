@@ -23,10 +23,13 @@ export const ONBOARDING_ELIGIBILITY_QUERY_KEY = ['onboarding', 'eligibility'];
 // TODO: Replace with a real backend call once the eligibility endpoint exists.
 const fetchOnboardingEligibility = (): Promise<OnboardingEligibility> => Promise.resolve({ eligible: true });
 
-const useOnboardingEligibility = (): { data: OnboardingEligibility | undefined; isLoading: boolean } => {
+const useOnboardingEligibility = (
+  enabled: boolean = true,
+): { data: OnboardingEligibility | undefined; isLoading: boolean } => {
   const { data, isLoading } = useQuery({
     queryKey: ONBOARDING_ELIGIBILITY_QUERY_KEY,
     queryFn: fetchOnboardingEligibility,
+    enabled,
   });
 
   return { data, isLoading };

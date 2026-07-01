@@ -40,7 +40,7 @@ const mockConfig = (overrides: Partial<ReturnType<typeof useDebugMetricsConfig>>
 
 describe('EnableDebugMetricsButton', () => {
   beforeEach(() => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => true });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
     mockConfig();
   });
 
@@ -81,7 +81,7 @@ describe('EnableDebugMetricsButton', () => {
   });
 
   it('renders nothing without the pipeline:edit permission', () => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => false });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => false, isAnyPermitted: () => false });
     render(<EnableDebugMetricsButton />);
 
     expect(screen.queryByRole('button', { name: /enable debug metrics/i })).not.toBeInTheDocument();
