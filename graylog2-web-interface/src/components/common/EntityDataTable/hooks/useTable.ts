@@ -62,6 +62,34 @@ const updateColumnPreferences = (
   return updatedPreferences;
 };
 
+const insertColumnAtDefaultPosition = (
+  currentOrder: Array<string>,
+  columnId: string,
+  defaultColumnOrder: Array<string>,
+) => {
+  if (currentOrder.includes(columnId)) {
+    return currentOrder;
+  }
+
+  const defaultIdx = defaultColumnOrder.indexOf(columnId);
+
+  if (defaultIdx === -1) {
+    return [...currentOrder, columnId];
+  }
+
+  const insertIdx = currentOrder.findIndex((currentColumnId) => {
+    const currentDefaultIdx = defaultColumnOrder.indexOf(currentColumnId);
+
+    return currentDefaultIdx !== -1 && currentDefaultIdx > defaultIdx;
+  });
+
+  if (insertIdx === -1) {
+    return [...currentOrder, columnId];
+  }
+
+  return [...currentOrder.slice(0, insertIdx), columnId, ...currentOrder.slice(insertIdx)];
+};
+
 type Props<Entity extends EntityBase> = {
   columnOrder: Array<string>;
   columnDefinitions: Array<ColumnDef<Entity>>;
@@ -141,26 +169,18 @@ const useTable = <Entity extends EntityBase>({
         attributes: updateColumnPreferences(visibleAttributeColumns, removedColumns, layoutPreferences.attributes),
       };
 
-      // if user has a custom order, we need to update it to reflect the visibility changes
-      if (layoutPreferences.order) {
-        const newOrder = layoutPreferences.order.filter((colId) => !removedColumns.has(colId));
-
-        // Insert added columns at their default positions or at the end
-        [...addedColumns].forEach((colId) => {
-          const defaultIdx = defaultColumnOrder.indexOf(colId);
-          if (defaultIdx !== -1 && defaultIdx < newOrder.length) {
-            newOrder.splice(defaultIdx, 0, colId);
-          } else {
-            newOrder.push(colId);
-          }
-        });
-
-        newLayoutPreferences.order = newOrder;
-      }
+      const currentAttributeColumnOrder = columnOrder.filter((colId) => !UTILITY_COLUMNS.has(colId));
+      const baseOrder = layoutPreferences.order?.length ? layoutPreferences.order : currentAttributeColumnOrder;
+      const newOrder = [...addedColumns].reduce(
+        (result, colId) => insertColumnAtDefaultPosition(result, colId, defaultColumnOrder),
+        baseOrder.filter((colId) => !removedColumns.has(colId)),
+      );
+      newLayoutPreferences.order = newOrder;
 
       return onLayoutPreferencesChange(newLayoutPreferences);
     },
     [
+      columnOrder,
       columnVisibility,
       defaultColumnOrder,
       layoutPreferences.order,
