@@ -62,6 +62,15 @@ describe('SourceFormModal', () => {
 
     await screen.findByLabelText(/file path/i);
   });
+
+  it('renders macOS predicate field when macos source type selected', async () => {
+    render(<SourceFormModal fleetId="fleet-1" onClose={jest.fn()} onSave={jest.fn()} />);
+
+    await screen.findByText('macOS Unified Logging');
+    await userEvent.selectOptions(screen.getByLabelText(/Source Type/i), 'macos_unified_logging');
+
+    await screen.findByLabelText(/Predicate/i);
+  });
 });
 
 describe('splitToList', () => {

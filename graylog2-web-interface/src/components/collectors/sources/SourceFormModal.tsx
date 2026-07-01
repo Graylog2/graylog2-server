@@ -36,6 +36,7 @@ import type {
   JournaldSourceConfig,
   JournaldPriority,
   WindowsEventLogSourceConfig,
+  MacOSUnifiedLoggingSourceConfig,
 } from '../types';
 
 type Props = {
@@ -45,10 +46,14 @@ type Props = {
   onSave: (source: Omit<Source, 'id'>) => Promise<{ id?: string } | void>;
 };
 
-const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
+const defaultConfigs: Record<
+  SourceType,
+  FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig
+> = {
   file: { paths: [''], read_mode: 'end' },
   journald: { read_mode: 'end', priority: 'info' },
   windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end' },
+  macos_unified_logging: {},
 };
 
 type FormValues = {
@@ -56,7 +61,7 @@ type FormValues = {
   name: string;
   description: string;
   enabled: boolean;
-  config: FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig;
+  config: FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig;
 };
 
 const validate = (values: FormValues) => {
@@ -210,6 +215,23 @@ const WindowsEventLogConfigFields = ({
   );
 };
 
+const MacOSUnifiedLoggingConfigFields = ({
+  config,
+  setFieldValue,
+}: {
+  config: MacOSUnifiedLoggingSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+}) => (
+  <Input
+    id="macos-predicate"
+    type="textarea"
+    label="Predicate"
+    help="Optional macOS unified logging filter predicate passed to the `log` command. Leave empty to use the secure default (security-relevant subsystems, error severity and above). Example: subsystem == 'com.apple.securityd'"
+    value={config.predicate || ''}
+    onChange={(e) => setFieldValue('config', { ...config, predicate: e.target.value || undefined })}
+  />
+);
+
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
   const isEdit = !!source;
   const sendTelemetry = useSendCollectorsTelemetry();
@@ -344,6 +366,9 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                 {values.source_type === 'windows_event_log' && (
                   <HelpBlock>Collect events from Windows Event Viewer channels.</HelpBlock>
                 )}
+                {values.source_type === 'macos_unified_logging' && (
+                  <HelpBlock>Collect from the macOS unified logging system via the `log` command (macOS only).</HelpBlock>
+                )}
                 <FormikInput id="source-name" label="Name" name="name" required />
                 <FormikInput id="source-description" label="Description" name="description" type="textarea" />
                 <FormikInput
@@ -362,6 +387,12 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                 {values.source_type === 'windows_event_log' && (
                   <WindowsEventLogConfigFields
                     config={values.config as WindowsEventLogSourceConfig}
+                    setFieldValue={setFieldValue}
+                  />
+                )}
+                {values.source_type === 'macos_unified_logging' && (
+                  <MacOSUnifiedLoggingConfigFields
+                    config={values.config as MacOSUnifiedLoggingSourceConfig}
                     setFieldValue={setFieldValue}
                   />
                 )}

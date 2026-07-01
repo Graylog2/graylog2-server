@@ -22,10 +22,12 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog.collectors.cloud.CloudCollectorIngestService;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
+import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 import org.graylog.collectors.config.receiver.WindowsEventLogReceiverConfig;
 import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.JournaldSourceConfig;
+import org.graylog.collectors.db.MacOSUnifiedLoggingSourceConfig;
 import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog.collectors.input.CollectorIngestCodec;
@@ -37,6 +39,7 @@ import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
 import org.graylog.collectors.input.processor.FilelogRecordProcessor;
 import org.graylog.collectors.input.processor.JournaldRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
+import org.graylog.collectors.input.processor.MacOSUnifiedLoggingRecordProcessor;
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.opamp.OpAmpModule;
@@ -97,6 +100,7 @@ public class CollectorsModule extends PluginModule {
         logRecordProcessorBinder.addBinding(FilelogReceiverConfig.RECEIVER_TYPE).to(FilelogRecordProcessor.class);
         logRecordProcessorBinder.addBinding(JournaldReceiverConfig.RECEIVER_TYPE).to(JournaldRecordProcessor.class);
         logRecordProcessorBinder.addBinding(WindowsEventLogReceiverConfig.RECEIVER_TYPE).to(WindowsEventLogRecordProcessor.class);
+        logRecordProcessorBinder.addBinding(MacOSUnifiedLoggingReceiverConfig.RECEIVER_TYPE).to(MacOSUnifiedLoggingRecordProcessor.class);
         logRecordProcessorBinder.addBinding(CollectorLogRecordProcessor.RECEIVER_TYPE).to(CollectorLogRecordProcessor.class);
 
         if (otlpDumpEnabled) {
@@ -143,6 +147,7 @@ public class CollectorsModule extends PluginModule {
         registerJacksonSubtype(FileSourceConfig.class);
         registerJacksonSubtype(JournaldSourceConfig.class);
         registerJacksonSubtype(WindowsEventLogSourceConfig.class);
+        registerJacksonSubtype(MacOSUnifiedLoggingSourceConfig.class);
 
         final var indexTemplateProviderBinder = MapBinder.newMapBinder(binder(), String.class,
                 IndexTemplateProvider.class);
