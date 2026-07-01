@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useState} from 'react';
+import { useCallback, useMemo } from 'react';
 import { Formik, Form } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
@@ -29,6 +29,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useInputsStates from 'hooks/useInputsStates';
 import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
+import Collapsible from 'components/common/Collapsible';
 
 import IngestEndpointStatus from './IngestEndpointStatus';
 import PortMismatchAlert from './PortMismatchAlert';
@@ -78,7 +79,6 @@ const CollectorsSettings = () => {
   const { data: inputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
 
   const isCloud = AppConfig.isCloud();
-  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
   const canCreateInputs = isPermitted(currentUser?.permissions, [
     'inputs:create',
@@ -296,77 +296,73 @@ const CollectorsSettings = () => {
                     )}
                   </>
                 )}
-
-                  <button type="button" onClick={() => setShowAdvancedSettings(prev => !prev)} style={{ background: "none", border: "none", padding: 0, color: "#06c", textDecoration: "underline", cursor: "pointer", marginBottom: "1rem" }}>
-                    {showAdvancedSettings ? "<<< Hide advanced settings" : "Show advanced settings >>>"}
-                  </button>
               </Col>
 
-              {showAdvancedSettings && (
-              <Col md={6}>
-                <SectionTitle>Collector Lifecycle</SectionTitle>
+              <Collapsible label="Advanced options">
+                <Col md={6}>
+                  <SectionTitle>Collector Lifecycle</SectionTitle>
 
-                <TimeUnitInput
-                  label="Offline threshold"
-                  update={(value: number, unit: string) => {
-                    setFieldValue('offline_value', value);
-                    setFieldValue('offline_unit', unit);
-                  }}
-                  value={values.offline_value}
-                  unit={values.offline_unit}
-                  units={THRESHOLD_UNITS}
-                  required
-                  hideCheckbox
-                  help={
-                    errors.offline_value ? (
-                      <span className="text-danger">{errors.offline_value}</span>
-                    ) : (
-                      "Collectors that haven't reported within this time are shown as offline."
-                    )
-                  }
-                />
+                  <TimeUnitInput
+                    label="Offline threshold"
+                    update={(value: number, unit: string) => {
+                      setFieldValue('offline_value', value);
+                      setFieldValue('offline_unit', unit);
+                    }}
+                    value={values.offline_value}
+                    unit={values.offline_unit}
+                    units={THRESHOLD_UNITS}
+                    required
+                    hideCheckbox
+                    help={
+                      errors.offline_value ? (
+                        <span className="text-danger">{errors.offline_value}</span>
+                      ) : (
+                        "Collectors that haven't reported within this time are shown as offline."
+                      )
+                    }
+                  />
 
-                <TimeUnitInput
-                  label="Default visibility"
-                  update={(value: number, unit: string) => {
-                    setFieldValue('visibility_value', value);
-                    setFieldValue('visibility_unit', unit);
-                  }}
-                  value={values.visibility_value}
-                  unit={values.visibility_unit}
-                  units={THRESHOLD_UNITS}
-                  required
-                  hideCheckbox
-                  help={
-                    errors.visibility_value ? (
-                      <span className="text-danger">{errors.visibility_value}</span>
-                    ) : (
-                      "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
-                    )
-                  }
-                />
+                  <TimeUnitInput
+                    label="Default visibility"
+                    update={(value: number, unit: string) => {
+                      setFieldValue('visibility_value', value);
+                      setFieldValue('visibility_unit', unit);
+                    }}
+                    value={values.visibility_value}
+                    unit={values.visibility_unit}
+                    units={THRESHOLD_UNITS}
+                    required
+                    hideCheckbox
+                    help={
+                      errors.visibility_value ? (
+                        <span className="text-danger">{errors.visibility_value}</span>
+                      ) : (
+                        "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
+                      )
+                    }
+                  />
 
-                <TimeUnitInput
-                  label="Expiration threshold"
-                  update={(value: number, unit: string) => {
-                    setFieldValue('expiration_value', value);
-                    setFieldValue('expiration_unit', unit);
-                  }}
-                  value={values.expiration_value}
-                  unit={values.expiration_unit}
-                  units={THRESHOLD_UNITS}
-                  required
-                  hideCheckbox
-                  help={
-                    errors.expiration_value ? (
-                      <span className="text-danger">{errors.expiration_value}</span>
-                    ) : (
-                      "Collectors that haven't reported within this time are permanently removed."
-                    )
-                  }
-                />
-              </Col>
-                )}
+                  <TimeUnitInput
+                    label="Expiration threshold"
+                    update={(value: number, unit: string) => {
+                      setFieldValue('expiration_value', value);
+                      setFieldValue('expiration_unit', unit);
+                    }}
+                    value={values.expiration_value}
+                    unit={values.expiration_unit}
+                    units={THRESHOLD_UNITS}
+                    required
+                    hideCheckbox
+                    help={
+                      errors.expiration_value ? (
+                        <span className="text-danger">{errors.expiration_value}</span>
+                      ) : (
+                        "Collectors that haven't reported within this time are permanently removed."
+                      )
+                    }
+                  />
+                </Col>
+              </Collapsible>
 
               <Col md={12}>
                 <FormSubmit
