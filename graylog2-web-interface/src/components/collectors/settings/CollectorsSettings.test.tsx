@@ -137,7 +137,7 @@ describe('CollectorsSettings', () => {
     await user.type(hostnameInput, 'ingest.example.com');
     await user.clear(portInput);
     await user.type(portInput, '14411');
-    await user.click(screen.getByRole('button', { name: /Update settings/i }));
+    await user.click(screen.getByRole('button', { name: /Confirm settings/i }));
 
     await waitFor(() =>
       expect(updateConfig).toHaveBeenCalledWith({
@@ -216,7 +216,10 @@ describe('CollectorsSettings', () => {
     });
 
     it('shows the ingest endpoint read-only and hides editing/creation controls', async () => {
+      const user = userEvent.setup();
+
       render(<CollectorsSettings />);
+      await user.click(screen.getByRole('button', { name: /advanced settings/i }));
 
       // Endpoint fields are present but read-only (disabled), showing the server-provisioned values.
       const hostname = await screen.findByLabelText('External hostname');
@@ -309,7 +312,7 @@ describe('CollectorsSettings telemetry', () => {
     await user.clear(hostnameInput);
     await user.type(hostnameInput, 'newhost.example.com');
 
-    await user.click(screen.getByRole('button', { name: /Update settings/i }));
+    await user.click(screen.getByRole('button', { name: /Confirm settings/i }));
 
     await waitFor(() => {
       expect(sendTelemetry).toHaveBeenCalledWith(
