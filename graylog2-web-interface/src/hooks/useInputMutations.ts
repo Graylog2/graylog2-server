@@ -46,7 +46,7 @@ const useInputMutations = () => {
     },
     onSuccess: () => {
       UserNotification.success('Input has been successfully updated.', 'Success!');
-      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
+      queryClient.invalidateQueries({ queryKey: ['inputs'] });
     },
   });
   const deleteMutation = useMutation({
