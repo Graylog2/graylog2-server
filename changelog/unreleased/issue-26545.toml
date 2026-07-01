@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed traffic graph on the System Overview and Licenses pages showing no history from before the 7.1 upgrade by plotting output traffic again instead of indexed input traffic, which is only recorded since 7.1.0."
+
+issues = ["26545"]
+pulls = ["26546"]
