@@ -425,6 +425,77 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
+    void enrollDoesNotPersistPreviousCertificateFieldsAsNull() throws Exception {
+        // A freshly enrolled instance has never rotated, so none of the previous-certificate fields nor
+        // certificates_rotated_at exist yet. They must be ABSENT, not present-with-null: the partial index
+        // on previous_certificate_fingerprint is UNIQUE, and {$exists: true} matches an explicit null, so a
+        // second instance persisting a null previous fingerprint would collide and fail the write.
+        enroll("uid-no-previous-fields");
+
+        final var doc = findRawDocument("uid-no-previous-fields").orElseThrow();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT)).isFalse();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_PEM)).isFalse();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT)).isFalse();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT)).isFalse();
+    }
+
+    @Test
+    void enrollingMultipleInstancesWithoutPreviousDoesNotCollideOnUniqueIndex() throws Exception {
+        // Guards the unique partial index on previous_certificate_fingerprint: instances that have never
+        // rotated omit the field entirely, so the partial {$exists: true} filter excludes them and many
+        // such instances can coexist. If any write path ever wrote an explicit null instead, the second
+        // enroll here would fail with a duplicate-key error.
+        final var first = enroll("uid-no-previous-1");
+        final var second = enroll("uid-no-previous-2");
+
+        assertThat(first.id()).isNotNull();
+        assertThat(second.id()).isNotNull();
+        assertThat(collectorInstanceService.findByInstanceUid("uid-no-previous-1")).isPresent();
+        assertThat(collectorInstanceService.findByInstanceUid("uid-no-previous-2")).isPresent();
+    }
+
+    @Test
+    void constructionClearsLegacyNullNextCertificateValuesSoTheUniqueIndexCanBuild() throws Exception {
+        // Released versions persisted next_certificate_fingerprint as an explicit null (the field predates
+        // @JsonInclude(NON_ABSENT)). Reproduce that pre-migration state: drop the unique next index so
+        // multiple null documents can be seeded (the live unique index would reject the second null), then
+        // seed several. On construction the service must clear the nulls and successfully (re)build the index.
+        final var raw = mongoCollections.nonEntityCollection(CollectorInstanceService.COLLECTION_NAME, Document.class);
+        raw.dropIndex("next_certificate_fingerprint_1");
+        for (int i = 0; i < 3; i++) {
+            enroll("uid-legacy-null-" + i);
+            raw.updateOne(Filters.eq(CollectorInstanceDTO.FIELD_INSTANCE_UID, "uid-legacy-null-" + i),
+                    new Document("$set", new Document()
+                            .append(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT, null)
+                            .append(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_PEM, null)
+                            .append(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT, null)));
+        }
+
+        // Constructing the service runs the cleanup, then rebuilds the indexes over the now-clean data.
+        new CollectorInstanceService(mongoCollections, new ClusterEventBus(), clock);
+
+        for (int i = 0; i < 3; i++) {
+            final var doc = findRawDocument("uid-legacy-null-" + i).orElseThrow();
+            assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT)).isFalse();
+            assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_PEM)).isFalse();
+            assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT)).isFalse();
+        }
+
+        // The unique next index must exist again — if the cleanup had failed, createIndexes would have
+        // collided on the nulls (swallowed by its catch) and the index would be missing.
+        boolean uniqueNextIndexPresent = false;
+        for (Document index : raw.listIndexes()) {
+            final Document key = index.get("key", Document.class);
+            if (key != null && key.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT)
+                    && index.getBoolean("unique", false)) {
+                uniqueNextIndexPresent = true;
+                break;
+            }
+        }
+        assertThat(uniqueNextIndexPresent).isTrue();
+    }
+
+    @Test
     void activateNextCertificateRemovesNextCertificateFingerprintField() throws Exception {
         // Activation promotes next -> active and must remove the next fingerprint field entirely (not set
         // it to null), so the instance drops back out of the partial index once it is no longer mid-renewal.

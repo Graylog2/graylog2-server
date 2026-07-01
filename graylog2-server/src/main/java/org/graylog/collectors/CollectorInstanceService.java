@@ -31,11 +31,13 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.BsonType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.db.Attribute;
@@ -91,6 +93,7 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFIC
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_PEM;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT;
 import static org.graylog2.database.MongoEntity.FIELD_ID;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -121,6 +124,21 @@ public class CollectorInstanceService {
         this.clusterEventBus = clusterEventBus;
         this.clock = clock;
 
+        // Clean up legacy null values which would prevent creating a unique index below
+        try {
+            final var updated = collection.updateMany(Filters.type(FIELD_NEXT_CERTIFICATE_FINGERPRINT, BsonType.NULL),
+                    Updates.combine(Updates.unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
+                            Updates.unset(FIELD_NEXT_CERTIFICATE_PEM),
+                            Updates.unset(FIELD_NEXT_CERTIFICATE_EXPIRES_AT)
+                    )
+            );
+            if (updated.getModifiedCount() > 0) {
+                LOG.info("Cleaned up {} legacy null values for the \"next_certificate_*\" fields", updated.getModifiedCount());
+            }
+        } catch (Exception e) {
+            LOG.error("Cleaning up legacy null values for the \"next_certificate_*\" fields failed", e);
+        }
+
         try {
             collection.createIndexes(List.of(
                     new IndexModel(Indexes.ascending(FIELD_INSTANCE_UID), new IndexOptions().unique(true)),
@@ -131,7 +149,11 @@ public class CollectorInstanceService {
                     new IndexModel(Indexes.ascending(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT),
                             new IndexOptions().unique(true)),
                     new IndexModel(Indexes.ascending(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
-                            new IndexOptions().partialFilterExpression(Filters.exists(FIELD_NEXT_CERTIFICATE_FINGERPRINT))),
+                            new IndexOptions().partialFilterExpression(Filters.exists(FIELD_NEXT_CERTIFICATE_FINGERPRINT))
+                                    .unique(true)),
+                    new IndexModel(Indexes.ascending(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT),
+                            new IndexOptions().partialFilterExpression(Filters.exists(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT))
+                                    .unique(true)),
                     new IndexModel(Indexes.ascending(FIELD_LAST_SEEN))
             ));
         } catch (Exception e) {
