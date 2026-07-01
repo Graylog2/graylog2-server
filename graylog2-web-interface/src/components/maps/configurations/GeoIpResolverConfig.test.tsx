@@ -85,7 +85,7 @@ describe('GeoIpResolverConfig', () => {
 
     expect(
       screen.getByRole('textbox', {
-        name: /googe cloud storage project id \(opt\.\)/i,
+        name: /google cloud storage project id \(opt\.\)/i,
       }),
     ).toBeInTheDocument();
 

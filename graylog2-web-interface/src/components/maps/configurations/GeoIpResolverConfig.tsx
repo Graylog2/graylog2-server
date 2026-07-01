@@ -233,9 +233,11 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                         onChange={(option) => {
                           setFieldValue('pull_from_cloud', option);
 
-                          if (option !== CLOUD_STORAGE_OPTION.GCS) {
-                            setFieldValue('gcs_project_id', undefined);
-                          }
+                          setFieldValue('gcs_project_id', undefined);
+                          setFieldValue('azure_endpoint', undefined);
+                          setFieldValue('azure_account_key', undefined);
+                          setFieldValue('azure_account', undefined);
+                          setFieldValue('azure_container', undefined);
                         }}
                       />
                     </Input>

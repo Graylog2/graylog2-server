@@ -33,7 +33,7 @@ const GCSGeoIpFormGroup = () => {
         disabled={!values.enabled}
         label={
           <>
-            Googe Cloud Storage Project ID <InputOptionalInfo />
+            Google Cloud Storage Project ID <InputOptionalInfo />
           </>
         }
         name="gcs_project_id"
