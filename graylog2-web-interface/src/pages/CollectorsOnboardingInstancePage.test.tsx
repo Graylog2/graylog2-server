@@ -21,6 +21,9 @@ import asMock from 'helpers/mocking/AsMock';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
 import type { CollectorInstanceView } from 'components/collectors/types';
+import collectorReceivedMessagesUrl from 'components/collectors/common/collectorReceivedMessagesUrl';
+import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
+import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
 
@@ -57,10 +60,17 @@ jest.mock(
 );
 
 const mockUseLocation = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ instanceUid: 'uid-42' }),
+  useNavigate: () => mockNavigate,
+}));
+
+jest.mock('views/hooks/useDefaultIntervalForRefresh', () => ({
+  __esModule: true,
+  default: jest.fn(),
 }));
 
 jest.mock('routing/useLocation', () => ({
@@ -94,6 +104,7 @@ describe('CollectorsOnboardingInstancePage', () => {
     mockUseLocation.mockReturnValue({ state: null });
     mockInstanceLookup();
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);
+    asMock(useDefaultInterval).mockReturnValue(null);
   });
 
   it('shows a spinner while loading', () => {
@@ -114,6 +125,24 @@ describe('CollectorsOnboardingInstancePage', () => {
       'href',
       expect.stringContaining('/system/collectors/instances'),
     );
+  });
+
+  it('navigates to the search page once the instance and default interval are both available', () => {
+    asMock(useDefaultInterval).mockReturnValue('PT5S');
+
+    render(<CollectorsOnboardingInstancePage />);
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, 'PT5S'),
+    );
+  });
+
+  it('does not navigate before the default interval has loaded', () => {
+    asMock(useDefaultInterval).mockReturnValue(null);
+
+    render(<CollectorsOnboardingInstancePage />);
+
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('surfaces a fetch error', () => {
