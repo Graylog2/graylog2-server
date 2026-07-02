@@ -34,8 +34,6 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.shared.security.EntityPermissionsUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -44,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
@@ -53,8 +52,6 @@ import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
 import static org.graylog2.users.UserImpl.USERNAME;
 
 public class MongoEntitySuggestionService implements EntitySuggestionService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MongoEntitySuggestionService.class);
 
     private final MongoConnection mongoConnection;
     private final EntityPermissionsUtils permissionsUtils;
@@ -113,10 +110,10 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
             final Set<String> searchFields = new LinkedHashSet<>(displayFields);
             searchFields.add(valueColumn);
             bsonFilter = Filters.or(searchFields.stream()
-                    .map(field -> Filters.regex(field, query, "i"))
+                    .map(field -> Filters.regex(field, Pattern.quote(query), "i"))
                     .toList());
         } else {
-            bsonFilter = Filters.regex(valueColumn, query, "i");
+            bsonFilter = Filters.regex(valueColumn, Pattern.quote(query), "i");
         }
 
         final String sortColumn = (displayFields != null && !displayFields.isEmpty())
