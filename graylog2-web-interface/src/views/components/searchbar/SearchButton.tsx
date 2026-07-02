@@ -23,6 +23,7 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { StyledButton } from 'views/components/aggregationwizard/units/FieldUnitPopover';
 
 export const SEARCH_BUTTON_WIDTH = '64';
 
@@ -104,6 +105,7 @@ const SearchButton = ({
       className={className}
       type="submit"
       bsStyle="primary"
+      showOverflow
       $dirty={dirty && !displaySpinner}>
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>
