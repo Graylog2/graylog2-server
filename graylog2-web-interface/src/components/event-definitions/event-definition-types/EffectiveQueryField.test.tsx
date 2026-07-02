@@ -37,7 +37,16 @@ describe('EffectiveQueryField', () => {
     jest.clearAllMocks();
   });
 
-  const filters: SearchFilter[] = [{ type: 'inlineQueryString', queryString: 'source:firewall' }];
+  const filters: SearchFilter[] = [
+    {
+      id: 'filter-1',
+      type: 'inlineQueryString',
+      title: 'Firewall',
+      queryString: 'source:firewall',
+      disabled: false,
+      negation: false,
+    },
+  ];
 
   it('renders the effective query returned by the backend', async () => {
     render(<EffectiveQueryField queryString="action:login" filters={filters} />);
@@ -52,7 +61,16 @@ describe('EffectiveQueryField', () => {
 
     expect(fetch).toHaveBeenCalledWith('POST', qualifyUrl(URL), {
       query_string: 'action:login',
-      filters: [{ type: 'inlineQueryString', queryString: 'source:firewall' }],
+      filters: [
+        {
+          id: 'filter-1',
+          type: 'inlineQueryString',
+          title: 'Firewall',
+          queryString: 'source:firewall',
+          disabled: false,
+          negation: false,
+        },
+      ],
     });
   });
 
