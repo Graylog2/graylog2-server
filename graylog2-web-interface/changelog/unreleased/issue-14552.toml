@@ -1,0 +1,4 @@
+type = "added"
+message = "Show the effective query (base query combined with applied search filters) on the event definition condition screen."
+
+issues = ["14552"]

@@ -39,7 +39,8 @@ import Query from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
+import { Alert, Button, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
+import EffectiveQueryField from 'components/event-definitions/event-definition-types/EffectiveQueryField';
 import RelativeTime from 'components/common/RelativeTime';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
@@ -78,6 +79,20 @@ const STREAM_PERMISSIONS: Permission[] = ['streams:read'];
 const InputRow = styled.div`
   display: flex;
   align-items: center;
+`;
+
+const EFFECTIVE_QUERY_STORAGE_KEY = 'event-definition-show-effective-query';
+
+const InlineToggle = styled(Button)`
+  && {
+    padding: 0;
+    border: 0;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
+  }
 `;
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
@@ -179,6 +194,9 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
 const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
+  const [showEffectiveQuery, setShowEffectiveQuery] = useState<boolean>(
+    () => Store.get(EFFECTIVE_QUERY_STORAGE_KEY) === true,
+  );
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
   const { userTimezone } = useUserDateTime();
@@ -549,9 +567,39 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
           <HelpBlock>
             Search query that Messages should match. You can use the same syntax as in the Search page, including
             declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
+            {(currentConfig.filters?.length ?? 0) > 0 && (
+              <>
+                {' '}
+                <InlineToggle
+                  bsStyle="link"
+                  bsSize="xsmall"
+                  onClick={() => {
+                    const next = !showEffectiveQuery;
+                    setShowEffectiveQuery(next);
+                    Store.set(EFFECTIVE_QUERY_STORAGE_KEY, next);
+                  }}>
+                  {showEffectiveQuery ? 'Hide effective query' : 'Show effective query'}
+                </InlineToggle>{' '}
+                including the search filters below.
+              </>
+            )}
           </HelpBlock>
         </FormGroup>
       )}
+
+      {/* Scoped (Illuminate) definitions hide the non-editable base query, so the effective-query
+          preview is intentionally not shown for them; revealing the scoped query is handled separately
+          by the search-filter guardrails work. */}
+      {onlyFilters ||
+        ((currentConfig.filters?.length ?? 0) > 0 && showEffectiveQuery && (
+          <FormGroup controlId="effective-query">
+            <ControlLabel>Effective query</ControlLabel>
+            <EffectiveQueryField queryString={currentConfig.query ?? ''} filters={currentConfig.filters} />
+            <HelpBlock>
+              The Search Query with the applied search filters included. This is what messages are matched against.
+            </HelpBlock>
+          </FormGroup>
+        ))}
 
       {onlyFilters || (
         <QueryParameters
