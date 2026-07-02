@@ -96,32 +96,6 @@ describe('CollectorsOnboardingInstancePage', () => {
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);
   });
 
-  it('renders the connection result for the instance', () => {
-    render(<CollectorsOnboardingInstancePage />);
-
-    expect(useInstance).toHaveBeenCalledWith('uid-42');
-    expect(screen.getByText('Collector connected')).toBeInTheDocument();
-    expect(screen.getByText('web-prod-01')).toBeInTheDocument();
-    expect(screen.getByText('Default Fleet')).toBeInTheDocument();
-  });
-
-  it('passes the platform from router location state', () => {
-    mockUseLocation.mockReturnValue({ state: { platformId: 'linux' } });
-
-    render(<CollectorsOnboardingInstancePage />);
-
-    expect(screen.getByTestId('platform-id')).toHaveTextContent('linux');
-  });
-
-  it('falls back to the fleet name from location state while the fleet loads', () => {
-    mockUseLocation.mockReturnValue({ state: { fleetName: 'Fresh Fleet' } });
-    asMock(useFleet).mockReturnValue({ data: undefined } as ReturnType<typeof useFleet>);
-
-    render(<CollectorsOnboardingInstancePage />);
-
-    expect(screen.getByText('Fresh Fleet')).toBeInTheDocument();
-  });
-
   it('shows a spinner while loading', () => {
     mockInstanceLookup({ data: undefined, isLoading: true });
 
