@@ -14,19 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.input.processor;
+import * as React from 'react';
 
-import org.graylog.inputs.otel.OTelJournal;
+import { EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
 
-import java.util.Map;
+// Render the active `type` filter chip with the plugin's display name (e.g. "Filter & Aggregation")
+// instead of the raw config.type value (e.g. "aggregation-v1"), matching the Type column.
+const FilterValueRenderers = {
+  type: (value: string) => <EventDefinitionTypeRenderer type={value} />,
+};
 
-/**
- * Processor for OpenTelemetry log records. Maps OTel attributes to GIM fields.
- */
-public interface LogRecordProcessor {
-    Map<String, Object> process(OTelJournal.Log log);
-
-    default boolean producesUnaccountedMessages() {
-        return false;
-    }
-}
+export default FilterValueRenderers;
