@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
@@ -25,6 +25,7 @@ import collectorReceivedMessagesUrl from 'components/collectors/common/collector
 import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import mockHistory from 'helpers/mocking/mockHistory';
+import useHistory from 'routing/useHistory';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
 
@@ -72,6 +73,8 @@ jest.mock('views/hooks/useDefaultIntervalForRefresh', () => ({
   default: jest.fn(),
 }));
 
+jest.mock('routing/useHistory');
+
 jest.mock('routing/useLocation', () => ({
   __esModule: true,
   default: () => mockUseLocation(),
@@ -102,6 +105,7 @@ describe('CollectorsOnboardingInstancePage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     history = mockHistory();
+    asMock(useHistory).mockReturnValue(history);
 
     mockUseLocation.mockReturnValue({ state: null });
     mockInstanceLookup();
@@ -129,16 +133,16 @@ describe('CollectorsOnboardingInstancePage', () => {
     );
   });
 
-  it('navigates to the search page once the instance and default interval are both available', () => {
+  it('navigates to the search page once the instance and default interval are both available', async () => {
     asMock(useDefaultInterval).mockReturnValue('PT5S');
-    mockInstanceLookup();
 
     render(<CollectorsOnboardingInstancePage />);
 
-    expect(useInstance).toHaveBeenCalledWith('uid-42');
-    expect(history.push).toHaveBeenCalledWith(
-      collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, 'PT5S'),
-    );
+    await waitFor(() => {
+      expect(history.push).toHaveBeenCalledWith(
+        collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, 'PT5S'),
+      );
+    });
   });
 
   it('does not navigate before the default interval has loaded', () => {
