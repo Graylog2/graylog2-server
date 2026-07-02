@@ -90,7 +90,7 @@ describe('EditInputButton', () => {
     asMock(useInputMutations).mockReturnValue({
       updateInput: updateInputMock,
     } as any);
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => true });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
     asMock(useSendTelemetry).mockReturnValue(jest.fn());
     asMock(useLocation).mockReturnValue({
       pathname: '/system/input/diagnosis/input3',
@@ -135,7 +135,7 @@ describe('EditInputButton', () => {
   });
 
   it('does not render the button without edit permissions', () => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => false });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => false, isAnyPermitted: () => true });
 
     renderSUT();
 
