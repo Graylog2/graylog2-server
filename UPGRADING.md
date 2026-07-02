@@ -7,7 +7,7 @@ Upgrading to Graylog 7.2.x
 
 The `query` parameter of the entity suggestion endpoint is now treated as a plain-text substring
 rather than a regular expression. Previously, passing a regex pattern (e.g. `foo.*bar`) would be
-evaluated by MongoDB directly, which allowed ReDoS attacks via crafted inputs.
+evaluated by MongoDB, which allowed ReDoS attacks via crafted inputs.
 
 After upgrading, queries containing regex metacharacters (`.`, `*`, `+`, `?`, `(`, `)`, etc.) will
 be matched literally instead of being interpreted as a pattern.
