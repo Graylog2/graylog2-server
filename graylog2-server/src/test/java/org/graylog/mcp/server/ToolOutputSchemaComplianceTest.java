@@ -82,6 +82,54 @@ class ToolOutputSchemaComplianceTest {
         assertConforms(result, new TypeReference<ListFieldsTool.Result>() {});
     }
 
+    // The following fixtures are structuredContent payloads captured verbatim from a live server.
+    // Unlike the round-trip tests above (which prove generator and serializer are consistent with
+    // each other), these pin the wire format itself: if schema generation and serialization ever
+    // drift together (e.g. dates becoming numeric timestamps on both sides), the round-trip tests
+    // would still pass while deployed clients see a breaking change — these tests would not.
+
+    @Test
+    void capturedTabularResponsePayloadValidatesAgainstGeneratedSchema() throws Exception {
+        final String payload = """
+                {
+                  "schema": [
+                    {"column_type": "grouping", "type": "string", "field": "source", "name": "grouping: source"},
+                    {"column_type": "metric", "type": "numeric", "function": "count", "name": "metric: count()"}
+                  ],
+                  "datarows": [["example.org", 35098]],
+                  "metadata": {
+                    "effective_timerange": {
+                      "from": "2026-07-02T12:51:47.669Z",
+                      "to": "2026-07-02T13:51:47.669Z",
+                      "type": "absolute"
+                    }
+                  }
+                }
+                """;
+        assertPayloadConforms(payload, new TypeReference<TabularResponse>() {});
+    }
+
+    @Test
+    void capturedListFieldsPayloadValidatesAgainstGeneratedSchema() throws Exception {
+        final String payload = """
+                {
+                  "fields": [
+                    {
+                      "name": "timestamp",
+                      "type": {"type": "date", "properties": ["enumerable"], "index_names": []},
+                      "unit": null
+                    },
+                    {
+                      "name": "gl2_processing_duration_ms",
+                      "type": {"type": "int", "properties": ["numeric", "enumerable"], "index_names": []},
+                      "unit": {"unit_type": "time", "abbrev": "ms"}
+                    }
+                  ]
+                }
+                """;
+        assertPayloadConforms(payload, new TypeReference<ListFieldsTool.Result>() {});
+    }
+
     @Test
     void dateTimeIsDescribedAsIsoDateTimeString() {
         final JsonNode schema = generateSchema(DateTime.class);
@@ -105,10 +153,24 @@ class ToolOutputSchemaComplianceTest {
      * way {@link Tool} and {@link McpService} do, and validates one against the other.
      */
     private void assertConforms(Object result, TypeReference<?> outputType) {
-        final Map<String, Object> outputSchema = objectMapper.convertValue(
-                generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
         final Map<String, Object> structuredContent = objectMapper.convertValue(
                 result, new TypeReference<Map<String, Object>>() {});
+        assertContentConforms(structuredContent, outputType);
+    }
+
+    /**
+     * Validates a literal JSON payload (as sent over the wire) against the schema generated for the
+     * declared output type.
+     */
+    private void assertPayloadConforms(String payload, TypeReference<?> outputType) throws Exception {
+        final Map<String, Object> structuredContent = objectMapper.readValue(
+                payload, new TypeReference<Map<String, Object>>() {});
+        assertContentConforms(structuredContent, outputType);
+    }
+
+    private void assertContentConforms(Map<String, Object> structuredContent, TypeReference<?> outputType) {
+        final Map<String, Object> outputSchema = objectMapper.convertValue(
+                generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
 
         final JsonSchemaValidator.ValidationResponse response = schemaValidator.validate(outputSchema, structuredContent);
         assertThat(response.valid())
