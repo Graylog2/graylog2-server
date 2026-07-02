@@ -24,6 +24,7 @@ import type { CollectorInstanceView } from 'components/collectors/types';
 import collectorReceivedMessagesUrl from 'components/collectors/common/collectorReceivedMessagesUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
+import mockHistory from 'helpers/mocking/mockHistory';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
 
@@ -60,12 +61,10 @@ jest.mock(
 );
 
 const mockUseLocation = jest.fn();
-const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => ({ instanceUid: 'uid-42' }),
-  useNavigate: () => mockNavigate,
+  useParams: () => ({ instanceUid: 'uid-42' })
 }));
 
 jest.mock('views/hooks/useDefaultIntervalForRefresh', () => ({
@@ -88,6 +87,8 @@ const instance = {
 } as CollectorInstanceView;
 
 describe('CollectorsOnboardingInstancePage', () => {
+  let history;
+
   const mockInstanceLookup = (
     overrides: { data?: CollectorInstanceView | null; isLoading?: boolean; error?: Error | null } = {},
   ) =>
@@ -100,6 +101,7 @@ describe('CollectorsOnboardingInstancePage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    history = mockHistory();
 
     mockUseLocation.mockReturnValue({ state: null });
     mockInstanceLookup();
@@ -129,10 +131,12 @@ describe('CollectorsOnboardingInstancePage', () => {
 
   it('navigates to the search page once the instance and default interval are both available', () => {
     asMock(useDefaultInterval).mockReturnValue('PT5S');
+    mockInstanceLookup();
 
     render(<CollectorsOnboardingInstancePage />);
 
-    expect(mockNavigate).toHaveBeenCalledWith(
+    expect(useInstance).toHaveBeenCalledWith('uid-42');
+    expect(history.push).toHaveBeenCalledWith(
       collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, 'PT5S'),
     );
   });
@@ -142,7 +146,7 @@ describe('CollectorsOnboardingInstancePage', () => {
 
     render(<CollectorsOnboardingInstancePage />);
 
-    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(history.push).not.toHaveBeenCalled();
   });
 
   it('surfaces a fetch error', () => {

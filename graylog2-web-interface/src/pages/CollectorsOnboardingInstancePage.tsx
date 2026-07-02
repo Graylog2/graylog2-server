@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
@@ -28,10 +28,11 @@ import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import Routes from 'routing/Routes';
 import { extractErrorMessage } from 'util/extractErrorMessage';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
+import useHistory from 'routing/useHistory';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
-  const navigate = useNavigate();
+  const history = useHistory();
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
   const defaultInterval = useDefaultInterval();
@@ -39,9 +40,9 @@ const CollectorsOnboardingInstancePage = () => {
   // using useEffect to guard that the default is actually there when we call the navigate
   useEffect(() => {
     if (instance && defaultInterval) {
-      navigate(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
+      history.push(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
     }
-  }, [defaultInterval, instance, navigate]);
+  }, [defaultInterval, instance, history]);
 
   const content = () => {
     if (isLoading) return <Spinner />;
