@@ -1,4 +1,0 @@
-type = "f"
-message = "Fix truncated change indicator on the search submit button."
-issues = ["Graylog2/graylog-plugin-enterprise#14690"]
-pulls = ["26549"]
