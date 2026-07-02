@@ -14,19 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.onboarding.audit;
+import { useQuery } from '@tanstack/react-query';
 
-import org.graylog2.audit.PluginAuditEventTypes;
+import { Onboarding } from '@graylog/server-api';
 
-import java.util.Set;
+export const ONBOARDING_ELIGIBILITY_QUERY_KEY = ['onboarding', 'eligibility'];
 
-public class OnboardingAuditEventTypes implements PluginAuditEventTypes {
-    private static final String NAMESPACE = "onboarding";
+// TODO: Replace with a real backend call once the eligibility endpoint exists.
+const fetchOnboardingEligibility = () => Onboarding.get();
 
-    public static final String ONBOARDING_DISMISSED = NAMESPACE + ":status:dismissed";
+const useOnboardingEligibility = (enabled: boolean = true) => {
+  const { data, isLoading } = useQuery({
+    queryKey: ONBOARDING_ELIGIBILITY_QUERY_KEY,
+    queryFn: fetchOnboardingEligibility,
+    enabled,
+  });
 
-    @Override
-    public Set<String> auditEventTypes() {
-        return Set.of(ONBOARDING_DISMISSED);
-    }
-}
+  return { data, isLoading };
+};
+
+export default useOnboardingEligibility;
