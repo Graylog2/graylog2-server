@@ -84,44 +84,54 @@ class CollectorFingerprintCacheTest {
     }
 
     @Test
-    void removedFingerprintIsInvalidatedAndReResolved() {
+    void touchedFingerprintThatIsCachedIsReResolved() {
         final var instance = instance("uid-1");
         when(instanceService.findByActiveOrNextFingerprint("fp-1")).thenReturn(Optional.of(instance));
         assertThat(cache.lookup("fp-1")).contains("uid-1");
 
-        // The instance is deleted: the fingerprint no longer resolves.
+        // The instance is deleted: the fingerprint no longer resolves. A certs-changed event touching the
+        // still-cached fingerprint re-resolves it (to empty).
         when(instanceService.findByActiveOrNextFingerprint("fp-1")).thenReturn(Optional.empty());
-        cache.handleCertsChanged(new CollectorInstanceCertsChangedEvent(Set.of(), Set.of("fp-1")));
+        cache.handleCertsChanged(new CollectorInstanceCertsChangedEvent(Set.of("fp-1")));
 
         assertThat(cache.lookup("fp-1")).isEmpty();
         verify(instanceService, times(2)).findByActiveOrNextFingerprint("fp-1");
     }
 
     @Test
-    void addedFingerprintIsRefreshedIntoCache() {
+    void touchedFingerprintThatIsNotCachedIsNotLoaded() {
         final var instance = instance("uid-2");
         when(instanceService.findByActiveOrNextFingerprint("fp-2")).thenReturn(Optional.of(instance));
 
-        cache.handleCertsChanged(new CollectorInstanceCertsChangedEvent(Set.of("fp-2"), Set.of()));
+        // fp-2 is not cached, so a certs-changed event must NOT proactively load it (avoids loading the
+        // many fingerprints of expired instances that no longer exist).
+        cache.handleCertsChanged(new CollectorInstanceCertsChangedEvent(Set.of("fp-2")));
+        verify(instanceService, never()).findByActiveOrNextFingerprint("fp-2");
 
-        // The refresh loaded fp-2, so the subsequent lookup is a cache hit (loader called once, by the refresh).
+        // It cold-loads on first lookup instead.
         assertThat(cache.lookup("fp-2")).contains("uid-2");
         verify(instanceService, times(1)).findByActiveOrNextFingerprint("fp-2");
     }
 
     @Test
-    void preWarmLoadsUnexpiredInstances() {
+    void preWarmLoadsOnlyActiveFingerprints() {
         final var config = CollectorsConfig.createDefault("test-host");
         when(configService.getOrDefault()).thenReturn(config);
-        final var instance = instanceWithCerts("uid-pw", "active-fp", "next-fp");
+        final var instance = mock(CollectorInstanceDTO.class);
+        when(instance.instanceUid()).thenReturn("uid-pw");
+        when(instance.activeCertificateFingerprint()).thenReturn("active-fp");
         when(instanceService.streamAllUnexpired(config.collectorExpirationThreshold())).thenReturn(Stream.of(instance));
 
         cache.startAsync().awaitRunning();
         try {
+            // The active fingerprint is prewarmed: it resolves without hitting MongoDB.
             assertThat(cache.lookup("active-fp")).contains("uid-pw");
-            assertThat(cache.lookup("next-fp")).contains("uid-pw");
-            // Both fingerprints were prewarmed, so no per-fingerprint lookup hit MongoDB.
             verify(instanceService, never()).findByActiveOrNextFingerprint(any());
+
+            // The next fingerprint is NOT prewarmed — it cold-loads on first lookup.
+            when(instanceService.findByActiveOrNextFingerprint("next-fp")).thenReturn(Optional.of(instance));
+            assertThat(cache.lookup("next-fp")).contains("uid-pw");
+            verify(instanceService).findByActiveOrNextFingerprint("next-fp");
         } finally {
             cache.stopAsync().awaitTerminated();
         }
@@ -140,7 +150,7 @@ class CollectorFingerprintCacheTest {
             assertThat(cache.lookup("fp-1")).contains("uid-1");
 
             when(instanceService.findByActiveOrNextFingerprint("fp-1")).thenReturn(Optional.empty());
-            eventBus.post(new CollectorInstanceCertsChangedEvent(Set.of(), Set.of("fp-1")));
+            eventBus.post(new CollectorInstanceCertsChangedEvent(Set.of("fp-1")));
 
             assertThat(cache.lookup("fp-1")).isEmpty();
         } finally {
@@ -151,14 +161,6 @@ class CollectorFingerprintCacheTest {
     private static CollectorInstanceDTO instance(String instanceUid) {
         final var dto = mock(CollectorInstanceDTO.class);
         when(dto.instanceUid()).thenReturn(instanceUid);
-        return dto;
-    }
-
-    private static CollectorInstanceDTO instanceWithCerts(String instanceUid, String activeFp, String nextFp) {
-        final var dto = mock(CollectorInstanceDTO.class);
-        when(dto.instanceUid()).thenReturn(instanceUid);
-        when(dto.activeCertificateFingerprint()).thenReturn(activeFp);
-        when(dto.nextCertificateFingerprint()).thenReturn(Optional.ofNullable(nextFp));
         return dto;
     }
 }

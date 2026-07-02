@@ -30,6 +30,9 @@ import org.graylog2.jackson.MongoInstantSerializer;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @AutoValue
 @JsonDeserialize(builder = CollectorInstanceDTO.Builder.class)
@@ -135,6 +138,14 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
 
     public static Builder builder() {
         return AutoValue_CollectorInstanceDTO.Builder.create();
+    }
+
+    public Set<String> allCertFingerprints() {
+        return Stream.of(
+                previousCertificateFingerprint(),
+                Optional.of(activeCertificateFingerprint()),
+                nextCertificateFingerprint()
+        ).flatMap(Optional::stream).collect(Collectors.toSet());
     }
 
 

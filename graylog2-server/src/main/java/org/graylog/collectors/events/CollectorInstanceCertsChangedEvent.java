@@ -17,31 +17,20 @@
 package org.graylog.collectors.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.Sets;
 
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Cluster event signalling that the set of certificate fingerprints belonging to collector instances
- * has changed. {@code addedFingerprints} became valid; {@code removedFingerprints} are no longer
- * associated with an active instance.
+ * Cluster event signalling that a collector instance operation touched a set of certificate fingerprints
+ * (enrollment, renewal insertion/activation, re-enrollment, or deletion). Subscribers re-resolve the
+ * affected fingerprints against current state. The event carries the fingerprints only, not their new
+ * binding — the resolver is the source of truth for what each fingerprint now maps to (or that it no
+ * longer maps to anything).
  */
 public record CollectorInstanceCertsChangedEvent(
-        @JsonProperty("added_fingerprints") Set<String> addedFingerprints,
-        @JsonProperty("removed_fingerprints") Set<String> removedFingerprints) {
+        @JsonProperty("fingerprints") Set<String> fingerprints) {
     public CollectorInstanceCertsChangedEvent {
-        Objects.requireNonNull(addedFingerprints, "addedFingerprints must not be null");
-        Objects.requireNonNull(removedFingerprints, "removedFingerprints must not be null");
-    }
-
-    /**
-     * Builds an event from an instance's fingerprints before and after a change: fingerprints only in
-     * {@code after} are added, fingerprints only in {@code before} are removed.
-     */
-    public static CollectorInstanceCertsChangedEvent forDifference(Set<String> before, Set<String> after) {
-        final Set<String> added = Sets.difference(after, before);
-        final Set<String> removed = Sets.difference(before, after);
-        return new CollectorInstanceCertsChangedEvent(added, removed);
+        Objects.requireNonNull(fingerprints, "fingerprints must not be null");
     }
 }

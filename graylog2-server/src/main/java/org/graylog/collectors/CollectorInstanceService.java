@@ -19,6 +19,7 @@ package org.graylog.collectors;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
@@ -81,6 +82,7 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIF
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_FINGERPRINT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_PEM;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CAPABILITIES;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ENROLLMENT_TOKEN_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_FLEET_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_IDENTIFYING_ATTRIBUTES;
@@ -93,7 +95,9 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFIC
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_PEM;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_PEM;
 import static org.graylog2.database.MongoEntity.FIELD_ID;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -222,7 +226,7 @@ public class CollectorInstanceService {
      * The {@code instance_uid} index is unique; concurrent first-time enrollments for the same UID
      * surface as {@link com.mongodb.MongoWriteException} with a duplicate-key error.
      * <p>
-     * Publishes a {@link CollectorInstanceCertsChangedEvent} with the new active fingerprint as added.
+     * Publishes a {@link CollectorInstanceCertsChangedEvent} for the new active fingerprint.
      *
      * @param instanceUid       the agent's self-chosen OpAMP instance UID
      * @param fleetId           the fleet the enrolling token belongs to
@@ -252,7 +256,7 @@ public class CollectorInstanceService {
                 .build();
         final InsertOneResult insertOneResult = collection.insertOne(dto);
 
-        clusterEventBus.post(new CollectorInstanceCertsChangedEvent(Set.of(issuedCert.fingerprint()), Set.of()));
+        clusterEventBus.post(new CollectorInstanceCertsChangedEvent(Set.of(issuedCert.fingerprint())));
 
         return dto.toBuilder()
                 .id(insertedIdAsString(insertOneResult))
@@ -275,10 +279,11 @@ public class CollectorInstanceService {
      * public key) before calling this method. This service method performs no such check — it
      * only enforces the compare-and-swap race guard.
      * <p>
-     * Publishes a {@link CollectorInstanceCertsChangedEvent} with the new active fingerprint as added
-     * and the replaced active and next fingerprints as removed.
+     * Publishes a {@link CollectorInstanceCertsChangedEvent} for every fingerprint this touches — the new
+     * active fingerprint plus the replaced active, next, and previous fingerprints — so subscribers
+     * re-resolve them all (the replaced ones resolve to nothing, since they were cleared).
      *
-     * @param instance          the record state the caller validated (supplies the {@code _id} and the
+     * @param existingInstance  the record state the caller validated (supplies the {@code _id} and the
      *                          active and next fingerprints matched by the compare-and-swap)
      * @param issuedCert        the freshly signed agent certificate
      * @param enrollmentTokenId the id of the enrollment token that authorized this re-enrollment
@@ -287,15 +292,19 @@ public class CollectorInstanceService {
      *                               fingerprints is found — the target was concurrently deleted,
      *                               replaced, or modified
      */
-    public CollectorInstanceDTO reEnroll(CollectorInstanceDTO instance,
+    public CollectorInstanceDTO reEnroll(CollectorInstanceDTO existingInstance,
                                          IssuedCertificate issuedCert,
                                          String enrollmentTokenId) {
 
         final var updates = combine(
                 set(FIELD_LAST_SEEN, Date.from(clock.instant())),
+                unset(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT),
+                unset(FIELD_PREVIOUS_CERTIFICATE_PEM),
+                unset(FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT),
                 unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
                 unset(FIELD_NEXT_CERTIFICATE_PEM),
                 unset(FIELD_NEXT_CERTIFICATE_EXPIRES_AT),
+                unset(FIELD_CERTIFICATES_ROTATED_AT),
                 set(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, issuedCert.fingerprint()),
                 set(FIELD_ACTIVE_CERTIFICATE_PEM, issuedCert.certPem()),
                 set(FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT, Date.from(issuedCert.notAfter())),
@@ -306,21 +315,24 @@ public class CollectorInstanceService {
         final var updated = collection.findOneAndUpdate(
                 Filters.and(
                         MongoUtils.idEq(
-                                Objects.requireNonNull(instance.id(), "Instance ID must not be null for re-enrollment")
+                                Objects.requireNonNull(existingInstance.id(), "Instance ID must not be null for re-enrollment")
                         ),
-                        Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, instance.activeCertificateFingerprint()),
-                        Filters.eq(FIELD_NEXT_CERTIFICATE_FINGERPRINT, instance.nextCertificateFingerprint().orElse(null))
+                        Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, existingInstance.activeCertificateFingerprint()),
+                        Filters.eq(FIELD_NEXT_CERTIFICATE_FINGERPRINT, existingInstance.nextCertificateFingerprint().orElse(null)),
+                        Filters.eq(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT, existingInstance.previousCertificateFingerprint().orElse(null))
                 ),
                 updates,
                 new FindOneAndUpdateOptions().upsert(false).returnDocument(ReturnDocument.AFTER)
         );
 
         if (updated == null) {
-            throw new IllegalStateException(f("Cannot re-enroll. Collector instance with id %s doesn't exist or its active certificate changed concurrently.", instance.id()));
+            throw new IllegalStateException(f("Cannot re-enroll. Collector instance with id %s doesn't exist or its active certificate changed concurrently.", existingInstance.id()));
         }
 
-        clusterEventBus.post(CollectorInstanceCertsChangedEvent.forDifference(
-                certFingerprints(instance), certFingerprints(updated)));
+
+        clusterEventBus.post(new CollectorInstanceCertsChangedEvent(
+                Sets.union(existingInstance.allCertFingerprints(), updated.allCertFingerprints()))
+        );
 
         return updated;
     }
@@ -341,10 +353,12 @@ public class CollectorInstanceService {
     }
 
     /**
-     * Sets the next certificate as active for the given instance.
+     * Promotes the instance's next certificate to active. The superseded active certificate is demoted to
+     * the previous slot (kept resolvable on the ingest path for the grace window measured from
+     * {@code certificates_rotated_at}, which this stamps to now) and the next slot is cleared.
      *
-     * Publishes a {@link CollectorInstanceCertsChangedEvent} with the superseded active fingerprint as
-     * removed.
+     * Publishes a {@link CollectorInstanceCertsChangedEvent} for the rotated fingerprints (promoted,
+     * demoted, and any displaced previous) so subscribers re-resolve them.
      *
      * @param instance the instance DTO
      * @return true if the activation succeeded, false otherwise
@@ -354,17 +368,22 @@ public class CollectorInstanceService {
         final Supplier<IllegalArgumentException> err = () -> new IllegalArgumentException("Instance missing next certificate data");
 
         final var orig = collection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, instance.instanceUid()), combine(
+                set(FIELD_PREVIOUS_CERTIFICATE_PEM, instance.activeCertificatePem()),
+                set(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT, instance.activeCertificateFingerprint()),
+                set(FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT, Date.from(instance.activeCertificateExpiresAt())),
                 set(FIELD_ACTIVE_CERTIFICATE_PEM, instance.nextCertificatePem().orElseThrow(err)),
                 set(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, instance.nextCertificateFingerprint().orElseThrow(err)),
                 set(FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT, Date.from(instance.nextCertificateExpiresAt().orElseThrow(err))),
+                set(FIELD_CERTIFICATES_ROTATED_AT, Date.from(clock.instant())),
                 unset(FIELD_NEXT_CERTIFICATE_PEM),
                 unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
                 unset(FIELD_NEXT_CERTIFICATE_EXPIRES_AT)
         ), new FindOneAndUpdateOptions().returnDocument(ReturnDocument.BEFORE));
 
         if (orig != null) {
-            clusterEventBus.post(CollectorInstanceCertsChangedEvent.forDifference(
-                    certFingerprints(orig), Set.of(instance.nextCertificateFingerprint().orElseThrow(err))));
+            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(
+                    Sets.union(instance.allCertFingerprints(), orig.allCertFingerprints()))
+            );
         }
 
         return orig != null;
@@ -373,8 +392,8 @@ public class CollectorInstanceService {
     /**
      * Inserts the next certificate data for the given instance UID.
      * <p>
-     * Publishes a {@link CollectorInstanceCertsChangedEvent} with the new next fingerprint as added and
-     * any replaced next fingerprint as removed.
+     * Publishes a {@link CollectorInstanceCertsChangedEvent} for the new next fingerprint and the
+     * fingerprints already on the instance, so subscribers re-resolve them.
      *
      * @param instanceUid the instance UID
      * @param fingerprint the next certificate fingerprint
@@ -390,8 +409,9 @@ public class CollectorInstanceService {
         ), new FindOneAndUpdateOptions().returnDocument(ReturnDocument.BEFORE));
 
         if (orig != null) {
-            final var removedFingerprints = orig.nextCertificateFingerprint().map(Set::of).orElse(Set.of());
-            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(Set.of(fingerprint), removedFingerprints));
+            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(
+                    Sets.union(orig.allCertFingerprints(), Set.of(fingerprint)))
+            );
         }
 
         return orig != null;
@@ -410,14 +430,15 @@ public class CollectorInstanceService {
 
     /**
      * Deletes the collector instance with the given instance UID and, if one was deleted, publishes a
-     * {@link CollectorInstanceCertsChangedEvent} with its certificate fingerprints as removed.
+     * {@link CollectorInstanceCertsChangedEvent} for all of its certificate fingerprints so subscribers
+     * re-resolve them (and drop them, since the instance is gone).
      *
      * @return true if an instance was deleted, false if none matched
      */
     public boolean deleteByInstanceUid(String instanceUid) {
         final var deleted = collection.findOneAndDelete(Filters.eq(FIELD_INSTANCE_UID, instanceUid));
         if (deleted != null) {
-            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(Set.of(), certFingerprints(deleted)));
+            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(deleted.allCertFingerprints()));
         }
 
         return deleted != null;
@@ -426,7 +447,7 @@ public class CollectorInstanceService {
     /**
      * Deletes collector instances whose {@code last_seen} is older than {@code expirationThreshold},
      * one at a time via {@link com.mongodb.client.MongoCollection#findOneAndDelete}, and publishes the
-     * deleted certificate fingerprints as removed in {@link CollectorInstanceCertsChangedEvent}s,
+     * deleted certificate fingerprints in {@link CollectorInstanceCertsChangedEvent}s,
      * batched by {@link #REVOCATION_EVENT_BATCH_SIZE}. Deletes at most {@link #MAX_DELETIONS_PER_RUN}
      * instances per call.
      *
@@ -444,6 +465,7 @@ public class CollectorInstanceService {
                     new FindOneAndDeleteOptions().projection(
                             Projections.include(
                                     FIELD_ID,
+                                    FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT,
                                     FIELD_ACTIVE_CERTIFICATE_FINGERPRINT,
                                     FIELD_NEXT_CERTIFICATE_FINGERPRINT))
             );
@@ -459,12 +481,12 @@ public class CollectorInstanceService {
             LOG.warn("Exceptionally high number of expired Collectors. Expiration cleanup might not be able to keep up.");
         }
 
-        final var revokedFingerprints = deleted.stream()
-                .flatMap(DeletedInstance::allFingerprints)
+        final var revokedCertFingerprints = deleted.stream()
+                .flatMap(DeletedInstance::allCertFingerprints)
                 .collect(Collectors.toSet());
 
-        Iterables.partition(revokedFingerprints, REVOCATION_EVENT_BATCH_SIZE).forEach(batch -> {
-            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(Set.of(), Set.copyOf(batch)));
+        Iterables.partition(revokedCertFingerprints, REVOCATION_EVENT_BATCH_SIZE).forEach(batch -> {
+            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(revokedCertFingerprints));
         });
 
         return deleted.size();
@@ -483,12 +505,15 @@ public class CollectorInstanceService {
     }
 
     private record DeletedInstance(@Id @JsonProperty(FIELD_ID) String id,
+                                   @JsonProperty(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT) String previousFingerprint,
                                    @JsonProperty(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT) String activeFingerprint,
                                    @JsonProperty(FIELD_NEXT_CERTIFICATE_FINGERPRINT) String nextFingerprint) {
-        public Stream<String> allFingerprints() {
-            return Stream.concat(
-                    Optional.ofNullable(activeFingerprint()).stream(),
-                    Optional.ofNullable(nextFingerprint()).stream());
+        public Stream<String> allCertFingerprints() {
+            return Stream.of(
+                    Optional.ofNullable(previousFingerprint()),
+                    Optional.of(activeFingerprint()),
+                    Optional.ofNullable(nextFingerprint())
+            ).flatMap(Optional::stream);
         }
     }
 
@@ -590,10 +615,4 @@ public class CollectorInstanceService {
         }
     }
 
-    private Set<String> certFingerprints(CollectorInstanceDTO instance) {
-        return Stream.concat(
-                Stream.of(instance.activeCertificateFingerprint()),
-                instance.nextCertificateFingerprint().stream()
-        ).collect(Collectors.toSet());
-    }
 }

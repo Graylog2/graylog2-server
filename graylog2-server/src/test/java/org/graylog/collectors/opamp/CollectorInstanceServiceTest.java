@@ -663,28 +663,27 @@ class CollectorInstanceServiceTest {
     // ----- CollectorInstanceCertsChangedEvent publishing -----
 
     @Test
-    void enrollPublishesAddedFingerprint() throws Exception {
+    void enrollPublishesActiveFingerprint() throws Exception {
         final var instance = enroll("uid-evt-enroll");
 
-        assertThat(lastEvent().addedFingerprints()).containsExactly(instance.activeCertificateFingerprint());
-        assertThat(lastEvent().removedFingerprints()).isEmpty();
+        assertThat(lastEvent().fingerprints()).containsExactly(instance.activeCertificateFingerprint());
     }
 
     @Test
-    void insertNextCertificatePublishesAddedNextFingerprint() throws Exception {
-        enroll("uid-evt-next");
+    void insertNextCertificatePublishesActiveAndNextFingerprints() throws Exception {
+        final var enrolled = enroll("uid-evt-next");
         capturedEvents.clear();
 
         collectorInstanceService.insertNextCertificate("uid-evt-next", "sha256:next-fp", "pem",
                 Instant.now().plus(Duration.ofDays(30)));
 
-        assertThat(lastEvent().addedFingerprints()).containsExactly("sha256:next-fp");
-        assertThat(lastEvent().removedFingerprints()).isEmpty();
+        assertThat(lastEvent().fingerprints())
+                .containsExactlyInAnyOrder(enrolled.activeCertificateFingerprint(), "sha256:next-fp");
     }
 
     @Test
-    void insertNextCertificatePublishesReplacedNextAsRemoved() throws Exception {
-        enroll("uid-evt-next-replace");
+    void insertNextCertificatePublishesReplacedAndNewNextFingerprints() throws Exception {
+        final var enrolled = enroll("uid-evt-next-replace");
         collectorInstanceService.insertNextCertificate("uid-evt-next-replace", "sha256:first-next", "pem1",
                 Instant.now().plus(Duration.ofDays(10)));
         capturedEvents.clear();
@@ -692,12 +691,12 @@ class CollectorInstanceServiceTest {
         collectorInstanceService.insertNextCertificate("uid-evt-next-replace", "sha256:second-next", "pem2",
                 Instant.now().plus(Duration.ofDays(20)));
 
-        assertThat(lastEvent().addedFingerprints()).containsExactly("sha256:second-next");
-        assertThat(lastEvent().removedFingerprints()).containsExactly("sha256:first-next");
+        assertThat(lastEvent().fingerprints()).containsExactlyInAnyOrder(
+                enrolled.activeCertificateFingerprint(), "sha256:first-next", "sha256:second-next");
     }
 
     @Test
-    void activateNextCertificatePublishesSupersededActiveAsRemoved() throws Exception {
+    void activateNextCertificatePublishesRotatedFingerprints() throws Exception {
         final var enrolled = enroll("uid-evt-activate");
         setNextCertificateFields("uid-evt-activate", "sha256:new-active", "new-pem",
                 Instant.now().plus(Duration.ofDays(30)));
@@ -706,12 +705,31 @@ class CollectorInstanceServiceTest {
 
         collectorInstanceService.activateNextCertificate(withNext);
 
-        assertThat(lastEvent().removedFingerprints()).containsExactly(enrolled.activeCertificateFingerprint());
-        assertThat(lastEvent().addedFingerprints()).isEmpty();
+        // Both rotated fingerprints (demoted old active + promoted next) are touched and re-resolved.
+        assertThat(lastEvent().fingerprints())
+                .containsExactlyInAnyOrder(enrolled.activeCertificateFingerprint(), "sha256:new-active");
     }
 
     @Test
-    void reEnrollPublishesReplacedActiveFingerprint() throws Exception {
+    void activateNextCertificateDemotesActiveToPreviousAndStampsRotationTimestamp() throws Exception {
+        final var enrolled = enroll("uid-rotate-fields");
+        setNextCertificateFields("uid-rotate-fields", "sha256:new-active", "new-pem",
+                Instant.now().plus(Duration.ofDays(30)));
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-rotate-fields").orElseThrow();
+
+        collectorInstanceService.activateNextCertificate(withNext);
+
+        // The old active cert is demoted into the previous slot, and the rotation is timestamped so the
+        // ingest grace window can be measured from it. Temporal fields must be stored as BSON dates.
+        final var doc = findRawDocument("uid-rotate-fields").orElseThrow();
+        assertThat(doc.getString(CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT))
+                .isEqualTo(enrolled.activeCertificateFingerprint());
+        assertFieldIsDate("uid-rotate-fields", CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT);
+        assertFieldIsDate("uid-rotate-fields", CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT);
+    }
+
+    @Test
+    void reEnrollPublishesOldAndNewActiveFingerprints() throws Exception {
         final var original = enroll("uid-evt-reenroll");
         final var newCert = certBuilder.createEndEntityCert("uid-evt-reenroll", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
@@ -719,12 +737,12 @@ class CollectorInstanceServiceTest {
 
         collectorInstanceService.reEnroll(original, newIssued, "token-evt");
 
-        assertThat(lastEvent().addedFingerprints()).containsExactly(newIssued.fingerprint());
-        assertThat(lastEvent().removedFingerprints()).containsExactly(original.activeCertificateFingerprint());
+        assertThat(lastEvent().fingerprints())
+                .containsExactlyInAnyOrder(original.activeCertificateFingerprint(), newIssued.fingerprint());
     }
 
     @Test
-    void deleteByInstanceUidPublishesActiveAndNextAsRemoved() throws Exception {
+    void deleteByInstanceUidPublishesAllCertFingerprints() throws Exception {
         final var instance = enroll("uid-evt-delete");
         setNextCertificateFields("uid-evt-delete", "sha256:pending", "pending-pem",
                 Instant.now().plus(Duration.ofDays(30)));
@@ -732,13 +750,12 @@ class CollectorInstanceServiceTest {
 
         collectorInstanceService.deleteByInstanceUid("uid-evt-delete");
 
-        assertThat(lastEvent().addedFingerprints()).isEmpty();
-        assertThat(lastEvent().removedFingerprints())
+        assertThat(lastEvent().fingerprints())
                 .containsExactlyInAnyOrder(instance.activeCertificateFingerprint(), "sha256:pending");
     }
 
     @Test
-    void deleteExpiredPublishesRemovedFingerprintsForPurgedInstances() throws Exception {
+    void deleteExpiredPublishesFingerprintsForPurgedInstances() throws Exception {
         final Instant reference = Instant.parse("2025-01-01T00:00:00Z");
         final var expiredA = enrollWithFleetAndLastSeen("uid-exp-a", "507f1f77bcf86cd799439012", reference.minus(Duration.ofDays(8)));
         final var expiredB = enrollWithFleetAndLastSeen("uid-exp-b", "507f1f77bcf86cd799439012", reference.minus(Duration.ofDays(8)));
@@ -748,12 +765,9 @@ class CollectorInstanceServiceTest {
         clock.setInstant(reference);
         collectorInstanceService.deleteExpired(Duration.ofDays(7));
 
-        final var removed = new ArrayList<String>();
-        capturedEvents.forEach(event -> {
-            assertThat(event.addedFingerprints()).isEmpty();
-            removed.addAll(event.removedFingerprints());
-        });
-        assertThat(removed).containsExactlyInAnyOrder(
+        final var fingerprints = new ArrayList<String>();
+        capturedEvents.forEach(event -> fingerprints.addAll(event.fingerprints()));
+        assertThat(fingerprints).containsExactlyInAnyOrder(
                 expiredA.activeCertificateFingerprint(), expiredB.activeCertificateFingerprint());
     }
 

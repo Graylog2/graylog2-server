@@ -39,8 +39,9 @@ import java.util.concurrent.Executor;
  * <p>
  * Misses load from {@link CollectorInstanceService#findByActiveOrNextFingerprint(String)} (caching both
  * hits and "no active instance" results); idle entries are evicted; the cache is kept consistent by
- * {@link CollectorInstanceCertsChangedEvent}s and prewarmed with the currently-active instances at startup.
- * Asynchronous work (refreshes, prewarm) runs on the {@link CollectorCertVerificationExecutor}.
+ * {@link CollectorInstanceCertsChangedEvent}s and prewarmed at startup with each unexpired instance's
+ * active certificate fingerprint. Asynchronous work (refreshes, prewarm) runs on the
+ * {@link CollectorCertVerificationExecutor}.
  */
 @Singleton
 public class CollectorFingerprintCache extends AbstractIdleService {
@@ -86,7 +87,7 @@ public class CollectorFingerprintCache extends AbstractIdleService {
 
     /**
      * Resolves a certificate fingerprint to its collector instance UID, loading and caching on a miss.
-     * Returns an empty optional if no active instance has the fingerprint, or if the lookup fails (fail closed).
+     * Returns an empty optional if no active instance has the fingerprint, or if the lookup fails.
      */
     public Optional<String> lookup(String fingerprint) {
         try {
@@ -98,29 +99,36 @@ public class CollectorFingerprintCache extends AbstractIdleService {
     }
 
     /**
-     * Keeps the cache consistent with certificate changes: invalidates removed fingerprints (re-resolved on
-     * next access) and refreshes added ones into the cache.
+     * Keeps the cache consistent with certificate changes by re-resolving each touched fingerprint that is
+     * currently cached. Absent fingerprints are left alone: they hold no stale binding and will resolve
+     * correctly on their next lookup, so proactively loading them would only add pointless work (e.g. for
+     * the many fingerprints of expired instances that no longer exist).
      */
     @Subscribe
     public void handleCertsChanged(CollectorInstanceCertsChangedEvent event) {
-        cache.invalidateAll(event.removedFingerprints());
-        cache.refreshAll(event.addedFingerprints());
+        event.fingerprints().forEach(fp -> {
+            //noinspection OptionalAssignedToNull
+            if (cache.getIfPresent(fp) != null) {
+                cache.refresh(fp);
+            }
+        });
     }
 
     /**
-     * Loads the currently-active instances' fingerprints into the cache at startup (bounded by
-     * {@link #MAX_SIZE}), so a fleet reconnecting after a restart hits a warm cache instead of loading on
-     * each handshake. Best-effort: a failure leaves the cache to populate lazily.
+     * Loads each unexpired instance's active certificate fingerprint into the cache at startup (bounded by
+     * {@link #MAX_SIZE}), so a fleet reconnecting after a restart hits a warm cache instead of cold-loading
+     * on each handshake. Only the active fingerprint is prewarmed: it is what essentially every ingest
+     * connection presents in steady state (the hot set). The {@code next} and {@code previous} fingerprints
+     * are held only by the few instances mid-renewal or within the post-activation grace window, so they
+     * cold-load off the event loop on first use without risking a stampede. Best-effort: a failure leaves
+     * the cache to populate lazily.
      */
     private void preWarm() {
         try {
             final var expirationThreshold = configService.getOrDefault().collectorExpirationThreshold();
             try (var stream = instanceService.streamAllUnexpired(expirationThreshold).limit(MAX_SIZE)) {
-                stream.forEach(instance -> {
-                    cache.put(instance.activeCertificateFingerprint(), Optional.of(instance.instanceUid()));
-                    instance.nextCertificateFingerprint().ifPresent(fp ->
-                            cache.put(fp, Optional.of(instance.instanceUid())));
-                });
+                stream.forEach(instance ->
+                        cache.put(instance.activeCertificateFingerprint(), Optional.of(instance.instanceUid())));
             }
         } catch (Exception e) {
             LOG.warn("Failed pre-warming collector fingerprint cache.", e);
