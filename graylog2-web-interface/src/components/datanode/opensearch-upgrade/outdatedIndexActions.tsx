@@ -43,16 +43,21 @@ type ActionDefinition = {
   telemetryEventType: TelemetryEventType;
 };
 
-const archiveAndDeleteIndex = (indexName: string) =>
+// Archiving lives in the enterprise Archive plugin. Its `@graylog/server-api` stub only exists after a local
+// enterprise-stub sync; CI generates core stubs only, so importing it there breaks the build. Call the
+// endpoint directly to stay CI-safe.
+const archiveAndDeleteIndex = (index: OutdatedIndex) =>
   fetch(
     'POST',
     qualifyUrl(
-      `/plugins/org.graylog.plugins.archive/cluster/archives/${encodeURIComponent(indexName)}?index_action=DELETE`,
+      `/plugins/org.graylog.plugins.archive/cluster/archives/${encodeURIComponent(index.index_name)}?index_action=DELETE`,
     ),
   );
 
 const deleteOutdatedIndex = (index: OutdatedIndex) =>
   index.managed_index ? IndexerIndices.remove(index.index_name) : IndexerIndices.deleteOutdated(index.index_name);
+
+const reindexSystemIndex = (index: OutdatedIndex) => IndexerIndices.reindex(index.index_name);
 
 export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
   delete: {
@@ -79,7 +84,7 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
         This will create an archive for <strong>{index.index_name}</strong> and delete the index afterwards.
       </p>
     ),
-    run: (index) => archiveAndDeleteIndex(index.index_name),
+    run: archiveAndDeleteIndex,
     successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
   },
@@ -93,7 +98,7 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
         This will reindex <strong>{index.index_name}</strong> so it can be used with OpenSearch 3.
       </p>
     ),
-    run: (index) => IndexerIndices.reindex(index.index_name),
+    run: reindexSystemIndex,
     successMessage: (index) => `Index "${index.index_name}" was reindexed.`,
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.SYSTEM_INDEX_REINDEX_CONFIRMED,
   },

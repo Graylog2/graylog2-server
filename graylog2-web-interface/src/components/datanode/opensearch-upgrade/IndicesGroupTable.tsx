@@ -18,14 +18,23 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, ButtonToolbar, Label, Table } from 'components/bootstrap';
+import { ProgressBar } from 'components/common';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
 
+import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions';
 import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
 import type { ConfirmedAction } from './outdatedIndexActions';
 import type { IndicesGroup } from './outdatedIndexGroups';
 
 const ActionsToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
+`;
+
+const ArchiveProgressBar = styled(ProgressBar)`
+  display: inline-flex;
+  width: 120px;
+  margin-bottom: 0;
+  vertical-align: middle;
 `;
 
 const ScrollableTableWrapper = styled.div(
@@ -86,15 +95,36 @@ const OutdatedIndexActions = ({
   index,
   onAction,
   canArchive,
+  pendingStatus,
 }: {
   index: OutdatedIndex;
   onAction: (action: ConfirmedAction) => void;
   canArchive: boolean;
+  pendingStatus: PendingIndexStatus | undefined;
 }) => {
+  if (pendingStatus?.state === 'archiving') {
+    // Avoid flashing an empty 0% bar for indices that archive/delete almost instantly — only show the bar
+    // once there is real progress to render.
+    return pendingStatus.percent > 0 ? (
+      <ArchiveProgressBar
+        bars={[
+          { value: pendingStatus.percent, label: `${pendingStatus.percent}%`, bsStyle: 'warning', animated: true, striped: true },
+        ]}
+      />
+    ) : (
+      <Label bsStyle="warning">Archiving...</Label>
+    );
+  }
+
   const actions = getAvailableActions(index, canArchive);
 
   return (
     <ActionsToolbar>
+      {pendingStatus?.state === 'failed' && (
+        <Label bsStyle="danger" title={pendingStatus.message}>
+          Archive failed
+        </Label>
+      )}
       {actions.map((action) => {
         const actionDefinition = ACTION_DEFINITIONS[action];
 
@@ -116,10 +146,12 @@ const IndicesGroupTable = ({
   group,
   onAction,
   canArchive,
+  pendingIndexStatuses,
 }: {
   group: IndicesGroup;
   onAction: (action: ConfirmedAction) => void;
   canArchive: boolean;
+  pendingIndexStatuses: Map<string, PendingIndexStatus>;
 }) => {
   if (group.indices.length === 0) {
     return <Alert bsStyle="info">No outdated {group.shortLabel} indices.</Alert>;
@@ -151,7 +183,12 @@ const IndicesGroupTable = ({
               </td>
               <td>{index.version || 'Unknown'}</td>
               <td>
-                <OutdatedIndexActions index={index} onAction={onAction} canArchive={canArchive} />
+                <OutdatedIndexActions
+                  index={index}
+                  onAction={onAction}
+                  canArchive={canArchive}
+                  pendingStatus={pendingIndexStatuses.get(index.index_name)}
+                />
               </td>
             </tr>
           ))}

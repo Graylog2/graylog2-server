@@ -26,9 +26,18 @@ import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
 
 import IndicesGroupTable from './IndicesGroupTable';
+import usePendingOutdatedIndexActions from './hooks/usePendingOutdatedIndexActions';
 import { ACTION_DEFINITIONS } from './outdatedIndexActions';
 import type { ConfirmedAction } from './outdatedIndexActions';
 import { getFirstGroupWithIndices, getSelectedGroup, groupOutdatedIndices } from './outdatedIndexGroups';
+
+type ArchiveAndDeleteResponse = {
+  system_job?: {
+    id?: string;
+  };
+};
+
+const getArchiveSystemJobId = (actionResponse: unknown) => (actionResponse as ArchiveAndDeleteResponse)?.system_job?.id;
 
 const Heading = styled.h4(
   ({ theme }) => css`
@@ -69,6 +78,12 @@ const OutdatedIndicesTable = () => {
   const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices();
   const canArchive = useCanArchive();
   const sendTelemetry = useSendTelemetry();
+  const { pendingIndexStatuses, addArchiveDeleteAction } = usePendingOutdatedIndexActions({
+    outdatedIndices,
+    isLoading,
+    isError,
+    refetch,
+  });
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
@@ -99,7 +114,15 @@ const OutdatedIndicesTable = () => {
     setIsSubmitting(true);
 
     try {
-      await actionDefinition.run(confirmedAction.index);
+      const actionResponse = await actionDefinition.run(confirmedAction.index);
+
+      if (confirmedAction.action === 'archive-delete') {
+        addArchiveDeleteAction({
+          indexName: confirmedAction.index.index_name,
+          systemJobId: getArchiveSystemJobId(actionResponse),
+        });
+      }
+
       UserNotification.success(actionDefinition.successMessage(confirmedAction.index));
       const { data: updatedOutdatedIndices = [] } = await refetch();
       const updatedGroups = groupOutdatedIndices(updatedOutdatedIndices);
@@ -139,7 +162,12 @@ const OutdatedIndicesTable = () => {
         color="warning"
         autoContrast
       />
-      <IndicesGroupTable group={selectedGroup} onAction={setConfirmedAction} canArchive={canArchive} />
+      <IndicesGroupTable
+        group={selectedGroup}
+        onAction={setConfirmedAction}
+        canArchive={canArchive}
+        pendingIndexStatuses={pendingIndexStatuses}
+      />
 
       {confirmedAction && (
         <ActionConfirmDialog
