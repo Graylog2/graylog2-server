@@ -30,9 +30,7 @@ const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) =>
   const jobIds = useViewsSelector(selectJobIds);
   const { autoRefresh } = useSearchURLQueryParams();
 
-  const refreshConfig = autoRefresh
-    ? { interval: durationToMS(autoRefresh), enabled: true }
-    : null;
+  const refreshConfig = autoRefresh ? { interval: durationToMS(autoRefresh), enabled: true } : null;
 
   const onRefresh = useCallback(() => {
     if (!jobIds) {
