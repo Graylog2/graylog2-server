@@ -216,10 +216,7 @@ describe('CollectorsSettings', () => {
     });
 
     it('shows the ingest endpoint read-only and hides editing/creation controls', async () => {
-      const user = userEvent.setup();
-
       render(<CollectorsSettings />);
-      await user.click(screen.getByRole('button', { name: /advanced settings/i }));
 
       // Endpoint fields are present but read-only (disabled), showing the server-provisioned values.
       const hostname = await screen.findByLabelText('External hostname');
