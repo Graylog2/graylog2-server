@@ -73,9 +73,10 @@ const ResourceLink = styled.a`
   flex: 1;
   text-decoration: none;
   color: inherit;
+  outline: none;
 
   &:hover,
-  &:focus-visible {
+  &:focus {
     text-decoration: none;
     color: inherit;
   }
