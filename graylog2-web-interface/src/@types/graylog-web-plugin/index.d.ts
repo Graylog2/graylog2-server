@@ -202,6 +202,9 @@ type IndexRetentionConfig = {
 
 type StreamsOverviewTableElement = {
   attributeName: string;
+  // Assigns the element's columns to a quick-select view group ('routing' or 'performance').
+  // All attribute ids from `attributes` are included in that group's column set.
+  group?: 'routing' | 'performance';
   attributes: Array<Attribute>;
   columnRenderers: ColumnRenderersByAttribute<Stream>;
   // Optional map of column id → backend metric fields. Plugins use this to plug their
