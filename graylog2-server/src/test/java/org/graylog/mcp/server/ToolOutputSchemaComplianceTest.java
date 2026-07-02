@@ -1,0 +1,118 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.mcp.server;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
+import io.modelcontextprotocol.json.schema.jackson2.JacksonJsonSchemaValidatorSupplier;
+import org.graylog.mcp.tools.ListFieldsTool;
+import org.graylog.plugins.formatting.units.model.UnitId;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog2.indexer.fieldtypes.FieldTypes;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Validates that the {@code outputSchema} generated for MCP tool output types accepts the actual
+ * serialized tool output. Schema-validating MCP clients (e.g. the official MCP SDKs) reject every
+ * response of a tool whose {@code structuredContent} does not conform to its advertised schema,
+ * so any mismatch makes the tool unusable for those clients.
+ *
+ * @see <a href="https://github.com/Graylog2/graylog2-server/issues/23980">#23980</a>
+ * @see <a href="https://github.com/Graylog2/graylog2-server/issues/26402">#26402</a>
+ */
+class ToolOutputSchemaComplianceTest {
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final SchemaGeneratorProvider schemaGeneratorProvider = new SchemaGeneratorProvider(Set.of());
+    // the same validator implementation that MCP SDK clients run against tool responses
+    private final JsonSchemaValidator schemaValidator = new JacksonJsonSchemaValidatorSupplier().get();
+
+    @Test
+    void tabularResponseValidatesAgainstGeneratedSchema() {
+        // shape of an actual search_messages/aggregate_messages result: string and numeric cells,
+        // missing values as null, and a Joda DateTime based timerange in the metadata
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final TabularResponse response = new TabularResponse(
+                List.of(ResponseSchemaEntry.groupBy("source"),
+                        ResponseSchemaEntry.metric("count", null)),
+                List.of(Arrays.asList("example.org", 42, 13.37, null)),
+                new Metadata(AbsoluteRange.create(now.minusHours(1), now)));
+
+        assertConforms(response, new TypeReference<TabularResponse>() {});
+    }
+
+    @Test
+    void listFieldsResultValidatesAgainstGeneratedSchema() {
+        // fields without a unit serialize "unit": null
+        final ListFieldsTool.Result result = new ListFieldsTool.Result(Set.of(
+                MappedFieldTypeDTO.create("timestamp", FieldTypes.Type.createType("date", Set.of("enumerable"))),
+                new MappedFieldTypeDTO("took_ms", FieldTypes.Type.createType("long", Set.of("numeric")),
+                        new UnitId("time", "ms"))));
+
+        assertConforms(result, new TypeReference<ListFieldsTool.Result>() {});
+    }
+
+    @Test
+    void dateTimeIsDescribedAsIsoDateTimeString() {
+        final JsonNode schema = generateSchema(DateTime.class);
+        assertThat(schema.path("type").asText()).isEqualTo("string");
+        assertThat(schema.path("format").asText()).isEqualTo("date-time");
+    }
+
+    @Test
+    void plainObjectRemainsUnconstrained() {
+        // java.lang.Object (e.g. the cells of TabularResponse#datarows) holds any value, so its
+        // schema must not constrain the type
+        assertThat(generateSchema(Object.class).has("type")).isFalse();
+    }
+
+    private JsonNode generateSchema(Type type) {
+        return schemaGeneratorProvider.get().generateSchema(type);
+    }
+
+    /**
+     * Builds the {@code outputSchema} and {@code structuredContent} for the given tool result the same
+     * way {@link Tool} and {@link McpService} do, and validates one against the other.
+     */
+    private void assertConforms(Object result, TypeReference<?> outputType) {
+        final Map<String, Object> outputSchema = objectMapper.convertValue(
+                generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
+        final Map<String, Object> structuredContent = objectMapper.convertValue(
+                result, new TypeReference<Map<String, Object>>() {});
+
+        final JsonSchemaValidator.ValidationResponse response = schemaValidator.validate(outputSchema, structuredContent);
+        assertThat(response.valid())
+                .as("structuredContent should conform to the generated output schema: %s", response.errorMessage())
+                .isTrue();
+    }
+}
