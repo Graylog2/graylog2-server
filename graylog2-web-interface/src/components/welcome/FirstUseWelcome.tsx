@@ -31,9 +31,11 @@ import useDismissOnboarding from './hooks/useDismissOnboarding';
 import DataSourceIcons from './DataSourceIcons';
 
 import PageHeader from '../common/PageHeader';
-const StyledSectionComponent = styled(SectionComponent)`
-  flex: 1;
-`;
+const StyledSectionComponent = styled(SectionComponent)<{ $grow: number }>(
+  ({ $grow }) => css`
+    flex: ${$grow};
+  `,
+);
 
 const Description = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <p className="description">{children}</p>
@@ -143,7 +145,7 @@ const FirstUseWelcome = () => {
         </span>
       </PageHeader>
       <ActionsSection>
-        <StyledSectionComponent title="Endpoint Logging">
+        <StyledSectionComponent $grow={65} title="Endpoint Logging">
           <Description>
             Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
             configuration automatically.
@@ -155,7 +157,7 @@ const FirstUseWelcome = () => {
             </LinkContainer>
           </BoxActions>
         </StyledSectionComponent>
-        <StyledSectionComponent title="Other Data Sources">
+        <StyledSectionComponent $grow={35} title="Other Data Sources">
           <Description>
             Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
           </Description>
