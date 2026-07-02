@@ -51,6 +51,9 @@ const archiveAndDeleteIndex = (indexName: string) =>
     ),
   );
 
+const deleteOutdatedIndex = (index: OutdatedIndex) =>
+  index.managed_index ? IndexerIndices.remove(index.index_name) : IndexerIndices.deleteOutdated(index.index_name);
+
 export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
   delete: {
     buttonLabel: 'Delete',
@@ -62,7 +65,7 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
         This will permanently delete <strong>{index.index_name}</strong>.
       </p>
     ),
-    run: (index) => IndexerIndices.remove(index.index_name),
+    run: deleteOutdatedIndex,
     successMessage: (index) => `Index "${index.index_name}" was deleted.`,
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_DELETE_CONFIRMED,
   },

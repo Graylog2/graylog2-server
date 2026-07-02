@@ -33,7 +33,12 @@ import OutdatedIndicesTable from './OutdatedIndicesTable';
 jest.mock('components/indices/hooks/useOutdatedIndices');
 jest.mock('components/indices/hooks/useCanArchive');
 jest.mock('logic/telemetry/useSendTelemetry');
-jest.mock('@graylog/server-api', () => ({ IndexerIndices: { remove: jest.fn(() => Promise.resolve()) } }));
+jest.mock('@graylog/server-api', () => ({
+  IndexerIndices: {
+    deleteOutdated: jest.fn(() => Promise.resolve()),
+    remove: jest.fn(() => Promise.resolve()),
+  },
+}));
 jest.mock('util/UserNotification', () => ({ success: jest.fn(), error: jest.fn() }));
 
 const makeIndex = (overrides: Partial<OutdatedIndex>): OutdatedIndex => ({
@@ -126,7 +131,7 @@ describe('OutdatedIndicesTable', () => {
     expect(screen.queryByRole('button', { name: /archive/i })).not.toBeInTheDocument();
   });
 
-  it('runs the delete action, sends telemetry and notifies on confirm', async () => {
+  it('uses the outdated delete endpoint for foreign indices', async () => {
     const sendTelemetry = jest.fn();
     asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
     mockOutdatedIndices({ data: [foreignIndex] });
@@ -139,11 +144,23 @@ describe('OutdatedIndicesTable', () => {
 
     await userEvent.click(within(dialog).getByRole('button', { name: /^delete$/i }));
 
-    await waitFor(() => expect(IndexerIndices.remove).toHaveBeenCalledWith('legacy-index'));
+    await waitFor(() => expect(IndexerIndices.deleteOutdated).toHaveBeenCalledWith('legacy-index'));
     expect(sendTelemetry).toHaveBeenCalledWith(
       TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_DELETE_CONFIRMED,
       expect.objectContaining({ app_section: 'opensearch-upgrade' }),
     );
     expect(UserNotification.success).toHaveBeenCalled();
+  });
+
+  it('uses the generic delete endpoint for Graylog-managed indices', async () => {
+    mockOutdatedIndices({ data: [graylogIndex] });
+    render(<OutdatedIndicesTable />);
+
+    await userEvent.click(screen.getByRole('button', { name: /^delete$/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: /^delete$/i }));
+
+    await waitFor(() => expect(IndexerIndices.remove).toHaveBeenCalledWith('graylog_0'));
   });
 });
