@@ -59,6 +59,8 @@ export interface EventDefinitionType {
   }>;
   useCondition: () => boolean;
   hideFieldsStep?: boolean;
+  // Hides the type from the create wizard's dropdown while still listing it as a filter option.
+  hideFromCreation?: boolean;
 }
 export type TacticsTechniquesEditorPlugin = {
   component: React.ComponentType<{
