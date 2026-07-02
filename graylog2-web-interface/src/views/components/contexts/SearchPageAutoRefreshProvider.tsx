@@ -22,10 +22,24 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import {useSearchURLQueryParams} from 'views/logic/NormalizeSearchURLQueryParams';
+import {durationToMS} from 'util/DateTime';
 
 const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   const dispatch = useViewsDispatch();
   const jobIds = useViewsSelector(selectJobIds);
+  const { autoRefresh } = useSearchURLQueryParams();
+
+  const refreshConfig = () => {
+    if(autoRefresh) {
+      return {
+        interval: durationToMS(autoRefresh),
+        enabled: true,
+      }
+    }
+
+    return null;
+  }
 
   const onRefresh = useCallback(() => {
     if (!jobIds) {
@@ -33,7 +47,7 @@ const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) =>
     }
   }, [dispatch, jobIds]);
 
-  return <AutoRefreshProvider onRefresh={onRefresh}>{children}</AutoRefreshProvider>;
+  return <AutoRefreshProvider defaultRefreshConfig={refreshConfig()} onRefresh={onRefresh}>{children}</AutoRefreshProvider>;
 };
 
 export default SearchPageAutoRefreshProvider;

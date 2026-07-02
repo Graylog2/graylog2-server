@@ -41,10 +41,9 @@ const useDisableOnFormChange = () => {
 
 type Props = {
   disable?: boolean;
-  autoRefresh?: string;
 };
 
-const ViewsRefreshControls = ({ disable = false, autoRefresh = null }: Props) => {
+const ViewsRefreshControls = ({ disable = false }: Props) => {
   const { dirty, submitForm } = useFormikContext();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -93,7 +92,6 @@ const ViewsRefreshControls = ({ disable = false, autoRefresh = null }: Props) =>
     <RefreshControls
       disable={disable}
       intervalOptions={intervalOptions}
-      autoRefresh={autoRefresh}
       isLoadingMinimumInterval={isLoadingMinimumInterval}
       minimumRefreshInterval={minimumRefreshInterval}
       defaultInterval={defaultInterval}
