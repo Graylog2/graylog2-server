@@ -63,10 +63,7 @@ const useInputDetails = (
   isFetching: boolean;
   isError: boolean;
 } => {
-  const regularIds = useMemo(
-    () => typedInputs.filter((t) => t.type === 'input').map((t) => t.id),
-    [typedInputs],
-  );
+  const regularIds = useMemo(() => typedInputs.filter((t) => t.type === 'input').map((t) => t.id), [typedInputs]);
   const titleEntities = useMemo(() => regularIds.map((id) => ({ id, type: 'inputs' })), [regularIds]);
   const {
     titlesById,

@@ -31,11 +31,7 @@ const ExpandedAssociatedInputsSection = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const typedInputs = metrics?.associated_inputs;
 
-  const {
-    resolvedById,
-    isFetching: areDetailsFetching,
-    isError: isDetailsError,
-  } = useInputDetails(typedInputs ?? []);
+  const { resolvedById, isFetching: areDetailsFetching, isError: isDetailsError } = useInputDetails(typedInputs ?? []);
   const buildLink = useInputTitleLinkBuilder();
 
   if (isInitialLoading && !typedInputs) {
@@ -54,8 +50,7 @@ const ExpandedAssociatedInputsSection = ({ stream }: Props) => {
     <ListGroup componentClass="ul">
       {typedInputs.map(({ id: inputId }) => {
         const resolved = resolvedById[inputId];
-        const label =
-          resolved?.title ?? (areDetailsFetching || isDetailsError ? inputId : `${inputId} (deleted)`);
+        const label = resolved?.title ?? (areDetailsFetching || isDetailsError ? inputId : `${inputId} (deleted)`);
         const path = resolved ? buildLink(resolved) : null;
 
         return <ListGroupItem key={inputId}>{path ? <Link to={path}>{label}</Link> : label}</ListGroupItem>;
