@@ -16,10 +16,11 @@
  */
 
 import type { IconName } from 'components/common/Icon';
+import type BrandIcon from 'components/common/BrandIcon';
 
 export type PlatformId = 'linux' | 'windows' | 'macos' | 'kubernetes' | 'docker';
 
-type BrandIconRef = { type: 'brand'; name: 'apple' | 'linux' | 'windows' };
+type BrandIconRef = { type: 'brand'; name: React.ComponentProps<typeof BrandIcon>['name'] };
 type MaterialIconRef = { type: 'material'; name: IconName };
 export type PlatformIcon = BrandIconRef | MaterialIconRef;
 
@@ -55,14 +56,14 @@ const PLATFORMS: Platform[] = [
   {
     id: 'kubernetes',
     label: 'Kubernetes',
-    icon: { type: 'material', name: 'cloud' },
+    icon: { type: 'brand', name: 'kubernetes' },
     commandTemplate: (host, port, token) =>
       `helm install graylog-collector oci://${host}:${port}/collectors/charts/collector --set enrollmentToken=${token}`,
   },
   {
     id: 'docker',
     label: 'Docker',
-    icon: { type: 'material', name: 'deployed_code' },
+    icon: { type: 'brand', name: 'docker' },
     commandTemplate: (host, port, token) =>
       `docker run -d -e ENROLLMENT_TOKEN=${token} ${host}:${port}/collectors/collector:latest`,
   },
