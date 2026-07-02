@@ -71,6 +71,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.threeten.extra.MutableClock;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -112,8 +113,9 @@ import static org.mockito.Mockito.when;
  * It verifies the security fix for the ingest mTLS path: a certificate is trusted only when it binds
  * to an active, non-deleted collector instance — not merely because it was signed by the CA. It also
  * covers the renewal model (the {@code next} certificate is accepted before activation; the superseded
- * certificate loses access after activation) and that a foreign-CA certificate is rejected at the
- * crypto gate. A trusted connection propagates the resolved instance UID to the journal record.
+ * certificate stays accepted for a grace window after activation, then loses access) and that a
+ * foreign-CA certificate is rejected at the crypto gate. A trusted connection propagates the resolved
+ * instance UID to the journal record.
  * <p>
  * The test client uses an {@link X509ExtendedTrustManager} that accepts any server certificate, which
  * also bypasses the JDK's hostname-verification wrapper — so the real OTLP server certificate is used
@@ -137,6 +139,7 @@ class CollectorIngestMtlsIT {
     private PrivateKey agentKey;
     private X509Certificate agentCert;
 
+    private MutableClock clock;
     private CollectorInstanceService instanceService;
     private CollectorFingerprintCache fingerprintCache;
     private CollectorTLSUtils tlsUtils;
@@ -149,6 +152,9 @@ class CollectorIngestMtlsIT {
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections, ClusterConfigService clusterConfigService) throws Exception {
+        // The instance service and the fingerprint cache share a MutableClock so the renewal grace window
+        // can be advanced deterministically; certificate crypto validity uses the real clock.
+        clock = MutableClock.epochUTC();
         certBuilder = new CertificateBuilder(encryptedValueService, "Test", Clock.systemUTC());
         final var certService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), Clock.systemUTC());
 
@@ -174,14 +180,14 @@ class CollectorIngestMtlsIT {
         agentKey = agent.key();
         agentCert = agent.cert();
 
-        instanceService = new CollectorInstanceService(mongoCollections, new ClusterEventBus(), Clock.systemUTC());
+        instanceService = new CollectorInstanceService(mongoCollections, new ClusterEventBus(), clock);
         instanceService.enroll(AGENT_INSTANCE_UID, "000000000000000000000000",
                 new IssuedCertificate(agent.entry().fingerprint(), agent.entry().certificate(),
                         agent.entry().notAfter(), signingCertEntry.id()),
                 "000000000000000000000000");
 
         fingerprintCache = new CollectorFingerprintCache(collectorsConfigService, instanceService,
-                new EventBus(), MoreExecutors.directExecutor());
+                new EventBus(), clock, MoreExecutors.directExecutor());
 
         caCache = new CollectorCaCache(caService, certService, encryptedValueService, new EventBus(), Clock.systemUTC());
         caCache.startAsync().awaitRunning();
@@ -280,21 +286,42 @@ class CollectorIngestMtlsIT {
     }
 
     @Test
-    void rejectsSupersededCertificateAfterRenewalActivation() throws Exception {
-        // Insert a next certificate and activate it: the previously active fingerprint is dropped. The
-        // old certificate is presented for the first time only after activation, so the binding lookup
-        // resolves from MongoDB and no longer finds it — renewal rotates ingest access off the old cert.
-        final AgentCert renewed = mintClientCert(AGENT_INSTANCE_UID, signingCertEntry);
-        instanceService.insertNextCertificate(AGENT_INSTANCE_UID, renewed.entry().fingerprint(),
-                renewed.entry().certificate(), renewed.entry().notAfter());
-        final var instance = instanceService.findByInstanceUid(AGENT_INSTANCE_UID).orElseThrow();
-        assertThat(instanceService.activateNextCertificate(instance)).isTrue();
+    void acceptsSupersededCertificateWithinRenewalGraceWindow() throws Exception {
+        // After activation the old certificate is demoted to the previous slot and stays accepted for the
+        // grace window, so the collector's in-flight ingest connection isn't cut before its exporter has
+        // switched to the new certificate.
+        activateRenewedCertificate();
+
+        final int port = startServer();
+        final HttpClient client = createMtlsClient(agentKey, agentCert); // the now-superseded cert
+
+        final HttpResponse<byte[]> response = postLogs(client, port);
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(capturedJournalRecord().getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
+    }
+
+    @Test
+    void rejectsSupersededCertificateAfterGraceWindowElapses() throws Exception {
+        // Once the grace window has elapsed, the superseded certificate no longer binds and is rejected —
+        // renewal rotates ingest access off the old cert.
+        activateRenewedCertificate();
+        clock.add(Duration.ofHours(1)); // well past the grace window
 
         final int port = startServer();
         final HttpClient client = createMtlsClient(agentKey, agentCert);
 
         assertThatThrownBy(() -> postLogs(client, port))
                 .hasCauseInstanceOf(SSLException.class);
+    }
+
+    /** Stages a fresh next certificate for the enrolled agent and activates it, demoting the old active cert. */
+    private void activateRenewedCertificate() throws Exception {
+        final AgentCert renewed = mintClientCert(AGENT_INSTANCE_UID, signingCertEntry);
+        instanceService.insertNextCertificate(AGENT_INSTANCE_UID, renewed.entry().fingerprint(),
+                renewed.entry().certificate(), renewed.entry().notAfter());
+        final var instance = instanceService.findByInstanceUid(AGENT_INSTANCE_UID).orElseThrow();
+        assertThat(instanceService.activateNextCertificate(instance)).isTrue();
     }
 
     @Test

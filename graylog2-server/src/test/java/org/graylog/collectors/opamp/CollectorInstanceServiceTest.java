@@ -19,20 +19,20 @@ package org.graylog.collectors.opamp;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.client.model.Filters;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
-import org.graylog2.events.ClusterEventBus;
 import org.bson.Document;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -123,6 +123,78 @@ class CollectorInstanceServiceTest {
         final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByInstanceUid("non-existent-uid");
 
         assertThat(found).isEmpty();
+    }
+
+    @Test
+    void resolveCertBindingBindsActiveFingerprint() throws Exception {
+        final var enrolled = enroll("uid-active");
+
+        assertThat(collectorInstanceService.resolveCertBinding(enrolled.activeCertificateFingerprint()))
+                .hasValueSatisfying(binding -> {
+                    assertThat(binding.instanceUid()).isEqualTo("uid-active");
+                    assertThat(binding.validUntil()).isEmpty();
+                });
+    }
+
+    @Test
+    void resolveCertBindingBindsNextFingerprint() throws Exception {
+        enroll("uid-next");
+        setNextCertificateFields("uid-next", "sha256:next", "next-pem", clock.instant().plus(Duration.ofDays(30)));
+
+        assertThat(collectorInstanceService.resolveCertBinding("sha256:next"))
+                .hasValueSatisfying(binding -> {
+                    assertThat(binding.instanceUid()).isEqualTo("uid-next");
+                    assertThat(binding.validUntil()).isEmpty();
+                });
+    }
+
+    @Test
+    void resolveCertBindingBindsPreviousFingerprintWithinGraceWindow() throws Exception {
+        final var previousFp = enrollAndRotate("uid-prev");
+
+        assertThat(collectorInstanceService.resolveCertBinding(previousFp))
+                .hasValueSatisfying(binding -> {
+                    assertThat(binding.instanceUid()).isEqualTo("uid-prev");
+                    assertThat(binding.validUntil()).isPresent();
+                });
+    }
+
+    @Test
+    void resolveCertBindingDoesNotBindPreviousFingerprintPastGraceWindow() throws Exception {
+        final var previousFp = enrollAndRotate("uid-prev-expired");
+        clock.add(Duration.ofHours(1)); // past the grace window
+
+        assertThat(collectorInstanceService.resolveCertBinding(previousFp)).isEmpty();
+    }
+
+    @Test
+    void resolveCertBindingDoesNotBindPreviousFingerprintWithoutRotationTimestamp() throws Exception {
+        final var previousFp = enrollAndRotate("uid-prev-no-ts");
+        // Simulate a missing rotation timestamp (shouldn't happen, but must fail closed rather than
+        // granting an unbounded grace).
+        mongoCollections.nonEntityCollection(CollectorInstanceService.COLLECTION_NAME, Document.class)
+                .updateOne(Filters.eq(CollectorInstanceDTO.FIELD_INSTANCE_UID, "uid-prev-no-ts"),
+                        new Document("$unset", new Document(CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT, "")));
+
+        assertThat(collectorInstanceService.resolveCertBinding(previousFp)).isEmpty();
+    }
+
+    @Test
+    void resolveCertBindingReturnsUnboundForUnknownFingerprint() {
+        assertThat(collectorInstanceService.resolveCertBinding("sha256:unknown")).isEmpty();
+    }
+
+    /**
+     * Enrolls an instance, stages a next certificate, and activates it — leaving the original active
+     * certificate in the previous slot with a fresh rotation timestamp. Returns that (now previous) fingerprint.
+     */
+    private String enrollAndRotate(String instanceUid) throws Exception {
+        final var previousFp = enroll(instanceUid).activeCertificateFingerprint();
+        setNextCertificateFields(instanceUid, "sha256:new-active-" + instanceUid, "new-pem",
+                clock.instant().plus(Duration.ofDays(30)));
+        collectorInstanceService.activateNextCertificate(
+                collectorInstanceService.findByInstanceUid(instanceUid).orElseThrow());
+        return previousFp;
     }
 
     @Test
