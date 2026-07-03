@@ -75,6 +75,20 @@ const nodeTrace = () => {
 
 const edgeTraces = () => chartData().slice(0, -1);
 
+// Edges render as a casing trace (border) followed by a fill trace, so the non-node traces are
+// the casings (first half) then the fills (second half).
+const casingTraces = () => {
+  const edges = edgeTraces();
+
+  return edges.slice(0, edges.length / 2);
+};
+
+const fillTraces = () => {
+  const edges = edgeTraces();
+
+  return edges.slice(edges.length / 2);
+};
+
 describe('NetworkGraphVisualization', () => {
   useViewsPlugin();
 
@@ -91,12 +105,12 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
 
-    const edges = edgeTraces();
+    const fills = fillTraces();
     const node = nodeTrace();
 
     // 3 edges, each its own two-point line trace.
-    expect(edges).toHaveLength(3);
-    edges.forEach((edge) => {
+    expect(fills).toHaveLength(3);
+    fills.forEach((edge) => {
       expect(edge.type).toBe('scatter');
       expect(edge.mode).toBe('lines');
       expect(edge.x).toHaveLength(2);
@@ -124,7 +138,7 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
 
-    const widths = edgeTraces().map((edge) => edge.line.width);
+    const widths = fillTraces().map((edge) => edge.line.width);
 
     // twoRowPivots has edges with distinct counts, so widths must vary and stay within [1, 8].
     expect(Math.min(...widths)).toBe(1);
@@ -135,7 +149,7 @@ describe('NetworkGraphVisualization', () => {
     });
   });
 
-  it('renders edges in a translucent color', () => {
+  it('renders edge fills in a translucent color', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
       .series([Series.forFunction('count()')])
@@ -145,9 +159,34 @@ describe('NetworkGraphVisualization', () => {
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
 
     // chroma(...).alpha(0.3).css() yields an `rgb(r g b / 0.3)` string — i.e. a translucent edge.
-    edgeTraces().forEach((edge) => {
+    fillTraces().forEach((edge) => {
       expect(edge.line.color).toContain('/ 0.3)');
     });
+  });
+
+  it('draws a wider, opaque casing under each edge as a contrasting border', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+      .series([Series.forFunction('count()')])
+      .visualization('network')
+      .build();
+
+    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    const casings = casingTraces();
+    const fills = fillTraces();
+
+    // One casing per edge, and the casing color is opaque (not the translucent fill color).
+    expect(casings).toHaveLength(fills.length);
+    casings.forEach((casing) => {
+      expect(casing.line.color).not.toContain('/ 0.3)');
+    });
+
+    // Each casing is EDGE_BORDER_WIDTH (1.5) wider on both sides than its fill (i.e. width + 3).
+    const sortedFills = fills.map((f) => f.line.width).sort((a, b) => a - b);
+    const sortedCasings = casings.map((c) => c.line.width).sort((a, b) => a - b);
+
+    expect(sortedCasings).toEqual(sortedFills.map((w) => w + 3));
   });
 
   it('makes the graph zoomable and pannable', () => {
@@ -234,8 +273,8 @@ describe('NetworkGraphVisualization', () => {
     const node = nodeTrace();
 
     expect(node.text).toEqual(['a1', 'b1', 'c1', 'c2', 'b2']);
-    // 5 edges → 5 traces, each a two-point segment.
-    expect(edgeTraces()).toHaveLength(5);
+    // 5 edges → 5 fill traces (each also has a casing), each a two-point segment.
+    expect(fillTraces()).toHaveLength(5);
     expect(node.customdata).toEqual([
       { field: 'a', value: 'a1' },
       { field: 'b', value: 'b1' },
