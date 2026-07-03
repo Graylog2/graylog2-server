@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide } from 'd3-force';
+import chroma from 'chroma-js';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -247,6 +248,9 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
     const values = edges.map((edge) => edge.value);
     const minValue = Math.min(...values);
     const maxValue = Math.max(...values);
+    // Translucent theme foreground: achromatic so it never clashes with the configurable node
+    // colorscale, and it flips with the theme (dark ink on light, light ink on dark).
+    const edgeColor = chroma(theme.colors.text.primary).alpha(0.3).css();
 
     // Plotly's `line.width` is per-trace, so each edge is its own two-point line trace
     // to let width scale with the aggregated metric value.
@@ -276,7 +280,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
         mode: 'lines',
         x: [s.x, t.x],
         y: [s.y, t.y],
-        line: { width: edgeWidth(edge.value, minValue, maxValue), color: theme.colors.text.secondary },
+        line: { width: edgeWidth(edge.value, minValue, maxValue), color: edgeColor },
         customdata: [cd, cd],
         hoverinfo: 'none',
         showlegend: false,

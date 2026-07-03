@@ -135,6 +135,21 @@ describe('NetworkGraphVisualization', () => {
     });
   });
 
+  it('renders edges in a translucent color', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+      .series([Series.forFunction('count()')])
+      .visualization('network')
+      .build();
+
+    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    // chroma(...).alpha(0.3).css() yields an `rgb(r g b / 0.3)` string — i.e. a translucent edge.
+    edgeTraces().forEach((edge) => {
+      expect(edge.line.color).toContain('/ 0.3)');
+    });
+  });
+
   it('makes the graph zoomable and pannable', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
