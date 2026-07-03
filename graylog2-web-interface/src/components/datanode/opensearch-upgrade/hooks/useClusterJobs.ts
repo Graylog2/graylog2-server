@@ -27,14 +27,18 @@ export type SystemJobSummary = Awaited<ReturnType<typeof ClusterJobs.getJob>>;
 
 // `jobsUpdatedAt` (ms, 0 if never fetched) lets callers tell whether the jobs list is fresh relative to a
 // given action — so a stale cached list isn't mistaken for "the job is gone". See usePendingOutdatedIndexActions.
-export type ClusterJobsResult = { jobsById: Map<string, SystemJobSummary>; jobsUpdatedAt: number };
+export type ClusterJobsResult = {
+  jobsById: Map<string, SystemJobSummary>;
+  jobsUpdatedAt: number;
+  refetch?: () => Promise<unknown>;
+};
 
 /**
  * Polls cluster-wide system jobs (archive-and-delete jobs run on the leader node) and returns them keyed
  * by job id. Only polls while `enabled` so it stays idle when nothing is being tracked.
  */
 const useClusterJobs = (enabled: boolean): ClusterJobsResult => {
-  const { data, dataUpdatedAt } = useQuery({
+  const { data, dataUpdatedAt, refetch } = useQuery({
     queryKey: ['opensearch-upgrade', 'cluster-jobs'],
     queryFn: () => defaultOnError(ClusterJobs.list(), 'Loading cluster jobs failed', 'Could not load cluster jobs'),
     enabled,
@@ -54,7 +58,7 @@ const useClusterJobs = (enabled: boolean): ClusterJobsResult => {
     return map;
   }, [data]);
 
-  return { jobsById, jobsUpdatedAt: dataUpdatedAt };
+  return { jobsById, jobsUpdatedAt: dataUpdatedAt, refetch };
 };
 
 export default useClusterJobs;

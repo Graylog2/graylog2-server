@@ -33,11 +33,13 @@ import OutdatedIndicesTable from './OutdatedIndicesTable';
 import { PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY } from './hooks/usePendingOutdatedIndexActions';
 import useClusterJobs from './hooks/useClusterJobs';
 import type { SystemJobSummary } from './hooks/useClusterJobs';
+import useArchivedIndexNames from './hooks/useArchivedIndexNames';
 
 jest.mock('components/indices/hooks/useOutdatedIndices');
 jest.mock('components/indices/hooks/useCanArchive');
 jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('./hooks/useClusterJobs');
+jest.mock('./hooks/useArchivedIndexNames');
 jest.mock('logic/rest/FetchProvider', () => {
   class Builder {
     setHeader() {
@@ -138,6 +140,7 @@ describe('OutdatedIndicesTable', () => {
     asMock(useCanArchive).mockReturnValue(true);
     asMock(useSendTelemetry).mockReturnValue(jest.fn());
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: 0 });
+    asMock(useArchivedIndexNames).mockReturnValue(new Set());
     asMock(fetch).mockResolvedValue({ system_job: { id: 'archive-job-id' } });
     mockOutdatedIndices({});
   });
@@ -181,7 +184,7 @@ describe('OutdatedIndicesTable', () => {
     const { rerender } = render(<OutdatedIndicesTable />);
 
     expect(screen.getByRole('button', { name: /^archive and delete$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /archive and delete all/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /archive and delete all/i })).not.toBeInTheDocument();
 
     asMock(useCanArchive).mockReturnValue(false);
     rerender(<OutdatedIndicesTable />);
@@ -282,17 +285,47 @@ describe('OutdatedIndicesTable', () => {
     expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
   });
 
-  it('stops tracking (no stuck progress) when the job finished but the index is still outdated', async () => {
+  it('shows a skipped-delete archived state when the job finished but the index is still outdated', async () => {
     // e.g. archiving the active write index: the archive completes and the job is cleared, but the index
-    // can't be deleted, so it stays outdated. It must show actionable buttons again, not a frozen 0% bar.
+    // can't be deleted, so it stays outdated. It must not offer archiving the same index again, but it should
+    // still offer a plain delete so the skipped cleanup can be finished.
     storePendingArchive('graylog_0', 'job-1');
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: JOBS_POLLED_AFTER_ACTION });
     mockOutdatedIndices({ data: [graylogIndex] });
     render(<OutdatedIndicesTable />);
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^archive and delete$/i })).toBeInTheDocument();
-    await waitFor(() => expect(window.localStorage.getItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY)).toBe('[]'));
+    expect(screen.getByText(/archived, delete skipped/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^archive and delete$/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
+    // An archived (delete-skipped) index is deletable, so it also counts as a bulk delete candidate.
+    expect(screen.getByRole('button', { name: /delete all \(1\)/i })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(JSON.parse(window.localStorage.getItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY))).toEqual([
+        expect.objectContaining({ action: 'archive-delete', indexName: 'graylog_0', state: 'archived' }),
+      ]),
+    );
+  });
+
+  it('flags an index the archive catalog already knows about, even without a local pending action', () => {
+    // An archive made in another browser or by retention: no localStorage entry, but the catalog reports it.
+    asMock(useArchivedIndexNames).mockReturnValue(new Set(['graylog_0']));
+    mockOutdatedIndices({ data: [graylogIndex] });
+    render(<OutdatedIndicesTable />);
+
+    expect(screen.getByText(/archived, delete skipped/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^archive and delete$/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
+  });
+
+  it('still counts an already-archived index as a bulk delete candidate', () => {
+    // Archiving is a row-only action, so being already archived only affects the row: the index must remain
+    // deletable in bulk. Both managed indices are still delete candidates.
+    asMock(useArchivedIndexNames).mockReturnValue(new Set(['graylog_0']));
+    mockOutdatedIndices({ data: [graylogIndex, secondGraylogIndex] });
+    render(<OutdatedIndicesTable />);
+
+    expect(screen.getByRole('button', { name: /delete all \(2\)/i })).toBeInTheDocument();
   });
 
   it('keeps tracking when the jobs list predates the action (stale cache is not "job gone")', () => {
@@ -376,28 +409,23 @@ describe('OutdatedIndicesTable', () => {
     expect(refetch).toHaveBeenCalled();
   });
 
-  it('tracks successful bulk archive-and-delete jobs as pending actions', async () => {
+  it('tracks a successful archive-and-delete job as a pending action', async () => {
     mockOutdatedIndices({ data: [graylogIndex, secondGraylogIndex] });
     render(<OutdatedIndicesTable />);
 
-    await userEvent.click(screen.getByRole('button', { name: /archive and delete all/i }));
+    await userEvent.click(screen.getAllByRole('button', { name: /^archive and delete$/i })[0]);
 
     const dialog = await screen.findByRole('dialog');
-    await userEvent.click(within(dialog).getByRole('button', { name: /archive and delete all/i }));
+    await userEvent.click(within(dialog).getByRole('button', { name: /^archive and delete$/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
     const storedActions = JSON.parse(window.localStorage.getItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY));
 
-    expect(storedActions).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ action: 'archive-delete', indexName: 'graylog_0', systemJobId: 'archive-job-id' }),
-        expect.objectContaining({ action: 'archive-delete', indexName: 'graylog_1', systemJobId: 'archive-job-id' }),
-      ]),
-    );
-    expect(UserNotification.success).toHaveBeenCalledWith(
-      'Archive and delete jobs were started for 2 outdated indices.',
-    );
+    expect(storedActions).toEqual([
+      expect.objectContaining({ action: 'archive-delete', indexName: 'graylog_0', systemJobId: 'archive-job-id' }),
+    ]);
+    expect(UserNotification.success).toHaveBeenCalledWith('Archive and delete job for "graylog_0" was started.');
   });
 
   it('skips in-progress archive actions when running a bulk action', async () => {

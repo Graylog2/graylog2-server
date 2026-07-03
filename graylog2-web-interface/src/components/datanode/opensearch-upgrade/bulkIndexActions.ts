@@ -22,7 +22,9 @@ import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions'
 import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
 import type { IndexAction } from './outdatedIndexActions';
 
-const BULK_ACTION_ORDER: Array<IndexAction> = ['archive-delete', 'delete', 'reindex-system-index'];
+// Archive creation is backed by a single-concurrency system job. Offering a frontend bulk action made from
+// multiple single-index requests races against that backend limit, so keep archive/delete as a row action only.
+const BULK_ACTION_ORDER: Array<IndexAction> = ['delete', 'reindex-system-index'];
 
 type BulkActionCopy = {
   buttonLabel: string;
@@ -93,22 +95,26 @@ const BULK_ACTION_COPY: Record<IndexAction, BulkActionCopy> = {
   },
 };
 
-const isArchiving = (pendingStatus: PendingIndexStatus | undefined) => pendingStatus?.state === 'archiving';
+// Only an in-flight archive blocks bulk delete — deleting mid-archive is racy. An already-archived index
+// ("delete skipped") is deletable, just like its per-row Delete action, so it stays a bulk delete candidate.
+const isArchiveInProgress = (pendingStatus: PendingIndexStatus | undefined) => pendingStatus?.state === 'archiving';
 
 export const getBulkIndexActionCandidates = ({
   indices,
   canArchive,
   pendingIndexStatuses,
+  archivedIndexNames,
 }: {
   indices: Array<OutdatedIndex>;
   canArchive: boolean;
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
+  archivedIndexNames: Set<string>;
 }): Array<BulkIndexActionCandidate> =>
   BULK_ACTION_ORDER.map((action) => {
     const targetIndices = indices.filter(
       (index) =>
-        getAvailableActions(index, canArchive).includes(action) &&
-        !isArchiving(pendingIndexStatuses.get(index.index_name)),
+        getAvailableActions(index, canArchive, archivedIndexNames.has(index.index_name)).includes(action) &&
+        !isArchiveInProgress(pendingIndexStatuses.get(index.index_name)),
     );
 
     return {

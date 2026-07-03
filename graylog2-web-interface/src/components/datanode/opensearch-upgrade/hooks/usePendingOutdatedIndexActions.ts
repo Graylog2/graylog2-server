@@ -30,13 +30,19 @@ export type PendingOutdatedIndexAction = {
   indexName: string;
   startedAt: string;
   systemJobId?: string;
+  state?: 'archived';
 };
 
 export type PendingIndexStatus =
   | { state: 'archiving'; percent: number }
+  | { state: 'archived' }
   | { state: 'failed'; message: string };
 
-type ActionResolution = { kind: 'archiving'; percent: number } | { kind: 'failed'; message: string } | { kind: 'done' };
+type ActionResolution =
+  | { kind: 'archiving'; percent: number }
+  | { kind: 'archived' }
+  | { kind: 'failed'; message: string }
+  | { kind: 'done' };
 
 type Params = {
   outdatedIndices: Array<OutdatedIndex>;
@@ -57,7 +63,8 @@ const isValidStoredAction = (value: unknown): value is PendingOutdatedIndexActio
     typeof candidate.indexName === 'string' &&
     typeof candidate.startedAt === 'string' &&
     !Number.isNaN(Date.parse(candidate.startedAt)) &&
-    (candidate.systemJobId === undefined || typeof candidate.systemJobId === 'string')
+    (candidate.systemJobId === undefined || typeof candidate.systemJobId === 'string') &&
+    (candidate.state === undefined || candidate.state === 'archived')
   );
 };
 
@@ -81,15 +88,20 @@ const storeActions = (actions: Array<PendingOutdatedIndexAction>) => {
 };
 
 // Classify a pending action from its backend system job:
-// - error                          → failed (kept visible so the user can retry)
-// - complete / cancelled            → done   (job finished — stop tracking)
-// - has a job id but it's absent from a jobs list fetched AFTER the action started → done (finished & cleared)
+// - error                          → failed   (kept visible so the user can retry)
+// - complete                        → archived (job finished, but the index is still outdated)
+// - cancelled                       → done     (job stopped — stop tracking and allow retry)
+// - has a job id but it's absent from a jobs list fetched AFTER the action started → archived (finished & cleared)
 // - running, jobs list predates the action, or we have no job id to poll → archiving (keep waiting; a
 //   no-job-id action is only cleared once its index leaves the outdated list)
 const resolveAction = (
   action: PendingOutdatedIndexAction,
   { jobsById, jobsUpdatedAt }: ClusterJobsResult,
 ): ActionResolution => {
+  if (action.state === 'archived') {
+    return { kind: 'archived' };
+  }
+
   const job = action.systemJobId ? jobsById.get(action.systemJobId) : undefined;
 
   if (job?.job_status === 'error') {
@@ -97,7 +109,11 @@ const resolveAction = (
     return { kind: 'failed', message: job.info || job.description };
   }
 
-  if (job?.job_status === 'complete' || job?.job_status === 'cancelled') {
+  if (job?.job_status === 'complete') {
+    return { kind: 'archived' };
+  }
+
+  if (job?.job_status === 'cancelled') {
     return { kind: 'done' };
   }
 
@@ -105,7 +121,7 @@ const resolveAction = (
   // action started; otherwise the list may predate it (stale cache / concurrent add) or we never had a job
   // to track — in both cases keep waiting.
   if (action.systemJobId && !job && jobsUpdatedAt > Date.parse(action.startedAt)) {
-    return { kind: 'done' };
+    return { kind: 'archived' };
   }
 
   return { kind: 'archiving', percent: job?.percent_complete ?? 0 };
@@ -114,9 +130,9 @@ const resolveAction = (
 /**
  * Tracks long-running "archive and delete" actions on outdated indices. Each action's real progress comes
  * from its backend system job (polled via {@link useClusterJobs}): a running job reports progress, an errored
- * job surfaces as failed, and a finished job stops tracking — so a row never lingers on a fake 0% once its
- * job is gone (e.g. archiving the active write index, which cannot be deleted). Persisted in localStorage so
- * progress survives reloads.
+ * job surfaces as failed, and a finished job keeps an "archived" row state if the index is still outdated
+ * (e.g. the backend could not delete the current write index). Persisted in localStorage so progress survives
+ * reloads.
  */
 const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, refetch }: Params) => {
   const [pendingActions, setPendingActions] = useState<Array<PendingOutdatedIndexAction>>(readStoredActions);
@@ -126,8 +142,12 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     () => pendingActions.filter((pendingAction) => outdatedIndexNames.has(pendingAction.indexName)),
     [outdatedIndexNames, pendingActions],
   );
-  const hasTrackedActions = trackedActions.length > 0;
-  const { jobsById, jobsUpdatedAt } = useClusterJobs(hasTrackedActions);
+  const activeTrackedActions = useMemo(
+    () => trackedActions.filter((pendingAction) => pendingAction.state !== 'archived'),
+    [trackedActions],
+  );
+  const hasActiveTrackedActions = activeTrackedActions.length > 0;
+  const { jobsById, jobsUpdatedAt } = useClusterJobs(hasActiveTrackedActions);
 
   const pendingIndexStatuses = useMemo(() => {
     const statuses = new Map<string, PendingIndexStatus>();
@@ -137,6 +157,8 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
 
       if (resolution.kind === 'archiving') {
         statuses.set(pendingAction.indexName, { state: 'archiving', percent: resolution.percent });
+      } else if (resolution.kind === 'archived') {
+        statuses.set(pendingAction.indexName, { state: 'archived' });
       } else if (resolution.kind === 'failed') {
         statuses.set(pendingAction.indexName, { state: 'failed', message: resolution.message });
       }
@@ -160,20 +182,33 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     [],
   );
 
-  // Stop tracking an action once its index is gone (deleted) or its job has finished.
+  // Stop tracking an action once its index is gone (deleted), or mark it as archived once its job has finished
+  // but the index is still outdated.
   useEffect(() => {
     if (isLoading || isError) {
       return;
     }
 
     setPendingActions((current) => {
-      const next = current.filter(
-        (pendingAction) =>
-          outdatedIndexNames.has(pendingAction.indexName) &&
-          resolveAction(pendingAction, { jobsById, jobsUpdatedAt }).kind !== 'done',
-      );
+      const next = current.flatMap((pendingAction): Array<PendingOutdatedIndexAction> => {
+        if (!outdatedIndexNames.has(pendingAction.indexName)) {
+          return [];
+        }
 
-      if (next.length === current.length) {
+        const resolution = resolveAction(pendingAction, { jobsById, jobsUpdatedAt });
+
+        if (resolution.kind === 'done') {
+          return [];
+        }
+
+        if (resolution.kind === 'archived' && pendingAction.state !== 'archived') {
+          return [{ ...pendingAction, state: 'archived' }];
+        }
+
+        return [pendingAction];
+      });
+
+      if (next.length === current.length && next.every((pendingAction, index) => pendingAction === current[index])) {
         return current;
       }
 
@@ -185,7 +220,7 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
 
   // Refresh the outdated indices while actions are in flight so completed ones drop off.
   useEffect(() => {
-    if (!hasTrackedActions) {
+    if (!hasActiveTrackedActions) {
       return undefined;
     }
 
@@ -194,7 +229,7 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     }, ARCHIVE_POLL_INTERVAL_MS);
 
     return () => window.clearInterval(polling);
-  }, [hasTrackedActions, refetch]);
+  }, [hasActiveTrackedActions, refetch]);
 
   return { pendingIndexStatuses, addArchiveDeleteAction };
 };

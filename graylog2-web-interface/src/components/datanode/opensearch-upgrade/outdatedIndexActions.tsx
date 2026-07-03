@@ -104,10 +104,16 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
   },
 };
 
-export const getAvailableActions = (index: OutdatedIndex, canArchive: boolean): Array<IndexAction> => {
+export const getAvailableActions = (
+  index: OutdatedIndex,
+  canArchive: boolean,
+  alreadyArchived: boolean,
+): Array<IndexAction> => {
   if (index.system_index) {
     return ['reindex-system-index'];
   }
 
-  return index.managed_index && canArchive ? ['archive-delete', 'delete'] : ['delete'];
+  // An index that already has an archive should not be archived again (e.g. the "archived but delete skipped"
+  // case, where a completed archive left the index in place) — offer a plain delete instead.
+  return index.managed_index && canArchive && !alreadyArchived ? ['archive-delete', 'delete'] : ['delete'];
 };

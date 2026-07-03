@@ -29,6 +29,9 @@ import BulkIndexActionConfirmDialog from './BulkIndexActionConfirmDialog';
 import { getBulkIndexActionCandidates, getBulkIndexActionNotification, runBulkIndexAction } from './bulkIndexActions';
 import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
 import IndicesGroupTable from './IndicesGroupTable';
+import useArchivedIndexNames from './hooks/useArchivedIndexNames';
+import useClusterJobs from './hooks/useClusterJobs';
+import type { SystemJobSummary } from './hooks/useClusterJobs';
 import usePendingOutdatedIndexActions from './hooks/usePendingOutdatedIndexActions';
 import { ACTION_DEFINITIONS } from './outdatedIndexActions';
 import type { ConfirmedAction } from './outdatedIndexActions';
@@ -41,6 +44,13 @@ type ArchiveAndDeleteResponse = {
 };
 
 const getArchiveSystemJobId = (actionResponse: unknown) => (actionResponse as ArchiveAndDeleteResponse)?.system_job?.id;
+const ARCHIVE_CREATE_SYSTEM_JOB = 'org.graylog.plugins.archive.job.ArchiveCreateSystemJob';
+const ARCHIVE_JOB_ALREADY_RUNNING_MESSAGE = /Archive job for index .+ is already running!?/;
+
+const isRunningArchiveSystemJob = (job: SystemJobSummary) =>
+  job.name === ARCHIVE_CREATE_SYSTEM_JOB && String(job.job_status).toLowerCase() === 'running';
+
+const isArchiveJobAlreadyRunningError = (message: string) => ARCHIVE_JOB_ALREADY_RUNNING_MESSAGE.test(message);
 
 const showBulkNotification = ({ type, message, title }: BulkIndexActionNotification) => {
   const notify = (notification: (notificationMessage: string, notificationTitle?: string) => void) =>
@@ -100,6 +110,9 @@ const OutdatedIndicesTable = () => {
     isError,
     refetch,
   });
+  const { jobsById: clusterJobsById, refetch: refetchClusterJobs } = useClusterJobs(canArchive);
+  const outdatedIndexNames = useMemo(() => outdatedIndices.map((index) => index.index_name), [outdatedIndices]);
+  const archivedIndexNames = useArchivedIndexNames(outdatedIndexNames, canArchive);
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
   const [confirmedBulkAction, setConfirmedBulkAction] = useState<BulkIndexActionCandidate | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,6 +123,11 @@ const OutdatedIndicesTable = () => {
   const firstGroupWithIndices = useMemo(() => getFirstGroupWithIndices(indicesGroups), [indicesGroups]);
   const activeGroupId = selectedGroupId ?? firstGroupWithIndices;
   const selectedGroup = getSelectedGroup(indicesGroups, activeGroupId);
+  const runningArchiveJob = useMemo(
+    () => Array.from(clusterJobsById.values()).find(isRunningArchiveSystemJob),
+    [clusterJobsById],
+  );
+  const archiveActionsAvailable = canArchive && !runningArchiveJob;
   const segments = useMemo(
     () => indicesGroups.map((group) => ({ value: group.id, label: `${group.shortLabel} (${group.indices.length})` })),
     [indicesGroups],
@@ -118,10 +136,11 @@ const OutdatedIndicesTable = () => {
     () =>
       getBulkIndexActionCandidates({
         indices: selectedGroup.indices,
-        canArchive,
+        canArchive: archiveActionsAvailable,
         pendingIndexStatuses,
+        archivedIndexNames,
       }),
-    [canArchive, pendingIndexStatuses, selectedGroup.indices],
+    [archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, selectedGroup.indices],
   );
 
   const closeConfirmDialog = () => setConfirmedAction(undefined);
@@ -139,6 +158,14 @@ const OutdatedIndicesTable = () => {
     if (updatedSelectedGroup.indices.length === 0) {
       setSelectedGroupId(getFirstGroupWithIndices(updatedGroups));
     }
+  };
+
+  const showArchiveJobAlreadyRunningWarning = () => {
+    UserNotification.warning(
+      'Another archive job is already running. New archive jobs can be started after it finishes.',
+      'Archive job already running',
+    );
+    void refetchClusterJobs?.();
   };
 
   const handleConfirm = async () => {
@@ -171,7 +198,14 @@ const OutdatedIndicesTable = () => {
 
       closeConfirmDialog();
     } catch (errorThrown) {
-      UserNotification.error(extractErrorMessage(errorThrown), `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
+      const errorMessage = extractErrorMessage(errorThrown);
+
+      if (confirmedAction.action === 'archive-delete' && isArchiveJobAlreadyRunningError(errorMessage)) {
+        showArchiveJobAlreadyRunningWarning();
+        closeConfirmDialog();
+      } else {
+        UserNotification.error(errorMessage, `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -211,10 +245,14 @@ const OutdatedIndicesTable = () => {
       updateSelectedGroup(updatedOutdatedIndices);
       closeBulkConfirmDialog();
     } catch (errorThrown) {
-      UserNotification.error(
-        extractErrorMessage(errorThrown),
-        `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`,
-      );
+      const errorMessage = extractErrorMessage(errorThrown);
+
+      if (confirmedBulkAction.action === 'archive-delete' && isArchiveJobAlreadyRunningError(errorMessage)) {
+        showArchiveJobAlreadyRunningWarning();
+        closeBulkConfirmDialog();
+      } else {
+        UserNotification.error(errorMessage, `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`);
+      }
     } finally {
       setIsBulkSubmitting(false);
     }
@@ -246,8 +284,9 @@ const OutdatedIndicesTable = () => {
         group={selectedGroup}
         onAction={setConfirmedAction}
         onBulkAction={setConfirmedBulkAction}
-        canArchive={canArchive}
+        canArchive={archiveActionsAvailable}
         pendingIndexStatuses={pendingIndexStatuses}
+        archivedIndexNames={archivedIndexNames}
         bulkActions={bulkActions}
         isBulkActionSubmitting={isBulkSubmitting}
       />

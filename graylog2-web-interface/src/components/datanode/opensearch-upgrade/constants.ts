@@ -20,3 +20,8 @@ export const ARCHIVE_POLL_INTERVAL_MS = 5000;
 
 // Keep frontend-orchestrated bulk requests small until the backend exposes dedicated bulk endpoints.
 export const BULK_INDEX_ACTION_CONCURRENCY = 3;
+
+// Upper bound of archive catalog entries we read when checking which outdated indices are already archived.
+// The lookup is scoped to the current outdated index names (a bounded set during an upgrade), so this only
+// guards against an index having been archived many times over — a page this large is never actually filled.
+export const ARCHIVE_CATALOG_LOOKUP_MAX_ENTRIES = 10000;
