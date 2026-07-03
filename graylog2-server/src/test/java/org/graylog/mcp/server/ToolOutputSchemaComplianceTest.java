@@ -138,6 +138,34 @@ class ToolOutputSchemaComplianceTest {
     }
 
     @Test
+    void isoDateTimeJsonValuesValidateAgainstDateTimeSchema() throws Exception {
+        final Map<String, Object> metadataSchema = objectMapper.convertValue(
+                generateSchema(Metadata.class), new TypeReference<Map<String, Object>>() {});
+
+        // the value the server actually serializes for a DateTime field
+        final JsonSchemaValidator.ValidationResponse valid =
+                schemaValidator.validate(metadataSchema, timerangePayload("\"2026-07-02T12:51:47.669Z\""));
+        assertThat(valid.valid())
+                .as("ISO-8601 date-time strings should validate: %s", valid.errorMessage())
+                .isTrue();
+
+        // date shapes the server never produces must be rejected, so the schema cannot silently
+        // regress to something permissive-but-wrong
+        assertThat(schemaValidator.validate(metadataSchema, timerangePayload("1751462707669")).valid())
+                .as("epoch millis should not validate against the date-time string schema")
+                .isFalse();
+        assertThat(schemaValidator.validate(metadataSchema, timerangePayload("{}")).valid())
+                .as("an object (the shape the schema wrongly declared before the fix) should not validate")
+                .isFalse();
+    }
+
+    private Map<String, Object> timerangePayload(String fromJson) throws Exception {
+        return objectMapper.readValue("""
+                {"effective_timerange": {"from": %s, "to": "2026-07-02T13:51:47.669Z", "type": "absolute"}}
+                """.formatted(fromJson), new TypeReference<Map<String, Object>>() {});
+    }
+
+    @Test
     void plainObjectRemainsUnconstrained() {
         // java.lang.Object (e.g. the cells of TabularResponse#datarows) holds any value, so its
         // schema must not constrain the type
