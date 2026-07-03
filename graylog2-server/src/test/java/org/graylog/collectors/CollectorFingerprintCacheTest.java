@@ -27,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.threeten.extra.MutableClock;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -41,9 +40,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests the caching mechanics over {@link CollectorInstanceService#resolveCertBinding(String)}: what is cached,
- * for how long, and how events refresh it. The binding decision itself (including the grace window) is the
- * service's responsibility and is tested in the service's own test — here {@code resolveBinding} is mocked.
+ * Tests the caching mechanics over {@link CollectorInstanceService#resolveCertBinding(String)}: what is
+ * cached, for how long, how events refresh it, and that reads enforce the binding's {@code validUntil}
+ * stamp locally (no reload). How the stamp is computed (cert expiry, renewal grace) is the service's
+ * responsibility and is tested in the service's own test — here {@code resolveCertBinding} is mocked.
  */
 @ExtendWith(MockitoExtension.class)
 class CollectorFingerprintCacheTest {
@@ -62,13 +62,20 @@ class CollectorFingerprintCacheTest {
         eventBus = new EventBus();
         clock = MutableClock.epochUTC();
         // Runnable::run makes Caffeine's refresh reloads (and preWarm) run inline for deterministic tests.
-        // The ticker is derived from this clock, so advancing it drives the per-entry expiry.
+        // The ticker is derived from this clock, so advancing it drives the idle expiry.
         cache = new CollectorFingerprintCache(configService, instanceService, eventBus, clock, Runnable::run);
+    }
+
+    /**
+     * A binding whose stamp is far in the future, for tests that are not about validity.
+     */
+    private CertBinding longLivedBinding(String instanceUid) {
+        return new CertBinding(instanceUid, clock.instant().plus(Duration.ofDays(365)));
     }
 
     @Test
     void lookupReturnsInstanceUidAndCachesIt() {
-        when(instanceService.resolveCertBinding("fp-1")).thenReturn(Optional.of(CertBinding.bound("uid-1")));
+        when(instanceService.resolveCertBinding("fp-1")).thenReturn(Optional.of(longLivedBinding("uid-1")));
 
         assertThat(cache.lookup("fp-1")).contains("uid-1");
         assertThat(cache.lookup("fp-1")).contains("uid-1");
@@ -94,27 +101,40 @@ class CollectorFingerprintCacheTest {
     }
 
     @Test
-    void deadlineBoundEntryExpiresAtItsDeadlineAndReadsDoNotExtendIt() {
-        final Instant deadline = clock.instant().plus(Duration.ofMinutes(5));
-        when(instanceService.resolveCertBinding("prev-fp")).thenReturn(Optional.of(CertBinding.boundWithDeadline("uid-prev", deadline)));
+    void lookupRejectsExpiredBindingWithoutReload() {
+        final var validUntil = clock.instant().plus(Duration.ofMinutes(5));
+        when(instanceService.resolveCertBinding("prev-fp"))
+                .thenReturn(Optional.of(new CertBinding("uid-prev", validUntil)));
 
-        assertThat(cache.lookup("prev-fp")).contains("uid-prev"); // loads and caches with the fixed deadline
-
-        // A read within the window is a cache hit and must not push the deadline out.
-        clock.add(Duration.ofMinutes(4));
         assertThat(cache.lookup("prev-fp")).contains("uid-prev");
-        verify(instanceService, times(1)).resolveCertBinding("prev-fp");
 
-        // Past the deadline the entry has expired, so the next lookup reloads — proving the +4m read did
-        // not extend it to +9m.
-        clock.add(Duration.ofMinutes(2)); // now +6m
-        cache.lookup("prev-fp");
-        verify(instanceService, times(2)).resolveCertBinding("prev-fp");
+        clock.add(Duration.ofMinutes(4)); // still within the stamp
+        assertThat(cache.lookup("prev-fp")).contains("uid-prev");
+
+        // Past the stamp the still-cached entry keeps serving local rejects — the cut must not cost a
+        // reload (this is what keeps the deadline cut off the Netty event loop).
+        clock.add(Duration.ofMinutes(2)); // now past validUntil
+        assertThat(cache.lookup("prev-fp")).isEmpty();
+        assertThat(cache.lookup("prev-fp")).isEmpty();
+
+        verify(instanceService, times(1)).resolveCertBinding("prev-fp");
+    }
+
+    @Test
+    void idleEntryExpiresAndReloadsOnNextLookup() {
+        when(instanceService.resolveCertBinding("fp-idle")).thenReturn(Optional.of(longLivedBinding("uid-idle")));
+
+        assertThat(cache.lookup("fp-idle")).contains("uid-idle");
+
+        clock.add(Duration.ofMinutes(61)); // exceeds IDLE_EXPIRY without any access
+        assertThat(cache.lookup("fp-idle")).contains("uid-idle");
+
+        verify(instanceService, times(2)).resolveCertBinding("fp-idle");
     }
 
     @Test
     void touchedFingerprintThatIsCachedIsReResolved() {
-        when(instanceService.resolveCertBinding("fp-1")).thenReturn(Optional.of(CertBinding.bound("uid-1")));
+        when(instanceService.resolveCertBinding("fp-1")).thenReturn(Optional.of(longLivedBinding("uid-1")));
         assertThat(cache.lookup("fp-1")).contains("uid-1");
 
         // The instance is deleted: the fingerprint no longer binds. A certs-changed event touching the
@@ -127,8 +147,28 @@ class CollectorFingerprintCacheTest {
     }
 
     @Test
+    void refreshInstallsGraceStampOnLiveEntry() {
+        // Rotation scenario: the fingerprint is cached as a plain active binding, then rotation demotes it
+        // to the previous slot — the certs-changed refresh must install the grace stamp into the live
+        // entry, and the subsequent cut must again be reload-free.
+        when(instanceService.resolveCertBinding("fp-rot")).thenReturn(Optional.of(longLivedBinding("uid-rot")));
+        assertThat(cache.lookup("fp-rot")).contains("uid-rot");
+
+        final var graceDeadline = clock.instant().plus(Duration.ofMinutes(5));
+        when(instanceService.resolveCertBinding("fp-rot"))
+                .thenReturn(Optional.of(new CertBinding("uid-rot", graceDeadline)));
+        cache.handleCertsChanged(new CollectorInstanceCertsChangedEvent(Set.of("fp-rot")));
+
+        assertThat(cache.lookup("fp-rot")).contains("uid-rot"); // still within grace
+
+        clock.add(Duration.ofMinutes(6)); // past the grace deadline
+        assertThat(cache.lookup("fp-rot")).isEmpty();
+        verify(instanceService, times(2)).resolveCertBinding("fp-rot"); // initial load + refresh, no third
+    }
+
+    @Test
     void touchedFingerprintThatIsNotCachedIsNotLoaded() {
-        when(instanceService.resolveCertBinding("fp-2")).thenReturn(Optional.of(CertBinding.bound("uid-2")));
+        when(instanceService.resolveCertBinding("fp-2")).thenReturn(Optional.of(longLivedBinding("uid-2")));
 
         // fp-2 is not cached, so a certs-changed event must NOT proactively load it (avoids loading the
         // many fingerprints of expired instances that no longer exist).
@@ -147,6 +187,7 @@ class CollectorFingerprintCacheTest {
         final var instance = mock(CollectorInstanceDTO.class);
         when(instance.instanceUid()).thenReturn("uid-pw");
         when(instance.activeCertificateFingerprint()).thenReturn("active-fp");
+        when(instance.activeCertificateExpiresAt()).thenReturn(clock.instant().plus(Duration.ofDays(365)));
         when(instanceService.streamAllUnexpired(config.collectorExpirationThreshold())).thenReturn(Stream.of(instance));
 
         cache.startAsync().awaitRunning();
@@ -156,7 +197,7 @@ class CollectorFingerprintCacheTest {
             verify(instanceService, never()).resolveCertBinding(any());
 
             // The next fingerprint is NOT prewarmed — it cold-loads on first lookup.
-            when(instanceService.resolveCertBinding("next-fp")).thenReturn(Optional.of(CertBinding.bound("uid-pw")));
+            when(instanceService.resolveCertBinding("next-fp")).thenReturn(Optional.of(longLivedBinding("uid-pw")));
             assertThat(cache.lookup("next-fp")).contains("uid-pw");
             verify(instanceService).resolveCertBinding("next-fp");
         } finally {
@@ -172,7 +213,7 @@ class CollectorFingerprintCacheTest {
 
         cache.startAsync().awaitRunning();
         try {
-            when(instanceService.resolveCertBinding("fp-1")).thenReturn(Optional.of(CertBinding.bound("uid-1")));
+            when(instanceService.resolveCertBinding("fp-1")).thenReturn(Optional.of(longLivedBinding("uid-1")));
             assertThat(cache.lookup("fp-1")).contains("uid-1");
 
             when(instanceService.resolveCertBinding("fp-1")).thenReturn(Optional.empty());

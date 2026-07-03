@@ -17,7 +17,6 @@
 package org.graylog.collectors;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.Ticker;
 import com.google.common.eventbus.EventBus;
@@ -38,19 +37,26 @@ import java.util.concurrent.Executor;
  * Caches the mapping from a collector client-certificate fingerprint to the instance UID it binds to, so
  * the ingest mTLS path can resolve a presented certificate without a MongoDB lookup on every request.
  * <p>
- * This is purely an optimization over {@link CollectorInstanceService#resolveCertBinding(String)}, which is the
- * authoritative binding decision (including the renewal grace window for superseded certificates). Each
- * entry is cached for exactly as long as that decision is valid: an active/next binding uses an idle
- * sliding window, while a superseded (previous-slot) binding's entry expires at its grace deadline, so it
- * stops resolving even for a continuously-used connection. The cache is prewarmed at startup with active
- * fingerprints and kept consistent by {@link CollectorInstanceCertsChangedEvent}s. Asynchronous work
+ * This is purely an optimization over {@link CollectorInstanceService#resolveCertBinding(String)}, which
+ * produces the authoritative binding. Each binding carries the instant it stops being honored
+ * ({@link CertBinding#validUntil()} — cert expiry, capped by the renewal grace deadline for superseded
+ * certificates), and {@link #lookup(String)} enforces it on every read: past that instant the cached entry
+ * keeps serving <em>local rejects</em> without any reload. Since TLS never re-validates an established
+ * connection, this per-request check is the sole post-handshake cut for rotated, revoked, and expired
+ * certificates. Entries expire after a constant idle window ({@link #IDLE_EXPIRY}, sliding on access) —
+ * deliberately longer than the ingest transport's forced idle connection timeout, so an entry warmed at
+ * the TLS handshake always outlives its connection and per-request lookups never load on the Netty event
+ * loop. The cache is prewarmed at startup with active fingerprints and kept consistent by
+ * {@link CollectorInstanceCertsChangedEvent}s, which refresh touched entries in place. Asynchronous work
  * (refreshes, prewarm) runs on the {@link CollectorCertVerificationExecutor}.
  */
 @Singleton
 public class CollectorFingerprintCache extends AbstractIdleService {
 
     public static final long MAX_SIZE = 1_000_000L; // safety net
-    private static final Duration IDLE_EXPIRY = Duration.ofMinutes(30); // TODO: make configurable
+    // Fixing a cache expiry > idle connection timeout (See CollectorIngestHttpTransport). This makes sure that
+    // cert lookups in the request path are cache hits, after the TLS handshake has populated the cache.
+    private static final Duration IDLE_EXPIRY = Duration.ofMinutes(60);
     private static final Logger LOG = LoggerFactory.getLogger(CollectorFingerprintCache.class);
 
     private final CollectorsConfigService configService;
@@ -76,11 +82,7 @@ public class CollectorFingerprintCache extends AbstractIdleService {
                 .maximumSize(MAX_SIZE)
                 .executor(executor) // event-driven refresh runs on this executor
                 .ticker(clockTicker()) // drive Caffeine's expiry off the same Clock as the binding deadlines
-                .expireAfter(Expiry.<String, Optional<CertBinding>>accessing((fingerprint, binding) ->
-                        binding.flatMap(CertBinding::validUntil)
-                                .map(deadline -> Duration.between(this.clock.instant(), deadline))
-                                .map(remaining -> remaining.isNegative() ? Duration.ZERO : remaining)
-                                .orElse(IDLE_EXPIRY)))
+                .expireAfterAccess(IDLE_EXPIRY)
                 .build(instanceService::resolveCertBinding);
     }
 
@@ -97,12 +99,15 @@ public class CollectorFingerprintCache extends AbstractIdleService {
 
     /**
      * Resolves a certificate fingerprint to its collector instance UID, loading and caching on a miss.
-     * Returns an empty optional if the fingerprint does not bind to an instance (unknown, or a superseded
-     * certificate past its grace window), or if the lookup fails.
+     * Returns an empty optional if the fingerprint does not bind to an instance (unknown), if the binding
+     * is no longer valid (superseded certificate past its grace window, or expired certificate), or if
+     * the lookup fails.
      */
     public Optional<String> lookup(String fingerprint) {
         try {
-            return cache.get(fingerprint).map(CertBinding::instanceUid);
+            return cache.get(fingerprint)
+                    .filter(binding -> binding.isValidAt(clock.instant()))
+                    .map(CertBinding::instanceUid);
         } catch (Exception e) {
             LOG.error("Error looking up collector instance for fingerprint {}.", fingerprint, e);
         }
@@ -142,8 +147,8 @@ public class CollectorFingerprintCache extends AbstractIdleService {
             final var expirationThreshold = configService.getOrDefault().collectorExpirationThreshold();
             try (var stream = instanceService.streamAllUnexpired(expirationThreshold).limit(MAX_SIZE)) {
                 stream.forEach(instance ->
-                        cache.put(instance.activeCertificateFingerprint(),
-                                Optional.of(CertBinding.bound(instance.instanceUid()))));
+                        cache.put(instance.activeCertificateFingerprint(), Optional.of(
+                                new CertBinding(instance.instanceUid(), instance.activeCertificateExpiresAt()))));
             }
         } catch (Exception e) {
             LOG.warn("Failed pre-warming collector fingerprint cache.", e);

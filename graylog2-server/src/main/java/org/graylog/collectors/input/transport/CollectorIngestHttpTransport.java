@@ -79,17 +79,20 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                                         CollectorTLSUtils tlsUtils,
                                         EncryptedValueService encryptedValueService,
                                         CollectorIngestHttpHandler.Factory httpHandlerFactory) {
-        super(withTlsDefaults(configuration), eventLoopGroup, eventLoopGroupFactory,
+        super(withCustomDefaults(configuration), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
                 tlsConfiguration, encryptedValueService, trustedProxies, OtlpHttpUtils.LOGS_PATH);
         this.tlsUtils = tlsUtils;
         this.httpHandlerFactory = httpHandlerFactory;
     }
 
-    private static Configuration withTlsDefaults(Configuration userConfig) {
+    private static Configuration withCustomDefaults(Configuration userConfig) {
         final var merged = Optional.ofNullable(userConfig.getSource()).map(HashMap::new).orElse(new HashMap<>());
         merged.put(CK_TLS_ENABLE, true);
         merged.put(CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_REQUIRED);
+        // Fixing an idle timeout < fingerprint cache expiry (see CollectorFingerprintCache). This makes sure that
+        // cert lookups in the request path are cache hits, after the TLS handshake has populated the cache.
+        merged.put(CK_IDLE_WRITER_TIMEOUT, 60);
         return new Configuration(merged);
     }
 
@@ -137,7 +140,6 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
                 CK_RECV_BUFFER_SIZE,
                 CK_NUMBER_WORKER_THREADS,
                 CK_MAX_CHUNK_SIZE,
-                CK_IDLE_WRITER_TIMEOUT,
                 CK_TCP_KEEPALIVE
         );
 

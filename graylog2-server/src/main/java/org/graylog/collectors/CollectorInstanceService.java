@@ -356,34 +356,42 @@ public class CollectorInstanceService {
     }
 
     /**
-     * Resolves a client-certificate fingerprint to the collector instance it currently binds to, honoring
-     * the renewal grace window: a superseded (previous-slot) certificate binds only until
-     * {@code certificates_rotated_at + PREVIOUS_CERT_GRACE_TTL}.
+     * Resolves a client-certificate fingerprint to the collector instance it binds to. This is a pure
+     * mapping of the instance's certificate slots — no clock is consulted: every binding carries the
+     * instant it stops being honored on the ingest path ({@link CertBinding#validUntil()}: the
+     * certificate's own expiry, capped for a superseded previous-slot certificate by the renewal grace
+     * deadline {@code certificates_rotated_at + PREVIOUS_CERT_GRACE_TTL}). Callers evaluate validity via
+     * {@link CertBinding#isValidAt(Instant)}. A returned binding may already be expired.
      *
      * @param fingerprint the presented certificate fingerprint
-     * @return the binding (empty if the fingerprint is not bound to any instance): the instance UID and,
-     * for a superseded certificate, the instant until which the binding remains valid
+     * @return the binding, or an empty optional if no instance has this fingerprint in any slot
      */
     public Optional<CertBinding> resolveCertBinding(String fingerprint) {
         return findByActiveOrNextOrPreviousFingerprint(fingerprint)
-                .flatMap(instance -> {
-                    if (instance.previousCertificateFingerprint().filter(fingerprint::equals).isPresent()) {
-                        // A superseded certificate binds only within the grace window measured from the
-                        // rotation timestamp. Once elapsed (or if the timestamp is somehow absent) it no
-                        // longer binds.
-                        return instance.certificatesRotatedAt()
-                                .map(rotatedAt -> rotatedAt.plus(PREVIOUS_CERT_GRACE_TTL))
-                                .filter(deadline -> clock.instant().isBefore(deadline))
-                                .map(deadline -> CertBinding.boundWithDeadline(instance.instanceUid(), deadline));
+                .map(instance -> {
+                    if (fingerprint.equals(instance.activeCertificateFingerprint())) {
+                        return new CertBinding(instance.instanceUid(), instance.activeCertificateExpiresAt());
                     }
-                    return Optional.of(CertBinding.bound(instance.instanceUid()));
+                    if (instance.previousCertificateFingerprint().filter(fingerprint::equals).isPresent()) {
+                        final var graceDeadline = instance.certificatesRotatedAt()
+                                .map(rotatedAt -> rotatedAt.plus(PREVIOUS_CERT_GRACE_TTL))
+                                .orElse(Instant.MIN);
+                        final var certExpiry = instance.previousCertificateExpiresAt().orElse(Instant.MIN);
+                        return new CertBinding(instance.instanceUid(),
+                                graceDeadline.isBefore(certExpiry) ? graceDeadline : certExpiry);
+                    }
+                    if (instance.nextCertificateFingerprint().filter(fingerprint::equals).isPresent()) {
+                        final var certExpiry = instance.nextCertificateExpiresAt().orElse(Instant.MIN);
+                        return new CertBinding(instance.instanceUid(), certExpiry);
+                    }
+                    return null;
                 });
     }
 
     /**
      * Finds the collector instance that has the given value as its active, next, or previous certificate
-     * fingerprint. Internal building block for {@link #resolveCertBinding(String)}; it applies no grace window,
-     * so it is not exposed directly.
+     * fingerprint. Internal building block for {@link #resolveCertBinding(String)}; it yields the raw
+     * document without the binding's validity stamp, so it is not exposed directly.
      */
     private Optional<CollectorInstanceDTO> findByActiveOrNextOrPreviousFingerprint(String fingerprint) {
         return Optional.ofNullable(

@@ -270,8 +270,8 @@ class CollectorIngestMtlsIT {
     @Test
     void acceptsNextCertificateDuringRenewal() throws Exception {
         // During renewal the agent may present its freshly issued "next" certificate before it is
-        // activated. findByActiveOrNextFingerprint resolves the next fingerprint to the same instance,
-        // so the handshake is trusted and the same instance UID reaches the journal.
+        // activated. resolveCertBinding resolves the next fingerprint to the same instance, so the
+        // handshake is trusted and the same instance UID reaches the journal.
         final AgentCert renewed = mintClientCert(AGENT_INSTANCE_UID, signingCertEntry);
         assertThat(instanceService.insertNextCertificate(AGENT_INSTANCE_UID, renewed.entry().fingerprint(),
                 renewed.entry().certificate(), renewed.entry().notAfter())).isTrue();
@@ -303,8 +303,8 @@ class CollectorIngestMtlsIT {
 
     @Test
     void rejectsSupersededCertificateAfterGraceWindowElapses() throws Exception {
-        // Once the grace window has elapsed, the superseded certificate no longer binds and is rejected —
-        // renewal rotates ingest access off the old cert.
+        // Once the grace window has elapsed, the superseded certificate's binding is expired and a new
+        // connection is rejected at the handshake — renewal rotates ingest access off the old cert.
         activateRenewedCertificate();
         clock.add(Duration.ofHours(1)); // well past the grace window
 
@@ -313,6 +313,24 @@ class CollectorIngestMtlsIT {
 
         assertThatThrownBy(() -> postLogs(client, port))
                 .hasCauseInstanceOf(SSLException.class);
+    }
+
+    @Test
+    void cutsEstablishedConnectionWhenGraceWindowElapses() throws Exception {
+        // TLS validates the client certificate only at the handshake — an established connection is never
+        // re-checked by the TLS layer. So a connection opened within the grace window must be cut by the
+        // per-request binding check once the grace deadline passes: same connection (the HttpClient reuses
+        // its pooled keep-alive connection, no new handshake), but now 401 instead of 200.
+        activateRenewedCertificate();
+
+        final int port = startServer();
+        final HttpClient client = createMtlsClient(agentKey, agentCert); // the now-superseded cert
+
+        assertThat(postLogs(client, port).statusCode()).isEqualTo(200); // within grace
+
+        clock.add(Duration.ofMinutes(10)); // past the grace window, well within the cache's idle expiry
+
+        assertThat(postLogs(client, port).statusCode()).isEqualTo(401);
     }
 
     /** Stages a fresh next certificate for the enrolled agent and activates it, demoting the old active cert. */

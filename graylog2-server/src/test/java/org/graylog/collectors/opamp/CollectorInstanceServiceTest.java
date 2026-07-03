@@ -126,57 +126,68 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void resolveCertBindingBindsActiveFingerprint() throws Exception {
+    void resolveCertBindingBindsActiveFingerprintUntilCertExpiry() throws Exception {
         final var enrolled = enroll("uid-active");
 
         assertThat(collectorInstanceService.resolveCertBinding(enrolled.activeCertificateFingerprint()))
                 .hasValueSatisfying(binding -> {
                     assertThat(binding.instanceUid()).isEqualTo("uid-active");
-                    assertThat(binding.validUntil()).isEmpty();
+                    assertThat(binding.validUntil()).isEqualTo(enrolled.activeCertificateExpiresAt());
+                    assertThat(binding.isValidAt(clock.instant())).isTrue();
                 });
     }
 
     @Test
-    void resolveCertBindingBindsNextFingerprint() throws Exception {
+    void resolveCertBindingBindsNextFingerprintUntilCertExpiry() throws Exception {
         enroll("uid-next");
-        setNextCertificateFields("uid-next", "sha256:next", "next-pem", clock.instant().plus(Duration.ofDays(30)));
+        final var nextExpiry = clock.instant().plus(Duration.ofDays(30));
+        setNextCertificateFields("uid-next", "sha256:next", "next-pem", nextExpiry);
 
         assertThat(collectorInstanceService.resolveCertBinding("sha256:next"))
                 .hasValueSatisfying(binding -> {
                     assertThat(binding.instanceUid()).isEqualTo("uid-next");
-                    assertThat(binding.validUntil()).isEmpty();
+                    assertThat(binding.validUntil()).isEqualTo(nextExpiry);
                 });
     }
 
     @Test
-    void resolveCertBindingBindsPreviousFingerprintWithinGraceWindow() throws Exception {
+    void resolveCertBindingBindsPreviousFingerprintUntilGraceDeadline() throws Exception {
         final var previousFp = enrollAndRotate("uid-prev");
+        final var previousCertExpiry = collectorInstanceService.findByInstanceUid("uid-prev").orElseThrow()
+                .previousCertificateExpiresAt().orElseThrow();
 
         assertThat(collectorInstanceService.resolveCertBinding(previousFp))
                 .hasValueSatisfying(binding -> {
                     assertThat(binding.instanceUid()).isEqualTo("uid-prev");
-                    assertThat(binding.validUntil()).isPresent();
+                    // The grace deadline caps the binding well below the certificate's own expiry.
+                    assertThat(binding.isValidAt(clock.instant())).isTrue();
+                    assertThat(binding.isValidAt(clock.instant().plus(Duration.ofHours(1)))).isFalse();
+                    assertThat(binding.validUntil()).isBefore(previousCertExpiry);
                 });
     }
 
     @Test
-    void resolveCertBindingDoesNotBindPreviousFingerprintPastGraceWindow() throws Exception {
+    void resolveCertBindingReturnsExpiredBindingForPreviousFingerprintPastGraceWindow() throws Exception {
         final var previousFp = enrollAndRotate("uid-prev-expired");
         clock.add(Duration.ofHours(1)); // past the grace window
 
-        assertThat(collectorInstanceService.resolveCertBinding(previousFp)).isEmpty();
+        // The binding is a pure mapping — it is still resolved, but its stamp is in the past, so the
+        // reader-side validity check rejects it.
+        assertThat(collectorInstanceService.resolveCertBinding(previousFp))
+                .hasValueSatisfying(binding -> assertThat(binding.isValidAt(clock.instant())).isFalse());
     }
 
     @Test
-    void resolveCertBindingDoesNotBindPreviousFingerprintWithoutRotationTimestamp() throws Exception {
+    void resolveCertBindingReturnsExpiredBindingForPreviousFingerprintWithoutRotationTimestamp() throws Exception {
         final var previousFp = enrollAndRotate("uid-prev-no-ts");
-        // Simulate a missing rotation timestamp (shouldn't happen, but must fail closed rather than
-        // granting an unbounded grace).
+        // Simulate a missing rotation timestamp (shouldn't happen). The binding must come out already
+        // expired rather than granting an unbounded grace.
         mongoCollections.nonEntityCollection(CollectorInstanceService.COLLECTION_NAME, Document.class)
                 .updateOne(Filters.eq(CollectorInstanceDTO.FIELD_INSTANCE_UID, "uid-prev-no-ts"),
                         new Document("$unset", new Document(CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT, "")));
 
-        assertThat(collectorInstanceService.resolveCertBinding(previousFp)).isEmpty();
+        assertThat(collectorInstanceService.resolveCertBinding(previousFp))
+                .hasValueSatisfying(binding -> assertThat(binding.isValidAt(clock.instant())).isFalse());
     }
 
     @Test

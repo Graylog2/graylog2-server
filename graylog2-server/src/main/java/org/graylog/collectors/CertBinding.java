@@ -17,21 +17,22 @@
 package org.graylog.collectors;
 
 import java.time.Instant;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
- * A certificate fingerprint's binding to a collector instance: the instance it binds to and — for a
- * superseded (previous-slot) certificate — the instant until which the binding remains valid
- * ({@code validUntil} empty means valid indefinitely, i.e. an active or next certificate). A
- * {@code CertBinding} is always bound; the absence of any binding is represented by an empty
- * {@link Optional} at the API boundary (see {@link CollectorInstanceService#resolveCertBinding(String)}).
+ * A certificate fingerprint's binding to a collector instance: the instance the certificate binds to and
+ * the instant the binding stops being honored on the ingest path — the certificate's own expiry, capped
+ * for a superseded (previous-slot) certificate by the renewal grace deadline. The binding is a pure fact
+ * about the instance's certificate slots; whether it is valid <em>now</em> is evaluated by the reader via
+ * {@link #isValidAt(Instant)}, so a resolved binding may already be expired.
  */
-public record CertBinding(String instanceUid, Optional<Instant> validUntil) {
-    public static CertBinding bound(String instanceUid) {
-        return new CertBinding(instanceUid, Optional.empty());
+public record CertBinding(String instanceUid, Instant validUntil) {
+    public CertBinding {
+        Objects.requireNonNull(instanceUid, "instanceUid must not be null");
+        Objects.requireNonNull(validUntil, "validUntil must not be null");
     }
 
-    public static CertBinding boundWithDeadline(String instanceUid, Instant validUntil) {
-        return new CertBinding(instanceUid, Optional.of(validUntil));
+    public boolean isValidAt(Instant instant) {
+        return instant.isBefore(validUntil());
     }
 }
