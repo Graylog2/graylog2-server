@@ -48,7 +48,7 @@ type Args = {
   queryId: string;
   field: string;
   value?: string;
-  contexts?: { valuePath?: ValuePath; valuePathOperator?: 'AND' | 'OR'; widget?: Widget } | null;
+  contexts?: { valuePath?: ValuePath; valuePathOperator?: 'AND' | 'OR' | 'EDGE'; widget?: Widget } | null;
 };
 
 const ExcludeFromQueryHandler =
