@@ -16,20 +16,26 @@
  */
 import * as React from 'react';
 
-import { DocumentTitle, Spinner } from 'components/common';
-import Welcome from 'components/welcome/Welcome';
-import useShowOnboardingWizard from 'components/welcome/useShowOnboardingWizard';
-import FirstUseWelcome from 'components/welcome/FirstUseWelcome';
+import { BootstrapModalWrapper, Modal, Button } from 'components/bootstrap';
 
-const WelcomePage = () => {
-  const showOnboardingWizard = useShowOnboardingWizard();
-  if (showOnboardingWizard === 'LOADING') {
-    return <Spinner />;
-  }
-
-  return (
-    <DocumentTitle title="Welcome">{showOnboardingWizard === 'SHOW' ? <FirstUseWelcome /> : <Welcome />}</DocumentTitle>
-  );
+type Props = {
+  show: boolean;
+  onHide: () => void;
 };
 
-export default WelcomePage;
+// Placeholder for the upcoming guided first-use ingestion setup wizard.
+const IngestionSetupModal = ({ show, onHide }: Props) => (
+  <BootstrapModalWrapper showModal={show} onHide={onHide}>
+    <Modal.Header>
+      <Modal.Title>Set up ingestion</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <p>The guided ingestion setup is coming soon.</p>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button onClick={onHide}>Close</Button>
+    </Modal.Footer>
+  </BootstrapModalWrapper>
+);
+
+export default IngestionSetupModal;

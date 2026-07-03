@@ -137,7 +137,7 @@ describe('CollectorsSettings', () => {
     await user.type(hostnameInput, 'ingest.example.com');
     await user.clear(portInput);
     await user.type(portInput, '14411');
-    await user.click(screen.getByRole('button', { name: /Update settings/i }));
+    await user.click(screen.getByRole('button', { name: /Confirm settings/i }));
 
     await waitFor(() =>
       expect(updateConfig).toHaveBeenCalledWith({
@@ -309,7 +309,7 @@ describe('CollectorsSettings telemetry', () => {
     await user.clear(hostnameInput);
     await user.type(hostnameInput, 'newhost.example.com');
 
-    await user.click(screen.getByRole('button', { name: /Update settings/i }));
+    await user.click(screen.getByRole('button', { name: /Confirm settings/i }));
 
     await waitFor(() => {
       expect(sendTelemetry).toHaveBeenCalledWith(
