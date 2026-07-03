@@ -16,9 +16,14 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import styled from 'styled-components';
 
 import SegmentedControl from 'components/bootstrap/SegmentedControl';
 import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
+
+const NarrowSegmentedControl = styled(SegmentedControl)`
+  width: fit-content;
+`;
 
 import { STREAM_VIEW_VARIANTS } from './Constants';
 
@@ -44,7 +49,7 @@ const StreamViewButtons = () => {
     [activeLayoutVariant, selectLayoutVariant],
   );
 
-  return <SegmentedControl<VariantValue> data={SEGMENTS} value={activeLayoutVariant as VariantValue} onChange={onChange} />;
+  return <NarrowSegmentedControl<VariantValue> data={SEGMENTS} value={activeLayoutVariant as VariantValue} onChange={onChange} />;
 };
 
 export default StreamViewButtons;
