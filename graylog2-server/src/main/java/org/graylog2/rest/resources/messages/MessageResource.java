@@ -103,6 +103,7 @@ public class MessageResource extends RestResource {
                                 @PathParam("index") String index,
                                 @ApiParam(name = "messageId", required = true)
                                 @PathParam("messageId") String messageId) throws IOException {
+        checkPermission(RestPermissions.INDICES_READ, index);
         checkPermission(RestPermissions.MESSAGES_READ, messageId);
         try {
             final ResultMessage resultMessage = messages.get(messageId, index);
