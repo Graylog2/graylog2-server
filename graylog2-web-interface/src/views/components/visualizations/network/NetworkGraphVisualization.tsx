@@ -26,9 +26,9 @@ import extractLeafPaths from 'views/components/visualizations/utils/extractLeafP
 import type { NodeCustomData } from 'views/components/visualizations/sankey/SankeyVisualization';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
-import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 
 import buildGraph from './buildGraph';
+import edgeColorScale from './edgeColorScale';
 import normalizeEdgeValue from './normalizeEdgeValue';
 import networkOnClickPopover from './networkOnClickPopover';
 
@@ -252,7 +252,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
     const maxValue = Math.max(...values);
     // Edge weight is encoded through the configured node colorscale: each edge's aggregated value is
     // normalized to [0, 1] and sampled from the same scale, honouring the reverse-scale option.
-    const scale = scaleForGradient(visualizationConfig.colorScale);
+    const scale = edgeColorScale(visualizationConfig.colorScale);
 
     // Plotly's `line.color` is per-trace, so each edge is its own two-point line trace to let its
     // color track the metric value.
