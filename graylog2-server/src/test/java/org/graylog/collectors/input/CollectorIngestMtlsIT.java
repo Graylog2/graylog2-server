@@ -93,6 +93,7 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -207,8 +208,10 @@ class CollectorIngestMtlsIT {
         if (serverChannel != null) {
             serverChannel.close().sync();
         }
-        bossGroup.shutdownGracefully().sync();
-        workerGroup.shutdownGracefully().sync();
+        // Zero quiet period: the no-arg default waits 2s per group for "no new tasks", which only adds
+        // dead time here — the server channel is already closed, nothing is in flight.
+        bossGroup.shutdownGracefully(0, 15, TimeUnit.SECONDS).sync();
+        workerGroup.shutdownGracefully(0, 15, TimeUnit.SECONDS).sync();
     }
 
     @Test
@@ -333,7 +336,9 @@ class CollectorIngestMtlsIT {
         assertThat(postLogs(client, port).statusCode()).isEqualTo(401);
     }
 
-    /** Stages a fresh next certificate for the enrolled agent and activates it, demoting the old active cert. */
+    /**
+     * Stages a fresh next certificate for the enrolled agent and activates it, demoting the old active cert.
+     */
     private void activateRenewedCertificate() throws Exception {
         final AgentCert renewed = mintClientCert(AGENT_INSTANCE_UID, signingCertEntry);
         instanceService.insertNextCertificate(AGENT_INSTANCE_UID, renewed.entry().fingerprint(),
