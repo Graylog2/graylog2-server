@@ -396,6 +396,10 @@ public class CollectorInstanceService {
         ), new FindOneAndUpdateOptions().returnDocument(ReturnDocument.BEFORE));
 
         if (orig != null) {
+            LOG.debug("Rotated certificates for instance {}: promoted next fingerprint {} to \"active\", demoted " +
+                            "active fingerprint {} to \"previous\".",
+                    instance.instanceUid(), instance.nextCertificateFingerprint().orElse(null),
+                    instance.activeCertificateFingerprint());
             clusterEventBus.post(new CollectorInstanceCertsChangedEvent(
                     Sets.union(instance.allCertFingerprints(), orig.allCertFingerprints()))
             );

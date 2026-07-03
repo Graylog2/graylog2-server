@@ -93,7 +93,8 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
 
         final var instanceUid = certBindingResolver.resolve(certFingerprint);
         if (instanceUid.isEmpty()) {
-            LOG.warn("Rejecting request without agent identity (no valid client certificate)");
+            LOG.warn("Rejecting request from {}: certificate fingerprint {} does not resolve to a collector instance.",
+                    ctx.channel().remoteAddress(), certFingerprint);
             sendError(ctx, HttpResponseStatus.UNAUTHORIZED, keepAlive);
             return;
         }

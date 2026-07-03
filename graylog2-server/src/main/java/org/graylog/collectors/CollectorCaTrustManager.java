@@ -162,6 +162,8 @@ public class CollectorCaTrustManager extends X509ExtendedTrustManager {
         if (!cn.equals(boundInstanceUuid.get())) {
             throw new CertificateException("Certificate CN does not match bound collector instance");
         }
+
+        LOG.debug("Verified collector binding for fingerprint {} -> instance {}.", fingerprint, boundInstanceUuid.get());
     }
 
     @Override

@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Resolves a client-certificate fingerprint to the collector instance it currently binds to — the single
@@ -124,10 +125,11 @@ public class CertBindingResolver extends AbstractIdleService {
      * than an error.
      */
     private Optional<CertBinding> loadBinding(String fingerprint) {
-        return instanceService.findByActiveOrNextOrPreviousFingerprint(fingerprint)
+        final var binding = instanceService.findByActiveOrNextOrPreviousFingerprint(fingerprint)
                 .map(instance -> {
                     if (fingerprint.equals(instance.activeCertificateFingerprint())) {
-                        return new CertBinding(instance.instanceUid(), instance.activeCertificateExpiresAt());
+                        return loadedBinding(fingerprint, instance.instanceUid(), "active",
+                                instance.activeCertificateExpiresAt());
                     }
                     if (instance.previousCertificateFingerprint().filter(fingerprint::equals).isPresent()) {
                         final var gracePeriod = configService.getOrDefault().collectorCertRotationGracePeriod();
@@ -135,15 +137,25 @@ public class CertBindingResolver extends AbstractIdleService {
                                 .map(rotatedAt -> rotatedAt.plus(gracePeriod))
                                 .orElse(Instant.MIN);
                         final var certExpiry = instance.previousCertificateExpiresAt().orElse(Instant.MIN);
-                        return new CertBinding(instance.instanceUid(),
+                        return loadedBinding(fingerprint, instance.instanceUid(), "previous",
                                 graceDeadline.isBefore(certExpiry) ? graceDeadline : certExpiry);
                     }
                     if (instance.nextCertificateFingerprint().filter(fingerprint::equals).isPresent()) {
                         final var certExpiry = instance.nextCertificateExpiresAt().orElse(Instant.MIN);
-                        return new CertBinding(instance.instanceUid(), certExpiry);
+                        return loadedBinding(fingerprint, instance.instanceUid(), "next", certExpiry);
                     }
                     return null;
                 });
+        if (binding.isEmpty()) {
+            LOG.debug("No instance binds fingerprint {}.", fingerprint);
+        }
+        return binding;
+    }
+
+    private static CertBinding loadedBinding(String fingerprint, String instanceUid, String slot, Instant validUntil) {
+        LOG.debug("Loaded binding for fingerprint {}: instance {}, slot {}, valid until {}.",
+                fingerprint, instanceUid, slot, validUntil);
+        return new CertBinding(instanceUid, validUntil);
     }
 
     /**
@@ -154,11 +166,15 @@ public class CertBindingResolver extends AbstractIdleService {
      */
     @Subscribe
     public void handleCertsChanged(CollectorInstanceCertsChangedEvent event) {
-        event.fingerprints().forEach(fingerprint -> {
+        int refreshed = 0;
+        for (final var fingerprint : event.fingerprints()) {
             if (cache.asMap().containsKey(fingerprint)) {
                 cache.refresh(fingerprint);
+                refreshed++;
             }
-        });
+        }
+        LOG.debug("Certificates changed: refreshing {} cached of {} touched fingerprint(s).",
+                refreshed, event.fingerprints().size());
     }
 
     private Ticker clockTicker() {
@@ -177,11 +193,15 @@ public class CertBindingResolver extends AbstractIdleService {
     private void preWarm() {
         try {
             final var expirationThreshold = configService.getOrDefault().collectorExpirationThreshold();
+            final var prewarmed = new AtomicLong();
             try (var stream = instanceService.streamAllUnexpired(expirationThreshold).limit(MAX_SIZE)) {
-                stream.forEach(instance ->
-                        cache.put(instance.activeCertificateFingerprint(), Optional.of(
-                                new CertBinding(instance.instanceUid(), instance.activeCertificateExpiresAt()))));
+                stream.forEach(instance -> {
+                    cache.put(instance.activeCertificateFingerprint(), Optional.of(
+                            new CertBinding(instance.instanceUid(), instance.activeCertificateExpiresAt())));
+                    prewarmed.incrementAndGet();
+                });
             }
+            LOG.debug("Prewarmed {} active collector fingerprint(s).", prewarmed.get());
         } catch (Exception e) {
             LOG.warn("Failed pre-warming collector fingerprint cache.", e);
         }
