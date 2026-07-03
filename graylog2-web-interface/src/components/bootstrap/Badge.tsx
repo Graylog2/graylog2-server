@@ -63,7 +63,7 @@ type Props = React.PropsWithChildren<{
   bsStyle?: ColorVariant;
   className?: string;
   'data-testid'?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   onMouseEnter?: React.MouseEventHandler<HTMLElement>;
   onMouseLeave?: React.MouseEventHandler<HTMLElement>;
   role?: string;
