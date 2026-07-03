@@ -57,6 +57,10 @@ type SimLink = { source: number | SimNode; target: number | SimNode };
 
 const LAYOUT_ITERATIONS = 500;
 const NODE_RADIUS = 75;
+// Number of invisible hit-target markers sampled along each edge so the whole edge is clickable.
+// Plotly click detection is point-based, and an edge's only real data points are its endpoints
+// (which coincide with node markers), so without these an edge line is not clickable.
+const EDGE_HIT_SAMPLES = 9;
 
 const runLayout = (nodeCount: number, links: ReadonlyArray<{ source: number; target: number }>): Array<SimNode> => {
   const simNodes: Array<SimNode> = Array.from({ length: nodeCount }, (_, i) => ({ id: i }));
@@ -130,6 +134,17 @@ type EdgeTrace = {
   // Per-point customdata so plotly attaches the edge metadata to whichever point the
   // user lands on when clicking the line segment.
   customdata: Array<EdgeCustomData | null>;
+  hoverinfo: 'none';
+  showlegend: false;
+};
+
+type HitTrace = {
+  type: 'scatter';
+  mode: 'markers';
+  x: Array<number>;
+  y: Array<number>;
+  marker: { size: number; opacity: number; color: string };
+  customdata: Array<EdgeCustomData>;
   hoverinfo: 'none';
   showlegend: false;
 };
@@ -225,7 +240,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
   const visualizationConfig =
     (config.visualizationConfig as NetworkVisualizationConfig) ?? NetworkVisualizationConfig.empty();
 
-  const plot = useMemo<{ traces: [EdgeTrace, NodeTrace]; xs: Array<number>; ys: Array<number> } | null>(() => {
+  const plot = useMemo<{ traces: [EdgeTrace, HitTrace, NodeTrace]; xs: Array<number>; ys: Array<number> } | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
     const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
     const allFields = [...rowFields, ...columnFields];
@@ -246,6 +261,9 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
     const edgeX: Array<number | null> = [];
     const edgeY: Array<number | null> = [];
     const edgeCustomData: Array<EdgeCustomData | null> = [];
+    const hitX: Array<number> = [];
+    const hitY: Array<number> = [];
+    const hitCustomData: Array<EdgeCustomData> = [];
     edges.forEach((edge) => {
       const s = positions[edge.source];
       const t = positions[edge.target];
@@ -271,6 +289,15 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
       // Both points carry the same edge metadata; the separator slot is `null` so
       // plotly won't surface a click between segments.
       edgeCustomData.push(cd, cd, null);
+
+      // Sample interior points along the edge (excluding endpoints, which sit on the nodes) so a
+      // click anywhere along the edge lands on a hit-detectable marker carrying the edge metadata.
+      for (let i = 1; i <= EDGE_HIT_SAMPLES; i += 1) {
+        const f = i / (EDGE_HIT_SAMPLES + 1);
+        hitX.push(s.x + f * (t.x - s.x));
+        hitY.push(s.y + f * (t.y - s.y));
+        hitCustomData.push(cd);
+      }
     });
 
     const textColor = theme.colors.text.primary;
@@ -282,6 +309,18 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
       y: edgeY,
       line: { width: 1, color: theme.colors.text.secondary },
       customdata: edgeCustomData,
+      hoverinfo: 'none',
+      showlegend: false,
+    };
+
+    const hitTrace: HitTrace = {
+      type: 'scatter',
+      mode: 'markers',
+      x: hitX,
+      y: hitY,
+      // Invisible (opacity 0) but still rendered as points, so they remain hit-detectable.
+      marker: { size: 10, opacity: 0, color: theme.colors.text.secondary },
+      customdata: hitCustomData,
       hoverinfo: 'none',
       showlegend: false,
     };
@@ -324,7 +363,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
       showlegend: false,
     };
 
-    return { traces: [edgeTrace, nodeTrace], xs, ys };
+    return { traces: [edgeTrace, hitTrace, nodeTrace], xs, ys };
   }, [config, mapKeys, rows, theme, visualizationConfig]);
 
   const layout = useMemo(() => buildLayout(width, height, plot), [width, height, plot]);

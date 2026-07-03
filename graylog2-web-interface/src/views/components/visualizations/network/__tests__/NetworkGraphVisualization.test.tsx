@@ -60,11 +60,19 @@ const baseProps = {
   toggleEdit: () => {},
 };
 
-const lastTraces = () => {
+const chartData = (): Array<Record<string, any>> => {
   const { calls } = asMock(GenericPlot).mock;
   const lastCall = calls[calls.length - 1];
 
-  return lastCall[0].chartData as [Record<string, any>, Record<string, any>];
+  return lastCall[0].chartData as Array<Record<string, any>>;
+};
+
+const edgeLineTrace = () => chartData()[0];
+const hitTrace = () => chartData()[1];
+const nodeTrace = () => {
+  const data = chartData();
+
+  return data[data.length - 1];
 };
 
 describe('NetworkGraphVisualization', () => {
@@ -83,7 +91,8 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
 
-    const [edgeTrace, nodeTrace] = lastTraces();
+    const edgeTrace = edgeLineTrace();
+    const node = nodeTrace();
 
     expect(edgeTrace.type).toBe('scatter');
     expect(edgeTrace.mode).toBe('lines');
@@ -93,16 +102,41 @@ describe('NetworkGraphVisualization', () => {
     expect(edgeTrace.x[5]).toBeNull();
     expect(edgeTrace.x[8]).toBeNull();
 
-    expect(nodeTrace.type).toBe('scatter');
-    expect(nodeTrace.mode).toBe('markers+text');
-    expect(nodeTrace.text).toEqual(['a1', 'b1', 'b2', 'a2']);
-    expect(nodeTrace.customdata).toEqual([
+    expect(node.type).toBe('scatter');
+    expect(node.mode).toBe('markers+text');
+    expect(node.text).toEqual(['a1', 'b1', 'b2', 'a2']);
+    expect(node.customdata).toEqual([
       { field: 'source', value: 'a1' },
       { field: 'target', value: 'b1' },
       { field: 'target', value: 'b2' },
       { field: 'source', value: 'a2' },
     ]);
-    expect(nodeTrace.marker.color).toEqual([2, 2, 1, 1]);
+    expect(node.marker.color).toEqual([2, 2, 1, 1]);
+  });
+
+  it('renders an invisible hit-target trace with sampled points along each edge', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+      .series([Series.forFunction('count()')])
+      .visualization('network')
+      .build();
+
+    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    const hits = hitTrace();
+
+    // 3 edges × 9 samples each.
+    expect(hits.type).toBe('scatter');
+    expect(hits.mode).toBe('markers');
+    expect(hits.marker.opacity).toBe(0);
+    expect(hits.x).toHaveLength(27);
+    expect(hits.y).toHaveLength(27);
+    // Each sample carries the edge (link) metadata so the popover treats it as an edge.
+    expect(hits.customdata[0].source).toBeDefined();
+    expect(hits.customdata[0].target).toBeDefined();
+
+    // The node trace stays last so it wins hit-detection near endpoints.
+    expect(nodeTrace().mode).toBe('markers+text');
   });
 
   it('makes the graph zoomable and pannable', () => {
@@ -134,16 +168,16 @@ describe('NetworkGraphVisualization', () => {
 
     const { calls } = asMock(GenericPlot).mock;
     const props = calls[calls.length - 1][0];
-    const nodeTrace = props.chartData[1];
+    const node = props.chartData[props.chartData.length - 1];
     const [xLo, xHi] = props.layout.xaxis.range;
     const [yLo, yHi] = props.layout.yaxis.range;
 
     // The initial range is an explicit padded range (so double-click reset restores it) that fully
     // contains every node with room to spare for the labels.
-    expect(xLo).toBeLessThan(Math.min(...nodeTrace.x));
-    expect(xHi).toBeGreaterThan(Math.max(...nodeTrace.x));
-    expect(yLo).toBeLessThan(Math.min(...nodeTrace.y));
-    expect(yHi).toBeGreaterThan(Math.max(...nodeTrace.y));
+    expect(xLo).toBeLessThan(Math.min(...node.x));
+    expect(xHi).toBeGreaterThan(Math.max(...node.x));
+    expect(yLo).toBeLessThan(Math.min(...node.y));
+    expect(yHi).toBeGreaterThan(Math.max(...node.y));
   });
 
   it('unifies same value across stages into a single node', () => {
@@ -155,10 +189,10 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.sharedValue} />);
 
-    const [, nodeTrace] = lastTraces();
+    const node = nodeTrace();
 
-    expect(nodeTrace.text).toEqual(['x', 'y']);
-    expect(nodeTrace.marker.color).toEqual([2, 2]);
+    expect(node.text).toEqual(['x', 'y']);
+    expect(node.marker.color).toEqual([2, 2]);
   });
 
   it('uses static weight of 1 per edge when no metric is configured', () => {
@@ -170,10 +204,10 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivotsNoMetric} />);
 
-    const [, nodeTrace] = lastTraces();
+    const node = nodeTrace();
 
-    expect(nodeTrace.text).toEqual(['a1', 'b1', 'a2', 'b2']);
-    expect(nodeTrace.marker.color).toEqual([1, 1, 1, 1]);
+    expect(node.text).toEqual(['a1', 'b1', 'a2', 'b2']);
+    expect(node.marker.color).toEqual([1, 1, 1, 1]);
   });
 
   it('chains edges across 3 groupings', () => {
@@ -186,12 +220,13 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.threeGroupings} />);
 
-    const [edgeTrace, nodeTrace] = lastTraces();
+    const edgeTrace = edgeLineTrace();
+    const node = nodeTrace();
 
-    expect(nodeTrace.text).toEqual(['a1', 'b1', 'c1', 'c2', 'b2']);
+    expect(node.text).toEqual(['a1', 'b1', 'c1', 'c2', 'b2']);
     // 5 edges × 3 entries (src, tgt, null) = 15
     expect(edgeTrace.x).toHaveLength(15);
-    expect(nodeTrace.customdata).toEqual([
+    expect(node.customdata).toEqual([
       { field: 'a', value: 'a1' },
       { field: 'b', value: 'b1' },
       { field: 'c', value: 'c1' },
