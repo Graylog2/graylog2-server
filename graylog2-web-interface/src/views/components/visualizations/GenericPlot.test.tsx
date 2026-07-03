@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { PlotRelayoutEvent } from 'plotly.js';
 import { render } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -51,5 +52,44 @@ describe('GenericPlot datarevision', () => {
     rerender(<GenericPlot chartData={resolved} />);
 
     expect(lastLayout().datarevision).not.toBe(firstRevision);
+  });
+});
+
+describe('GenericPlot relayout', () => {
+  beforeEach(() => {
+    asMock(Plot).mockClear();
+  });
+
+  const lastPlotProps = () => {
+    const { calls } = asMock(Plot).mock;
+
+    return calls[calls.length - 1][0];
+  };
+
+  it('reports a zoom when the relayout carries an x-range', () => {
+    const onZoom = jest.fn();
+    const onZoomReset = jest.fn();
+
+    render(<GenericPlot chartData={[{ type: 'bar' }]} onZoom={onZoom} onZoomReset={onZoomReset} />);
+
+    lastPlotProps().onRelayout({
+      'xaxis.range[0]': '2026-04-07',
+      'xaxis.range[1]': '2026-04-08',
+    } as unknown as PlotRelayoutEvent);
+
+    expect(onZoom).toHaveBeenCalledWith('2026-04-07', '2026-04-08');
+    expect(onZoomReset).not.toHaveBeenCalled();
+  });
+
+  it('reports a zoom reset when the plot relayouts to autorange (e.g. double-click reset)', () => {
+    const onZoom = jest.fn();
+    const onZoomReset = jest.fn();
+
+    render(<GenericPlot chartData={[{ type: 'bar' }]} onZoom={onZoom} onZoomReset={onZoomReset} />);
+
+    lastPlotProps().onRelayout({ 'xaxis.autorange': true });
+
+    expect(onZoomReset).toHaveBeenCalled();
+    expect(onZoom).not.toHaveBeenCalled();
   });
 });
