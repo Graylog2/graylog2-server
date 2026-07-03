@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'integrations/aws/common/Routes';
 
 type AWSInputConfigurationProps = {
@@ -24,11 +24,11 @@ type AWSInputConfigurationProps = {
 };
 
 const AWSInputConfiguration = ({ url = Routes.INTEGRATIONS.AWS.CLOUDWATCH.index }: AWSInputConfigurationProps) => {
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   useEffect(() => {
-    navigate(url);
-  }, [url, navigate]);
+    push(url);
+  }, [url, push]);
 
   return null;
 };

@@ -43,6 +43,11 @@ public final class EmptyObjectAsObjectModule implements Module {
     private static final class ForceObjectTypeIfEmpty implements TypeAttributeOverrideV2 {
         @Override
         public void overrideTypeAttributes(ObjectNode schemaNode, TypeScope scope, SchemaGenerationContext context) {
+            // java.lang.Object stands for "any value" (e.g. the cells in TabularResponse#datarows, which hold
+            // strings, numbers or null) and must stay an unconstrained schema.
+            if (scope.getType() != null && Object.class.equals(scope.getType().getErasedType())) {
+                return;
+            }
             // If the generator didn’t decide on a type (and it’s not a $ref),
             // declare an object with an empty properties object.
             final String type = context.getKeyword(SchemaKeyword.TAG_TYPE);
