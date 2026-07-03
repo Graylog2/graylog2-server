@@ -42,7 +42,6 @@ const getStreamTableElements = (
   const extRouting = extensionColumnGroups?.routing ?? [];
   const extPerformance = extensionColumnGroups?.performance ?? [];
 
-  // Extension attrs not assigned a group are appended to the order without a specific position
   const groupedIds = new Set([...extRouting, ...extPerformance]);
   const ungroupedExtNames = (extensionAttributes?.attributeNames ?? []).filter((id) => !groupedIds.has(id));
 
@@ -71,7 +70,6 @@ const getStreamTableElements = (
     METRIC_COLUMN_IDS.maxProcessingTime,
   ];
 
-  // Shared pitch-ordered column list, used across all three variants
   const defaultColumnOrder = [
     ...defaultCols,
     ...routingCols,

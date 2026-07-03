@@ -57,8 +57,6 @@ const useStreamsOverviewExtensions = (): {
       ],
       attributes: [...pluginTableElements.flatMap(({ attributes }) => attributes), ...pluggableAttributes.attributes],
     },
-    // Collect the attribute ids each plugin registers, keyed by the group ('routing'|'performance')
-    // the plugin declares. Core remains ignorant of specific enterprise column ids.
     columnGroups: pluginTableElements.reduce<ExtensionColumnGroups>(
       (acc, curr) => {
         const group: 'routing' | 'performance' | undefined = curr.group;

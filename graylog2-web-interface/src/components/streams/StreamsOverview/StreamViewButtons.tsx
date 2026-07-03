@@ -27,7 +27,6 @@ const StreamViewButtons = () => {
 
   const onDefault = useCallback(() => {
     if (activeLayoutVariant) {
-      // selectLayoutVariant toggles: calling it with the active variant clears it
       selectLayoutVariant(activeLayoutVariant);
     }
   }, [activeLayoutVariant, selectLayoutVariant]);
