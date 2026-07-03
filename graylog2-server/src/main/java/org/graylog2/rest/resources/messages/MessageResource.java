@@ -76,9 +76,6 @@ import static java.util.Objects.requireNonNull;
 @Path("/messages")
 public class MessageResource extends RestResource {
 
-    private static final String INDEX_NOT_PERMITTED_OR_MISSING = "The requested index cannot be found, or the user does not have the required permissions";
-    private static final String MESSAGE_NOT_PERMITTED_OR_MISSING = "The requested message cannot be found, or the user does not have the required permissions";
-
     private final Messages messages;
     private final CodecFactory codecFactory;
     private final IndexSetRegistry indexSetRegistry;
@@ -99,25 +96,15 @@ public class MessageResource extends RestResource {
     @Operation(summary = "Get a single message.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns the message", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "404", description = "Specified index does not exist or user is not privileged to see it."),
-            @ApiResponse(responseCode = "404", description = "Message does not exist or user is not privileged to see it.")
+            @ApiResponse(responseCode = "404", description = "Specified index does not exist"),
+            @ApiResponse(responseCode = "404", description = "Message does not exist")
     })
     public ResultMessage search(@Parameter(name = "index", description = "The index this message is stored in.", required = true)
                                 @PathParam("index") String index,
                                 @Parameter(name = "messageId", required = true)
                                 @PathParam("messageId") String messageId) throws IOException {
-        try {
-            checkPermission(RestPermissions.INDICES_READ, index);
-        } catch (ForbiddenException e) {
-            //intentionally using the same error for missing permissions and index not found, as decided in graylog-plugin-enterprise/issues/13402
-            throw new NotFoundException(INDEX_NOT_PERMITTED_OR_MISSING, e);
-        }
-        try {
-            checkPermission(RestPermissions.MESSAGES_READ, messageId);
-        } catch (ForbiddenException e) {
-            //intentionally using the same error for missing permissions and message not found, as decided in graylog-plugin-enterprise/issues/13402
-            throw new NotFoundException(MESSAGE_NOT_PERMITTED_OR_MISSING, e);
-        }
+        checkPermission(RestPermissions.INDICES_READ, index);
+        checkPermission(RestPermissions.MESSAGES_READ, messageId);
         try {
             final ResultMessage resultMessage = messages.get(messageId, index);
             final Message message = resultMessage.getMessage();
@@ -125,14 +112,10 @@ public class MessageResource extends RestResource {
 
             return resultMessage;
         } catch (DocumentNotFoundException e) {
-            throw new NotFoundException(MESSAGE_NOT_PERMITTED_OR_MISSING, e);
+            throw new NotFoundException("Message " + messageId + " does not exist in index " + index, e);
         } catch (IndexNotFoundException e) {
-            throw new NotFoundException(INDEX_NOT_PERMITTED_OR_MISSING, e);
-        } catch (ForbiddenException e) {
-            //intentionally using the same error for missing permissions and message not found, as decided in graylog-plugin-enterprise/issues/13402
-            throw new NotFoundException(MESSAGE_NOT_PERMITTED_OR_MISSING, e);
+            throw new NotFoundException("Index " + index + " does not exist.", e);
         }
-
     }
 
     private void checkMessageReadPermission(Message message) {
