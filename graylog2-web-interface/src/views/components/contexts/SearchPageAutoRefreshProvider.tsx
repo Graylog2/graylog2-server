@@ -31,12 +31,12 @@ const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) =>
   const jobIds = useViewsSelector(selectJobIds);
   const { autoRefresh } = useSearchURLQueryParams();
 
-  const { data: minimumRefresh } = useMinimumRefreshInterval();
-  const minimumRefreshInterval = durationToMS(minimumRefresh);
+  const { data: minimumRefresh, isInitialLoading: isLoadingMinimumRefresh } = useMinimumRefreshInterval();
+  const minimumRefreshInterval = minimumRefresh ? durationToMS(minimumRefresh) : 0;
   const autoRefreshInterval = durationToMS(autoRefresh);
   const interval = minimumRefreshInterval > autoRefreshInterval ? minimumRefreshInterval : autoRefreshInterval;
 
-  const refreshConfig = autoRefresh ? { interval: interval, enabled: true } : null;
+  const refreshConfig = autoRefresh && !isLoadingMinimumRefresh ? { interval: interval, enabled: true } : null;
 
   const onRefresh = useCallback(() => {
     if (!jobIds) {
@@ -45,7 +45,10 @@ const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) =>
   }, [dispatch, jobIds]);
 
   return (
-    <AutoRefreshProvider defaultRefreshConfig={refreshConfig} onRefresh={onRefresh}>
+    <AutoRefreshProvider
+      key={isLoadingMinimumRefresh ? 'loading' : 'ready'}
+      defaultRefreshConfig={refreshConfig}
+      onRefresh={onRefresh}>
       {children}
     </AutoRefreshProvider>
   );
