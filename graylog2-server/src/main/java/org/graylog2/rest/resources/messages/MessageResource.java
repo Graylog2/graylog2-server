@@ -96,8 +96,8 @@ public class MessageResource extends RestResource {
     @Operation(summary = "Get a single message.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns the message", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "404", description = "Specified index does not exist"),
-            @ApiResponse(responseCode = "404", description = "Message does not exist")
+            @ApiResponse(responseCode = "404", description = "Specified index does not exist."),
+            @ApiResponse(responseCode = "404", description = "Message does not exist.")
     })
     public ResultMessage search(@Parameter(name = "index", description = "The index this message is stored in.", required = true)
                                 @PathParam("index") String index,
