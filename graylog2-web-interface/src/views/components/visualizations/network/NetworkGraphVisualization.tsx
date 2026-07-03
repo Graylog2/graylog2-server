@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide } from 'd3-force';
-import chroma from 'chroma-js';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -27,9 +26,10 @@ import extractLeafPaths from 'views/components/visualizations/utils/extractLeafP
 import type { NodeCustomData } from 'views/components/visualizations/sankey/SankeyVisualization';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
+import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 
 import buildGraph from './buildGraph';
-import edgeWidth from './edgeWidth';
+import normalizeEdgeValue from './normalizeEdgeValue';
 import networkOnClickPopover from './networkOnClickPopover';
 
 import GenericPlot from '../GenericPlot';
@@ -59,9 +59,8 @@ type SimLink = { source: number | SimNode; target: number | SimNode };
 
 const LAYOUT_ITERATIONS = 500;
 const NODE_RADIUS = 75;
-// Per-side border thickness for the edge casing. Plotly lines can't be stroked, so a wider
-// background-colored line is drawn under each edge to give it a contrasting border.
-const EDGE_BORDER_WIDTH = 1.5;
+// Edge weight is encoded through the colorscale, not thickness, so every edge shares one width.
+const EDGE_WIDTH = 2;
 
 const runLayout = (nodeCount: number, links: ReadonlyArray<{ source: number; target: number }>): Array<SimNode> => {
   const simNodes: Array<SimNode> = Array.from({ length: nodeCount }, (_, i) => ({ id: i }));
@@ -251,18 +250,13 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
     const values = edges.map((edge) => edge.value);
     const minValue = Math.min(...values);
     const maxValue = Math.max(...values);
-    // Translucent theme foreground: achromatic so it never clashes with the configurable node
-    // colorscale, and it flips with the theme (dark ink on light, light ink on dark).
-    const edgeColor = chroma(theme.colors.text.primary).alpha(0.3).css();
-    // The casing matches the (theme-aware) canvas behind the transparent plot, so it reads as a
-    // contrasting border that separates overlapping edges — dark on the dark theme, light on light.
-    const edgeBorderColor = theme.colors.global.contentBackground;
+    // Edge weight is encoded through the configured node colorscale: each edge's aggregated value is
+    // normalized to [0, 1] and sampled from the same scale, honouring the reverse-scale option.
+    const scale = scaleForGradient(visualizationConfig.colorScale);
 
-    // Plotly's `line.width` is per-trace, so each edge is its own two-point line trace to let width
-    // scale with the aggregated metric value. Each edge also gets a wider casing trace drawn beneath
-    // all fills to give it a border.
-    const casingTraces: Array<EdgeTrace> = [];
-    const fillTraces: Array<EdgeTrace> = [];
+    // Plotly's `line.color` is per-trace, so each edge is its own two-point line trace to let its
+    // color track the metric value.
+    const edgeTraces: Array<EdgeTrace> = [];
     edges.forEach((edge) => {
       const s = positions[edge.source];
       const t = positions[edge.target];
@@ -283,23 +277,20 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
         value: edge.value,
       };
 
-      const lineWidth = edgeWidth(edge.value, minValue, maxValue);
-      const common = {
-        type: 'scatter' as const,
-        mode: 'lines' as const,
+      const normalized = normalizeEdgeValue(edge.value, minValue, maxValue);
+      const position = visualizationConfig.reverseScale ? 1 - normalized : normalized;
+
+      edgeTraces.push({
+        type: 'scatter',
+        mode: 'lines',
         x: [s.x, t.x],
         y: [s.y, t.y],
+        line: { width: EDGE_WIDTH, color: scale(position).hex() },
         customdata: [cd, cd],
-        hoverinfo: 'none' as const,
-        showlegend: false as const,
-      };
-
-      casingTraces.push({ ...common, line: { width: lineWidth + 2 * EDGE_BORDER_WIDTH, color: edgeBorderColor } });
-      fillTraces.push({ ...common, line: { width: lineWidth, color: edgeColor } });
+        hoverinfo: 'none',
+        showlegend: false,
+      });
     });
-
-    // Casings first (bottom), then fills, so every edge's fill sits on top of the borders.
-    const edgeTraces = [...casingTraces, ...fillTraces];
 
     const textColor = theme.colors.text.primary;
 

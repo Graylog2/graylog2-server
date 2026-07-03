@@ -22,6 +22,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -75,19 +76,10 @@ const nodeTrace = () => {
 
 const edgeTraces = () => chartData().slice(0, -1);
 
-// Edges render as a casing trace (border) followed by a fill trace, so the non-node traces are
-// the casings (first half) then the fills (second half).
-const casingTraces = () => {
-  const edges = edgeTraces();
-
-  return edges.slice(0, edges.length / 2);
-};
-
-const fillTraces = () => {
-  const edges = edgeTraces();
-
-  return edges.slice(edges.length / 2);
-};
+// Each edge trace carries its aggregated value in customdata, so we can look up the color assigned
+// to a specific edge value.
+const colorForValue = (value: number) =>
+  edgeTraces().find((edge) => edge.customdata[0].value === value)?.line.color;
 
 describe('NetworkGraphVisualization', () => {
   useViewsPlugin();
@@ -105,12 +97,12 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
 
-    const fills = fillTraces();
+    const edges = edgeTraces();
     const node = nodeTrace();
 
     // 3 edges, each its own two-point line trace.
-    expect(fills).toHaveLength(3);
-    fills.forEach((edge) => {
+    expect(edges).toHaveLength(3);
+    edges.forEach((edge) => {
       expect(edge.type).toBe('scatter');
       expect(edge.mode).toBe('lines');
       expect(edge.x).toHaveLength(2);
@@ -129,7 +121,7 @@ describe('NetworkGraphVisualization', () => {
     expect(node.marker.color).toEqual([2, 2, 1, 1]);
   });
 
-  it('scales edge line width by the aggregated metric value', () => {
+  it('colors edges by the aggregated metric value via the colorscale, at a uniform width', () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
       .series([Series.forFunction('count()')])
@@ -138,55 +130,34 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
 
-    const widths = fillTraces().map((edge) => edge.line.width);
-
-    // twoRowPivots has edges with distinct counts, so widths must vary and stay within [1, 8].
-    expect(Math.min(...widths)).toBe(1);
-    expect(Math.max(...widths)).toBe(8);
-    widths.forEach((w) => {
-      expect(w).toBeGreaterThanOrEqual(1);
-      expect(w).toBeLessThanOrEqual(8);
+    // All edges share one width; weight is conveyed by color.
+    edgeTraces().forEach((edge) => {
+      expect(edge.line.width).toBe(2);
+      expect(edge.line.color).toMatch(/^#[0-9a-f]{6}$/i);
     });
+
+    // twoRowPivots has distinct edge values (3, 5, 7), so the low and high edges sample different
+    // ends of the colorscale.
+    expect(colorForValue(3)).not.toBe(colorForValue(7));
   });
 
-  it('renders edge fills in a translucent color', () => {
-    const config = AggregationWidgetConfig.builder()
-      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
-      .series([Series.forFunction('count()')])
-      .visualization('network')
-      .build();
+  it('reverses the color mapping when reverseScale is enabled', () => {
+    const buildConfig = (reverseScale: boolean) =>
+      AggregationWidgetConfig.builder()
+        .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+        .series([Series.forFunction('count()')])
+        .visualization('network')
+        .visualizationConfig(NetworkVisualizationConfig.create('YlOrRd', reverseScale))
+        .build();
 
-    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+    render(<WrappedNetwork {...baseProps} config={buildConfig(false)} data={fixtures.twoRowPivots} />);
+    const forwardMax = colorForValue(7);
 
-    // chroma(...).alpha(0.3).css() yields an `rgb(r g b / 0.3)` string — i.e. a translucent edge.
-    fillTraces().forEach((edge) => {
-      expect(edge.line.color).toContain('/ 0.3)');
-    });
-  });
+    asMock(GenericPlot).mockClear();
+    render(<WrappedNetwork {...baseProps} config={buildConfig(true)} data={fixtures.twoRowPivots} />);
 
-  it('draws a wider, opaque casing under each edge as a contrasting border', () => {
-    const config = AggregationWidgetConfig.builder()
-      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
-      .series([Series.forFunction('count()')])
-      .visualization('network')
-      .build();
-
-    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
-
-    const casings = casingTraces();
-    const fills = fillTraces();
-
-    // One casing per edge, and the casing color is opaque (not the translucent fill color).
-    expect(casings).toHaveLength(fills.length);
-    casings.forEach((casing) => {
-      expect(casing.line.color).not.toContain('/ 0.3)');
-    });
-
-    // Each casing is EDGE_BORDER_WIDTH (1.5) wider on both sides than its fill (i.e. width + 3).
-    const sortedFills = fills.map((f) => f.line.width).sort((a, b) => a - b);
-    const sortedCasings = casings.map((c) => c.line.width).sort((a, b) => a - b);
-
-    expect(sortedCasings).toEqual(sortedFills.map((w) => w + 3));
+    // With the scale reversed, the max value samples the opposite end, so its color changes.
+    expect(colorForValue(7)).not.toBe(forwardMax);
   });
 
   it('makes the graph zoomable and pannable', () => {
@@ -273,8 +244,8 @@ describe('NetworkGraphVisualization', () => {
     const node = nodeTrace();
 
     expect(node.text).toEqual(['a1', 'b1', 'c1', 'c2', 'b2']);
-    // 5 edges → 5 fill traces (each also has a casing), each a two-point segment.
-    expect(fillTraces()).toHaveLength(5);
+    // 5 edges → 5 traces, each a two-point segment.
+    expect(edgeTraces()).toHaveLength(5);
     expect(node.customdata).toEqual([
       { field: 'a', value: 'a1' },
       { field: 'b', value: 'b1' },

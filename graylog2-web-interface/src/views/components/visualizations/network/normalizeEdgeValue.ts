@@ -14,21 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const MIN_EDGE_WIDTH = 1;
-const MAX_EDGE_WIDTH = 8;
-
 /**
- * Linearly map an edge's aggregated metric value to a line width in
- * [MIN_EDGE_WIDTH, MAX_EDGE_WIDTH]. When every edge shares the same value
- * (including a single-edge graph) there is no meaningful range, so all edges
- * render at the thinnest width.
+ * Linearly map an edge's aggregated metric value to a position in [0, 1], used to sample a color
+ * from the configured colorscale. When every edge shares the same value (including a single-edge
+ * graph) there is no meaningful range, so all edges sample the low end of the scale.
  */
-const edgeWidth = (value: number, min: number, max: number): number => {
-  if (max === min) return MIN_EDGE_WIDTH;
+const normalizeEdgeValue = (value: number, min: number, max: number): number =>
+  max === min ? 0 : (value - min) / (max - min);
 
-  const t = (value - min) / (max - min);
-
-  return MIN_EDGE_WIDTH + t * (MAX_EDGE_WIDTH - MIN_EDGE_WIDTH);
-};
-
-export default edgeWidth;
+export default normalizeEdgeValue;
