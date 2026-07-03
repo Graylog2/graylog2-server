@@ -26,6 +26,7 @@ import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import OutdatedIndicesTable from './OutdatedIndicesTable';
@@ -37,13 +38,47 @@ jest.mock('components/indices/hooks/useOutdatedIndices');
 jest.mock('components/indices/hooks/useCanArchive');
 jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('./hooks/useClusterJobs');
+jest.mock('logic/rest/FetchProvider', () => {
+  class Builder {
+    setHeader() {
+      return this;
+    }
+
+    setHeaders() {
+      return this;
+    }
+
+    json() {
+      return this;
+    }
+
+    text() {
+      return this;
+    }
+
+    raw() {
+      return this;
+    }
+
+    build() {
+      return Promise.resolve(this);
+    }
+  }
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => Promise.resolve({ system_job: { id: 'archive-job-id' } })),
+    Builder,
+  };
+});
 jest.mock('@graylog/server-api', () => ({
   IndexerIndices: {
     deleteOutdated: jest.fn(() => Promise.resolve()),
     remove: jest.fn(() => Promise.resolve()),
+    reindex: jest.fn(() => Promise.resolve()),
   },
 }));
-jest.mock('util/UserNotification', () => ({ success: jest.fn(), error: jest.fn() }));
+jest.mock('util/UserNotification', () => ({ success: jest.fn(), warning: jest.fn(), error: jest.fn() }));
 
 const makeIndex = (overrides: Partial<OutdatedIndex>): OutdatedIndex => ({
   index_name: 'index',
@@ -55,6 +90,7 @@ const makeIndex = (overrides: Partial<OutdatedIndex>): OutdatedIndex => ({
 });
 
 const graylogIndex = makeIndex({ index_name: 'graylog_0', managed_index: true });
+const secondGraylogIndex = makeIndex({ index_name: 'graylog_1', managed_index: true });
 const systemIndex = makeIndex({ index_name: '.system-index', system_index: true });
 const foreignIndex = makeIndex({ index_name: 'legacy-index' });
 
@@ -97,10 +133,12 @@ const storePendingArchive = (indexName: string, systemJobId?: string) => {
 
 describe('OutdatedIndicesTable', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     window.localStorage.removeItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY);
     asMock(useCanArchive).mockReturnValue(true);
     asMock(useSendTelemetry).mockReturnValue(jest.fn());
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: 0 });
+    asMock(fetch).mockResolvedValue({ system_job: { id: 'archive-job-id' } });
     mockOutdatedIndices({});
   });
 
@@ -133,13 +171,17 @@ describe('OutdatedIndicesTable', () => {
     expect(screen.getByText('System (1)')).toBeInTheDocument();
     expect(screen.getByText('Foreign (0)')).toBeInTheDocument();
     expect(screen.getByText('graylog_0')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('columnheader', { name: 'Actions' })).getByRole('button', { name: /^delete all/i }),
+    ).toBeInTheDocument();
   });
 
   it('offers archive-and-delete for managed indices only when archiving is available', () => {
     mockOutdatedIndices({ data: [graylogIndex] });
     const { rerender } = render(<OutdatedIndicesTable />);
 
-    expect(screen.getByRole('button', { name: /archive and delete/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^archive and delete$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /archive and delete all/i })).toBeInTheDocument();
 
     asMock(useCanArchive).mockReturnValue(false);
     rerender(<OutdatedIndicesTable />);
@@ -152,7 +194,8 @@ describe('OutdatedIndicesTable', () => {
     mockOutdatedIndices({ data: [systemIndex] });
     render(<OutdatedIndicesTable />);
 
-    expect(screen.getByRole('button', { name: /reindex/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^reindex$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /reindex all/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
   });
 
@@ -235,7 +278,7 @@ describe('OutdatedIndicesTable', () => {
     render(<OutdatedIndicesTable />);
 
     expect(screen.getByText(/archive failed/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /archive and delete/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^archive and delete$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
   });
 
@@ -248,7 +291,7 @@ describe('OutdatedIndicesTable', () => {
     render(<OutdatedIndicesTable />);
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /archive and delete/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^archive and delete$/i })).toBeInTheDocument();
     await waitFor(() => expect(window.localStorage.getItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY)).toBe('[]'));
   });
 
@@ -291,7 +334,7 @@ describe('OutdatedIndicesTable', () => {
     mockOutdatedIndices({ data: [graylogIndex] });
     render(<OutdatedIndicesTable />);
 
-    expect(screen.getByRole('button', { name: /archive and delete/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^archive and delete$/i })).toBeInTheDocument();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
@@ -303,7 +346,78 @@ describe('OutdatedIndicesTable', () => {
     mockOutdatedIndices({ data: [graylogIndex] });
     render(<OutdatedIndicesTable />);
 
-    expect(screen.getByRole('button', { name: /archive and delete/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^archive and delete$/i })).toBeInTheDocument();
     expect(screen.queryByText(/archiving\.\.\./i)).not.toBeInTheDocument();
+  });
+
+  it('runs bulk delete for eligible group indices and reports partial failures', async () => {
+    const refetch = jest.fn(() =>
+      Promise.resolve({ data: [secondGraylogIndex] }),
+    ) as unknown as ReturnType<typeof useOutdatedIndices>['refetch'];
+    asMock(IndexerIndices.remove).mockImplementation((indexName: string) =>
+      indexName === 'graylog_1' ? Promise.reject(new Error('Delete failed')) : Promise.resolve(),
+    );
+    mockOutdatedIndices({ data: [graylogIndex, secondGraylogIndex], refetch });
+    render(<OutdatedIndicesTable />);
+
+    await userEvent.click(screen.getByRole('button', { name: /^delete all/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/this will delete 2 outdated indices/i)).toBeInTheDocument();
+
+    await userEvent.click(within(dialog).getByRole('button', { name: /delete all/i }));
+
+    await waitFor(() => expect(IndexerIndices.remove).toHaveBeenCalledWith('graylog_0'));
+    expect(IndexerIndices.remove).toHaveBeenCalledWith('graylog_1');
+    expect(UserNotification.warning).toHaveBeenCalledWith(
+      expect.stringContaining('1 succeeded, 1 failed'),
+      'Some indices could not be deleted',
+    );
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('tracks successful bulk archive-and-delete jobs as pending actions', async () => {
+    mockOutdatedIndices({ data: [graylogIndex, secondGraylogIndex] });
+    render(<OutdatedIndicesTable />);
+
+    await userEvent.click(screen.getByRole('button', { name: /archive and delete all/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: /archive and delete all/i }));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+
+    const storedActions = JSON.parse(window.localStorage.getItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY));
+
+    expect(storedActions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ action: 'archive-delete', indexName: 'graylog_0', systemJobId: 'archive-job-id' }),
+        expect.objectContaining({ action: 'archive-delete', indexName: 'graylog_1', systemJobId: 'archive-job-id' }),
+      ]),
+    );
+    expect(UserNotification.success).toHaveBeenCalledWith(
+      'Archive and delete jobs were started for 2 outdated indices.',
+    );
+  });
+
+  it('skips in-progress archive actions when running a bulk action', async () => {
+    storePendingArchive('graylog_0', 'job-1');
+    asMock(useClusterJobs).mockReturnValue({
+      jobsById: new Map([['job-1', clusterJob({ job_status: 'running', percent_complete: 42 })]]),
+      jobsUpdatedAt: JOBS_POLLED_AFTER_ACTION,
+    });
+    mockOutdatedIndices({ data: [graylogIndex, secondGraylogIndex] });
+    render(<OutdatedIndicesTable />);
+
+    await userEvent.click(screen.getByRole('button', { name: /^delete all/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/this will delete 1 outdated index/i)).toBeInTheDocument();
+
+    await userEvent.click(within(dialog).getByRole('button', { name: /delete all/i }));
+
+    await waitFor(() => expect(IndexerIndices.remove).toHaveBeenCalledTimes(1));
+    expect(IndexerIndices.remove).toHaveBeenCalledWith('graylog_1');
+    expect(IndexerIndices.remove).not.toHaveBeenCalledWith('graylog_0');
   });
 });

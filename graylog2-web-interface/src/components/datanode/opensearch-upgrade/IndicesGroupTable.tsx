@@ -21,6 +21,7 @@ import { Alert, Button, ButtonToolbar, Label, Table } from 'components/bootstrap
 import { ProgressBar } from 'components/common';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
 
+import type { BulkIndexActionCandidate } from './bulkIndexActions';
 import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions';
 import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
 import type { ConfirmedAction } from './outdatedIndexActions';
@@ -29,6 +30,13 @@ import type { IndicesGroup } from './outdatedIndexGroups';
 const ActionsToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
+
+const BulkActionsToolbar = styled(ButtonToolbar)(
+  () => css`
+    justify-content: flex-end;
+    margin: 0;
+  `,
+);
 
 const ArchiveProgressBar = styled(ProgressBar)`
   display: inline-flex;
@@ -145,13 +153,19 @@ const OutdatedIndexActions = ({
 const IndicesGroupTable = ({
   group,
   onAction,
+  onBulkAction,
   canArchive,
   pendingIndexStatuses,
+  bulkActions,
+  isBulkActionSubmitting,
 }: {
   group: IndicesGroup;
   onAction: (action: ConfirmedAction) => void;
+  onBulkAction: (bulkAction: BulkIndexActionCandidate) => void;
   canArchive: boolean;
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
+  bulkActions: Array<BulkIndexActionCandidate>;
+  isBulkActionSubmitting: boolean;
 }) => {
   if (group.indices.length === 0) {
     return <Alert bsStyle="info">No outdated {group.shortLabel} indices.</Alert>;
@@ -164,7 +178,22 @@ const IndicesGroupTable = ({
           <tr>
             <th>{group.indexLabel}</th>
             <th>OpenSearch version</th>
-            <th aria-label="Actions" />
+            <th aria-label="Actions">
+              {bulkActions.length > 0 && (
+                <BulkActionsToolbar>
+                  {bulkActions.map((bulkAction) => (
+                    <Button
+                      key={bulkAction.action}
+                      bsSize="xs"
+                      bsStyle={ACTION_DEFINITIONS[bulkAction.action].buttonStyle}
+                      disabled={isBulkActionSubmitting}
+                      onClick={() => onBulkAction(bulkAction)}>
+                      {bulkAction.buttonLabel} ({bulkAction.targetIndices.length})
+                    </Button>
+                  ))}
+                </BulkActionsToolbar>
+              )}
+            </th>
           </tr>
         </thead>
         <tbody>

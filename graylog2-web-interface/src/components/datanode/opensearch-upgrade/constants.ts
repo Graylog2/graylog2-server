@@ -17,3 +17,6 @@
 
 // How often to poll cluster jobs and outdated indices while archive-and-delete actions are in flight.
 export const ARCHIVE_POLL_INTERVAL_MS = 5000;
+
+// Keep frontend-orchestrated bulk requests small until the backend exposes dedicated bulk endpoints.
+export const BULK_INDEX_ACTION_CONCURRENCY = 3;

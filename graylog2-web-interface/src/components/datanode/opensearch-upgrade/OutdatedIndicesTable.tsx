@@ -25,6 +25,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
 
+import BulkIndexActionConfirmDialog from './BulkIndexActionConfirmDialog';
+import { getBulkIndexActionCandidates, getBulkIndexActionNotification, runBulkIndexAction } from './bulkIndexActions';
+import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
 import IndicesGroupTable from './IndicesGroupTable';
 import usePendingOutdatedIndexActions from './hooks/usePendingOutdatedIndexActions';
 import { ACTION_DEFINITIONS } from './outdatedIndexActions';
@@ -38,6 +41,19 @@ type ArchiveAndDeleteResponse = {
 };
 
 const getArchiveSystemJobId = (actionResponse: unknown) => (actionResponse as ArchiveAndDeleteResponse)?.system_job?.id;
+
+const showBulkNotification = ({ type, message, title }: BulkIndexActionNotification) => {
+  const notify = (notification: (notificationMessage: string, notificationTitle?: string) => void) =>
+    title ? notification(message, title) : notification(message);
+
+  if (type === 'success') {
+    notify(UserNotification.success);
+  } else if (type === 'warning') {
+    notify(UserNotification.warning);
+  } else {
+    notify(UserNotification.error);
+  }
+};
 
 const Heading = styled.h4(
   ({ theme }) => css`
@@ -85,7 +101,9 @@ const OutdatedIndicesTable = () => {
     refetch,
   });
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
+  const [confirmedBulkAction, setConfirmedBulkAction] = useState<BulkIndexActionCandidate | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
 
   const indicesGroups = useMemo(() => groupOutdatedIndices(outdatedIndices), [outdatedIndices]);
@@ -96,8 +114,32 @@ const OutdatedIndicesTable = () => {
     () => indicesGroups.map((group) => ({ value: group.id, label: `${group.shortLabel} (${group.indices.length})` })),
     [indicesGroups],
   );
+  const bulkActions = useMemo(
+    () =>
+      getBulkIndexActionCandidates({
+        indices: selectedGroup.indices,
+        canArchive,
+        pendingIndexStatuses,
+      }),
+    [canArchive, pendingIndexStatuses, selectedGroup.indices],
+  );
 
   const closeConfirmDialog = () => setConfirmedAction(undefined);
+  const closeBulkConfirmDialog = () => setConfirmedBulkAction(undefined);
+  const cancelBulkConfirmDialog = () => {
+    if (!isBulkSubmitting) {
+      closeBulkConfirmDialog();
+    }
+  };
+
+  const updateSelectedGroup = (updatedOutdatedIndices: typeof outdatedIndices) => {
+    const updatedGroups = groupOutdatedIndices(updatedOutdatedIndices);
+    const updatedSelectedGroup = getSelectedGroup(updatedGroups, activeGroupId);
+
+    if (updatedSelectedGroup.indices.length === 0) {
+      setSelectedGroupId(getFirstGroupWithIndices(updatedGroups));
+    }
+  };
 
   const handleConfirm = async () => {
     if (!confirmedAction) {
@@ -125,18 +167,56 @@ const OutdatedIndicesTable = () => {
 
       UserNotification.success(actionDefinition.successMessage(confirmedAction.index));
       const { data: updatedOutdatedIndices = [] } = await refetch();
-      const updatedGroups = groupOutdatedIndices(updatedOutdatedIndices);
-      const updatedSelectedGroup = getSelectedGroup(updatedGroups, activeGroupId);
-
-      if (updatedSelectedGroup.indices.length === 0) {
-        setSelectedGroupId(getFirstGroupWithIndices(updatedGroups));
-      }
+      updateSelectedGroup(updatedOutdatedIndices);
 
       closeConfirmDialog();
     } catch (errorThrown) {
       UserNotification.error(extractErrorMessage(errorThrown), `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkConfirm = async () => {
+    if (!confirmedBulkAction || isBulkSubmitting) {
+      return;
+    }
+
+    sendTelemetry(ACTION_DEFINITIONS[confirmedBulkAction.action].telemetryEventType, {
+      app_pathname: 'datanode',
+      app_section: 'opensearch-upgrade',
+      app_action_value: 'bulk',
+      bulk_count: confirmedBulkAction.targetIndices.length,
+    });
+
+    setIsBulkSubmitting(true);
+
+    try {
+      const result = await runBulkIndexAction({
+        action: confirmedBulkAction.action,
+        indices: confirmedBulkAction.targetIndices,
+        onIndexSuccess: ({ index, response }) => {
+          if (confirmedBulkAction.action === 'archive-delete') {
+            addArchiveDeleteAction({
+              indexName: index.index_name,
+              systemJobId: getArchiveSystemJobId(response),
+            });
+          }
+        },
+      });
+
+      showBulkNotification(getBulkIndexActionNotification(confirmedBulkAction, result));
+
+      const { data: updatedOutdatedIndices = [] } = await refetch();
+      updateSelectedGroup(updatedOutdatedIndices);
+      closeBulkConfirmDialog();
+    } catch (errorThrown) {
+      UserNotification.error(
+        extractErrorMessage(errorThrown),
+        `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`,
+      );
+    } finally {
+      setIsBulkSubmitting(false);
     }
   };
 
@@ -165,8 +245,11 @@ const OutdatedIndicesTable = () => {
       <IndicesGroupTable
         group={selectedGroup}
         onAction={setConfirmedAction}
+        onBulkAction={setConfirmedBulkAction}
         canArchive={canArchive}
         pendingIndexStatuses={pendingIndexStatuses}
+        bulkActions={bulkActions}
+        isBulkActionSubmitting={isBulkSubmitting}
       />
 
       {confirmedAction && (
@@ -175,6 +258,14 @@ const OutdatedIndicesTable = () => {
           isSubmitting={isSubmitting}
           onCancel={closeConfirmDialog}
           onConfirm={handleConfirm}
+        />
+      )}
+      {confirmedBulkAction && (
+        <BulkIndexActionConfirmDialog
+          bulkAction={confirmedBulkAction}
+          isSubmitting={isBulkSubmitting}
+          onCancel={cancelBulkConfirmDialog}
+          onConfirm={handleBulkConfirm}
         />
       )}
     </>
