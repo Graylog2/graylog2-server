@@ -23,6 +23,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import ForceStartConfirmDialog from './ForceStartConfirmDialog';
+import StartUpgradeConfirmDialog from './StartUpgradeConfirmDialog';
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/useOpenSearchRollingRestart';
 import OutdatedIndicesTable from './OutdatedIndicesTable';
@@ -56,7 +57,6 @@ const OpenSearchUpgradeSection = () => {
     nodes: openSearchVersionNodes,
     numberOfDataNodes,
     isError: isVersionOverviewError,
-    isFetching: isFetchingVersionOverview,
     isLoading,
     isUpgradeAvailable,
     refetch: refetchOpenSearchClusterStats,
@@ -75,30 +75,31 @@ const OpenSearchUpgradeSection = () => {
   } = useOpenSearchRollingRestart();
   const sendTelemetry = useSendTelemetry();
   const [forceStartFailedChecks, setForceStartFailedChecks] = useState<Array<string>>([]);
+  const [showStartConfirm, setShowStartConfirm] = useState(false);
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
   const hasOutdatedIndices = outdatedIndices.length > 0;
   const rollingRestartState = rollingRestart?.data?.sm_state;
   const hasActiveRollingRestart = isRollingRestartActive(rollingRestart);
   const showStartAction = !hasActiveRollingRestart && isUpgradeAvailable;
-  const isCheckingVersionOverview = isLoading || isFetchingVersionOverview;
+  // Only the initial load counts as "checking" — background refetches (the 5s poll) must not blank the status
+  // table or flip the start button, otherwise the whole section flickers on every poll.
+  const isCheckingVersionOverview = isLoading;
   const isStartActionDisabled =
     isStartingRollingRestart ||
     isCheckingVersionOverview ||
     isVersionOverviewError ||
     isLoadingOutdatedIndices ||
     isOutdatedIndicesError ||
-    hasOutdatedIndices;
-  const startActionLabel = isRollingUpgradePossible
-    ? 'Start OpenSearch Rolling Upgrade'
-    : 'Apply OpenSearch Upgrade on Next Restart';
-  const startActionLoadingLabel = isRollingUpgradePossible
-    ? 'Starting OpenSearch Rolling Upgrade...'
-    : 'Applying OpenSearch Upgrade...';
+    hasOutdatedIndices ||
+    !isRollingUpgradePossible;
+  const startActionLabel = 'Start OpenSearch Rolling Upgrade';
+  const startActionLoadingLabel = 'Starting OpenSearch Rolling Upgrade...';
   const canResumeRollingRestart =
     rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
-  const showRollingUpgradeStatus =
-    !!rollingRestart &&
-    (hasActiveRollingRestart || (!isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable));
+  // Show the status/parallel table whenever there is a rolling-restart job to display (active or finished).
+  // Deliberately decoupled from the version-overview query so its 5s poll (fetching/error churn) can never
+  // blank the table mid-upgrade.
+  const showRollingUpgradeStatus = !!rollingRestart?.data;
 
   useEffect(() => {
     if (isRollingRestartTerminalState(rollingRestartState)) {
@@ -119,14 +120,13 @@ const OpenSearchUpgradeSection = () => {
     }
   };
 
-  const handleStartClick = () => {
-    sendTelemetry(
-      isRollingUpgradePossible
-        ? TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.ROLLING_UPGRADE_STARTED
-        : TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.APPLY_ON_NEXT_RESTART_CLICKED,
-      { ...TELEMETRY_DEFAULTS, event_details: { number_of_data_nodes: numberOfDataNodes } },
-    );
-    void handleStartRollingRestart();
+  const handleStartConfirm = async () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.ROLLING_UPGRADE_STARTED, {
+      ...TELEMETRY_DEFAULTS,
+      event_details: { number_of_data_nodes: numberOfDataNodes },
+    });
+    await handleStartRollingRestart();
+    setShowStartConfirm(false);
   };
 
   const handleForceStartConfirm = () => {
@@ -154,7 +154,11 @@ const OpenSearchUpgradeSection = () => {
         <Col xs={12}>
           <ButtonToolbar>
             {showStartAction && (
-              <Button bsStyle="primary" onClick={handleStartClick} disabled={isStartActionDisabled} type="button">
+              <Button
+                bsStyle="primary"
+                onClick={() => setShowStartConfirm(true)}
+                disabled={isStartActionDisabled}
+                type="button">
                 {isStartingRollingRestart ? startActionLoadingLabel : startActionLabel}
               </Button>
             )}
@@ -167,9 +171,6 @@ const OpenSearchUpgradeSection = () => {
           {!hasActiveRollingRestart && isVersionOverviewError && (
             <DisabledHint>Could not check OpenSearch upgrade availability.</DisabledHint>
           )}
-          {!hasActiveRollingRestart && isFetchingVersionOverview && !isLoading && (
-            <DisabledHint>Refreshing OpenSearch upgrade status...</DisabledHint>
-          )}
           {!hasActiveRollingRestart && !isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable && (
             <DisabledHint>Data Nodes&apos; embedded OpenSearch is already up to date.</DisabledHint>
           )}
@@ -178,6 +179,12 @@ const OpenSearchUpgradeSection = () => {
             <DisabledHint>Reload outdated indices before starting the OpenSearch upgrade.</DisabledHint>
           )}
           {hasOutdatedIndices && <DisabledHint>Resolve all outdated indices first.</DisabledHint>}
+          {showStartAction && !isRollingUpgradePossible && (
+            <DisabledHint>
+              A rolling upgrade requires at least {MIN_NODES_FOR_ROLLING_UPGRADE} Data Nodes (you have{' '}
+              {numberOfDataNodes}).
+            </DisabledHint>
+          )}
         </Col>
       </Row>
 
@@ -187,6 +194,16 @@ const OpenSearchUpgradeSection = () => {
             <OpenSearchRollingUpgradeNodes job={rollingRestart} versionNodes={openSearchVersionNodes} />
           </Col>
         </Row>
+      )}
+      {showStartConfirm && (
+        <StartUpgradeConfirmDialog
+          currentVersion={currentVersion}
+          targetVersion={targetVersion}
+          numberOfDataNodes={numberOfDataNodes}
+          isSubmitting={isStartingRollingRestart}
+          onCancel={() => setShowStartConfirm(false)}
+          onConfirm={handleStartConfirm}
+        />
       )}
       {!!forceStartFailedChecks.length && (
         <ForceStartConfirmDialog

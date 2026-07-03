@@ -112,24 +112,43 @@ describe('OpenSearchUpgradeSection', () => {
     mockOutdatedIndices([]);
   });
 
-  it('starts a rolling upgrade and sends telemetry on a healthy multi-node cluster', async () => {
+  it('confirms before starting a rolling upgrade, then starts and sends telemetry', async () => {
     const startRollingRestart = jest.fn(() => Promise.resolve());
     mockRollingRestart({ startRollingRestart });
     render(<OpenSearchUpgradeSection />);
 
     await userEvent.click(screen.getByRole('button', { name: /start opensearch rolling upgrade/i }));
 
+    // Nothing happens until the confirmation is acknowledged.
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/restarts every data node, one at a time/i)).toBeInTheDocument();
+    expect(startRollingRestart).not.toHaveBeenCalled();
+
+    await userEvent.click(within(dialog).getByRole('button', { name: /^start rolling upgrade$/i }));
+
     expect(startRollingRestart).toHaveBeenCalledWith(false);
     expect(sendTelemetry).toHaveBeenCalledWith(EVENTS.ROLLING_UPGRADE_STARTED, expect.anything());
   });
 
-  it('offers an apply-on-next-restart action below the rolling-upgrade node threshold', async () => {
+  it('does not start the rolling upgrade when the confirmation is cancelled', async () => {
+    const startRollingRestart = jest.fn(() => Promise.resolve());
+    mockRollingRestart({ startRollingRestart });
+    render(<OpenSearchUpgradeSection />);
+
+    await userEvent.click(screen.getByRole('button', { name: /start opensearch rolling upgrade/i }));
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: /cancel/i }));
+
+    expect(startRollingRestart).not.toHaveBeenCalled();
+    expect(sendTelemetry).not.toHaveBeenCalledWith(EVENTS.ROLLING_UPGRADE_STARTED, expect.anything());
+  });
+
+  it('disables the start action below the rolling-upgrade node threshold and explains why', () => {
     mockClusterStats({ numberOfDataNodes: 2 });
     render(<OpenSearchUpgradeSection />);
 
-    await userEvent.click(screen.getByRole('button', { name: /apply opensearch upgrade on next restart/i }));
-
-    expect(sendTelemetry).toHaveBeenCalledWith(EVENTS.APPLY_ON_NEXT_RESTART_CLICKED, expect.anything());
+    expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
+    expect(screen.getByText(/a rolling upgrade requires at least 3 data nodes \(you have 2\)/i)).toBeInTheDocument();
   });
 
   it('disables the start action while outdated indices remain', () => {
@@ -165,10 +184,14 @@ describe('OpenSearchUpgradeSection', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /start opensearch rolling upgrade/i }));
 
-    const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText(/cluster status is yellow/i)).toBeInTheDocument();
+    // Confirm the start; the (mocked) start rejects with an overridable failure, surfacing the force dialog.
+    const confirmDialog = await screen.findByRole('dialog');
+    await userEvent.click(within(confirmDialog).getByRole('button', { name: /^start rolling upgrade$/i }));
 
-    await userEvent.click(within(dialog).getByRole('button', { name: /start anyway/i }));
+    const forceDialog = await screen.findByRole('dialog');
+    expect(within(forceDialog).getByText(/cluster status is yellow/i)).toBeInTheDocument();
+
+    await userEvent.click(within(forceDialog).getByRole('button', { name: /start anyway/i }));
 
     await waitFor(() => expect(startRollingRestart).toHaveBeenCalledWith(true));
     expect(sendTelemetry).toHaveBeenCalledWith(EVENTS.ROLLING_UPGRADE_FORCE_STARTED, expect.anything());
