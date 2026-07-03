@@ -81,7 +81,7 @@ const getStreamTableElements = (
   const defaultVariantLayout = {
     ...SHARED_LAYOUT,
     defaultColumnOrder,
-    defaultDisplayedAttributes: [...defaultCols, ...ungroupedExtNames],
+    defaultDisplayedAttributes: defaultCols,
   };
 
   const routingVariantLayout = {
