@@ -27,6 +27,7 @@ import type { Input } from 'components/messageloaders/Types';
 import useProductName from 'brand-customization/useProductName';
 import InputDiagnosisOverviewTab from 'components/inputs/InputDiagnosis/InputDiagnosisOverviewTab';
 import InputDiagnosisRulesTab from 'components/inputs/InputDiagnosis/InputDiagnosisRulesTab';
+import { EditInputButton } from 'components/inputs';
 
 const LeftCol = styled.div(
   ({ theme }) => css`
@@ -52,6 +53,15 @@ const Header = styled.div(
     align-items: center;
   `,
 );
+
+const Actions = styled.div`
+  margin-left: auto;
+`;
+
+const ControlsRow = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const StyledSegmentedControl = styled(SegmentedControl)(
   ({ theme }) => css`
@@ -114,7 +124,14 @@ const InputDiagnosisPage = () => {
           <p>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</p>
         </LeftCol>
       </Header>
-      <StyledSegmentedControl<DiagnosisTab> data={TABS} radius="sm" value={currentTab} onChange={setCurrentTab} />
+      <ControlsRow>
+        <StyledSegmentedControl<DiagnosisTab> data={TABS} radius="sm" value={currentTab} onChange={setCurrentTab} />
+        {input && (
+          <Actions>
+            <EditInputButton input={input} />
+          </Actions>
+        )}
+      </ControlsRow>
       {input && currentTab === 'overview' && (
         <InputDiagnosisOverviewTab
           input={input}
