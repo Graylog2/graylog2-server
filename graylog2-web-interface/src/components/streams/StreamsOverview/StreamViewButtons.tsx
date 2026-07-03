@@ -16,16 +16,31 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import SegmentedControl from 'components/bootstrap/SegmentedControl';
 import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
 
+import { STREAM_VIEW_VARIANTS } from './Constants';
+
+const Container = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.sm};
+  `,
+);
+
+const Label = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
+    white-space: nowrap;
+  `,
+);
+
 const NarrowSegmentedControl = styled(SegmentedControl)`
   width: fit-content;
 `;
-
-import { STREAM_VIEW_VARIANTS } from './Constants';
 
 const SEGMENTS = [
   { label: 'Default', value: STREAM_VIEW_VARIANTS.default },
@@ -49,7 +64,16 @@ const StreamViewButtons = () => {
     [activeLayoutVariant, selectLayoutVariant],
   );
 
-  return <NarrowSegmentedControl<VariantValue> data={SEGMENTS} value={activeLayoutVariant as VariantValue} onChange={onChange} />;
+  return (
+    <Container>
+      <Label>View:</Label>
+      <NarrowSegmentedControl<VariantValue>
+        data={SEGMENTS}
+        value={activeLayoutVariant as VariantValue}
+        onChange={onChange}
+      />
+    </Container>
+  );
 };
 
 export default StreamViewButtons;
