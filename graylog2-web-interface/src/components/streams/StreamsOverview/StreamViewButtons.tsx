@@ -17,40 +17,34 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import { Button, ButtonGroup } from 'components/bootstrap';
+import SegmentedControl from 'components/bootstrap/SegmentedControl';
 import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
 
 import { STREAM_VIEW_VARIANTS } from './Constants';
 
+const SEGMENTS = [
+  { label: 'Default', value: STREAM_VIEW_VARIANTS.default },
+  { label: 'Routing', value: STREAM_VIEW_VARIANTS.routing },
+  { label: 'Performance', value: STREAM_VIEW_VARIANTS.performance },
+];
+
+type VariantValue = (typeof STREAM_VIEW_VARIANTS)[keyof typeof STREAM_VIEW_VARIANTS];
+
 const StreamViewButtons = () => {
   const { activeLayoutVariant, selectLayoutVariant } = useLayoutVariant();
 
-  const onDefault = useCallback(() => {
-    if (activeLayoutVariant) {
-      selectLayoutVariant(activeLayoutVariant);
-    }
-  }, [activeLayoutVariant, selectLayoutVariant]);
-
-  const onRouting = useCallback(() => selectLayoutVariant(STREAM_VIEW_VARIANTS.routing), [selectLayoutVariant]);
-  const onPerformance = useCallback(() => selectLayoutVariant(STREAM_VIEW_VARIANTS.performance), [selectLayoutVariant]);
-
-  const isDefault = !activeLayoutVariant;
-  const isRouting = activeLayoutVariant === STREAM_VIEW_VARIANTS.routing;
-  const isPerformance = activeLayoutVariant === STREAM_VIEW_VARIANTS.performance;
-
-  return (
-    <ButtonGroup>
-      <Button active={isDefault} onClick={onDefault}>
-        Default
-      </Button>
-      <Button active={isRouting} onClick={onRouting}>
-        Routing
-      </Button>
-      <Button active={isPerformance} onClick={onPerformance}>
-        Performance
-      </Button>
-    </ButtonGroup>
+  const onChange = useCallback(
+    (value: VariantValue) => {
+      if (value === STREAM_VIEW_VARIANTS.default) {
+        if (activeLayoutVariant) selectLayoutVariant(activeLayoutVariant);
+      } else {
+        selectLayoutVariant(value);
+      }
+    },
+    [activeLayoutVariant, selectLayoutVariant],
   );
+
+  return <SegmentedControl<VariantValue> data={SEGMENTS} value={activeLayoutVariant as VariantValue} onChange={onChange} />;
 };
 
 export default StreamViewButtons;
