@@ -16,6 +16,7 @@
  */
 package org.graylog2.datanode.restart;
 
+import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
@@ -23,6 +24,7 @@ import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.Node;
 import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
@@ -42,14 +44,16 @@ public class RollingRestartActions {
     private final DatanodeClusterAdminAdapter clusterAdmin;
     private final DatanodeRestApiProxy datanodeProxy;
     private final NodeService<DataNodeDto> nodeService;
+    private final DataNodeMetadataService dataNodeMetadataService;
 
     @Inject
     public RollingRestartActions(DatanodeClusterAdminAdapter clusterAdmin,
                                  DatanodeRestApiProxy datanodeProxy,
-                                 NodeService<DataNodeDto> nodeService) {
+                                 NodeService<DataNodeDto> nodeService, DataNodeMetadataService dataNodeMetadataService) {
         this.clusterAdmin = clusterAdmin;
         this.datanodeProxy = datanodeProxy;
         this.nodeService = nodeService;
+        this.dataNodeMetadataService = dataNodeMetadataService;
     }
 
     public void prepareCluster() {
@@ -67,9 +71,15 @@ public class RollingRestartActions {
         datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::stop);
     }
 
-    public void upgradeNode(String hostname) {
-        LOG.info("Sending UPGRADE trigger to DataNode {}", hostname);
-        datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::upgrade);
+    public void upgradeNode(String nodeID) {
+        LOG.info("Sending UPGRADE trigger to DataNode {}", nodeID);
+        dataNodeMetadataService.findByNodeId(nodeID)
+                .filter(m -> m.latestAvailableOpensearchVersion() != null)
+                .filter(m -> Version.parse(m.latestAvailableOpensearchVersion()).isHigherThan(Version.parse(m.currentOpensearchVersion())))
+                .ifPresentOrElse(
+                        dataNodeMetadata -> dataNodeMetadataService.setOpensearchVersions(nodeID, dataNodeMetadata.latestAvailableOpensearchVersion(), null),
+                        () -> LOG.warn("Node {} can't be upgraded, no newer opensearch version available", nodeID)
+                );
     }
 
     public void startNode(String hostname) {
@@ -129,9 +139,6 @@ public class RollingRestartActions {
     interface DataNodeManagementClient {
         @POST("management/start")
         Call<Void> start();
-
-        @POST("management/upgrade")
-        Call<Void> upgrade();
 
         @POST("management/stop")
         Call<Void> stop();

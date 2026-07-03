@@ -149,7 +149,7 @@ public class RollingRestartExecutionJob implements Job {
             }
             case UPGRADING_NODE -> {
                 final RollingRestartNodeEntry current = requireCurrent(data);
-                actions.upgradeNode(current.hostname());
+                actions.upgradeNode(current.datanodeId());
                 sm.fire(RollingRestartTrigger.PROCEED);
                 return data.toBuilder().smState(sm.getState()).build();
             }

@@ -16,19 +16,17 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.rest.config.OnlyInSecuredNode;
-import org.graylog2.datanode.DataNodeLifecycleEvent;
-import org.graylog2.datanode.DataNodeLifecycleTrigger;
-import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.system.NodeId;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.graylog.datanode.rest.config.OnlyInSecuredNode;
+import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.system.NodeId;
 
 @Path("/management")
 @Produces(MediaType.APPLICATION_JSON)
@@ -55,13 +53,6 @@ public class ManagementController {
     @OnlyInSecuredNode
     public void start() {
         postEvent(DataNodeLifecycleTrigger.START);
-    }
-
-    @POST
-    @Path("/upgrade")
-    @OnlyInSecuredNode
-    public void updateOpensearch() {
-        postEvent(DataNodeLifecycleTrigger.UPDATE_OPENSEARCH);
     }
 
     @POST
