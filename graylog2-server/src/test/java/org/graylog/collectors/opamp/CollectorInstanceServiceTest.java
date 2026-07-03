@@ -610,6 +610,46 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
+    void activateNextCertificateIsNoOpWhenSlotsChangedConcurrently() throws Exception {
+        final var enrolled = enroll("uid-cas");
+        setNextCertificateFields("uid-cas", "sha256:cas-next", "next-pem", clock.instant().plus(Duration.ofDays(30)));
+        final var stale = collectorInstanceService.findByInstanceUid("uid-cas").orElseThrow();
+        // A concurrent renewal stages a different next certificate after our read: the activation must
+        // not promote the outdated one it read.
+        setNextCertificateFields("uid-cas", "sha256:cas-next-2", "next-pem-2", clock.instant().plus(Duration.ofDays(60)));
+        capturedEvents.clear();
+
+        assertThat(collectorInstanceService.activateNextCertificate(stale)).isFalse();
+
+        // The concurrently written state stays intact: no promotion, no rotation stamp, no event.
+        final var current = collectorInstanceService.findByInstanceUid("uid-cas").orElseThrow();
+        assertThat(current.activeCertificateFingerprint()).isEqualTo(enrolled.activeCertificateFingerprint());
+        assertThat(current.nextCertificateFingerprint()).contains("sha256:cas-next-2");
+        assertThat(current.previousCertificateFingerprint()).isEmpty();
+        assertThat(current.certificatesRotatedAt()).isEmpty();
+        assertThat(capturedEvents).isEmpty();
+    }
+
+    @Test
+    void activateNextCertificateRepeatedActivationWithStaleStateIsNoOp() throws Exception {
+        enroll("uid-cas-double");
+        setNextCertificateFields("uid-cas-double", "sha256:cas-d-next", "next-pem", clock.instant().plus(Duration.ofDays(30)));
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-cas-double").orElseThrow();
+        assertThat(collectorInstanceService.activateNextCertificate(withNext)).isTrue();
+        final var rotatedAt = collectorInstanceService.findByInstanceUid("uid-cas-double").orElseThrow()
+                .certificatesRotatedAt().orElseThrow();
+
+        // A second activation with the same stale DTO (e.g. two concurrent requests both presenting the
+        // next thumbprint) must be a no-op — re-stamping certificates_rotated_at would silently extend
+        // the rotation grace window.
+        clock.add(Duration.ofMinutes(1));
+        assertThat(collectorInstanceService.activateNextCertificate(withNext)).isFalse();
+
+        assertThat(collectorInstanceService.findByInstanceUid("uid-cas-double").orElseThrow()
+                .certificatesRotatedAt()).contains(rotatedAt);
+    }
+
+    @Test
     void insertNextCertificateSetsNextFields() throws Exception {
         final var instance = enroll("uid-insert-next");
         final var nextDuration = Duration.ofDays(30);

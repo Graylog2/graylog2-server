@@ -375,25 +375,39 @@ public class CollectorInstanceService {
      * Publishes a {@link CollectorInstanceCertsChangedEvent} for the rotated fingerprints (promoted,
      * demoted, and any displaced previous) so subscribers re-resolve them.
      *
-     * @param instance the instance DTO
-     * @return true if the activation succeeded, false otherwise
+     * The update only applies while the document's certificate slots still match the given DTO
+     * (compare-and-swap): if a concurrent re-enrollment, renewal, or activation changed them after the
+     * caller's read, nothing is written and the caller may retry with a fresh read.
+     *
+     * @param instance the instance DTO whose slot state must still be current
+     * @return true if the activation succeeded, false if the instance doesn't exist or its certificate
+     * slots changed concurrently
      * @throws IllegalArgumentException if no next certificate exists for the instance
      */
     public boolean activateNextCertificate(CollectorInstanceDTO instance) {
         final Supplier<IllegalArgumentException> err = () -> new IllegalArgumentException("Instance missing next certificate data");
 
-        final var orig = collection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, instance.instanceUid()), combine(
-                set(FIELD_PREVIOUS_CERTIFICATE_PEM, instance.activeCertificatePem()),
-                set(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT, instance.activeCertificateFingerprint()),
-                set(FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT, Date.from(instance.activeCertificateExpiresAt())),
-                set(FIELD_ACTIVE_CERTIFICATE_PEM, instance.nextCertificatePem().orElseThrow(err)),
-                set(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, instance.nextCertificateFingerprint().orElseThrow(err)),
-                set(FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT, Date.from(instance.nextCertificateExpiresAt().orElseThrow(err))),
-                set(FIELD_CERTIFICATES_ROTATED_AT, Date.from(clock.instant())),
-                unset(FIELD_NEXT_CERTIFICATE_PEM),
-                unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
-                unset(FIELD_NEXT_CERTIFICATE_EXPIRES_AT)
-        ), new FindOneAndUpdateOptions().returnDocument(ReturnDocument.BEFORE));
+        final var orig = collection.findOneAndUpdate(
+                Filters.and(
+                        Filters.eq(FIELD_INSTANCE_UID, instance.instanceUid()),
+                        Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, instance.activeCertificateFingerprint()),
+                        Filters.eq(FIELD_NEXT_CERTIFICATE_FINGERPRINT, instance.nextCertificateFingerprint().orElse(null)),
+                        Filters.eq(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT, instance.previousCertificateFingerprint().orElse(null))
+                ),
+                combine(
+                        set(FIELD_PREVIOUS_CERTIFICATE_PEM, instance.activeCertificatePem()),
+                        set(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT, instance.activeCertificateFingerprint()),
+                        set(FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT, Date.from(instance.activeCertificateExpiresAt())),
+                        set(FIELD_ACTIVE_CERTIFICATE_PEM, instance.nextCertificatePem().orElseThrow(err)),
+                        set(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, instance.nextCertificateFingerprint().orElseThrow(err)),
+                        set(FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT, Date.from(instance.nextCertificateExpiresAt().orElseThrow(err))),
+                        set(FIELD_CERTIFICATES_ROTATED_AT, Date.from(clock.instant())),
+                        unset(FIELD_NEXT_CERTIFICATE_PEM),
+                        unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
+                        unset(FIELD_NEXT_CERTIFICATE_EXPIRES_AT)
+                ),
+                new FindOneAndUpdateOptions().returnDocument(ReturnDocument.BEFORE)
+        );
 
         if (orig != null) {
             LOG.debug("Rotated certificates for instance {}: promoted next fingerprint {} to \"active\", demoted " +
