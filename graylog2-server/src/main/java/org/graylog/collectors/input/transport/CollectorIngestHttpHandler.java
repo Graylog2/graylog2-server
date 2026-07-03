@@ -31,7 +31,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
-import org.graylog.collectors.CollectorFingerprintCache;
+import org.graylog.collectors.CertBindingResolver;
 import org.graylog.collectors.input.CollectorJournalRecordFactory;
 import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -58,16 +58,16 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
     private static final String LOGS_PATH = OtlpHttpUtils.LOGS_PATH;
 
     private final MessageInput input;
-    private final CollectorFingerprintCache fingerprintCache;
+    private final CertBindingResolver certBindingResolver;
 
     public interface Factory {
         CollectorIngestHttpHandler create(MessageInput input);
     }
 
     @AssistedInject
-    public CollectorIngestHttpHandler(@Assisted MessageInput input, CollectorFingerprintCache fingerprintCache) {
+    public CollectorIngestHttpHandler(@Assisted MessageInput input, CertBindingResolver certBindingResolver) {
         this.input = input;
-        this.fingerprintCache = fingerprintCache;
+        this.certBindingResolver = certBindingResolver;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
             return;
         }
 
-        final var instanceUid = fingerprintCache.lookup(certFingerprint);
+        final var instanceUid = certBindingResolver.resolve(certFingerprint);
         if (instanceUid.isEmpty()) {
             LOG.warn("Rejecting request without agent identity (no valid client certificate)");
             sendError(ctx, HttpResponseStatus.UNAUTHORIZED, keepAlive);

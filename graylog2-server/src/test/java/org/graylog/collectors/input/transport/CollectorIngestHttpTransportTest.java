@@ -65,7 +65,7 @@ class CollectorIngestHttpTransportTest {
     /**
      * The idle connection timeout is part of the transport's forced, non-configurable envelope (like
      * mTLS): connections must be closed well before their fingerprint cache entry can idle out, so that
-     * per-request binding lookups are always cache hits (see {@code CollectorFingerprintCache}). A user
+     * per-request binding lookups are always cache hits (see {@code CertBindingResolver}). A user
      * config of {@code 0} would disable the read-timeout handler entirely and void that guarantee, so it
      * must be overridden.
      */

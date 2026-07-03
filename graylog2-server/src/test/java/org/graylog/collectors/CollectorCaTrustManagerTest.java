@@ -49,7 +49,7 @@ class CollectorCaTrustManagerTest {
     private CertificateEntry signingCertEntry;
     private CollectorCaTrustManager trustManager;
     private CollectorCaCache caCache;
-    private CollectorFingerprintCache fingerprintCache;
+    private CertBindingResolver certBindingResolver;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -67,10 +67,10 @@ class CollectorCaTrustManagerTest {
 
         // The binding check resolves the client cert fingerprint to its instance UID; the success-path
         // tests use "test-agent" as the cert CN, so bind every fingerprint to that UID.
-        fingerprintCache = mock(CollectorFingerprintCache.class);
-        when(fingerprintCache.lookup(any())).thenReturn(Optional.of("test-agent"));
+        certBindingResolver = mock(CertBindingResolver.class);
+        when(certBindingResolver.resolve(any())).thenReturn(Optional.of("test-agent"));
 
-        trustManager = new CollectorCaTrustManager(caCache, fingerprintCache, TestClocks.fixedEpoch());
+        trustManager = new CollectorCaTrustManager(caCache, certBindingResolver, TestClocks.fixedEpoch());
     }
 
     @Test
@@ -153,7 +153,7 @@ class CollectorCaTrustManagerTest {
 
         // Use a clock far in the future so the cert is expired
         final var futureClock = Clock.fixed(Instant.EPOCH.plus(Duration.ofDays(365)), ZoneOffset.UTC);
-        final var futureTrustManager = new CollectorCaTrustManager(caCache, fingerprintCache, futureClock);
+        final var futureTrustManager = new CollectorCaTrustManager(caCache, certBindingResolver, futureClock);
 
         assertThatThrownBy(() -> futureTrustManager.checkClientTrusted(new X509Certificate[]{expiredCert}, "Ed25519"))
                 .isInstanceOf(CertificateException.class);

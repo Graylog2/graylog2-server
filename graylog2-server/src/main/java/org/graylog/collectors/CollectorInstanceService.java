@@ -110,9 +110,6 @@ public class CollectorInstanceService {
 
     private static final int REVOCATION_EVENT_BATCH_SIZE = 1000; // not more than this many fingerprints per event
     private static final long MAX_DELETIONS_PER_RUN = 100_000; // safety net for deleteExpired
-    // How long a superseded (previous-slot) certificate remains valid on the ingest path after rotation,
-    // covering the collector's asynchronous switch to the new certificate. TODO: make configurable.
-    private static final Duration PREVIOUS_CERT_GRACE_TTL = Duration.ofMinutes(5);
 
     private final MongoCollection<CollectorInstanceDTO> collection;
     private final MongoPaginationHelper<CollectorInstanceDTO> paginationHelper;
@@ -356,44 +353,11 @@ public class CollectorInstanceService {
     }
 
     /**
-     * Resolves a client-certificate fingerprint to the collector instance it binds to. This is a pure
-     * mapping of the instance's certificate slots — no clock is consulted: every binding carries the
-     * instant it stops being honored on the ingest path ({@link CertBinding#validUntil()}: the
-     * certificate's own expiry, capped for a superseded previous-slot certificate by the renewal grace
-     * deadline {@code certificates_rotated_at + PREVIOUS_CERT_GRACE_TTL}). Callers evaluate validity via
-     * {@link CertBinding#isValidAt(Instant)}. A returned binding may already be expired.
-     *
-     * @param fingerprint the presented certificate fingerprint
-     * @return the binding, or an empty optional if no instance has this fingerprint in any slot
+     * Finds the instance holding the given fingerprint in any certificate slot (active, next, or
+     * previous). Raw data access with no validity semantics — {@link CertBindingResolver} is the only
+     * intended caller and the authority on whether the certificate may actually be used.
      */
-    public Optional<CertBinding> resolveCertBinding(String fingerprint) {
-        return findByActiveOrNextOrPreviousFingerprint(fingerprint)
-                .map(instance -> {
-                    if (fingerprint.equals(instance.activeCertificateFingerprint())) {
-                        return new CertBinding(instance.instanceUid(), instance.activeCertificateExpiresAt());
-                    }
-                    if (instance.previousCertificateFingerprint().filter(fingerprint::equals).isPresent()) {
-                        final var graceDeadline = instance.certificatesRotatedAt()
-                                .map(rotatedAt -> rotatedAt.plus(PREVIOUS_CERT_GRACE_TTL))
-                                .orElse(Instant.MIN);
-                        final var certExpiry = instance.previousCertificateExpiresAt().orElse(Instant.MIN);
-                        return new CertBinding(instance.instanceUid(),
-                                graceDeadline.isBefore(certExpiry) ? graceDeadline : certExpiry);
-                    }
-                    if (instance.nextCertificateFingerprint().filter(fingerprint::equals).isPresent()) {
-                        final var certExpiry = instance.nextCertificateExpiresAt().orElse(Instant.MIN);
-                        return new CertBinding(instance.instanceUid(), certExpiry);
-                    }
-                    return null;
-                });
-    }
-
-    /**
-     * Finds the collector instance that has the given value as its active, next, or previous certificate
-     * fingerprint. Internal building block for {@link #resolveCertBinding(String)}; it yields the raw
-     * document without the binding's validity stamp, so it is not exposed directly.
-     */
-    private Optional<CollectorInstanceDTO> findByActiveOrNextOrPreviousFingerprint(String fingerprint) {
+    Optional<CollectorInstanceDTO> findByActiveOrNextOrPreviousFingerprint(String fingerprint) {
         return Optional.ofNullable(
                 collection.find(Filters.or(
                         Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, fingerprint),

@@ -41,7 +41,7 @@ import org.graylog.collectors.CollectorCaCache;
 import org.graylog.collectors.CollectorCaKeyManager;
 import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorCaTrustManager;
-import org.graylog.collectors.CollectorFingerprintCache;
+import org.graylog.collectors.CertBindingResolver;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog.collectors.CollectorTLSUtils;
@@ -106,7 +106,7 @@ import static org.mockito.Mockito.when;
  * <p>
  * It initializes the collectors CA hierarchy, enrolls an agent, and wires the real
  * {@link CollectorCaKeyManager}, {@link CollectorCaTrustManager} (including its active-instance
- * binding), {@link CollectorFingerprintCache}, and {@link CollectorIngestHttpHandler} into a Netty
+ * binding), {@link CertBindingResolver}, and {@link CollectorIngestHttpHandler} into a Netty
  * server. Client certificates are minted with the production {@link CertificateBuilder}
  * (clientAuth EKU, signed by the real signing cert), so they are cryptographically valid and only
  * the instance binding decides whether a handshake is trusted.
@@ -142,7 +142,7 @@ class CollectorIngestMtlsIT {
 
     private MutableClock clock;
     private CollectorInstanceService instanceService;
-    private CollectorFingerprintCache fingerprintCache;
+    private CertBindingResolver certBindingResolver;
     private CollectorTLSUtils tlsUtils;
     private CollectorCaCache caCache;
     private MessageInput input;
@@ -187,13 +187,13 @@ class CollectorIngestMtlsIT {
                         agent.entry().notAfter(), signingCertEntry.id()),
                 "000000000000000000000000");
 
-        fingerprintCache = new CollectorFingerprintCache(collectorsConfigService, instanceService,
+        certBindingResolver = new CertBindingResolver(collectorsConfigService, instanceService,
                 new EventBus(), clock, MoreExecutors.directExecutor());
 
         caCache = new CollectorCaCache(caService, certService, encryptedValueService, new EventBus(), Clock.systemUTC());
         caCache.startAsync().awaitRunning();
         final var keyManager = new CollectorCaKeyManager(caCache);
-        final var trustManager = new CollectorCaTrustManager(caCache, fingerprintCache, Clock.systemUTC());
+        final var trustManager = new CollectorCaTrustManager(caCache, certBindingResolver, Clock.systemUTC());
         tlsUtils = new CollectorTLSUtils(keyManager, trustManager, MoreExecutors.directExecutor());
 
         input = mock(MessageInput.class);
@@ -273,7 +273,7 @@ class CollectorIngestMtlsIT {
     @Test
     void acceptsNextCertificateDuringRenewal() throws Exception {
         // During renewal the agent may present its freshly issued "next" certificate before it is
-        // activated. resolveCertBinding resolves the next fingerprint to the same instance, so the
+        // activated. the binding resolver resolves the next fingerprint to the same instance, so the
         // handshake is trusted and the same instance UID reaches the journal.
         final AgentCert renewed = mintClientCert(AGENT_INSTANCE_UID, signingCertEntry);
         assertThat(instanceService.insertNextCertificate(AGENT_INSTANCE_UID, renewed.entry().fingerprint(),
@@ -379,7 +379,7 @@ class CollectorIngestMtlsIT {
                         pipeline.addLast("agent-cert-handler", new AgentCertChannelHandler());
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(1024 * 1024));
-                        pipeline.addLast("http-handler", new CollectorIngestHttpHandler(input, fingerprintCache));
+                        pipeline.addLast("http-handler", new CollectorIngestHttpHandler(input, certBindingResolver));
                     }
                 });
 

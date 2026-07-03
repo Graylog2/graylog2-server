@@ -47,13 +47,13 @@ public class CollectorCaTrustManager extends X509ExtendedTrustManager {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorCaTrustManager.class);
 
     private final CollectorCaCache caCache;
-    private final CollectorFingerprintCache fingerprintCache;
+    private final CertBindingResolver certBindingResolver;
     private final Clock clock;
 
     @Inject
-    public CollectorCaTrustManager(CollectorCaCache caCache, CollectorFingerprintCache fingerprintCache, Clock clock) {
+    public CollectorCaTrustManager(CollectorCaCache caCache, CertBindingResolver certBindingResolver, Clock clock) {
         this.caCache = caCache;
-        this.fingerprintCache = fingerprintCache;
+        this.certBindingResolver = certBindingResolver;
         this.clock = clock;
     }
 
@@ -154,7 +154,7 @@ public class CollectorCaTrustManager extends X509ExtendedTrustManager {
             throw new CertificateException("Failed to compute fingerprint for client certificate", e);
         }
 
-        final var boundInstanceUuid = fingerprintCache.lookup(fingerprint);
+        final var boundInstanceUuid = certBindingResolver.resolve(fingerprint);
         if (boundInstanceUuid.isEmpty()) {
             throw new CertificateException(f("No collector instance found for certificate fingerprint %s", fingerprint));
         }

@@ -31,7 +31,7 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
-import org.graylog.collectors.CollectorFingerprintCache;
+import org.graylog.collectors.CertBindingResolver;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
@@ -60,7 +60,7 @@ class CollectorIngestHttpHandlerTest {
     private MessageInput input;
 
     @Mock
-    private CollectorFingerprintCache fingerprintCache;
+    private CertBindingResolver certBindingResolver;
 
     @Test
     void postWithValidIdentityReturns200() throws Exception {
@@ -92,9 +92,9 @@ class CollectorIngestHttpHandlerTest {
 
     @Test
     void postWithUnboundFingerprintReturns401() {
-        final EmbeddedChannel channel = new EmbeddedChannel(new CollectorIngestHttpHandler(input, fingerprintCache));
+        final EmbeddedChannel channel = new EmbeddedChannel(new CollectorIngestHttpHandler(input, certBindingResolver));
         channel.attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).set("sha256:unbound");
-        when(fingerprintCache.lookup("sha256:unbound")).thenReturn(Optional.empty());
+        when(certBindingResolver.resolve("sha256:unbound")).thenReturn(Optional.empty());
 
         final ExportLogsServiceRequest request = createTestRequest();
         final FullHttpRequest httpRequest = createProtobufRequest("/v1/logs", request.toByteArray());
@@ -285,12 +285,12 @@ class CollectorIngestHttpHandlerTest {
 
     private EmbeddedChannel createChannel(String agentInstanceUid) {
         final EmbeddedChannel channel = new EmbeddedChannel(
-                new CollectorIngestHttpHandler(input, fingerprintCache));
+                new CollectorIngestHttpHandler(input, certBindingResolver));
         if (agentInstanceUid != null) {
             // The handler reads the fingerprint from the channel attribute and resolves it to an
             // instance UID via the cache; here the test uses the UID itself as the fingerprint.
             channel.attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).set(agentInstanceUid);
-            lenient().when(fingerprintCache.lookup(agentInstanceUid)).thenReturn(Optional.of(agentInstanceUid));
+            lenient().when(certBindingResolver.resolve(agentInstanceUid)).thenReturn(Optional.of(agentInstanceUid));
         }
         return channel;
     }

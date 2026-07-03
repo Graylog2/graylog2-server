@@ -39,6 +39,7 @@ public abstract class CollectorsConfig {
     private static final Duration DEFAULT_COLLECTOR_CERT_LIFETIME = Duration.ofDays(365);
     private static final Duration DEFAULT_COLLECTOR_HEARTBEAT_INTERVAL = Duration.ofSeconds(30);
     private static final int DEFAULT_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES = Ints.saturatedCast(Size.megabytes(10).toBytes());
+    private static final Duration DEFAULT_COLLECTOR_CERT_ROTATION_GRACE_PERIOD = Duration.ofMinutes(5);
 
     public static final String FIELD_CA_CERT_ID = "ca_cert_id";
     public static final String FIELD_SIGNING_CERT_ID = "signing_cert_id";
@@ -51,6 +52,7 @@ public abstract class CollectorsConfig {
     public static final String FIELD_COLLECTOR_CERT_LIFETIME = "collector_cert_lifetime";
     public static final String FIELD_COLLECTOR_HEARTBEAT_INTERVAL = "collector_heartbeat_interval";
     public static final String FIELD_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES = "opamp_max_request_body_size_bytes";
+    public static final String FIELD_COLLECTOR_CERT_ROTATION_GRACE_PERIOD = "collector_cert_rotation_grace_period";
 
     @JsonProperty(FIELD_CA_CERT_ID)
     @Nullable
@@ -91,6 +93,9 @@ public abstract class CollectorsConfig {
     @JsonProperty(FIELD_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES)
     public abstract int opampMaxRequestBodySizeBytes();
 
+    @JsonProperty(FIELD_COLLECTOR_CERT_ROTATION_GRACE_PERIOD)
+    public abstract Duration collectorCertRotationGracePeriod();
+
     public static Builder createDefaultBuilder(String hostname) {
         requireNonBlank(hostname, "hostname can't be blank");
 
@@ -118,7 +123,8 @@ public abstract class CollectorsConfig {
                     .collectorExpirationThreshold(DEFAULT_EXPIRATION_THRESHOLD)
                     .collectorCertLifetime(DEFAULT_COLLECTOR_CERT_LIFETIME)
                     .collectorHeartbeatInterval(DEFAULT_COLLECTOR_HEARTBEAT_INTERVAL)
-                    .opampMaxRequestBodySizeBytes(DEFAULT_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES);
+                    .opampMaxRequestBodySizeBytes(DEFAULT_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES)
+                    .collectorCertRotationGracePeriod(DEFAULT_COLLECTOR_CERT_ROTATION_GRACE_PERIOD);
         }
 
         @JsonProperty(FIELD_CA_CERT_ID)
@@ -153,6 +159,9 @@ public abstract class CollectorsConfig {
 
         @JsonProperty(FIELD_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES)
         public abstract Builder opampMaxRequestBodySizeBytes(int opampMaxRequestBodySizeBytes);
+
+        @JsonProperty(FIELD_COLLECTOR_CERT_ROTATION_GRACE_PERIOD)
+        public abstract Builder collectorCertRotationGracePeriod(Duration collectorCertRotationGracePeriod);
 
         public abstract CollectorsConfig build();
     }

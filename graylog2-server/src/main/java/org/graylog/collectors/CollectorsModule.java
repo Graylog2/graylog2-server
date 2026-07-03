@@ -104,7 +104,7 @@ public class CollectorsModule extends PluginModule {
         addTransport(CollectorIngestHttpTransport.NAME, CollectorIngestHttpTransport.class);
         addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
         install(new FactoryModuleBuilder().build(CollectorIngestHttpHandler.Factory.class));
-        addInitializer(CollectorFingerprintCache.class);
+        addInitializer(CertBindingResolver.class);
 
         if (isCloud) {
             serviceBinder().addBinding().to(CloudCollectorIngestService.class).in(Scopes.SINGLETON);

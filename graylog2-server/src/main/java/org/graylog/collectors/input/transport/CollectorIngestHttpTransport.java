@@ -90,9 +90,9 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
         final var merged = Optional.ofNullable(userConfig.getSource()).map(HashMap::new).orElse(new HashMap<>());
         merged.put(CK_TLS_ENABLE, true);
         merged.put(CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_REQUIRED);
-        // Fixing an idle timeout < fingerprint cache expiry (see CollectorFingerprintCache). This makes sure that
+        // Using a fixed idle timeout < fingerprint cache expiry (see CertBindingResolver). This makes sure that
         // cert lookups in the request path are cache hits, after the TLS handshake has populated the cache.
-        merged.put(CK_IDLE_WRITER_TIMEOUT, 60);
+        merged.put(CK_IDLE_WRITER_TIMEOUT, 60); // seconds
         return new Configuration(merged);
     }
 
