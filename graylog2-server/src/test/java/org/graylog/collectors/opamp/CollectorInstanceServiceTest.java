@@ -44,6 +44,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -769,6 +770,39 @@ class CollectorInstanceServiceTest {
         capturedEvents.forEach(event -> fingerprints.addAll(event.fingerprints()));
         assertThat(fingerprints).containsExactlyInAnyOrder(
                 expiredA.activeCertificateFingerprint(), expiredB.activeCertificateFingerprint());
+    }
+
+    @Test
+    void deleteExpiredBatchesRevocationEvents() {
+        // Enough expired instances that the purge spans multiple revocation-event batches
+        // (REVOCATION_EVENT_BATCH_SIZE is 1000). Inserted as raw documents — deleteExpired only reads
+        // last_seen and the fingerprint fields through its projection, so full enrollment is unnecessary.
+        final int instanceCount = 1100;
+        final Instant reference = Instant.parse("2025-01-01T00:00:00Z");
+        final var expectedFingerprints = new HashSet<String>();
+        final var documents = new ArrayList<Document>(instanceCount);
+        for (int i = 0; i < instanceCount; i++) {
+            final var fingerprint = "sha256:batch-" + i;
+            expectedFingerprints.add(fingerprint);
+            documents.add(new Document(CollectorInstanceDTO.FIELD_INSTANCE_UID, "uid-batch-" + i)
+                    .append(CollectorInstanceDTO.FIELD_LAST_SEEN, Date.from(reference.minus(Duration.ofDays(8))))
+                    .append(CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, fingerprint));
+        }
+        mongoCollections.nonEntityCollection(CollectorInstanceService.COLLECTION_NAME, Document.class)
+                .insertMany(documents);
+        capturedEvents.clear();
+
+        clock.setInstant(reference);
+        assertThat(collectorInstanceService.deleteExpired(Duration.ofDays(7))).isEqualTo(instanceCount);
+
+        // Each event must respect the batch limit, and together the events must cover every revoked
+        // fingerprint exactly once.
+        assertThat(capturedEvents).allSatisfy(event ->
+                assertThat(event.fingerprints()).hasSizeLessThanOrEqualTo(1000));
+        final var posted = new ArrayList<String>();
+        capturedEvents.forEach(event -> posted.addAll(event.fingerprints()));
+        assertThat(posted).hasSize(instanceCount); // no fingerprint posted twice
+        assertThat(Set.copyOf(posted)).isEqualTo(expectedFingerprints);
     }
 
     @Test

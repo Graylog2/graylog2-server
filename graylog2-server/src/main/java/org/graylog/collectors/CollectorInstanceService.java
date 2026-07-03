@@ -504,10 +504,9 @@ public class CollectorInstanceService {
                 .flatMap(DeletedInstance::allCertFingerprints)
                 .collect(Collectors.toSet());
 
-        Iterables.partition(revokedCertFingerprints, REVOCATION_EVENT_BATCH_SIZE).forEach(batch -> {
-            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(revokedCertFingerprints));
-        });
-
+        for (var batch : Iterables.partition(revokedCertFingerprints, REVOCATION_EVENT_BATCH_SIZE)) {
+            clusterEventBus.post(new CollectorInstanceCertsChangedEvent(Set.copyOf(batch)));
+        }
         return deleted.size();
     }
 
