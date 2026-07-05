@@ -51,8 +51,11 @@ import java.util.concurrent.atomic.AtomicLong;
  * handshake always outlives its connection and per-request resolutions never load on the Netty event
  * loop. Validity is enforced on every read, so a cut never requires a reload. The cache is prewarmed at
  * startup with active fingerprints and kept consistent by {@link CollectorInstanceCertsChangedEvent}s,
- * which refresh touched entries in place. Asynchronous work (refreshes, prewarm) runs on the
- * {@link CollectorCertVerificationExecutor}.
+ * which refresh touched entries in place.
+ * <p>
+ * Refreshes are <em>serve-stale-while-revalidating</em>: a failed reload retains the current value,
+ * and {@code refreshAfterWrite} re-resolves every entry that is still being accessed once its value
+ * is older than half the idle window.
  */
 @Singleton
 public class CertBindingResolver extends AbstractIdleService {
@@ -76,7 +79,7 @@ public class CertBindingResolver extends AbstractIdleService {
                                CollectorInstanceService instanceService,
                                EventBus eventBus,
                                Clock clock,
-                               @CollectorCertVerificationExecutor Executor executor) {
+                               @CollectorCertCacheRefreshExecutor Executor executor) {
         this.configService = configService;
         this.instanceService = instanceService;
         this.executor = executor;
@@ -84,9 +87,10 @@ public class CertBindingResolver extends AbstractIdleService {
         this.clock = clock;
         this.cache = Caffeine.newBuilder()
                 .maximumSize(MAX_SIZE)
-                .executor(executor) // event-driven refresh runs on this executor
+                .executor(executor) // refresh runs on this executor
                 .ticker(clockTicker()) // drive Caffeine's expiry off the same Clock as the binding deadlines
                 .expireAfterAccess(IDLE_EXPIRY)
+                .refreshAfterWrite(IDLE_EXPIRY.dividedBy(2)) // self-healing bound for failed/missed refreshes
                 .build(this::loadBinding);
     }
 
@@ -163,6 +167,10 @@ public class CertBindingResolver extends AbstractIdleService {
      * currently cached. Absent fingerprints are left alone: they hold no stale binding and will resolve
      * correctly on their next lookup, so proactively loading them would only add pointless work (e.g. for
      * the many fingerprints of expired instances that no longer exist).
+     * <p>
+     * A failed re-resolve retains the current value (serve-stale): the entry's write timestamp is not
+     * renewed, so {@code refreshAfterWrite} keeps re-attempting it on later accesses until a reload
+     * succeeds — see the class javadoc for the staleness bound this provides.
      */
     @Subscribe
     public void handleCertsChanged(CollectorInstanceCertsChangedEvent event) {

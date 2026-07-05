@@ -265,6 +265,51 @@ class CertBindingResolverTest {
     }
 
     @Test
+    void failedReResolveServesStaleUntilRefreshSucceeds() {
+        final var instance = activeInstance("uid-1", "fp-1", clock.instant().plus(Duration.ofDays(365)));
+        // Call sequence: initial load binds; the event-driven re-resolve hits a Mongo outage; the
+        // later refreshAfterWrite re-resolve succeeds against recovered Mongo (instance revoked).
+        when(instanceService.findByActiveOrNextOrPreviousFingerprint("fp-1"))
+                .thenReturn(Optional.of(instance))
+                .thenThrow(new RuntimeException("mongo down"))
+                .thenReturn(Optional.empty());
+        assertThat(resolver.resolve("fp-1")).contains("uid-1");
+
+        // The certs-changed event says this fingerprint's binding changed (the instance was revoked),
+        // but the re-resolve fails. Serve-stale: the last authoritative state keeps being served — the
+        // cut must not depend on Mongo being up at the moment of the event.
+        resolver.handleCertsChanged(new CollectorInstanceCertsChangedEvent(Set.of("fp-1")));
+        assertThat(resolver.resolve("fp-1")).contains("uid-1");
+
+        // Mongo recovers. The failed refresh did not renew the entry's write timestamp, so once the
+        // entry is older than the refreshAfterWrite interval, an access re-resolves it and the missed
+        // revocation is applied — the bounded self-healing that makes serve-stale safe. (The value the
+        // triggering access itself returns depends on executor timing; the inline test executor
+        // completes the reload immediately, so only the post-trigger state is asserted.)
+        clock.add(Duration.ofMinutes(31)); // past refreshAfterWrite (30m), within idle expiry (60m)
+        resolver.resolve("fp-1"); // triggers the re-resolve
+        assertThat(resolver.resolve("fp-1")).isEmpty(); // revocation applied
+
+        verify(instanceService, times(3)).findByActiveOrNextOrPreviousFingerprint("fp-1");
+    }
+
+    @Test
+    void staleEntryIsReResolvedOnAccessAfterRefreshInterval() {
+        final var instance = activeInstance("uid-1", "fp-1", clock.instant().plus(Duration.ofDays(365)));
+        when(instanceService.findByActiveOrNextOrPreviousFingerprint("fp-1")).thenReturn(Optional.of(instance));
+        assertThat(resolver.resolve("fp-1")).contains("uid-1");
+
+        // The instance is revoked but the certs-changed event never arrives (lost cluster event).
+        // refreshAfterWrite is the backstop: an access past the interval re-resolves the entry.
+        when(instanceService.findByActiveOrNextOrPreviousFingerprint("fp-1")).thenReturn(Optional.empty());
+        clock.add(Duration.ofMinutes(31)); // past refreshAfterWrite (30m), within idle expiry (60m)
+        resolver.resolve("fp-1"); // triggers the background re-resolve
+
+        assertThat(resolver.resolve("fp-1")).isEmpty();
+        verify(instanceService, times(2)).findByActiveOrNextOrPreviousFingerprint("fp-1");
+    }
+
+    @Test
     void touchedFingerprintThatIsNotCachedIsNotLoaded() {
         // fp-2 is not cached, so a certs-changed event must NOT proactively load it (avoids loading the
         // many fingerprints of expired instances that no longer exist).

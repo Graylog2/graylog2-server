@@ -201,4 +201,38 @@ public class CollectorsModule extends PluginModule {
         return new InstrumentedExecutorService(executor, metricRegistry,
                 name("collector-cert-verification", "executor-service"));
     }
+
+    /**
+     * Provides the executor that runs the {@link CertBindingResolver}'s background cache work —
+     * refreshes (event-driven and {@code refreshAfterWrite}) and the startup prewarm (see
+     * {@link CollectorCertCacheRefreshExecutor}).
+     * <p>
+     * Deliberately separate from the cert-verification executor: refresh tasks block on MongoDB, and
+     * during a Mongo outage each attempt can park a thread for the driver's server-selection timeout.
+     * On a shared pool that would delay or shed TLS handshakes (the periodic refresh wave alone could
+     * saturate it at large fleet sizes); on this dedicated two-thread pool the blast radius is capped
+     * at "refreshes stall", which is harmless — reads keep serving the current value and stale entries
+     * are retried on later access.
+     * <p>
+     * The queue is unbounded but intrinsically limited: Caffeine coalesces reloads per cache key, so
+     * the backlog can never exceed the number of cached fingerprints. Nobody waits on these tasks, so
+     * queueing (rather than shedding) is the right overload behavior, and the fixed two-thread pool is
+     * the throttle towards MongoDB.
+     */
+    @Provides
+    @Singleton
+    @CollectorCertCacheRefreshExecutor
+    Executor collectorCertCacheRefreshExecutor(MetricRegistry metricRegistry) {
+        final var maxThreads = 2;
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("collector-cert-refresh-%d")
+                .setDaemon(true)
+                .build();
+        final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(maxThreads, maxThreads, 60L, SECONDS, queue,
+                threadFactory);
+        executor.allowCoreThreadTimeOut(true);
+        return new InstrumentedExecutorService(executor, metricRegistry,
+                name("collector-cert-cache-refresh", "executor-service"));
+    }
 }
