@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -48,11 +48,11 @@ const Title = styled.div`
 const TitleCol = ({ adapter, children }: { adapter: DataAdapterEntity; children: string }) => {
   const { errors } = useErrorsContext();
   const adapterErrorText = errors?.adapterErrors[adapter.name];
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const onClick = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(adapter?.name));
-  }, [navigate, adapter?.name]);
+    push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(adapter?.name));
+  }, [push, adapter?.name]);
 
   return (
     <TitleRow>
