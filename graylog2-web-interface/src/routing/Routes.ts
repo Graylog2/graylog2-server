@@ -290,7 +290,7 @@ const Routes = {
       queryParams.stream_categories = streamCategories.join(',');
     }
 
-    if(autorefresh) {
+    if (autorefresh) {
       queryParams.autorefresh = autorefresh;
     }
 

@@ -93,6 +93,7 @@ describe('CollectorsOnboardingInstancePage', () => {
       data: instance,
       isLoading: false,
       error: null,
+      isError: false,
       ...overrides,
     });
 

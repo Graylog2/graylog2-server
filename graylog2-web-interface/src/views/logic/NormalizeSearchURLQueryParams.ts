@@ -110,7 +110,8 @@ export const useSearchURLQueryParams = () => {
   const query = useQuery();
 
   return useMemo(() => {
-    const { timeRange, autoRefresh, queryString, streamsFilter, streamCategoriesFilter } = normalizeSearchURLQueryParams(query);
+    const { timeRange, autoRefresh, queryString, streamsFilter, streamCategoriesFilter } =
+      normalizeSearchURLQueryParams(query);
 
     return {
       timeRange,
