@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
@@ -156,7 +155,6 @@ const getPageDescription = (segment: DetailsSegment) => (
 );
 
 const StreamDetails = ({ stream }: Props) => {
-  const navigate = useNavigate();
   const { segment } = useQuery();
   const [currentSegment, setCurrentSegment] = useState<DetailsSegment>((segment as DetailsSegment) || INTAKE_SEGMENT);
   const DataLakeJobComponent = PluginStore.exports('dataLake')?.[0]?.DataLakeJobs;
@@ -204,7 +202,7 @@ const StreamDetails = ({ stream }: Props) => {
       <Container>
         <Header>
           <LeftCol>
-            <Button onClick={() => navigate(Routes.STREAMS)}>
+            <Button onClick={() => history.push(Routes.STREAMS)}>
               <Icon name="arrow_left_alt" size="sm" /> Back
             </Button>
 

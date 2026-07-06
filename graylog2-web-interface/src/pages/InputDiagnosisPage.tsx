@@ -16,8 +16,8 @@
  */
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import { Icon } from 'components/common';
 import useParams from 'routing/useParams';
 import { Button, SegmentedControl } from 'components/bootstrap';
@@ -101,7 +101,7 @@ const getListeningProtocol = (input?: Input) => {
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
   const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const productName = useProductName();
   const listeningProtocol = getListeningProtocol(input);
   const [currentTab, setCurrentTab] = useState<DiagnosisTab>('overview');
@@ -115,7 +115,7 @@ const InputDiagnosisPage = () => {
   return (
     <>
       <Header>
-        <Button onClick={() => navigate(Routes.SYSTEM.INPUTS)}>
+        <Button onClick={() => push(Routes.SYSTEM.INPUTS)}>
           <Icon name="arrow_left_alt" size="sm" /> Back
         </Button>
         <LeftCol>

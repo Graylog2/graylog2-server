@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { MenuItem, DeleteMenuItem, BootstrapModalConfirm } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -37,11 +37,11 @@ function Actions({ cache }: ActionsProps) {
   const sendTelemetry = useSendTelemetry();
   const { deleteCache, deletingCache } = useDeleteCache();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const handleEdit = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
-  }, [navigate, cache.name]);
+    push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
+  }, [push, cache.name]);
 
   const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.CACHE_DELETED, {

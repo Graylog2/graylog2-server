@@ -22,6 +22,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -67,13 +68,25 @@ const chartData = (): Array<Record<string, any>> => {
   return lastCall[0].chartData as Array<Record<string, any>>;
 };
 
-const edgeLineTrace = () => chartData()[0];
-const hitTrace = () => chartData()[1];
+// Traces are laid out as [...edgeTraces, hitTrace, nodeTrace].
 const nodeTrace = () => {
   const data = chartData();
 
   return data[data.length - 1];
 };
+
+const hitTrace = () => {
+  const data = chartData();
+
+  return data[data.length - 2];
+};
+
+const edgeTraces = () => chartData().slice(0, -2);
+
+// Each edge trace carries its aggregated value in customdata, so we can look up the color assigned
+// to a specific edge value.
+const colorForValue = (value: number) =>
+  edgeTraces().find((edge) => edge.customdata[0].value === value)?.line.color;
 
 describe('NetworkGraphVisualization', () => {
   useViewsPlugin();
@@ -91,16 +104,17 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
 
-    const edgeTrace = edgeLineTrace();
+    const edges = edgeTraces();
     const node = nodeTrace();
 
-    expect(edgeTrace.type).toBe('scatter');
-    expect(edgeTrace.mode).toBe('lines');
-    expect(edgeTrace.x).toHaveLength(9);
-    expect(edgeTrace.y).toHaveLength(9);
-    expect(edgeTrace.x[2]).toBeNull();
-    expect(edgeTrace.x[5]).toBeNull();
-    expect(edgeTrace.x[8]).toBeNull();
+    // 3 edges, each its own two-point line trace.
+    expect(edges).toHaveLength(3);
+    edges.forEach((edge) => {
+      expect(edge.type).toBe('scatter');
+      expect(edge.mode).toBe('lines');
+      expect(edge.x).toHaveLength(2);
+      expect(edge.y).toHaveLength(2);
+    });
 
     expect(node.type).toBe('scatter');
     expect(node.mode).toBe('markers+text');
@@ -137,6 +151,45 @@ describe('NetworkGraphVisualization', () => {
 
     // The node trace stays last so it wins hit-detection near endpoints.
     expect(nodeTrace().mode).toBe('markers+text');
+  });
+
+  it('colors edges by the aggregated metric value via the colorscale, at a uniform width', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+      .series([Series.forFunction('count()')])
+      .visualization('network')
+      .build();
+
+    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    // All edges share one width; weight is conveyed by color.
+    edgeTraces().forEach((edge) => {
+      expect(edge.line.width).toBe(2);
+      expect(edge.line.color).toMatch(/^#[0-9a-f]{6}$/i);
+    });
+
+    // twoRowPivots has distinct edge values (3, 5, 7), so the low and high edges sample different
+    // ends of the colorscale.
+    expect(colorForValue(3)).not.toBe(colorForValue(7));
+  });
+
+  it('reverses the color mapping when reverseScale is enabled', () => {
+    const buildConfig = (reverseScale: boolean) =>
+      AggregationWidgetConfig.builder()
+        .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+        .series([Series.forFunction('count()')])
+        .visualization('network')
+        .visualizationConfig(NetworkVisualizationConfig.create('YlOrRd', reverseScale))
+        .build();
+
+    render(<WrappedNetwork {...baseProps} config={buildConfig(false)} data={fixtures.twoRowPivots} />);
+    const forwardMax = colorForValue(7);
+
+    asMock(GenericPlot).mockClear();
+    render(<WrappedNetwork {...baseProps} config={buildConfig(true)} data={fixtures.twoRowPivots} />);
+
+    // With the scale reversed, the max value samples the opposite end, so its color changes.
+    expect(colorForValue(7)).not.toBe(forwardMax);
   });
 
   it('makes the graph zoomable and pannable', () => {
@@ -220,12 +273,11 @@ describe('NetworkGraphVisualization', () => {
 
     render(<WrappedNetwork {...baseProps} config={config} data={fixtures.threeGroupings} />);
 
-    const edgeTrace = edgeLineTrace();
     const node = nodeTrace();
 
     expect(node.text).toEqual(['a1', 'b1', 'c1', 'c2', 'b2']);
-    // 5 edges × 3 entries (src, tgt, null) = 15
-    expect(edgeTrace.x).toHaveLength(15);
+    // 5 edges → 5 traces, each a two-point segment.
+    expect(edgeTraces()).toHaveLength(5);
     expect(node.customdata).toEqual([
       { field: 'a', value: 'a1' },
       { field: 'b', value: 'b1' },

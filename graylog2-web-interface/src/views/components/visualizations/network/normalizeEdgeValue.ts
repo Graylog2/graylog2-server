@@ -14,24 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { useNavigate } from 'react-router-dom';
+/**
+ * Linearly map an edge's aggregated metric value to a position in [0, 1], used to sample a color
+ * from the configured colorscale. When every edge shares the same value (including a single-edge
+ * graph) there is no meaningful range, so all edges sample the low end of the scale.
+ */
+const normalizeEdgeValue = (value: number, min: number, max: number): number =>
+  max === min ? 0 : (value - min) / (max - min);
 
-const useHistory = () => {
-  const navigate = useNavigate();
-
-  return useMemo(
-    () => ({
-      goBack: () => navigate(-1),
-      push: (to: string) => navigate(to),
-      pushWithState: <T>(to: string, state: T) => navigate(to, { state }),
-      replace: (to: string) => navigate(to, { replace: true }),
-    }),
-    [navigate],
-  );
-};
-
-export type HistoryFunction = ReturnType<typeof useHistory>;
-
-export default useHistory;
+export default normalizeEdgeValue;
