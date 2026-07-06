@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.streams.Stream;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,5 +72,32 @@ class WidgetEntityTest {
         final WidgetDTO nativeEntity = widget.toNativeEntity(Collections.emptyMap(), nativeEntities);
 
         assertThat(nativeEntity.streams()).containsExactly("native-stream-id");
+    }
+
+    @Test
+    public void dropsOnlyUnresolvableStreamReferences() {
+        final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("native-stream-id");
+        final Map<EntityDescriptor, Object> nativeEntities =
+                Map.of(EntityDescriptor.create("cp-stream-id", ModelTypes.STREAM_REF_V1), stream);
+
+        final WidgetEntity widget = widgetBuilder(ImmutableSet.of("cp-stream-id", "missing-stream-id")).build();
+
+        final WidgetDTO nativeEntity = widget.toNativeEntity(Collections.emptyMap(), nativeEntities);
+
+        assertThat(nativeEntity.streams()).containsExactly("native-stream-id");
+    }
+
+    @Test
+    public void failsOnWrongTypeStreamReference() {
+        // A non-null value that is not a Stream indicates a corrupt entity map, which must still abort the install.
+        final Map<EntityDescriptor, Object> nativeEntities =
+                Map.of(EntityDescriptor.create("cp-stream-id", ModelTypes.STREAM_REF_V1), "not-a-stream");
+
+        final WidgetEntity widget = widgetBuilder(ImmutableSet.of("cp-stream-id")).build();
+
+        assertThatThrownBy(() -> widget.toNativeEntity(Collections.emptyMap(), nativeEntities))
+                .isInstanceOf(ContentPackException.class)
+                .hasMessageContaining("Invalid type for stream");
     }
 }

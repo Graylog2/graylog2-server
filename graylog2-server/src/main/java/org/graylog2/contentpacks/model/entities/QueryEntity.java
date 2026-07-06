@@ -154,15 +154,21 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                           .map(filter -> {
                               if (filter.type().matches(StreamFilter.NAME)) {
                                   final StreamFilter streamFilter = (StreamFilter) filter;
-                                  final Stream stream = (Stream) resolveStreamEntityObject(streamFilter.streamId(), nativeEntities);
-                                  if (Objects.isNull(stream)) {
+                                  final Object object = resolveStreamEntityObject(streamFilter.streamId(), nativeEntities);
+                                  if (object == null) {
                                       // Skip a dangling stream reference instead of aborting the whole content pack
                                       // installation. This mirrors the export side, which also drops unresolvable references.
                                       LOG.warn("Skipping unresolvable stream reference <{}> in query filter for query <{}> during content pack installation",
                                               streamFilter.streamId(), id());
                                       return null;
+                                  } else if (object instanceof final Stream stream) {
+                                      return streamFilter.toBuilder().streamId(stream.getId()).build();
+                                  } else {
+                                      // A non-null, non-Stream value indicates a corrupt entity map rather than a
+                                      // missing reference, so abort the installation like the other view resolvers.
+                                      throw new ContentPackException(
+                                              "Invalid type for stream Stream for query filter: " + object.getClass());
                                   }
-                                  return streamFilter.toBuilder().streamId(stream.getId()).build();
                               }
                               return filter;
                           })

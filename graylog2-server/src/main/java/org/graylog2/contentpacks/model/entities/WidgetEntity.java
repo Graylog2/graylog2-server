@@ -185,7 +185,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .id(this.id())
                 .streams(this.streams().stream()
-                        .map(id -> resolveStreamReference(id, nativeEntities))
+                        .map(streamId -> resolveStreamReference(streamId, nativeEntities))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toSet()))
@@ -208,10 +208,10 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
      * side ({@link org.graylog.plugins.views.search.views.WidgetDTO#toContentPackEntity}), which also silently
      * drops stream references it cannot map.
      */
-    private Optional<String> resolveStreamReference(String id, Map<EntityDescriptor, Object> nativeEntities) {
-        final Object object = resolveStreamEntityObject(id, nativeEntities);
+    private Optional<String> resolveStreamReference(String streamId, Map<EntityDescriptor, Object> nativeEntities) {
+        final Object object = resolveStreamEntityObject(streamId, nativeEntities);
         if (object == null) {
-            LOG.warn("Skipping unresolvable stream reference <{}> for widget <{}> during content pack installation", id, id());
+            LOG.warn("Skipping unresolvable stream reference <{}> for widget <{}> during content pack installation", streamId, id());
             return Optional.empty();
         } else if (object instanceof final Stream stream) {
             return Optional.of(stream.getId());

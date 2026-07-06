@@ -211,7 +211,7 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
 
     default Set<String> mappedStreams(Map<EntityDescriptor, Object> nativeEntities) {
         return streams().stream()
-                .map(id -> resolveStreamReference(id, nativeEntities))
+                .map(streamId -> resolveStreamReference(streamId, nativeEntities))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
@@ -224,10 +224,10 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
      * skipped with a warning rather than aborting the whole content pack installation. This mirrors the export
      * side, which also silently drops stream references it cannot map.
      */
-    default Optional<String> resolveStreamReference(String id, Map<EntityDescriptor, Object> nativeEntities) {
-        final Object object = resolveStreamEntityObject(id, nativeEntities);
+    default Optional<String> resolveStreamReference(String streamId, Map<EntityDescriptor, Object> nativeEntities) {
+        final Object object = resolveStreamEntityObject(streamId, nativeEntities);
         if (object == null) {
-            LOG.warn("Skipping unresolvable stream reference <{}> for search type <{}> during content pack installation", id, id());
+            LOG.warn("Skipping unresolvable stream reference <{}> for search type <{}> during content pack installation", streamId, id());
             return Optional.empty();
         } else if (object instanceof Stream) {
             return Optional.of(((Stream) object).getId());
