@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
@@ -57,6 +58,7 @@ public class CollectorCaTrustManager extends X509ExtendedTrustManager {
         this.clock = clock;
     }
 
+    @WithSpan
     @Override
     public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {
         if (certs == null || certs.length == 0) {
