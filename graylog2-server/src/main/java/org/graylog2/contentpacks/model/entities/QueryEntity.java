@@ -56,6 +56,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 import static java.util.stream.Collectors.toSet;
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
 @JsonAutoDetect
@@ -167,7 +168,8 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                                       // A non-null, non-Stream value indicates a corrupt entity map rather than a
                                       // missing reference, so abort the installation like the other view resolvers.
                                       throw new ContentPackException(
-                                              "Invalid type for stream Stream for query filter: " + object.getClass());
+                                              f("Invalid type for stream <%s> in query <%s>: %s",
+                                                      streamFilter.streamId(), id(), object.getClass()));
                                   }
                               }
                               return filter;

@@ -98,6 +98,7 @@ class WidgetEntityTest {
 
         assertThatThrownBy(() -> widget.toNativeEntity(Collections.emptyMap(), nativeEntities))
                 .isInstanceOf(ContentPackException.class)
-                .hasMessageContaining("Invalid type for stream");
+                .hasMessageContaining("cp-stream-id")
+                .hasMessageContaining("widget-id");
     }
 }

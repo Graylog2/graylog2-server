@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -233,7 +234,7 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
             return Optional.of(((Stream) object).getId());
         } else {
             throw new ContentPackException(
-                    "Invalid type for stream Stream for search type: " + object.getClass());
+                    f("Invalid type for stream <%s> in search type <%s>: %s", streamId, id(), object.getClass()));
         }
     }
 }

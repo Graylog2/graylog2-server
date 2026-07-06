@@ -66,6 +66,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetEntity.Builder.class)
@@ -217,7 +218,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
             return Optional.of(stream.getId());
         } else {
             throw new ContentPackException(
-                    "Invalid type for stream Stream for widget entity: " + object.getClass());
+                    f("Invalid type for stream <%s> in widget <%s>: %s", streamId, id(), object.getClass()));
         }
     }
 

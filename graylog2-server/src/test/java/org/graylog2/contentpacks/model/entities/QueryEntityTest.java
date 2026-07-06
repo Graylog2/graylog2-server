@@ -137,7 +137,8 @@ class QueryEntityTest {
 
         assertThatThrownBy(() -> query.toNativeEntity(Collections.emptyMap(), nativeEntities))
                 .isInstanceOf(ContentPackException.class)
-                .hasMessageContaining("Invalid type for stream");
+                .hasMessageContaining("cp-stream-id")
+                .hasMessageContaining("nvmd");
     }
 
     private class TestDBSearchFilter implements DBSearchFilter {
