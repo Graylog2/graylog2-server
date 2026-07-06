@@ -16,8 +16,6 @@
  */
 package org.graylog.mcp.server;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.mcp.resources.DashboardResourceProvider;
 import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
@@ -38,12 +36,6 @@ import org.graylog2.plugin.PluginModule;
 public class McpServerModule extends PluginModule {
     @Override
     protected void configure() {
-        // Workaround for https://github.com/modelcontextprotocol/java-sdk/issues/766
-        // Remove once the SDK adds @JsonIgnoreProperties(ignoreUnknown=true) to capability records.
-        bind(ObjectMapper.class).annotatedWith(McpProtocolObjectMapper.class)
-                .toInstance(new ObjectMapper()
-                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false));
-
         // Initialize schema module binder (empty set by default, plugins can contribute)
         schemaModuleBinder();
 

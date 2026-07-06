@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -142,8 +143,12 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                                            Map<EntityDescriptor, Object> nativeEntities) {
         final DBSearchFilter dbFilter = (DBSearchFilter) nativeEntities.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
         if (dbFilter != null) {
-            // If this filter references a newly imported filter, update this filter with the ID of the new filter created in MongoDB.
-            return this.withId(dbFilter.id());
+            // If this filter references a newly imported filter, update this filter with the ID and scope of the new filter created in MongoDB.
+            final Builder builder = toBuilder().id(dbFilter.id());
+            if (dbFilter instanceof ScopedEntity<?> scopedFilter) {
+                builder.scope(scopedFilter.scope());
+            }
+            return builder.build();
         } else {
             // Otherwise return this filter as it is in the parent entity, but convert to inline.
             return this.toInlineRepresentation();

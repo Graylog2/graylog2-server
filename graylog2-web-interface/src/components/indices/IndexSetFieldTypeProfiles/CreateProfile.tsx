@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -30,7 +29,6 @@ import useHistory from 'routing/useHistory';
 const CreateProfile = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const navigate = useNavigate();
   const { createProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const location = useLocation<{ customFieldMappings: any }>();
@@ -57,10 +55,10 @@ const CreateProfile = () => {
           app_action_value: { mappingsQuantity: profile?.customFieldMappings?.length },
         });
 
-        navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
+        history.push(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
       });
     },
-    [createProfile, navigate, sendTelemetry, telemetryPathName],
+    [createProfile, history, sendTelemetry, telemetryPathName],
   );
 
   useEffect(() => {

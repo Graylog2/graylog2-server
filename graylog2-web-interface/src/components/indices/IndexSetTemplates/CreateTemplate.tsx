@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -30,7 +29,6 @@ import useHistory from 'routing/useHistory';
 const CreateTemplate = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const navigate = useNavigate();
   const { createTemplate } = useTemplateMutation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const history = useHistory();
@@ -43,10 +41,10 @@ const CreateTemplate = () => {
       });
 
       createTemplate(template).then(() => {
-        navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
+        history.push(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
       });
     },
-    [createTemplate, navigate, sendTelemetry, telemetryPathName],
+    [createTemplate, history, sendTelemetry, telemetryPathName],
   );
 
   useEffect(() => {
