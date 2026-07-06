@@ -27,6 +27,14 @@ import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions'
 import type { ConfirmedAction } from './outdatedIndexActions';
 import type { IndicesGroup } from './outdatedIndexGroups';
 
+// Descriptor badges rendered after the index name; `show` decides visibility.
+const indexNameBadges = (index: OutdatedIndex, isArchived: boolean) =>
+  [
+    { text: 'warm', style: 'default', show: index.warm_index },
+    { text: 'active write index', style: 'default', show: !!index.active_write_index },
+    { text: 'archived already', style: 'success', show: isArchived },
+  ] as const;
+
 const ActionsToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
@@ -217,30 +225,16 @@ const IndicesGroupTable = ({
               <tr key={index.index_name}>
                 <td>
                   {index.index_name}
-                  {index.warm_index && (
-                    <>
-                      &nbsp;
-                      <Label bsStyle="default" bsSize="xs">
-                        warm
-                      </Label>
-                    </>
-                  )}
-                  {index.active_write_index && (
-                    <>
-                      &nbsp;
-                      <Label bsStyle="default" bsSize="xs">
-                        active write index
-                      </Label>
-                    </>
-                  )}
-                  {isArchived && (
-                    <>
-                      &nbsp;
-                      <Label bsStyle="success" bsSize="xs">
-                        archived already
-                      </Label>
-                    </>
-                  )}
+                  {indexNameBadges(index, isArchived)
+                    .filter((badge) => badge.show)
+                    .map(({ text, style }) => (
+                      <React.Fragment key={text}>
+                        &nbsp;
+                        <Label bsStyle={style} bsSize="xs">
+                          {text}
+                        </Label>
+                      </React.Fragment>
+                    ))}
                 </td>
                 <td>{index.version || 'Unknown'}</td>
                 <td>

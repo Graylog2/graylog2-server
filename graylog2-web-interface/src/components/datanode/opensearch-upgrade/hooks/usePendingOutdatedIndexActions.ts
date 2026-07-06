@@ -17,9 +17,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
+import Store from 'logic/local-storage/Store';
 
 import useClusterJobs from './useClusterJobs';
-import type { ClusterJobsResult } from './useClusterJobs';
+import type { ClusterJobsResult, SystemJobSummary } from './useClusterJobs';
 
 import { ARCHIVE_POLL_INTERVAL_MS } from '../constants';
 
@@ -49,7 +50,13 @@ type Params = {
   isLoading: boolean;
   isError: boolean;
   refetch: () => Promise<unknown>;
+  canArchive: boolean;
 };
+
+const ARCHIVE_CREATE_SYSTEM_JOB = 'org.graylog.plugins.archive.job.ArchiveCreateSystemJob';
+
+const isRunningArchiveSystemJob = (job: SystemJobSummary) =>
+  job.name === ARCHIVE_CREATE_SYSTEM_JOB && String(job.job_status).toLowerCase() === 'running';
 
 const isValidStoredAction = (value: unknown): value is PendingOutdatedIndexAction => {
   if (typeof value !== 'object' || value === null) {
@@ -69,19 +76,14 @@ const isValidStoredAction = (value: unknown): value is PendingOutdatedIndexActio
 };
 
 const readStoredActions = (): Array<PendingOutdatedIndexAction> => {
-  try {
-    const stored = window.localStorage.getItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY);
-    const parsed = stored ? JSON.parse(stored) : [];
+  const stored = Store.get(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY);
 
-    return Array.isArray(parsed) ? parsed.filter(isValidStoredAction) : [];
-  } catch {
-    return [];
-  }
+  return Array.isArray(stored) ? stored.filter(isValidStoredAction) : [];
 };
 
 const storeActions = (actions: Array<PendingOutdatedIndexAction>) => {
   try {
-    window.localStorage.setItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY, JSON.stringify(actions));
+    Store.set(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY, actions);
   } catch {
     // Ignore write failures (e.g. storage full / disabled) — tracking degrades to this session only.
   }
@@ -134,7 +136,7 @@ const resolveAction = (
  * (e.g. the backend could not delete the current write index). Persisted in localStorage so progress survives
  * reloads.
  */
-const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, refetch }: Params) => {
+const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, refetch, canArchive }: Params) => {
   const [pendingActions, setPendingActions] = useState<Array<PendingOutdatedIndexAction>>(readStoredActions);
 
   const outdatedIndexNames = useMemo(() => new Set(outdatedIndices.map((index) => index.index_name)), [outdatedIndices]);
@@ -147,7 +149,18 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     [trackedActions],
   );
   const hasActiveTrackedActions = activeTrackedActions.length > 0;
-  const { jobsById, jobsUpdatedAt } = useClusterJobs(hasActiveTrackedActions);
+  // One snapshot for archive-capable users catches jobs started elsewhere (other sessions, retention);
+  // continuous polling is reserved for actions this session is actually tracking.
+  const {
+    jobsById,
+    jobsUpdatedAt,
+    refetch: refetchClusterJobs,
+  } = useClusterJobs({ enabled: canArchive || hasActiveTrackedActions, poll: hasActiveTrackedActions });
+
+  const isArchiveJobRunning = useMemo(
+    () => Array.from(jobsById.values()).some(isRunningArchiveSystemJob),
+    [jobsById],
+  );
 
   const pendingIndexStatuses = useMemo(() => {
     const statuses = new Map<string, PendingIndexStatus>();
@@ -218,7 +231,10 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     });
   }, [isError, isLoading, jobsById, jobsUpdatedAt, outdatedIndexNames]);
 
-  // Refresh the outdated indices while actions are in flight so completed ones drop off.
+  // Refresh the outdated indices while actions are in flight so completed ones drop off. A plain interval
+  // instead of react-query's refetchInterval on purpose: the poll flag derives from this hook's own output,
+  // which itself consumes the query's data — feeding it back into useOutdatedIndices would need a state
+  // round-trip through the parent. The interval stops as soon as nothing is actively tracked.
   useEffect(() => {
     if (!hasActiveTrackedActions) {
       return undefined;
@@ -231,7 +247,7 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     return () => window.clearInterval(polling);
   }, [hasActiveTrackedActions, refetch]);
 
-  return { pendingIndexStatuses, addArchiveDeleteAction };
+  return { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs };
 };
 
 export default usePendingOutdatedIndexActions;

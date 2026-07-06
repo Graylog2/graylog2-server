@@ -17,7 +17,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
 
@@ -117,7 +117,18 @@ export const startShardReplication = async (): Promise<FlushResponse> => {
   }
 };
 
-const fetchDataNodeUpgradeStatus = async () => fetch('GET', qualifyUrl('/datanodes/upgrade/status'));
+// `fetchPeriodically` so the poll does not keep an idle user's session alive.
+const fetchDataNodeUpgradeStatus = async () =>
+  fetchPeriodically<DatanodeUpgradeStatus>('GET', qualifyUrl('/datanodes/upgrade/status'));
+
+const UPGRADE_STATUS_REFETCH_INTERVAL_MS = 5000;
+// Once every node is up to date, replication is on and the cluster is healthy, nothing on the page is
+// mid-change — drop to a slow heartbeat that still catches external changes (e.g. a new outdated node
+// joining) without hammering the endpoint from an idle page.
+const STEADY_STATE_REFETCH_INTERVAL_MS = 30000;
+
+const isSteadyState = (status: DatanodeUpgradeStatus | undefined) =>
+  !!status && !status.outdated_nodes?.length && status.shard_replication_enabled && status.cluster_healthy;
 
 const useDataNodeUpgradeStatus = (): {
   data: DatanodeUpgradeStatus;
@@ -136,7 +147,8 @@ const useDataNodeUpgradeStatus = (): {
       ),
 
     notifyOnChangeProps: ['data', 'error'],
-    refetchInterval: 5000,
+    refetchInterval: (query) =>
+      isSteadyState(query.state.data) ? STEADY_STATE_REFETCH_INTERVAL_MS : UPGRADE_STATUS_REFETCH_INTERVAL_MS,
   });
 
   return {

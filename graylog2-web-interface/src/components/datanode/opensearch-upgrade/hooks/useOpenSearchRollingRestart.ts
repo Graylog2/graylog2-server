@@ -39,13 +39,12 @@ type RollingRestartErrorBody = {
 };
 
 // The generated API does not expose the rolling restart data payload yet, so keep the payload typed locally.
-const fetchCurrentRollingRestart = () => DataNodeRollingRestart.current() as Promise<RollingRestartJob | null>;
+const fetchCurrentRollingRestart = () =>
+  DataNodeRollingRestart.current({ requestShouldExtendSession: false }) as Promise<RollingRestartJob | null>;
 
 // The generated start() function does not accept the StartRequest body, but force must be sent for retry flow.
 const startRollingRestartRequest = (force: boolean) =>
   fetch<RollingRestartJob>('POST', qualifyUrl(ROLLING_RESTART_URL), { force });
-
-const resumeRollingRestartRequest = () => DataNodeRollingRestart.resume() as unknown as Promise<RollingRestartJob>;
 
 const rollingRestartErrorBody = (error: unknown): RollingRestartErrorBody | undefined =>
   error instanceof FetchError ? error.additional?.body : undefined;
@@ -111,9 +110,11 @@ const useOpenSearchRollingRestart = () => {
   });
 
   const { mutateAsync: resumeRollingRestart, isPending: isResumingRollingRestart } = useMutation({
-    mutationFn: resumeRollingRestartRequest,
-    onSuccess: (rollingRestart) => {
-      queryClient.setQueryData(ROLLING_RESTART_QUERY_KEY, rollingRestart);
+    // The resume response is a bare job trigger without the rolling-restart payload — instead of trusting
+    // (and force-casting) it, refetch the status query, which is the typed source of truth.
+    mutationFn: () => DataNodeRollingRestart.resume(),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ROLLING_RESTART_QUERY_KEY });
       UserNotification.success('OpenSearch rolling upgrade was resumed.');
     },
     onError: (error) => {

@@ -37,7 +37,7 @@ const useOpenSearchClusterStats = () => {
     queryKey: ['opensearch-upgrade', 'versions-overview'],
     queryFn: () =>
       defaultOnError(
-        DatanodeUpgrade.opensearchVersions(),
+        DatanodeUpgrade.opensearchVersions({ requestShouldExtendSession: false }),
         'Loading OpenSearch versions overview failed',
         'Could not load OpenSearch versions overview',
       ),

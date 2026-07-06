@@ -96,11 +96,14 @@ const OpenSearchUpgradeSection = () => {
   const startActionLoadingLabel = 'Starting OpenSearch Rolling Upgrade...';
   const canResumeRollingRestart =
     rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
-  // Outdated indices take precedence over everything else on this page: while any remain (or are still
-  // being checked), resolving them is the user's task and the rolling-upgrade status stays hidden — no
-  // matter the job's state. Kept decoupled from the version-overview query so its 5s poll (fetching/error
+  // An ACTIVE (running/paused) upgrade is always visible — its progress, paused_reason and per-node errors
+  // must never disappear mid-run, and outdated indices legitimately (re)appear during a rolling upgrade as
+  // the live cluster major shifts. Only a TERMINAL job (completed/aborted/failed) yields to outdated
+  // indices: while any remain (or are still being checked), resolving them is the user's task and a stale
+  // result table is noise. Kept decoupled from the version-overview query so its 5s poll (fetching/error
   // churn) can never blank the table mid-upgrade.
-  const showRollingUpgradeStatus = !!rollingRestart?.data && !hasOutdatedIndices && !isLoadingOutdatedIndices;
+  const showRollingUpgradeStatus =
+    !!rollingRestart?.data && (hasActiveRollingRestart || (!hasOutdatedIndices && !isLoadingOutdatedIndices));
 
   useEffect(() => {
     if (isRollingRestartTerminalState(rollingRestartState)) {

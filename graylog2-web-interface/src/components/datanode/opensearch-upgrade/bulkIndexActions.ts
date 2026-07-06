@@ -20,14 +20,14 @@ import extractErrorMessage from 'util/extractErrorMessage';
 import { BULK_INDEX_ACTION_CONCURRENCY } from './constants';
 import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions';
 import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
-import type { IndexAction } from './outdatedIndexActions';
 
-// Archive creation is backed by a single-concurrency system job. Offering a frontend bulk action made from
-// multiple single-index requests races against that backend limit, so keep archive/delete as a row action only.
-// Rotate is row-only by nature: it targets the index set of one active write index, not the index itself.
-type BulkCapableIndexAction = Exclude<IndexAction, 'rotate'>;
+// The single source of truth for which actions exist in bulk, and in which order their buttons render.
+// Deliberately absent: 'archive-delete' — archive creation is backed by a single-concurrency system job, and
+// a frontend bulk action made from multiple single-index requests races against that backend limit; 'rotate' —
+// row-only by nature, it targets the index set of one active write index, not the index itself.
+const BULK_ACTION_ORDER = ['delete', 'reindex-system-index'] as const;
 
-const BULK_ACTION_ORDER: Array<BulkCapableIndexAction> = ['delete', 'reindex-system-index'];
+type BulkCapableIndexAction = (typeof BULK_ACTION_ORDER)[number];
 
 type BulkActionCopy = {
   buttonLabel: string;
@@ -74,18 +74,6 @@ const BULK_ACTION_COPY: Record<BulkCapableIndexAction, BulkActionCopy> = {
     successMessage: (count) => `${count} outdated ${count === 1 ? 'index was' : 'indices were'} deleted.`,
     partialSuccessTitle: 'Some indices could not be deleted',
     failureTitle: 'Could not delete indices',
-  },
-  'archive-delete': {
-    buttonLabel: 'Archive and delete all',
-    confirmTitle: 'Archive and delete outdated indices',
-    confirmText: 'Archive and delete all',
-    targetVerb: 'archive and delete',
-    successMessage: (count) =>
-      `Archive and delete ${count === 1 ? 'job was' : 'jobs were'} started for ${count} outdated ${
-        count === 1 ? 'index' : 'indices'
-      }.`,
-    partialSuccessTitle: 'Some archive and delete jobs could not be started',
-    failureTitle: 'Could not start archive and delete jobs',
   },
   'reindex-system-index': {
     buttonLabel: 'Reindex all',
@@ -135,11 +123,9 @@ export const getBulkIndexActionCandidates = ({
 export const runBulkIndexAction = async ({
   action,
   indices,
-  onIndexSuccess,
 }: {
-  action: IndexAction;
+  action: BulkCapableIndexAction;
   indices: Array<OutdatedIndex>;
-  onIndexSuccess?: (success: BulkIndexActionSuccess) => void;
 }): Promise<BulkIndexActionResult> => {
   const actionDefinition = ACTION_DEFINITIONS[action];
   const successes: Array<BulkIndexActionSuccess> = [];
@@ -157,10 +143,7 @@ export const runBulkIndexAction = async ({
     return Promise.resolve()
       .then(() => actionDefinition.run(index))
       .then((response) => {
-        const success = { index, response };
-
-        successes.push(success);
-        onIndexSuccess?.(success);
+        successes.push({ index, response });
       })
       .catch((error) => {
         failures.push({ index, error });

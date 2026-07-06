@@ -105,6 +105,12 @@ const pausedJob = (): RollingRestartJob => ({
   },
 });
 
+const failedJob = (): RollingRestartJob => {
+  const job = pausedJob();
+
+  return { ...job, status: 'error', data: { ...job.data, sm_state: 'FAILED', paused_reason: null } };
+};
+
 describe('OpenSearchUpgradeSection', () => {
   let sendTelemetry: jest.Mock;
 
@@ -170,17 +176,27 @@ describe('OpenSearchUpgradeSection', () => {
     expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
-  it('hides the rolling-upgrade status while outdated indices remain, regardless of the job', () => {
+  it('keeps an active rolling upgrade visible even while outdated indices remain', () => {
+    // Outdated indices legitimately (re)appear mid-upgrade as the cluster major shifts — the progress of a
+    // running/paused upgrade must never disappear because of them.
     mockOutdatedIndices([{ index_name: 'graylog_0' }]);
     mockRollingRestart({ data: pausedJob() });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
+  });
+
+  it('hides a finished rolling-upgrade status while outdated indices remain', () => {
+    mockOutdatedIndices([{ index_name: 'graylog_0' }]);
+    mockRollingRestart({ data: failedJob() });
     render(<OpenSearchUpgradeSection />);
 
     expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
   });
 
-  it('hides the rolling-upgrade status while outdated indices are still being checked', () => {
+  it('hides a finished rolling-upgrade status while outdated indices are still being checked', () => {
     mockOutdatedIndices([], { isLoading: true });
-    mockRollingRestart({ data: pausedJob() });
+    mockRollingRestart({ data: failedJob() });
     render(<OpenSearchUpgradeSection />);
 
     expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();

@@ -32,6 +32,11 @@ export type ConfirmedAction = {
   index: OutdatedIndex;
 };
 
+export type PendingArchiveTracking = {
+  indexName: string;
+  systemJobId?: string;
+};
+
 type ActionDefinition = {
   buttonLabel: string;
   buttonStyle: StyleProps;
@@ -41,6 +46,10 @@ type ActionDefinition = {
   run: (index: OutdatedIndex) => Promise<unknown>;
   successMessage: (index: OutdatedIndex) => string;
   telemetryEventType: TelemetryEventType;
+  /** Returns tracking info when the action starts a long-running backend job that should be followed as a pending archive. */
+  getPendingArchiveTracking?: (index: OutdatedIndex, response: unknown) => PendingArchiveTracking;
+  /** True when the error means another archive job currently blocks this action and the user should retry later. */
+  isArchiveJobConflict?: (errorMessage: string) => boolean;
 };
 
 // Archiving lives in the enterprise Archive plugin. Its `@graylog/server-api` stub only exists after a local
@@ -53,6 +62,14 @@ const archiveAndDeleteIndex = (index: OutdatedIndex) =>
       `/plugins/org.graylog.plugins.archive/cluster/archives/${encodeURIComponent(index.index_name)}?index_action=DELETE`,
     ),
   );
+
+type ArchiveAndDeleteResponse = {
+  system_job?: {
+    id?: string;
+  };
+};
+
+const ARCHIVE_JOB_ALREADY_RUNNING_MESSAGE = /Archive job for index .+ is already running!?/;
 
 const deleteOutdatedIndex = (index: OutdatedIndex) =>
   index.managed_index ? IndexerIndices.remove(index.index_name) : IndexerIndices.deleteOutdated(index.index_name);
@@ -89,6 +106,11 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
     run: archiveAndDeleteIndex,
     successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
+    getPendingArchiveTracking: (index, response) => ({
+      indexName: index.index_name,
+      systemJobId: (response as ArchiveAndDeleteResponse)?.system_job?.id,
+    }),
+    isArchiveJobConflict: (errorMessage) => ARCHIVE_JOB_ALREADY_RUNNING_MESSAGE.test(errorMessage),
   },
   'reindex-system-index': {
     buttonLabel: 'Reindex',

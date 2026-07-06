@@ -30,27 +30,12 @@ import { getBulkIndexActionCandidates, getBulkIndexActionNotification, runBulkIn
 import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
 import IndicesGroupTable from './IndicesGroupTable';
 import useArchivedIndexNames from './hooks/useArchivedIndexNames';
-import useClusterJobs from './hooks/useClusterJobs';
-import type { SystemJobSummary } from './hooks/useClusterJobs';
 import usePendingOutdatedIndexActions from './hooks/usePendingOutdatedIndexActions';
 import { ACTION_DEFINITIONS } from './outdatedIndexActions';
 import type { ConfirmedAction } from './outdatedIndexActions';
 import { getFirstGroupWithIndices, getSelectedGroup, groupOutdatedIndices } from './outdatedIndexGroups';
 
-type ArchiveAndDeleteResponse = {
-  system_job?: {
-    id?: string;
-  };
-};
-
-const getArchiveSystemJobId = (actionResponse: unknown) => (actionResponse as ArchiveAndDeleteResponse)?.system_job?.id;
-const ARCHIVE_CREATE_SYSTEM_JOB = 'org.graylog.plugins.archive.job.ArchiveCreateSystemJob';
-const ARCHIVE_JOB_ALREADY_RUNNING_MESSAGE = /Archive job for index .+ is already running!?/;
-
-const isRunningArchiveSystemJob = (job: SystemJobSummary) =>
-  job.name === ARCHIVE_CREATE_SYSTEM_JOB && String(job.job_status).toLowerCase() === 'running';
-
-const isArchiveJobAlreadyRunningError = (message: string) => ARCHIVE_JOB_ALREADY_RUNNING_MESSAGE.test(message);
+const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
 
 const showBulkNotification = ({ type, message, title }: BulkIndexActionNotification) => {
   const notify = (notification: (notificationMessage: string, notificationTitle?: string) => void) =>
@@ -104,13 +89,14 @@ const OutdatedIndicesTable = () => {
   const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices();
   const canArchive = useCanArchive();
   const sendTelemetry = useSendTelemetry();
-  const { pendingIndexStatuses, addArchiveDeleteAction } = usePendingOutdatedIndexActions({
-    outdatedIndices,
-    isLoading,
-    isError,
-    refetch,
-  });
-  const { jobsById: clusterJobsById, refetch: refetchClusterJobs } = useClusterJobs(canArchive);
+  const { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs } =
+    usePendingOutdatedIndexActions({
+      outdatedIndices,
+      isLoading,
+      isError,
+      refetch,
+      canArchive,
+    });
   const outdatedIndexNames = useMemo(() => outdatedIndices.map((index) => index.index_name), [outdatedIndices]);
   const archivedIndexNames = useArchivedIndexNames(outdatedIndexNames, canArchive);
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
@@ -123,11 +109,7 @@ const OutdatedIndicesTable = () => {
   const firstGroupWithIndices = useMemo(() => getFirstGroupWithIndices(indicesGroups), [indicesGroups]);
   const activeGroupId = selectedGroupId ?? firstGroupWithIndices;
   const selectedGroup = getSelectedGroup(indicesGroups, activeGroupId);
-  const runningArchiveJob = useMemo(
-    () => Array.from(clusterJobsById.values()).find(isRunningArchiveSystemJob),
-    [clusterJobsById],
-  );
-  const archiveActionsAvailable = canArchive && !runningArchiveJob;
+  const archiveActionsAvailable = canArchive && !isArchiveJobRunning;
   const segments = useMemo(
     () => indicesGroups.map((group) => ({ value: group.id, label: `${group.shortLabel} (${group.indices.length})` })),
     [indicesGroups],
@@ -151,7 +133,10 @@ const OutdatedIndicesTable = () => {
     }
   };
 
-  const updateSelectedGroup = (updatedOutdatedIndices: typeof outdatedIndices) => {
+  // Refresh the outdated list and, if the active group ran empty, move the selection to the next group
+  // that still has indices.
+  const finalizeAfterActions = async () => {
+    const { data: updatedOutdatedIndices = [] } = await refetch();
     const updatedGroups = groupOutdatedIndices(updatedOutdatedIndices);
     const updatedSelectedGroup = getSelectedGroup(updatedGroups, activeGroupId);
 
@@ -160,7 +145,7 @@ const OutdatedIndicesTable = () => {
     }
   };
 
-  const showArchiveJobAlreadyRunningWarning = () => {
+  const showArchiveJobConflictWarning = () => {
     UserNotification.warning(
       'Another archive job is already running. New archive jobs can be started after it finishes.',
       'Archive job already running',
@@ -173,35 +158,28 @@ const OutdatedIndicesTable = () => {
       return;
     }
 
-    const actionDefinition = ACTION_DEFINITIONS[confirmedAction.action];
+    const { action, index } = confirmedAction;
+    const actionDefinition = ACTION_DEFINITIONS[action];
 
-    sendTelemetry(actionDefinition.telemetryEventType, {
-      app_pathname: 'datanode',
-      app_section: 'opensearch-upgrade',
-    });
-
+    sendTelemetry(actionDefinition.telemetryEventType, { ...TELEMETRY_DEFAULTS });
     setIsSubmitting(true);
 
     try {
-      const actionResponse = await actionDefinition.run(confirmedAction.index);
+      const actionResponse = await actionDefinition.run(index);
+      const pendingArchive = actionDefinition.getPendingArchiveTracking?.(index, actionResponse);
 
-      if (confirmedAction.action === 'archive-delete') {
-        addArchiveDeleteAction({
-          indexName: confirmedAction.index.index_name,
-          systemJobId: getArchiveSystemJobId(actionResponse),
-        });
+      if (pendingArchive) {
+        addArchiveDeleteAction(pendingArchive);
       }
 
-      UserNotification.success(actionDefinition.successMessage(confirmedAction.index));
-      const { data: updatedOutdatedIndices = [] } = await refetch();
-      updateSelectedGroup(updatedOutdatedIndices);
-
+      UserNotification.success(actionDefinition.successMessage(index));
+      await finalizeAfterActions();
       closeConfirmDialog();
     } catch (errorThrown) {
       const errorMessage = extractErrorMessage(errorThrown);
 
-      if (confirmedAction.action === 'archive-delete' && isArchiveJobAlreadyRunningError(errorMessage)) {
-        showArchiveJobAlreadyRunningWarning();
+      if (actionDefinition.isArchiveJobConflict?.(errorMessage)) {
+        showArchiveJobConflictWarning();
         closeConfirmDialog();
       } else {
         UserNotification.error(errorMessage, `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
@@ -217,42 +195,26 @@ const OutdatedIndicesTable = () => {
     }
 
     sendTelemetry(ACTION_DEFINITIONS[confirmedBulkAction.action].telemetryEventType, {
-      app_pathname: 'datanode',
-      app_section: 'opensearch-upgrade',
+      ...TELEMETRY_DEFAULTS,
       app_action_value: 'bulk',
       bulk_count: confirmedBulkAction.targetIndices.length,
     });
-
     setIsBulkSubmitting(true);
 
     try {
       const result = await runBulkIndexAction({
         action: confirmedBulkAction.action,
         indices: confirmedBulkAction.targetIndices,
-        onIndexSuccess: ({ index, response }) => {
-          if (confirmedBulkAction.action === 'archive-delete') {
-            addArchiveDeleteAction({
-              indexName: index.index_name,
-              systemJobId: getArchiveSystemJobId(response),
-            });
-          }
-        },
       });
 
       showBulkNotification(getBulkIndexActionNotification(confirmedBulkAction, result));
-
-      const { data: updatedOutdatedIndices = [] } = await refetch();
-      updateSelectedGroup(updatedOutdatedIndices);
+      await finalizeAfterActions();
       closeBulkConfirmDialog();
     } catch (errorThrown) {
-      const errorMessage = extractErrorMessage(errorThrown);
-
-      if (confirmedBulkAction.action === 'archive-delete' && isArchiveJobAlreadyRunningError(errorMessage)) {
-        showArchiveJobAlreadyRunningWarning();
-        closeBulkConfirmDialog();
-      } else {
-        UserNotification.error(errorMessage, `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`);
-      }
+      UserNotification.error(
+        extractErrorMessage(errorThrown),
+        `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`,
+      );
     } finally {
       setIsBulkSubmitting(false);
     }

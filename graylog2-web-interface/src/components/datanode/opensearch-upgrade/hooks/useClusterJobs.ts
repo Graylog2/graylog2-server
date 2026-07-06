@@ -33,16 +33,29 @@ export type ClusterJobsResult = {
   refetch?: () => Promise<unknown>;
 };
 
+type Options = {
+  /** Fetch at all — one snapshot also catches jobs started by other sessions. */
+  enabled: boolean;
+  /** Keep polling — only wanted while something is actively tracked, so the query stays idle otherwise. */
+  poll: boolean;
+};
+
 /**
- * Polls cluster-wide system jobs (archive-and-delete jobs run on the leader node) and returns them keyed
- * by job id. Only polls while `enabled` so it stays idle when nothing is being tracked.
+ * Fetches cluster-wide system jobs (archive-and-delete jobs run on the leader node) and returns them keyed
+ * by job id. Fetching and polling are gated separately: `enabled` grants the initial snapshot, `poll` the
+ * 5s interval — so a mounted-but-idle caller does not keep the endpoint busy.
  */
-const useClusterJobs = (enabled: boolean): ClusterJobsResult => {
+const useClusterJobs = ({ enabled, poll }: Options): ClusterJobsResult => {
   const { data, dataUpdatedAt, refetch } = useQuery({
     queryKey: ['opensearch-upgrade', 'cluster-jobs'],
-    queryFn: () => defaultOnError(ClusterJobs.list(), 'Loading cluster jobs failed', 'Could not load cluster jobs'),
+    queryFn: () =>
+      defaultOnError(
+        ClusterJobs.list({ requestShouldExtendSession: false }),
+        'Loading cluster jobs failed',
+        'Could not load cluster jobs',
+      ),
     enabled,
-    refetchInterval: enabled ? ARCHIVE_POLL_INTERVAL_MS : false,
+    refetchInterval: poll ? ARCHIVE_POLL_INTERVAL_MS : false,
   });
 
   const jobsById = useMemo(() => {

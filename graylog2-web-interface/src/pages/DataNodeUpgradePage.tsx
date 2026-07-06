@@ -95,7 +95,7 @@ const DataNodeUpgradePage = () => {
 
   const isRollingUpgradePossible = numberOfNodes >= 3;
   const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && (!!nodeInProgress || isRollingUpgradePossible);
-  const areAllDataNodesUpToDate = !data?.outdated_nodes?.length && data?.up_to_date_nodes?.length > 0;
+  const areAllDataNodesUpToDate = !data?.outdated_nodes?.length && (data?.up_to_date_nodes?.length ?? 0) > 0;
   const showOpenSearchUpgradeSection =
     areAllDataNodesUpToDate &&
     !isLoadingOpenSearchVersion &&
@@ -155,7 +155,7 @@ const DataNodeUpgradePage = () => {
                 onStartNodeUpgrade={startNodeUpgrade}
               />
             )}
-            {!data?.outdated_nodes?.length && data?.up_to_date_nodes?.length > 0 && (
+            {areAllDataNodesUpToDate && (
               <UpgradeStatusAlert
                 currentOpenSearchVersion={currentOpenSearchVersion}
                 isOpenSearchVersionError={isOpenSearchVersionError}
