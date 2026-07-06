@@ -19,6 +19,8 @@ package org.graylog2.indexer.indices;
 
 import org.assertj.core.api.Assertions;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,8 +85,15 @@ class OutdatedIndexServiceTest {
         );
         when(indexSetRegistry.isManagedIndex("outdated1")).thenReturn(true);
         when(indexSetRegistry.isManagedIndex("outdated2")).thenReturn(false);
-        when(indexSetRegistry.isCurrentWriteIndex("outdated1")).thenReturn(true);
-        when(indexSetRegistry.isCurrentWriteIndex("outdated2")).thenReturn(false);
+        IndexSet writeIndex = mock(IndexSet.class);
+        when(writeIndex.getActiveWriteIndex()).thenReturn("outdated1");
+        IndexSetConfig writeIndexConfig = mock(IndexSetConfig.class);
+        when(writeIndex.getConfig()).thenReturn(writeIndexConfig);
+        when(writeIndexConfig.id()).thenReturn("id1");
+        when(indexSetRegistry.getForIndex("outdated1")).thenReturn(Optional.of(writeIndex));
+        IndexSet noWriteIndex = mock(IndexSet.class);
+        when(noWriteIndex.getActiveWriteIndex()).thenReturn("another_index");
+        when(indexSetRegistry.getForIndex("outdated2")).thenReturn(Optional.of(noWriteIndex));
         when(indicesAdapter.getOutdatedIndices(2)).thenReturn(outdatedIndices);
         assertThat(outdatedIndexService.getOutdatedIndices()).isEqualTo(List.of(
                 new OutdatedIndex("outdated1", "1.3.0", false, true, "id1"),
