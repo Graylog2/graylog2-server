@@ -75,6 +75,7 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/messages")
 public class MessageResource extends RestResource {
+
     private final Messages messages;
     private final CodecFactory codecFactory;
     private final IndexSetRegistry indexSetRegistry;
@@ -102,6 +103,7 @@ public class MessageResource extends RestResource {
                                 @PathParam("index") String index,
                                 @Parameter(name = "messageId", required = true)
                                 @PathParam("messageId") String messageId) throws IOException {
+        checkPermission(RestPermissions.INDICES_READ, index);
         checkPermission(RestPermissions.MESSAGES_READ, messageId);
         try {
             final ResultMessage resultMessage = messages.get(messageId, index);
@@ -191,7 +193,7 @@ public class MessageResource extends RestResource {
     @Path("/{index}/analyze")
     @Timed
     @Operation(summary = "Analyze a message string",
-                  description = "Returns what tokens/terms a message string (message or full_message) is split to.")
+               description = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns tokens", useReturnTypeSchema = true),

@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import omit from 'lodash/omit';
 
+import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -36,7 +36,7 @@ type Props = {
 
 const EditProfile = ({ profile }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const { pathname } = useLocation();
   const { editProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
@@ -49,10 +49,10 @@ const EditProfile = ({ profile }: Props) => {
           app_action_value: { mappingsQuantity: newProfile?.customFieldMappings?.length },
         });
 
-        navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
+        push(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
       });
     },
-    [editProfile, navigate, profile.id, sendTelemetry, telemetryPathName],
+    [editProfile, push, profile.id, sendTelemetry, telemetryPathName],
   );
 
   useEffect(() => {
@@ -67,8 +67,8 @@ const EditProfile = ({ profile }: Props) => {
       app_pathname: telemetryPathName,
       app_action_value: 'create-new-index-set-field-type-profile-canceled',
     });
-    navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
-  }, [navigate, sendTelemetry, telemetryPathName]);
+    push(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
+  }, [push, sendTelemetry, telemetryPathName]);
 
   const initialValues = useMemo(() => omit(profile, ['id', 'indexSetIds']), [profile]);
 

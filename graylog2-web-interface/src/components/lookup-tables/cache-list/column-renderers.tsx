@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
@@ -45,11 +45,11 @@ const Title = styled.div`
 `;
 
 const TitleCol = ({ cache, children }: { cache: CacheEntity; children: string }) => {
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const onClick = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name));
-  }, [navigate, cache.name]);
+    push(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name));
+  }, [push, cache.name]);
 
   return (
     <TitleRow>
