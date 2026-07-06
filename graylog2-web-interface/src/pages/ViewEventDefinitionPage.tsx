@@ -30,7 +30,7 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import { isSystemEventDefinition, isSigmaEventDefinition } from 'components/event-definitions/event-definitions-types';
+import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import usePluginEntities from 'hooks/usePluginEntities';
 import {
@@ -38,7 +38,6 @@ import {
   copyEventDefinition,
   EVENT_DEFINITIONS_QUERY_KEY,
 } from 'components/event-definitions/hooks/useEventDefinitions';
-import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 type SigmaEventDefinitionConfig = EventDefinition['config'] & {
   sigma_rule_id: string;
@@ -76,8 +75,6 @@ const ViewEventDefinitionPage = () => {
       },
     };
   }, [data]);
-
-  const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
 
   useEffect(() => {
     if (!isFetching && !eventDefinition) {
@@ -128,14 +125,12 @@ const ViewEventDefinitionPage = () => {
           title={`View "${eventDefinition.title}" Event Definition`}
           actions={
             <ButtonToolbar>
-              {(!isSigmaEventDefinition(eventDefinition) || scopePermissions?.is_mutable) && (
                 <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                   <Button bsStyle="primary" onClick={onEditEventDefinition}>
                     Edit Event Definition
                   </Button>
                 </IfPermitted>
-              )}
-              {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
+              {!isSystemEventDefinition(eventDefinition) && (
                 <IfPermitted permissions="eventdefinitions:create">
                   <Button onClick={() => setShowDialog(true)}>Duplicate Event Definition</Button>
                 </IfPermitted>
