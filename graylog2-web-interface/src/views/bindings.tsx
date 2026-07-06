@@ -117,6 +117,7 @@ import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/
 import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
 import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
 import FieldTypeValueRenderer from 'views/components/fieldtypes/FieldTypeValueRenderer';
+import CoreKeyMappers from 'views/components/visualizations/keyMappers/CoreKeyMappers';
 import AddTextWidget, { CreateTextWidget } from 'views/logic/creatoractions/AddTextWidget';
 import TextWidget from 'views/logic/widgets/TextWidget';
 import TextVisualization from 'views/components/widgets/text/TextVisualization';
@@ -411,6 +412,7 @@ const exports: PluginExports = {
     ['create-extractor'],
   ),
   fieldTypeValueRenderer: FieldTypeValueRenderer,
+  visualizationKeyMappers: CoreKeyMappers,
   visualizationTypes: visualizationBindings,
   widgetCreators: [
     {

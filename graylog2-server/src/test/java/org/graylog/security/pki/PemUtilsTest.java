@@ -121,10 +121,10 @@ class PemUtilsTest {
         final KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(keyPair, "test-agent");
 
-        final PKCS10CertificationRequest csr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+        final VerifiedCsr csr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
 
         assertThat(csr).isNotNull();
-        assertThat(csr.getSubject().toString()).contains("CN=test-agent");
+        assertThat(csr.csr().getSubject().toString()).contains("CN=test-agent");
     }
 
     @Test
@@ -167,15 +167,15 @@ class PemUtilsTest {
                 .hasMessageContaining("signature is invalid");
     }
 
-    // extractPublicKeyFromCsr tests
+    // VerifiedCsr.publicKey tests
 
     @Test
-    void extractPublicKeyFromCsrReturnsCsrPublicKey() throws Exception {
+    void verifiedCsrPublicKeyReturnsCsrPublicKey() throws Exception {
         final KeyPair keyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(keyPair, "test-agent");
-        final PKCS10CertificationRequest csr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
+        final VerifiedCsr csr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
 
-        final PublicKey extracted = PemUtils.extractPublicKeyFromCsr(csr);
+        final PublicKey extracted = csr.publicKey();
 
         assertThat(Arrays.equals(keyPair.getPublic().getEncoded(), extracted.getEncoded())).isTrue();
     }

@@ -524,8 +524,9 @@ public class CertificateBuilder {
     /**
      * Signs a Certificate Signing Request (CSR) and produces an X.509 certificate.
      * <p>
-     * The caller must supply a CSR that has already been parsed and signature-verified — typically
-     * via {@link PemUtils#parseCsr(String)}. This method does not re-verify the self-signature.
+     * Accepting only {@link VerifiedCsr} guarantees the CSR's self-signature has already been
+     * verified (see {@link PemUtils#parseCsr(String)}), so the requester has proven possession of
+     * the private key.
      * <p>
      * This method:
      * <ul>
@@ -536,7 +537,7 @@ public class CertificateBuilder {
      *   <li>Caps the cert's {@code NotAfter} at the issuer's {@code NotAfter}</li>
      * </ul>
      *
-     * @param csr       the parsed and verified CSR
+     * @param csr       the signature-verified CSR
      * @param issuer    the issuing CA's certificate entry (must contain the private key)
      * @param subjectCn the common name for the certificate subject (CSR subject is ignored)
      * @param validity  the validity period of the certificate
@@ -544,10 +545,10 @@ public class CertificateBuilder {
      * @throws Exception                if signing fails
      * @throws IllegalArgumentException if the CSR public key is not Ed25519
      */
-    public X509Certificate signCsr(PKCS10CertificationRequest csr, CertificateEntry issuer, String subjectCn, Duration validity)
+    public X509Certificate signCsr(VerifiedCsr csr, CertificateEntry issuer, String subjectCn, Duration validity)
             throws Exception {
 
-        final PublicKey publicKey = PemUtils.extractPublicKeyFromCsr(csr);
+        final PublicKey publicKey = csr.publicKey();
 
         if (!Set.of("Ed25519", "EdDSA").contains(publicKey.getAlgorithm())) {
             throw new IllegalArgumentException(

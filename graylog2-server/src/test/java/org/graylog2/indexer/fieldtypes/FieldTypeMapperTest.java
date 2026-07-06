@@ -74,4 +74,23 @@ public class FieldTypeMapperTest {
         assertMapping("geo_point", "geo-point");
         assertMapping("ip", "ip", "enumerable");
     }
+
+    @Test
+    public void identifiesNumericPhysicalTypes() {
+        assertThat(FieldTypeMapper.isNumericType("long")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("integer")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("short")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("byte")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("double")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("float")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("half_float")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("scaled_float")).isTrue();
+
+        assertThat(FieldTypeMapper.isNumericType("keyword")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("text")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("date")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("boolean")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("ip")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("unknown_type")).isFalse();
+    }
 }

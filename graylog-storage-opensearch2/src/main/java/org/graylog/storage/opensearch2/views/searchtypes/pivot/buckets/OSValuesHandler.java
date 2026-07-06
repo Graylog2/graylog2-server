@@ -53,7 +53,6 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
     public static final BucketOrder DEFAULT_ORDER = BucketOrder.count(false);
-    public static final String SORT_HELPER = "sort_helper";
 
     @Nonnull
     @Override

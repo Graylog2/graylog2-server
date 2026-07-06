@@ -88,13 +88,13 @@ class DataNodeMetadataServiceImplTest {
     }
 
     @Test
-    void settingVersionWithNullLatestAvailableDoesNotClearExistingLatestAvailable() {
+    void settingVersionWithNullLatestAvailableClearsExistingLatestAvailable() {
         service.setOpensearchVersions(NODE_ID, "2.18.0", "2.19.5");
         service.setOpensearchVersions(NODE_ID, "2.19.5", null);
 
         assertThat(service.findByNodeId(NODE_ID)).hasValueSatisfying(metadata -> {
             assertThat(metadata.currentOpensearchVersion()).isEqualTo("2.19.5");
-            assertThat(metadata.latestAvailableOpensearchVersion()).isEqualTo("2.19.5");
+            assertThat(metadata.latestAvailableOpensearchVersion()).isNull();
         });
     }
 

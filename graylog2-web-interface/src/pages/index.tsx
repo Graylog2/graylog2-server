@@ -107,6 +107,7 @@ const CollectorsOverviewPage = loadAsync(() => import('pages/CollectorsOverviewP
 const CollectorsFleetsPage = loadAsync(() => import('pages/CollectorsFleetsPage'));
 const CollectorsFleetDetailPage = loadAsync(() => import('pages/CollectorsFleetDetailPage'));
 const CollectorsInstancesPage = loadAsync(() => import('pages/CollectorsInstancesPage'));
+const CollectorsOnboardingInstancePage = loadAsync(() => import('pages/CollectorsOnboardingInstancePage'));
 const CollectorsDeploymentPage = loadAsync(() => import('pages/CollectorsDeploymentPage'));
 const CollectorsSettingsPage = loadAsync(() => import('pages/CollectorsSettingsPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
@@ -221,6 +222,7 @@ export {
   CollectorsFleetsPage,
   CollectorsFleetDetailPage,
   CollectorsInstancesPage,
+  CollectorsOnboardingInstancePage,
   CollectorsDeploymentPage,
   CollectorsSettingsPage,
   SimulatorPage,

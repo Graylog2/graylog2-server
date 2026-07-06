@@ -65,6 +65,7 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.ArrayList;
@@ -79,6 +80,7 @@ import java.util.stream.Stream;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@PublicCloudAPI
 public class EnrollmentTokenResource extends RestResource {
 
     private static final String DEFAULT_SORT_FIELD = EnrollmentTokenDTO.FIELD_CREATED_AT;
