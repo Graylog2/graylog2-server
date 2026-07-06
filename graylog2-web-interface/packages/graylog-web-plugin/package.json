@@ -47,7 +47,7 @@
     "typescript": "6.0.3",
     "use-query-params": "^2.2.0",
     "webpack": "5.108.1",
-    "webpack-cli": "7.0.3",
+    "webpack-cli": "7.1.0",
     "webpack-merge": "^6.0.1"
   },
   "eslintConfig": {

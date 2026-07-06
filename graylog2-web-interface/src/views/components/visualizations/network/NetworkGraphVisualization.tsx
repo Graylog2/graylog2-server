@@ -28,6 +28,8 @@ import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlot
 import NetworkVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
 
 import buildGraph from './buildGraph';
+import edgeColorScale from './edgeColorScale';
+import normalizeEdgeValue from './normalizeEdgeValue';
 import networkOnClickPopover from './networkOnClickPopover';
 
 import GenericPlot from '../GenericPlot';
@@ -57,6 +59,8 @@ type SimLink = { source: number | SimNode; target: number | SimNode };
 
 const LAYOUT_ITERATIONS = 500;
 const NODE_RADIUS = 75;
+// Edge weight is encoded through the colorscale, not thickness, so every edge shares one width.
+const EDGE_WIDTH = 2;
 
 const runLayout = (nodeCount: number, links: ReadonlyArray<{ source: number; target: number }>): Array<SimNode> => {
   const simNodes: Array<SimNode> = Array.from({ length: nodeCount }, (_, i) => ({ id: i }));
@@ -124,12 +128,12 @@ type EdgeCustomData = { source: EdgeEndpoint; target: EdgeEndpoint; value: numbe
 type EdgeTrace = {
   type: 'scatter';
   mode: 'lines';
-  x: Array<number | null>;
-  y: Array<number | null>;
+  x: Array<number>;
+  y: Array<number>;
   line: { width: number; color: string };
-  // Per-point customdata so plotly attaches the edge metadata to whichever point the
-  // user lands on when clicking the line segment.
-  customdata: Array<EdgeCustomData | null>;
+  // Both endpoints carry the same edge metadata so plotly attaches it wherever
+  // the user clicks along the segment.
+  customdata: Array<EdgeCustomData>;
   hoverinfo: 'none';
   showlegend: false;
 };
@@ -225,7 +229,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
   const visualizationConfig =
     (config.visualizationConfig as NetworkVisualizationConfig) ?? NetworkVisualizationConfig.empty();
 
-  const plot = useMemo<{ traces: [EdgeTrace, NodeTrace]; xs: Array<number>; ys: Array<number> } | null>(() => {
+  const plot = useMemo<{ traces: [...Array<EdgeTrace>, NodeTrace]; xs: Array<number>; ys: Array<number> } | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
     const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
     const allFields = [...rowFields, ...columnFields];
@@ -243,9 +247,16 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
 
     const positions = runLayout(nodes.length, edges);
 
-    const edgeX: Array<number | null> = [];
-    const edgeY: Array<number | null> = [];
-    const edgeCustomData: Array<EdgeCustomData | null> = [];
+    const values = edges.map((edge) => edge.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    // Edge weight is encoded through the configured node colorscale: each edge's aggregated value is
+    // normalized to [0, 1] and sampled from the same scale, honouring the reverse-scale option.
+    const scale = edgeColorScale(visualizationConfig.colorScale);
+
+    // Plotly's `line.color` is per-trace, so each edge is its own two-point line trace to let its
+    // color track the metric value.
+    const edgeTraces: Array<EdgeTrace> = [];
     edges.forEach((edge) => {
       const s = positions[edge.source];
       const t = positions[edge.target];
@@ -266,25 +277,22 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
         value: edge.value,
       };
 
-      edgeX.push(s.x, t.x, null);
-      edgeY.push(s.y, t.y, null);
-      // Both points carry the same edge metadata; the separator slot is `null` so
-      // plotly won't surface a click between segments.
-      edgeCustomData.push(cd, cd, null);
+      const normalized = normalizeEdgeValue(edge.value, minValue, maxValue);
+      const position = visualizationConfig.reverseScale ? 1 - normalized : normalized;
+
+      edgeTraces.push({
+        type: 'scatter',
+        mode: 'lines',
+        x: [s.x, t.x],
+        y: [s.y, t.y],
+        line: { width: EDGE_WIDTH, color: scale(position).hex() },
+        customdata: [cd, cd],
+        hoverinfo: 'none',
+        showlegend: false,
+      });
     });
 
     const textColor = theme.colors.text.primary;
-
-    const edgeTrace: EdgeTrace = {
-      type: 'scatter',
-      mode: 'lines',
-      x: edgeX,
-      y: edgeY,
-      line: { width: 1, color: theme.colors.text.secondary },
-      customdata: edgeCustomData,
-      hoverinfo: 'none',
-      showlegend: false,
-    };
 
     const displayLabels = nodes.map((n) => String(mapKeys(n.value, n.field) ?? n.label));
 
@@ -324,7 +332,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
       showlegend: false,
     };
 
-    return { traces: [edgeTrace, nodeTrace], xs, ys };
+    return { traces: [...edgeTraces, nodeTrace], xs, ys };
   }, [config, mapKeys, rows, theme, visualizationConfig]);
 
   const layout = useMemo(() => buildLayout(width, height, plot), [width, height, plot]);
