@@ -24,7 +24,10 @@ import type { IndexAction } from './outdatedIndexActions';
 
 // Archive creation is backed by a single-concurrency system job. Offering a frontend bulk action made from
 // multiple single-index requests races against that backend limit, so keep archive/delete as a row action only.
-const BULK_ACTION_ORDER: Array<IndexAction> = ['delete', 'reindex-system-index'];
+// Rotate is row-only by nature: it targets the index set of one active write index, not the index itself.
+type BulkCapableIndexAction = Exclude<IndexAction, 'rotate'>;
+
+const BULK_ACTION_ORDER: Array<BulkCapableIndexAction> = ['delete', 'reindex-system-index'];
 
 type BulkActionCopy = {
   buttonLabel: string;
@@ -37,7 +40,7 @@ type BulkActionCopy = {
 };
 
 export type BulkIndexActionCandidate = BulkActionCopy & {
-  action: IndexAction;
+  action: BulkCapableIndexAction;
   targetIndices: Array<OutdatedIndex>;
 };
 
@@ -62,7 +65,7 @@ export type BulkIndexActionNotification = {
   title?: string;
 };
 
-const BULK_ACTION_COPY: Record<IndexAction, BulkActionCopy> = {
+const BULK_ACTION_COPY: Record<BulkCapableIndexAction, BulkActionCopy> = {
   delete: {
     buttonLabel: 'Delete all',
     confirmTitle: 'Delete outdated indices',
@@ -126,8 +129,9 @@ export const getBulkIndexActionCandidates = ({
 
 // Each index is processed via its own request. If one 403s — e.g. deleting an active write index —
 // FetchProvider's global "Missing Permissions" handler redirects the whole page, which the per-index
-// catch below cannot intercept, aborting the rest of the batch. Outdated indices are not write indices
-// in real deployments, so this is not expected to happen in practice.
+// catch below cannot intercept, aborting the rest of the batch. An active write index never reaches a
+// batch though: getAvailableActions only offers it the row-level rotate action, keeping it out of every
+// bulk candidate list.
 export const runBulkIndexAction = async ({
   action,
   indices,

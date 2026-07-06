@@ -26,6 +26,8 @@ export type OutdatedIndex = {
   warm_index: boolean;
   managed_index: boolean;
   system_index: boolean;
+  /** Id of the index set this index is the active write index of, `null` for all other indices. */
+  active_write_index: string | null;
 };
 
 const useOutdatedIndices = () => {

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { IndexerIndices } from '@graylog/server-api';
+import { ClusterDeflector, IndexerIndices } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
@@ -79,6 +79,9 @@ jest.mock('@graylog/server-api', () => ({
     remove: jest.fn(() => Promise.resolve()),
     reindex: jest.fn(() => Promise.resolve()),
   },
+  ClusterDeflector: {
+    cycleByindexSetId: jest.fn(() => Promise.resolve()),
+  },
 }));
 jest.mock('util/UserNotification', () => ({ success: jest.fn(), warning: jest.fn(), error: jest.fn() }));
 
@@ -88,6 +91,7 @@ const makeIndex = (overrides: Partial<OutdatedIndex>): OutdatedIndex => ({
   warm_index: false,
   managed_index: false,
   system_index: false,
+  active_write_index: null,
   ...overrides,
 });
 
@@ -95,6 +99,7 @@ const graylogIndex = makeIndex({ index_name: 'graylog_0', managed_index: true })
 const secondGraylogIndex = makeIndex({ index_name: 'graylog_1', managed_index: true });
 const systemIndex = makeIndex({ index_name: '.system-index', system_index: true });
 const foreignIndex = makeIndex({ index_name: 'legacy-index' });
+const writeIndex = makeIndex({ index_name: 'graylog_2', managed_index: true, active_write_index: 'index-set-id' });
 
 const mockOutdatedIndices = (overrides: Partial<ReturnType<typeof useOutdatedIndices>>) => {
   asMock(useOutdatedIndices).mockReturnValue({
@@ -210,6 +215,49 @@ describe('OutdatedIndicesTable', () => {
     expect(screen.queryByRole('button', { name: /archive/i })).not.toBeInTheDocument();
   });
 
+  it('only offers rotate for the active write index', () => {
+    mockOutdatedIndices({ data: [writeIndex] });
+    render(<OutdatedIndicesTable />);
+
+    expect(screen.getByText('active write index')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^rotate$/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /archive/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /reindex/i })).not.toBeInTheDocument();
+  });
+
+  it('rotates the active write index via its index set and refreshes the list', async () => {
+    const sendTelemetry = jest.fn();
+    asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
+    const refetch = jest.fn(() =>
+      Promise.resolve({ data: [makeIndex({ ...writeIndex, active_write_index: null })] }),
+    ) as unknown as ReturnType<typeof useOutdatedIndices>['refetch'];
+    mockOutdatedIndices({ data: [writeIndex], refetch });
+    render(<OutdatedIndicesTable />);
+
+    await userEvent.click(screen.getByRole('button', { name: /^rotate$/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/is the active write index of its index set/i)).toBeInTheDocument();
+
+    await userEvent.click(within(dialog).getByRole('button', { name: /^rotate$/i }));
+
+    await waitFor(() => expect(ClusterDeflector.cycleByindexSetId).toHaveBeenCalledWith('index-set-id'));
+    expect(sendTelemetry).toHaveBeenCalledWith(
+      TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.WRITE_INDEX_ROTATE_CONFIRMED,
+      expect.objectContaining({ app_section: 'opensearch-upgrade' }),
+    );
+    expect(UserNotification.success).toHaveBeenCalledWith(expect.stringContaining('graylog_2'));
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('excludes the active write index from bulk delete', () => {
+    mockOutdatedIndices({ data: [graylogIndex, writeIndex] });
+    render(<OutdatedIndicesTable />);
+
+    expect(screen.getByRole('button', { name: /delete all \(1\)/i })).toBeInTheDocument();
+  });
+
   it('uses the outdated delete endpoint for foreign indices', async () => {
     const sendTelemetry = jest.fn();
     asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
@@ -285,17 +333,19 @@ describe('OutdatedIndicesTable', () => {
     expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
   });
 
-  it('shows a skipped-delete archived state when the job finished but the index is still outdated', async () => {
-    // e.g. archiving the active write index: the archive completes and the job is cleared, but the index
-    // can't be deleted, so it stays outdated. It must not offer archiving the same index again, but it should
-    // still offer a plain delete so the skipped cleanup can be finished.
+  it('shows an archived-already badge when the job finished but the index is still outdated', async () => {
+    // The archive completed but the delete step did not remove the index (skipped or failed on the backend),
+    // so it stays outdated. Note: active write indices only offer rotate in this UI, but the backend can
+    // still skip deletes for other reasons, and archives can be created outside this page (Archives page,
+    // retention, API). It must not offer archiving the same index again, but it should still offer a plain
+    // delete so the skipped cleanup can be finished.
     storePendingArchive('graylog_0', 'job-1');
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: JOBS_POLLED_AFTER_ACTION });
     mockOutdatedIndices({ data: [graylogIndex] });
     render(<OutdatedIndicesTable />);
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(screen.getByText(/archived, delete skipped/i)).toBeInTheDocument();
+    expect(screen.getByText(/archived already/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^archive and delete$/i })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
     // An archived (delete-skipped) index is deletable, so it also counts as a bulk delete candidate.
@@ -313,7 +363,7 @@ describe('OutdatedIndicesTable', () => {
     mockOutdatedIndices({ data: [graylogIndex] });
     render(<OutdatedIndicesTable />);
 
-    expect(screen.getByText(/archived, delete skipped/i)).toBeInTheDocument();
+    expect(screen.getByText(/archived already/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^archive and delete$/i })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
   });

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { IndexerIndices } from '@graylog/server-api';
+import { ClusterDeflector, IndexerIndices } from '@graylog/server-api';
 
 import type { StyleProps } from 'components/bootstrap/Button';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
@@ -25,7 +25,7 @@ import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
-export type IndexAction = 'delete' | 'archive-delete' | 'reindex-system-index';
+export type IndexAction = 'delete' | 'archive-delete' | 'reindex-system-index' | 'rotate';
 
 export type ConfirmedAction = {
   action: IndexAction;
@@ -58,6 +58,8 @@ const deleteOutdatedIndex = (index: OutdatedIndex) =>
   index.managed_index ? IndexerIndices.remove(index.index_name) : IndexerIndices.deleteOutdated(index.index_name);
 
 const reindexSystemIndex = (index: OutdatedIndex) => IndexerIndices.reindex(index.index_name);
+
+const rotateWriteIndex = (index: OutdatedIndex) => ClusterDeflector.cycleByindexSetId(index.active_write_index);
 
 export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
   delete: {
@@ -102,6 +104,25 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
     successMessage: (index) => `Index "${index.index_name}" was reindexed.`,
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.SYSTEM_INDEX_REINDEX_CONFIRMED,
   },
+  rotate: {
+    buttonLabel: 'Rotate',
+    buttonStyle: 'primary',
+    confirmTitle: 'Rotate active write index',
+    confirmText: 'Rotate',
+    confirmationBody: (index) => (
+      <div>
+        <p>
+          <strong>{index.index_name}</strong> is the active write index of its index set and still receives new
+          messages. Rotating starts a new write index on the current OpenSearch version.
+        </p>
+        <p>Afterwards, <strong>{index.index_name}</strong> can be archived or deleted.</p>
+      </div>
+    ),
+    run: rotateWriteIndex,
+    successMessage: (index) =>
+      `The index set of "${index.index_name}" was rotated. The index no longer receives messages and can now be archived or deleted.`,
+    telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.WRITE_INDEX_ROTATE_CONFIRMED,
+  },
 };
 
 export const getAvailableActions = (
@@ -109,6 +130,12 @@ export const getAvailableActions = (
   canArchive: boolean,
   alreadyArchived: boolean,
 ): Array<IndexAction> => {
+  // The active write index still receives messages: deleting it breaks ingestion and reindexing it races
+  // incoming writes. It has to be rotated out of write duty first — everything else unlocks afterwards.
+  if (index.active_write_index) {
+    return ['rotate'];
+  }
+
   if (index.system_index) {
     return ['reindex-system-index'];
   }

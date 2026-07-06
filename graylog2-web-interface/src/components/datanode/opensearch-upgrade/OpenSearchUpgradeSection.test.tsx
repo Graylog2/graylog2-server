@@ -29,7 +29,10 @@ import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/u
 import type { RollingRestartJob, RollingRestartState } from './rollingRestartTypes';
 
 jest.mock('./OutdatedIndicesTable', () => ({ __esModule: true, default: () => null }));
-jest.mock('./OpenSearchRollingUpgradeNodes', () => ({ __esModule: true, default: () => null }));
+jest.mock('./OpenSearchRollingUpgradeNodes', () => ({
+  __esModule: true,
+  default: () => <div>rolling-upgrade-nodes-stub</div>,
+}));
 jest.mock('./hooks/useOpenSearchClusterStats');
 jest.mock('./hooks/useOpenSearchRollingRestart', () => ({
   __esModule: true,
@@ -74,12 +77,13 @@ const mockRollingRestart = (overrides: RollingRestartHookOverrides = {}) =>
     ...overrides,
   } as unknown as ReturnType<typeof useOpenSearchRollingRestart>);
 
-const mockOutdatedIndices = (data: Array<unknown> = []) =>
+const mockOutdatedIndices = (data: Array<unknown> = [], overrides: { isLoading?: boolean } = {}) =>
   asMock(useOutdatedIndices).mockReturnValue({
     data,
     isError: false,
     isLoading: false,
     refetch: jest.fn(),
+    ...overrides,
   } as unknown as ReturnType<typeof useOutdatedIndices>);
 
 const pausedJob = (): RollingRestartJob => ({
@@ -157,6 +161,29 @@ describe('OpenSearchUpgradeSection', () => {
 
     expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
     expect(screen.getByText(/resolve all outdated indices first/i)).toBeInTheDocument();
+  });
+
+  it('shows the rolling-upgrade status when a job exists and no outdated indices remain', () => {
+    mockRollingRestart({ data: pausedJob() });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
+  });
+
+  it('hides the rolling-upgrade status while outdated indices remain, regardless of the job', () => {
+    mockOutdatedIndices([{ index_name: 'graylog_0' }]);
+    mockRollingRestart({ data: pausedJob() });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
+  });
+
+  it('hides the rolling-upgrade status while outdated indices are still being checked', () => {
+    mockOutdatedIndices([], { isLoading: true });
+    mockRollingRestart({ data: pausedJob() });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
   });
 
   it('shows a resume action for a paused upgrade and sends telemetry', async () => {

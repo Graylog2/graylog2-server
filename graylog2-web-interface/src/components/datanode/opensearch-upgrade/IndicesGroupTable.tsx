@@ -104,13 +104,13 @@ const OutdatedIndexActions = ({
   onAction,
   canArchive,
   pendingStatus,
-  alreadyArchived,
+  isArchived,
 }: {
   index: OutdatedIndex;
   onAction: (action: ConfirmedAction) => void;
   canArchive: boolean;
   pendingStatus: PendingIndexStatus | undefined;
-  alreadyArchived: boolean;
+  isArchived: boolean;
 }) => {
   if (pendingStatus?.state === 'archiving') {
     // Avoid flashing an empty 0% bar for indices that archive/delete almost instantly — only show the bar
@@ -126,16 +126,12 @@ const OutdatedIndexActions = ({
     );
   }
 
-  // "Archived" from either source: this session's finished job (localStorage) or the durable archive catalog
-  // (archives made in another session / by retention). Both mean the archive exists but the index is still here.
-  const isArchived = alreadyArchived || pendingStatus?.state === 'archived';
-  // An already-archived index still offers a plain Delete (so the "delete skipped" cleanup can be finished), but
-  // never Archive again — getAvailableActions collapses to ['delete'] for a managed index once archived.
+  // An already-archived index still offers a plain Delete (so the skipped cleanup can be finished), but never
+  // Archive again — getAvailableActions collapses to ['delete'] for a managed index once archived.
   const actions = getAvailableActions(index, canArchive, isArchived);
 
   return (
     <ActionsToolbar>
-      {isArchived && <Label bsStyle="success">Archived, delete skipped</Label>}
       {pendingStatus?.state === 'failed' && (
         <Label bsStyle="danger" title={pendingStatus.message}>
           Archive failed
@@ -207,31 +203,58 @@ const IndicesGroupTable = ({
           </tr>
         </thead>
         <tbody>
-          {group.indices.map((index) => (
-            <tr key={index.index_name}>
-              <td>
-                {index.index_name}
-                {index.warm_index && (
-                  <>
-                    &nbsp;
-                    <Label bsStyle="gray" bsSize="xs">
-                      warm
-                    </Label>
-                  </>
-                )}
-              </td>
-              <td>{index.version || 'Unknown'}</td>
-              <td>
-                <OutdatedIndexActions
-                  index={index}
-                  onAction={onAction}
-                  canArchive={canArchive}
-                  pendingStatus={pendingIndexStatuses.get(index.index_name)}
-                  alreadyArchived={archivedIndexNames.has(index.index_name)}
-                />
-              </td>
-            </tr>
-          ))}
+          {group.indices.map((index) => {
+            const pendingStatus = pendingIndexStatuses.get(index.index_name);
+            // "Archived" from either source: this session's finished job (localStorage) or the durable archive
+            // catalog (archives made in another session / by retention). Both mean the archive exists but the
+            // index is still here. Hidden while a new archive job is running — the actions column shows its
+            // progress instead.
+            const isArchived =
+              pendingStatus?.state !== 'archiving' &&
+              (archivedIndexNames.has(index.index_name) || pendingStatus?.state === 'archived');
+
+            return (
+              <tr key={index.index_name}>
+                <td>
+                  {index.index_name}
+                  {index.warm_index && (
+                    <>
+                      &nbsp;
+                      <Label bsStyle="default" bsSize="xs">
+                        warm
+                      </Label>
+                    </>
+                  )}
+                  {index.active_write_index && (
+                    <>
+                      &nbsp;
+                      <Label bsStyle="default" bsSize="xs">
+                        active write index
+                      </Label>
+                    </>
+                  )}
+                  {isArchived && (
+                    <>
+                      &nbsp;
+                      <Label bsStyle="success" bsSize="xs">
+                        archived already
+                      </Label>
+                    </>
+                  )}
+                </td>
+                <td>{index.version || 'Unknown'}</td>
+                <td>
+                  <OutdatedIndexActions
+                    index={index}
+                    onAction={onAction}
+                    canArchive={canArchive}
+                    pendingStatus={pendingStatus}
+                    isArchived={isArchived}
+                  />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
     </ScrollableTableWrapper>

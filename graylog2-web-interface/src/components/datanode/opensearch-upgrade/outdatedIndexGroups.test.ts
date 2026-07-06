@@ -24,6 +24,7 @@ const makeIndex = (overrides: Partial<OutdatedIndex>): OutdatedIndex => ({
   warm_index: false,
   managed_index: false,
   system_index: false,
+  active_write_index: null,
   ...overrides,
 });
 

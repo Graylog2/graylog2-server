@@ -418,6 +418,7 @@ export const TELEMETRY_EVENT_TYPE = {
     INDEX_DELETE_CONFIRMED: 'Datanode OpenSearch Upgrade Index Delete Confirmed',
     INDEX_ARCHIVE_AND_DELETE_CONFIRMED: 'Datanode OpenSearch Upgrade Index Archive And Delete Confirmed',
     SYSTEM_INDEX_REINDEX_CONFIRMED: 'Datanode OpenSearch Upgrade System Index Reindex Confirmed',
+    WRITE_INDEX_ROTATE_CONFIRMED: 'Datanode OpenSearch Upgrade Write Index Rotate Confirmed',
   },
   ALERTS_AND_EVENTS: {
     ACTION_RAN: 'Alerts And Events Action Ran',

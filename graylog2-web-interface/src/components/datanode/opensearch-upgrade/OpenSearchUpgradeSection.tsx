@@ -96,10 +96,11 @@ const OpenSearchUpgradeSection = () => {
   const startActionLoadingLabel = 'Starting OpenSearch Rolling Upgrade...';
   const canResumeRollingRestart =
     rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
-  // Show the status/parallel table whenever there is a rolling-restart job to display (active or finished).
-  // Deliberately decoupled from the version-overview query so its 5s poll (fetching/error churn) can never
-  // blank the table mid-upgrade.
-  const showRollingUpgradeStatus = !!rollingRestart?.data;
+  // Outdated indices take precedence over everything else on this page: while any remain (or are still
+  // being checked), resolving them is the user's task and the rolling-upgrade status stays hidden — no
+  // matter the job's state. Kept decoupled from the version-overview query so its 5s poll (fetching/error
+  // churn) can never blank the table mid-upgrade.
+  const showRollingUpgradeStatus = !!rollingRestart?.data && !hasOutdatedIndices && !isLoadingOutdatedIndices;
 
   useEffect(() => {
     if (isRollingRestartTerminalState(rollingRestartState)) {
