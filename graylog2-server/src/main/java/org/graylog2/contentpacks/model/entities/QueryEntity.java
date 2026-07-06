@@ -38,6 +38,8 @@ import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,6 +62,8 @@ import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStr
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = QueryEntity.Builder.class)
 public abstract class QueryEntity implements NativeEntityConverter<Query> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(QueryEntity.class);
 
     @JsonProperty
     public abstract String id();
@@ -152,13 +156,18 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                                   final StreamFilter streamFilter = (StreamFilter) filter;
                                   final Stream stream = (Stream) resolveStreamEntityObject(streamFilter.streamId(), nativeEntities);
                                   if (Objects.isNull(stream)) {
-                                      throw new ContentPackException("Could not find matching stream id: " +
-                                              streamFilter.streamId());
+                                      // Skip a dangling stream reference instead of aborting the whole content pack
+                                      // installation. This mirrors the export side, which also drops unresolvable references.
+                                      LOG.warn("Skipping unresolvable stream reference <{}> in query filter for query <{}> during content pack installation",
+                                              streamFilter.streamId(), id());
+                                      return null;
                                   }
                                   return streamFilter.toBuilder().streamId(stream.getId()).build();
                               }
                               return filter;
-                          }).collect(Collectors.toSet());
+                          })
+                          .filter(Objects::nonNull)
+                          .collect(Collectors.toSet());
                   return optFilter.toGenericBuilder().filters(newFilters).build();
                })
                .orElse(null);

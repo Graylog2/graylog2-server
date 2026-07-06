@@ -18,6 +18,8 @@ package org.graylog2.contentpacks.model.entities;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.filter.OrFilter;
+import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.model.DBSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
@@ -74,6 +76,20 @@ class QueryEntityTest {
         assertThat(queryWithFilters.toNativeEntity(Collections.emptyMap(), nativeEntities).filters())
                 .isNotNull()
                 .isEqualTo(expectedSearchFilters);
+    }
+
+    @Test
+    public void dropsUnresolvableStreamFilterInsteadOfFailing() {
+        final QueryEntity query = QueryEntity.Builder
+                .createWithDefaults()
+                .id("nvmd")
+                .timerange(RelativeRange.allTime())
+                .query(ElasticsearchQueryString.empty())
+                .filter(OrFilter.or(StreamFilter.ofId("missing-stream-id")))
+                .build();
+
+        assertThat(query.toNativeEntity(Collections.emptyMap(), Collections.emptyMap()).filter().filters())
+                .noneMatch(f -> f instanceof StreamFilter);
     }
 
     private class TestDBSearchFilter implements DBSearchFilter {
