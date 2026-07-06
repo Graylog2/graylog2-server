@@ -17,7 +17,7 @@
 import React from 'react';
 
 import Routes from 'routing/Routes';
-import { Spinner } from 'components/common';
+import { ClearFloat, Spinner } from 'components/common';
 import { Button, Alert, Table, Modal, BootstrapModalConfirm, BootstrapModalWrapper } from 'components/bootstrap';
 import {
   deleteConfigurationVariable,
@@ -186,7 +186,7 @@ class ConfigurationVariablesHelper extends React.Component<
     return (
       <div>
         <EditConfigurationVariableModal create saveConfigurationVariable={this._saveConfigurationVariable} />
-        <div className="clearfix" />
+        <ClearFloat />
         <div className={`table-responsive ${ConfigurationHelperStyle.tableMaxHeight}`}>
           <Table responsive>
             <thead>

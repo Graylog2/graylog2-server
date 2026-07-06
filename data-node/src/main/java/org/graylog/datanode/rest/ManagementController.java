@@ -58,6 +58,13 @@ public class ManagementController {
     }
 
     @POST
+    @Path("/upgrade")
+    @OnlyInSecuredNode
+    public void updateOpensearch() {
+        postEvent(DataNodeLifecycleTrigger.UPDATE_OPENSEARCH);
+    }
+
+    @POST
     @Path("/stop")
     @OnlyInSecuredNode
     public void stop() {

@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import URI from 'urijs';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -39,11 +40,10 @@ const EditEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = useState<EventDefinition>(undefined);
   const history = useHistory();
-  const navigate = useNavigate();
 
   const goToOverview = useCallback(() => {
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
-  }, [navigate]);
+    history.push(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [history]);
 
   useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
@@ -113,7 +113,7 @@ const EditEventDefinitionPage = () => {
         <Col md={12}>
           <EventDefinitionFormContainer
             action="edit"
-            initialStep={step as string}
+            initialStep={normalizeStepKey(step as string)}
             onChangeStep={updateURLStepQueryParam}
             eventDefinition={eventDefinition}
             onSubmit={goToOverview}

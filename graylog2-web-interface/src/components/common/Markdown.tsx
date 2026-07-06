@@ -18,26 +18,22 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
-import parse from 'html-react-parser';
-import type { HTMLReactParserOptions } from 'html-react-parser';
+import parse, { domToReact, Element } from 'html-react-parser';
+import type { DOMNode, HTMLReactParserOptions } from 'html-react-parser';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import useMarkdownConfig from 'components/common/useMarkdownConfig';
 import Spinner from 'components/common/Spinner';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
+import MarkdownLink from 'components/common/markdown/MarkdownLink';
 
 type Props = {
   text: string;
   augment?: boolean;
 };
 
-DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-  if (node instanceof HTMLAnchorElement && node.getAttribute('href')) {
-    node.setAttribute('target', '_blank');
-    node.setAttribute('rel', 'noopener noreferrer');
-  }
-});
+const ALLOWED_URI_REGEXP = /^(?:https?:|graylog:|[^a-z])/i;
 
 type Transformer = Parameters<typeof parse>[1]['replace'];
 type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
@@ -119,17 +115,41 @@ const imageWarningTransformer: Transformer = (domNode) => {
   return undefined;
 };
 
+const anchorTransformer: Transformer = (domNode) => {
+  if (!(domNode instanceof Element) || domNode.name !== 'a') {
+    return undefined;
+  }
+
+  const href = domNode.attribs?.href;
+
+  if (!href) {
+    return undefined;
+  }
+
+  return <MarkdownLink href={href}>{domToReact(domNode.children as DOMNode[])}</MarkdownLink>;
+};
+
 const Markdown = ({ augment = false, text }: Props) => {
   const { isInitialLoading, data: markdownConfig } = useMarkdownConfig();
+
   // Remove dangerous HTML
   const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
 
   // Remove dangerous markdown
-  const html = useMemo(() => DOMPurify.sanitize(marked(sanitizedText, { async: false })), [sanitizedText]);
-  const transformer =
+  const html = useMemo(
+    () => DOMPurify.sanitize(marked.parse(sanitizedText, { async: false }), { ALLOWED_URI_REGEXP }),
+    [sanitizedText],
+  );
+
+  const imageTransformer: Transformer =
     markdownConfig?.allow_all_image_sources == true || markdownConfig?.allowed_image_sources
       ? undefined
       : imageWarningTransformer;
+
+  const transformer = useMemo(
+    () => (imageTransformer ? mergeTransformer([anchorTransformer, imageTransformer]) : anchorTransformer),
+    [imageTransformer],
+  );
 
   const RendererComponent = augment ? Augment : HTML;
 

@@ -19,7 +19,7 @@ package org.graylog2.datanode;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog.plugins.datanode.dto.Node;
@@ -41,20 +41,20 @@ import java.util.stream.Collectors;
 @Singleton
 public class DatanodeUpgradeService {
 
-    private final DatanodeUpgradeServiceAdapter upgradeService;
+    private final DatanodeClusterAdminAdapter clusterAdmin;
     private final NodeService<DataNodeDto> nodeService;
     private final Version serverVersion;
 
     @Inject
-    public DatanodeUpgradeService(DatanodeUpgradeServiceAdapter upgradeService, NodeService<DataNodeDto> nodeService, Version serverVersion) {
-        this.upgradeService = upgradeService;
+    public DatanodeUpgradeService(DatanodeClusterAdminAdapter clusterAdmin, NodeService<DataNodeDto> nodeService, Version serverVersion) {
+        this.clusterAdmin = clusterAdmin;
         this.nodeService = nodeService;
         this.serverVersion = serverVersion;
     }
 
     public DatanodeUpgradeStatus status() {
 
-        final ClusterState clusterState = upgradeService.getClusterState();
+        final ClusterState clusterState = clusterAdmin.getClusterState();
         final Collection<DataNodeDto> dataNodes = nodeService.allActive().values();
 
         final List<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isDatanodeUpToDate(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toList());
@@ -132,10 +132,10 @@ public class DatanodeUpgradeService {
     }
 
     public FlushResponse stopReplication() {
-        return upgradeService.disableShardReplication();
+        return clusterAdmin.disableShardReplication();
     }
 
     public FlushResponse startReplication() {
-        return upgradeService.enableShardReplication();
+        return clusterAdmin.enableShardReplication();
     }
 }

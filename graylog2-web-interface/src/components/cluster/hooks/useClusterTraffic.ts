@@ -32,6 +32,7 @@ const useClusterTraffic = (days: number) => {
       ),
     enabled: !!days,
     placeholderData: keepPreviousData,
+    staleTime: 30_000,
   });
 
   return { traffic, isLoading };

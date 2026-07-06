@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { LinkContainer, IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
@@ -89,7 +89,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const { actions: pluggableActions, actionModals: pluggableActionModals } =
     usePluggableEntitySharedActions<EventDefinition>(eventDefinition, 'event_definition');
   const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
@@ -243,7 +243,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
     }
   };
 
-  const onEditEventDefinition = () => navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
+  const onEditEventDefinition = () => push(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
 
   const isEnabled = eventDefinition?.state === 'ENABLED';
 
@@ -257,13 +257,11 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           bsSize="xsmall"
         />
         <MoreActions>
-          {(!isSigmaEventDefinition(eventDefinition) || showActions()) && (
-            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-              <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
-                Edit
-              </MenuItem>
-            </IfPermitted>
-          )}
+          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+            <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
+              Edit
+            </MenuItem>
+          </IfPermitted>
           <IfPermitted permissions="eventdefinitions:create">
             {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>

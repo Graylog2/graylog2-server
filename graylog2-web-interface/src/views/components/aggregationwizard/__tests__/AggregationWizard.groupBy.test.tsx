@@ -141,6 +141,31 @@ describe('AggregationWizard', () => {
   );
 
   it(
+    'should allow entering an arbitrary field that is not in the field list',
+    async () => {
+      const onChange = jest.fn();
+      renderSUT({ onChange });
+
+      await addGrouping();
+
+      const groupingContainer = await screen.findByTestId('grouping-0');
+      const fieldInput = await selectEvent.findSelectInput('Add a field', { container: groupingContainer });
+      await selectEvent.create(fieldInput, 'my_custom_field');
+
+      await within(groupingContainer).findByText('my_custom_field');
+      await submitWidgetConfigForm();
+
+      const pivot = Pivot.createValues(['my_custom_field'], expectedPivotConfig);
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
+
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
+
+  it(
     'should update config, even when field only exists for current query',
     async () => {
       const onChange = jest.fn();

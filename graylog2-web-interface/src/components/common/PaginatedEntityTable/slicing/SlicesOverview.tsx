@@ -176,7 +176,12 @@ const SlicesOverview = ({
     setEmptyPage(1);
 
     if (sliceCol) {
-      onSlicingPreferencesChange({ sliceColumn: sliceCol, sortBy: mode, order: direction });
+      onSlicingPreferencesChange({
+        sliceColumn: sliceCol,
+        sortBy: mode,
+        order: direction,
+        readOnly: slicingPreferences?.readOnly,
+      });
     }
   };
   const onSortDirectionUpdate = (direction: SortDirection) => {
@@ -184,7 +189,12 @@ const SlicesOverview = ({
     setEmptyPage(1);
 
     if (sliceCol) {
-      onSlicingPreferencesChange({ sliceColumn: sliceCol, sortBy: sortMode, order: direction });
+      onSlicingPreferencesChange({
+        sliceColumn: sliceCol,
+        sortBy: sortMode,
+        order: direction,
+        readOnly: slicingPreferences?.readOnly,
+      });
     }
   };
 

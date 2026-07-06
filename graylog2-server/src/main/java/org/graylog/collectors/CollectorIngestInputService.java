@@ -29,6 +29,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -85,16 +86,7 @@ public class CollectorIngestInputService {
             throw new NotFoundException(f("No input of type %s registered", inputType));
         }
 
-        // Start with the default configuration values for the input type and then only override the port
-        final var inputConfig = inputDescription.getConfigurationRequest().getFields().entrySet().stream()
-                .filter(entry -> entry.getValue().getDefaultValue() != null)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().getDefaultValue(),
-                        (a, b) -> b,
-                        HashMap::new
-                ));
-        inputConfig.put(NettyTransport.CK_PORT, port);
+        final var inputConfig = getHttpIngestInputConfig(port, inputDescription.getConfigurationRequest());
 
         try {
             final var inputCreateRequest = InputCreateRequest.create(
@@ -119,5 +111,19 @@ public class CollectorIngestInputService {
         } catch (ConfigurationException e) {
             throw new BadRequestException("Invalid input configuration", e);
         }
+    }
+
+    public static Map<String, Object> getHttpIngestInputConfig(int port, ConfigurationRequest configurationRequest) {
+        // Start with the default configuration values for the input type and then only override the port
+        final var inputConfig = configurationRequest.getFields().entrySet().stream()
+                .filter(entry -> entry.getValue().getDefaultValue() != null)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().getDefaultValue(),
+                        (a, b) -> b,
+                        HashMap::new
+                ));
+        inputConfig.put(NettyTransport.CK_PORT, port);
+        return inputConfig;
     }
 }

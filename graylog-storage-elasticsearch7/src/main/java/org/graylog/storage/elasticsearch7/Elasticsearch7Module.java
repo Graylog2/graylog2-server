@@ -19,7 +19,7 @@ package org.graylog.storage.elasticsearch7;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
@@ -92,7 +92,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
         bind(CredentialsProvider.class).toProvider(ESCredentialsProvider.class);
 
-        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterES7.class);
+        bindForSupportedVersion(DatanodeClusterAdminAdapter.class).to(DatanodeClusterAdminAdapterES7.class);
 
         bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterES7.class);
         bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterES7.class);

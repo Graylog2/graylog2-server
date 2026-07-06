@@ -28,7 +28,6 @@ import org.graylog.datanode.configuration.DatanodeCertificateRenewedEvent;
 import org.graylog.datanode.configuration.DatanodeCertificateRevokedEvent;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
-import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
@@ -46,7 +45,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
 
     private final OpensearchProcess process;
-    private final OpensearchConfigurationService configurationProvider;
     private final NodeId nodeId;
     private final DatanodeDirectoriesLockfileCheck lockfileCheck;
     private final PreflightConfigService preflightConfigService;
@@ -54,20 +52,20 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final DatanodeKeystore datanodeKeystore;
 
     private final OpensearchStateMachine stateMachine;
+    private final OpensearchUpgradeAction opensearchUpgradeAction;
     private final CsrRequester csrRequester;
     private boolean processAutostart = true;
 
 
     @Inject
     public OpensearchProcessService(
-            final OpensearchConfigurationService configurationProvider,
             final EventBus eventBus,
             final Configuration configuration,
             final NodeId nodeId,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, DatanodeKeystore datanodeKeystore, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
-        this.configurationProvider = configurationProvider;
+            final OpensearchProcess process, DatanodeKeystore datanodeKeystore, CsrRequester csrRequester, OpensearchStateMachine stateMachine,
+            OpensearchUpgradeAction opensearchUpgradeAction) {
         this.configuration = configuration;
         this.nodeId = nodeId;
         this.lockfileCheck = lockfileCheck;
@@ -76,6 +74,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.datanodeKeystore = datanodeKeystore;
         this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
+        this.opensearchUpgradeAction = opensearchUpgradeAction;
         eventBus.register(this);
     }
 
@@ -103,6 +102,10 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     } catch (DatanodeKeystoreException e) {
                         throw new RuntimeException(e);
                     }
+                }
+                case UPDATE_OPENSEARCH -> {
+                    LOG.info("Upgrading opensearch version to the latest");
+                    opensearchUpgradeAction.enableLatestVersion();
                 }
             }
         }

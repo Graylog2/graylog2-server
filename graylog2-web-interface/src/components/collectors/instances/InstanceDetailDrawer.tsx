@@ -23,6 +23,7 @@ import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
+import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import type { CollectorInstanceView, Source } from '../types';
 
@@ -131,7 +132,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
         <DetailRow>
           <Title>Messages:</Title>
-          <Link to={collectorReceivedMessagesUrl('collector_instance_uid', instance.instance_uid)}>
+          <Link to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
             Received messages
           </Link>
         </DetailRow>

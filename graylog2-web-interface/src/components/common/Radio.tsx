@@ -32,7 +32,7 @@ const StyledLabel = styled.label`
   cursor: pointer;
   margin-bottom: 0;
 
-  input[type="radio"] { 
+  input[type='radio'] {
     margin-top: 1px;
   }
 `;

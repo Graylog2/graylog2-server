@@ -256,7 +256,7 @@ public class OpAmpService {
             if (existingInstance.isPresent()) {
                 final var publicKeyFromExistingCollector = PemUtils.parseCertificate(
                         existingInstance.get().activeCertificatePem()).getPublicKey();
-                final var publicKeyFromCSR = PemUtils.extractPublicKeyFromCsr(csr);
+                final var publicKeyFromCSR = csr.publicKey();
                 if (!Arrays.equals(publicKeyFromExistingCollector.getEncoded(), publicKeyFromCSR.getEncoded())) {
                     LOG.warn("Rejecting re-enrollment for collector {}: CSR public key does not match public key in " +
                             "stored certificate", instanceUid);

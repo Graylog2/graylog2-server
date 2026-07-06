@@ -30,12 +30,13 @@ const useEntityTitles = (
   titlesById: Record<string, string>;
   notPermittedIds: Set<string>;
   isInitialLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
 } => {
   const stableEntities = [...entities].sort((a, b) => a.id.localeCompare(b.id));
   const enabled = stableEntities.length > 0;
 
-  const { data, isInitialLoading, isError } = useQuery({
+  const { data, isInitialLoading, isFetching, isError } = useQuery({
     queryKey: ['entity_titles', stableEntities],
     queryFn: () =>
       defaultOnError(
@@ -58,6 +59,7 @@ const useEntityTitles = (
     titlesById,
     notPermittedIds,
     isInitialLoading,
+    isFetching,
     isError,
   };
 };

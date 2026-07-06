@@ -58,7 +58,23 @@ public class FieldTypesLookupTest {
     }
 
     @Test
-    void returnsEmptyOptionalIfMultipleTypesExistForField() {
+    void returnsEmptyOptionalIfConflictingTypesExistForField() {
+        final Pair<IndexFieldTypesService, StreamService> services = mockServices(
+                IndexFieldTypesDTO.create("indexSet1", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("somefield", "long")
+                )),
+                IndexFieldTypesDTO.create("indexSet2", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("somefield", "keyword")
+                ))
+        );
+
+        final FieldTypesLookup lookup = new FieldTypesLookup(services.getLeft(), services.getRight());
+        final Optional<String> result = lookup.getType(Collections.singleton("stream1"), "somefield");
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void returnsDoubleIfMultipleNumericTypesIncludingFloatingPointExistForField() {
         final Pair<IndexFieldTypesService, StreamService> services = mockServices(
                 IndexFieldTypesDTO.create("indexSet1", "stream1", ImmutableSet.of(
                         FieldTypeDTO.create("somefield", "long")
@@ -70,7 +86,23 @@ public class FieldTypesLookupTest {
 
         final FieldTypesLookup lookup = new FieldTypesLookup(services.getLeft(), services.getRight());
         final Optional<String> result = lookup.getType(Collections.singleton("stream1"), "somefield");
-        assertThat(result).isEmpty();
+        assertThat(result).contains("double");
+    }
+
+    @Test
+    void returnsLongIfMultipleIntegerNumericTypesExistForField() {
+        final Pair<IndexFieldTypesService, StreamService> services = mockServices(
+                IndexFieldTypesDTO.create("indexSet1", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("somefield", "long")
+                )),
+                IndexFieldTypesDTO.create("indexSet2", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("somefield", "integer")
+                ))
+        );
+
+        final FieldTypesLookup lookup = new FieldTypesLookup(services.getLeft(), services.getRight());
+        final Optional<String> result = lookup.getType(Collections.singleton("stream1"), "somefield");
+        assertThat(result).contains("long");
     }
 
     @Test
@@ -130,18 +162,33 @@ public class FieldTypesLookupTest {
     }
 
     @Test
-    void getTypesReturnsEmptyMapIfMultipleTypesExistForField() {
+    void getTypesReturnsEmptyMapIfConflictingTypesExistForField() {
         final Pair<IndexFieldTypesService, StreamService> services = mockServices(
                 IndexFieldTypesDTO.create("indexSet1", "stream1", ImmutableSet.of(
                         FieldTypeDTO.create("somefield", "long")
                 )),
                 IndexFieldTypesDTO.create("indexSet2", "stream1", ImmutableSet.of(
-                        FieldTypeDTO.create("somefield", "float")
+                        FieldTypeDTO.create("somefield", "keyword")
                 ))
         );
 
         final FieldTypesLookup lookup = new FieldTypesLookup(services.getLeft(), services.getRight());
         assertThat(lookup.getTypes(Set.of("stream1"), Set.of("somefield"))).isEmpty();
+    }
+
+    @Test
+    void getTypesReturnsNumericTypeIfMultipleNumericTypesExistForField() {
+        final Pair<IndexFieldTypesService, StreamService> services = mockServices(
+                IndexFieldTypesDTO.create("indexSet1", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("somefield", "long")
+                )),
+                IndexFieldTypesDTO.create("indexSet2", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("somefield", "double")
+                ))
+        );
+
+        final FieldTypesLookup lookup = new FieldTypesLookup(services.getLeft(), services.getRight());
+        assertThat(lookup.getTypes(Set.of("stream1"), Set.of("somefield"))).containsEntry("somefield", "double");
     }
 
     @Test
