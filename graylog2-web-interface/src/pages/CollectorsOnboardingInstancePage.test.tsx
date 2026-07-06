@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { type Location } from 'react-router-dom';
 
 import asMock from 'helpers/mocking/AsMock';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
@@ -26,6 +27,7 @@ import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/field
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import mockHistory from 'helpers/mocking/mockHistory';
 import useHistory from 'routing/useHistory';
+import useLocation from 'routing/useLocation';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
 
@@ -61,24 +63,16 @@ jest.mock(
     },
 );
 
-const mockUseLocation = jest.fn();
-
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => ({ instanceUid: 'uid-42' })
+  useParams: () => ({ instanceUid: 'uid-42' }),
 }));
 
-jest.mock('views/hooks/useDefaultIntervalForRefresh', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
+jest.mock('views/hooks/useDefaultIntervalForRefresh');
 
 jest.mock('routing/useHistory');
 
-jest.mock('routing/useLocation', () => ({
-  __esModule: true,
-  default: () => mockUseLocation(),
-}));
+jest.mock('routing/useLocation');
 
 const instance = {
   id: 'uid-42',
@@ -90,7 +84,7 @@ const instance = {
 } as CollectorInstanceView;
 
 describe('CollectorsOnboardingInstancePage', () => {
-  let history;
+  const history = mockHistory();
 
   const mockInstanceLookup = (
     overrides: { data?: CollectorInstanceView | null; isLoading?: boolean; error?: Error | null } = {},
@@ -100,14 +94,13 @@ describe('CollectorsOnboardingInstancePage', () => {
       isLoading: false,
       error: null,
       ...overrides,
-    } as ReturnType<typeof useInstance>);
+    });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    history = mockHistory();
-    asMock(useHistory).mockReturnValue(history);
 
-    mockUseLocation.mockReturnValue({ state: null });
+    asMock(useHistory).mockReturnValue(history);
+    asMock(useLocation).mockReturnValue({ state: null } as Location);
     mockInstanceLookup();
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);
     asMock(useDefaultInterval).mockReturnValue(null);
