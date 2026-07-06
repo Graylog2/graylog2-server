@@ -20,7 +20,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
@@ -99,7 +99,7 @@ public class OpenSearch2Module extends VersionAwareModule {
 
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
-        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);
+        bindForSupportedVersion(DatanodeClusterAdminAdapter.class).to(DatanodeClusterAdminAdapterOS2.class);
 
         Multibinder<SnifferBuilder> snifferBuilders = Multibinder.newSetBinder(binder(), SnifferBuilder.class);
         snifferBuilders.addBinding().to(OpensearchClusterSniffer.class);

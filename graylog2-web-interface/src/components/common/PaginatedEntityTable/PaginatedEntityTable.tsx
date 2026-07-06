@@ -170,7 +170,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   noColumnReordering = false,
 }: PaginatedEntityTableInnerProps<T, M>) => {
   const { searchParams, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useTableFilterContext();
-  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(
+  const { mutateAsync: updateTableLayout, resetAsync: resetTableLayout } = useUpdateUserLayoutPreferences(
     tableLayout.entityTableId,
     tableLayout.layoutVariant,
   );
@@ -214,6 +214,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     paginationQueryParameter: paginationState,
     updateTableLayout,
     setQuery,
+    resetTableLayout,
   });
 
   const columnSchemas = useMemo(

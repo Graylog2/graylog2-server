@@ -38,11 +38,19 @@ const getSankeyAnchorElement = (gd: HTMLElement, pt: SankeyClickPoint): Element 
 };
 
 const sankeyAnchorKey = (anchor: ElementAnchor): string => {
-  const pt: SankeyClickPoint = anchor.pt;
-  const isLink = isSankeyLinkPoint(anchor.pt);
+  const pt = anchor.pt as SankeyClickPoint & {
+    curveNumber?: number;
+    customdata?: { source?: unknown; target?: unknown };
+  };
+  // A link is either plotly's native sankey link (`source`/`target` at the top level) or a
+  // customdata-encoded edge (e.g. network graph edges rendered as scatter traces).
+  const isLink =
+    isSankeyLinkPoint(anchor.pt) ||
+    !!(pt.customdata && typeof pt.customdata === 'object' && pt.customdata.source && pt.customdata.target);
+  const curve = pt.curveNumber ?? 0;
   const idx = pt.pointNumber ?? pt.index ?? 0;
 
-  return `${isLink ? 'l' : 'n'}-${idx}`;
+  return `${curve}-${isLink ? 'l' : 'n'}-${idx}`;
 };
 
 const makeSankeyAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {

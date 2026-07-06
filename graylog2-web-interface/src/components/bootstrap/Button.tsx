@@ -161,7 +161,8 @@ const StyledButton = styled(MantineButton)<{
   $bsStyle: StyleProps;
   $bsSize: BsSize;
   $active: boolean;
-}>(({ theme, $bsStyle, $bsSize, $active }) => {
+  $showOverflow: boolean;
+}>(({ theme, $bsStyle, $bsSize, $active, $showOverflow = false }) => {
   const isLink = isLinkStyle($bsStyle);
   const isTransparent = isTransparentStyle($bsStyle);
   const color = textColor($bsStyle, theme.colors);
@@ -169,7 +170,7 @@ const StyledButton = styled(MantineButton)<{
   return css`
     color: ${color};
     font-weight: 400;
-    overflow: visible;
+    ${$showOverflow ? 'overflow: visible;' : null}
 
     ${disabledStyles(theme.colors, $bsStyle)}
     ${stylesForSize($bsSize, $bsStyle)}
@@ -190,7 +191,7 @@ const StyledButton = styled(MantineButton)<{
 
     .mantine-Button-label {
       gap: 0.25em;
-      overflow: visible;
+      ${$showOverflow ? 'overflow: visible;' : null}
     }
 
     .mantine-Button-loader {
@@ -214,6 +215,7 @@ type Props = React.PropsWithChildren<{
   onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void);
   rel?: 'noopener noreferrer';
   role?: string;
+  showOverflow?: boolean;
   style?: React.ComponentProps<typeof StyledButton>['style'];
   tabIndex?: number;
   target?: '_blank';
@@ -242,6 +244,7 @@ const Button = (
     tabIndex = undefined,
     children = undefined,
     active = undefined,
+    showOverflow = false,
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
 ) => {
@@ -266,6 +269,7 @@ const Button = (
     tabIndex,
     title,
     type,
+    '$showOverflow': showOverflow,
   } as const;
 
   if (href) {

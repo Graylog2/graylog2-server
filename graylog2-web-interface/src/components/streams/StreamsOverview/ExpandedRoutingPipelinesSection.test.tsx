@@ -36,6 +36,7 @@ describe('ExpandedRoutingPipelinesSection', () => {
     asMock(useEntityTitles).mockReturnValue({
       titlesById: { 'pipeline-1': 'Routing Pipeline' },
       notPermittedIds: new Set(),
+      isFetching: false,
       isInitialLoading: false,
       isError: false,
     });

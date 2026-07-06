@@ -1,0 +1,4 @@
+type = "c"
+message = "Improve Number visualization layout visually, increasing trend visibility."
+
+pulls = ["26340"]

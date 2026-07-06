@@ -32,11 +32,13 @@ export type StreamMetricField =
   | 'pipelines'
   | 'routing_pipelines';
 
+export type TypedInputId = { id: string; type: string };
+
 export type StreamMetrics = {
   message_count?: number;
   avg_processing_time_ms?: number;
   max_processing_time_ms?: number;
-  associated_inputs?: Array<string>;
+  associated_inputs?: Array<TypedInputId>;
   pipelines?: Array<string>;
   routing_pipelines?: Array<string>;
   [extensionField: string]: unknown;

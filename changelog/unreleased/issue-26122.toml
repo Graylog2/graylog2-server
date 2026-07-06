@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed extractor listing breaking with a 500 error when a lookup table extractor references a lookup table that was deleted. Such extractors can now be listed, edited and deleted again."
+
+issues = ["26122"]
+pulls = ["26289"]

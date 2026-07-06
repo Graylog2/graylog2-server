@@ -54,7 +54,6 @@ const LimitedTd = styled.td(
 );
 const DefaultLabel = styled(Label)(
   ({ theme }) => css`
-    display: inline-flex;
     margin-left: ${theme.spacings.xxs};
     vertical-align: inherit;
   `,

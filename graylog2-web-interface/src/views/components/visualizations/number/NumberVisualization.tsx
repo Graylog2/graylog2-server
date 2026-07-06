@@ -34,13 +34,23 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
 import AutoFontSizer from './AutoFontSizer';
 import Trend from './Trend';
+import trendDirection, { trendBackground } from './trendDirection';
+import type { TrendDirection } from './trendDirection';
 
-const Container = styled.div<{ $height: number }>(
-  ({ $height }) => css`
+const Container = styled.div<{ $height: number; $trend: TrendDirection | undefined }>(({ theme, $height, $trend }) => {
+  const bgColor = trendBackground(theme, $trend);
+
+  return css`
     height: ${$height}px;
     width: 100%;
-  `,
-);
+    ${$trend &&
+    css`
+      background-color: ${bgColor} !important; /* Needed for report generation */
+      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+      color-adjust: exact !important; /* Needed for report generation */
+    `}
+  `;
+});
 
 const GridContainer = styled(Container)`
   display: grid;
@@ -119,12 +129,15 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   }
 
   const ContainerComponent = visualizationConfig.trend ? GridContainer : SingleItemGrid;
+  const trend = visualizationConfig.trend
+    ? trendDirection(value, previousValue, visualizationConfig.trendPreference)
+    : undefined;
 
   return (
-    <ContainerComponent $height={heightProp}>
+    <ContainerComponent $height={heightProp} $trend={trend} data-testid="trend-background">
       <NumberBox resizeDelay={20}>
         {({ height, width }) => (
-          <AutoFontSizer height={height} width={width} center>
+          <AutoFontSizer height={height} width={width} alignment="bottom-right">
             <CustomHighlighting field={field} value={value}>
               <Value
                 field={field}
@@ -141,13 +154,7 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
         <TrendBox>
           {({ height, width }) => (
             <AutoFontSizer height={height} width={width} target={targetRef}>
-              <Trend
-                ref={targetRef}
-                current={value}
-                previous={previousValue}
-                trendPreference={visualizationConfig.trendPreference}
-                unit={unit}
-              />
+              <Trend ref={targetRef} current={value} previous={previousValue} unit={unit} />
             </AutoFontSizer>
           )}
         </TrendBox>

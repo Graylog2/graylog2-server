@@ -146,7 +146,7 @@ describe('InputsActions', () => {
       updateInput: updateInputMock,
       deleteInput: deleteInputMock,
     } as any);
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => true });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
     asMock(useInputStateMutations).mockReturnValue({
       startInput: jest.fn(() => Promise.resolve()),
       stopInput: jest.fn(() => Promise.resolve()),
@@ -191,7 +191,7 @@ describe('InputsActions', () => {
     };
     const isPermitted = jest.fn((permission) => permission === `inputs:changestate:${input.id}`);
 
-    asMock(usePermissions).mockReturnValue({ isPermitted });
+    asMock(usePermissions).mockReturnValue({ isPermitted, isAnyPermitted: () => false });
 
     renderSUT(input);
 
@@ -207,7 +207,7 @@ describe('InputsActions', () => {
       type: 'org.graylog2.inputs.gelf.udp.GELFUDPInput',
     };
 
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => false });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => false, isAnyPermitted: () => false });
 
     renderSUT(input);
 

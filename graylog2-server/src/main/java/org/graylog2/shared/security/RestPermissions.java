@@ -66,6 +66,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String DATANODE_STOP = "datanode:stop";
     public static final String DATANODE_START = "datanode:start";
     public static final String DATANODE_MIGRATION = "datanode:migration";
+    public static final String DATANODE_RESTART = "datanode:restart";
     public static final String DASHBOARDS_CREATE = "dashboards:create";
     public static final String DASHBOARDS_EDIT = "dashboards:edit";
     public static final String DASHBOARDS_READ = "dashboards:read";
@@ -231,6 +232,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DATANODE_STOP, ""))
             .add(create(DATANODE_START, ""))
             .add(create(DATANODE_MIGRATION, ""))
+            .add(create(DATANODE_RESTART, ""))
             .add(create(DATANODE_OPENSEARCH_PROXY, ""))
             .add(create(DATANODE_REST_PROXY, ""))
             .add(create(GRAYLOG_CA_CREATE, ""))

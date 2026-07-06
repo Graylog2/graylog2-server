@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/* eslint-disable @typescript-eslint/no-require-imports,no-undef */
 const fs = require('fs');
 const path = require('path');
 

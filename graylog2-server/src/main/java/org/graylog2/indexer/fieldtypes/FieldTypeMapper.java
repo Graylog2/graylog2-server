@@ -93,6 +93,18 @@ public class FieldTypeMapper {
     );
 
     /**
+     * Checks if the given physical (Elasticsearch/OpenSearch) field type maps to a numeric Graylog type.
+     *
+     * @param physicalType Elasticsearch type name
+     * @return true if the type is numeric
+     */
+    public static boolean isNumericType(String physicalType) {
+        return Optional.ofNullable(TYPE_MAP.get(physicalType))
+                .map(type -> type.properties().contains(PROP_NUMERIC))
+                .orElse(false);
+    }
+
+    /**
      * Map the given Elasticsearch field type to a Graylog type.
      *
      * @param type Elasticsearch type name
