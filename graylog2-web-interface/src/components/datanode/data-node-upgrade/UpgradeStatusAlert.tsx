@@ -24,11 +24,13 @@ const OpenSearchStatusLine = ({
   isOpenSearchVersionError,
   isLoadingOpenSearchVersion,
   isOpenSearchUpToDate,
+  unavailableDataNodeCount,
 }: {
   currentOpenSearchVersion: string | undefined;
   isOpenSearchVersionError: boolean;
   isLoadingOpenSearchVersion: boolean;
   isOpenSearchUpToDate: boolean;
+  unavailableDataNodeCount: number;
 }) => {
   if (isLoadingOpenSearchVersion) {
     return <p>Checking OpenSearch version...</p>;
@@ -38,6 +40,17 @@ const OpenSearchStatusLine = ({
     return (
       <p>
         <Icon name="warning" bsStyle="warning" /> Could not check Data Nodes&apos; embedded OpenSearch version.
+      </p>
+    );
+  }
+
+  // A node that is down or still starting may come back with a different OpenSearch version than its
+  // metadata claims, so neither "up to date" nor "not up to date" can be stated honestly.
+  if (unavailableDataNodeCount > 0) {
+    return (
+      <p>
+        <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch state cannot be confirmed
+        while {unavailableDataNodeCount} Data {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable.
       </p>
     );
   }
@@ -63,11 +76,13 @@ const UpgradeStatusAlert = ({
   isOpenSearchVersionError,
   isOpenSearchUpToDate,
   isLoadingOpenSearchVersion,
+  unavailableDataNodeCount,
 }: {
   currentOpenSearchVersion: string | undefined;
   isOpenSearchVersionError: boolean;
   isOpenSearchUpToDate: boolean;
   isLoadingOpenSearchVersion: boolean;
+  unavailableDataNodeCount: number;
 }) => (
   <Alert bsStyle={isOpenSearchUpToDate ? 'success' : 'warning'} noIcon>
     <p>
@@ -78,6 +93,7 @@ const UpgradeStatusAlert = ({
       isOpenSearchVersionError={isOpenSearchVersionError}
       isLoadingOpenSearchVersion={isLoadingOpenSearchVersion}
       isOpenSearchUpToDate={isOpenSearchUpToDate}
+      unavailableDataNodeCount={unavailableDataNodeCount}
     />
   </Alert>
 );

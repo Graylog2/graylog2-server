@@ -44,14 +44,21 @@ const useOpenSearchClusterStats = () => {
     refetchInterval: CLUSTER_STATS_REFETCH_INTERVAL_MS,
   });
   const nodes: Array<OpenSearchVersionNode> = data?.nodes ?? [];
+  const availableDataNodeCount = nodes.filter(isAvailableDataNode).length;
+  const unavailableDataNodeCount = nodes.length - availableDataNodeCount;
 
   return {
     currentVersion: data?.lowest_current_version,
     targetVersion: data?.highest_available_version,
     nodes,
-    numberOfDataNodes: nodes.filter(isAvailableDataNode).length,
+    numberOfDataNodes: availableDataNodeCount,
+    unavailableDataNodeCount,
     isUpgradeAvailable: data?.upgrade_available ?? false,
-    isUpToDate: data ? !data.upgrade_available && data.up_to_date_count === data.nodes.length : false,
+    // The version overview is computed from node metadata, which cannot be confirmed for a Data Node that
+    // is down or still starting — "up to date" is only claimed once every node is also AVAILABLE.
+    isUpToDate: data
+      ? !data.upgrade_available && data.up_to_date_count === data.nodes.length && unavailableDataNodeCount === 0
+      : false,
     isError,
     isFetching,
     isLoading: isInitialLoading,

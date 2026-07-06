@@ -53,6 +53,7 @@ const DataNodeUpgradePage = () => {
     isError: isOpenSearchVersionError,
     isUpToDate: isOpenSearchUpToDate,
     isLoading: isLoadingOpenSearchVersion,
+    unavailableDataNodeCount,
   } = useOpenSearchClusterStats();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
   const [openUpgradeConfirmDialog, setOpenUpgradeConfirmDialog] = useState<boolean>(false);
@@ -161,6 +162,7 @@ const DataNodeUpgradePage = () => {
                 isOpenSearchVersionError={isOpenSearchVersionError}
                 isOpenSearchUpToDate={isOpenSearchUpToDate}
                 isLoadingOpenSearchVersion={isLoadingOpenSearchVersion}
+                unavailableDataNodeCount={unavailableDataNodeCount}
               />
             )}
             {showOpenSearchUpgradeSection && <OpenSearchUpgradeSection />}
