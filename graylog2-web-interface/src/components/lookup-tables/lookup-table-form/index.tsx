@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { Formik } from 'formik';
 import type { FormikErrors } from 'formik';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Wizard, Spinner } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -71,7 +72,7 @@ function LookupTableWizard() {
   const { lookupTable, loadingLookupTable } = useFetchLookupTable(lutIdOrName);
   const initialValues = useMemo(() => lookupTable || INIT_TABLE_VALUES, [lookupTable]);
   const [steps, { activeStep, setActiveStep }] = useSteps();
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const sendTelemetry = useSendTelemetry();
   const { createLookupTable, creatingLookupTable } = useCreateLookupTable();
   const { updateLookupTable, updatingLookupTable } = useUpdateLookupTable();
@@ -99,7 +100,7 @@ function LookupTableWizard() {
         },
       });
 
-      navigate(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
+      push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
     });
   };
 

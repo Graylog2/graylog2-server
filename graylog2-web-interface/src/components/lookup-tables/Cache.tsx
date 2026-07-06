@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Button, Label } from 'components/bootstrap';
@@ -34,7 +34,7 @@ type Props = {
 const Cache = ({ cache, noEdit = false }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const plugin = usePluginEntities('lookupTableCaches').find((p: CachePluginType) => p.type === cache.config?.type);
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
@@ -43,7 +43,7 @@ const Cache = ({ cache, noEdit = false }: Props) => {
   }
 
   const handleEdit = () => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
+    push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
   };
 
   return (

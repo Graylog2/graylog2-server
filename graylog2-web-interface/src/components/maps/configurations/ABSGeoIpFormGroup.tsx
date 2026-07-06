@@ -62,6 +62,7 @@ const ABSGeoIpFormGroup = () => {
         help="Your Azure Blob Container name."
         labelClassName=""
         required
+        disabled={!values.enabled}
         wrapperClassName=""
       />
       <FormikFormGroup
@@ -70,6 +71,7 @@ const ABSGeoIpFormGroup = () => {
         label="Azure Blob Endpoint URL"
         help="Your Azure Blob Endpoint URL, only required if you want to override the default endpoint."
         labelClassName=""
+        disabled={!values.enabled}
         wrapperClassName=""
       />
       <FormikFormGroup
@@ -79,12 +81,15 @@ const ABSGeoIpFormGroup = () => {
         placeholder="your-account-name"
         help="The name of your Azure storage account."
         required
+        disabled={!values.enabled}
         labelClassName=""
         wrapperClassName=""
       />
       {showResetPasswordButton ? (
         <Input id="azure_account_reset" label="Azure Account Key" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-          <Button onClick={toggleAccountKeyReset}>Reset password</Button>
+          <Button onClick={toggleAccountKeyReset} disabled={!values.enabled}>
+            Reset password
+          </Button>
         </Input>
       ) : (
         <Input
@@ -93,10 +98,11 @@ const ABSGeoIpFormGroup = () => {
           data-testid="azure-account-key-input"
           type="password"
           label="Azure account key"
+          disabled={!values.enabled}
           onChange={({ target: { value } }) => setAccessKey({ set_value: value })}
           buttonAfter={
             !isCreate ? (
-              <Button type="button" onClick={toggleAccountKeyReset}>
+              <Button type="button" onClick={toggleAccountKeyReset} disabled={!values.enabled}>
                 Undo Reset
               </Button>
             ) : undefined

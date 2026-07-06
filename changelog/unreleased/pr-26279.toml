@@ -1,0 +1,5 @@
+type = "a"
+message = "Added a new event definition type filter and column on the main Event Definitions page."
+
+issues = ["Graylog2/graylog-plugin-enterprise#11986"]
+pulls = ["26279"]
