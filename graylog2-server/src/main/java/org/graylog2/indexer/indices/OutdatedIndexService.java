@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -62,8 +63,15 @@ public class OutdatedIndexService {
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
         return indicesAdapter.getOutdatedIndices(currentMajorVersion).stream()
                 .map(index -> index.asManaged(indexSetRegistry.isManagedIndex(index.indexName())))
-                .map(index -> index.asActiveWriteIndex(indexSetRegistry.isCurrentWriteIndex(index.indexName())))
+                .map(index -> index.asActiveWriteIndex(isActiveWriteIndexForSet(index.indexName())))
                 .sorted().toList();
+    }
+
+    public String isActiveWriteIndexForSet(String index) {
+        return indexSetRegistry.getForIndex(index)
+                .filter(indexSet -> Objects.equals(indexSet.getActiveWriteIndex(), index))
+                .map(indexSet -> indexSet.getConfig().id())
+                .orElse(null);
     }
 
     public void reindex(String index, boolean withReplicas) {
