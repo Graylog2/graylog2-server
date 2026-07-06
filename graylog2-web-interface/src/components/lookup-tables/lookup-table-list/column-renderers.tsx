@@ -119,10 +119,12 @@ const columnRenderers: ColumnRenderers<LookupTableEntity, { adapters: AdaptersMa
     },
     cache_id: {
       width: 0.1,
+      textAlign: 'left',
       renderCell: (cache_id: string, _c, meta) => <CacheCol cacheId={cache_id} caches={meta.caches} />,
     },
     data_adapter_id: {
       width: 0.1,
+      textAlign: 'left',
       renderCell: (data_adapter_id: string, _c, meta) => (
         <DataAdapterCol dataAdapterId={data_adapter_id} dataAdapters={meta.adapters} />
       ),

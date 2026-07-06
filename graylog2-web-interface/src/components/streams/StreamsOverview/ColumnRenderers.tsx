@@ -53,10 +53,12 @@ const customColumnRenderers = (
     title: {
       renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
       width: 0.5,
+      wrapContent: true,
     },
     index_set_title: {
       renderCell: (_index_set_title: string, stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
       width: 0.3,
+      textAlign: 'left',
     },
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,

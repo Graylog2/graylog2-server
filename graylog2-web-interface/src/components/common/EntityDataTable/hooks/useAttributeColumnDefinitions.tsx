@@ -38,6 +38,26 @@ import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/Ac
 
 import SortIcon from '../SortIcon';
 
+// Column drag-to-reorder and resize controls are hidden until the header is hovered or focused,
+// reducing visual clutter. Uses opacity (not display) so the reserved width stays stable for
+// useHeaderSectionObserver and the label doesn't shift when the control appears. Devices
+// without hover (touch) keep the controls always visible, since they could not reveal them.
+const HandleSlot = styled.div<{ $forceVisible?: boolean }>(
+  ({ $forceVisible }) => css`
+    opacity: ${$forceVisible ? 1 : 0};
+    transition: opacity 150ms ease-in-out;
+
+    th:hover &,
+    th:focus-within & {
+      opacity: 1;
+    }
+
+    @media (hover: none) {
+      opacity: 1;
+    }
+  `,
+);
+
 export const ThInner = styled.div`
   display: flex;
   justify-content: space-between;
@@ -119,13 +139,15 @@ const AttributeHeader = <Entity extends EntityBase>({
     <ThInner ref={setNodeRef}>
       <LeftCol ref={leftRef}>
         {columnMeta?.enableColumnOrdering && (
-          <DragHandle
-            ref={setActivatorNodeRef}
-            index={ctx.header.index}
-            dragHandleProps={{ ...attributes, ...listeners }}
-            isDragging={isDragging}
-            itemTitle={columnLabel}
-          />
+          <HandleSlot $forceVisible={isDragging}>
+            <DragHandle
+              ref={setActivatorNodeRef}
+              index={ctx.header.index}
+              dragHandleProps={{ ...attributes, ...listeners }}
+              isDragging={isDragging}
+              itemTitle={columnLabel}
+            />
+          </HandleSlot>
         )}
         <HeaderActionsDropdown
           label={columnLabel}
@@ -142,11 +164,13 @@ const AttributeHeader = <Entity extends EntityBase>({
       </LeftCol>
       <RightCol ref={rightRef}>
         {ctx.header.column.getCanResize() && (
-          <ResizeHandle
-            onMouseDown={ctx.header.getResizeHandler()}
-            onTouchStart={ctx.header.getResizeHandler()}
-            colTitle={columnLabel}
-          />
+          <HandleSlot $forceVisible={ctx.header.column.getIsResizing()}>
+            <ResizeHandle
+              onMouseDown={ctx.header.getResizeHandler()}
+              onTouchStart={ctx.header.getResizeHandler()}
+              colTitle={columnLabel}
+            />
+          </HandleSlot>
         )}
       </RightCol>
     </ThInner>

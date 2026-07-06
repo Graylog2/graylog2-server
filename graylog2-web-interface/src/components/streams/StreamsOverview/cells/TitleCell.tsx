@@ -30,22 +30,41 @@ const DefaultLabel = styled(Label)`
   vertical-align: inherit;
 `;
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 2lh; /* reserve two lines so rows with and without description have the same height */
+`;
+
+const TitleRow = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
 const StyledText = styled(Text)(
   ({ theme }) => css`
     color: ${theme.colors.text.secondary};
+    line-height: inherit; /* match the title line, so two lines fill the container exactly */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   `,
 );
 
 const TitleCell = ({ stream }: Props) => (
-  <>
-    <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
-    {stream.is_default && (
-      <DefaultLabel bsStyle="primary" bsSize="xsmall">
-        Default
-      </DefaultLabel>
-    )}
-    <StyledText>{stream.description}</StyledText>
-  </>
+  <Container>
+    <TitleRow>
+      <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
+      {stream.is_default && (
+        <DefaultLabel bsStyle="primary" bsSize="xsmall">
+          Default
+        </DefaultLabel>
+      )}
+    </TitleRow>
+    {stream.description && <StyledText>{stream.description}</StyledText>}
+  </Container>
 );
 
 export default TitleCell;

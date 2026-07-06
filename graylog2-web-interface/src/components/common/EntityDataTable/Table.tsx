@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 import { Table as BaseTable } from 'components/bootstrap';
 import EntityTableOverrideRow from 'components/common/EntityDataTable/EntityTableOverrideRow';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { ACTIONS_COL_ID, ROW_MIN_HEIGHT, UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 import type {
   EntityBase,
   ExpandedSectionRenderers,
@@ -44,7 +44,7 @@ const StyledTable = styled(BaseTable)(
   ({ theme }) => css`
     table-layout: fixed;
     margin-bottom: 0;
-    height: 100%; // required to be able to use height: 100% in td
+    height: 100%; /* required to be able to use height: 100% in td */
 
     tbody > tr.active {
       background-color: ${theme.colors.table.row.backgroundStriped} !important;
@@ -52,34 +52,63 @@ const StyledTable = styled(BaseTable)(
   `,
 );
 
+const Tr = styled.tr`
+  height: ${ROW_MIN_HEIGHT}px; /* standardizes row height, acts as a minimum in table layout */
+`;
+
 const Td = styled.td<{
   $colId: string;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
+  $showDivider: boolean;
+  $textAlign: 'left' | 'center' | 'right' | undefined;
+  $wrapContent: boolean;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition }) => css`
-    word-break: break-word;
+  ({ $colId, $hidePadding, $pinningPosition, $showDivider, $textAlign, $wrapContent, theme }) => css`
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
-    height: 100%; // required to be able to use height: 100% in child elements
+    height: 100%; /* required to be able to use height: 100% in child elements */
+    text-align: ${$textAlign ?? 'center'};
+
+    && {
+      vertical-align: middle; /* center content vertically (horizontal alignment unchanged) */
+    }
+
+    ${$showDivider &&
+    css`
+      border-right: 1px solid ${theme.colors.table.row.divider};
+    `}
+
     ${$pinningPosition
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
           ${ScrollShadow('left')}
+
           &::before {
             display: var(${displayScrollRightIndicatorVar}, none);
           }
         `
       : ''}
 
-    ${$hidePadding &&
-    css`
-      && {
-        padding: 0;
-      }
-    `}
+    ${$hidePadding
+      ? css`
+          && {
+            padding: 0;
+          }
+        `
+      : css`
+          ${$wrapContent
+            ? css`
+                overflow-wrap: break-word;
+              `
+            : css`
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              `}
+        `}
   `,
 );
 
@@ -106,15 +135,23 @@ const Table = <Entity extends EntityBase>({
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
         const visibleCellCount = visibleCells.length;
-        const renderCell = (cell) => {
+        const renderCell = (cell, index?: number) => {
           const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
+          const nextCell = index === undefined ? undefined : visibleCells[index + 1];
+          // Column dividers are only drawn between two attribute columns, so the bulk select
+          // and the (possibly empty) actions column don't produce stray lines.
+          const showDivider =
+            !!nextCell && !UTILITY_COLUMNS.has(cell.column.id) && !UTILITY_COLUMNS.has(nextCell.column.id);
 
           return (
             <Td
               key={cell.id}
               $colId={cell.column.id}
               $pinningPosition={cell.column.getIsPinned()}
-              $hidePadding={columnMeta?.hideCellPadding}>
+              $hidePadding={columnMeta?.hideCellPadding}
+              $showDivider={showDivider}
+              $textAlign={columnMeta?.columnRenderer?.textAlign}
+              $wrapContent={columnMeta?.columnRenderer?.wrapContent}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           );
@@ -133,7 +170,7 @@ const Table = <Entity extends EntityBase>({
               />
             ) : (
               <>
-                <tr className={isRowExpanded(row.id) ? 'active' : null}>{visibleCells.map(renderCell)}</tr>
+                <Tr className={isRowExpanded(row.id) ? 'active' : null}>{visibleCells.map(renderCell)}</Tr>
                 <ExpandedSections
                   key={`expanded-sections-${row.id}`}
                   expandedSectionRenderers={expandedSectionRenderers}

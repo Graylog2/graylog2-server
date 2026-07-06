@@ -31,6 +31,12 @@ const DefaultColumnRenderers = {
     },
   },
   attributes: {
+    title: {
+      textAlign: 'left' as const,
+    },
+    name: {
+      textAlign: 'left' as const,
+    },
     description: {
       width: 2,
     },

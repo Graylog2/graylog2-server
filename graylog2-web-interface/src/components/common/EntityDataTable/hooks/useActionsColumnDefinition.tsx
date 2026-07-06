@@ -57,7 +57,7 @@ const Actions = styled.div<{ $isEvenRow: boolean }>(
       $isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped,
     ])};
     height: 100%;
-    align-items: flex-start;
+    align-items: center;
   `,
 );
 

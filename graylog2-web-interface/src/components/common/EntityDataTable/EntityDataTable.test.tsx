@@ -108,6 +108,16 @@ describe('<EntityDataTable />', () => {
     await screen.findByText('Entity description');
   });
 
+  it('should center cell content, except for title cells', async () => {
+    render(<EntityDataTable {...defaultProps} />);
+
+    const statusCell = await screen.findByRole('cell', { name: 'enabled' });
+    const titleCell = await screen.findByRole('cell', { name: 'Entity title' });
+
+    expect(statusCell).toHaveStyle({ textAlign: 'center' });
+    expect(titleCell).toHaveStyle({ textAlign: 'left' });
+  });
+
   it('should render custom cell and header renderer', async () => {
     render(
       <EntityDataTable

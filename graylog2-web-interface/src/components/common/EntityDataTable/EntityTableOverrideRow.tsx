@@ -17,14 +17,21 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import { ROW_MIN_HEIGHT } from 'components/common/EntityDataTable/Constants';
+
 const Row = styled.tr`
   cursor: default;
+  height: ${ROW_MIN_HEIGHT}px; /* standardizes row height, acts as a minimum in table layout */
 `;
 
 const TD = styled.td`
   min-width: 50px;
-  word-break: break-word;
+  overflow-wrap: break-word;
   padding: 4px 5px 2px;
+
+  && {
+    vertical-align: middle;
+  }
 `;
 
 const Content = styled.div`

@@ -16,6 +16,7 @@
  */
 
 export const CELL_PADDING = 5; // px
+export const ROW_MIN_HEIGHT = 38; // px, keeps sparse rows (e.g. bulk-select only) from collapsing
 export const DEFAULT_COL_MIN_WIDTH = 150; // px
 export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.
 export const MORE_ACTIONS_TITLE = 'More';

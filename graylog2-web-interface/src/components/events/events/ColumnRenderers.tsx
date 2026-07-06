@@ -146,6 +146,7 @@ const CustomColumnRenderers: ColumnRenderers<Event> = {
     ...getGeneralEventAttributeRenderers<Event>(),
     event_definition_id: {
       width: 0.3,
+      textAlign: 'left',
       renderCell: (eventDefinitionId: string, _, meta: EventsAdditionalData) => (
         <EventDefinitionRenderer meta={meta} eventDefinitionId={eventDefinitionId} />
       ),

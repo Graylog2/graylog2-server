@@ -45,11 +45,14 @@ export type ColumnSchema = {
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
   renderCell?: (value: unknown, entity: Entity, meta: Meta, additionalInfo?: unknown) => React.ReactNode;
   renderHeader?: (title: string) => React.ReactNode;
-  textAlign?: string;
+  // Horizontal cell content alignment. Cells are centered by default; title and link cells should be left-aligned.
+  textAlign?: 'left' | 'center' | 'right';
   minWidth?: number; // px
   width?: number; // fraction of unassigned table width, similar to CSS unit fr.
   // Uses the rendered title width as the fixed width; or provide a px value, if the title width is too small.
   staticWidth?: number | 'matchHeader';
+  // Opt out of the default single-line truncation for cells whose content needs to wrap (e.g. multi-line renderers).
+  wrapContent?: boolean;
 };
 
 export type ColumnRenderersByAttribute<Entity extends EntityBase, Meta = unknown> = {
