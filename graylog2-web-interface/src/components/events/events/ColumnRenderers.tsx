@@ -46,7 +46,7 @@ const EventDefinitionRenderer = ({
   return <EventDefinitionLink id={eventDefinitionId} title={title} />;
 };
 
-const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
+export const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
   const plugin = useMemo(() => {
     if (!type) {
