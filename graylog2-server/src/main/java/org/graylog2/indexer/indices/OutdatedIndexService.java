@@ -62,6 +62,7 @@ public class OutdatedIndexService {
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
         return indicesAdapter.getOutdatedIndices(currentMajorVersion).stream()
                 .map(index -> index.asManaged(indexSetRegistry.isManagedIndex(index.indexName())))
+                .map(index -> index.asActiveWriteIndex(indexSetRegistry.isCurrentWriteIndex(index.indexName())))
                 .sorted().toList();
     }
 

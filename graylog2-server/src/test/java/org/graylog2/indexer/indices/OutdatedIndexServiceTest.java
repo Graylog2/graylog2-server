@@ -82,10 +82,12 @@ class OutdatedIndexServiceTest {
         );
         when(indexSetRegistry.isManagedIndex("outdated1")).thenReturn(true);
         when(indexSetRegistry.isManagedIndex("outdated2")).thenReturn(false);
+        when(indexSetRegistry.isCurrentWriteIndex("outdated1")).thenReturn(true);
+        when(indexSetRegistry.isCurrentWriteIndex("outdated2")).thenReturn(false);
         when(indicesAdapter.getOutdatedIndices(2)).thenReturn(outdatedIndices);
         assertThat(outdatedIndexService.getOutdatedIndices()).isEqualTo(List.of(
-                new OutdatedIndex("outdated1", "1.3.0", false, true),
-                new OutdatedIndex("outdated2", "1.3.0", true, false)
+                new OutdatedIndex("outdated1", "1.3.0", false, true, true),
+                new OutdatedIndex("outdated2", "1.3.0", true, false, false)
         ));
 
     }
