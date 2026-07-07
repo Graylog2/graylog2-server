@@ -27,5 +27,6 @@ public class OnboardingModule extends PluginModule {
         addSystemRestResource(OnboardingResource.class);
         addAuditEventTypes(OnboardingAuditEventTypes.class);
         addMigration(V20260624153204_InitializeOnboardingState.class);
+        bind(OnboardingAutoDismissService.class).asEagerSingleton();
     }
 }
