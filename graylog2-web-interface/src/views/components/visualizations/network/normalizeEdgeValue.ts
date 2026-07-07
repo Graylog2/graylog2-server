@@ -14,15 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Routes from 'routing/Routes';
-
 /**
- * Builds a Graylog search URL filtered on a collector message field
- * (e.g. `collector_instance_uid`, `collector_fleet_id`, `collector_source_id`).
- * Uses a 1h relative time range and no stream scoping — the Collector System
- * Logs stream is system-scoped and is not included in unscoped searches.
+ * Linearly map an edge's aggregated metric value to a position in [0, 1], used to sample a color
+ * from the configured colorscale. When every edge shares the same value (including a single-edge
+ * graph) there is no meaningful range, so all edges sample the low end of the scale.
  */
-const collectorReceivedMessagesUrl = (field: string, value: string, autorefresh?: string): string =>
-  Routes.search_with_query(`${field}:"${value}"`, 'relative', { relative: 3600 }, undefined, undefined, autorefresh);
+const normalizeEdgeValue = (value: number, min: number, max: number): number =>
+  max === min ? 0 : (value - min) / (max - min);
 
-export default collectorReceivedMessagesUrl;
+export default normalizeEdgeValue;
