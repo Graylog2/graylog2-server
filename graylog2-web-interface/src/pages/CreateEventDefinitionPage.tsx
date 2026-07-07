@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
@@ -30,7 +30,7 @@ import useQuery from 'routing/useQuery';
 
 const CreateEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
   const { step } = useQuery();
@@ -50,14 +50,14 @@ const CreateEventDefinitionPage = () => {
   );
 
   const goToOverview = useCallback(() => {
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
-  }, [navigate]);
+    push(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [push]);
 
   useEffect(() => {
     if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
-      navigate(Routes.NOTFOUND);
+      push(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, navigate]);
+  }, [currentUser.permissions, push]);
 
   return (
     <DocumentTitle title={pageTitle}>

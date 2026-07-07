@@ -24,6 +24,7 @@ import type { QueryClientConfig } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
+import { dataRouterFuture, routerProviderFuture } from '../reactRouterFutureFlags';
 
 const renderHookWithWrapper = <TProps, TResult>(
   callback: (props: TProps) => TResult,
@@ -53,7 +54,12 @@ const renderHookWithDataRouter = <TProps, TResult>(
       const CustomWrapper = (options.wrapper as React.ElementType) ?? React.Fragment;
       const Wrapper = () => <CustomWrapper>{children}</CustomWrapper>;
 
-      return <RouterProvider router={createMemoryRouter([{ path: '/', element: <Wrapper /> }])} />;
+      return (
+        <RouterProvider
+          router={createMemoryRouter([{ path: '/', element: <Wrapper /> }], { future: dataRouterFuture })}
+          future={routerProviderFuture}
+        />
+      );
     },
   });
 

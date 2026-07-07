@@ -25,4 +25,8 @@ import java.util.Map;
  */
 public interface LogRecordProcessor {
     Map<String, Object> process(OTelJournal.Log log);
+
+    default boolean producesUnaccountedMessages() {
+        return false;
+    }
 }

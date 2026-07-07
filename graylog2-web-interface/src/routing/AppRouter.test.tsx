@@ -22,6 +22,7 @@ import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
 import { defaultUser } from 'defaultMockValues';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
+import { dataRouterFuture } from 'reactRouterFutureFlags';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -68,6 +69,7 @@ const setInitialPath = (path: string) => {
   asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
     createMemoryRouter(routes, {
       initialEntries: [path],
+      future: dataRouterFuture,
     }),
   );
 };
@@ -83,7 +85,9 @@ describe('AppRouter', () => {
   beforeEach(() => {
     asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
     asMock(usePluginEntities).mockReturnValue([]);
-    asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
+    asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
+      createMemoryRouter(routes, { future: dataRouterFuture }),
+    );
   });
 
   it('routes to Getting Started Page for `/` or empty location', async () => {

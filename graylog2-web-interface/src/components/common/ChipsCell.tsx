@@ -49,12 +49,11 @@ const HoverableLabel = styled(Label)(
   ({ theme }) => css`
     transition: background-color 0.1s ease-in-out;
 
-    /* Override bootstrap Label defaults so a long chip wraps inside the cell. */
-    display: inline-block;
-    max-width: 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    /* Override Label's flex label so the bare-string chip can be abbreviated with an ellipsis
+       (overflow/text-overflow/white-space already come from Badge) instead of overflowing the cell. */
+    .mantine-Badge-label {
+      display: block;
+    }
 
     button:hover > & {
       background-color: ${theme.colors.gray[60]};
@@ -68,6 +67,10 @@ const ChipButton = styled.button(
     border: 0;
     padding: 0;
     cursor: pointer;
+
+    /* Shrink as a flex item so the chip inside can truncate instead of leaking past the cell. */
+    min-width: 0;
+    max-width: 100%;
 
     /* Inner Label/Badge components set their own cursor; force pointer everywhere
        inside the button so the hover affordance is consistent. */
@@ -142,9 +145,9 @@ const ChipsCell = ({
     }
     if (!onItemClick) {
       return (
-        <span key={item}>
-          <HoverableLabel bsStyle="default">{item}</HoverableLabel>
-        </span>
+        <HoverableLabel key={item} bsStyle="default" title={item}>
+          {item}
+        </HoverableLabel>
       );
     }
 
