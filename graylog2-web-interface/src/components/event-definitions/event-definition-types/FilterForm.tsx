@@ -40,6 +40,7 @@ import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
+import usePluginEntities from 'hooks/usePluginEntities';
 import RelativeTime from 'components/common/RelativeTime';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
@@ -179,6 +180,7 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
 const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
+  const searchQueryPreviews = usePluginEntities('eventDefinitions.components.searchQueryPreview') ?? [];
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
   const { userTimezone } = useUserDateTime();
@@ -552,6 +554,14 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
           </HelpBlock>
         </FormGroup>
       )}
+
+      {/* Extension point (filled by the enterprise search-filters plugin) for a read-only preview of the
+          effective query beneath the Search Query. Scoped (Illuminate) definitions hide the base query, so
+          the preview is not rendered for them. */}
+      {onlyFilters ||
+        searchQueryPreviews.map(({ component: SearchQueryPreview, key }) => (
+          <SearchQueryPreview key={key} queryString={currentConfig.query ?? ''} filters={currentConfig.filters ?? []} />
+        ))}
 
       {onlyFilters || (
         <QueryParameters
