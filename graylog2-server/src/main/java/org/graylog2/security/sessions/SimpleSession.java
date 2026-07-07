@@ -46,6 +46,7 @@ import org.apache.shiro.session.StoppedSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.ValidatingSession;
 import org.apache.shiro.util.CollectionUtils;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -295,6 +296,7 @@ public class SimpleSession implements ValidatingSession, Serializable {
         return false;
     }
 
+    @SuppressForbidden("Copied from upstream, date formatter without locale")
     @Override
     public void validate() throws InvalidSessionException {
         //check for stopped:
@@ -482,6 +484,7 @@ public class SimpleSession implements ValidatingSession, Serializable {
      * @throws IOException if any of this object's fields cannot be written to the stream.
      * @since 1.0
      */
+    @SuppressForbidden("Copied from upstream, needs java serialization")
     @SuppressWarnings("checkstyle:NPathComplexity")
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
@@ -533,6 +536,7 @@ public class SimpleSession implements ValidatingSession, Serializable {
      * @throws ClassNotFoundException if a required class needed for instantiation is not available in the present JVM
      * @since 1.0
      */
+    @SuppressForbidden("Copied from upstream, needs java serialization")
     @SuppressWarnings({"unchecked", "checkstyle:NPathComplexity"})
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
