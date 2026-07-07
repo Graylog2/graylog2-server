@@ -32,13 +32,13 @@ import HealthModule from 'components/health/HealthModule';
 const SystemOverviewPage = () => (
   <DocumentTitle title="System overview">
     <span>
-      <HideOnCloud>
-        <HealthModule />
-      </HideOnCloud>
-
       <Row>
         <PageNavigation items={SYSTEM_OVERVIEW_TABS} />
       </Row>
+
+      <HideOnCloud>
+        <HealthModule />
+      </HideOnCloud>
 
       <HideOnCloud>
         <IfPermitted permissions="systemjobs:read">
