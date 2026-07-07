@@ -42,7 +42,7 @@ const CollectorsOnboardingInstancePage = () => {
   useEffect(() => {
     if (instance && defaultInterval) {
       history.push(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
-      UserNotification.success(`Collector ${name} connected successfully! Showing received messages ...`);
+      UserNotification.success('Collector connected successfully! Showing received messages ...');
     }
   }, [defaultInterval, instance, history]);
 
