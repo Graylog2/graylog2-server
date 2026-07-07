@@ -28,7 +28,10 @@ import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/useOpenSearchRollingRestart';
 import type { RollingRestartJob, RollingRestartState } from './rollingRestartTypes';
 
-jest.mock('./OutdatedIndicesTable', () => ({ __esModule: true, default: () => null }));
+jest.mock('./OutdatedIndicesTable', () => ({
+  __esModule: true,
+  default: () => <div>outdated-indices-stub</div>,
+}));
 jest.mock('./OpenSearchRollingUpgradeNodes', () => ({
   __esModule: true,
   default: () => <div>rolling-upgrade-nodes-stub</div>,
@@ -168,6 +171,29 @@ describe('OpenSearchUpgradeSection', () => {
 
     expect(screen.getByText('Data Nodes:')).toBeInTheDocument();
     expect(screen.getByText('3 (2 available)')).toBeInTheDocument();
+  });
+
+  it('replaces the operational panels with a warning when versions look up to date but nodes are unavailable', () => {
+    mockClusterStats({ isUpgradeAvailable: false, numberOfDataNodes: 2, unavailableDataNodeCount: 1 });
+    mockRollingRestart({ data: failedJob() });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.getByText(/cannot be checked while 1 data node is unavailable/i)).toBeInTheDocument();
+    expect(screen.getByText('3 (2 available)')).toBeInTheDocument();
+    expect(screen.queryByText('outdated-indices-stub')).not.toBeInTheDocument();
+    expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /start opensearch rolling upgrade/i })).not.toBeInTheDocument();
+  });
+
+  it('keeps an active rolling upgrade visible while versions look up to date but nodes are unavailable', () => {
+    // A temporarily unavailable node is the normal operating condition of a rolling upgrade — its progress
+    // must not be replaced by the unconfirmed-state warning.
+    mockClusterStats({ isUpgradeAvailable: false, numberOfDataNodes: 2, unavailableDataNodeCount: 1 });
+    mockRollingRestart({ data: pausedJob() });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
+    expect(screen.queryByText(/cannot be checked while/i)).not.toBeInTheDocument();
   });
 
   it('disables the start action while outdated indices remain', () => {

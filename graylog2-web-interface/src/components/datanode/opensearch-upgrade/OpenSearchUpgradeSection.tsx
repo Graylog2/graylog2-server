@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { Alert, Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -146,6 +146,33 @@ const OpenSearchUpgradeSection = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.ROLLING_UPGRADE_RESUMED, TELEMETRY_DEFAULTS);
     void resumeRollingRestart();
   };
+
+  // Versions look up to date, but that cannot be confirmed while Data Nodes are missing — rendering the
+  // operational panels (outdated indices, upgrade results, start controls) would suggest a certainty we
+  // don't have, and nothing in them is safely actionable anyway. An ACTIVE rolling upgrade is exempt: a
+  // temporarily unavailable node is its normal operating condition and its progress must stay visible.
+  const isVersionStateUnconfirmed =
+    !isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable && unavailableDataNodeCount > 0;
+
+  if (isVersionStateUnconfirmed && !hasActiveRollingRestart) {
+    return (
+      <Section>
+        <h1>Upgrade Data Nodes&apos; embedded OpenSearch</h1>
+        <OpenSearchUpgradeInfo
+          currentVersion={currentVersion}
+          targetVersion={targetVersion}
+          isLoading={isLoading}
+          availableDataNodes={numberOfDataNodes}
+          unavailableDataNodes={unavailableDataNodeCount}
+        />
+        <Alert bsStyle="warning">
+          Outdated indices and upgrade status cannot be checked while {unavailableDataNodeCount} Data{' '}
+          {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all
+          Data Nodes are available.
+        </Alert>
+      </Section>
+    );
+  }
 
   return (
     <Section>
