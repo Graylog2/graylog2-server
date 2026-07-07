@@ -19,6 +19,8 @@ package org.graylog2.periodical;
 import org.junit.jupiter.api.Test;
 import oshi.hardware.CentralProcessor;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CpuLoadGaugeTest {
@@ -43,9 +45,11 @@ class CpuLoadGaugeTest {
     void degradesGracefullyWhenNativeAccessFails() {
         // Simulate a host where OSHI/JNA cannot load its native library (e.g. a 'noexec' data dir),
         // which surfaces as a LinkageError (NoClassDefFoundError / UnsatisfiedLinkError), not an Exception.
+        final AtomicInteger nativeCalls = new AtomicInteger();
         final CpuLoadGauge gauge = new CpuLoadGauge() {
             @Override
             protected CentralProcessor processor() {
+                nativeCalls.incrementAndGet();
                 throw new NoClassDefFoundError("Could not initialize class oshi.software.os.linux.LinuxOperatingSystemJNA");
             }
         };
@@ -54,8 +58,9 @@ class CpuLoadGaugeTest {
         gauge.update();
         assertThat(gauge.getValue()).isNull();
 
-        // Once disabled, subsequent runs stay quiet and keep returning null.
+        // Once disabled, subsequent runs stay quiet: the native path is never touched again.
         gauge.update();
         assertThat(gauge.getValue()).isNull();
+        assertThat(nativeCalls.get()).isEqualTo(1);
     }
 }

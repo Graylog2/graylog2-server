@@ -30,16 +30,13 @@ public class NodeMetricPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodeMetricPeriodical.class);
 
-    private final CpuLoadGauge cpuLoadGauge;
+    private final CpuLoadGauge cpuLoadGauge = new CpuLoadGauge();
 
     private final MetricRegistry metricRegistry;
 
     @Inject
     public NodeMetricPeriodical(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
-        // Constructed here rather than in a field initializer so that building this eagerly-instantiated
-        // @Singleton periodical does not touch OSHI/JNA native code during Guice injector creation.
-        this.cpuLoadGauge = new CpuLoadGauge();
     }
 
     @Override
