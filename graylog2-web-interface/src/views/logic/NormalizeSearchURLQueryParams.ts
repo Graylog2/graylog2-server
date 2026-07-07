@@ -38,7 +38,12 @@ type StreamCategoryQuery = {
   stream_categories?: string;
 };
 
+type AutoRefreshQuery = {
+  autorefresh?: string;
+};
+
 export type RawQuery = (TimeRangeQueryParameter | { relative?: string }) &
+  AutoRefreshQuery &
   StreamsQuery &
   StreamCategoryQuery & { q?: string };
 
@@ -78,6 +83,7 @@ const normalizeStreamCategories = (query: StreamCategoryQuery = {}): Array<strin
 
 type NormalizedSearchURLQueryParams = {
   timeRange: TimeRange | undefined;
+  autoRefresh: string | undefined;
   streamsFilter: FilterType | undefined;
   streamCategoriesFilter: FilterType | undefined;
   queryString: QueryString | undefined;
@@ -89,8 +95,11 @@ const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQuer
   const streamsFilter = filtersForQuery(normalizeStreams(query));
   const streamCategoriesFilter = categoryFiltersForQuery(normalizeStreamCategories(query));
 
+  const autoRefresh = query?.autorefresh;
+
   return {
     timeRange,
+    autoRefresh,
     streamsFilter,
     streamCategoriesFilter,
     queryString: queryString ? createElasticsearchQueryString(queryString) : undefined,
@@ -101,10 +110,12 @@ export const useSearchURLQueryParams = () => {
   const query = useQuery();
 
   return useMemo(() => {
-    const { timeRange, queryString, streamsFilter, streamCategoriesFilter } = normalizeSearchURLQueryParams(query);
+    const { timeRange, autoRefresh, queryString, streamsFilter, streamCategoriesFilter } =
+      normalizeSearchURLQueryParams(query);
 
     return {
       timeRange,
+      autoRefresh,
       queryString,
       streams: filtersToStreamSet(streamsFilter).toArray(),
       streamCategories: filtersToStreamCategorySet(streamCategoriesFilter).toArray(),
