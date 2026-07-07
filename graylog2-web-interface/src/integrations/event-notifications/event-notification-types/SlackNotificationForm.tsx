@@ -30,7 +30,7 @@ import {
   InputGroup,
   Row,
 } from 'components/bootstrap';
-import { ColorPickerPopover, TimezoneSelect } from 'components/common';
+import { ColorPickerPopover, TimezoneSelect, URLAllowListInput } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import DocumentationLink from 'components/support/DocumentationLink';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -154,6 +154,10 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
     propagateChange(name, getValueFromInput(event.target));
   };
 
+  const handleWebhookUrlChange = (event) => {
+    propagateChange('webhook_url', getValueFromInput(event.target));
+  };
+
   const handleTimeZoneChange = (nextValue) => {
     propagateChange('time_zone', nextValue);
   };
@@ -183,16 +187,13 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
         </div>
         <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
       </FormGroup>
-      <Input
-        id="notification-webhookUrl"
-        name="webhook_url"
+      <URLAllowListInput
         label="Webhook URL"
-        type="text"
-        bsStyle={validation.errors.webhook_url ? 'error' : null}
-        help={validation?.errors?.webhook_url?.[0] || 'Slack "Incoming Webhook" URL'}
-        value={config.webhook_url || ''}
-        onChange={handleChange}
-        required
+        onChange={handleWebhookUrlChange}
+        validationState={validation.errors.webhook_url ? 'error' : null}
+        validationMessage={validation?.errors?.webhook_url?.[0] || 'Slack "Incoming Webhook" URL'}
+        url={config.webhook_url || ''}
+        autofocus={false}
       />
       <Input
         id="notification-channel"

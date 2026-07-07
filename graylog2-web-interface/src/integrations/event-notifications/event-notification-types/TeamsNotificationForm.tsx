@@ -19,7 +19,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
-import { ColorPickerPopover, TimezoneSelect } from 'components/common';
+import { ColorPickerPopover, TimezoneSelect, URLAllowListInput } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -118,6 +118,10 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
     propagateChange(name, getValueFromInput(event.target));
   };
 
+  const handleWebhookUrlChange = (event: any) => {
+    propagateChange('webhook_url', getValueFromInput(event.target));
+  };
+
   const element = (
     <p>
       Custom message to be appended below the alert title. See{' '}
@@ -143,16 +147,13 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
         </div>
         <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
       </FormGroup>
-      <Input
-        id="notification-webhookUrl"
-        name="webhook_url"
+      <URLAllowListInput
         label="Webhook URL"
-        type="text"
-        bsStyle={validation.errors.webhook_url ? 'error' : null}
-        help={validation?.errors?.webhook_url?.[0] ?? 'Teams "Incoming Webhook" URL'}
-        value={config.webhook_url || ''}
-        onChange={handleChange}
-        required
+        onChange={handleWebhookUrlChange}
+        validationState={validation.errors.webhook_url ? 'error' : null}
+        validationMessage={validation?.errors?.webhook_url?.[0] ?? 'Teams "Incoming Webhook" URL'}
+        url={config.webhook_url || ''}
+        autofocus={false}
       />
       <Input
         id="notification-customMessage"
