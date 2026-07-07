@@ -98,8 +98,8 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
     refetchInterval: options.refetchInterval,
   });
 
-export const useInstance = (instanceUid: string | undefined) =>
-  useQuery<CollectorInstanceView>({
+export const useInstance = (instanceUid: string | undefined) => {
+  const { data, isLoading, error, isError } = useQuery<CollectorInstanceView>({
     queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
     queryFn: () =>
       defaultOnError(
@@ -109,3 +109,6 @@ export const useInstance = (instanceUid: string | undefined) =>
       ),
     enabled: !!instanceUid,
   });
+
+  return { data, isLoading, error, isError };
+};
