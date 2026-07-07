@@ -31,7 +31,6 @@ import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
-import HealthStatusBadge from './HealthStatusBadge';
 import NotificationBadge from './NotificationBadge';
 import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
 import InactiveNavItem from './InactiveNavItem';
@@ -62,6 +61,7 @@ const BrandLink = styled(Link)(
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
+  const pluginBadges = usePluginEntities('navigation.badges');
 
   return (
     <StyledNavbar fluid fixedTop collapseOnSelect>
@@ -80,7 +80,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
       <Navbar.Collapse>
         <MainNavbar pathname={pathname} />
 
-        <HealthStatusBadge />
+        {pluginBadges.map(({ key, component: PluginBadge }) => (
+          <PluginBadge key={key} />
+        ))}
         <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">

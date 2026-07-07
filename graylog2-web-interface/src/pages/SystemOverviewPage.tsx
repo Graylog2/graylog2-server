@@ -27,41 +27,45 @@ import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import { Row } from 'components/bootstrap';
 import SYSTEM_OVERVIEW_TABS from 'components/notifications/systemOverviewTabs';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import HealthModule from 'components/health/HealthModule';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-const SystemOverviewPage = () => (
-  <DocumentTitle title="System overview">
-    <span>
-      <Row>
-        <PageNavigation items={SYSTEM_OVERVIEW_TABS} />
-      </Row>
+const SystemOverviewPage = () => {
+  const pluginSections = usePluginEntities('systemOverview.sections');
 
-      <HideOnCloud>
-        <HealthModule />
-      </HideOnCloud>
+  return (
+    <DocumentTitle title="System overview">
+      <span>
+        <Row>
+          <PageNavigation items={SYSTEM_OVERVIEW_TABS} />
+        </Row>
 
-      <HideOnCloud>
-        <IfPermitted permissions="systemjobs:read">
-          <SystemJobsComponent />
+        {pluginSections.map(({ key, component: PluginSection }) => (
+          <PluginSection key={key} />
+        ))}
+
+        <HideOnCloud>
+          <IfPermitted permissions="systemjobs:read">
+            <SystemJobsComponent />
+          </IfPermitted>
+        </HideOnCloud>
+
+        <GraylogClusterOverview showLicenseGraph />
+
+        <HideOnCloud>
+          <IndexerClusterHealth />
+        </HideOnCloud>
+
+        <IfPermitted permissions="indices:failures">
+          <IndexerSystemOverviewComponent />
         </IfPermitted>
-      </HideOnCloud>
+        <TimesList />
 
-      <GraylogClusterOverview showLicenseGraph />
-
-      <HideOnCloud>
-        <IndexerClusterHealth />
-      </HideOnCloud>
-
-      <IfPermitted permissions="indices:failures">
-        <IndexerSystemOverviewComponent />
-      </IfPermitted>
-      <TimesList />
-
-      <IfPermitted permissions="systemmessages:read">
-        <SystemMessagesComponent />
-      </IfPermitted>
-    </span>
-  </DocumentTitle>
-);
+        <IfPermitted permissions="systemmessages:read">
+          <SystemMessagesComponent />
+        </IfPermitted>
+      </span>
+    </DocumentTitle>
+  );
+};
 
 export default SystemOverviewPage;

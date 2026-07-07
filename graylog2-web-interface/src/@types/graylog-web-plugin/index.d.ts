@@ -43,6 +43,16 @@ interface GlobalNotification {
   component: React.ComponentType;
 }
 
+interface NavigationBadge {
+  key: string;
+  component: React.ComponentType;
+}
+
+interface SystemOverviewSection {
+  key: string;
+  component: React.ComponentType;
+}
+
 interface PluginPages {
   search?: {
     component: React.ComponentType;
@@ -418,6 +428,10 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    // Status badges rendered in the top navigation, left of the notification badge.
+    'navigation.badges'?: Array<NavigationBadge>;
+    // Content sections rendered at the top of the System Overview page, below the page navigation.
+    'systemOverview.sections'?: Array<SystemOverviewSection>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
