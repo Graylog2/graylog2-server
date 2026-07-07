@@ -172,22 +172,18 @@ const OpenSearchUpgradeSection = () => {
               </Button>
             )}
           </ButtonToolbar>
+          {hasOutdatedIndices && <DisabledHint>Resolve all outdated indices first.</DisabledHint>}
           {!hasActiveRollingRestart && isVersionOverviewError && (
             <DisabledHint>Could not check OpenSearch upgrade availability.</DisabledHint>
           )}
-          {!hasActiveRollingRestart && !isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable && (
-            <DisabledHint>Data Nodes&apos; embedded OpenSearch is already up to date.</DisabledHint>
-          )}
-          {isLoadingOutdatedIndices && <DisabledHint>Checking outdated indices...</DisabledHint>}
-          {isOutdatedIndicesError && (
-            <DisabledHint>Reload outdated indices before starting the OpenSearch upgrade.</DisabledHint>
-          )}
-          {hasOutdatedIndices && <DisabledHint>Resolve all outdated indices first.</DisabledHint>}
           {showStartAction && !isRollingUpgradePossible && (
             <DisabledHint>
               A rolling upgrade requires at least {MIN_NODES_FOR_ROLLING_UPGRADE} Data Nodes (you have{' '}
               {numberOfDataNodes}).
             </DisabledHint>
+          )}
+          {!hasActiveRollingRestart && !isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable && (
+            <DisabledHint>Data Nodes&apos; embedded OpenSearch is already up to date.</DisabledHint>
           )}
         </Col>
       </Row>

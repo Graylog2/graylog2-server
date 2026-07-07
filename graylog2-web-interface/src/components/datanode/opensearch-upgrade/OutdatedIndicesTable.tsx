@@ -17,7 +17,7 @@
 import React, { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Alert, SegmentedControl } from 'components/bootstrap';
+import { Alert, Button, SegmentedControl } from 'components/bootstrap';
 import { ConfirmDialog, Spinner } from 'components/common';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
@@ -225,7 +225,14 @@ const OutdatedIndicesTable = () => {
   }
 
   if (isError) {
-    return <Alert bsStyle="danger">Could not load outdated indices.</Alert>;
+    return (
+      <Alert bsStyle="danger">
+        Could not load outdated indices — retrying automatically.{' '}
+        <Button bsSize="xs" onClick={() => refetch()}>
+          Retry now
+        </Button>
+      </Alert>
+    );
   }
 
   if (!outdatedIndices.length) {

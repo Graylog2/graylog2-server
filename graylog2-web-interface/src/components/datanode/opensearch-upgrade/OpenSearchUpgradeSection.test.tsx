@@ -77,7 +77,7 @@ const mockRollingRestart = (overrides: RollingRestartHookOverrides = {}) =>
     ...overrides,
   } as unknown as ReturnType<typeof useOpenSearchRollingRestart>);
 
-const mockOutdatedIndices = (data: Array<unknown> = [], overrides: { isLoading?: boolean } = {}) =>
+const mockOutdatedIndices = (data: Array<unknown> = [], overrides: { isLoading?: boolean; isError?: boolean } = {}) =>
   asMock(useOutdatedIndices).mockReturnValue({
     data,
     isError: false,
@@ -167,6 +167,14 @@ describe('OpenSearchUpgradeSection', () => {
 
     expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
     expect(screen.getByText(/resolve all outdated indices first/i)).toBeInTheDocument();
+  });
+
+  it('disables the start action when the outdated indices check failed', () => {
+    // The error message itself (with its retry) is rendered by OutdatedIndicesTable right above the button.
+    mockOutdatedIndices([], { isError: true });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
   });
 
   it('shows the rolling-upgrade status when a job exists and no outdated indices remain', () => {

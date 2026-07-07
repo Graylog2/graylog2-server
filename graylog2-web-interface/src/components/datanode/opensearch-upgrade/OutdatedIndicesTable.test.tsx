@@ -164,6 +164,18 @@ describe('OutdatedIndicesTable', () => {
     expect(screen.getByText(/could not load outdated indices/i)).toBeInTheDocument();
   });
 
+  it('retries loading outdated indices on demand from the error state', async () => {
+    const refetch = jest.fn(() => Promise.resolve({ data: [] })) as unknown as ReturnType<
+      typeof useOutdatedIndices
+    >['refetch'];
+    mockOutdatedIndices({ isError: true, refetch });
+    render(<OutdatedIndicesTable />);
+
+    await userEvent.click(screen.getByRole('button', { name: /retry now/i }));
+
+    expect(refetch).toHaveBeenCalled();
+  });
+
   it('shows a success message when there are no outdated indices', () => {
     mockOutdatedIndices({ data: [] });
     render(<OutdatedIndicesTable />);

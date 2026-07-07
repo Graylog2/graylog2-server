@@ -18,8 +18,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { IndexerIndices } from '@graylog/server-api';
 
-import { defaultOnError } from 'util/conditional/onError';
-
 export type OutdatedIndex = {
   index_name: string;
   version: string;
@@ -30,6 +28,10 @@ export type OutdatedIndex = {
   active_write_index: string | null;
 };
 
+// While the query is in error state, keep retrying gently in the background so a transient backend failure
+// (e.g. a Data Node restarting mid-upgrade) heals without the user having to reload the page.
+const ERROR_REFETCH_INTERVAL_MS = 30000;
+
 const useOutdatedIndices = () => {
   const {
     data = [],
@@ -38,13 +40,11 @@ const useOutdatedIndices = () => {
     refetch,
   } = useQuery({
     queryKey: ['outdatedIndices'],
-    queryFn: () =>
-      defaultOnError(
-        IndexerIndices.getOutdatedIndices() as Promise<Array<OutdatedIndex>>,
-        'Loading outdated indices failed',
-        'Could not load outdated indices',
-      ),
-    retry: false,
+    // No error toast on purpose: the outdated-indices panel and the upgrade section render a persistent,
+    // actionable error state themselves, and the background retries below would turn a toast into spam.
+    queryFn: () => IndexerIndices.getOutdatedIndices() as Promise<Array<OutdatedIndex>>,
+    retry: 2,
+    refetchInterval: (query) => (query.state.status === 'error' ? ERROR_REFETCH_INTERVAL_MS : false),
   });
 
   return {
