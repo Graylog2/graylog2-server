@@ -22,11 +22,26 @@ import oshi.hardware.CentralProcessor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class CpuLoadGaugeTest {
     @Test
     void reportsCpuLoadAfterTwoSamples() {
-        final CpuLoadGauge gauge = new CpuLoadGauge();
+        // Stub the processor so the test exercises the gauge's own seed-then-compute logic and stays
+        // deterministic and independent of native OSHI/JNA availability (which is absent on 'noexec' hosts).
+        final CentralProcessor processor = mock(CentralProcessor.class);
+        when(processor.getSystemCpuLoadTicks()).thenReturn(new long[]{1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L});
+        when(processor.getSystemCpuLoadBetweenTicks(any(), any())).thenReturn(0.42d);
+
+        final CpuLoadGauge gauge = new CpuLoadGauge() {
+            @Override
+            protected CentralProcessor processor() {
+                return processor;
+            }
+        };
+
         // No sample taken yet.
         assertThat(gauge.getValue()).isNull();
 
@@ -34,11 +49,9 @@ class CpuLoadGaugeTest {
         gauge.update();
         assertThat(gauge.getValue()).isNull();
 
-        // The second run has a previous sample to compute the load between.
+        // The second run has a previous sample to compute the load between: 0.42 * 100.
         gauge.update();
-        assertThat(gauge.getValue())
-                .isNotNull()
-                .isGreaterThanOrEqualTo(0.0d);
+        assertThat(gauge.getValue()).isEqualTo(42.0d);
     }
 
     @Test
