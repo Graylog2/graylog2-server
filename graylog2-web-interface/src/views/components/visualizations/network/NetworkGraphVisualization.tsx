@@ -229,7 +229,11 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
   const visualizationConfig =
     (config.visualizationConfig as NetworkVisualizationConfig) ?? NetworkVisualizationConfig.empty();
 
-  const plot = useMemo<{ traces: [...Array<EdgeTrace>, NodeTrace]; xs: Array<number>; ys: Array<number> } | null>(() => {
+  const plot = useMemo<{
+    traces: [...Array<EdgeTrace>, NodeTrace];
+    xs: Array<number>;
+    ys: Array<number>;
+  } | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
     const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
     const allFields = [...rowFields, ...columnFields];

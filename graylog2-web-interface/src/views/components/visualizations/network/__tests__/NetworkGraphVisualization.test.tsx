@@ -78,8 +78,7 @@ const edgeTraces = () => chartData().slice(0, -1);
 
 // Each edge trace carries its aggregated value in customdata, so we can look up the color assigned
 // to a specific edge value.
-const colorForValue = (value: number) =>
-  edgeTraces().find((edge) => edge.customdata[0].value === value)?.line.color;
+const colorForValue = (value: number) => edgeTraces().find((edge) => edge.customdata[0].value === value)?.line.color;
 
 describe('NetworkGraphVisualization', () => {
   useViewsPlugin();
