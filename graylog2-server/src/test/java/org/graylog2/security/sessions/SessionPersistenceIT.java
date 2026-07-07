@@ -21,7 +21,7 @@ import com.google.common.eventbus.EventBus;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.UnknownSessionException;
-import org.apache.shiro.session.mgt.SimpleSession;
+import org.graylog2.security.sessions.SimpleSession;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;

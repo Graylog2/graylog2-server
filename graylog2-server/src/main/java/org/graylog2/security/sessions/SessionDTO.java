@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
-import org.apache.shiro.session.mgt.SimpleSession;
 import org.graylog2.database.BuildableMongoEntity;
 
 import java.time.Instant;

@@ -22,7 +22,7 @@ import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.ext.RuntimeDelegate;
-import org.apache.shiro.session.mgt.SimpleSession;
+import org.graylog2.security.sessions.SimpleSession;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.configuration.HttpConfiguration;
 import org.junit.jupiter.api.BeforeEach;

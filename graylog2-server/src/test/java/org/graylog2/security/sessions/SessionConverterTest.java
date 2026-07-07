@@ -16,7 +16,6 @@
  */
 package org.graylog2.security.sessions;
 
-import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.graylog2.rest.models.system.sessions.SessionUtils;

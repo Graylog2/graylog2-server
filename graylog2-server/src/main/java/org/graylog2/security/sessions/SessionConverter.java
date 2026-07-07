@@ -18,7 +18,6 @@ package org.graylog2.security.sessions;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
