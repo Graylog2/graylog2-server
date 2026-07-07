@@ -572,6 +572,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               filters={eventDefinition.config.filters}
               onChange={handleSearchFiltersChange}
               hideFiltersPreview={hideFiltersPreview}
+              queryString={currentConfig.query}
             />
           </div>
         </FormGroup>
