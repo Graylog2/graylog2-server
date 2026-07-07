@@ -1,4 +1,0 @@
-type = "added"
-message = "Add an extension point to display a read-only query preview beneath the Search Query on the event definition condition screen."
-
-issues = ["14552"]
