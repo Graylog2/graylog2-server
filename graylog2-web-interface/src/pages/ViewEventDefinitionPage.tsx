@@ -29,19 +29,14 @@ import { useEventNotifications } from 'components/event-notifications/hooks/useE
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import usePluginEntities from 'hooks/usePluginEntities';
 import {
   useEventDefinitionWithContext,
   copyEventDefinition,
   EVENT_DEFINITIONS_QUERY_KEY,
 } from 'components/event-definitions/hooks/useEventDefinitions';
 
-type SigmaEventDefinitionConfig = EventDefinition['config'] & {
-  sigma_rule_id: string;
-};
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
@@ -51,15 +46,6 @@ const ViewEventDefinitionPage = () => {
   const notifications = notificationsData?.notifications;
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
-  const [showSigmaModal, setShowSigmaModal] = useState(false);
-
-  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
-    (entity: { key: string }) => entity.key === 'coreSigmaModal',
-  );
-
-  const CoreSigmaModal = pluggableSigmaModal
-    ? (pluggableSigmaModal.component as React.FC<{ ruleId: string; onCancel: () => void; onConfirm: () => void }>)
-    : null;
 
   const queryClient = useQueryClient();
   const { data, isFetching } = useEventDefinitionWithContext(params.definitionId);
@@ -100,11 +86,6 @@ const ViewEventDefinitionPage = () => {
 
   const onEditEventDefinition = () => history.push(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
 
-  const onSigmaModalClose = () => {
-    queryClient.invalidateQueries({ queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, params.definitionId] });
-    setShowSigmaModal(false);
-  };
-
   if (isFetching || !eventDefinition || !notifications) {
     return (
       <DocumentTitle title="View Event Definition">
@@ -125,11 +106,11 @@ const ViewEventDefinitionPage = () => {
           title={`View "${eventDefinition.title}" Event Definition`}
           actions={
             <ButtonToolbar>
-                <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
-                  <Button bsStyle="primary" onClick={onEditEventDefinition}>
-                    Edit Event Definition
-                  </Button>
-                </IfPermitted>
+              <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
+                <Button bsStyle="primary" onClick={onEditEventDefinition}>
+                  Edit Event Definition
+                </Button>
+              </IfPermitted>
               {!isSystemEventDefinition(eventDefinition) && (
                 <IfPermitted permissions="eventdefinitions:create">
                   <Button onClick={() => setShowDialog(true)}>Duplicate Event Definition</Button>
@@ -162,13 +143,6 @@ const ViewEventDefinitionPage = () => {
           onCancel={() => setShowDialog(false)}>
           {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
         </ConfirmDialog>
-      )}
-      {showSigmaModal && CoreSigmaModal && (
-        <CoreSigmaModal
-          ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
-          onCancel={onSigmaModalClose}
-          onConfirm={onSigmaModalClose}
-        />
       )}
     </>
   );
