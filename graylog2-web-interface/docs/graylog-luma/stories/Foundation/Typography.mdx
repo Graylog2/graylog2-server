@@ -1,11 +1,24 @@
 import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
-import { FontFamiliesDoc, TypeScaleDoc, TextColorsDoc } from './Typography';
+import { Alert } from 'components/bootstrap';
+import { FontFamiliesDoc, TypeScaleGroupDoc, TextColorsDoc } from './Typography';
 
 <Meta title="Foundation/Typography" />
 
 # Typography
 
 Typography in our design system ensures clarity, consistency, and accessibility across all user interfaces. We use a dual-typeface approach to distinguish between general interface content and technical or system-specific elements.
+
+<Unstyled>
+  <Alert bsStyle="warning">
+    {'Typography theme tokens are for '}
+    <strong>component authors</strong>
+    {' building new reusable components in '}
+    <code>components/common</code>
+    {
+      '. When using an existing component, its internal typography is already applied. Do not set typography tokens manually outside of reusable components.'
+    }
+  </Alert>
+</Unstyled>
 
 ## Font Families
 
@@ -15,8 +28,26 @@ Typography in our design system ensures clarity, consistency, and accessibility 
 
 ## Type Scale
 
+### Headings
+
+Applied automatically to h1–h6 HTML elements.
+
 <Unstyled>
-  <TypeScaleDoc />
+  <TypeScaleGroupDoc label="Headings" />
+</Unstyled>
+
+### Body
+
+<Unstyled>
+  <TypeScaleGroupDoc label="Body" />
+</Unstyled>
+
+### Navigation
+
+Used exclusively for navigation links. Applied by navigation components. Do not set manually in other contexts.
+
+<Unstyled>
+  <TypeScaleGroupDoc label="Navigation" />
 </Unstyled>
 
 ## Text Colors

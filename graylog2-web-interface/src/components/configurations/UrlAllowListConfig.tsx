@@ -110,7 +110,7 @@ const UrlAllowListConfig = () => {
         access to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others.
         Allowlist administrative access is separate from data adapters and event notification configuration.
       </p>
-      <Table striped bordered condensed className="top-margin">
+      <Table bordered condensed className="top-margin">
         <thead>
           <tr>
             <th>#</th>

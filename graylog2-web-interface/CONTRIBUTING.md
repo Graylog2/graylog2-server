@@ -218,7 +218,7 @@ Test thoroughly before submitting a PR:
 Run checks locally before creating a PR:
 
 ```sh
-yarn tsc && yarn lint:changes && yarn test
+yarn tsgo && yarn lint:changes && yarn test
 ```
 
 ## Browser Compatibility

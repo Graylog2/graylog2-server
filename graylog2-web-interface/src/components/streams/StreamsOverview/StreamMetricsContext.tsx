@@ -19,6 +19,7 @@ import { createContext, useContext } from 'react';
 
 import useStreamMetrics from 'hooks/useStreamMetrics';
 import type { StreamMetricField, StreamMetrics, StreamMetricsByStreamId } from 'hooks/useStreamMetrics';
+import { singleton } from 'logic/singleton';
 
 type StreamMetricsContextValue = {
   metricsByStreamId: StreamMetricsByStreamId;
@@ -32,7 +33,9 @@ const EMPTY_CONTEXT: StreamMetricsContextValue = {
   isError: false,
 };
 
-const StreamMetricsContext = createContext<StreamMetricsContextValue>(EMPTY_CONTEXT);
+const StreamMetricsContext = singleton('contexts.StreamMetricsContext', () =>
+  createContext<StreamMetricsContextValue>(EMPTY_CONTEXT),
+);
 
 type Props = React.PropsWithChildren<{
   streamIds: Array<string>;

@@ -170,7 +170,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   noColumnReordering = false,
 }: PaginatedEntityTableInnerProps<T, M>) => {
   const { searchParams, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useTableFilterContext();
-  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(
+  const { mutateAsync: updateTableLayout, resetAsync: resetTableLayout } = useUpdateUserLayoutPreferences(
     tableLayout.entityTableId,
     tableLayout.layoutVariant,
   );
@@ -214,6 +214,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     paginationQueryParameter: paginationState,
     updateTableLayout,
     setQuery,
+    resetTableLayout,
   });
 
   const columnSchemas = useMemo(
@@ -330,7 +331,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                     onChangeSlicing={onSlicingLayout}
                     expandedSectionRenderers={expandedSectionRenderers}
                     rowOverride={rowOverride}
-                    enableSlicing={typeof fetchSlices === 'function'}
+                    enableSlicing={typeof fetchSlices === 'function' && !layoutConfig?.slicing?.readOnly}
                     bulkSelection={bulkSelection}
                     onSortChange={onSortChange}
                     onPageSizeChange={onPageSizeChange}

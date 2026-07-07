@@ -71,7 +71,6 @@ const SidecarStatusFileList = ({ files }: Props) => {
     <div>
       <DataTable
         id="log-file-list"
-        hover
         headers={headers}
         headerCellFormatter={_headerCellFormatter}
         rows={files}

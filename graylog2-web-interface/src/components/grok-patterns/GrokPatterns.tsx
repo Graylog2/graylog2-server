@@ -260,8 +260,6 @@ class GrokPatterns extends React.Component<
                   <PaginatedList onChange={this._onPageChange} totalItems={pagination.total}>
                     <GrokPatternsList
                       id="grok-pattern-list"
-                      striped
-                      hover
                       headers={headers}
                       headerCellFormatter={_headerCellFormatter}
                       sortByKey="name"

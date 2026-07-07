@@ -17,8 +17,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Label } from 'components/bootstrap';
-
 export const MetricsColumn = styled.div`
   display: flex;
   flex-direction: column;
@@ -53,16 +51,6 @@ export const NodePrimary = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
-`;
-
-export const StyledLabel = styled(Label)`
-  display: inline-flex;
-`;
-
-export const RoleLabel = styled(Label)`
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
 `;
 
 export const MetricPlaceholder = () => (

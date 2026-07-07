@@ -142,6 +142,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                     ))
                     .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
                     .build(),
+            EntityAttribute.builder().id("type").title("Type").type(SearchQueryField.Type.STRING)
+                    .dbField(EventDefinitionDto.FIELD_CONFIG + "." + EventProcessorConfig.TYPE_FIELD)
+                    // Not sortable: A DB sort on the raw config.type wouldn't match the display-name labels shown.
+                    .sortable(false)
+                    .filterable(true)
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
+                    .build(),
             EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
                     .type(SearchQueryField.Type.STRING)
                     .sortable(false)
@@ -572,7 +579,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public ValidationResult validate(@RequestBody(required = true)
+    public ValidationResult validateEventDefinition(@RequestBody(required = true)
                                          @Valid @NotNull EventDefinitionDto toValidate,
                                      @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
@@ -587,7 +594,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate a cron expression")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
-    public CronValidationResponse validate(@RequestBody(required = true)
+    public CronValidationResponse validateEventDefinitionCronExpression(@RequestBody(required = true)
                                            @Valid @NotNull CronValidationRequest toValidate) {
         try {
             CronUtils.validateExpression(toValidate.expression());

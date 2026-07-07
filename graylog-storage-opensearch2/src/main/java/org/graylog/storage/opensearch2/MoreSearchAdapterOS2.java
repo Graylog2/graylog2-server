@@ -217,7 +217,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
         });
 
-        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
     }
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
@@ -421,7 +421,8 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         final Map<String, Double> result = new HashMap<>();
         outerTerms.getBuckets().forEach(bucket -> {
             final var metric = (NumericMetricsAggregation.SingleValue) bucket.getAggregations().get(METRIC_AGGREGATION_NAME);
-            result.put(bucket.getKeyAsString(), metric.value());
+            final double value = metric.value();
+            result.put(bucket.getKeyAsString(), Double.isFinite(value) ? value : 0.0);
         });
         return result;
     }

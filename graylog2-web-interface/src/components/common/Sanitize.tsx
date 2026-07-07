@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import DOMPurify from 'dompurify';
+import DOMPurify, { type Config } from 'dompurify';
 
 type Props = {
   html: string | null | undefined;
-  config?: DOMPurify.Config;
+  config?: Config;
 } & Omit<React.HTMLAttributes<HTMLSpanElement>, 'dangerouslySetInnerHTML' | 'children'>;
 
 const Sanitize = ({ html, config = undefined, ...rest }: Props) => {

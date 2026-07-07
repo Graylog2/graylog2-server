@@ -49,6 +49,7 @@ const getEventDefinitionTableElements = (
       '_entity_source.source',
       'matched_at',
       'status',
+      'type',
       'scheduling',
       'tags',
       ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),

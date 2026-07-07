@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { useTimeout } from '@mantine/hooks';
 
+import useTimeout from 'util/hooks/useTimeout';
 import copyToClipboard from 'util/copyToClipboard';
 import Tooltip from 'components/common/Tooltip';
 

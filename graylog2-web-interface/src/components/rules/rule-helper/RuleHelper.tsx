@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import ObjectUtils from 'util/ObjectUtils';
-import connect from 'stores/connect';
 import { PaginatedList, Spinner, SearchForm } from 'components/common';
 import { Row, Col, Panel, Tabs } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import DocsHelper from 'util/DocsHelper';
-import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
+import { useRuleFunctionDescriptors } from 'components/rules/hooks/useRules';
 
 import { functionSignature } from './helpers';
 import RuleHelperStyle from './RuleHelper.css';
@@ -41,20 +40,16 @@ then
 end`;
 
 type Props = {
-  functionDescriptors?: Array<BlockDict>;
   paginationQueryParameter: any;
   hideExampleTab?: boolean;
 };
 
-const RuleHelper = ({ functionDescriptors = undefined, paginationQueryParameter, hideExampleTab = false }: Props) => {
+const RuleHelper = ({ paginationQueryParameter, hideExampleTab = false }: Props) => {
+  const { data: functionDescriptors } = useRuleFunctionDescriptors();
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState<number>(paginationQueryParameter.page);
   const [pageSize, setPageSize] = useState<number>(10);
   const [filteredDescriptors, setFilteredDescriptors] = useState<BlockDict[] | undefined>(undefined);
-
-  useEffect(() => {
-    RulesActions.loadFunctions();
-  }, []);
 
   const toggleFunctionDetail = (functionName: string) => {
     const newState = ObjectUtils.clone(expanded);
@@ -185,6 +180,4 @@ const RuleHelper = ({ functionDescriptors = undefined, paginationQueryParameter,
   );
 };
 
-export default connect(withPaginationQueryParameter(RuleHelper), { ruleStore: RulesStore }, ({ ruleStore }) => ({
-  ...ruleStore,
-}));
+export default withPaginationQueryParameter(RuleHelper);

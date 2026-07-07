@@ -112,7 +112,6 @@ const BackendsOverview = () => {
         </p>
         <PaginatedList totalItems={paginatedBackends.pagination.total}>
           <DataTable
-            hover
             customFilter={<BackendsFilter onSearch={onSearch} />}
             dataRowFormatter={(authBackend) => _backendsOverviewItem(authBackend, context, paginatedRoles)}
             filterKeys={[]}

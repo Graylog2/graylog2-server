@@ -34,7 +34,7 @@
 import React from 'react';
 
 import StreamRuleList from 'components/streamrules/StreamRuleList';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Pluralize } from 'components/common';
 
 const verbalMatchingType = (matchingType: 'OR' | 'AND') => {

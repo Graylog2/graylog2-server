@@ -16,7 +16,7 @@
  */
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { ColumnRenderersByAttribute, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 import type { ExtensionMetricFields } from 'components/streams/StreamsOverview/metricColumns';

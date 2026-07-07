@@ -103,6 +103,15 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       }
     `}
 
+    ${$striped &&
+    $hover &&
+    css`
+      & tbody:only-of-type > tr:hover,
+      & tbody:not(:only-of-type) > tr:hover {
+        background-color: ${theme.colors.table.row.backgroundHover};
+      }
+    `}
+
     & thead > tr > th.${PINNED_CELL_CLASS_NAME} {
       background-color: ${theme.utils.flattenColorStack([
         theme.colors.global.contentBackground,
@@ -137,8 +146,8 @@ const Table = ({
   children = undefined,
   className = undefined,
   'data-testid': dataTestId = undefined,
-  striped = undefined,
-  hover = undefined,
+  striped = true,
+  hover = true,
   condensed = undefined,
   bordered = undefined,
   responsive = undefined,

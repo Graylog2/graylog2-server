@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { Output } from 'hooks/useOutputs';
-import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
+import type { Stream, StreamRule } from 'logic/streams/types';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
 import TitleCell from 'components/streams/StreamsOverview/cells/TitleCell';
@@ -64,7 +64,7 @@ const customColumnRenderers = (
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
-      staticWidth: 'matchHeader' as const,
+      staticWidth: 100,
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,

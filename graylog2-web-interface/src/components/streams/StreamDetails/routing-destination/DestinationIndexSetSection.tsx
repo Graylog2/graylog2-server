@@ -23,7 +23,7 @@ import { Icon, Section, Spinner, LinkContainer } from 'components/common';
 import { Table, Button, Alert } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import NumberUtils from 'util/NumberUtils';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
 import IndexSetArchivingCell from 'components/streams/StreamDetails/routing-destination/IndexSetArchivingCell';

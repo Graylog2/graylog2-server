@@ -23,10 +23,10 @@ import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
@@ -36,12 +36,14 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.streams.StreamService;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
-import java.util.Collection;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -130,7 +132,7 @@ public class MoreSearch {
 
         final var effectiveTimeRange = AbsoluteRange.create(parameters.timerange().getFrom(), parameters.timerange().getTo());
         if (affectedIndices == null || affectedIndices.isEmpty()) {
-            return Histogram.empty();
+            return Histogram.empty(effectiveTimeRange);
         }
         return moreSearchAdapter.eventHistogram(queryString, effectiveTimeRange, affectedIndices, eventStreams,
                 filterString, sourceStreamFilter, timeZone, parameters.filter().extraFilters());
@@ -240,11 +242,6 @@ public class MoreSearch {
     }
 
     public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
-                                            String termsField, int maxBuckets) {
-        return aggregateTerms(queryString, timeRange, termsField, maxBuckets, Set.of());
-    }
-
-    public Map<String, Long> aggregateTerms(String queryString, TimeRange timeRange,
                                             String termsField, int maxBuckets,
                                             Collection<String> includeTerms) {
         final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
@@ -253,12 +250,6 @@ public class MoreSearch {
         }
         return moreSearchAdapter.aggregateTerms(queryString, timeRange, affectedIndices,
                 termsField, maxBuckets, includeTerms);
-    }
-
-    public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
-                                                      String groupByField, MoreSearchAdapter.AggregationType metricType,
-                                                      String metricField, int maxBuckets) {
-        return aggregateGroupedMetric(queryString, timeRange, groupByField, metricType, metricField, maxBuckets, Set.of());
     }
 
     public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timeRange,
@@ -342,9 +333,13 @@ public class MoreSearch {
         }
     }
 
-    public record Histogram(EventsBuckets buckets) {
+    public record Histogram(EventsBuckets buckets, AbsoluteRange effectiveTimerange) {
         public static Histogram empty() {
-            return new Histogram(new EventsBuckets(List.of(), List.of()));
+            return empty(AbsoluteRange.create(new DateTime(0, DateTimeZone.UTC), new DateTime(0, DateTimeZone.UTC)));
+        }
+
+        public static Histogram empty(AbsoluteRange effectiveTimerange) {
+            return new Histogram(new EventsBuckets(List.of(), List.of()), effectiveTimerange);
         }
 
         public record EventsBuckets(List<Bucket> events, List<Bucket> alerts) {}

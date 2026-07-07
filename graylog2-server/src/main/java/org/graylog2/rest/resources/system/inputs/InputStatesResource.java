@@ -220,7 +220,8 @@ public class InputStatesResource extends AbstractInputsResource {
                         ),
                         messageInput.getStaticFields(),
                         messageInput.getNodeId()
-                )
+                ),
+                messageInput.onlyOnePerCluster()
         );
     }
 }

@@ -40,7 +40,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.collectors.db.FleetReassignedPayload;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
@@ -51,6 +50,7 @@ import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
@@ -71,6 +71,7 @@ import org.graylog2.search.AttributeFieldSorts;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +129,7 @@ public class CollectorInstancesResource extends RestResource {
                     .title("Fleet")
                     .relatedCollection(FleetService.COLLECTION_NAME)
                     .relatedIdentifier("_id")
+                    .relatedProperty(FleetDTO.FIELD_NAME)
                     .relatedDisplayFields(List.of(FleetDTO.FIELD_NAME))
                     .relatedDisplayTemplate("{name}")
                     .type(SearchQueryField.Type.OBJECT_ID)
@@ -195,13 +197,12 @@ public class CollectorInstancesResource extends RestResource {
         // TODO for a permission check we would need to know which fleets are granted to the user
         // since we haven't implemented that yet, we can't add them as filters to the count queries, as a consequence
         // the counts would be wrong in case someone had explicit grants
-        final long totalInstances = collectorInstanceService.count();
-        final long onlineInstances = collectorInstanceService.countOnline(
+        final var instanceCount = collectorInstanceService.countAcrossAllFleets(
                 Instant.now().minus(getOfflineThreshold()));
         return new CollectorStatsResponse(
-                totalInstances,
-                onlineInstances,
-                totalInstances - onlineInstances,
+                instanceCount.total(),
+                instanceCount.online(),
+                instanceCount.offline(),
                 fleetService.count(),
                 sourceService.count());
     }
@@ -231,7 +232,7 @@ public class CollectorInstancesResource extends RestResource {
                 resolvedSort,
                 page,
                 perPage,
-                dto ->  isPermitted(CollectorsPermissions.FLEET_READ, dto.fleetId()));
+                dto -> isPermitted(CollectorsPermissions.FLEET_READ, dto.fleetId()));
 
         return PageListResponse.create(
                 query,
@@ -239,22 +240,29 @@ public class CollectorInstancesResource extends RestResource {
                 list.pagination().total(),
                 sort,
                 order,
-                list.stream().map(dto -> new CollectorInstanceResponse(
-                        dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
-                        dto.instanceUid(),
-                        dto.fleetId(),
-                        dto.capabilities(),
-                        dto.enrolledAt(),
-                        dto.lastSeen(),
-                        dto.activeCertificateFingerprint(),
-                        dto.activeCertificateExpiresAt(),
-                        dto.nextCertificateFingerprint().orElse(null),
-                        dto.nextCertificateExpiresAt().orElse(null),
-                        attributesToMap(dto.identifyingAttributes()),
-                        attributesToMap(dto.nonIdentifyingAttributes())
-                )).toList(),
+                list.stream().map(dto -> toResponse(dto, offlineCutoff)).toList(),
                 ATTRIBUTES,
                 DEFAULTS);
+    }
+
+    @GET
+    @Path("/instances/{instanceUid}")
+    @Timed
+    @Operation(summary = "Get a collector instance")
+    public CollectorInstanceResponse getInstance(
+            @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
+        final Optional<CollectorInstanceDTO> collector = collectorInstanceService.findByInstanceUid(instanceUid);
+        if (collector.isEmpty()) {
+            throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
+        }
+        final CollectorInstanceDTO dto = collector.get();
+        // we scope instance read on the entire fleet, there's no sharing that makes sense per instance.
+        checkPermission(CollectorsPermissions.FLEET_READ, dto.fleetId());
+
+        final Duration offlineThreshold = getOfflineThreshold();
+        final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
+
+        return toResponse(dto, offlineCutoff);
     }
 
     @DELETE
@@ -326,6 +334,23 @@ public class CollectorInstancesResource extends RestResource {
                         "targetFleetId", targetFleetId
                 )));
         return Response.noContent().build();
+    }
+
+    private static @NonNull CollectorInstanceResponse toResponse(CollectorInstanceDTO dto, Instant offlineCutoff) {
+        return new CollectorInstanceResponse(
+                dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
+                dto.instanceUid(),
+                dto.fleetId(),
+                dto.capabilities(),
+                dto.enrolledAt(),
+                dto.lastSeen(),
+                dto.activeCertificateFingerprint(),
+                dto.activeCertificateExpiresAt(),
+                dto.nextCertificateFingerprint().orElse(null),
+                dto.nextCertificateExpiresAt().orElse(null),
+                attributesToMap(dto.identifyingAttributes()),
+                attributesToMap(dto.nonIdentifyingAttributes())
+        );
     }
 
     private Duration getOfflineThreshold() {

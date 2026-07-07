@@ -23,6 +23,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.streams.StreamService;
 
@@ -85,13 +86,17 @@ public class EventsSearchService extends AbstractEventsSearchService {
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
         final var eventStreams = allowedEventStreams(subject);
         if (eventStreams.isEmpty()) {
-            return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty());
+            return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty(effectiveTimeRange(parameters)));
         }
 
         final var filter = buildFilter(parameters);
         final var result = moreSearch.histogram(parameters, filter, eventStreams, allowedSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
+    }
+
+    private AbsoluteRange effectiveTimeRange(EventsSearchParameters parameters) {
+        return AbsoluteRange.create(parameters.timerange().getFrom(), parameters.timerange().getTo());
     }
 
     public EventsSearchResult searchByIds(Collection<String> eventIds, Subject subject) {

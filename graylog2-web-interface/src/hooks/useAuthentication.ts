@@ -22,7 +22,7 @@ import type { AuthenticationBackendJSON } from 'logic/authentication/Authenticat
 import { qualifyUrl } from 'util/URLUtils';
 import fetch, { Builder } from 'logic/rest/FetchProvider';
 import PaginationURL from 'util/PaginationURL';
-import type { PaginatedUsers } from 'stores/users/UsersStore';
+import type { PaginatedUsers } from 'hooks/useUsers';
 import type { PaginatedResponseType, Pagination, PaginatedList } from 'stores/PaginationTypes';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { UserOverviewJSON } from 'logic/users/UserOverview';
@@ -216,17 +216,19 @@ export const loadAuthBackendUsersPaginated = (
     query,
   );
 
-  return fetch('GET', qualifyUrl(url)).then((response: PaginatedUsersResponse) => ({
-    list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
-    pagination: {
-      page: response.page,
-      perPage: response.per_page,
-      query: response.query,
-      count: response.count,
-      total: response.total,
-    },
-    adminUser: undefined,
-  }));
+  return fetch('GET', qualifyUrl(url)).then(
+    (response: PaginatedUsersResponse): PaginatedUsers => ({
+      list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
+      pagination: {
+        page: response.page,
+        perPage: response.per_page,
+        query: response.query,
+        count: response.count,
+        total: response.total,
+      },
+      adminUser: undefined,
+    }),
+  );
 };
 
 export const loadActiveAuthBackendType = (): Promise<string | undefined> => {

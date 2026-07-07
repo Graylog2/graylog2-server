@@ -28,7 +28,7 @@ import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Input } from 'components/messageloaders/Types';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
 import useFeature from 'hooks/useFeature';

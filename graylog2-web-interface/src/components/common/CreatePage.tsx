@@ -53,29 +53,21 @@ const CreatePageContent = ({
       </PageHeader>
       <Row className="content">
         <Col lg={8}>
-          <Form className="form form-horizontal">
+          <Form>
             {children}
             {submitError && (
-              <Row>
-                <Col xs={9} xsOffset={3}>
-                  <Alert bsStyle="danger" title="Failed to save">
-                    {submitError}
-                  </Alert>
-                </Col>
-              </Row>
+              <Alert bsStyle="danger" title="Failed to save">
+                {submitError}
+              </Alert>
             )}
-            <Row>
-              <Col md={9} mdOffset={3}>
-                <FormSubmit
-                  submitButtonText={`Create ${entityNameLower}`}
-                  submitLoadingText={`Creating ${entityNameLower}...`}
-                  isSubmitting={isSubmitting}
-                  isAsyncSubmit
-                  disabledSubmit={!isValid || isValidating}
-                  onCancel={onCancel}
-                />
-              </Col>
-            </Row>
+            <FormSubmit
+              submitButtonText={`Create ${entityNameLower}`}
+              submitLoadingText={`Creating ${entityNameLower}...`}
+              isSubmitting={isSubmitting}
+              isAsyncSubmit
+              disabledSubmit={!isValid || isValidating}
+              onCancel={onCancel}
+            />
           </Form>
         </Col>
       </Row>

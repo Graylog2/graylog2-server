@@ -52,10 +52,9 @@ const mockLoadUsersPromise = Promise.resolve({
   },
 });
 
-jest.mock('stores/users/UsersStore', () => ({
-  UsersActions: {
-    loadUsersPaginated: jest.fn(() => mockLoadUsersPromise),
-  },
+jest.mock('hooks/useUsers', () => ({
+  USERS_QUERY_KEY: ['users'],
+  loadUsersPaginated: jest.fn(() => mockLoadUsersPromise),
 }));
 
 describe('UsersSection', () => {

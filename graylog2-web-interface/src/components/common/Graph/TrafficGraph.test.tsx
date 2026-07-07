@@ -25,10 +25,6 @@ import TrafficGraph from './TrafficGraph';
 
 jest.mock('views/components/visualizations/GenericPlot', () => jest.fn(mockComponent('GenericPlot')));
 
-jest.mock('util/AppConfig', () => ({
-  isCloud: jest.fn(() => false),
-}));
-
 const sampleTraffic = {
   '2026-04-07T00:00:00.000Z': 1024,
   '2026-04-08T00:00:00.000Z': 2048,

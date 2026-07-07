@@ -50,7 +50,7 @@ const NotificationBadge = () => {
 
   return isLoading || !data ? null : (
     <StyledNav navbar>
-      <LinkContainer to={Routes.SYSTEM.HEALTH}>
+      <LinkContainer to={Routes.SYSTEM.NOTIFICATIONS}>
         <StyledInactiveNavItem>
           <Badge bsStyle="danger" data-testid="notification-badge" title="System Notifications">
             {data}

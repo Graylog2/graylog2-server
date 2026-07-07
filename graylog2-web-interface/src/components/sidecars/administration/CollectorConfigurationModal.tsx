@@ -259,7 +259,7 @@ const CollectorConfigurationModal = ({
           </InfoContainer>
         )}
         <ConfigurationContainer>
-          <ConfigurationTable condensed hover>
+          <ConfigurationTable condensed>
             <tbody>
               {rows.length === 0 ? (
                 <TableRow>

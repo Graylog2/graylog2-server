@@ -110,7 +110,6 @@ class ConfigurationList extends React.Component<Props> {
               <div className={style.configurationTable}>
                 <DataTable
                   id="collector-configurations-list"
-                  hover
                   headers={headers}
                   headerCellFormatter={_headerCellFormatter}
                   rows={configurations}

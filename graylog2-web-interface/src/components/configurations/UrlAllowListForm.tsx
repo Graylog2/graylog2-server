@@ -276,7 +276,7 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
         Add Url
       </Button>
-      <StyledTable striped bordered>
+      <StyledTable bordered>
         <thead>
           <tr>
             <th>#</th>

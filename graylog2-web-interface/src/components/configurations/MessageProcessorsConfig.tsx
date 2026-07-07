@@ -87,7 +87,7 @@ const MessageProcessorsConfig = () => {
       <h2>Message Processors Configuration</h2>
       <p>The following message processors are executed in order. Disabled processors will be skipped.</p>
 
-      <Table striped bordered condensed className="top-margin">
+      <Table bordered condensed className="top-margin">
         <thead>
           <tr>
             <th>#</th>

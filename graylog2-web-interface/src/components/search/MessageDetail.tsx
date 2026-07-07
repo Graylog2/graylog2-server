@@ -26,7 +26,7 @@ import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 import type { Message } from 'views/components/messagelist/Types';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type { Input } from 'components/messageloaders/Types';
 import NodeName from 'views/components/messagelist/NodeName';
 

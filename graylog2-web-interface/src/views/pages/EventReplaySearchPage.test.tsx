@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import SearchComponent from 'views/components/Search';
 import StreamsContext from 'contexts/StreamsContext';
@@ -38,11 +37,12 @@ import {
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
-jest.mock('logic/telemetry/useSendTelemetry');
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
 const mockView = createSearch();
-
+jest.mock('util/AppConfig', () => jest.requireActual('util/AppConfig'));
 jest.mock('views/components/Search');
 jest.mock('routing/useParams');
 
@@ -54,11 +54,9 @@ jest.mock('hooks/useEventById');
 jest.mock('hooks/useEventDefinition');
 jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: {
-    listAll: jest.fn(async () => Promise.resolve()),
-  },
-  EventNotificationsStore: MockStore(['getInitialState', () => ({ all: [] })]),
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] as Array<EventNotification> }, isFetched: true })),
 }));
 
 jest.mock('views/logic/Widgets', () => ({

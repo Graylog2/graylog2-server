@@ -102,6 +102,19 @@ public class DBEventDefinitionService {
         this.searchFiltersRefetcher = searchFiltersRefetcher;
     }
 
+    /**
+     * Filter matching event definitions that declare at least one MITRE tactic/technique. Uses the
+     * {@code field.0} existence idiom (cheaper and more index-friendly than a {@code $size} check)
+     * to mean "the array is non-empty".
+     */
+    public static Bson hasTacticsTechniquesFilter() {
+        return Filters.exists(EventDefinitionDto.FIELD_TACTICS_TECHNIQUES + ".0");
+    }
+
+    public long count(Bson query) {
+        return collection.countDocuments(query);
+    }
+
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
                                                              Bson sort, int page, int perPage) {
         return searchPaginated(query.toBson(), filter, sort, page, perPage);

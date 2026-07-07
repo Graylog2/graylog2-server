@@ -18,8 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
-
-import { StyledLabel } from './NodeMetricsLayout';
+import { Label } from 'components/bootstrap';
 
 const SecondaryText = styled.div`
   font-size: small;
@@ -62,9 +61,9 @@ const RatioIndicator = ({ ratio, warningThreshold = Number.NaN, dangerThreshold 
 
   return (
     <SecondaryText>
-      <StyledLabel bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs">
+      <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs">
         {formattedRatio}
-      </StyledLabel>
+      </Label>
     </SecondaryText>
   );
 };

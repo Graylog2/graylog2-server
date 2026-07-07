@@ -102,10 +102,10 @@ const ApiRoutes = {
   DashboardsApiController: {
     create: () => ({ url: '/dashboards' }),
     index: () => ({ url: '/dashboards' }),
-    get: (id) => ({ url: `/dashboards/${id}` }),
-    delete: (id) => ({ url: `/dashboards/${id}` }),
-    update: (id) => ({ url: `/dashboards/${id}` }),
-    addWidget: (id) => ({ url: `/dashboards/${id}/widgets` }),
+    get: (id: string) => ({ url: `/dashboards/${id}` }),
+    delete: (id: string) => ({ url: `/dashboards/${id}` }),
+    update: (id: string) => ({ url: `/dashboards/${id}` }),
+    addWidget: (id: string) => ({ url: `/dashboards/${id}/widgets` }),
     removeWidget: (dashboardId: string, widgetId: string) => ({
       url: `/dashboards/${dashboardId}/widgets/${widgetId}`,
     }),
@@ -186,16 +186,16 @@ const ApiRoutes = {
     list: (stats: boolean, only_open: boolean = false) => ({
       url: `/system/indices/index_sets?stats=${stats}&only_open=${only_open}`,
     }),
-    listPaginated: (skip, limit, stats) => ({
+    listPaginated: (skip: number, limit: number, stats: boolean) => ({
       url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}`,
     }),
     get: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}` }),
     getIndexSetStats: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}/stats` }),
     create: () => ({ url: '/system/indices/index_sets' }),
-    delete: (indexSetId: string, deleteIndices) => ({
+    delete: (indexSetId: string, deleteIndices: boolean) => ({
       url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}`,
     }),
-    searchPaginated: (searchTerm, skip, limit, stats) => ({
+    searchPaginated: (searchTerm: string, skip: number, limit: number, stats: boolean) => ({
       url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}`,
     }),
     setDefault: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}/default` }),
@@ -326,7 +326,7 @@ const ApiRoutes = {
   ToolsApiController: {
     grokTest: () => ({ url: '/tools/grok_tester' }),
     jsonTest: () => ({ url: '/tools/json_tester' }),
-    naturalDateTest: (string, timezone) => ({
+    naturalDateTest: (string: string, timezone: string) => ({
       url: `/tools/natural_date_tester?string=${string}&timezone=${timezone}`,
     }),
     regexTest: () => ({ url: '/tools/regex_tester' }),
@@ -347,20 +347,14 @@ const ApiRoutes = {
     _streamFilter(streamId: string) {
       return streamId ? { filter: `streams:${streamId}` } : {};
     },
-    _buildBaseQueryString(query: string, timerange: TimeRange, streamId): SearchQueryString {
-      const queryString: Partial<SearchQueryString> = {};
-
+    _buildBaseQueryString(query: string, timerange: TimeRange, streamId: string): SearchQueryString {
       const streamFilter = this._streamFilter(streamId);
 
-      queryString.query = query;
-
-      Object.keys(timerange).forEach((key) => {
-        queryString[key] = timerange[key];
-      });
-
-      Object.keys(streamFilter).forEach((key) => {
-        queryString[key] = streamFilter[key];
-      });
+      const queryString: Partial<SearchQueryString> = {
+        query,
+        ...timerange,
+        ...streamFilter,
+      };
 
       return queryString as SearchQueryString;
     },
@@ -438,13 +432,13 @@ const ApiRoutes = {
     create_token: (userId: string, tokenName: string) => ({ url: `/users/${userId}/tokens/${tokenName}` }),
     delete_token: (userId: string, tokenName: string) => ({ url: `/users/${userId}/tokens/${tokenName}` }),
     list_tokens: (userId: string) => ({ url: `/users/${userId}/tokens` }),
-    setStatus: (userId: string, accountStatus) => ({ url: `/users/${userId}/status/${accountStatus}` }),
+    setStatus: (userId: string, accountStatus: string) => ({ url: `/users/${userId}/status/${accountStatus}` }),
   },
   TokenManagementController: {
     paginated: () => ({ url: '/token_usage/paginated' }),
   },
   DashboardsController: {
-    show: (id) => ({ url: `/dashboards/${id}` }),
+    show: (id: string) => ({ url: `/dashboards/${id}` }),
   },
   ExtractorsController: {
     create: (inputId: string) => ({ url: `/system/inputs/${inputId}/extractors` }),

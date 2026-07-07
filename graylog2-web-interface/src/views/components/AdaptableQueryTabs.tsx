@@ -23,8 +23,8 @@ import { OrderedSet } from 'immutable';
 import UserNotification from 'util/UserNotification';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, MenuItem } from 'components/bootstrap';
-import { Icon, IconButton } from 'components/common';
+import { Nav, NavItem, MenuItem, Button } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 import CopyToDashboardForm from 'views/components/widgets/CopyToDashboardForm';
@@ -76,10 +76,22 @@ const MORE_TABS_BUTTON_CLASS = 'query-tabs-more';
 const MORE_TABS_LI_CLASS = 'query-tabs-more-li';
 const NEW_TAB_BUTTON_CLASS = 'query-tab-create';
 
+const tabButtonStyles = css`
+  height: 100%;
+  width: auto;
+  padding: 10px 15px;
+  // same color as IconButton
+  color: ${({ theme }) => theme.colors.gray[60]};
+`;
+
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .query-config-btn {
+    ${tabButtonStyles}
+  }
 `;
 
 const StyledQueryNav = styled(Nav)(
@@ -106,6 +118,11 @@ const StyledQueryNav = styled(Nav)(
         }
       }
 
+      > li.${MORE_TABS_LI_CLASS} > button,
+      > li.${NEW_TAB_BUTTON_CLASS} > button {
+        ${tabButtonStyles}
+      }
+
       > li.active {
         display: flex;
         flex-direction: column;
@@ -128,10 +145,6 @@ const StyledQueryNav = styled(Nav)(
           }
         }
       }
-
-      > li.${MORE_TABS_BUTTON_CLASS}, > li.${MORE_TABS_BUTTON_CLASS} a {
-        cursor: pointer;
-      }
     }
   `,
 );
@@ -142,13 +155,20 @@ const QueryTab = styled(NavItem)`
   }
 `;
 
+const NewTabLi = ({ onClick }: { onClick: () => void }) => (
+  <li className={NEW_TAB_BUTTON_CLASS}>
+    <Button bsStyle="transparent" title="Create New Page" onClick={onClick}>
+      <Icon name="add" />
+    </Button>
+  </li>
+);
+
 const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
   <li className={MORE_TABS_LI_CLASS}>
     <MoreActionsMenu
       className={MORE_TABS_BUTTON_CLASS}
       id="query-tabs-more"
       aria-label="More Dashboard Pages"
-      bsStyle="link"
       keepMounted
       pullRight>
       {menuItems.toArray()}
@@ -399,10 +419,7 @@ const AdaptableQueryTabs = ({
 
         {currentTabs.lockedItems.toArray()}
 
-        <QueryTab
-          key="new"
-          eventKey="new"
-          title="Create New Page"
+        <NewTabLi
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
               app_pathname: 'dashboard',
@@ -412,13 +429,11 @@ const AdaptableQueryTabs = ({
 
             onSelect('new');
           }}
-          className={NEW_TAB_BUTTON_CLASS}>
-          <Icon name="add" />
-        </QueryTab>
+        />
       </StyledQueryNav>
-      <IconButton
+      <Button
+        bsStyle="transparent"
         title="Open pages configuration"
-        name="settings"
         ref={queriesConfigBtn}
         className="query-config-btn"
         onClick={() => {
@@ -429,8 +444,9 @@ const AdaptableQueryTabs = ({
           });
 
           setShowConfigurationModal(true);
-        }}
-      />
+        }}>
+        <Icon name="settings" />
+      </Button>
       {showConfigurationModal && (
         <AdaptableQueryTabsConfiguration
           show={showConfigurationModal}

@@ -23,8 +23,6 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
@@ -46,7 +44,6 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,7 +53,6 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
     public static final BucketOrder DEFAULT_ORDER = BucketOrder.count(false);
-    public static final String SORT_HELPER = "sort_helper";
 
     @Nonnull
     @Override
@@ -105,32 +101,6 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
                         """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
-    }
-
-    private TermsAggregationBuilder applyOrdering(Pivot pivot, TermsAggregationBuilder terms, List<BucketOrder> ordering, ESGeneratedQueryContext queryContext) {
-        return sortsOnNumericPivotField(pivot, queryContext)
-                /* When we sort on a numeric pivot field, we create a metric sub-aggregation for that field, which returns
-                the numeric value of it, so that we can sort on it numerically. Any metric aggregation (min/max/avg) will work. */
-                .map(pivotSort -> terms
-                        .subAggregation(AggregationBuilders.max(SORT_HELPER).field(pivotSort.field()))
-                        .order(BucketOrder.aggregation(SORT_HELPER, SortSpec.Direction.Ascending.equals(pivotSort.direction()))))
-                .orElseGet(() -> terms
-                        .order(ordering.isEmpty() ? List.of(DEFAULT_ORDER) : ordering));
-    }
-
-    private Optional<PivotSort> sortsOnNumericPivotField(Pivot pivot, ESGeneratedQueryContext queryContext) {
-        return Optional.ofNullable(pivot.sort())
-                .filter(sorts -> sorts.size() == 1)
-                .map(sorts -> sorts.get(0))
-                .filter(sort -> sort instanceof PivotSort)
-                .map(sort -> (PivotSort) sort)
-                .filter(pivotSort -> queryContext.fieldType(pivot.effectiveStreams(), pivotSort.field())
-                        .filter(this::isNumericFieldType)
-                        .isPresent());
-    }
-
-    private boolean isNumericFieldType(String fieldType) {
-        return fieldType.equals("long") || fieldType.equals("double") || fieldType.equals("float");
     }
 
     @Override

@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import moment from 'moment';
 
 import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -35,8 +34,6 @@ import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/
 import useUserDateTime from 'hooks/useUserDateTime';
 import { toUTCFromTz } from 'util/DateTime';
 import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
-import type { TimeRange } from 'views/logic/queries/Query';
-import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 const config = AggregationWidgetConfig.builder()
@@ -112,16 +109,14 @@ const layout: Partial<PlotLayout> = {
   legend: { y: yLegendPosition(height) },
 };
 
-const prepareTimeRangeForGraph = (timerange: TimeRange, formatTime: FormatTime) => {
-  if (isTypeRelativeWithStartOnly(timerange)) {
-    const from = moment().subtract(timerange.range, 'seconds');
-    const to = moment();
-
-    return [formatTime(from, 'internal'), formatTime(to, 'internal')];
-  }
-
-  return [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
-};
+const prepareTimeRangeForGraph = (
+  timerange: {
+    from: string;
+    to: string;
+    type: string;
+  },
+  formatTime: FormatTime,
+) => [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
 
 const EventsGraph = ({
   data: { results, timerange },
@@ -177,7 +172,7 @@ type Props = MiddleSectionProps & {
 };
 const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const { data, isInitialLoading, refetch, isError, error } = useQuery({
+  const { data, isLoading, refetch, isError, error } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
     queryFn: () => eventsHistogramFetcher(searchParams),
     placeholderData: keepPreviousData,
@@ -195,7 +190,7 @@ const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fe
     [formatTime, searchParams.filters, setFilters, userTimezone],
   );
 
-  if (isInitialLoading) {
+  if (isLoading) {
     return <Spinner />;
   }
 

@@ -729,6 +729,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Netty async HTTP client, used by the AWS async clients (DynamoDB, CloudWatch, Kinesis) for the Kinesis
+             input. Required for HTTP/2 (Kinesis Client Library) and proxy support on the async clients. -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>netty-nio-client</artifactId>
+        </dependency>
         <!-- additional integrations dependencies -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -1409,13 +1415,13 @@
                             </execution>
 
                             <execution>
-                                <id>yarn tsc</id>
+                                <id>yarn tsgo</id>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
                                 <phase>compile</phase>
                                 <configuration>
-                                    <arguments>tsc</arguments>
+                                    <arguments>tsgo</arguments>
                                 </configuration>
                             </execution>
 

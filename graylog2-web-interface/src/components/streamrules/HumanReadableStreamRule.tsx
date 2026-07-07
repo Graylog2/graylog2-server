@@ -17,7 +17,7 @@
 import React from 'react';
 
 import type { Input } from 'components/messageloaders/Types';
-import type { StreamRule } from 'stores/streams/StreamsStore';
+import type { StreamRule } from 'logic/streams/types';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 

@@ -32,6 +32,7 @@ import org.graylog2.database.MongoConnectionImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mongodb.MongoDBContainer;
@@ -63,7 +64,10 @@ class MongodbClusterResourceIntegrationIT {
     static MongoDBContainer mongoContainer = new MongoDBContainer("mongo:" + MongoDBVersion.DEFAULT.version())
             .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN_USER)
             .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN_PASSWORD)
-            .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE);
+            .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE)
+            // MongoDB does a 2-phase start when auth is enabled: starts without auth, creates the admin user,
+            // restarts with --auth. Wait for the 2nd "Waiting for connections" to ensure auth is fully set up.
+            .waitingFor(Wait.forLogMessage("(?i).*waiting for connections.*", 2));
 
     private static MongoClient adminClient;
     private static MongoClient restrictedClient;

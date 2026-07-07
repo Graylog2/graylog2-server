@@ -17,8 +17,9 @@
 import React from 'react';
 
 import NumberUtils from 'util/NumberUtils';
+import { Label } from 'components/bootstrap';
 
-import { MetricPlaceholder, MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
+import { MetricPlaceholder, MetricsColumn, MetricsRow } from '../../shared-components/NodeMetricsLayout';
 import { MongodbRole, type MongodbRoleType } from '../fetchClusterMongodbNodes';
 
 type Props = {
@@ -91,9 +92,9 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
   return (
     <MetricsColumn>
       <MetricsRow>
-        <StyledLabel bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs" title={exactValueTitle}>
+        <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs" title={exactValueTitle}>
           {formatted}
-        </StyledLabel>
+        </Label>
       </MetricsRow>
     </MetricsColumn>
   );

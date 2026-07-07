@@ -199,7 +199,7 @@ export default class User {
     const MS_MINUTE = 60 * 1000;
     const MS_SECOND = 1000;
 
-    const _estimateUnit = (value): [number, string] => {
+    const _estimateUnit = (value: number): [number, string] => {
       if (value === 0) {
         return [MS_SECOND, 'Seconds'];
       }

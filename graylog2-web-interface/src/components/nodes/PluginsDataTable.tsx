@@ -58,9 +58,7 @@ const PluginsDataTable = ({ plugins = undefined }: Props) => {
     <DataTable
       id="plugin-list"
       rowClassName="row-sm"
-      striped
       condensed
-      hover
       headers={headers}
       headerCellFormatter={headerCellFormatter}
       sortByKey="name"

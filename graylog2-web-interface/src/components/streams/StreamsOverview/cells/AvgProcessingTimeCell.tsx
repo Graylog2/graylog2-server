@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Spinner } from 'components/common';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
 import ProcessingTimeBadge from 'components/streams/StreamsOverview/cells/ProcessingTimeBadge';

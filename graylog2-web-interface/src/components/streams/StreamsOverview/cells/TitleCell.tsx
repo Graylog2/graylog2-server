@@ -19,14 +19,13 @@ import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Link, Text } from 'components/common';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Label } from 'components/bootstrap';
 
 type Props = {
   stream: Stream;
 };
 const DefaultLabel = styled(Label)`
-  display: inline-flex;
   margin-left: 5px;
   vertical-align: inherit;
 `;

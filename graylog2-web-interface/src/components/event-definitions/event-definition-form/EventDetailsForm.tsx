@@ -21,8 +21,8 @@ import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
 import { useMantineTheme } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 
+import useMediaQuery from 'util/hooks/useMediaQuery';
 import { Select } from 'components/common';
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';

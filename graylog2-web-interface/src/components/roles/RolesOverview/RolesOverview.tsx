@@ -127,7 +127,6 @@ const RolesOverview = () => {
           <StyledPaginatedList totalItems={paginatedRoles.pagination.total}>
             <DataTable
               id="roles-overview"
-              hover
               rowClassName="no-bm"
               headers={TABLE_HEADERS}
               headerCellFormatter={_headerCellFormatter}

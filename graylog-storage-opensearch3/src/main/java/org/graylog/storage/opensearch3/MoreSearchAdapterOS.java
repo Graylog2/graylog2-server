@@ -281,7 +281,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
         });
 
-        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
     }
 
     static Query buildExtraFilter(String field, String value) {
@@ -509,10 +509,11 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     }
 
     private double extractMetricValue(org.opensearch.client.opensearch._types.aggregations.Aggregate agg, AggregationType metricType) {
-        return switch (metricType) {
+        final Double value = switch (metricType) {
             case AVG -> agg.avg().value();
             case MAX -> agg.max().value();
         };
+        return value != null ? value : 0.0;
     }
 
     private Query createSimpleQuery(String queryString, TimeRange timerange) {

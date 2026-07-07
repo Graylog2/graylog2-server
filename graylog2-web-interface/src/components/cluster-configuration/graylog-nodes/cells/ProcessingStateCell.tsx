@@ -16,8 +16,10 @@
  */
 import React from 'react';
 
+import { Label } from 'components/bootstrap';
+
 import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
-import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
+import { MetricsColumn, MetricsRow } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
   node: ClusterGraylogNode;
@@ -33,12 +35,12 @@ const ProcessingStateCell = ({ node }: Props) => {
   return (
     <MetricsColumn>
       <MetricsRow>
-        <StyledLabel
+        <Label
           bsStyle={node.is_processing ? 'success' : 'warning'}
           bsSize="xs"
           aria-label={`Message processing ${status}`}>
           {status}
-        </StyledLabel>
+        </Label>
       </MetricsRow>
     </MetricsColumn>
   );

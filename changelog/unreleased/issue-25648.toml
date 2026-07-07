@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix inconsistent collector instance counts (online exceeding total) while collectors are enrolling."
+
+issues = ["25648"]
+pulls = ["26109"]

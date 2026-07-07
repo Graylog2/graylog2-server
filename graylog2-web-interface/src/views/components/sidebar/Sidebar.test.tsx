@@ -32,12 +32,6 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 import Sidebar from './Sidebar';
 
-jest.mock('util/AppConfig', () => ({
-  ...jest.requireActual('util/AppConfig'),
-  rootTimeZone: jest.fn(() => 'America/Chicago'),
-  __esModule: true,
-}));
-
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/hooks/useViewType');
 jest.mock('views/hooks/useActiveQueryId');

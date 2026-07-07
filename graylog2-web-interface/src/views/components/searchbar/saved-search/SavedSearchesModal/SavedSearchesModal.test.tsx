@@ -84,7 +84,10 @@ describe('SavedSearchesModal', () => {
 
   beforeEach(() => {
     asMock(fetchSavedSearches).mockResolvedValue(defaultPaginatedSearches);
-    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutateAsync: () => Promise.resolve() });
+    asMock(useUpdateUserLayoutPreferences).mockReturnValue({
+      mutateAsync: () => Promise.resolve(),
+      resetAsync: () => Promise.resolve(),
+    });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
@@ -192,9 +195,11 @@ describe('SavedSearchesModal', () => {
 
     it('should update layout setting when changing page size', async () => {
       const updateTableLayout = jest.fn();
+      const resetTableLayout = jest.fn();
 
       asMock(useUpdateUserLayoutPreferences).mockReturnValue({
         mutateAsync: updateTableLayout,
+        resetAsync: resetTableLayout,
       });
 
       render(

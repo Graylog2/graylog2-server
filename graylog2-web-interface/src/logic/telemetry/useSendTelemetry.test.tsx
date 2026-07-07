@@ -21,7 +21,6 @@ import TelemetryContext from 'logic/telemetry/TelemetryContext';
 
 import useSendTelemetry from './useSendTelemetry';
 
-jest.mock('util/AppConfig');
 jest.mock('routing/useLocation', () => () => ({ pathname: '/foo' }));
 
 const contextValue = {

@@ -363,6 +363,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private List<ProcessingError> processingErrors;
 
+    // Indicates if a message is supposed to be accounted for license usage. Except for some special cases, this will
+    // usually be true.
+    private final boolean accounted;
+
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
 
     static {
@@ -396,7 +400,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(final String message, final String source, final DateTime timestamp) {
+    Message(final String message, final String source, final DateTime timestamp, boolean accounted) {
+        this.accounted = accounted;
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
         addRequiredField(FIELD_SOURCE, source);
@@ -404,15 +409,30 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
+    Message(final String message, final String source, final DateTime timestamp) {
+        this(message, source, timestamp, true);
+    }
+
+    Message(final Map<String, Object> fields, boolean accounted) {
+        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))), accounted);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
     Message(final Map<String, Object> fields) {
-        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))));
+        this(fields, true);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(String id, Map<String, Object> newFields, boolean accounted) {
+        this.accounted = accounted;
+        Preconditions.checkArgument(id != null, "message id cannot be null");
+        fields.put(FIELD_ID, id);
+        addFields(newFields);
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
     Message(String id, Map<String, Object> newFields) {
-        Preconditions.checkArgument(id != null, "message id cannot be null");
-        fields.put(FIELD_ID, id);
-        addFields(newFields);
+        this(id, newFields, true);
     }
 
     public boolean isComplete() {
@@ -707,9 +727,44 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return valueSize;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the accumulated size of all message fields when the message is accounted, and {@code 0}
+     * when it is not (see {@link #isAccounted()}). Since this value is also stored as
+     * {@link #FIELD_GL2_ACCOUNTED_MESSAGE_SIZE}, an unaccounted message records an accounted size of
+     * {@code 0}.
+     */
     @Override
     public long getSize() {
-        return sizeCounter.getCount();
+        return isAccounted() ? sizeCounter.getCount() : 0L;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the raw input size recorded in {@link #FIELD_GL2_INPUT_MESSAGE_SIZE} (set by the decoding
+     * layer from the original transport payload), falling back to {@link #getSize()} when no input size
+     * was recorded — e.g. for messages created in-process rather than decoded from an input.
+     */
+    @Override
+    @JsonIgnore
+    public long getInputMessageSize() {
+        final Object value = getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        return value instanceof Number n ? n.longValue() : getSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The flag is fixed at construction (a message is created as excluded via the
+     * {@code MessageFactory.createUnaccountedMessage(...)} factory method) and is never toggled
+     * between accounted and unaccounted afterward.
+     */
+    @Override
+    @JsonIgnore
+    public boolean isAccounted() {
+        return accounted;
     }
 
     public static boolean validKey(final String key) {
@@ -1062,11 +1117,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public abstract static class Recording {
-        static Timing timing(String name, long elapsedNanos) {
+        private static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
 
-        public static Message.Counter counter(String name, int counter) {
+        private static Message.Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }
 

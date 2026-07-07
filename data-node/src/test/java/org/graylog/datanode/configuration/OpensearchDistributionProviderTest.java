@@ -16,9 +16,10 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.github.zafarkhaja.semver.Version;
+import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.OpensearchDistribution;
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -26,7 +27,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.Comparator;
 
 class OpensearchDistributionProviderTest {
 
@@ -137,11 +138,18 @@ class OpensearchDistributionProviderTest {
 
     @Nonnull
     private OpensearchDistributionProvider provider(Path dir, OpensearchArchitecture arch) {
-        return new OpensearchDistributionProvider(dir, arch);
+        return new OpensearchDistributionProvider(dir, arch, oldestVersionSelector());
     }
 
     @Nonnull
     private OpensearchDistributionProvider providerWithVersion(Path dir, OpensearchArchitecture arch, String version) {
-        return new OpensearchDistributionProvider(dir, arch, Optional.of(version));
+        final OpensearchVersionSelector selector = opensearchDistributions -> opensearchDistributions.stream().filter(d -> d.version().equals(version)).findFirst().orElseThrow(() -> new IllegalArgumentException("No OpenSearch distribution found for requested version '" + version + "'"));
+        return new OpensearchDistributionProvider(dir, arch, selector);
+    }
+
+    private static OpensearchVersionSelector oldestVersionSelector() {
+        return candidates -> candidates.stream()
+                .min(Comparator.comparing(OpensearchDistribution::version, Comparator.comparing(Version::parse)))
+                .orElseThrow(() -> new IllegalArgumentException("No suitable OpenSearch distribution found"));
     }
 }
