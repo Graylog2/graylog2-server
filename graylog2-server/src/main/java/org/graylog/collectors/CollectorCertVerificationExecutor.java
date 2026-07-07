@@ -24,18 +24,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Qualifies the {@code ExecutorService} used to run collector mTLS certificate verification off
- * the Netty event loop.
+ * Qualifies the {@code Executor} used to run collector mTLS certificate verification off the Netty
+ * event loop: it is the {@code SslHandler} delegated-task executor for the ingest TLS handshake, so
+ * the trust manager's {@code checkClientTrusted} (and its instance-binding resolution, which may
+ * block on MongoDB on a cold cache miss) never runs on an event-loop thread.
  * <p>
- * It backs two uses, both of which would otherwise block an event-loop thread on MongoDB:
- * <ul>
- *   <li>the {@code SslHandler} delegated-task executor for the ingest TLS handshake, so the trust
- *       manager's {@code checkClientTrusted} (and its instance-binding lookup) runs off the event
- *       loop;</li>
- *   <li>the background refresh executor of the collector fingerprint cache.</li>
- * </ul>
- * The bound pool and its overload (shedding) behavior are defined where the executor is provided
- * in {@code CollectorsModule}.
+ * The {@link CertBindingResolver}'s background cache work deliberately does <em>not</em> share this
+ * pool — see {@link CollectorCertCacheRefreshExecutor}. The bound pool and its overload (shedding)
+ * behavior are defined where the executor is provided in {@code CollectorsModule}.
  */
 @Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

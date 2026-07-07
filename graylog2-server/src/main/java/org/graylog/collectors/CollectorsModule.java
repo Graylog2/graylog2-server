@@ -171,19 +171,12 @@ public class CollectorsModule extends PluginModule {
     }
 
     /**
-     * Provides the executor that runs collector mTLS certificate verification off the Netty event
-     * loop (see {@link CollectorCertVerificationExecutor}).
+     * Executor for collector mTLS certificate verification (see {@link CollectorCertVerificationExecutor}).
      * <p>
-     * Sized to {@code max(2, cores/2)} threads: the work is mostly fast in-memory cache hits with
-     * occasional blocking MongoDB lookups, and concurrency is bounded so a reconnect storm cannot
-     * oversubscribe CPU or flood the shared Mongo connection pool. {@code allowCoreThreadTimeOut}
-     * lets the pool scale back to zero when idle, and daemon threads avoid any shutdown wiring.
-     * <p>
-     * The bounded queue with the default {@code AbortPolicy} makes overload shed rather than grow
-     * unboundedly: once the pool and queue are full, {@code execute} throws, which fails the TLS
-     * handshake and lets the collector reconnect with backoff — bounded admission rather than
-     * latency-unbounded queueing. Wrapped in an {@link InstrumentedExecutorService} so queue depth
-     * and rejections are observable.
+     * Handshakes are latency-sensitive work someone waits on, so overload must <em>shed</em>: with pool
+     * and bounded queue full, {@code execute} rejects, failing the TLS handshake so the collector retries
+     * with backoff — bounded admission instead of latency-unbounded queueing. The fixed thread count also
+     * caps concurrent MongoDB lookups during a reconnect storm.
      */
     @Provides
     @Singleton
@@ -203,21 +196,12 @@ public class CollectorsModule extends PluginModule {
     }
 
     /**
-     * Provides the executor that runs the {@link CertBindingResolver}'s background cache work —
-     * refreshes (event-driven and {@code refreshAfterWrite}) and the startup prewarm (see
-     * {@link CollectorCertCacheRefreshExecutor}).
+     * Executor for the {@link CertBindingResolver}'s background cache work — refreshes and prewarm
+     * (see {@link CollectorCertCacheRefreshExecutor} for why it must not share the verification pool).
      * <p>
-     * Deliberately separate from the cert-verification executor: refresh tasks block on MongoDB, and
-     * during a Mongo outage each attempt can park a thread for the driver's server-selection timeout.
-     * On a shared pool that would delay or shed TLS handshakes (the periodic refresh wave alone could
-     * saturate it at large fleet sizes); on this dedicated two-thread pool the blast radius is capped
-     * at "refreshes stall", which is harmless — reads keep serving the current value and stale entries
-     * are retried on later access.
-     * <p>
-     * The queue is unbounded but intrinsically limited: Caffeine coalesces reloads per cache key, so
-     * the backlog can never exceed the number of cached fingerprints. Nobody waits on these tasks, so
-     * queueing (rather than shedding) is the right overload behavior, and the fixed two-thread pool is
-     * the throttle towards MongoDB.
+     * Nobody waits on these tasks, so the overload policy is the inverse of the verification pool's:
+     * <em>queue</em> instead of shed. The queue is unbounded but intrinsically capped by Caffeine's
+     * per-key reload coalescing, and the fixed two-thread pool is the throttle towards MongoDB.
      */
     @Provides
     @Singleton
