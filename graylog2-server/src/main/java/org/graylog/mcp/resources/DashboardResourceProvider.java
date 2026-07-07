@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.resources;
 
+import com.google.common.base.Strings;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
@@ -100,7 +101,8 @@ public class DashboardResourceProvider extends ResourceProvider {
             return resultStream
                     .map(dashboard -> new McpSchema.Resource(
                             GRN_TYPE.toGRN(dashboard.id()).toString(),
-                            dashboard.title(),
+                            // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+                            Strings.isNullOrEmpty(dashboard.title()) ? dashboard.id() : dashboard.title(),
                             dashboard.title(),
                             dashboard.description(),
                             null,
