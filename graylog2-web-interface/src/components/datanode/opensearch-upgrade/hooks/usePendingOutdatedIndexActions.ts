@@ -129,6 +129,38 @@ const resolveAction = (
   return { kind: 'archiving', percent: job?.percent_complete ?? 0 };
 };
 
+// Reconcile tracked actions with reality: drop actions whose index is gone (deleted), and materialize the
+// archived state once a job has finished but its index is still outdated. Returns `current` unchanged
+// (referentially) when there is nothing to do, so callers can use identity to gate state updates.
+const reconcileActions = (
+  current: Array<PendingOutdatedIndexAction>,
+  outdatedIndexNames: Set<string>,
+  jobs: Pick<ClusterJobsResult, 'jobsById' | 'jobsUpdatedAt'>,
+): Array<PendingOutdatedIndexAction> => {
+  const next = current.flatMap((pendingAction): Array<PendingOutdatedIndexAction> => {
+    if (!outdatedIndexNames.has(pendingAction.indexName)) {
+      return [];
+    }
+
+    const resolution = resolveAction(pendingAction, jobs);
+
+    if (resolution.kind === 'done') {
+      return [];
+    }
+
+    if (resolution.kind === 'archived' && pendingAction.state !== 'archived') {
+      return [{ ...pendingAction, state: 'archived' }];
+    }
+
+    return [pendingAction];
+  });
+
+  const unchanged =
+    next.length === current.length && next.every((pendingAction, index) => pendingAction === current[index]);
+
+  return unchanged ? current : next;
+};
+
 /**
  * Tracks long-running "archive and delete" actions on outdated indices. Each action's real progress comes
  * from its backend system job (polled via {@link useClusterJobs}): a running job reports progress, an errored
@@ -182,54 +214,30 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
 
   const addArchiveDeleteAction = useCallback(
     ({ indexName, systemJobId }: { indexName: string; systemJobId?: string }) => {
-      setPendingActions((current) => {
-        const next: Array<PendingOutdatedIndexAction> = [
-          ...current.filter((pendingAction) => pendingAction.indexName !== indexName),
-          { action: 'archive-delete', indexName, systemJobId, startedAt: new Date().toISOString() },
-        ];
-        storeActions(next);
-
-        return next;
-      });
+      setPendingActions((current) => [
+        ...current.filter((pendingAction) => pendingAction.indexName !== indexName),
+        { action: 'archive-delete', indexName, systemJobId, startedAt: new Date().toISOString() },
+      ]);
     },
     [],
   );
 
-  // Stop tracking an action once its index is gone (deleted), or mark it as archived once its job has finished
-  // but the index is still outdated.
-  useEffect(() => {
-    if (isLoading || isError) {
-      return;
+  // Adjust state during render (guarded by referential equality) instead of in an effect: this both avoids
+  // an extra committed render per change and keeps setState out of effects, following
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  if (!isLoading && !isError) {
+    const reconciled = reconcileActions(pendingActions, outdatedIndexNames, { jobsById, jobsUpdatedAt });
+
+    if (reconciled !== pendingActions) {
+      setPendingActions(reconciled);
     }
+  }
 
-    setPendingActions((current) => {
-      const next = current.flatMap((pendingAction): Array<PendingOutdatedIndexAction> => {
-        if (!outdatedIndexNames.has(pendingAction.indexName)) {
-          return [];
-        }
-
-        const resolution = resolveAction(pendingAction, { jobsById, jobsUpdatedAt });
-
-        if (resolution.kind === 'done') {
-          return [];
-        }
-
-        if (resolution.kind === 'archived' && pendingAction.state !== 'archived') {
-          return [{ ...pendingAction, state: 'archived' }];
-        }
-
-        return [pendingAction];
-      });
-
-      if (next.length === current.length && next.every((pendingAction, index) => pendingAction === current[index])) {
-        return current;
-      }
-
-      storeActions(next);
-
-      return next;
-    });
-  }, [isError, isLoading, jobsById, jobsUpdatedAt, outdatedIndexNames]);
+  // Persisting is a pure external-system sync, which is what effects are for. It also covers additions from
+  // addArchiveDeleteAction, keeping that a plain state update.
+  useEffect(() => {
+    storeActions(pendingActions);
+  }, [pendingActions]);
 
   // Refresh the outdated indices while actions are in flight so completed ones drop off. A plain interval
   // instead of react-query's refetchInterval on purpose: the poll flag derives from this hook's own output,
