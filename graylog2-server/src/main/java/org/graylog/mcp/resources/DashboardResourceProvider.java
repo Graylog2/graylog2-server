@@ -99,7 +99,6 @@ public class DashboardResourceProvider extends ResourceProvider {
 
         try (resultStream) {
             return resultStream
-<<<<<<< backport-7.1/refactor/mcp-sdk
                     .map(dashboard -> McpSchema.Resource.builder(
                                     GRN_TYPE.toGRN(dashboard.id()).toString(),
                                     // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
@@ -107,18 +106,6 @@ public class DashboardResourceProvider extends ResourceProvider {
                             .title(dashboard.title())
                             .description(dashboard.description())
                             .build())
-=======
-                    .map(dashboard -> new McpSchema.Resource(
-                            GRN_TYPE.toGRN(dashboard.id()).toString(),
-                            // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
-                            Strings.isNullOrEmpty(dashboard.title()) ? dashboard.id() : dashboard.title(),
-                            dashboard.title(),
-                            dashboard.description(),
-                            null,
-                            null,
-                            null,
-                            null))
->>>>>>> 7.1
                     .toList();
         }
     }

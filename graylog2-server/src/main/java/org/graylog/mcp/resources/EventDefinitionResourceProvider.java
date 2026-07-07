@@ -93,7 +93,6 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
             return dtos
                     .filter(eventDefinition -> permissionHelper.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ,
                             eventDefinition.id()))
-<<<<<<< backport-7.1/refactor/mcp-sdk
                     .map(eventDefinition -> McpSchema.Resource.builder(
                                     GRN_TYPE.toGRN(eventDefinition.id()).toString(),
                                     // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
@@ -101,18 +100,6 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
                             .title(eventDefinition.title())
                             .description(eventDefinition.description())
                             .build())
-=======
-                    .map(eventDefinition -> new McpSchema.Resource(
-                            GRN_TYPE.toGRN(eventDefinition.id()).toString(),
-                            // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
-                            Strings.isNullOrEmpty(eventDefinition.title()) ? eventDefinition.id() : eventDefinition.title(),
-                            eventDefinition.title(),
-                            eventDefinition.description(),
-                            null,
-                            null,
-                            null,
-                            null))
->>>>>>> 7.1
                     .toList();
         }
     }
