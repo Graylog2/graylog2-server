@@ -56,6 +56,7 @@ const OpenSearchUpgradeSection = () => {
     targetVersion,
     nodes: openSearchVersionNodes,
     numberOfDataNodes,
+    unavailableDataNodeCount,
     isError: isVersionOverviewError,
     isLoading,
     isUpgradeAvailable,
@@ -96,14 +97,17 @@ const OpenSearchUpgradeSection = () => {
   const startActionLoadingLabel = 'Starting OpenSearch Rolling Upgrade...';
   const canResumeRollingRestart =
     rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
+  // Outdated indices are only "resolved" when the check succeeded AND returned none — a loading or failing
+  // check means we simply don't know yet.
+  const outdatedIndicesConfirmedEmpty = !hasOutdatedIndices && !isLoadingOutdatedIndices && !isOutdatedIndicesError;
   // An ACTIVE (running/paused) upgrade is always visible — its progress, paused_reason and per-node errors
   // must never disappear mid-run, and outdated indices legitimately (re)appear during a rolling upgrade as
   // the live cluster major shifts. Only a TERMINAL job (completed/aborted/failed) yields to outdated
-  // indices: while any remain (or are still being checked), resolving them is the user's task and a stale
-  // result table is noise. Kept decoupled from the version-overview query so its 5s poll (fetching/error
-  // churn) can never blank the table mid-upgrade.
+  // indices: until they are confirmed absent, resolving them is the user's task and a stale result table is
+  // noise. Kept decoupled from the version-overview query so its 5s poll (fetching/error churn) can never
+  // blank the table mid-upgrade.
   const showRollingUpgradeStatus =
-    !!rollingRestart?.data && (hasActiveRollingRestart || (!hasOutdatedIndices && !isLoadingOutdatedIndices));
+    !!rollingRestart?.data && (hasActiveRollingRestart || outdatedIndicesConfirmedEmpty);
 
   useEffect(() => {
     if (isRollingRestartTerminalState(rollingRestartState)) {
@@ -146,7 +150,13 @@ const OpenSearchUpgradeSection = () => {
   return (
     <Section>
       <h1>Upgrade Data Nodes&apos; embedded OpenSearch</h1>
-      <OpenSearchUpgradeInfo currentVersion={currentVersion} targetVersion={targetVersion} isLoading={isLoading} />
+      <OpenSearchUpgradeInfo
+        currentVersion={currentVersion}
+        targetVersion={targetVersion}
+        isLoading={isLoading}
+        availableDataNodes={numberOfDataNodes}
+        unavailableDataNodes={unavailableDataNodeCount}
+      />
 
       <Row>
         <Col xs={12}>

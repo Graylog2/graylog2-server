@@ -50,6 +50,7 @@ const mockClusterStats = (overrides: Partial<ReturnType<typeof useOpenSearchClus
     targetVersion: '3.5.0',
     nodes: [],
     numberOfDataNodes: 3,
+    unavailableDataNodeCount: 0,
     isError: false,
     isFetching: false,
     isLoading: false,
@@ -161,6 +162,14 @@ describe('OpenSearchUpgradeSection', () => {
     expect(screen.getByText(/a rolling upgrade requires at least 3 data nodes \(you have 2\)/i)).toBeInTheDocument();
   });
 
+  it('shows the data node count with how many are available', () => {
+    mockClusterStats({ numberOfDataNodes: 2, unavailableDataNodeCount: 1 });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.getByText('Data Nodes:')).toBeInTheDocument();
+    expect(screen.getByText('3 (2 available)')).toBeInTheDocument();
+  });
+
   it('disables the start action while outdated indices remain', () => {
     mockOutdatedIndices([{ index_name: 'graylog_0' }]);
     render(<OpenSearchUpgradeSection />);
@@ -208,6 +217,23 @@ describe('OpenSearchUpgradeSection', () => {
     render(<OpenSearchUpgradeSection />);
 
     expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
+  });
+
+  it('hides a finished rolling-upgrade status while the outdated indices check is failing', () => {
+    // A failing check means the list is unknown, not empty — the stale result table must not imply otherwise.
+    mockOutdatedIndices([], { isError: true });
+    mockRollingRestart({ data: failedJob() });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
+  });
+
+  it('keeps an active rolling upgrade visible while the outdated indices check is failing', () => {
+    mockOutdatedIndices([], { isError: true });
+    mockRollingRestart({ data: pausedJob() });
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
   it('shows a resume action for a paused upgrade and sends telemetry', async () => {

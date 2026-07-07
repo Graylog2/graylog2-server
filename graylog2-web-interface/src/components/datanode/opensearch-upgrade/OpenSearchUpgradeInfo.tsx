@@ -41,16 +41,28 @@ const OpenSearchUpgradeInfo = ({
   currentVersion,
   targetVersion,
   isLoading,
+  availableDataNodes,
+  unavailableDataNodes,
 }: {
   currentVersion: string | undefined;
   targetVersion: string | undefined;
   isLoading: boolean;
+  availableDataNodes: number;
+  unavailableDataNodes: number;
 }) => (
   <InfoList>
     <dt>Current OpenSearch version:</dt>
-    <dd>{isLoading ? <Spinner text="Loading..." /> : currentVersion || 'Unknown'}</dd>
+    <dd>{isLoading ? <Spinner text="Loading..." /> : (currentVersion ?? 'Unknown')}</dd>
     <dt>Target OpenSearch version:</dt>
-    <dd>{isLoading ? <Spinner text="Loading..." /> : targetVersion || 'Unknown'}</dd>
+    <dd>{isLoading ? <Spinner text="Loading..." /> : (targetVersion ?? 'Unknown')}</dd>
+    <dt>Data Nodes:</dt>
+    <dd>
+      {isLoading ? (
+        <Spinner text="Loading..." />
+      ) : (
+        `${availableDataNodes + unavailableDataNodes} (${availableDataNodes} available)`
+      )}
+    </dd>
   </InfoList>
 );
 
