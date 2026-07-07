@@ -16,17 +16,46 @@
  */
 package org.graylog2.periodical;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import oshi.hardware.CentralProcessor;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class CpuLoadGaugeTest {
     @Test
-    void testGauge() {
+    void reportsCpuLoadAfterTwoSamples() {
         final CpuLoadGauge gauge = new CpuLoadGauge();
-        Assertions.assertThat(gauge.getValue()).isNull();
+        // No sample taken yet.
+        assertThat(gauge.getValue()).isNull();
+
+        // The first run only seeds the baseline ticks, so there is nothing to compare against yet.
         gauge.update();
-        Assertions.assertThat(gauge.getValue())
+        assertThat(gauge.getValue()).isNull();
+
+        // The second run has a previous sample to compute the load between.
+        gauge.update();
+        assertThat(gauge.getValue())
                 .isNotNull()
                 .isGreaterThanOrEqualTo(0.0d);
+    }
+
+    @Test
+    void degradesGracefullyWhenNativeAccessFails() {
+        // Simulate a host where OSHI/JNA cannot load its native library (e.g. a 'noexec' data dir),
+        // which surfaces as a LinkageError (NoClassDefFoundError / UnsatisfiedLinkError), not an Exception.
+        final CpuLoadGauge gauge = new CpuLoadGauge() {
+            @Override
+            protected CentralProcessor processor() {
+                throw new NoClassDefFoundError("Could not initialize class oshi.software.os.linux.LinuxOperatingSystemJNA");
+            }
+        };
+
+        // update() must swallow the error rather than propagate it.
+        gauge.update();
+        assertThat(gauge.getValue()).isNull();
+
+        // Once disabled, subsequent runs stay quiet and keep returning null.
+        gauge.update();
+        assertThat(gauge.getValue()).isNull();
     }
 }

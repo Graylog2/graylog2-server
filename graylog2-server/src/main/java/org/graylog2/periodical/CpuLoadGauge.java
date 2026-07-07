@@ -17,13 +17,18 @@
 package org.graylog2.periodical;
 
 import com.codahale.metrics.Gauge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 
 public class CpuLoadGauge implements Gauge<Double> {
 
-    private long[] lastTicks = processor().getSystemCpuLoadTicks();
+    private static final Logger LOG = LoggerFactory.getLogger(CpuLoadGauge.class);
+
+    private long[] lastTicks;
     private Double cpuLoad;
+    private boolean disabled = false;
 
     @Override
     public Double getValue() {
@@ -31,14 +36,35 @@ public class CpuLoadGauge implements Gauge<Double> {
     }
 
     public void update() {
-        final CentralProcessor processor = processor();
-        final long[] newTicks = processor.getSystemCpuLoadTicks();
-        cpuLoad = processor.getSystemCpuLoadBetweenTicks(lastTicks, newTicks) * 100.0d;
-        lastTicks = newTicks;
+        if (disabled) {
+            return;
+        }
+        try {
+            final CentralProcessor processor = processor();
+            final long[] newTicks = processor.getSystemCpuLoadTicks();
+            if (lastTicks == null) {
+                // First run: there is no previous sample to compare against yet, so just seed the baseline.
+                lastTicks = newTicks;
+                return;
+            }
+            cpuLoad = processor.getSystemCpuLoadBetweenTicks(lastTicks, newTicks) * 100.0d;
+            lastTicks = newTicks;
+        } catch (Throwable t) {
+            // NoClassDefFoundError / UnsatisfiedLinkError are Errors (not Exceptions), so we must catch Throwable.
+            // This typically happens when the Graylog data directory - which holds the unpacked JNA native library -
+            // is on a 'noexec' mounted filesystem and OSHI/JNA cannot map its native library. The CPU-load metric is
+            // a nice-to-have and must never prevent the node from running, so we disable it and carry on.
+            disabled = true;
+            cpuLoad = null;
+            LOG.warn("Disabling the system CPU-load metric: unable to read CPU statistics via the OSHI native library. " +
+                    "This usually means the Graylog data directory (which holds the unpacked JNA native library) is on " +
+                    "a 'noexec' mounted filesystem. To enable the metric, point 'jna.tmpdir' at a writable, " +
+                    "exec-capable directory via the JVM options.", t);
+        }
     }
 
-    private static CentralProcessor processor() {
-        SystemInfo si = new SystemInfo();
+    protected CentralProcessor processor() {
+        final SystemInfo si = new SystemInfo();
         return si.getHardware().getProcessor();
     }
 }
