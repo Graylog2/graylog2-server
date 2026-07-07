@@ -34,6 +34,7 @@ import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Mints short-lived in-memory client certificates signed by Graylog's CA and wraps them in an
@@ -63,9 +64,9 @@ public class ClientCertSslContextFactory {
      * lifetime, and returns an {@link SSLContext} configured with that cert for client auth and
      * the platform's configured trust manager for server verification.
      */
-    public SSLContext buildClientCertSslContext(String commonName, Duration certificateLifetime) {
+    public Optional<SSLContext> buildClientCertSslContext(String commonName, Duration certificateLifetime) {
         if (!caKeystore.exists()) {
-            throw new CaKeystoreException("Cannot mint client certificate: no CA configured.");
+            return Optional.empty();
         }
         try {
             final CertRequest certRequest = CertRequest.selfSigned(commonName)
@@ -91,7 +92,7 @@ public class ClientCertSslContextFactory {
             final X509TrustManager trustManager = trustManagerAndSocketFactoryProvider.getTrustManager();
             final SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(kmf.getKeyManagers(), new TrustManager[]{trustManager}, new SecureRandom());
-            return sslContext;
+            return Optional.of(sslContext);
         } catch (CaKeystoreException e) {
             throw e;
         } catch (Exception e) {

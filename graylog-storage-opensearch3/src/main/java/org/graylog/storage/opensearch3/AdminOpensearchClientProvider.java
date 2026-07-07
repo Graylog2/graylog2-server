@@ -35,6 +35,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -106,9 +107,10 @@ public class AdminOpensearchClientProvider {
         }
 
         try {
-            final SSLContext sslContext = sslContextFactory.buildClientCertSslContext(
-                    IndexerAdminCertConstants.ADMIN_CN, CERT_LIFETIME);
-            final OpenSearchTransport newTransport = transportProvider.buildTransport(hosts, TransportConfig.clientCertAuth(sslContext));
+            final OpenSearchTransport newTransport = sslContextFactory.buildClientCertSslContext(IndexerAdminCertConstants.ADMIN_CN, CERT_LIFETIME)
+                    .map(TransportConfig::clientCertAuth)
+                    .map(certAuth -> transportProvider.buildTransport(hosts, certAuth))
+                    .orElse(transportProvider.buildTransport(hosts));
 
             if (cachedClient == null) {
                 this.drainScheduler = createDrainScheduler();
