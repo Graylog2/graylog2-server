@@ -97,15 +97,10 @@ const OpenSearchUpgradeSection = () => {
   const startActionLoadingLabel = 'Starting OpenSearch Rolling Upgrade...';
   const canResumeRollingRestart =
     rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
-  // Outdated indices are only "resolved" when the check succeeded AND returned none — a loading or failing
-  // check means we simply don't know yet.
+  // A loading or failing check means "unknown", not "none".
   const outdatedIndicesConfirmedEmpty = !hasOutdatedIndices && !isLoadingOutdatedIndices && !isOutdatedIndicesError;
-  // An ACTIVE (running/paused) upgrade is always visible — its progress, paused_reason and per-node errors
-  // must never disappear mid-run, and outdated indices legitimately (re)appear during a rolling upgrade as
-  // the live cluster major shifts. Only a TERMINAL job (completed/aborted/failed) yields to outdated
-  // indices: until they are confirmed absent, resolving them is the user's task and a stale result table is
-  // noise. Kept decoupled from the version-overview query so its 5s poll (fetching/error churn) can never
-  // blank the table mid-upgrade.
+  // Active upgrades stay visible (outdated indices legitimately reappear mid-run); terminal results yield
+  // until outdated indices are confirmed absent.
   const showRollingUpgradeStatus =
     !!rollingRestart?.data && (hasActiveRollingRestart || outdatedIndicesConfirmedEmpty);
 
@@ -147,10 +142,8 @@ const OpenSearchUpgradeSection = () => {
     void resumeRollingRestart();
   };
 
-  // Versions look up to date, but that cannot be confirmed while Data Nodes are missing — rendering the
-  // operational panels (outdated indices, upgrade results, start controls) would suggest a certainty we
-  // don't have, and nothing in them is safely actionable anyway. An ACTIVE rolling upgrade is exempt: a
-  // temporarily unavailable node is its normal operating condition and its progress must stay visible.
+  // Versions look equal but can't be confirmed while nodes are down — hide the operational panels.
+  // Active upgrades are exempt: a temporarily missing node is their normal condition.
   const isVersionStateUnconfirmed =
     !isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable && unavailableDataNodeCount > 0;
 

@@ -129,9 +129,8 @@ const resolveAction = (
   return { kind: 'archiving', percent: job?.percent_complete ?? 0 };
 };
 
-// Reconcile tracked actions with reality: drop actions whose index is gone (deleted), and materialize the
-// archived state once a job has finished but its index is still outdated. Returns `current` unchanged
-// (referentially) when there is nothing to do, so callers can use identity to gate state updates.
+// Drop actions whose index is gone, mark actions archived once their job finished but the index remains.
+// Returns `current` referentially unchanged when there is nothing to do.
 const reconcileActions = (
   current: Array<PendingOutdatedIndexAction>,
   outdatedIndexNames: Set<string>,
@@ -181,8 +180,7 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     [trackedActions],
   );
   const hasActiveTrackedActions = activeTrackedActions.length > 0;
-  // One snapshot for archive-capable users catches jobs started elsewhere (other sessions, retention);
-  // continuous polling is reserved for actions this session is actually tracking.
+  // Snapshot for archive-capable users (catches jobs from other sessions); poll only while tracking.
   const {
     jobsById,
     jobsUpdatedAt,
@@ -222,8 +220,7 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     [],
   );
 
-  // Adjust state during render (guarded by referential equality) instead of in an effect: this both avoids
-  // an extra committed render per change and keeps setState out of effects, following
+  // Guarded state adjustment during render instead of an effect:
   // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
   if (!isLoading && !isError) {
     const reconciled = reconcileActions(pendingActions, outdatedIndexNames, { jobsById, jobsUpdatedAt });
@@ -233,16 +230,13 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     }
   }
 
-  // Persisting is a pure external-system sync, which is what effects are for. It also covers additions from
-  // addArchiveDeleteAction, keeping that a plain state update.
+  // External-system sync — the one job effects are for.
   useEffect(() => {
     storeActions(pendingActions);
   }, [pendingActions]);
 
-  // Refresh the outdated indices while actions are in flight so completed ones drop off. A plain interval
-  // instead of react-query's refetchInterval on purpose: the poll flag derives from this hook's own output,
-  // which itself consumes the query's data — feeding it back into useOutdatedIndices would need a state
-  // round-trip through the parent. The interval stops as soon as nothing is actively tracked.
+  // Plain interval on purpose: the poll flag derives from this hook's own output, so react-query's
+  // refetchInterval on the parent-owned query would need a state round-trip.
   useEffect(() => {
     if (!hasActiveTrackedActions) {
       return undefined;

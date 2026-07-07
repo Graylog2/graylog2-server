@@ -213,10 +213,8 @@ const IndicesGroupTable = ({
         <tbody>
           {group.indices.map((index) => {
             const pendingStatus = pendingIndexStatuses.get(index.index_name);
-            // "Archived" from either source: this session's finished job (localStorage) or the durable archive
-            // catalog (archives made in another session / by retention). Both mean the archive exists but the
-            // index is still here. Hidden while a new archive job is running — the actions column shows its
-            // progress instead.
+            // Archived per this session's finished job or the archive catalog; hidden while a new archive
+            // job runs (the actions column shows its progress instead).
             const isArchived =
               pendingStatus?.state !== 'archiving' &&
               (archivedIndexNames.has(index.index_name) || pendingStatus?.state === 'archived');

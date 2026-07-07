@@ -122,9 +122,7 @@ const fetchDataNodeUpgradeStatus = async () =>
   fetchPeriodically<DatanodeUpgradeStatus>('GET', qualifyUrl('/datanodes/upgrade/status'));
 
 const UPGRADE_STATUS_REFETCH_INTERVAL_MS = 5000;
-// Once every node is up to date, replication is on and the cluster is healthy, nothing on the page is
-// mid-change — drop to a slow heartbeat that still catches external changes (e.g. a new outdated node
-// joining) without hammering the endpoint from an idle page.
+// In steady state (all up to date, replication on, healthy) drop to a slow heartbeat.
 const STEADY_STATE_REFETCH_INTERVAL_MS = 30000;
 
 const isSteadyState = (status: DatanodeUpgradeStatus | undefined) =>

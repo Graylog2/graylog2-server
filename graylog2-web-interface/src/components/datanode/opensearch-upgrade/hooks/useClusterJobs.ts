@@ -34,17 +34,11 @@ export type ClusterJobsResult = {
 };
 
 type Options = {
-  /** Fetch at all — one snapshot also catches jobs started by other sessions. */
   enabled: boolean;
-  /** Keep polling — only wanted while something is actively tracked, so the query stays idle otherwise. */
   poll: boolean;
 };
 
-/**
- * Fetches cluster-wide system jobs (archive-and-delete jobs run on the leader node) and returns them keyed
- * by job id. Fetching and polling are gated separately: `enabled` grants the initial snapshot, `poll` the
- * 5s interval — so a mounted-but-idle caller does not keep the endpoint busy.
- */
+/** Cluster-wide system jobs keyed by job id. `enabled` gates fetching, `poll` the 5s interval. */
 const useClusterJobs = ({ enabled, poll }: Options): ClusterJobsResult => {
   const { data, dataUpdatedAt, refetch } = useQuery({
     queryKey: ['opensearch-upgrade', 'cluster-jobs'],

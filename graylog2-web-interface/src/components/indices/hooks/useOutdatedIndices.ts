@@ -28,8 +28,7 @@ export type OutdatedIndex = {
   active_write_index: string | null;
 };
 
-// While the query is in error state, keep retrying gently in the background so a transient backend failure
-// (e.g. a Data Node restarting mid-upgrade) heals without the user having to reload the page.
+// While errored, retry gently in the background so transient failures heal without a reload.
 const ERROR_REFETCH_INTERVAL_MS = 30000;
 
 const useOutdatedIndices = () => {
@@ -40,8 +39,7 @@ const useOutdatedIndices = () => {
     refetch,
   } = useQuery({
     queryKey: ['outdatedIndices'],
-    // No error toast on purpose: the outdated-indices panel and the upgrade section render a persistent,
-    // actionable error state themselves, and the background retries below would turn a toast into spam.
+    // No error toast: the panels render a persistent error state, and background retries would spam toasts.
     queryFn: () => IndexerIndices.getOutdatedIndices() as Promise<Array<OutdatedIndex>>,
     retry: 2,
     refetchInterval: (query) => (query.state.status === 'error' ? ERROR_REFETCH_INTERVAL_MS : false),

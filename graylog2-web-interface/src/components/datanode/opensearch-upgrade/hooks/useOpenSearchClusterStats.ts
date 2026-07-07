@@ -54,8 +54,7 @@ const useOpenSearchClusterStats = () => {
     numberOfDataNodes: availableDataNodeCount,
     unavailableDataNodeCount,
     isUpgradeAvailable: data?.upgrade_available ?? false,
-    // The version overview is computed from node metadata, which cannot be confirmed for a Data Node that
-    // is down or still starting — "up to date" is only claimed once every node is also AVAILABLE.
+    // "Up to date" requires every node AVAILABLE — a down node's version metadata can't be trusted.
     isUpToDate: data
       ? !data.upgrade_available && data.up_to_date_count === data.nodes.length && unavailableDataNodeCount === 0
       : false,

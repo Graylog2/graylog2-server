@@ -346,11 +346,8 @@ describe('OutdatedIndicesTable', () => {
   });
 
   it('shows an archived-already badge when the job finished but the index is still outdated', async () => {
-    // The archive completed but the delete step did not remove the index (skipped or failed on the backend),
-    // so it stays outdated. Note: active write indices only offer rotate in this UI, but the backend can
-    // still skip deletes for other reasons, and archives can be created outside this page (Archives page,
-    // retention, API). It must not offer archiving the same index again, but it should still offer a plain
-    // delete so the skipped cleanup can be finished.
+    // Archive finished but the delete didn't remove the index (backend skip/failure, or archived outside
+    // this page) — never offer re-archiving, but keep a plain delete to finish the cleanup.
     storePendingArchive('graylog_0', 'job-1');
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: JOBS_POLLED_AFTER_ACTION });
     mockOutdatedIndices({ data: [graylogIndex] });
