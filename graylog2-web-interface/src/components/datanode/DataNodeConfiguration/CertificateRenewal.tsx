@@ -38,8 +38,8 @@ import DataNodeBadge from '../DataNodeList/DataNodeBadge';
 const StyledList = styled(ListGroup)`
   max-width: fit-content;
 
-  .list-group-item {
-    display: flex;
+  li > div,
+  li > a {
     justify-content: space-between;
   }
 `;
