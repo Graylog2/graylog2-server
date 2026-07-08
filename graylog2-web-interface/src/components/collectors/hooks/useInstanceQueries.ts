@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { hashKey, useQuery } from '@tanstack/react-query';
 
 import { Collectors } from '@graylog/server-api';
 
@@ -56,6 +56,26 @@ const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
   };
 };
 
+// The instances table refetches both on user interaction and on a fixed interval, but react-query
+// doesn't tell the query function what triggered a fetch. We infer it instead: interactions
+// (paging, sorting, filtering, searching) always change the search params, while an interval
+// refresh repeats the previous ones — so a repeated-params fetch is a background refresh and must
+// not keep the session alive, whereas a user actively working with the table extends it as usual.
+//
+// Caveat:
+// - Returning to the page via SPA navigation with unchanged params looks like a background refresh
+//   (this module-level state outlives the component). The page's sibling queries (fleets, config)
+//   don't opt out of session extension, so the navigation still extends the session through them.
+let lastFetchedParamsHash: string | null = null;
+
+const isBackgroundRefresh = (searchParams: SearchParams): boolean => {
+  const paramsHash = hashKey(instancesKeyFn(searchParams));
+  const isRepeatedFetch = paramsHash === lastFetchedParamsHash;
+  lastFetchedParamsHash = paramsHash;
+
+  return isRepeatedFetch;
+};
+
 export const fetchPaginatedInstances = async (
   searchParams: SearchParams,
 ): Promise<PaginatedResponse<CollectorInstanceView>> =>
@@ -67,7 +87,7 @@ export const fetchPaginatedInstances = async (
       FiltersForQueryParams(searchParams.filters),
       searchParams.sort?.attributeId as 'instance_uid' | 'last_seen',
       searchParams.sort?.direction,
-      { requestShouldExtendSession: false },
+      { requestShouldExtendSession: !isBackgroundRefresh(searchParams) },
     ).then((response) => ({
       list: response.elements.map(toView),
       pagination: response.pagination,
