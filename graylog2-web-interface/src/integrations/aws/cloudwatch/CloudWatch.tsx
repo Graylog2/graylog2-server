@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Wizard from 'components/common/Wizard';
 import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
@@ -43,7 +43,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
   const { availableStreams } = useContext(ApiContext);
   const { sidebar, clearSidebar } = useContext(SidebarContext);
   // const history = useHistory();
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const handleStepChange = (nextStep) => {
     setCurrentStep(nextStep);
@@ -79,7 +79,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
         onSubmit(maybeFormData);
       } else {
         // history.push(Routes.SYSTEM.INPUTS);
-        navigate(Routes.SYSTEM.INPUTS);
+        push(Routes.SYSTEM.INPUTS);
       }
     };
 
@@ -130,7 +130,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
     currentStep,
     setEnabledStep,
     onSubmit,
-    navigate,
+    push,
   ]);
 
   useEffect(() => {

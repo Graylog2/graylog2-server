@@ -178,6 +178,11 @@ export default [
               message: 'Please use `routing/useLocation` instead.',
             },
             {
+              name: 'react-router-dom',
+              importNames: ['useNavigate'],
+              message: 'Please use `routing/useHistory` instead.',
+            },
+            {
               name: 'create-react-class',
               message: 'Please use an ES6 or functional component instead.',
             },
