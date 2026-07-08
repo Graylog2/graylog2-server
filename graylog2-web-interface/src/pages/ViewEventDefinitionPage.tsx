@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
@@ -52,7 +52,6 @@ const ViewEventDefinitionPage = () => {
   const notifications = notificationsData?.notifications;
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
-  const navigate = useNavigate();
   const [showSigmaModal, setShowSigmaModal] = useState(false);
 
   const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
@@ -94,7 +93,7 @@ const ViewEventDefinitionPage = () => {
     copyEventDefinition(eventDefinition).then(
       (duplicatedEvent) => {
         queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
-        navigate(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
+        history.push(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
       },
       () => {
         // Error feedback is handled by `copyEventDefinition` itself.
@@ -102,7 +101,7 @@ const ViewEventDefinitionPage = () => {
     );
   };
 
-  const onEditEventDefinition = () => navigate(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
+  const onEditEventDefinition = () => history.push(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
 
   const onSigmaModalClose = () => {
     queryClient.invalidateQueries({ queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, params.definitionId] });
