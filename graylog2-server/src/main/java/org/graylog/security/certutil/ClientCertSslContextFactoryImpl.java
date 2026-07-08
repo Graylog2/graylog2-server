@@ -36,13 +36,15 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 /**
  * Mints short-lived in-memory client certificates signed by Graylog's CA and wraps them in an
  * {@link SSLContext} ready for use with HTTPS clients that require certificate-based
  * authentication. The certificate, its private key, and all derived material live only in
  * memory for the duration of the returned context.
  *
- * <p>Requires a configured CA. Calls fail with {@link CaKeystoreException} if no CA is present.
+ * <p>Requires a configured CA. Returns {@link Optional#empty()} if no CA is present.
  */
 @Singleton
 public class ClientCertSslContextFactoryImpl implements ClientCertSslContextFactory {
@@ -64,6 +66,7 @@ public class ClientCertSslContextFactoryImpl implements ClientCertSslContextFact
      * lifetime, and returns an {@link SSLContext} configured with that cert for client auth and
      * the platform's configured trust manager for server verification.
      */
+    @Override
     public Optional<SSLContext> buildClientCertSslContext(String commonName, Duration certificateLifetime) {
         if (!caKeystore.exists()) {
             return Optional.empty();
@@ -96,7 +99,7 @@ public class ClientCertSslContextFactoryImpl implements ClientCertSslContextFact
         } catch (CaKeystoreException e) {
             throw e;
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to build client-cert SSL context for CN=" + commonName, e);
+            throw new IllegalStateException(f("Failed to build client-cert SSL context for CN=%s", commonName), e);
         }
     }
 }
