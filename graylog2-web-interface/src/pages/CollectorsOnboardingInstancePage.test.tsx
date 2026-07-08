@@ -15,12 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { type Location } from 'react-router-dom';
 
 import asMock from 'helpers/mocking/AsMock';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
 import type { CollectorInstanceView } from 'components/collectors/types';
+import collectorReceivedMessagesUrl from 'components/collectors/common/collectorReceivedMessagesUrl';
+import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
+import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
+import mockHistory from 'helpers/mocking/mockHistory';
+import useHistory from 'routing/useHistory';
+import useLocation from 'routing/useLocation';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
 
@@ -56,17 +63,16 @@ jest.mock(
     },
 );
 
-const mockUseLocation = jest.fn();
-
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ instanceUid: 'uid-42' }),
 }));
 
-jest.mock('routing/useLocation', () => ({
-  __esModule: true,
-  default: () => mockUseLocation(),
-}));
+jest.mock('views/hooks/useDefaultIntervalForRefresh');
+
+jest.mock('routing/useHistory');
+
+jest.mock('routing/useLocation');
 
 const instance = {
   id: 'uid-42',
@@ -78,6 +84,8 @@ const instance = {
 } as CollectorInstanceView;
 
 describe('CollectorsOnboardingInstancePage', () => {
+  const history = mockHistory();
+
   const mockInstanceLookup = (
     overrides: { data?: CollectorInstanceView | null; isLoading?: boolean; error?: Error | null } = {},
   ) =>
@@ -85,41 +93,18 @@ describe('CollectorsOnboardingInstancePage', () => {
       data: instance,
       isLoading: false,
       error: null,
+      isError: false,
       ...overrides,
-    } as ReturnType<typeof useInstance>);
+    });
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockUseLocation.mockReturnValue({ state: null });
+    asMock(useHistory).mockReturnValue(history);
+    asMock(useLocation).mockReturnValue({ state: null } as Location);
     mockInstanceLookup();
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);
-  });
-
-  it('renders the connection result for the instance', () => {
-    render(<CollectorsOnboardingInstancePage />);
-
-    expect(useInstance).toHaveBeenCalledWith('uid-42');
-    expect(screen.getByText('Collector connected')).toBeInTheDocument();
-    expect(screen.getByText('web-prod-01')).toBeInTheDocument();
-    expect(screen.getByText('Default Fleet')).toBeInTheDocument();
-  });
-
-  it('passes the platform from router location state', () => {
-    mockUseLocation.mockReturnValue({ state: { platformId: 'linux' } });
-
-    render(<CollectorsOnboardingInstancePage />);
-
-    expect(screen.getByTestId('platform-id')).toHaveTextContent('linux');
-  });
-
-  it('falls back to the fleet name from location state while the fleet loads', () => {
-    mockUseLocation.mockReturnValue({ state: { fleetName: 'Fresh Fleet' } });
-    asMock(useFleet).mockReturnValue({ data: undefined } as ReturnType<typeof useFleet>);
-
-    render(<CollectorsOnboardingInstancePage />);
-
-    expect(screen.getByText('Fresh Fleet')).toBeInTheDocument();
+    asMock(useDefaultInterval).mockReturnValue(null);
   });
 
   it('shows a spinner while loading', () => {
@@ -140,6 +125,26 @@ describe('CollectorsOnboardingInstancePage', () => {
       'href',
       expect.stringContaining('/system/collectors/instances'),
     );
+  });
+
+  it('navigates to the search page once the instance and default interval are both available', async () => {
+    asMock(useDefaultInterval).mockReturnValue('PT5S');
+
+    render(<CollectorsOnboardingInstancePage />);
+
+    await waitFor(() => {
+      expect(history.push).toHaveBeenCalledWith(
+        collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, 'PT5S'),
+      );
+    });
+  });
+
+  it('does not navigate before the default interval has loaded', () => {
+    asMock(useDefaultInterval).mockReturnValue(null);
+
+    render(<CollectorsOnboardingInstancePage />);
+
+    expect(history.push).not.toHaveBeenCalled();
   });
 
   it('surfaces a fetch error', () => {
