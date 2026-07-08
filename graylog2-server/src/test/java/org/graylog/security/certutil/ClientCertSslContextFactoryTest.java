@@ -60,8 +60,7 @@ class ClientCertSslContextFactoryTest {
         final CaKeystore caKeystore = mock(CaKeystore.class);
         when(caKeystore.exists()).thenReturn(false);
 
-        final ClientCertSslContextFactory factory =
-                new ClientCertSslContextFactory(caKeystore, trustManagerAndSocketFactoryProvider);
+        final ClientCertSslContextFactory factory = new ClientCertSslContextFactoryImpl(caKeystore, trustManagerAndSocketFactoryProvider);
 
         Assertions.assertThat(factory.buildClientCertSslContext("anyone", Duration.ofMinutes(1)))
                 .isEmpty();
@@ -70,8 +69,7 @@ class ClientCertSslContextFactoryTest {
     @Test
     void mintsCertWithRequestedCommonName() {
         final CaKeystore caKeystore = signingCaKeystore();
-        final ClientCertSslContextFactory factory =
-                new ClientCertSslContextFactory(caKeystore, trustManagerAndSocketFactoryProvider);
+        final ClientCertSslContextFactory factory = new ClientCertSslContextFactoryImpl(caKeystore, trustManagerAndSocketFactoryProvider);
 
         factory.buildClientCertSslContext("graylog-admin", Duration.ofMinutes(15));
 
@@ -83,8 +81,7 @@ class ClientCertSslContextFactoryTest {
 
     @Test
     void returnsUsableSslContext() {
-        final ClientCertSslContextFactory factory =
-                new ClientCertSslContextFactory(signingCaKeystore(), trustManagerAndSocketFactoryProvider);
+        final ClientCertSslContextFactory factory = new ClientCertSslContextFactoryImpl(signingCaKeystore(), trustManagerAndSocketFactoryProvider);
 
         final Optional<SSLContext> sslContext = factory.buildClientCertSslContext("graylog-admin", Duration.ofMinutes(15));
 
