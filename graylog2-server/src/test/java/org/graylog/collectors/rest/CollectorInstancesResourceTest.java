@@ -18,11 +18,13 @@ package org.graylog.collectors.rest;
 
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
+import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
+import org.graylog.collectors.PendingChangesLookup;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
@@ -30,7 +32,9 @@ import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,15 +47,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -183,6 +190,36 @@ class CollectorInstancesResourceTest {
                 .isInstanceOf(ForbiddenException.class);
 
         verify(txnLogService, never()).getUnprocessedMarkers(any(), any(), anyLong());
+    }
+
+    @Test
+    void findInstancesSharesOneSnapshotBetweenPendingChangesFilterAndFlags() {
+        stubOfflineThreshold();
+        // Fleet marker with seq 7: uid-1 (processed up to 5) is pending, uid-2 (processed up to 7) is in sync.
+        final var lookup = new PendingChangesLookup(Map.of("fleet-1", 7L), Map.of("uid-9", 3L));
+        // Any further lookup would observe a drifted (here: emptied) transaction log. A buggy second
+        // fetch therefore computes flags that contradict the filter, tripping the assertions below.
+        final var driftedLookup = new PendingChangesLookup(Map.of(), Map.of());
+        when(txnLogService.pendingChangesLookup()).thenReturn(lookup, driftedLookup);
+        when(collectorInstanceService.findPaginated(any(), any(), anyInt(), anyInt(), any()))
+                .thenReturn(new PaginatedList<>(
+                        List.of(instance("uid-1", "fleet-1", 5L), instance("uid-2", "fleet-1", 7L)), 2, 1, 50));
+
+        final var response = resource.findInstances(
+                1, 50, "", List.of("has_pending_changes:true"), "last_seen", SortOrder.DESCENDING);
+
+        // The Mongo filter must be derived from the first snapshot ...
+        final ArgumentCaptor<Bson> dbQuery = ArgumentCaptor.forClass(Bson.class);
+        verify(collectorInstanceService).findPaginated(dbQuery.capture(), any(), anyInt(), anyInt(), any());
+        final var expectedFilter = CollectorInstanceService.hasPendingChangesFilter(lookup).toBsonDocument().toJson();
+        assertThat(dbQuery.getValue().toBsonDocument().toJson()).contains(expectedFilter);
+
+        // ... and so must the flags on the returned rows.
+        assertThat(response.elements())
+                .extracting(CollectorInstanceResponse::hasPendingChanges)
+                .containsExactly(true, false);
+
+        verify(txnLogService, times(1)).pendingChangesLookup();
     }
 
     @Test
