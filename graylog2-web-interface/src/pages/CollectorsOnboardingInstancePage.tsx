@@ -29,6 +29,7 @@ import Routes from 'routing/Routes';
 import { extractErrorMessage } from 'util/extractErrorMessage';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import useHistory from 'routing/useHistory';
+import UserNotification from 'util/UserNotification';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
@@ -41,6 +42,7 @@ const CollectorsOnboardingInstancePage = () => {
   useEffect(() => {
     if (instance && defaultInterval) {
       history.push(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
+      UserNotification.success('Collector connected successfully! Showing received messages ...');
     }
   }, [defaultInterval, instance, history]);
 
