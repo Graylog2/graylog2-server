@@ -104,6 +104,7 @@ const SearchButton = ({
       className={className}
       type="submit"
       bsStyle="primary"
+      showOverflow
       $dirty={dirty && !displaySpinner}>
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>

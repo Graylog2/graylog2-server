@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -28,13 +28,13 @@ import Routes from 'routing/Routes';
 
 const ClusterConfigurationPage = () => {
   const currentUser = useCurrentUser();
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   useEffect(() => {
     if (!isPermitted(currentUser.permissions, 'clusterconfiguration:read')) {
-      navigate(Routes.NOTFOUND);
+      push(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, navigate]);
+  }, [currentUser.permissions, push]);
 
   return (
     <DocumentTitle title="Cluster Configuration">
