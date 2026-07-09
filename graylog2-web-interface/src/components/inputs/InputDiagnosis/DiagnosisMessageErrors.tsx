@@ -44,7 +44,6 @@ const StyledListGroup = styled(ListGroup)(
 );
 
 const StyledListGroupItem = styled(ListGroupItem)`
-  background-color: transparent;
   display: flex;
 `;
 
