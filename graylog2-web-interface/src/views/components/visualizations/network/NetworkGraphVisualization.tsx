@@ -59,6 +59,10 @@ type SimLink = { source: number | SimNode; target: number | SimNode };
 
 const LAYOUT_ITERATIONS = 500;
 const NODE_RADIUS = 75;
+// Number of invisible hit-target markers sampled along each edge so the whole edge is clickable.
+// Plotly click detection is point-based, and an edge's only real data points are its endpoints
+// (which coincide with node markers), so without these an edge line is not clickable.
+const EDGE_HIT_SAMPLES = 9;
 // Edge weight is encoded through the colorscale, not thickness, so every edge shares one width.
 const EDGE_WIDTH = 2;
 
@@ -133,6 +137,17 @@ type EdgeTrace = {
   line: { width: number; color: string };
   // Both endpoints carry the same edge metadata so plotly attaches it wherever
   // the user clicks along the segment.
+  customdata: Array<EdgeCustomData>;
+  hoverinfo: 'none';
+  showlegend: false;
+};
+
+type HitTrace = {
+  type: 'scatter';
+  mode: 'markers';
+  x: Array<number>;
+  y: Array<number>;
+  marker: { size: number; opacity: number; color: string };
   customdata: Array<EdgeCustomData>;
   hoverinfo: 'none';
   showlegend: false;
@@ -230,7 +245,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
     (config.visualizationConfig as NetworkVisualizationConfig) ?? NetworkVisualizationConfig.empty();
 
   const plot = useMemo<{
-    traces: [...Array<EdgeTrace>, NodeTrace];
+    traces: [...Array<EdgeTrace>, HitTrace, NodeTrace];
     xs: Array<number>;
     ys: Array<number>;
   } | null>(() => {
@@ -261,6 +276,11 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
     // Plotly's `line.color` is per-trace, so each edge is its own two-point line trace to let its
     // color track the metric value.
     const edgeTraces: Array<EdgeTrace> = [];
+    // Invisible hit-target markers sampled along every edge, collected into one trace, so clicks
+    // anywhere along an edge are detectable (see EDGE_HIT_SAMPLES).
+    const hitX: Array<number> = [];
+    const hitY: Array<number> = [];
+    const hitCustomData: Array<EdgeCustomData> = [];
     edges.forEach((edge) => {
       const s = positions[edge.source];
       const t = positions[edge.target];
@@ -294,9 +314,30 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
         hoverinfo: 'none',
         showlegend: false,
       });
+
+      // Sample interior points along the edge (excluding endpoints, which sit on the nodes) so a
+      // click anywhere along the edge lands on a hit-detectable marker carrying the edge metadata.
+      for (let i = 1; i <= EDGE_HIT_SAMPLES; i += 1) {
+        const f = i / (EDGE_HIT_SAMPLES + 1);
+        hitX.push(s.x + f * (t.x - s.x));
+        hitY.push(s.y + f * (t.y - s.y));
+        hitCustomData.push(cd);
+      }
     });
 
     const textColor = theme.colors.text.primary;
+
+    const hitTrace: HitTrace = {
+      type: 'scatter',
+      mode: 'markers',
+      x: hitX,
+      y: hitY,
+      // Invisible (opacity 0) but still rendered as points, so they remain hit-detectable.
+      marker: { size: 10, opacity: 0, color: theme.colors.text.secondary },
+      customdata: hitCustomData,
+      hoverinfo: 'none',
+      showlegend: false,
+    };
 
     const displayLabels = nodes.map((n) => String(mapKeys(n.value, n.field) ?? n.label));
 
@@ -336,7 +377,7 @@ const NetworkGraphVisualization = makeVisualization(({ config, data, height, wid
       showlegend: false,
     };
 
-    return { traces: [...edgeTraces, nodeTrace], xs, ys };
+    return { traces: [...edgeTraces, hitTrace, nodeTrace], xs, ys };
   }, [config, mapKeys, rows, theme, visualizationConfig]);
 
   const layout = useMemo(() => buildLayout(width, height, plot), [width, height, plot]);

@@ -1,0 +1,4 @@
+type = "added"
+message = "Added support for providing an External ID when assuming AWS IAM roles for the CloudTrail and Kinesis/CloudWatch inputs."
+
+pulls = ["26077"]
