@@ -219,39 +219,37 @@ describe('OpenSearchUpgradeSection', () => {
     expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
-  it('keeps an active rolling upgrade visible even while outdated indices remain', () => {
+  it('hides outdated indices and keeps an active rolling upgrade visible even while outdated indices remain', () => {
     // Outdated indices legitimately (re)appear mid-upgrade as the cluster major shifts — the progress of a
-    // running/paused upgrade must never disappear because of them.
+    // running/paused upgrade must never disappear because of them, but users must not act on the list mid-run.
     mockOutdatedIndices([{ index_name: 'graylog_0' }]);
     mockRollingRestart({ data: pausedJob() });
     render(<OpenSearchUpgradeSection />);
 
+    expect(screen.queryByText('outdated-indices-stub')).not.toBeInTheDocument();
+    expect(screen.queryByText(/resolve all outdated indices first/i)).not.toBeInTheDocument();
     expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
-  it('hides a finished rolling-upgrade status while outdated indices remain', () => {
+  it('hides outdated indices and keeps the status visible for a finished (terminal) rolling upgrade', () => {
+    // A finished upgrade (COMPLETED/ABORTED/FAILED) still owns the section: its outcome stays visible and the
+    // outdated-indices workflow is hidden, regardless of whether outdated indices remain.
     mockOutdatedIndices([{ index_name: 'graylog_0' }]);
     mockRollingRestart({ data: failedJob() });
     render(<OpenSearchUpgradeSection />);
 
-    expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
+    expect(screen.queryByText('outdated-indices-stub')).not.toBeInTheDocument();
+    expect(screen.queryByText(/resolve all outdated indices first/i)).not.toBeInTheDocument();
+    expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
-  it('hides a finished rolling-upgrade status while outdated indices are still being checked', () => {
+  it('keeps a finished rolling-upgrade status visible independent of the outdated indices check', () => {
+    // The finished result must not blank out while the outdated-indices list is still loading or failing.
     mockOutdatedIndices([], { isLoading: true });
     mockRollingRestart({ data: failedJob() });
     render(<OpenSearchUpgradeSection />);
 
-    expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
-  });
-
-  it('hides a finished rolling-upgrade status while the outdated indices check is failing', () => {
-    // A failing check means the list is unknown, not empty — the stale result table must not imply otherwise.
-    mockOutdatedIndices([], { isError: true });
-    mockRollingRestart({ data: failedJob() });
-    render(<OpenSearchUpgradeSection />);
-
-    expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
+    expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
   it('keeps an active rolling upgrade visible while the outdated indices check is failing', () => {

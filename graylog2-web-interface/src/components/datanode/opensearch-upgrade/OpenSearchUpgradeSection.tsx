@@ -81,6 +81,9 @@ const OpenSearchUpgradeSection = () => {
   const hasOutdatedIndices = outdatedIndices.length > 0;
   const rollingRestartState = rollingRestart?.data?.sm_state;
   const hasActiveRollingRestart = isRollingRestartActive(rollingRestart);
+  // A job (running or finished) owns the section: hide the outdated-indices list, show its status panel.
+  const hasRollingRestartJob = !!rollingRestart?.data;
+  const showOutdatedIndices = !hasRollingRestartJob;
   const showStartAction = !hasActiveRollingRestart && isUpgradeAvailable;
   // Only the initial load counts as "checking" — background refetches (the 5s poll) must not blank the status
   // table or flip the start button, otherwise the whole section flickers on every poll.
@@ -97,12 +100,8 @@ const OpenSearchUpgradeSection = () => {
   const startActionLoadingLabel = 'Starting OpenSearch Rolling Upgrade...';
   const canResumeRollingRestart =
     rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
-  // A loading or failing check means "unknown", not "none".
-  const outdatedIndicesConfirmedEmpty = !hasOutdatedIndices && !isLoadingOutdatedIndices && !isOutdatedIndicesError;
-  // Active upgrades stay visible (outdated indices legitimately reappear mid-run); terminal results yield
-  // until outdated indices are confirmed absent.
-  const showRollingUpgradeStatus =
-    !!rollingRestart?.data && (hasActiveRollingRestart || outdatedIndicesConfirmedEmpty);
+  // Not gated on indices, so a finished FAILED/ABORTED run keeps showing its outcome.
+  const showRollingUpgradeStatus = hasRollingRestartJob;
 
   useEffect(() => {
     if (isRollingRestartTerminalState(rollingRestartState)) {
@@ -178,11 +177,13 @@ const OpenSearchUpgradeSection = () => {
         unavailableDataNodes={unavailableDataNodeCount}
       />
 
-      <Row>
-        <Col xs={12}>
-          <OutdatedIndicesTable />
-        </Col>
-      </Row>
+      {showOutdatedIndices && (
+        <Row>
+          <Col xs={12}>
+            <OutdatedIndicesTable />
+          </Col>
+        </Row>
+      )}
 
       <Row>
         <Col xs={12}>
@@ -202,7 +203,9 @@ const OpenSearchUpgradeSection = () => {
               </Button>
             )}
           </ButtonToolbar>
-          {hasOutdatedIndices && <DisabledHint>Resolve all outdated indices first.</DisabledHint>}
+          {showOutdatedIndices && hasOutdatedIndices && (
+            <DisabledHint>Resolve all outdated indices first.</DisabledHint>
+          )}
           {!hasActiveRollingRestart && isVersionOverviewError && (
             <DisabledHint>Could not check OpenSearch upgrade availability.</DisabledHint>
           )}
