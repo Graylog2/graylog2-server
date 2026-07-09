@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.tools;
 
+import jakarta.ws.rs.BadRequestException;
 import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
 import org.graylog2.rest.models.tools.responses.RegexValidationResponse;
@@ -25,11 +26,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import jakarta.ws.rs.BadRequestException;
-
+import java.time.Clock;
 import java.util.Collections;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RegexTesterResourceTest {
     @Rule
@@ -43,7 +43,7 @@ public class RegexTesterResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        resource = new RegexTesterResource();
+        resource = new RegexTesterResource(new SafePattern(Clock.systemUTC()));
     }
 
     @Test
