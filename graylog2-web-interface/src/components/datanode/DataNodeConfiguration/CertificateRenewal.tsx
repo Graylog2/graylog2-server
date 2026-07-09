@@ -40,6 +40,7 @@ const StyledList = styled(ListGroup)`
 
   li > div,
   li > a {
+    display: flex;
     justify-content: space-between;
   }
 `;

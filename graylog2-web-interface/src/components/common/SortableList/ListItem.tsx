@@ -39,6 +39,7 @@ const StyledListGroupItem = styled(ListGroupItem)<{
   $alignItemContent: 'flex-start' | 'center';
 }>(
   ({ $alignItemContent }) => css`
+    display: flex;
     align-items: ${$alignItemContent};
   `,
 );

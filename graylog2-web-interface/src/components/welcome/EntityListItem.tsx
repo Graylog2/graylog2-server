@@ -27,6 +27,7 @@ import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
 const StyledListGroupItem = styled(ListGroupItem)`
+  display: flex;
   gap: 16px;
   align-items: flex-start;
 `;

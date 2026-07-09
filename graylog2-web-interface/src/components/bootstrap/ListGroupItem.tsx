@@ -35,7 +35,6 @@ const StyledItem = styled.li(
 
 const InnerContainer = styled.div<StyledProps>(
   ({ theme, $active, $disabled, $bsStyle, $isInteractive }) => css`
-    display: flex;
     padding: 5px 10px;
     background-color: ${theme.colors.global.contentBackground};
     line-height: 1.25;

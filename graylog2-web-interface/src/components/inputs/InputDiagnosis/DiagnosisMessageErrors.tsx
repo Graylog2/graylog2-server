@@ -43,6 +43,10 @@ const StyledListGroup = styled(ListGroup)(
   `,
 );
 
+const StyledListGroupItem = styled(ListGroupItem)`
+  display: flex;
+`;
+
 const StyledTitle = styled.p(
   ({ theme }) => css`
     font-weight: bold;
@@ -97,30 +101,30 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
         Cluster. Click on a category to view the associated messages.
       </StyledP>
       <StyledListGroup>
-        <ListGroupItem>
+        <StyledListGroupItem>
           <StyledTitle>
             <LinkCompoment failureType="input" inputId={inputId}>
               Message Error at Input:
             </LinkCompoment>
           </StyledTitle>
           {messageErrors.failures_inputs_codecs}
-        </ListGroupItem>
-        <ListGroupItem>
+        </StyledListGroupItem>
+        <StyledListGroupItem>
           <StyledTitle>
             <LinkCompoment failureType="processing" inputId={inputId}>
               Message failed to process:
             </LinkCompoment>
           </StyledTitle>
           {messageErrors.failures_processing}
-        </ListGroupItem>
-        <ListGroupItem>
+        </StyledListGroupItem>
+        <StyledListGroupItem>
           <StyledTitle>
             <LinkCompoment failureType="indexing" inputId={inputId}>
               Message failed to index:
             </LinkCompoment>
           </StyledTitle>
           {messageErrors.failures_indexing}
-        </ListGroupItem>
+        </StyledListGroupItem>
       </StyledListGroup>
     </Section>
   );
