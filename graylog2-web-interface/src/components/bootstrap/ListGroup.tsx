@@ -24,6 +24,7 @@ const StyledList = styled.ul`
 `;
 
 type Props = {
+  'aria-label'?: string;
   bsClass?: string;
   children?: React.ReactNode;
   className?: string;
@@ -33,6 +34,7 @@ type Props = {
 };
 
 const ListGroup = ({
+  'aria-label': ariaLabel = undefined,
   bsClass = undefined,
   children = undefined,
   className = undefined,
@@ -40,7 +42,7 @@ const ListGroup = ({
   'data-testid': dataTestId = undefined,
   style = undefined,
 }: Props) => (
-  <StyledList as={componentClass} className={`${className ?? ''} ${bsClass ?? ''}`} style={style} data-testid={dataTestId}>
+  <StyledList as={componentClass} aria-label={ariaLabel} className={`${className ?? ''} ${bsClass ?? ''}`} style={style} data-testid={dataTestId}>
     {children}
   </StyledList>
 );
