@@ -18,7 +18,14 @@ import uniq from 'lodash/uniq';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
-import { escape, addToQuery, formatTimestamp, predicate, concatQueryStrings } from 'views/logic/queries/QueryHelper';
+import {
+  escape,
+  addToQuery,
+  formatTimestamp,
+  predicate,
+  concatQueryStrings,
+  edgeClause,
+} from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
@@ -64,13 +71,24 @@ const AddToQueryHandler =
         : [{ field, value, type }],
     );
 
-    const newQuery =
-      multipleValues && contexts?.valuePathOperator === 'OR'
-        ? addToQuery(oldQuery, orClause(valuesToAdd))
-        : valuesToAdd.reduce(
-            (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value, valueToAdd.type),
-            oldQuery,
-          );
+    let newQuery: string;
+
+    if (multipleValues && contexts?.valuePathOperator === 'EDGE') {
+      newQuery = addToQuery(
+        oldQuery,
+        edgeClause(
+          { field: valuesToAdd[0].field, value: valuesToAdd[0].value },
+          { field: valuesToAdd[1].field, value: valuesToAdd[1].value },
+        ),
+      );
+    } else if (multipleValues && contexts?.valuePathOperator === 'OR') {
+      newQuery = addToQuery(oldQuery, orClause(valuesToAdd));
+    } else {
+      newQuery = valuesToAdd.reduce(
+        (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value, valueToAdd.type),
+        oldQuery,
+      );
+    }
 
     await recordQueryStringUsage(newQuery, oldQuery);
 

@@ -20,15 +20,20 @@ import { CollectorsActivity } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
+import useCollectorRefetchInterval from './useCollectorRefetchInterval';
+
 import type { RecentActivityResponse } from '../types';
 
 export const ACTIVITY_KEY = ['collectors', 'activity', 'recent'];
 
 const fetchRecentActivity = (): Promise<RecentActivityResponse> =>
-  CollectorsActivity.recent() as Promise<RecentActivityResponse>;
+  // The activity feed auto-refreshes; don't let its polling keep idle sessions alive.
+  CollectorsActivity.recent({ requestShouldExtendSession: false }) as Promise<RecentActivityResponse>;
 
-export const useRecentActivity = (): { data: RecentActivityResponse | undefined; isLoading: boolean } =>
-  useQuery<RecentActivityResponse>({
+export const useRecentActivity = (): { data: RecentActivityResponse | undefined; isLoading: boolean } => {
+  const refetchInterval = useCollectorRefetchInterval();
+
+  return useQuery<RecentActivityResponse>({
     queryKey: ACTIVITY_KEY,
     queryFn: () =>
       defaultOnError(
@@ -36,5 +41,6 @@ export const useRecentActivity = (): { data: RecentActivityResponse | undefined;
         'Loading recent activity failed with status',
         'Could not load recent activity',
       ),
-    refetchInterval: 30000,
+    refetchInterval,
   });
+};
