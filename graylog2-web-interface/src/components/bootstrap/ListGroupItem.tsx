@@ -126,6 +126,31 @@ const InnerContainer = styled.div<StyledProps>(
   `,
 );
 
+type ItemBodyProps = StyledProps & {
+  children: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+  href?: string;
+  onClick?: () => void;
+  onKeyDown?: React.KeyboardEventHandler;
+};
+
+const ItemBody = ({ href = undefined, disabled = undefined, onClick = undefined, onKeyDown = undefined, children, ...styledProps }: ItemBodyProps) => {
+  if (href) {
+    return <InnerContainer as="a" href={href} {...styledProps}>{children}</InnerContainer>;
+  }
+
+  if (onClick) {
+    return (
+      <InnerContainer as="button" type="button" disabled={disabled} onClick={onClick} onKeyDown={onKeyDown} {...styledProps}>
+        {children}
+      </InnerContainer>
+    );
+  }
+
+  return <InnerContainer {...styledProps}>{children}</InnerContainer>;
+};
+
 type Props = React.PropsWithChildren<{
   id?: string;
   active?: boolean;
@@ -153,9 +178,7 @@ const ListGroupItem = (
   }: Props,
   ref: React.ForwardedRef<HTMLLIElement>,
 ) => {
-  const isLink = !!href;
-  const isButton = !!onClick && !href;
-  const isInteractive = isLink || isButton;
+  const isInteractive = !!(onClick || href);
 
   const content = (
     <>
@@ -164,35 +187,20 @@ const ListGroupItem = (
     </>
   );
 
-  const sharedInnerProps = {
-    className,
-    $active: active,
-    $disabled: disabled,
-    $bsStyle: bsStyle,
-    $isInteractive: isInteractive,
-  };
-
   return (
     <StyledItem ref={ref} id={id}>
-      {isLink ? (
-        <InnerContainer as="a" href={href} {...sharedInnerProps}>
-          {content}
-        </InnerContainer>
-      ) : isButton ? (
-        <InnerContainer
-          as="button"
-          type="button"
-          disabled={disabled}
-          {...sharedInnerProps}
-          onClick={onClick}
-          onKeyDown={onKeyDown}>
-          {content}
-        </InnerContainer>
-      ) : (
-        <InnerContainer {...sharedInnerProps}>
-          {content}
-        </InnerContainer>
-      )}
+      <ItemBody
+        href={href}
+        disabled={disabled}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        className={className}
+        $active={active}
+        $disabled={disabled}
+        $bsStyle={bsStyle}
+        $isInteractive={isInteractive}>
+        {content}
+      </ItemBody>
     </StyledItem>
   );
 };
