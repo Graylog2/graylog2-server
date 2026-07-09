@@ -150,6 +150,31 @@ describe('ExcludeFromQueryHandler', () => {
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT (source:a OR target:a)');
   });
 
+  it('negates the symmetric edge clause when the operator is EDGE', async () => {
+    const query = createQuery('answer:42');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'source',
+        value: 'a',
+        contexts: {
+          widget: { config: { visualization: 'network' } } as unknown as Widget,
+          valuePath: [{ source: 'a' }, { target: 'b' }],
+          valuePathOperator: 'EDGE',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'queryId',
+      'answer:42 AND NOT ((source:a AND target:b) OR (source:b AND target:a))',
+    );
+  });
+
   it('escapes special characters in field value', async () => {
     const query = createQuery('*');
     const view = createViewWithQuery(query);
