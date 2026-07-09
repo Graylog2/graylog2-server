@@ -35,6 +35,10 @@ const StyledItem = styled.li(
 
 const InnerContainer = styled.div<StyledProps>(
   ({ theme, $active, $disabled, $bsStyle, $isInteractive }) => css`
+    border: none;
+    font: inherit;
+    text-align: left;
+    width: 100%;
     padding: 5px 10px;
     background-color: ${theme.colors.global.contentBackground};
     line-height: 1.25;
@@ -150,7 +154,8 @@ const ListGroupItem = (
   ref: React.ForwardedRef<HTMLLIElement>,
 ) => {
   const isLink = !!href;
-  const isInteractive = !!(onClick || href);
+  const isButton = !!onClick && !href;
+  const isInteractive = isLink || isButton;
 
   const content = (
     <>
@@ -169,17 +174,22 @@ const ListGroupItem = (
 
   return (
     <StyledItem ref={ref} id={id}>
-      {href ? (
+      {isLink ? (
         <InnerContainer as="a" href={href} {...sharedInnerProps}>
           {content}
         </InnerContainer>
-      ) : (
+      ) : isButton ? (
         <InnerContainer
+          as="button"
+          type="button"
+          disabled={disabled}
           {...sharedInnerProps}
-          role={isInteractive && !isLink ? 'button' : undefined}
-          tabIndex={isInteractive && !disabled ? 0 : undefined}
-          onClick={!disabled ? onClick : undefined}
+          onClick={onClick}
           onKeyDown={onKeyDown}>
+          {content}
+        </InnerContainer>
+      ) : (
+        <InnerContainer {...sharedInnerProps}>
           {content}
         </InnerContainer>
       )}
