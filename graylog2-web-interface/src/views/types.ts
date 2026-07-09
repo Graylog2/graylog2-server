@@ -281,8 +281,9 @@ export interface ActionContexts {
   message: Message;
   valuePath: ValuePath;
   // How to combine the entries of `valuePath` when generating a query clause. Defaults to 'AND'
-  // (combined groupings); 'OR' is used e.g. for a network-graph node queried across all groupings.
-  valuePathOperator?: 'AND' | 'OR';
+  // (combined groupings); 'OR' is used e.g. for a network-graph node queried across all groupings;
+  // 'EDGE' builds the symmetric two-field clause for a network-graph edge.
+  valuePathOperator?: 'AND' | 'OR' | 'EDGE';
   isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;

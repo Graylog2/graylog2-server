@@ -16,11 +16,25 @@
  */
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 
-import { concatQueryStrings, escape, predicate } from './QueryHelper';
+import { concatQueryStrings, edgeClause, escape, predicate } from './QueryHelper';
 
 describe('QueryHelper', () => {
   it('quotes $ in values', () => {
     expect(escape('foo$bar$')).toEqual('foo\\$bar\\$');
+  });
+
+  describe('edgeClause', () => {
+    it('builds a symmetric compound clause over both fields, bracketed as one group', () => {
+      expect(edgeClause({ field: 'source', value: 'a1' }, { field: 'target', value: 'b1' })).toBe(
+        '((source:a1 AND target:b1) OR (source:b1 AND target:a1))',
+      );
+    });
+
+    it('escapes values', () => {
+      expect(edgeClause({ field: 'source', value: 'a b' }, { field: 'target', value: 'c:d' })).toBe(
+        '((source:"a b" AND target:c\\:d) OR (source:c\\:d AND target:"a b"))',
+      );
+    });
   });
 
   describe('concatQueryStrings', () => {

@@ -42,6 +42,7 @@ export type CollectorInstanceView = {
   os: string | null;
   version: string | null;
   status: 'online' | 'offline';
+  has_pending_changes: boolean;
 };
 
 export type SourceType = 'file' | 'journald' | 'windows_event_log';
@@ -124,6 +125,7 @@ export type CollectorsConfig = {
   token_signing_key: TokenSigningKey | null;
   otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
+  collector_heartbeat_interval: string;
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
@@ -191,5 +193,19 @@ export type FleetReassignedActivityEntry = ActivityEntryBase & {
 export type ActivityEntry = SimpleActivityEntry | FleetReassignedActivityEntry;
 
 export type RecentActivityResponse = {
+  activities: ActivityEntry[];
+};
+
+export type CoalescedActions = {
+  recompute_config: boolean;
+  recompute_ingest_config: boolean;
+  reassign: boolean;
+  restart: boolean;
+  run_discovery: boolean;
+};
+
+export type PendingChangesResponse = {
+  has_pending_changes: boolean;
+  coalesced: CoalescedActions;
   activities: ActivityEntry[];
 };

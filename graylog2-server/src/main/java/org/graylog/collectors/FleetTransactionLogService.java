@@ -18,6 +18,8 @@ package org.graylog.collectors;
 
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
@@ -27,6 +29,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.FleetReassignedPayload;
@@ -39,7 +42,9 @@ import org.graylog2.plugin.system.NodeId;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.graylog.collectors.db.TransactionMarker.FIELD_CREATED_AT;
@@ -162,6 +167,38 @@ public class FleetTransactionLogService {
         return collection.find(filter)
                 .sort(Sorts.ascending(FIELD_ID))
                 .into(new ArrayList<>());
+    }
+
+    /**
+     * Builds a {@link PendingChangesLookup} from the entire transaction log: the highest sequence
+     * number per fleet (fleet-scoped markers) and per collector instance (collector-scoped markers,
+     * with bulk markers unwound per target). All marker types are included — including
+     * {@code UNKNOWN} — so the result stays consistent with the per-instance indicator. The full
+     * collection is scanned (its size is bounded by transaction-log truncation).
+     */
+    public PendingChangesLookup pendingChangesLookup() {
+
+        final var pipeline = List.of(
+                Aggregates.match(Filters.empty()),
+                Aggregates.unwind("$" + FIELD_TARGET_ID),
+                Aggregates.group(
+                        new Document(FIELD_TARGET, "$" + FIELD_TARGET).append(FIELD_TARGET_ID, "$" + FIELD_TARGET_ID),
+                        Accumulators.max("maxSeq", "$" + FIELD_ID)
+                )
+        );
+
+        final Map<String, Long> maxByFleetId = new HashMap<>();
+        final Map<String, Long> maxByInstanceUid = new HashMap<>();
+        collection.aggregate(pipeline, Document.class).forEach(doc -> {
+            final var key = doc.get(FIELD_ID, Document.class);
+            if (TARGET_FLEET.equals(key.getString(FIELD_TARGET))) {
+                maxByFleetId.put(key.getString(FIELD_TARGET_ID), doc.getLong("maxSeq"));
+            } else if (TARGET_COLLECTOR.equals(key.getString(FIELD_TARGET))) {
+                maxByInstanceUid.put(key.getString(FIELD_TARGET_ID), doc.getLong("maxSeq"));
+            }
+        });
+
+        return new PendingChangesLookup(maxByFleetId, maxByInstanceUid);
     }
 
     @Nullable
