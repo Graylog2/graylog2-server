@@ -46,9 +46,7 @@ const NodesHeading = styled.h3(
 const STATE_LABELS: Record<RollingRestartState, string> = {
   PREPARING_CLUSTER: 'Preparing cluster',
   SELECTING_NEXT_NODE: 'Selecting next node',
-  STOPPING_NODE: 'Stopping node',
-  WAITING_NODE_LEFT: 'Waiting for node to leave',
-  STARTING_NODE: 'Starting node',
+  UPGRADING_NODE: 'Upgrading node',
   WAITING_NODE_JOINED: 'Waiting for node to rejoin',
   REENABLING_ALLOCATION: 'Re-enabling allocation',
   WAITING_GREEN: 'Waiting for green cluster',
@@ -62,9 +60,7 @@ const STATE_LABELS: Record<RollingRestartState, string> = {
 const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 'warning' | 'danger'> = {
   PREPARING_CLUSTER: 'info',
   SELECTING_NEXT_NODE: 'info',
-  STOPPING_NODE: 'warning',
-  WAITING_NODE_LEFT: 'warning',
-  STARTING_NODE: 'info',
+  UPGRADING_NODE: 'info',
   WAITING_NODE_JOINED: 'info',
   REENABLING_ALLOCATION: 'info',
   WAITING_GREEN: 'info',

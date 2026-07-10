@@ -31,6 +31,7 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,18 +53,20 @@ public class RollingRestartJobHandler {
     private final RollingRestartActions actions;
     private final JobSchedulerClock clock;
     private final LockService lockService;
+    private final DataNodeMetadataService dataNodeMetadataService;
 
     @Inject
     public RollingRestartJobHandler(DBJobDefinitionService jobDefinitionService,
                                     DBJobTriggerService jobTriggerService,
                                     RollingRestartActions actions,
                                     JobSchedulerClock clock,
-                                    LockService lockService) {
+                                    LockService lockService, DataNodeMetadataService dataNodeMetadataService) {
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
         this.actions = actions;
         this.clock = clock;
         this.lockService = lockService;
+        this.dataNodeMetadataService = dataNodeMetadataService;
     }
 
     public JobTriggerDto start(String triggeredBy, boolean force) {
@@ -85,11 +88,16 @@ public class RollingRestartJobHandler {
                     .map(n -> RollingRestartNodeEntry.pending(n.getHostname(), n.getNodeId()))
                     .toList();
 
+            final String targetOpensearchVersion = dataNodeMetadataService.getVersionsOverview()
+                    .highestAvailableVersion()
+                    .orElseThrow(() -> new IllegalStateException("There is no available opensearch version to upgrade"));
+
             final RollingRestartExecutionJob.Data data = RollingRestartExecutionJob.Data.builder()
                     .smState(RollingRestartState.PREPARING_CLUSTER)
                     .nodes(nodes)
                     .triggeredBy(triggeredBy)
                     .waitingGreenSince(Instant.now())
+                    .targetOpensearchVersion(targetOpensearchVersion)
                     .build();
 
             final JobTriggerDto trigger = JobTriggerDto.builder()

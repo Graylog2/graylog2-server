@@ -28,6 +28,7 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.joda.time.DateTime;
@@ -70,12 +71,14 @@ class RollingRestartJobHandlerTest {
     Lock lock;
     @Mock
     ClusterState clusterState;
+    @Mock
+    DataNodeMetadataService dataNodeMetadataService;
 
     private RollingRestartJobHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new RollingRestartJobHandler(jobDefinitionService, jobTriggerService, actions, clock, lockService);
+        handler = new RollingRestartJobHandler(jobDefinitionService, jobTriggerService, actions, clock, lockService, dataNodeMetadataService);
         // Default: lock acquisition succeeds for most tests; tests that exercise contention override.
         lenient().when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE)).thenReturn(Optional.of(lock));
         lenient().when(clock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
@@ -134,7 +137,7 @@ class RollingRestartJobHandlerTest {
         greenClusterWithThreeNodes();
         final var existing = buildExistingTrigger(
                 RollingRestartExecutionJob.Data.builder()
-                        .smState(RollingRestartState.STOPPING_NODE)
+                        .smState(RollingRestartState.UPGRADING_NODE)
                         .nodes(List.of())
                         .triggeredBy("bob")
                         .waitingGreenSince(java.time.Instant.now())

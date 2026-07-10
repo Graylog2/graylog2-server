@@ -27,6 +27,8 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationPara
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
@@ -34,20 +36,26 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class OpensearchConfigurationService extends AbstractIdleService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigurationService.class);
+
     private final Configuration localConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans;
     private final EventBus eventBus;
+    private final OpensearchUpgradeAction opensearchUpgradeAction;
 
     @Inject
     public OpensearchConfigurationService(final Configuration localConfiguration,
                                           final DatanodeConfiguration datanodeConfiguration,
                                           final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans,
-                                          final EventBus eventBus) {
+                                          final EventBus eventBus,
+                                          OpensearchUpgradeAction  opensearchUpgradeAction) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.opensearchConfigurationBeans = opensearchConfigurationBeans;
         this.eventBus = eventBus;
+        this.opensearchUpgradeAction = opensearchUpgradeAction;
         eventBus.register(this);
     }
 
@@ -66,6 +74,19 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         // configuration relies on the keystore. Initial change there should rebuild the configuration and restart
         // dependent services
         triggerConfigurationChangedEvent();
+    }
+
+
+    @Subscribe
+    public void onOpensearchVersionChange(OpensearchUpdateEvent event) {
+        // configuration relies on the keystore. Initial change there should rebuild the configuration and restart
+        // dependent services
+        final boolean upgraded = opensearchUpgradeAction.upgradeToLatestAvaiable();
+        if (upgraded) {
+            triggerConfigurationChangedEvent();
+        } else {
+            LOG.warn("Node can't be upgraded, no newer opensearch version available");
+        }
     }
 
     private OpensearchConfiguration get() {

@@ -189,20 +189,12 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         return this.processState.getState().equals(expectedState);
     }
 
+    @Deprecated
     @Override
     public void configure(OpensearchConfiguration configuration) {
         this.opensearchConfiguration = Optional.of(configuration);
-        configure();
-    }
-
-    private void configure() {
-        opensearchConfiguration.ifPresentOrElse(
-                (config -> {
-                    // refresh TM if the SSL certs changed
-                    trustManager.refresh();
-                }),
-                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-        );
+        // refresh TM if the SSL certs changed
+        trustManager.refresh();
     }
 
     @Override
@@ -369,7 +361,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Override
     public void reset() {
         stop();
-        configure();
+        opensearchConfiguration.ifPresentOrElse(
+                (config -> {
+                    // refresh TM if the SSL certs changed
+                    trustManager.refresh();
+                }),
+                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+        );
         start();
     }
 

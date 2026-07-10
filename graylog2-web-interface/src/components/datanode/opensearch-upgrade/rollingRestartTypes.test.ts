@@ -64,7 +64,7 @@ describe('rollingRestartTypes', () => {
     });
 
     it('is true for a job in a non-terminal state', () => {
-      expect(isRollingRestartActive(jobWithState('STOPPING_NODE'))).toBe(true);
+      expect(isRollingRestartActive(jobWithState('UPGRADING_NODE'))).toBe(true);
     });
 
     it('is false for a job in a terminal state', () => {

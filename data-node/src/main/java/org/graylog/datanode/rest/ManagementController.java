@@ -22,6 +22,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.graylog.datanode.configuration.OpensearchUpdateEvent;
 import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
@@ -48,11 +49,19 @@ public class ManagementController {
         postEvent(DataNodeLifecycleTrigger.REMOVE);
     }
 
+    @Deprecated
     @POST
     @Path("/start")
     @OnlyInSecuredNode
     public void start() {
         postEvent(DataNodeLifecycleTrigger.START);
+    }
+
+    @POST
+    @Path("/upgrade")
+    @OnlyInSecuredNode
+    public void upgrade() {
+        clusterEventBus.post(new OpensearchUpdateEvent());
     }
 
     @POST

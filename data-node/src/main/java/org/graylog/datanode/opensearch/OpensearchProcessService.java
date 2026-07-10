@@ -155,6 +155,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         }
     }
 
+    @Deprecated
     private void configure(OpensearchConfiguration config) {
         if (config.securityConfigured()) {
             this.process.configure(config);

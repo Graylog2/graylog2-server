@@ -16,7 +16,6 @@
  */
 package org.graylog2.datanode.restart;
 
-import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
@@ -24,7 +23,6 @@ import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.Node;
 import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
@@ -35,6 +33,7 @@ import retrofit2.http.POST;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -44,16 +43,14 @@ public class RollingRestartActions {
     private final DatanodeClusterAdminAdapter clusterAdmin;
     private final DatanodeRestApiProxy datanodeProxy;
     private final NodeService<DataNodeDto> nodeService;
-    private final DataNodeMetadataService dataNodeMetadataService;
 
     @Inject
     public RollingRestartActions(DatanodeClusterAdminAdapter clusterAdmin,
                                  DatanodeRestApiProxy datanodeProxy,
-                                 NodeService<DataNodeDto> nodeService, DataNodeMetadataService dataNodeMetadataService) {
+                                 NodeService<DataNodeDto> nodeService) {
         this.clusterAdmin = clusterAdmin;
         this.datanodeProxy = datanodeProxy;
         this.nodeService = nodeService;
-        this.dataNodeMetadataService = dataNodeMetadataService;
     }
 
     public void prepareCluster() {
@@ -66,25 +63,9 @@ public class RollingRestartActions {
         clusterAdmin.enableShardReplication();
     }
 
-    public void stopNode(String hostname) {
-        LOG.info("Sending STOP trigger to DataNode {}", hostname);
-        datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::stop);
-    }
-
-    public void upgradeNode(String nodeID) {
-        LOG.info("Sending UPGRADE trigger to DataNode {}", nodeID);
-        dataNodeMetadataService.findByNodeId(nodeID)
-                .filter(m -> m.latestAvailableOpensearchVersion() != null)
-                .filter(m -> Version.parse(m.latestAvailableOpensearchVersion()).isHigherThan(Version.parse(m.currentOpensearchVersion())))
-                .ifPresentOrElse(
-                        dataNodeMetadata -> dataNodeMetadataService.setOpensearchVersions(nodeID, dataNodeMetadata.latestAvailableOpensearchVersion(), null),
-                        () -> LOG.warn("Node {} can't be upgraded, no newer opensearch version available", nodeID)
-                );
-    }
-
-    public void startNode(String hostname) {
-        LOG.info("Sending START trigger to DataNode {}", hostname);
-        datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::start);
+    public void upgradeNode(String hostname) {
+        LOG.info("Sending UPGRADE trigger to DataNode {}", hostname);
+        datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::upgrade);
     }
 
     public ClusterState getClusterState() {
@@ -109,9 +90,11 @@ public class RollingRestartActions {
         }
     }
 
-    public boolean isNodeInCluster(String hostname) {
+    public boolean isNodeInCluster(String hostname, String expectedOpensearchVersion) {
         try {
-            return clusterAdmin.getClusterState().findByHostname(hostname).isPresent();
+            return clusterAdmin.getClusterState().findByHostname(hostname)
+                    .filter(n -> Objects.equals(n.version(), expectedOpensearchVersion))
+                    .isPresent();
         } catch (Exception e) {
             LOG.debug("Failed to check node presence for {}", hostname, e);
             return false;
@@ -137,10 +120,7 @@ public class RollingRestartActions {
     }
 
     interface DataNodeManagementClient {
-        @POST("management/start")
-        Call<Void> start();
-
-        @POST("management/stop")
-        Call<Void> stop();
+        @POST("management/upgrade")
+        Call<Void> upgrade();
     }
 }

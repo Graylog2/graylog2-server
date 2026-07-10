@@ -24,6 +24,8 @@ import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBea
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.InputStreamConfigFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,6 +46,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchDefaultConfigFilesBean.class);
 
     private final DatanodeConfiguration datanodeConfiguration;
 
@@ -83,6 +87,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
         }
 
         final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
+        LOG.info("Preparing opensearch config files for version " + opensearchVersion);
         try {
             configFiles.addAll(readConfigFiles(Path.of("opensearch", "config", opensearchVersion)));
         } catch (URISyntaxException | IOException e) {
