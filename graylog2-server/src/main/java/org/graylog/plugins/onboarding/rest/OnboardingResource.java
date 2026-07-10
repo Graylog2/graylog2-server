@@ -69,7 +69,7 @@ public class OnboardingResource extends RestResource {
     @PUT
     @Path("/dismiss")
     @AuditEvent(type = OnboardingAuditEventTypes.ONBOARDING_DISMISSED)
-    @Operation(summary = "Update onboarding status")
+    @Operation(summary = "Dismiss onboarding")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Updated onboarding status"),
             @ApiResponse(responseCode = "400", description = "Bad request, illegal status value")
@@ -77,5 +77,18 @@ public class OnboardingResource extends RestResource {
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT)
     public void dismiss() {
         clusterConfigService.write(new OnboardingState(OnboardingStatus.DISMISSED));
+    }
+
+    @PUT
+    @Path("/finish")
+    @AuditEvent(type = OnboardingAuditEventTypes.ONBOARDING_DISMISSED)
+    @Operation(summary = "Finish onboarding")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Updated onboarding status"),
+            @ApiResponse(responseCode = "400", description = "Bad request, illegal status value")
+    })
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT)
+    public void finish() {
+        clusterConfigService.write(new OnboardingState(OnboardingStatus.FINISHED));
     }
 }

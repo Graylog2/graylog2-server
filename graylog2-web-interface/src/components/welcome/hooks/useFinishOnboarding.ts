@@ -14,22 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Onboarding } from '@graylog/server-api';
 
-export const ONBOARDING_ELIGIBILITY_QUERY_KEY = ['onboarding', 'eligibility'];
+import { ONBOARDING_ELIGIBILITY_QUERY_KEY } from './useOnboardingEligibility';
 
-const fetchOnboardingEligibility = () => Onboarding.get();
+const finishOnboarding = () => Onboarding.finish();
 
-const useOnboardingEligibility = (enabled: boolean = true) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ONBOARDING_ELIGIBILITY_QUERY_KEY,
-    queryFn: fetchOnboardingEligibility,
-    enabled,
+const useFinishOnboarding = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: finishOnboarding,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ONBOARDING_ELIGIBILITY_QUERY_KEY }),
   });
-
-  return { data, isLoading };
 };
 
-export default useOnboardingEligibility;
+export default useFinishOnboarding;

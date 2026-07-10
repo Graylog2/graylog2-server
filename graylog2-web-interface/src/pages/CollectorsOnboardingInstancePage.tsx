@@ -30,6 +30,7 @@ import { extractErrorMessage } from 'util/extractErrorMessage';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import useHistory from 'routing/useHistory';
 import UserNotification from 'util/UserNotification';
+import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
@@ -37,14 +38,16 @@ const CollectorsOnboardingInstancePage = () => {
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
   const defaultInterval = useDefaultInterval();
+  const { mutate: finish } = useFinishOnboarding();
 
   // using useEffect to guard that the default is actually there when we call the navigate
   useEffect(() => {
     if (instance && defaultInterval) {
+      finish();
       history.push(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
       UserNotification.success('Collector connected successfully! Showing received messages ...');
     }
-  }, [defaultInterval, instance, history]);
+  }, [defaultInterval, instance, history, finish]);
 
   const content = () => {
     if (isLoading) return <Spinner />;
