@@ -40,19 +40,19 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigurationService.class);
 
     private final Configuration localConfiguration;
-    private final DatanodeConfiguration datanodeConfiguration;
+    private final DatanodeConfigurationProvider datanodeConfigurationProvider;
     private final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans;
     private final EventBus eventBus;
     private final OpensearchUpgradeAction opensearchUpgradeAction;
 
     @Inject
     public OpensearchConfigurationService(final Configuration localConfiguration,
-                                          final DatanodeConfiguration datanodeConfiguration,
+                                          final DatanodeConfigurationProvider datanodeConfigurationProvider,
                                           final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans,
                                           final EventBus eventBus,
                                           OpensearchUpgradeAction  opensearchUpgradeAction) {
         this.localConfiguration = localConfiguration;
-        this.datanodeConfiguration = datanodeConfiguration;
+        this.datanodeConfigurationProvider = datanodeConfigurationProvider;
         this.opensearchConfigurationBeans = opensearchConfigurationBeans;
         this.eventBus = eventBus;
         this.opensearchUpgradeAction = opensearchUpgradeAction;
@@ -91,10 +91,13 @@ public class OpensearchConfigurationService extends AbstractIdleService {
 
     private OpensearchConfiguration get() {
 
+        // get fresh instance of datanode configuration, some parts (like opensearch version) could change meanwhile
+        final DatanodeConfiguration datanodeConfiguration = datanodeConfigurationProvider.get();
+
         final OpensearchConfigurationDir targetConfigDir = datanodeConfiguration.datanodeDirectories().createUniqueOpensearchProcessConfigurationDir();
 
         final List<DatanodeConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
-                .map(bean -> bean.buildConfigurationPart(new OpensearchConfigurationParams(targetConfigDir.configurationRoot())))
+                .map(bean -> bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, targetConfigDir.configurationRoot())))
                 .collect(Collectors.toList());
 
         return new OpensearchConfiguration(

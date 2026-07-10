@@ -17,11 +17,12 @@
 package org.graylog.datanode.opensearch.configuration;
 
 
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.process.configuration.beans.ConfigurationBuildParams;
 
 import java.nio.file.Path;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-public record OpensearchConfigurationParams(Path targetConfigDir) implements ConfigurationBuildParams {
+public record OpensearchConfigurationParams(DatanodeConfiguration datanodeConfiguration, Path targetConfigDir) implements ConfigurationBuildParams {
 }

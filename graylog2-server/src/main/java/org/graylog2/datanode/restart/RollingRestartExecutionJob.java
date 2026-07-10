@@ -156,6 +156,7 @@ public class RollingRestartExecutionJob implements Job {
             case WAITING_NODE_JOINED -> {
                 final RollingRestartNodeEntry current = requireCurrent(data);
                 String expectedVersion = data.targetOpensearchVersion();
+
                 if (actions.isNodeInCluster(current.hostname(), expectedVersion)) {
                     sm.fire(RollingRestartTrigger.NODE_JOINED);
                     return data.toBuilder()

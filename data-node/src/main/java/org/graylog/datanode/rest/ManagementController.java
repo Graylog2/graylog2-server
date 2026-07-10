@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.rest;
 
+import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.POST;
@@ -34,12 +35,14 @@ import org.graylog2.plugin.system.NodeId;
 public class ManagementController {
 
     private final ClusterEventBus clusterEventBus;
+    private final EventBus eventBus;
     private final NodeId nodeId;
 
 
     @Inject
-    public ManagementController(ClusterEventBus clusterEventBus, NodeId nodeId) {
+    public ManagementController(ClusterEventBus clusterEventBus, EventBus eventBus, NodeId nodeId) {
         this.clusterEventBus = clusterEventBus;
+        this.eventBus = eventBus;
         this.nodeId = nodeId;
     }
 
@@ -61,7 +64,7 @@ public class ManagementController {
     @Path("/upgrade")
     @OnlyInSecuredNode
     public void upgrade() {
-        clusterEventBus.post(new OpensearchUpdateEvent());
+        eventBus.post(new OpensearchUpdateEvent());
     }
 
     @POST

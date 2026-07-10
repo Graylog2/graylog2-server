@@ -17,8 +17,6 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import jakarta.annotation.Nonnull;
-import jakarta.inject.Inject;
-import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
@@ -49,17 +47,10 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchDefaultConfigFilesBean.class);
 
-    private final DatanodeConfiguration datanodeConfiguration;
-
-    @Inject
-    public OpensearchDefaultConfigFilesBean(DatanodeConfiguration datanodeConfiguration) {
-        this.datanodeConfiguration = datanodeConfiguration;
-    }
-
     @Override
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
         return DatanodeConfigurationPart.builder()
-                .withConfigFiles(collectConfigFiles())
+                .withConfigFiles(collectConfigFiles(configurationParams))
                 // the opensearch.policy file is part of collected config files from the call above. We just need to provide it as system property
                 .javaOpt("-Djava.security.policy=" + opensearchPolicyFilePath(configurationParams.targetConfigDir()))
                 .build();
@@ -72,7 +63,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
         return "file://" + targetConfigDir.resolve("opensearch.policy").toAbsolutePath().toString();
     }
 
-    private List<DatanodeConfigFile> collectConfigFiles() {
+    private List<DatanodeConfigFile> collectConfigFiles(OpensearchConfigurationParams configurationParams) {
         List<DatanodeConfigFile> configFiles = new LinkedList<>();
         // this is a directory in main/resources that holds all the common initial configuration files needed by the opensearch
         // we manage this directory in git. Generally we assume that this is a read-only location and we need to copy
@@ -86,7 +77,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
             throw new RuntimeException(e);
         }
 
-        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
+        final String opensearchVersion = configurationParams.datanodeConfiguration().opensearchDistribution().version();
         LOG.info("Preparing opensearch config files for version " + opensearchVersion);
         try {
             configFiles.addAll(readConfigFiles(Path.of("opensearch", "config", opensearchVersion)));
