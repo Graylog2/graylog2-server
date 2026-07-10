@@ -183,6 +183,15 @@ public class InputServiceImpl implements InputService {
         return result;
     }
 
+    public String save(Input model) throws ValidationException {
+        return save(model, true);
+    }
+
+    @Override
+    public String saveWithoutEvents(Input model) throws ValidationException {
+        return save(model, false);
+    }
+
     private InputImpl toInputImpl(Input input) {
         if (input instanceof InputImpl inputImpl) {
             return inputImpl;
@@ -190,7 +199,7 @@ public class InputServiceImpl implements InputService {
         throw new IllegalArgumentException("Expected InputImpl, got " + input.getClass().getName());
     }
 
-    public String save(Input model) throws ValidationException {
+    private String save(Input model, boolean fireEvents) throws ValidationException {
         validateStaticFields(model);
         final InputImpl input = toInputImpl(model);
         String inputId = input.getId();
@@ -202,7 +211,9 @@ public class InputServiceImpl implements InputService {
             collection.replaceOne(MongoUtils.idEq(inputId), input);
         }
 
-        publishChange(InputCreated.create(inputId));
+        if (fireEvents) {
+            publishChange(InputCreated.create(inputId));
+        }
 
         return inputId;
     }
