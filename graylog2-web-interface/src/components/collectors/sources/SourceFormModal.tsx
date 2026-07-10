@@ -19,10 +19,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FormikTouched } from 'formik';
 import { Formik, Form } from 'formik';
 import isEqual from 'lodash/isEqual';
+import moment from 'moment';
 
 import { HelpBlock, Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 import { FormikInput } from 'components/common';
+import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import ModalSubmit from 'components/common/ModalSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -215,22 +217,69 @@ const WindowsEventLogConfigFields = ({
   );
 };
 
+// Ordered largest-first so extractDurationAndUnit renders the most readable unit (e.g. PT24H -> "1 days").
+const POLL_INTERVAL_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
+const LOG_AGE_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
+
 const MacOSUnifiedLoggingConfigFields = ({
   config,
   setFieldValue,
 }: {
   config: MacOSUnifiedLoggingSourceConfig;
   setFieldValue: (field: string, value: unknown) => void;
-}) => (
-  <Input
-    id="macos-predicate"
-    type="textarea"
-    label="Predicate"
-    help="Optional macOS unified logging filter predicate passed to the `log` command. Leave empty to use the secure default (security-relevant subsystems, error severity and above). Example: subsystem == 'com.apple.securityd'"
-    value={config.predicate || ''}
-    onChange={(e) => setFieldValue('config', { ...config, predicate: e.target.value || undefined })}
-  />
-);
+}) => {
+  const pollInterval = extractDurationAndUnit(config.max_poll_interval, POLL_INTERVAL_UNITS);
+  const logAge = extractDurationAndUnit(config.max_log_age, LOG_AGE_UNITS);
+
+  // TimeUnitInput reports (value, unit, checked). Unchecked clears the field so the backend default applies.
+  const updateDuration =
+    (field: 'max_poll_interval' | 'max_log_age') =>
+    (value: number, unit: string, checked: boolean) => {
+      setFieldValue('config', {
+        ...config,
+        [field]: checked ? moment.duration(value, unit as moment.unitOfTime.DurationConstructor).toISOString() : undefined,
+      });
+    };
+
+  return (
+    <>
+      <Input
+        id="macos-predicate"
+        type="textarea"
+        label="Predicate"
+        help="Optional macOS unified logging filter predicate passed to the `log` command. Leave empty to use the secure default (security-relevant subsystems, error severity and above). Example: subsystem == 'com.apple.securityd'"
+        value={config.predicate || ''}
+        onChange={(e) => setFieldValue('config', { ...config, predicate: e.target.value || undefined })}
+      />
+      <Input
+        id="macos-start-time"
+        type="text"
+        label="Start time"
+        help="Optional. Backfill logs starting from this timestamp, then continue tailing. Format: YYYY-MM-DD HH:MM:SS. Leave empty to collect only new logs."
+        value={config.start_time || ''}
+        onChange={(e) => setFieldValue('config', { ...config, start_time: e.target.value || undefined })}
+      />
+      <TimeUnitInput
+        label="Max poll interval"
+        update={updateDuration('max_poll_interval')}
+        value={pollInterval.duration}
+        unit={pollInterval.unit}
+        units={POLL_INTERVAL_UNITS}
+        enabled={config.max_poll_interval !== undefined}
+        help="Optional. How often the Collector checks for new log entries. Leave unchecked to use the default (30s)."
+      />
+      <TimeUnitInput
+        label="Max log age"
+        update={updateDuration('max_log_age')}
+        value={logAge.duration}
+        unit={logAge.unit}
+        units={LOG_AGE_UNITS}
+        enabled={config.max_log_age !== undefined}
+        help="Optional. On first start, how far back to backfill logs. Leave unchecked to use the default (24h)."
+      />
+    </>
+  );
+};
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
   const isEdit = !!source;

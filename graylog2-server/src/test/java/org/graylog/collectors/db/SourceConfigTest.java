@@ -19,10 +19,12 @@ package org.graylog.collectors.db;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.graylog.collectors.CollectorReadMode;
+import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -144,10 +146,8 @@ class SourceConfigTest {
         final var receiver = original.toReceiverConfig("src-1").orElseThrow();
         assertThat(receiver.type()).isEqualTo("macos_unified_logging");
         assertThat(receiver.name()).isEqualTo("macos_unified_logging/src-1");
-        assertThat(receiver).isInstanceOf(
-                org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig.class);
-        final var macReceiver =
-                (org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig) receiver;
+        assertThat(receiver).isInstanceOf(MacOSUnifiedLoggingReceiverConfig.class);
+        final var macReceiver = (MacOSUnifiedLoggingReceiverConfig) receiver;
         assertThat(macReceiver.predicate()).isEqualTo("subsystem == 'com.apple.securityd'");
         assertThat(macReceiver.storage()).isEqualTo("file_storage/default");
     }
@@ -156,9 +156,55 @@ class SourceConfigTest {
     void macosUsesDefaultPredicateWhenUnset() {
         final var config = MacOSUnifiedLoggingSourceConfig.builder().build();
         final var macReceiver =
-                (org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig)
-                        config.toReceiverConfig("s").orElseThrow();
+                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s").orElseThrow();
         assertThat(macReceiver.predicate()).contains("subsystem");
+    }
+
+    @Test
+    void macosForwardsStartTimeAndDurationsToReceiverConfig() {
+        final var config = MacOSUnifiedLoggingSourceConfig.builder()
+                .startTime("2026-07-10 00:00:00")
+                .maxPollInterval(Duration.ofSeconds(15))
+                .maxLogAge(Duration.ofHours(6))
+                .build();
+
+        final var macReceiver =
+                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("src-1").orElseThrow();
+
+        assertThat(macReceiver.startTime()).isEqualTo("2026-07-10 00:00:00");
+        assertThat(macReceiver.maxPollInterval()).isEqualTo(Duration.ofSeconds(15));
+        assertThat(macReceiver.maxLogAge()).isEqualTo(Duration.ofHours(6));
+    }
+
+    @Test
+    void macosLeavesReceiverDefaultsWhenOptionalFieldsUnset() {
+        final var config = MacOSUnifiedLoggingSourceConfig.builder().build();
+
+        final var macReceiver =
+                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s").orElseThrow();
+
+        assertThat(macReceiver.startTime()).isNull();
+        assertThat(macReceiver.maxPollInterval()).isEqualTo(Duration.ofSeconds(30));
+        assertThat(macReceiver.maxLogAge()).isEqualTo(Duration.ofHours(24));
+    }
+
+    @Test
+    void macosRoundTripSerializesNewFields() throws Exception {
+        final var original = MacOSUnifiedLoggingSourceConfig.builder()
+                .predicate("subsystem == 'com.apple.securityd'")
+                .startTime("2026-07-10 00:00:00")
+                .maxPollInterval(Duration.ofSeconds(30))
+                .maxLogAge(Duration.ofHours(24))
+                .build();
+
+        final var json = objectMapper.writeValueAsString(original);
+        final var tree = objectMapper.readTree(json);
+        assertThat(tree.get("start_time").asText()).isEqualTo("2026-07-10 00:00:00");
+        assertThat(tree.get("max_poll_interval").asText()).isEqualTo("PT30S");
+        assertThat(tree.get("max_log_age").asText()).isEqualTo("PT24H");
+
+        final var deserialized = objectMapper.readValue(json, SourceConfig.class);
+        assertThat(deserialized).isEqualTo(original);
     }
 
 }

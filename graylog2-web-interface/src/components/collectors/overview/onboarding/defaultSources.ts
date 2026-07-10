@@ -40,6 +40,14 @@ const DEFAULT_SOURCES: NewSource[] = [
     },
   },
   {
+    name: 'macOS Unified Logs',
+    description: 'Collects common logs from macOS unified logs',
+    enabled: true,
+    type: 'macos_unified_logging',
+    config: {
+    },
+  },
+  {
     name: 'Windows Event Log',
     description: 'Collects Windows event logs from default channels',
     enabled: true,

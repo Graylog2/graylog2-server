@@ -71,6 +71,34 @@ describe('SourceFormModal', () => {
 
     await screen.findByLabelText(/Predicate/i);
   });
+
+  it('renders macOS start time, poll interval and log age fields when macos source type selected', async () => {
+    render(<SourceFormModal fleetId="fleet-1" onClose={jest.fn()} onSave={jest.fn()} />);
+
+    await userEvent.selectOptions(screen.getByLabelText(/Source Type/i), 'macos_unified_logging');
+
+    await screen.findByLabelText(/Start time/i);
+    await screen.findByLabelText(/Max poll interval/i);
+    await screen.findByLabelText(/Max log age/i);
+  });
+
+  it('includes a typed macOS start time in the saved source config', async () => {
+    const onSave = jest.fn().mockResolvedValue({ id: 's-1' });
+    render(<SourceFormModal fleetId="f-1" onClose={jest.fn()} onSave={onSave} />);
+
+    await userEvent.selectOptions(screen.getByLabelText(/Source Type/i), 'macos_unified_logging');
+    await userEvent.type(screen.getByLabelText(/Name/i), 'mac-src');
+    await userEvent.type(screen.getByLabelText(/Start time/i), '2026-07-10 00:00:00');
+    fireEvent.click(screen.getByRole('button', { name: /Create source/i }));
+    await screen.findByRole('button', { name: /Create source/i });
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'macos_unified_logging',
+        config: expect.objectContaining({ start_time: '2026-07-10 00:00:00' }),
+      }),
+    );
+  });
 });
 
 describe('splitToList', () => {

@@ -25,6 +25,7 @@ import jakarta.annotation.Nullable;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @AutoValue
@@ -41,6 +42,18 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
     @JsonProperty("predicate")
     public abstract String predicate();
 
+    @Nullable
+    @JsonProperty("start_time")
+    public abstract String startTime();
+
+    @Nullable
+    @JsonProperty("max_poll_interval")
+    public abstract Duration maxPollInterval();
+
+    @Nullable
+    @JsonProperty("max_log_age")
+    public abstract Duration maxLogAge();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -55,6 +68,15 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
         final var builder = MacOSUnifiedLoggingReceiverConfig.builder(id);
         if (predicate() != null) {
             builder.predicate(predicate());
+        }
+        if (startTime() != null) {
+            builder.startTime(startTime());
+        }
+        if (maxPollInterval() != null) {
+            builder.maxPollInterval(maxPollInterval());
+        }
+        if (maxLogAge() != null) {
+            builder.maxLogAge(maxLogAge());
         }
         return Optional.of(builder.build());
     }
@@ -72,6 +94,15 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
 
         @JsonProperty("predicate")
         public abstract Builder predicate(@Nullable String predicate);
+
+        @JsonProperty("start_time")
+        public abstract Builder startTime(@Nullable String startTime);
+
+        @JsonProperty("max_poll_interval")
+        public abstract Builder maxPollInterval(@Nullable Duration maxPollInterval);
+
+        @JsonProperty("max_log_age")
+        public abstract Builder maxLogAge(@Nullable Duration maxLogAge);
 
         public abstract MacOSUnifiedLoggingSourceConfig build();
     }

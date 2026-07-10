@@ -32,6 +32,11 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * OTel collector macOS Unified Logging Receiver configuration.
+ * <p>
+ * Graylog only models the live-collection subset of the upstream receiver's options. The upstream
+ * {@code archive_path} (one-shot collection from a static {@code .logarchive}) and {@code end_time}
+ * (a bounded, finite collection window) options are intentionally omitted: the collector is meant
+ * for continuous live tailing, so those would only ever produce one-shot behavior.
  *
  * @see <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/macosunifiedloggingreceiver">macOS Unified Logging Receiver</a>
  */
@@ -50,20 +55,12 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements CollectorRece
     }
 
     @Nullable
-    @JsonProperty("archive_path")
-    public abstract String archivePath();
-
-    @Nullable
     @JsonProperty("predicate")
     public abstract String predicate();
 
     @Nullable
     @JsonProperty("start_time")
     public abstract String startTime();
-
-    @Nullable
-    @JsonProperty("end_time")
-    public abstract String endTime();
 
     @Nullable
     @JsonProperty("max_poll_interval")
@@ -113,13 +110,9 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements CollectorRece
     public abstract static class Builder {
         public abstract Builder name(String name);
 
-        public abstract Builder archivePath(@Nullable String archivePath);
-
         public abstract Builder predicate(@Nullable String predicate);
 
         public abstract Builder startTime(@Nullable String startTime);
-
-        public abstract Builder endTime(@Nullable String endTime);
 
         public abstract Builder maxPollInterval(@Nullable Duration maxPollInterval);
 
