@@ -30,8 +30,13 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { awsCloudWatchBatchSize, overrideSource, awsCloudWatchThrottleEnabled, awsCloudWatchAddFlowLogPrefix } =
-    formData;
+  const {
+    awsCloudWatchBatchSize,
+    overrideSource,
+    awsCloudWatchThrottleEnabled,
+    awsCloudWatchAddFlowLogPrefix,
+    awsKinesisSingleTableStateTracking,
+  } = formData;
 
   const handleToggle = (visible) => {
     setAdvancedOptionsVisibility(visible);
@@ -71,6 +76,16 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         onChange={onChange}
         label="Kinesis Record batch size"
         help="The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time."
+      />
+
+      <Input
+        id="awsKinesisSingleTableStateTracking"
+        type="checkbox"
+        value="enable-single-table-state-tracking"
+        defaultChecked={awsKinesisSingleTableStateTracking?.value}
+        onChange={onChange}
+        label="Use single DynamoDB table for state tracking"
+        help="Store all Kinesis Client Library (KCL) state (leases, worker metrics, and coordinator state) in a single DynamoDB table. Enabling this on an existing input starts a one-way migration from the separate legacy tables, which cannot be reverted once complete. See the documentation for migration and cleanup steps."
       />
     </AdditionalFields>
   );

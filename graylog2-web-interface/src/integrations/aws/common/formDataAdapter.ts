@@ -69,6 +69,7 @@ export const toGenericInputCreateRequest = ({
   key,
   secret,
   overrideSource,
+  awsKinesisSingleTableStateTracking = { value: true },
 }) => ({
   type: 'org.graylog.integrations.aws.inputs.AWSInput',
   title: awsCloudWatchName.value,
@@ -93,6 +94,7 @@ export const toGenericInputCreateRequest = ({
     kinesis_endpoint: awsEndpointKinesis?.value,
     kinesis_stream_name: awsCloudWatchKinesisStream.value,
     kinesis_record_batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
+    kinesis_single_table_state_tracking: !!awsKinesisSingleTableStateTracking?.value,
     override_source: overrideSource?.value,
   },
 });

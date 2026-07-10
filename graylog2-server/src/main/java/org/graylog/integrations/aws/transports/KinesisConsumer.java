@@ -76,6 +76,7 @@ public class KinesisConsumer implements Runnable {
     private final AWSRequest request;
     private final AWSClientBuilderUtil awsClientBuilderUtil;
     private final InputFailureRecorder inputFailureRecorder;
+    private final boolean migrateToSingleTable;
     private Scheduler kinesisScheduler;
 
     KinesisConsumer(NodeId nodeId,
@@ -86,7 +87,8 @@ public class KinesisConsumer implements Runnable {
                     AWSMessageType awsMessageType,
                     int recordBatchSize, AWSRequest request,
                     AWSClientBuilderUtil awsClientBuilderUtil,
-                    InputFailureRecorder inputFailureRecorder) {
+                    InputFailureRecorder inputFailureRecorder,
+                    boolean migrateToSingleTable) {
         Preconditions.checkArgument(StringUtils.isNotBlank(kinesisStreamName), "A Kinesis stream name is required.");
         Preconditions.checkNotNull(awsMessageType, "A AWSMessageType is required.");
 
@@ -100,6 +102,7 @@ public class KinesisConsumer implements Runnable {
         this.request = request;
         this.awsClientBuilderUtil = awsClientBuilderUtil;
         this.inputFailureRecorder = inputFailureRecorder;
+        this.migrateToSingleTable = migrateToSingleTable;
     }
 
     @Override
@@ -174,9 +177,16 @@ public class KinesisConsumer implements Runnable {
                 }
             };
 
+            final var coordinatorConfig = configsBuilder.coordinatorConfig()
+                    .workerStateChangeListener(workerStateChangeListener);
+            if (migrateToSingleTable) {
+                LOG.info("Enabling one-time KCL metadata migration to the lease table.");
+                coordinatorConfig.migrateAllEntitiesToLeaseTable(true);
+            }
+
             this.kinesisScheduler = new Scheduler(
                     configsBuilder.checkpointConfig(),
-                    configsBuilder.coordinatorConfig().workerStateChangeListener(workerStateChangeListener),
+                    coordinatorConfig,
                     configsBuilder.leaseManagementConfig(),
                     configsBuilder.lifecycleConfig().taskExecutionListener(taskExecutionListener),
                     configsBuilder.metricsConfig(),

@@ -44,6 +44,9 @@ const DEFAULT_SETTINGS: FormSettings = {
   overrideSource: {
     value: '',
   },
+  awsKinesisSingleTableStateTracking: {
+    value: true,
+  },
 };
 
 export default DEFAULT_SETTINGS;

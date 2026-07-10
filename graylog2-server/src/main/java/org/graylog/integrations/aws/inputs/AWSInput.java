@@ -28,6 +28,7 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
@@ -193,6 +194,12 @@ public class AWSInput extends MessageInput {
                     "The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time.",
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
+
+            request.addField(new BooleanField(
+                    KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING,
+                    "Use single DynamoDB table for state tracking",
+                    true,
+                    "Store all Kinesis Client Library (KCL) state (leases, worker metrics, and coordinator state) in a single DynamoDB table. Enabling this on an existing input starts a one-way migration from the separate legacy tables, which cannot be reverted once complete. See the documentation for migration and cleanup steps."));
 
             request.addField(getOverrideSourceFieldDefinition());
 

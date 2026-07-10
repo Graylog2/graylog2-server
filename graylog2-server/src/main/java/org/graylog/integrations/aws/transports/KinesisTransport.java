@@ -34,6 +34,7 @@ import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
@@ -71,6 +72,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
     public static final String CK_KINESIS_STREAM_NAME = "kinesis_stream_name";
     public static final String CK_KINESIS_STREAM_ARN = "kinesis_stream_arn";
     public static final String CK_KINESIS_RECORD_BATCH_SIZE = "kinesis_record_batch_size";
+    public static final String CK_KINESIS_SINGLE_TABLE_STATE_TRACKING = "kinesis_single_table_state_tracking";
 
     public static final int DEFAULT_BATCH_SIZE = 10000;
 
@@ -146,9 +148,11 @@ public class KinesisTransport extends ThrottleableTransport2 {
         final int batchSize = configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE);
         final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
+        final boolean migrateToSingleTable = configuration.getBoolean(CK_KINESIS_SINGLE_TABLE_STATE_TRACKING, false);
 
         this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, input::processRawMessage,
-                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder);
+                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder,
+                migrateToSingleTable);
 
         LOG.debug("Starting Kinesis reader thread for input {}", input.toIdentifier());
         executor.submit(this.kinesisConsumer);
@@ -249,6 +253,12 @@ public class KinesisTransport extends ThrottleableTransport2 {
                     "The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time.",
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
+
+            r.addField(new BooleanField(
+                    CK_KINESIS_SINGLE_TABLE_STATE_TRACKING,
+                    "Use single DynamoDB table for state tracking",
+                    true,
+                    "Store all Kinesis Client Library (KCL) state (leases, worker metrics, and coordinator state) in a single DynamoDB table. Enabling this on an existing input starts a one-way migration from the separate legacy tables, which cannot be reverted once complete. See the documentation for migration and cleanup steps."));
 
             return r;
         }
