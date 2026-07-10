@@ -26,13 +26,21 @@ import { DEFAULT_LAYOUT } from './Constants';
 import { InstanceDetailDrawer } from './index';
 
 import type { CollectorInstanceView } from '../types';
-import { fetchPaginatedInstances, instancesKeyFn, useFleets, useSources, useDefaultInstanceFilters } from '../hooks';
+import {
+  fetchPaginatedInstances,
+  instancesKeyFn,
+  useFleets,
+  useSources,
+  useDefaultInstanceFilters,
+  useCollectorRefetchInterval,
+} from '../hooks';
 
 const CollectorsInstances = () => {
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
   const { data: fleets } = useFleets();
   const { data: sources } = useSources(selectedInstance?.fleet_id);
   const defaultFilters = useDefaultInstanceFilters();
+  const refetchInterval = useCollectorRefetchInterval();
 
   const fleetNames = useMemo(() => Object.fromEntries((fleets ?? []).map((fleet) => [fleet.id, fleet.name])), [fleets]);
 
@@ -50,6 +58,7 @@ const CollectorsInstances = () => {
         entityActions={entityActions}
         tableLayout={DEFAULT_LAYOUT}
         fetchEntities={fetchPaginatedInstances}
+        fetchOptions={{ refetchInterval }}
         keyFn={instancesKeyFn}
         entityAttributesAreCamelCase={false}
         columnRenderers={columnRenderers}

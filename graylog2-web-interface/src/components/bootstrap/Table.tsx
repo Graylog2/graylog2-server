@@ -17,7 +17,12 @@
 import React from 'react';
 import { Table as MantineTable } from '@mantine/core';
 import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
+export const TABLE_ROW_HOVER_TRANSITION = 'background-color 150ms ease-in-out';
+export const TABLE_ROW_PINNED_HOVER_BG_VAR = '--table-row-pinned-hover-bg';
+export const flattenTableBackground = (theme: DefaultTheme, color: string) =>
+  theme.utils.flattenColorStack([theme.colors.global.contentBackground, color]);
 export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
 export const PINNED_CELL_STRIPED_CLASS_NAME = 'table-pinned-cell-striped';
 
@@ -78,7 +83,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
 
     & tbody > tr {
       background-color: ${theme.colors.global.contentBackground};
-      transition: background-color 150ms ease-in-out;
+      transition: ${TABLE_ROW_HOVER_TRANSITION};
     }
 
     ${$striped &&
@@ -100,6 +105,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     css`
       & tbody > tr:hover {
         background-color: ${theme.colors.table.row.backgroundHover};
+        ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
       }
     `}
 
@@ -109,28 +115,20 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       & tbody:only-of-type > tr:hover,
       & tbody:not(:only-of-type) > tr:hover {
         background-color: ${theme.colors.table.row.backgroundHover};
+        ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
       }
     `}
 
     & thead > tr > th.${PINNED_CELL_CLASS_NAME} {
-      background-color: ${theme.utils.flattenColorStack([
-        theme.colors.global.contentBackground,
-        theme.colors.table.head.background,
-      ])};
+      background-color: ${flattenTableBackground(theme, theme.colors.table.head.background)};
     }
 
     & tbody > tr > .${PINNED_CELL_CLASS_NAME}, & tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
-      background-color: ${theme.utils.flattenColorStack([
-        theme.colors.global.contentBackground,
-        theme.colors.table.row.background,
-      ])};
+      background-color: ${flattenTableBackground(theme, theme.colors.table.row.background)};
     }
 
     & tbody > tr > .${PINNED_CELL_STRIPED_CLASS_NAME} {
-      background-color: ${theme.utils.flattenColorStack([
-        theme.colors.global.contentBackground,
-        theme.colors.table.row.backgroundStriped,
-      ])};
+      background-color: ${flattenTableBackground(theme, theme.colors.table.row.backgroundStriped)};
     }
 
     @media print {

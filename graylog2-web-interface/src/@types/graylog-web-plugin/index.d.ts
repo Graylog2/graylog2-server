@@ -202,6 +202,7 @@ type IndexRetentionConfig = {
 
 type StreamsOverviewTableElement = {
   attributeName: string;
+  group?: 'routing' | 'performance';
   attributes: Array<Attribute>;
   columnRenderers: ColumnRenderersByAttribute<Stream>;
   // Optional map of column id → backend metric fields. Plugins use this to plug their

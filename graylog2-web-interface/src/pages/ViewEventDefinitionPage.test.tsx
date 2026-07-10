@@ -29,7 +29,6 @@ import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { useEventDefinitionWithContext } from 'components/event-definitions/hooks/useEventDefinitions';
-import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
@@ -42,7 +41,6 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('hooks/useScopePermissions');
 
 jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
   ...jest.requireActual('components/event-definitions/hooks/useEventDefinitions'),
@@ -70,11 +68,6 @@ describe('<ViewEventDefinitionPage />', () => {
         is_mutable: true,
       },
       isFetching: false,
-    });
-    asMock(useGetPermissionsByScope).mockReturnValue({
-      loadingScopePermissions: false,
-      scopePermissions: { is_mutable: true, is_deletable: true },
-      checkPermissions: () => true,
     });
     asMock(usePluginEntities).mockImplementation(
       (entityKey) =>

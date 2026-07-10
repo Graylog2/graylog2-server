@@ -1,0 +1,4 @@
+type = "a"
+message = "Add Default, Routing, and Performance view buttons to the streams table for quickly switching between predefined column sets."
+
+pulls = ["26555", "Graylog2/graylog-plugin-enterprise#14711"]

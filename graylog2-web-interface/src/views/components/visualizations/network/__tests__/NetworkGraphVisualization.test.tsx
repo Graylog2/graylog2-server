@@ -68,13 +68,20 @@ const chartData = (): Array<Record<string, any>> => {
   return lastCall[0].chartData as Array<Record<string, any>>;
 };
 
+// Traces are laid out as [...edgeTraces, hitTrace, nodeTrace].
 const nodeTrace = () => {
   const data = chartData();
 
   return data[data.length - 1];
 };
 
-const edgeTraces = () => chartData().slice(0, -1);
+const hitTrace = () => {
+  const data = chartData();
+
+  return data[data.length - 2];
+};
+
+const edgeTraces = () => chartData().slice(0, -2);
 
 // Each edge trace carries its aggregated value in customdata, so we can look up the color assigned
 // to a specific edge value.
@@ -118,6 +125,31 @@ describe('NetworkGraphVisualization', () => {
       { field: 'source', value: 'a2' },
     ]);
     expect(node.marker.color).toEqual([2, 2, 1, 1]);
+  });
+
+  it('renders an invisible hit-target trace with sampled points along each edge', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source']), Pivot.createValues(['target'])])
+      .series([Series.forFunction('count()')])
+      .visualization('network')
+      .build();
+
+    render(<WrappedNetwork {...baseProps} config={config} data={fixtures.twoRowPivots} />);
+
+    const hits = hitTrace();
+
+    // 3 edges × 9 samples each.
+    expect(hits.type).toBe('scatter');
+    expect(hits.mode).toBe('markers');
+    expect(hits.marker.opacity).toBe(0);
+    expect(hits.x).toHaveLength(27);
+    expect(hits.y).toHaveLength(27);
+    // Each sample carries the edge (link) metadata so the popover treats it as an edge.
+    expect(hits.customdata[0].source).toBeDefined();
+    expect(hits.customdata[0].target).toBeDefined();
+
+    // The node trace stays last so it wins hit-detection near endpoints.
+    expect(nodeTrace().mode).toBe('markers+text');
   });
 
   it('colors edges by the aggregated metric value via the colorscale, at a uniform width', () => {
