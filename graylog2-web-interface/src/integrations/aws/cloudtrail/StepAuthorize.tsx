@@ -20,6 +20,7 @@ import FormDataContext from 'integrations/contexts/FormDataContext';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import formValidation from 'integrations/aws/utils/formValidation';
+import { validateExternalIdRequiresArn } from 'integrations/aws/utils/awsValidation';
 
 import { ApiRoutes } from './common/Routes';
 import type { ErrorMessageType, HandleFieldUpdateType, HandleSubmitType } from './types';
@@ -51,6 +52,21 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
+    // Validate that External ID is only used with Assume Role ARN
+    const externalIdError = validateExternalIdRequiresArn(
+      formData?.awsAssumeRoleARN?.value,
+      formData?.awsExternalId?.value,
+    );
+
+    if (externalIdError) {
+      setFormError({
+        full_message: externalIdError,
+        nice_message: externalIdError,
+      });
+
+      return;
+    }
+
     setLoading(true);
 
     fetch('POST', qualifyUrl(ApiRoutes.INTEGRATIONS.AWSCloudTrail.CHECK_CREDENTIALS), {
@@ -60,6 +76,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
       aws_sqs_region: formData?.awsCloudTrailSqsRegion?.value || '',
       aws_s3_region: formData?.awsCloudTrailS3Region?.value || '',
       assume_role_arn: formData?.awsAssumeRoleARN?.value || '',
+      aws_external_id: formData?.awsExternalId?.value || '',
     })
       .then((result: any) => {
         if (result.result === 'valid') {

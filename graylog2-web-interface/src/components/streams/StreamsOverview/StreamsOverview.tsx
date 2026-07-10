@@ -20,11 +20,12 @@ import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'logic/streams/types';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { keyFn, fetchStreams } from 'components/streams/hooks/useStreams';
-import getStreamTableElements from 'components/streams/StreamsOverview/Constants';
+import getStreamTableElements, { STREAM_VIEW_VARIANTS } from 'components/streams/StreamsOverview/Constants';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
 import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -33,6 +34,7 @@ import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/u
 import CustomColumnRenderers from './ColumnRenderers';
 import usePipelineColumn from './hooks/usePipelineColumn';
 import useStreamsOverviewExtensions from './hooks/useStreamsOverviewExtensions';
+import StreamViewButtons from './StreamViewButtons';
 import { StreamMetricsProvider } from './StreamMetricsContext';
 import { backendFieldsForVisibleColumns } from './metricColumns';
 
@@ -48,6 +50,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const {
     columnRenderers: extensionColumnRenderers,
     attributes: extensionAttributes,
+    columnGroups: extensionColumnGroups,
     expandedSections: pluggableExpandedSections,
     metricFields: extensionMetricFields,
   } = useStreamsOverviewExtensions();
@@ -55,10 +58,16 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets, pluggableExpandedSections });
 
   const columnRenderers = CustomColumnRenderers(indexSets, isPipelineColumnPermitted, extensionColumnRenderers);
-  const { additionalAttributes, defaultLayout } = getStreamTableElements(
-    isPipelineColumnPermitted,
-    extensionAttributes,
-  );
+  const { defaultVariantLayout, routingVariantLayout, performanceVariantLayout, additionalAttributes } =
+    getStreamTableElements(isPipelineColumnPermitted, extensionAttributes, extensionColumnGroups);
+
+  const { activeLayoutVariant } = useLayoutVariant();
+
+  const variantLayouts: Record<string, typeof defaultVariantLayout> = {
+    [STREAM_VIEW_VARIANTS.routing]: routingVariantLayout,
+    [STREAM_VIEW_VARIANTS.performance]: performanceVariantLayout,
+  };
+  const activeLayout = variantLayouts[activeLayoutVariant] ?? defaultVariantLayout;
 
   const fetchEntities = (options: SearchParams): Promise<PaginatedResponse<Stream>> => {
     CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
@@ -75,12 +84,12 @@ const StreamsOverview = ({ indexSets }: Props) => {
     );
   };
 
-  const { data: layoutPreferences } = useUserLayoutPreferences(defaultLayout.entityTableId);
+  const { data: layoutPreferences } = useUserLayoutPreferences(activeLayout.entityTableId, activeLayoutVariant);
   const userPrefs = layoutPreferences?.attributes ?? {};
   const userSelection = Object.entries(userPrefs)
     .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
     .map(([attributeId]) => attributeId);
-  const visibleColumns = userSelection.length > 0 ? userSelection : defaultLayout.defaultDisplayedAttributes;
+  const visibleColumns = userSelection.length > 0 ? userSelection : activeLayout.defaultDisplayedAttributes;
   const requestedFields = backendFieldsForVisibleColumns(visibleColumns, extensionMetricFields);
 
   return (
@@ -90,7 +99,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
         additionalAttributes={additionalAttributes}
         queryHelpComponent={<QueryHelper entityName="stream" />}
         entityActions={entityActions}
-        tableLayout={defaultLayout}
+        tableLayout={activeLayout}
         fetchEntities={fetchEntities}
         onDataLoaded={onDataLoaded}
         keyFn={keyFn}
@@ -99,6 +108,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
         entityAttributesAreCamelCase={false}
         filterValueRenderers={FilterValueRenderers}
         columnRenderers={columnRenderers}
+        topSection={StreamViewButtons}
       />
     </StreamMetricsProvider>
   );
