@@ -17,11 +17,26 @@
 
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import LookupTableQueryParameterEdit from 'components/lookup-table-parameters/LookupTableQueryParameterEdit';
+
 import FilterAggregationFormContainer from './FilterAggregationFormContainer';
 import FilterAggregationForm from './FilterAggregationForm';
 import FilterAggregationSummary from './FilterAggregationSummary';
 
 const bindings: PluginExports = {
+  eventDefinitionQueryParameterTypes: [
+    {
+      type: LookupTableParameter.type,
+      title: 'Lookup Table',
+      fromJSON: LookupTableParameter.fromJSON.bind(LookupTableParameter),
+      validate: (param: any) => ({
+        lookupTable: !param.lookupTable ? 'Cannot be empty' : undefined,
+        key: !param.key ? 'Cannot be empty' : undefined,
+      }),
+      editComponent: LookupTableQueryParameterEdit,
+    },
+  ],
   eventDefinitionTypes: [
     {
       type: 'aggregation-v1',
