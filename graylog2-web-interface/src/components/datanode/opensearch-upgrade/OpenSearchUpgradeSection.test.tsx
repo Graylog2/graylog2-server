@@ -157,12 +157,27 @@ describe('OpenSearchUpgradeSection', () => {
     expect(sendTelemetry).not.toHaveBeenCalledWith(EVENTS.ROLLING_UPGRADE_STARTED, expect.anything());
   });
 
-  it('disables the start action below the rolling-upgrade node threshold and explains why', () => {
+  it('offers an enabled Restart action below the rolling-upgrade node threshold', () => {
+    // Under 3 nodes a rolling upgrade is impossible, so the action becomes a plain (full) restart — still
+    // actionable, just relabeled. The backend enforces what a sub-3-node cluster can actually do.
     mockClusterStats({ numberOfDataNodes: 2 });
     render(<OpenSearchUpgradeSection />);
 
-    expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
-    expect(screen.getByText(/a rolling upgrade requires at least 3 data nodes \(you have 2\)/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^restart$/i })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: /start opensearch rolling upgrade/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/requires at least 3 data nodes/i)).not.toBeInTheDocument();
+  });
+
+  it('warns about downtime and the journal when restarting below the 3-node threshold', async () => {
+    mockClusterStats({ numberOfDataNodes: 2 });
+    render(<OpenSearchUpgradeSection />);
+
+    await userEvent.click(screen.getByRole('button', { name: /^restart$/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/full restart, not a rolling one/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/disk journal/i)).toBeInTheDocument();
+    expect(within(dialog).queryByText(/one at a time/i)).not.toBeInTheDocument();
   });
 
   it('shows the data node count with how many are available', () => {

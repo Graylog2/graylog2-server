@@ -94,10 +94,10 @@ const OpenSearchUpgradeSection = () => {
     isVersionOverviewError ||
     isLoadingOutdatedIndices ||
     isOutdatedIndicesError ||
-    hasOutdatedIndices ||
-    !isRollingUpgradePossible;
-  const startActionLabel = 'Start OpenSearch Rolling Upgrade';
-  const startActionLoadingLabel = 'Starting OpenSearch Rolling Upgrade...';
+    hasOutdatedIndices;
+  // Below the 3-node floor a rolling upgrade isn't possible, so the action is a plain (full) restart.
+  const startActionLabel = isRollingUpgradePossible ? 'Start OpenSearch Rolling Upgrade' : 'Restart';
+  const startActionLoadingLabel = isRollingUpgradePossible ? 'Starting OpenSearch Rolling Upgrade...' : 'Restarting...';
   const canResumeRollingRestart =
     rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
   // Not gated on indices, so a finished FAILED/ABORTED run keeps showing its outcome.
@@ -209,12 +209,6 @@ const OpenSearchUpgradeSection = () => {
           {!hasActiveRollingRestart && isVersionOverviewError && (
             <DisabledHint>Could not check OpenSearch upgrade availability.</DisabledHint>
           )}
-          {showStartAction && !isRollingUpgradePossible && (
-            <DisabledHint>
-              A rolling upgrade requires at least {MIN_NODES_FOR_ROLLING_UPGRADE} Data Nodes (you have{' '}
-              {numberOfDataNodes}).
-            </DisabledHint>
-          )}
           {!hasActiveRollingRestart && !isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable && (
             <DisabledHint>Data Nodes&apos; embedded OpenSearch is already up to date.</DisabledHint>
           )}
@@ -233,6 +227,7 @@ const OpenSearchUpgradeSection = () => {
           currentVersion={currentVersion}
           targetVersion={targetVersion}
           numberOfDataNodes={numberOfDataNodes}
+          isRollingUpgrade={isRollingUpgradePossible}
           isSubmitting={isStartingRollingRestart}
           onCancel={() => setShowStartConfirm(false)}
           onConfirm={handleStartConfirm}

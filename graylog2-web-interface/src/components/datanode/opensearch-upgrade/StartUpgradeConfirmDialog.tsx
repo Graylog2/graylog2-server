@@ -34,6 +34,7 @@ type Props = {
   currentVersion: string | undefined;
   targetVersion: string | undefined;
   numberOfDataNodes: number;
+  isRollingUpgrade: boolean;
   isSubmitting: boolean;
   onCancel: () => void;
   onConfirm: () => void;
@@ -52,36 +53,63 @@ const StartUpgradeConfirmDialog = ({
   currentVersion,
   targetVersion,
   numberOfDataNodes,
+  isRollingUpgrade,
   isSubmitting,
   onCancel,
   onConfirm,
-}: Props) => (
-  <ConfirmDialog
-    show
-    title="Start OpenSearch rolling upgrade?"
-    btnConfirmText="Start rolling upgrade"
-    isAsyncSubmit
-    isSubmitting={isSubmitting}
-    onCancel={onCancel}
-    onConfirm={onConfirm}
-    submitLoadingText="Starting...">
-    <Alert bsStyle="warning" title="This restarts every Data Node, one at a time">
-      <Paragraph>
-        Each of your {numberOfDataNodes} Data Nodes will be upgraded and restarted one at a time to move its embedded
-        OpenSearch {versionSummary(currentVersion, targetVersion)}.
-      </Paragraph>
-      <Paragraph>
-        Shard allocation is paused during each restart, so the cluster stays available — but indexing and search may
-        be briefly degraded while a node leaves and rejoins.
-      </Paragraph>
-      <Paragraph>
-        After each node the upgrade waits for the cluster to return to green before continuing. If that takes too
-        long it pauses and waits for you to resume.
-      </Paragraph>
-      <Paragraph>Once started, it cannot be rolled back to the previous version.</Paragraph>
-    </Alert>
-    <p>Make sure the cluster is healthy (green) before proceeding.</p>
-  </ConfirmDialog>
-);
+}: Props) =>
+  isRollingUpgrade ? (
+    <ConfirmDialog
+      show
+      title="Start OpenSearch rolling upgrade?"
+      btnConfirmText="Start rolling upgrade"
+      isAsyncSubmit
+      isSubmitting={isSubmitting}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      submitLoadingText="Starting...">
+      <Alert bsStyle="warning" title="This restarts every Data Node, one at a time">
+        <Paragraph>
+          Each of your {numberOfDataNodes} Data Nodes will be upgraded and restarted one at a time to move its embedded
+          OpenSearch {versionSummary(currentVersion, targetVersion)}.
+        </Paragraph>
+        <Paragraph>
+          Shard allocation is paused during each restart, so the cluster stays available — but indexing and search may
+          be briefly degraded while a node leaves and rejoins.
+        </Paragraph>
+        <Paragraph>
+          After each node the upgrade waits for the cluster to return to green before continuing. If that takes too
+          long it pauses and waits for you to resume.
+        </Paragraph>
+        <Paragraph>Once started, it cannot be rolled back to the previous version.</Paragraph>
+      </Alert>
+      <p>Make sure the cluster is healthy (green) before proceeding.</p>
+    </ConfirmDialog>
+  ) : (
+    <ConfirmDialog
+      show
+      title="Restart Data Nodes' OpenSearch?"
+      btnConfirmText="Restart"
+      isAsyncSubmit
+      isSubmitting={isSubmitting}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      submitLoadingText="Restarting...">
+      <Alert bsStyle="danger" title="Fewer than 3 Data Nodes — this is a full restart, not a rolling one">
+        <Paragraph>
+          With fewer than 3 Data Nodes, OpenSearch can&apos;t stay available by restarting one node at a time. All your
+          Data Nodes restart together to move OpenSearch {versionSummary(currentVersion, targetVersion)}, so the storage
+          backend is <strong>unavailable</strong> until they finish — search and indexing are interrupted.
+        </Paragraph>
+        <Paragraph>
+          While OpenSearch is down, incoming messages pile up in the disk journal on each Graylog node. If the outage
+          outlasts the journal&apos;s size or age limit, ingestion stalls and messages can be dropped — only proceed if
+          the journal has enough headroom for the expected downtime.
+        </Paragraph>
+        <Paragraph>Once started, it cannot be rolled back to the previous version.</Paragraph>
+      </Alert>
+      <p>Proceed only if you can tolerate the downtime.</p>
+    </ConfirmDialog>
+  );
 
 export default StartUpgradeConfirmDialog;
