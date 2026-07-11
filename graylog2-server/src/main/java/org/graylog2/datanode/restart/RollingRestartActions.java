@@ -67,6 +67,11 @@ public class RollingRestartActions {
         datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::stop);
     }
 
+    public void upgradeNode(String hostname) {
+        LOG.info("Sending UPGRADE trigger to DataNode {}", hostname);
+        datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::upgrade);
+    }
+
     public void startNode(String hostname) {
         LOG.info("Sending START trigger to DataNode {}", hostname);
         datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::start);
@@ -124,6 +129,9 @@ public class RollingRestartActions {
     interface DataNodeManagementClient {
         @POST("management/start")
         Call<Void> start();
+
+        @POST("management/upgrade")
+        Call<Void> upgrade();
 
         @POST("management/stop")
         Call<Void> stop();

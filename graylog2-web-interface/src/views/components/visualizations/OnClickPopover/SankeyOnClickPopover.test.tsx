@@ -129,6 +129,16 @@ describe('SankeyOnClickPopover', () => {
       expect(screen.queryByText('408')).not.toBeInTheDocument();
     });
 
+    it('does not tag the sankey combined groupings option with the EDGE operator', async () => {
+      renderPopover(linkClickPoint);
+
+      await userEvent.click(await screen.findByText('index.html-GET'));
+
+      const dropdown = await screen.findByTestId('action-dropdown');
+
+      expect(dropdown).toHaveAttribute('data-value-path-operator', '');
+    });
+
     it('shows resolved node labels rather than raw ids in the groupings dialog', async () => {
       renderPopover(linkClickPointWithResolvedIds);
 
@@ -197,6 +207,38 @@ describe('SankeyOnClickPopover', () => {
 
       expect(dropdown).toHaveAttribute('data-value-path-operator', 'OR');
       expect(JSON.parse(dropdown.getAttribute('data-value-path'))).toEqual([{ source: 'a' }, { target: 'a' }]);
+    });
+  });
+
+  describe('for a network graph edge', () => {
+    const networkConfig = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source'])])
+      .columnPivots([Pivot.createValues(['target'])])
+      .series([new Series('count()')])
+      .visualization('network')
+      .build();
+    const networkActionContext = { widget: { config: { visualization: 'network' } } } as unknown as ActionContexts;
+
+    it('tags the combined groupings option with the EDGE operator', async () => {
+      render(
+        <FieldTypesContext.Provider value={fieldTypes}>
+          <ActionContext.Provider value={networkActionContext}>
+            <Popover opened withinPortal={false}>
+              <Popover.Target>
+                <button type="button">target</button>
+              </Popover.Target>
+              <SankeyOnClickPopover clickPoint={linkClickPoint} config={networkConfig} onPopoverClose={jest.fn()} />
+            </Popover>
+          </ActionContext.Provider>
+        </FieldTypesContext.Provider>,
+      );
+
+      await userEvent.click(await screen.findByText('index.html-GET'));
+
+      const dropdown = await screen.findByTestId('action-dropdown');
+
+      expect(dropdown).toHaveAttribute('data-value-path-operator', 'EDGE');
+      expect(JSON.parse(dropdown.getAttribute('data-value-path'))).toEqual([{ page: 'index.html' }, { action: 'GET' }]);
     });
   });
 

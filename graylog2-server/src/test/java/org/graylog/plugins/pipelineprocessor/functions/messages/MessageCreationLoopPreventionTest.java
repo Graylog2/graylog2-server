@@ -56,7 +56,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -145,7 +145,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(ScheduledExecutorService.class),
                 eventBus
         );
         this.pipelineInterpreter = new PipelineInterpreter(

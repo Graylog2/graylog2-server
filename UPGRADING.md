@@ -3,6 +3,15 @@ Upgrading to Graylog 7.2.x
 
 ## Breaking Changes
 
+### Entity Suggestion Search: Regex No Longer Supported in Query Parameter
+
+The `query` parameter of the entity suggestion endpoint is now treated as a plain-text substring
+rather than a regular expression. Previously, passing a regex pattern (e.g. `foo.*bar`) would be
+evaluated by MongoDB, which allowed ReDoS attacks via crafted inputs.
+
+After upgrading, queries containing regex metacharacters (`.`, `*`, `+`, `?`, `(`, `)`, etc.) will
+be matched literally instead of being interpreted as a pattern.
+
 ### Paginated REST APIs: Case-Insensitive Matching and Sorting
 
 Paginated entity endpoints (e.g. Streams, Event Definitions, Notifications, Lookup Tables, Dashboards,
@@ -18,6 +27,15 @@ After upgrading:
   matched only `test` now also matches `Test` and `TEST`. API clients relying on exact-case matching
   via paginated endpoints will see additional results.
 
+### `gl2_accounted_message_size` can now be `0` for restored Data Lake messages
+
+When messages are restored from the Data Lake, those that do not count against your license traffic
+now have their `gl2_accounted_message_size` field set to `0`. Previously the field always held the
+message's accounted size, regardless of whether the restore counted against the license.
+
+This field is informational and is not used to compute license usage, so your license consumption is
+unaffected by the change.
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"
@@ -28,6 +46,7 @@ parameter changed from `fields` to `additional-details`, so the URL for that ste
 `.../edit?step=additional-details`. Existing bookmarked links using the old `?step=fields` value will continue to
 work, since they are mapped to the renamed step. You should update them to the new value, because support for the
 old value may be removed in a future version.
+
 
 ## Java API Changes
 

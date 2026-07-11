@@ -202,6 +202,7 @@ type IndexRetentionConfig = {
 
 type StreamsOverviewTableElement = {
   attributeName: string;
+  group?: 'routing' | 'performance';
   attributes: Array<Attribute>;
   columnRenderers: ColumnRenderersByAttribute<Stream>;
   // Optional map of column id → backend metric fields. Plugins use this to plug their
@@ -237,6 +238,7 @@ declare module 'graylog-web-plugin/plugin' {
     api_browser: 'read';
     authentication: 'edit';
     buffers: 'read';
+    collectors: 'create';
     // Do we need both of the following?
     clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';

@@ -17,6 +17,7 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { MemoryRouter } from 'react-router-dom';
 import * as React from 'react';
+import { memoryRouterFuture } from 'reactRouterFutureFlags';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
@@ -27,7 +28,11 @@ jest.mock('logic/telemetry/useSendTelemetry');
 
 const wrapper =
   (pathname: string) =>
-  ({ children }: { children: React.ReactNode }) => <MemoryRouter initialEntries={[pathname]}>{children}</MemoryRouter>;
+  ({ children }: { children: React.ReactNode }) => (
+    <MemoryRouter initialEntries={[pathname]} future={memoryRouterFuture}>
+      {children}
+    </MemoryRouter>
+  );
 
 describe('useSendCollectorsTelemetry', () => {
   const sendTelemetry = jest.fn();
