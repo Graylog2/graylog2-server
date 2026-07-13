@@ -55,8 +55,8 @@ const NODE_STATUS_LABELS: Record<RollingRestartNodeStatus, string> = {
   SKIPPED: 'Skipped',
 };
 
-// The current node's whole journey: work is ongoing even in the resting states (STOPPED = binaries
-// upgrading, STARTED = rejoining the cluster).
+// The current node's whole journey: work is ongoing even in the resting state (STARTED = rejoining
+// the cluster).
 const IN_FLIGHT_NODE_STATUSES: Array<RollingRestartNodeStatus> = ['RESTARTING', 'STARTED'];
 
 const nodeName = (node: RollingRestartNode, versionNode: OpenSearchVersionNode | undefined) =>
