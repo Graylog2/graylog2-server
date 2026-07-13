@@ -64,7 +64,6 @@ import org.graylog.collectors.config.processor.ResourceProcessorConfig;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.NoopReceiverConfig;
 import org.graylog.collectors.db.Attribute;
-import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
@@ -551,7 +550,18 @@ public class OpAmpService {
             final String fleetId = previousState.fleetId();
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
-            final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
+
+            var coalesced = txnLogService.coalesce(unprocessedMarkers);
+
+            // Read the floor only after fetching the markers: a concurrent purge then causes at
+            // most an unnecessary recompute instead of silently losing the purged changes.
+            final var floor = txnLogService.lowestRetainedSeq();
+            if (floor.isPresent() && lastProcessedTxnSeq < floor.getAsLong() - 1) {
+                // Markers this collector never processed may have been purged. We cannot
+                // reconstruct what changed, so recompute everything from current state.
+                coalesced = coalesced.withForcedRecompute(floor.getAsLong() - 1);
+            }
+
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 

@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import com.google.common.base.Preconditions;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
@@ -42,9 +43,11 @@ import org.graylog2.plugin.system.NodeId;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import static org.graylog.collectors.db.TransactionMarker.FIELD_CREATED_AT;
@@ -302,5 +305,48 @@ public class FleetTransactionLogService {
     // Package-private for test access
     MongoCollection<TransactionMarker> getCollection() {
         return collection;
+    }
+
+    /**
+     * Returns the sequence number of the oldest retained marker — the truncation floor of the log.
+     * A collector whose {@code lastProcessedTxnSeq} is below {@code floor - 1} may have missed
+     * markers that {@link #purgeMarkers} has deleted and needs a full config recompute. An empty
+     * result means no marker was ever written, never "everything was purged": {@code purgeMarkers}
+     * always retains markers.
+     */
+    public OptionalLong lowestRetainedSeq() {
+        final var lowest = collection.find().sort(Sorts.ascending(FIELD_ID)).limit(1).first();
+        return lowest == null ? OptionalLong.empty() : OptionalLong.of(lowest.seq());
+    }
+
+    /**
+     * Deletes markers older than {@code cutoff}, always retaining every marker younger than the
+     * cutoff and at least the {@code numToKeep} newest markers overall, regardless of age. Always
+     * deletes a contiguous prefix of the sequence so that {@link #lowestRetainedSeq()} remains a
+     * reliable truncation floor.
+     *
+     * @param numToKeep must be positive
+     * @return the number of deleted markers
+     * @throws IllegalArgumentException if {@code numToKeep} is not positive
+     */
+    public long purgeMarkers(Instant cutoff, int numToKeep) {
+        Preconditions.checkArgument(numToKeep > 0, "numToKeep must be positive");
+
+        final var keepFloor = collection.find()
+                .sort(Sorts.descending(FIELD_ID))
+                .skip(numToKeep - 1)
+                .limit(1)
+                .first();
+        final var agedBoundary = collection.find(Filters.lt(FIELD_CREATED_AT, Date.from(cutoff)))
+                .sort(Sorts.descending(FIELD_ID))
+                .limit(1)
+                .first();
+
+        if (keepFloor == null || agedBoundary == null) {
+            return 0;
+        }
+
+        return collection.deleteMany(Filters.lte(FIELD_ID, Math.min(keepFloor.seq() - 1, agedBoundary.seq())))
+                .getDeletedCount();
     }
 }
