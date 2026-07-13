@@ -63,16 +63,20 @@ public class MongodbNodeUtils {
      * exist (with whatever budget the count left over), to tell live profiling data from residue recorded before
      * profiling was disabled.
      *
+     * @param database the CONFIGURED Graylog database ({@code MongoConnection.getMongoDatabase()}), not a
+     *                 hardcoded default name -- on a deployment whose {@code mongodb_uri} names a custom database,
+     *                 the profiling level and {@code system.profile} of that database are the ones that matter.
+     *                 Reading them requires dbAdmin-level access; an unauthorized read throws (a health caller
+     *                 maps it to {@code unknown} with a message naming the missing privilege).
      * @return the number of slow queries in the profiler lookback window, or {@code 0} when profiling is
      *         disabled (residue entries recorded before it was disabled do not count)
      * @throws MongoOperationTimeoutException when the count exhausts the budget before the profiling level could
      *         be read -- live entries cannot be told from residue at that point, so the call fails (for a health
      *         caller: {@code unknown}) rather than guessing a false warning or a false healthy
      */
-    public static long countLiveSlowQueries(MongoClient mongoConnection, Duration budget) {
+    public static long countLiveSlowQueries(MongoDatabase database, Duration budget) {
         final long deadlineNanos = System.nanoTime() + budget.toNanos();
-        final MongoDatabase db = withOptionalTimeout(
-                mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME), budget);
+        final MongoDatabase db = withOptionalTimeout(database, budget);
         final long slowQueries = db.getCollection("system.profile").countDocuments(slowQueriesQuery());
         if (slowQueries == 0) {
             return 0;
@@ -100,7 +104,7 @@ public class MongodbNodeUtils {
 
     public static double calculateStorageUsedPercent(MongoClient mongoConnection) {
         try {
-            return storageUsedPercent(mongoConnection, null);
+            return storageUsedPercent(mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME));
         } catch (Exception e) {
             LOG.warn("Failed to calculate disk usage for mongodb node", e);
             return 0.0;
@@ -108,22 +112,23 @@ public class MongodbNodeUtils {
     }
 
     /**
-     * @param timeout optional client-side operation timeout (CSOT), so a stuck read fails fast instead of
-     *                blocking indefinitely (the Mongo driver's default socket timeout is infinite). Unlike
-     *                {@link #calculateStorageUsedPercent(MongoClient)}, this overload propagates failures instead of
-     *                swallowing them as {@code 0.0}, so a caller can surface them. That includes a timeout, a failed
-     *                {@code dbStats} command, <em>and</em> a missing/zero {@code fsTotalSize} (no usable capacity
-     *                figure) -- the swallowing overload reports the last case as {@code 0.0}, but a caller such as a
-     *                health check needs to tell "0% used" apart from "capacity unknown" and map the latter to
-     *                {@code unknown} rather than a false "healthy 0%".
+     * @param database the CONFIGURED Graylog database ({@code MongoConnection.getMongoDatabase()}), not a
+     *                 hardcoded default name -- {@code dbStats} is unauthorized for a user scoped to a custom
+     *                 database when run against a database it has no access to.
+     * @param timeout  optional client-side operation timeout (CSOT), so a stuck read fails fast instead of
+     *                 blocking indefinitely (the Mongo driver's default socket timeout is infinite). Unlike
+     *                 {@link #calculateStorageUsedPercent(MongoClient)}, this overload propagates failures instead of
+     *                 swallowing them as {@code 0.0}, so a caller can surface them. That includes a timeout, a failed
+     *                 {@code dbStats} command, <em>and</em> a missing/zero {@code fsTotalSize} (no usable capacity
+     *                 figure) -- the swallowing overload reports the last case as {@code 0.0}, but a caller such as a
+     *                 health check needs to tell "0% used" apart from "capacity unknown" and map the latter to
+     *                 {@code unknown} rather than a false "healthy 0%".
      */
-    public static double calculateStorageUsedPercent(MongoClient mongoConnection, Duration timeout) {
-        return storageUsedPercent(mongoConnection, timeout);
+    public static double calculateStorageUsedPercent(MongoDatabase database, Duration timeout) {
+        return storageUsedPercent(withOptionalTimeout(database, timeout));
     }
 
-    private static double storageUsedPercent(MongoClient mongoConnection, Duration timeout) {
-        final MongoDatabase db = withOptionalTimeout(
-                mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME), timeout);
+    private static double storageUsedPercent(MongoDatabase db) {
         final Document dbStats = db.runCommand(new Document("dbStats", 1));
         // getDouble returns a boxed Double that is null when the field is absent, so read into Double (not the
         // primitive) and null-check before use -- unboxing a missing field into a primitive double would throw a

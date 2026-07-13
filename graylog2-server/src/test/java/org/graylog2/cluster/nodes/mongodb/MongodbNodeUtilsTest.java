@@ -58,7 +58,7 @@ class MongodbNodeUtilsTest {
     void computesUsedPercentWhenCapacityIsKnown() {
         dbStats(new Document("fsUsedSize", 50.0).append("fsTotalSize", 200.0));
 
-        assertThat(MongodbNodeUtils.calculateStorageUsedPercent(client, Duration.ofSeconds(4))).isEqualTo(25.0);
+        assertThat(MongodbNodeUtils.calculateStorageUsedPercent(database, Duration.ofSeconds(4))).isEqualTo(25.0);
     }
 
     @Test
@@ -68,7 +68,7 @@ class MongodbNodeUtilsTest {
         // unknown.
         dbStats(new Document("fsUsedSize", 0.0).append("fsTotalSize", 0.0));
 
-        assertThatThrownBy(() -> MongodbNodeUtils.calculateStorageUsedPercent(client, Duration.ofSeconds(4)))
+        assertThatThrownBy(() -> MongodbNodeUtils.calculateStorageUsedPercent(database, Duration.ofSeconds(4)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("no filesystem capacity");
     }
@@ -88,7 +88,7 @@ class MongodbNodeUtilsTest {
         // NullPointerException.
         dbStats(new Document());
 
-        assertThatThrownBy(() -> MongodbNodeUtils.calculateStorageUsedPercent(client, Duration.ofSeconds(4)))
+        assertThatThrownBy(() -> MongodbNodeUtils.calculateStorageUsedPercent(database, Duration.ofSeconds(4)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("no filesystem capacity");
     }
@@ -107,7 +107,7 @@ class MongodbNodeUtilsTest {
         // countDocuments returns 0) must cost a single round-trip: the profiling level is never read.
         slowQueryCount(0);
 
-        assertThat(MongodbNodeUtils.countLiveSlowQueries(client, Duration.ofSeconds(4))).isZero();
+        assertThat(MongodbNodeUtils.countLiveSlowQueries(database, Duration.ofSeconds(4))).isZero();
         verify(database, never()).runCommand(any(Bson.class));
     }
 
@@ -116,7 +116,7 @@ class MongodbNodeUtilsTest {
         slowQueryCount(7);
         when(database.runCommand(any(Bson.class))).thenReturn(new Document("was", 1));
 
-        assertThat(MongodbNodeUtils.countLiveSlowQueries(client, Duration.ofSeconds(4))).isEqualTo(7);
+        assertThat(MongodbNodeUtils.countLiveSlowQueries(database, Duration.ofSeconds(4))).isEqualTo(7);
     }
 
     @Test
@@ -126,7 +126,7 @@ class MongodbNodeUtilsTest {
         slowQueryCount(7);
         when(database.runCommand(any(Bson.class))).thenReturn(new Document("was", 0));
 
-        assertThat(MongodbNodeUtils.countLiveSlowQueries(client, Duration.ofSeconds(4))).isZero();
+        assertThat(MongodbNodeUtils.countLiveSlowQueries(database, Duration.ofSeconds(4))).isZero();
     }
 
     @Test
@@ -136,7 +136,7 @@ class MongodbNodeUtilsTest {
         // (returning the count) or a false healthy (returning 0) -- and must not issue the second read.
         slowQueryCount(7);
 
-        assertThatThrownBy(() -> MongodbNodeUtils.countLiveSlowQueries(client, Duration.ZERO))
+        assertThatThrownBy(() -> MongodbNodeUtils.countLiveSlowQueries(database, Duration.ZERO))
                 .isInstanceOf(MongoOperationTimeoutException.class)
                 .hasMessageContaining("budget");
         verify(database, never()).runCommand(any(Bson.class));
