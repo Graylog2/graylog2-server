@@ -30,6 +30,7 @@ import ClusterConfigurationPageNavigation from 'components/cluster-configuration
 import DocumentationLink from 'components/support/DocumentationLink';
 import OpenSearchUpgradeSection from 'components/datanode/opensearch-upgrade/OpenSearchUpgradeSection';
 import useOpenSearchClusterStats from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchClusterStats';
+import useOpenSearchUpgradeStatus from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchUpgradeStatus';
 import DataNodeUpgradeNodes from 'components/datanode/data-node-upgrade/DataNodeUpgradeNodes';
 import UpgradeMethodSelector, {
   type DataNodeUpgradeMethodType,
@@ -48,13 +49,8 @@ const DataNodeUpgradePage = () => {
   const upgradeListRef = useRef<HTMLTableSectionElement>(null);
 
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
-  const {
-    currentVersion: currentOpenSearchVersion,
-    isError: isOpenSearchVersionError,
-    isUpToDate: isOpenSearchUpToDate,
-    isLoading: isLoadingOpenSearchVersion,
-    unavailableDataNodeCount,
-  } = useOpenSearchClusterStats();
+  const { currentVersion: currentOpenSearchVersion, unavailableDataNodeCount } = useOpenSearchClusterStats();
+  const openSearchStatus = useOpenSearchUpgradeStatus();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
   const [openUpgradeConfirmDialog, setOpenUpgradeConfirmDialog] = useState<boolean>(false);
 
@@ -97,11 +93,10 @@ const DataNodeUpgradePage = () => {
   const isRollingUpgradePossible = numberOfNodes >= 3;
   const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && (!!nodeInProgress || isRollingUpgradePossible);
   const areAllDataNodesUpToDate = !data?.outdated_nodes?.length && (data?.up_to_date_nodes?.length ?? 0) > 0;
+  // The section owns everything with an outcome still open: a pending upgrade, a running one, or an
+  // unconfirmed version state. Settled verdicts (`up-to-date`, `checking`, `error`) render as a plain alert.
   const showOpenSearchUpgradeSection =
-    areAllDataNodesUpToDate &&
-    !isLoadingOpenSearchVersion &&
-    !isOpenSearchVersionError &&
-    !isOpenSearchUpToDate;
+    areAllDataNodesUpToDate && ['outdated', 'upgrading', 'unconfirmed'].includes(openSearchStatus);
 
   return (
     <DocumentTitle title="Data Node Upgrade">
@@ -159,9 +154,7 @@ const DataNodeUpgradePage = () => {
             {areAllDataNodesUpToDate && (
               <UpgradeStatusAlert
                 currentOpenSearchVersion={currentOpenSearchVersion}
-                isOpenSearchVersionError={isOpenSearchVersionError}
-                isOpenSearchUpToDate={isOpenSearchUpToDate}
-                isLoadingOpenSearchVersion={isLoadingOpenSearchVersion}
+                status={openSearchStatus}
                 unavailableDataNodeCount={unavailableDataNodeCount}
               />
             )}

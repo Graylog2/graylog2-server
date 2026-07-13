@@ -25,7 +25,10 @@ import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 
 import OpenSearchUpgradeSection from './OpenSearchUpgradeSection';
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
-import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/useOpenSearchRollingRestart';
+import useOpenSearchRollingRestart, {
+  rollingRestartStartError,
+  useCurrentRollingRestart,
+} from './hooks/useOpenSearchRollingRestart';
 import type { RollingRestartJob, RollingRestartState } from './rollingRestartTypes';
 
 jest.mock('./OutdatedIndicesTable', () => ({
@@ -41,6 +44,7 @@ jest.mock('./hooks/useOpenSearchRollingRestart', () => ({
   __esModule: true,
   default: jest.fn(),
   rollingRestartStartError: jest.fn(),
+  useCurrentRollingRestart: jest.fn(),
 }));
 jest.mock('components/indices/hooks/useOutdatedIndices');
 jest.mock('logic/telemetry/useSendTelemetry');
@@ -58,7 +62,6 @@ const mockClusterStats = (overrides: Partial<ReturnType<typeof useOpenSearchClus
     isFetching: false,
     isLoading: false,
     isUpgradeAvailable: true,
-    isUpToDate: false,
     refetch: jest.fn(),
     ...overrides,
   } as ReturnType<typeof useOpenSearchClusterStats>);
@@ -71,8 +74,14 @@ type RollingRestartHookOverrides = {
   startRollingRestart?: jest.Mock;
 };
 
-const mockRollingRestart = (overrides: RollingRestartHookOverrides = {}) =>
-  asMock(useOpenSearchRollingRestart).mockReturnValue({
+const mockRollingRestart = (overrides: RollingRestartHookOverrides = {}) => {
+  asMock(useCurrentRollingRestart).mockReturnValue({
+    data: overrides.data ?? null,
+    isLoading: false,
+    refetch: jest.fn(),
+  } as unknown as ReturnType<typeof useCurrentRollingRestart>);
+
+  return asMock(useOpenSearchRollingRestart).mockReturnValue({
     data: null,
     isResumingRollingRestart: false,
     isStartingRollingRestart: false,
@@ -80,6 +89,7 @@ const mockRollingRestart = (overrides: RollingRestartHookOverrides = {}) =>
     startRollingRestart: jest.fn(() => Promise.resolve()),
     ...overrides,
   } as unknown as ReturnType<typeof useOpenSearchRollingRestart>);
+};
 
 const mockOutdatedIndices = (data: Array<unknown> = [], overrides: { isLoading?: boolean; isError?: boolean } = {}) =>
   asMock(useOutdatedIndices).mockReturnValue({
