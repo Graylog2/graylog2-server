@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { Alert, Col, Label, Row } from 'components/bootstrap';
 
@@ -43,10 +43,32 @@ const NodesHeading = styled.h3(
   `,
 );
 
+// Counts up "" → "." → ".." → "..." so an in-progress state reads as ongoing. Fixed width avoids label jitter.
+const ellipsis = keyframes`
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+  100% { content: ''; }
+`;
+
+const AnimatedEllipsis = styled.span`
+  &::after {
+    content: '';
+    display: inline-block;
+    width: 1.25em;
+    text-align: left;
+    animation: ${ellipsis} 1.4s linear infinite;
+  }
+`;
+
 const STATE_LABELS: Record<RollingRestartState, string> = {
   PREPARING_CLUSTER: 'Preparing cluster',
   SELECTING_NEXT_NODE: 'Selecting next node',
   UPGRADING_NODE: 'Upgrading node',
+  STOPPING_NODE: 'Stopping node',
+  WAITING_NODE_LEFT: 'Waiting for node to leave',
+  STARTING_NODE: 'Starting node',
   WAITING_NODE_JOINED: 'Waiting for node to rejoin',
   REENABLING_ALLOCATION: 'Re-enabling allocation',
   WAITING_GREEN: 'Waiting for green cluster',
@@ -61,6 +83,9 @@ const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 
   PREPARING_CLUSTER: 'info',
   SELECTING_NEXT_NODE: 'info',
   UPGRADING_NODE: 'info',
+  STOPPING_NODE: 'warning',
+  WAITING_NODE_LEFT: 'warning',
+  STARTING_NODE: 'info',
   WAITING_NODE_JOINED: 'info',
   REENABLING_ALLOCATION: 'info',
   WAITING_GREEN: 'info',
@@ -86,14 +111,21 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
   }));
   const completedNodes = nodes.filter(({ node }) => node.status === 'COMPLETED');
   const remainingNodes = nodes.filter(({ node }) => node.status !== 'COMPLETED');
-  const currentNodeIndex = isRollingRestartTerminalState(data.sm_state) ? -1 : data.current_node_index;
+  const isTerminal = isRollingRestartTerminalState(data.sm_state);
+  const currentNodeIndex = isTerminal ? -1 : data.current_node_index;
+  // Fallbacks guard against a backend state the UI doesn't know yet — never render an empty gray label.
+  const stateStyle = STATE_STYLE[data.sm_state] ?? 'info';
+  const stateLabel = STATE_LABELS[data.sm_state] ?? 'In progress';
+  // Paused is non-terminal but stalled (awaiting resume), so it gets no "working" animation.
+  const showProgress = !isTerminal && data.sm_state !== 'PAUSED_WAITING_GREEN';
 
   return (
     <>
       <SectionHeading>
         OpenSearch rolling upgrade&nbsp;
-        <Label bsStyle={STATE_STYLE[data.sm_state]}>
-          {STATE_LABELS[data.sm_state]}
+        <Label bsStyle={stateStyle}>
+          {stateLabel}
+          {showProgress && <AnimatedEllipsis aria-hidden data-testid="rolling-upgrade-progress" />}
         </Label>
       </SectionHeading>
       {data.paused_reason && <Alert bsStyle="warning">{data.paused_reason}</Alert>}
