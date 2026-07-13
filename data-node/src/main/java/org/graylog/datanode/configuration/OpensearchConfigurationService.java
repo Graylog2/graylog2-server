@@ -23,8 +23,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
-import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.slf4j.Logger;
@@ -81,8 +81,10 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     public void onOpensearchVersionChange(OpensearchUpdateEvent event) {
         // configuration relies on the keystore. Initial change there should rebuild the configuration and restart
         // dependent services
+        LOG.info("Setting OpenSearch version to latest available");
         final boolean upgraded = opensearchUpgradeAction.upgradeToLatestAvaiable();
         if (upgraded) {
+            LOG.info("Triggering configuration change event");
             triggerConfigurationChangedEvent();
         } else {
             LOG.warn("Node can't be upgraded, no newer opensearch version available");
