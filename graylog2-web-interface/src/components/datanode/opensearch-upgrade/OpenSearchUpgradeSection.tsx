@@ -26,10 +26,11 @@ import ForceStartConfirmDialog from './ForceStartConfirmDialog';
 import StartUpgradeConfirmDialog from './StartUpgradeConfirmDialog';
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/useOpenSearchRollingRestart';
+import useOpenSearchUpgradeStatus from './hooks/useOpenSearchUpgradeStatus';
 import OutdatedIndicesTable from './OutdatedIndicesTable';
 import OpenSearchUpgradeInfo from './OpenSearchUpgradeInfo';
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
-import { isRollingRestartActive, isRollingRestartTerminalState } from './rollingRestartTypes';
+import { isRollingRestartTerminalState } from './rollingRestartTypes';
 
 const Section = styled.div(
   ({ theme }) => css`
@@ -57,11 +58,10 @@ const OpenSearchUpgradeSection = () => {
     nodes: openSearchVersionNodes,
     numberOfDataNodes,
     unavailableDataNodeCount,
-    isError: isVersionOverviewError,
     isLoading,
-    isUpgradeAvailable,
     refetch: refetchOpenSearchClusterStats,
   } = useOpenSearchClusterStats();
+  const openSearchStatus = useOpenSearchUpgradeStatus();
   const {
     data: outdatedIndices,
     isError: isOutdatedIndicesError,
@@ -80,21 +80,12 @@ const OpenSearchUpgradeSection = () => {
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
   const hasOutdatedIndices = outdatedIndices.length > 0;
   const rollingRestartState = rollingRestart?.data?.sm_state;
-  const hasActiveRollingRestart = isRollingRestartActive(rollingRestart);
   // A job (running or finished) owns the section: hide the outdated-indices list, show its status panel.
   const hasRollingRestartJob = !!rollingRestart?.data;
   const showOutdatedIndices = !hasRollingRestartJob;
-  const showStartAction = !hasActiveRollingRestart && isUpgradeAvailable;
-  // Only the initial load counts as "checking" — background refetches (the 5s poll) must not blank the status
-  // table or flip the start button, otherwise the whole section flickers on every poll.
-  const isCheckingVersionOverview = isLoading;
+  const showStartAction = openSearchStatus === 'outdated';
   const isStartActionDisabled =
-    isStartingRollingRestart ||
-    isCheckingVersionOverview ||
-    isVersionOverviewError ||
-    isLoadingOutdatedIndices ||
-    isOutdatedIndicesError ||
-    hasOutdatedIndices;
+    isStartingRollingRestart || isLoadingOutdatedIndices || isOutdatedIndicesError || hasOutdatedIndices;
   // Below the 3-node floor a rolling upgrade isn't possible, so the action is a plain (full) restart.
   const startActionLabel = isRollingUpgradePossible ? 'Start OpenSearch Rolling Upgrade' : 'Restart';
   const startActionLoadingLabel = isRollingUpgradePossible ? 'Starting OpenSearch Rolling Upgrade...' : 'Restarting...';
@@ -142,11 +133,8 @@ const OpenSearchUpgradeSection = () => {
   };
 
   // Versions look equal but can't be confirmed while nodes are down — hide the operational panels.
-  // Active upgrades are exempt: a temporarily missing node is their normal condition.
-  const isVersionStateUnconfirmed =
-    !isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable && unavailableDataNodeCount > 0;
-
-  if (isVersionStateUnconfirmed && !hasActiveRollingRestart) {
+  // (An active upgrade never reads as `unconfirmed`: a temporarily missing node is its normal condition.)
+  if (openSearchStatus === 'unconfirmed') {
     return (
       <Section>
         <h1>Upgrade Data Nodes&apos; embedded OpenSearch</h1>
@@ -206,10 +194,10 @@ const OpenSearchUpgradeSection = () => {
           {showOutdatedIndices && hasOutdatedIndices && (
             <DisabledHint>Resolve all outdated indices first.</DisabledHint>
           )}
-          {!hasActiveRollingRestart && isVersionOverviewError && (
+          {openSearchStatus === 'error' && (
             <DisabledHint>Could not check OpenSearch upgrade availability.</DisabledHint>
           )}
-          {!hasActiveRollingRestart && !isCheckingVersionOverview && !isVersionOverviewError && !isUpgradeAvailable && (
+          {openSearchStatus === 'up-to-date' && (
             <DisabledHint>Data Nodes&apos; embedded OpenSearch is already up to date.</DisabledHint>
           )}
         </Col>

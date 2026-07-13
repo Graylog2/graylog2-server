@@ -73,9 +73,8 @@ export const rollingRestartStartError = (error: unknown) => {
   };
 };
 
-const useOpenSearchRollingRestart = () => {
-  const queryClient = useQueryClient();
-
+// Read-only view on the current rolling-restart job, for consumers that only need its state.
+export const useCurrentRollingRestart = () => {
   const { data, isInitialLoading, refetch } = useQuery<RollingRestartJob | null>({
     queryKey: ROLLING_RESTART_QUERY_KEY,
     queryFn: () =>
@@ -94,6 +93,13 @@ const useOpenSearchRollingRestart = () => {
       return ROLLING_RESTART_STATUS_REFETCH_INTERVAL;
     },
   });
+
+  return { data, isLoading: isInitialLoading, refetch };
+};
+
+const useOpenSearchRollingRestart = () => {
+  const queryClient = useQueryClient();
+  const { data, isLoading, refetch } = useCurrentRollingRestart();
 
   const { mutateAsync: startRollingRestart, isPending: isStartingRollingRestart } = useMutation({
     mutationFn: (force: boolean = false) => startRollingRestartRequest(force),
@@ -124,7 +130,7 @@ const useOpenSearchRollingRestart = () => {
 
   return {
     data,
-    isLoading: isInitialLoading,
+    isLoading,
     isResumingRollingRestart,
     isStartingRollingRestart,
     refetch,

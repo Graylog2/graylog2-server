@@ -59,6 +59,10 @@ const NODE_STATUS_LABELS: Record<RollingRestartNodeStatus, string> = {
   SKIPPED: 'Skipped',
 };
 
+// The current node's whole journey: work is ongoing even in the resting states (STOPPED = binaries
+// upgrading, STARTED = rejoining the cluster).
+const IN_FLIGHT_NODE_STATUSES: Array<RollingRestartNodeStatus> = ['STOPPING', 'STOPPED', 'STARTING', 'STARTED'];
+
 const nodeName = (node: RollingRestartNode, versionNode: OpenSearchVersionNode | undefined) =>
   versionNode?.datanode?.node_name ?? versionNode?.datanode?.hostname ?? node.hostname;
 
@@ -122,12 +126,15 @@ const OpenSearchVersionCell = ({
   versionNode?: OpenSearchVersionNode;
 }) => <td>{opensearchVersion(node, versionNode)}</td>;
 
-const NodeStatusCell = ({ node }: { node: RollingRestartNode }) => (
+const NodeStatusCell = ({ node, showProgress }: { node: RollingRestartNode; showProgress: boolean }) => (
   <td align="right">
     <Label bsStyle={NODE_STATUS_STYLE[node.status]}>
       {NODE_STATUS_LABELS[node.status]}
       &nbsp;
       {node.status === 'COMPLETED' && <Icon name="check" />}
+      {showProgress && IN_FLIGHT_NODE_STATUSES.includes(node.status) && (
+        <Icon name="progress_activity" spin data-testid="node-upgrade-progress" />
+      )}
     </Label>
   </td>
 );
@@ -136,10 +143,12 @@ const OpenSearchRollingUpgradeNodeTable = ({
   emptyMessage,
   nodes,
   currentNodeIndex,
+  showProgress,
 }: {
   emptyMessage: string;
   nodes: Array<RollingUpgradeNodeWithContext>;
   currentNodeIndex: number;
+  showProgress: boolean;
 }) => (
   <Table>
     <thead>
@@ -154,7 +163,7 @@ const OpenSearchRollingUpgradeNodeTable = ({
         <tr key={node.datanode_id}>
           <NodeIdentityCell node={node} versionNode={versionNode} isCurrent={index === currentNodeIndex} />
           <OpenSearchVersionCell node={node} versionNode={versionNode} />
-          <NodeStatusCell node={node} />
+          <NodeStatusCell node={node} showProgress={showProgress} />
         </tr>
       ))}
       {!nodes.length && (

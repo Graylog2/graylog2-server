@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Alert, Col, Label, Row } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
 import type { OpenSearchVersionNode } from './hooks/useOpenSearchClusterStats';
 import OpenSearchRollingUpgradeNodeTable from './OpenSearchRollingUpgradeNodeTable';
@@ -43,24 +44,11 @@ const NodesHeading = styled.h3(
   `,
 );
 
-// Counts up "" → "." → ".." → "..." so an in-progress state reads as ongoing. Fixed width avoids label jitter.
-const ellipsis = keyframes`
-  0%   { content: ''; }
-  25%  { content: '.'; }
-  50%  { content: '..'; }
-  75%  { content: '...'; }
-  100% { content: ''; }
-`;
-
-const AnimatedEllipsis = styled.span`
-  &::after {
-    content: '';
-    display: inline-block;
-    width: 1.25em;
-    text-align: left;
-    animation: ${ellipsis} 1.4s linear infinite;
-  }
-`;
+const ProgressSpinner = styled(Icon)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xxs};
+  `,
+);
 
 const STATE_LABELS: Record<RollingRestartState, string> = {
   PREPARING_CLUSTER: 'Preparing cluster',
@@ -125,7 +113,7 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
         OpenSearch rolling upgrade&nbsp;
         <Label bsStyle={stateStyle}>
           {stateLabel}
-          {showProgress && <AnimatedEllipsis aria-hidden data-testid="rolling-upgrade-progress" />}
+          {showProgress && <ProgressSpinner name="progress_activity" spin data-testid="rolling-upgrade-progress" />}
         </Label>
       </SectionHeading>
       {data.paused_reason && <Alert bsStyle="warning">{data.paused_reason}</Alert>}
@@ -140,6 +128,7 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
             nodes={remainingNodes}
             currentNodeIndex={currentNodeIndex}
             emptyMessage="No remaining nodes."
+            showProgress={showProgress}
           />
         </Col>
         <Col sm={6}>
@@ -148,6 +137,7 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
             nodes={completedNodes}
             currentNodeIndex={currentNodeIndex}
             emptyMessage="No upgraded nodes yet."
+            showProgress={showProgress}
           />
         </Col>
       </Row>

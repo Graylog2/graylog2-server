@@ -18,9 +18,22 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
-import type { RollingRestartData, RollingRestartJob, RollingRestartState } from './rollingRestartTypes';
+import type {
+  RollingRestartData,
+  RollingRestartJob,
+  RollingRestartNode,
+  RollingRestartNodeStatus,
+  RollingRestartState,
+} from './rollingRestartTypes';
 
-const jobWithState = (smState: string): RollingRestartJob => ({
+const nodeWithStatus = (status: RollingRestartNodeStatus, datanodeId: string = 'node-1'): RollingRestartNode => ({
+  hostname: `${datanodeId}.example.org`,
+  datanode_id: datanodeId,
+  status,
+  attempts: 1,
+});
+
+const jobWithState = (smState: string, nodes: Array<RollingRestartNode> = []): RollingRestartJob => ({
   job_definition_type: 'rolling-restart-v1',
   job_definition_id: 'def-1',
   status: 'running',
@@ -30,7 +43,7 @@ const jobWithState = (smState: string): RollingRestartJob => ({
   data: {
     type: 'rolling-restart-v1',
     sm_state: smState as RollingRestartState,
-    nodes: [],
+    nodes,
     current_node_index: -1,
     abort_requested: false,
     triggered_by: 'admin',
@@ -68,5 +81,20 @@ describe('OpenSearchRollingUpgradeNodes', () => {
     render(<OpenSearchRollingUpgradeNodes job={jobWithState('PAUSED_WAITING_GREEN')} versionNodes={[]} />);
 
     expect(screen.queryByTestId('rolling-upgrade-progress')).not.toBeInTheDocument();
+  });
+
+  it('shows a progress indicator on the in-flight node while running', () => {
+    const nodes = [nodeWithStatus('STOPPING', 'node-1'), nodeWithStatus('PENDING', 'node-2')];
+    render(<OpenSearchRollingUpgradeNodes job={jobWithState('STOPPING_NODE', nodes)} versionNodes={[]} />);
+
+    // Exactly one: the in-flight node spins, the queued one does not.
+    expect(screen.getAllByTestId('node-upgrade-progress')).toHaveLength(1);
+  });
+
+  it('hides node progress indicators while paused — a frozen status must not read as ongoing work', () => {
+    const nodes = [nodeWithStatus('STARTED')];
+    render(<OpenSearchRollingUpgradeNodes job={jobWithState('PAUSED_WAITING_GREEN', nodes)} versionNodes={[]} />);
+
+    expect(screen.queryByTestId('node-upgrade-progress')).not.toBeInTheDocument();
   });
 });

@@ -17,82 +17,78 @@
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Icon, Spinner } from 'components/common';
+import type { OpenSearchUpgradeStatus } from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchUpgradeStatus';
+import assertUnreachable from 'logic/assertUnreachable';
 
-const OpenSearchStatusLine = ({
-  currentOpenSearchVersion,
-  isOpenSearchVersionError,
-  isLoadingOpenSearchVersion,
-  isOpenSearchUpToDate,
-  unavailableDataNodeCount,
-}: {
+type Props = {
   currentOpenSearchVersion: string | undefined;
-  isOpenSearchVersionError: boolean;
-  isLoadingOpenSearchVersion: boolean;
-  isOpenSearchUpToDate: boolean;
+  status: OpenSearchUpgradeStatus;
   unavailableDataNodeCount: number;
-}) => {
-  if (isLoadingOpenSearchVersion) {
-    return <p>Checking OpenSearch version...</p>;
-  }
-
-  if (isOpenSearchVersionError) {
-    return (
-      <p>
-        <Icon name="warning" bsStyle="warning" /> Could not check Data Nodes&apos; embedded OpenSearch version.
-      </p>
-    );
-  }
-
-  // A node that is down or still starting may come back with a different OpenSearch version than its
-  // metadata claims, so neither "up to date" nor "not up to date" can be stated honestly.
-  if (unavailableDataNodeCount > 0) {
-    return (
-      <p>
-        <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch state cannot be confirmed
-        while {unavailableDataNodeCount} Data {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable.
-      </p>
-    );
-  }
-
-  if (isOpenSearchUpToDate) {
-    return (
-      <p>
-        <Icon name="check_circle" bsStyle="success" /> Data Nodes&apos; embedded OpenSearch is up to date
-        {currentOpenSearchVersion ? <b>{` (${currentOpenSearchVersion}).`}</b> : '.'}
-      </p>
-    );
-  }
-
-  return (
-    <p>
-      <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch is not up to date.
-    </p>
-  );
 };
 
-const UpgradeStatusAlert = ({
-  currentOpenSearchVersion,
-  isOpenSearchVersionError,
-  isOpenSearchUpToDate,
-  isLoadingOpenSearchVersion,
-  unavailableDataNodeCount,
-}: {
-  currentOpenSearchVersion: string | undefined;
-  isOpenSearchVersionError: boolean;
-  isOpenSearchUpToDate: boolean;
-  isLoadingOpenSearchVersion: boolean;
-  unavailableDataNodeCount: number;
-}) => (
-  <Alert bsStyle={isOpenSearchUpToDate ? 'success' : 'warning'} noIcon>
+const ALERT_STYLE: Record<OpenSearchUpgradeStatus, 'info' | 'success' | 'warning'> = {
+  upgrading: 'info',
+  checking: 'info',
+  error: 'warning',
+  outdated: 'warning',
+  unconfirmed: 'warning',
+  'up-to-date': 'success',
+};
+
+const OpenSearchStatusLine = ({ currentOpenSearchVersion, status, unavailableDataNodeCount }: Props) => {
+  switch (status) {
+    case 'checking':
+      return (
+        <p>
+          <Spinner text="Checking OpenSearch status..." />
+        </p>
+      );
+    case 'upgrading':
+      return (
+        <p>
+          <Icon name="info" /> OpenSearch rolling upgrade is in progress.
+        </p>
+      );
+    case 'error':
+      return (
+        <p>
+          <Icon name="warning" bsStyle="warning" /> Could not check Data Nodes&apos; embedded OpenSearch version.
+        </p>
+      );
+    case 'unconfirmed':
+      return (
+        <p>
+          <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch state cannot be confirmed
+          while {unavailableDataNodeCount} Data {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable.
+        </p>
+      );
+    case 'up-to-date':
+      return (
+        <p>
+          <Icon name="check_circle" bsStyle="success" /> Data Nodes&apos; embedded OpenSearch is up to date
+          {currentOpenSearchVersion ? <b>{` (${currentOpenSearchVersion}).`}</b> : '.'}
+        </p>
+      );
+    case 'outdated':
+      return (
+        <p>
+          <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch is not up to date.
+        </p>
+      );
+    default:
+      return assertUnreachable(status, 'Unknown OpenSearch upgrade status');
+  }
+};
+
+const UpgradeStatusAlert = ({ currentOpenSearchVersion, status, unavailableDataNodeCount }: Props) => (
+  <Alert bsStyle={ALERT_STYLE[status]} noIcon>
     <p>
       <Icon name="check_circle" bsStyle="success" /> All your Data Nodes are up to date.
     </p>
     <OpenSearchStatusLine
       currentOpenSearchVersion={currentOpenSearchVersion}
-      isOpenSearchVersionError={isOpenSearchVersionError}
-      isLoadingOpenSearchVersion={isLoadingOpenSearchVersion}
-      isOpenSearchUpToDate={isOpenSearchUpToDate}
+      status={status}
       unavailableDataNodeCount={unavailableDataNodeCount}
     />
   </Alert>
