@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import {render, screen} from 'wrappedTestingLibrary';
 
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
 import type {
@@ -84,8 +84,8 @@ describe('OpenSearchRollingUpgradeNodes', () => {
   });
 
   it('shows a progress indicator on the in-flight node while running', () => {
-    const nodes = [nodeWithStatus('STOPPING', 'node-1'), nodeWithStatus('PENDING', 'node-2')];
-    render(<OpenSearchRollingUpgradeNodes job={jobWithState('STOPPING_NODE', nodes)} versionNodes={[]} />);
+    const nodes = [nodeWithStatus('RESTARTING', 'node-1'), nodeWithStatus('PENDING', 'node-2')];
+    render(<OpenSearchRollingUpgradeNodes job={jobWithState('RESTARTING_NODE', nodes)} versionNodes={[]} />);
 
     // Exactly one: the in-flight node spins, the queued one does not.
     expect(screen.getAllByTestId('node-upgrade-progress')).toHaveLength(1);
