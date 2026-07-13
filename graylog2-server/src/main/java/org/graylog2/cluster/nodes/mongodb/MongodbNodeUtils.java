@@ -17,6 +17,7 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoOperationTimeoutException;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -26,41 +27,75 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class MongodbNodeUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongodbNodeUtils.class);
 
     public static final int SLOW_QUERIES_THRESHOLD = 100;
 
-    public static ProfilingResult getProfilingResults(MongoClient mongoConnection) {
-        return getProfilingResults(mongoConnection, null);
-    }
+    // Slow queries recorded further back than this are not counted (they no longer say anything about now).
+    private static final Duration PROFILER_LOOKBACK = Duration.ofMinutes(5);
 
-    /**
-     * @param timeout optional client-side operation timeout (CSOT). When non-null, the commands run against a
-     *                {@code withTimeout} database view so a stuck read fails fast instead of blocking indefinitely
-     *                (the Mongo driver's default socket timeout is infinite). Pass {@code null} to leave the
-     *                operations bounded only by the client's configured timeouts.
-     */
-    public static ProfilingResult getProfilingResults(MongoClient mongoConnection, Duration timeout) {
+    // countLiveSlowQueries refuses to issue its second round-trip with less than this left of the caller's
+    // budget: a read with a degenerate timeout would fail anyway, only slower.
+    private static final Duration MIN_REMAINING_BUDGET = Duration.ofMillis(100);
+
+    public static ProfilingResult getProfilingResults(MongoClient mongoConnection) {
         // Check if profiling is enabled and query system.profile
-        final MongoDatabase db = withOptionalTimeout(
-                mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME), timeout);
+        final MongoDatabase db = mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME);
         Document profileStatus = db.runCommand(new Document("profile", -1));
         int profilingLevel = profileStatus.getInteger("was", 0);
         if (profilingLevel > 0) {
-            // Count slow queries from the last 5 minutes
-            long fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000);
-            Date cutoffTime = new Date(fiveMinutesAgo);
-
-            Document query = new Document("ts", new Document("$gte", cutoffTime))
-                    .append("millis", new Document("$gte", SLOW_QUERIES_THRESHOLD)); // Queries taking more than 100ms
-
-            final long slowQueries = db.getCollection("system.profile").countDocuments(query);
+            final long slowQueries = db.getCollection("system.profile").countDocuments(slowQueriesQuery());
             return new ProfilingResult(ProfilingLevel.fromNumericalValue(profilingLevel), slowQueries);
         } else {
             return new ProfilingResult(ProfilingLevel.OFF, null);
         }
+    }
+
+    /**
+     * Slow-query count for the cluster health check, bounded by a single wall-clock {@code budget} shared across
+     * its round-trips (CSOT -- the driver's default socket timeout is infinite, so an unbounded read could block
+     * forever). The count runs first -- {@code countDocuments} on a missing or empty {@code system.profile}
+     * returns 0 -- so the common healthy path costs one round-trip; the profiling level is read only when entries
+     * exist (with whatever budget the count left over), to tell live profiling data from residue recorded before
+     * profiling was disabled.
+     *
+     * @return the number of slow queries in the profiler lookback window, or {@code 0} when profiling is
+     *         disabled (residue entries recorded before it was disabled do not count)
+     * @throws MongoOperationTimeoutException when the count exhausts the budget before the profiling level could
+     *         be read -- live entries cannot be told from residue at that point, so the call fails (for a health
+     *         caller: {@code unknown}) rather than guessing a false warning or a false healthy
+     */
+    public static long countLiveSlowQueries(MongoClient mongoConnection, Duration budget) {
+        final long deadlineNanos = System.nanoTime() + budget.toNanos();
+        final MongoDatabase db = withOptionalTimeout(
+                mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME), budget);
+        final long slowQueries = db.getCollection("system.profile").countDocuments(slowQueriesQuery());
+        if (slowQueries == 0) {
+            return 0;
+        }
+
+        // Entries exist: read the profiling level to tell live data from residue, bounded by whatever the count
+        // left over so the PAIR honors the caller's budget -- a per-read constant would either let the pair
+        // overrun the budget or over-throttle a fast first read.
+        final Duration remaining = Duration.ofNanos(deadlineNanos - System.nanoTime());
+        if (remaining.compareTo(MIN_REMAINING_BUDGET) < 0) {
+            throw new MongoOperationTimeoutException(f(
+                    "Counting slow queries consumed the %dms budget before the profiling level could be read",
+                    budget.toMillis()));
+        }
+        final Document profileStatus = withOptionalTimeout(db, remaining).runCommand(new Document("profile", -1));
+        return profileStatus.getInteger("was", 0) > 0 ? slowQueries : 0;
+    }
+
+    /** Slow operations ({@code >= SLOW_QUERIES_THRESHOLD} ms) within the profiler lookback window. */
+    private static Document slowQueriesQuery() {
+        final Date cutoffTime = new Date(System.currentTimeMillis() - PROFILER_LOOKBACK.toMillis());
+        return new Document("ts", new Document("$gte", cutoffTime))
+                .append("millis", new Document("$gte", SLOW_QUERIES_THRESHOLD));
     }
 
     public static double calculateStorageUsedPercent(MongoClient mongoConnection) {
@@ -73,8 +108,8 @@ public class MongodbNodeUtils {
     }
 
     /**
-     * @param timeout optional client-side operation timeout (CSOT); see
-     *                {@link #getProfilingResults(MongoClient, Duration)}. Unlike
+     * @param timeout optional client-side operation timeout (CSOT), so a stuck read fails fast instead of
+     *                blocking indefinitely (the Mongo driver's default socket timeout is infinite). Unlike
      *                {@link #calculateStorageUsedPercent(MongoClient)}, this overload propagates failures instead of
      *                swallowing them as {@code 0.0}, so a caller can surface them. That includes a timeout, a failed
      *                {@code dbStats} command, <em>and</em> a missing/zero {@code fsTotalSize} (no usable capacity

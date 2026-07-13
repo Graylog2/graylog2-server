@@ -17,6 +17,8 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoOperationTimeoutException;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -29,16 +31,27 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class MongodbNodeUtilsTest {
     private final MongoClient client = mock(MongoClient.class);
     private final MongoDatabase database = mock(MongoDatabase.class);
+    @SuppressWarnings("unchecked")
+    private final MongoCollection<Document> profileCollection = mock(MongoCollection.class);
 
     private void dbStats(Document stats) {
         when(client.getDatabase(any())).thenReturn(database);
         when(database.withTimeout(anyLong(), any())).thenReturn(database);
         when(database.runCommand(any(Bson.class))).thenReturn(stats);
+    }
+
+    private void slowQueryCount(long count) {
+        when(client.getDatabase(any())).thenReturn(database);
+        when(database.withTimeout(anyLong(), any())).thenReturn(database);
+        when(database.getCollection("system.profile")).thenReturn(profileCollection);
+        when(profileCollection.countDocuments(any(Bson.class))).thenReturn(count);
     }
 
     @Test
@@ -86,5 +99,46 @@ class MongodbNodeUtilsTest {
         dbStats(new Document());
 
         assertThat(MongodbNodeUtils.calculateStorageUsedPercent(client)).isEqualTo(0.0);
+    }
+
+    @Test
+    void zeroSlowQueriesSkipsTheProfilingLevelRead() {
+        // The common healthy path (no slow entries -- including a missing or empty system.profile, where
+        // countDocuments returns 0) must cost a single round-trip: the profiling level is never read.
+        slowQueryCount(0);
+
+        assertThat(MongodbNodeUtils.countLiveSlowQueries(client, Duration.ofSeconds(4))).isZero();
+        verify(database, never()).runCommand(any(Bson.class));
+    }
+
+    @Test
+    void liveSlowQueriesAreCountedWhenProfilingIsEnabled() {
+        slowQueryCount(7);
+        when(database.runCommand(any(Bson.class))).thenReturn(new Document("was", 1));
+
+        assertThat(MongodbNodeUtils.countLiveSlowQueries(client, Duration.ofSeconds(4))).isEqualTo(7);
+    }
+
+    @Test
+    void residueEntriesRecordedBeforeProfilingWasDisabledDoNotCount() {
+        // Entries can linger in system.profile after profiling is turned off; with profiling OFF they are
+        // residue, not a live signal, so the count reads as 0 (healthy) rather than a false warning.
+        slowQueryCount(7);
+        when(database.runCommand(any(Bson.class))).thenReturn(new Document("was", 0));
+
+        assertThat(MongodbNodeUtils.countLiveSlowQueries(client, Duration.ofSeconds(4))).isZero();
+    }
+
+    @Test
+    void failsRatherThanGuessesWhenTheCountExhaustsTheBudget() {
+        // A zero budget is exhausted by the time the count returns; entries exist, so live-vs-residue cannot be
+        // decided. The call must fail (a health caller maps it to unknown) rather than guess a false warning
+        // (returning the count) or a false healthy (returning 0) -- and must not issue the second read.
+        slowQueryCount(7);
+
+        assertThatThrownBy(() -> MongodbNodeUtils.countLiveSlowQueries(client, Duration.ZERO))
+                .isInstanceOf(MongoOperationTimeoutException.class)
+                .hasMessageContaining("budget");
+        verify(database, never()).runCommand(any(Bson.class));
     }
 }
