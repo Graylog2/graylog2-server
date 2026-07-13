@@ -143,7 +143,7 @@ public class RollingRestartExecutionJob implements Job {
                         .currentNodeIndex(nextIdx)
                         .nodes(replaceNode(data.nodes(), nextIdx,
                                 data.nodes().get(nextIdx)
-                                        .withStatus(RollingRestartNodeStatus.STOPPING)
+                                        .withStatus(RollingRestartNodeStatus.RESTARTING)
                                         .withStarted(Instant.now())))
                         .build();
             }

@@ -19,8 +19,7 @@ package org.graylog2.datanode.restart;
 public enum RollingRestartNodeStatus {
     PENDING,
     STOPPING,
-    STOPPED,
-    STARTING,
+    RESTARTING,
     STARTED,
     COMPLETED,
     FAILED,

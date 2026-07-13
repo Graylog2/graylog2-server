@@ -122,7 +122,7 @@ class RollingRestartExecutionJobTest {
         assertThat(data.smState()).isEqualTo(RollingRestartState.UPGRADING_NODE);
         assertThat(data.currentNodeIndex()).isEqualTo(0);
         assertThat(data.nodes().get(0).hostname()).isEqualTo("node-a");
-        assertThat(data.nodes().get(0).status()).isEqualTo(RollingRestartNodeStatus.STOPPING);
+        assertThat(data.nodes().get(0).status()).isEqualTo(RollingRestartNodeStatus.RESTARTING);
     }
 
     @Test
