@@ -392,6 +392,23 @@ class FleetTransactionLogServiceTest {
     }
 
     @Test
+    void purgeMarkersNeverDeletesMarkersYoungerThanCutoff() {
+        appendMarkers(4);
+        // timestamp inversion across the cutoff: seq 3 is aged but follows the young seq 2
+        backdate(1, 1, Instant.now().minus(Duration.ofDays(40)));
+        // seq 2 stays young
+        backdate(3, 3, Instant.now().minus(Duration.ofDays(38)));
+        // seq 4 stays young
+
+        final long deleted = service.purgeMarkers(Instant.now().minus(Duration.ofDays(30)), 1);
+
+        // deletion stops below the first young marker (seq 2); the aged seq 3 survives this
+        // run and is purged later, once the advancing cutoff passes seq 2
+        assertThat(deleted).isEqualTo(1L);
+        assertThat(service.lowestRetainedSeq()).hasValue(2L);
+    }
+
+    @Test
     void purgeMarkersRejectsNonPositiveNumToKeep() {
         assertThatThrownBy(() -> service.purgeMarkers(Instant.now(), 0))
                 .isInstanceOf(IllegalArgumentException.class);

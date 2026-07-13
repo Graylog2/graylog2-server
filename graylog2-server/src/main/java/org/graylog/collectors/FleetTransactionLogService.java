@@ -332,21 +332,25 @@ public class FleetTransactionLogService {
     public long purgeMarkers(Instant cutoff, int numToKeep) {
         Preconditions.checkArgument(numToKeep > 0, "numToKeep must be positive");
 
-        final var keepFloor = collection.find()
+        final var oldestToKeepByCount = collection.find()
                 .sort(Sorts.descending(FIELD_ID))
                 .skip(numToKeep - 1)
                 .limit(1)
                 .first();
-        final var agedBoundary = collection.find(Filters.lt(FIELD_CREATED_AT, Date.from(cutoff)))
-                .sort(Sorts.descending(FIELD_ID))
-                .limit(1)
-                .first();
 
-        if (keepFloor == null || agedBoundary == null) {
+        if (oldestToKeepByCount == null) {
             return 0;
         }
 
-        return collection.deleteMany(Filters.lte(FIELD_ID, Math.min(keepFloor.seq() - 1, agedBoundary.seq())))
-                .getDeletedCount();
+        final var oldestToKeepByAge = collection.find(Filters.gte(FIELD_CREATED_AT, Date.from(cutoff)))
+                .sort(Sorts.ascending(FIELD_ID))
+                .limit(1)
+                .first();
+
+        final var lowestSeqToKeep = oldestToKeepByAge == null
+                ? oldestToKeepByCount.seq()
+                : Math.min(oldestToKeepByCount.seq(), oldestToKeepByAge.seq());
+
+        return collection.deleteMany(Filters.lt(FIELD_ID, lowestSeqToKeep)).getDeletedCount();
     }
 }
