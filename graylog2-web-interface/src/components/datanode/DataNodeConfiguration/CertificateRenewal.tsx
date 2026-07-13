@@ -38,7 +38,8 @@ import DataNodeBadge from '../DataNodeList/DataNodeBadge';
 const StyledList = styled(ListGroup)`
   max-width: fit-content;
 
-  .list-group-item {
+  li > div,
+  li > a {
     display: flex;
     justify-content: space-between;
   }
