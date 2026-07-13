@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import type { Stream } from 'logic/streams/types';
-import { CountBadge, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
 import { formatCount } from 'components/inputs/helpers/InputThroughputUtils';
 
@@ -37,10 +37,7 @@ const MessageCountCell = ({ stream }: Props) => {
   }
 
   return (
-    <CountBadge
-      count={formatCount(metrics.message_count)}
-      title={`${metrics.message_count} messages in the last 24 hours`}
-    />
+    <span title={`${metrics.message_count} messages in the last 24 hours`}>{formatCount(metrics.message_count)}</span>
   );
 };
 
