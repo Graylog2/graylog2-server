@@ -164,6 +164,14 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
                 httpClientBuilder.addResponseInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
             }
 
+            // Workaround to disable transparent content compression and decompression by the http client.
+            // In opensearch-java < 3.6.0, the OpenSearch client handles decompression of the responses itself, so
+            // leaving this enabled would cause double decompression and fail with "Not in GZIP format".
+            // Remove this when upgrading opensearch-java to >= 3.6.0, which relies on the http client for
+            // decompression instead (https://github.com/opensearch-project/opensearch-java/pull/1844) —
+            // OpensearchClientGzipHandlingTest will fail if this line outlives the upgrade.
+            httpClientBuilder.disableContentCompression();
+
             return httpClientBuilder;
         });
 
