@@ -37,9 +37,7 @@ import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.SimpleBindRequest;
-import com.unboundid.ldap.sdk.controls.ServerSideSortRequestControl;
 import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
-import com.unboundid.ldap.sdk.controls.SortKey;
 import com.unboundid.ldap.sdk.extensions.StartTLSExtendedRequest;
 import com.unboundid.util.Base64;
 import com.unboundid.util.LDAPTestUtils;
@@ -195,8 +193,6 @@ public class UnboundLDAPConnector {
             searchRequest.setTimeLimitSeconds(requestTimeoutSeconds);
             searchRequest.addControl(new SimplePagedResultsControl(pageSize, cookie));
             final SearchResult searchResult = connection.search(searchRequest);
-            SortKey sortKey = new SortKey("cn");
-            searchRequest.addControl(new ServerSideSortRequestControl(sortKey));
             SimplePagedResultsControl responseControl = SimplePagedResultsControl.get(searchResult);
             final List<SearchResultEntry> results = searchResult.getSearchEntries();
             LOG.debug("Received page of [{}] records.", results.size());
