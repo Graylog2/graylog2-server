@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, {css} from 'styled-components';
 
-import { Spinner } from 'components/common';
+import {Spinner} from 'components/common';
 
 const InfoList = styled.dl(
   ({ theme }) => css`
@@ -54,7 +54,7 @@ const OpenSearchUpgradeInfo = ({
     <dt>Current OpenSearch version:</dt>
     <dd>{isLoading ? <Spinner text="Loading..." /> : (currentVersion ?? 'Unknown')}</dd>
     <dt>Target OpenSearch version:</dt>
-    <dd>{isLoading ? <Spinner text="Loading..." /> : (targetVersion ?? 'Unknown')}</dd>
+    <dd>{isLoading ? <Spinner text="Loading..." /> : (targetVersion ?? currentVersion ?? 'Unknown')}</dd>
     <dt>Data Nodes:</dt>
     <dd>
       {isLoading ? (
