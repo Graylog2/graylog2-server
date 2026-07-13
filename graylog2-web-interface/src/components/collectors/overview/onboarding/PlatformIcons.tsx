@@ -60,6 +60,7 @@ const PlatformCard = styled(Card)`
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: none;
 `;
 
 const renderPlatformIcon = (icon: PlatformIcon) => {

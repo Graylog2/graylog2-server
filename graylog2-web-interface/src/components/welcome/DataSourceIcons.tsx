@@ -44,6 +44,7 @@ const SourceCard = styled(Card)`
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: none;
 `;
 
 const IconContainer = styled.span`
@@ -73,7 +74,7 @@ const MaterialIcon = styled(Icon)`
 
 const AndMore = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

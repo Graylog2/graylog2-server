@@ -20,10 +20,11 @@ import styled, { css } from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
 import SectionComponent from 'components/common/Section/SectionComponent';
+
 import LinkContainer from 'components/common/LinkContainer';
 import ConfirmDialog from 'components/common/ConfirmDialog';
-import { Card } from 'components/common';
-import { Button } from 'components/bootstrap';
+import { Card, Icon, Section as SectionBox } from 'components/common';
+import { Button, Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
 
@@ -31,9 +32,22 @@ import useDismissOnboarding from './hooks/useDismissOnboarding';
 import DataSourceIcons from './DataSourceIcons';
 
 import PageHeader from '../common/PageHeader';
+
+const DismissButton = styled(Button)`
+  margin-top: -8px;
+  margin-right: -8px;
+`;
+
 const StyledSectionComponent = styled(SectionComponent)<{ $grow: number }>(
   ({ $grow }) => css`
     flex: ${$grow};
+    margin: 0;
+  `,
+);
+
+const ActionsHeadline = styled.h2(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.md};
   `,
 );
 
@@ -59,15 +73,23 @@ const resources = [
   },
 ];
 
-const Section = styled.div`
-  display: flex;
-  column-gap: 40px;
+const Section = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    column-gap: ${theme.spacings.sm};
+  `,
+);
+
+const StyledSectionBox = styled(SectionBox)`
+  flex: 1;
 `;
 
-const Resources = styled.h3`
-  padding-top: 2rem;
-  padding-bottom: 1rem;
-`;
+const SecondaryHeadline = styled.h2(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.lg};
+    padding-bottom: ${theme.spacings.md};
+  `,
+);
 
 const ResourceLink = styled.a`
   flex: 1;
@@ -100,17 +122,15 @@ const ResourceTitle = styled.h3`
   margin-top: 0;
 `;
 
-const ActionsSection = styled(Section)`
-  padding-top: 1rem;
-`;
+const ActionsSection = styled(Section)``;
 
 const BoxActions = styled.div(
   ({ theme }) => css`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: ${theme.spacings.md};
-    margin-top: ${theme.spacings.md};
+    gap: ${theme.spacings.lg};
+    margin-top: ${theme.spacings.lg};
   `,
 );
 
@@ -136,53 +156,60 @@ const FirstUseWelcome = () => {
       <PageHeader
         title={`Welcome to ${productName}!`}
         topActions={
-          <Button bsStyle="link" onClick={() => setShowDismissConfirm(true)}>
-            Dismiss
-          </Button>
+          <DismissButton bsStyle="transparent" onClick={() => setShowDismissConfirm(true)}>
+            <Icon name="close" /> Dismiss onboarding
+          </DismissButton>
         }>
-        <span>
-          {productName} connects to dozens of sources; servers, firewalls, cloud apps, and more.{' '}
-          <strong>Where would you like to start?</strong>
-        </span>
+        <span>{productName} connects to dozens of sources; servers, firewalls, cloud apps, and more. </span>
       </PageHeader>
-      <ActionsSection>
-        <StyledSectionComponent $grow={65} title="Endpoint Logging">
-          <Description>
-            Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
-            configuration automatically.
-          </Description>
-          <BoxActions>
-            <PlatformIcons />
-            <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
-              <Button bsStyle="primary">Set up Collector</Button>
-            </LinkContainer>
-          </BoxActions>
-        </StyledSectionComponent>
-        <StyledSectionComponent $grow={35} title="Other Data Sources">
-          <Description>
-            Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
-          </Description>
-          <BoxActions>
-            <DataSourceIcons />
-            <LinkContainer to={Routes.SYSTEM.INPUTS}>
-              <Button bsStyle="primary">Configure Input</Button>
-            </LinkContainer>
-          </BoxActions>
-        </StyledSectionComponent>
-      </ActionsSection>
 
-      <Resources>Resources</Resources>
+      <Row className={'content'}>
+        <Col xs={12}>
+          <ActionsHeadline>Where would you like to start?</ActionsHeadline>
+          <ActionsSection>
+            <StyledSectionBox title="Set up Collectors">
+              <Description>
+                Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
+                configuration automatically.
+              </Description>
+              <BoxActions>
+                <PlatformIcons />
+                <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
+                  <Button bsStyle="primary">Set up Collector</Button>
+                </LinkContainer>
+              </BoxActions>
+            </StyledSectionBox>
+            <StyledSectionBox title="Set up Other Sources">
+              <Description>
+                Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
+              </Description>
+              <BoxActions>
+                <DataSourceIcons />
+                <LinkContainer to={Routes.SYSTEM.INPUTS}>
+                  <Button bsStyle="default">Configure Input</Button>
+                </LinkContainer>
+              </BoxActions>
+            </StyledSectionBox>
+          </ActionsSection>
+        </Col>
+      </Row>
 
-      <Section>
-        {resources.map((resource) => (
-          <ResourceLink key={resource.title} href={resource.link} target="_blank" rel="noreferrer">
-            <ResourceCard>
-              <ResourceTitle>{resource.title}</ResourceTitle>
-              <Description>{resource.description}</Description>
-            </ResourceCard>
-          </ResourceLink>
-        ))}
-      </Section>
+      <SecondaryHeadline>Resources</SecondaryHeadline>
+
+      <Row>
+        <Col>
+          <Section>
+            {resources.map((resource) => (
+              <ResourceLink key={resource.title} href={resource.link} target="_blank" rel="noreferrer">
+                <ResourceCard>
+                  <ResourceTitle>{resource.title}</ResourceTitle>
+                  <Description>{resource.description}</Description>
+                </ResourceCard>
+              </ResourceLink>
+            ))}
+          </Section>
+        </Col>
+      </Row>
     </>
   );
 };

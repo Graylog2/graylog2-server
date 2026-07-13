@@ -47,7 +47,7 @@ const Header = styled.div(
   `,
 );
 
-export const Headline = styled.h2`
+export const Headline = styled.h3`
   margin-bottom: 5px;
   display: inline;
 `;
