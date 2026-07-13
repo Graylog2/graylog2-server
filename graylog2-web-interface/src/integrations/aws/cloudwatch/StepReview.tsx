@@ -105,6 +105,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     awsAuthenticationType,
     awsCloudWatchAddFlowLogPrefix = { value: undefined },
     awsAssumeRoleARN = { value: undefined },
+    awsExternalId = { value: undefined },
     awsAccessKey = { value: undefined },
     awsCloudWatchAwsRegion,
     awsCloudWatchBatchSize,
@@ -142,6 +143,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
       kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
+      aws_external_id: awsExternalId.value ?? '',
       override_source: overrideSource?.value ?? '',
     }),
   );
@@ -200,6 +202,13 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <li>
               <strong>AWS Assumed ARN Role</strong>
               <span>{awsAssumeRoleARN.value}</span>
+            </li>
+          )}
+
+          {awsExternalId.value && (
+            <li>
+              <strong>AWS External ID</strong>
+              <span>{awsExternalId.value}</span>
             </li>
           )}
 
