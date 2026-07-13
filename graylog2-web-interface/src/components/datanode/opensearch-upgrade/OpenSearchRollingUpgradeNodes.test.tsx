@@ -85,7 +85,7 @@ describe('OpenSearchRollingUpgradeNodes', () => {
 
   it('shows a progress indicator on the in-flight node while running', () => {
     const nodes = [nodeWithStatus('RESTARTING', 'node-1'), nodeWithStatus('PENDING', 'node-2')];
-    render(<OpenSearchRollingUpgradeNodes job={jobWithState('RESTARTING_NODE', nodes)} versionNodes={[]} />);
+    render(<OpenSearchRollingUpgradeNodes job={jobWithState('WAITING_NODE_JOINED', nodes)} versionNodes={[]} />);
 
     // Exactly one: the in-flight node spins, the queued one does not.
     expect(screen.getAllByTestId('node-upgrade-progress')).toHaveLength(1);
