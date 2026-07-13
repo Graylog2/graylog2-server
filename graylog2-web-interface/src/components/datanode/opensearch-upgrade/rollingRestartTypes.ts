@@ -33,9 +33,7 @@ export type RollingRestartState =
 
 export type RollingRestartNodeStatus =
   | 'PENDING'
-  | 'STOPPING'
-  | 'STOPPED'
-  | 'STARTING'
+  | 'RESTARTING'
   | 'STARTED'
   | 'COMPLETED'
   | 'FAILED'

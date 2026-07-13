@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, {css} from 'styled-components';
 
-import { Label, Table } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import {Label, Table} from 'components/bootstrap';
+import {Icon} from 'components/common';
 
-import type { OpenSearchVersionNode } from './hooks/useOpenSearchClusterStats';
-import type { RollingRestartNode, RollingRestartNodeStatus } from './rollingRestartTypes';
+import type {OpenSearchVersionNode} from './hooks/useOpenSearchClusterStats';
+import type {RollingRestartNode, RollingRestartNodeStatus} from './rollingRestartTypes';
 
 export type RollingUpgradeNodeWithContext = {
   node: RollingRestartNode;
@@ -39,9 +39,7 @@ const CellDetail = styled.div(
 
 const NODE_STATUS_STYLE: Record<RollingRestartNodeStatus, 'default' | 'info' | 'success' | 'warning' | 'danger'> = {
   PENDING: 'default',
-  STOPPING: 'warning',
-  STOPPED: 'warning',
-  STARTING: 'info',
+  RESTARTING: 'info',
   STARTED: 'info',
   COMPLETED: 'success',
   FAILED: 'danger',
@@ -50,9 +48,7 @@ const NODE_STATUS_STYLE: Record<RollingRestartNodeStatus, 'default' | 'info' | '
 
 const NODE_STATUS_LABELS: Record<RollingRestartNodeStatus, string> = {
   PENDING: 'Waiting',
-  STOPPING: 'Stopping',
-  STOPPED: 'Stopped',
-  STARTING: 'Starting',
+  RESTARTING: 'Restarting',
   STARTED: 'Started',
   COMPLETED: 'Upgraded',
   FAILED: 'Failed',
@@ -61,7 +57,7 @@ const NODE_STATUS_LABELS: Record<RollingRestartNodeStatus, string> = {
 
 // The current node's whole journey: work is ongoing even in the resting states (STOPPED = binaries
 // upgrading, STARTED = rejoining the cluster).
-const IN_FLIGHT_NODE_STATUSES: Array<RollingRestartNodeStatus> = ['STOPPING', 'STOPPED', 'STARTING', 'STARTED'];
+const IN_FLIGHT_NODE_STATUSES: Array<RollingRestartNodeStatus> = ['RESTARTING', 'STARTED'];
 
 const nodeName = (node: RollingRestartNode, versionNode: OpenSearchVersionNode | undefined) =>
   versionNode?.datanode?.node_name ?? versionNode?.datanode?.hostname ?? node.hostname;
