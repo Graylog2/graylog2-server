@@ -45,13 +45,10 @@ describe('deriveOpenSearchUpgradeStatus', () => {
   });
 
   it('reports upgrading while a rolling upgrade is active, even when versions already read as equal', () => {
-    // The end phase of a rolling upgrade: every node reports the new version, but the job is still
-    // e.g. WAITING_GREEN — it must not read as up to date before the job is terminal.
     expect(deriveOpenSearchUpgradeStatus({ ...settledCluster, hasActiveRollingRestart: true })).toBe('upgrading');
   });
 
   it('lets an active upgrade outrank unavailable nodes and version fetch errors', () => {
-    // Both are normal operating conditions of a rolling upgrade, not independent problems to report.
     expect(
       deriveOpenSearchUpgradeStatus({
         ...settledCluster,

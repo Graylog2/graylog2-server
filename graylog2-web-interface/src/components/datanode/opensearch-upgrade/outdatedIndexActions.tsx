@@ -46,15 +46,12 @@ type ActionDefinition = {
   run: (index: OutdatedIndex) => Promise<unknown>;
   successMessage: (index: OutdatedIndex) => string;
   telemetryEventType: TelemetryEventType;
-  /** Returns tracking info when the action starts a long-running backend job that should be followed as a pending archive. */
   getPendingArchiveTracking?: (index: OutdatedIndex, response: unknown) => PendingArchiveTracking;
-  /** True when the error means another archive job currently blocks this action and the user should retry later. */
   isArchiveJobConflict?: (errorMessage: string) => boolean;
 };
 
-// Archiving lives in the enterprise Archive plugin. Its `@graylog/server-api` stub only exists after a local
-// enterprise-stub sync; CI generates core stubs only, so importing it there breaks the build. Call the
-// endpoint directly to stay CI-safe.
+// The enterprise Archive plugin's `@graylog/server-api` stub is absent in CI (core stubs only), so a raw
+// fetch is required — importing the stub would break the CI build.
 const archiveAndDeleteIndex = (index: OutdatedIndex) =>
   fetch(
     'POST',
@@ -152,8 +149,7 @@ export const getAvailableActions = (
   canArchive: boolean,
   alreadyArchived: boolean,
 ): Array<IndexAction> => {
-  // The active write index still receives messages: deleting it breaks ingestion and reindexing it races
-  // incoming writes. It has to be rotated out of write duty first — everything else unlocks afterwards.
+  // Deleting the active write index breaks ingestion and reindexing it races incoming writes — rotate first.
   if (index.active_write_index) {
     return ['rotate'];
   }
@@ -162,7 +158,6 @@ export const getAvailableActions = (
     return ['reindex-system-index'];
   }
 
-  // An index that already has an archive should not be archived again (e.g. the "archived but delete skipped"
-  // case, where a completed archive left the index in place) — offer a plain delete instead.
+  // Never archive twice — an existing archive (e.g. the delete-skipped case) leaves only a plain delete.
   return index.managed_index && canArchive && !alreadyArchived ? ['archive-delete', 'delete'] : ['delete'];
 };

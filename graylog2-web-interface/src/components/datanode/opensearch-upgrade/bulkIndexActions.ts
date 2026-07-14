@@ -21,8 +21,7 @@ import { BULK_INDEX_ACTION_CONCURRENCY } from './constants';
 import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions';
 import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
 
-// Single source of truth for bulk actions and their button order. Deliberately absent: 'archive-delete'
-// (bulk would race the single-concurrency backend job) and 'rotate' (row-only, targets the index set).
+// Deliberately no 'archive-delete' (bulk would race the single-concurrency backend job) or 'rotate' (row-only).
 const BULK_ACTION_ORDER = ['delete', 'reindex-system-index'] as const;
 
 type BulkCapableIndexAction = (typeof BULK_ACTION_ORDER)[number];
@@ -84,8 +83,7 @@ const BULK_ACTION_COPY: Record<BulkCapableIndexAction, BulkActionCopy> = {
   },
 };
 
-// Only an in-flight archive blocks bulk delete — deleting mid-archive is racy. An already-archived index
-// ("delete skipped") is deletable, just like its per-row Delete action, so it stays a bulk delete candidate.
+// Deleting mid-archive is racy; an already-archived index stays deletable.
 const isArchiveInProgress = (pendingStatus: PendingIndexStatus | undefined) => pendingStatus?.state === 'archiving';
 
 export const getBulkIndexActionCandidates = ({
@@ -113,8 +111,8 @@ export const getBulkIndexActionCandidates = ({
     };
   }).filter((candidate) => candidate.targetIndices.length > 0);
 
-// Each index runs as its own request. A 403 would trigger FetchProvider's global redirect mid-batch, but
-// the only 403 case (an active write index) never reaches a batch — getAvailableActions offers it rotate only.
+// A 403 would trigger FetchProvider's global redirect mid-batch, but the only 403 case (an active
+// write index) never reaches a batch — getAvailableActions offers it rotate only.
 export const runBulkIndexAction = async ({
   action,
   indices,

@@ -119,8 +119,6 @@ describe('DataNodeUpgradePage', () => {
   });
 
   it('keeps the section visible while a rolling upgrade is active even though versions read up to date', async () => {
-    // At the end of a rolling upgrade every node already reports the new version while the job is still
-    // e.g. WAITING_GREEN — the section (with the job's progress) must stay until the job is terminal.
     mockRollingRestart(rollingRestartJob('WAITING_GREEN'));
 
     render(<DataNodeUpgradePage />);

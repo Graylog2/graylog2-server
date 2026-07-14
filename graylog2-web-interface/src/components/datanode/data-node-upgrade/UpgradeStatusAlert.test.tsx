@@ -39,8 +39,6 @@ describe('UpgradeStatusAlert', () => {
   });
 
   it('states neither verdict while Data Nodes are unavailable', () => {
-    // An unavailable node may come back with a different OpenSearch version than its metadata claims, so
-    // neither "up to date" nor "not up to date" would be honest.
     render(<UpgradeStatusAlert {...defaultProps} status="unconfirmed" unavailableDataNodeCount={2} />);
 
     expect(screen.getByText(/cannot be confirmed while 2 data nodes are unavailable/i)).toBeInTheDocument();
@@ -49,8 +47,6 @@ describe('UpgradeStatusAlert', () => {
   });
 
   it('reports a rolling upgrade in progress instead of a verdict while the job is active', () => {
-    // At the end of a rolling upgrade the versions already read as up to date while the job is still
-    // finalizing (e.g. waiting for the cluster to return to GREEN) — that must not be reported as done.
     render(<UpgradeStatusAlert {...defaultProps} status="upgrading" />);
 
     expect(screen.getByText(/rolling upgrade is in progress/i)).toBeInTheDocument();
@@ -61,7 +57,6 @@ describe('UpgradeStatusAlert', () => {
   it('states neither verdict while the OpenSearch state is still loading', async () => {
     render(<UpgradeStatusAlert {...defaultProps} status="checking" />);
 
-    // The spinner renders its text after a short delay.
     expect(await screen.findByText(/checking opensearch status/i)).toBeInTheDocument();
     expect(screen.queryByText(/is up to date/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/is not up to date/i)).not.toBeInTheDocument();

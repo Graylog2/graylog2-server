@@ -80,18 +80,15 @@ const OpenSearchUpgradeSection = () => {
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
   const hasOutdatedIndices = outdatedIndices.length > 0;
   const rollingRestartState = rollingRestart?.data?.sm_state;
-  // A job (running or finished) owns the section: hide the outdated-indices list, show its status panel.
   const hasRollingRestartJob = !!rollingRestart?.data;
   const showOutdatedIndices = !hasRollingRestartJob;
   const showStartAction = openSearchStatus === 'outdated';
   const isStartActionDisabled =
     isStartingRollingRestart || isLoadingOutdatedIndices || isOutdatedIndicesError || hasOutdatedIndices;
-  // Below the 3-node floor a rolling upgrade isn't possible, so the action is a plain (full) restart.
   const startActionLabel = isRollingUpgradePossible ? 'Start OpenSearch Rolling Upgrade' : 'Restart';
   const startActionLoadingLabel = isRollingUpgradePossible ? 'Starting OpenSearch Rolling Upgrade...' : 'Restarting...';
   const canResumeRollingRestart =
     rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
-  // Not gated on indices, so a finished FAILED/ABORTED run keeps showing its outcome.
   const showRollingUpgradeStatus = hasRollingRestartJob;
 
   useEffect(() => {
@@ -132,8 +129,6 @@ const OpenSearchUpgradeSection = () => {
     void resumeRollingRestart();
   };
 
-  // Versions look equal but can't be confirmed while nodes are down — hide the operational panels.
-  // (An active upgrade never reads as `unconfirmed`: a temporarily missing node is its normal condition.)
   if (openSearchStatus === 'unconfirmed') {
     return (
       <Section>

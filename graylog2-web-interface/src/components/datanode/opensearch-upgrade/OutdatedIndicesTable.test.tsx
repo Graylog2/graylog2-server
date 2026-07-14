@@ -346,8 +346,6 @@ describe('OutdatedIndicesTable', () => {
   });
 
   it('shows an archived-already badge when the job finished but the index is still outdated', async () => {
-    // Archive finished but the delete didn't remove the index (backend skip/failure, or archived outside
-    // this page) — never offer re-archiving, but keep a plain delete to finish the cleanup.
     storePendingArchive('graylog_0', 'job-1');
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: JOBS_POLLED_AFTER_ACTION });
     mockOutdatedIndices({ data: [graylogIndex] });
@@ -357,7 +355,6 @@ describe('OutdatedIndicesTable', () => {
     expect(screen.getByText(/archived already/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^archive and delete$/i })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
-    // An archived (delete-skipped) index is deletable, so it also counts as a bulk delete candidate.
     expect(screen.getByRole('button', { name: /delete all \(1\)/i })).toBeInTheDocument();
     await waitFor(() =>
       expect(JSON.parse(window.localStorage.getItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY))).toEqual([
@@ -367,7 +364,6 @@ describe('OutdatedIndicesTable', () => {
   });
 
   it('flags an index the archive catalog already knows about, even without a local pending action', () => {
-    // An archive made in another browser or by retention: no localStorage entry, but the catalog reports it.
     asMock(useArchivedIndexNames).mockReturnValue(new Set(['graylog_0']));
     mockOutdatedIndices({ data: [graylogIndex] });
     render(<OutdatedIndicesTable />);
@@ -378,8 +374,6 @@ describe('OutdatedIndicesTable', () => {
   });
 
   it('still counts an already-archived index as a bulk delete candidate', () => {
-    // Archiving is a row-only action, so being already archived only affects the row: the index must remain
-    // deletable in bulk. Both managed indices are still delete candidates.
     asMock(useArchivedIndexNames).mockReturnValue(new Set(['graylog_0']));
     mockOutdatedIndices({ data: [graylogIndex, secondGraylogIndex] });
     render(<OutdatedIndicesTable />);
@@ -388,8 +382,6 @@ describe('OutdatedIndicesTable', () => {
   });
 
   it('keeps tracking when the jobs list predates the action (stale cache is not "job gone")', () => {
-    // Guards the race where a just-started archive would be dropped against a stale/cached jobs list that
-    // was fetched before the action existed. It must keep showing progress, not be resolved as done.
     storePendingArchive('graylog_0', 'job-1');
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: JOBS_POLLED_BEFORE_ACTION });
     mockOutdatedIndices({ data: [graylogIndex] });
@@ -410,8 +402,6 @@ describe('OutdatedIndicesTable', () => {
   });
 
   it('keeps tracking an action without a system job id until its index disappears', () => {
-    // Without a job id there is nothing to poll, so job-absence must not resolve it as done — even once the
-    // jobs list is newer than the action — otherwise progress would vanish while archive/delete still runs.
     storePendingArchive('graylog_0');
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: JOBS_POLLED_AFTER_ACTION });
     mockOutdatedIndices({ data: [graylogIndex] });

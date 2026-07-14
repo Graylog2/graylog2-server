@@ -95,10 +95,9 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
   const remainingNodes = nodes.filter(({ node }) => node.status !== 'COMPLETED');
   const isTerminal = isRollingRestartTerminalState(data.sm_state);
   const currentNodeIndex = isTerminal ? -1 : data.current_node_index;
-  // Fallbacks guard against a backend state the UI doesn't know yet — never render an empty gray label.
+  // Fallbacks cover backend states the UI doesn't know yet.
   const stateStyle = STATE_STYLE[data.sm_state] ?? 'info';
   const stateLabel = STATE_LABELS[data.sm_state] ?? 'In progress';
-  // Paused is non-terminal but stalled (awaiting resume), so it gets no "working" animation.
   const showProgress = !isTerminal && data.sm_state !== 'PAUSED_WAITING_GREEN';
 
   return (

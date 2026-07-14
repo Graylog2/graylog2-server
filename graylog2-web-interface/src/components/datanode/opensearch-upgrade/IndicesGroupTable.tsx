@@ -27,7 +27,6 @@ import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions'
 import type { ConfirmedAction } from './outdatedIndexActions';
 import type { IndicesGroup } from './outdatedIndexGroups';
 
-// Descriptor badges rendered after the index name; `show` decides visibility.
 const indexNameBadges = (index: OutdatedIndex, isArchived: boolean) =>
   [
     { text: 'warm', style: 'default', show: index.warm_index },
@@ -121,8 +120,7 @@ const OutdatedIndexActions = ({
   isArchived: boolean;
 }) => {
   if (pendingStatus?.state === 'archiving') {
-    // Avoid flashing an empty 0% bar for indices that archive/delete almost instantly — only show the bar
-    // once there is real progress to render.
+    // No empty 0% bar flash for jobs that finish almost instantly.
     return pendingStatus.percent > 0 ? (
       <ArchiveProgressBar
         bars={[
@@ -134,8 +132,6 @@ const OutdatedIndexActions = ({
     );
   }
 
-  // An already-archived index still offers a plain Delete (so the skipped cleanup can be finished), but never
-  // Archive again — getAvailableActions collapses to ['delete'] for a managed index once archived.
   const actions = getAvailableActions(index, canArchive, isArchived);
 
   return (
@@ -213,8 +209,6 @@ const IndicesGroupTable = ({
         <tbody>
           {group.indices.map((index) => {
             const pendingStatus = pendingIndexStatuses.get(index.index_name);
-            // Archived per this session's finished job or the archive catalog; hidden while a new archive
-            // job runs (the actions column shows its progress instead).
             const isArchived =
               pendingStatus?.state !== 'archiving' &&
               (archivedIndexNames.has(index.index_name) || pendingStatus?.state === 'archived');

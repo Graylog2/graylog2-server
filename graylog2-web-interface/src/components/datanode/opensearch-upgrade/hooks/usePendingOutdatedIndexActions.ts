@@ -89,13 +89,6 @@ const storeActions = (actions: Array<PendingOutdatedIndexAction>) => {
   }
 };
 
-// Classify a pending action from its backend system job:
-// - error                          → failed   (kept visible so the user can retry)
-// - complete                        → archived (job finished, but the index is still outdated)
-// - cancelled                       → done     (job stopped — stop tracking and allow retry)
-// - has a job id but it's absent from a jobs list fetched AFTER the action started → archived (finished & cleared)
-// - running, jobs list predates the action, or we have no job id to poll → archiving (keep waiting; a
-//   no-job-id action is only cleared once its index leaves the outdated list)
 const resolveAction = (
   action: PendingOutdatedIndexAction,
   { jobsById, jobsUpdatedAt }: ClusterJobsResult,
@@ -119,9 +112,7 @@ const resolveAction = (
     return { kind: 'done' };
   }
 
-  // Only conclude the job is gone if we actually have a job id and have polled the jobs list since this
-  // action started; otherwise the list may predate it (stale cache / concurrent add) or we never had a job
-  // to track — in both cases keep waiting.
+  // A jobs list fetched before the action started cannot prove the job is gone — keep waiting.
   if (action.systemJobId && !job && jobsUpdatedAt > Date.parse(action.startedAt)) {
     return { kind: 'archived' };
   }
@@ -129,8 +120,6 @@ const resolveAction = (
   return { kind: 'archiving', percent: job?.percent_complete ?? 0 };
 };
 
-// Drop actions whose index is gone, mark actions archived once their job finished but the index remains.
-// Returns `current` referentially unchanged when there is nothing to do.
 const reconcileActions = (
   current: Array<PendingOutdatedIndexAction>,
   outdatedIndexNames: Set<string>,
@@ -160,13 +149,6 @@ const reconcileActions = (
   return unchanged ? current : next;
 };
 
-/**
- * Tracks long-running "archive and delete" actions on outdated indices. Each action's real progress comes
- * from its backend system job (polled via {@link useClusterJobs}): a running job reports progress, an errored
- * job surfaces as failed, and a finished job keeps an "archived" row state if the index is still outdated
- * (e.g. the backend could not delete the current write index). Persisted in localStorage so progress survives
- * reloads.
- */
 const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, refetch, canArchive }: Params) => {
   const [pendingActions, setPendingActions] = useState<Array<PendingOutdatedIndexAction>>(readStoredActions);
 
@@ -180,7 +162,6 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     [trackedActions],
   );
   const hasActiveTrackedActions = activeTrackedActions.length > 0;
-  // Snapshot for archive-capable users (catches jobs from other sessions); poll only while tracking.
   const {
     jobsById,
     jobsUpdatedAt,
@@ -230,13 +211,11 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     }
   }
 
-  // External-system sync — the one job effects are for.
   useEffect(() => {
     storeActions(pendingActions);
   }, [pendingActions]);
 
-  // Plain interval on purpose: the poll flag derives from this hook's own output, so react-query's
-  // refetchInterval on the parent-owned query would need a state round-trip.
+  // Plain interval: react-query's refetchInterval would need a state round-trip for a flag derived here.
   useEffect(() => {
     if (!hasActiveTrackedActions) {
       return undefined;

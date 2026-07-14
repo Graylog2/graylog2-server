@@ -59,7 +59,6 @@ describe('OpenSearchRollingUpgradeNodes', () => {
   });
 
   it('falls back to a generic label for an unknown backend state instead of an empty label', () => {
-    // Guards the enum-drift bug: a backend state the UI has no mapping for must not render a blank gray label.
     render(<OpenSearchRollingUpgradeNodes job={jobWithState('SOME_FUTURE_STATE')} versionNodes={[]} />);
 
     expect(screen.getByText('In progress')).toBeInTheDocument();
@@ -87,7 +86,6 @@ describe('OpenSearchRollingUpgradeNodes', () => {
     const nodes = [nodeWithStatus('RESTARTING', 'node-1'), nodeWithStatus('PENDING', 'node-2')];
     render(<OpenSearchRollingUpgradeNodes job={jobWithState('WAITING_NODE_JOINED', nodes)} versionNodes={[]} />);
 
-    // Exactly one: the in-flight node spins, the queued one does not.
     expect(screen.getAllByTestId('node-upgrade-progress')).toHaveLength(1);
   });
 

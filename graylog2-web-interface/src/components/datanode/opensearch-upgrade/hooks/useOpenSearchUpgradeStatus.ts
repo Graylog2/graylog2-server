@@ -20,13 +20,10 @@ import { useCurrentRollingRestart } from './useOpenSearchRollingRestart';
 import { isRollingRestartActive } from '../rollingRestartTypes';
 
 /**
- * The single verdict on the state of the Data Nodes' embedded OpenSearch:
- * - `upgrading` — a rolling upgrade job is running.
- * - `checking` — the version overview or job state has not loaded yet.
- * - `error` — the version overview could not be loaded.
  * - `outdated` — at least one node has a newer OpenSearch version available.
- * - `unconfirmed` — versions look equal, but unavailable nodes may report stale version metadata.
+ * - `unconfirmed` — versions look equal, but a down node's version metadata can't be trusted.
  * - `up-to-date` — every node is available and reports no newer version.
+ * The remaining states (`upgrading`, `checking`, `error`) mean what they say.
  */
 export type OpenSearchUpgradeStatus = 'upgrading' | 'checking' | 'error' | 'outdated' | 'unconfirmed' | 'up-to-date';
 
@@ -47,9 +44,8 @@ export const deriveOpenSearchUpgradeStatus = ({
   isVersionsError,
   unavailableDataNodeCount,
 }: StatusInputs): OpenSearchUpgradeStatus => {
-  // An active upgrade is the dominant fact: versions already read as equal while the job is still
-  // finalizing (e.g. waiting for the cluster to return to GREEN), fetch errors and temporarily
-  // missing nodes are its normal operating conditions.
+  // Outranks everything: versions already read as equal while the job is still finalizing, and fetch
+  // errors / missing nodes are normal operating conditions of a rolling upgrade.
   if (hasActiveRollingRestart) {
     return 'upgrading';
   }
@@ -62,14 +58,11 @@ export const deriveOpenSearchUpgradeStatus = ({
     return 'error';
   }
 
-  // Outranks `unconfirmed`: a node reporting an older version is proof enough, no matter which
-  // other nodes are down.
   if (isUpgradeAvailable) {
     return 'outdated';
   }
 
-  // A node that is down or still starting may come back with a different OpenSearch version than
-  // its metadata claims, so neither "up to date" nor "outdated" can be stated honestly.
+  // A down node may come back with a different OpenSearch version than its metadata claims.
   if (unavailableDataNodeCount > 0) {
     return 'unconfirmed';
   }
@@ -77,8 +70,6 @@ export const deriveOpenSearchUpgradeStatus = ({
   return 'up-to-date';
 };
 
-// Both underlying queries only report loading on their initial fetch, so the status never
-// flickers back to `checking` during the 5s background polls.
 const useOpenSearchUpgradeStatus = (): OpenSearchUpgradeStatus => {
   const { isError, isLoading, isUpgradeAvailable, unavailableDataNodeCount } = useOpenSearchClusterStats();
   const { data: rollingRestart, isLoading: isLoadingRollingRestart } = useCurrentRollingRestart();

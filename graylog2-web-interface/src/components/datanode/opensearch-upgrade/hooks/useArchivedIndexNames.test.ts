@@ -46,12 +46,10 @@ describe('useArchivedIndexNames', () => {
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
     const [method, url] = asMock(fetch).mock.calls[0];
-    // The query is percent-encoded (encodeURIComponent), so decode before asserting on it.
     const decodedQuery = decodeURIComponent(url as string);
 
     expect(method).toBe('GET');
     expect(url).toContain('/plugins/org.graylog.plugins.archive/cluster/archives/catalog');
-    // Names are sorted for a stable cache key and matched with the exact-match operator.
     expect(decodedQuery).toContain('query=index:=graylog_0 index:=graylog_1');
     expect(decodedQuery).toContain('per_page=10000');
   });

@@ -143,7 +143,6 @@ describe('OpenSearchUpgradeSection', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /start opensearch rolling upgrade/i }));
 
-    // Nothing happens until the confirmation is acknowledged.
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByText(/restarts every data node, one at a time/i)).toBeInTheDocument();
     expect(startRollingRestart).not.toHaveBeenCalled();
@@ -168,8 +167,6 @@ describe('OpenSearchUpgradeSection', () => {
   });
 
   it('offers an enabled Restart action below the rolling-upgrade node threshold', () => {
-    // Under 3 nodes a rolling upgrade is impossible, so the action becomes a plain (full) restart — still
-    // actionable, just relabeled. The backend enforces what a sub-3-node cluster can actually do.
     mockClusterStats({ numberOfDataNodes: 2 });
     render(<OpenSearchUpgradeSection />);
 
@@ -211,8 +208,6 @@ describe('OpenSearchUpgradeSection', () => {
   });
 
   it('keeps an active rolling upgrade visible while versions look up to date but nodes are unavailable', () => {
-    // A temporarily unavailable node is the normal operating condition of a rolling upgrade — its progress
-    // must not be replaced by the unconfirmed-state warning.
     mockClusterStats({ isUpgradeAvailable: false, numberOfDataNodes: 2, unavailableDataNodeCount: 1 });
     mockRollingRestart({ data: pausedJob() });
     render(<OpenSearchUpgradeSection />);
@@ -230,7 +225,6 @@ describe('OpenSearchUpgradeSection', () => {
   });
 
   it('disables the start action when the outdated indices check failed', () => {
-    // The error message itself (with its retry) is rendered by OutdatedIndicesTable right above the button.
     mockOutdatedIndices([], { isError: true });
     render(<OpenSearchUpgradeSection />);
 
@@ -245,8 +239,6 @@ describe('OpenSearchUpgradeSection', () => {
   });
 
   it('hides outdated indices and keeps an active rolling upgrade visible even while outdated indices remain', () => {
-    // Outdated indices legitimately (re)appear mid-upgrade as the cluster major shifts — the progress of a
-    // running/paused upgrade must never disappear because of them, but users must not act on the list mid-run.
     mockOutdatedIndices([{ index_name: 'graylog_0' }]);
     mockRollingRestart({ data: pausedJob() });
     render(<OpenSearchUpgradeSection />);
@@ -257,8 +249,6 @@ describe('OpenSearchUpgradeSection', () => {
   });
 
   it('hides outdated indices and keeps the status visible for a finished (terminal) rolling upgrade', () => {
-    // A finished upgrade (COMPLETED/ABORTED/FAILED) still owns the section: its outcome stays visible and the
-    // outdated-indices workflow is hidden, regardless of whether outdated indices remain.
     mockOutdatedIndices([{ index_name: 'graylog_0' }]);
     mockRollingRestart({ data: failedJob() });
     render(<OpenSearchUpgradeSection />);
@@ -269,7 +259,6 @@ describe('OpenSearchUpgradeSection', () => {
   });
 
   it('keeps a finished rolling-upgrade status visible independent of the outdated indices check', () => {
-    // The finished result must not blank out while the outdated-indices list is still loading or failing.
     mockOutdatedIndices([], { isLoading: true });
     mockRollingRestart({ data: failedJob() });
     render(<OpenSearchUpgradeSection />);
@@ -310,7 +299,6 @@ describe('OpenSearchUpgradeSection', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /start opensearch rolling upgrade/i }));
 
-    // Confirm the start; the (mocked) start rejects with an overridable failure, surfacing the force dialog.
     const confirmDialog = await screen.findByRole('dialog');
     await userEvent.click(within(confirmDialog).getByRole('button', { name: /^start rolling upgrade$/i }));
 

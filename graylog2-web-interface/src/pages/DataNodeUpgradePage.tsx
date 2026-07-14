@@ -93,8 +93,6 @@ const DataNodeUpgradePage = () => {
   const isRollingUpgradePossible = numberOfNodes >= 3;
   const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && (!!nodeInProgress || isRollingUpgradePossible);
   const areAllDataNodesUpToDate = !data?.outdated_nodes?.length && (data?.up_to_date_nodes?.length ?? 0) > 0;
-  // The section owns everything with an outcome still open: a pending upgrade, a running one, or an
-  // unconfirmed version state. Settled verdicts (`up-to-date`, `checking`, `error`) render as a plain alert.
   const showOpenSearchUpgradeSection =
     areAllDataNodesUpToDate && ['outdated', 'upgrading', 'unconfirmed'].includes(openSearchStatus);
 

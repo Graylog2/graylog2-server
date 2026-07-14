@@ -133,8 +133,6 @@ const OutdatedIndicesTable = () => {
     }
   };
 
-  // Refresh the outdated list and, if the active group ran empty, move the selection to the next group
-  // that still has indices.
   const finalizeAfterActions = async () => {
     const { data: updatedOutdatedIndices = [] } = await refetch();
     const updatedGroups = groupOutdatedIndices(updatedOutdatedIndices);

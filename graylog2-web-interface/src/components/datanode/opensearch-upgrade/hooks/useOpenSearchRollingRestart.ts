@@ -73,7 +73,6 @@ export const rollingRestartStartError = (error: unknown) => {
   };
 };
 
-// Read-only view on the current rolling-restart job, for consumers that only need its state.
 export const useCurrentRollingRestart = () => {
   const { data, isInitialLoading, refetch } = useQuery<RollingRestartJob | null>({
     queryKey: ROLLING_RESTART_QUERY_KEY,
@@ -107,8 +106,7 @@ const useOpenSearchRollingRestart = () => {
     onError: (error, force) => {
       const startError = rollingRestartStartError(error);
 
-      // When the failure is overridable with force, the caller shows a confirmation dialog instead,
-      // skip the toast to avoid signalling the same thing twice. A failed forced retry still toasts.
+      // Overridable failures surface as the caller's force-confirm dialog instead of a toast.
       if (force || !startError.canRetryWithForce) {
         UserNotification.error(startError.message, 'Could not start OpenSearch rolling upgrade');
       }
@@ -116,8 +114,7 @@ const useOpenSearchRollingRestart = () => {
   });
 
   const { mutateAsync: resumeRollingRestart, isPending: isResumingRollingRestart } = useMutation({
-    // The resume response is a bare job trigger without the rolling-restart payload — instead of trusting
-    // (and force-casting) it, refetch the status query, which is the typed source of truth.
+    // The resume response is a bare job trigger without the rolling-restart payload, so refetch instead.
     mutationFn: () => DataNodeRollingRestart.resume(),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ROLLING_RESTART_QUERY_KEY });

@@ -20,8 +20,6 @@ import { DatanodeUpgrade } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
-// Poll so node count, versions and upgrade availability stay live while the page is open (e.g. a Data Node
-// joining/leaving flips whether a rolling upgrade is possible). Matches the 5s cadence of the other upgrade hooks.
 const CLUSTER_STATS_REFETCH_INTERVAL_MS = 5000;
 
 type OpenSearchVersionsOverview = Awaited<ReturnType<typeof DatanodeUpgrade.opensearchVersions>>;

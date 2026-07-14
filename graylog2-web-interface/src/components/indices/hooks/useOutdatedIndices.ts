@@ -28,7 +28,6 @@ export type OutdatedIndex = {
   active_write_index: string | null;
 };
 
-// While errored, retry gently in the background so transient failures heal without a reload.
 const ERROR_REFETCH_INTERVAL_MS = 30000;
 
 const useOutdatedIndices = () => {

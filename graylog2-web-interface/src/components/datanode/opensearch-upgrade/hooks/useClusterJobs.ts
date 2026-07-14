@@ -25,8 +25,6 @@ import { ARCHIVE_POLL_INTERVAL_MS } from '../constants';
 
 export type SystemJobSummary = Awaited<ReturnType<typeof ClusterJobs.getJob>>;
 
-// `jobsUpdatedAt` (ms, 0 if never fetched) lets callers tell whether the jobs list is fresh relative to a
-// given action — so a stale cached list isn't mistaken for "the job is gone". See usePendingOutdatedIndexActions.
 export type ClusterJobsResult = {
   jobsById: Map<string, SystemJobSummary>;
   jobsUpdatedAt: number;
@@ -38,7 +36,6 @@ type Options = {
   poll: boolean;
 };
 
-/** Cluster-wide system jobs keyed by job id. `enabled` gates fetching, `poll` the 5s interval. */
 const useClusterJobs = ({ enabled, poll }: Options): ClusterJobsResult => {
   const { data, dataUpdatedAt, refetch } = useQuery({
     queryKey: ['opensearch-upgrade', 'cluster-jobs'],
@@ -55,7 +52,6 @@ const useClusterJobs = ({ enabled, poll }: Options): ClusterJobsResult => {
   const jobsById = useMemo(() => {
     const map = new Map<string, SystemJobSummary>();
 
-    // Shape: { [nodeId]: { [group]: SystemJobSummary[] } }
     Object.values(data ?? {}).forEach((nodeJobs) => {
       Object.values(nodeJobs ?? {}).forEach((jobs) => {
         (jobs ?? []).forEach((job) => map.set(job.id, job));
