@@ -27,7 +27,7 @@ public class CpuLoadGauge implements Gauge<Double> {
     private static final Logger LOG = LoggerFactory.getLogger(CpuLoadGauge.class);
 
     private long[] lastTicks;
-    private Double cpuLoad;
+    private volatile Double cpuLoad;
     private boolean disabled = false;
 
     @Override
@@ -49,13 +49,11 @@ public class CpuLoadGauge implements Gauge<Double> {
             }
             cpuLoad = processor.getSystemCpuLoadBetweenTicks(lastTicks, newTicks) * 100.0d;
             lastTicks = newTicks;
-        } catch (LinkageError e) {
-            // The OSHI/JNA native-load failures we degrade on (NoClassDefFoundError, UnsatisfiedLinkError,
-            // ExceptionInInitializerError) are all LinkageErrors, so catching LinkageError is sufficient - and safer
-            // than catching Throwable, which would also swallow JVM-fatal errors such as OutOfMemoryError.
-            // This typically happens when the Graylog data directory - which holds the unpacked JNA native library -
-            // is on a 'noexec' mounted filesystem and OSHI/JNA cannot map its native library. The CPU-load metric is
-            // a nice-to-have and must never prevent the node from running, so we disable it and carry on.
+        } catch (LinkageError | RuntimeException e) {
+            // The CPU-load metric is a nice-to-have and must never crash the node. Native OSHI/JNA load
+            // failures surface as LinkageErrors (typically a 'noexec' data dir), and OSHI can also throw
+            // RuntimeExceptions reading CPU stats - catch both, but not Throwable (keep OutOfMemoryError etc.
+            // propagating). Disable the metric and carry on. Remedy: point 'jna.tmpdir' at an exec-capable dir.
             disabled = true;
             cpuLoad = null;
             LOG.warn("Disabling the system CPU-load metric: unable to read CPU statistics via the OSHI native library. " +
