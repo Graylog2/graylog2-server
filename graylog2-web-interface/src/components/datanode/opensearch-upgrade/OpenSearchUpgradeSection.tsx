@@ -94,7 +94,7 @@ const OpenSearchUpgradeSection = () => {
 
   useEffect(() => {
     if (isRollingRestartTerminalState(rollingRestartState)) {
-      void refetchOpenSearchClusterStats();
+      refetchOpenSearchClusterStats();
     }
   }, [refetchOpenSearchClusterStats, rollingRestartState]);
 
@@ -122,12 +122,12 @@ const OpenSearchUpgradeSection = () => {
 
   const handleForceStartConfirm = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.ROLLING_UPGRADE_FORCE_STARTED, TELEMETRY_DEFAULTS);
-    void handleStartRollingRestart(true);
+    handleStartRollingRestart(true);
   };
 
   const handleResumeClick = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.ROLLING_UPGRADE_RESUMED, TELEMETRY_DEFAULTS);
-    void resumeRollingRestart();
+    resumeRollingRestart();
   };
 
   if (openSearchStatus === 'unconfirmed') {

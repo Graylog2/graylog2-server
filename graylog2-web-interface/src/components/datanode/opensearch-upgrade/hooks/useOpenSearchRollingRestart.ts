@@ -117,7 +117,7 @@ const useOpenSearchRollingRestart = () => {
     // The resume response is a bare job trigger without the rolling-restart payload, so refetch instead.
     mutationFn: () => DataNodeRollingRestart.resume(),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ROLLING_RESTART_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ROLLING_RESTART_QUERY_KEY });
       UserNotification.success('OpenSearch rolling upgrade was resumed.');
     },
     onError: (error) => {

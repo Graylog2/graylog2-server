@@ -144,7 +144,7 @@ const OutdatedIndicesTable = () => {
       'Another archive job is already running. New archive jobs can be started after it finishes.',
       'Archive job already running',
     );
-    void refetchClusterJobs?.();
+    refetchClusterJobs?.();
   };
 
   const handleConfirm = async () => {

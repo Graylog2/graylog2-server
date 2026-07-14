@@ -205,7 +205,7 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     }
 
     const polling = window.setInterval(() => {
-      void refetch();
+      refetch();
     }, ARCHIVE_POLL_INTERVAL_MS);
 
     return () => window.clearInterval(polling);
