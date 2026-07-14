@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useIndexArchive from 'components/indices/archive/useIndexArchive';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-const useCanArchive = (): boolean => {
-  const archive = useIndexArchive();
+import type { IndexArchiveBinding } from './types';
 
-  return archive?.useCanArchive() ?? false;
-};
+const useIndexArchive = (): IndexArchiveBinding | undefined => usePluginEntities('indices.archive')?.[0];
 
-export default useCanArchive;
+export default useIndexArchive;

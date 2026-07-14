@@ -19,11 +19,11 @@ import React from 'react';
 import { ClusterDeflector, IndexerIndices } from '@graylog/server-api';
 
 import type { StyleProps } from 'components/bootstrap/Button';
+import type { IndexArchiveBinding } from 'components/indices/archive/types';
+import useIndexArchive from 'components/indices/archive/useIndexArchive';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 
 export type IndexAction = 'delete' | 'archive-delete' | 'reindex-system-index' | 'rotate';
 
@@ -50,24 +50,6 @@ type ActionDefinition = {
   isArchiveJobConflict?: (errorMessage: string) => boolean;
 };
 
-// The enterprise Archive plugin's `@graylog/server-api` stub is absent in CI (core stubs only), so a raw
-// fetch is required — importing the stub would break the CI build.
-const archiveAndDeleteIndex = (index: OutdatedIndex) =>
-  fetch(
-    'POST',
-    qualifyUrl(
-      `/plugins/org.graylog.plugins.archive/cluster/archives/${encodeURIComponent(index.index_name)}?index_action=DELETE`,
-    ),
-  );
-
-type ArchiveAndDeleteResponse = {
-  system_job?: {
-    id?: string;
-  };
-};
-
-const ARCHIVE_JOB_ALREADY_RUNNING_MESSAGE = /Archive job for index .+ is already running!?/;
-
 const deleteOutdatedIndex = (index: OutdatedIndex) =>
   index.managed_index ? IndexerIndices.remove(index.index_name) : IndexerIndices.deleteOutdated(index.index_name);
 
@@ -75,7 +57,7 @@ const reindexSystemIndex = (index: OutdatedIndex) => IndexerIndices.reindex(inde
 
 const rotateWriteIndex = (index: OutdatedIndex) => ClusterDeflector.cycleByindexSetId(index.active_write_index);
 
-export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
+export const CORE_ACTION_DEFINITIONS: Record<Exclude<IndexAction, 'archive-delete'>, ActionDefinition> = {
   delete: {
     buttonLabel: 'Delete',
     buttonStyle: 'danger',
@@ -89,25 +71,6 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
     run: deleteOutdatedIndex,
     successMessage: (index) => `Index "${index.index_name}" was deleted.`,
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_DELETE_CONFIRMED,
-  },
-  'archive-delete': {
-    buttonLabel: 'Archive and delete',
-    buttonStyle: 'warning',
-    confirmTitle: 'Archive and delete index',
-    confirmText: 'Archive and delete',
-    confirmationBody: (index) => (
-      <p>
-        This will create an archive for <strong>{index.index_name}</strong> and delete the index afterwards.
-      </p>
-    ),
-    run: archiveAndDeleteIndex,
-    successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
-    telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
-    getPendingArchiveTracking: (index, response) => ({
-      indexName: index.index_name,
-      systemJobId: (response as ArchiveAndDeleteResponse)?.system_job?.id,
-    }),
-    isArchiveJobConflict: (errorMessage) => ARCHIVE_JOB_ALREADY_RUNNING_MESSAGE.test(errorMessage),
   },
   'reindex-system-index': {
     buttonLabel: 'Reindex',
@@ -144,12 +107,41 @@ export const ACTION_DEFINITIONS: Record<IndexAction, ActionDefinition> = {
   },
 };
 
+const archiveDeleteDefinition = (archive: IndexArchiveBinding | undefined): ActionDefinition => ({
+  buttonLabel: 'Archive and delete',
+  buttonStyle: 'warning',
+  confirmTitle: 'Archive and delete index',
+  confirmText: 'Archive and delete',
+  confirmationBody: (index) => (
+    <p>
+      This will create an archive for <strong>{index.index_name}</strong> and delete the index afterwards.
+    </p>
+  ),
+  run: (index) =>
+    archive ? archive.archiveAndDeleteIndex(index.index_name) : Promise.reject(new Error('Archiving is not available.')),
+  successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
+  telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
+  getPendingArchiveTracking: (index, response) => ({
+    indexName: index.index_name,
+    systemJobId: (response as { systemJobId?: string })?.systemJobId,
+  }),
+  isArchiveJobConflict: (errorMessage) => archive?.isArchiveJobConflict(errorMessage) ?? false,
+});
+
+export const useOutdatedIndexActionDefinitions = (): Record<IndexAction, ActionDefinition> => {
+  const archive = useIndexArchive();
+
+  return {
+    ...CORE_ACTION_DEFINITIONS,
+    'archive-delete': archiveDeleteDefinition(archive),
+  };
+};
+
 export const getAvailableActions = (
   index: OutdatedIndex,
   canArchive: boolean,
   alreadyArchived: boolean,
 ): Array<IndexAction> => {
-  // Deleting the active write index breaks ingestion and reindexing it races incoming writes — rotate first.
   if (index.active_write_index) {
     return ['rotate'];
   }
@@ -158,6 +150,5 @@ export const getAvailableActions = (
     return ['reindex-system-index'];
   }
 
-  // Never archive twice — an existing archive (e.g. the delete-skipped case) leaves only a plain delete.
   return index.managed_index && canArchive && !alreadyArchived ? ['archive-delete', 'delete'] : ['delete'];
 };

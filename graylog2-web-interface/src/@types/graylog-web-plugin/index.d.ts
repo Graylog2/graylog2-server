@@ -19,6 +19,7 @@ import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
@@ -448,6 +449,7 @@ declare module 'graylog-web-plugin/plugin' {
       useCondition?: () => boolean;
     }>;
     indexRetentionConfig?: Array<IndexRetentionConfig>;
+    'indices.archive'?: Array<IndexArchiveBinding>;
     inputsBadgeProviders?: Array<{
       useCondition: () => { hasIssues: boolean; title: string };
     }>;

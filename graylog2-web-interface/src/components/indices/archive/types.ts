@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useIndexArchive from 'components/indices/archive/useIndexArchive';
 
-const useCanArchive = (): boolean => {
-  const archive = useIndexArchive();
-
-  return archive?.useCanArchive() ?? false;
+export type IndexArchiveBinding = {
+  useCanArchive: () => boolean;
+  useArchivedIndexNames: (indexNames: Array<string>, enabled: boolean) => Set<string>;
+  archiveAndDeleteIndex: (indexName: string) => Promise<{ systemJobId?: string }>;
+  isArchiveJobConflict: (errorMessage: string) => boolean;
+  archiveSystemJobName: string;
 };
-
-export default useCanArchive;

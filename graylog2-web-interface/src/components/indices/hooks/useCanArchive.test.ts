@@ -17,9 +17,7 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import useArchivedIndexNames from './useArchivedIndexNames';
-
-const useArchivedIndexNamesBinding = jest.fn(() => new Set(['graylog_0']));
+import useCanArchive from './useCanArchive';
 
 const archivePlugin = new PluginManifest(
   {},
@@ -27,7 +25,7 @@ const archivePlugin = new PluginManifest(
     'indices.archive': [
       {
         useCanArchive: () => true,
-        useArchivedIndexNames: useArchivedIndexNamesBinding,
+        useArchivedIndexNames: () => new Set<string>(),
         archiveAndDeleteIndex: () => Promise.resolve({}),
         isArchiveJobConflict: () => false,
         archiveSystemJobName: 'archive-job',
@@ -36,23 +34,22 @@ const archivePlugin = new PluginManifest(
   },
 );
 
-describe('useArchivedIndexNames', () => {
+describe('useCanArchive', () => {
   afterEach(() => {
     PluginStore.unregister(archivePlugin);
   });
 
-  it('returns an empty set while no plugin provides the indices.archive binding', () => {
-    const { result } = renderHook(() => useArchivedIndexNames(['graylog_0'], true));
+  it('is false while no plugin provides the indices.archive binding', () => {
+    const { result } = renderHook(() => useCanArchive());
 
-    expect(result.current.size).toBe(0);
+    expect(result.current).toBe(false);
   });
 
   it('delegates to the registered indices.archive binding', () => {
     PluginStore.register(archivePlugin);
 
-    const { result } = renderHook(() => useArchivedIndexNames(['graylog_0'], true));
+    const { result } = renderHook(() => useCanArchive());
 
-    expect(result.current.has('graylog_0')).toBe(true);
-    expect(useArchivedIndexNamesBinding).toHaveBeenCalledWith(['graylog_0'], true);
+    expect(result.current).toBe(true);
   });
 });

@@ -16,8 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
+import { DatanodeUpgrade } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
 
@@ -85,7 +85,7 @@ export const removeSavedNodeToUpgrade = () => localStorage.removeItem('datanode-
 
 export const stopShardReplication = async (): Promise<FlushResponse> => {
   try {
-    const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/stop'));
+    const response = await DatanodeUpgrade.stopReplication();
 
     UserNotification.success(`Shard replication stopped successfully`);
 
@@ -104,7 +104,7 @@ export const startShardReplication = async (): Promise<FlushResponse> => {
   try {
     removeSavedNodeToUpgrade();
 
-    const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/start'));
+    const response = await DatanodeUpgrade.startReplication();
 
     UserNotification.success(`Shard replication started successfully`);
 
@@ -119,9 +119,9 @@ export const startShardReplication = async (): Promise<FlushResponse> => {
   }
 };
 
-// `fetchPeriodically` so the poll does not keep an idle user's session alive.
-const fetchDataNodeUpgradeStatus = async () =>
-  fetchPeriodically<DatanodeUpgradeStatus>('GET', qualifyUrl('/datanodes/upgrade/status'));
+// The generated types are not exported, so the payload stays typed locally.
+const fetchDataNodeUpgradeStatus = () =>
+  DatanodeUpgrade.status({ requestShouldExtendSession: false }) as Promise<DatanodeUpgradeStatus>;
 
 const UPGRADE_STATUS_REFETCH_INTERVAL_MS = 5000;
 // In steady state (all up to date, replication on, healthy) drop to a slow heartbeat.

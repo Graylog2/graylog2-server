@@ -19,7 +19,7 @@ import extractErrorMessage from 'util/extractErrorMessage';
 
 import { BULK_INDEX_ACTION_CONCURRENCY } from './constants';
 import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions';
-import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
+import { CORE_ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
 
 // Deliberately no 'archive-delete' (bulk would race the single-concurrency backend job) or 'rotate' (row-only).
 const BULK_ACTION_ORDER = ['delete', 'reindex-system-index'] as const;
@@ -120,7 +120,7 @@ export const runBulkIndexAction = async ({
   action: BulkCapableIndexAction;
   indices: Array<OutdatedIndex>;
 }): Promise<BulkIndexActionResult> => {
-  const actionDefinition = ACTION_DEFINITIONS[action];
+  const actionDefinition = CORE_ACTION_DEFINITIONS[action];
   const successes: Array<BulkIndexActionSuccess> = [];
   const failures: Array<BulkIndexActionFailure> = [];
   let nextIndex = 0;

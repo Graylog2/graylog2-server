@@ -16,6 +16,7 @@
  */
 import { useEffect, useState } from 'react';
 
+import useIndexArchive from 'components/indices/archive/useIndexArchive';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
 import Store from 'logic/local-storage/Store';
 
@@ -53,10 +54,8 @@ type Params = {
   canArchive: boolean;
 };
 
-const ARCHIVE_CREATE_SYSTEM_JOB = 'org.graylog.plugins.archive.job.ArchiveCreateSystemJob';
-
-const isRunningArchiveSystemJob = (job: SystemJobSummary) =>
-  job.name === ARCHIVE_CREATE_SYSTEM_JOB && String(job.job_status).toLowerCase() === 'running';
+const isRunningArchiveSystemJob = (job: SystemJobSummary, archiveSystemJobName: string) =>
+  job.name === archiveSystemJobName && String(job.job_status).toLowerCase() === 'running';
 
 const isValidStoredAction = (value: unknown): value is PendingOutdatedIndexAction => {
   if (typeof value !== 'object' || value === null) {
@@ -150,6 +149,7 @@ const reconcileActions = (
 };
 
 const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, refetch, canArchive }: Params) => {
+  const archive = useIndexArchive();
   const [pendingActions, setPendingActions] = useState<Array<PendingOutdatedIndexAction>>(readStoredActions);
 
   const outdatedIndexNames = new Set(outdatedIndices.map((index) => index.index_name));
@@ -162,7 +162,8 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     refetch: refetchClusterJobs,
   } = useClusterJobs({ enabled: canArchive || hasActiveTrackedActions, poll: hasActiveTrackedActions });
 
-  const isArchiveJobRunning = Array.from(jobsById.values()).some(isRunningArchiveSystemJob);
+  const isArchiveJobRunning =
+    !!archive && Array.from(jobsById.values()).some((job) => isRunningArchiveSystemJob(job, archive.archiveSystemJobName));
 
   const pendingIndexStatuses = new Map<string, PendingIndexStatus>();
   trackedActions.forEach((pendingAction) => {

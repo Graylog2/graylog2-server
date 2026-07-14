@@ -21,12 +21,13 @@ import userEvent from '@testing-library/user-event';
 import { ClusterDeflector, IndexerIndices } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
+import type { IndexArchiveBinding } from 'components/indices/archive/types';
+import useIndexArchive from 'components/indices/archive/useIndexArchive';
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import OutdatedIndicesTable from './OutdatedIndicesTable';
@@ -35,6 +36,7 @@ import useClusterJobs from './hooks/useClusterJobs';
 import type { SystemJobSummary } from './hooks/useClusterJobs';
 import useArchivedIndexNames from './hooks/useArchivedIndexNames';
 
+jest.mock('components/indices/archive/useIndexArchive');
 jest.mock('components/indices/hooks/useOutdatedIndices');
 jest.mock('components/indices/hooks/useCanArchive');
 jest.mock('logic/telemetry/useSendTelemetry');
@@ -131,6 +133,14 @@ const clusterJob = (overrides: Partial<SystemJobSummary>): SystemJobSummary =>
     ...overrides,
   }) as SystemJobSummary;
 
+const archiveBinding = (): IndexArchiveBinding => ({
+  useCanArchive: () => true,
+  useArchivedIndexNames: () => new Set<string>(),
+  archiveAndDeleteIndex: jest.fn(() => Promise.resolve({ systemJobId: 'archive-job-id' })),
+  isArchiveJobConflict: (errorMessage) => errorMessage.includes('already running'),
+  archiveSystemJobName: 'org.graylog.plugins.archive.job.ArchiveCreateSystemJob',
+});
+
 const storePendingArchive = (indexName: string, systemJobId?: string) => {
   window.localStorage.setItem(
     PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY,
@@ -143,10 +153,10 @@ describe('OutdatedIndicesTable', () => {
     jest.clearAllMocks();
     window.localStorage.removeItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY);
     asMock(useCanArchive).mockReturnValue(true);
+    asMock(useIndexArchive).mockReturnValue(archiveBinding());
     asMock(useSendTelemetry).mockReturnValue(jest.fn());
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: 0 });
     asMock(useArchivedIndexNames).mockReturnValue(new Set());
-    asMock(fetch).mockResolvedValue({ system_job: { id: 'archive-job-id' } });
     mockOutdatedIndices({});
   });
 
@@ -459,6 +469,8 @@ describe('OutdatedIndicesTable', () => {
   });
 
   it('tracks a successful archive-and-delete job as a pending action', async () => {
+    const binding = archiveBinding();
+    asMock(useIndexArchive).mockReturnValue(binding);
     mockOutdatedIndices({ data: [graylogIndex, secondGraylogIndex] });
     render(<OutdatedIndicesTable />);
 
@@ -467,7 +479,7 @@ describe('OutdatedIndicesTable', () => {
     const dialog = await screen.findByRole('dialog');
     await userEvent.click(within(dialog).getByRole('button', { name: /^archive and delete$/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(binding.archiveAndDeleteIndex).toHaveBeenCalledWith('graylog_0'));
 
     const storedActions = JSON.parse(window.localStorage.getItem(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY));
 

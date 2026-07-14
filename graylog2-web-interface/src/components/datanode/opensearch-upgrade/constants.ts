@@ -19,6 +19,3 @@ export const ARCHIVE_POLL_INTERVAL_MS = 5000;
 
 // Keep frontend-orchestrated bulk requests small until the backend exposes dedicated bulk endpoints.
 export const BULK_INDEX_ACTION_CONCURRENCY = 3;
-
-// Only guards against an index having been archived many times over — never actually filled.
-export const ARCHIVE_CATALOG_LOOKUP_MAX_ENTRIES = 10000;

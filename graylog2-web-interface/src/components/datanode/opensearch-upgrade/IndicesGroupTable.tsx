@@ -23,7 +23,7 @@ import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices'
 
 import type { BulkIndexActionCandidate } from './bulkIndexActions';
 import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions';
-import { ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
+import { CORE_ACTION_DEFINITIONS, getAvailableActions, useOutdatedIndexActionDefinitions } from './outdatedIndexActions';
 import type { ConfirmedAction } from './outdatedIndexActions';
 import type { IndicesGroup } from './outdatedIndexGroups';
 
@@ -119,6 +119,8 @@ const OutdatedIndexActions = ({
   pendingStatus: PendingIndexStatus | undefined;
   isArchived: boolean;
 }) => {
+  const actionDefinitions = useOutdatedIndexActionDefinitions();
+
   if (pendingStatus?.state === 'archiving') {
     // No empty 0% bar flash for jobs that finish almost instantly.
     return pendingStatus.percent > 0 ? (
@@ -142,7 +144,7 @@ const OutdatedIndexActions = ({
         </Label>
       )}
       {actions.map((action) => {
-        const actionDefinition = ACTION_DEFINITIONS[action];
+        const actionDefinition = actionDefinitions[action];
 
         return (
           <Button
@@ -195,7 +197,7 @@ const IndicesGroupTable = ({
                     <Button
                       key={bulkAction.action}
                       bsSize="xs"
-                      bsStyle={ACTION_DEFINITIONS[bulkAction.action].buttonStyle}
+                      bsStyle={CORE_ACTION_DEFINITIONS[bulkAction.action].buttonStyle}
                       disabled={isBulkActionSubmitting}
                       onClick={() => onBulkAction(bulkAction)}>
                       {bulkAction.buttonLabel} ({bulkAction.targetIndices.length})

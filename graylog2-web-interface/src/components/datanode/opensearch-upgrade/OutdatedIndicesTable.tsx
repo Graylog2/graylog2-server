@@ -31,7 +31,7 @@ import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bu
 import IndicesGroupTable from './IndicesGroupTable';
 import useArchivedIndexNames from './hooks/useArchivedIndexNames';
 import usePendingOutdatedIndexActions from './hooks/usePendingOutdatedIndexActions';
-import { ACTION_DEFINITIONS } from './outdatedIndexActions';
+import { useOutdatedIndexActionDefinitions } from './outdatedIndexActions';
 import type { ConfirmedAction } from './outdatedIndexActions';
 import { getFirstGroupWithIndices, getSelectedGroup, groupOutdatedIndices } from './outdatedIndexGroups';
 
@@ -68,7 +68,8 @@ const ActionConfirmDialog = ({
   onCancel: () => void;
   onConfirm: () => void;
 }) => {
-  const actionDefinition = ACTION_DEFINITIONS[confirmedAction.action];
+  const actionDefinitions = useOutdatedIndexActionDefinitions();
+  const actionDefinition = actionDefinitions[confirmedAction.action];
 
   return (
     <ConfirmDialog
@@ -88,6 +89,7 @@ const ActionConfirmDialog = ({
 const OutdatedIndicesTable = () => {
   const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices();
   const canArchive = useCanArchive();
+  const actionDefinitions = useOutdatedIndexActionDefinitions();
   const sendTelemetry = useSendTelemetry();
   const { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs } =
     usePendingOutdatedIndexActions({
@@ -153,7 +155,7 @@ const OutdatedIndicesTable = () => {
     }
 
     const { action, index } = confirmedAction;
-    const actionDefinition = ACTION_DEFINITIONS[action];
+    const actionDefinition = actionDefinitions[action];
 
     sendTelemetry(actionDefinition.telemetryEventType, { ...TELEMETRY_DEFAULTS });
     setIsSubmitting(true);
@@ -188,7 +190,7 @@ const OutdatedIndicesTable = () => {
       return;
     }
 
-    sendTelemetry(ACTION_DEFINITIONS[confirmedBulkAction.action].telemetryEventType, {
+    sendTelemetry(actionDefinitions[confirmedBulkAction.action].telemetryEventType, {
       ...TELEMETRY_DEFAULTS,
       app_action_value: 'bulk',
       bulk_count: confirmedBulkAction.targetIndices.length,
