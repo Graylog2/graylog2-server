@@ -180,7 +180,7 @@ const FirstUseWelcome = () => {
         <Col xs={12}>
           <ActionsHeadline>Where would you like to start?</ActionsHeadline>
           <ActionsSection>
-            <StyledSectionBox title="Set up Collectors">
+            <StyledSectionBox title="Set up Collectors" titleAs="h3">
               <Description>
                 Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
                 configuration automatically.
@@ -192,7 +192,7 @@ const FirstUseWelcome = () => {
                 </LinkContainer>
               </BoxActions>
             </StyledSectionBox>
-            <StyledSectionBox title="Set up Other Sources">
+            <StyledSectionBox title="Set up Other Sources" titleAs="h3">
               <Description>
                 Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
               </Description>

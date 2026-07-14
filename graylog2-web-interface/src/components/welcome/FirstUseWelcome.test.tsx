@@ -64,19 +64,19 @@ describe('FirstUseWelcome', () => {
     expect(screen.getByTitle('AWS')).toBeInTheDocument();
   });
 
-  it('renders resource panels as links that open in a new tab', () => {
+  it('renders resource panels with a continue link that opens in a new tab', () => {
     render(<FirstUseWelcome />);
 
-    const link = screen.getByRole('link', { name: /Quickstart Guide/i });
+    const links = screen.getAllByRole('link', { name: /continue/i });
 
-    expect(link).toHaveAttribute('href', 'https://www.graylog.org');
-    expect(link).toHaveAttribute('target', '_blank');
+    expect(links[0]).toHaveAttribute('href', 'https://www.graylog.org');
+    expect(links[0]).toHaveAttribute('target', '_blank');
   });
 
   it('asks for confirmation before dismissing the onboarding', async () => {
     render(<FirstUseWelcome />);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    await userEvent.click(screen.getByRole('button', { name: /dismiss onboarding/i }));
 
     expect(await screen.findByRole('button', { name: /Dismiss for everyone/i })).toBeInTheDocument();
     expect(mockDismiss).not.toHaveBeenCalled();
@@ -85,7 +85,7 @@ describe('FirstUseWelcome', () => {
   it('dismisses the onboarding after confirming', async () => {
     render(<FirstUseWelcome />);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    await userEvent.click(screen.getByRole('button', { name: /dismiss onboarding/i }));
     await userEvent.click(await screen.findByRole('button', { name: /Dismiss for everyone/i }));
 
     expect(mockDismiss).toHaveBeenCalledTimes(1);
