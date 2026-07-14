@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
 import Store from 'logic/local-storage/Store';
@@ -152,15 +152,9 @@ const reconcileActions = (
 const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, refetch, canArchive }: Params) => {
   const [pendingActions, setPendingActions] = useState<Array<PendingOutdatedIndexAction>>(readStoredActions);
 
-  const outdatedIndexNames = useMemo(() => new Set(outdatedIndices.map((index) => index.index_name)), [outdatedIndices]);
-  const trackedActions = useMemo(
-    () => pendingActions.filter((pendingAction) => outdatedIndexNames.has(pendingAction.indexName)),
-    [outdatedIndexNames, pendingActions],
-  );
-  const activeTrackedActions = useMemo(
-    () => trackedActions.filter((pendingAction) => pendingAction.state !== 'archived'),
-    [trackedActions],
-  );
+  const outdatedIndexNames = new Set(outdatedIndices.map((index) => index.index_name));
+  const trackedActions = pendingActions.filter((pendingAction) => outdatedIndexNames.has(pendingAction.indexName));
+  const activeTrackedActions = trackedActions.filter((pendingAction) => pendingAction.state !== 'archived');
   const hasActiveTrackedActions = activeTrackedActions.length > 0;
   const {
     jobsById,
@@ -168,38 +162,27 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
     refetch: refetchClusterJobs,
   } = useClusterJobs({ enabled: canArchive || hasActiveTrackedActions, poll: hasActiveTrackedActions });
 
-  const isArchiveJobRunning = useMemo(
-    () => Array.from(jobsById.values()).some(isRunningArchiveSystemJob),
-    [jobsById],
-  );
+  const isArchiveJobRunning = Array.from(jobsById.values()).some(isRunningArchiveSystemJob);
 
-  const pendingIndexStatuses = useMemo(() => {
-    const statuses = new Map<string, PendingIndexStatus>();
+  const pendingIndexStatuses = new Map<string, PendingIndexStatus>();
+  trackedActions.forEach((pendingAction) => {
+    const resolution = resolveAction(pendingAction, { jobsById, jobsUpdatedAt });
 
-    trackedActions.forEach((pendingAction) => {
-      const resolution = resolveAction(pendingAction, { jobsById, jobsUpdatedAt });
+    if (resolution.kind === 'archiving') {
+      pendingIndexStatuses.set(pendingAction.indexName, { state: 'archiving', percent: resolution.percent });
+    } else if (resolution.kind === 'archived') {
+      pendingIndexStatuses.set(pendingAction.indexName, { state: 'archived' });
+    } else if (resolution.kind === 'failed') {
+      pendingIndexStatuses.set(pendingAction.indexName, { state: 'failed', message: resolution.message });
+    }
+  });
 
-      if (resolution.kind === 'archiving') {
-        statuses.set(pendingAction.indexName, { state: 'archiving', percent: resolution.percent });
-      } else if (resolution.kind === 'archived') {
-        statuses.set(pendingAction.indexName, { state: 'archived' });
-      } else if (resolution.kind === 'failed') {
-        statuses.set(pendingAction.indexName, { state: 'failed', message: resolution.message });
-      }
-    });
-
-    return statuses;
-  }, [jobsById, jobsUpdatedAt, trackedActions]);
-
-  const addArchiveDeleteAction = useCallback(
-    ({ indexName, systemJobId }: { indexName: string; systemJobId?: string }) => {
-      setPendingActions((current) => [
-        ...current.filter((pendingAction) => pendingAction.indexName !== indexName),
-        { action: 'archive-delete', indexName, systemJobId, startedAt: new Date().toISOString() },
-      ]);
-    },
-    [],
-  );
+  const addArchiveDeleteAction = ({ indexName, systemJobId }: { indexName: string; systemJobId?: string }) => {
+    setPendingActions((current) => [
+      ...current.filter((pendingAction) => pendingAction.indexName !== indexName),
+      { action: 'archive-delete', indexName, systemJobId, startedAt: new Date().toISOString() },
+    ]);
+  };
 
   // Guarded state adjustment during render instead of an effect:
   // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes

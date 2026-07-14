@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, SegmentedControl } from 'components/bootstrap';
@@ -97,7 +97,7 @@ const OutdatedIndicesTable = () => {
       refetch,
       canArchive,
     });
-  const outdatedIndexNames = useMemo(() => outdatedIndices.map((index) => index.index_name), [outdatedIndices]);
+  const outdatedIndexNames = outdatedIndices.map((index) => index.index_name);
   const archivedIndexNames = useArchivedIndexNames(outdatedIndexNames, canArchive);
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
   const [confirmedBulkAction, setConfirmedBulkAction] = useState<BulkIndexActionCandidate | undefined>();
@@ -105,25 +105,21 @@ const OutdatedIndicesTable = () => {
   const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
 
-  const indicesGroups = useMemo(() => groupOutdatedIndices(outdatedIndices), [outdatedIndices]);
-  const firstGroupWithIndices = useMemo(() => getFirstGroupWithIndices(indicesGroups), [indicesGroups]);
+  const indicesGroups = groupOutdatedIndices(outdatedIndices);
+  const firstGroupWithIndices = getFirstGroupWithIndices(indicesGroups);
   const activeGroupId = selectedGroupId ?? firstGroupWithIndices;
   const selectedGroup = getSelectedGroup(indicesGroups, activeGroupId);
   const archiveActionsAvailable = canArchive && !isArchiveJobRunning;
-  const segments = useMemo(
-    () => indicesGroups.map((group) => ({ value: group.id, label: `${group.shortLabel} (${group.indices.length})` })),
-    [indicesGroups],
-  );
-  const bulkActions = useMemo(
-    () =>
-      getBulkIndexActionCandidates({
-        indices: selectedGroup.indices,
-        canArchive: archiveActionsAvailable,
-        pendingIndexStatuses,
-        archivedIndexNames,
-      }),
-    [archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, selectedGroup.indices],
-  );
+  const segments = indicesGroups.map((group) => ({
+    value: group.id,
+    label: `${group.shortLabel} (${group.indices.length})`,
+  }));
+  const bulkActions = getBulkIndexActionCandidates({
+    indices: selectedGroup.indices,
+    canArchive: archiveActionsAvailable,
+    pendingIndexStatuses,
+    archivedIndexNames,
+  });
 
   const closeConfirmDialog = () => setConfirmedAction(undefined);
   const closeBulkConfirmDialog = () => setConfirmedBulkAction(undefined);

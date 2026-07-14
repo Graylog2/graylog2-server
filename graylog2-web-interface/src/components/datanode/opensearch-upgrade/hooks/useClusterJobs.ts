@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { ClusterJobs } from '@graylog/server-api';
@@ -49,17 +48,12 @@ const useClusterJobs = ({ enabled, poll }: Options): ClusterJobsResult => {
     refetchInterval: poll ? ARCHIVE_POLL_INTERVAL_MS : false,
   });
 
-  const jobsById = useMemo(() => {
-    const map = new Map<string, SystemJobSummary>();
-
-    Object.values(data ?? {}).forEach((nodeJobs) => {
-      Object.values(nodeJobs ?? {}).forEach((jobs) => {
-        (jobs ?? []).forEach((job) => map.set(job.id, job));
-      });
+  const jobsById = new Map<string, SystemJobSummary>();
+  Object.values(data ?? {}).forEach((nodeJobs) => {
+    Object.values(nodeJobs ?? {}).forEach((jobs) => {
+      (jobs ?? []).forEach((job) => jobsById.set(job.id, job));
     });
-
-    return map;
-  }, [data]);
+  });
 
   return { jobsById, jobsUpdatedAt: dataUpdatedAt, refetch };
 };

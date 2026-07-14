@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -43,7 +42,7 @@ const fetchArchivedIndexNames = async (indexNames: Array<string>): Promise<Set<s
 };
 
 const useArchivedIndexNames = (indexNames: Array<string>, enabled: boolean): Set<string> => {
-  const sortedIndexNames = useMemo(() => [...indexNames].sort(), [indexNames]);
+  const sortedIndexNames = [...indexNames].sort();
   const isEnabled = enabled && sortedIndexNames.length > 0;
 
   const { data } = useQuery({
