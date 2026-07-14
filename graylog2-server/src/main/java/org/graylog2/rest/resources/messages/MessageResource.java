@@ -96,7 +96,7 @@ public class MessageResource extends RestResource {
     @Operation(summary = "Get a single message.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns the message", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "403", description = "Specified index and/or message do not exist or the user does not have the required permissions.")
+            @ApiResponse(responseCode = "404", description = "Specified message does not exist or the user does not have the required permissions.")
     })
     public ResultMessage search(@Parameter(name = "index", description = "The index this message is stored in.", required = true)
                                 @PathParam("index") String index,
@@ -110,7 +110,7 @@ public class MessageResource extends RestResource {
 
             return resultMessage;
         } catch (DocumentNotFoundException | IndexNotFoundException | ForbiddenException e) {
-            throw new ForbiddenException("The requested index and message cannot be found, or the user does not have the required permissions");
+            throw new NotFoundException("Specified message does not exist or the user does not have the required permissions");
         }
     }
 
