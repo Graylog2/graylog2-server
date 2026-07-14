@@ -551,16 +551,7 @@ public class OpAmpService {
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
 
-            var coalesced = txnLogService.coalesce(unprocessedMarkers);
-
-            // Read the floor only after fetching the markers: a concurrent purge then causes at
-            // most an unnecessary recompute instead of silently losing the purged changes.
-            final var floor = txnLogService.lowestRetainedSeq();
-            if (floor.isPresent() && lastProcessedTxnSeq < floor.getAsLong() - 1) {
-                // Markers this collector never processed may have been purged. We cannot
-                // reconstruct what changed, so recompute everything from current state.
-                coalesced = coalesced.withForcedRecompute(floor.getAsLong() - 1);
-            }
+            final var coalesced = txnLogService.coalesce(unprocessedMarkers, lastProcessedTxnSeq);
 
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);

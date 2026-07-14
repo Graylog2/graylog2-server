@@ -42,12 +42,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -55,10 +55,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for the transaction log truncation floor handling in
- * {@link OpAmpService#handleMessage}: a collector whose last processed sequence lies below the
- * oldest retained marker gets a full config recompute because the markers it missed may have been
- * purged.
+ * Tests for how {@link OpAmpService#handleMessage} handles transaction log truncation: the
+ * decision whether a collector's cursor lies below the purged range is made by
+ * {@link FleetTransactionLogService#coalesce(List, long)} (covered by its own tests) — here we
+ * verify that the server passes the right cursor and acts correctly on a forced recompute.
  */
 @ExtendWith(MockitoExtension.class)
 class OpAmpServiceTransactionLogTruncationTest {
@@ -108,37 +108,40 @@ class OpAmpServiceTransactionLogTruncationTest {
     }
 
     @Test
-    void collectorBehindFloorGetsForcedConfigRecompute() {
-        stubPreviousState(5L); // floor 101: everything up to seq 100 may have been purged
-        stubNoUnprocessedMarkers(5L);
-        when(fleetTransactionLogService.lowestRetainedSeq()).thenReturn(OptionalLong.of(101L));
+    void forcedRecomputeIsDeliveredAsRemoteConfigWithThePurgedRangeAcknowledged() {
+        stubPreviousState(5L);
+        stubMarkers(5L, List.of());
+        // markers up to seq 100 were purged: the service forces a recompute acknowledging them
+        when(fleetTransactionLogService.coalesce(List.of(), 5L))
+                .thenReturn(CoalescedActions.empty(0L).withForcedRecompute(100L));
 
         final ServerToAgent response = opAmpService.handleMessage(message(SEQUENCE_NUM, 0L), AUTH);
 
         assertThat(response.hasRemoteConfig()).isTrue();
-        // hash = purge boundary, so the collector's APPLIED report lifts it past the purged range
+        // hash = purged range, so the collector's APPLIED report lifts its cursor past it
         assertThat(response.getRemoteConfig().getConfigHash().toStringUtf8()).isEqualTo("100");
     }
 
     @Test
-    void collectorAtFloorMinusOneGetsNoForcedRecompute() {
-        // lastProcessedTxnSeq == floor - 1: the collector has processed the entire purged prefix
+    void noConfigIsSentWithoutMarkersOrForcedRecompute() {
         stubPreviousState(100L);
-        stubNoUnprocessedMarkers(100L);
-        when(fleetTransactionLogService.lowestRetainedSeq()).thenReturn(OptionalLong.of(101L));
+        stubMarkers(100L, List.of());
+        when(fleetTransactionLogService.coalesce(List.of(), 100L)).thenReturn(CoalescedActions.empty(0L));
 
         final ServerToAgent response = opAmpService.handleMessage(message(SEQUENCE_NUM, 0L), AUTH);
 
         assertThat(response.hasRemoteConfig()).isFalse();
+        verify(sourceService, never()).streamAllByFleet(any());
     }
 
     @Test
-    void forcedRecomputeDoesNotLoopOnceBoundaryIsAcknowledged() {
-        // The collector acknowledges the boundary hash from a previous forced recompute. Its
-        // persisted cursor is still stale, but the APPLIED status must win and suppress a re-send.
+    void appliedStatusAdvancesTheCursorPassedToCoalesce() {
+        // The collector acknowledges hash "100" from a previous forced recompute. Even though its
+        // persisted cursor is stale (5), the APPLIED status must win — this is what terminates the
+        // forcing after one exchange instead of looping.
         stubPreviousState(5L);
-        stubNoUnprocessedMarkers(100L);
-        when(fleetTransactionLogService.lowestRetainedSeq()).thenReturn(OptionalLong.of(101L));
+        stubMarkers(100L, List.of());
+        when(fleetTransactionLogService.coalesce(List.of(), 100L)).thenReturn(CoalescedActions.empty(0L));
 
         final var applied = Opamp.RemoteConfigStatus.newBuilder()
                 .setStatus(Opamp.RemoteConfigStatuses.RemoteConfigStatuses_APPLIED)
@@ -150,17 +153,17 @@ class OpAmpServiceTransactionLogTruncationTest {
         final ServerToAgent response = opAmpService.handleMessage(message, AUTH);
 
         assertThat(response.hasRemoteConfig()).isFalse();
+        verify(fleetTransactionLogService).coalesce(List.of(), 100L);
     }
 
     @Test
     @SuppressWarnings("MustBeClosedChecker") // stubbing streamAllByFleet on a mock opens no resource
     void forcedRecomputePreservesRetainedFleetReassignment() {
         stubPreviousState(5L);
-        // A FLEET_REASSIGNED marker (seq 150) survived the purge and coalesces alongside the floor
-        when(fleetTransactionLogService.getUnprocessedMarkers(FLEET_ID, INSTANCE_UID, 5L)).thenReturn(List.of());
-        when(fleetTransactionLogService.coalesce(any()))
-                .thenReturn(new CoalescedActions(true, false, "fleet-B", false, false, 150L));
-        when(fleetTransactionLogService.lowestRetainedSeq()).thenReturn(OptionalLong.of(101L));
+        stubMarkers(5L, List.of());
+        // a FLEET_REASSIGNED marker (seq 150) survived the purge and coalesces alongside the forcing
+        when(fleetTransactionLogService.coalesce(List.of(), 5L))
+                .thenReturn(new CoalescedActions(true, true, "fleet-B", false, false, 150L));
         when(sourceService.streamAllByFleet("fleet-B")).thenReturn(Stream.empty());
 
         final ServerToAgent response = opAmpService.handleMessage(message(SEQUENCE_NUM, 0L), AUTH);
@@ -168,18 +171,6 @@ class OpAmpServiceTransactionLogTruncationTest {
         assertThat(response.hasRemoteConfig()).isTrue();
         assertThat(response.getRemoteConfig().getConfigHash().toStringUtf8()).isEqualTo("150");
         verify(collectorInstanceService).updateCurrentFleet(INSTANCE_UID, "fleet-B");
-    }
-
-    @Test
-    void emptyLogMeansNothingWasEverPurgedAndForcesNothing() {
-        stubPreviousState(0L);
-        stubNoUnprocessedMarkers(0L);
-        when(fleetTransactionLogService.lowestRetainedSeq()).thenReturn(OptionalLong.empty());
-
-        final ServerToAgent response = opAmpService.handleMessage(message(SEQUENCE_NUM, 0L), AUTH);
-
-        assertThat(response.hasRemoteConfig()).isFalse();
-        verify(sourceService, never()).streamAllByFleet(any());
     }
 
     private static AgentToServer message(long sequenceNum, long capabilities) {
@@ -198,10 +189,8 @@ class OpAmpServiceTransactionLogTruncationTest {
                 new MinimalCollectorInstanceDTO("id-1", FLEET_ID, SEQUENCE_NUM - 1, lastProcessedTxnSeq, null));
     }
 
-    private void stubNoUnprocessedMarkers(long lastProcessedTxnSeq) {
-        when(fleetTransactionLogService.getUnprocessedMarkers(FLEET_ID, INSTANCE_UID, lastProcessedTxnSeq))
-                .thenReturn(List.of());
-        when(fleetTransactionLogService.coalesce(List.of())).thenReturn(CoalescedActions.empty(0L));
+    private void stubMarkers(long lastProcessedTxnSeq, List<org.graylog.collectors.db.TransactionMarker> markers) {
+        when(fleetTransactionLogService.getUnprocessedMarkers(eq(FLEET_ID), eq(INSTANCE_UID), eq(lastProcessedTxnSeq)))
+                .thenReturn(markers);
     }
-
 }
