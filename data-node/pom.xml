@@ -822,6 +822,64 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stage-log4j-replacement-jars</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-api</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-core</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-slf4j2-impl</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-jul</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-1.2-api</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/log4j-replacement</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
@@ -913,64 +971,6 @@
                                 <!-- use the following line if you want to distribute the generated version instead of manually created -->
                                 <!-- <argument>${project.build.directory}/datanode.conf.example</argument> -->
                             </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeScope>runtime</includeScope>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stage-log4j-replacement-jars</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-api</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-core</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-slf4j2-impl</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-jul</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-1.2-api</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/log4j-replacement</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
