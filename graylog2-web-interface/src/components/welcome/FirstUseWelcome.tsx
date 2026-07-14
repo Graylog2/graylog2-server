@@ -19,6 +19,8 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import LinkContainer from 'components/common/LinkContainer';
 import ConfirmDialog from 'components/common/ConfirmDialog';
 import { Icon, Section as SectionBox, ExternalLinkButton } from 'components/common';
@@ -152,6 +154,7 @@ const FirstUseWelcome = () => {
   const productName = useProductName();
   const { mutate: dismiss } = useDismissOnboarding();
   const [showDismissConfirm, setShowDismissConfirm] = useState(false);
+  const sendTelemetry = useSendTelemetry();
 
   return (
     <>
@@ -170,7 +173,15 @@ const FirstUseWelcome = () => {
       <PageHeader
         title={`Welcome to ${productName}!`}
         topActions={
-          <DismissButton bsStyle="transparent" onClick={() => setShowDismissConfirm(true)}>
+          <DismissButton
+            bsStyle="transparent"
+            onClick={() => {
+              sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.DISMISS_CLICKED, {
+                app_section: 'welcome',
+                app_action_value: 'dismiss-onboarding-button',
+              });
+              setShowDismissConfirm(true);
+            }}>
             <Icon name="close" /> Dismiss onboarding
           </DismissButton>
         }>
@@ -189,7 +200,16 @@ const FirstUseWelcome = () => {
               <PlatformIcons />
               <BoxActions>
                 <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
-                  <Button bsStyle="primary">Set up Collector</Button>
+                  <Button
+                    bsStyle="primary"
+                    onClick={() =>
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.SETUP_COLLECTOR_CLICKED, {
+                        app_section: 'welcome',
+                        app_action_value: 'setup-collector-button',
+                      })
+                    }>
+                    Set up Collector
+                  </Button>
                 </LinkContainer>
               </BoxActions>
             </StyledSectionBox>
@@ -201,7 +221,16 @@ const FirstUseWelcome = () => {
                 <DataSourceIcons />
                 <BoxActions>
                   <LinkContainer to={Routes.SYSTEM.INPUTS}>
-                    <Button bsStyle="default">Configure Input</Button>
+                    <Button
+                      bsStyle="default"
+                      onClick={() =>
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.CONFIGURE_INPUT_CLICKED, {
+                          app_section: 'welcome',
+                          app_action_value: 'configure-input-button',
+                        })
+                      }>
+                      Configure Input
+                    </Button>
                   </LinkContainer>
                 </BoxActions>
               </StyledSectionBox>
@@ -223,7 +252,15 @@ const FirstUseWelcome = () => {
                 <div>
                   <ResourceTitle>{resource.title}</ResourceTitle>
                   <ResourceDescription>{resource.description}</ResourceDescription>
-                  <ExternalLinkButton href={resource.link} bsSize="xs">
+                  <ExternalLinkButton
+                    href={resource.link}
+                    bsSize="xs"
+                    onClick={() =>
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
+                        app_section: 'welcome',
+                        app_action_value: resource.title,
+                      })
+                    }>
                     Continue
                   </ExternalLinkButton>
                 </div>
