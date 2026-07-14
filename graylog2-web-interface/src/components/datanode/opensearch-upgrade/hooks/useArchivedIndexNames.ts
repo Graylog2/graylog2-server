@@ -16,9 +16,9 @@
  */
 import useIndexArchive from 'components/indices/archive/useIndexArchive';
 
-const EMPTY_SET: Set<string> = new Set();
+const EMPTY_SET: ReadonlySet<string> = new Set();
 
-const useArchivedIndexNames = (indexNames: Array<string>, enabled: boolean): Set<string> => {
+const useArchivedIndexNames = (indexNames: Array<string>, enabled: boolean): ReadonlySet<string> => {
   const archive = useIndexArchive();
 
   return archive?.useArchivedIndexNames(indexNames, enabled) ?? EMPTY_SET;

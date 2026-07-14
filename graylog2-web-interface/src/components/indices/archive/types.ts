@@ -17,7 +17,7 @@
 
 export type IndexArchiveBinding = {
   useCanArchive: () => boolean;
-  useArchivedIndexNames: (indexNames: Array<string>, enabled: boolean) => Set<string>;
+  useArchivedIndexNames: (indexNames: Array<string>, enabled: boolean) => ReadonlySet<string>;
   archiveAndDeleteIndex: (indexName: string) => Promise<{ systemJobId?: string }>;
   isArchiveJobConflict: (errorMessage: string) => boolean;
   archiveSystemJobName: string;

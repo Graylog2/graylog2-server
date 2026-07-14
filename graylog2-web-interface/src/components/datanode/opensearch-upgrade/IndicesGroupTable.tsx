@@ -175,7 +175,7 @@ const IndicesGroupTable = ({
   onBulkAction: (bulkAction: BulkIndexActionCandidate) => void;
   canArchive: boolean;
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
-  archivedIndexNames: Set<string>;
+  archivedIndexNames: ReadonlySet<string>;
   bulkActions: Array<BulkIndexActionCandidate>;
   isBulkActionSubmitting: boolean;
 }) => {

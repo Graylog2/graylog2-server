@@ -95,7 +95,7 @@ export const getBulkIndexActionCandidates = ({
   indices: Array<IncompatibleIndex>;
   canArchive: boolean;
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
-  archivedIndexNames: Set<string>;
+  archivedIndexNames: ReadonlySet<string>;
 }): Array<BulkIndexActionCandidate> =>
   BULK_ACTION_ORDER.map((action) => {
     const targetIndices = indices.filter(
