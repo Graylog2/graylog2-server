@@ -22,6 +22,7 @@ import useProductName from 'brand-customization/useProductName';
 import LinkContainer from 'components/common/LinkContainer';
 import ConfirmDialog from 'components/common/ConfirmDialog';
 import { Icon, Section as SectionBox, ExternalLinkButton } from 'components/common';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SectionCol } from 'components/common/Section/SectionComponent';
 import type { IconName } from 'components/common/Icon/types';
 import { Button, Row, Col } from 'components/bootstrap';
@@ -192,17 +193,19 @@ const FirstUseWelcome = () => {
                 </LinkContainer>
               </BoxActions>
             </StyledSectionBox>
-            <StyledSectionBox title="Set up Other Sources" titleAs="h3">
-              <Description>
-                Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
-              </Description>
-              <DataSourceIcons />
-              <BoxActions>
-                <LinkContainer to={Routes.SYSTEM.INPUTS}>
-                  <Button bsStyle="default">Configure Input</Button>
-                </LinkContainer>
-              </BoxActions>
-            </StyledSectionBox>
+            <HideOnCloud>
+              <StyledSectionBox title="Set up Other Sources" titleAs="h3">
+                <Description>
+                  Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
+                </Description>
+                <DataSourceIcons />
+                <BoxActions>
+                  <LinkContainer to={Routes.SYSTEM.INPUTS}>
+                    <Button bsStyle="default">Configure Input</Button>
+                  </LinkContainer>
+                </BoxActions>
+              </StyledSectionBox>
+            </HideOnCloud>
           </ActionsSection>
         </Col>
       </Row>

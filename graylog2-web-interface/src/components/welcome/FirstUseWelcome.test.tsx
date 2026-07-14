@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useDismissOnboarding from 'components/welcome/hooks/useDismissOnboarding';
+import AppConfig from 'util/AppConfig';
 
 import FirstUseWelcome from './FirstUseWelcome';
 
@@ -31,6 +32,7 @@ beforeEach(() => {
   asMock(useDismissOnboarding).mockReturnValue({ mutate: mockDismiss } as unknown as ReturnType<
     typeof useDismissOnboarding
   >);
+  asMock(AppConfig.isCloud).mockReturnValue(false);
 });
 
 describe('FirstUseWelcome', () => {
@@ -89,5 +91,18 @@ describe('FirstUseWelcome', () => {
     await userEvent.click(await screen.findByRole('button', { name: /Dismiss for everyone/i }));
 
     expect(mockDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the "Set up Other Sources" section when not on cloud', () => {
+    render(<FirstUseWelcome />);
+
+    expect(screen.getByRole('heading', { name: /set up other sources/i })).toBeInTheDocument();
+  });
+
+  it('hides the "Set up Other Sources" section on cloud', () => {
+    asMock(AppConfig.isCloud).mockReturnValue(true);
+    render(<FirstUseWelcome />);
+
+    expect(screen.queryByRole('heading', { name: /set up other sources/i })).not.toBeInTheDocument();
   });
 });
