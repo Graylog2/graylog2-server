@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import { Alert, Button, SegmentedControl } from 'components/bootstrap';
 import { ConfirmDialog, Spinner } from 'components/common';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
-import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
+import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
@@ -30,10 +30,10 @@ import { getBulkIndexActionCandidates, getBulkIndexActionNotification, runBulkIn
 import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
 import IndicesGroupTable from './IndicesGroupTable';
 import useArchivedIndexNames from './hooks/useArchivedIndexNames';
-import usePendingOutdatedIndexActions from './hooks/usePendingOutdatedIndexActions';
-import { useOutdatedIndexActionDefinitions } from './outdatedIndexActions';
-import type { ConfirmedAction } from './outdatedIndexActions';
-import { getFirstGroupWithIndices, getSelectedGroup, groupOutdatedIndices } from './outdatedIndexGroups';
+import usePendingIncompatibleIndexActions from './hooks/usePendingIncompatibleIndexActions';
+import { useIncompatibleIndexActionDefinitions } from './incompatibleIndexActions';
+import type { ConfirmedAction } from './incompatibleIndexActions';
+import { getFirstGroupWithIndices, getSelectedGroup, groupIncompatibleIndices } from './incompatibleIndexGroups';
 
 const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
 
@@ -68,7 +68,7 @@ const ActionConfirmDialog = ({
   onCancel: () => void;
   onConfirm: () => void;
 }) => {
-  const actionDefinitions = useOutdatedIndexActionDefinitions();
+  const actionDefinitions = useIncompatibleIndexActionDefinitions();
   const actionDefinition = actionDefinitions[confirmedAction.action];
 
   return (
@@ -86,28 +86,28 @@ const ActionConfirmDialog = ({
   );
 };
 
-const OutdatedIndicesTable = () => {
-  const { data: outdatedIndices, isError, isLoading, refetch } = useOutdatedIndices();
+const IncompatibleIndicesTable = () => {
+  const { data: incompatibleIndices, isError, isLoading, refetch } = useIncompatibleIndices();
   const canArchive = useCanArchive();
-  const actionDefinitions = useOutdatedIndexActionDefinitions();
+  const actionDefinitions = useIncompatibleIndexActionDefinitions();
   const sendTelemetry = useSendTelemetry();
   const { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs } =
-    usePendingOutdatedIndexActions({
-      outdatedIndices,
+    usePendingIncompatibleIndexActions({
+      incompatibleIndices,
       isLoading,
       isError,
       refetch,
       canArchive,
     });
-  const outdatedIndexNames = outdatedIndices.map((index) => index.index_name);
-  const archivedIndexNames = useArchivedIndexNames(outdatedIndexNames, canArchive);
+  const incompatibleIndexNames = incompatibleIndices.map((index) => index.index_name);
+  const archivedIndexNames = useArchivedIndexNames(incompatibleIndexNames, canArchive);
   const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
   const [confirmedBulkAction, setConfirmedBulkAction] = useState<BulkIndexActionCandidate | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
 
-  const indicesGroups = groupOutdatedIndices(outdatedIndices);
+  const indicesGroups = groupIncompatibleIndices(incompatibleIndices);
   const firstGroupWithIndices = getFirstGroupWithIndices(indicesGroups);
   const activeGroupId = selectedGroupId ?? firstGroupWithIndices;
   const selectedGroup = getSelectedGroup(indicesGroups, activeGroupId);
@@ -132,8 +132,8 @@ const OutdatedIndicesTable = () => {
   };
 
   const finalizeAfterActions = async () => {
-    const { data: updatedOutdatedIndices = [] } = await refetch();
-    const updatedGroups = groupOutdatedIndices(updatedOutdatedIndices);
+    const { data: updatedIncompatibleIndices = [] } = await refetch();
+    const updatedGroups = groupIncompatibleIndices(updatedIncompatibleIndices);
     const updatedSelectedGroup = getSelectedGroup(updatedGroups, activeGroupId);
 
     if (updatedSelectedGroup.indices.length === 0) {
@@ -217,13 +217,13 @@ const OutdatedIndicesTable = () => {
   };
 
   if (isLoading) {
-    return <Spinner text="Loading outdated indices..." />;
+    return <Spinner text="Loading incompatible indices..." />;
   }
 
   if (isError) {
     return (
       <Alert bsStyle="danger">
-        Could not load outdated indices — retrying automatically.{' '}
+        Could not load incompatible indices — retrying automatically.{' '}
         <Button bsSize="xs" onClick={() => refetch()}>
           Retry now
         </Button>
@@ -231,13 +231,13 @@ const OutdatedIndicesTable = () => {
     );
   }
 
-  if (!outdatedIndices.length) {
-    return <Alert bsStyle="success">No outdated indices found.</Alert>;
+  if (!incompatibleIndices.length) {
+    return <Alert bsStyle="success">No incompatible indices found.</Alert>;
   }
 
   return (
     <>
-      <Heading>Outdated indices</Heading>
+      <Heading>Incompatible indices</Heading>
       <SegmentedControl
         data={segments}
         value={activeGroupId}
@@ -276,4 +276,4 @@ const OutdatedIndicesTable = () => {
   );
 };
 
-export default OutdatedIndicesTable;
+export default IncompatibleIndicesTable;

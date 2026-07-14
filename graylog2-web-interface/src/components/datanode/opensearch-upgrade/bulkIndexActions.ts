@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
+import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 import extractErrorMessage from 'util/extractErrorMessage';
 
 import { BULK_INDEX_ACTION_CONCURRENCY } from './constants';
-import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions';
-import { CORE_ACTION_DEFINITIONS, getAvailableActions } from './outdatedIndexActions';
+import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
+import { CORE_ACTION_DEFINITIONS, getAvailableActions } from './incompatibleIndexActions';
 
 // Deliberately no 'archive-delete' (bulk would race the single-concurrency backend job) or 'rotate' (row-only).
 const BULK_ACTION_ORDER = ['delete', 'reindex-system-index'] as const;
@@ -38,16 +38,16 @@ type BulkActionCopy = {
 
 export type BulkIndexActionCandidate = BulkActionCopy & {
   action: BulkCapableIndexAction;
-  targetIndices: Array<OutdatedIndex>;
+  targetIndices: Array<IncompatibleIndex>;
 };
 
 export type BulkIndexActionSuccess = {
-  index: OutdatedIndex;
+  index: IncompatibleIndex;
   response: unknown;
 };
 
 export type BulkIndexActionFailure = {
-  index: OutdatedIndex;
+  index: IncompatibleIndex;
   error: unknown;
 };
 
@@ -65,10 +65,10 @@ export type BulkIndexActionNotification = {
 const BULK_ACTION_COPY: Record<BulkCapableIndexAction, BulkActionCopy> = {
   delete: {
     buttonLabel: 'Delete all',
-    confirmTitle: 'Delete outdated indices',
+    confirmTitle: 'Delete incompatible indices',
     confirmText: 'Delete all',
     targetVerb: 'delete',
-    successMessage: (count) => `${count} outdated ${count === 1 ? 'index was' : 'indices were'} deleted.`,
+    successMessage: (count) => `${count} incompatible ${count === 1 ? 'index was' : 'indices were'} deleted.`,
     partialSuccessTitle: 'Some indices could not be deleted',
     failureTitle: 'Could not delete indices',
   },
@@ -92,7 +92,7 @@ export const getBulkIndexActionCandidates = ({
   pendingIndexStatuses,
   archivedIndexNames,
 }: {
-  indices: Array<OutdatedIndex>;
+  indices: Array<IncompatibleIndex>;
   canArchive: boolean;
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
   archivedIndexNames: Set<string>;
@@ -118,7 +118,7 @@ export const runBulkIndexAction = async ({
   indices,
 }: {
   action: BulkCapableIndexAction;
-  indices: Array<OutdatedIndex>;
+  indices: Array<IncompatibleIndex>;
 }): Promise<BulkIndexActionResult> => {
   const actionDefinition = CORE_ACTION_DEFINITIONS[action];
   const successes: Array<BulkIndexActionSuccess> = [];

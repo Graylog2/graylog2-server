@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 import asMock from 'helpers/mocking/AsMock';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
+import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
 
 import OpenSearchUpgradeSection from './OpenSearchUpgradeSection';
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
@@ -31,9 +31,9 @@ import useOpenSearchRollingRestart, {
 } from './hooks/useOpenSearchRollingRestart';
 import type { RollingRestartJob, RollingRestartState } from './rollingRestartTypes';
 
-jest.mock('./OutdatedIndicesTable', () => ({
+jest.mock('./IncompatibleIndicesTable', () => ({
   __esModule: true,
-  default: () => <div>outdated-indices-stub</div>,
+  default: () => <div>incompatible-indices-stub</div>,
 }));
 jest.mock('./OpenSearchRollingUpgradeNodes', () => ({
   __esModule: true,
@@ -46,7 +46,7 @@ jest.mock('./hooks/useOpenSearchRollingRestart', () => ({
   rollingRestartStartError: jest.fn(),
   useCurrentRollingRestart: jest.fn(),
 }));
-jest.mock('components/indices/hooks/useOutdatedIndices');
+jest.mock('components/indices/hooks/useIncompatibleIndices');
 jest.mock('logic/telemetry/useSendTelemetry');
 
 const EVENTS = TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE;
@@ -91,14 +91,14 @@ const mockRollingRestart = (overrides: RollingRestartHookOverrides = {}) => {
   } as unknown as ReturnType<typeof useOpenSearchRollingRestart>);
 };
 
-const mockOutdatedIndices = (data: Array<unknown> = [], overrides: { isLoading?: boolean; isError?: boolean } = {}) =>
-  asMock(useOutdatedIndices).mockReturnValue({
+const mockIncompatibleIndices = (data: Array<unknown> = [], overrides: { isLoading?: boolean; isError?: boolean } = {}) =>
+  asMock(useIncompatibleIndices).mockReturnValue({
     data,
     isError: false,
     isLoading: false,
     refetch: jest.fn(),
     ...overrides,
-  } as unknown as ReturnType<typeof useOutdatedIndices>);
+  } as unknown as ReturnType<typeof useIncompatibleIndices>);
 
 const pausedJob = (): RollingRestartJob => ({
   job_definition_type: 'rolling-restart-v1',
@@ -133,7 +133,7 @@ describe('OpenSearchUpgradeSection', () => {
     asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
     mockClusterStats();
     mockRollingRestart();
-    mockOutdatedIndices([]);
+    mockIncompatibleIndices([]);
   });
 
   it('confirms before starting a rolling upgrade, then starts and sends telemetry', async () => {
@@ -202,7 +202,7 @@ describe('OpenSearchUpgradeSection', () => {
 
     expect(screen.getByText(/cannot be checked while 1 data node is unavailable/i)).toBeInTheDocument();
     expect(screen.getByText('3 (2 available)')).toBeInTheDocument();
-    expect(screen.queryByText('outdated-indices-stub')).not.toBeInTheDocument();
+    expect(screen.queryByText('incompatible-indices-stub')).not.toBeInTheDocument();
     expect(screen.queryByText('rolling-upgrade-nodes-stub')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /start opensearch rolling upgrade/i })).not.toBeInTheDocument();
   });
@@ -216,58 +216,58 @@ describe('OpenSearchUpgradeSection', () => {
     expect(screen.queryByText(/cannot be checked while/i)).not.toBeInTheDocument();
   });
 
-  it('disables the start action while outdated indices remain', () => {
-    mockOutdatedIndices([{ index_name: 'graylog_0' }]);
+  it('disables the start action while incompatible indices remain', () => {
+    mockIncompatibleIndices([{ index_name: 'graylog_0' }]);
     render(<OpenSearchUpgradeSection />);
 
     expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
-    expect(screen.getByText(/resolve all outdated indices first/i)).toBeInTheDocument();
+    expect(screen.getByText(/resolve all incompatible indices first/i)).toBeInTheDocument();
   });
 
-  it('disables the start action when the outdated indices check failed', () => {
-    mockOutdatedIndices([], { isError: true });
+  it('disables the start action when the incompatible indices check failed', () => {
+    mockIncompatibleIndices([], { isError: true });
     render(<OpenSearchUpgradeSection />);
 
     expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
   });
 
-  it('shows the rolling-upgrade status when a job exists and no outdated indices remain', () => {
+  it('shows the rolling-upgrade status when a job exists and no incompatible indices remain', () => {
     mockRollingRestart({ data: pausedJob() });
     render(<OpenSearchUpgradeSection />);
 
     expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
-  it('hides outdated indices and keeps an active rolling upgrade visible even while outdated indices remain', () => {
-    mockOutdatedIndices([{ index_name: 'graylog_0' }]);
+  it('hides incompatible indices and keeps an active rolling upgrade visible even while incompatible indices remain', () => {
+    mockIncompatibleIndices([{ index_name: 'graylog_0' }]);
     mockRollingRestart({ data: pausedJob() });
     render(<OpenSearchUpgradeSection />);
 
-    expect(screen.queryByText('outdated-indices-stub')).not.toBeInTheDocument();
-    expect(screen.queryByText(/resolve all outdated indices first/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('incompatible-indices-stub')).not.toBeInTheDocument();
+    expect(screen.queryByText(/resolve all incompatible indices first/i)).not.toBeInTheDocument();
     expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
-  it('hides outdated indices and keeps the status visible for a finished (terminal) rolling upgrade', () => {
-    mockOutdatedIndices([{ index_name: 'graylog_0' }]);
+  it('hides incompatible indices and keeps the status visible for a finished (terminal) rolling upgrade', () => {
+    mockIncompatibleIndices([{ index_name: 'graylog_0' }]);
     mockRollingRestart({ data: failedJob() });
     render(<OpenSearchUpgradeSection />);
 
-    expect(screen.queryByText('outdated-indices-stub')).not.toBeInTheDocument();
-    expect(screen.queryByText(/resolve all outdated indices first/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('incompatible-indices-stub')).not.toBeInTheDocument();
+    expect(screen.queryByText(/resolve all incompatible indices first/i)).not.toBeInTheDocument();
     expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
-  it('keeps a finished rolling-upgrade status visible independent of the outdated indices check', () => {
-    mockOutdatedIndices([], { isLoading: true });
+  it('keeps a finished rolling-upgrade status visible independent of the incompatible indices check', () => {
+    mockIncompatibleIndices([], { isLoading: true });
     mockRollingRestart({ data: failedJob() });
     render(<OpenSearchUpgradeSection />);
 
     expect(screen.getByText('rolling-upgrade-nodes-stub')).toBeInTheDocument();
   });
 
-  it('keeps an active rolling upgrade visible while the outdated indices check is failing', () => {
-    mockOutdatedIndices([], { isError: true });
+  it('keeps an active rolling upgrade visible while the incompatible indices check is failing', () => {
+    mockIncompatibleIndices([], { isError: true });
     mockRollingRestart({ data: pausedJob() });
     render(<OpenSearchUpgradeSection />);
 

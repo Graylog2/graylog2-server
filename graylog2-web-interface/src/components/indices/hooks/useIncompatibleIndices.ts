@@ -18,7 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { IndexerIndices } from '@graylog/server-api';
 
-export type OutdatedIndex = {
+export type IncompatibleIndex = {
   index_name: string;
   version: string;
   warm_index: boolean;
@@ -30,16 +30,16 @@ export type OutdatedIndex = {
 
 const ERROR_REFETCH_INTERVAL_MS = 30000;
 
-const useOutdatedIndices = () => {
+const useIncompatibleIndices = () => {
   const {
     data = [],
     isError,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['outdatedIndices'],
+    queryKey: ['incompatibleIndices'],
     // No error toast: the panels render a persistent error state, and background retries would spam toasts.
-    queryFn: () => IndexerIndices.getOutdatedIndices() as Promise<Array<OutdatedIndex>>,
+    queryFn: () => IndexerIndices.getOutdatedIndices() as Promise<Array<IncompatibleIndex>>,
     retry: 2,
     refetchInterval: (query) => (query.state.status === 'error' ? ERROR_REFETCH_INTERVAL_MS : false),
   });
@@ -52,4 +52,4 @@ const useOutdatedIndices = () => {
   };
 };
 
-export default useOutdatedIndices;
+export default useIncompatibleIndices;

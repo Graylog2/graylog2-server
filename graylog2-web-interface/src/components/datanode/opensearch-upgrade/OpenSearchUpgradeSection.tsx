@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Alert, Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { Title } from 'components/common';
-import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
+import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -28,7 +28,7 @@ import StartUpgradeConfirmDialog from './StartUpgradeConfirmDialog';
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/useOpenSearchRollingRestart';
 import useOpenSearchUpgradeStatus from './hooks/useOpenSearchUpgradeStatus';
-import OutdatedIndicesTable from './OutdatedIndicesTable';
+import IncompatibleIndicesTable from './IncompatibleIndicesTable';
 import OpenSearchUpgradeInfo from './OpenSearchUpgradeInfo';
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
 import { isRollingRestartPaused, isRollingRestartTerminalState } from './rollingRestartTypes';
@@ -64,10 +64,10 @@ const OpenSearchUpgradeSection = () => {
   } = useOpenSearchClusterStats();
   const openSearchStatus = useOpenSearchUpgradeStatus();
   const {
-    data: outdatedIndices,
-    isError: isOutdatedIndicesError,
-    isLoading: isLoadingOutdatedIndices,
-  } = useOutdatedIndices();
+    data: incompatibleIndices,
+    isError: isIncompatibleIndicesError,
+    isLoading: isLoadingIncompatibleIndices,
+  } = useIncompatibleIndices();
   const {
     data: rollingRestart,
     isResumingRollingRestart,
@@ -79,13 +79,13 @@ const OpenSearchUpgradeSection = () => {
   const [forceStartFailedChecks, setForceStartFailedChecks] = useState<Array<string>>([]);
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
-  const hasOutdatedIndices = outdatedIndices.length > 0;
+  const hasIncompatibleIndices = incompatibleIndices.length > 0;
   const rollingRestartState = rollingRestart?.data?.sm_state;
   const hasRollingRestartJob = !!rollingRestart?.data;
-  const showOutdatedIndices = !hasRollingRestartJob;
+  const showIncompatibleIndices = !hasRollingRestartJob;
   const showStartAction = openSearchStatus === 'outdated';
   const isStartActionDisabled =
-    isStartingRollingRestart || isLoadingOutdatedIndices || isOutdatedIndicesError || hasOutdatedIndices;
+    isStartingRollingRestart || isLoadingIncompatibleIndices || isIncompatibleIndicesError || hasIncompatibleIndices;
   const startActionLabel = isRollingUpgradePossible ? 'Start OpenSearch Rolling Upgrade' : 'Restart';
   const startActionLoadingLabel = isRollingUpgradePossible ? 'Starting OpenSearch Rolling Upgrade...' : 'Restarting...';
   const canResumeRollingRestart =
@@ -142,7 +142,7 @@ const OpenSearchUpgradeSection = () => {
           unavailableDataNodes={unavailableDataNodeCount}
         />
         <Alert bsStyle="warning">
-          Outdated indices and upgrade status cannot be checked while {unavailableDataNodeCount} Data{' '}
+          Incompatible indices and upgrade status cannot be checked while {unavailableDataNodeCount} Data{' '}
           {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all
           Data Nodes are available.
         </Alert>
@@ -161,10 +161,10 @@ const OpenSearchUpgradeSection = () => {
         unavailableDataNodes={unavailableDataNodeCount}
       />
 
-      {showOutdatedIndices && (
+      {showIncompatibleIndices && (
         <Row>
           <Col xs={12}>
-            <OutdatedIndicesTable />
+            <IncompatibleIndicesTable />
           </Col>
         </Row>
       )}
@@ -187,8 +187,8 @@ const OpenSearchUpgradeSection = () => {
               </Button>
             )}
           </ButtonToolbar>
-          {showOutdatedIndices && hasOutdatedIndices && (
-            <DisabledHint>Resolve all outdated indices first.</DisabledHint>
+          {showIncompatibleIndices && hasIncompatibleIndices && (
+            <DisabledHint>Resolve all incompatible indices first.</DisabledHint>
           )}
           {openSearchStatus === 'error' && (
             <DisabledHint>Could not check OpenSearch upgrade availability.</DisabledHint>

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
+import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 
 type IndexGroupId = 'graylog' | 'system' | 'foreign';
 
@@ -22,11 +22,11 @@ type IndexGroupDefinition = {
   id: IndexGroupId;
   shortLabel: string;
   indexLabel: string;
-  matches: (index: OutdatedIndex) => boolean;
+  matches: (index: IncompatibleIndex) => boolean;
 };
 
 export type IndicesGroup = Omit<IndexGroupDefinition, 'matches'> & {
-  indices: Array<OutdatedIndex>;
+  indices: Array<IncompatibleIndex>;
 };
 
 const INDEX_GROUPS: Array<IndexGroupDefinition> = [
@@ -52,7 +52,7 @@ const INDEX_GROUPS: Array<IndexGroupDefinition> = [
 
 const DEFAULT_GROUP_ID = INDEX_GROUPS[0].id;
 
-export const groupOutdatedIndices = (indices: Array<OutdatedIndex>): Array<IndicesGroup> =>
+export const groupIncompatibleIndices = (indices: Array<IncompatibleIndex>): Array<IndicesGroup> =>
   INDEX_GROUPS.map(({ id, shortLabel, indexLabel, matches }) => ({
     id,
     shortLabel,

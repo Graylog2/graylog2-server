@@ -17,7 +17,7 @@
 import { useEffect, useState } from 'react';
 
 import useIndexArchive from 'components/indices/archive/useIndexArchive';
-import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
+import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 import Store from 'logic/local-storage/Store';
 
 import useClusterJobs from './useClusterJobs';
@@ -25,9 +25,9 @@ import type { ClusterJobsResult, SystemJobSummary } from './useClusterJobs';
 
 import { ARCHIVE_POLL_INTERVAL_MS } from '../constants';
 
-export const PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY = 'datanode-pending-outdated-index-actions';
+export const PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY = 'datanode-pending-incompatible-index-actions';
 
-export type PendingOutdatedIndexAction = {
+export type PendingIncompatibleIndexAction = {
   action: 'archive-delete';
   indexName: string;
   startedAt: string;
@@ -47,7 +47,7 @@ type ActionResolution =
   | { kind: 'done' };
 
 type Params = {
-  outdatedIndices: Array<OutdatedIndex>;
+  incompatibleIndices: Array<IncompatibleIndex>;
   isLoading: boolean;
   isError: boolean;
   refetch: () => Promise<unknown>;
@@ -57,7 +57,7 @@ type Params = {
 const isRunningArchiveSystemJob = (job: SystemJobSummary, archiveSystemJobName: string) =>
   job.name === archiveSystemJobName && String(job.job_status).toLowerCase() === 'running';
 
-const isValidStoredAction = (value: unknown): value is PendingOutdatedIndexAction => {
+const isValidStoredAction = (value: unknown): value is PendingIncompatibleIndexAction => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -74,22 +74,22 @@ const isValidStoredAction = (value: unknown): value is PendingOutdatedIndexActio
   );
 };
 
-const readStoredActions = (): Array<PendingOutdatedIndexAction> => {
-  const stored = Store.get(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY);
+const readStoredActions = (): Array<PendingIncompatibleIndexAction> => {
+  const stored = Store.get(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY);
 
   return Array.isArray(stored) ? stored.filter(isValidStoredAction) : [];
 };
 
-const storeActions = (actions: Array<PendingOutdatedIndexAction>) => {
+const storeActions = (actions: Array<PendingIncompatibleIndexAction>) => {
   try {
-    Store.set(PENDING_OUTDATED_INDEX_ACTIONS_STORAGE_KEY, actions);
+    Store.set(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY, actions);
   } catch {
     // Ignore write failures (e.g. storage full / disabled) — tracking degrades to this session only.
   }
 };
 
 const resolveAction = (
-  action: PendingOutdatedIndexAction,
+  action: PendingIncompatibleIndexAction,
   { jobsById, jobsUpdatedAt }: ClusterJobsResult,
 ): ActionResolution => {
   if (action.state === 'archived') {
@@ -120,12 +120,12 @@ const resolveAction = (
 };
 
 const reconcileActions = (
-  current: Array<PendingOutdatedIndexAction>,
-  outdatedIndexNames: Set<string>,
+  current: Array<PendingIncompatibleIndexAction>,
+  incompatibleIndexNames: Set<string>,
   jobs: Pick<ClusterJobsResult, 'jobsById' | 'jobsUpdatedAt'>,
-): Array<PendingOutdatedIndexAction> => {
-  const next = current.flatMap((pendingAction): Array<PendingOutdatedIndexAction> => {
-    if (!outdatedIndexNames.has(pendingAction.indexName)) {
+): Array<PendingIncompatibleIndexAction> => {
+  const next = current.flatMap((pendingAction): Array<PendingIncompatibleIndexAction> => {
+    if (!incompatibleIndexNames.has(pendingAction.indexName)) {
       return [];
     }
 
@@ -148,12 +148,12 @@ const reconcileActions = (
   return unchanged ? current : next;
 };
 
-const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, refetch, canArchive }: Params) => {
+const usePendingIncompatibleIndexActions = ({ incompatibleIndices, isLoading, isError, refetch, canArchive }: Params) => {
   const archive = useIndexArchive();
-  const [pendingActions, setPendingActions] = useState<Array<PendingOutdatedIndexAction>>(readStoredActions);
+  const [pendingActions, setPendingActions] = useState<Array<PendingIncompatibleIndexAction>>(readStoredActions);
 
-  const outdatedIndexNames = new Set(outdatedIndices.map((index) => index.index_name));
-  const trackedActions = pendingActions.filter((pendingAction) => outdatedIndexNames.has(pendingAction.indexName));
+  const incompatibleIndexNames = new Set(incompatibleIndices.map((index) => index.index_name));
+  const trackedActions = pendingActions.filter((pendingAction) => incompatibleIndexNames.has(pendingAction.indexName));
   const activeTrackedActions = trackedActions.filter((pendingAction) => pendingAction.state !== 'archived');
   const hasActiveTrackedActions = activeTrackedActions.length > 0;
   const {
@@ -188,7 +188,7 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
   // Guarded state adjustment during render instead of an effect:
   // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
   if (!isLoading && !isError) {
-    const reconciled = reconcileActions(pendingActions, outdatedIndexNames, { jobsById, jobsUpdatedAt });
+    const reconciled = reconcileActions(pendingActions, incompatibleIndexNames, { jobsById, jobsUpdatedAt });
 
     if (reconciled !== pendingActions) {
       setPendingActions(reconciled);
@@ -215,4 +215,4 @@ const usePendingOutdatedIndexActions = ({ outdatedIndices, isLoading, isError, r
   return { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs };
 };
 
-export default usePendingOutdatedIndexActions;
+export default usePendingIncompatibleIndexActions;

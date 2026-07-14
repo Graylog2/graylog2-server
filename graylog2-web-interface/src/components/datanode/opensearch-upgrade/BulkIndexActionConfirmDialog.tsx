@@ -44,7 +44,7 @@ const BulkIndexActionConfirmDialog = ({
       onConfirm={onConfirm}
       submitLoadingText="Working...">
       <p>
-        This will {bulkAction.targetVerb} {bulkAction.targetIndices.length} outdated {indicesLabel}.
+        This will {bulkAction.targetVerb} {bulkAction.targetIndices.length} incompatible {indicesLabel}.
       </p>
       <p>If an individual index fails, the remaining indices will still be processed.</p>
     </ConfirmDialog>

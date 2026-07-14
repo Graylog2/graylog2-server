@@ -19,15 +19,15 @@ import styled, { css } from 'styled-components';
 
 import { Alert, Button, ButtonToolbar, Label, Table } from 'components/bootstrap';
 import { ProgressBar } from 'components/common';
-import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
+import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 
 import type { BulkIndexActionCandidate } from './bulkIndexActions';
-import type { PendingIndexStatus } from './hooks/usePendingOutdatedIndexActions';
-import { CORE_ACTION_DEFINITIONS, getAvailableActions, useOutdatedIndexActionDefinitions } from './outdatedIndexActions';
-import type { ConfirmedAction } from './outdatedIndexActions';
-import type { IndicesGroup } from './outdatedIndexGroups';
+import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
+import { CORE_ACTION_DEFINITIONS, getAvailableActions, useIncompatibleIndexActionDefinitions } from './incompatibleIndexActions';
+import type { ConfirmedAction } from './incompatibleIndexActions';
+import type { IndicesGroup } from './incompatibleIndexGroups';
 
-const indexNameBadges = (index: OutdatedIndex, isArchived: boolean) =>
+const indexNameBadges = (index: IncompatibleIndex, isArchived: boolean) =>
   [
     { text: 'warm', style: 'default', show: index.warm_index },
     { text: 'active write index', style: 'default', show: !!index.active_write_index },
@@ -106,20 +106,20 @@ const ScrollableTableWrapper = styled.div(
   `,
 );
 
-const OutdatedIndexActions = ({
+const IncompatibleIndexActions = ({
   index,
   onAction,
   canArchive,
   pendingStatus,
   isArchived,
 }: {
-  index: OutdatedIndex;
+  index: IncompatibleIndex;
   onAction: (action: ConfirmedAction) => void;
   canArchive: boolean;
   pendingStatus: PendingIndexStatus | undefined;
   isArchived: boolean;
 }) => {
-  const actionDefinitions = useOutdatedIndexActionDefinitions();
+  const actionDefinitions = useIncompatibleIndexActionDefinitions();
 
   if (pendingStatus?.state === 'archiving') {
     // No empty 0% bar flash for jobs that finish almost instantly.
@@ -180,7 +180,7 @@ const IndicesGroupTable = ({
   isBulkActionSubmitting: boolean;
 }) => {
   if (group.indices.length === 0) {
-    return <Alert bsStyle="info">No outdated {group.shortLabel} indices.</Alert>;
+    return <Alert bsStyle="info">No incompatible {group.shortLabel} indices.</Alert>;
   }
 
   return (
@@ -232,7 +232,7 @@ const IndicesGroupTable = ({
                 </td>
                 <td>{index.version || 'Unknown'}</td>
                 <td>
-                  <OutdatedIndexActions
+                  <IncompatibleIndexActions
                     index={index}
                     onAction={onAction}
                     canArchive={canArchive}

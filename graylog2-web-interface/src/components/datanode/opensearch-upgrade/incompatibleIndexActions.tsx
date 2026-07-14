@@ -21,7 +21,7 @@ import { ClusterDeflector, IndexerIndices } from '@graylog/server-api';
 import type { StyleProps } from 'components/bootstrap/Button';
 import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import useIndexArchive from 'components/indices/archive/useIndexArchive';
-import type { OutdatedIndex } from 'components/indices/hooks/useOutdatedIndices';
+import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
@@ -29,7 +29,7 @@ export type IndexAction = 'delete' | 'archive-delete' | 'reindex-system-index' |
 
 export type ConfirmedAction = {
   action: IndexAction;
-  index: OutdatedIndex;
+  index: IncompatibleIndex;
 };
 
 export type PendingArchiveTracking = {
@@ -42,20 +42,20 @@ type ActionDefinition = {
   buttonStyle: StyleProps;
   confirmTitle: string;
   confirmText: string;
-  confirmationBody: (index: OutdatedIndex) => React.ReactNode;
-  run: (index: OutdatedIndex) => Promise<unknown>;
-  successMessage: (index: OutdatedIndex) => string;
+  confirmationBody: (index: IncompatibleIndex) => React.ReactNode;
+  run: (index: IncompatibleIndex) => Promise<unknown>;
+  successMessage: (index: IncompatibleIndex) => string;
   telemetryEventType: TelemetryEventType;
-  getPendingArchiveTracking?: (index: OutdatedIndex, response: unknown) => PendingArchiveTracking;
+  getPendingArchiveTracking?: (index: IncompatibleIndex, response: unknown) => PendingArchiveTracking;
   isArchiveJobConflict?: (errorMessage: string) => boolean;
 };
 
-const deleteOutdatedIndex = (index: OutdatedIndex) =>
+const deleteIncompatibleIndex = (index: IncompatibleIndex) =>
   index.managed_index ? IndexerIndices.remove(index.index_name) : IndexerIndices.deleteOutdated(index.index_name);
 
-const reindexSystemIndex = (index: OutdatedIndex) => IndexerIndices.reindex(index.index_name);
+const reindexSystemIndex = (index: IncompatibleIndex) => IndexerIndices.reindex(index.index_name);
 
-const rotateWriteIndex = (index: OutdatedIndex) => ClusterDeflector.cycleByindexSetId(index.active_write_index);
+const rotateWriteIndex = (index: IncompatibleIndex) => ClusterDeflector.cycleByindexSetId(index.active_write_index);
 
 export const CORE_ACTION_DEFINITIONS: Record<Exclude<IndexAction, 'archive-delete'>, ActionDefinition> = {
   delete: {
@@ -68,7 +68,7 @@ export const CORE_ACTION_DEFINITIONS: Record<Exclude<IndexAction, 'archive-delet
         This will permanently delete <strong>{index.index_name}</strong>.
       </p>
     ),
-    run: deleteOutdatedIndex,
+    run: deleteIncompatibleIndex,
     successMessage: (index) => `Index "${index.index_name}" was deleted.`,
     telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_DELETE_CONFIRMED,
   },
@@ -128,7 +128,7 @@ const archiveDeleteDefinition = (archive: IndexArchiveBinding | undefined): Acti
   isArchiveJobConflict: (errorMessage) => archive?.isArchiveJobConflict(errorMessage) ?? false,
 });
 
-export const useOutdatedIndexActionDefinitions = (): Record<IndexAction, ActionDefinition> => {
+export const useIncompatibleIndexActionDefinitions = (): Record<IndexAction, ActionDefinition> => {
   const archive = useIndexArchive();
 
   return {
@@ -138,7 +138,7 @@ export const useOutdatedIndexActionDefinitions = (): Record<IndexAction, ActionD
 };
 
 export const getAvailableActions = (
-  index: OutdatedIndex,
+  index: IncompatibleIndex,
   canArchive: boolean,
   alreadyArchived: boolean,
 ): Array<IndexAction> => {
