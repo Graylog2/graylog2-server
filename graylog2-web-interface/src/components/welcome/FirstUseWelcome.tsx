@@ -19,31 +19,39 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
-import SectionComponent from 'components/common/Section/SectionComponent';
-
 import LinkContainer from 'components/common/LinkContainer';
 import ConfirmDialog from 'components/common/ConfirmDialog';
-import { Card, Icon, Section as SectionBox } from 'components/common';
+import { Icon, Section as SectionBox, ExternalLinkButton } from 'components/common';
+import type { IconName } from 'components/common/Icon/types';
 import { Button, Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
 
 import useDismissOnboarding from './hooks/useDismissOnboarding';
 import DataSourceIcons from './DataSourceIcons';
+import IconCard from './IconCard';
 
 import PageHeader from '../common/PageHeader';
+
+const Container = styled.div(
+  ({ theme }) => css`
+    gap: ${theme.spacings.sm};
+    display: flex;
+
+    margin-left: -15px;
+    margin-right: -15px;
+  `,
+);
+
+const ResourceTile = styled.div`
+  margin: 0;
+  flex: 1;
+`;
 
 const DismissButton = styled(Button)`
   margin-top: -8px;
   margin-right: -8px;
 `;
-
-const StyledSectionComponent = styled(SectionComponent)<{ $grow: number }>(
-  ({ $grow }) => css`
-    flex: ${$grow};
-    margin: 0;
-  `,
-);
 
 const ActionsHeadline = styled.h2(
   ({ theme }) => css`
@@ -55,21 +63,31 @@ const Description = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <p className="description">{children}</p>
 );
 
-const resources = [
+type Resource = {
+  title: string;
+  description: string;
+  link: string;
+  iconName: IconName;
+};
+
+const resources: Resource[] = [
   {
     title: 'Quickstart Guide',
     description: 'End-to-end walkthrough to your first search in 10 minutes.',
     link: 'https://www.graylog.org',
+    iconName: 'acute',
   },
   {
     title: 'Video: Sidecar',
     description: 'Setup Install and configure your first collector agent.',
     link: 'https://www.graylog.org',
+    iconName: 'arrow_or_edge',
   },
   {
     title: 'Community Forum',
     description: 'Ask questions and browse solutions from other Graylog users.',
     link: 'https://www.graylog.org',
+    iconName: 'chat',
   },
 ];
 
@@ -91,36 +109,25 @@ const SecondaryHeadline = styled.h2(
   `,
 );
 
-const ResourceLink = styled.a`
-  flex: 1;
-  text-decoration: none;
-  color: inherit;
-  outline: none;
-
-  &:hover,
-  &:focus {
-    text-decoration: none;
-    color: inherit;
-  }
-`;
-
-const ResourceCard = styled(Card)(
-  ({ theme }) => css`
-    height: 100%;
-    cursor: pointer;
-    background-color: ${theme.colors.global.contentBackground};
-
-    &:hover,
-    ${ResourceLink}:focus-visible & {
-      border-color: ${theme.colors.input.borderFocus};
-      box-shadow: ${theme.colors.input.boxShadow};
-    }
-  `,
-);
-
 const ResourceTitle = styled.h3`
   margin-top: 0;
 `;
+
+const ResourceDescription = styled.p(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
+    margin-top: ${theme.spacings.xs};
+  `,
+);
+
+const ResourceTileContent = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: flex-start;
+    gap: ${theme.spacings.md};
+    padding: 0 ${theme.spacings.md};
+  `,
+);
 
 const ActionsSection = styled(Section)``;
 
@@ -196,20 +203,26 @@ const FirstUseWelcome = () => {
 
       <SecondaryHeadline>Resources</SecondaryHeadline>
 
-      <Row>
-        <Col>
-          <Section>
-            {resources.map((resource) => (
-              <ResourceLink key={resource.title} href={resource.link} target="_blank" rel="noreferrer">
-                <ResourceCard>
+      <Container>
+        {resources.map((resource) => (
+          <ResourceTile className="content" key={resource.title}>
+            <Col>
+              <ResourceTileContent>
+                <IconCard>
+                  <Icon name={resource.iconName} />
+                </IconCard>
+                <div>
                   <ResourceTitle>{resource.title}</ResourceTitle>
-                  <Description>{resource.description}</Description>
-                </ResourceCard>
-              </ResourceLink>
-            ))}
-          </Section>
-        </Col>
-      </Row>
+                  <ResourceDescription>{resource.description}</ResourceDescription>
+                  <ExternalLinkButton href={resource.link} bsSize="xs">
+                    Continue
+                  </ExternalLinkButton>
+                </div>
+              </ResourceTileContent>
+            </Col>
+          </ResourceTile>
+        ))}
+      </Container>
     </>
   );
 };

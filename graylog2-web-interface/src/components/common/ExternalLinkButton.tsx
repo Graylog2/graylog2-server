@@ -15,9 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import ExternalLink from 'components/common/ExternalLink';
+
+const StyledButton = styled(Button)`
+  .external-link-inner {
+    display: flex;
+    align-items: center;
+  }
+`;
 
 /**
  * Component that renders a link to an external resource as a button.
@@ -37,9 +45,9 @@ const ExternalLinkButton = ({
   children = undefined,
   ...props
 }: Props) => (
-  <Button bsStyle={bsStyle} target={target} className={className} disabled={disabled} {...props}>
+  <StyledButton bsStyle={bsStyle} target={target} className={className} disabled={disabled} {...props}>
     <ExternalLink iconName={iconName}>{children}</ExternalLink>
-  </Button>
+  </StyledButton>
 );
 
 export default ExternalLinkButton;

@@ -17,7 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { BrandIcon, Card, Icon } from 'components/common';
+import { BrandIcon, Icon } from 'components/common';
+import IconCard from 'components/welcome/IconCard';
 
 import PLATFORMS from './platforms';
 import type { PlatformIcon } from './platforms';
@@ -31,36 +32,10 @@ const Icons = styled.div(
   `,
 );
 
-const IconContainer = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-
-  /* BrandIcon has its own 20x20 container — scale it to match */
-  > div {
-    width: 24px;
-    height: 24px;
-
-    svg {
-      width: 24px;
-      height: 24px;
-    }
-  }
-`;
-
 const MaterialIcon = styled(Icon)`
   && {
     font-size: 24px;
   }
-`;
-
-const PlatformCard = styled(Card)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: none;
 `;
 
 const renderPlatformIcon = (icon: PlatformIcon) => {
@@ -75,9 +50,7 @@ const renderPlatformIcon = (icon: PlatformIcon) => {
 const PlatformIcons = () => (
   <Icons>
     {PLATFORMS.map((platform) => (
-      <PlatformCard key={platform.id} padding="sm">
-        <IconContainer title={platform.label}>{renderPlatformIcon(platform.icon)}</IconContainer>
-      </PlatformCard>
+      <IconCard key={platform.id} title={platform.label}>{renderPlatformIcon(platform.icon)}</IconCard>
     ))}
   </Icons>
 );
