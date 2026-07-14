@@ -22,6 +22,7 @@ import useProductName from 'brand-customization/useProductName';
 import LinkContainer from 'components/common/LinkContainer';
 import ConfirmDialog from 'components/common/ConfirmDialog';
 import { Icon, Section as SectionBox, ExternalLinkButton } from 'components/common';
+import { SectionCol } from 'components/common/Section/SectionComponent';
 import type { IconName } from 'components/common/Icon/types';
 import { Button, Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -100,6 +101,14 @@ const Section = styled.div(
 
 const StyledSectionBox = styled(SectionBox)`
   flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  ${SectionCol} {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 const SecondaryHeadline = styled.h2(
@@ -116,7 +125,7 @@ const ResourceTitle = styled.h3`
 const ResourceDescription = styled.p(
   ({ theme }) => css`
     color: ${theme.colors.text.secondary};
-    margin-top: ${theme.spacings.xs};
+    margin-top: ${theme.spacings.xxs};
   `,
 );
 
@@ -133,11 +142,8 @@ const ActionsSection = styled(Section)``;
 
 const BoxActions = styled.div(
   ({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: ${theme.spacings.lg};
-    margin-top: ${theme.spacings.lg};
+    margin-top: auto;
+    padding-top: ${theme.spacings.lg};
   `,
 );
 
@@ -179,8 +185,8 @@ const FirstUseWelcome = () => {
                 Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
                 configuration automatically.
               </Description>
+              <PlatformIcons />
               <BoxActions>
-                <PlatformIcons />
                 <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
                   <Button bsStyle="primary">Set up Collector</Button>
                 </LinkContainer>
@@ -190,8 +196,8 @@ const FirstUseWelcome = () => {
               <Description>
                 Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
               </Description>
+              <DataSourceIcons />
               <BoxActions>
-                <DataSourceIcons />
                 <LinkContainer to={Routes.SYSTEM.INPUTS}>
                   <Button bsStyle="default">Configure Input</Button>
                 </LinkContainer>

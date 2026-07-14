@@ -20,8 +20,10 @@ import styled from 'styled-components';
 import { Button } from 'components/bootstrap';
 import ExternalLink from 'components/common/ExternalLink';
 
+export const EXTERNAL_LINK_INNER_CLASS = 'external-link-inner';
+
 const StyledButton = styled(Button)`
-  .external-link-inner {
+  .${EXTERNAL_LINK_INNER_CLASS} {
     display: flex;
     align-items: center;
   }
