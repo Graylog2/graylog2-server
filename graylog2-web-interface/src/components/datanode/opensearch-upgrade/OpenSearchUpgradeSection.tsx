@@ -18,6 +18,7 @@ import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
+import { Title } from 'components/common';
 import useOutdatedIndices from 'components/indices/hooks/useOutdatedIndices';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -132,7 +133,7 @@ const OpenSearchUpgradeSection = () => {
   if (openSearchStatus === 'unconfirmed') {
     return (
       <Section>
-        <h1>Upgrade Data Nodes&apos; embedded OpenSearch</h1>
+        <Title order={1}>Upgrade Data Nodes&apos; embedded OpenSearch</Title>
         <OpenSearchUpgradeInfo
           currentVersion={currentVersion}
           targetVersion={targetVersion}
@@ -151,7 +152,7 @@ const OpenSearchUpgradeSection = () => {
 
   return (
     <Section>
-      <h1>Upgrade Data Nodes&apos; embedded OpenSearch</h1>
+      <Title order={1}>Upgrade Data Nodes&apos; embedded OpenSearch</Title>
       <OpenSearchUpgradeInfo
         currentVersion={currentVersion}
         targetVersion={targetVersion}

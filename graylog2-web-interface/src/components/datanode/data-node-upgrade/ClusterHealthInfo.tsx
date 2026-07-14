@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Button, Label } from 'components/bootstrap';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
+import Title from 'components/common/Title';
 import { startShardReplication, stopShardReplication } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import type { DatanodeUpgradeStatus } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 
@@ -122,13 +123,13 @@ type Props = {
 
 const ClusterHealthInfo = ({ data, numberOfNodes, showShardReplication }: Props) => (
   <>
-    <h3>
+    <Title order={3}>
       <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="large">
         {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
       </Label>
       &nbsp;
       <HelpPopoverButton helpText={clusterStateHelp} />
-    </h3>
+    </Title>
     <StyledHorizontalDl>
       <dt>Server Version:</dt>
       <ServerVersion>

@@ -17,7 +17,7 @@
 import React, { useState, useRef } from 'react';
 
 import { Row, Col, Button, Alert, Modal } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, Title } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, {
   getNodeToUpgrade,
@@ -117,7 +117,7 @@ const DataNodeUpgradePage = () => {
           <Col xs={12}>
             {!areAllDataNodesUpToDate && (
               <>
-                <h1>Select Upgrade Strategy</h1>
+                <Title order={1}>Select Upgrade Strategy</Title>
                 <br />
                 <UpgradeMethodSelector upgradeMethod={upgradeMethod} onChange={setUpgradeMethod} />
                 {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
@@ -132,7 +132,7 @@ const DataNodeUpgradePage = () => {
             )}
             {showOpenSearchUpgradeSection && (
               <>
-                <h1>Upgrade Data Node</h1>
+                <Title order={1}>Upgrade Data Node</Title>
                 <br />
               </>
             )}
