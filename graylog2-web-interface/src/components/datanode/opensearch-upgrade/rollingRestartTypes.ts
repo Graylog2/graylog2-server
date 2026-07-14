@@ -74,5 +74,7 @@ export type RollingRestartJob = {
 export const isRollingRestartTerminalState = (state: RollingRestartState | undefined) =>
   state === 'COMPLETED' || state === 'ABORTED' || state === 'FAILED';
 
+export const isRollingRestartPaused = (state: RollingRestartState | undefined) => state === 'PAUSED_WAITING_GREEN';
+
 export const isRollingRestartActive = (job: RollingRestartJob | null | undefined) =>
   !!job?.data && !isRollingRestartTerminalState(job.data.sm_state);

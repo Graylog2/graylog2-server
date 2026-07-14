@@ -18,6 +18,7 @@ import React from 'react';
 
 import { Button, Col, Label, Row, Table } from 'components/bootstrap';
 import { Icon } from 'components/common';
+import { isDataNodeAvailable } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 
 type Props = {
@@ -31,7 +32,7 @@ const NodeIdentityCell = ({ node }: { node: DataNodeInformation }) => (
   <td>
     <div>
       {node?.hostname}&nbsp;
-      <Label bsStyle={node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">
+      <Label bsStyle={isDataNodeAvailable(node) ? 'success' : 'warning'} bsSize="xs">
         {node?.data_node_status}
       </Label>
       &nbsp;

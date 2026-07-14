@@ -23,7 +23,7 @@ import { Icon } from 'components/common';
 import type { OpenSearchVersionNode } from './hooks/useOpenSearchClusterStats';
 import OpenSearchRollingUpgradeNodeTable from './OpenSearchRollingUpgradeNodeTable';
 import type { RollingRestartJob, RollingRestartState } from './rollingRestartTypes';
-import { isRollingRestartTerminalState } from './rollingRestartTypes';
+import { isRollingRestartPaused, isRollingRestartTerminalState } from './rollingRestartTypes';
 
 type Props = {
   job: RollingRestartJob | null | undefined;
@@ -98,7 +98,7 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
   // Fallbacks cover backend states the UI doesn't know yet.
   const stateStyle = STATE_STYLE[data.sm_state] ?? 'info';
   const stateLabel = STATE_LABELS[data.sm_state] ?? 'In progress';
-  const showProgress = !isTerminal && data.sm_state !== 'PAUSED_WAITING_GREEN';
+  const showProgress = !isTerminal && !isRollingRestartPaused(data.sm_state);
 
   return (
     <>

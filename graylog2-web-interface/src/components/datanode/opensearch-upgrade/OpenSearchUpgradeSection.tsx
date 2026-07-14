@@ -31,7 +31,7 @@ import useOpenSearchUpgradeStatus from './hooks/useOpenSearchUpgradeStatus';
 import OutdatedIndicesTable from './OutdatedIndicesTable';
 import OpenSearchUpgradeInfo from './OpenSearchUpgradeInfo';
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
-import { isRollingRestartTerminalState } from './rollingRestartTypes';
+import { isRollingRestartPaused, isRollingRestartTerminalState } from './rollingRestartTypes';
 
 const Section = styled.div(
   ({ theme }) => css`
@@ -89,7 +89,7 @@ const OpenSearchUpgradeSection = () => {
   const startActionLabel = isRollingUpgradePossible ? 'Start OpenSearch Rolling Upgrade' : 'Restart';
   const startActionLoadingLabel = isRollingUpgradePossible ? 'Starting OpenSearch Rolling Upgrade...' : 'Restarting...';
   const canResumeRollingRestart =
-    rollingRestart?.data?.sm_state === 'PAUSED_WAITING_GREEN' && !rollingRestart.data.abort_requested;
+    isRollingRestartPaused(rollingRestart?.data?.sm_state) && !rollingRestart?.data?.abort_requested;
   const showRollingUpgradeStatus = hasRollingRestartJob;
 
   useEffect(() => {

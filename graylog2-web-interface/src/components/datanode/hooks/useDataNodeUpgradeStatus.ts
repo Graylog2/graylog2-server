@@ -32,6 +32,8 @@ export interface DataNodeInformation {
   upgrade_possible: boolean;
   manager_node: boolean;
 }
+
+export const isDataNodeAvailable = (node: DataNodeInformation | undefined) => node?.data_node_status === 'AVAILABLE';
 export interface ManagerNode {
   node_uid: string;
   name: string;
