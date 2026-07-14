@@ -566,6 +566,9 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!-- Skip if all OpenSearch bundles are already unpacked (see check-opensearch-download-dirs) -->
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.compat.version}/opensearch-${opensearch.compat.version}-linux-x64.tar.gz
                             </url>
@@ -588,6 +591,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.compat.version}/opensearch-${opensearch.compat.version}-linux-arm64.tar.gz
                             </url>
@@ -610,6 +615,9 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!-- Skip if all repository plugin zips already exist (see check-opensearch-download-dirs) -->
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.compat.version}/repository-s3-${opensearch.compat.version}.zip
                             </url>
@@ -625,6 +633,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-gcs/${opensearch.compat.version}/repository-gcs-${opensearch.compat.version}.zip
                             </url>
@@ -640,6 +650,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-hdfs/${opensearch.compat.version}/repository-hdfs-${opensearch.compat.version}.zip
                             </url>
@@ -655,6 +667,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-azure/${opensearch.compat.version}/repository-azure-${opensearch.compat.version}.zip
                             </url>
@@ -671,6 +685,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.latest.version}/opensearch-${opensearch.latest.version}-linux-x64.tar.gz
                             </url>
@@ -693,6 +709,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.latest.version}/opensearch-${opensearch.latest.version}-linux-arm64.tar.gz
                             </url>
@@ -715,6 +733,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.latest.version}/repository-s3-${opensearch.latest.version}.zip
                             </url>
@@ -730,6 +750,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-gcs/${opensearch.latest.version}/repository-gcs-${opensearch.latest.version}.zip
                             </url>
@@ -745,6 +767,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-hdfs/${opensearch.latest.version}/repository-hdfs-${opensearch.latest.version}.zip
                             </url>
@@ -760,6 +784,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-azure/${opensearch.latest.version}/repository-azure-${opensearch.latest.version}.zip
                             </url>
@@ -775,6 +801,61 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
+                    <execution>
+                        <!-- Set two skip flags used by the download/unpack executions below, so the
+                             (expensive) downloads are only done when needed. Runs before the
+                             generate-resources phase where the downloads happen.
+
+                             Each flag is set to true only when *all* artifacts of its group already
+                             exist for the currently configured versions. The checks are version-aware
+                             (the unpack dirs and plugin zip filenames contain the version), so bumping
+                             opensearch.*.version leaves the corresponding artifacts missing, the flag
+                             stays unset (treated as false) and the whole group is re-downloaded. -->
+                        <id>check-opensearch-download-dirs</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <exportAntProperties>true</exportAntProperties>
+                            <target>
+                                <!-- OpenSearch bundles (unpacked into version+arch named directories) -->
+                                <condition property="opensearch.download.skip">
+                                    <and>
+                                        <available type="dir"
+                                                   file="${project.build.directory}/opensearch/opensearch-${opensearch.compat.version}-linux-x64"/>
+                                        <available type="dir"
+                                                   file="${project.build.directory}/opensearch/opensearch-${opensearch.compat.version}-linux-aarch64"/>
+                                        <available type="dir"
+                                                   file="${project.build.directory}/opensearch/opensearch-${opensearch.latest.version}-linux-x64"/>
+                                        <available type="dir"
+                                                   file="${project.build.directory}/opensearch/opensearch-${opensearch.latest.version}-linux-aarch64"/>
+                                    </and>
+                                </condition>
+                                <!-- Repository plugin zips (filename contains the version) -->
+                                <condition property="opensearch.plugins.download.skip">
+                                    <and>
+                                        <available type="file"
+                                                   file="${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.compat.version}.zip"/>
+                                        <available type="file"
+                                                   file="${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.compat.version}.zip"/>
+                                        <available type="file"
+                                                   file="${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.compat.version}.zip"/>
+                                        <available type="file"
+                                                   file="${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.compat.version}.zip"/>
+                                        <available type="file"
+                                                   file="${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.latest.version}.zip"/>
+                                        <available type="file"
+                                                   file="${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.latest.version}.zip"/>
+                                        <available type="file"
+                                                   file="${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.latest.version}.zip"/>
+                                        <available type="file"
+                                                   file="${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.latest.version}.zip"/>
+                                    </and>
+                                </condition>
+                            </target>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>fix-opensearch-config-permissions</id>
                         <phase>prepare-package</phase>
