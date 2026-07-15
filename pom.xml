@@ -166,7 +166,7 @@
         <lucene.version>10.5.0</lucene.version>
         <lz4.version>1.11.1</lz4.version>
         <metrics.version>4.2.39</metrics.version>
-        <mongodb-driver.version>5.8.0</mongodb-driver.version>
+        <mongodb-driver.version>5.9.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.16.Final</netty.version>
