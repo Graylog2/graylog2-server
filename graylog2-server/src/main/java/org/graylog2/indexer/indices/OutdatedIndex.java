@@ -34,12 +34,12 @@ public record OutdatedIndex(@JsonProperty(FIELD_INDEX_NAME) String indexName,
                             @JsonProperty(FIELD_END) DateTime end)
         implements Comparable<OutdatedIndex>, InMemorySearchableEntity {
 
-    public static final String FIELD_INDEX_NAME = "indexName";
+    public static final String FIELD_INDEX_NAME = "index_name";
     public static final String FIELD_VERSION = "version";
-    public static final String FIELD_WARM_INDEX = "warmIndex";
-    public static final String FIELD_MANAGED_INDEX = "managedIndex";
-    public static final String FIELD_ACTIVE_WRITE_INDEX = "activeWriteIndex";
-    public static final String FIELD_SYSTEM_INDEX = "systemIndex";
+    public static final String FIELD_WARM_INDEX = "warm_index";
+    public static final String FIELD_MANAGED_INDEX = "managed_index";
+    public static final String FIELD_ACTIVE_WRITE_INDEX = "active_write_index";
+    public static final String FIELD_SYSTEM_INDEX = "system_index";
     public static final String FIELD_BEGIN = "begin";
     public static final String FIELD_END = "end";
 
