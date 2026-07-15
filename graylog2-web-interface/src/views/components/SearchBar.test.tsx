@@ -101,7 +101,7 @@ describe('SearchBar', () => {
 
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
-    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
+    await waitFor(() => expect(searchButton).not.toHaveAttribute('data-disabled'));
 
     asMock(dispatch).mockClear();
 
@@ -121,7 +121,7 @@ describe('SearchBar', () => {
     const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
-    await waitFor(() => expect(searchButton.classList).toContain('disabled'));
+    await waitFor(() => expect(searchButton).toHaveAttribute('data-disabled'));
     within(timeRangePickerButton).getByText('warning');
   });
 
@@ -191,7 +191,7 @@ describe('SearchBar', () => {
 
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
-    await waitFor(() => expect(searchButton.classList).toContain('disabled'));
+    await waitFor(() => expect(searchButton).toHaveAttribute('data-disabled'));
   });
 
   it('does not show warning icon on timerange button when search result timerange check returns false', async () => {
@@ -211,6 +211,6 @@ describe('SearchBar', () => {
 
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
-    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
+    await waitFor(() => expect(searchButton).not.toHaveAttribute('data-disabled'));
   });
 });
