@@ -43,11 +43,9 @@ public class NodeMetricPeriodical extends Periodical {
         
         this.nativeSystemStatsCollectorDisabled = configuration.isDisableNativeSystemStatsCollector();
         
-        if(nativeSystemStatsCollectorDisabled) {
-            this.cpuLoadGauge = null;
-        } else {
-            this.cpuLoadGauge = new CpuLoadGauge();
-        }
+        this.cpuLoadGauge = nativeSystemStatsCollectorDisabled
+                                ? null
+                                : new CpuLoadGauge();
     }
 
     @Override
