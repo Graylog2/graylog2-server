@@ -104,8 +104,9 @@
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.8</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
-        <apache-httpclient5.version>5.5.1</apache-httpclient5.version>
+        <apache-httpclient5.version>5.6.2</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
+        <apache-httpcore5.version>5.4.3</apache-httpcore5.version>
         <asm.version>9.10.1</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
@@ -140,9 +141,9 @@
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
-        <hibernate-validator.version>9.1.1.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.1.2.Final</hibernate-validator.version>
         <hk2.version>4.0.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.22.0</jackson.version>
+        <jackson.version>2.22.1</jackson.version>
         <jadconfig.version>1.1.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -165,7 +166,7 @@
         <lucene.version>10.5.0</lucene.version>
         <lz4.version>1.11.1</lz4.version>
         <metrics.version>4.2.39</metrics.version>
-        <mongodb-driver.version>5.8.0</mongodb-driver.version>
+        <mongodb-driver.version>5.9.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.16.Final</netty.version>
@@ -273,6 +274,16 @@
                 <groupId>org.apache.httpcomponents.client5</groupId>
                 <artifactId>httpclient5</artifactId>
                 <version>${apache-httpclient5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>${apache-httpcore5.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5-h2</artifactId>
+                <version>${apache-httpcore5.version}</version>
             </dependency>
 
             <dependency>

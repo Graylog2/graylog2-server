@@ -16,8 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { DatanodeUpgrade } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
 
@@ -32,6 +32,8 @@ export interface DataNodeInformation {
   upgrade_possible: boolean;
   manager_node: boolean;
 }
+
+export const isDataNodeAvailable = (node: DataNodeInformation | undefined) => node?.data_node_status === 'AVAILABLE';
 export interface ManagerNode {
   node_uid: string;
   name: string;
@@ -83,7 +85,7 @@ export const removeSavedNodeToUpgrade = () => localStorage.removeItem('datanode-
 
 export const stopShardReplication = async (): Promise<FlushResponse> => {
   try {
-    const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/stop'));
+    const response = await DatanodeUpgrade.stopReplication();
 
     UserNotification.success(`Shard replication stopped successfully`);
 
@@ -102,7 +104,7 @@ export const startShardReplication = async (): Promise<FlushResponse> => {
   try {
     removeSavedNodeToUpgrade();
 
-    const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/start'));
+    const response = await DatanodeUpgrade.startReplication();
 
     UserNotification.success(`Shard replication started successfully`);
 
@@ -117,7 +119,16 @@ export const startShardReplication = async (): Promise<FlushResponse> => {
   }
 };
 
-const fetchDataNodeUpgradeStatus = async () => fetch('GET', qualifyUrl('/datanodes/upgrade/status'));
+// The generated types are not exported, so the payload stays typed locally.
+const fetchDataNodeUpgradeStatus = () =>
+  DatanodeUpgrade.status({ requestShouldExtendSession: false }) as Promise<DatanodeUpgradeStatus>;
+
+const UPGRADE_STATUS_REFETCH_INTERVAL_MS = 5000;
+// In steady state (all up to date, replication on, healthy) drop to a slow heartbeat.
+const STEADY_STATE_REFETCH_INTERVAL_MS = 30000;
+
+const isSteadyState = (status: DatanodeUpgradeStatus | undefined) =>
+  !!status && !status.outdated_nodes?.length && status.shard_replication_enabled && status.cluster_healthy;
 
 const useDataNodeUpgradeStatus = (): {
   data: DatanodeUpgradeStatus;
@@ -136,7 +147,8 @@ const useDataNodeUpgradeStatus = (): {
       ),
 
     notifyOnChangeProps: ['data', 'error'],
-    refetchInterval: 5000,
+    refetchInterval: (query) =>
+      isSteadyState(query.state.data) ? STEADY_STATE_REFETCH_INTERVAL_MS : UPGRADE_STATUS_REFETCH_INTERVAL_MS,
   });
 
   return {

@@ -53,6 +53,7 @@ import org.graylog2.security.TrustManagerAggregator;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.opensearch.client.opensearch.generic.Request;
 import org.opensearch.client.opensearch.generic.Requests;
+import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
@@ -188,20 +189,12 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         return this.processState.getState().equals(expectedState);
     }
 
+    @Deprecated
     @Override
     public void configure(OpensearchConfiguration configuration) {
         this.opensearchConfiguration = Optional.of(configuration);
-        configure();
-    }
-
-    private void configure() {
-        opensearchConfiguration.ifPresentOrElse(
-                (config -> {
-                    // refresh TM if the SSL certs changed
-                    trustManager.refresh();
-                }),
-                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-        );
+        // refresh TM if the SSL certs changed
+        trustManager.refresh();
     }
 
     @Override
@@ -368,7 +361,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Override
     public void reset() {
         stop();
-        configure();
+        opensearchConfiguration.ifPresentOrElse(
+                (config -> {
+                    // refresh TM if the SSL certs changed
+                    trustManager.refresh();
+                }),
+                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+        );
         start();
     }
 
@@ -434,9 +433,33 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 .method("GET")
                 .endpoint("/_cluster/state")
                 .build();
-        JsonNode jsonNode = client.performRequest(request, "Failed to obtain cluster state response");
-        ClusterStateResponse state = objectMapper.convertValue(jsonNode, ClusterStateResponse.class);
-        return Optional.of(state);
+        try {
+            JsonNode jsonNode = client.performRequest(request, "Failed to obtain cluster state response");
+            ClusterStateResponse state = objectMapper.convertValue(jsonNode, ClusterStateResponse.class);
+            return Optional.of(state);
+        } catch (RuntimeException e) {
+            if (isClusterStateTemporarilyUnavailable(e)) {
+                LOG.debug("Cluster state temporarily unavailable, cannot determine cluster manager node yet", e);
+                return Optional.empty();
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Right after a (re)start, OpenSearch can respond to /_cluster/state with a transient 503 for
+     * reasons unrelated to this node's own health — e.g. "security_exception" while the Security
+     * plugin is still loading its config, or "cluster_manager_not_discovered_exception" while the
+     * cluster is still (re-)electing a manager node. A 503 here just means "not answerable yet", not
+     * that this process is unhealthy, so it shouldn't be treated as a heartbeat/health-check failure.
+     */
+    private boolean isClusterStateTemporarilyUnavailable(Throwable t) {
+        for (Throwable cause = t; cause != null; cause = cause.getCause()) {
+            if (cause instanceof ResponseException responseException && responseException.status() == 503) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
