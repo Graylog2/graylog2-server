@@ -14,17 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+
 import NotificationsNavTab from 'components/notifications/NotificationsNavTab';
 import Routes from 'routing/Routes';
 
-const SYSTEM_OVERVIEW_TABS = [
-  { description: 'Overview', path: Routes.SYSTEM.OVERVIEW },
-  {
-    description: 'Notifications',
-    path: Routes.SYSTEM.NOTIFICATIONS,
-    permissions: 'notifications:read',
-    BadgeComponent: NotificationsNavTab,
-  },
-];
+export const PAGE_NAV_TITLE = 'System';
 
-export default SYSTEM_OVERVIEW_TABS;
+const bindings: PluginExports = {
+  pageNavigation: [
+    {
+      description: PAGE_NAV_TITLE,
+      children: [
+        { description: 'Overview', path: Routes.SYSTEM.OVERVIEW },
+        {
+          description: 'Notifications',
+          path: Routes.SYSTEM.NOTIFICATIONS,
+          permissions: 'notifications:read',
+          BadgeComponent: NotificationsNavTab,
+        },
+      ],
+    },
+  ],
+};
+
+export default bindings;
