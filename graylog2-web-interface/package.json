@@ -85,7 +85,7 @@
     "p-debounce": "^4.0.0",
     "patch-package": "^8.0.1",
     "plotly.js": "3.5.0",
-    "posthog-js": "^1.371.1",
+    "posthog-js": "^1.400.1",
     "postinstall-postinstall": "^2.1.0",
     "qs": "^6.15.1",
     "react-ace": "14.0.1",
