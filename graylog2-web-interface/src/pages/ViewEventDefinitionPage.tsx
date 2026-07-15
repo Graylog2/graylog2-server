@@ -37,6 +37,7 @@ import {
   EVENT_DEFINITIONS_QUERY_KEY,
 } from 'components/event-definitions/hooks/useEventDefinitions';
 
+import useEventDefinitionDetailSections from './useEventDefinitionDetailSections';
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
@@ -46,6 +47,7 @@ const ViewEventDefinitionPage = () => {
   const notifications = notificationsData?.notifications;
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
+  const detailSections = useEventDefinitionDetailSections();
 
   const queryClient = useQueryClient();
   const { data, isFetching } = useEventDefinitionWithContext(params.definitionId);
@@ -127,6 +129,9 @@ const ViewEventDefinitionPage = () => {
 
         <Row className="content">
           <Col md={12}>
+            {detailSections.map(({ key, component: Component }) => (
+              <Component key={key} eventDefinition={eventDefinition} />
+            ))}
             <EventDefinitionSummary
               eventDefinition={eventDefinition}
               currentUser={currentUser}
