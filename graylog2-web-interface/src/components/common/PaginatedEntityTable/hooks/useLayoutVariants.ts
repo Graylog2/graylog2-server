@@ -37,10 +37,10 @@ type LayoutVariantJSON = {
   }>;
 };
 
-type LayoutVariant = {
+export type LayoutVariant<T = string> = {
   displayName: string;
   entityListId: string;
-  layoutVariant: string;
+  layoutVariant: T;
   metrics?: Array<{
     meaning: string;
     metricName: string;

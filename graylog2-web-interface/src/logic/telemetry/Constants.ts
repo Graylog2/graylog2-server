@@ -469,6 +469,9 @@ export const TELEMETRY_EVENT_TYPE = {
       UPDATED: 'Collector Settings Updated',
       DIAGNOSTICS_OPENED: 'Collector Settings Diagnostics Opened',
     },
+    ONBOARDING: {
+      COMPLETED: 'Collector Onboarding Completed',
+    },
   },
   RIGHT_SIDEBAR: {
     OPENED: 'Right Sidebar Opened',
@@ -477,5 +480,11 @@ export const TELEMETRY_EVENT_TYPE = {
     EXPANDED: 'Right Sidebar Expanded',
     NAVIGATED_BACK: 'Right Sidebar Navigated Back',
     NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
+  },
+  WELCOME: {
+    SETUP_COLLECTOR_CLICKED: 'Welcome Setup Collector Clicked',
+    CONFIGURE_INPUT_CLICKED: 'Welcome Configure Input Clicked',
+    RESOURCE_CONTINUE_CLICKED: 'Welcome Resource Continue Clicked',
+    DISMISS_CLICKED: 'Welcome Dismiss Clicked',
   },
 } as const;

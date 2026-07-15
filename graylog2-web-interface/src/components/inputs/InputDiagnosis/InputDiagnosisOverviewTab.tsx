@@ -37,6 +37,10 @@ import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMe
 import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
+const StyledListGroupItem = styled(ListGroupItem)`
+  display: flex;
+`;
+
 const StyledP = styled.p(
   ({ theme }) => css`
     &&.description {
@@ -72,11 +76,6 @@ const StyledListGroup = styled(ListGroup)(
     border-radius: ${theme.spacings.xs};
   `,
 );
-
-const StyledListGroupItem = styled(ListGroupItem)`
-  background-color: transparent;
-  display: flex;
-`;
 
 const StyledTitle = styled.p(
   ({ theme }) => css`
@@ -306,9 +305,7 @@ const InputDiagnosisOverviewTab = ({
           {Object.keys(inputNodeStates.states).map((state: InputState) => (
             <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
           ))}
-          {Object.keys(inputNodeStates.states).length === 0 && (
-            <StyledListGroupItem>Input is not running.</StyledListGroupItem>
-          )}
+          {Object.keys(inputNodeStates.states).length === 0 && <StyledListGroupItem>Input is not running.</StyledListGroupItem>}
         </StyledListGroup>
       </Section>
     </StyledSectionGrid>
