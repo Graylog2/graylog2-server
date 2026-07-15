@@ -24,15 +24,22 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
@@ -58,7 +65,7 @@ import java.util.concurrent.TimeUnit;
 
 @Tag(name = "System/Indexer/Indices", description = "Outdated index discovery")
 @RequiresAuthentication
-@Path("/system/indexer/outdated_indices")
+@Path("/system/indexer/indices/outdated")
 @Produces(MediaType.APPLICATION_JSON)
 public class OutdatedIndexResource extends RestResource {
 
@@ -88,11 +95,13 @@ public class OutdatedIndexResource extends RestResource {
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
 
+    private final OutdatedIndexService outdatedIndexService;
     private final InMemorySearchEngine<OutdatedIndex> outdatedIndexSearchService;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
     public OutdatedIndexResource(OutdatedIndexService outdatedIndexService) {
+        this.outdatedIndexService = outdatedIndexService;
         final Supplier<List<OutdatedIndex>> cachingSupplier = Suppliers.memoizeWithExpiration(
                 outdatedIndexService::getOutdatedIndices,
                 10,
@@ -105,7 +114,16 @@ public class OutdatedIndexResource extends RestResource {
     @GET
     @Timed
     @RequiresPermissions(RestPermissions.INDICES_READ)
+    @Operation(summary = "Get a list of indices that were created in an OpenSearch version prior to the recent one")
+    public List<OutdatedIndex> getOutdatedIndices() {
+        return outdatedIndexService.getOutdatedIndices();
+    }
+
+    @GET
+    @Timed
+    @RequiresPermissions(RestPermissions.INDICES_READ)
     @Operation(summary = "Get a paginated list of indices that were created in an OpenSearch version prior to the recent one")
+    @Path("/paginated")
     public PageListResponse<OutdatedIndex> listOutdatedIndices(
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -132,5 +150,34 @@ public class OutdatedIndexResource extends RestResource {
         final PaginatedList<OutdatedIndex> result = outdatedIndexSearchService.search(parsedQuery, sort, order, page, perPage);
         return PageListResponse.create(query, result.pagination(),
                 result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
+    }
+
+    @POST
+    @Path("/{index}/reindex")
+    @Operation(summary = "Reindexes an outdated index to make it compatible with the next major version of OpenSearch")
+    @RequiresPermissions(RestPermissions.INDICES_REINDEX)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
+    public void reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
+                        @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
+        OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
+                .filter(OutdatedIndex::isSystemIndex)
+                .filter(i -> i.indexName().equals(index))
+                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is no system index"));
+        outdatedIndexService.reindex(outdatedIndex.indexName(), withReplication);
+    }
+
+    @DELETE
+    @Path("/{index}")
+    @Operation(summary = "Deletes an outdated, non-Graylog managed index")
+    @RequiresPermissions(RestPermissions.INDICES_DELETE)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_DELETE)
+    public void deleteOutdated(@Parameter(name = "index") @PathParam("index") @NotNull String index) {
+        OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
+                .filter(i -> !i.managedIndex())
+                .filter(i -> i.indexName().equals(index))
+                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is an index managed by Graylog"));
+        outdatedIndexService.delete(outdatedIndex.indexName());
     }
 }

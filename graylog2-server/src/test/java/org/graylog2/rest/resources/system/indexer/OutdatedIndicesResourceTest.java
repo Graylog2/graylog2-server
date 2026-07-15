@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(WithAuthorizationExtension.class)
-class IndicesResourceTest {
+class OutdatedIndicesResourceTest {
 
     @Mock
     Indices indices;
@@ -56,12 +56,12 @@ class IndicesResourceTest {
     OutdatedIndexService outdatedIndexService;
 
     @InjectMocks
-    IndicesResource indicesResource;
+    OutdatedIndexResource outdatedIndexResource;
 
     @Test
     @WithAuthorization(permissions = {"something:else"})
     void getOutdatedIndicesFailsIfNotPermitted() {
-        Assertions.assertThatThrownBy(() -> indicesResource.getOutdatedIndices()).isInstanceOf(ForbiddenException.class);
+        Assertions.assertThatThrownBy(() -> outdatedIndexResource.getOutdatedIndices()).isInstanceOf(ForbiddenException.class);
     }
 
     @Test
@@ -72,13 +72,13 @@ class IndicesResourceTest {
                 new OutdatedIndex("outdated2", "1.3.0", true, true, "id1")
         );
         when(outdatedIndexService.getOutdatedIndices()).thenReturn(outdatedIndices);
-        assertThat(indicesResource.getOutdatedIndices()).isEqualTo(outdatedIndices);
+        assertThat(outdatedIndexResource.getOutdatedIndices()).isEqualTo(outdatedIndices);
     }
 
     @Test
     @WithAuthorization(permissions = {"something:else"})
     void reindexFailsIfNotPermitted() {
-        Assertions.assertThatThrownBy(() -> indicesResource.reindex("outdated", false))
+        Assertions.assertThatThrownBy(() -> outdatedIndexResource.reindex("outdated", false))
                 .isInstanceOf(ForbiddenException.class);
     }
 
@@ -86,7 +86,7 @@ class IndicesResourceTest {
     @WithAuthorization(permissions = {"indices:read", "indices:reindex"})
     void reindexSucceeds() {
         when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(new OutdatedIndex(".outdated1", "1.3.0", false, false, null)));
-        indicesResource.reindex(".outdated1", true);
+        outdatedIndexResource.reindex(".outdated1", true);
         verify(outdatedIndexService, times(1)).reindex(".outdated1", true);
     }
 
