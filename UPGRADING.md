@@ -46,8 +46,10 @@ creates, renames, and deletes teams for remote groups and updates membership for
 logged in, now runs as a background job (approximately hourly) on the leader node instead.
 
 After upgrading, directory-side changes that affect users who do not log in (for example removing a user
-from a group, or renaming or deleting a group) may take up to an hour to be reflected, rather than
-propagating at the next login of any user. To apply such changes immediately, open the active
+from a group, or renaming or deleting a group) may take up to the configured full sync interval (1 hour by
+default) to be reflected, rather than propagating at the next login of any user. The interval is tunable via
+the `full_sync_interval` value of the `TeamSyncConfig` cluster configuration (not surfaced in the UI); a zero
+or negative value disables the periodic sync. To apply such changes immediately, open the active
 authentication service backend and click **Trigger Synchronization** in its group synchronization section
 (equivalently, `POST /api/plugins/org.graylog.plugins.security/team-sync/trigger/{authServiceId}`).
 Re-activating the authentication service backend also runs a full synchronization.
