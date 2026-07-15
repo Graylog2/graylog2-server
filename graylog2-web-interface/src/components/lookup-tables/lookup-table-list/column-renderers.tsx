@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -47,11 +47,11 @@ const Title = styled.div`
 const TitleCol = ({ lut, children }: { lut: LookupTableEntity; children: string }) => {
   const { errors } = useErrorsContext();
   const tableErrorText = errors?.lutErrors[lut.name];
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const onClick = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.show(lut.name));
-  }, [navigate, lut.name]);
+    push(Routes.SYSTEM.LOOKUPTABLES.show(lut.name));
+  }, [push, lut.name]);
 
   return (
     <TitleRow>
@@ -63,11 +63,11 @@ const TitleCol = ({ lut, children }: { lut: LookupTableEntity; children: string 
 
 const CacheCol = ({ cacheId, caches }: { cacheId: string; caches: CachesMap }) => {
   const { errors } = useErrorsContext();
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const onClick = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(caches?.[cacheId]?.name));
-  }, [cacheId, caches, navigate]);
+    push(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(caches?.[cacheId]?.name));
+  }, [cacheId, caches, push]);
 
   if (!caches || !cacheId || !caches[cacheId]) return <i>No cache</i>;
 
@@ -83,11 +83,11 @@ const CacheCol = ({ cacheId, caches }: { cacheId: string; caches: CachesMap }) =
 
 const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string; dataAdapters: AdaptersMap }) => {
   const { errors } = useErrorsContext();
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const onClick = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapters?.[dataAdapterId]?.name));
-  }, [dataAdapterId, dataAdapters, navigate]);
+    push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapters?.[dataAdapterId]?.name));
+  }, [dataAdapterId, dataAdapters, push]);
 
   if (!dataAdapters || !dataAdapterId || !dataAdapters[dataAdapterId]) return <i>No data adapters</i>;
 

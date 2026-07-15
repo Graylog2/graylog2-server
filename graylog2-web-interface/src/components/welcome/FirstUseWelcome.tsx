@@ -19,21 +19,47 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
-import SectionComponent from 'components/common/Section/SectionComponent';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import LinkContainer from 'components/common/LinkContainer';
 import ConfirmDialog from 'components/common/ConfirmDialog';
-import { Card } from 'components/common';
-import { Button } from 'components/bootstrap';
+import { Icon, Section as SectionBox, ExternalLinkButton } from 'components/common';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import { SectionCol } from 'components/common/Section/SectionComponent';
+import type { IconName } from 'components/common/Icon/types';
+import { Button, Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
 
 import useDismissOnboarding from './hooks/useDismissOnboarding';
 import DataSourceIcons from './DataSourceIcons';
+import IconCard from './IconCard';
 
 import PageHeader from '../common/PageHeader';
-const StyledSectionComponent = styled(SectionComponent)<{ $grow: number }>(
-  ({ $grow }) => css`
-    flex: ${$grow};
+
+const Container = styled.div(
+  ({ theme }) => css`
+    gap: ${theme.spacings.sm};
+    display: flex;
+
+    margin-left: -15px;
+    margin-right: -15px;
+  `,
+);
+
+const ResourceTile = styled.div`
+  margin: 0;
+  flex: 1;
+`;
+
+const DismissButton = styled(Button)`
+  margin-top: -8px;
+  margin-right: -8px;
+`;
+
+const ActionsHeadline = styled.h2(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.md};
   `,
 );
 
@@ -41,58 +67,57 @@ const Description = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <p className="description">{children}</p>
 );
 
-const resources = [
+type Resource = {
+  title: string;
+  description: string;
+  link: string;
+  iconName: IconName;
+};
+
+const resources: Resource[] = [
   {
     title: 'Quickstart Guide',
     description: 'End-to-end walkthrough to your first search in 10 minutes.',
     link: 'https://www.graylog.org',
+    iconName: 'acute',
   },
   {
     title: 'Video: Sidecar',
     description: 'Setup Install and configure your first collector agent.',
     link: 'https://www.graylog.org',
+    iconName: 'arrow_or_edge',
   },
   {
     title: 'Community Forum',
     description: 'Ask questions and browse solutions from other Graylog users.',
     link: 'https://www.graylog.org',
+    iconName: 'chat',
   },
 ];
 
-const Section = styled.div`
-  display: flex;
-  column-gap: 40px;
-`;
+const Section = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    column-gap: ${theme.spacings.sm};
+  `,
+);
 
-const Resources = styled.h3`
-  padding-top: 2rem;
-  padding-bottom: 1rem;
-`;
-
-const ResourceLink = styled.a`
+const StyledSectionBox = styled(SectionBox)`
   flex: 1;
-  text-decoration: none;
-  color: inherit;
-  outline: none;
+  display: flex;
+  flex-direction: column;
 
-  &:hover,
-  &:focus {
-    text-decoration: none;
-    color: inherit;
+  ${SectionCol} {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 `;
 
-const ResourceCard = styled(Card)(
+const SecondaryHeadline = styled.h2(
   ({ theme }) => css`
-    height: 100%;
-    cursor: pointer;
-    background-color: ${theme.colors.global.contentBackground};
-
-    &:hover,
-    ${ResourceLink}:focus-visible & {
-      border-color: ${theme.colors.input.borderFocus};
-      box-shadow: ${theme.colors.input.boxShadow};
-    }
+    padding-top: ${theme.spacings.lg};
+    padding-bottom: ${theme.spacings.md};
   `,
 );
 
@@ -100,17 +125,28 @@ const ResourceTitle = styled.h3`
   margin-top: 0;
 `;
 
-const ActionsSection = styled(Section)`
-  padding-top: 1rem;
-`;
+const ResourceDescription = styled.p(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
+    margin-top: ${theme.spacings.xxs};
+  `,
+);
+
+const ResourceTileContent = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: flex-start;
+    gap: ${theme.spacings.md};
+    padding: 0 ${theme.spacings.md};
+  `,
+);
+
+const ActionsSection = styled(Section)``;
 
 const BoxActions = styled.div(
   ({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: ${theme.spacings.md};
-    margin-top: ${theme.spacings.md};
+    margin-top: auto;
+    padding-top: ${theme.spacings.lg};
   `,
 );
 
@@ -118,6 +154,7 @@ const FirstUseWelcome = () => {
   const productName = useProductName();
   const { mutate: dismiss } = useDismissOnboarding();
   const [showDismissConfirm, setShowDismissConfirm] = useState(false);
+  const sendTelemetry = useSendTelemetry();
 
   return (
     <>
@@ -136,53 +173,102 @@ const FirstUseWelcome = () => {
       <PageHeader
         title={`Welcome to ${productName}!`}
         topActions={
-          <Button bsStyle="link" onClick={() => setShowDismissConfirm(true)}>
-            Dismiss
-          </Button>
+          <DismissButton
+            bsStyle="transparent"
+            onClick={() => {
+              sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.DISMISS_CLICKED, {
+                app_section: 'welcome',
+                app_action_value: 'dismiss-onboarding-button',
+              });
+              setShowDismissConfirm(true);
+            }}>
+            <Icon name="close" /> Dismiss onboarding
+          </DismissButton>
         }>
-        <span>
-          {productName} connects to dozens of sources; servers, firewalls, cloud apps, and more.{' '}
-          <strong>Where would you like to start?</strong>
-        </span>
+        <span>{productName} connects to dozens of sources; servers, firewalls, cloud apps, and more. </span>
       </PageHeader>
-      <ActionsSection>
-        <StyledSectionComponent $grow={65} title="Endpoint Logging">
-          <Description>
-            Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
-            configuration automatically.
-          </Description>
-          <BoxActions>
-            <PlatformIcons />
-            <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
-              <Button bsStyle="primary">Set up Collector</Button>
-            </LinkContainer>
-          </BoxActions>
-        </StyledSectionComponent>
-        <StyledSectionComponent $grow={35} title="Other Data Sources">
-          <Description>
-            Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
-          </Description>
-          <BoxActions>
-            <DataSourceIcons />
-            <LinkContainer to={Routes.SYSTEM.INPUTS}>
-              <Button bsStyle="primary">Configure Input</Button>
-            </LinkContainer>
-          </BoxActions>
-        </StyledSectionComponent>
-      </ActionsSection>
 
-      <Resources>Resources</Resources>
+      <Row className={'content'}>
+        <Col xs={12}>
+          <ActionsHeadline>Where would you like to start?</ActionsHeadline>
+          <ActionsSection>
+            <StyledSectionBox title="Set up Collectors" titleAs="h3">
+              <Description>
+                Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
+                configuration automatically.
+              </Description>
+              <PlatformIcons />
+              <BoxActions>
+                <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
+                  <Button
+                    bsStyle="primary"
+                    onClick={() =>
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.SETUP_COLLECTOR_CLICKED, {
+                        app_section: 'welcome',
+                        app_action_value: 'setup-collector-button',
+                      })
+                    }>
+                    Set up Collector
+                  </Button>
+                </LinkContainer>
+              </BoxActions>
+            </StyledSectionBox>
+            <HideOnCloud>
+              <StyledSectionBox title="Set up Other Sources" titleAs="h3">
+                <Description>
+                  Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
+                </Description>
+                <DataSourceIcons />
+                <BoxActions>
+                  <LinkContainer to={Routes.SYSTEM.INPUTS}>
+                    <Button
+                      bsStyle="default"
+                      onClick={() =>
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.CONFIGURE_INPUT_CLICKED, {
+                          app_section: 'welcome',
+                          app_action_value: 'configure-input-button',
+                        })
+                      }>
+                      Configure Input
+                    </Button>
+                  </LinkContainer>
+                </BoxActions>
+              </StyledSectionBox>
+            </HideOnCloud>
+          </ActionsSection>
+        </Col>
+      </Row>
 
-      <Section>
+      <SecondaryHeadline>Resources</SecondaryHeadline>
+
+      <Container>
         {resources.map((resource) => (
-          <ResourceLink key={resource.title} href={resource.link} target="_blank" rel="noreferrer">
-            <ResourceCard>
-              <ResourceTitle>{resource.title}</ResourceTitle>
-              <Description>{resource.description}</Description>
-            </ResourceCard>
-          </ResourceLink>
+          <ResourceTile className="content" key={resource.title}>
+            <Col>
+              <ResourceTileContent>
+                <IconCard>
+                  <Icon name={resource.iconName} />
+                </IconCard>
+                <div>
+                  <ResourceTitle>{resource.title}</ResourceTitle>
+                  <ResourceDescription>{resource.description}</ResourceDescription>
+                  <ExternalLinkButton
+                    href={resource.link}
+                    bsSize="xs"
+                    onClick={() =>
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
+                        app_section: 'welcome',
+                        app_action_value: resource.title,
+                      })
+                    }>
+                    Continue
+                  </ExternalLinkButton>
+                </div>
+              </ResourceTileContent>
+            </Col>
+          </ResourceTile>
         ))}
-      </Section>
+      </Container>
     </>
   );
 };
