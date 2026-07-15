@@ -19,8 +19,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DataNodeRollingRestart } from '@graylog/server-api';
 
 import FetchError from 'logic/errors/FetchError';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
@@ -30,7 +28,6 @@ import { isRollingRestartTerminalState } from '../rollingRestartTypes';
 
 const ROLLING_RESTART_QUERY_KEY = ['opensearch-upgrade', 'rolling-restart'];
 const ROLLING_RESTART_STATUS_REFETCH_INTERVAL = 5000;
-const ROLLING_RESTART_URL = '/datanodes/restart';
 
 type RollingRestartErrorBody = {
   error?: string;
@@ -38,13 +35,11 @@ type RollingRestartErrorBody = {
   message?: string;
 };
 
-// The generated API does not expose the rolling restart data payload yet, so keep the payload typed locally.
 const fetchCurrentRollingRestart = () =>
   DataNodeRollingRestart.current({ requestShouldExtendSession: false }) as Promise<RollingRestartJob | null>;
 
-// The generated start() function does not accept the StartRequest body, but force must be sent for retry flow.
 const startRollingRestartRequest = (force: boolean) =>
-  fetch<RollingRestartJob>('POST', qualifyUrl(ROLLING_RESTART_URL), { force });
+  DataNodeRollingRestart.start({ force }) as Promise<RollingRestartJob>;
 
 const rollingRestartErrorBody = (error: unknown): RollingRestartErrorBody | undefined =>
   error instanceof FetchError ? error.additional?.body : undefined;
