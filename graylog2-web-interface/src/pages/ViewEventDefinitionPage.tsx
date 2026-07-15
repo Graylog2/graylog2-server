@@ -39,10 +39,6 @@ import {
 
 import useEventDefinitionDetailSections from './useEventDefinitionDetailSections';
 
-type SigmaEventDefinitionConfig = EventDefinition['config'] & {
-  sigma_rule_id: string;
-};
-
 const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
   const currentUser = useCurrentUser();
@@ -51,17 +47,7 @@ const ViewEventDefinitionPage = () => {
   const notifications = notificationsData?.notifications;
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
-  const navigate = useNavigate();
-  const [showSigmaModal, setShowSigmaModal] = useState(false);
   const detailSections = useEventDefinitionDetailSections();
-
-  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
-    (entity: { key: string }) => entity.key === 'coreSigmaModal',
-  );
-
-  const CoreSigmaModal = pluggableSigmaModal
-    ? (pluggableSigmaModal.component as React.FC<{ ruleId: string; onCancel: () => void; onConfirm: () => void }>)
-    : null;
 
   const queryClient = useQueryClient();
   const { data, isFetching } = useEventDefinitionWithContext(params.definitionId);
