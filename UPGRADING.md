@@ -36,6 +36,22 @@ message's accounted size, regardless of whether the restore counted against the 
 This field is informational and is not used to compute license usage, so your license consumption is
 unaffected by the change.
 
+### LDAP/AD Team Sync No Longer Runs a Full Reconciliation on Every Login
+
+Previously, every LDAP or Active Directory login triggered a full, org-wide team synchronization that
+reconciled all synced teams and their members. On large directories this made logins slow.
+
+Logins now synchronize only the logging-in user's own team memberships. The full reconciliation, which
+creates, renames, and deletes teams for remote groups and updates membership for users who have not
+logged in, now runs as a background job (approximately hourly) on the leader node instead.
+
+After upgrading, directory-side changes that affect users who do not log in (for example removing a user
+from a group, or renaming or deleting a group) may take up to an hour to be reflected, rather than
+propagating at the next login of any user. To apply such changes immediately, open the active
+authentication service backend and click **Trigger Synchronization** in its group synchronization section
+(equivalently, `POST /api/plugins/org.graylog.plugins.security/team-sync/trigger/{authServiceId}`).
+Re-activating the authentication service backend also runs a full synchronization.
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"
