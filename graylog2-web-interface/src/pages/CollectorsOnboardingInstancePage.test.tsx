@@ -19,6 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { type Location } from 'react-router-dom';
 
 import asMock from 'helpers/mocking/AsMock';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
 import type { CollectorInstanceView } from 'components/collectors/types';
@@ -30,6 +31,8 @@ import useHistory from 'routing/useHistory';
 import useLocation from 'routing/useLocation';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
+
+jest.mock('logic/telemetry/useSendTelemetry');
 
 jest.mock('components/collectors/hooks/useInstanceQueries', () => ({
   useInstance: jest.fn(),
@@ -100,6 +103,7 @@ describe('CollectorsOnboardingInstancePage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    asMock(useSendTelemetry).mockReturnValue(jest.fn());
     asMock(useHistory).mockReturnValue(history);
     asMock(useLocation).mockReturnValue({ state: null } as Location);
     mockInstanceLookup();

@@ -64,7 +64,7 @@ describe('RoleDetails', () => {
   it('should display assigned users', async () => {
     render(<RoleDetails role={exampleRole} />);
 
-    await screen.findByRole('heading', { level: 2, name: 'Users' });
+    await screen.findByRole('heading', { name: 'Users' });
     await screen.findByText(assignedUser.fullName);
   });
 });
