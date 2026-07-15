@@ -16,39 +16,40 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import { defaultOnError } from 'util/conditional/onError';
+import { IndexerIndices } from '@graylog/server-api';
 
-export type OutdatedIndex = {
+export type IncompatibleIndex = {
   index_name: string;
   version: string;
   warm_index: boolean;
   managed_index: boolean;
   system_index: boolean;
+  /** Id of the index set this index is the active write index of, `null` for all other indices. */
+  active_write_index: string | null;
 };
 
-const OUTDATED_INDICES_URL = qualifyUrl('/system/indexer/indices/outdated');
+const ERROR_REFETCH_INTERVAL_MS = 30000;
 
-const fetchOutdatedIndices = (): Promise<Array<OutdatedIndex>> => fetch('GET', OUTDATED_INDICES_URL);
-
-const useOutdatedIndices = () => {
+const useIncompatibleIndices = () => {
   const {
     data = [],
     isError,
     isLoading,
+    refetch,
   } = useQuery({
-    queryKey: ['outdatedIndices'],
-    queryFn: () =>
-      defaultOnError(fetchOutdatedIndices(), 'Loading outdated indices failed', 'Could not load outdated indices'),
-    retry: false,
+    queryKey: ['incompatibleIndices'],
+    // No error toast: the panels render a persistent error state, and background retries would spam toasts.
+    queryFn: () => IndexerIndices.getOutdatedIndices() as Promise<Array<IncompatibleIndex>>,
+    retry: 2,
+    refetchInterval: (query) => (query.state.status === 'error' ? ERROR_REFETCH_INTERVAL_MS : false),
   });
 
   return {
     data,
     isError,
     isLoading,
+    refetch,
   };
 };
 
-export default useOutdatedIndices;
+export default useIncompatibleIndices;

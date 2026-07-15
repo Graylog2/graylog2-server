@@ -17,13 +17,11 @@
 
 package org.graylog2.indexer.indices;
 
-import com.google.common.eventbus.EventBus;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.SearchServerBaseTest;
-import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,9 +43,7 @@ public class OutdatedIndexServiceIT extends SearchServerBaseTest {
     public void setUp() throws Exception {
         indicesAdapter = searchServer().adapters().indicesAdapter();
         countsAdapter = searchServer().adapters().countsAdapter();
-        Indices indices = new Indices(null, null, new NullAuditEventSender(), new EventBus("reindex-test"),
-                indicesAdapter, null, countsAdapter);
-        outdatedIndexService = new OutdatedIndexService(indices, indicesAdapter, null, null);
+        outdatedIndexService = new OutdatedIndexService(indicesAdapter, null, null);
     }
 
     @FullBackendTest

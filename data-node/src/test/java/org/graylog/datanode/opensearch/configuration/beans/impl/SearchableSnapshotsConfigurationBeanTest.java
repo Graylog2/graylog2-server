@@ -172,7 +172,7 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     private OpensearchConfigurationParams emptyBuildParams(Path tempDir) {
-        return new OpensearchConfigurationParams(tempDir);
+        return new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir);
     }
 
     @Test
