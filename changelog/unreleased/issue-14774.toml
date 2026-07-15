@@ -1,0 +1,5 @@
+type = "a"
+message = "Add option to AWS Kinesis/Cloudwatch input to store all Kinesis Client Library (KCL) state in a single DynamoDB table. Enabling it on an existing input starts a one-way migration from the separate legacy tables."
+
+issues=["14774"]
+pulls = ["26672"]
