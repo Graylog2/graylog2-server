@@ -71,6 +71,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -182,15 +183,6 @@ public class InputServiceImpl implements InputService {
         return result;
     }
 
-    public String save(Input model) throws ValidationException {
-        return save(model, true);
-    }
-
-    @Override
-    public String saveWithoutEvents(Input model) throws ValidationException {
-        return save(model, false);
-    }
-
     private InputImpl toInputImpl(Input input) {
         if (input instanceof InputImpl inputImpl) {
             return inputImpl;
@@ -198,7 +190,7 @@ public class InputServiceImpl implements InputService {
         throw new IllegalArgumentException("Expected InputImpl, got " + input.getClass().getName());
     }
 
-    private String save(Input model, boolean fireEvents) throws ValidationException {
+    public String save(Input model) throws ValidationException {
         validateStaticFields(model);
         final InputImpl input = toInputImpl(model);
         String inputId = input.getId();
@@ -210,9 +202,7 @@ public class InputServiceImpl implements InputService {
             collection.replaceOne(MongoUtils.idEq(inputId), input);
         }
 
-        if (fireEvents) {
-            publishChange(InputCreated.create(inputId));
-        }
+        publishChange(InputCreated.create(inputId));
 
         return inputId;
     }
@@ -460,6 +450,10 @@ public class InputServiceImpl implements InputService {
             list.stream()
                     .map(this::toDocument)
                     .map(this::getExtractorFromDoc)
+                    // getExtractorFromDoc() returns null for extractors that cannot be built from persisted data.
+                    // Skip those instead of adding null (which an ImmutableList rejects) so a single broken extractor
+                    // does not break listing of all extractors for the input (see issue #26122).
+                    .filter(Objects::nonNull)
                     .forEach(listBuilder::add);
         }
         return listBuilder.build();

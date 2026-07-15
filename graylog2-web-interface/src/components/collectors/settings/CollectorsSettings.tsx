@@ -27,7 +27,9 @@ import FormSubmit from 'components/common/FormSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useInputsStates from 'hooks/useInputsStates';
+import AppConfig from 'util/AppConfig';
 import { isPermitted } from 'util/PermissionsMixin';
+import Collapsible from 'components/common/Collapsible';
 
 import IngestEndpointStatus from './IngestEndpointStatus';
 import PortMismatchAlert from './PortMismatchAlert';
@@ -76,13 +78,16 @@ const CollectorsSettings = () => {
   const { loadedInputs: collectorInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
   const { data: inputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
 
+  const isCloud = AppConfig.isCloud();
+
   const canCreateInputs = isPermitted(currentUser?.permissions, [
     'inputs:create',
     'input_types:create:org.graylog.collectors.input.CollectorIngestHttpInput',
   ]);
 
+  // In Cloud the ingest endpoint is server-provisioned and there is no persisted input, so input creation is hidden.
   const showCreateInputCheckbox =
-    !isConfigured && !isLoadingInputIds && collectorInputIds.length === 0 && canCreateInputs;
+    !isCloud && !isConfigured && !isLoadingInputIds && collectorInputIds.length === 0 && canCreateInputs;
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const initialValues: FormValues = useMemo(() => {
@@ -245,9 +250,9 @@ const CollectorsSettings = () => {
             <Alert bsStyle="info">
               <strong>Getting started with Collectors</strong>
               <p>
-                Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below and save
-                to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy
-                collectors to your hosts.
+                {isCloud
+                  ? 'Collectors connect to a managed ingest endpoint to send their data. Save your collector settings to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy collectors to your hosts.'
+                  : 'Collectors need ingest endpoints to receive collected data. Configure the HTTP endpoint below and save to initialize the collector infrastructure. After setup, you can create fleets, add sources, and deploy collectors to your hosts.'}
               </p>
             </Alert>
           </Col>
@@ -258,9 +263,9 @@ const CollectorsSettings = () => {
               <Col md={6}>
                 <SectionTitle>Ingest Endpoint</SectionTitle>
                 <HelpText>
-                  Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that
-                  is pushed to managed collectors as their data destination. It must route to a running collector ingest
-                  input. This is typically the address of a load balancer or the server itself.
+                  {isCloud
+                    ? 'The ingest endpoint is system-managed. Collectors connect here automatically.'
+                    : 'Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that is pushed to managed collectors as their data destination. It must route to a running collector ingest input. This is typically the address of a load balancer or the server itself.'}
                 </HelpText>
 
                 <FormikInput
@@ -268,91 +273,102 @@ const CollectorsSettings = () => {
                   type="text"
                   label="External hostname"
                   name="http_hostname"
+                  disabled={isCloud}
                   placeholder="e.g. otlp.example.com"
-                  help="The hostname or IP address that Collectors will use to connect. Must be reachable from Collector hosts."
+                  help={
+                    isCloud
+                      ? undefined
+                      : 'The hostname or IP address that Collectors will use to connect. Must be reachable from Collector hosts.'
+                  }
                 />
-                <FormikInput id="http-port" type="number" label="External port" name="http_port" />
+                <FormikInput id="http-port" type="number" label="External port" name="http_port" disabled={isCloud} />
 
-                <PortMismatchAlert
-                  formPort={values.http_port}
-                  collectorInputs={collectorInputs}
-                  isLoading={isLoadingInputDetails}
-                />
+                {!isCloud && (
+                  <>
+                    <PortMismatchAlert
+                      formPort={values.http_port}
+                      collectorInputs={collectorInputs}
+                      isLoading={isLoadingInputDetails}
+                    />
 
-                {showCreateInputCheckbox && (
-                  <FormikInput id="create-input" type="checkbox" label="Create ingest input" name="create_input" />
+                    {showCreateInputCheckbox && (
+                      <FormikInput id="create-input" type="checkbox" label="Create ingest input" name="create_input" />
+                    )}
+                  </>
                 )}
               </Col>
 
-              <Col md={6}>
-                <SectionTitle>Collector Lifecycle</SectionTitle>
+              <Collapsible label="Advanced options">
+                <Col md={6}>
+                  <SectionTitle>Collector Lifecycle</SectionTitle>
 
-                <TimeUnitInput
-                  label="Offline threshold"
-                  update={(value: number, unit: string) => {
-                    setFieldValue('offline_value', value);
-                    setFieldValue('offline_unit', unit);
-                  }}
-                  value={values.offline_value}
-                  unit={values.offline_unit}
-                  units={THRESHOLD_UNITS}
-                  required
-                  hideCheckbox
-                  help={
-                    errors.offline_value ? (
-                      <span className="text-danger">{errors.offline_value}</span>
-                    ) : (
-                      "Collectors that haven't reported within this time are shown as offline."
-                    )
-                  }
-                />
+                  <TimeUnitInput
+                    label="Offline threshold"
+                    update={(value: number, unit: string) => {
+                      setFieldValue('offline_value', value);
+                      setFieldValue('offline_unit', unit);
+                    }}
+                    value={values.offline_value}
+                    unit={values.offline_unit}
+                    units={THRESHOLD_UNITS}
+                    required
+                    hideCheckbox
+                    help={
+                      errors.offline_value ? (
+                        <span className="text-danger">{errors.offline_value}</span>
+                      ) : (
+                        "Collectors that haven't reported within this time are shown as offline."
+                      )
+                    }
+                  />
 
-                <TimeUnitInput
-                  label="Default visibility"
-                  update={(value: number, unit: string) => {
-                    setFieldValue('visibility_value', value);
-                    setFieldValue('visibility_unit', unit);
-                  }}
-                  value={values.visibility_value}
-                  unit={values.visibility_unit}
-                  units={THRESHOLD_UNITS}
-                  required
-                  hideCheckbox
-                  help={
-                    errors.visibility_value ? (
-                      <span className="text-danger">{errors.visibility_value}</span>
-                    ) : (
-                      "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
-                    )
-                  }
-                />
+                  <TimeUnitInput
+                    label="Default visibility"
+                    update={(value: number, unit: string) => {
+                      setFieldValue('visibility_value', value);
+                      setFieldValue('visibility_unit', unit);
+                    }}
+                    value={values.visibility_value}
+                    unit={values.visibility_unit}
+                    units={THRESHOLD_UNITS}
+                    required
+                    hideCheckbox
+                    help={
+                      errors.visibility_value ? (
+                        <span className="text-danger">{errors.visibility_value}</span>
+                      ) : (
+                        "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
+                      )
+                    }
+                  />
 
-                <TimeUnitInput
-                  label="Expiration threshold"
-                  update={(value: number, unit: string) => {
-                    setFieldValue('expiration_value', value);
-                    setFieldValue('expiration_unit', unit);
-                  }}
-                  value={values.expiration_value}
-                  unit={values.expiration_unit}
-                  units={THRESHOLD_UNITS}
-                  required
-                  hideCheckbox
-                  help={
-                    errors.expiration_value ? (
-                      <span className="text-danger">{errors.expiration_value}</span>
-                    ) : (
-                      "Collectors that haven't reported within this time are permanently removed."
-                    )
-                  }
-                />
-              </Col>
+                  <TimeUnitInput
+                    label="Expiration threshold"
+                    update={(value: number, unit: string) => {
+                      setFieldValue('expiration_value', value);
+                      setFieldValue('expiration_unit', unit);
+                    }}
+                    value={values.expiration_value}
+                    unit={values.expiration_unit}
+                    units={THRESHOLD_UNITS}
+                    required
+                    hideCheckbox
+                    help={
+                      errors.expiration_value ? (
+                        <span className="text-danger">{errors.expiration_value}</span>
+                      ) : (
+                        "Collectors that haven't reported within this time are permanently removed."
+                      )
+                    }
+                  />
+                </Col>
+              </Collapsible>
 
               <Col md={12}>
                 <FormSubmit
                   isAsyncSubmit
-                  submitButtonText="Update settings"
-                  submitLoadingText="Updating..."
+                  submitButtonText="Confirm settings"
+                  submitLoadingText="Saving..."
                   isSubmitting={isSubmitting}
                   displayCancel={false}
                 />
@@ -362,7 +378,7 @@ const CollectorsSettings = () => {
         </Formik>
       </Row>
 
-      <IngestEndpointStatus isInitialSetup={!isConfigured} />
+      {!isCloud && <IngestEndpointStatus isInitialSetup={!isConfigured} />}
     </>
   );
 };

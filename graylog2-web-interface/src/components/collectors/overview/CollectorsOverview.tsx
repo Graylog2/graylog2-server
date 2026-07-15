@@ -23,9 +23,12 @@ import { Spinner } from 'components/common';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { CollectorStats } from 'components/collectors/types';
+import useFeature from 'hooks/useFeature';
 
 import FleetCardsGrid from './FleetCardsGrid';
 import RecentActivity from './RecentActivity';
+import FirstOnboarding from './FirstOnboarding';
 
 import { useCollectorStats, useFleetsBulkStats } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
@@ -56,8 +59,7 @@ const SectionTitle = styled.h3(
   `,
 );
 
-const StatsSection = () => {
-  const { data: stats, isLoading, isError } = useCollectorStats();
+const StatsSection = ({ stats }: { stats: CollectorStats }) => {
   const history = useHistory();
   const sendTelemetry = useSendCollectorsTelemetry();
 
@@ -84,10 +86,6 @@ const StatsSection = () => {
       ...snapshot,
     });
   };
-
-  if (isLoading) return <Spinner />;
-
-  if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
 
   return (
     <StatsRow>
@@ -145,15 +143,23 @@ const FleetsSection = ({ filter }: { filter: string }) => {
 
   if (isError) return <Alert bsStyle="danger">Could not load fleet stats.</Alert>;
 
-  return <FleetCardsGrid fleets={bulkStats?.fleets || []} filter={filter} />;
+  return <FleetCardsGrid fleets={bulkStats?.fleets ?? []} filter={filter} />;
 };
 
 const CollectorsOverview = () => {
   const [filter, setFilter] = useState('');
+  const { data: stats, isLoading, isError } = useCollectorStats();
+  const showOnboarding = useFeature('collectors_onboarding');
+
+  if (isLoading) return <Spinner />;
+
+  if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
+
+  if (showOnboarding && stats.total_instances === 0) return <FirstOnboarding />;
 
   return (
     <div>
-      <StatsSection />
+      <StatsSection stats={stats} />
 
       <SectionHeader>
         <SectionTitle>Fleets</SectionTitle>

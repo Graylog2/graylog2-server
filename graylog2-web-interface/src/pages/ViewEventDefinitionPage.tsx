@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
@@ -29,20 +29,15 @@ import { useEventNotifications } from 'components/event-notifications/hooks/useE
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import { isSystemEventDefinition, isSigmaEventDefinition } from 'components/event-definitions/event-definitions-types';
+import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import usePluginEntities from 'hooks/usePluginEntities';
 import {
   useEventDefinitionWithContext,
   copyEventDefinition,
   EVENT_DEFINITIONS_QUERY_KEY,
 } from 'components/event-definitions/hooks/useEventDefinitions';
-import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
-type SigmaEventDefinitionConfig = EventDefinition['config'] & {
-  sigma_rule_id: string;
-};
+import useEventDefinitionDetailSections from './useEventDefinitionDetailSections';
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
@@ -52,16 +47,7 @@ const ViewEventDefinitionPage = () => {
   const notifications = notificationsData?.notifications;
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
-  const navigate = useNavigate();
-  const [showSigmaModal, setShowSigmaModal] = useState(false);
-
-  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
-    (entity: { key: string }) => entity.key === 'coreSigmaModal',
-  );
-
-  const CoreSigmaModal = pluggableSigmaModal
-    ? (pluggableSigmaModal.component as React.FC<{ ruleId: string; onCancel: () => void; onConfirm: () => void }>)
-    : null;
+  const detailSections = useEventDefinitionDetailSections();
 
   const queryClient = useQueryClient();
   const { data, isFetching } = useEventDefinitionWithContext(params.definitionId);
@@ -78,8 +64,6 @@ const ViewEventDefinitionPage = () => {
     };
   }, [data]);
 
-  const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
-
   useEffect(() => {
     if (!isFetching && !eventDefinition) {
       history.push(Routes.ALERTS.DEFINITIONS.LIST);
@@ -94,7 +78,7 @@ const ViewEventDefinitionPage = () => {
     copyEventDefinition(eventDefinition).then(
       (duplicatedEvent) => {
         queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
-        navigate(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
+        history.push(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
       },
       () => {
         // Error feedback is handled by `copyEventDefinition` itself.
@@ -102,12 +86,7 @@ const ViewEventDefinitionPage = () => {
     );
   };
 
-  const onEditEventDefinition = () => navigate(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
-
-  const onSigmaModalClose = () => {
-    queryClient.invalidateQueries({ queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, params.definitionId] });
-    setShowSigmaModal(false);
-  };
+  const onEditEventDefinition = () => history.push(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
 
   if (isFetching || !eventDefinition || !notifications) {
     return (
@@ -129,14 +108,12 @@ const ViewEventDefinitionPage = () => {
           title={`View "${eventDefinition.title}" Event Definition`}
           actions={
             <ButtonToolbar>
-              {(!isSigmaEventDefinition(eventDefinition) || scopePermissions?.is_mutable) && (
-                <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
-                  <Button bsStyle="primary" onClick={onEditEventDefinition}>
-                    Edit Event Definition
-                  </Button>
-                </IfPermitted>
-              )}
-              {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
+              <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
+                <Button bsStyle="primary" onClick={onEditEventDefinition}>
+                  Edit Event Definition
+                </Button>
+              </IfPermitted>
+              {!isSystemEventDefinition(eventDefinition) && (
                 <IfPermitted permissions="eventdefinitions:create">
                   <Button onClick={() => setShowDialog(true)}>Duplicate Event Definition</Button>
                 </IfPermitted>
@@ -152,6 +129,9 @@ const ViewEventDefinitionPage = () => {
 
         <Row className="content">
           <Col md={12}>
+            {detailSections.map(({ key, component: Component }) => (
+              <Component key={key} eventDefinition={eventDefinition} />
+            ))}
             <EventDefinitionSummary
               eventDefinition={eventDefinition}
               currentUser={currentUser}
@@ -168,13 +148,6 @@ const ViewEventDefinitionPage = () => {
           onCancel={() => setShowDialog(false)}>
           {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
         </ConfirmDialog>
-      )}
-      {showSigmaModal && CoreSigmaModal && (
-        <CoreSigmaModal
-          ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
-          onCancel={onSigmaModalClose}
-          onConfirm={onSigmaModalClose}
-        />
       )}
     </>
   );

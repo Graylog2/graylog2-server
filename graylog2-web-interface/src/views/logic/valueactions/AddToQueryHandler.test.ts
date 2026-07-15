@@ -157,6 +157,37 @@ describe('AddToQueryHandler', () => {
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND (source:a OR target:a)');
   });
 
+  it('combines an edge value path into a symmetric compound clause when the operator is EDGE', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('network').build())
+      .build();
+
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'source',
+        value: 'a',
+        type: new FieldType('keyword', [], []),
+        contexts: {
+          widget,
+          valuePath: [{ source: 'a' }, { target: 'b' }],
+          valuePathOperator: 'EDGE',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'anotherQueryId',
+      'foo:23 AND ((source:a AND target:b) OR (source:b AND target:a))',
+    );
+  });
+
   it('resolves the field type per value path entry for mixed field types', async () => {
     const query = createQuery('anotherQueryId', 'foo:23');
     const view = createViewWithQuery(query);

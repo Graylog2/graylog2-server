@@ -17,14 +17,24 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 
-import { Spinner } from 'components/common';
+import { Spinner, Link } from 'components/common';
 import NodeName from 'views/components/messagelist/NodeName';
 import type { Input } from 'components/messageloaders/Types';
 import usePluginEntities from 'hooks/usePluginEntities';
+import Routes from 'routing/Routes';
 
 type Inputs = Immutable.Map<string, Input>;
 
+// Mirrors backend ReservedInputIds.EPHEMERAL_COLLECTOR_INGEST. Single-use, so kept local here.
+const EPHEMERAL_COLLECTOR_INGEST_INPUT_ID = '000000000000000000000001';
+
 const _inputName = (inputs: Inputs, inputId: string) => {
+  // The Cloud collector ingest input has no persisted Input record (it runs in-memory), so resolve it to a
+  // friendly label linking to the Collectors page instead of the "deleted input" fallback.
+  if (inputId === EPHEMERAL_COLLECTOR_INGEST_INPUT_ID) {
+    return <Link to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>Collector Ingest</Link>;
+  }
+
   const input = inputs.get(inputId);
 
   return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
