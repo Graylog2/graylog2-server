@@ -125,6 +125,44 @@ public class AWSServiceTest {
         assertEquals("us-east-1", input.configuration().get(AWSInput.CK_AWS_REGION));
         assertEquals("a-stream", input.configuration().get(KinesisTransport.CK_KINESIS_STREAM_NAME));
         assertEquals(10000, input.configuration().get(KinesisTransport.CK_KINESIS_RECORD_BATCH_SIZE));
+        // The flag was not set on the request, so it must default to false to avoid triggering the
+        // one-way single-table migration on existing inputs unintentionally.
+        assertEquals(false, input.configuration().get(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING));
+    }
+
+    @Test
+    public void testSaveInputStoresSingleTableStateTrackingFlag() throws Exception {
+        when(inputService.save(isA(Input.class))).thenReturn("input-id");
+        when(user.getName()).thenReturn("a-user-name");
+        when(messageInputFactory.create(isA(InputCreateRequest.class), isA(String.class), isA(String.class), anyBoolean())).thenReturn(messageInput);
+        when(inputService.create(isA(HashMap.class))).thenReturn(mock(Input.class));
+
+        AWSInputCreateRequest request =
+                AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
+                        .awsAccessKeyId("a-key")
+                        .awsSecretAccessKey(encryptedValue)
+                        .name("AWS Input")
+                        .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
+                        .streamName("a-stream")
+                        .batchSize(10000)
+                        .addFlowLogPrefix(true)
+                        .throttlingAllowed(true)
+                        .streamArn("test-arn")
+                        .overrideSource("test-source")
+                        .kinesisSingleTableStateTracking(true)
+                        .build();
+        awsService.saveInput(request, user);
+
+        final ArgumentCaptor<InputCreateRequest> argumentCaptor = ArgumentCaptor.forClass(InputCreateRequest.class);
+        verify(messageInputFactory, times(1)).create(argumentCaptor.capture(),
+                eq("a-user-name"),
+                eq("5ca1ab1e-0000-4000-a000-000000000000"),
+                eq(false));
+
+        // The flag must survive the transposition into the input configuration so the transport
+        // enables the KCL single-table migration when the input is launched.
+        InputCreateRequest input = argumentCaptor.getValue();
+        assertEquals(true, input.configuration().get(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING));
     }
 
     @Test

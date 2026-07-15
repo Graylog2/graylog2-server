@@ -16,9 +16,13 @@
  */
 package org.graylog.integrations.aws.transports;
 
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class KinesisTransportTest {
@@ -43,5 +47,17 @@ public class KinesisTransportTest {
                 .isExactlyInstanceOf(MisfireException.class)
                 .hasMessageContaining("Override Endpoint")
                 .hasMessageContaining("is invalid");
+    }
+
+    @Test
+    public void testConfigContainsSingleTableStateTrackingField() {
+        final ConfigurationRequest request = new KinesisTransport.Config().getRequestedConfiguration();
+
+        assertThat(request.containsField(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING)).isTrue();
+
+        final ConfigurationField field = request.getField(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING);
+        assertThat(field).isInstanceOf(BooleanField.class);
+        // New inputs should default to the single-table layout.
+        assertThat(field.getDefaultValue()).isEqualTo(true);
     }
 }
