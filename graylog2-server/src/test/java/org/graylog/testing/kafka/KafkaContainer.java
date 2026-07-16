@@ -45,11 +45,17 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * An Apache Kafka container that is optimized for fast startup. The container is using the
- * <a href="https://hub.docker.com/r/bitnami/kafka">bitnami/kafka</a> image.
+ * <a href="https://hub.docker.com/r/apache/kafka">apache/kafka</a> image.
  */
 public class KafkaContainer extends GenericContainer<KafkaContainer> {
     public enum Version {
-        V34("3.7.0");
+        V37("3.7.2"),
+        V38("3.8.1"),
+        V39("3.9.2"),
+        V40("4.0.2"),
+        V41("4.1.2"),
+        V42("4.2.1"),
+        V43("4.3.1");
 
         private final String version;
 
@@ -63,7 +69,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaContainer.class);
-    private static final Version DEFAULT_VERSION = Version.V34;
+    private static final Version DEFAULT_VERSION = Version.V37;
     private static final String KAFKA_ADVERTISED_LISTENERS_FILE = "/.env-kafka-advertised-listeners";
 
     private Admin adminClient = null;
@@ -186,7 +192,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
      * {@code linger.ms} is raised so that records sent in quick succession are grouped into the same batch.
      *
      * @param compressionType the {@code compression.type} producer setting (e.g. {@code none}, {@code gzip},
-     *                         {@code snappy}, {@code lz4} or {@code zstd})
+     *                        {@code snappy}, {@code lz4} or {@code zstd})
      * @return the new producer instance
      */
     public KafkaProducer<String, byte[]> createByteArrayProducer(String compressionType) {
