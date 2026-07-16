@@ -48,6 +48,7 @@ describe('MessagesPerStreamSection', () => {
     asMock(useEntityTitles).mockReturnValue({
       titlesById: { 'stream-a': 'Stream Alpha', 'stream-b': 'Stream Beta' },
       notPermittedIds: new Set(),
+      isFetching: false,
       isInitialLoading: false,
       isError: false,
     });

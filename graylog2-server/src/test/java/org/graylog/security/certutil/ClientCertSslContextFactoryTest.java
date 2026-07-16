@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil;
 
+import org.assertj.core.api.Assertions;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog2.cluster.certificates.CertificateSigningRequest;
@@ -29,6 +30,7 @@ import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,19 +60,16 @@ class ClientCertSslContextFactoryTest {
         final CaKeystore caKeystore = mock(CaKeystore.class);
         when(caKeystore.exists()).thenReturn(false);
 
-        final ClientCertSslContextFactory factory =
-                new ClientCertSslContextFactory(caKeystore, trustManagerAndSocketFactoryProvider);
+        final ClientCertSslContextFactory factory = new ClientCertSslContextFactoryImpl(caKeystore, trustManagerAndSocketFactoryProvider);
 
-        assertThatThrownBy(() -> factory.buildClientCertSslContext("anyone", Duration.ofMinutes(1)))
-                .isInstanceOf(CaKeystoreException.class)
-                .hasMessageContaining("no CA configured");
+        Assertions.assertThat(factory.buildClientCertSslContext("anyone", Duration.ofMinutes(1)))
+                .isEmpty();
     }
 
     @Test
     void mintsCertWithRequestedCommonName() {
         final CaKeystore caKeystore = signingCaKeystore();
-        final ClientCertSslContextFactory factory =
-                new ClientCertSslContextFactory(caKeystore, trustManagerAndSocketFactoryProvider);
+        final ClientCertSslContextFactory factory = new ClientCertSslContextFactoryImpl(caKeystore, trustManagerAndSocketFactoryProvider);
 
         factory.buildClientCertSslContext("graylog-admin", Duration.ofMinutes(15));
 
@@ -82,15 +81,14 @@ class ClientCertSslContextFactoryTest {
 
     @Test
     void returnsUsableSslContext() {
-        final ClientCertSslContextFactory factory =
-                new ClientCertSslContextFactory(signingCaKeystore(), trustManagerAndSocketFactoryProvider);
+        final ClientCertSslContextFactory factory = new ClientCertSslContextFactoryImpl(signingCaKeystore(), trustManagerAndSocketFactoryProvider);
 
-        final SSLContext sslContext = factory.buildClientCertSslContext("graylog-admin", Duration.ofMinutes(15));
+        final Optional<SSLContext> sslContext = factory.buildClientCertSslContext("graylog-admin", Duration.ofMinutes(15));
 
         // Successfully obtaining a socket factory means the underlying KeyManager + TrustManager
         // were initialized correctly (key/cert match, init params valid).
-        assertThat(sslContext.getSocketFactory()).isNotNull();
-        assertThat(sslContext.getProtocol()).isEqualTo("TLS");
+        assertThat(sslContext).hasValueSatisfying(sslC -> Assertions.assertThat(sslC.getSocketFactory()).isNotNull());
+        assertThat(sslContext).hasValueSatisfying(sslC -> Assertions.assertThat(sslC.getProtocol()).isEqualTo("TLS"));
     }
 
     private CaKeystore signingCaKeystore() {

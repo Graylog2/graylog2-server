@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import URI from 'urijs';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
@@ -40,11 +40,10 @@ const EditEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = useState<EventDefinition>(undefined);
   const history = useHistory();
-  const navigate = useNavigate();
 
   const goToOverview = useCallback(() => {
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
-  }, [navigate]);
+    history.push(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [history]);
 
   useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {

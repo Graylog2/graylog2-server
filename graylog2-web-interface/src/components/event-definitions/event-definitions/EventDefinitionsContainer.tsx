@@ -21,18 +21,19 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
 import Routes from 'routing/Routes';
-import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
+import FilterValueRenderers from 'components/event-definitions/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
-import { TagsRenderer } from 'components/events/events/ColumnRenderers';
+import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
 import ExpandedNotificationsSection from './ExpandedNotificationsSection';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
+import useEventDefinitionOverviewSections from './useEventDefinitionOverviewSections';
 
 import type { EventDefinition } from '../event-definitions-types';
 import type { TacticsTechniquesColumnPlugin } from '../types';
@@ -62,6 +63,13 @@ const getCustomColumnRenderers = (
         <StatusCell eventDefinition={eventDefinition} />
       ),
       staticWidth: 110,
+    },
+    type: {
+      renderCell: (_type: string, eventDefinition: EventDefinition) => (
+        <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
+      ),
+      width: 0.15,
+      minWidth: 150,
     },
     priority: {
       staticWidth: 'matchHeader' as const,
@@ -137,22 +145,28 @@ const EventDefinitionsContainer = () => {
     }),
     [pluggableExpandedSections],
   );
+  const overviewSections = useEventDefinitionOverviewSections();
 
   return (
-    <PaginatedEntityTable<EventDefinition>
-      humanName="event definitions"
-      additionalAttributes={additionalAttributes}
-      queryHelpComponent={<QueryHelper entityName="event definition" />}
-      tableLayout={defaultLayout}
-      fetchEntities={fetchEventDefinitions}
-      entityActions={renderEventDefinitionActions}
-      keyFn={keyFn}
-      entityAttributesAreCamelCase={false}
-      expandedSectionRenderers={expandedSections}
-      filterValueRenderers={FilterValueRenderers}
-      columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
-      bulkSelection={bulkSelection}
-    />
+    <>
+      {overviewSections.map(({ key, component: Component }) => (
+        <Component key={key} />
+      ))}
+      <PaginatedEntityTable<EventDefinition>
+        humanName="event definitions"
+        additionalAttributes={additionalAttributes}
+        queryHelpComponent={<QueryHelper entityName="event definition" />}
+        tableLayout={defaultLayout}
+        fetchEntities={fetchEventDefinitions}
+        entityActions={renderEventDefinitionActions}
+        keyFn={keyFn}
+        entityAttributesAreCamelCase={false}
+        expandedSectionRenderers={expandedSections}
+        filterValueRenderers={FilterValueRenderers}
+        columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
+        bulkSelection={bulkSelection}
+      />
+    </>
   );
 };
 

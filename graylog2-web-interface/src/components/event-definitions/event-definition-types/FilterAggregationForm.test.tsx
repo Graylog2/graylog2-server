@@ -24,6 +24,8 @@ import { adminUser } from 'fixtures/users';
 
 import FilterAggregationForm from './FilterAggregationForm';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
+
 describe('FilterAggregationForm', () => {
   const defaultProps = {
     eventDefinition: simpleEventDefinition,

@@ -2,22 +2,22 @@
   "name": "jest-preset-graylog",
   "version": "1.0.0",
   "description": "Graylog jest preset, contains the jest configuration and dependencies to setup the test environment for the web interface",
-  "main": "jest-preset.js",
-  "packageManager": "yarn@1.22.22",
   "keywords": [
     "graylog",
     "jest"
   ],
-  "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "SSPL-1.0",
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "main": "jest-preset.js",
   "dependencies": {
     "@jest/types": "30.4.1",
+    "@swc/core": "^1.15.43",
+    "@swc/jest": "^0.2.39",
     "@testing-library/dom": "9.3.4",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "30.0.0",
-    "babel-jest": "30.4.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "30.4.2",
     "jest-canvas-mock": "^2.3.1",
@@ -25,5 +25,6 @@
     "jest-styled-components": "7.4.0",
     "react-select-event": "5.5.1",
     "resize-observer-polyfill": "^1.5.1"
-  }
+  },
+  "packageManager": "yarn@1.22.22"
 }

@@ -68,8 +68,8 @@ class IndicesResourceTest {
     @WithAuthorization(permissions = {"indices:read"})
     void getOutdatedIndicesSucceeds() {
         List<OutdatedIndex> outdatedIndices = List.of(
-                new OutdatedIndex("outdated1", "1.3.0", false, false),
-                new OutdatedIndex("outdated2", "1.3.0", true, true)
+                new OutdatedIndex("outdated1", "1.3.0", false, false, null),
+                new OutdatedIndex("outdated2", "1.3.0", true, true, "id1")
         );
         when(outdatedIndexService.getOutdatedIndices()).thenReturn(outdatedIndices);
         assertThat(indicesResource.getOutdatedIndices()).isEqualTo(outdatedIndices);
@@ -85,7 +85,7 @@ class IndicesResourceTest {
     @Test
     @WithAuthorization(permissions = {"indices:read", "indices:reindex"})
     void reindexSucceeds() {
-        when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(new OutdatedIndex(".outdated1", "1.3.0", false, false)));
+        when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(new OutdatedIndex(".outdated1", "1.3.0", false, false, null)));
         indicesResource.reindex(".outdated1", true);
         verify(outdatedIndexService, times(1)).reindex(".outdated1", true);
     }

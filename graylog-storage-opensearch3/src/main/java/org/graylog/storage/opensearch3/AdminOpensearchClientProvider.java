@@ -21,6 +21,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.security.certutil.ClientCertSslContextFactory;
+import org.graylog.security.certutil.ClientCertSslContextFactoryImpl;
 import org.graylog.storage.opensearch3.client.CustomAsyncOpenSearchClient;
 import org.graylog.storage.opensearch3.client.CustomOpenSearchClient;
 import org.graylog2.configuration.IndexerHosts;
@@ -29,7 +30,6 @@ import org.opensearch.client.transport.OpenSearchTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.time.Clock;
 import java.time.Duration;
@@ -106,9 +106,10 @@ public class AdminOpensearchClientProvider {
         }
 
         try {
-            final SSLContext sslContext = sslContextFactory.buildClientCertSslContext(
-                    IndexerAdminCertConstants.ADMIN_CN, CERT_LIFETIME);
-            final OpenSearchTransport newTransport = transportProvider.buildTransport(hosts, TransportConfig.clientCertAuth(sslContext));
+            final OpenSearchTransport newTransport = sslContextFactory.buildClientCertSslContext(IndexerAdminCertConstants.ADMIN_CN, CERT_LIFETIME)
+                    .map(TransportConfig::clientCertAuth)
+                    .map(certAuth -> transportProvider.buildTransport(hosts, certAuth))
+                    .orElse(transportProvider.buildTransport(hosts));
 
             if (cachedClient == null) {
                 this.drainScheduler = createDrainScheduler();

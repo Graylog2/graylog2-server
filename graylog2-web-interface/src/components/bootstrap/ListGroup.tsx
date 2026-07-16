@@ -15,21 +15,36 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { ListGroup as BootstrapListGroup } from 'react-bootstrap';
+import styled from 'styled-components';
 
-type Props = React.PropsWithChildren<{
+const StyledList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+type Props = {
+  'aria-label'?: string;
+  bsClass?: string;
+  children?: React.ReactNode;
   className?: string;
-  componentClass?: React.ElementType | undefined;
-  bsClass?: React.ComponentProps<typeof BootstrapListGroup>['bsClass'];
-  role?: 'list';
-  style?: React.ComponentProps<typeof BootstrapListGroup>['style'];
-}>;
+  componentClass?: React.ElementType;
+  'data-testid'?: string;
+  style?: React.CSSProperties;
+};
 
-const ListGroup = ({ className = undefined, children = undefined, role = undefined, ...props }: Props) => (
-  <BootstrapListGroup bsClass={className} role={role} {...props}>
+const ListGroup = ({
+  'aria-label': ariaLabel = undefined,
+  bsClass = undefined,
+  children = undefined,
+  className = undefined,
+  componentClass = undefined,
+  'data-testid': dataTestId = undefined,
+  style = undefined,
+}: Props) => (
+  <StyledList as={componentClass} aria-label={ariaLabel} className={`${className ?? ''} ${bsClass ?? ''}`} style={style} data-testid={dataTestId}>
     {children}
-  </BootstrapListGroup>
+  </StyledList>
 );
 
 /** @component */

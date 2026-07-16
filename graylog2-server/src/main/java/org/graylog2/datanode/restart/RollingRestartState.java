@@ -19,9 +19,7 @@ package org.graylog2.datanode.restart;
 public enum RollingRestartState {
     PREPARING_CLUSTER,
     SELECTING_NEXT_NODE,
-    STOPPING_NODE,
-    WAITING_NODE_LEFT,
-    STARTING_NODE,
+    UPGRADING_NODE,
     WAITING_NODE_JOINED,
     REENABLING_ALLOCATION,
     WAITING_GREEN,

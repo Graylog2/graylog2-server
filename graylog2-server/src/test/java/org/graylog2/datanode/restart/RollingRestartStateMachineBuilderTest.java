@@ -29,11 +29,9 @@ import static org.graylog2.datanode.restart.RollingRestartState.PAUSED_WAITING_G
 import static org.graylog2.datanode.restart.RollingRestartState.PREPARING_CLUSTER;
 import static org.graylog2.datanode.restart.RollingRestartState.REENABLING_ALLOCATION;
 import static org.graylog2.datanode.restart.RollingRestartState.SELECTING_NEXT_NODE;
-import static org.graylog2.datanode.restart.RollingRestartState.STARTING_NODE;
-import static org.graylog2.datanode.restart.RollingRestartState.STOPPING_NODE;
+import static org.graylog2.datanode.restart.RollingRestartState.UPGRADING_NODE;
 import static org.graylog2.datanode.restart.RollingRestartState.WAITING_GREEN;
 import static org.graylog2.datanode.restart.RollingRestartState.WAITING_NODE_JOINED;
-import static org.graylog2.datanode.restart.RollingRestartState.WAITING_NODE_LEFT;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.ABORT;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.CLUSTER_GREEN;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.ERROR;
@@ -59,10 +57,10 @@ class RollingRestartStateMachineBuilderTest {
     }
 
     @Test
-    void selectingNextNode_moreNodes_goesToStoppingNode() {
+    void selectingNextNode_moreNodes_goesToUpgradingNode() {
         final var sm = from(SELECTING_NEXT_NODE);
         sm.fire(MORE_NODES);
-        assertThat(sm.getState()).isEqualTo(STOPPING_NODE);
+        assertThat(sm.getState()).isEqualTo(UPGRADING_NODE);
     }
 
     @Test
@@ -80,22 +78,8 @@ class RollingRestartStateMachineBuilderTest {
     }
 
     @Test
-    void stoppingNode_proceed_goesToWaitingNodeLeft() {
-        final var sm = from(STOPPING_NODE);
-        sm.fire(PROCEED);
-        assertThat(sm.getState()).isEqualTo(WAITING_NODE_LEFT);
-    }
-
-    @Test
-    void waitingNodeLeft_nodeLeft_goesToStartingNode() {
-        final var sm = from(WAITING_NODE_LEFT);
-        sm.fire(NODE_LEFT);
-        assertThat(sm.getState()).isEqualTo(STARTING_NODE);
-    }
-
-    @Test
     void startingNode_proceed_goesToWaitingNodeJoined() {
-        final var sm = from(STARTING_NODE);
+        final var sm = from(UPGRADING_NODE);
         sm.fire(PROCEED);
         assertThat(sm.getState()).isEqualTo(WAITING_NODE_JOINED);
     }

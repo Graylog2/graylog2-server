@@ -59,6 +59,8 @@ export interface EventDefinitionType {
   }>;
   useCondition: () => boolean;
   hideFieldsStep?: boolean;
+  // Hides the type from the create wizard's dropdown while still listing it as a filter option.
+  hideFromCreation?: boolean;
 }
 export type TacticsTechniquesEditorPlugin = {
   component: React.ComponentType<{
@@ -96,6 +98,16 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
     'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
     'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.overviewPageSections'?: Array<{
+      key: string;
+      component: React.ComponentType;
+      order?: number;
+    }>;
+    'eventDefinitions.components.detailPageSections'?: Array<{
+      key: string;
+      component: React.ComponentType<{ eventDefinition: EventDefinition }>;
+      order?: number;
+    }>;
     'eventDefinitions.components.tacticsTechniquesEditor'?: Array<TacticsTechniquesEditorPlugin>;
     'eventDefinitions.components.tacticsTechniquesColumn'?: Array<TacticsTechniquesColumnPlugin>;
     'eventDefinitions.components.tacticsTechniquesSummary'?: Array<TacticsTechniquesSummaryPlugin>;
