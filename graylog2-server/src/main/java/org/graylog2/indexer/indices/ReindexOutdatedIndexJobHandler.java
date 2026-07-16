@@ -63,7 +63,7 @@ public class ReindexOutdatedIndexJobHandler {
         // Cluster-wide, per-index lock around the find-active + create sequence so two concurrent reindex calls
         // (different Graylog nodes or the same node) cannot both pass the active-job check and insert duplicate
         // triggers — which would run two destructive reindexes on the same index simultaneously.
-        final Lock lock = lockService.lock(START_LOCK_PREFIX + index)
+        final Lock lock = lockService.lock(START_LOCK_PREFIX + index, 1)
                 .orElseThrow(() -> new IllegalStateException(
                         "A reindex for index " + index + " is currently being started — please retry shortly."));
         try {
