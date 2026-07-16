@@ -73,21 +73,18 @@ public class OutdatedIndexResource extends RestResource {
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id(OutdatedIndex.FIELD_INDEX_NAME).title("Index Name").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
+            EntityAttribute.builder().id(OutdatedIndex.FIELD_CATEGORY).title("Type").type(SearchQueryField.Type.STRING).sortable(false).filterable(true).filterOptions(categoryFilterOptions()).build(),
             EntityAttribute.builder().id(OutdatedIndex.FIELD_VERSION).title("Version").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
-            EntityAttribute.builder().id(OutdatedIndex.FIELD_ACTIVE_WRITE_INDEX).title("Active Write Index").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
-            EntityAttribute.builder().id(OutdatedIndex.FIELD_WARM_INDEX).title("Warm Index").type(SearchQueryField.Type.BOOLEAN).sortable(true).filterable(true).filterOptions(booleanFilterOptions()).build(),
-            EntityAttribute.builder().id(OutdatedIndex.FIELD_MANAGED_INDEX).title("Managed Index").type(SearchQueryField.Type.BOOLEAN).sortable(true).filterable(true).filterOptions(booleanFilterOptions()).build(),
-            EntityAttribute.builder().id(OutdatedIndex.FIELD_SYSTEM_INDEX).title("System Index").type(SearchQueryField.Type.BOOLEAN).sortable(true).filterable(true).filterOptions(booleanFilterOptions()).build(),
             EntityAttribute.builder().id(OutdatedIndex.FIELD_BEGIN).title("Message Range Begin").type(SearchQueryField.Type.DATE).sortable(true).build(),
             EntityAttribute.builder().id(OutdatedIndex.FIELD_END).title("Message Range End").type(SearchQueryField.Type.DATE).sortable(true).build()
     );
 
-    // Booleans are indexed as int 1/0 (see OutdatedIndex#buildLuceneDoc and LuceneQueryBuilder), so the filter
-    // values must be the numeric representations rather than "true"/"false".
-    private static Set<FilterOption> booleanFilterOptions() {
+    private static Set<FilterOption> categoryFilterOptions() {
         return Set.of(
-                FilterOption.create("1", "True"),
-                FilterOption.create("0", "False")
+                FilterOption.create(OutdatedIndex.CATEGORY_GRAYLOG, "Graylog"),
+                FilterOption.create(OutdatedIndex.CATEGORY_SYSTEM, "System"),
+                FilterOption.create(OutdatedIndex.CATEGORY_FOREIGN, "Foreign"),
+                FilterOption.create(OutdatedIndex.CATEGORY_WARM, "Warm")
         );
     }
 
@@ -134,10 +131,6 @@ public class OutdatedIndexResource extends RestResource {
                        schema = @Schema(allowableValues = {
                                OutdatedIndex.FIELD_INDEX_NAME,
                                OutdatedIndex.FIELD_VERSION,
-                               OutdatedIndex.FIELD_ACTIVE_WRITE_INDEX,
-                               OutdatedIndex.FIELD_WARM_INDEX,
-                               OutdatedIndex.FIELD_MANAGED_INDEX,
-                               OutdatedIndex.FIELD_SYSTEM_INDEX,
                                OutdatedIndex.FIELD_BEGIN,
                                OutdatedIndex.FIELD_END
                        }))

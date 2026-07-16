@@ -42,6 +42,12 @@ public record OutdatedIndex(@JsonProperty(FIELD_INDEX_NAME) String indexName,
     public static final String FIELD_SYSTEM_INDEX = "system_index";
     public static final String FIELD_BEGIN = "begin";
     public static final String FIELD_END = "end";
+    // Derived, multi-valued classification used for the single "type" filter column.
+    public static final String FIELD_CATEGORY = "category";
+    public static final String CATEGORY_GRAYLOG = "graylog";
+    public static final String CATEGORY_SYSTEM = "system";
+    public static final String CATEGORY_FOREIGN = "foreign";
+    public static final String CATEGORY_WARM = "warm";
 
     public OutdatedIndex(String indexName, String version, boolean warmIndex) {
         this(indexName, version, warmIndex, false, null, null, null);
@@ -75,15 +81,27 @@ public record OutdatedIndex(@JsonProperty(FIELD_INDEX_NAME) String indexName,
         return indexName.startsWith(".");
     }
 
+    /**
+     * The mutually exclusive primary classification of this index. System indices take precedence over the
+     * managed/foreign distinction, mirroring the badges shown in the UI.
+     */
+    private String primaryCategory() {
+        if (isSystemIndex()) {
+            return CATEGORY_SYSTEM;
+        }
+        return managedIndex ? CATEGORY_GRAYLOG : CATEGORY_FOREIGN;
+    }
+
     @JsonIgnore
     @Override
     public void buildLuceneDoc(LuceneDocBuilder builder) {
         builder.stringVal(FIELD_INDEX_NAME, indexName);
         builder.stringVal(FIELD_VERSION, version);
-        builder.boolVal(FIELD_WARM_INDEX, warmIndex);
-        builder.boolVal(FIELD_MANAGED_INDEX, managedIndex);
-        builder.stringVal(FIELD_ACTIVE_WRITE_INDEX, activeWriteIndex);
-        builder.boolVal(FIELD_SYSTEM_INDEX, isSystemIndex());
+        // category is multi-valued: the primary classification plus an optional "warm" token, matching the badges.
+        builder.searchableVal(FIELD_CATEGORY, primaryCategory());
+        if (warmIndex) {
+            builder.searchableVal(FIELD_CATEGORY, CATEGORY_WARM);
+        }
         // dateVal is not null-safe, so only add the range fields when present.
         if (begin != null) {
             builder.dateVal(FIELD_BEGIN, begin.toDate());
