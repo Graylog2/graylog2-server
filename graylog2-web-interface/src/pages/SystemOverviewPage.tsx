@@ -25,19 +25,14 @@ import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import { Row } from 'components/bootstrap';
-import SYSTEM_OVERVIEW_TABS from 'components/notifications/systemOverviewTabs';
+import { PAGE_NAV_TITLE } from 'components/system-overview/bindings';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import HealthModule from 'components/health/HealthModule';
 
 const SystemOverviewPage = () => (
   <DocumentTitle title="System overview">
     <span>
-      <HideOnCloud>
-        <HealthModule />
-      </HideOnCloud>
-
       <Row>
-        <PageNavigation items={SYSTEM_OVERVIEW_TABS} />
+        <PageNavigation page={PAGE_NAV_TITLE} />
       </Row>
 
       <HideOnCloud>
