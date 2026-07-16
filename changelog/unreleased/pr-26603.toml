@@ -1,0 +1,4 @@
+type = "s"
+message = "Update to Netty 4.2.16 to fix [several CVEs](https://netty.io/news/2026/07/06/4-2-16-Final.html)."
+
+pulls = ["26603"]

@@ -143,7 +143,7 @@ public class RollingRestartExecutionJob implements Job {
                         .currentNodeIndex(nextIdx)
                         .nodes(replaceNode(data.nodes(), nextIdx,
                                 data.nodes().get(nextIdx)
-                                        .withStatus(RollingRestartNodeStatus.STOPPING)
+                                        .withStatus(RollingRestartNodeStatus.RESTARTING)
                                         .withStarted(Instant.now())))
                         .build();
             }
@@ -153,37 +153,11 @@ public class RollingRestartExecutionJob implements Job {
                 sm.fire(RollingRestartTrigger.PROCEED);
                 return data.toBuilder().smState(sm.getState()).build();
             }
-            case STOPPING_NODE -> {
-                final RollingRestartNodeEntry current = requireCurrent(data);
-                actions.stopNode(current.hostname());
-                sm.fire(RollingRestartTrigger.PROCEED);
-                return data.toBuilder().smState(sm.getState()).build();
-            }
-            case WAITING_NODE_LEFT -> {
-                final RollingRestartNodeEntry current = requireCurrent(data);
-                if (!actions.isNodeInCluster(current.hostname())) {
-                    sm.fire(RollingRestartTrigger.NODE_LEFT);
-                    return data.toBuilder()
-                            .smState(sm.getState())
-                            .nodes(replaceNode(data.nodes(), data.currentNodeIndex(),
-                                    current.withStatus(RollingRestartNodeStatus.STOPPED)))
-                            .build();
-                }
-                return data;
-            }
-            case STARTING_NODE -> {
-                final RollingRestartNodeEntry current = requireCurrent(data);
-                actions.startNode(current.hostname());
-                sm.fire(RollingRestartTrigger.PROCEED);
-                return data.toBuilder()
-                        .smState(sm.getState())
-                        .nodes(replaceNode(data.nodes(), data.currentNodeIndex(),
-                                current.withStatus(RollingRestartNodeStatus.STARTING)))
-                        .build();
-            }
             case WAITING_NODE_JOINED -> {
                 final RollingRestartNodeEntry current = requireCurrent(data);
-                if (actions.isNodeInCluster(current.hostname())) {
+                String expectedVersion = data.targetOpensearchVersion();
+
+                if (actions.isNodeInCluster(current.hostname(), expectedVersion)) {
                     sm.fire(RollingRestartTrigger.NODE_JOINED);
                     return data.toBuilder()
                             .smState(sm.getState())
@@ -309,6 +283,7 @@ public class RollingRestartExecutionJob implements Job {
         public static final String FIELD_PAUSED_REASON = "paused_reason";
         public static final String FIELD_LAST_ERROR = "last_error";
         public static final String FIELD_WAITING_GREEN_SINCE = "waiting_green_since";
+        public static final String TARGET_OPENSEARCH_VERSION = "target_opensearch_version";
 
         @JsonProperty(FIELD_SM_STATE)
         public abstract RollingRestartState smState();
@@ -335,6 +310,10 @@ public class RollingRestartExecutionJob implements Job {
 
         @JsonProperty(FIELD_WAITING_GREEN_SINCE)
         public abstract Instant waitingGreenSince();
+
+        @JsonProperty(TARGET_OPENSEARCH_VERSION)
+        public abstract String targetOpensearchVersion();
+
 
         public abstract Builder toBuilder();
 
@@ -376,6 +355,9 @@ public class RollingRestartExecutionJob implements Job {
 
             @JsonProperty(FIELD_WAITING_GREEN_SINCE)
             public abstract Builder waitingGreenSince(Instant waitingGreenSince);
+
+            @JsonProperty(TARGET_OPENSEARCH_VERSION)
+            public abstract Builder targetOpensearchVersion(String targetOpensearchVersion);
 
             abstract Data autoBuild();
 

@@ -81,3 +81,12 @@ The following REST API changes are a direct result of this rework:
 | `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/import`       | Moved to `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/import/bulk/import`  |
 | `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/upload`       | Moved to `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/import/bulk/upload`  |
 | All other `/plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/...`     | Deleted                                                                                  |
+
+## Threat Coverage Percentages May Change After Upgrade
+
+Due to the migration of Sigma rules to Event Definitions in 7.2, the percentages displayed in the Threat
+Coverage widget may be different from what they were in 7.1. Coverage is now computed directly from Event
+Definitions rather than from the previous Sigma rules. Every Event Definition with MITRE tactics/techniques
+assigned is now included, and coverage reflects how many of them are enabled versus disabled (with no log
+source check that was previously present for Sigma rules). Therefore, a tactic may show a higher or lower
+percentage than it did in 7.1, without any change to the actual installed Event Definitions.

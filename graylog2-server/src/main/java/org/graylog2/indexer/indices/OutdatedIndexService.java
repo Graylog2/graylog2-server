@@ -22,8 +22,10 @@ import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.security.IndexerAdminCert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -40,14 +43,12 @@ public class OutdatedIndexService {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutdatedIndexService.class);
 
-    private final Indices indices;
     private final IndicesAdapter indicesAdapter;
     private final IndexSetRegistry indexSetRegistry;
     private final Cluster cluster;
 
     @Inject
-    public OutdatedIndexService(Indices indices, IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry, Cluster cluster) {
-        this.indices = indices;
+    public OutdatedIndexService(@IndexerAdminCert IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry, Cluster cluster) {
         this.indicesAdapter = indicesAdapter;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -62,24 +63,32 @@ public class OutdatedIndexService {
                         throw new IllegalStateException("Cluster version cannot be determined: " + version);
                     }
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
-        return indices.getOutdatedIndices(currentMajorVersion).stream()
+        return indicesAdapter.getOutdatedIndices(currentMajorVersion).stream()
                 .map(index -> index.asManaged(indexSetRegistry.isManagedIndex(index.indexName())))
+                .map(index -> index.asActiveWriteIndex(isActiveWriteIndexForSet(index.indexName())))
                 .sorted().toList();
     }
 
+    public String isActiveWriteIndexForSet(String index) {
+        return indexSetRegistry.getForIndex(index)
+                .filter(indexSet -> Objects.equals(indexSet.getActiveWriteIndex(), index))
+                .map(indexSet -> indexSet.getConfig().id())
+                .orElse(null);
+    }
+
     public void reindex(String index, boolean withReplicas) {
-        HealthStatus sourceStatus = indices.waitForRecovery(index, 2);
+        HealthStatus sourceStatus = indicesAdapter.waitForRecovery(index, 2);
         if (sourceStatus != HealthStatus.Green) {
             throw new IllegalStateException("Index " + index + " state is not healthy: " + sourceStatus);
         }
         // get settings & mapping of source index
-        Map<String, Object> sourceSettings = indices.indexSettings(index);
-        Map<String, Object> sourceMapping = indices.indexMapping(index);
+        Map<String, Object> sourceSettings = indicesAdapter.getStructuredIndexSettings(index);
+        Map<String, Object> sourceMapping = indicesAdapter.getIndexMapping(index);
         if (sourceSettings == null) {
             throw new IllegalStateException("No index sourceSettings found for index " + index);
         }
         // Remember how many documents the source holds so we can verify nothing is lost before each destructive step.
-        final long sourceCount = indices.numberOfMessages(index);
+        final long sourceCount = indicesAdapter.numberOfMessages(index);
         // clean index settings for creation
         Map<String, Object> tempSettings = cleanIndexSettings(sourceSettings, withReplicas);
         String tempIndex = ".gltmp_" + index.replaceAll("\\.", "");
@@ -88,7 +97,7 @@ public class OutdatedIndexService {
 
             // create and reindex into temp index
             indicesAdapter.create(tempIndex, new IndexSettings(tempSettings), sourceMapping);
-            HealthStatus tempStatus = indices.waitForRecovery(tempIndex);
+            HealthStatus tempStatus = indicesAdapter.waitForRecovery(tempIndex);
             if (tempStatus != HealthStatus.Green) {
                 throw new IllegalStateException("Temporary index " + tempIndex + " could not be created successfully: " + tempStatus);
             }
@@ -159,6 +168,21 @@ public class OutdatedIndexService {
                     "%s exists and may hold the only copy of the data from a previous failed reindex. Inspect and " +
                     "restore %s manually before retrying.", index, tempIndex, tempIndex));
         }
+    }
+
+    private void reindex(String source, String target) {
+        indicesAdapter.reindex(source, target, result -> {
+            LOG.info("Reindexing index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
+                    source,
+                    target,
+                    result,
+                    result.tookMs(),
+                    result.hasFailedItems());
+
+            if (result.hasFailedItems()) {
+                throw new ElasticsearchException("Failed to reindex a message. Check your indexer log.");
+            }
+        });
     }
 
     private Map<String, Object> cleanIndexSettings(Map<String, Object> settings, boolean withReplicas) {

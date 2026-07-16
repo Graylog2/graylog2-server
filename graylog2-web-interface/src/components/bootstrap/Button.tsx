@@ -202,6 +202,7 @@ const StyledButton = styled(MantineButton)<{
 
 type Props = React.PropsWithChildren<{
   active?: boolean;
+  allowClickWhenDisabled?: boolean;
   'aria-label'?: string;
   bsStyle?: StyleProps;
   bsSize?: BsSize;
@@ -226,6 +227,7 @@ type Props = React.PropsWithChildren<{
 const Button = (
   {
     'aria-label': ariaLabel,
+    allowClickWhenDisabled = false,
     bsStyle = 'default',
     bsSize = undefined,
     className = undefined,
@@ -263,7 +265,8 @@ const Button = (
     variant: active ? 'outline' : 'filled',
     color,
     'data-testid': dataTestId,
-    disabled,
+    disabled: allowClickWhenDisabled ? false : disabled,
+    'data-disabled': (allowClickWhenDisabled && disabled) || undefined,
     role,
     size: sizeForMantine(bsSize),
     tabIndex,

@@ -32,7 +32,6 @@ import java.util.Map;
 public class OpensearchCommonConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private final Configuration localConfiguration;
-    private final DatanodeConfiguration datanodeConfiguration;
 
     private static final List<String> DEFAULT_NODE_ROLES = List.of(
             OpensearchNodeRole.CLUSTER_MANAGER,
@@ -44,7 +43,6 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
     @Inject
     public OpensearchCommonConfigurationBean(Configuration localConfiguration, DatanodeConfiguration datanodeConfiguration) {
         this.localConfiguration = localConfiguration;
-        this.datanodeConfiguration = datanodeConfiguration;
     }
 
     @Override
@@ -79,8 +77,8 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
-        config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
+        config.put("path.data", buildParams.datanodeConfiguration().datanodeDirectories().getDataTargetDir().toString());
+        config.put("path.logs", buildParams.datanodeConfiguration().datanodeDirectories().getLogsTargetDir().toString());
 
         if (localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
             config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());

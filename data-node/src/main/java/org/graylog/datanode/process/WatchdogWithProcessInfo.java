@@ -43,4 +43,10 @@ public class WatchdogWithProcessInfo extends ExecuteWatchdog {
                 .orElse(ProcessInformation.empty());
     }
 
+    public void destroyForcibly() {
+        if (process != null) {
+            process.destroyForcibly();
+        }
+    }
+
 }

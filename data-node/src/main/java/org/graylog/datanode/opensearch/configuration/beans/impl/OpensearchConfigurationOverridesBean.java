@@ -49,7 +49,6 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigurationOverridesBean.class);
     private final Supplier<Map<String, String>> systemEnvSupplier;
-    private final DatanodeDirectories datanodeDirectories;
     private final Path overridesFile;
     private static final Set<Pattern> ALLOWED_OVERRIDES = Set.of(
             "^cluster\\.routing\\.allocation\\.disk\\.watermark\\..*$",
@@ -60,12 +59,11 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
     ).stream().map(Pattern::compile).collect(Collectors.toSet());
 
     @Inject
-    public OpensearchConfigurationOverridesBean(DatanodeConfiguration datanodeConfiguration, Configuration configuration) {
-        this(datanodeConfiguration.datanodeDirectories(), configuration.getOpensearchConfigurationOverridesFile(), System::getenv);
+    public OpensearchConfigurationOverridesBean(Configuration configuration) {
+        this(configuration.getOpensearchConfigurationOverridesFile(), System::getenv);
     }
 
-    public OpensearchConfigurationOverridesBean(DatanodeDirectories datanodeDirectories, Path overridesFile, Supplier<Map<String, String>> systemEnvSupplier) {
-        this.datanodeDirectories = datanodeDirectories;
+    public OpensearchConfigurationOverridesBean(Path overridesFile, Supplier<Map<String, String>> systemEnvSupplier) {
         this.overridesFile = overridesFile;
         this.systemEnvSupplier = systemEnvSupplier;
     }
@@ -85,7 +83,7 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
                 .forEach(entry -> properties.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
 
         if (overridesFile != null) {
-            datanodeDirectories.resolveConfigurationSourceFile(overridesFile)
+            configurationParams.datanodeConfiguration().datanodeDirectories().resolveConfigurationSourceFile(overridesFile)
                     .map(this::readPropertiesFile)
                     .ifPresentOrElse(properties::putAll, () -> LOG.error("Could not read opensearch overrides file {}", overridesFile));
         }

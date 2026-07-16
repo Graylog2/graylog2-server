@@ -27,24 +27,29 @@ import org.graylog2.security.jwt.IndexerJwtAuthToken;
 @Singleton
 public class DatanodeConfigurationProvider implements Provider<DatanodeConfiguration> {
 
-    private final DatanodeConfiguration datanodeConfiguration;
+    private final Configuration localConfiguration;
+    private final IndexerJwtAuthToken jwtAuthToken;
+    private final OpensearchDistributionProvider opensearchDistributionProvider;
+    private final NodeId nodeId;
 
     @Inject
     public DatanodeConfigurationProvider(
             final Configuration localConfiguration,
             IndexerJwtAuthToken jwtAuthToken,
-            OpensearchDistribution opensearchDistribution,
+            OpensearchDistributionProvider opensearchDistributionProvider,
             NodeId nodeId) {
-        datanodeConfiguration = new DatanodeConfiguration(
-                opensearchDistribution,
-                DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
-                localConfiguration.getProcessLogsBufferSize(),
-                jwtAuthToken
-        );
+        this.localConfiguration = localConfiguration;
+        this.jwtAuthToken = jwtAuthToken;
+        this.opensearchDistributionProvider = opensearchDistributionProvider;
+        this.nodeId = nodeId;
     }
 
     @Override
     public DatanodeConfiguration get() {
-        return datanodeConfiguration;
+        return new DatanodeConfiguration(
+                opensearchDistributionProvider.get(),
+                DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
+                localConfiguration.getProcessLogsBufferSize(),
+                jwtAuthToken);
     }
 }

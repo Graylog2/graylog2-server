@@ -57,8 +57,11 @@ const StyledRow = styled.div`
   }
 `;
 
-const Row = ({ children = undefined, as = undefined, ...rest }: Props, ref: React.ForwardedRef<HTMLDivElement>) => (
-  <StyledRow ref={ref} as={as} {...rest}>
+const Row = (
+  { children = undefined, as = undefined, className = undefined, ...rest }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <StyledRow ref={ref} as={as} className={`${className ?? ''} row`} {...rest}>
     {children}
   </StyledRow>
 );
