@@ -80,6 +80,11 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
     }
 
     @Override
+    public Set<String> requiredPermissions() {
+        return Set.of();
+    }
+
+    @Override
     public TabularResponse apply(PermissionHelper permissionHelper, AggregateMessagesTool.Parameters parameters) {
         try {
 

@@ -86,6 +86,11 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     }
 
     @Override
+    public Set<String> requiredPermissions() {
+        return Set.of();
+    }
+
+    @Override
     public String apply(PermissionHelper permissionHelper, ListIndicesTool.Parameters unused) {
         final var all = AllIndices.create(closed(permissionHelper), reopened(permissionHelper), open(permissionHelper));
         final var sw = new StringWriter();
