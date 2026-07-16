@@ -14,41 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { Alert, Button, SegmentedControl } from 'components/bootstrap';
-import { ConfirmDialog, Spinner } from 'components/common';
+import { PaginatedEntityTable } from 'components/common';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
-import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import extractErrorMessage from 'util/extractErrorMessage';
-import UserNotification from 'util/UserNotification';
 
-import BulkIndexActionConfirmDialog from './BulkIndexActionConfirmDialog';
-import { getBulkIndexActionCandidates, getBulkIndexActionNotification, runBulkIndexAction } from './bulkIndexActions';
-import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
-import IndicesGroupTable from './IndicesGroupTable';
+import {
+  fetchIncompatibleIndices,
+  incompatibleIndicesKeyFn,
+  INCOMPATIBLE_INDICES_QUERY_KEY,
+} from './fetchIncompatibleIndices';
+import type { IncompatibleIndexRow, IncompatibleIndicesResponse } from './fetchIncompatibleIndices';
+import { createColumnRenderers, DEFAULT_DISPLAYED_COLUMNS } from './IncompatibleIndicesColumnRenderers';
+import IncompatibleIndexTableActions from './IncompatibleIndexTableActions';
+import IncompatibleIndicesBulkActions from './IncompatibleIndicesBulkActions';
 import useArchivedIndexNames from './hooks/useArchivedIndexNames';
 import usePendingIncompatibleIndexActions from './hooks/usePendingIncompatibleIndexActions';
-import { useIncompatibleIndexActionDefinitions } from './incompatibleIndexActions';
-import type { ConfirmedAction } from './incompatibleIndexActions';
-import { getFirstGroupWithIndices, getSelectedGroup, groupIncompatibleIndices } from './incompatibleIndexGroups';
-
-const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
-
-const showBulkNotification = ({ type, message, title }: BulkIndexActionNotification) => {
-  const notify = (notification: (notificationMessage: string, notificationTitle?: string) => void) =>
-    title ? notification(message, title) : notification(message);
-
-  if (type === 'success') {
-    notify(UserNotification.success);
-  } else if (type === 'warning') {
-    notify(UserNotification.warning);
-  } else {
-    notify(UserNotification.error);
-  }
-};
 
 const Heading = styled.h4(
   ({ theme }) => css`
@@ -57,221 +40,100 @@ const Heading = styled.h4(
   `,
 );
 
-const ActionConfirmDialog = ({
-  confirmedAction,
-  isSubmitting,
-  onCancel,
-  onConfirm,
-}: {
-  confirmedAction: ConfirmedAction;
-  isSubmitting: boolean;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) => {
-  const actionDefinitions = useIncompatibleIndexActionDefinitions();
-  const actionDefinition = actionDefinitions[confirmedAction.action];
-
-  return (
-    <ConfirmDialog
-      show
-      title={actionDefinition.confirmTitle}
-      btnConfirmText={actionDefinition.confirmText}
-      isAsyncSubmit
-      isSubmitting={isSubmitting}
-      onCancel={onCancel}
-      onConfirm={onConfirm}
-      submitLoadingText="Working...">
-      {actionDefinition.confirmationBody(confirmedAction.index)}
-    </ConfirmDialog>
-  );
+const TABLE_LAYOUT = {
+  entityTableId: 'incompatible_indices',
+  defaultSort: { attributeId: 'index_name', direction: 'asc' as const },
+  defaultDisplayedAttributes: DEFAULT_DISPLAYED_COLUMNS,
+  defaultPageSize: 20,
+  defaultColumnOrder: ['index_name', 'category', 'version', 'begin', 'end'],
 };
 
 const IncompatibleIndicesTable = () => {
-  const { data: incompatibleIndices, isError, isLoading, refetch } = useIncompatibleIndices();
+  const queryClient = useQueryClient();
   const canArchive = useCanArchive();
-  const actionDefinitions = useIncompatibleIndexActionDefinitions();
-  const sendTelemetry = useSendTelemetry();
+  const [loadedIndices, setLoadedIndices] = useState<Array<IncompatibleIndexRow>>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  const refetch = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: INCOMPATIBLE_INDICES_QUERY_KEY }),
+    [queryClient],
+  );
+
+  const incompatibleIndexNames = useMemo(() => loadedIndices.map((index) => index.index_name), [loadedIndices]);
+  const archivedIndexNames = useArchivedIndexNames(incompatibleIndexNames, canArchive);
   const { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs } =
     usePendingIncompatibleIndexActions({
-      incompatibleIndices,
-      isLoading,
-      isError,
+      incompatibleIndices: loadedIndices,
+      isLoading: !hasLoaded,
+      isError: false,
       refetch,
       canArchive,
     });
-  const incompatibleIndexNames = incompatibleIndices.map((index) => index.index_name);
-  const archivedIndexNames = useArchivedIndexNames(incompatibleIndexNames, canArchive);
-  const [confirmedAction, setConfirmedAction] = useState<ConfirmedAction | undefined>();
-  const [confirmedBulkAction, setConfirmedBulkAction] = useState<BulkIndexActionCandidate | undefined>();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
-  const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
 
-  const indicesGroups = groupIncompatibleIndices(incompatibleIndices);
-  const firstGroupWithIndices = getFirstGroupWithIndices(indicesGroups);
-  const activeGroupId = selectedGroupId ?? firstGroupWithIndices;
-  const selectedGroup = getSelectedGroup(indicesGroups, activeGroupId);
+  // Suppress archive actions while an archive job runs — the backend archive job is single-concurrency.
   const archiveActionsAvailable = canArchive && !isArchiveJobRunning;
-  const segments = indicesGroups.map((group) => ({
-    value: group.id,
-    label: `${group.shortLabel} (${group.indices.length})`,
-  }));
-  const bulkActions = getBulkIndexActionCandidates({
-    indices: selectedGroup.indices,
-    canArchive: archiveActionsAvailable,
-    pendingIndexStatuses,
-    archivedIndexNames,
-  });
 
-  const closeConfirmDialog = () => setConfirmedAction(undefined);
-  const closeBulkConfirmDialog = () => setConfirmedBulkAction(undefined);
-  const cancelBulkConfirmDialog = () => {
-    if (!isBulkSubmitting) {
-      closeBulkConfirmDialog();
-    }
-  };
+  const handleDataLoaded = useCallback((data: IncompatibleIndicesResponse) => {
+    setLoadedIndices(data.list);
+    setHasLoaded(true);
+  }, []);
 
-  const finalizeAfterActions = async () => {
-    const { data: updatedIncompatibleIndices = [] } = await refetch();
-    const updatedGroups = groupIncompatibleIndices(updatedIncompatibleIndices);
-    const updatedSelectedGroup = getSelectedGroup(updatedGroups, activeGroupId);
+  const columnRenderers = useMemo(
+    () => createColumnRenderers(pendingIndexStatuses, archivedIndexNames),
+    [pendingIndexStatuses, archivedIndexNames],
+  );
 
-    if (updatedSelectedGroup.indices.length === 0) {
-      setSelectedGroupId(getFirstGroupWithIndices(updatedGroups));
-    }
-  };
+  const renderActions = useCallback(
+    (index: IncompatibleIndexRow) => {
+      const pendingStatus = pendingIndexStatuses.get(index.index_name);
+      const isArchived =
+        pendingStatus?.state !== 'archiving' &&
+        (archivedIndexNames.has(index.index_name) || pendingStatus?.state === 'archived');
 
-  const showArchiveJobConflictWarning = () => {
-    UserNotification.warning(
-      'Another archive job is already running. New archive jobs can be started after it finishes.',
-      'Archive job already running',
-    );
-    refetchClusterJobs?.();
-  };
-
-  const handleConfirm = async () => {
-    if (!confirmedAction) {
-      return;
-    }
-
-    const { action, index } = confirmedAction;
-    const actionDefinition = actionDefinitions[action];
-
-    sendTelemetry(actionDefinition.telemetryEventType, { ...TELEMETRY_DEFAULTS });
-    setIsSubmitting(true);
-
-    try {
-      const actionResponse = await actionDefinition.run(index);
-      const pendingArchive = actionDefinition.getPendingArchiveTracking?.(index, actionResponse);
-
-      if (pendingArchive) {
-        addArchiveDeleteAction(pendingArchive);
-      }
-
-      UserNotification.success(actionDefinition.successMessage(index));
-      await finalizeAfterActions();
-      closeConfirmDialog();
-    } catch (errorThrown) {
-      const errorMessage = extractErrorMessage(errorThrown);
-
-      if (actionDefinition.isArchiveJobConflict?.(errorMessage)) {
-        showArchiveJobConflictWarning();
-        closeConfirmDialog();
-      } else {
-        UserNotification.error(errorMessage, `Could not ${actionDefinition.confirmText.toLowerCase()}.`);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleBulkConfirm = async () => {
-    if (!confirmedBulkAction || isBulkSubmitting) {
-      return;
-    }
-
-    sendTelemetry(actionDefinitions[confirmedBulkAction.action].telemetryEventType, {
-      ...TELEMETRY_DEFAULTS,
-      app_action_value: 'bulk',
-      bulk_count: confirmedBulkAction.targetIndices.length,
-    });
-    setIsBulkSubmitting(true);
-
-    try {
-      const result = await runBulkIndexAction({
-        action: confirmedBulkAction.action,
-        indices: confirmedBulkAction.targetIndices,
-      });
-
-      showBulkNotification(getBulkIndexActionNotification(confirmedBulkAction, result));
-      await finalizeAfterActions();
-      closeBulkConfirmDialog();
-    } catch (errorThrown) {
-      UserNotification.error(
-        extractErrorMessage(errorThrown),
-        `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`,
+      return (
+        <IncompatibleIndexTableActions
+          index={index}
+          canArchive={archiveActionsAvailable}
+          pendingStatus={pendingStatus}
+          isArchived={isArchived}
+          addArchiveDeleteAction={addArchiveDeleteAction}
+          refetchClusterJobs={refetchClusterJobs}
+          refetch={refetch}
+        />
       );
-    } finally {
-      setIsBulkSubmitting(false);
-    }
-  };
+    },
+    [pendingIndexStatuses, archivedIndexNames, archiveActionsAvailable, addArchiveDeleteAction, refetchClusterJobs, refetch],
+  );
 
-  if (isLoading) {
-    return <Spinner text="Loading incompatible indices..." />;
-  }
-
-  if (isError) {
-    return (
-      <Alert bsStyle="danger">
-        Could not load incompatible indices — retrying automatically.{' '}
-        <Button bsSize="xs" onClick={() => refetch()}>
-          Retry now
-        </Button>
-      </Alert>
-    );
-  }
-
-  if (!incompatibleIndices.length) {
-    return <Alert bsStyle="success">No incompatible indices found.</Alert>;
-  }
+  const bulkSelection = useMemo(
+    () => ({
+      actions: (
+        <IncompatibleIndicesBulkActions
+          indices={loadedIndices}
+          canArchive={archiveActionsAvailable}
+          pendingIndexStatuses={pendingIndexStatuses}
+          archivedIndexNames={archivedIndexNames}
+          refetch={refetch}
+        />
+      ),
+    }),
+    [loadedIndices, archiveActionsAvailable, pendingIndexStatuses, archivedIndexNames, refetch],
+  );
 
   return (
     <>
       <Heading>Incompatible indices</Heading>
-      <SegmentedControl
-        data={segments}
-        value={activeGroupId}
-        onChange={setSelectedGroupId}
-        color="warning"
-        autoContrast
+      <PaginatedEntityTable<IncompatibleIndexRow>
+        humanName="incompatible indices"
+        tableLayout={TABLE_LAYOUT}
+        fetchEntities={fetchIncompatibleIndices}
+        keyFn={incompatibleIndicesKeyFn}
+        columnRenderers={columnRenderers}
+        entityActions={renderActions}
+        bulkSelection={bulkSelection}
+        onDataLoaded={handleDataLoaded}
+        entityAttributesAreCamelCase={false}
       />
-      <IndicesGroupTable
-        group={selectedGroup}
-        onAction={setConfirmedAction}
-        onBulkAction={setConfirmedBulkAction}
-        canArchive={archiveActionsAvailable}
-        pendingIndexStatuses={pendingIndexStatuses}
-        archivedIndexNames={archivedIndexNames}
-        bulkActions={bulkActions}
-        isBulkActionSubmitting={isBulkSubmitting}
-      />
-
-      {confirmedAction && (
-        <ActionConfirmDialog
-          confirmedAction={confirmedAction}
-          isSubmitting={isSubmitting}
-          onCancel={closeConfirmDialog}
-          onConfirm={handleConfirm}
-        />
-      )}
-      {confirmedBulkAction && (
-        <BulkIndexActionConfirmDialog
-          bulkAction={confirmedBulkAction}
-          isSubmitting={isBulkSubmitting}
-          onCancel={cancelBulkConfirmDialog}
-          onConfirm={handleBulkConfirm}
-        />
-      )}
     </>
   );
 };

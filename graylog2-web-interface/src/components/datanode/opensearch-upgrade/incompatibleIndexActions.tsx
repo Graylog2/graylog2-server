@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { ClusterDeflector, IndexerIndices } from '@graylog/server-api';
+import { ClusterDeflector, IndexerIndices, SystemIndexerIndices } from '@graylog/server-api';
 
 import type { StyleProps } from 'components/bootstrap/Button';
 import type { IndexArchiveBinding } from 'components/indices/archive/types';
@@ -51,9 +51,9 @@ type ActionDefinition = {
 };
 
 const deleteIncompatibleIndex = (index: IncompatibleIndex) =>
-  index.managed_index ? IndexerIndices.remove(index.index_name) : IndexerIndices.deleteOutdated(index.index_name);
+  index.managed_index ? IndexerIndices.remove(index.index_name) : SystemIndexerIndices.deleteOutdated(index.index_name);
 
-const reindexSystemIndex = (index: IncompatibleIndex) => IndexerIndices.reindex(index.index_name);
+const reindexSystemIndex = (index: IncompatibleIndex) => SystemIndexerIndices.reindex(index.index_name);
 
 const rotateWriteIndex = (index: IncompatibleIndex) => ClusterDeflector.cycleByindexSetId(index.active_write_index);
 
