@@ -76,7 +76,7 @@ public class RollingRestartJobHandler {
     public JobTriggerDto start(String triggeredBy, String authToken, boolean force) {
         // Cluster-wide lock around the find-active + create sequence so two concurrent /restart calls
         // (different Graylog nodes or the same node) cannot both pass preflight and insert duplicate triggers.
-        final Lock lock = lockService.lock(START_LOCK_RESOURCE)
+        final Lock lock = lockService.lock(START_LOCK_RESOURCE, 1)
                 .orElseThrow(() -> new IllegalStateException(
                         "Another rolling restart is being started right now — please retry shortly."));
         try {
