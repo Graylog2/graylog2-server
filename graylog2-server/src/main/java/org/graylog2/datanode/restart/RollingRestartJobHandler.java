@@ -73,14 +73,14 @@ public class RollingRestartJobHandler {
         this.dataNodeMetadataService = dataNodeMetadataService;
     }
 
-    public JobTriggerDto start(String triggeredBy, String authToken, boolean force) {
+    public JobTriggerDto start(String triggeredBy, boolean force) {
         // Cluster-wide lock around the find-active + create sequence so two concurrent /restart calls
         // (different Graylog nodes or the same node) cannot both pass preflight and insert duplicate triggers.
         final Lock lock = lockService.lock(START_LOCK_RESOURCE, 1)
                 .orElseThrow(() -> new IllegalStateException(
                         "Another rolling restart is being started right now — please retry shortly."));
         try {
-            final List<String> failures = checkPreconditions(force, authToken);
+            final List<String> failures = checkPreconditions(force);
             if (!failures.isEmpty()) {
                 throw new RollingRestartPreconditionsException(failures);
             }
@@ -105,7 +105,6 @@ public class RollingRestartJobHandler {
                             ? RollingRestartState.PAUSING_PROCESSING
                             : RollingRestartState.PREPARING_CLUSTER)
                     .pauseProcessing(pauseProcessing)
-                    .authToken(pauseProcessing ? authToken : null)
                     .nodes(nodes)
                     .triggeredBy(triggeredBy)
                     .waitingGreenSince(Instant.now())
@@ -215,7 +214,7 @@ public class RollingRestartJobHandler {
         return updated;
     }
 
-    private List<String> checkPreconditions(boolean force, String authToken) {
+    private List<String> checkPreconditions(boolean force) {
         final List<String> failures = new ArrayList<>();
         if (findActive().isPresent()) {
             failures.add("Another rolling restart job is already active");
@@ -223,11 +222,6 @@ public class RollingRestartJobHandler {
         final List<DataNodeDto> dataNodes = actions.liveDataNodes();
         if (dataNodes.isEmpty()) {
             failures.add("No active DataNodes found");
-        } else if (dataNodes.size() <= MAX_SMALL_CLUSTER_NODES && (authToken == null || authToken.isBlank())) {
-            // The small-cluster path pauses message processing across all Graylog nodes, which needs a
-            // forwardable auth token from the triggering request.
-            failures.add("A rolling restart of a " + dataNodes.size()
-                    + "-node cluster pauses message processing and must be triggered from an authenticated request");
         }
         try {
             final ClusterState state = actions.getClusterState();

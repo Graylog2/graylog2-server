@@ -91,7 +91,7 @@ public class RollingRestartExecutionJob implements Job {
             try {
                 if (data.pauseProcessing()) {
                     // Small-cluster path never disabled replication; undo the message-processing pause instead.
-                    actions.resumeProcessing(requireAuthToken(data));
+                    actions.resumeProcessing(data.triggeredBy());
                 } else {
                     actions.enableAllocation();
                 }
@@ -133,7 +133,7 @@ public class RollingRestartExecutionJob implements Job {
                 return data.toBuilder().smState(sm.getState()).build();
             }
             case PAUSING_PROCESSING -> {
-                actions.pauseProcessing(requireAuthToken(data));
+                actions.pauseProcessing(data.triggeredBy());
                 sm.fire(RollingRestartTrigger.PROCEED);
                 return data.toBuilder().smState(sm.getState()).build();
             }
@@ -142,7 +142,7 @@ public class RollingRestartExecutionJob implements Job {
                     // Undo whatever the preparation step did before bailing out: resume message processing on the
                     // small-cluster path, or re-enable shard allocation on the replication path.
                     if (data.pauseProcessing()) {
-                        actions.resumeProcessing(requireAuthToken(data));
+                        actions.resumeProcessing(data.triggeredBy());
                     } else {
                         actions.enableAllocation();
                     }
@@ -234,7 +234,7 @@ public class RollingRestartExecutionJob implements Job {
                 return data.toBuilder().smState(sm.getState()).build();
             }
             case RESUMING_PROCESSING -> {
-                actions.resumeProcessing(requireAuthToken(data));
+                actions.resumeProcessing(data.triggeredBy());
                 sm.fire(RollingRestartTrigger.PROCEED);
                 return data.toBuilder().smState(sm.getState()).build();
             }
@@ -242,15 +242,6 @@ public class RollingRestartExecutionJob implements Job {
                 return data;
             }
         }
-    }
-
-    private static String requireAuthToken(Data data) {
-        final String token = data.authToken();
-        if (token == null || token.isBlank()) {
-            throw new IllegalStateException(
-                    "No auth token available to control message processing for the rolling restart");
-        }
-        return token;
     }
 
     private RollingRestartNodeEntry requireCurrent(Data data) {
@@ -325,7 +316,6 @@ public class RollingRestartExecutionJob implements Job {
         public static final String FIELD_WAITING_GREEN_SINCE = "waiting_green_since";
         public static final String TARGET_OPENSEARCH_VERSION = "target_opensearch_version";
         public static final String FIELD_PAUSE_PROCESSING = "pause_processing";
-        public static final String FIELD_AUTH_TOKEN = "auth_token";
 
         @JsonProperty(FIELD_SM_STATE)
         public abstract RollingRestartState smState();
@@ -362,14 +352,6 @@ public class RollingRestartExecutionJob implements Job {
          */
         @JsonProperty(FIELD_PAUSE_PROCESSING)
         public abstract boolean pauseProcessing();
-
-        /**
-         * Auth token of the operator that triggered the restart, used to call the per-node message-processing
-         * control endpoints. Only populated when {@link #pauseProcessing()} is {@code true}.
-         */
-        @Nullable
-        @JsonProperty(FIELD_AUTH_TOKEN)
-        public abstract String authToken();
 
 
         public abstract Builder toBuilder();
@@ -419,9 +401,6 @@ public class RollingRestartExecutionJob implements Job {
 
             @JsonProperty(FIELD_PAUSE_PROCESSING)
             public abstract Builder pauseProcessing(boolean pauseProcessing);
-
-            @JsonProperty(FIELD_AUTH_TOKEN)
-            public abstract Builder authToken(@Nullable String authToken);
 
             abstract Data autoBuild();
 

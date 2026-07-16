@@ -129,7 +129,7 @@ class RollingRestartJobHandlerTest {
     void start_failsWhenLockNotAcquired() {
         when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE, 1)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> handler.start("alice", "token", false))
+        assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Another rolling restart is being started");
 
@@ -149,7 +149,7 @@ class RollingRestartJobHandlerTest {
                         .build());
         mockActiveTrigger(existing);
 
-        assertThatThrownBy(() -> handler.start("alice", "token", false))
+        assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(RollingRestartPreconditionsException.class)
                 .extracting("failedChecks").asList()
                 .anyMatch(c -> ((String) c).contains("already active"));
@@ -161,27 +161,14 @@ class RollingRestartJobHandlerTest {
         mockNoActiveTrigger();
         when(actions.liveDataNodes()).thenReturn(List.of());
 
-        assertThatThrownBy(() -> handler.start("alice", "token", false))
+        assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(RollingRestartPreconditionsException.class)
                 .extracting("failedChecks").asList()
                 .anyMatch(c -> ((String) c).contains("No active DataNodes"));
     }
 
     @Test
-    void start_smallCluster_failsWithoutAuthToken() {
-        mockNoActiveTrigger();
-        when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a"), node("b", "node-b")));
-        when(actions.getClusterState()).thenReturn(clusterState);
-        when(clusterState.status()).thenReturn(HealthStatus.Green);
-
-        assertThatThrownBy(() -> handler.start("alice", null, false))
-                .isInstanceOf(RollingRestartPreconditionsException.class)
-                .extracting("failedChecks").asList()
-                .anyMatch(c -> ((String) c).contains("authenticated request"));
-    }
-
-    @Test
-    void start_smallCluster_pausesProcessingAndPersistsToken() {
+    void start_smallCluster_startsInPausingProcessingState() {
         mockNoActiveTrigger();
         when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a"), node("b", "node-b")));
         when(actions.getClusterState()).thenReturn(clusterState);
@@ -190,12 +177,13 @@ class RollingRestartJobHandlerTest {
                 .thenReturn(Optional.of(RollingRestartExecutionJob.DEFINITION_INSTANCE));
         when(jobTriggerService.create(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        final var created = handler.start("alice", "Bearer xyz", false);
+        final var created = handler.start("alice", false);
 
         final var data = (RollingRestartExecutionJob.Data) created.data().orElseThrow();
         assertThat(data.smState()).isEqualTo(RollingRestartState.PAUSING_PROCESSING);
         assertThat(data.pauseProcessing()).isTrue();
-        assertThat(data.authToken()).isEqualTo("Bearer xyz");
+        // No credential is persisted — only the triggering username, used to mint an ephemeral token at run time.
+        assertThat(data.triggeredBy()).isEqualTo("alice");
         assertThat(data.nodes()).hasSize(2);
     }
 
@@ -206,7 +194,7 @@ class RollingRestartJobHandlerTest {
         when(actions.getClusterState()).thenReturn(clusterState);
         when(clusterState.status()).thenReturn(HealthStatus.Yellow);
 
-        assertThatThrownBy(() -> handler.start("alice", "token", false))
+        assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(RollingRestartPreconditionsException.class)
                 .extracting("failedChecks").asList()
                 .anyMatch(c -> ((String) c).contains("must be GREEN"));
@@ -224,7 +212,7 @@ class RollingRestartJobHandlerTest {
                 .thenReturn(Optional.of(RollingRestartExecutionJob.DEFINITION_INSTANCE));
         when(jobTriggerService.create(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        final var created = handler.start("alice", "token", /* force */ true);
+        final var created = handler.start("alice", /* force */ true);
 
         assertThat(created).isNotNull();
         final var data = (RollingRestartExecutionJob.Data) created.data().orElseThrow();
@@ -242,7 +230,7 @@ class RollingRestartJobHandlerTest {
                 .thenReturn(Optional.of(RollingRestartExecutionJob.DEFINITION_INSTANCE));
         when(jobTriggerService.create(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        final var created = handler.start("alice", "token", false);
+        final var created = handler.start("alice", false);
 
         assertThat(created).isNotNull();
         verify(jobTriggerService).create(any());
@@ -252,12 +240,9 @@ class RollingRestartJobHandlerTest {
     @Test
     void start_releasesLock_onPreconditionFailure() {
         when(jobTriggerService.streamByQuery(any(Bson.class))).thenReturn(Stream.empty());
-        when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a")));
-        when(actions.getClusterState()).thenReturn(clusterState);
-        when(clusterState.status()).thenReturn(HealthStatus.Green);
+        when(actions.liveDataNodes()).thenReturn(List.of()); // no nodes → precondition failure
 
-        // Small cluster with no auth token fails preconditions.
-        assertThatThrownBy(() -> handler.start("alice", null, false))
+        assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(RollingRestartPreconditionsException.class);
 
         verify(lockService).unlock(lock);
@@ -271,7 +256,7 @@ class RollingRestartJobHandlerTest {
         when(jobDefinitionService.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(jobTriggerService.create(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        handler.start("alice", "token", false);
+        handler.start("alice", false);
 
         verify(jobDefinitionService).save(eq(RollingRestartExecutionJob.DEFINITION_INSTANCE));
     }
@@ -448,7 +433,7 @@ class RollingRestartJobHandlerTest {
         final var captor = ArgumentCaptor.forClass(JobTriggerDto.class);
         when(jobTriggerService.create(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
 
-        handler.start("alice", "token", false);
+        handler.start("alice", false);
 
         final JobTriggerDto trigger = captor.getValue();
         assertThat(trigger.jobDefinitionType()).isEqualTo(RollingRestartExecutionJob.TYPE_NAME);

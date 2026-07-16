@@ -83,7 +83,6 @@ class RollingRestartExecutionJobTest {
         return RollingRestartExecutionJob.Data.builder()
                 .smState(smState)
                 .pauseProcessing(true)
-                .authToken("Bearer xyz")
                 .nodes(List.of(
                         RollingRestartNodeEntry.pending("node-a", "id-a"),
                         RollingRestartNodeEntry.pending("node-b", "id-b")))
@@ -288,7 +287,7 @@ class RollingRestartExecutionJobTest {
     void pausingProcessing_pausesMessageProcessing_andAdvances() throws Exception {
         final var update = job.execute(ctxWith(smallClusterData(RollingRestartState.PAUSING_PROCESSING)));
 
-        verify(actions).pauseProcessing("Bearer xyz");
+        verify(actions).pauseProcessing("alice");
         verify(actions, never()).prepareCluster();
         assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.SELECTING_NEXT_NODE);
         assertThat(update.nextTime()).isPresent();
@@ -328,7 +327,7 @@ class RollingRestartExecutionJobTest {
         final var update = job.execute(ctxWith(data));
 
         assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.ABORTED);
-        verify(actions).resumeProcessing("Bearer xyz");
+        verify(actions).resumeProcessing("alice");
         verify(actions, never()).enableAllocation();
     }
 
@@ -336,7 +335,7 @@ class RollingRestartExecutionJobTest {
     void resumingProcessing_resumesMessageProcessing_andCompletes() throws Exception {
         final var update = job.execute(ctxWith(smallClusterData(RollingRestartState.RESUMING_PROCESSING)));
 
-        verify(actions).resumeProcessing("Bearer xyz");
+        verify(actions).resumeProcessing("alice");
         assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.COMPLETED);
         assertThat(update.nextTime()).isEmpty();
     }
@@ -351,7 +350,7 @@ class RollingRestartExecutionJobTest {
 
         assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.FAILED);
         assertThat(update.status()).contains(JobTriggerStatus.ERROR);
-        verify(actions).resumeProcessing("Bearer xyz");
+        verify(actions).resumeProcessing("alice");
         verify(actions, never()).enableAllocation();
     }
 
