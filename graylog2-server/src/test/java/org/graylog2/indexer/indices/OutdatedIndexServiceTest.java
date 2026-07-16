@@ -44,6 +44,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -104,7 +105,7 @@ class OutdatedIndexServiceTest {
 
     @Test
     void reindexFailsIfSourceIndexNotHealthy() {
-        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Yellow);
+        when(indicesAdapter.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Yellow);
 
         Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
                 .isInstanceOf(IllegalStateException.class)
@@ -113,8 +114,8 @@ class OutdatedIndexServiceTest {
 
     @Test
     void reindexFailsIfSourceSettingsAreNull() {
-        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
-        when(indices.indexSettings("my_index")).thenReturn(null);
+        when(indicesAdapter.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
+        when(indicesAdapter.getStructuredIndexSettings("my_index")).thenReturn(null);
 
         Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
                 .isInstanceOf(IllegalStateException.class)
@@ -123,28 +124,28 @@ class OutdatedIndexServiceTest {
 
     @Test
     void reindexFailsIfTempIndexIsNotHealthyAfterCreation() throws IOException {
-        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
-        when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
-        when(indices.indexMapping("my_index")).thenReturn(sourceMapping());
+        when(indicesAdapter.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
+        when(indicesAdapter.getStructuredIndexSettings("my_index")).thenReturn(sourceSettings());
+        when(indicesAdapter.getIndexMapping("my_index")).thenReturn(sourceMapping());
         when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
-        when(indices.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Red);
+        when(indicesAdapter.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Red);
 
         Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Temporary index .gltmp_my_index could not be created successfully: Red");
 
-        verify(indices, never()).reindex(any(), any());
-        verify(indices, never()).delete(any());
+        verify(indicesAdapter, never()).reindex(any(), any(), any());
+        verify(indicesAdapter, never()).delete(any());
     }
 
     @Test
     void reindexFailsIfRecreatedTargetIndexIsNotHealthy() throws IOException {
-        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
-        when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
-        when(indices.indexMapping("my_index")).thenReturn(sourceMapping());
+        when(indicesAdapter.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
+        when(indicesAdapter.getStructuredIndexSettings("my_index")).thenReturn(sourceSettings());
+        when(indicesAdapter.getIndexMapping("my_index")).thenReturn(sourceMapping());
         when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
-        when(indices.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
-        when(indices.waitForRecovery("my_index")).thenReturn(HealthStatus.Yellow);
+        when(indicesAdapter.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
+        when(indicesAdapter.waitForRecovery("my_index")).thenReturn(HealthStatus.Yellow);
 
         Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
                 .isInstanceOf(IllegalStateException.class)
@@ -152,17 +153,17 @@ class OutdatedIndexServiceTest {
 
         // The reindex into temp and the source delete have already happened, but the
         // final reindex back into the source must not run if the recreated index is unhealthy.
-        verify(indices).reindex("my_index", ".gltmp_my_index");
-        verify(indices).delete("my_index");
-        verify(indices, never()).reindex(".gltmp_my_index", "my_index");
-        verify(indices, never()).delete(".gltmp_my_index");
+        verify(indicesAdapter).reindex(eq("my_index"), eq(".gltmp_my_index"), any());
+        verify(indicesAdapter).delete("my_index");
+        verify(indicesAdapter, never()).reindex(eq(".gltmp_my_index"), eq("my_index"), any());
+        verify(indicesAdapter, never()).delete(".gltmp_my_index");
     }
 
     @Test
     void reindexWrapsIOExceptionInRuntimeException() throws IOException {
-        when(indices.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
-        when(indices.indexSettings("my_index")).thenReturn(sourceSettings());
-        when(indices.indexMapping("my_index")).thenReturn(sourceMapping());
+        when(indicesAdapter.waitForRecovery("my_index", 2)).thenReturn(HealthStatus.Green);
+        when(indicesAdapter.getStructuredIndexSettings("my_index")).thenReturn(sourceSettings());
+        when(indicesAdapter.getIndexMapping("my_index")).thenReturn(sourceMapping());
         when(indicesAdapter.exists(".gltmp_my_index")).thenThrow(new IOException("boom"));
 
         Assertions.assertThatThrownBy(() -> outdatedIndexService.reindex("my_index", true))
@@ -177,32 +178,33 @@ class OutdatedIndexServiceTest {
         when(indicesAdapter.getStructuredIndexSettings("my_index")).thenReturn(sourceSettings());
         when(indicesAdapter.getIndexMapping("my_index")).thenReturn(sourceMapping);
         when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
-        when(indices.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
-        when(indices.waitForRecovery("my_index")).thenReturn(HealthStatus.Green);
+        when(indicesAdapter.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
+        when(indicesAdapter.waitForRecovery("my_index")).thenReturn(HealthStatus.Green);
         // Equal counts everywhere so both safety checks pass: source == temp == recreated.
-        when(indices.numberOfMessages("my_index")).thenReturn(10L);
-        when(indices.numberOfMessages(".gltmp_my_index")).thenReturn(10L);
+        OutdatedIndexService spiedService = spy(outdatedIndexService);
+        when(spiedService.numberOfMessages("my_index")).thenReturn(10L);
+        when(spiedService.numberOfMessages(".gltmp_my_index")).thenReturn(10L);
 
-        outdatedIndexService.reindex("my_index", true);
+        spiedService.reindex("my_index", true);
 
-        InOrder inOrder = inOrder(indices, indicesAdapter);
-        inOrder.verify(indices).waitForRecovery("my_index", 2);
-        inOrder.verify(indices).indexSettings("my_index");
-        inOrder.verify(indices).indexMapping("my_index");
-        inOrder.verify(indices).numberOfMessages("my_index"); // capture source count before any destructive step
+        InOrder inOrder = inOrder(spiedService, indicesAdapter);
+        inOrder.verify(indicesAdapter).waitForRecovery("my_index", 2);
+        inOrder.verify(indicesAdapter).getStructuredIndexSettings("my_index");
+        inOrder.verify(indicesAdapter).getIndexMapping("my_index");
+        inOrder.verify(spiedService).numberOfMessages("my_index"); // capture source count before any destructive step
         inOrder.verify(indicesAdapter).exists(".gltmp_my_index");
         inOrder.verify(indicesAdapter).create(eq(".gltmp_my_index"), any(IndexSettings.class), eq(sourceMapping));
-        inOrder.verify(indices).waitForRecovery(".gltmp_my_index");
-        inOrder.verify(indices).reindex("my_index", ".gltmp_my_index");
-        inOrder.verify(indices).refresh(".gltmp_my_index");
-        inOrder.verify(indices).numberOfMessages(".gltmp_my_index"); // verify temp copy is complete before deleting source
-        inOrder.verify(indices).delete("my_index");
+        inOrder.verify(indicesAdapter).waitForRecovery(".gltmp_my_index");
+        inOrder.verify(indicesAdapter).reindex(eq("my_index"), eq(".gltmp_my_index"), any());
+        inOrder.verify(indicesAdapter).refresh(".gltmp_my_index");
+        inOrder.verify(spiedService).numberOfMessages(".gltmp_my_index"); // verify temp copy is complete before deleting source
+        inOrder.verify(indicesAdapter).delete("my_index");
         inOrder.verify(indicesAdapter).create(eq("my_index"), any(IndexSettings.class), eq(sourceMapping));
-        inOrder.verify(indices).waitForRecovery("my_index");
-        inOrder.verify(indices).reindex(".gltmp_my_index", "my_index");
-        inOrder.verify(indices).refresh("my_index");
-        inOrder.verify(indices).numberOfMessages("my_index"); // verify recreated index is complete before deleting temp
-        inOrder.verify(indices).delete(".gltmp_my_index");
+        inOrder.verify(indicesAdapter).waitForRecovery("my_index");
+        inOrder.verify(indicesAdapter).reindex(eq(".gltmp_my_index"), eq("my_index"), any());
+        inOrder.verify(indicesAdapter).refresh("my_index");
+        inOrder.verify(spiedService).numberOfMessages("my_index"); // verify recreated index is complete before deleting temp
+        inOrder.verify(indicesAdapter).delete(".gltmp_my_index");
     }
 
     @Test
