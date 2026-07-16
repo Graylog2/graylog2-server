@@ -84,7 +84,7 @@ class RollingRestartJobHandlerTest {
         lenient().when(dataNodeMetadataService.getVersionsOverview()).thenReturn(versionOverview);
         handler = new RollingRestartJobHandler(jobDefinitionService, jobTriggerService, actions, clock, lockService, dataNodeMetadataService);
         // Default: lock acquisition succeeds for most tests; tests that exercise contention override.
-        lenient().when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE)).thenReturn(Optional.of(lock));
+        lenient().when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE, 1)).thenReturn(Optional.of(lock));
         lenient().when(clock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
     }
 
@@ -127,7 +127,7 @@ class RollingRestartJobHandlerTest {
 
     @Test
     void start_failsWhenLockNotAcquired() {
-        when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE)).thenReturn(Optional.empty());
+        when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE, 1)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> handler.start("alice", "token", false))
                 .isInstanceOf(IllegalStateException.class)

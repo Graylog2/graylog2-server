@@ -139,8 +139,12 @@ public class RollingRestartExecutionJob implements Job {
             }
             case SELECTING_NEXT_NODE -> {
                 if (data.abortRequested()) {
+                    // Undo whatever the preparation step did before bailing out: resume message processing on the
+                    // small-cluster path, or re-enable shard allocation on the replication path.
                     if (data.pauseProcessing()) {
                         actions.resumeProcessing(requireAuthToken(data));
+                    } else {
+                        actions.enableAllocation();
                     }
                     sm.fire(RollingRestartTrigger.ABORT);
                     return data.toBuilder().smState(sm.getState()).build();

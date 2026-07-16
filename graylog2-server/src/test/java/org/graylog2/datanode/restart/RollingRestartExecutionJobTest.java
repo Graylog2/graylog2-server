@@ -180,6 +180,7 @@ class RollingRestartExecutionJobTest {
         assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.ABORTED);
         assertThat(update.status()).contains(JobTriggerStatus.CANCELLED);
         assertThat(update.nextTime()).isEmpty();
+        verify(actions).enableAllocation();
     }
 
     @Test
@@ -328,6 +329,7 @@ class RollingRestartExecutionJobTest {
 
         assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.ABORTED);
         verify(actions).resumeProcessing("Bearer xyz");
+        verify(actions, never()).enableAllocation();
     }
 
     @Test
