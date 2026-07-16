@@ -84,7 +84,7 @@ public class OutdatedIndexService {
         Map<String, Object> tempSettings = cleanIndexSettings(sourceSettings, withReplicas);
         String tempIndex = ".gltmp_" + index.replaceAll("\\.", "");
         try {
-            prepareTempIndex(index, tempIndex);
+            safeCreateTempIndex(index, tempIndex);
 
             // create and reindex into temp index
             indicesAdapter.create(tempIndex, new IndexSettings(tempSettings), sourceMapping);
@@ -147,7 +147,7 @@ public class OutdatedIndexService {
      * failed. We only discard it when the source index still exists — if the source is gone, the temporary index may
      * hold the only surviving copy of the data and must not be deleted automatically.
      */
-    private void prepareTempIndex(String index, String tempIndex) throws IOException {
+    private void safeCreateTempIndex(String index, String tempIndex) throws IOException {
         if (!indicesAdapter.exists(tempIndex)) {
             return;
         }
