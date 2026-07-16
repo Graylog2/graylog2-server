@@ -68,7 +68,12 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
     }
 
     @Override
-    public Set<String> requiredPermissions() {
+    public Set<String> minimalRequiredPermissions() {
+        return Set.of();
+    }
+
+    @Override
+    public Set<String> fullAccessPermissions() {
         return Set.of(RestPermissions.SYSTEM_READ);
     }
 

@@ -63,7 +63,7 @@ public class CurrentTimeTool extends Tool<CurrentTimeTool.Parameters, String> {
     }
 
     @Override
-    public Set<String> requiredPermissions() {
+    public Set<String> minimalRequiredPermissions() {
         return Set.of();
     }
 

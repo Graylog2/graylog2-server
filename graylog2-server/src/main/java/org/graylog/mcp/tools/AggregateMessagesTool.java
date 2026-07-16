@@ -80,7 +80,7 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
     }
 
     @Override
-    public Set<String> requiredPermissions() {
+    public Set<String> minimalRequiredPermissions() {
         return Set.of();
     }
 

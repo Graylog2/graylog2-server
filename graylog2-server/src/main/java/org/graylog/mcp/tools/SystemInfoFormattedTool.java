@@ -65,7 +65,12 @@ public class SystemInfoFormattedTool extends Tool<SystemInfoFormattedTool.Parame
     }
 
     @Override
-    public Set<String> requiredPermissions() {
+    public Set<String> minimalRequiredPermissions() {
+        return Set.of();
+    }
+
+    @Override
+    public Set<String> fullAccessPermissions() {
         return Set.of(RestPermissions.SYSTEM_READ);
     }
 

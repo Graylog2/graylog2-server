@@ -59,7 +59,7 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListReso
     }
 
     @Override
-    public Set<String> requiredPermissions() {
+    public Set<String> minimalRequiredPermissions() {
         return Set.of();
     }
 

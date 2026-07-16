@@ -58,7 +58,7 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
     }
 
     @Override
-    public Set<String> requiredPermissions() {
+    public Set<String> minimalRequiredPermissions() {
         return Set.of();
     }
 
