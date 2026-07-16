@@ -170,17 +170,36 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
 
     /**
      * Returns a new {@code KafkaProducer<String, byte[]>} instance that is connected to the Kafka container.
+     * The producer doesn't compress record batches.
      *
      * @return the new producer instance
      */
     public KafkaProducer<String, byte[]> createByteArrayProducer() {
+        return createByteArrayProducer("none");
+    }
+
+    /**
+     * Returns a new {@code KafkaProducer<String, byte[]>} instance that is connected to the Kafka container and
+     * compresses record batches using the given compression type.
+     * <p>
+     * To make the producer actually build a compressed record batch that contains more than a single record,
+     * {@code linger.ms} is raised so that records sent in quick succession are grouped into the same batch.
+     *
+     * @param compressionType the {@code compression.type} producer setting (e.g. {@code none}, {@code gzip},
+     *                         {@code snappy}, {@code lz4} or {@code zstd})
+     * @return the new producer instance
+     */
+    public KafkaProducer<String, byte[]> createByteArrayProducer(String compressionType) {
         final var props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:" + getKafkaPort());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "graylog-node-" + UUID.randomUUID());
         props.put(ProducerConfig.ACKS_CONFIG, "1");
-        props.put(ProducerConfig.LINGER_MS_CONFIG, 0);
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, requireNonNull(compressionType, "compressionType cannot be null"));
+        // Give records a chance to accumulate in a single (compressed) record batch instead of being sent
+        // immediately in a batch of their own.
+        props.put(ProducerConfig.LINGER_MS_CONFIG, "none".equals(compressionType) ? 0 : 100);
 
         return new KafkaProducer<>(props);
     }
