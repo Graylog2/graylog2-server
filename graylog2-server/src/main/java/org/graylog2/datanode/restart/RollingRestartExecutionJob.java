@@ -49,7 +49,7 @@ public class RollingRestartExecutionJob implements Job {
     public static final String TYPE_NAME = "rolling-restart-v1";
 
     static final Duration TICK_INTERVAL = Duration.ofSeconds(5);
-    static final Duration GREEN_WAIT_TIMEOUT = Duration.ofMinutes(30);
+    static final Duration GREEN_WAIT_TIMEOUT = Duration.ofMinutes(5);
 
     /**
      * Built-in singleton job definition. The ID must remain stable across deployments so triggers can reference it.
