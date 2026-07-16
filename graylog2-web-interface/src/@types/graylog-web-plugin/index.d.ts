@@ -427,7 +427,6 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    // Status badges rendered in the top navigation, left of the notification badge.
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
