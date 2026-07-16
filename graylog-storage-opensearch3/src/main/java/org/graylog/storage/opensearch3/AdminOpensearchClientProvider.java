@@ -62,7 +62,7 @@ public class AdminOpensearchClientProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(AdminOpensearchClientProvider.class);
 
-    static final Duration CERT_LIFETIME = Duration.ofMinutes(1);
+    static final Duration CERT_LIFETIME = Duration.ofMinutes(15);
     static final Duration REFRESH_BEFORE_EXPIRY = Duration.ofMinutes(1);
 
     private final ClientCertSslContextFactory sslContextFactory;
