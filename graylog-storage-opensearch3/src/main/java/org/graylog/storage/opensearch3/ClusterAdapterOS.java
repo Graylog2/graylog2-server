@@ -37,6 +37,7 @@ import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeStats;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.opensearch.client.json.JsonData;
@@ -337,6 +338,26 @@ public class ClusterAdapterOS implements ClusterAdapter {
         return new NodeOSInfo(
                 nodesOsJson.at("/os/mem/total_in_bytes").asLong(),
                 toStream(nodesOsJson.at("/roles").elements()).map(JsonNode::asText).toList()
+        );
+    }
+
+    @Override
+    public Map<String, NodeStats> nodesStats() {
+        Request request = Requests.builder()
+                .endpoint("/_nodes/stats/os,jvm")
+                .method("GET")
+                .build();
+        JsonNode json = opensearchClient.performRequest(request, "Couldn't read Opensearch nodes stats data!");
+        JsonNode nodes = json.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeStats(nodes.get(name))));
+    }
+
+    private NodeStats createNodeStats(JsonNode nodeJson) {
+        return new NodeStats(
+                nodeJson.at("/name").asText(),
+                nodeJson.at("/os/cpu/percent").asDouble(-1),
+                nodeJson.at("/jvm/mem/heap_used_percent").asDouble(-1)
         );
     }
 

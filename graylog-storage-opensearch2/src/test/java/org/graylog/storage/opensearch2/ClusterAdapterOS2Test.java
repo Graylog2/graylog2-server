@@ -34,6 +34,7 @@ import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.stats.elasticsearch.NodeStats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -208,6 +209,34 @@ class ClusterAdapterOS2Test {
     }
 
 
+
+    @Test
+    void nodesStatsParsesPerNodeCpuAndHeapPercent() throws IOException {
+        when(jsonApi.perform(any(), anyString())).thenReturn(objectMapper.readTree("""
+                {"nodes":{
+                  "nodeId1":{"name":"os01","os":{"cpu":{"percent":42}},"jvm":{"mem":{"heap_used_percent":73}}},
+                  "nodeId2":{"name":"os02","os":{"cpu":{"percent":5}},"jvm":{"mem":{"heap_used_percent":18}}}
+                }}"""));
+
+        final Map<String, NodeStats> stats = clusterAdapter.nodesStats();
+
+        assertThat(stats).hasSize(2);
+        assertThat(stats.get("nodeId1").name()).isEqualTo("os01");
+        assertThat(stats.get("nodeId1").cpuPercent()).isEqualTo(42.0);
+        assertThat(stats.get("nodeId1").jvmHeapUsedPercent()).isEqualTo(73.0);
+        assertThat(stats.get("nodeId2").name()).isEqualTo("os02");
+    }
+
+    @Test
+    void nodesStatsReportsMinusOneForAbsentFields() throws IOException {
+        when(jsonApi.perform(any(), anyString())).thenReturn(objectMapper.readTree("""
+                {"nodes":{"nodeId1":{"name":"os01"}}}"""));
+
+        final NodeStats stats = clusterAdapter.nodesStats().get("nodeId1");
+
+        assertThat(stats.cpuPercent()).isEqualTo(-1.0);
+        assertThat(stats.jvmHeapUsedPercent()).isEqualTo(-1.0);
+    }
 
     private void mockNodesResponse() throws IOException {
         when(jsonApi.perform(any(), anyString()))

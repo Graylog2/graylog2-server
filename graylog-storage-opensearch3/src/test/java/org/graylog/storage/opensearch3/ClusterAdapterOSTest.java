@@ -26,6 +26,7 @@ import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
+import org.graylog2.system.stats.elasticsearch.NodeStats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -137,5 +138,22 @@ class ClusterAdapterOSTest {
         assertThat(clusterShardAllocation.nodeShardAllocations())
                 .extracting(NodeShardAllocation::shards)
                 .containsExactly(15, 16);
+    }
+
+    @Test
+    void nodesStatsParsesPerNodeCpuAndHeapPercent() {
+        final OfficialOpensearchClient statsClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/_nodes/stats/os,jvm", """
+                        {"nodes":{
+                          "nodeId1":{"name":"os01","os":{"cpu":{"percent":42}},"jvm":{"mem":{"heap_used_percent":73}}}
+                        }}""")
+                .build();
+        final ClusterAdapterOS adapter = new ClusterAdapterOS(statsClient, Duration.seconds(1));
+
+        final NodeStats stats = adapter.nodesStats().get("nodeId1");
+
+        assertThat(stats.name()).isEqualTo("os01");
+        assertThat(stats.cpuPercent()).isEqualTo(42.0);
+        assertThat(stats.jvmHeapUsedPercent()).isEqualTo(73.0);
     }
 }
