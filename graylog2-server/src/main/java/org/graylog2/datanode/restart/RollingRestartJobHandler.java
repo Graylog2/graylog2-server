@@ -45,7 +45,11 @@ import java.util.Optional;
 @Singleton
 public class RollingRestartJobHandler {
     private static final Logger LOG = LoggerFactory.getLogger(RollingRestartJobHandler.class);
-    static final int MIN_DATANODES = 3;
+    /**
+     * Clusters with at most this many DataNodes have no shard redundancy to lean on during a node restart, so
+     * instead of toggling shard replication we pause cluster-wide message processing for the whole run.
+     */
+    static final int MAX_SMALL_CLUSTER_NODES = 2;
     static final String START_LOCK_RESOURCE = "datanode-rolling-restart-start";
 
     private final DBJobDefinitionService jobDefinitionService;
@@ -69,14 +73,14 @@ public class RollingRestartJobHandler {
         this.dataNodeMetadataService = dataNodeMetadataService;
     }
 
-    public JobTriggerDto start(String triggeredBy, boolean force) {
+    public JobTriggerDto start(String triggeredBy, String authToken, boolean force) {
         // Cluster-wide lock around the find-active + create sequence so two concurrent /restart calls
         // (different Graylog nodes or the same node) cannot both pass preflight and insert duplicate triggers.
         final Lock lock = lockService.lock(START_LOCK_RESOURCE)
                 .orElseThrow(() -> new IllegalStateException(
                         "Another rolling restart is being started right now — please retry shortly."));
         try {
-            final List<String> failures = checkPreconditions(force);
+            final List<String> failures = checkPreconditions(force, authToken);
             if (!failures.isEmpty()) {
                 throw new RollingRestartPreconditionsException(failures);
             }
@@ -92,8 +96,16 @@ public class RollingRestartJobHandler {
                     .highestAvailableVersion()
                     .orElseThrow(() -> new IllegalStateException("There is no available opensearch version to upgrade"));
 
+            // Small clusters (1-2 DataNodes) can't shuffle shards away from the restarting node, so we pause
+            // message processing for the whole run instead of toggling replication per node.
+            final boolean pauseProcessing = nodes.size() <= MAX_SMALL_CLUSTER_NODES;
+
             final RollingRestartExecutionJob.Data data = RollingRestartExecutionJob.Data.builder()
-                    .smState(RollingRestartState.PREPARING_CLUSTER)
+                    .smState(pauseProcessing
+                            ? RollingRestartState.PAUSING_PROCESSING
+                            : RollingRestartState.PREPARING_CLUSTER)
+                    .pauseProcessing(pauseProcessing)
+                    .authToken(pauseProcessing ? authToken : null)
                     .nodes(nodes)
                     .triggeredBy(triggeredBy)
                     .waitingGreenSince(Instant.now())
@@ -203,14 +215,19 @@ public class RollingRestartJobHandler {
         return updated;
     }
 
-    private List<String> checkPreconditions(boolean force) {
+    private List<String> checkPreconditions(boolean force, String authToken) {
         final List<String> failures = new ArrayList<>();
         if (findActive().isPresent()) {
             failures.add("Another rolling restart job is already active");
         }
         final List<DataNodeDto> dataNodes = actions.liveDataNodes();
-        if (dataNodes.size() < MIN_DATANODES) {
-            failures.add("Need at least " + MIN_DATANODES + " DataNodes for safe rolling restart (found " + dataNodes.size() + ")");
+        if (dataNodes.isEmpty()) {
+            failures.add("No active DataNodes found");
+        } else if (dataNodes.size() <= MAX_SMALL_CLUSTER_NODES && (authToken == null || authToken.isBlank())) {
+            // The small-cluster path pauses message processing across all Graylog nodes, which needs a
+            // forwardable auth token from the triggering request.
+            failures.add("A rolling restart of a " + dataNodes.size()
+                    + "-node cluster pauses message processing and must be triggered from an authenticated request");
         }
         try {
             final ClusterState state = actions.getClusterState();

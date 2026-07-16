@@ -26,6 +26,9 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
+import org.graylog2.system.processing.control.ClusterProcessingControl;
+import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
+import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -43,14 +46,17 @@ public class RollingRestartActions {
     private final DatanodeClusterAdminAdapter clusterAdmin;
     private final DatanodeRestApiProxy datanodeProxy;
     private final NodeService<DataNodeDto> nodeService;
+    private final ClusterProcessingControlFactory clusterProcessingControlFactory;
 
     @Inject
     public RollingRestartActions(DatanodeClusterAdminAdapter clusterAdmin,
                                  DatanodeRestApiProxy datanodeProxy,
-                                 NodeService<DataNodeDto> nodeService) {
+                                 NodeService<DataNodeDto> nodeService,
+                                 ClusterProcessingControlFactory clusterProcessingControlFactory) {
         this.clusterAdmin = clusterAdmin;
         this.datanodeProxy = datanodeProxy;
         this.nodeService = nodeService;
+        this.clusterProcessingControlFactory = clusterProcessingControlFactory;
     }
 
     public void prepareCluster() {
@@ -61,6 +67,27 @@ public class RollingRestartActions {
     public void enableAllocation() {
         LOG.info("Re-enabling shard allocation");
         clusterAdmin.enableShardReplication();
+    }
+
+    /**
+     * Pauses message processing on all Graylog server nodes and waits for their output buffers to drain, so that
+     * no in-flight messages are lost while a DataNode's OpenSearch process is restarted. Used for small clusters
+     * (1-2 DataNodes) that have no shard redundancy to fall back on.
+     */
+    public void pauseProcessing(String authToken) {
+        final ClusterProcessingControl<RemoteProcessingControlResource> control =
+                clusterProcessingControlFactory.create(authToken);
+        LOG.info("Pausing message processing on all Graylog nodes for rolling restart");
+        control.pauseProcessing();
+        LOG.info("Waiting for output buffers to drain on all Graylog nodes");
+        control.waitForEmptyBuffers();
+        LOG.info("Message processing paused and output buffers drained");
+    }
+
+    public void resumeProcessing(String authToken) {
+        final ClusterProcessingControl<RemoteProcessingControlResource> control =
+                clusterProcessingControlFactory.create(authToken);
+        control.resumeGraylogMessageProcessing();
     }
 
     public void upgradeNode(String hostname) {

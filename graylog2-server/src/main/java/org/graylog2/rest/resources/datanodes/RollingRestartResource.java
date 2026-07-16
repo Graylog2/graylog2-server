@@ -28,6 +28,8 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
@@ -37,6 +39,7 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.datanode.restart.RollingRestartJobHandler;
 import org.graylog2.datanode.restart.RollingRestartPreconditionsException;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -64,10 +67,11 @@ public class RollingRestartResource extends RestResource {
     @Operation(summary = "Trigger rolling restart of embedded OpenSearch")
     @RequiresPermissions(RestPermissions.DATANODE_RESTART)
     @AuditEvent(type = DATANODE_TRIGGER_RESTART)
-    public Response start(@RequestBody(required = false) StartRequest request) {
+    public Response start(@Context HttpHeaders httpHeaders, @RequestBody(required = false) StartRequest request) {
         try {
             final String triggeredBy = String.valueOf(SecurityUtils.getSubject().getPrincipal());
-            final JobTriggerDto trigger = handler.start(triggeredBy, request != null && request.force());
+            final String authToken = ProxiedResource.authenticationToken(httpHeaders);
+            final JobTriggerDto trigger = handler.start(triggeredBy, authToken, request != null && request.force());
             return Response.status(Response.Status.CREATED).entity(trigger).build();
         } catch (RollingRestartPreconditionsException e) {
             return Response.status(Response.Status.BAD_REQUEST)
