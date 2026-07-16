@@ -40,6 +40,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
@@ -67,7 +68,7 @@ class ReindexOutdatedIndexJobHandlerTest {
     void setUp() {
         handler = new ReindexOutdatedIndexJobHandler(jobDefinitionService, jobTriggerService, clock, lockService);
         // Default: lock acquisition succeeds; the contention test overrides this.
-        lenient().when(lockService.lock(anyString())).thenReturn(Optional.of(lock));
+        lenient().when(lockService.lock(anyString(), anyInt())).thenReturn(Optional.of(lock));
         lenient().when(clock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
     }
 
