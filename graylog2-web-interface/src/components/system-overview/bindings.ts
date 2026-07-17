@@ -14,29 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type HealthStatus = 'healthy' | 'warning' | 'critical' | 'unknown';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-type HealthNodeBase = {
-  id: string;
-  title: string;
-  status: HealthStatus;
-  total_affected?: number;
-  total?: number;
-  message?: string;
+import NotificationsNavTab from 'components/notifications/NotificationsNavTab';
+import Routes from 'routing/Routes';
+
+export const PAGE_NAV_TITLE = 'System';
+
+const bindings: PluginExports = {
+  pageNavigation: [
+    {
+      description: PAGE_NAV_TITLE,
+      children: [
+        { description: 'Overview', path: Routes.SYSTEM.OVERVIEW },
+        {
+          description: 'Notifications',
+          path: Routes.SYSTEM.NOTIFICATIONS,
+          permissions: 'notifications:read',
+          BadgeComponent: NotificationsNavTab,
+        },
+      ],
+    },
+  ],
 };
 
-export type HealthCheck = HealthNodeBase;
-
-export type HealthFeature = HealthNodeBase & {
-  children: HealthNode[];
-};
-
-export type HealthNode = HealthFeature | HealthCheck;
-
-export type HealthReport = {
-  overall_status: HealthStatus;
-  generated_at: string;
-  features: HealthFeature[];
-};
-
-export const isHealthFeature = (node: HealthNode): node is HealthFeature => 'children' in node;
+export default bindings;
