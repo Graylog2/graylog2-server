@@ -36,6 +36,17 @@ message's accounted size, regardless of whether the restore counted against the 
 This field is informational and is not used to compute license usage, so your license consumption is
 unaffected by the change.
 
+### Slack and Microsoft Teams Notifications Now Enforce URL Allowlist
+
+Slack and Microsoft Teams notification webhook URLs are now validated against the URL allowlist, matching
+the behavior of HTTP notifications. Existing notifications with webhook URLs that are not in the allowlist
+will fail after upgrading.
+
+To avoid disruption, either add the webhook URLs to the URL allowlist
+(`System > Configurations > URL Allowlist`) before upgrading, or edit each affected notification after
+upgrading — the configuration form will display a warning with an "Add to URL allowlist" button that
+adds the URL in one step.
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"
