@@ -17,6 +17,7 @@
 
 package org.graylog2.indexer.indices;
 
+import com.google.common.eventbus.EventBus;
 import org.assertj.core.api.Assertions;
 import org.bson.conversions.Bson;
 import org.graylog2.indexer.cluster.Cluster;
@@ -65,6 +66,9 @@ class OutdatedIndexServiceTest {
 
     @Mock
     IndexRangeService indexRangeService;
+
+    @Mock
+    EventBus eventBus;
 
     @InjectMocks
     OutdatedIndexService outdatedIndexService;

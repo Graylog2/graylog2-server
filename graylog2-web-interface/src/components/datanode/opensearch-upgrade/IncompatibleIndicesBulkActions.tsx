@@ -16,6 +16,8 @@
  */
 import React, { useMemo, useState } from 'react';
 
+import { SystemIndexerIndices } from '@graylog/server-api';
+
 import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
@@ -30,7 +32,7 @@ import {
   getBulkIndexActionNotification,
   runBulkIndexAction,
 } from './bulkIndexActions';
-import type { BulkIndexActionCandidate } from './bulkIndexActions';
+import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
 import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
 
@@ -40,6 +42,54 @@ type Props = {
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
   archivedIndexNames: ReadonlySet<string>;
   refetch: () => void;
+};
+
+const showNotification = ({ type, message, title }: BulkIndexActionNotification) => {
+  if (type === 'success') {
+    UserNotification.success(message);
+  } else if (type === 'warning') {
+    UserNotification.warning(message, title);
+  } else {
+    UserNotification.error(message, title);
+  }
+};
+
+// Deletes are handled by a single server-side bulk endpoint. Returns the names of the indices that were deleted.
+const bulkDeleteIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
+  const entityIds = bulkAction.targetIndices.map((index) => index.index_name);
+  const { failures } = await SystemIndexerIndices.bulkDeleteOutdated({ entity_ids: entityIds });
+  const failedIds = (failures ?? []).map(({ entity_id }) => entity_id);
+  const succeeded = entityIds.length - failedIds.length;
+
+  if (failedIds.length === 0) {
+    showNotification({ type: 'success', message: `${succeeded} ${succeeded === 1 ? 'index was' : 'indices were'} deleted.` });
+  } else {
+    const details = (failures ?? [])
+      .slice(0, 3)
+      .map(({ entity_id, failure_explanation }) => `${entity_id}: ${failure_explanation}`)
+      .join('\n');
+    const more = failedIds.length > 3 ? `\n...and ${failedIds.length - 3} more.` : '';
+    const message =
+      succeeded > 0
+        ? `${succeeded} succeeded, ${failedIds.length} failed.\n${details}${more}`
+        : `${failedIds.length} ${failedIds.length === 1 ? 'index' : 'indices'} failed.\n${details}${more}`;
+
+    showNotification(
+      succeeded > 0
+        ? { type: 'warning', message, title: 'Some indices could not be deleted' }
+        : { type: 'error', message, title: 'Could not delete indices' },
+    );
+  }
+
+  return entityIds.filter((id) => !failedIds.includes(id));
+};
+
+// Reindex has no bulk endpoint, so it runs client-side. Returns the names of the indices that were reindexed.
+const bulkReindexIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
+  const result = await runBulkIndexAction({ action: bulkAction.action, indices: bulkAction.targetIndices });
+  showNotification(getBulkIndexActionNotification(bulkAction, result));
+
+  return result.successes.map(({ index }) => index.index_name);
 };
 
 const IncompatibleIndicesBulkActions = ({
@@ -77,23 +127,12 @@ const IncompatibleIndicesBulkActions = ({
     setIsSubmitting(true);
 
     try {
-      const result = await runBulkIndexAction({
-        action: confirmedBulkAction.action,
-        indices: confirmedBulkAction.targetIndices,
-      });
+      const succeededIds =
+        confirmedBulkAction.action === 'delete'
+          ? await bulkDeleteIndices(confirmedBulkAction)
+          : await bulkReindexIndices(confirmedBulkAction);
 
-      const notification = getBulkIndexActionNotification(confirmedBulkAction, result);
-
-      if (notification.type === 'success') {
-        UserNotification.success(notification.message);
-      } else if (notification.type === 'warning') {
-        UserNotification.warning(notification.message, notification.title);
-      } else {
-        UserNotification.error(notification.message, notification.title);
-      }
-
-      const succeededIds = new Set(result.successes.map(({ index }) => index.index_name));
-      setSelectedEntities(selectedEntities.filter((id) => !succeededIds.has(id)));
+      setSelectedEntities(selectedEntities.filter((id) => !succeededIds.includes(id)));
       refetch();
       setConfirmedBulkAction(undefined);
     } finally {

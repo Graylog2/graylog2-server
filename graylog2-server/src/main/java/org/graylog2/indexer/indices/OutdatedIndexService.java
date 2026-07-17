@@ -19,12 +19,14 @@ package org.graylog2.indexer.indices;
 
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.security.IndexerAdminCert;
@@ -51,14 +53,16 @@ public class OutdatedIndexService {
     private final IndicesAdapter indicesAdapter;
     private final IndexSetRegistry indexSetRegistry;
     private final IndexRangeService indexRangeService;
+    private final EventBus eventBus;
     private final Cluster cluster;
 
     @Inject
     public OutdatedIndexService(@IndexerAdminCert IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry,
-                                IndexRangeService indexRangeService, Cluster cluster) {
+                                IndexRangeService indexRangeService, EventBus eventBus, Cluster cluster) {
         this.indicesAdapter = indicesAdapter;
         this.indexSetRegistry = indexSetRegistry;
         this.indexRangeService = indexRangeService;
+        this.eventBus = eventBus;
         this.cluster = cluster;
     }
 
@@ -183,5 +187,7 @@ public class OutdatedIndexService {
 
     public void delete(@NotNull String index) {
         indicesAdapter.delete(index);
+        // Mirror Indices#delete so listeners clean up index ranges and cached field types for managed indices.
+        eventBus.post(IndicesDeletedEvent.create(index));
     }
 }
