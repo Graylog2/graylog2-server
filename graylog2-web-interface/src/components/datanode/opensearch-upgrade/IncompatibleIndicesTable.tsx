@@ -44,7 +44,7 @@ const TABLE_LAYOUT = {
   entityTableId: 'incompatible_indices',
   defaultSort: { attributeId: 'index_name', direction: 'asc' as const },
   defaultDisplayedAttributes: DEFAULT_DISPLAYED_COLUMNS,
-  defaultPageSize: 20,
+  defaultPageSize: 10,
   defaultColumnOrder: ['index_name', 'category', 'version', 'begin', 'end'],
 };
 
@@ -70,7 +70,6 @@ const IncompatibleIndicesTable = () => {
       canArchive,
     });
 
-  // Suppress archive actions while an archive job runs — the backend archive job is single-concurrency.
   const archiveActionsAvailable = canArchive && !isArchiveJobRunning;
 
   const handleDataLoaded = useCallback((data: IncompatibleIndicesResponse) => {
@@ -102,7 +101,14 @@ const IncompatibleIndicesTable = () => {
         />
       );
     },
-    [pendingIndexStatuses, archivedIndexNames, archiveActionsAvailable, addArchiveDeleteAction, refetchClusterJobs, refetch],
+    [
+      pendingIndexStatuses,
+      archivedIndexNames,
+      archiveActionsAvailable,
+      addArchiveDeleteAction,
+      refetchClusterJobs,
+      refetch,
+    ],
   );
 
   const bulkSelection = useMemo(

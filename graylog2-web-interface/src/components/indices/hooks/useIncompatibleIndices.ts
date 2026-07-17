@@ -24,11 +24,8 @@ export type IncompatibleIndex = {
   warm_index: boolean;
   managed_index: boolean;
   system_index: boolean;
-  /** Id of the index set this index is the active write index of, `null` for all other indices. */
   active_write_index: string | null;
-  /** Start of the message time range stored in the index, `null` when unknown / not calculated. */
   begin?: string | null;
-  /** End of the message time range stored in the index, `null` when unknown / not calculated. */
   end?: string | null;
 };
 
@@ -42,7 +39,6 @@ const useIncompatibleIndices = () => {
     refetch,
   } = useQuery({
     queryKey: ['incompatibleIndices'],
-    // No error toast: the panels render a persistent error state, and background retries would spam toasts.
     queryFn: () => SystemIndexerIndices.getOutdatedIndices() as Promise<Array<IncompatibleIndex>>,
     retry: 2,
     refetchInterval: (query) => (query.state.status === 'error' ? ERROR_REFETCH_INTERVAL_MS : false),

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-
 import type { ColorVariant } from '@graylog/sawmill';
 
 import { Label } from 'components/bootstrap';
@@ -30,7 +29,6 @@ export const DEFAULT_DISPLAYED_COLUMNS = ['index_name', 'category', 'version', '
 
 type Badge = { text: string; style: ColorVariant };
 
-// The primary, mutually exclusive classification; matches the backend `category` field precedence.
 const primaryTypeBadge = (index: IncompatibleIndex): Badge => {
   if (index.system_index) {
     return { text: 'System', style: 'info' };
@@ -75,7 +73,11 @@ export const createColumnRenderers = (
     index_name: {
       minWidth: 300,
       renderCell: (_value, index) => {
-        const isArchived = isIndexArchived(index.index_name, pendingIndexStatuses.get(index.index_name), archivedIndexNames);
+        const isArchived = isIndexArchived(
+          index.index_name,
+          pendingIndexStatuses.get(index.index_name),
+          archivedIndexNames,
+        );
 
         return (
           <span>

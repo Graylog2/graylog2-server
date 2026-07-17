@@ -97,7 +97,9 @@ export const CORE_ACTION_DEFINITIONS: Record<Exclude<IndexAction, 'archive-delet
           <strong>{index.index_name}</strong> is the active write index of its index set and still receives new
           messages. Rotating starts a new write index on the current OpenSearch version.
         </p>
-        <p>Afterwards, <strong>{index.index_name}</strong> can be archived or deleted.</p>
+        <p>
+          Afterwards, <strong>{index.index_name}</strong> can be archived or deleted.
+        </p>
       </div>
     ),
     run: rotateWriteIndex,
@@ -118,7 +120,9 @@ const archiveDeleteDefinition = (archive: IndexArchiveBinding | undefined): Acti
     </p>
   ),
   run: (index) =>
-    archive ? archive.archiveAndDeleteIndex(index.index_name) : Promise.reject(new Error('Archiving is not available.')),
+    archive
+      ? archive.archiveAndDeleteIndex(index.index_name)
+      : Promise.reject(new Error('Archiving is not available.')),
   successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
   telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
   getPendingArchiveTracking: (index, response) => ({

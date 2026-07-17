@@ -20,7 +20,6 @@ import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQue
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 
-// Entity tables require an `id` on every row; the index name is a stable natural key.
 export type IncompatibleIndexRow = IncompatibleIndex & { id: string };
 
 export type IncompatibleIndicesResponse = {
@@ -35,16 +34,14 @@ type ListOutdatedIndicesSort = Parameters<typeof SystemIndexerIndices.listOutdat
 type ListOutdatedIndicesOrder = Parameters<typeof SystemIndexerIndices.listOutdatedIndices>[4];
 
 export const fetchIncompatibleIndices = (searchParams: SearchParams): Promise<IncompatibleIndicesResponse> => {
-  // This endpoint is backed by an in-memory Lucene search that only understands the `query` string
-  // (there is no separate `filters` param), so fold the active filter chips into the query.
-  const query = [searchParams.query, ...FiltersForQueryParams(searchParams.filters)].filter(Boolean).join(' ');
+  const query = [searchParams.query, ...(FiltersForQueryParams(searchParams.filters) ?? [])].filter(Boolean).join(' ');
   const sort = (searchParams.sort?.attributeId ?? 'index_name') as ListOutdatedIndicesSort;
   const order = (searchParams.sort?.direction ?? 'asc') as ListOutdatedIndicesOrder;
 
   return SystemIndexerIndices.listOutdatedIndices(sort, searchParams.page, searchParams.pageSize, query, order).then(
-    ({ elements, attributes, total }) => ({
+    ({ elements, attributes, pagination }) => ({
       list: elements.map((element) => ({ ...element, id: element.index_name })) as Array<IncompatibleIndexRow>,
-      pagination: { total },
+      pagination: { total: pagination.total },
       attributes,
     }),
   );

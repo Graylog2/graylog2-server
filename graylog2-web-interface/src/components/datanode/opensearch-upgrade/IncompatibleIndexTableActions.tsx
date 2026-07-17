@@ -57,7 +57,7 @@ const IncompatibleIndexTableActions = ({
   pendingStatus,
   isArchived,
   addArchiveDeleteAction,
-  refetchClusterJobs,
+  refetchClusterJobs = undefined,
   refetch,
 }: Props) => {
   const actionDefinitions = useIncompatibleIndexActionDefinitions();
@@ -67,7 +67,6 @@ const IncompatibleIndexTableActions = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (pendingStatus?.state === 'archiving') {
-    // No empty 0% bar flash for jobs that finish almost instantly.
     return pendingStatus.percent > 0 ? (
       <ArchiveProgressBar
         bars={[

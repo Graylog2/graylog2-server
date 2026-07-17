@@ -22,16 +22,13 @@ import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
 
 import { TELEMETRY_DEFAULTS } from './telemetry';
 import BulkIndexActionConfirmDialog from './BulkIndexActionConfirmDialog';
 import { CORE_ACTION_DEFINITIONS } from './incompatibleIndexActions';
-import {
-  getBulkIndexActionCandidates,
-  getBulkIndexActionNotification,
-  runBulkIndexAction,
-} from './bulkIndexActions';
+import { getBulkIndexActionCandidates, getBulkIndexActionNotification, runBulkIndexAction } from './bulkIndexActions';
 import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
 import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
@@ -54,7 +51,6 @@ const showNotification = ({ type, message, title }: BulkIndexActionNotification)
   }
 };
 
-// Deletes are handled by a single server-side bulk endpoint. Returns the names of the indices that were deleted.
 const bulkDeleteIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
   const entityIds = bulkAction.targetIndices.map((index) => index.index_name);
   const { failures } = await SystemIndexerIndices.bulkDeleteOutdated({ entity_ids: entityIds });
@@ -62,7 +58,10 @@ const bulkDeleteIndices = async (bulkAction: BulkIndexActionCandidate): Promise<
   const succeeded = entityIds.length - failedIds.length;
 
   if (failedIds.length === 0) {
-    showNotification({ type: 'success', message: `${succeeded} ${succeeded === 1 ? 'index was' : 'indices were'} deleted.` });
+    showNotification({
+      type: 'success',
+      message: `${succeeded} ${succeeded === 1 ? 'index was' : 'indices were'} deleted.`,
+    });
   } else {
     const details = (failures ?? [])
       .slice(0, 3)
@@ -84,7 +83,6 @@ const bulkDeleteIndices = async (bulkAction: BulkIndexActionCandidate): Promise<
   return entityIds.filter((id) => !failedIds.includes(id));
 };
 
-// Reindex has no bulk endpoint, so it runs client-side. Returns the names of the indices that were reindexed.
 const bulkReindexIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
   const result = await runBulkIndexAction({ action: bulkAction.action, indices: bulkAction.targetIndices });
   showNotification(getBulkIndexActionNotification(bulkAction, result));
@@ -110,9 +108,16 @@ const IncompatibleIndicesBulkActions = ({
   );
 
   const candidates = useMemo(
-    () => getBulkIndexActionCandidates({ indices: selectedIndices, canArchive, pendingIndexStatuses, archivedIndexNames }),
+    () =>
+      getBulkIndexActionCandidates({ indices: selectedIndices, canArchive, pendingIndexStatuses, archivedIndexNames }),
     [selectedIndices, canArchive, pendingIndexStatuses, archivedIndexNames],
   );
+
+  const handleCancel = () => {
+    if (!isSubmitting) {
+      setConfirmedBulkAction(undefined);
+    }
+  };
 
   const handleConfirm = async () => {
     if (!confirmedBulkAction || isSubmitting) {
@@ -135,6 +140,11 @@ const IncompatibleIndicesBulkActions = ({
       setSelectedEntities(selectedEntities.filter((id) => !succeededIds.includes(id)));
       refetch();
       setConfirmedBulkAction(undefined);
+    } catch (errorThrown) {
+      UserNotification.error(
+        extractErrorMessage(errorThrown),
+        `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -153,7 +163,7 @@ const IncompatibleIndicesBulkActions = ({
         <BulkIndexActionConfirmDialog
           bulkAction={confirmedBulkAction}
           isSubmitting={isSubmitting}
-          onCancel={() => setConfirmedBulkAction(undefined)}
+          onCancel={handleCancel}
           onConfirm={handleConfirm}
         />
       )}

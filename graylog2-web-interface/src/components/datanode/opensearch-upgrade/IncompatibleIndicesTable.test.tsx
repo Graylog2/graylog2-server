@@ -17,9 +17,12 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import { SystemIndexerIndices } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
+import type { SearchParams } from 'stores/PaginationTypes';
 
 import IncompatibleIndicesTable from './IncompatibleIndicesTable';
 import { createColumnRenderers } from './IncompatibleIndicesColumnRenderers';
@@ -34,6 +37,9 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
 
+jest.mock('@graylog/server-api', () => ({
+  SystemIndexerIndices: { listOutdatedIndices: jest.fn() },
+}));
 jest.mock('components/indices/hooks/useCanArchive');
 jest.mock('./hooks/useArchivedIndexNames');
 jest.mock('./hooks/usePendingIncompatibleIndexActions');
@@ -50,6 +56,14 @@ const makeIndex = (overrides: Partial<IncompatibleIndexRow>): IncompatibleIndexR
   end: null,
   ...overrides,
 });
+
+const searchParams: SearchParams = {
+  page: 2,
+  pageSize: 20,
+  query: '',
+  sort: { attributeId: 'index_name', direction: 'asc' },
+  filters: undefined,
+};
 
 describe('IncompatibleIndicesTable', () => {
   beforeEach(() => {
@@ -73,7 +87,10 @@ describe('IncompatibleIndicesTable', () => {
     expect(screen.getByText('Paginated incompatible indices')).toBeInTheDocument();
     expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1);
 
-    const callProps = mockPaginatedEntityTable.mock.calls[0][0] as PaginatedEntityTableProps<IncompatibleIndexRow, unknown>;
+    const callProps = mockPaginatedEntityTable.mock.calls[0][0] as PaginatedEntityTableProps<
+      IncompatibleIndexRow,
+      unknown
+    >;
     expect(callProps.fetchEntities).toBe(fetchIncompatibleIndices);
     expect(callProps.keyFn).toBe(incompatibleIndicesKeyFn);
     expect(callProps.entityAttributesAreCamelCase).toBe(false);
@@ -81,6 +98,33 @@ describe('IncompatibleIndicesTable', () => {
     expect(typeof callProps.entityActions).toBe('function');
     expect(callProps.bulkSelection.actions).toBeTruthy();
     expect(callProps.columnRenderers.attributes).toHaveProperty('index_name');
+  });
+});
+
+describe('fetchIncompatibleIndices', () => {
+  it('maps the nested pagination total and adds the entity id', async () => {
+    const index = {
+      index_name: 'legacy-index',
+      version: '7.10.2',
+      warm_index: false,
+      managed_index: false,
+      system_index: false,
+      active_write_index: null,
+      begin: null,
+      end: null,
+    };
+    const listOutdatedIndices = asMock(SystemIndexerIndices.listOutdatedIndices).mockResolvedValue({
+      elements: [index],
+      attributes: [],
+      pagination: { total: 42 },
+      total: 0,
+    } as never);
+
+    const result = await fetchIncompatibleIndices(searchParams);
+
+    expect(listOutdatedIndices).toHaveBeenCalledWith('index_name', 2, 20, '', 'asc');
+    expect(result.list).toEqual([{ ...index, id: 'legacy-index' }]);
+    expect(result.pagination).toEqual({ total: 42 });
   });
 });
 
