@@ -98,7 +98,7 @@ class ReindexOutdatedIndexJobHandlerTest {
 
     @Test
     void start_failsWhenLockNotAcquired() {
-        when(lockService.lock(ReindexOutdatedIndexJobHandler.START_LOCK_PREFIX + ".idx")).thenReturn(Optional.empty());
+        when(lockService.lock(ReindexOutdatedIndexJobHandler.START_LOCK_PREFIX + ".idx", 1)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> handler.start(".idx", true, "alice"))
                 .isInstanceOf(IllegalStateException.class)
