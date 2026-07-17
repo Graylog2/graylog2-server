@@ -84,7 +84,7 @@ const ScrollContainer = styled.div<{
 
     ${Object.entries($columnWidths).map(([id, width]) => cssVariable(columnWidthVar(id), `${width}px`))}
     ${Object.entries($columnTransform).map(([id, transform]) => cssVariable(columnTransformVar(id), transform))}
-    ${$actionsHeaderWidth ? cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`) : ''}
+    ${$actionsHeaderWidth ? cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth - 1}px`) : ''}
     ${$canScrollRight ? cssVariable(displayScrollRightIndicatorVar, 'block') : ''}
     ${$scrollContainerWidth ? cssVariable(scrollContainerWidthVar, `${$scrollContainerWidth}px`) : ''}
     ${$activeColId

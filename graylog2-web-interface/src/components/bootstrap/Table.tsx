@@ -41,6 +41,7 @@ type Props = React.PropsWithChildren<{
   hover?: boolean;
   condensed?: boolean;
   bordered?: boolean;
+  columnBorders?: boolean;
   responsive?: boolean;
 }>;
 
@@ -49,10 +50,11 @@ type StyledProps = {
   $hover?: boolean;
   $condensed?: boolean;
   $bordered?: boolean;
+  $columnBorders?: boolean;
 };
 
 const StyledTable = styled(MantineTable)<StyledProps>(
-  ({ theme, $striped, $hover, $condensed, $bordered }) => css`
+  ({ theme, $striped, $hover, $condensed, $bordered, $columnBorders }) => css`
     --table-border-color: ${theme.colors.table.row.divider};
     font-size: inherit;
     line-height: inherit;
@@ -70,6 +72,14 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       ${$bordered &&
       css`
         border: 1px solid ${theme.colors.table.row.divider};
+      `}
+      ${$columnBorders &&
+      css`
+        border-right: 1px solid ${theme.colors.table.row.divider};
+
+        &:last-child {
+          border-right: none;
+        }
       `}
     }
 
@@ -148,6 +158,7 @@ const Table = ({
   hover = true,
   condensed = undefined,
   bordered = undefined,
+  columnBorders = undefined,
   responsive = undefined,
 }: Props) => {
   const table = (
@@ -157,7 +168,8 @@ const Table = ({
       $striped={striped}
       $hover={hover}
       $condensed={condensed}
-      $bordered={bordered}>
+      $bordered={bordered}
+      $columnBorders={columnBorders}>
       {children}
     </StyledTable>
   );
