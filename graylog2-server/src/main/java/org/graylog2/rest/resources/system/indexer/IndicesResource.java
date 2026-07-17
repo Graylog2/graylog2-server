@@ -355,6 +355,40 @@ public class IndicesResource extends RestResource {
         }
     }
 
+    @POST
+    @Path("/outdated/bulkreindex")
+    @Operation(summary = "Bulk reindexes the given indices to make them compatible with the next major version of OpenSearch")
+    @RequiresPermissions(RestPermissions.INDICES_REINDEX)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
+    public Response bulkReindex(@Parameter(name = "indices", required = true) BulkReindexRequest bulkRequest) {
+        final List<OutdatedIndex> allOutdatedIndices = getOutdatedIndices();
+        final Set<String> outdatedIndexNames = allOutdatedIndices.stream()
+                .filter(OutdatedIndex::isSystemIndex)
+                .map(OutdatedIndex::indexName)
+                .collect(Collectors.toSet());
+        final List<String> unknownIndices = bulkRequest.indices().stream()
+                .filter(i -> !outdatedIndexNames.contains(i))
+                .toList();
+        if (!unknownIndices.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", "The following indices were not found or are no system indices: " + unknownIndices))
+                    .build();
+        }
+        final String triggeredBy = String.valueOf(SecurityUtils.getSubject().getPrincipal());
+        final List<JobTriggerDto> triggers = new LinkedList<>();
+        for (String indexName : bulkRequest.indices()) {
+            try {
+                triggers.add(reindexOutdatedIndexJobHandler.start(indexName, bulkRequest.withReplication(), triggeredBy));
+            } catch (IllegalStateException e) {
+                return Response.status(Response.Status.CONFLICT)
+                        .entity(Map.of("error", e.getMessage()))
+                        .build();
+            }
+        }
+        return Response.status(Response.Status.CREATED).entity(triggers).build();
+    }
+
     @DELETE
     @Path("/outdated/{index}")
     @Operation(summary = "Deletes an outdated, non-Graylog managed index")
