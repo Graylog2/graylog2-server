@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useRef } from 'react';
-import styled, { css } from 'styled-components';
 
-import { Row, Col, Button, Table, Label, SegmentedControl, Alert, Modal } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
+import { Row, Col, Button, Alert, Modal } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner, Title } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, {
   getNodeToUpgrade,
@@ -29,60 +28,15 @@ import useDataNodeUpgradeStatus, {
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
-import HelpPopoverButton from 'components/common/HelpPopoverButton';
-
-const ServerVersion = styled.dl(
-  ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
-  `,
-);
-
-const StyledHorizontalDl = styled.dl(
-  ({ theme }) => css`
-    margin: ${theme.spacings.md} 0;
-
-    > dt {
-      clear: left;
-      float: left;
-      margin-bottom: ${theme.spacings.sm};
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      width: 160px;
-    }
-
-    > *:not(dt) {
-      margin-bottom: ${theme.spacings.sm};
-      margin-left: 140px;
-    }
-  `,
-);
-
-const ShardReplicationContainer = styled.div`
-  display: flex;
-  height: 20px;
-  align-items: center;
-`;
-
-type DataNodeUpgradeMethodType = 'cluster-restart' | 'rolling-upgrade';
-
-const UpgradeMethodSegments: Array<{ value: DataNodeUpgradeMethodType; label: string }> = [
-  { value: 'cluster-restart', label: 'Cluster Restart' },
-  { value: 'rolling-upgrade', label: 'Rolling Upgrade' },
-];
-
-const getClusterHealthStyle = (status: string) => {
-  switch (status) {
-    case 'GREEN':
-      return 'success';
-    case 'YELLOW':
-      return 'warning';
-    case 'RED':
-      return 'danger';
-    default:
-      return 'info';
-  }
-};
+import OpenSearchUpgradeSection from 'components/datanode/opensearch-upgrade/OpenSearchUpgradeSection';
+import useOpenSearchClusterStats from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchClusterStats';
+import useOpenSearchUpgradeStatus from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchUpgradeStatus';
+import DataNodeUpgradeNodes from 'components/datanode/data-node-upgrade/DataNodeUpgradeNodes';
+import UpgradeMethodSelector, {
+  type DataNodeUpgradeMethodType,
+} from 'components/datanode/data-node-upgrade/UpgradeMethodSelector';
+import ClusterHealthInfo from 'components/datanode/data-node-upgrade/ClusterHealthInfo';
+import UpgradeStatusAlert from 'components/datanode/data-node-upgrade/UpgradeStatusAlert';
 
 const upgradeInstructionsDocumentationMessage = (
   <p>
@@ -92,15 +46,17 @@ const upgradeInstructionsDocumentationMessage = (
 );
 
 const DataNodeUpgradePage = () => {
-  const upgradeListRef = useRef();
+  const upgradeListRef = useRef<HTMLTableSectionElement>(null);
 
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
+  const { currentVersion: currentOpenSearchVersion, unavailableDataNodeCount } = useOpenSearchClusterStats();
+  const openSearchStatus = useOpenSearchUpgradeStatus();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
   const [openUpgradeConfirmDialog, setOpenUpgradeConfirmDialog] = useState<boolean>(false);
 
   const scrollIntoDataNodeUpgradedList = () => {
-    if (!isInitialLoading && upgradeListRef?.current) {
-      (upgradeListRef.current as HTMLTableSectionElement).scrollIntoView({ behavior: 'smooth' });
+    if (!isInitialLoading && upgradeListRef.current) {
+      upgradeListRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -134,7 +90,11 @@ const DataNodeUpgradePage = () => {
 
   const numberOfNodes = (data?.outdated_nodes?.length || 0) + (data?.up_to_date_nodes?.length || 0);
 
-  const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && (!!nodeInProgress || numberOfNodes > 2);
+  const isRollingUpgradePossible = numberOfNodes >= 3;
+  const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && (!!nodeInProgress || isRollingUpgradePossible);
+  const areAllDataNodesUpToDate = !data?.outdated_nodes?.length && (data?.up_to_date_nodes?.length ?? 0) > 0;
+  const showOpenSearchUpgradeSection =
+    areAllDataNodesUpToDate && ['outdated', 'upgrading', 'unconfirmed'].includes(openSearchStatus);
 
   return (
     <DocumentTitle title="Data Node Upgrade">
@@ -155,265 +115,62 @@ const DataNodeUpgradePage = () => {
       ) : (
         <Row className="content">
           <Col xs={12}>
-            <SegmentedControl
-              data={UpgradeMethodSegments}
-              value={upgradeMethod}
-              onChange={(value: DataNodeUpgradeMethodType) => setUpgradeMethod(value)}
+            {!areAllDataNodesUpToDate && (
+              <>
+                <Title order={1}>Select Upgrade Strategy</Title>
+                <br />
+                <UpgradeMethodSelector upgradeMethod={upgradeMethod} onChange={setUpgradeMethod} />
+                {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
+                {(data?.warnings?.length || 0) > 0 && (
+                  <Alert bsStyle="danger">
+                    {data.warnings.map((warning) => (
+                      <p key={warning}>{warning}</p>
+                    ))}
+                  </Alert>
+                )}
+              </>
+            )}
+            {showOpenSearchUpgradeSection && (
+              <>
+                <Title order={1}>Upgrade Data Node</Title>
+                <br />
+              </>
+            )}
+            <ClusterHealthInfo
+              data={data}
+              numberOfNodes={numberOfNodes}
+              showShardReplication={upgradeMethod === 'rolling-upgrade'}
             />
-            <Alert bsStyle="info">
-              {upgradeMethod === 'cluster-restart' && (
-                <>
-                  <p>
-                    When using the cluster restart method, you will upgrade all Data Nodes at once. During this time,
-                    messages will be buffered in the journal and processed as the Data Node cluster comes back online,
-                    leading to no data loss provided your journal size is configured for the message volume which is
-                    expected during the Data Node downtime.
-                  </p>
-                  <p>
-                    If you are running a Data Node cluster with less than three nodes, the cluster restart method is the
-                    only method available.
-                  </p>
-                  <p>
-                    If you are running a Data Node cluster with three or more nodes, you can choose to use the cluster
-                    restart method after consideration of your journal size and your message throughput.
-                  </p>
-                </>
-              )}
-              {upgradeMethod === 'rolling-upgrade' && (
-                <>
-                  <p>
-                    Rolling upgrades can be performed on a running Data Node cluster only with{' '}
-                    <b>three or more nodes</b>, with virtually no downtime.
-                  </p>
-                  <p>
-                    Data Nodes are individually stopped and upgraded in place. Alternatively, Data Nodes can be stopped
-                    and replaced, one at a time, by hosts running the new version. During this process you can continue
-                    to index and query data in your cluster.
-                  </p>
-                </>
-              )}
-            </Alert>
-            {!data?.outdated_nodes?.length && data?.up_to_date_nodes?.length > 0 && (
-              <Alert bsStyle="success">All your Data Nodes are Up-to-date.</Alert>
-            )}
-            {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
-            {(data?.warnings?.length || 0) > 0 && (
-              <Alert bsStyle="danger">
-                {data.warnings.map((warning) => (
-                  <p key={warning}>{warning}</p>
-                ))}
-              </Alert>
-            )}
-          </Col>
-          <Col xs={12}>
-            <h3>
-              <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
-                {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
-              </Label>
-              &nbsp;
-              <HelpPopoverButton
-                helpText={
-                  <>
-                    <p>How does my cluster change state during the rolling upgrade?</p>
-                    <p>
-                      RED - if you are using indices with no replication and upgrade the node hosting the shards of
-                      these indices, the cluster will go to a red state and no data will be ingested into or searchable
-                      from these indices.
-                    </p>
-                    <p>
-                      YELLOW - after starting the upgrade of a node, shard allocation will be set to no replication to
-                      allow OpenSearch to use only the available shards.
-                    </p>
-                    <p>
-                      After a node has been upgraded and you click on <em>Confirm Upgrade</em>, shard replication will
-                      be re-enabled and all shards that were unavailable due to the node being upgraded will be
-                      re-allocated and the cluster will return to a GREEN state.
-                    </p>
-                  </>
-                }
+            {!areAllDataNodesUpToDate && showRollingUpgrade && (
+              <DataNodeUpgradeNodes
+                outdatedNodes={data?.outdated_nodes ?? []}
+                upToDateNodes={data?.up_to_date_nodes ?? []}
+                upgradedListRef={upgradeListRef}
+                onStartNodeUpgrade={startNodeUpgrade}
               />
-            </h3>
-            <StyledHorizontalDl>
-              <dt>Server Version:</dt>
-              <ServerVersion>
-                <b>{data?.server_version?.version || ''}</b>
-              </ServerVersion>
-              {upgradeMethod === 'rolling-upgrade' && (
-                <>
-                  <dt>Shard Replication:</dt>
-                  <dd>
-                    <ShardReplicationContainer>
-                      {data?.shard_replication_enabled ? (
-                        <Label bsStyle="success" bsSize="xs">
-                          Enabled
-                        </Label>
-                      ) : (
-                        <Label bsStyle="warning" bsSize="xs">
-                          Disabled
-                        </Label>
-                      )}
-                      &nbsp;
-                      <HelpPopoverButton
-                        helpText={
-                          <>
-                            <p>
-                              After you click on{' '}
-                              <em>
-                                <b>Start Upgrade Process</b>
-                              </em>{' '}
-                              of a node, shard allocation will be set to no replication to allow OpenSearch to use only
-                              the available shards.
-                            </p>
-                            <p>
-                              After a node has been upgraded and you click on{' '}
-                              <em>
-                                <b>Confirm Upgrade</b>
-                              </em>
-                              , shard replication will be re-enabled and all shards that were unavailable due to the
-                              node being upgraded will be re-allocated.
-                            </p>
-                            <br />
-                            <Button
-                              onClick={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
-                              bsStyle="warning"
-                              bsSize="xsmall">
-                              Force {data?.shard_replication_enabled ? 'Disabled' : 'Enabled'}
-                            </Button>
-                          </>
-                        }
-                      />
-                    </ShardReplicationContainer>
-                  </dd>
-                </>
-              )}
-              <dt>Cluster Manager:</dt>
-              <dd>{data?.cluster_state?.manager_node?.name}</dd>
-              <dt>Number of Nodes:</dt>
-              <dd>
-                {numberOfNodes} ({data?.outdated_nodes?.length || 0} outdated, {data?.up_to_date_nodes?.length || 0}{' '}
-                upgraded)
-              </dd>
-              <dt>Number of Shards:</dt>
-              <dd>
-                {data?.cluster_state?.active_shards || 0} active,&nbsp;
-                {data?.cluster_state?.initializing_shards || 0} initializing,&nbsp;
-                {data?.cluster_state?.relocating_shards || 0} relocating,&nbsp;
-                {data?.cluster_state?.unassigned_shards || 0} unassigned
-              </dd>
-            </StyledHorizontalDl>
-            <br />
-          </Col>
-          {showRollingUpgrade && (
-            <Col xs={12}>
-              <Row>
-                <Col sm={6}>
-                  <h3>Outdated Nodes</h3>
-                  <br />
-                  <Table>
-                    <tbody>
-                      {data?.outdated_nodes?.map((outdated_node) => (
-                        <tr key={outdated_node?.hostname}>
-                          <td>
-                            <div>
-                              {outdated_node?.hostname}&nbsp;
-                              <Label
-                                bsStyle={outdated_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'}
-                                bsSize="xs">
-                                {outdated_node?.data_node_status}
-                              </Label>
-                              &nbsp;
-                              {outdated_node?.manager_node && (
-                                <Label bsStyle="info" bsSize="xs">
-                                  manager
-                                </Label>
-                              )}
-                            </div>
-                            <div>
-                              <i>{outdated_node?.ip}</i>
-                            </div>
-                          </td>
-                          <td>
-                            <i>{outdated_node?.datanode_version}</i>
-                          </td>
-                          <td align="right">
-                            <Button
-                              onClick={() => startNodeUpgrade(outdated_node)}
-                              disabled={!outdated_node?.upgrade_possible}
-                              bsSize="sm"
-                              bsStyle="primary">
-                              Start Upgrade Process
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                      {!data?.outdated_nodes?.length && (
-                        <tr>
-                          <td>No outdated nodes found.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </Table>
-                </Col>
-                <Col sm={6}>
-                  <h3>Upgraded Nodes</h3>
-                  <br />
-                  <Table>
-                    <tbody ref={upgradeListRef}>
-                      {data?.up_to_date_nodes?.map((upgraded_node) => (
-                        <tr key={upgraded_node?.hostname}>
-                          <td>
-                            <div>
-                              {upgraded_node?.hostname}&nbsp;
-                              <Label
-                                bsStyle={upgraded_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'}
-                                bsSize="xs">
-                                {upgraded_node?.data_node_status}
-                              </Label>
-                              &nbsp;
-                              {upgraded_node?.manager_node && (
-                                <Label bsStyle="info" bsSize="xs">
-                                  manager
-                                </Label>
-                              )}
-                            </div>
-                            <div>
-                              <i>{upgraded_node?.ip}</i>
-                            </div>
-                          </td>
-                          <td>
-                            <i>{upgraded_node?.datanode_version}</i>
-                          </td>
-                          <td align="right">
-                            <Label bsStyle="success" bsSize="xs">
-                              Upgraded <Icon name="check" />
-                            </Label>
-                          </td>
-                        </tr>
-                      ))}
-                      {!data?.up_to_date_nodes?.length && (
-                        <tr>
-                          <td>No upgraded nodes found.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </Table>
-                </Col>
-              </Row>
-            </Col>
-          )}
-          {openUpgradeConfirmDialog && nodeInProgress && (
-            <Modal
-              show
-              backdrop={false}
-              onHide={() => setOpenUpgradeConfirmDialog(false)}
-              rootProps={{ lockScroll: false }}>
-              <Modal.Header>
-                <Modal.Title>Data Node Manual Upgrade</Modal.Title>
-              </Modal.Header>
+            )}
+            {areAllDataNodesUpToDate && (
+              <UpgradeStatusAlert
+                currentOpenSearchVersion={currentOpenSearchVersion}
+                status={openSearchStatus}
+                unavailableDataNodeCount={unavailableDataNodeCount}
+              />
+            )}
+            {showOpenSearchUpgradeSection && <OpenSearchUpgradeSection />}
+            {openUpgradeConfirmDialog && nodeInProgress && (
+              <Modal
+                show
+                backdrop={false}
+                onHide={() => setOpenUpgradeConfirmDialog(false)}
+                rootProps={{ lockScroll: false }}>
+                <Modal.Header>
+                  <Modal.Title>Data Node Manual Upgrade</Modal.Title>
+                </Modal.Header>
 
-              <Modal.Body>{manualUpgradeAlert(nodeInProgress)}</Modal.Body>
-            </Modal>
-          )}
+                <Modal.Body>{manualUpgradeAlert(nodeInProgress)}</Modal.Body>
+              </Modal>
+            )}
+          </Col>
         </Row>
       )}
     </DocumentTitle>
