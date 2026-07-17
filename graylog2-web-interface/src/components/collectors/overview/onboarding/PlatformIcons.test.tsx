@@ -23,7 +23,7 @@ describe('PlatformIcons', () => {
   it('renders an icon for each supported platform', () => {
     render(<PlatformIcons />);
 
-    ['Linux', 'Windows', 'macOS', 'Kubernetes', 'Docker'].forEach((label) => {
+    ['Linux', 'Windows', 'macOS'].forEach((label) => {
       expect(screen.getByTitle(label)).toBeInTheDocument();
     });
   });

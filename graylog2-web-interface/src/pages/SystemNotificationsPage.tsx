@@ -19,14 +19,14 @@ import * as React from 'react';
 import { DocumentTitle, IfPermitted } from 'components/common';
 import PageNavigation from 'components/common/PageNavigation';
 import { SystemNotificationsTable } from 'components/notifications';
-import SYSTEM_OVERVIEW_TABS from 'components/notifications/systemOverviewTabs';
+import { PAGE_NAV_TITLE } from 'components/system-overview/bindings';
 import { Row } from 'components/bootstrap';
 
 const SystemNotificationsPage = () => (
   <DocumentTitle title="System notifications">
     <span>
       <Row>
-        <PageNavigation items={SYSTEM_OVERVIEW_TABS} />
+        <PageNavigation page={PAGE_NAV_TITLE} />
       </Row>
       <IfPermitted permissions="notifications:read">
         <SystemNotificationsTable />

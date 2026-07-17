@@ -19,6 +19,7 @@ import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
@@ -41,6 +42,13 @@ interface PluginNavigationItems {
 interface GlobalNotification {
   key: string;
   component: React.ComponentType;
+}
+
+interface NavigationBadge {
+  key: string;
+  component: React.ComponentType;
+  // Active badges replace the built-in notification badge, so they must render the notification count themselves.
+  useCondition: () => boolean;
 }
 
 interface PluginPages {
@@ -243,6 +251,7 @@ declare module 'graylog-web-plugin/plugin' {
     clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';
     clusterconfiguration: 'read';
+    clusterhealth: 'read';
     collector_fleets: 'read';
     collectors_config: 'read';
     contentpack: 'read';
@@ -418,6 +427,7 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
@@ -448,6 +458,7 @@ declare module 'graylog-web-plugin/plugin' {
       useCondition?: () => boolean;
     }>;
     indexRetentionConfig?: Array<IndexRetentionConfig>;
+    'indices.archive'?: Array<IndexArchiveBinding>;
     inputsBadgeProviders?: Array<{
       useCondition: () => { hasIssues: boolean; title: string };
     }>;

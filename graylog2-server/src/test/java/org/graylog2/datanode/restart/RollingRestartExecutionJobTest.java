@@ -75,6 +75,7 @@ class RollingRestartExecutionJobTest {
                         RollingRestartNodeEntry.pending("node-c", "id-c")))
                 .triggeredBy("alice")
                 .waitingGreenSince(Instant.now())
+                .targetOpensearchVersion("3.5.0")
                 .build();
     }
 
@@ -121,7 +122,7 @@ class RollingRestartExecutionJobTest {
         assertThat(data.smState()).isEqualTo(RollingRestartState.UPGRADING_NODE);
         assertThat(data.currentNodeIndex()).isEqualTo(0);
         assertThat(data.nodes().get(0).hostname()).isEqualTo("node-a");
-        assertThat(data.nodes().get(0).status()).isEqualTo(RollingRestartNodeStatus.STOPPING);
+        assertThat(data.nodes().get(0).status()).isEqualTo(RollingRestartNodeStatus.RESTARTING);
     }
 
     @Test
@@ -168,40 +169,8 @@ class RollingRestartExecutionJobTest {
     }
 
     @Test
-    void stoppingNode_sendsStopAndAdvances() throws Exception {
-        final var data = baseData(RollingRestartState.STOPPING_NODE).toBuilder().currentNodeIndex(0).build();
-
-        final var update = job.execute(ctxWith(data));
-
-        verify(actions).stopNode("node-a");
-        assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.WAITING_NODE_LEFT);
-    }
-
-    @Test
-    void waitingNodeLeft_staysWhenNodeStillInCluster() throws Exception {
-        when(actions.isNodeInCluster("node-a")).thenReturn(true);
-        final var data = baseData(RollingRestartState.WAITING_NODE_LEFT).toBuilder().currentNodeIndex(0).build();
-
-        final var update = job.execute(ctxWith(data));
-
-        assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.WAITING_NODE_LEFT);
-    }
-
-    @Test
-    void waitingNodeLeft_advancesWhenNodeGone() throws Exception {
-        when(actions.isNodeInCluster("node-a")).thenReturn(false);
-        final var data = baseData(RollingRestartState.WAITING_NODE_LEFT).toBuilder().currentNodeIndex(0).build();
-
-        final var update = job.execute(ctxWith(data));
-
-        final var newData = dataOf(update);
-        assertThat(newData.smState()).isEqualTo(RollingRestartState.STARTING_NODE);
-        assertThat(newData.nodes().get(0).status()).isEqualTo(RollingRestartNodeStatus.STOPPED);
-    }
-
-    @Test
     void waitingNodeJoined_advancesWhenNodePresent() throws Exception {
-        when(actions.isNodeInCluster("node-a")).thenReturn(true);
+        when(actions.isNodeInCluster("node-a", "3.5.0")).thenReturn(true);
         final var data = baseData(RollingRestartState.WAITING_NODE_JOINED).toBuilder().currentNodeIndex(0).build();
 
         final var update = job.execute(ctxWith(data));
@@ -321,9 +290,9 @@ class RollingRestartExecutionJobTest {
     @Test
     void execute_marksFailed_andAttemptsAllocationCleanup_onActionThrow() throws Exception {
         org.mockito.Mockito.doThrow(new RuntimeException("simulated stop failure"))
-                .when(actions).stopNode(any());
+                .when(actions).upgradeNode(any());
 
-        final var data = baseData(RollingRestartState.STOPPING_NODE).toBuilder().currentNodeIndex(0).build();
+        final var data = baseData(RollingRestartState.UPGRADING_NODE).toBuilder().currentNodeIndex(0).build();
         final var update = job.execute(ctxWith(data));
 
         assertThat(dataOf(update).smState()).isEqualTo(RollingRestartState.FAILED);
