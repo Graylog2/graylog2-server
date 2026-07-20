@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { act } from 'react';
 
 import { SystemIndexerIndices } from '@graylog/server-api';
 
@@ -27,7 +28,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import IncompatibleIndicesTable from './IncompatibleIndicesTable';
 import { createColumnRenderers } from './IncompatibleIndicesColumnRenderers';
 import { fetchIncompatibleIndices, incompatibleIndicesKeyFn } from './fetchIncompatibleIndices';
-import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
+import type { IncompatibleIndexRow, IncompatibleIndicesResponse } from './fetchIncompatibleIndices';
 import useArchivedIndexNames from './hooks/useArchivedIndexNames';
 import usePendingIncompatibleIndexActions from './hooks/usePendingIncompatibleIndexActions';
 
@@ -65,6 +66,17 @@ const searchParams: SearchParams = {
   filters: undefined,
 };
 
+const makeResponse = (list: Array<IncompatibleIndexRow>): IncompatibleIndicesResponse => ({
+  list,
+  pagination: { total: list.length },
+  attributes: [],
+});
+
+const latestTableProps = (
+  mockPaginatedEntityTable: jest.Mock,
+): PaginatedEntityTableProps<IncompatibleIndexRow, unknown> =>
+  mockPaginatedEntityTable.mock.calls[mockPaginatedEntityTable.mock.calls.length - 1][0];
+
 describe('IncompatibleIndicesTable', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -98,6 +110,65 @@ describe('IncompatibleIndicesTable', () => {
     expect(typeof callProps.entityActions).toBe('function');
     expect(callProps.bulkSelection.actions).toBeTruthy();
     expect(callProps.columnRenderers.attributes).toHaveProperty('index_name');
+  });
+
+  it('retains selected index data across pages and removes deselected indices', () => {
+    const { default: PaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(PaginatedEntityTable);
+    const firstPageIndex = makeIndex({ id: 'legacy_0', index_name: 'legacy_0' });
+    const secondPageIndex = makeIndex({ id: 'legacy_1', index_name: 'legacy_1' });
+
+    render(<IncompatibleIndicesTable />);
+
+    act(() => {
+      latestTableProps(mockPaginatedEntityTable).onDataLoaded?.(makeResponse([firstPageIndex]));
+    });
+
+    act(() => {
+      latestTableProps(mockPaginatedEntityTable).bulkSelection.onChangeSelection?.(
+        [firstPageIndex.id],
+        [firstPageIndex],
+      );
+    });
+
+    act(() => {
+      latestTableProps(mockPaginatedEntityTable).onDataLoaded?.(makeResponse([secondPageIndex]));
+    });
+
+    act(() => {
+      latestTableProps(mockPaginatedEntityTable).bulkSelection.onChangeSelection?.(
+        [firstPageIndex.id, secondPageIndex.id],
+        [secondPageIndex],
+      );
+    });
+
+    const bulkActions = latestTableProps(mockPaginatedEntityTable).bulkSelection.actions as React.ReactElement<{
+      indices: Array<IncompatibleIndexRow>;
+    }>;
+
+    expect(bulkActions.props.indices.map(({ id }) => id)).toEqual(['legacy_0', 'legacy_1']);
+    expect(useArchivedIndexNames).toHaveBeenLastCalledWith(['legacy_0', 'legacy_1'], true);
+    expect(usePendingIncompatibleIndexActions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ incompatibleIndices: [firstPageIndex, secondPageIndex] }),
+    );
+
+    act(() => {
+      latestTableProps(mockPaginatedEntityTable).bulkSelection.onChangeSelection?.(
+        [secondPageIndex.id],
+        [secondPageIndex],
+      );
+    });
+
+    const actionsAfterDeselection = latestTableProps(mockPaginatedEntityTable).bulkSelection
+      .actions as React.ReactElement<{
+      indices: Array<IncompatibleIndexRow>;
+    }>;
+
+    expect(actionsAfterDeselection.props.indices).toEqual([secondPageIndex]);
+    expect(useArchivedIndexNames).toHaveBeenLastCalledWith(['legacy_1'], true);
+    expect(usePendingIncompatibleIndexActions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ incompatibleIndices: [secondPageIndex] }),
+    );
   });
 });
 

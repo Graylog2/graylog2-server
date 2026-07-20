@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
+import keyBy from 'lodash/keyBy';
+import pickBy from 'lodash/pickBy';
 
 import { PaginatedEntityTable } from 'components/common';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
@@ -52,18 +54,17 @@ const IncompatibleIndicesTable = () => {
   const queryClient = useQueryClient();
   const canArchive = useCanArchive();
   const [loadedIndices, setLoadedIndices] = useState<Array<IncompatibleIndexRow>>([]);
+  const [selectedIndicesData, setSelectedIndicesData] = useState<Record<string, IncompatibleIndexRow>>({});
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  const refetch = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: INCOMPATIBLE_INDICES_QUERY_KEY }),
-    [queryClient],
-  );
-
-  const incompatibleIndexNames = useMemo(() => loadedIndices.map((index) => index.index_name), [loadedIndices]);
+  const refetch = () => queryClient.invalidateQueries({ queryKey: INCOMPATIBLE_INDICES_QUERY_KEY });
+  const selectedIndices = Object.values(selectedIndicesData);
+  const trackedIndices = Object.values({ ...selectedIndicesData, ...keyBy(loadedIndices, 'id') });
+  const incompatibleIndexNames = trackedIndices.map((index) => index.index_name);
   const archivedIndexNames = useArchivedIndexNames(incompatibleIndexNames, canArchive);
   const { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs } =
     usePendingIncompatibleIndexActions({
-      incompatibleIndices: loadedIndices,
+      incompatibleIndices: trackedIndices,
       isLoading: !hasLoaded,
       isError: false,
       refetch,
@@ -72,59 +73,53 @@ const IncompatibleIndicesTable = () => {
 
   const archiveActionsAvailable = canArchive && !isArchiveJobRunning;
 
-  const handleDataLoaded = useCallback((data: IncompatibleIndicesResponse) => {
+  const handleDataLoaded = (data: IncompatibleIndicesResponse) => {
     setLoadedIndices(data.list);
     setHasLoaded(true);
-  }, []);
+  };
 
-  const columnRenderers = useMemo(
-    () => createColumnRenderers(pendingIndexStatuses, archivedIndexNames),
-    [pendingIndexStatuses, archivedIndexNames],
-  );
+  const columnRenderers = createColumnRenderers(pendingIndexStatuses, archivedIndexNames);
 
-  const renderActions = useCallback(
-    (index: IncompatibleIndexRow) => {
-      const pendingStatus = pendingIndexStatuses.get(index.index_name);
-      const isArchived =
-        pendingStatus?.state !== 'archiving' &&
-        (archivedIndexNames.has(index.index_name) || pendingStatus?.state === 'archived');
+  const renderActions = (index: IncompatibleIndexRow) => {
+    const pendingStatus = pendingIndexStatuses.get(index.index_name);
+    const isArchived =
+      pendingStatus?.state !== 'archiving' &&
+      (archivedIndexNames.has(index.index_name) || pendingStatus?.state === 'archived');
 
-      return (
-        <IncompatibleIndexTableActions
-          index={index}
-          canArchive={archiveActionsAvailable}
-          pendingStatus={pendingStatus}
-          isArchived={isArchived}
-          addArchiveDeleteAction={addArchiveDeleteAction}
-          refetchClusterJobs={refetchClusterJobs}
-          refetch={refetch}
-        />
-      );
+    return (
+      <IncompatibleIndexTableActions
+        index={index}
+        canArchive={archiveActionsAvailable}
+        pendingStatus={pendingStatus}
+        isArchived={isArchived}
+        addArchiveDeleteAction={addArchiveDeleteAction}
+        refetchClusterJobs={refetchClusterJobs}
+        refetch={refetch}
+      />
+    );
+  };
+
+  const bulkSelection = {
+    onChangeSelection: (selectedItemsIds: Array<string>, list: Readonly<Array<IncompatibleIndexRow>>) => {
+      setSelectedIndicesData((cur) => {
+        const selectedItemsIdsSet = new Set(selectedItemsIds);
+        const selectedCurrentItems = pickBy(cur, (_, indexId) => selectedItemsIdsSet.has(indexId));
+        const selectedCurrentEntries = list.filter(({ id }) => selectedItemsIdsSet.has(id));
+        const currentEntriesById = keyBy(selectedCurrentEntries, 'id');
+
+        return { ...selectedCurrentItems, ...currentEntriesById };
+      });
     },
-    [
-      pendingIndexStatuses,
-      archivedIndexNames,
-      archiveActionsAvailable,
-      addArchiveDeleteAction,
-      refetchClusterJobs,
-      refetch,
-    ],
-  );
-
-  const bulkSelection = useMemo(
-    () => ({
-      actions: (
-        <IncompatibleIndicesBulkActions
-          indices={loadedIndices}
-          canArchive={archiveActionsAvailable}
-          pendingIndexStatuses={pendingIndexStatuses}
-          archivedIndexNames={archivedIndexNames}
-          refetch={refetch}
-        />
-      ),
-    }),
-    [loadedIndices, archiveActionsAvailable, pendingIndexStatuses, archivedIndexNames, refetch],
-  );
+    actions: (
+      <IncompatibleIndicesBulkActions
+        indices={selectedIndices}
+        canArchive={archiveActionsAvailable}
+        pendingIndexStatuses={pendingIndexStatuses}
+        archivedIndexNames={archivedIndexNames}
+        refetch={refetch}
+      />
+    ),
+  };
 
   return (
     <>

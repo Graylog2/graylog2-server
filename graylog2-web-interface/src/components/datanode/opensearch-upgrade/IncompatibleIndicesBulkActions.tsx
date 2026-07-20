@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 import { SystemIndexerIndices } from '@graylog/server-api';
 
@@ -102,16 +102,13 @@ const IncompatibleIndicesBulkActions = ({
   const [confirmedBulkAction, setConfirmedBulkAction] = useState<BulkIndexActionCandidate | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selectedIndices = useMemo(
-    () => indices.filter((index) => selectedEntities.includes(index.id)),
-    [indices, selectedEntities],
-  );
-
-  const candidates = useMemo(
-    () =>
-      getBulkIndexActionCandidates({ indices: selectedIndices, canArchive, pendingIndexStatuses, archivedIndexNames }),
-    [selectedIndices, canArchive, pendingIndexStatuses, archivedIndexNames],
-  );
+  const selectedIndices = indices.filter((index) => selectedEntities.includes(index.id));
+  const candidates = getBulkIndexActionCandidates({
+    indices: selectedIndices,
+    canArchive,
+    pendingIndexStatuses,
+    archivedIndexNames,
+  });
 
   const handleCancel = () => {
     if (!isSubmitting) {
