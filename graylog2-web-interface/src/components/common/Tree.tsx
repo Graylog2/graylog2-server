@@ -14,15 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useQuery from 'routing/useQuery';
+import * as React from 'react';
+import { Tree as MantineTree, useTree } from '@mantine/core';
 
-export const HEALTH_QUERY_PARAM = 'health';
-export const HEALTH_ON_VALUE = 'on';
+const Tree = ({ ...props }: React.ComponentProps<typeof MantineTree>) => <MantineTree {...props} />;
 
-/**
- * Returns whether the Health module should be shown on the System Overview page.
- * Default: hidden. Add `?health=on` to the URL to show it.
- */
-const useHealthModuleVisible = (): boolean => useQuery()[HEALTH_QUERY_PARAM] === HEALTH_ON_VALUE;
+export type { TreeNodeData, RenderTreeNodePayload } from '@mantine/core';
+export { useTree };
 
-export default useHealthModuleVisible;
+export default Tree;

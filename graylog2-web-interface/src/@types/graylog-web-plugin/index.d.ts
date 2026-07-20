@@ -44,6 +44,13 @@ interface GlobalNotification {
   component: React.ComponentType;
 }
 
+interface NavigationBadge {
+  key: string;
+  component: React.ComponentType;
+  // Active badges replace the built-in notification badge, so they must render the notification count themselves.
+  useCondition: () => boolean;
+}
+
 interface PluginPages {
   search?: {
     component: React.ComponentType;
@@ -244,6 +251,7 @@ declare module 'graylog-web-plugin/plugin' {
     clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';
     clusterconfiguration: 'read';
+    clusterhealth: 'read';
     collector_fleets: 'read';
     collectors_config: 'read';
     contentpack: 'read';
@@ -419,6 +427,7 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
