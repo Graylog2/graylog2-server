@@ -19,7 +19,6 @@ package org.graylog.collectors.rest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.IngestEndpointConfig;
 
 import java.time.Duration;
@@ -31,6 +30,7 @@ public record CollectorsConfigRequest(
         @JsonProperty("collector_offline_threshold") @Nullable Duration collectorOfflineThreshold,
         @JsonProperty("collector_default_visibility_threshold") @Nullable Duration collectorDefaultVisibilityThreshold,
         @JsonProperty("collector_expiration_threshold") @Nullable Duration collectorExpirationThreshold,
+        @JsonProperty("collector_transaction_log_retention_threshold") @Nullable Duration collectorTransactionLogRetentionThreshold,
         @JsonProperty("create_input") boolean createInput
 ) {
     public CollectorsConfigRequest {
@@ -44,19 +44,5 @@ public record CollectorsConfigRequest(
         public IngestEndpointConfig toConfig() {
             return new IngestEndpointConfig(hostname(), port());
         }
-    }
-
-    public CollectorsConfig.Builder applyTo(CollectorsConfig.Builder configBuilder) {
-        configBuilder.http(http.toConfig());
-        if (collectorOfflineThreshold() != null) {
-            configBuilder.collectorOfflineThreshold(collectorOfflineThreshold());
-        }
-        if (collectorDefaultVisibilityThreshold() != null) {
-            configBuilder.collectorDefaultVisibilityThreshold(collectorDefaultVisibilityThreshold());
-        }
-        if (collectorExpirationThreshold() != null) {
-            configBuilder.collectorExpirationThreshold(collectorExpirationThreshold());
-        }
-        return configBuilder;
     }
 }

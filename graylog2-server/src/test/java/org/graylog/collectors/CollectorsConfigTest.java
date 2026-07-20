@@ -81,4 +81,25 @@ class CollectorsConfigTest {
         assertThat(deserialized.collectorDefaultVisibilityThreshold()).isEqualTo(Duration.ofHours(12));
         assertThat(deserialized.collectorExpirationThreshold()).isEqualTo(Duration.ofDays(3));
     }
+
+    @Test
+    void serializesAndDeserializesRetentionThreshold() throws Exception {
+        final var config = CollectorsConfig.createDefaultBuilder("host")
+                .collectorTransactionLogRetentionThreshold(Duration.ofDays(14))
+                .build();
+
+        final var json = objectMapper.writeValueAsString(config);
+        final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
+
+        assertThat(deserialized.collectorTransactionLogRetentionThreshold()).isEqualTo(Duration.ofDays(14));
+        assertThat(json).contains("\"collector_transaction_log_retention_threshold\"");
+    }
+
+    @Test
+    void defaultRetentionThreshold() {
+        final var config = CollectorsConfig.createDefault("host");
+
+        assertThat(config.collectorTransactionLogRetentionThreshold())
+                .isEqualTo(CollectorsConfig.DEFAULT_COLLECTOR_TRANSACTION_LOG_RETENTION);
+    }
 }

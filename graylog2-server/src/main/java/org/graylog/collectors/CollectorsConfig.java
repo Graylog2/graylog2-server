@@ -36,6 +36,7 @@ public abstract class CollectorsConfig {
     public static final Duration DEFAULT_OFFLINE_THRESHOLD = Duration.ofMinutes(5);
     public static final Duration DEFAULT_VISIBILITY_THRESHOLD = Duration.ofDays(1);
     public static final Duration DEFAULT_EXPIRATION_THRESHOLD = Duration.ofDays(7);
+    public static final Duration DEFAULT_COLLECTOR_TRANSACTION_LOG_RETENTION = Duration.ofDays(30);
     private static final Duration DEFAULT_COLLECTOR_CERT_LIFETIME = Duration.ofDays(365);
     private static final Duration DEFAULT_COLLECTOR_HEARTBEAT_INTERVAL = Duration.ofSeconds(30);
     private static final int DEFAULT_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES = Ints.saturatedCast(Size.megabytes(10).toBytes());
@@ -51,6 +52,7 @@ public abstract class CollectorsConfig {
     public static final String FIELD_COLLECTOR_CERT_LIFETIME = "collector_cert_lifetime";
     public static final String FIELD_COLLECTOR_HEARTBEAT_INTERVAL = "collector_heartbeat_interval";
     public static final String FIELD_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES = "opamp_max_request_body_size_bytes";
+    public static final String FIELD_COLLECTOR_TRANSACTION_LOG_RETENTION_THRESHOLD = "collector_transaction_log_retention_threshold";
 
     @JsonProperty(FIELD_CA_CERT_ID)
     @Nullable
@@ -91,6 +93,9 @@ public abstract class CollectorsConfig {
     @JsonProperty(FIELD_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES)
     public abstract int opampMaxRequestBodySizeBytes();
 
+    @JsonProperty(FIELD_COLLECTOR_TRANSACTION_LOG_RETENTION_THRESHOLD)
+    public abstract Duration collectorTransactionLogRetentionThreshold();
+
     public static Builder createDefaultBuilder(String hostname) {
         requireNonBlank(hostname, "hostname can't be blank");
 
@@ -118,7 +123,8 @@ public abstract class CollectorsConfig {
                     .collectorExpirationThreshold(DEFAULT_EXPIRATION_THRESHOLD)
                     .collectorCertLifetime(DEFAULT_COLLECTOR_CERT_LIFETIME)
                     .collectorHeartbeatInterval(DEFAULT_COLLECTOR_HEARTBEAT_INTERVAL)
-                    .opampMaxRequestBodySizeBytes(DEFAULT_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES);
+                    .opampMaxRequestBodySizeBytes(DEFAULT_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES)
+                    .collectorTransactionLogRetentionThreshold(DEFAULT_COLLECTOR_TRANSACTION_LOG_RETENTION);
         }
 
         @JsonProperty(FIELD_CA_CERT_ID)
@@ -153,6 +159,9 @@ public abstract class CollectorsConfig {
 
         @JsonProperty(FIELD_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES)
         public abstract Builder opampMaxRequestBodySizeBytes(int opampMaxRequestBodySizeBytes);
+
+        @JsonProperty(FIELD_COLLECTOR_TRANSACTION_LOG_RETENTION_THRESHOLD)
+        public abstract Builder collectorTransactionLogRetentionThreshold(Duration collectorTransactionLogRetentionThreshold);
 
         public abstract CollectorsConfig build();
     }

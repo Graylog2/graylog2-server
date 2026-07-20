@@ -226,6 +226,47 @@ class FleetTransactionLogServiceTest {
         assertThat(markers.getFirst().type()).isEqualTo(MarkerType.CONFIG_CHANGED);
     }
 
+    // --- Delete old markers tests ---
+
+    @Test
+    void deleteOldMarkersDeletesMatchingEntries() throws InterruptedException {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
+        Thread.sleep(50);
+
+        final Instant cutoff = Instant.now();
+        Thread.sleep(50);
+        service.appendFleetMarker("fleet-2", MarkerType.CONFIG_CHANGED);
+
+        final long deleted = service.deleteOldMarkers(cutoff, 1L);
+
+        assertThat(deleted).isEqualTo(1L);
+        assertThat(service.getCollection().countDocuments()).isEqualTo(1L);
+    }
+
+    @Test
+    void deleteOldMarkersRequiresBothConditions() throws InterruptedException {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED); // seq 1
+        Thread.sleep(50);
+
+        final Instant cutoff = Instant.now();
+        Thread.sleep(50);
+        service.appendFleetMarker("fleet-2", MarkerType.CONFIG_CHANGED); // seq 2
+
+        // Marker is old (created_at < cutoff) but seq >= minActiveSeq — should NOT be deleted
+        assertThat(service.deleteOldMarkers(cutoff, 2L)).isEqualTo(1L);
+        // Only seq 1 was old AND below minActiveSeq
+        assertThat(service.getCollection().countDocuments()).isEqualTo(1L);
+    }
+
+    @Test
+    void deleteOldMarkersReturnsZeroWhenNothingMatches() throws InterruptedException {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
+
+        final Instant cutoff = Instant.now().minusSeconds(3600);
+
+        assertThat(service.deleteOldMarkers(cutoff, 1L)).isEqualTo(0L);
+    }
+
     // --- pendingChangesLookup / isPending tests ---
 
     @Test

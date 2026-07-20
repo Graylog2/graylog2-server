@@ -129,6 +129,7 @@ export type CollectorsConfig = {
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
+  collector_transaction_log_retention_threshold: string;
 };
 
 export type CollectorInputIdsResponse = {
@@ -143,6 +144,7 @@ export type CollectorsConfigRequest = {
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
+  collector_transaction_log_retention_threshold: string;
   create_input: boolean;
 };
 
