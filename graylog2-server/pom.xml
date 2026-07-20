@@ -658,6 +658,11 @@
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
         </dependency>
+        <!-- Explicitly declare lz4 since kafka-clients depends on it and we exclude it from the declaration. -->
+        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
