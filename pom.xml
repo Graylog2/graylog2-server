@@ -784,7 +784,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.86.1</version>
+                            <version>8.86.4</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
@@ -799,7 +799,7 @@
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.38.0</version>
+                            <version>2.39.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
