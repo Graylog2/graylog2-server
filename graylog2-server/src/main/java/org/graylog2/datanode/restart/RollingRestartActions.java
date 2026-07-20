@@ -33,6 +33,7 @@ import retrofit2.http.POST;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Singleton
@@ -62,19 +63,9 @@ public class RollingRestartActions {
         clusterAdmin.enableShardReplication();
     }
 
-    public void stopNode(String hostname) {
-        LOG.info("Sending STOP trigger to DataNode {}", hostname);
-        datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::stop);
-    }
-
     public void upgradeNode(String hostname) {
         LOG.info("Sending UPGRADE trigger to DataNode {}", hostname);
         datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::upgrade);
-    }
-
-    public void startNode(String hostname) {
-        LOG.info("Sending START trigger to DataNode {}", hostname);
-        datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::start);
     }
 
     public ClusterState getClusterState() {
@@ -99,9 +90,11 @@ public class RollingRestartActions {
         }
     }
 
-    public boolean isNodeInCluster(String hostname) {
+    public boolean isNodeInCluster(String hostname, String expectedOpensearchVersion) {
         try {
-            return clusterAdmin.getClusterState().findByHostname(hostname).isPresent();
+            return clusterAdmin.getClusterState().findByHostname(hostname)
+                    .filter(n -> Objects.equals(n.version(), expectedOpensearchVersion))
+                    .isPresent();
         } catch (Exception e) {
             LOG.debug("Failed to check node presence for {}", hostname, e);
             return false;
@@ -127,13 +120,7 @@ public class RollingRestartActions {
     }
 
     interface DataNodeManagementClient {
-        @POST("management/start")
-        Call<Void> start();
-
         @POST("management/upgrade")
         Call<Void> upgrade();
-
-        @POST("management/stop")
-        Call<Void> stop();
     }
 }

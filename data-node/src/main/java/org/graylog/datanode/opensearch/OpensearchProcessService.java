@@ -52,7 +52,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final DatanodeKeystore datanodeKeystore;
 
     private final OpensearchStateMachine stateMachine;
-    private final OpensearchUpgradeAction opensearchUpgradeAction;
     private final CsrRequester csrRequester;
     private boolean processAutostart = true;
 
@@ -64,8 +63,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             final NodeId nodeId,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, DatanodeKeystore datanodeKeystore, CsrRequester csrRequester, OpensearchStateMachine stateMachine,
-            OpensearchUpgradeAction opensearchUpgradeAction) {
+            final OpensearchProcess process, DatanodeKeystore datanodeKeystore, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
         this.configuration = configuration;
         this.nodeId = nodeId;
         this.lockfileCheck = lockfileCheck;
@@ -74,7 +72,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.datanodeKeystore = datanodeKeystore;
         this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
-        this.opensearchUpgradeAction = opensearchUpgradeAction;
         eventBus.register(this);
     }
 
@@ -102,10 +99,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     } catch (DatanodeKeystoreException e) {
                         throw new RuntimeException(e);
                     }
-                }
-                case UPDATE_OPENSEARCH -> {
-                    LOG.info("Upgrading opensearch version to the latest");
-                    opensearchUpgradeAction.enableLatestVersion();
                 }
             }
         }
@@ -162,6 +155,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         }
     }
 
+    @Deprecated
     private void configure(OpensearchConfiguration config) {
         if (config.securityConfigured()) {
             this.process.configure(config);
