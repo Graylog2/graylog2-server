@@ -54,9 +54,9 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
   );
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(PointerSensor, {}),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, {}),
   );
   const handleDragStart = useCallback(

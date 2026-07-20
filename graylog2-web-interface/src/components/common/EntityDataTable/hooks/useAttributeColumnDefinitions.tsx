@@ -28,23 +28,54 @@ import type {
   ColumnMetaContext,
 } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
-import DragHandle from 'components/common/SortableList/DragHandle';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { DRAG_HANDLE_DEFAULT_TITLE } from 'components/common/SortableList/DragHandle';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
+import IsResizingColumnContext from 'components/common/EntityDataTable/contexts/IsResizingColumnContext';
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
-import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
 import Icon from 'components/common/Icon';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
 import SortIcon from '../SortIcon';
 
-export const ThInner = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-`;
+export const DragIcon = styled(Icon)<{ $isDragging?: boolean }>(
+  ({ theme, $isDragging }) => css`
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%) rotate(90deg);
+    color: ${theme.colors.text.secondary};
+    opacity: ${$isDragging ? 1 : 0};
+    transition: opacity 0.15s ease-in-out;
+    pointer-events: none;
+    font-size: 12px;
+  `,
+);
+
+export const ThInner = styled.div<{ $isDraggable?: boolean; $isDragging?: boolean }>(
+  ({ theme, $isDraggable, $isDragging }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    // th no longer has its own padding, so this is the only padding for the header cell,
+    // meaning it's part of this element's own box and therefore draggable/hoverable too.
+    padding: ${CELL_PADDING}px;
+    //padding-top: ${$isDraggable ? `calc(${CELL_PADDING}px + ${theme.spacings.xxs})` : `${CELL_PADDING}px`};
+
+    ${$isDraggable &&
+    css`
+      cursor: ${$isDragging ? 'grabbing' : 'grab'};
+
+      &:hover ${DragIcon} {
+        opacity: 1;
+      }
+    `}
+  `,
+);
 
 export const LeftCol = styled.div`
   display: flex;
@@ -52,9 +83,11 @@ export const LeftCol = styled.div`
   height: 100%;
 `;
 
-const RightCol = styled.div`
+// Sits in the same spot the old resize handle icon used to occupy.
+export const RightCol = styled.div`
   display: flex;
   align-items: center;
+  height: 100%;
 `;
 
 const ActiveSliceIcon = styled(Icon)(
@@ -66,7 +99,7 @@ const ActiveSliceIcon = styled(Icon)(
 
 const useSortableCol = (colId: string, disabled: boolean) => {
   const { setColumnTransform } = useContext(DndStylesContext);
-  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
+  const { attributes, isDragging, listeners, setNodeRef, transform } = useSortable({
     id: colId,
     disabled,
   });
@@ -85,7 +118,6 @@ const useSortableCol = (colId: string, disabled: boolean) => {
     isDragging,
     listeners,
     setNodeRef,
-    setActivatorNodeRef,
   };
 };
 
@@ -101,32 +133,35 @@ const AttributeHeader = <Entity extends EntityBase>({
   appSection: string;
 }) => {
   const activeSliceCol = useContext(ActiveSliceColContext);
+  const { isResizingColumn } = useContext(IsResizingColumnContext) ?? {};
   const colId = ctx.header.column.id;
   const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
-  const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
-    colId,
-    !columnMeta?.enableColumnOrdering,
-  );
+  const isDraggable = Boolean(columnMeta?.enableColumnOrdering);
+  // Suppress the drag affordance (cursor + hover indicator) while a column is being resized, so it
+  // doesn't flicker on/off as the pointer passes over other headers during the resize drag.
+  const showDragAffordance = isDraggable && !isResizingColumn;
+  const { attributes, isDragging, listeners, setNodeRef } = useSortableCol(colId, !isDraggable);
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
-  const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
   const columnLabel = columnMeta?.label ?? colId;
   const canSlice = columnMeta?.enableSlicing;
   const isSliceActive = activeSliceCol === colId;
   const canSort = ctx.header.column.getCanSort();
   const sortDirection = ctx.header.column.getIsSorted();
+  const dragTitle =
+    typeof columnLabel === 'string'
+      ? `${DRAG_HANDLE_DEFAULT_TITLE} ${columnLabel.toLocaleLowerCase()}`
+      : DRAG_HANDLE_DEFAULT_TITLE;
 
   return (
-    <ThInner ref={setNodeRef}>
+    <ThInner
+      ref={setNodeRef}
+      $isDraggable={showDragAffordance}
+      $isDragging={isDragging}
+      title={isDraggable ? dragTitle : undefined}
+      aria-label={isDraggable ? dragTitle : undefined}
+      {...(isDraggable ? { ...attributes, ...listeners } : {})}>
+      {isDraggable && <DragIcon name="drag_indicator" size="xs" $isDragging={isDragging} />}
       <LeftCol ref={leftRef}>
-        {columnMeta?.enableColumnOrdering && (
-          <DragHandle
-            ref={setActivatorNodeRef}
-            index={ctx.header.index}
-            dragHandleProps={{ ...attributes, ...listeners }}
-            isDragging={isDragging}
-            itemTitle={columnLabel}
-          />
-        )}
         <HeaderActionsDropdown
           label={columnLabel}
           activeSort={sortDirection}
@@ -138,17 +173,12 @@ const AttributeHeader = <Entity extends EntityBase>({
           {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
         </HeaderActionsDropdown>
         {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" />}
-        {sortDirection && <SortIcon<Entity> column={ctx.header.column} />}
       </LeftCol>
-      <RightCol ref={rightRef}>
-        {ctx.header.column.getCanResize() && (
-          <ResizeHandle
-            onMouseDown={ctx.header.getResizeHandler()}
-            onTouchStart={ctx.header.getResizeHandler()}
-            colTitle={columnLabel}
-          />
-        )}
-      </RightCol>
+      {sortDirection && (
+        <RightCol>
+          <SortIcon<Entity> column={ctx.header.column} />
+        </RightCol>
+      )}
     </ThInner>
   );
 };

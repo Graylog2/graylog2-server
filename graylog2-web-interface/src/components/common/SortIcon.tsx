@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 import React, { useCallback } from 'react';
 
 import Icon from 'components/common/Icon';
+import type { SizeProp } from 'components/common/Icon/types';
 
 const StyledSortIcon = styled.button<{ $disabled: boolean }>(
   ({ theme, $disabled }) => css`
@@ -57,6 +58,7 @@ type Props<AscDirection extends string, DescDirection extends string> = {
   title?: string;
   order?: number;
   className?: string;
+  size?: SizeProp;
 };
 
 const SortIcon = <AscDirection extends string, DescDirection extends string>({
@@ -67,6 +69,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
   ascId = 'Ascending',
   descId = 'Descending',
   className = '',
+  size = 'xs',
 }: Props<AscDirection, DescDirection>) => {
   const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
   const isAscSort = activeDirection === ascId && activeDirection !== descId;
@@ -90,6 +93,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
         name={isAscSort ? 'arrow_upward' : 'arrow_downward'}
         data-testid="sort-icon-svg"
         className={`sort-icon-${isAscSort ? 'asc' : 'desc'}`}
+        size={size}
       />
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>

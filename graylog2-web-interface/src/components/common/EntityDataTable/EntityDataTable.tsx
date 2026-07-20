@@ -19,6 +19,7 @@ import { useMemo, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ButtonGroup } from 'components/bootstrap';
+import { COLUMN_BORDER_WIDTH_VAR } from 'components/bootstrap/Table';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
@@ -91,6 +92,7 @@ const ScrollContainer = styled.div<{
       ? css`
           ${cssVariable(columnOpacityVar($activeColId), 0.4)}
           ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
+          ${cssVariable(COLUMN_BORDER_WIDTH_VAR, '0px')}
         `
       : ''}
   `,

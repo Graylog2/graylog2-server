@@ -23,6 +23,7 @@ export const TABLE_ROW_HOVER_TRANSITION = 'background-color 150ms ease-in-out';
 export const TABLE_ROW_PINNED_HOVER_BG_VAR = '--table-row-pinned-hover-bg';
 export const flattenTableBackground = (theme: DefaultTheme, color: string) =>
   theme.utils.flattenColorStack([theme.colors.global.contentBackground, color]);
+export const COLUMN_BORDER_WIDTH_VAR = '--column-border-width';
 export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
 export const PINNED_CELL_STRIPED_CLASS_NAME = 'table-pinned-cell-striped';
 
@@ -75,7 +76,9 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       `}
       ${$columnBorders &&
       css`
-        border-right: 1px solid ${theme.colors.table.row.divider};
+        border-right-style: solid;
+        border-right-color: ${theme.colors.table.row.divider};
+        border-right-width: var(${COLUMN_BORDER_WIDTH_VAR}, 1px);
 
         &:last-child {
           border-right: none;

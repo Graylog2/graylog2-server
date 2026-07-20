@@ -24,6 +24,11 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MenuItem } from 'components/bootstrap';
 
+export const DropdownCaret = styled(Icon)`
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+`;
+
 const DropdownTrigger = styled.button(
   ({ theme }) => css`
     background: transparent;
@@ -36,6 +41,12 @@ const DropdownTrigger = styled.button(
 
     &:focus-visible {
       outline-offset: 2px;
+    }
+
+    &:hover ${DropdownCaret},
+    &:focus-within ${DropdownCaret},
+    &[aria-expanded='true'] ${DropdownCaret} {
+      opacity: 1;
     }
   `,
 );
@@ -98,7 +109,7 @@ const HeaderActionsDropdown = ({
       <Menu.Target>
         <DropdownTrigger type="button" title={`Toggle ${label} actions`} aria-label={`Toggle ${label} actions`}>
           <span>{children}</span>
-          <Icon name="arrow_drop_down" size="xs" />
+          <DropdownCaret name="arrow_drop_down" size="xs" />
         </DropdownTrigger>
       </Menu.Target>
       <Menu.Dropdown>
