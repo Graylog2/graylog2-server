@@ -44,7 +44,9 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
     public static final Pattern FULL_NAME_PATTERN = Pattern.compile("opensearch-(.*)-(.+)-(.+)");
     public static final Pattern SHORT_NAME_PATTERN = Pattern.compile("opensearch-(.*)");
 
-    private final Supplier<OpensearchDistribution> distribution;
+    private final Path opensearchDistributionRoot;
+    private final OpensearchArchitecture architecture;
+    private final OpensearchVersionSelector selector;
 
     @Inject
     public OpensearchDistributionProvider(final Configuration localConfiguration,
@@ -58,12 +60,14 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
 
     public OpensearchDistributionProvider(final Path opensearchDistributionRoot, OpensearchArchitecture architecture,
                                           OpensearchVersionSelector selector) {
-        this.distribution = Suppliers.memoize(() -> detectInDirectory(opensearchDistributionRoot, architecture, selector));
+        this.opensearchDistributionRoot = opensearchDistributionRoot;
+        this.architecture = architecture;
+        this.selector = selector;
     }
 
     @Override
     public OpensearchDistribution get() {
-        return distribution.get();
+        return detectInDirectory(opensearchDistributionRoot, architecture, selector);
     }
 
     private static OpensearchDistribution detectInDirectory(Path rootDistDirectory, OpensearchArchitecture osArch,

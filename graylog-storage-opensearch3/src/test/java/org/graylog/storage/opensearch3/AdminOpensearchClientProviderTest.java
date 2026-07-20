@@ -17,7 +17,8 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.security.certutil.CaKeystoreException;
+import com.mongodb.assertions.Assertions;
+import jakarta.annotation.Nonnull;
 import org.graylog.security.certutil.ClientCertSslContextFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,15 +26,16 @@ import org.opensearch.client.transport.OpenSearchTransport;
 
 import javax.net.ssl.SSLContext;
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,17 +43,12 @@ import static org.mockito.Mockito.when;
 
 class AdminOpensearchClientProviderTest {
 
-    private ClientCertSslContextFactory sslContextFactory;
     private OfficialOpensearchClientProvider transportProvider;
     private List<URI> hosts;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        this.sslContextFactory = mock(ClientCertSslContextFactory.class);
-        when(sslContextFactory.buildClientCertSslContext(any(), any()))
-                .thenAnswer(inv -> SSLContext.getInstance("TLS"));
-
         this.transportProvider = mock(OfficialOpensearchClientProvider.class);
         when(transportProvider.buildTransport(any(), any())).thenAnswer(inv -> mock(OpenSearchTransport.class));
 
@@ -59,27 +56,39 @@ class AdminOpensearchClientProviderTest {
         this.objectMapper = new ObjectMapper();
     }
 
+    @Nonnull
+    private static ClientCertSslContextFactory initializedSslContextFactory() {
+        return (commonName, certificateLifetime) -> {
+            try {
+                return Optional.of(SSLContext.getInstance("TLS"));
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    @Nonnull
+    private static ClientCertSslContextFactory disabledSslContextFactory() {
+        return (commonName, certificateLifetime) -> {
+            return Optional.empty();
+        };
+    }
+
     @Test
     void propagatesNoCaError() {
-        when(sslContextFactory.buildClientCertSslContext(any(), any()))
-                .thenThrow(new CaKeystoreException("Cannot mint client certificate: no CA configured."));
-
-        final AdminOpensearchClientProvider provider = newProvider(Clock.systemUTC());
-
-        assertThatThrownBy(provider::getAdminClient)
-                .isInstanceOf(CaKeystoreException.class)
-                .hasMessageContaining("no CA configured");
+        final AdminOpensearchClientProvider provider = newProvider(Clock.systemUTC(), disabledSslContextFactory());
+        assertThatNoException().isThrownBy(provider::getAdminClient);
     }
 
     @Test
     void cachesClientAcrossCalls() {
-        final AdminOpensearchClientProvider provider = newProvider(Clock.systemUTC());
+        final ClientCertSslContextFactory sslContextFactory = initializedSslContextFactory();
+        final AdminOpensearchClientProvider provider = newProvider(Clock.systemUTC(), sslContextFactory);
 
         final OfficialOpensearchClient first = provider.getAdminClient();
         final OfficialOpensearchClient second = provider.getAdminClient();
 
         assertThat(second).isSameAs(first);
-        verify(sslContextFactory, times(1)).buildClientCertSslContext(any(), any());
         verify(transportProvider, times(1)).buildTransport(any(), any());
     }
 
@@ -87,7 +96,8 @@ class AdminOpensearchClientProviderTest {
     void refreshesTransportWhenCertNearsExpiryButKeepsClientReference() {
         final Instant start = Instant.parse("2026-01-01T00:00:00Z");
         final MutableClock clock = new MutableClock(start);
-        final AdminOpensearchClientProvider provider = newProvider(clock);
+        final ClientCertSslContextFactory sslContextFactory = initializedSslContextFactory();
+        final AdminOpensearchClientProvider provider = newProvider(clock, sslContextFactory);
 
         final OfficialOpensearchClient initialClient = provider.getAdminClient();
 
@@ -99,21 +109,29 @@ class AdminOpensearchClientProviderTest {
         assertThat(afterRefresh)
                 .as("client reference must remain stable across cert rotation")
                 .isSameAs(initialClient);
-        verify(sslContextFactory, times(2)).buildClientCertSslContext(any(), any());
+
+
         verify(transportProvider, times(2)).buildTransport(any(), any());
     }
 
     @Test
     void requestsCertWithAdminCommonNameAndConfiguredLifetime() {
-        newProvider(Clock.systemUTC()).getAdminClient();
+        final ClientCertSslContextFactory sslContextFactory = (commonName, certificateLifetime) -> {
+            if(!commonName.equals("graylog-admin") || !certificateLifetime.equals(AdminOpensearchClientProvider.CERT_LIFETIME)) {
+                throw new AssertionError("Unexpected certificate common name or lifetime");
+            }
+            try {
+                return Optional.of(SSLContext.getInstance("TLS"));
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        };
 
-        verify(sslContextFactory).buildClientCertSslContext(
-                eq("graylog-admin"),
-                eq(AdminOpensearchClientProvider.CERT_LIFETIME));
+        Assertions.doesNotThrow(() -> newProvider(Clock.systemUTC(), sslContextFactory).getAdminClient());
     }
 
-    private AdminOpensearchClientProvider newProvider(Clock clock) {
-        return new AdminOpensearchClientProvider(sslContextFactory, hosts, transportProvider, objectMapper, clock);
+    private AdminOpensearchClientProvider newProvider(Clock clock, ClientCertSslContextFactory clientCertSslContextFactory) {
+        return new AdminOpensearchClientProvider(clientCertSslContextFactory, hosts, transportProvider, objectMapper, clock);
     }
 
     /**

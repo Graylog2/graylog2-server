@@ -53,20 +53,6 @@ const PLATFORMS: Platform[] = [
     commandTemplate: (host, port, token) =>
       `curl -fsSL https://${host}:${port}/collectors/install | ENROLLMENT_TOKEN=${token} bash`,
   },
-  {
-    id: 'kubernetes',
-    label: 'Kubernetes',
-    icon: { type: 'brand', name: 'kubernetes' },
-    commandTemplate: (host, port, token) =>
-      `helm install graylog-collector oci://${host}:${port}/collectors/charts/collector --set enrollmentToken=${token}`,
-  },
-  {
-    id: 'docker',
-    label: 'Docker',
-    icon: { type: 'brand', name: 'docker' },
-    commandTemplate: (host, port, token) =>
-      `docker run -d -e ENROLLMENT_TOKEN=${token} ${host}:${port}/collectors/collector:latest`,
-  },
 ];
 
 export default PLATFORMS;
