@@ -115,6 +115,29 @@ class AdminOpensearchClientProviderTest {
     }
 
     @Test
+    void refreshIfNeededRotatesTransportOnUseOnlyWhenCertNearsExpiry() {
+        final Instant start = Instant.parse("2026-01-01T00:00:00Z");
+        final MutableClock clock = new MutableClock(start);
+        final AdminOpensearchClientProvider provider = newProvider(clock, initializedSslContextFactory());
+
+        final OfficialOpensearchClient client = provider.getAdminClient();
+        verify(transportProvider, times(1)).buildTransport(any(), any());
+
+        // A "use" while the cert is still fresh must not mint a new cert.
+        provider.refreshIfNeeded();
+        verify(transportProvider, times(1)).buildTransport(any(), any());
+
+        // Once the cert nears expiry, the next "use" rotates the transport in place.
+        clock.advance(AdminOpensearchClientProvider.CERT_LIFETIME);
+        provider.refreshIfNeeded();
+
+        verify(transportProvider, times(2)).buildTransport(any(), any());
+        assertThat(provider.getAdminClient())
+                .as("client reference must remain stable across the on-use rotation")
+                .isSameAs(client);
+    }
+
+    @Test
     void requestsCertWithAdminCommonNameAndConfiguredLifetime() {
         final ClientCertSslContextFactory sslContextFactory = (commonName, certificateLifetime) -> {
             if(!commonName.equals("graylog-admin") || !certificateLifetime.equals(AdminOpensearchClientProvider.CERT_LIFETIME)) {
