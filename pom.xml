@@ -162,6 +162,9 @@
         <jsoup.version>1.22.2</jsoup.version>
         <kafka.version>4.3.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
+        <kotlin.version>2.3.21</kotlin.version>
+        <kotlinx-serialization.version>1.11.0</kotlinx-serialization.version>
+        <kotlinx-coroutines.version>1.11.0</kotlinx-coroutines.version>
         <log4j.version>2.26.1</log4j.version>
         <lucene.version>10.5.0</lucene.version>
         <lz4.version>1.11.1</lz4.version>
@@ -620,6 +623,27 @@
                 <groupId>com.github.victools</groupId>
                 <artifactId>jsonschema-module-jakarta-validation</artifactId>
                 <version>${json-schema-generator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>${kotlin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <artifactId>kotlinx-serialization-bom</artifactId>
+                <version>${kotlinx-serialization.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlinx</groupId>
+                <artifactId>kotlinx-coroutines-bom</artifactId>
+                <version>${kotlinx-coroutines.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
