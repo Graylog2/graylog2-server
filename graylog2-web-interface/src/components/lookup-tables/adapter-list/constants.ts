@@ -38,7 +38,7 @@ export const attributes: Array<Attribute> = [
   {
     id: 'throughput',
     title: 'Throughput',
-    type: 'STRING',
+    type: 'DOUBLE',
   },
 ];
 

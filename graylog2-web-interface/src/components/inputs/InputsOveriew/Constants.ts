@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Sort } from 'stores/PaginationTypes';
+import type { Attribute, Sort } from 'stores/PaginationTypes';
 import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from 'components/inputs/InputsOveriew/metricColumns';
 
 const getInputsTableElements = () => {
@@ -49,14 +49,26 @@ const getInputsTableElements = () => {
     ],
   };
 
-  const additionalAttributes = [
-    { id: 'traffic', title: 'Traffic Last Minute' },
-    { id: 'input_failures', title: 'Input Failures' },
+  const additionalAttributes: Array<Attribute> = [
+    { id: 'traffic', title: 'Traffic Last Minute', type: 'DOUBLE' },
+    { id: 'input_failures', title: 'Input Failures', type: 'LONG' },
     { id: 'address', title: 'Address' },
-    { id: 'port', title: 'Port' },
-    { id: METRIC_COLUMN_IDS.messagesPerStream, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messagesPerStream] },
-    { id: METRIC_COLUMN_IDS.extractorCount, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.extractorCount] },
-    { id: METRIC_COLUMN_IDS.associatedStreams, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedStreams] },
+    { id: 'port', title: 'Port', type: 'INT' },
+    {
+      id: METRIC_COLUMN_IDS.messagesPerStream,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messagesPerStream],
+      type: 'INT',
+    },
+    {
+      id: METRIC_COLUMN_IDS.extractorCount,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.extractorCount],
+      type: 'INT',
+    },
+    {
+      id: METRIC_COLUMN_IDS.associatedStreams,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedStreams],
+      type: 'INT',
+    },
   ];
 
   return {

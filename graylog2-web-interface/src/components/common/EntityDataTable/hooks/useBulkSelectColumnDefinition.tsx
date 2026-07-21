@@ -31,7 +31,7 @@ const HeaderCheckboxContainer = styled.div`
   display: flex;
   align-items: center;
   height: 100%;
-  padding: ${CELL_PADDING}px;
+  padding: ${CELL_PADDING + CELL_PADDING / 2}px ${CELL_PADDING}px ${CELL_PADDING}px ${CELL_PADDING}px;
 `;
 
 const BulkSelectHeader = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => {

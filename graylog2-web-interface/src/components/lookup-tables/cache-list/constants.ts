@@ -38,17 +38,17 @@ export const attributes: Array<Attribute> = [
   {
     id: 'entries',
     title: 'Entries',
-    type: 'STRING',
+    type: 'LONG',
   },
   {
     id: 'hit_rate',
     title: 'Hit Rate',
-    type: 'STRING',
+    type: 'DOUBLE',
   },
   {
     id: 'throughput',
     title: 'Throughput',
-    type: 'STRING',
+    type: 'DOUBLE',
   },
 ];
 

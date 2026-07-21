@@ -42,7 +42,7 @@ import SortIcon from '../SortIcon';
 export const DragIcon = styled(Icon)<{ $isDragging?: boolean }>(
   ({ theme, $isDragging }) => css`
     position: absolute;
-    top: -3px;
+    top: 0px;
     left: 50%;
     transform: translateX(-50%) rotate(90deg);
     color: ${theme.colors.text.secondary};
@@ -56,6 +56,9 @@ export const DragIcon = styled(Icon)<{ $isDragging?: boolean }>(
 export const ThInner = styled.div<{ $isDraggable?: boolean; $isDragging?: boolean }>(
   ({ theme, $isDraggable, $isDragging }) => css`
     display: flex;
+    // Always space-between: for right-aligned (numeric) columns, the sort icon and title group
+    // are simply reordered (see AttributeHeader) so this spreads them mirrored, sort-icon-then-title
+    // instead of title-then-sort-icon, rather than clustering them together.
     justify-content: space-between;
     align-items: center;
     width: 100%;
@@ -64,7 +67,7 @@ export const ThInner = styled.div<{ $isDraggable?: boolean; $isDragging?: boolea
     // th no longer has its own padding, so this is the only padding for the header cell,
     // meaning it's part of this element's own box and therefore draggable/hoverable too.
     // Top/bottom padding is +2.5px each (+5px total) to make the header row a bit taller.
-    padding: ${CELL_PADDING + 2.5}px ${CELL_PADDING}px;
+    padding: ${CELL_PADDING + CELL_PADDING / 2}px ${CELL_PADDING}px ${CELL_PADDING}px ${CELL_PADDING}px;
     //padding-top: ${$isDraggable ? `calc(${CELL_PADDING}px + ${theme.spacings.xxs})` : `${CELL_PADDING}px`};
 
     ${$isDraggable &&
@@ -148,10 +151,34 @@ const AttributeHeader = <Entity extends EntityBase>({
   const isSliceActive = activeSliceCol === colId;
   const canSort = ctx.header.column.getCanSort();
   const sortDirection = ctx.header.column.getIsSorted();
+  const textAlign = columnMeta?.columnRenderer?.textAlign;
+  const isRightAligned = textAlign === 'right';
   const dragTitle =
     typeof columnLabel === 'string'
       ? `${DRAG_HANDLE_DEFAULT_TITLE} ${columnLabel.toLocaleLowerCase()}`
       : DRAG_HANDLE_DEFAULT_TITLE;
+
+  // Always rendered (even with no active sort), so ThInner always has two flex children:
+  // with only one child, "justify-content: space-between" collapses to "flex-start", pinning
+  // a lone title group to the left even when this column is right-aligned.
+  const sortIcon = <RightCol>{sortDirection && <SortIcon<Entity> column={ctx.header.column} />}</RightCol>;
+
+  const titleGroup = (
+    <LeftCol ref={leftRef}>
+      <HeaderActionsDropdown
+        label={columnLabel}
+        activeSort={sortDirection}
+        isSliceActive={isSliceActive}
+        onChangeSlicing={canSlice ? onChangeSlicing : undefined}
+        sliceColumnId={colId}
+        appSection={appSection}
+        textAlign={textAlign}
+        onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}>
+        {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
+      </HeaderActionsDropdown>
+      {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" />}
+    </LeftCol>
+  );
 
   return (
     <ThInner
@@ -162,23 +189,18 @@ const AttributeHeader = <Entity extends EntityBase>({
       aria-label={isDraggable ? dragTitle : undefined}
       {...(isDraggable ? { ...attributes, ...listeners } : {})}>
       {isDraggable && <DragIcon name="drag_indicator" size="xs" $isDragging={isDragging} />}
-      <LeftCol ref={leftRef}>
-        <HeaderActionsDropdown
-          label={columnLabel}
-          activeSort={sortDirection}
-          isSliceActive={isSliceActive}
-          onChangeSlicing={canSlice ? onChangeSlicing : undefined}
-          sliceColumnId={colId}
-          appSection={appSection}
-          onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}>
-          {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
-        </HeaderActionsDropdown>
-        {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" />}
-      </LeftCol>
-      {sortDirection && (
-        <RightCol>
-          <SortIcon<Entity> column={ctx.header.column} />
-        </RightCol>
+      {/* Right-aligned columns mirror the default layout: sort icon on the far left, title
+          (with its dropdown caret before the label) hugging the right edge of the cell. */}
+      {isRightAligned ? (
+        <>
+          {sortIcon}
+          {titleGroup}
+        </>
+      ) : (
+        <>
+          {titleGroup}
+          {sortIcon}
+        </>
       )}
     </ThInner>
   );
@@ -245,7 +267,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           header,
           size: columnWidths[col.id],
           enableHiding: true,
-          enableResizing: !columnRenderersByAttribute[col.id].staticWidth,
+          enableResizing: true,
           meta: {
             label: col.title,
             enableSlicing: enableSlicing && col.sliceable,

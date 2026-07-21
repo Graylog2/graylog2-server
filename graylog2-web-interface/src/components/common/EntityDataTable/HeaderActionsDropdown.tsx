@@ -66,6 +66,7 @@ type Props = {
   sliceColumnId?: string;
   appSection?: string;
   onSort?: (desc: boolean) => void;
+  textAlign?: string;
 };
 
 const HeaderActionsDropdown = ({
@@ -77,6 +78,7 @@ const HeaderActionsDropdown = ({
   sliceColumnId = undefined,
   appSection = undefined,
   onSort = undefined,
+  textAlign = undefined,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const hasActions = Boolean(onChangeSlicing || onSort);
@@ -108,8 +110,9 @@ const HeaderActionsDropdown = ({
     <Menu shadow="md" withinPortal position="bottom-start">
       <Menu.Target>
         <DropdownTrigger type="button" title={`Toggle ${label} actions`} aria-label={`Toggle ${label} actions`}>
+          {textAlign === 'right' && <DropdownCaret name="arrow_drop_down" size="xs" />}
           <span>{children}</span>
-          <DropdownCaret name="arrow_drop_down" size="xs" />
+          {textAlign !== 'right' && <DropdownCaret name="arrow_drop_down" size="xs" />}
         </DropdownTrigger>
       </Menu.Target>
       <Menu.Dropdown>
