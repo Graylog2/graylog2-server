@@ -60,6 +60,11 @@ const Td = styled.td<{
 }>(
   ({ $colId, $hidePadding, $pinningPosition }) => css`
     word-break: break-word;
+    // Overrides the shared Table component's default of "top", so cell content stays centered
+    // when a row grows taller than this cell's own content (e.g. a sibling cell wraps to 2 lines).
+    // Needs !important: the shared "& th, & td" rule has higher specificity (it includes the
+    // "td" type selector) than a plain class override here.
+    vertical-align: middle !important;
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
