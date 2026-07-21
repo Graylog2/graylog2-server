@@ -14,24 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode.restart;
+package org.graylog.plugins.views.search.rest;
 
-public enum RollingRestartState {
-    PREPARING_CLUSTER,
-    PAUSING_PROCESSING,
-    SELECTING_NEXT_NODE,
-    UPGRADING_NODE,
-    WAITING_NODE_JOINED,
-    REENABLING_ALLOCATION,
-    WAITING_GREEN,
-    PAUSED_WAITING_GREEN,
-    FINALIZING,
-    RESUMING_PROCESSING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 
-    public boolean isTerminal() {
-        return this == COMPLETED || this == ABORTED || this == FAILED;
+import java.util.List;
+
+public record EffectiveQueryRequest(@JsonProperty("query_string") String queryString,
+                                    @JsonProperty("filters") List<UsedSearchFilter> filters) {
+    @JsonCreator
+    public EffectiveQueryRequest {
+        queryString = queryString == null ? "" : queryString;
+        filters = filters == null ? List.of() : filters;
     }
 }

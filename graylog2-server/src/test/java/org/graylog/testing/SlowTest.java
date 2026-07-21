@@ -14,29 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type HealthStatus = 'healthy' | 'warning' | 'critical' | 'unknown';
+package org.graylog.testing;
 
-type HealthNodeBase = {
-  id: string;
-  title: string;
-  status: HealthStatus;
-  total_affected?: number;
-  total?: number;
-  message?: string;
-};
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.annotation.Testable;
 
-export type HealthCheck = HealthNodeBase;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-export type HealthFeature = HealthNodeBase & {
-  children: HealthNode[];
-};
-
-export type HealthNode = HealthFeature | HealthCheck;
-
-export type HealthReport = {
-  overall_status: HealthStatus;
-  generated_at: string;
-  features: HealthFeature[];
-};
-
-export const isHealthFeature = (node: HealthNode): node is HealthFeature => 'children' in node;
+/**
+ * Use this annotation instead of the {@link Test} annotation to tag slow tests. Rule of thumb: everything that takes
+ * multiple seconds.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Testable
+@Tag("slow-test")
+@Test
+public @interface SlowTest {
+}

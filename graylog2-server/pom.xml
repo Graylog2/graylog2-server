@@ -658,6 +658,11 @@
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
         </dependency>
+        <!-- Explicitly declare lz4 since kafka-clients depends on it and we exclude it from the declaration. -->
+        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
@@ -767,6 +772,13 @@
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- Glue schema support pulls in outdated Kotlin dependencies. ATM we don't support integrating
+                 Amazon Kinesis Data Streams with the AWS Glue Schema Registry, so we can skip the dependency.
+                 Once we add support, this exclusion has to be revisited. -->
+                <exclusion>
+                    <groupId>software.amazon.glue</groupId>
+                    <artifactId>schema-registry-serde</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useQuery from 'routing/useQuery';
+package org.graylog.plugins.views.search.searchfilters;
 
-export const HEALTH_QUERY_PARAM = 'health';
-export const HEALTH_ON_VALUE = 'on';
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 
-/**
- * Returns whether the Health module should be shown on the System Overview page.
- * Default: hidden. Add `?health=on` to the URL to show it.
- */
-const useHealthModuleVisible = (): boolean => useQuery()[HEALTH_QUERY_PARAM] === HEALTH_ON_VALUE;
+import java.util.List;
 
-export default useHealthModuleVisible;
+public interface EffectiveQueryComposer {
+
+    String compose(String baseQuery, List<UsedSearchFilter> filters);
+}
