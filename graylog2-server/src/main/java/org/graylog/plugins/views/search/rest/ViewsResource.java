@@ -362,12 +362,19 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
     public ViewDTO update(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid UnwrappedCreateEntityRequest<ViewDTO> unwrappedCreateEntityRequest,
                           @Context SearchUser searchUser) {
+        // the ID from the path always has to match the id from the request body for an update.
+        // currently, the FE always uses it like that, so mismatches should only occur when using the API directly
+        // possible improvement could be removing the ID from the path and only have it in the body
+        if (!id.equals(createEntityRequest.entity().id())) {
+           throw new BadRequestException("Invalid update request");
+        }
+
         final ViewDTO dto = unwrappedCreateEntityRequest.getEntity();
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 
         final var grnType = toGRNType(dto);
-        unwrappedCreateEntityRequest.getShareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(dto.id())));
+        unwrappedCreateEntityRequest.getShareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(updatedDTO.id())));
 
         var result = dbService.update(updatedDTO);
         recentActivityService.update(result.id(), grnType, searchUser);
