@@ -1,13 +1,5 @@
-type = "f"
-message = "Validate Slack and Microsoft Teams notification webhook URLs against the URL allowlist."
+type = "a"
+message = "Warn when Slack or Microsoft Teams notification webhook URLs are not in the URL allowlist. A future release will block non-allowlisted URLs."
 
 issues = ["Graylog2/graylog-plugin-enterprise#14748"]
 pulls = ["26619"]
-
-details.user = """
-Existing Slack and Microsoft Teams notifications with webhook URLs that are not in the URL allowlist \
-will fail after upgrading. To avoid disruption, either add the webhook URLs to the URL allowlist \
-(System > Configurations > URL Allowlist) before upgrading, or edit each affected notification \
-after upgrading — the form will show a warning with an "Add to URL allowlist" button that adds \
-the URL in one step.
-"""

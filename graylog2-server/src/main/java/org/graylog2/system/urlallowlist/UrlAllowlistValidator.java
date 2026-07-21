@@ -20,11 +20,14 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.NotificationTestData;
-import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class UrlAllowlistValidator {
+    private static final Logger LOG = LoggerFactory.getLogger(UrlAllowlistValidator.class);
+
     private final UrlAllowlistService allowlistService;
     private final UrlAllowlistNotificationService allowlistNotificationService;
 
@@ -35,16 +38,19 @@ public class UrlAllowlistValidator {
         this.allowlistNotificationService = allowlistNotificationService;
     }
 
-    public void validateUrl(String url, EventNotificationContext ctx) throws TemporaryEventNotificationException {
+    public void validateUrl(String url, EventNotificationContext ctx) {
         if (!allowlistService.isAllowlisted(url)) {
+            LOG.warn("Notification is using a URL which is not allowlisted. " +
+                    "A future version of Graylog will block this request. [url: {}, notification: {}]",
+                    url, ctx.notificationId());
             if (!NotificationTestData.TEST_NOTIFICATION_ID.equals(ctx.notificationId())) {
                 final String eventDefTitle = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Unnamed");
-                final String description = "The alert notification \"" + eventDefTitle +
-                        "\" is trying to access a URL which is not allowlisted. Please check your configuration. [url: \"" +
-                        url + "\"]";
+                final String description = "The alert notification " + eventDefTitle +
+                        " is trying to access a URL which is not allowlisted. Please add it to the URL allowlist. " +
+                        "A future version of Graylog will block requests to non-allowlisted URLs. [url: " +
+                        url + "]";
                 allowlistNotificationService.publishAllowlistFailure(description);
             }
-            throw new TemporaryEventNotificationException("URL <" + url + "> is not allowlisted.");
         }
     }
 }
