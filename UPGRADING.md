@@ -73,6 +73,24 @@ definition can be created after the rules are imported to create the same tempor
 All previously imported Sigma rules, including correlation rules, will be migrated to the new Event Definition pattern
 on upgrade and work as they did before.
 
+Two additional changes to fired events result from this rework:
+
+- The `sigma_rule_tag_*` fields are no longer added to fired events. Previously, fired events included
+  `sigma_rule_tag_1`, `sigma_rule_tag_2`, etc. in their Additional Fields. MITRE information recognized by Graylog is
+  now stored on the Event Definition as `tactics_techniques`, and any other tag values are moved to a dedicated `tags`
+  field. Both `tactics_techniques` and `tags` are multi-valued (array) fields, unlike the individual
+  `sigma_rule_tag_N` fields they replace. If you rely on the `sigma_rule_tag_*` fields in summary templates,
+  notification bodies, or downstream processing, you will need to update those references.
+- The `Sigma: ` prefix is no longer added to fired event titles. Events already stored in the index keep their
+  original title, but newly fired events will not include the prefix.
+
+For previously imported Sigma rules, the upgrade migration applies these changes to the Event Definitions
+automatically: each source Sigma rule's tag values are written onto its Event Definition (MITRE references into
+`tactics_techniques`, all other tags into `tags`), and the `Sigma: ` prefix is removed from the Event Definition
+title. You do not need to re-import or reconfigure your rules. Note that events already stored in the index are not
+rewritten — they keep the original `sigma_rule_tag_*` Additional Fields and titles they were fired with; the changes
+above apply to events fired after the upgrade.
+
 The following REST API changes are a direct result of this rework:
 
 | Endpoint                                                                       | Description                                                                              |
