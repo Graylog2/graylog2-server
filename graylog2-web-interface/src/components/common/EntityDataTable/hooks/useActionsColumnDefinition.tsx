@@ -32,6 +32,11 @@ const AlignRight = styled.div`
   display: flex;
   justify-content: flex-end;
   height: 100%;
+  // Leaves a 1px transparent gap at the true right edge of the cell (mirroring the -1px width on
+  // BackgroundFoundation below, which leaves the same kind of gap on the left), so the pinned
+  // column's own right-edge box-shadow (see Table.tsx/TableHead.tsx) isn't painted over by this
+  // content and can actually show through.
+  padding-right: 1px;
 `;
 
 const BackgroundFoundation = styled.div`

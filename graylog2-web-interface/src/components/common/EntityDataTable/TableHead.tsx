@@ -76,6 +76,14 @@ export const Th = styled.th<{
             theme.colors.global.contentBackground,
             theme.colors.table.head.background,
           ])};
+          // Closes the table's own right edge here instead of a real border: borders on sticky
+          // cells render unreliably (same issue as the left-edge shadow elsewhere), and this edge
+          // was only visible once fully scrolled. box-shadow isn't part of the border-collapse
+          // model, so it doesn't have that problem.
+          ${$pinningPosition === 'right' &&
+          css`
+            box-shadow: inset -1px 0 0 ${theme.colors.table.row.divider};
+          `}
         `
       : ''}
 

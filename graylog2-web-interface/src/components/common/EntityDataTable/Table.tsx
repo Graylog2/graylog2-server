@@ -45,7 +45,12 @@ const StyledTable = styled(BaseTable)(
     table-layout: fixed;
     margin-bottom: 0;
     height: 100%; // required to be able to use height: 100% in td
-    border: 1px solid ${theme.colors.table.row.divider};
+    // No border-right here: at the pinned column's sticky boundary, border-collapse doesn't
+    // reliably render the table's own border. That edge is closed by the pinned cell's own
+    // border-right instead (see Td below and Th in TableHead.tsx).
+    border-top: 1px solid ${theme.colors.table.row.divider};
+    border-left: 1px solid ${theme.colors.table.row.divider};
+    border-bottom: 1px solid ${theme.colors.table.row.divider};
 
     tbody > tr.active {
       background-color: ${theme.colors.table.row.backgroundExpanded} !important;
@@ -59,7 +64,7 @@ const Td = styled.td<{
   $pinningPosition: ColumnPinningPosition;
   $textAlign: string;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, $textAlign }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, $textAlign, theme }) => css`
     word-break: break-word;
     // Overrides the shared Table component's default of "top", so cell content stays centered
     // when a row grows taller than this cell's own content (e.g. a sibling cell wraps to 2 lines).
@@ -79,6 +84,14 @@ const Td = styled.td<{
           &::before {
             display: var(${displayScrollRightIndicatorVar}, none);
           }
+          // Closes the table's own right edge here instead of a real border: borders on sticky
+          // cells render unreliably (same issue as the left-edge shadow above), and this edge was
+          // only visible once fully scrolled. box-shadow isn't part of the border-collapse model,
+          // so it doesn't have that problem.
+          ${$pinningPosition === 'right' &&
+          css`
+            box-shadow: inset -1px 0 0 ${theme.colors.table.row.divider};
+          `}
         `
       : ''}
 
