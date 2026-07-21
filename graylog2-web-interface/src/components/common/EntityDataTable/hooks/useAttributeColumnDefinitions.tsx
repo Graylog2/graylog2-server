@@ -146,6 +146,7 @@ const AttributeHeader = <Entity extends EntityBase>({
   const showDragAffordance = isDraggable && !isResizingColumn;
   const { attributes, isDragging, listeners, setNodeRef } = useSortableCol(colId, !isDraggable);
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
+  const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
   const columnLabel = columnMeta?.label ?? colId;
   const canSlice = columnMeta?.enableSlicing;
   const isSliceActive = activeSliceCol === colId;
@@ -161,7 +162,9 @@ const AttributeHeader = <Entity extends EntityBase>({
   // Always rendered (even with no active sort), so ThInner always has two flex children:
   // with only one child, "justify-content: space-between" collapses to "flex-start", pinning
   // a lone title group to the left even when this column is right-aligned.
-  const sortIcon = <RightCol>{sortDirection && <SortIcon<Entity> column={ctx.header.column} />}</RightCol>;
+  const sortIcon = (
+    <RightCol ref={rightRef}>{sortDirection && <SortIcon<Entity> column={ctx.header.column} />}</RightCol>
+  );
 
   const titleGroup = (
     <LeftCol ref={leftRef}>
