@@ -19,13 +19,17 @@
 package org.graylog2.indexer.indices;
 
 public record OutdatedIndex(String indexName, String version, boolean warmIndex,
-                            boolean managedIndex) implements Comparable<OutdatedIndex> {
+                            boolean managedIndex, String activeWriteIndex) implements Comparable<OutdatedIndex> {
     public OutdatedIndex(String indexName, String version, boolean warmIndex) {
-        this(indexName, version, warmIndex, false);
+        this(indexName, version, warmIndex, false, null);
     }
 
     public OutdatedIndex asManaged(boolean managed) {
-        return new OutdatedIndex(indexName, version, warmIndex, managed);
+        return new OutdatedIndex(indexName, version, warmIndex, managed, activeWriteIndex);
+    }
+
+    public OutdatedIndex asActiveWriteIndex(String isActiveWriteIndex) {
+        return new OutdatedIndex(indexName, version, warmIndex, managedIndex, isActiveWriteIndex);
     }
 
     public boolean isSystemIndex() {

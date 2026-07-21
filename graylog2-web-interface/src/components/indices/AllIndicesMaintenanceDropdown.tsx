@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { SystemIndexRanges } from '@graylog/server-api';
 
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
-import OutdatedIndicesModal from 'components/indices/OutdatedIndicesModal';
+import IncompatibleIndicesModal from 'components/indices/IncompatibleIndicesModal';
 
 const _onRecalculateAllIndexRange = () => {
   // eslint-disable-next-line no-alert
@@ -30,7 +30,7 @@ const _onRecalculateAllIndexRange = () => {
 };
 
 const AllIndicesMaintenanceDropdown = () => {
-  const [showOutdatedModal, setShowOutdatedModal] = useState(false);
+  const [showIncompatibleModal, setShowIncompatibleModal] = useState(false);
 
   return (
     <ButtonGroup>
@@ -38,11 +38,11 @@ const AllIndicesMaintenanceDropdown = () => {
         <MenuItem eventKey="1" onClick={_onRecalculateAllIndexRange}>
           Cleanup & recalculate all index ranges
         </MenuItem>
-        <MenuItem eventKey="4" onClick={() => setShowOutdatedModal(true)}>
-          Show outdated indices
+        <MenuItem eventKey="4" onClick={() => setShowIncompatibleModal(true)}>
+          Check index versions
         </MenuItem>
       </DropdownButton>
-      {showOutdatedModal && <OutdatedIndicesModal show onClose={() => setShowOutdatedModal(false)} />}
+      {showIncompatibleModal && <IncompatibleIndicesModal show onClose={() => setShowIncompatibleModal(false)} />}
     </ButtonGroup>
   );
 };

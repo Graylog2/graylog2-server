@@ -41,7 +41,7 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetPositions, updateWidgetPosition } from 'views/logic/slices/widgetActions';
 import { setIsDirty } from 'views/logic/slices/viewSlice';
 import { widgetDragHandleClass } from 'views/components/widgets/Constants';
-import { selectNewWidget } from 'views/logic/slices/widgetsSlice';
+import { selectNewWidget, clearNewWidget } from 'views/logic/slices/widgetsSlice';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 
 import WidgetContainer from './WidgetContainer';
@@ -91,8 +91,10 @@ type WidgetsProps = {
 };
 
 const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget, isNewWidget }: WidgetsProps) => {
+  const dispatch = useViewsDispatch();
   const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
   const widgetPosition = positions[widgetId];
+  const onSettled = useCallback(() => dispatch(clearNewWidget(widgetId)), [dispatch, widgetId]);
 
   return (
     <>
@@ -101,6 +103,7 @@ const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget,
         scrollContainer={{ current: document.body }}
         title="Scroll to new widget"
         ifTrue={isNewWidget}
+        onSettled={onSettled}
       />
       <WidgetComponent
         editing={editing}

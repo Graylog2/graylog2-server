@@ -74,6 +74,10 @@ public class CommandLineProcess {
         this.watchDog.destroyProcess();
     }
 
+    public void destroyForcibly() {
+        this.watchDog.destroyForcibly();
+    }
+
     @NotNull
     public ProcessInformation processInfo() {
         return watchDog.processInfo();
