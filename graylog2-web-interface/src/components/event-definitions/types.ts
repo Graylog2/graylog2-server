@@ -19,7 +19,7 @@ import type React from 'react';
 
 import type { SearchBarControl } from 'views/types';
 import type User from 'logic/users/User';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
 import type { Attribute } from 'stores/PaginationTypes';
 
 export type AlertType = 'alert' | 'event' | 'event_definition';
@@ -115,5 +115,9 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitions.components.sigmaGitImport'?: Array<{ component: React.FC; key: string }>;
     'eventDefinitions.components.sigmaFileUpload'?: Array<{ component: React.FC; key: string }>;
     'eventDefinitions.components.sigmaOptions'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.searchQueryPreview'?: Array<{
+      component: React.ComponentType<{ queryString: string; filters: SearchFilter[] }>;
+      key: string;
+    }>;
   }
 }

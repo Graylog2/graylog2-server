@@ -26,6 +26,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The base class for MCP tools.
@@ -109,6 +110,8 @@ public abstract class Tool<P, O> {
     protected ObjectMapper getObjectMapper() {
         return objectMapper;
     }
+
+    public abstract Set<String> checkedPermissions();
 
     @JsonProperty
     public String name() {
