@@ -59,6 +59,7 @@ const FlexWrapper = styled.div(
 
 type Props = React.PropsWithChildren<{
   title: string;
+  titleAs?: 'h2' | 'h3';
   header?: React.ReactNode;
   actions?: React.ReactNode;
   preHeaderSection?: React.ReactNode;
@@ -76,6 +77,7 @@ type Props = React.PropsWithChildren<{
  */
 const Section = ({
   title,
+  titleAs: TitleAs = 'h2',
   header = null,
   actions = null,
   preHeaderSection = null,
@@ -127,7 +129,7 @@ const Section = ({
               {preHeaderSection}
             </FlexWrapper>
           )}
-          <h2>{header ?? title}</h2>
+          <TitleAs>{header ?? title}</TitleAs>
           {headerLeftSection && (
             <FlexWrapper
               onClick={(e) => {

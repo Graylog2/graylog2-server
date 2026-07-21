@@ -33,8 +33,6 @@ describe('PlatformPicker', () => {
     expect(screen.getByRole('button', { name: /linux/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /windows/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /macos/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /kubernetes/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /docker/i })).toBeInTheDocument();
   });
 
   it('calls onSelect with the platform id when a card is clicked', async () => {

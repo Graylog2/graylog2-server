@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.search.searchfilters.module;
 
 import com.google.inject.multibindings.OptionalBinder;
+import org.graylog.plugins.views.search.searchfilters.DefaultEffectiveQueryComposer;
+import org.graylog.plugins.views.search.searchfilters.EffectiveQueryComposer;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
@@ -33,5 +35,7 @@ public class SearchFiltersModule extends Graylog2Module {
         OptionalBinder.newOptionalBinder(binder(), SearchFiltersReFetcher.class)
                 .setDefault().to(IgnoreSearchFilters.class);
 
+        OptionalBinder.newOptionalBinder(binder(), EffectiveQueryComposer.class)
+                .setDefault().to(DefaultEffectiveQueryComposer.class);
     }
 }

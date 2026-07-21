@@ -44,7 +44,6 @@ import type { EventDefinition } from '../event-definitions-types';
 import {
   isAggregationEventDefinition,
   isSystemEventDefinition,
-  isSigmaEventDefinition,
 } from '../event-definitions-types';
 
 type Props = {
@@ -263,7 +262,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
             </MenuItem>
           </IfPermitted>
           <IfPermitted permissions="eventdefinitions:create">
-            {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
+            {!isSystemEventDefinition(eventDefinition) && (
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
             )}
             <MenuItem divider />

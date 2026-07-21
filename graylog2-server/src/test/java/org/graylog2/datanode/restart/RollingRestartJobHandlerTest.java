@@ -20,7 +20,6 @@ import org.bson.conversions.Bson;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
-import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -28,7 +27,9 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.cluster.nodes.OpensearchVersionsOverview;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -70,12 +72,17 @@ class RollingRestartJobHandlerTest {
     Lock lock;
     @Mock
     ClusterState clusterState;
+    @Mock
+    DataNodeMetadataService dataNodeMetadataService;
 
     private RollingRestartJobHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new RollingRestartJobHandler(jobDefinitionService, jobTriggerService, actions, clock, lockService);
+        OpensearchVersionsOverview versionOverview = mock(OpensearchVersionsOverview.class);
+        lenient().when(versionOverview.highestAvailableVersion()).thenReturn(Optional.of("999.999.999"));
+        lenient().when(dataNodeMetadataService.getVersionsOverview()).thenReturn(versionOverview);
+        handler = new RollingRestartJobHandler(jobDefinitionService, jobTriggerService, actions, clock, lockService, dataNodeMetadataService);
         // Default: lock acquisition succeeds for most tests; tests that exercise contention override.
         lenient().when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE)).thenReturn(Optional.of(lock));
         lenient().when(clock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
@@ -134,10 +141,11 @@ class RollingRestartJobHandlerTest {
         greenClusterWithThreeNodes();
         final var existing = buildExistingTrigger(
                 RollingRestartExecutionJob.Data.builder()
-                        .smState(RollingRestartState.STOPPING_NODE)
+                        .smState(RollingRestartState.UPGRADING_NODE)
                         .nodes(List.of())
                         .triggeredBy("bob")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -244,6 +252,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -269,6 +278,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -288,6 +298,7 @@ class RollingRestartJobHandlerTest {
                         .triggeredBy("alice")
                         .waitingGreenSince(oldTs)
                         .pausedReason("stuck")
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -309,6 +320,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -332,6 +344,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         // First streamByQuery (findActive) returns the trigger. We don't need any second query.
         when(jobTriggerService.streamByQuery(any(Bson.class))).thenReturn(Stream.of(existing));
@@ -347,6 +360,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         when(jobTriggerService.streamByQuery(any(Bson.class)))
                 .thenReturn(Stream.empty())     // findActive — none
@@ -366,6 +380,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build())
                 .toBuilder()
                 .createdAt(DateTime.now(DateTimeZone.UTC).minusDays(1))
@@ -376,6 +391,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("bob")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build())
                 .toBuilder()
                 .createdAt(DateTime.now(DateTimeZone.UTC))

@@ -31,7 +31,7 @@ import createSearch from 'views/logic/slices/createSearch';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import Query from 'views/logic/queries/Query';
 import type { LookupTableParameterJsonEmbryonic } from 'components/event-definitions/event-definition-types/FilterForm';
-import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import Parameter from 'views/logic/parameters/Parameter';
 import type User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
@@ -133,7 +133,7 @@ const constructSearch = (
     .parameters(
       config?.query_parameters
         ?.filter((param: LookupTableParameterJsonEmbryonic) => !param.embryonic)
-        .map((param) => LookupTableParameter.fromJSON(param)) ?? [],
+        .map((param) => Parameter.fromJSON(param)) ?? [],
     )
     .queries([query])
     .build();

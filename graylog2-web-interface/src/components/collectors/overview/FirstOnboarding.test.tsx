@@ -67,6 +67,7 @@ jest.mock('./onboarding/WaitingForConnection', () => {
     os: 'linux',
     version: '1.2.3',
     status: 'online' as const,
+    has_pending_changes: false,
   };
 
   return function WaitingForConnectionStub({
@@ -94,6 +95,7 @@ const mockConfig = {
   collector_offline_threshold: 'PT5M',
   collector_default_visibility_threshold: 'PT1H',
   collector_expiration_threshold: 'P30D',
+  collector_heartbeat_interval: 'PT30S',
 };
 
 const mockFleets = [
