@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.datanodes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
@@ -63,7 +64,7 @@ public class RollingRestartResource extends RestResource {
     @Operation(summary = "Trigger rolling restart of embedded OpenSearch")
     @RequiresPermissions(RestPermissions.DATANODE_RESTART)
     @AuditEvent(type = DATANODE_TRIGGER_RESTART)
-    public Response start(StartRequest request) {
+    public Response start(@RequestBody(required = false) StartRequest request) {
         try {
             final String triggeredBy = String.valueOf(SecurityUtils.getSubject().getPrincipal());
             final JobTriggerDto trigger = handler.start(triggeredBy, request != null && request.force());
