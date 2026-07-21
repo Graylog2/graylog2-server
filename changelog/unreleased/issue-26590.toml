@@ -1,0 +1,5 @@
+type = "s"
+message = "Enforce per-entity read permission on the event definition duplicate endpoint, preventing users from cloning event definitions they have not been granted access to."
+
+pulls = ["26706"]
+issues = ["26590"]
