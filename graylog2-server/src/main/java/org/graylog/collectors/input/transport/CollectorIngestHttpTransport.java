@@ -45,6 +45,7 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.utilities.IpSubnet;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -63,6 +64,12 @@ import java.util.concurrent.Callable;
 public class CollectorIngestHttpTransport extends AbstractHttpTransport {
     public static final String NAME = "CollectorIngestHttpTransport";
     static final int DEFAULT_HTTP_PORT = 14401;
+
+    /**
+     * Forced idle connection timeout — deliberately not user-configurable, because connections must be
+     * closed well before their fingerprint cache entry can expire. See {@code CertBindingResolver#IDLE_EXPIRY}
+     */
+    public static final Duration IDLE_WRITER_TIMEOUT = Duration.ofSeconds(60);
 
     private final CollectorTLSUtils tlsUtils;
     private final CollectorIngestHttpHandler.Factory httpHandlerFactory;
@@ -90,9 +97,7 @@ public class CollectorIngestHttpTransport extends AbstractHttpTransport {
         final var merged = Optional.ofNullable(userConfig.getSource()).map(HashMap::new).orElse(new HashMap<>());
         merged.put(CK_TLS_ENABLE, true);
         merged.put(CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_REQUIRED);
-        // Using a fixed idle timeout < fingerprint cache expiry (see CertBindingResolver). This makes sure that
-        // cert lookups in the request path are cache hits, after the TLS handshake has populated the cache.
-        merged.put(CK_IDLE_WRITER_TIMEOUT, 60); // seconds
+        merged.put(CK_IDLE_WRITER_TIMEOUT, Math.toIntExact(IDLE_WRITER_TIMEOUT.toSeconds()));
         return new Configuration(merged);
     }
 

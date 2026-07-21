@@ -17,8 +17,11 @@
 package org.graylog.collectors;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
+import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
+import org.graylog2.utilities.FakeTicker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,15 +61,27 @@ class CertBindingResolverTest {
 
     private EventBus eventBus;
     private MutableClock clock;
+    private FakeTicker cacheTicker;
     private CertBindingResolver resolver;
 
     @BeforeEach
     void setUp() {
         eventBus = new EventBus();
         clock = MutableClock.epochUTC();
-        // Runnable::run makes Caffeine's refresh reloads (and preWarm) run inline for deterministic tests.
-        // The ticker is derived from this clock, so advancing it drives the idle expiry.
-        resolver = new CertBindingResolver(configService, instanceService, eventBus, clock, Runnable::run);
+        cacheTicker = new FakeTicker(Duration.ZERO);
+        // The direct executor makes Caffeine's refresh reloads (and preWarm) run inline, so tests observe
+        // post-refresh state deterministically. Cache time (ticker) and binding-stamp time (clock) are
+        // separate sources — advance them in tandem via advanceTime().
+        resolver = new CertBindingResolver(configService, instanceService, eventBus, clock, cacheTicker,
+                MoreExecutors.directExecutor());
+    }
+
+    @Test
+    void idleConnectionTimeoutStaysWellBelowCacheExpiry() {
+        // The event-loop hit guarantee: a connection must die long before its warmed cache entry can idle
+        // out. The two constants are pinned independently. This inequality is their contract.
+        assertThat(CollectorIngestHttpTransport.IDLE_WRITER_TIMEOUT.multipliedBy(10))
+                .isLessThanOrEqualTo(CertBindingResolver.IDLE_EXPIRY);
     }
 
     // ----- Binding resolution: which slot binds, until when -----
@@ -111,7 +126,7 @@ class CertBindingResolverTest {
 
         assertThat(resolver.resolve("fp-prev")).contains("uid-1"); // within grace
 
-        clock.add(GRACE_PERIOD.plus(Duration.ofMinutes(1)));
+        advanceTime(GRACE_PERIOD.plus(Duration.ofMinutes(1)));
         assertThat(resolver.resolve("fp-prev")).isEmpty(); // past grace
     }
 
@@ -126,7 +141,7 @@ class CertBindingResolverTest {
 
         assertThat(resolver.resolve("fp-prev")).contains("uid-1");
 
-        clock.add(Duration.ofMinutes(2)); // past cert expiry, still within grace
+        advanceTime(Duration.ofMinutes(2)); // past cert expiry, still within grace
         assertThat(resolver.resolve("fp-prev")).isEmpty();
     }
 
@@ -202,12 +217,12 @@ class CertBindingResolverTest {
 
         assertThat(resolver.resolve("prev-fp")).contains("uid-prev");
 
-        clock.add(Duration.ofMinutes(4)); // still within grace
+        advanceTime(Duration.ofMinutes(4)); // still within grace
         assertThat(resolver.resolve("prev-fp")).contains("uid-prev");
 
         // Past the grace deadline the still-cached entry keeps serving local rejects — the cut must not
         // cost a reload (this is what keeps the deadline cut off the Netty event loop).
-        clock.add(Duration.ofMinutes(2)); // now past the deadline
+        advanceTime(Duration.ofMinutes(2)); // now past the deadline
         assertThat(resolver.resolve("prev-fp")).isEmpty();
         assertThat(resolver.resolve("prev-fp")).isEmpty();
 
@@ -221,7 +236,7 @@ class CertBindingResolverTest {
 
         assertThat(resolver.resolve("fp-idle")).contains("uid-idle");
 
-        clock.add(Duration.ofMinutes(61)); // exceeds IDLE_EXPIRY without any access
+        advanceTime(Duration.ofMinutes(61)); // exceeds IDLE_EXPIRY without any access
         assertThat(resolver.resolve("fp-idle")).contains("uid-idle");
 
         verify(instanceService, times(2)).findByActiveOrNextOrPreviousFingerprint("fp-idle");
@@ -259,7 +274,7 @@ class CertBindingResolverTest {
 
         assertThat(resolver.resolve("fp-rot")).contains("uid-rot"); // still within grace
 
-        clock.add(GRACE_PERIOD.plus(Duration.ofMinutes(1)));
+        advanceTime(GRACE_PERIOD.plus(Duration.ofMinutes(1)));
         assertThat(resolver.resolve("fp-rot")).isEmpty();
         verify(instanceService, times(2)).findByActiveOrNextOrPreviousFingerprint("fp-rot"); // load + refresh
     }
@@ -286,7 +301,7 @@ class CertBindingResolverTest {
         // revocation is applied — the bounded self-healing that makes serve-stale safe. (The value the
         // triggering access itself returns depends on executor timing; the inline test executor
         // completes the reload immediately, so only the post-trigger state is asserted.)
-        clock.add(Duration.ofMinutes(31)); // past refreshAfterWrite (30m), within idle expiry (60m)
+        advanceTime(Duration.ofMinutes(31)); // past refreshAfterWrite (30m), within idle expiry (60m)
         resolver.resolve("fp-1"); // triggers the re-resolve
         assertThat(resolver.resolve("fp-1")).isEmpty(); // revocation applied
 
@@ -302,7 +317,7 @@ class CertBindingResolverTest {
         // The instance is revoked but the certs-changed event never arrives (lost cluster event).
         // refreshAfterWrite is the backstop: an access past the interval re-resolves the entry.
         when(instanceService.findByActiveOrNextOrPreviousFingerprint("fp-1")).thenReturn(Optional.empty());
-        clock.add(Duration.ofMinutes(31)); // past refreshAfterWrite (30m), within idle expiry (60m)
+        advanceTime(Duration.ofMinutes(31)); // past refreshAfterWrite (30m), within idle expiry (60m)
         resolver.resolve("fp-1"); // triggers the background re-resolve
 
         assertThat(resolver.resolve("fp-1")).isEmpty();
@@ -365,6 +380,11 @@ class CertBindingResolverTest {
         } finally {
             resolver.stopAsync().awaitTerminated();
         }
+    }
+
+    private void advanceTime(Duration duration) {
+        clock.add(duration);
+        cacheTicker.advance(duration);
     }
 
     // ----- Fixtures -----

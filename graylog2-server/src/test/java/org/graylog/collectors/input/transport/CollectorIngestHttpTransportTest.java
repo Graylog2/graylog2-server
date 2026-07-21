@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,7 +76,8 @@ class CollectorIngestHttpTransportTest {
 
         assertThat(handlers).containsKey("read-timeout-handler");
         final var handler = (IdleStateHandler) handlers.get("read-timeout-handler").call();
-        assertThat(handler.getReaderIdleTimeInMillis()).isEqualTo(Duration.ofSeconds(60).toMillis());
+        assertThat(handler.getReaderIdleTimeInMillis())
+                .isEqualTo(CollectorIngestHttpTransport.IDLE_WRITER_TIMEOUT.toMillis());
     }
 
     private CollectorIngestHttpTransport buildTransport(Map<String, Object> userConfig) {

@@ -19,9 +19,11 @@ package org.graylog.collectors;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.Ticker;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
@@ -61,9 +63,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class CertBindingResolver extends AbstractIdleService {
 
     public static final long MAX_SIZE = 1_000_000L; // safety net
-    // Using a fixed cache expiry > idle connection timeout (See CollectorIngestHttpTransport). This makes sure that
-    // cert lookups in the request path are cache hits, after the TLS handshake has populated the cache.
-    private static final Duration IDLE_EXPIRY = Duration.ofMinutes(60);
+    // Expiry must stay well above the ingest transport's forced idle connection timeout, so that an entry warmed
+    // at the TLS handshake always outlives its connection and per-request lookups stay cache hits.
+    static final Duration IDLE_EXPIRY = Duration.ofHours(1);
     private static final Logger LOG = LoggerFactory.getLogger(CertBindingResolver.class);
 
     private final CollectorsConfigService configService;
@@ -80,18 +82,30 @@ public class CertBindingResolver extends AbstractIdleService {
                                EventBus eventBus,
                                Clock clock,
                                @CollectorCertCacheRefreshExecutor Executor executor) {
+        this(configService, instanceService, eventBus, clock, null, executor);
+    }
+
+    @VisibleForTesting
+    CertBindingResolver(CollectorsConfigService configService,
+                        CollectorInstanceService instanceService,
+                        EventBus eventBus,
+                        Clock clock,
+                        @Nullable Ticker cacheTicker,
+                        @CollectorCertCacheRefreshExecutor Executor executor) {
         this.configService = configService;
         this.instanceService = instanceService;
         this.executor = executor;
         this.eventBus = eventBus;
         this.clock = clock;
-        this.cache = Caffeine.newBuilder()
+        final var cacheBuilder = Caffeine.newBuilder()
                 .maximumSize(MAX_SIZE)
                 .executor(executor) // refresh runs on this executor
-                .ticker(clockTicker()) // drive Caffeine's expiry off the same Clock as the binding deadlines
                 .expireAfterAccess(IDLE_EXPIRY)
-                .refreshAfterWrite(IDLE_EXPIRY.dividedBy(2)) // self-healing bound for failed/missed refreshes
-                .build(this::loadBinding);
+                .refreshAfterWrite(IDLE_EXPIRY.dividedBy(2)); // self-healing bound for failed/missed refreshes
+        if (cacheTicker != null) {
+            cacheBuilder.ticker(cacheTicker);
+        }
+        this.cache = cacheBuilder.build(this::loadBinding);
     }
 
     @Override
@@ -183,10 +197,6 @@ public class CertBindingResolver extends AbstractIdleService {
         }
         LOG.debug("Certificates changed: refreshing {} cached of {} touched fingerprint(s).",
                 refreshed, event.fingerprints().size());
-    }
-
-    private Ticker clockTicker() {
-        return () -> clock.millis() * 1_000_000L;
     }
 
     /**
