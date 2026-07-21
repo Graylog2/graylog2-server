@@ -399,7 +399,6 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
                           @Context SearchUser searchUser) {
         // the ID from the path always has to match the id from the request body for an update.
         // currently, the FE always uses it like that, so mismatches should only occur when using the API directly
-        // possible improvement could be removing the ID from the path and only have it in the body
         if (!id.equals(createEntityRequest.entity().id())) {
            throw new BadRequestException("Invalid update request");
         }
