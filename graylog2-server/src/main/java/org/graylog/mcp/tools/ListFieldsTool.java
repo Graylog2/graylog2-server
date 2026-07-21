@@ -67,7 +67,7 @@ public class ListFieldsTool extends Tool<ListFieldsTool.Parameters, ListFieldsTo
     }
 
     @Override
-    public Set<String> minimalRequiredPermissions() {
+    public Set<String> checkedPermissions() {
         return Set.of();
     }
 

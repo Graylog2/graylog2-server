@@ -111,17 +111,7 @@ public abstract class Tool<P, O> {
         return objectMapper;
     }
 
-    /**
-     * @return Minimal set of permissions to run the MCP Tool. Depending on additional permissions the results of the run can be different.
-     */
-    public abstract Set<String> minimalRequiredPermissions();
-
-    /**
-     * @return Full set of permissions needed to access all the data when invoking MCP Tool. Override for tools that filter results based on permissions or have entity-level permissions checks.
-     */
-    public Set<String> fullAccessPermissions() {
-        return minimalRequiredPermissions();
-    }
+    public abstract Set<String> checkedPermissions();
 
     @JsonProperty
     public String name() {

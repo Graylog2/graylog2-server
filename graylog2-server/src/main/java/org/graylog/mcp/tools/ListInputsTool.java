@@ -76,12 +76,7 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
     }
 
     @Override
-    public Set<String> minimalRequiredPermissions() {
-        return Set.of();
-    }
-
-    @Override
-    public Set<String> fullAccessPermissions() {
+    public Set<String> checkedPermissions() {
         return Set.of(RestPermissions.INPUTS_READ);
     }
 

@@ -86,12 +86,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     }
 
     @Override
-    public Set<String> minimalRequiredPermissions() {
-        return Set.of();
-    }
-
-    @Override
-    public Set<String> fullAccessPermissions() {
+    public Set<String> checkedPermissions() {
         return Set.of(RestPermissions.INDICES_READ);
     }
 

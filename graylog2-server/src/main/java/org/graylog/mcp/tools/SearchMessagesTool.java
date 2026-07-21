@@ -78,7 +78,7 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
     }
 
     @Override
-    public Set<String> minimalRequiredPermissions() {
+    public Set<String> checkedPermissions() {
         return Set.of();
     }
 

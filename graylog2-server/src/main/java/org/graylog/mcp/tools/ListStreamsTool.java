@@ -59,12 +59,7 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     }
 
     @Override
-    public Set<String> minimalRequiredPermissions() {
-        return Set.of();
-    }
-
-    @Override
-    public Set<String> fullAccessPermissions() {
+    public Set<String> checkedPermissions() {
         return Set.of(RestPermissions.STREAMS_READ);
     }
 
