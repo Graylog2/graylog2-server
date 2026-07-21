@@ -45,9 +45,10 @@ const StyledTable = styled(BaseTable)(
     table-layout: fixed;
     margin-bottom: 0;
     height: 100%; // required to be able to use height: 100% in td
+    border: 1px solid ${theme.colors.table.row.divider};
 
     tbody > tr.active {
-      background-color: ${theme.colors.table.row.backgroundStriped} !important;
+      background-color: ${theme.colors.table.row.backgroundExpanded} !important;
     }
   `,
 );

@@ -16,10 +16,12 @@
  */
 import * as React from 'react';
 import { useMemo, useState, useCallback, useRef } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, ThemeProvider } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import { ButtonGroup } from 'components/bootstrap';
 import { COLUMN_BORDER_WIDTH_VAR } from 'components/bootstrap/Table';
+import { COLOR_SCHEME_LIGHT } from 'theme/constants';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
@@ -63,6 +65,34 @@ import BulkActionsRow from './BulkActionsRow';
 const cssVariable = (variable: string, value: string | number) => css`
   ${variable}: ${value};
 `;
+
+// TEMPORARY: trying out alternative table colors. Remove this override once we've settled on values.
+// Dark values are taken from the design system's gray scale: gray[1] #E1E4ED, gray[2] #C1C7DC,
+// gray[4] #394261, gray[8] #12182B.
+const withExperimentalTableColors = (theme: DefaultTheme): DefaultTheme => {
+  const isLight = theme.mode === COLOR_SCHEME_LIGHT;
+
+  return {
+    ...theme,
+    colors: {
+      ...theme.colors,
+      table: {
+        ...theme.colors.table,
+        head: {
+          ...theme.colors.table.head,
+          background: isLight ? '#F6F7FC' : 'rgba(57, 66, 97, 0.5)', // gray[4] @ 50%
+        },
+        row: {
+          ...theme.colors.table.row,
+          backgroundStriped: isLight ? 'rgba(246, 247, 252, 0.5)' : 'rgba(57, 66, 97, 0.2)', // gray[4] @ 20%
+          backgroundExpanded: isLight ? 'rgba(246, 247, 252, 0.75)' : '#12182B', // gray[8]
+          backgroundHover: isLight ? '#E1E4ED' : '#394261', // gray[4]
+          divider: isLight ? '#E1E4ED' : 'rgba(57, 66, 97, 0.9)', // gray[4] @ 90%
+        },
+      },
+    },
+  };
+};
 
 const ScrollContainer = styled.div<{
   $columnWidths: { [_attributeId: string]: number };
@@ -316,62 +346,64 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   ]);
 
   return (
-    <MetaDataProvider<Meta> meta={meta}>
-      <SelectedEntitiesProvider<Entity>
-        table={table}
-        selectedEntities={selectedEntities}
-        isSomeRowsSelected={table.getIsSomeRowsSelected()}
-        isAllRowsSelected={table.getIsAllRowsSelected()}>
-        <ActiveSliceColContext.Provider value={activeSliceCol}>
-          <ExpandedSectionsProvider>
-            <ActionsRow>
-              <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
-              {noColumnReordering && noPageSizeSelect ? null : (
-                <LayoutConfigRow>
-                  Show
-                  <ButtonGroup>
-                    {displayPageSizeSelect && !noPageSizeSelect && (
-                      <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
-                    )}
-                    {!noColumnReordering && (
-                      <ColumnsVisibilitySelect<Entity>
-                        table={table}
-                        onResetLayoutPreferences={resetLayoutPreferences}
-                      />
-                    )}
-                  </ButtonGroup>
-                </LayoutConfigRow>
-              )}
-            </ActionsRow>
-            <TableDndProvider table={table}>
-              <DndStylesContext.Consumer>
-                {({ activeColId, columnTransform }) => (
-                  <ScrollContainer
-                    id="scroll-container"
-                    ref={scrollContainerRef}
-                    $actionsHeaderWidth={actionsColMinWidth}
-                    $activeColId={activeColId}
-                    $columnTransform={columnTransform}
-                    $columnWidths={columnWidths}
-                    $canScrollRight={scrolledToRight && tableIsCompressed}
-                    $scrollContainerWidth={scrollContainerWidth}>
-                    <InnerContainer>
-                      <Table<Entity>
-                        expandedSectionRenderers={expandedSectionRenderers}
-                        headerGroups={headerGroups}
-                        rowOverride={rowOverride}
-                        rows={table.getRowModel().rows}
-                      />
-                      <ScrollRightIndicator ref={scrolledToRightIndicator} />
-                    </InnerContainer>
-                  </ScrollContainer>
+    <ThemeProvider theme={withExperimentalTableColors}>
+      <MetaDataProvider<Meta> meta={meta}>
+        <SelectedEntitiesProvider<Entity>
+          table={table}
+          selectedEntities={selectedEntities}
+          isSomeRowsSelected={table.getIsSomeRowsSelected()}
+          isAllRowsSelected={table.getIsAllRowsSelected()}>
+          <ActiveSliceColContext.Provider value={activeSliceCol}>
+            <ExpandedSectionsProvider>
+              <ActionsRow>
+                <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
+                {noColumnReordering && noPageSizeSelect ? null : (
+                  <LayoutConfigRow>
+                    Show
+                    <ButtonGroup>
+                      {displayPageSizeSelect && !noPageSizeSelect && (
+                        <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+                      )}
+                      {!noColumnReordering && (
+                        <ColumnsVisibilitySelect<Entity>
+                          table={table}
+                          onResetLayoutPreferences={resetLayoutPreferences}
+                        />
+                      )}
+                    </ButtonGroup>
+                  </LayoutConfigRow>
                 )}
-              </DndStylesContext.Consumer>
-            </TableDndProvider>
-          </ExpandedSectionsProvider>
-        </ActiveSliceColContext.Provider>
-      </SelectedEntitiesProvider>
-    </MetaDataProvider>
+              </ActionsRow>
+              <TableDndProvider table={table}>
+                <DndStylesContext.Consumer>
+                  {({ activeColId, columnTransform }) => (
+                    <ScrollContainer
+                      id="scroll-container"
+                      ref={scrollContainerRef}
+                      $actionsHeaderWidth={actionsColMinWidth}
+                      $activeColId={activeColId}
+                      $columnTransform={columnTransform}
+                      $columnWidths={columnWidths}
+                      $canScrollRight={scrolledToRight && tableIsCompressed}
+                      $scrollContainerWidth={scrollContainerWidth}>
+                      <InnerContainer>
+                        <Table<Entity>
+                          expandedSectionRenderers={expandedSectionRenderers}
+                          headerGroups={headerGroups}
+                          rowOverride={rowOverride}
+                          rows={table.getRowModel().rows}
+                        />
+                        <ScrollRightIndicator ref={scrolledToRightIndicator} />
+                      </InnerContainer>
+                    </ScrollContainer>
+                  )}
+                </DndStylesContext.Consumer>
+              </TableDndProvider>
+            </ExpandedSectionsProvider>
+          </ActiveSliceColContext.Provider>
+        </SelectedEntitiesProvider>
+      </MetaDataProvider>
+    </ThemeProvider>
   );
 };
 

@@ -19,6 +19,8 @@ import { Table as MantineTable } from '@mantine/core';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
+import { COLOR_SCHEME_LIGHT } from 'theme/constants';
+
 export const TABLE_ROW_HOVER_TRANSITION = 'background-color 150ms ease-in-out';
 export const TABLE_ROW_PINNED_HOVER_BG_VAR = '--table-row-pinned-hover-bg';
 export const flattenTableBackground = (theme: DefaultTheme, color: string) =>
@@ -77,7 +79,12 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       ${$columnBorders &&
       css`
         border-right-style: solid;
-        border-right-color: ${theme.colors.table.row.divider};
+        // TEMPORARY: trying out an alternative column-divider color, hardcoded since there's no
+        // dedicated theme token for it yet (unlike the row divider). Remove once settled on a value.
+        // Both values are gray[2] #C1C7DC from the design system's gray scale, at different alphas.
+        border-right-color: ${theme.mode === COLOR_SCHEME_LIGHT
+          ? 'rgba(193, 199, 220, 0.15)' // #C1C7DC @ 15%
+          : 'rgba(193, 199, 220, 0.1)'}; // #C1C7DC @ 10%
         border-right-width: var(${COLUMN_BORDER_WIDTH_VAR}, 1px);
 
         &:last-child {

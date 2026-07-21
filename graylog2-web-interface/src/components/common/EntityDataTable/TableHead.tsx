@@ -53,6 +53,10 @@ export const Th = styled.th<{
     // Values stay positive on purpose: a negative z-index on a th that also has a transform
     // (for column drag/reorder) can make some browsers cull the cell's own content entirely.
     padding: 0 !important;
+    font-weight: normal; // override the browser default bold th styling
+    // Use the row divider color for the border between headers, instead of the columnDivider
+    // color the shared "columnBorders" table rule uses for the body rows.
+    border-right-color: ${theme.colors.table.row.divider} !important;
     z-index: ${$pinningPosition ? 2000 : $zIndex};
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);

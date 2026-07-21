@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export const CELL_PADDING = 5; // px
+export const CELL_PADDING = 6; // px
 export const DEFAULT_COL_MIN_WIDTH = 150; // px
 export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.
 export const MORE_ACTIONS_TITLE = 'More';

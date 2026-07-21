@@ -63,7 +63,8 @@ export const ThInner = styled.div<{ $isDraggable?: boolean; $isDragging?: boolea
     position: relative;
     // th no longer has its own padding, so this is the only padding for the header cell,
     // meaning it's part of this element's own box and therefore draggable/hoverable too.
-    padding: ${CELL_PADDING}px;
+    // Top/bottom padding is +2.5px each (+5px total) to make the header row a bit taller.
+    padding: ${CELL_PADDING + 2.5}px ${CELL_PADDING}px;
     //padding-top: ${$isDraggable ? `calc(${CELL_PADDING}px + ${theme.spacings.xxs})` : `${CELL_PADDING}px`};
 
     ${$isDraggable &&
