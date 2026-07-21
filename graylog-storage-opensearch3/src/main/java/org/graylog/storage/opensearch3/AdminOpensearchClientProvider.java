@@ -21,7 +21,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.security.certutil.ClientCertSslContextFactory;
-import org.graylog.security.certutil.ClientCertSslContextFactoryImpl;
 import org.graylog.storage.opensearch3.client.CustomAsyncOpenSearchClient;
 import org.graylog.storage.opensearch3.client.CustomOpenSearchClient;
 import org.graylog2.configuration.IndexerHosts;
@@ -53,6 +52,10 @@ import static org.graylog.storage.opensearch3.OfficialOpensearchClientProvider.T
  * returned forever, while the underlying transport is hot-swapped through a
  * {@link DynamicTransport} when the cert nears expiry. This makes the returned client safe
  * to cache in adapter constructors.
+ *
+ * <p>Refresh is lazy and driven by actual use: the cert is only rotated when a request is
+ * about to be sent and the current cert is close to expiry (see {@link #refreshIfNeeded()},
+ * wired as the transport's pre-request hook).
  */
 @Singleton
 public class AdminOpensearchClientProvider {
@@ -70,7 +73,6 @@ public class AdminOpensearchClientProvider {
 
     private volatile OfficialOpensearchClient cachedClient;
     private volatile DynamicTransport dynamicTransport;
-    private volatile ScheduledExecutorService drainScheduler;
     private volatile Instant currentCertExpiresAt;
 
     @Inject
@@ -89,14 +91,22 @@ public class AdminOpensearchClientProvider {
     /**
      * Returns the admin client. The same {@link OfficialOpensearchClient} instance is returned
      * across the lifetime of this provider; only the internal transport (and underlying cert)
-     * is rotated when the cert nears expiry.
+     * is rotated, lazily, when a request is sent through a client whose cert nears expiry.
      */
     @Nonnull
     public OfficialOpensearchClient getAdminClient() {
-        if (cachedClient != null && !needsRefresh(clock.instant())) {
-            return cachedClient;
-        }
         return initOrRefresh();
+    }
+
+    /**
+     * Rotates the cert if it is close to expiry. Wired as the {@link DynamicTransport}
+     * pre-request hook so the cached (and therefore never re-fetched) client picks up a fresh
+     * cert on its next actual use rather than relying on a background timer.
+     */
+    void refreshIfNeeded() {
+        if (cachedClient != null && needsRefresh(clock.instant())) {
+            initOrRefresh();
+        }
     }
 
     private synchronized OfficialOpensearchClient initOrRefresh() {
@@ -105,32 +115,36 @@ public class AdminOpensearchClientProvider {
             return cachedClient;
         }
 
+        if (cachedClient == null) {
+            this.dynamicTransport = new DynamicTransport(buildTransport(), createDrainScheduler(), this::refreshIfNeeded);
+            this.cachedClient = new OfficialOpensearchClient(
+                    new CustomOpenSearchClient(dynamicTransport),
+                    new CustomAsyncOpenSearchClient(dynamicTransport),
+                    objectMapper);
+            this.currentCertExpiresAt = now.plus(CERT_LIFETIME);
+            LOG.info("Built admin OpenSearch client with a {} min cert lifetime.", CERT_LIFETIME.toMinutes());
+        } else {
+            dynamicTransport.swap(buildTransport());
+            this.currentCertExpiresAt = now.plus(CERT_LIFETIME);
+            LOG.debug("Rotated admin OpenSearch client certificate.");
+        }
+        return cachedClient;
+    }
+
+    /**
+     * Builds a fresh transport authenticated with a newly minted, short-lived admin cert.
+     */
+    private OpenSearchTransport buildTransport() {
         try {
-            final OpenSearchTransport newTransport = sslContextFactory.buildClientCertSslContext(IndexerAdminCertConstants.ADMIN_CN, CERT_LIFETIME)
+            return sslContextFactory.buildClientCertSslContext(IndexerAdminCertConstants.ADMIN_CN, CERT_LIFETIME)
                     .map(TransportConfig::clientCertAuth)
                     .map(certAuth -> transportProvider.buildTransport(hosts, certAuth))
-                    .orElse(transportProvider.buildTransport(hosts));
-
-            if (cachedClient == null) {
-                this.drainScheduler = createDrainScheduler();
-                this.dynamicTransport = new DynamicTransport(newTransport, drainScheduler);
-                this.cachedClient = new OfficialOpensearchClient(
-                        new CustomOpenSearchClient(dynamicTransport),
-                        new CustomAsyncOpenSearchClient(dynamicTransport),
-                        objectMapper);
-                LOG.info("Built admin OpenSearch client with a {} min cert lifetime.", CERT_LIFETIME.toMinutes());
-            } else {
-                dynamicTransport.swap(newTransport);
-                LOG.debug("Rotated admin OpenSearch client certificate.");
-            }
-            this.currentCertExpiresAt = now.plus(CERT_LIFETIME);
+                    .orElseGet(() -> transportProvider.buildTransport(hosts));
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new IllegalStateException("Failed to build admin OpenSearch client", e);
         }
-
-        return cachedClient;
     }
 
     private boolean needsRefresh(Instant now) {
