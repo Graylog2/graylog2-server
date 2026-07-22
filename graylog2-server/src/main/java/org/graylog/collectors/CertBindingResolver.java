@@ -180,6 +180,13 @@ public class CertBindingResolver extends AbstractIdleService {
         return new CertBinding(instanceUid, validUntil);
     }
 
+    /**
+     * Entry point for certificate-change events. Until the startup prewarm has completed, events are
+     * buffered and replayed afterwards: processing them right away would race the prewarm inserts — a
+     * refresh-if-present for a not-yet-inserted fingerprint is a no-op, and prewarm would then insert its
+     * stale snapshot value over the event's newer truth. Replaying after prewarm is always safe because a
+     * refresh reloads the current database state, so ordering and duplication don't matter.
+     */
     @Subscribe
     public void handleCertsChanged(CollectorInstanceCertsChangedEvent event) {
         if (bufferedEventsBeforeCachePrewarming != null) {
@@ -222,7 +229,8 @@ public class CertBindingResolver extends AbstractIdleService {
      * connection presents in steady state (the hot set). The {@code next} and {@code previous} fingerprints
      * are held only by the few instances mid-renewal or within the post-activation grace window, so they
      * cold-load off the event loop on first use without risking a stampede. Best-effort: a failure leaves
-     * the cache to populate lazily.
+     * the cache to populate lazily. Success or failure, the event gate is opened afterwards (see
+     * {@link #handleCertsChanged}) — buffered events are replayed, and later events are processed directly.
      */
     private void preWarm() {
         try {

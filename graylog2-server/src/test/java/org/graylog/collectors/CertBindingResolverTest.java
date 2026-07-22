@@ -22,6 +22,7 @@ import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog2.utilities.FakeTicker;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,6 +75,23 @@ class CertBindingResolverTest {
         // separate sources — advance them in tandem via advanceTime().
         resolver = new CertBindingResolver(configService, instanceService, eventBus, clock, cacheTicker,
                 MoreExecutors.directExecutor());
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (resolver.isRunning()) {
+            resolver.stopAsync().awaitTerminated();
+        }
+    }
+
+    /**
+     * Starts the resolver with an empty prewarm. Event processing is gated until prewarm completes, so
+     * tests that exercise {@code handleCertsChanged} directly need a started resolver.
+     */
+    private void startWithEmptyPrewarm() {
+        when(configService.getOrDefault()).thenReturn(CollectorsConfig.createDefault("test-host"));
+        when(instanceService.streamAllUnexpired(any())).thenReturn(Stream.empty());
+        resolver.startAsync().awaitRunning();
     }
 
     @Test
@@ -244,6 +262,7 @@ class CertBindingResolverTest {
 
     @Test
     void touchedFingerprintThatIsCachedIsReResolved() {
+        startWithEmptyPrewarm();
         final var instance = activeInstance("uid-1", "fp-1", clock.instant().plus(Duration.ofDays(365)));
         when(instanceService.findByActiveOrNextOrPreviousFingerprint("fp-1")).thenReturn(Optional.of(instance));
         assertThat(resolver.resolve("fp-1")).contains("uid-1");
@@ -259,6 +278,7 @@ class CertBindingResolverTest {
 
     @Test
     void refreshInstallsGraceStampOnLiveEntry() {
+        startWithEmptyPrewarm();
         // Rotation scenario: the fingerprint is cached as a plain active binding, then rotation demotes it
         // to the previous slot — the certs-changed refresh must re-resolve the live entry so it picks up
         // the grace deadline, and the subsequent cut must again be reload-free.
@@ -281,6 +301,7 @@ class CertBindingResolverTest {
 
     @Test
     void failedReResolveServesStaleUntilRefreshSucceeds() {
+        startWithEmptyPrewarm();
         final var instance = activeInstance("uid-1", "fp-1", clock.instant().plus(Duration.ofDays(365)));
         // Call sequence: initial load binds; the event-driven re-resolve hits a Mongo outage; the
         // later refreshAfterWrite re-resolve succeeds against recovered Mongo (instance revoked).
@@ -326,6 +347,7 @@ class CertBindingResolverTest {
 
     @Test
     void touchedFingerprintThatIsNotCachedIsNotLoaded() {
+        startWithEmptyPrewarm();
         // fp-2 is not cached, so a certs-changed event must NOT proactively load it (avoids loading the
         // many fingerprints of expired instances that no longer exist).
         resolver.handleCertsChanged(new CollectorInstanceCertsChangedEvent(Set.of("fp-2")));
@@ -359,6 +381,27 @@ class CertBindingResolverTest {
         } finally {
             resolver.stopAsync().awaitTerminated();
         }
+    }
+
+    @Test
+    void eventArrivingDuringPrewarmIsAppliedAfterPrewarm() {
+        // The instance is in the prewarm snapshot but gets revoked while prewarm is running: the
+        // certs-changed event fires mid-stream, before prewarm has inserted the entry (posted from the
+        // stream itself via peek). Without the event gate, the event's refresh-if-present would no-op
+        // (nothing cached yet) and prewarm would insert the stale snapshot binding. The gate buffers the
+        // event and replays it after prewarm, re-resolving to the current (revoked) state.
+        final var config = CollectorsConfig.createDefault("test-host");
+        when(configService.getOrDefault()).thenReturn(config);
+        final var instance = activeInstance("uid-pw", "fp-1", clock.instant().plus(Duration.ofDays(365)));
+        when(instanceService.streamAllUnexpired(config.collectorExpirationThreshold())).thenReturn(
+                Stream.of(instance).peek(i ->
+                        eventBus.post(new CollectorInstanceCertsChangedEvent(Set.of("fp-1")))));
+        when(instanceService.findByActiveOrNextOrPreviousFingerprint("fp-1")).thenReturn(Optional.empty());
+
+        resolver.startAsync().awaitRunning();
+
+        assertThat(resolver.resolve("fp-1")).isEmpty();
+        verify(instanceService, times(1)).findByActiveOrNextOrPreviousFingerprint("fp-1");
     }
 
     @Test
