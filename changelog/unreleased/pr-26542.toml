@@ -1,5 +1,5 @@
 type = "a"
-message = "Add macOS Unified Logging collector source"
+message = "Add macOS Unified Logging Collector source"
 
 issues = [""]
 pulls = ["26542"]
