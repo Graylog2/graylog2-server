@@ -543,7 +543,7 @@ public class CollectorInstanceService {
         public Stream<String> allCertFingerprints() {
             return Stream.of(
                     Optional.ofNullable(previousFingerprint()),
-                    Optional.of(activeFingerprint()),
+                    Optional.ofNullable(activeFingerprint()), // should never be null but saves us some special handling
                     Optional.ofNullable(nextFingerprint())
             ).flatMap(Optional::stream);
         }
