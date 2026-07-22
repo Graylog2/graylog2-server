@@ -284,6 +284,37 @@ public class ViewsResourceTest {
         verify(viewService, times(0)).update(any());
     }
 
+    /**
+     * Test for security fix in #26715, where we now additionally make sure that the ID from the path and in the body with the entity have to match.
+     * We only use the path ID in the end for the update operation but a mismatch can signify a possible malicious request.
+     */
+    @Test
+    public void throwsExceptionWhenUpdatingViewWithPathAndIDMismatch() {
+        final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
+
+        // making sure that the invalid view id is different from the view id used in all tests by adding a prefix
+        final String INVALID_VIEW_ID = "invalid_" + VIEW_ID;
+        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW.toBuilder().id(INVALID_VIEW_ID).build(), EntityShareRequest.create(ImmutableMap.of()));
+
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        assertThatThrownBy(() -> viewsResource.update(VIEW_ID, request, SEARCH_USER))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Invalid update request");
+
+        verify(viewService, times(0)).update(any());
+    }
+
+
     @Test
     public void updatesSharingWhenUserOwnsView() {
         final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
