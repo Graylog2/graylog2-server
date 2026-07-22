@@ -27,7 +27,6 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -35,13 +34,9 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -50,9 +45,7 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
-import org.graylog2.indexer.indices.ReindexOutdatedIndexJobHandler;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
@@ -87,17 +80,13 @@ public class IndicesResource extends RestResource {
     private final NodeInfoCache nodeInfoCache;
     private final IndexSetRegistry indexSetRegistry;
     private final OutdatedIndexService outdatedIndexService;
-    private final ReindexOutdatedIndexJobHandler reindexOutdatedIndexJobHandler;
 
     @Inject
-    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry,
-                           OutdatedIndexService outdatedIndexService,
-                           ReindexOutdatedIndexJobHandler reindexOutdatedIndexJobHandler) {
+    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry, OutdatedIndexService outdatedIndexService) {
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
         this.outdatedIndexService = outdatedIndexService;
-        this.reindexOutdatedIndexJobHandler = reindexOutdatedIndexJobHandler;
     }
 
     @GET
@@ -321,86 +310,6 @@ public class IndicesResource extends RestResource {
                 .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
-    }
-
-    @GET
-    @Path("/outdated")
-    @Operation(summary = "Get a list of indices that were created in a OpenSearch version prior to the recent one")
-    @RequiresPermissions(RestPermissions.INDICES_READ)
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<OutdatedIndex> getOutdatedIndices() {
-        return outdatedIndexService.getOutdatedIndices();
-    }
-
-    @POST
-    @Path("/outdated/{index}/reindex")
-    @Operation(summary = "Reindexes an outdated index to make it compatible with the next major version of OpenSearch")
-    @RequiresPermissions(RestPermissions.INDICES_REINDEX)
-    @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
-    public Response reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
-                            @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
-        OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
-                .filter(OutdatedIndex::isSystemIndex)
-                .filter(i -> i.indexName().equals(index))
-                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is no system index"));
-        final String triggeredBy = String.valueOf(SecurityUtils.getSubject().getPrincipal());
-        try {
-            final JobTriggerDto trigger = reindexOutdatedIndexJobHandler.start(outdatedIndex.indexName(), withReplication, triggeredBy);
-            return Response.status(Response.Status.CREATED).entity(trigger).build();
-        } catch (IllegalStateException e) {
-            return Response.status(Response.Status.CONFLICT)
-                    .entity(Map.of("error", e.getMessage()))
-                    .build();
-        }
-    }
-
-    @POST
-    @Path("/outdated/bulkreindex")
-    @Operation(summary = "Bulk reindexes the given indices to make them compatible with the next major version of OpenSearch")
-    @RequiresPermissions(RestPermissions.INDICES_REINDEX)
-    @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
-    public Response bulkReindex(@Parameter(name = "indices", required = true) BulkReindexRequest bulkRequest) {
-        final List<OutdatedIndex> allOutdatedIndices = getOutdatedIndices();
-        final Set<String> outdatedIndexNames = allOutdatedIndices.stream()
-                .filter(OutdatedIndex::isSystemIndex)
-                .map(OutdatedIndex::indexName)
-                .collect(Collectors.toSet());
-        final List<String> unknownIndices = bulkRequest.indices().stream()
-                .filter(i -> !outdatedIndexNames.contains(i))
-                .toList();
-        if (!unknownIndices.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("error", "The following indices were not found or are no system indices: " + unknownIndices))
-                    .build();
-        }
-        final String triggeredBy = String.valueOf(SecurityUtils.getSubject().getPrincipal());
-        final List<JobTriggerDto> triggers = new LinkedList<>();
-        for (String indexName : bulkRequest.indices()) {
-            try {
-                triggers.add(reindexOutdatedIndexJobHandler.start(indexName, bulkRequest.withReplication(), triggeredBy));
-            } catch (IllegalStateException e) {
-                return Response.status(Response.Status.CONFLICT)
-                        .entity(Map.of("error", e.getMessage()))
-                        .build();
-            }
-        }
-        return Response.status(Response.Status.CREATED).entity(triggers).build();
-    }
-
-    @DELETE
-    @Path("/outdated/{index}")
-    @Operation(summary = "Deletes an outdated, non-Graylog managed index")
-    @RequiresPermissions(RestPermissions.INDICES_DELETE)
-    @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.ES_INDEX_DELETE)
-    public void deleteOutdated(@Parameter(name = "index") @PathParam("index") @NotNull String index) {
-        OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
-                .filter(i -> !i.managedIndex())
-                .filter(i -> i.indexName().equals(index))
-                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is an index managed by Graylog"));
-        outdatedIndexService.delete(outdatedIndex.indexName());
     }
 
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {
