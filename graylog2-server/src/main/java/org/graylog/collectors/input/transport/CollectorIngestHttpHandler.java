@@ -87,7 +87,7 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
         final String certFingerprint = ctx.channel().attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).get();
         if (certFingerprint == null) {
             LOG.error("Missing client certificate fingerprint channel attribute.");
-            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
+            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, false);
             return;
         }
 
@@ -95,7 +95,7 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
         if (instanceUid.isEmpty()) {
             LOG.warn("Rejecting request from {}: certificate fingerprint {} does not resolve to a collector instance.",
                     ctx.channel().remoteAddress(), certFingerprint);
-            sendError(ctx, HttpResponseStatus.UNAUTHORIZED, keepAlive);
+            sendError(ctx, HttpResponseStatus.UNAUTHORIZED, false);
             return;
         }
 
