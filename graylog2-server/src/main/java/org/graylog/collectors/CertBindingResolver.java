@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executor;
@@ -75,6 +77,7 @@ public class CertBindingResolver extends AbstractIdleService {
     private final Clock clock;
 
     private final LoadingCache<String, Optional<CertBinding>> cache;
+    private volatile List<CollectorInstanceCertsChangedEvent> bufferedEventsBeforeCachePrewarming;
 
     @Inject
     public CertBindingResolver(CollectorsConfigService configService,
@@ -106,6 +109,7 @@ public class CertBindingResolver extends AbstractIdleService {
             cacheBuilder.ticker(cacheTicker);
         }
         this.cache = cacheBuilder.build(this::loadBinding);
+        this.bufferedEventsBeforeCachePrewarming = new ArrayList<>();
     }
 
     @Override
@@ -176,6 +180,19 @@ public class CertBindingResolver extends AbstractIdleService {
         return new CertBinding(instanceUid, validUntil);
     }
 
+    @Subscribe
+    public void handleCertsChanged(CollectorInstanceCertsChangedEvent event) {
+        if (bufferedEventsBeforeCachePrewarming != null) {
+            synchronized (this) {
+                if (bufferedEventsBeforeCachePrewarming != null) {
+                    bufferedEventsBeforeCachePrewarming.add(event);
+                    return;
+                }
+            }
+        }
+        doHandleCertsChanged(event);
+    }
+
     /**
      * Keeps the cache consistent with certificate changes by re-resolving each touched fingerprint that is
      * currently cached. Absent fingerprints are left alone: they hold no stale binding and will resolve
@@ -186,8 +203,7 @@ public class CertBindingResolver extends AbstractIdleService {
      * renewed, so {@code refreshAfterWrite} keeps re-attempting it on later accesses until a reload
      * succeeds — see the class javadoc for the staleness bound this provides.
      */
-    @Subscribe
-    public void handleCertsChanged(CollectorInstanceCertsChangedEvent event) {
+    private void doHandleCertsChanged(CollectorInstanceCertsChangedEvent event) {
         int refreshed = 0;
         for (final var fingerprint : event.fingerprints()) {
             if (cache.asMap().containsKey(fingerprint)) {
@@ -222,6 +238,13 @@ public class CertBindingResolver extends AbstractIdleService {
             LOG.debug("Prewarmed {} active collector fingerprint(s).", prewarmed.get());
         } catch (Exception e) {
             LOG.warn("Failed pre-warming collector fingerprint cache.", e);
+        } finally {
+            final List<CollectorInstanceCertsChangedEvent> bufferedEvents;
+            synchronized (this) {
+                bufferedEvents = bufferedEventsBeforeCachePrewarming;
+                bufferedEventsBeforeCachePrewarming = null;
+            }
+            bufferedEvents.forEach(this::doHandleCertsChanged);
         }
     }
 
