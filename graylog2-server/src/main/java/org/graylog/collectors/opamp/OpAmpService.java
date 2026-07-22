@@ -64,7 +64,6 @@ import org.graylog.collectors.config.processor.ResourceProcessorConfig;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.NoopReceiverConfig;
 import org.graylog.collectors.db.Attribute;
-import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
@@ -551,7 +550,9 @@ public class OpAmpService {
             final String fleetId = previousState.fleetId();
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
-            final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
+
+            final var coalesced = txnLogService.coalesce(unprocessedMarkers, lastProcessedTxnSeq);
+
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 
