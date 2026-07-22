@@ -65,7 +65,6 @@ import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog.security.rest.RestResourceWithOwnerCheck;
-import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
@@ -364,7 +363,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
                           @Context SearchUser searchUser) {
         // the ID from the path always has to match the id from the request body for an update.
         // currently, the FE always uses it like that, so mismatches should only occur when using the API directly
-        if (!id.equals(createEntityRequest.entity().id())) {
+        if (!id.equals(unwrappedCreateEntityRequest.getEntity().id())) {
            throw new BadRequestException("Invalid update request");
         }
 
