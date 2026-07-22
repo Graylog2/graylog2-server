@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 import { ButtonToolbar } from 'components/bootstrap';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING_HORIZONTAL, CELL_PADDING_VERTICAL } from 'components/common/EntityDataTable/Constants';
 import { scrollContainerWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
 import type { EntityBase, ExpandedSectionRenderers } from './types';
@@ -47,7 +47,7 @@ const Content = styled.div(
     left: 0;
     width: 100%;
     max-width: var(${scrollContainerWidthVar}, 100%);
-    padding: ${CELL_PADDING}px ${CELL_PADDING}px ${theme.spacings.md} ${theme.spacings.lg};
+    padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px ${theme.spacings.md} ${theme.spacings.lg};
     background-color: ${theme.colors.table.row.backgroundStriped};
   `,
 );
