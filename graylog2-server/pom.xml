@@ -773,6 +773,13 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <!-- Glue schema support pulls in outdated Kotlin dependencies. ATM we don't support integrating
+                 Amazon Kinesis Data Streams with the AWS Glue Schema Registry, so we can skip the dependency.
+                 Once we add support, this exclusion has to be revisited. -->
+                <exclusion>
+                    <groupId>software.amazon.glue</groupId>
+                    <artifactId>schema-registry-serde</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- end of additional integrations dependencies -->

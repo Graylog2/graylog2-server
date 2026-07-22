@@ -49,7 +49,7 @@ public class RollingRestartExecutionJob implements Job {
     public static final String TYPE_NAME = "rolling-restart-v1";
 
     static final Duration TICK_INTERVAL = Duration.ofSeconds(5);
-    static final Duration GREEN_WAIT_TIMEOUT = Duration.ofMinutes(30);
+    static final Duration GREEN_WAIT_TIMEOUT = Duration.ofMinutes(5);
 
     /**
      * Built-in singleton job definition. The ID must remain stable across deployments so triggers can reference it.
@@ -89,9 +89,14 @@ public class RollingRestartExecutionJob implements Job {
         } catch (Exception e) {
             LOG.error("Rolling restart tick failed", e);
             try {
-                actions.enableAllocation();
+                if (data.pauseProcessing()) {
+                    // Small-cluster path never disabled replication; undo the message-processing pause instead.
+                    actions.resumeProcessing(data.triggeredBy());
+                } else {
+                    actions.enableAllocation();
+                }
             } catch (Exception cleanup) {
-                LOG.warn("Failed to re-enable allocation during failure cleanup", cleanup);
+                LOG.warn("Failed to run failure cleanup for rolling restart", cleanup);
             }
             final Data failed = data.toBuilder()
                     .smState(RollingRestartState.FAILED)
@@ -127,14 +132,28 @@ public class RollingRestartExecutionJob implements Job {
                 sm.fire(RollingRestartTrigger.PROCEED);
                 return data.toBuilder().smState(sm.getState()).build();
             }
+            case PAUSING_PROCESSING -> {
+                actions.pauseProcessing(data.triggeredBy());
+                sm.fire(RollingRestartTrigger.PROCEED);
+                return data.toBuilder().smState(sm.getState()).build();
+            }
             case SELECTING_NEXT_NODE -> {
                 if (data.abortRequested()) {
+                    // Undo whatever the preparation step did before bailing out: resume message processing on the
+                    // small-cluster path, or re-enable shard allocation on the replication path.
+                    if (data.pauseProcessing()) {
+                        actions.resumeProcessing(data.triggeredBy());
+                    } else {
+                        actions.enableAllocation();
+                    }
                     sm.fire(RollingRestartTrigger.ABORT);
                     return data.toBuilder().smState(sm.getState()).build();
                 }
                 final int nextIdx = pickNextNodeIndex(data);
                 if (nextIdx < 0) {
-                    sm.fire(RollingRestartTrigger.NO_MORE_NODES);
+                    sm.fire(data.pauseProcessing()
+                            ? RollingRestartTrigger.NO_MORE_NODES_RESUME
+                            : RollingRestartTrigger.NO_MORE_NODES);
                     return data.toBuilder().smState(sm.getState()).build();
                 }
                 sm.fire(RollingRestartTrigger.MORE_NODES);
@@ -158,11 +177,18 @@ public class RollingRestartExecutionJob implements Job {
                 String expectedVersion = data.targetOpensearchVersion();
 
                 if (actions.isNodeInCluster(current.hostname(), expectedVersion)) {
-                    sm.fire(RollingRestartTrigger.NODE_JOINED);
+                    // Small clusters skip the per-node replication/green gate — message processing stays paused
+                    // for the whole run, so we go straight back to selecting the next node.
+                    final boolean noReplication = data.pauseProcessing();
+                    sm.fire(noReplication
+                            ? RollingRestartTrigger.NODE_JOINED_NO_REPLICATION
+                            : RollingRestartTrigger.NODE_JOINED);
+                    final RollingRestartNodeEntry updated = noReplication
+                            ? current.withStatus(RollingRestartNodeStatus.COMPLETED).withFinished(Instant.now())
+                            : current.withStatus(RollingRestartNodeStatus.STARTED);
                     return data.toBuilder()
                             .smState(sm.getState())
-                            .nodes(replaceNode(data.nodes(), data.currentNodeIndex(),
-                                    current.withStatus(RollingRestartNodeStatus.STARTED)))
+                            .nodes(replaceNode(data.nodes(), data.currentNodeIndex(), updated))
                             .build();
                 }
                 return data;
@@ -204,6 +230,11 @@ public class RollingRestartExecutionJob implements Job {
                 if (!actions.isAllocationEnabled()) {
                     actions.enableAllocation();
                 }
+                sm.fire(RollingRestartTrigger.PROCEED);
+                return data.toBuilder().smState(sm.getState()).build();
+            }
+            case RESUMING_PROCESSING -> {
+                actions.resumeProcessing(data.triggeredBy());
                 sm.fire(RollingRestartTrigger.PROCEED);
                 return data.toBuilder().smState(sm.getState()).build();
             }
@@ -284,6 +315,7 @@ public class RollingRestartExecutionJob implements Job {
         public static final String FIELD_LAST_ERROR = "last_error";
         public static final String FIELD_WAITING_GREEN_SINCE = "waiting_green_since";
         public static final String TARGET_OPENSEARCH_VERSION = "target_opensearch_version";
+        public static final String FIELD_PAUSE_PROCESSING = "pause_processing";
 
         @JsonProperty(FIELD_SM_STATE)
         public abstract RollingRestartState smState();
@@ -314,6 +346,13 @@ public class RollingRestartExecutionJob implements Job {
         @JsonProperty(TARGET_OPENSEARCH_VERSION)
         public abstract String targetOpensearchVersion();
 
+        /**
+         * When {@code true}, this run pauses cluster-wide message processing for its whole duration instead of
+         * toggling shard replication per node. Used for small clusters (1-2 DataNodes) with no shard redundancy.
+         */
+        @JsonProperty(FIELD_PAUSE_PROCESSING)
+        public abstract boolean pauseProcessing();
+
 
         public abstract Builder toBuilder();
 
@@ -329,6 +368,7 @@ public class RollingRestartExecutionJob implements Job {
                         .type(TYPE_NAME)
                         .currentNodeIndex(-1)
                         .abortRequested(false)
+                        .pauseProcessing(false)
                         .waitingGreenSince(Instant.EPOCH);
             }
 
@@ -358,6 +398,9 @@ public class RollingRestartExecutionJob implements Job {
 
             @JsonProperty(TARGET_OPENSEARCH_VERSION)
             public abstract Builder targetOpensearchVersion(String targetOpensearchVersion);
+
+            @JsonProperty(FIELD_PAUSE_PROCESSING)
+            public abstract Builder pauseProcessing(boolean pauseProcessing);
 
             abstract Data autoBuild();
 

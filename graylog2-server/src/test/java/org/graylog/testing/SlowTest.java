@@ -14,24 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode.restart;
+package org.graylog.testing;
 
-public enum RollingRestartState {
-    PREPARING_CLUSTER,
-    PAUSING_PROCESSING,
-    SELECTING_NEXT_NODE,
-    UPGRADING_NODE,
-    WAITING_NODE_JOINED,
-    REENABLING_ALLOCATION,
-    WAITING_GREEN,
-    PAUSED_WAITING_GREEN,
-    FINALIZING,
-    RESUMING_PROCESSING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.annotation.Testable;
 
-    public boolean isTerminal() {
-        return this == COMPLETED || this == ABORTED || this == FAILED;
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Use this annotation instead of the {@link Test} annotation to tag slow tests. Rule of thumb: everything that takes
+ * multiple seconds.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Testable
+@Tag("slow-test")
+@Test
+public @interface SlowTest {
 }

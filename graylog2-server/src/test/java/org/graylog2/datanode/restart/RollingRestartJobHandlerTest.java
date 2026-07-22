@@ -84,7 +84,7 @@ class RollingRestartJobHandlerTest {
         lenient().when(dataNodeMetadataService.getVersionsOverview()).thenReturn(versionOverview);
         handler = new RollingRestartJobHandler(jobDefinitionService, jobTriggerService, actions, clock, lockService, dataNodeMetadataService);
         // Default: lock acquisition succeeds for most tests; tests that exercise contention override.
-        lenient().when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE)).thenReturn(Optional.of(lock));
+        lenient().when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE, 1)).thenReturn(Optional.of(lock));
         lenient().when(clock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
     }
 
@@ -127,7 +127,7 @@ class RollingRestartJobHandlerTest {
 
     @Test
     void start_failsWhenLockNotAcquired() {
-        when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE)).thenReturn(Optional.empty());
+        when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE, 1)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(IllegalStateException.class)
@@ -157,16 +157,34 @@ class RollingRestartJobHandlerTest {
     }
 
     @Test
-    void start_failsWhenFewerThanThreeNodes() {
+    void start_failsWhenNoNodes() {
         mockNoActiveTrigger();
-        when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a"), node("b", "node-b")));
-        when(actions.getClusterState()).thenReturn(clusterState);
-        when(clusterState.status()).thenReturn(HealthStatus.Green);
+        when(actions.liveDataNodes()).thenReturn(List.of());
 
         assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(RollingRestartPreconditionsException.class)
                 .extracting("failedChecks").asList()
-                .anyMatch(c -> ((String) c).contains("at least 3 DataNodes"));
+                .anyMatch(c -> ((String) c).contains("No active DataNodes"));
+    }
+
+    @Test
+    void start_smallCluster_startsInPausingProcessingState() {
+        mockNoActiveTrigger();
+        when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a"), node("b", "node-b")));
+        when(actions.getClusterState()).thenReturn(clusterState);
+        when(clusterState.status()).thenReturn(HealthStatus.Green);
+        when(jobDefinitionService.get(RollingRestartExecutionJob.DEFINITION_INSTANCE.id()))
+                .thenReturn(Optional.of(RollingRestartExecutionJob.DEFINITION_INSTANCE));
+        when(jobTriggerService.create(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        final var created = handler.start("alice", false);
+
+        final var data = (RollingRestartExecutionJob.Data) created.data().orElseThrow();
+        assertThat(data.smState()).isEqualTo(RollingRestartState.PAUSING_PROCESSING);
+        assertThat(data.pauseProcessing()).isTrue();
+        // No credential is persisted — only the triggering username, used to mint an ephemeral token at run time.
+        assertThat(data.triggeredBy()).isEqualTo("alice");
+        assertThat(data.nodes()).hasSize(2);
     }
 
     @Test
@@ -199,6 +217,7 @@ class RollingRestartJobHandlerTest {
         assertThat(created).isNotNull();
         final var data = (RollingRestartExecutionJob.Data) created.data().orElseThrow();
         assertThat(data.smState()).isEqualTo(RollingRestartState.PREPARING_CLUSTER);
+        assertThat(data.pauseProcessing()).isFalse();
         assertThat(data.triggeredBy()).isEqualTo("alice");
         assertThat(data.nodes()).hasSize(3);
     }
@@ -221,7 +240,7 @@ class RollingRestartJobHandlerTest {
     @Test
     void start_releasesLock_onPreconditionFailure() {
         when(jobTriggerService.streamByQuery(any(Bson.class))).thenReturn(Stream.empty());
-        when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a"))); // too few
+        when(actions.liveDataNodes()).thenReturn(List.of()); // no nodes → precondition failure
 
         assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(RollingRestartPreconditionsException.class);
