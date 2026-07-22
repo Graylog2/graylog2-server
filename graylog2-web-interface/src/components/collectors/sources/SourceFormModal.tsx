@@ -266,7 +266,7 @@ const LOG_AGE_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
 const MacOSUnifiedLoggingConfigFields = ({
   config,
   setFieldValue,
-  errors,
+  errors = undefined,
 }: {
   config: MacOSUnifiedLoggingSourceConfig;
   setFieldValue: (field: string, value: unknown) => void;
