@@ -63,7 +63,7 @@ const getEventDefinitionTableElements = (
   const additionalAttributes: Array<Attribute> = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
-    { id: 'notifications', title: 'Notifications', type: 'INT', sortable: false },
+    { id: 'notifications', title: 'Notifications', sortable: false },
     ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute] : []),
     ...(pluggableAttributes?.attributes || []),
   ];

@@ -100,21 +100,19 @@ const getStreamTableElements = (
 
   const additionalAttributes: Array<Attribute> = [
     { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
-    { id: 'throughput', title: 'Throughput', type: 'DOUBLE' as const },
+    { id: 'throughput', title: 'Throughput' },
     { id: 'rules', title: 'Stream Rules' },
     ...(isPipelineColumnPermitted ? [{ id: 'pipelines', title: 'Pipelines' }] : []),
     { id: 'destination_filters', title: 'Filter Rules' },
     {
       id: METRIC_COLUMN_IDS.associatedInputs,
       title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedInputs],
-      type: 'INT' as const,
     },
     ...(isPipelineColumnPermitted
       ? [
           {
             id: METRIC_COLUMN_IDS.routingPipelines,
             title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.routingPipelines],
-            type: 'INT' as const,
           },
         ]
       : []),

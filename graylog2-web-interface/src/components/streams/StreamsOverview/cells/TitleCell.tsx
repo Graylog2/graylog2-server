@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Link, Text } from 'components/common';
+import { Link, Text, TextOverflowEllipsis } from 'components/common';
 import type { Stream } from 'logic/streams/types';
 import { Label } from 'components/bootstrap';
 

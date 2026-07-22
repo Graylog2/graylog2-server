@@ -50,14 +50,13 @@ const getInputsTableElements = () => {
   };
 
   const additionalAttributes: Array<Attribute> = [
-    { id: 'traffic', title: 'Traffic Last Minute', type: 'DOUBLE' },
-    { id: 'input_failures', title: 'Input Failures', type: 'LONG' },
+    { id: 'traffic', title: 'Traffic Last Minute' },
+    { id: 'input_failures', title: 'Input Failures' },
     { id: 'address', title: 'Address' },
     { id: 'port', title: 'Port', type: 'INT' },
     {
       id: METRIC_COLUMN_IDS.messagesPerStream,
       title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messagesPerStream],
-      type: 'INT',
     },
     {
       id: METRIC_COLUMN_IDS.extractorCount,
@@ -67,7 +66,6 @@ const getInputsTableElements = () => {
     {
       id: METRIC_COLUMN_IDS.associatedStreams,
       title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedStreams],
-      type: 'INT',
     },
   ];
 

@@ -53,12 +53,12 @@ export const DEFAULT_VISIBLE_COLUMNS = [
 ];
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
-  { id: 'cpu', title: 'CPU', type: 'DOUBLE', isDerived: true, sortable: false },
-  { id: 'jvm', title: 'JVM', type: 'LONG', isDerived: true, sortable: false },
-  { id: 'buffers', title: 'Buffers', type: 'DOUBLE', isDerived: true, sortable: false },
-  { id: 'journal', title: 'Journal', type: 'LONG', isDerived: true, sortable: false },
-  { id: 'dataLakeJournal', title: 'Data Lake Journal', type: 'LONG', isDerived: true, sortable: false },
-  { id: 'throughput', title: 'Throughput', type: 'DOUBLE', isDerived: true, sortable: false },
+  { id: 'cpu', title: 'CPU', isDerived: true, sortable: false },
+  { id: 'jvm', title: 'JVM', isDerived: true, sortable: false },
+  { id: 'buffers', title: 'Buffers', isDerived: true, sortable: false },
+  { id: 'journal', title: 'Journal', isDerived: true, sortable: false },
+  { id: 'dataLakeJournal', title: 'Data Lake Journal', isDerived: true, sortable: false },
+  { id: 'throughput', title: 'Throughput', isDerived: true, sortable: false },
 ];
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
@@ -102,6 +102,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         />
       ),
       staticWidth: 130,
+      textAlign: 'right',
     },
     journal: {
       renderCell: (_value, entity) => (
@@ -114,6 +115,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         />
       ),
       staticWidth: 130,
+      textAlign: 'right',
     },
     dataLakeJournal: {
       renderCell: (_value, entity) => (
@@ -125,6 +127,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         />
       ),
       staticWidth: 'matchHeader',
+      textAlign: 'right',
     },
     jvm: {
       renderCell: (_value, entity) => (
@@ -135,14 +138,17 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         />
       ),
       staticWidth: 130,
+      textAlign: 'right',
     },
     buffers: {
       renderCell: (_value, entity) => <BuffersMetricsCell node={entity} warningThreshold={BUFFER_WARNING_THRESHOLD} />,
       staticWidth: 130,
+      textAlign: 'right',
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
       staticWidth: 'matchHeader',
+      textAlign: 'right',
     },
   },
 });
