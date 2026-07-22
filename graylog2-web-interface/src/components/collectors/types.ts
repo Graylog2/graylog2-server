@@ -78,10 +78,9 @@ export type WindowsEventLogSourceConfig = {
 
 export type MacOSUnifiedLoggingSourceConfig = {
   predicate?: string;
-  start_time?: string;
   // ISO-8601 durations (e.g. 'PT30S', 'PT24H'); omitted values fall back to the backend defaults.
-  max_poll_interval?: string;
-  max_log_age?: string;
+  max_poll_interval: string;
+  max_log_age: string;
 };
 
 export type FileSource = SourceBase & { type: 'file'; config: FileSourceConfig };

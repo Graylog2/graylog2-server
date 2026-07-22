@@ -43,7 +43,7 @@ class MacOSUnifiedLoggingReceiverConfigTest {
         final var tree = objectMapper.readTree(objectMapper.writeValueAsString(config));
         assertThat(tree.get("storage").asText()).isEqualTo("file_storage/default");
         assertThat(tree.get("format").asText()).isEqualTo("ndjson");
-        assertThat(tree.get("predicate").asText()).contains("subsystem");
+        assertThat(tree.has("predicate")).isFalse();
         assertThat(tree.has("max_poll_interval")).isTrue();
         assertThat(tree.has("max_log_age")).isTrue();
         // @JsonIgnore fields must not leak into the rendered receiver block

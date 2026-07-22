@@ -163,7 +163,6 @@ class SourceConfigTest {
     @Test
     void macosForwardsStartTimeAndDurationsToReceiverConfig() {
         final var config = MacOSUnifiedLoggingSourceConfig.builder()
-                .startTime("2026-07-10 00:00:00")
                 .maxPollInterval(Duration.ofSeconds(15))
                 .maxLogAge(Duration.ofHours(6))
                 .build();
@@ -171,7 +170,6 @@ class SourceConfigTest {
         final var macReceiver =
                 (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("src-1").orElseThrow();
 
-        assertThat(macReceiver.startTime()).isEqualTo("2026-07-10 00:00:00");
         assertThat(macReceiver.maxPollInterval()).isEqualTo(Duration.ofSeconds(15));
         assertThat(macReceiver.maxLogAge()).isEqualTo(Duration.ofHours(6));
     }
@@ -183,7 +181,6 @@ class SourceConfigTest {
         final var macReceiver =
                 (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s").orElseThrow();
 
-        assertThat(macReceiver.startTime()).isNull();
         assertThat(macReceiver.maxPollInterval()).isEqualTo(Duration.ofSeconds(30));
         assertThat(macReceiver.maxLogAge()).isEqualTo(Duration.ofHours(24));
     }
@@ -192,14 +189,12 @@ class SourceConfigTest {
     void macosRoundTripSerializesNewFields() throws Exception {
         final var original = MacOSUnifiedLoggingSourceConfig.builder()
                 .predicate("subsystem == 'com.apple.securityd'")
-                .startTime("2026-07-10 00:00:00")
                 .maxPollInterval(Duration.ofSeconds(30))
                 .maxLogAge(Duration.ofHours(24))
                 .build();
 
         final var json = objectMapper.writeValueAsString(original);
         final var tree = objectMapper.readTree(json);
-        assertThat(tree.get("start_time").asText()).isEqualTo("2026-07-10 00:00:00");
         assertThat(tree.get("max_poll_interval").asText()).isEqualTo("PT30S");
         assertThat(tree.get("max_log_age").asText()).isEqualTo("PT24H");
 

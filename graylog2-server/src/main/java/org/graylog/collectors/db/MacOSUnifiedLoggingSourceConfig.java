@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import jakarta.annotation.Nullable;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
@@ -42,15 +43,9 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
     @JsonProperty("predicate")
     public abstract String predicate();
 
-    @Nullable
-    @JsonProperty("start_time")
-    public abstract String startTime();
-
-    @Nullable
     @JsonProperty("max_poll_interval")
     public abstract Duration maxPollInterval();
 
-    @Nullable
     @JsonProperty("max_log_age")
     public abstract Duration maxLogAge();
 
@@ -60,23 +55,22 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
 
     @Override
     public void validate() {
-        // No required fields — predicate is optional, defaults are sensible.
+        // empty predicates are valid
+        if (maxPollInterval().isZero() || maxPollInterval().isNegative()) {
+            throw new IllegalArgumentException("max_poll_interval must be positive");
+        }
+        if (maxLogAge().isNegative()) {
+            throw new IllegalArgumentException("max_log_age must be zero or positive");
+        }
     }
 
     @Override
     public Optional<CollectorReceiverConfig> toReceiverConfig(String id) {
-        final var builder = MacOSUnifiedLoggingReceiverConfig.builder(id);
+        final var builder = MacOSUnifiedLoggingReceiverConfig.builder(id)
+                .maxLogAge(maxLogAge())
+                .maxPollInterval(maxPollInterval());
         if (predicate() != null) {
-            builder.predicate(predicate());
-        }
-        if (startTime() != null) {
-            builder.startTime(startTime());
-        }
-        if (maxPollInterval() != null) {
-            builder.maxPollInterval(maxPollInterval());
-        }
-        if (maxLogAge() != null) {
-            builder.maxLogAge(maxLogAge());
+            builder.predicate(Strings.emptyToNull(predicate()));
         }
         return Optional.of(builder.build());
     }
@@ -95,14 +89,11 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
         @JsonProperty("predicate")
         public abstract Builder predicate(@Nullable String predicate);
 
-        @JsonProperty("start_time")
-        public abstract Builder startTime(@Nullable String startTime);
-
         @JsonProperty("max_poll_interval")
-        public abstract Builder maxPollInterval(@Nullable Duration maxPollInterval);
+        public abstract Builder maxPollInterval(Duration maxPollInterval);
 
         @JsonProperty("max_log_age")
-        public abstract Builder maxLogAge(@Nullable Duration maxLogAge);
+        public abstract Builder maxLogAge(Duration maxLogAge);
 
         public abstract MacOSUnifiedLoggingSourceConfig build();
     }

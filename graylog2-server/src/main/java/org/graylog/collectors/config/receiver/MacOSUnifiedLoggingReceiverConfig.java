@@ -38,7 +38,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * (a bounded, finite collection window) options are intentionally omitted: the collector is meant
  * for continuous live tailing, so those would only ever produce one-shot behavior.
  *
- * @see <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/macosunifiedloggingreceiver">macOS Unified Logging Receiver</a>
+ * @see <a href="https://github.com/Graylog2/collector/tree/main/receiver/macosunifiedloggingreceiver">macOS Unified Logging Receiver</a>
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -58,16 +58,10 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements CollectorRece
     @JsonProperty("predicate")
     public abstract String predicate();
 
-    @Nullable
-    @JsonProperty("start_time")
-    public abstract String startTime();
-
-    @Nullable
     @JsonProperty("max_poll_interval")
     @JsonSerialize(using = GoDurationSerializer.class)
     public abstract Duration maxPollInterval();
 
-    @Nullable
     @JsonProperty("max_log_age")
     @JsonSerialize(using = GoDurationSerializer.class)
     public abstract Duration maxLogAge();
@@ -81,26 +75,10 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements CollectorRece
     @JsonProperty("storage")
     public abstract String storage();
 
-    // Default predicate: security-relevant subsystems, error severity and above.
-    static final String DEFAULT_PREDICATE = "subsystem IN {"
-            + "'com.apple.opendirectoryd',"
-            + "'com.apple.authorization',"
-            + "'com.apple.loginwindow',"
-            + "'com.apple.securityd',"
-            + "'com.apple.TCC',"
-            + "'com.apple.alf',"
-            + "'com.apple.networkextension',"
-            + "'com.apple.DiskManagement',"
-            + "'com.apple.CoreStorage',"
-            + "'com.apple.endpointsecurity',"
-            + "'com.apple.syspolicyd',"
-            + "'com.apple.launchd'"
-            + "} AND messageType >= error";
 
     public static Builder builder(String id) {
         return new AutoValue_MacOSUnifiedLoggingReceiverConfig.Builder()
                 .name(f("macos_unified_logging/%s", id))
-                .predicate(DEFAULT_PREDICATE)
                 .maxPollInterval(Duration.ofSeconds(30))
                 .maxLogAge(Duration.ofHours(24))
                 .storage(FileStorageExtensionConfig.defaultInstance().name());
@@ -112,11 +90,9 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements CollectorRece
 
         public abstract Builder predicate(@Nullable String predicate);
 
-        public abstract Builder startTime(@Nullable String startTime);
+        public abstract Builder maxPollInterval(Duration maxPollInterval);
 
-        public abstract Builder maxPollInterval(@Nullable Duration maxPollInterval);
-
-        public abstract Builder maxLogAge(@Nullable Duration maxLogAge);
+        public abstract Builder maxLogAge(Duration maxLogAge);
 
         public abstract Builder storage(String storage);
 
