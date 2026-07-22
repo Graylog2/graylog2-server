@@ -14,24 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode.restart;
+package org.graylog.plugins.views.search.searchfilters;
 
-public enum RollingRestartState {
-    PREPARING_CLUSTER,
-    PAUSING_PROCESSING,
-    SELECTING_NEXT_NODE,
-    UPGRADING_NODE,
-    WAITING_NODE_JOINED,
-    REENABLING_ALLOCATION,
-    WAITING_GREEN,
-    PAUSED_WAITING_GREEN,
-    FINALIZING,
-    RESUMING_PROCESSING,
-    COMPLETED,
-    ABORTED,
-    FAILED;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 
-    public boolean isTerminal() {
-        return this == COMPLETED || this == ABORTED || this == FAILED;
-    }
+import java.util.List;
+
+public interface EffectiveQueryComposer {
+
+    String compose(String baseQuery, List<UsedSearchFilter> filters);
 }

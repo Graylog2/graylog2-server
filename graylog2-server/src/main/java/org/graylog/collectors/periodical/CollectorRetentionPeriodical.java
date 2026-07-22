@@ -19,28 +19,49 @@ package org.graylog.collectors.periodical;
 import jakarta.inject.Inject;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PurgeExpiredCollectorInstancesPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(PurgeExpiredCollectorInstancesPeriodical.class);
+import java.time.Clock;
+import java.time.Duration;
+
+/**
+ * Deletes collector instances that haven't been seen for longer than the expiration threshold and
+ * truncates the fleet transaction log accordingly.
+ */
+public class CollectorRetentionPeriodical extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectorRetentionPeriodical.class);
+    // Grace period during which unprocessed transaction markers outlive the collector expiration threshold.
+    private static final Duration TXN_LOG_SAFETY_MARGIN = Duration.ofDays(30);
+    private static final int MIN_TXNS_TO_KEEP = 100;
 
     private final CollectorInstanceService collectorInstanceService;
     private final CollectorsConfigService collectorsConfigService;
+    private final FleetTransactionLogService txnLogService;
+    private final Clock clock;
 
     @Inject
-    public PurgeExpiredCollectorInstancesPeriodical(CollectorInstanceService collectorInstanceService,
-                                                    CollectorsConfigService collectorsConfigService) {
+    public CollectorRetentionPeriodical(CollectorInstanceService collectorInstanceService,
+                                                    CollectorsConfigService collectorsConfigService,
+                                                    FleetTransactionLogService txnLogService,
+                                                    Clock clock) {
         this.collectorInstanceService = collectorInstanceService;
         this.collectorsConfigService = collectorsConfigService;
+        this.txnLogService = txnLogService;
+        this.clock = clock;
     }
 
     @Override
     public void doRun() {
         final var expirationThreshold = collectorsConfigService.getOrDefault().collectorExpirationThreshold();
-        final long purged = collectorInstanceService.deleteExpired(expirationThreshold);
-        LOG.debug("Purged {} expired collector instances.", purged);
+        final var purgedInstances = collectorInstanceService.deleteExpired(expirationThreshold);
+        LOG.debug("Purged {} expired collector instances.", purgedInstances);
+
+        final var txnCutoff = clock.instant().minus(expirationThreshold.plus(TXN_LOG_SAFETY_MARGIN));
+        final long purgedTxns = txnLogService.purgeMarkers(txnCutoff, MIN_TXNS_TO_KEEP);
+        LOG.debug("Purged {} transactions.", purgedTxns);
     }
 
     @Override

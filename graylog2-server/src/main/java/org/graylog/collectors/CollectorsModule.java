@@ -48,7 +48,7 @@ import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.opamp.OpAmpModule;
 import org.graylog.collectors.periodical.CollectorCaRenewalPeriodical;
-import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
+import org.graylog.collectors.periodical.CollectorRetentionPeriodical;
 import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog.collectors.rest.CollectorsActivityResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
@@ -148,7 +148,7 @@ public class CollectorsModule extends PluginModule {
         addSystemRestResource(CollectorsActivityResource.class);
 
         // Periodicals
-        addPeriodical(PurgeExpiredCollectorInstancesPeriodical.class);
+        addPeriodical(CollectorRetentionPeriodical.class);
         addPeriodical(CollectorCaRenewalPeriodical.class);
 
         // Fleet permissions

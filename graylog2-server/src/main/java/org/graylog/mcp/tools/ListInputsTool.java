@@ -38,6 +38,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -72,6 +73,11 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
         this.inputService = inputService;
         this.availableInputs = messageInputFactory.getAvailableInputs();
         this.customizationConfig = customizationConfig;
+    }
+
+    @Override
+    public Set<String> checkedPermissions() {
+        return Set.of(RestPermissions.INPUTS_READ);
     }
 
     @Override

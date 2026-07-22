@@ -18,6 +18,7 @@ package org.graylog.integrations.aws.transports;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
@@ -36,15 +37,22 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClientBuilder;
+import software.amazon.kinesis.checkpoint.CheckpointConfig;
 import software.amazon.kinesis.common.ConfigsBuilder;
+import software.amazon.kinesis.coordinator.CoordinatorConfig;
 import software.amazon.kinesis.coordinator.NoOpWorkerStateChangeListener;
 import software.amazon.kinesis.coordinator.Scheduler;
 import software.amazon.kinesis.coordinator.WorkerStateChangeListener;
+import software.amazon.kinesis.leases.LeaseManagementConfig;
+import software.amazon.kinesis.lifecycle.LifecycleConfig;
 import software.amazon.kinesis.lifecycle.NoOpTaskExecutionListener;
 import software.amazon.kinesis.lifecycle.TaskExecutionListener;
 import software.amazon.kinesis.lifecycle.TaskOutcome;
 import software.amazon.kinesis.lifecycle.TaskType;
 import software.amazon.kinesis.lifecycle.events.TaskExecutionListenerInput;
+import software.amazon.kinesis.metrics.MetricsConfig;
+import software.amazon.kinesis.processor.ProcessorConfig;
+import software.amazon.kinesis.retrieval.RetrievalConfig;
 import software.amazon.kinesis.retrieval.polling.PollingConfig;
 
 import java.util.Locale;
@@ -135,7 +143,7 @@ public class KinesisConsumer implements Runnable {
             LOG.debug("Using workerId [{}].", workerId);
 
             // The application name needs to be unique per input/consumer.
-            final String applicationName = String.format(Locale.ENGLISH, "graylog-aws-plugin-%s", kinesisStreamName);
+            final String applicationName = applicationName(kinesisStreamName);
             LOG.debug("Using Kinesis applicationName [{}].", applicationName);
 
             // The KinesisShardProcessorFactory contains the message processing logic.
@@ -174,19 +182,52 @@ public class KinesisConsumer implements Runnable {
                 }
             };
 
-            this.kinesisScheduler = new Scheduler(
-                    configsBuilder.checkpointConfig(),
-                    configsBuilder.coordinatorConfig().workerStateChangeListener(workerStateChangeListener),
-                    configsBuilder.leaseManagementConfig(),
-                    configsBuilder.lifecycleConfig().taskExecutionListener(taskExecutionListener),
-                    configsBuilder.metricsConfig(),
-                    configsBuilder.processorConfig(),
-                    configsBuilder.retrievalConfig().retrievalSpecificConfig(pollingConfig));
+            // ConfigsBuilder accessors create a new config object on every call, so each config must be
+            // materialized exactly once and the same instances passed to the Scheduler — otherwise the
+            // customizeSchedulerConfigs() customizations would be silently discarded.
+            final CheckpointConfig checkpointConfig = configsBuilder.checkpointConfig();
+            final CoordinatorConfig coordinatorConfig = configsBuilder.coordinatorConfig()
+                    .workerStateChangeListener(workerStateChangeListener);
+            final LeaseManagementConfig leaseManagementConfig = configsBuilder.leaseManagementConfig();
+            final LifecycleConfig lifecycleConfig = configsBuilder.lifecycleConfig()
+                    .taskExecutionListener(taskExecutionListener);
+            final MetricsConfig metricsConfig = configsBuilder.metricsConfig();
+            final ProcessorConfig processorConfig = configsBuilder.processorConfig();
+            final RetrievalConfig retrievalConfig = configsBuilder.retrievalConfig()
+                    .retrievalSpecificConfig(pollingConfig);
+
+            customizeSchedulerConfigs(coordinatorConfig, leaseManagementConfig, metricsConfig, retrievalConfig, pollingConfig);
+
+            this.kinesisScheduler = new Scheduler(checkpointConfig, coordinatorConfig, leaseManagementConfig,
+                    lifecycleConfig, metricsConfig, processorConfig, retrievalConfig);
 
             LOG.debug("Starting Kinesis scheduler.");
             kinesisScheduler.run();
             LOG.debug("After Kinesis scheduler stopped.");
         }
+    }
+
+    /**
+     * Hook that allows tests to tune KCL coordination timings (e.g. lease failover, polling intervals)
+     * before the {@link Scheduler} is built. KCL's defaults are appropriate for production but make
+     * integration tests needlessly slow. Production code must not override this.
+     */
+    @VisibleForTesting
+    void customizeSchedulerConfigs(CoordinatorConfig coordinatorConfig,
+                                   LeaseManagementConfig leaseManagementConfig,
+                                   MetricsConfig metricsConfig,
+                                   RetrievalConfig retrievalConfig,
+                                   PollingConfig pollingConfig) {
+        // Intentionally empty: production uses KCL defaults.
+    }
+
+    /**
+     * The KCL application name used for a stream. KCL derives the DynamoDB lease table name from it,
+     * which integration tests rely on when pre-seeding leases.
+     */
+    @VisibleForTesting
+    static String applicationName(String kinesisStreamName) {
+        return String.format(Locale.ENGLISH, "graylog-aws-plugin-%s", kinesisStreamName);
     }
 
     /**
