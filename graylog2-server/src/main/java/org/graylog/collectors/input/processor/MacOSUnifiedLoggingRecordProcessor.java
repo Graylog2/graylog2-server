@@ -16,12 +16,16 @@
  */
 package org.graylog.collectors.input.processor;
 
+import com.google.common.base.Strings;
+import org.apache.commons.lang.StringUtils;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.ProcessFields;
 import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +56,7 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
                 case "macos.eventType" -> putStr(result, VendorFields.VENDOR_EVENT_TYPE, value.getStringValue());
                 case "macos.formatString" -> putStr(result, VendorFields.VENDOR_EVENT_DESCRIPTION, value.getStringValue());
                 case "macos.processImagePath" -> {
-                    final var path = emptyToNull(value.getStringValue());
+                    final var path = Strings.emptyToNull(value.getStringValue());
                     if (path != null) {
                         processImagePath = path;
                         result.put(ProcessFields.PROCESS_PATH, path);
@@ -80,10 +84,10 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
 
         // Derive the process name from the executable path.
         if (processImagePath != null) {
-            final var lastSlash = processImagePath.lastIndexOf('/');
-            final var name = lastSlash >= 0 ? processImagePath.substring(lastSlash + 1) : processImagePath;
-            if (!name.isEmpty()) {
-                result.put(ProcessFields.PROCESS_NAME, name);
+            Path path = Paths.get(processImagePath);
+            final var fileName = path.getFileName();
+            if (fileName != null) {
+                result.put(ProcessFields.PROCESS_NAME, fileName.toString());
             }
         }
 
@@ -91,12 +95,8 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
     }
 
     private static void putStr(Map<String, Object> target, String field, String value) {
-        if (value != null && !value.isEmpty()) {
+        if (StringUtils.isNotBlank(value)) {
             target.put(field, value);
         }
-    }
-
-    private static String emptyToNull(String s) {
-        return (s == null || s.isEmpty()) ? null : s;
     }
 }
