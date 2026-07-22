@@ -55,7 +55,6 @@ type Props = {
   sliceColumnId?: string;
   appSection?: string;
   onSort?: (desc: boolean) => void;
-  textAlign?: string;
 };
 
 const HeaderActionsDropdown = ({
