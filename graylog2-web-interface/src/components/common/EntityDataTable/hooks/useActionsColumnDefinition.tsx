@@ -23,7 +23,11 @@ import styled, { css } from 'styled-components';
 import useResizeObserver from '@react-hook/resize-observer';
 
 import { ButtonToolbar } from 'components/bootstrap';
-import { TABLE_ROW_HOVER_TRANSITION, TABLE_ROW_PINNED_HOVER_BG_VAR, flattenTableBackground } from 'components/bootstrap/Table';
+import {
+  TABLE_ROW_HOVER_TRANSITION,
+  TABLE_ROW_PINNED_HOVER_BG_VAR,
+  flattenTableBackground,
+} from 'components/bootstrap/Table';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import { actionsHeaderWidthVar } from 'components/common/EntityDataTable/CSSVariables';
@@ -37,6 +41,7 @@ const AlignRight = styled.div`
 const BackgroundFoundation = styled.div`
   height: 100%;
   width: var(${actionsHeaderWidthVar});
+  overflow: hidden;
 `;
 
 const HeaderBackground = styled(BackgroundFoundation)(
@@ -50,7 +55,10 @@ const Actions = styled.div<{ $isEvenRow: boolean }>(
     display: flex;
     justify-content: flex-end;
     padding: ${CELL_PADDING}px;
-    background-color: ${flattenTableBackground(theme, $isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped)};
+    background-color: ${flattenTableBackground(
+      theme,
+      $isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped,
+    )};
     height: 100%;
     align-items: flex-start;
     transition: ${TABLE_ROW_HOVER_TRANSITION};

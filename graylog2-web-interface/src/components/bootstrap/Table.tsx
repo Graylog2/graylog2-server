@@ -21,6 +21,7 @@ import type { DefaultTheme } from 'styled-components';
 
 export const TABLE_ROW_HOVER_TRANSITION = 'background-color 150ms ease-in-out';
 export const TABLE_ROW_PINNED_HOVER_BG_VAR = '--table-row-pinned-hover-bg';
+export const TABLE_BORDER_WIDTH = 1;
 export const flattenTableBackground = (theme: DefaultTheme, color: string) =>
   theme.utils.flattenColorStack([theme.colors.global.contentBackground, color]);
 export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
@@ -61,20 +62,20 @@ const StyledTable = styled(MantineTable)<StyledProps>(
 
     ${$bordered &&
     css`
-      border-top: 1px solid ${theme.colors.table.row.divider};
-      border-left: 1px solid ${theme.colors.table.row.divider};
+      border-top: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+      border-left: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
     `}
 
     & th,
     & td {
       padding: ${$condensed ? '5px' : '8px'};
       vertical-align: top;
-      border-top: 1px solid ${theme.colors.table.row.divider};
+      border-top: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
       ${$bordered &&
       css`
         border-top: none;
-        border-right: 1px solid ${theme.colors.table.row.divider};
-        border-bottom: 1px solid ${theme.colors.table.row.divider};
+        border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+        border-bottom: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
       `}
     }
 
@@ -83,7 +84,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       white-space: nowrap;
       vertical-align: bottom;
       border-top: none;
-      border-bottom: 1px solid ${theme.colors.table.row.divider};
+      border-bottom: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
     }
 
     & thead + tbody > tr:first-child > td {
