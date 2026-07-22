@@ -293,7 +293,7 @@ public class ViewsResourceTest {
 
         // making sure that the invalid view id is different from the view id used in all tests by adding a prefix
         final String INVALID_VIEW_ID = "invalid_" + VIEW_ID;
-        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW.toBuilder().id(INVALID_VIEW_ID).build(), EntityShareRequest.create(ImmutableMap.of()));
+        final var request = new UnwrappedCreateEntityRequest<>(TEST_DASHBOARD_VIEW.toBuilder().id(INVALID_VIEW_ID).build(), EntityShareRequest.create(ImmutableMap.of()));
 
         final ViewsResource viewsResource = createViewsResource(
                 viewService,
