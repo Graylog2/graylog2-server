@@ -45,6 +45,22 @@ const DEFAULT_SOURCES: NewSource[] = [
     enabled: true,
     type: 'macos_unified_logging',
     config: {
+      predicate: 'subsystem IN {\n' +
+        '\'com.apple.opendirectoryd\',\n' +
+        '\'com.apple.authorization\',\n' +
+        '\'com.apple.loginwindow\',\n' +
+        '\'com.apple.securityd\',\n' +
+        '\'com.apple.TCC\',\n' +
+        '\'com.apple.alf\',\n' +
+        '\'com.apple.networkextension\',\n' +
+        '\'com.apple.DiskManagement\',\n' +
+        '\'com.apple.CoreStorage\',\n' +
+        '\'com.apple.endpointsecurity\',\n' +
+        '\'com.apple.syspolicyd\',\n' +
+        '\'com.apple.launchd\'\n' +
+        '} AND messageType >= error',
+      max_log_age: 'PT24H',
+      max_poll_interval: 'PT30S',
     },
   },
   {
