@@ -97,7 +97,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
 
     ${$striped &&
     css`
-      & tbody:only-of-type > tr:nth-of-type(odd) {
+      & tbody:only-of-type > tr:nth-of-type(even) {
         background-color: ${theme.colors.table.row.backgroundStriped};
       }
 
