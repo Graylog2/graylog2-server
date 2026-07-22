@@ -165,9 +165,11 @@ const MessageTable = ({
           <TableHead>
             <tr>
               {displayBulkSelectCol && (
-                <BulkSelectCell>
-                  <BulkSelectHead />
-                </BulkSelectCell>
+                <TableHeaderCell $noMinWidth>
+                  <BulkSelectCell>
+                    <BulkSelectHead />
+                  </BulkSelectCell>
+                </TableHeaderCell>
               )}
               {selectedFields
                 .toSeq()
