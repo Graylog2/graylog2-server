@@ -17,11 +17,15 @@
 
 package org.graylog2.indexer.indices;
 
+import com.google.common.eventbus.EventBus;
 import org.assertj.core.api.Assertions;
+import org.bson.conversions.Bson;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +36,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +63,12 @@ class OutdatedIndexServiceTest {
 
     @Mock
     IndexSetRegistry indexSetRegistry;
+
+    @Mock
+    IndexRangeService indexRangeService;
+
+    @Mock
+    EventBus eventBus;
 
     @InjectMocks
     OutdatedIndexService outdatedIndexService;
@@ -95,6 +106,7 @@ class OutdatedIndexServiceTest {
         when(noWriteIndex.getActiveWriteIndex()).thenReturn("another_index");
         when(indexSetRegistry.getForIndex("outdated2")).thenReturn(Optional.of(noWriteIndex));
         when(indicesAdapter.getOutdatedIndices(2)).thenReturn(outdatedIndices);
+        when(indexRangeService.find(any(Bson.class))).thenReturn(Collections.<IndexRange>emptySortedSet());
         assertThat(outdatedIndexService.getOutdatedIndices()).isEqualTo(List.of(
                 new OutdatedIndex("outdated1", "1.3.0", false, true, "id1"),
                 new OutdatedIndex("outdated2", "1.3.0", true, false, null)
