@@ -1,0 +1,5 @@
+type = "a"
+message = "Add HTTP Async proxy support for AWS Kinesis/Cloudwatch input."
+
+issues = ["14460"]
+pulls = ["26404"]

@@ -17,8 +17,8 @@
 
 import * as React from 'react';
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -30,7 +30,7 @@ const CreateIndexSetTemplateButton = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const handleClick = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECT_OPENED, {
@@ -38,7 +38,7 @@ const CreateIndexSetTemplateButton = () => {
       app_action_value: 'select-index-set-template-opened',
     });
 
-    navigate(Routes.SYSTEM.INDICES.TEMPLATES.CREATE);
+    push(Routes.SYSTEM.INDICES.TEMPLATES.CREATE);
   };
 
   return (

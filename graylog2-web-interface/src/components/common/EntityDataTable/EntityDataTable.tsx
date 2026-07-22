@@ -233,7 +233,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const scrolledToRightIndicator = useRef<HTMLDivElement>();
   const scrolledToRight = useIntersectionObserver(scrollContainerRef, scrolledToRightIndicator);
 
-  const { setInternalAttributeColumnOrder, setInternalColumnWidthPreferences, internalColumnWidthPreferences, internalAttributeColumnOrder } = useInternalLayoutPreferences({ layoutPreferences, defaultColumnOrder });
+  const {
+    setInternalAttributeColumnOrder,
+    setInternalColumnWidthPreferences,
+    internalColumnWidthPreferences,
+    internalAttributeColumnOrder,
+  } = useInternalLayoutPreferences({ layoutPreferences, defaultColumnOrder });
 
   const columnOrder = useVisibleColumnOrder(
     layoutPreferences?.attributes,
@@ -301,7 +306,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
       setInternalAttributeColumnOrder(defaultColumnOrder);
       setInternalColumnWidthPreferences({});
     });
-  }, [defaultColumnOrder, onResetLayoutPreferences, setInternalAttributeColumnOrder, setInternalColumnWidthPreferences]);
+  }, [
+    defaultColumnOrder,
+    onResetLayoutPreferences,
+    setInternalAttributeColumnOrder,
+    setInternalColumnWidthPreferences,
+  ]);
 
   return (
     <MetaDataProvider<Meta> meta={meta}>

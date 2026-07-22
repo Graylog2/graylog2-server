@@ -129,7 +129,10 @@ export const fetchEventsHistogram = async (searchParams: SearchParams) => {
     sort_unmapped_type: undefined,
     filter,
     timerange,
-  }).then((results) => ({ timerange, results }));
+  }).then(({ buckets, effective_timerange }) => ({
+    timerange: effective_timerange,
+    results: { buckets },
+  }));
 };
 
 export const keyFn = (searchParams: SearchParams) => ['events', 'search', searchParams];

@@ -71,6 +71,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -518,7 +519,7 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(ScheduledExecutorService.class),
                 eventBus
         );
 
@@ -577,7 +578,7 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(ScheduledExecutorService.class),
                 mock(EventBus.class)
         );
         return new PipelineInterpreter(
@@ -638,7 +639,7 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(ScheduledExecutorService.class),
                 mock(EventBus.class)
         );
         final PipelineInterpreter interpreter = new PipelineInterpreter(

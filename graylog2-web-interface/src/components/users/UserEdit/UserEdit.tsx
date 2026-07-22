@@ -25,7 +25,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
-import type { UserUpdate } from 'stores/users/UsersStore';
+import type { UserUpdate } from 'hooks/useUsers';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';

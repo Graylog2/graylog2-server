@@ -39,7 +39,7 @@ type SystemMessagesListProps = {
 };
 
 const SystemMessagesList = ({ messages }: SystemMessagesListProps) => (
-  <SystemMessagesTable striped hover condensed>
+  <SystemMessagesTable condensed>
     <thead>
       <tr>
         <TimestampTH>Timestamp</TimestampTH>

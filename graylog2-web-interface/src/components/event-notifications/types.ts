@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import type { ErrorType } from 'integrations/event-notifications/types';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 

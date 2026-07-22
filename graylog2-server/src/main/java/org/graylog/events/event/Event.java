@@ -113,6 +113,10 @@ public interface Event extends Indexable {
 
     void addAssociatedAssets(Set<String> associatedAssets);
 
+    List<String> getTacticsTechniques();
+
+    void setTacticsTechniques(List<String> tacticsTechniques);
+
     Set<String> getTags();
 
     void setTags(Set<String> tags);
@@ -135,6 +139,7 @@ public interface Event extends Indexable {
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
         from.originContext().ifPresent(event::setOriginContext);
         from.replayInfo().ifPresent(event::setReplayInfo);
+        event.setTacticsTechniques(from.tacticsTechniques());
         event.setTags(from.tags());
 
         return event;

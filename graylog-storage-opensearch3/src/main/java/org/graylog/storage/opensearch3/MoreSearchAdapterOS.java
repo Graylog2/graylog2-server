@@ -21,6 +21,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.events.search.MitreBackwardsCompatibilityFilter;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.SourceStreamFilter;
@@ -164,7 +165,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         boolQuery.filter(timerangeQuery(timerange));
 
 
-        extraFilters.forEach((field, values) -> {
+        final BoolQuery.Builder mitreOr = BoolQuery.builder().minimumShouldMatch("1");
+        if (MitreBackwardsCompatibilityFilter.emitShouldClauses(extraFilters,
+                (k, v) -> mitreOr.should(buildExtraFilter(k, v)))) {
+            boolQuery.filter(Query.of(b -> b.bool(mitreOr.build())));
+        }
+
+        extraFilters.entrySet().stream()
+                .filter(e -> !MitreBackwardsCompatibilityFilter.isMitreKey(e.getKey()))
+                .forEach(e -> {
+            final var field = e.getKey();
+            final var values = e.getValue();
             values.stream()
                     .filter(MoreSearchAdapter::isRangeValue)
                     .map(value -> buildExtraFilter(field, value))
@@ -270,7 +281,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
         });
 
-        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
     }
 
     static Query buildExtraFilter(String field, String value) {
@@ -498,10 +509,11 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     }
 
     private double extractMetricValue(org.opensearch.client.opensearch._types.aggregations.Aggregate agg, AggregationType metricType) {
-        return switch (metricType) {
+        final Double value = switch (metricType) {
             case AVG -> agg.avg().value();
             case MAX -> agg.max().value();
         };
+        return value != null ? value : 0.0;
     }
 
     private Query createSimpleQuery(String queryString, TimeRange timerange) {

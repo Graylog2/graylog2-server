@@ -75,10 +75,10 @@ public class DataNodeApiProxyResource extends RestResource {
     @Operation(summary = "GET request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestGet(@Parameter(name = "path", required = true)
-                                       @PathParam("path") String path,
-                                       @Parameter(name = "hostname", required = true)
-                                       @PathParam("hostname") String hostname,
-                                       @Context ContainerRequestContext requestContext) throws IOException {
+                               @PathParam("path") String path,
+                               @Parameter(name = "hostname", required = true)
+                               @PathParam("hostname") String hostname,
+                               @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 
@@ -86,10 +86,10 @@ public class DataNodeApiProxyResource extends RestResource {
     @Operation(summary = "POST request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestPost(@Parameter(name = "path", required = true)
-                                        @PathParam("path") String path,
-                                        @Parameter(name = "hostname", required = true)
-                                        @PathParam("hostname") String hostname,
-                                        @Context ContainerRequestContext requestContext) throws IOException {
+                                @PathParam("path") String path,
+                                @Parameter(name = "hostname", required = true)
+                                @PathParam("hostname") String hostname,
+                                @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 

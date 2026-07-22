@@ -56,7 +56,6 @@ import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListCon
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.security.Capability;
 import org.graylog.security.UserContext;
-import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.Configuration;
@@ -72,6 +71,7 @@ import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
+import org.graylog2.contentpacks.model.ContentPackUpgrade;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -139,7 +139,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -207,8 +209,6 @@ public class ContentPackServiceTest {
     @Mock
     private EntitySharesService entitySharesService;
     @Mock
-    private EntityGrantLookup grantLookup;
-    @Mock
     private FavoriteFieldsService favoriteFieldsService;
 
     private ContentPackService contentPackService;
@@ -231,8 +231,8 @@ public class ContentPackServiceTest {
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
-                ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, grantLookup),
-                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, grantLookup),
+                ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
+                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService),
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );
@@ -413,7 +413,6 @@ public class ContentPackServiceTest {
                 .failedEntities(ImmutableSet.of())
                 .entities(nativeEntityDescriptors)
                 .entityObjects(entityObjectMap)
-                .entityGrants(ImmutableMap.of(ModelId.of("12345"), new ArrayList<>()))
                 .build();
 
         ContentPackUninstallation resultSuccess = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
@@ -455,6 +454,243 @@ public class ContentPackServiceTest {
 
         ContentPackUninstallation resultFailure = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultFailure).isEqualTo(expectFailure);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackRecreatesNonUpdatableEntityType() throws Exception {
+        // GrokPatternFacade does not implement UpdatableEntityFacade, so an existing grok pattern
+        // falls back to delete-and-recreate on upgrade: content stays fresh, but the ID changes.
+        GrokPattern existingPattern = GrokPattern.builder().id("dead-beef1").name("NAME").pattern("\\w").build();
+        when(patternService.load("dead-beef1")).thenReturn(existingPattern);
+        GrokPattern recreatedPattern = GrokPattern.builder().id("recreated-id").name("NAME").pattern("\\w").build();
+        when(patternService.save(any())).thenReturn(recreatedPattern);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                contentPack, contentPackInstallation, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        verify(patternService).delete("dead-beef1");
+
+        assertThat(result.installation().entities()).hasSize(1);
+        NativeEntityDescriptor descriptor = result.installation().entities().iterator().next();
+        assertThat(descriptor.id()).isEqualTo(ModelId.of("recreated-id"));
+        assertThat(descriptor.contentPackEntityId()).isEqualTo(ModelId.of("12345"));
+
+        // The old entity is still snapshotted for the preservation service.
+        assertThat(result.oldEntitySnapshots().entityObjects()).containsKey(ModelId.of("12345"));
+        assertThat(result.oldEntitySnapshots().entityObjects().get(ModelId.of("12345"))).isEqualTo(existingPattern);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, RestPermissions.EVENT_DEFINITIONS_CREATE})
+    public void upgradeContentPackWithMultipleEntityTypes() throws Exception {
+        ImmutableSet<Entity> entities = ImmutableSet.of(createTestViewEntity(), createTestEventDefinitionEntity());
+        ContentPackV1 newPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(2)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        NativeEntityDescriptor viewDescriptor = NativeEntityDescriptor.create(
+                ModelId.of("1"), "view-native-id", ModelTypes.SEARCH_V1, "title", false);
+        NativeEntityDescriptor eventDefDescriptor = NativeEntityDescriptor.create(
+                ModelId.of("beef-1337"), "eventdef-native-id", ModelTypes.EVENT_DEFINITION_V1, "title", false);
+
+        ContentPackInstallation oldInstall = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(1)
+                .entities(ImmutableSet.of(viewDescriptor, eventDefDescriptor))
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
+            when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
+        }
+
+        ViewDTO existingView = ViewDTO.builder().id("view-native-id").title("title").searchId("search-id").state(Collections.emptyMap()).build();
+        when(viewService.get("view-native-id")).thenReturn(Optional.of(existingView));
+
+        EventDefinitionDto existingEventDef = createTestEventDefinitionDto().toBuilder().id("eventdef-native-id").build();
+        when(eventDefinitionService.get("eventdef-native-id")).thenReturn(Optional.of(existingEventDef));
+
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                newPack, oldInstall, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        assertThat(result.installation().entities()).hasSize(2);
+        Set<ModelId> preservedIds = result.installation().entities().stream()
+                .map(NativeEntityDescriptor::id)
+                .collect(Collectors.toSet());
+        assertThat(preservedIds).containsExactlyInAnyOrder(
+                ModelId.of("view-native-id"), ModelId.of("eventdef-native-id"));
+
+        assertThat(result.oldEntitySnapshots().entityObjects()).hasSize(2);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackCreatesNewEntityWhenNotInOldInstallation() throws Exception {
+        GrokPattern savedPattern = GrokPattern.builder().id("new-id").name("NAME").pattern("\\w").build();
+        when(patternService.save(any())).thenReturn(savedPattern);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        ContentPackInstallation emptyOldInstall = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(0)
+                .entities(ImmutableSet.of())
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                contentPack, emptyOldInstall, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        assertThat(result.installation().entities()).hasSize(1);
+        assertThat(result.oldEntitySnapshots().entityObjects()).isEmpty();
+        assertThat(result.oldEntitySnapshots().entities()).isEmpty();
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackFallsBackToCreateWhenOldEntityMissing() throws Exception {
+        when(patternService.load("dead-beef1")).thenThrow(new NotFoundException("Not found."));
+
+        GrokPattern newGrokPattern = GrokPattern.builder()
+                .id("new-id")
+                .pattern("\\w")
+                .name("NAME")
+                .build();
+        when(patternService.save(any())).thenReturn(newGrokPattern);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                contentPack, contentPackInstallation, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        assertThat(result.installation().entities()).hasSize(1);
+        NativeEntityDescriptor descriptor = result.installation().entities().iterator().next();
+        assertThat(descriptor.id()).isEqualTo(ModelId.of("new-id"));
+
+        assertThat(result.oldEntitySnapshots().entityObjects()).isEmpty();
+        assertThat(result.oldEntitySnapshots().entities()).hasSize(1);
+        assertThat(result.oldEntitySnapshots().entities().iterator().next().id()).isEqualTo(ModelId.of("dead-beef1"));
+    }
+
+    @Test
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, "inputs:create"})
+    public void upgradeContentPackMixedExistingAndNewEntities() throws Exception {
+        // Existing entity: a view (updatable facade, update branch). New entity: a grok pattern
+        // (create branch, which does not require update support).
+        Map<String, String> entityData = new HashMap<>();
+        entityData.put("name", "NEW_PATTERN");
+        entityData.put("pattern", "\\d+");
+        EntityV1 newEntityV1 = EntityV1.builder()
+                .id(ModelId.of("entity-2"))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .data(objectMapper.convertValue(entityData, JsonNode.class))
+                .build();
+
+        ContentPackV1 newPack = ContentPackV1.builder()
+                .description("test")
+                .entities(ImmutableSet.of(createTestViewEntity(), newEntityV1))
+                .name("test")
+                .revision(2)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        NativeEntityDescriptor oldDescriptor = NativeEntityDescriptor.create(
+                ModelId.of("1"), "view-native-id", ModelTypes.SEARCH_V1, "title", false);
+        ContentPackInstallation oldInstall = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(1)
+                .entities(ImmutableSet.of(oldDescriptor))
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
+            when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
+        }
+
+        ViewDTO existingView = ViewDTO.builder().id("view-native-id").title("title").searchId("search-id").state(Collections.emptyMap()).build();
+        when(viewService.get("view-native-id")).thenReturn(Optional.of(existingView));
+
+        GrokPattern newPattern = GrokPattern.builder().id("native-2").name("NEW_PATTERN").pattern("\\d+").build();
+        when(patternService.save(any())).thenReturn(newPattern);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                newPack, oldInstall, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        assertThat(result.installation().entities()).hasSize(2);
+        Set<ModelId> nativeIds = result.installation().entities().stream()
+                .map(NativeEntityDescriptor::id)
+                .collect(Collectors.toSet());
+        assertThat(nativeIds).containsExactlyInAnyOrder(ModelId.of("view-native-id"), ModelId.of("native-2"));
+
+        assertThat(result.oldEntitySnapshots().entityObjects()).hasSize(1);
+        assertThat(result.oldEntitySnapshots().entityObjects()).containsKey(ModelId.of("1"));
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackRollsBackNewlyCreatedEntitiesOnFailure() throws Exception {
+        when(patternService.save(any())).thenThrow(new RuntimeException("DB failure"));
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+
+        ContentPackInstallation emptyOldInstall = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(0)
+                .entities(ImmutableSet.of())
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        assertThatThrownBy(() -> contentPackService.upgradeContentPack(
+                contentPack, emptyOldInstall, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY))
+                .isInstanceOf(ContentPackException.class)
+                .hasMessageContaining("upgrade");
+
+        verify(patternService, never()).delete(any());
     }
 
     @Test

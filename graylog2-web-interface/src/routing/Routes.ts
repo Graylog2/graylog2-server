@@ -49,6 +49,7 @@ type SearchQueryParams = {
   keyword?: string;
   streams?: string;
   stream_categories?: string;
+  autorefresh?: string;
 };
 
 const Routes = {
@@ -68,6 +69,10 @@ const Routes = {
       edit: (definitionId: string) => `/alerts/definitions/${definitionId}/edit`,
       show: (definitionId: string) => `/alerts/definitions/${definitionId}`,
       replay_search: (definitionId: string) => `/alerts/definitions/${definitionId}/replay-search`,
+      SIGMA: {
+        GIT_IMPORT: '/alerts/definitions/sigma/git-import',
+        FILE_IMPORT: '/alerts/definitions/sigma/file-import',
+      },
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
@@ -149,6 +154,7 @@ const Routes = {
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
+    NOTIFICATIONS: '/system/notifications',
     PROCESSBUFFERDUMP: (nodeId: string) => `/system/processbufferdump/${nodeId}`,
     SYSTEMLOGS: (nodeId: string) => `/system/logs/recent/${nodeId}`,
     AUTHENTICATION: {
@@ -233,6 +239,7 @@ const Routes = {
       FLEET: (fleetId: string) => `/system/collectors/fleets/${fleetId}`,
       INSTANCES: '/system/collectors/instances',
       INSTANCE: (instanceId: string) => `/system/collectors/instances/${instanceId}`,
+      ONBOARDING_INSTANCE: (instanceUid: string) => `/system/collectors/onboarding/${instanceUid}`,
       DEPLOYMENT: '/system/collectors/deployment',
       SETTINGS: '/system/collectors/settings',
     },
@@ -249,6 +256,7 @@ const Routes = {
     timeRange: RoutesTimeRange,
     streams?: string[],
     streamCategories?: string[],
+    autorefresh?: string,
   ) => {
     const route = new URI(Routes.SEARCH);
     const queryParams: SearchQueryParams = {
@@ -280,6 +288,10 @@ const Routes = {
 
     if (streamCategories) {
       queryParams.stream_categories = streamCategories.join(',');
+    }
+
+    if (autorefresh) {
+      queryParams.autorefresh = autorefresh;
     }
 
     route.query(queryParams);

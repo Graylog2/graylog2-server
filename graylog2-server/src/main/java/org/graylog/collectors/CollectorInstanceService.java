@@ -37,15 +37,18 @@ import org.bson.conversions.Bson;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.collectors.opamp.IssuedCertificate;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 import org.mongojack.Id;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -69,9 +72,11 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIF
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_FINGERPRINT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_PEM;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CAPABILITIES;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ENROLLMENT_TOKEN_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_FLEET_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_IDENTIFYING_ATTRIBUTES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_INSTANCE_UID;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ISSUING_CA_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_PROCESSED_TXN_SEQ;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_MESSAGE_SEQ_NUM;
@@ -81,6 +86,7 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NEXT_CERTIFIC
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES;
 import static org.graylog2.database.MongoEntity.FIELD_ID;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class CollectorInstanceService {
@@ -90,12 +96,14 @@ public class CollectorInstanceService {
     private final MongoCollection<CollectorInstanceDTO> collection;
     private final MongoPaginationHelper<CollectorInstanceDTO> paginationHelper;
     private final com.mongodb.client.MongoCollection<MinimalCollectorInstanceDTO> projectedCollection;
+    private final Clock clock;
 
     @Inject
-    public CollectorInstanceService(MongoCollections mongoCollections) {
+    public CollectorInstanceService(MongoCollections mongoCollections, Clock clock) {
         collection = mongoCollections.collection("collector_instances", CollectorInstanceDTO.class);
         projectedCollection = mongoCollections.nonEntityCollection("collector_instances", MinimalCollectorInstanceDTO.class);
         paginationHelper = mongoCollections.paginationHelper(collection);
+        this.clock = clock;
 
         try {
             collection.createIndexes(List.of(
@@ -167,29 +175,36 @@ public class CollectorInstanceService {
         collection.updateOne(Filters.eq(FIELD_INSTANCE_UID, instanceUid), set(FIELD_FLEET_ID, newFleetId));
     }
 
-    public boolean existsByInstanceUid(String instanceUid) {
-        return collection.countDocuments(Filters.eq(FIELD_INSTANCE_UID, instanceUid)) == 1L;
-    }
-
+    /**
+     * Inserts a new collector instance record for a first-time enrollment.
+     * <p>
+     * The {@code instance_uid} index is unique; concurrent first-time enrollments for the same UID
+     * surface as {@link com.mongodb.MongoWriteException} with a duplicate-key error.
+     *
+     * @param instanceUid       the agent's self-chosen OpAMP instance UID
+     * @param fleetId           the fleet the enrolling token belongs to
+     * @param issuedCert        the freshly signed agent certificate
+     * @param enrollmentTokenId the id of the enrollment token that authorized this enrollment
+     * @return the inserted DTO, populated with the generated Mongo {@code _id}
+     */
     public CollectorInstanceDTO enroll(String instanceUid,
                                        String fleetId,
-                                       String fingerprint,
-                                       String certPem,
-                                       Date notAfter,
-                                       String caId,
-                                       Instant enrolledAt,
+                                       IssuedCertificate issuedCert,
                                        String enrollmentTokenId) {
+
+        final var now = clock.instant();
+
         final CollectorInstanceDTO dto = CollectorInstanceDTO.builder()
                 .instanceUid(instanceUid)
-                .lastSeen(enrolledAt)
+                .lastSeen(now)
                 .messageSeqNum(0L) // set to 0 explicitly for clarity, this will cause full resync later in the connection
                 .capabilities(0L) // capabilities are unspecified at this point
                 .fleetId(fleetId)
-                .activeCertificateFingerprint(fingerprint)
-                .activeCertificatePem(certPem)
-                .activeCertificateExpiresAt(notAfter.toInstant())
-                .issuingCaId(caId)
-                .enrolledAt(enrolledAt)
+                .activeCertificateFingerprint(issuedCert.fingerprint())
+                .activeCertificatePem(issuedCert.certPem())
+                .activeCertificateExpiresAt(issuedCert.notAfter())
+                .issuingCaId(issuedCert.issuerId())
+                .enrolledAt(now)
                 .enrollmentTokenId(enrollmentTokenId)
                 .build();
         final InsertOneResult insertOneResult = collection.insertOne(dto);
@@ -198,10 +213,61 @@ public class CollectorInstanceService {
                 .build();
     }
 
-    public Optional<CollectorInstanceDTO> findByFingerprint(String fingerprint) {
-        return Optional.ofNullable(
-                collection.find(Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, fingerprint)).first()
+    /**
+     * Atomically re-issues a collector's active certificate on an existing record.
+     * <p>
+     * The update is a compare-and-swap: it only matches the record with the given Mongo
+     * {@code _id} <em>and</em> the given active certificate fingerprint. Callers must pass the id
+     * and fingerprint they observed when they verified the re-enrollment request (typically via
+     * {@link #findByInstanceUid}). This ensures the update only lands on the exact state the
+     * caller validated. If the record has since been deleted, replaced, or had its active
+     * certificate changed (e.g. by a concurrent renewal activation), the update matches nothing
+     * and this method throws.
+     * <p>
+     * The caller (typically {@code OpAmpService.handleEnrollment}) is responsible for enforcing
+     * proof-of-possession (matching the CSR public key against the stored active certificate's
+     * public key) before calling this method. This service method performs no such check — it
+     * only enforces the compare-and-swap race guard.
+     *
+     * @param id                        the Mongo {@code _id} of the record to update
+     * @param expectedActiveFingerprint the active certificate fingerprint the caller observed when
+     *                                  it verified proof-of-possession
+     * @param issuedCert                the freshly signed agent certificate
+     * @param enrollmentTokenId         the id of the enrollment token that authorized this
+     *                                  re-enrollment
+     * @return the updated DTO (post-update state)
+     * @throws IllegalStateException if no record with the given {@code _id} and active certificate
+     *                               fingerprint is found — the target was concurrently deleted,
+     *                               replaced, or modified
+     */
+    public CollectorInstanceDTO reEnroll(String id,
+                                         String expectedActiveFingerprint,
+                                         IssuedCertificate issuedCert,
+                                         String enrollmentTokenId) {
+
+        final var updates = combine(
+                set(FIELD_LAST_SEEN, Date.from(clock.instant())),
+                unset(FIELD_NEXT_CERTIFICATE_FINGERPRINT),
+                unset(FIELD_NEXT_CERTIFICATE_PEM),
+                unset(FIELD_NEXT_CERTIFICATE_EXPIRES_AT),
+                set(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, issuedCert.fingerprint()),
+                set(FIELD_ACTIVE_CERTIFICATE_PEM, issuedCert.certPem()),
+                set(FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT, Date.from(issuedCert.notAfter())),
+                set(FIELD_ISSUING_CA_ID, issuedCert.issuerId()),
+                set(FIELD_ENROLLMENT_TOKEN_ID, enrollmentTokenId)
         );
+
+        final var updated = collection.findOneAndUpdate(
+                Filters.and(MongoUtils.idEq(id), Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, expectedActiveFingerprint)),
+                updates,
+                new FindOneAndUpdateOptions().upsert(false).returnDocument(ReturnDocument.AFTER)
+        );
+
+        if (updated == null) {
+            throw new IllegalStateException(f("Cannot re-enroll. Collector instance with id %s doesn't exist or its active certificate changed concurrently.", id));
+        }
+
+        return updated;
     }
 
     /**
@@ -270,7 +336,7 @@ public class CollectorInstanceService {
     }
 
     public long deleteExpired(Duration expirationThreshold) {
-        final Date cutoff = Date.from(Instant.now().minus(expirationThreshold));
+        final Date cutoff = Date.from(Instant.now(clock).minus(expirationThreshold));
         return collection.deleteMany(Filters.lt(FIELD_LAST_SEEN, cutoff)).getDeletedCount();
     }
 
@@ -285,26 +351,7 @@ public class CollectorInstanceService {
                 .page(page, selector);
     }
 
-    public long count() {
-        return collection.countDocuments();
-    }
-
-    public long countOnline(Instant onlineThreshold) {
-        return collection.countDocuments(Filters.gte(FIELD_LAST_SEEN, Date.from(onlineThreshold)));
-    }
-
-    public long countByFleet(String fleetId) {
-        return collection.countDocuments(Filters.eq(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId));
-    }
-
-    public long countOnlineByFleet(String fleetId, Instant onlineThreshold) {
-        return collection.countDocuments(Filters.and(
-                Filters.eq(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId),
-                Filters.gte(FIELD_LAST_SEEN, Date.from(onlineThreshold))
-        ));
-    }
-
-    public Map<String, long[]> countByFleetGrouped(Instant onlineThreshold) {
+    public Map<String, InstanceCount> countByFleetGrouped(Instant onlineThreshold) {
         final var pipeline = List.of(
                 Aggregates.group("$" + FIELD_FLEET_ID,
                         Accumulators.sum("total", 1L),
@@ -317,17 +364,26 @@ public class CollectorInstanceService {
                         )
                 )
         );
-        final Map<String, long[]> result = new HashMap<>();
+        final Map<String, InstanceCount> result = new HashMap<>();
         collection.aggregate(pipeline, Document.class).forEach(doc -> {
             final String fleetId = doc.getString("_id");
             if (fleetId != null) {
-                result.put(fleetId, new long[]{
+                result.put(fleetId, new InstanceCount(
                         ((Number) doc.get("total")).longValue(),
-                        ((Number) doc.get("online")).longValue()
-                });
+                        ((Number) doc.get("online")).longValue()));
             }
         });
         return result;
+    }
+
+    public InstanceCount countAcrossAllFleets(Instant onlineThreshold) {
+        return countByFleetGrouped(onlineThreshold).values().stream()
+                .reduce(new InstanceCount(0L, 0L), (a, b) ->
+                        new InstanceCount(a.total() + b.total(), a.online() + b.online()));
+    }
+
+    public InstanceCount countByFleet(String fleetId, Instant onlineThreshold) {
+        return countByFleetGrouped(onlineThreshold).getOrDefault(fleetId, new InstanceCount(0L, 0L));
     }
 
     public Map<String, CollectorInstanceDTO> findByInstanceUids(Set<String> instanceUids) {
@@ -353,6 +409,30 @@ public class CollectorInstanceService {
         return extractOSType(report.nonIdentifyingAttributes().orElse(List.of()).stream());
     }
 
+    /**
+     * Builds a MongoDB filter selecting the instances that have pending changes, given a
+     * {@link PendingChangesLookup}: an instance matches when its {@code last_processed_txn_seq} is
+     * behind the newest marker sequence for its fleet or for the instance itself. Negate the result
+     * (e.g. {@link Filters#nor}) to select instances that are in sync. When the lookup is empty (no
+     * markers anywhere), nothing is pending, so the returned filter matches no document.
+     */
+    public static Bson hasPendingChangesFilter(PendingChangesLookup pendingChangesLookup) {
+        final List<Bson> clauses = new ArrayList<>();
+
+        pendingChangesLookup.maxByInstanceUid().forEach((uid, maxSeq) ->
+                clauses.add(Filters.and(
+                        Filters.eq(FIELD_INSTANCE_UID, uid),
+                        Filters.lt(FIELD_LAST_PROCESSED_TXN_SEQ, maxSeq))
+                ));
+        pendingChangesLookup.maxByFleetId().forEach((fleetId, maxSeq) ->
+                clauses.add(Filters.and(
+                        Filters.eq(FIELD_FLEET_ID, fleetId),
+                        Filters.lt(FIELD_LAST_PROCESSED_TXN_SEQ, maxSeq))
+                ));
+
+        return clauses.isEmpty() ? Filters.in(FIELD_ID, List.of()) : Filters.or(clauses);
+    }
+
     private static CollectorOSType extractOSType(Stream<Attribute> attributes) {
         return attributes.filter(a -> OS_TYPE_KEY.equals(a.key()))
                 .map(Attribute::value)
@@ -373,6 +453,12 @@ public class CollectorInstanceService {
                 return CollectorOSType.UNKNOWN;
             }
             return extractOSType(nonIdentifyingAttributes.stream());
+        }
+    }
+
+    public record InstanceCount(long total, long online) {
+        public long offline() {
+            return total() - online();
         }
     }
 }

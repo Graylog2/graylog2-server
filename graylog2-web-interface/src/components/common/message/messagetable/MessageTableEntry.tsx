@@ -20,9 +20,8 @@ import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
-import { useStore } from 'stores/connect';
-import type { Stream } from 'views/stores/StreamsStore';
-import { StreamsStore } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import StreamsContext from 'contexts/StreamsContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Input } from 'components/messageloaders/Types';
@@ -174,14 +173,13 @@ const MessageTableEntry = ({
   overrideContent = undefined,
 }: Props) => {
   const { data: inputsList = [] } = useInputsList();
-  const { streams: streamsList = [] } = useStore(StreamsStore);
+  const streamsList = useContext(StreamsContext);
   const highlightMessageId = useContext(HighlightMessageContext);
 
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
-  const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
   const streams = useMemo(
-    () => Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream])),
+    () => Immutable.Map<string, Stream>((streamsList ?? []).map((stream) => [stream.id, stream])),
     [streamsList],
   );
   const inputs = useMemo(
@@ -269,7 +267,6 @@ const MessageTableEntry = ({
                 message={message}
                 fields={fields}
                 streams={streams}
-                allStreams={allStreams}
                 inputs={inputs}
                 disableSurroundingSearch={disableSurroundingSearch}
                 expandAllRenderAsync={expandAllRenderAsync}

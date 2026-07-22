@@ -24,12 +24,12 @@ import type View from 'views/logic/views/View';
 import TitleCell from 'views/components/dashboard/DashboardsOverview/TitleCell';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import { useTableFilterContext } from 'components/common/PaginatedEntityTable';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 
 const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; dashboardId: string }) => {
   const queryClient = useQueryClient();
-  const { searchParams } = useTableFetchContext();
+  const { searchParams } = useTableFilterContext();
 
   return (
     <FavoriteIcon

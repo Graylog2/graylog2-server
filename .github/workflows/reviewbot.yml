@@ -28,7 +28,7 @@ jobs:
           node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Compile with Maven / Install dependencies
-        run: ./mvnw --fail-fast -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 compile
+        run: ./mvnw --fail-fast -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.test.skip -Dskip.datanode -Dcyclonedx.skip compile
       - name: Reviewbot
         uses: Graylog2/reviewbot@v1
         with:

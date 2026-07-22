@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 import { Table as BaseTable } from 'components/bootstrap';
 import EntityTableOverrideRow from 'components/common/EntityDataTable/EntityTableOverrideRow';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 import type {
   EntityBase,
   ExpandedSectionRenderers,
@@ -46,26 +46,8 @@ const StyledTable = styled(BaseTable)(
     margin-bottom: 0;
     height: 100%; // required to be able to use height: 100% in td
 
-    thead > tr > th,
-    tbody > tr > td {
-      padding: ${CELL_PADDING}px;
-    }
-
-    && {
-      > tbody:nth-of-type(even) > tr {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
-
-      > tbody:nth-of-type(odd) > tr {
-        background-color: ${theme.colors.table.row.background};
-      }
-      > tbody > tr.active {
-        background-color: ${theme.colors.table.row.backgroundStriped} !important;
-
-        & td {
-          background-color: transparent !important;
-        }
-      }
+    tbody > tr.active {
+      background-color: ${theme.colors.table.row.backgroundStriped} !important;
     }
   `,
 );
@@ -119,7 +101,7 @@ const Table = <Entity extends EntityBase>({
   const isRowExpanded = (rowId: string) => !!expandedSections?.[rowId];
 
   return (
-    <StyledTable striped condensed hover>
+    <StyledTable condensed>
       <TableHead headerGroups={headerGroups} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();

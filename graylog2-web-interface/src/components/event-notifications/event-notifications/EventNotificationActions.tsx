@@ -16,13 +16,16 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import { ConfirmDialog, IfPermitted, ShareButton, LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
 import { MenuItem, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import {
+  deleteEventNotification,
+  EVENT_NOTIFICATIONS_QUERY_KEY,
+} from 'components/event-notifications/hooks/useEventNotifications';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -42,6 +45,7 @@ type Props = {
 const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props) => {
   const { refetch: refetchEventNotification } = useTableFetchContext();
   const { deselectEntity } = useSelectedEntities();
+  const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(undefined);
   const sendTelemetry = useSendTelemetry();
@@ -66,23 +70,16 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
   };
 
   const handleDelete = () => {
-    EventNotificationsActions.delete(notification)
-      .then(
-        () => {
-          deselectEntity(notification.id);
-
-          UserNotification.success(
-            'Event Notification deleted successfully',
-            `Event Notification "${notification.title}" was deleted successfully.`,
-          );
-        },
-        (error) => {
-          UserNotification.error(
-            `Deleting Event Notification "${notification.title}" failed with status: ${error}`,
-            'Could not delete Event Notification',
-          );
-        },
-      )
+    deleteEventNotification(notification)
+      .then(() => {
+        deselectEntity(notification.id);
+        // Refresh non-table consumers (e.g. the event-definition form notification dropdown),
+        // which read from EVENT_NOTIFICATIONS_QUERY_KEY rather than the table fetch context.
+        queryClient.invalidateQueries({ queryKey: EVENT_NOTIFICATIONS_QUERY_KEY });
+      })
+      .catch(() => {
+        /* feedback handled in deleteEventNotification */
+      })
       .finally(() => {
         handleClearState();
       });

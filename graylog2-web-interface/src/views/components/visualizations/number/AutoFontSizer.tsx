@@ -26,18 +26,26 @@ import styled, { css } from 'styled-components';
 const TOLERANCE = 0.05;
 const CHILD_SIZE_RATIO = 0.8; // Proportion of the child size in relation to the container
 
-const FontSize = styled.div<{ fontSize: number; $center: boolean }>`
+type Alignment = 'center' | 'bottom-right';
+
+const FontSize = styled.div<{ fontSize: number; $alignment: Alignment | undefined }>`
   height: 100%;
   width: 100%;
-  font-size: ${(props) => css`
-    ${props.fontSize}px
-  `};
+  font-size: ${(props) => props.fontSize}px;
   ${(props) =>
-    props.$center
+    props.$alignment === 'center'
       ? css`
           display: flex;
           justify-content: center;
           align-items: center;
+        `
+      : ''}
+  ${(props) =>
+    props.$alignment === 'bottom-right'
+      ? css`
+          display: flex;
+          justify-content: flex-end;
+          align-items: flex-end;
         `
       : ''}
 `;
@@ -52,7 +60,7 @@ type Props = {
   target?: React.Ref<any> | ElementWithDimensions;
   height: number;
   width: number;
-  center?: boolean;
+  alignment?: Alignment;
 };
 
 const _multiplierForElement = (element, targetWidth, targetHeight) => {
@@ -88,6 +96,8 @@ const useAutoFontSize = (target, _container, height, width) => {
     const newFontSize = Math.floor(fontSize * multiplier);
 
     if (newFontSize !== fontSize && isValidFontSize(newFontSize)) {
+      // The font size is measured and iteratively adjusted after render, which requires setting state in the effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFontSize(newFontSize);
     }
   }, [target, _container, fontSize, height, width]);
@@ -95,13 +105,13 @@ const useAutoFontSize = (target, _container, height, width) => {
   return fontSize;
 };
 
-const AutoFontSizer = ({ children, target = null, height, width, center = false }: Props) => {
+const AutoFontSizer = ({ children, target = null, height, width, alignment = undefined }: Props) => {
   const _container = useRef<HTMLElement | undefined>();
   const fontSize = useAutoFontSize(target, _container, height, width);
   const _mixedContainer: { current } = _container;
 
   return (
-    <FontSize $center={center} fontSize={fontSize} ref={_mixedContainer}>
+    <FontSize $alignment={alignment} fontSize={fontSize} ref={_mixedContainer}>
       {children}
     </FontSize>
   );

@@ -24,11 +24,6 @@ import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
 import { useUpdateTelemetrySettings } from 'logic/telemetry/useTelemetrySettings';
 
-const mockedTelemetryConfig = {
-  api_key: 'key',
-  host: 'http://localhost',
-  enabled: true,
-};
 const mockTelemetryData = {
   current_user: {
     user: '1',
@@ -46,14 +41,6 @@ const mockTelemetryData = {
 };
 jest.mock('logic/telemetry/TelemetryInfoModal', () => mockComponent('MockTelemetryInfoModal'));
 jest.mock('./useTelemetryData');
-
-jest.mock('util/AppConfig', () => ({
-  gl2ServerUrl: jest.fn(() => {
-    'http://localhost';
-  }),
-  gl2AppPathPrefix: jest.fn,
-  telemetry: jest.fn(() => mockedTelemetryConfig),
-}));
 
 jest.mock('logic/telemetry/useTelemetrySettings', () => ({
   useUpdateTelemetrySettings: jest.fn(() => ({

@@ -20,6 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import PipelinesOverviewPage from './PipelinesOverviewPage';
 
 jest.mock('components/pipelines/processing-load', () => ({
+  EnableDebugMetricsButton: () => <div data-testid="enable-debug-metrics-button" />,
   ProcessingLoadDebugMetricsBanner: () => <div data-testid="debug-metrics-banner" />,
   ProcessingLoadProvider: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="processing-load-provider">{children}</div>

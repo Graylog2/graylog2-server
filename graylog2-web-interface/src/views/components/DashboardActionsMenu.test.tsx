@@ -45,16 +45,26 @@ jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ state: undefined })),
-  },
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 describe('DashboardActionsMenu', () => {
   const mockView = View.create()

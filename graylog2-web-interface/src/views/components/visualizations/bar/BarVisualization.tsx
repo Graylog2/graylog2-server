@@ -30,6 +30,7 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import barOnClickPopover from 'views/components/visualizations/bar/barOnClickPopover';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -156,7 +157,7 @@ const BarVisualization = makeVisualization(
       return _layouts;
     }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
-    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('bar', config);
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({ ...barOnClickPopover, config });
 
     return (
       <>

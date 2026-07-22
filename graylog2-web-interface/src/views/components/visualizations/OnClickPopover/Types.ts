@@ -41,7 +41,7 @@ export type Rel = { x: number; y: number };
 export type FieldData = {
   field: string;
   value: Datum;
-  contexts: { valuePath: ValuePath } | null;
+  contexts: { valuePath: ValuePath; valuePathOperator?: 'AND' | 'OR' | 'EDGE' } | null;
 };
 
 export type OnClickPopoverDropdownProps = {

@@ -16,6 +16,7 @@
  */
 export { default as PipelineLoadCell } from './PipelineLoadCell';
 export { default as useProcessingLoad } from './useProcessingLoad';
+export { default as EnableDebugMetricsButton } from '../debug-metrics/EnableDebugMetricsButton';
 export {
   ProcessingLoadDebugMetricsBanner,
   ProcessingLoadProvider,

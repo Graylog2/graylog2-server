@@ -38,12 +38,6 @@ jest.mock('hooks/useInputs', () => ({
   default: jest.fn(() => ({ data: mockInputsArray })),
 }));
 
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  gl2ServerUrl: jest.fn(() => ''),
-  isCloud: jest.fn(() => false),
-}));
-
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
     exports: jest.fn(),
@@ -78,8 +72,6 @@ describe('<RawMessageLoader.test>', () => {
     });
 
     it('allows user to select between server and forwarder input on premise', async () => {
-      asMock(AppConfig.isCloud).mockImplementation(() => false);
-
       render(<RawMessageLoader onMessageLoaded={jest.fn()} inputIdSelector />);
 
       const inputTypeSelect = screen.getByRole('combobox', { name: /select an input type \(optional\)/i });

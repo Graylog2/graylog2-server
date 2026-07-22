@@ -502,6 +502,41 @@ public class MessageTest {
     }
 
     @Test
+    public void messagesAreAccountedByDefaultButCanBeCreatedExcluded() {
+        final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
+        assertThat(accounted.isAccounted()).isTrue();
+
+        final Message excluded = new Message("1234567890", "12345", Tools.nowUTC(), false);
+        assertThat(excluded.isAccounted()).isFalse();
+    }
+
+    @Test
+    public void unaccountedMessageReportsZeroSize() {
+        // getSize() (also stored as gl2_accounted_message_size) is 0 for an unaccounted message,
+        // while an accounted message reports its real field size.
+        final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
+        final Message unaccounted = new Message("1234567890", "12345", Tools.nowUTC(), false);
+
+        assertThat(accounted.getSize()).isGreaterThan(0L);
+        assertThat(unaccounted.getSize()).isZero();
+    }
+
+    @Test
+    public void getInputMessageSizeReturnsRecordedFieldValue() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 500L);
+
+        assertThat(message.getInputMessageSize()).isEqualTo(500L);
+    }
+
+    @Test
+    public void getInputMessageSizeFallsBackToGetSizeWhenNotRecorded() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+
+        assertThat(message.getInputMessageSize()).isEqualTo(message.getSize());
+    }
+
+    @Test
     public void testMessageSizeIgnoresIlluminateFields() {
         final Message message = new Message("1234567890", "12345", Tools.nowUTC());
         assertThat(message.getSize()).isEqualTo(45);
@@ -802,7 +837,7 @@ public class MessageTest {
             assertThat(e).hasSize(1);
             assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
             assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
-            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Invalid format: \"1234\" is too short");
+            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Unsupported timestamp string format: <1234>");
         });
     }
 
@@ -843,6 +878,55 @@ public class MessageTest {
         assertThat(message.getTimestamp()).isEqualTo(expectedLocalDateEquivalent);
 
         assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignIsoStringWithOffsetAsTimestamp() {
+        // Reproduces https://github.com/Graylog2/graylog2-server/issues/26025: a pipeline rule (set_fields with
+        // key_value) assigns a string timestamp in ISO-8601 format with a numeric offset. This must be parsed
+        // leniently and must not record a processing error.
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18T08:57:55+0200");
+
+        // +0200 means the instant is 06:57:55 UTC
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 6, 57, 55, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignIsoStringInUtcAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18T08:57:55.123Z");
+
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 8, 57, 55, 123, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignEsFormatStringWithoutMillisAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18 08:57:55");
+
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 8, 57, 55, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignUnparseableStringStillRecordsProcessingError() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final DateTime previousTimestamp = message.getTimestamp();
+
+        message.addField(Message.FIELD_TIMESTAMP, "not-a-timestamp");
+
+        // genuinely invalid value still falls back to the current time and records an error
+        assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
+        assertThat(message.processingErrors()).satisfies(e -> {
+            assertThat(e).hasSize(1);
+            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
+        });
     }
 
     // Arguably, a message should not allow null values for basic fields, but it is what it is. Here we are checking

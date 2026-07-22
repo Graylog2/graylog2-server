@@ -22,10 +22,21 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
+import { durationToMS } from 'util/DateTime';
+import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 
 const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   const dispatch = useViewsDispatch();
   const jobIds = useViewsSelector(selectJobIds);
+  const { autoRefresh } = useSearchURLQueryParams();
+
+  const { data: minimumRefresh, isInitialLoading: isLoadingMinimumRefresh } = useMinimumRefreshInterval();
+  const minimumRefreshInterval = minimumRefresh ? durationToMS(minimumRefresh) : 0;
+  const autoRefreshInterval = durationToMS(autoRefresh);
+  const interval = minimumRefreshInterval > autoRefreshInterval ? minimumRefreshInterval : autoRefreshInterval;
+
+  const refreshConfig = autoRefresh && !isLoadingMinimumRefresh ? { interval: interval, enabled: true } : null;
 
   const onRefresh = useCallback(() => {
     if (!jobIds) {
@@ -33,7 +44,14 @@ const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) =>
     }
   }, [dispatch, jobIds]);
 
-  return <AutoRefreshProvider onRefresh={onRefresh}>{children}</AutoRefreshProvider>;
+  return (
+    <AutoRefreshProvider
+      key={isLoadingMinimumRefresh ? 'loading' : 'ready'}
+      defaultRefreshConfig={refreshConfig}
+      onRefresh={onRefresh}>
+      {children}
+    </AutoRefreshProvider>
+  );
 };
 
 export default SearchPageAutoRefreshProvider;

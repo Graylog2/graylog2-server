@@ -171,13 +171,22 @@ const useColumnWidths = <Entity extends EntityBase>({
       bulkSelectColWidth,
       staticColumnWidths,
       headerMinWidths,
-    })
+    });
 
     if (!isEqual(prevColumnWidthsRef.current, newColumnWidths)) {
       prevColumnWidthsRef.current = newColumnWidths;
       setColumnWidths(newColumnWidths);
     }
-  }, [actionsColMinWidth, bulkSelectColWidth, columnRenderersByAttribute, columnIds, scrollContainerWidth, columnWidthPreferences, staticColumnWidths, headerMinWidths]);
+  }, [
+    actionsColMinWidth,
+    bulkSelectColWidth,
+    columnRenderersByAttribute,
+    columnIds,
+    scrollContainerWidth,
+    columnWidthPreferences,
+    staticColumnWidths,
+    headerMinWidths,
+  ]);
 
   return columnWidths;
 };

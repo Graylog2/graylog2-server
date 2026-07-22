@@ -35,6 +35,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,11 +68,26 @@ class IndicesResourceTest {
     @WithAuthorization(permissions = {"indices:read"})
     void getOutdatedIndicesSucceeds() {
         List<OutdatedIndex> outdatedIndices = List.of(
-                new OutdatedIndex("outdated1", "1.3.0", false, false),
-                new OutdatedIndex("outdated2", "1.3.0", true, true)
+                new OutdatedIndex("outdated1", "1.3.0", false, false, null),
+                new OutdatedIndex("outdated2", "1.3.0", true, true, "id1")
         );
         when(outdatedIndexService.getOutdatedIndices()).thenReturn(outdatedIndices);
         assertThat(indicesResource.getOutdatedIndices()).isEqualTo(outdatedIndices);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"something:else"})
+    void reindexFailsIfNotPermitted() {
+        Assertions.assertThatThrownBy(() -> indicesResource.reindex("outdated", false))
+                .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"indices:read", "indices:reindex"})
+    void reindexSucceeds() {
+        when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(new OutdatedIndex(".outdated1", "1.3.0", false, false, null)));
+        indicesResource.reindex(".outdated1", true);
+        verify(outdatedIndexService, times(1)).reindex(".outdated1", true);
     }
 
 }

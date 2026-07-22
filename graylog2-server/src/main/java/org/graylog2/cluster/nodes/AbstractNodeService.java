@@ -30,6 +30,7 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,14 +49,23 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
     public static final String LAST_SEEN_FIELD = "$last_seen";
     private final long pingTimeout;
     private final static Map<String, Object> lastSeenFieldDefinition = Map.of("last_seen", Map.of("$type", "timestamp"));
-    private final static BasicDBObject addLastSeenFieldAsDate = new BasicDBObject("$addFields",
-            Map.of("last_seen_date", Map.of("$cond",
-            Map.of(
+    private final static Map<String, Object> dateExpression = Map.of(
+            "$cond", Map.of(
                     "if", Map.of("$isNumber", LAST_SEEN_FIELD),
                     "then", Map.of("$toDate", Map.of("$toLong", LAST_SEEN_FIELD)),
                     "else", Map.of("$toDate", Map.of("$dateToString", Map.of("date", LAST_SEEN_FIELD)))
             )
-    )));
+    );
+    private final static BasicDBObject addLastSeenFieldAsDate = new BasicDBObject(
+            "$addFields",
+            Map.of(
+                    "last_seen_date",
+                    Map.of("$ifNull", List.of(dateExpression, "$$NOW"))
+                    // we need to set this field to now if the value is null. This happens only during the brief time
+                    // when the node information is updated (or first registered), followed immediately by a db call
+                    // to update the time.
+            )
+    );
 
     private final MongoCollection<DTO> db;
 
@@ -139,7 +149,14 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
                 addLastSeenFieldAsDate,
                 new BasicDBObject("$match", Map.of("$expr", Map.of("$lt", List.of("$last_seen_date", Map.of("$subtract", List.of("$$NOW", this.pingTimeout))))))
         ))) {
-            var outdatedIds = stream.map(DTO::id).toList();
+            var outdatedIds = stream
+                    .peek(dto -> {
+                        String lastSeen = Optional.ofNullable(dto.getLastSeen())
+                                .map(DateTime::toString)
+                                .orElse("unknown");
+                        LOG.warn("Removing stale node {} (last seen {})", dto.getNodeId(), lastSeen);
+                    })
+                    .map(NodeDto::id).toList();
 
             if (!outdatedIds.isEmpty()) {
                 db.deleteMany(MongoUtils.stringIdsIn(outdatedIds));
@@ -178,10 +195,13 @@ public abstract class AbstractNodeService<DTO extends NodeDto> implements NodeSe
             registerServer(dto);
         }
         // set timestamp using db
-        db.updateOne(
+        UpdateResult updateResult = db.updateOne(
                 new BasicDBObject("node_id", dto.getNodeId()),
                 new BasicDBObject("$currentDate", lastSeenFieldDefinition)
         );
+        if (updateResult.getMatchedCount() != 1) {
+            LOG.warn("Could not mark node {} as alive", dto.getNodeId());
+        }
         try {
             // Remove old nodes that are no longer running. (Just some housekeeping)
             dropOutdated();

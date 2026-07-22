@@ -43,8 +43,8 @@ import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import { createEntityShareState } from 'fixtures/entityShareState';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import { createView } from 'views/api/views';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
@@ -57,17 +57,26 @@ jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  __esModule: true,
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
-  },
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
@@ -132,7 +141,7 @@ describe('SearchActionsMenu', () => {
     asMock(useView).mockReturnValue(defaultView);
     asMock(useIsDirty).mockReturnValue(false);
     asMock(useIsNew).mockReturnValue(false);
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
     // @ts-expect-error context return type is not complete
     asMock(useFormikContext).mockReturnValue({ dirty: false });
   });

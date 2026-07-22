@@ -85,7 +85,7 @@ describe('GeoIpResolverConfig', () => {
 
     expect(
       screen.getByRole('textbox', {
-        name: /googe cloud storage project id \(opt\.\)/i,
+        name: /google cloud storage project id \(opt\.\)/i,
       }),
     ).toBeInTheDocument();
 
@@ -93,6 +93,27 @@ describe('GeoIpResolverConfig', () => {
 
     expect(await screen.findByLabelText(/azure blob container name/i)).toBeInTheDocument();
   });
+
+  it('should normalize azure_account_key read shape to keep_value on submit when cloud is not Azure', async () => {
+    const configWithKey: GeoIpConfigType = {
+      ...defaultConfig,
+      enabled: true,
+      pull_from_cloud: 's3',
+      azure_account_key: { is_set: true },
+    };
+    mockUpdateConfig.mockResolvedValue(configWithKey);
+    render(<GeoIpResolverConfig config={configWithKey} updateConfig={mockUpdateConfig} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /edit configuration/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /update configuration/i }));
+
+    await waitFor(() => {
+      expect(mockUpdateConfig).toHaveBeenCalledWith(
+        expect.objectContaining({ azure_account_key: { keep_value: true } }),
+      );
+    });
+  });
+
   it('should disable form fields when processor is disabled', async () => {
     render(<GeoIpResolverConfig config={defaultConfig} updateConfig={mockUpdateConfig} />);
 

@@ -49,6 +49,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
@@ -68,6 +69,7 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.rest.RestResourceWithOwnerCheck;
 import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
@@ -91,7 +93,6 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Collection;
@@ -108,7 +109,7 @@ import static java.util.Locale.ENGLISH;
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-public class ViewsResource extends RestResource implements PluginRestResource {
+public class ViewsResource extends RestResourceWithOwnerCheck implements PluginRestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -278,7 +279,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         final User user = userContext.getUser();
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
-        recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        recentActivityService.create(result.id(), toGRNType(dto), searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
         return result;
@@ -286,9 +287,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     private void updateViewSharing(CreateEntityRequest<ViewDTO> createEntityRequest, SearchUser searchUser, ViewDTO dto) {
         createEntityRequest.shareRequest().ifPresent(shareRequest -> {
-            final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
-            entitySharesService.updateEntityShares(grnType, dto.id(), shareRequest, searchUser.getUser());
+            entitySharesService.updateEntityShares(toGRNType(dto), dto.id(), shareRequest, searchUser.getUser());
         });
+    }
+
+    private GRNType toGRNType(ViewDTO dto) {
+        return dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
     }
 
     private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
@@ -397,8 +401,11 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 
+        final var grnType = toGRNType(dto);
+        createEntityRequest.shareRequest().ifPresent(request -> checkOwnership(grnType.toGRN(dto.id())));
+
         var result = dbService.update(updatedDTO);
-        recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        recentActivityService.update(result.id(), grnType, searchUser);
         updateViewSharing(createEntityRequest, searchUser, result);
 
         return result;
@@ -434,7 +441,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         dbService.delete(id);
         triggerDeletedEvent(view);
-        recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
+        recentActivityService.delete(view.id(), toGRNType(view), view.title(), searchUser);
         return view;
     }
 

@@ -21,6 +21,7 @@ import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
 import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
+import { memoryRouterFuture } from './reactRouterFutureFlags';
 
 type Props = {
   children: React.ReactElement;
@@ -29,7 +30,7 @@ type Props = {
 const PreflightWrappingContainer = ({ children }: Props) => (
   <PreflightThemeProvider>
     <DefaultQueryClientProvider>
-      <MemoryRouter>
+      <MemoryRouter future={memoryRouterFuture}>
         <ThemeWrapper>{children}</ThemeWrapper>
       </MemoryRouter>
     </DefaultQueryClientProvider>

@@ -19,7 +19,6 @@ package org.graylog2.rest.resources.datanodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.NotFoundException;
 import org.graylog.security.UserContext;
-import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -50,8 +49,6 @@ public class DataNodeManagementResourceTest {
     private DataNodeCommandService dataNodeCommandService;
     @Mock
     private NodeService<DataNodeDto> nodeService;
-    @Mock
-    private CertRenewalService certRenewalService;
     @Mock
     private UserContext userContext;
     @Mock

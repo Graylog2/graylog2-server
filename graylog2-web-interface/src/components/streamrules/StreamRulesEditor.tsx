@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer, Icon } from 'components/common';
@@ -25,8 +26,8 @@ import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Spinner from 'components/common/Spinner';
-import type { MatchData } from 'stores/streams/StreamsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import { testMatch } from 'api/streams';
+import type { Message } from 'views/components/messagelist/Types';
 import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
 import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 
@@ -59,34 +60,22 @@ type Props = {
 
 const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
-  const [message, setMessage] = useState<{ [fieldName: string]: unknown } | undefined>();
-  const [matchData, setMatchData] = useState<MatchData | undefined>();
+  const [message, setMessage] = useState<Message | undefined>();
   const { data: stream, refetch } = useStream(streamId);
+  const { data: matchData } = useQuery({
+    queryKey: ['stream', streamId, 'testMatch', message?.fields],
+    queryFn: () => testMatch(streamId, { message: message?.fields ?? {} }),
+    enabled: !!message,
+    retry: false,
+  });
   const { onCreateStreamRule, showStartStreamDialog, onCancelStartStreamDialog, onStartStream, isStartingStream } =
     useCreateStreamRule({
       streamId,
       streamIsPaused: stream?.disabled ?? false,
     });
 
-  useEffect(() => {
-    const refetchStreams = () => refetch();
-    StreamsStore.onChange(refetchStreams);
-
-    return () => {
-      StreamsStore.unregister(refetchStreams);
-    };
-  }, [refetch]);
-
-  const onMessageLoaded = (newMessage) => {
+  const onMessageLoaded = (newMessage: Message) => {
     setMessage(newMessage);
-
-    if (message !== undefined) {
-      StreamsStore.testMatch(streamId, { message: message.fields }, (resultData) => {
-        setMatchData(resultData);
-      });
-    } else {
-      setMatchData(undefined);
-    }
   };
 
   const _onAddStreamRule = (event) => {

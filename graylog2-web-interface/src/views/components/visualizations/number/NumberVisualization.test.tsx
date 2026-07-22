@@ -23,6 +23,8 @@ import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
+import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -47,6 +49,7 @@ jest.mock('views/components/Value', () => ({ value }: { value: string }) => <div
 type Data = Record<string, Rows>;
 type SUTProps = {
   data?: Data;
+  config?: AggregationWidgetConfig;
 };
 
 describe('NumberVisualization', () => {
@@ -90,6 +93,33 @@ describe('NumberVisualization', () => {
       />
     </TestStoreProvider>
   );
+
+  const rowsWithValue = (value: number): Rows => [
+    {
+      key: [],
+      source: 'leaf',
+      values: [
+        {
+          key: ['count()'],
+          rollup: true,
+          source: 'row-leaf',
+          value,
+        },
+      ],
+    },
+  ];
+
+  const dataWithTrend = (current: number, previous: number): Data => ({
+    chart: rowsWithValue(current),
+    trend: rowsWithValue(previous),
+  });
+
+  const configWithTrend = (trendPreference: TrendPreference) =>
+    AggregationWidgetConfig.builder()
+      .series([Series.forFunction('count()')])
+      .visualization('numeric')
+      .visualizationConfig(NumberVisualizationConfig.create(true, trendPreference))
+      .build();
 
   useViewsPlugin();
 
@@ -153,5 +183,39 @@ describe('NumberVisualization', () => {
     render(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
 
     await screen.findByText('N/A');
+  });
+
+  describe('colors the container according to value and trend preference', () => {
+    it.each`
+      current | previous | preference   | expectedColor
+      ${42}   | ${42}    | ${'HIGHER'}  | ${'#fff'}
+      ${43}   | ${42}    | ${'HIGHER'}  | ${'#2ECA8F'}
+      ${41}   | ${42}    | ${'HIGHER'}  | ${'#FE4A49'}
+      ${41}   | ${42}    | ${'LOWER'}   | ${'#2ECA8F'}
+      ${43}   | ${42}    | ${'LOWER'}   | ${'#FE4A49'}
+      ${43}   | ${42}    | ${'NEUTRAL'} | ${'#fff'}
+    `(
+      'shows $expectedColor for current=$current, previous=$previous, preference=$preference',
+      async ({ current, previous, preference, expectedColor }) => {
+        render(
+          <SimplifiedNumberVisualization
+            data={dataWithTrend(current, previous)}
+            config={configWithTrend(preference)}
+          />,
+        );
+
+        const container = await screen.findByTestId('trend-background');
+
+        expect(container).toHaveStyleRule('background-color', `${expectedColor}!important`);
+      },
+    );
+
+    it('does not color the container when trend is disabled', async () => {
+      render(<SimplifiedNumberVisualization />);
+
+      const container = await screen.findByTestId('trend-background');
+
+      expect(container).not.toHaveStyleRule('background-color');
+    });
   });
 });

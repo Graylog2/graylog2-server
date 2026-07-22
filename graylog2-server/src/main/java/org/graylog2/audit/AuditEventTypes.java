@@ -60,10 +60,14 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DATANODE_START = PREFIX + "data_node:start";
     public static final String DATANODE_START_REPLICATION = PREFIX + "data_node:start_replication";
     public static final String DATANODE_STOP_REPLICATION = PREFIX + "data_node:stop_replication";
+    public static final String DATANODE_TRIGGER_RESTART = PREFIX + "data_node:trigger_restart";
+    public static final String DATANODE_ABORT_RESTART = PREFIX + "data_node:abort_restart";
+    public static final String DATANODE_RESUME_RESTART = PREFIX + "data_node:resume_restart";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
     public static final String ES_INDEX_OPEN = PREFIX + "es_index:open";
+    public static final String ES_INDEX_REINDEX = PREFIX + "es_index:reindex";
     public static final String ES_INDEX_RANGE_CREATE = PREFIX + "es_index_range:create";
     public static final String ES_INDEX_RANGE_DELETE = PREFIX + "es_index_range:delete";
     public static final String ES_INDEX_RANGE_UPDATE_JOB = PREFIX + "es_index_range_update_job:start";
@@ -245,11 +249,15 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DATANODE_START)
             .add(DATANODE_START_REPLICATION)
             .add(DATANODE_STOP_REPLICATION)
+            .add(DATANODE_TRIGGER_RESTART)
+            .add(DATANODE_ABORT_RESTART)
+            .add(DATANODE_RESUME_RESTART)
             .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)
             .add(ES_INDEX_OPEN)
+            .add(ES_INDEX_REINDEX)
             .add(ES_INDEX_RANGE_CREATE)
             .add(ES_INDEX_RANGE_DELETE)
             .add(ES_INDEX_RANGE_UPDATE_JOB)

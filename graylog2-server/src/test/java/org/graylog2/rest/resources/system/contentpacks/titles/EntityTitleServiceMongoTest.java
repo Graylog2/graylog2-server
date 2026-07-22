@@ -28,7 +28,9 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitl
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,14 +51,16 @@ public class EntityTitleServiceMongoTest {
         DbEntitiesCatalog entitiesCatalog = new DbEntitiesCatalog(
                 List.of(
                         new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read", List.of()),
-                        new DbEntityCatalogEntry("nodes", "node_id", StreamImpl.class, "nodes:read", List.of())
+                        new DbEntityCatalogEntry("nodes", "node_id", StreamImpl.class, "nodes:read", List.of()),
+                        new DbEntityCatalogEntry("users", "full_name", UserImpl.class, "users:read",
+                                List.of("_id", "username", "email", "full_name"))
                 )
         );
         mongoDBTestService.importFixture("fixture_for_title_retrieval_testing.json", EntityTitleServiceImpl.class);
 
         final MongoConnection connection = mongoDBTestService.mongoConnection();
 
-        toTest = new EntityTitleServiceImpl(connection, entitiesCatalog);
+        toTest = new EntityTitleServiceImpl(connection, entitiesCatalog, new EntityPermissionsUtils(entitiesCatalog));
     }
 
     @Test
@@ -96,5 +100,59 @@ public class EntityTitleServiceMongoTest {
                 .hasSize(2)
                 .containsAll(List.of("01020302e16f9a1d1f6b074c", "01020302e16f9a1d1f6b0742"));
 
+    }
+
+    @Test
+    public void doesNotLeakNonReadableDisplayFields() {
+        //Request a user title built from the non-readable "password" field
+        final EntityTitleRequest request = new EntityTitleRequest(
+                List.of(
+                        new EntityIdentifier("01020302e16f9a1d1f6b0751", "users",
+                                null, null, List.of("password"), "{password}")
+                )
+        );
+
+        //user is even permitted to read the requested user
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowUserRead("01020302e16f9a1d1f6b0751")
+                .build();
+
+        final EntitiesTitleResponse response = toTest.getTitles(request, searchUser);
+
+        //the password hash must not leak into the title, despite the read permission
+        assertThat(response.entities())
+                .isNotNull()
+                .hasSize(1)
+                .contains(new EntityTitleResponse("01020302e16f9a1d1f6b0751", "users", TITLE_IF_NOT_PERMITTED));
+
+        assertThat(response.notPermitted())
+                .isNotNull()
+                .containsExactly("01020302e16f9a1d1f6b0751");
+    }
+
+    @Test
+    public void resolvesCompositeTitleFromReadableDisplayFields() {
+        //Request a user title built from the readable "full_name" field
+        final EntityTitleRequest request = new EntityTitleRequest(
+                List.of(
+                        new EntityIdentifier("01020302e16f9a1d1f6b0751", "users",
+                                null, null, List.of("full_name"), "{full_name}")
+                )
+        );
+
+        final SearchUser searchUser = TestSearchUser.builder()
+                .allowUserRead("01020302e16f9a1d1f6b0751")
+                .build();
+
+        final EntitiesTitleResponse response = toTest.getTitles(request, searchUser);
+
+        assertThat(response.entities())
+                .isNotNull()
+                .hasSize(1)
+                .contains(new EntityTitleResponse("01020302e16f9a1d1f6b0751", "users", "Jane Doe"));
+
+        assertThat(response.notPermitted())
+                .isNotNull()
+                .isEmpty();
     }
 }

@@ -71,6 +71,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -169,6 +170,17 @@ public class InputServiceImplTest {
     public void localCountForNodeReturnsNumberOfLocalInputs() {
         assertThat(inputService.localCountForNode("cd03ee44-b2a7-cafe-babe-0000deadbeef")).isEqualTo(2);
         assertThat(inputService.localCountForNode("cd03ee44-b2a7-0000-0000-000000000000")).isEqualTo(0);
+    }
+
+    @Test
+    @MongoDBFixtures("inputCountByType.json")
+    public void totalCountByTypeReturnsCountsGroupedByType() {
+        final Map<String, Long> counts = inputService.totalCountByType();
+
+        assertThat(counts).isEqualTo(Map.of(
+                "org.graylog2.inputs.gelf.tcp.GELFTCPInput", 2L,
+                "org.graylog2.inputs.raw.tcp.RawTCPInput", 1L
+        ));
     }
 
     @Test
@@ -333,6 +345,63 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
+    public void getExtractorsSkipsExtractorsThatCannotBeBuilt() throws Exception {
+        // An extractor that can no longer be built from its persisted data (e.g. a lookup table extractor whose
+        // lookup table was deleted) must be skipped, while the remaining valid extractors are still listed. A single
+        // broken extractor must not break listing for the whole input. See issue #26122.
+        final Input input = inputService.find("54e3deadbeefdeadbeef0001");
+
+        final String brokenId = new ObjectId().toHexString();
+        final String validId = new ObjectId().toHexString();
+        final Extractor brokenExtractor = mockPersistableExtractor(brokenId, "broken extractor", Extractor.Type.LOOKUP_TABLE);
+        final Extractor validExtractor = mockPersistableExtractor(validId, "valid extractor", Extractor.Type.GROK);
+
+        inputService.addExtractor(input, brokenExtractor);
+        inputService.addExtractor(input, validExtractor);
+
+        // The factory throws for the extractor that cannot be built from its persisted document (this is what the
+        // real factory does, e.g. LookupTableExtractor's constructor throwing ConfigurationException when its lookup
+        // table is gone), and returns a real extractor for the valid one. This exercises getExtractorFromDoc()'s
+        // try/catch, which is what turns a build failure into the skipped null. Discriminating on the id proves the
+        // broken one is dropped while the valid one survives - not that the whole list is dropped.
+        when(extractorFactory.factory(eq(brokenId), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenThrow(new ConfigurationException("lookup table no longer exists"));
+        when(extractorFactory.factory(eq(validId), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(validExtractor);
+
+        assertThat(inputService.getExtractors(input.getId())).containsExactly(validExtractor);
+    }
+
+    // Builds a mock Extractor with the persisted fields and getters that InputServiceImpl#addExtractor /
+    // #validateExtractor read when persisting it to MongoDB.
+    private Extractor mockPersistableExtractor(String id, String title, Extractor.Type type) {
+        final Extractor extractor = Mockito.mock(Extractor.class);
+        final Map<String, Object> persistedFields = new HashMap<>();
+        persistedFields.put(Extractor.FIELD_ID, id);
+        persistedFields.put(Extractor.FIELD_TITLE, title);
+        persistedFields.put(Extractor.FIELD_ORDER, 0);
+        persistedFields.put(Extractor.FIELD_CURSOR_STRATEGY, Extractor.CursorStrategy.COPY.name());
+        persistedFields.put(Extractor.FIELD_TYPE, type.name());
+        persistedFields.put(Extractor.FIELD_SOURCE_FIELD, "message");
+        persistedFields.put(Extractor.FIELD_TARGET_FIELD, "message");
+        persistedFields.put(Extractor.FIELD_EXTRACTOR_CONFIG, Map.of());
+        persistedFields.put(Extractor.FIELD_CREATOR_USER_ID, "user-x");
+        persistedFields.put(Extractor.FIELD_CONVERTERS, List.of());
+        persistedFields.put(Extractor.FIELD_CONDITION_TYPE, Extractor.ConditionType.STRING.name());
+        when(extractor.getPersistedFields()).thenReturn(persistedFields);
+
+        when(extractor.getId()).thenReturn(id);
+        when(extractor.getTitle()).thenReturn(title);
+        when(extractor.getType()).thenReturn(type);
+        when(extractor.getCursorStrategy()).thenReturn(Extractor.CursorStrategy.COPY);
+        when(extractor.getSourceField()).thenReturn("message");
+        when(extractor.getCreatorUserId()).thenReturn("user-x");
+        when(extractor.getExtractorConfig()).thenReturn(Map.of());
+        return extractor;
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
     public void testDeleteExtractor() throws Exception {
         Input input = inputService.find("54e3deadbeefdeadbeef0002");
         Extractor extractor = Mockito.mock(Extractor.class);
@@ -448,6 +517,7 @@ public class InputServiceImplTest {
                 .setEmbeddedStaticFields(List.of(
                         Map.of(InputImpl.FIELD_STATIC_FIELD_KEY, "static_key",
                                 InputImpl.FIELD_STATIC_FIELD_VALUE, "static_value")))
+                .setEmbeddedExtractors(List.of(createCopyInputExtractor().getPersistedFields()))
                 .build();
 
         final String id = inputService.save(input);
@@ -466,10 +536,62 @@ public class InputServiceImplTest {
                 InputImpl.FIELD_GLOBAL,
                 InputImpl.FIELD_CONFIGURATION,
                 InputImpl.EMBEDDED_STATIC_FIELDS,
+                InputImpl.EMBEDDED_EXTRACTORS,
                 InputImpl.FIELD_DESIRED_STATE,
                 InputImpl.FIELD_CONTENT_PACK,
                 InputImpl.FIELD_NODE_ID
         );
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * persisting the desired state when starting or stopping an input must not delete its extractors.
+     */
+    @Test
+    void persistDesiredStateKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        inputService.persistDesiredState(input, IOState.Type.STOPPED);
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+        assertThat(inputService.find(input.getId()).getDesiredState()).isEqualTo(IOState.Type.STOPPED);
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * saving an input that was loaded from the database must round-trip the embedded extractors.
+     */
+    @Test
+    void saveKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        inputService.save(inputService.find(input.getId()));
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/Graylog2/graylog2-server/issues/26009">#26009</a>:
+     * the input update flow in {@code InputsResource} merges via the {@code getFields()} Map view and
+     * re-creates the input from the merged map. Extractors must survive this round-trip, too.
+     */
+    @Test
+    void updateViaFieldsMapKeepsExtractors() throws Exception {
+        final Input input = inputService.find(inputService.save(createTestInput()));
+        inputService.addExtractor(input, createCopyInputExtractor());
+
+        final Input reloaded = inputService.find(input.getId());
+        final Map<String, Object> mergedFields = new HashMap<>(reloaded.getFields());
+        mergedFields.put(MessageInput.FIELD_TITLE, "updated title");
+        inputService.update(inputService.create(reloaded.getId(), mergedFields));
+
+        assertThat(inputService.extractorCountByInputId(List.of(input.getId())))
+                .containsEntry(input.getId(), 1);
+        assertThat(inputService.find(input.getId()).getTitle()).isEqualTo("updated title");
     }
 
     @Test

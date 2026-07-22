@@ -16,14 +16,31 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivots;
 
+import com.google.common.collect.ImmutableList;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.storage.opensearch3.views.MutableSearchRequestBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -41,6 +58,8 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.opensearch.client.opensearch.core.search.HitsMetadata;
 import org.opensearch.client.opensearch.core.search.TotalHits;
@@ -48,9 +67,14 @@ import org.opensearch.client.opensearch.core.search.TotalHitsRelation;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -183,4 +207,305 @@ public class OSPivotTest {
         ));
     }
 
+    // ----------------------------------------------------------------------------------------------------------------
+    // Query generation (doGenerateQueryPart)
+    // ----------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void alwaysAddsTimestampMinMaxAggregations() {
+        final Pivot pivot = Pivot.builder().id("p").series().rollup(false).build();
+
+        final DocumentContext doc = generateQueryPart(pivot, Map.of(), Map.of());
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations['timestamp-min'].min.field").isEqualTo("timestamp");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations['timestamp-max'].max.field").isEqualTo("timestamp");
+    }
+
+    @Test
+    public void generatesAggregationForRowGroup() {
+        final Pivot pivot = Pivot.builder().id("p").rowGroups(values("field1")).series().rollup(false).build();
+
+        final DocumentContext doc = generateQueryPart(pivot, Map.of(Values.NAME, new FakeBucketHandler()), Map.of());
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.agg.terms.field").isEqualTo("field1");
+    }
+
+    @Test
+    public void nestsMultipleRowGroups() {
+        final Pivot pivot = Pivot.builder().id("p").rowGroups(values("field1"), values("field2")).series().rollup(false).build();
+
+        final DocumentContext doc = generateQueryPart(pivot, Map.of(Values.NAME, new FakeBucketHandler()), Map.of());
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.agg.terms.field").isEqualTo("field1");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.agg.aggregations.agg.terms.field").isEqualTo("field2");
+    }
+
+    @Test
+    public void attachesMetricSeriesAsSubAggregationOfRowLeaf() {
+        final Pivot pivot = Pivot.builder().id("p").rowGroups(values("field1")).series(count()).rollup(false).build();
+
+        final DocumentContext doc = generateQueryPart(pivot,
+                Map.of(Values.NAME, new FakeBucketHandler()),
+                Map.of(Count.NAME, new FakeSeriesHandler(SeriesAggregationBuilder::metric, List.of())));
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.agg.aggregations.metricseries.max.field").isEqualTo("value");
+    }
+
+    @Test
+    public void attachesGlobalRollupMetricSeriesAtRootWhenNoGroupsPresent() {
+        final Pivot pivot = Pivot.builder().id("p").series(count()).rollup(false).build();
+
+        final DocumentContext doc = generateQueryPart(pivot,
+                Map.of(),
+                Map.of(Count.NAME, new FakeSeriesHandler(SeriesAggregationBuilder::metric, List.of())));
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.metricseries.max.field").isEqualTo("value");
+    }
+
+    @Test
+    public void attachesColumnGroupUnderRowLeaf() {
+        final Pivot pivot = Pivot.builder()
+                .id("p")
+                .rowGroups(values("row1"))
+                .columnGroups(values("col1"))
+                .series()
+                .rollup(false)
+                .build();
+
+        final DocumentContext doc = generateQueryPart(pivot, Map.of(Values.NAME, new FakeBucketHandler()), Map.of());
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.agg.terms.field").isEqualTo("row1");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.agg.aggregations.agg.terms.field").isEqualTo("col1");
+    }
+
+    @Test
+    public void attachesColumnGroupAtRootWhenNoRowGroupsPresent() {
+        final Pivot pivot = Pivot.builder()
+                .id("p")
+                .columnGroups(values("col1"))
+                .series()
+                .rollup(false)
+                .build();
+
+        final DocumentContext doc = generateQueryPart(pivot, Map.of(Values.NAME, new FakeBucketHandler()), Map.of());
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.agg.terms.field").isEqualTo("col1");
+    }
+
+    @Test
+    public void attachesRootPlacedSeriesAtRootWhenNotGeneratingRollups() {
+        final Pivot pivot = Pivot.builder().id("p").rowGroups(values("row1")).series(count()).rollup(false).build();
+
+        final DocumentContext doc = generateQueryPart(pivot,
+                Map.of(Values.NAME, new FakeBucketHandler()),
+                Map.of(Count.NAME, new FakeSeriesHandler(SeriesAggregationBuilder::root, List.of())));
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.aggregations.metricseries.max.field").isEqualTo("value");
+    }
+
+    @Test
+    public void throwsWhenNoSeriesHandlerIsRegistered() {
+        final Pivot pivot = Pivot.builder().id("p").series(count()).rollup(false).build();
+
+        final MutableSearchRequestBuilder searchSourceBuilder = new MutableSearchRequestBuilder();
+        final OSGeneratedQueryContext context = mock(OSGeneratedQueryContext.class);
+        when(context.searchSourceBuilder(any())).thenReturn(searchSourceBuilder);
+        final OSPivot sut = new OSPivot(Map.of(), Map.of(), new EffectiveTimeRangeExtractor());
+
+        assertThatThrownBy(() -> sut.doGenerateQueryPart(query, pivot, context))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("No series handler registered for: " + Count.NAME);
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Result extraction (doExtractResult) with row/column/series handling
+    // ----------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void extractsOneLeafRowPerRowGroupBucket() {
+        stubResultMetadata();
+        final Pivot pivot = Pivot.builder().id("p").rowGroups(values("field1")).series(count()).rollup(false).build();
+
+        final FakeBucketHandler bucketHandler = new FakeBucketHandler(Map.of("field1", List.of(
+                PivotBucket.create(ImmutableList.of("a"), mock(MultiBucketBase.class)),
+                PivotBucket.create(ImmutableList.of("b"), mock(MultiBucketBase.class))
+        )));
+        final FakeSeriesHandler seriesHandler = new FakeSeriesHandler(SeriesAggregationBuilder::metric,
+                List.of(SeriesSpecHandler.Value.create("count()", Count.NAME, 42L)));
+        final OSPivot sut = new OSPivot(Map.of(Values.NAME, bucketHandler), Map.of(Count.NAME, seriesHandler), new EffectiveTimeRangeExtractor());
+
+        final PivotResult result = (PivotResult) sut.doExtractResult(query, pivot, queryResult, queryContext);
+
+        assertThat(result.rows()).hasSize(2);
+        assertThat(result.rows().get(0).key()).containsExactly("a");
+        assertThat(result.rows().get(0).source()).isEqualTo("leaf");
+        assertThat(result.rows().get(0).values()).hasSize(1);
+        final PivotResult.Value value = result.rows().get(0).values().get(0);
+        assertThat(value.key()).containsExactly("count()");
+        assertThat(value.value()).isEqualTo(42L);
+        assertThat(value.rollup()).isTrue();
+        assertThat(value.source()).isEqualTo("row-leaf");
+        assertThat(result.rows().get(1).key()).containsExactly("b");
+    }
+
+    @Test
+    public void addsRollupRowWhenRowGroupsPresentAndRollupEnabled() {
+        stubResultMetadata();
+        final Pivot pivot = Pivot.builder().id("p").rowGroups(values("field1")).series(count()).rollup(true).build();
+
+        final FakeBucketHandler bucketHandler = new FakeBucketHandler(Map.of("field1", List.of(
+                PivotBucket.create(ImmutableList.of("a"), mock(MultiBucketBase.class))
+        )));
+        final FakeSeriesHandler seriesHandler = new FakeSeriesHandler(SeriesAggregationBuilder::metric,
+                List.of(SeriesSpecHandler.Value.create("count()", Count.NAME, 7L)));
+        final OSPivot sut = new OSPivot(Map.of(Values.NAME, bucketHandler), Map.of(Count.NAME, seriesHandler), new EffectiveTimeRangeExtractor());
+
+        final PivotResult result = (PivotResult) sut.doExtractResult(query, pivot, queryResult, queryContext);
+
+        assertThat(result.rows()).hasSize(2);
+        final PivotResult.Row rollupRow = result.rows().get(1);
+        assertThat(rollupRow.key()).isEmpty();
+        assertThat(rollupRow.source()).isEqualTo("non-leaf");
+        assertThat(rollupRow.values()).hasSize(1);
+        assertThat(rollupRow.values().get(0).source()).isEqualTo("row-inner");
+    }
+
+    @Test
+    public void extractsNestedColumnValues() {
+        stubResultMetadata();
+        final Pivot pivot = Pivot.builder()
+                .id("p")
+                .rowGroups(values("row1"))
+                .columnGroups(values("col1"))
+                .series(count())
+                .rollup(false)
+                .build();
+
+        final FakeBucketHandler bucketHandler = new FakeBucketHandler(Map.of(
+                "row1", List.of(PivotBucket.create(ImmutableList.of("a"), mock(MultiBucketBase.class))),
+                "col1", List.of(PivotBucket.create(ImmutableList.of("x"), mock(MultiBucketBase.class)))
+        ));
+        final FakeSeriesHandler seriesHandler = new FakeSeriesHandler(SeriesAggregationBuilder::metric,
+                List.of(SeriesSpecHandler.Value.create("count()", Count.NAME, 5L)));
+        when(queryContext.withRowBucket(any())).thenReturn(queryContext);
+        final OSPivot sut = new OSPivot(Map.of(Values.NAME, bucketHandler), Map.of(Count.NAME, seriesHandler), new EffectiveTimeRangeExtractor());
+
+        final PivotResult result = (PivotResult) sut.doExtractResult(query, pivot, queryResult, queryContext);
+
+        assertThat(result.rows()).hasSize(1);
+        final PivotResult.Row row = result.rows().get(0);
+        assertThat(row.key()).containsExactly("a");
+        assertThat(row.values()).hasSize(1);
+        final PivotResult.Value value = row.values().get(0);
+        assertThat(value.key()).containsExactly("x", "count()");
+        assertThat(value.value()).isEqualTo(5L);
+        assertThat(value.source()).isEqualTo("col-leaf");
+    }
+
+    @Test
+    public void buildsColumnNamesFromRowFieldsAndColumnKeys() {
+        stubResultMetadata();
+        final Pivot pivot = Pivot.builder()
+                .id("p")
+                .rowGroups(values("row1"))
+                .columnGroups(values("col1"))
+                .series(count())
+                .rollup(false)
+                .build();
+
+        final FakeBucketHandler bucketHandler = new FakeBucketHandler(Map.of(
+                "row1", List.of(PivotBucket.create(ImmutableList.of("a"), mock(MultiBucketBase.class))),
+                "col1", List.of(PivotBucket.create(ImmutableList.of("x"), mock(MultiBucketBase.class)))
+        ));
+        final FakeSeriesHandler seriesHandler = new FakeSeriesHandler(SeriesAggregationBuilder::metric,
+                List.of(SeriesSpecHandler.Value.create("count()", Count.NAME, 5L)));
+        when(queryContext.withRowBucket(any())).thenReturn(queryContext);
+        final OSPivot sut = new OSPivot(Map.of(Values.NAME, bucketHandler), Map.of(Count.NAME, seriesHandler), new EffectiveTimeRangeExtractor());
+
+        final PivotResult result = (PivotResult) sut.doExtractResult(query, pivot, queryResult, queryContext);
+
+        assertThat(result.columnNames()).containsExactly("row1", "x, count()");
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------
+    // Helpers
+    // ----------------------------------------------------------------------------------------------------------------
+
+    private DocumentContext generateQueryPart(Pivot pivot,
+                                              Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers,
+                                              Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec>> seriesHandlers) {
+        final MutableSearchRequestBuilder searchSourceBuilder = new MutableSearchRequestBuilder();
+        final OSGeneratedQueryContext context = mock(OSGeneratedQueryContext.class);
+        when(context.searchSourceBuilder(any())).thenReturn(searchSourceBuilder);
+        when(context.seriesName(any(), any())).thenReturn("metricseries");
+
+        final OSPivot sut = new OSPivot(bucketHandlers, seriesHandlers, new EffectiveTimeRangeExtractor());
+        sut.doGenerateQueryPart(query, pivot, context);
+
+        return JsonPath.parse(searchSourceBuilder.toString());
+    }
+
+    private void stubResultMetadata() {
+        returnDocumentCount(queryResult, 10);
+        when(queryResult.aggregations()).thenReturn(createTimestampRangeAggregations(
+                (double) new Date().getTime(), (double) new Date().getTime()));
+        when(query.effectiveTimeRange(any())).thenReturn(RelativeRange.create(300));
+    }
+
+    private static Values values(String field) {
+        return Values.builder().field(field).build();
+    }
+
+    private static Count count() {
+        return Count.builder().id("count()").build();
+    }
+
+    private static class FakeBucketHandler extends OSPivotBucketSpecHandler<Values> {
+        private final Map<String, List<PivotBucket>> bucketsByField;
+
+        private FakeBucketHandler() {
+            this(Map.of());
+        }
+
+        private FakeBucketHandler(Map<String, List<PivotBucket>> bucketsByField) {
+            this.bucketsByField = bucketsByField;
+        }
+
+        @Override
+        public CreatedAggregations<MutableNamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
+            return CreatedAggregations.create(new MutableNamedAggregationBuilder(name,
+                    Aggregation.builder().terms(t -> t.field(bucketSpec.fields().get(0)))));
+        }
+
+        @Override
+        public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket) {
+            return bucketsByField.getOrDefault(bucketSpecs.fields().get(0), List.of()).stream();
+        }
+    }
+
+    private static class FakeSeriesHandler extends OSPivotSeriesSpecHandler<Count> {
+        private final Function<MutableNamedAggregationBuilder, SeriesAggregationBuilder> placement;
+        private final List<SeriesSpecHandler.Value> resultValues;
+
+        private FakeSeriesHandler(Function<MutableNamedAggregationBuilder, SeriesAggregationBuilder> placement, List<SeriesSpecHandler.Value> resultValues) {
+            this.placement = placement;
+            this.resultValues = resultValues;
+        }
+
+        @Override
+        public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count seriesSpec, OSGeneratedQueryContext queryContext) {
+            return List.of(placement.apply(new MutableNamedAggregationBuilder(name,
+                    Aggregation.builder().max(m -> m.field("value")))));
+        }
+
+        @Override
+        public Aggregate extractAggregationFromResult(Pivot pivot, PivotSpec spec, MultiBucketBase currentAggregationOrBucket, IndexerGeneratedQueryContext<?> queryContext) {
+            return null;
+        }
+
+        @Override
+        public Stream<SeriesSpecHandler.Value> doHandleResult(Pivot pivot, Count seriesSpec, MultiSearchItem<JsonData> searchResult, Aggregate aggregationResult, OSGeneratedQueryContext queryContext) {
+            return resultValues.stream();
+        }
+    }
 }

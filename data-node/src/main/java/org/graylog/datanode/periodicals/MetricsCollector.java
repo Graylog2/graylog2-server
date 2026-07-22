@@ -216,7 +216,7 @@ public class MetricsCollector extends Periodical {
 
         if (Objects.nonNull(searchResponse) && searchResponse.hits().total().value() > 0) {
             // Retrieve the first hit (latest document) from the search response
-            return OSSerializationUtils.toMap(searchResponse.hits().hits().getFirst());
+            return OSSerializationUtils.toMap(searchResponse.hits().hits().getFirst().source());
         } else {
             LOG.info("No previous metrics for cluster");
         }

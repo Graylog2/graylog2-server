@@ -63,7 +63,7 @@ public class CustomOpenSearchClient extends OpenSearchClient {
     }
 
     static void throwOnShardFailures(ShardStatistics shards) {
-        if (shards.failed() <= 0) {
+        if (shards.failed() == 0 || shards.failed() < shards.total()) {
             return;
         }
         final var reason = String.format(Locale.ROOT, "%d of %d shards failed", shards.failed(), shards.total());

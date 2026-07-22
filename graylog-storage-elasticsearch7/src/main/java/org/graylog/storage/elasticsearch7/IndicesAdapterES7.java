@@ -138,7 +138,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
+    public void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback) {
         final ReindexRequest request = new ReindexRequest();
         request.setSourceIndices(source);
         request.setDestIndex(target);

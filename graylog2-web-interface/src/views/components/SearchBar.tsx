@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useRef } from 'react';
+import { useCallback, useContext, useMemo, useRef } from 'react';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
 
 import useView from 'views/hooks/useView';
-import { useStore } from 'stores/connect';
+import StreamsContext from 'contexts/StreamsContext';
 import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
@@ -30,7 +30,6 @@ import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
-import { StreamsStore } from 'views/stores/StreamsStore';
 import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
@@ -181,23 +180,28 @@ type Props = {
 const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props) => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
-  const availableStreams = useStore(StreamsStore, ({ streams }) =>
-    streams.map((stream) => ({
-      key: stream.title,
-      value: stream.id,
-    })),
+  const streams = useContext(StreamsContext);
+  const availableStreams = useMemo(
+    () =>
+      (streams ?? []).map((stream) => ({
+        key: stream.title,
+        value: stream.id,
+      })),
+    [streams],
   );
-  const availableStreamCategories = useStore(StreamsStore, ({ streams }) =>
-    streams
-      .flatMap((stream) => {
-        if (stream.categories) {
-          return stream.categories.map((s) => ({ key: s, value: s }));
-        }
+  const availableStreamCategories = useMemo(
+    () =>
+      (streams ?? [])
+        .flatMap((stream) => {
+          if (stream.categories) {
+            return stream.categories.map((s) => ({ key: s, value: s }));
+          }
 
-        return [];
-      })
-      .filter((element, index, self) => index === self.findIndex((e) => e.value === element.value))
-      .sort((a, b) => defaultCompare(a.value, b.value)),
+          return [];
+        })
+        .filter((element, index, self) => index === self.findIndex((e) => e.value === element.value))
+        .sort((a, b) => defaultCompare(a.value, b.value)),
+    [streams],
   );
   const { config } = useSearchConfiguration();
   const { userTimezone } = useUserDateTime();

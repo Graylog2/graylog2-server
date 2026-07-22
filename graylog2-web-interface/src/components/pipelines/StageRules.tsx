@@ -22,7 +22,7 @@ import { DataTable, Icon, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';
-import type { RuleType } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
 import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 import {
   PipelineLoadCell,
@@ -81,7 +81,7 @@ const StageRules = ({
     'Description',
     'Throughput',
     'Errors',
-    ...(showLoadColumn ? ['Pipeline Load (15m)'] : []),
+    ...(showLoadColumn ? ['Rule Load (15m)'] : []),
     ...(canRemoveRoutingRules ? ['Actions'] : []),
   ];
 
@@ -192,7 +192,6 @@ const StageRules = ({
   return (
     <DataTable
       id={`stage-rules-${pipeline.id}-${stage.stage}`}
-      className="table-hover"
       headers={headers}
       headerCellFormatter={headerCellFormatter}
       rows={rules}

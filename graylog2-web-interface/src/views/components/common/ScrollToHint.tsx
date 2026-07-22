@@ -54,6 +54,10 @@ type Props = {
   ifValueChanges?: unknown;
   ifTrue?: boolean;
   autoScroll?: boolean;
+  // Called once the target is confirmed visible, either because it already was or because this
+  // component just scrolled it into view. Lets callers that track "still needs attention" state
+  // (e.g. a newly created widget) clear it based on the outcome instead of guessing a delay.
+  onSettled?: () => void;
 };
 
 const ScrollToHint = ({
@@ -62,6 +66,7 @@ const ScrollToHint = ({
   title,
   ifTrue = true,
   autoScroll = false,
+  onSettled = undefined,
 }: Props) => {
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
   const [showHint, setShowHint] = useState(false);
@@ -78,22 +83,28 @@ const ScrollToHint = ({
 
   // show the scroll hint if necessary
   useEffect(() => {
+    if (!ifTrue || !scrollTargetRef.current || !scrollContainer.current) {
+      return;
+    }
+
     if (
-      ifTrue &&
-      scrollTargetRef.current &&
-      scrollContainer.current &&
-      !isElementVisibleInContainer(
+      isElementVisibleInContainer(
         scrollTargetRef.current.parentElement ?? scrollTargetRef.current,
         scrollContainer.current,
       )
     ) {
-      if (autoScroll) {
-        scrollToTarget();
-      } else {
-        setShowHint(true);
-      }
+      onSettled?.();
+
+      return;
     }
-  }, [ifTrue, ifValueChanges, setShowHint, scrollContainer, scrollToTarget, autoScroll]);
+
+    if (autoScroll) {
+      scrollToTarget();
+      onSettled?.();
+    } else {
+      setShowHint(true);
+    }
+  }, [ifTrue, ifValueChanges, setShowHint, scrollContainer, scrollToTarget, autoScroll, onSettled]);
 
   // hide the hint automatically
   useEffect(() => {

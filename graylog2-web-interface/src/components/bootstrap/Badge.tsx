@@ -40,48 +40,87 @@ const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedM
     background-color: ${color};
     color: ${theme.utils.contrastingColor(color)};
 
+    /* Let the badge shrink below its content width — as a flex/grid item (min-width: 0) and
+       capped to its container (max-width: 100%) instead of Mantine's default width: fit-content.
+       Without this the badge always stays as wide as its text, so the label below never gets a
+       constrained width to truncate against. */
+    min-width: 0;
+    max-width: 100%;
+
     .mantine-Badge-label {
       font-size: ${theme.fonts.size[mapFontSize[size]]};
-      overflow: visible;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   `,
 );
 
 type Props = React.PropsWithChildren<{
+  'aria-label'?: string;
+  bsSize?: BsSize;
   bsStyle?: ColorVariant;
   className?: string;
   'data-testid'?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
+  onMouseEnter?: React.MouseEventHandler<HTMLElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLElement>;
+  role?: string;
+  style?: React.CSSProperties;
   title?: string;
-  bsSize?: BsSize;
 }>;
 
 const Badge = (
   {
+    'aria-label': ariaLabel = undefined,
     bsStyle = 'default',
     className = undefined,
     children = undefined,
     'data-testid': dataTestid,
     onClick = undefined,
+    onMouseEnter = undefined,
+    onMouseLeave = undefined,
+    role = undefined,
+    style = undefined,
     title = undefined,
     bsSize = 'md',
   }: Props,
-  ref: React.ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<HTMLElement>,
 ) => {
   const theme = useTheme();
   const color = mapStyle(bsStyle, theme);
   const size = sizeForMantine(bsSize);
 
+  const sharedProps = {
+    'aria-label': ariaLabel,
+    color,
+    className,
+    title,
+    'data-testid': dataTestid,
+    role,
+    style,
+    variant: 'filled' as const,
+    onMouseEnter,
+    onMouseLeave,
+    size,
+  };
+
+  if (onClick) {
+    return (
+      <StyledBadge
+        {...sharedProps}
+        style={{ cursor: 'pointer', ...style }}
+        component="button"
+        ref={ref as React.Ref<HTMLButtonElement>}
+        onClick={onClick}>
+        {children}
+      </StyledBadge>
+    );
+  }
+
   return (
-    <StyledBadge
-      color={color}
-      className={className}
-      title={title}
-      data-testid={dataTestid}
-      ref={ref}
-      variant="filled"
-      onClick={onClick}
-      size={size}>
+    <StyledBadge {...sharedProps} component="span" ref={ref as React.Ref<HTMLSpanElement>}>
       {children}
     </StyledBadge>
   );

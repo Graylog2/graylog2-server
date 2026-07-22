@@ -80,6 +80,7 @@ import org.graylog2.rest.models.system.indices.DefaultDataTieringStatusService;
 import org.graylog2.rest.models.users.requests.DashboardStartPage;
 import org.graylog2.rest.models.users.requests.SearchStartPage;
 import org.graylog2.rest.models.users.requests.StreamStartPage;
+import org.graylog2.rest.resources.datanodes.DatanodeProxyExceptionMapper;
 import org.graylog2.rest.resources.entities.preferences.listeners.EntityListPreferencesCleanerOnUserDeletion;
 import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
@@ -254,6 +255,7 @@ public class ServerBindings extends Graylog2Module {
         exceptionMappers.addBinding().toInstance(ElasticsearchExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(QueryParsingExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ResultWindowLimitExceededExceptionMapper.class);
+        exceptionMappers.addBinding().toInstance(DatanodeProxyExceptionMapper.class);
     }
 
     private void bindAdditionalJerseyComponents() {

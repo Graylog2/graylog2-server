@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import React, { useCallback } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import StreamsOverview from 'components/streams/StreamsOverview';
@@ -23,14 +22,12 @@ import PageHeader from 'components/common/PageHeader';
 import { DocumentTitle, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { EntityShare } from 'actions/permissions/EntityShareActions';
 import useStreamMutations from 'hooks/useStreamMutations';
-import { KEY_PREFIX } from 'components/streams/hooks/useStreams';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import CreateButton from 'components/common/CreateButton';
 import Routes from 'routing/Routes';
 import useLocation from 'routing/useLocation';
@@ -44,12 +41,8 @@ const StreamsPage = () => {
   } = useIndexSetsList(false);
   const sendTelemetry = useSendTelemetry();
   const { createStream } = useStreamMutations();
-  const queryClient = useQueryClient();
   const { pathname } = useLocation();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  useEffect(() => {
-    setShowCreateModal(pathname === Routes.STREAM_NEW);
-  }, [pathname]);
+  const showCreateModal = pathname === Routes.STREAM_NEW;
   const history = useHistory();
   const closeCreateModal = useCallback(() => history.push(Routes.STREAMS), [history]);
 
@@ -60,8 +53,6 @@ const StreamsPage = () => {
 
     return createStream(stream).then(() => {
       UserNotification.success('Stream has been successfully created.', 'Success');
-      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
-      CurrentUserStore.reload();
     });
   };
 

@@ -23,6 +23,7 @@ import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/ho
 import useTableFetchContext from 'components/common/PaginatedEntityTable/useTableFetchContext';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import Spinner from 'components/common/Spinner';
+import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -67,9 +68,11 @@ const EventsMetrics = ({ children = undefined, expanded: initialExpanded, onExpa
 type Props = React.PropsWithChildren<{}>;
 const EventsMetricsBarrier = ({ children = undefined }: Props) => {
   const { entityTableId } = useTableFetchContext();
-  const { mutateAsync: updatePreferences } = useUpdateUserLayoutPreferences(entityTableId);
+  const { activeLayoutVariant } = useLayoutVariant();
+  const { mutateAsync: updatePreferences } = useUpdateUserLayoutPreferences(entityTableId, activeLayoutVariant);
   const { data, isInitialLoading: isLoadingPreferences } = useUserLayoutPreferences<{ showMetrics: boolean }>(
     entityTableId,
+    activeLayoutVariant,
   );
   const onExpandToggle = useCallback(
     (expanded: boolean) => updatePreferences({ customPreferences: { showMetrics: expanded } }),

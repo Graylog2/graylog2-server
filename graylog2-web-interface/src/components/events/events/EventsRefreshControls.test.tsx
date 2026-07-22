@@ -20,7 +20,9 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Location } from 'history';
 
 import type { SearchParams } from 'stores/PaginationTypes';
-import TableFetchContext, { type ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
+import TableFilterContext, {
+  type TableFilterContextValue,
+} from 'components/common/PaginatedEntityTable/TableFilterContext';
 import { asMock } from 'helpers/mocking';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import type { SearchesConfig } from 'components/search/SearchConfig';
@@ -56,26 +58,34 @@ describe('EventsRefreshControls', () => {
   };
 
   const renderSUT = (searchParamsOverrides: Partial<SearchParams> = {}) => {
-    const contextValue: ContextValue = {
-      searchParams: {
-        page: 1,
-        pageSize: 10,
-        query: '',
-        sort: { attributeId: 'timestamp', direction: 'desc' },
-        sliceCol: undefined,
-        slice: undefined,
-        filters: undefined,
-        ...searchParamsOverrides,
+    const searchParams: SearchParams = {
+      page: 1,
+      pageSize: 10,
+      query: '',
+      sort: { attributeId: 'timestamp', direction: 'desc' },
+      sliceCol: undefined,
+      slice: undefined,
+      filters: undefined,
+      ...searchParamsOverrides,
+    };
+    const contextValue: TableFilterContextValue = {
+      searchParams,
+      setQuery: jest.fn(),
+      onChangeFilters: jest.fn(),
+      onChangeSlicingFilter: jest.fn(),
+      paginationState: {
+        page: searchParams.page,
+        pageSize: searchParams.pageSize,
+        resetPage: jest.fn(),
+        setPagination: jest.fn(),
       },
-      refetch: jest.fn(),
-      attributes: [],
-      entityTableId: 'events-table',
+      resetFilters: jest.fn(),
     };
 
     return render(
-      <TableFetchContext.Provider value={contextValue}>
+      <TableFilterContext.Provider value={contextValue}>
         <EventsRefreshControls />
-      </TableFetchContext.Provider>,
+      </TableFilterContext.Provider>,
     );
   };
 

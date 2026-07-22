@@ -24,7 +24,6 @@ import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
-import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -43,9 +42,8 @@ public class SearchFacade extends ViewFacade {
                         SearchDbService searchDbService,
                         ViewService viewService,
                         ViewSummaryService viewSummaryService,
-                        UserService userService,
-                        EntityGrantLookup grantLookup) {
-        super(objectMapper, searchDbService, viewService, viewSummaryService, userService, grantLookup);
+                        UserService userService) {
+        super(objectMapper, searchDbService, viewService, viewSummaryService, userService);
     }
 
     @Override

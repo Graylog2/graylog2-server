@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
 import * as Immutable from 'immutable';
 import { useQuery } from '@tanstack/react-query';
 
@@ -31,11 +31,13 @@ import createSearch from 'views/logic/slices/createSearch';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import Query from 'views/logic/queries/Query';
 import type { LookupTableParameterJsonEmbryonic } from 'components/event-definitions/event-definition-types/FilterForm';
-import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import Parameter from 'views/logic/parameters/Parameter';
 import type User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
 import useDebouncedValue from 'hooks/useDebouncedValue';
+import StreamsContext from 'contexts/StreamsContext';
+import type { Stream } from 'logic/streams/types';
 
 type FilterPreviewProps = {
   config: EventDefinition['config'];
@@ -72,7 +74,7 @@ const SearchResult = ({
   }
 
   return (
-    <Table striped condensed bordered>
+    <Table condensed bordered>
       <thead>
         <tr>
           <th>Timestamp</th>
@@ -86,8 +88,19 @@ const SearchResult = ({
   );
 };
 
-const constructSearch = (config: EventDefinition['config'], searchTypeId: string, queryId: string) => {
-  const formattedStreams = config?.streams?.map((stream) => ({ type: 'stream', id: stream })) || [];
+const constructSearch = (
+  config: EventDefinition['config'],
+  searchTypeId: string,
+  queryId: string,
+  streams: Stream[],
+) => {
+  const combinedStreamsAndCategories = new Set([
+    ...(config?.streams || []),
+    ...(config?.stream_categories?.flatMap((category) =>
+      streams.filter((s) => s.categories.includes(category)).map((s) => s.id),
+    ) || []),
+  ]);
+  const formattedStreams = [...combinedStreamsAndCategories].map((stream) => ({ type: 'stream', id: stream })) || [];
 
   const queryBuilder = Query.builder()
     .id(queryId)
@@ -120,7 +133,7 @@ const constructSearch = (config: EventDefinition['config'], searchTypeId: string
     .parameters(
       config?.query_parameters
         ?.filter((param: LookupTableParameterJsonEmbryonic) => !param.embryonic)
-        .map((param) => LookupTableParameter.fromJSON(param)) ?? [],
+        .map((param) => Parameter.fromJSON(param)) ?? [],
     )
     .queries([query])
     .build();
@@ -135,6 +148,8 @@ const isPermittedToSeePreview = (currentUser: User, config: EventDefinition['con
 };
 
 const useExecutePreview = (config: EventDefinition['config']) => {
+  const streams = useContext(StreamsContext);
+
   const currentUser = useCurrentUser();
   const queryId = useMemo(() => generateId(), []);
   const searchTypeId = useMemo(() => generateId(), []);
@@ -146,9 +161,9 @@ const useExecutePreview = (config: EventDefinition['config']) => {
   );
 
   const { data, isFetching } = useQuery({
-    queryKey: ['filter-preview', debouncedConfig, searchTypeId, queryId],
+    queryKey: ['filter-preview', debouncedConfig, searchTypeId, queryId, streams],
     queryFn: async () => {
-      const search = constructSearch(debouncedConfig, searchTypeId, queryId);
+      const search = constructSearch(debouncedConfig, searchTypeId, queryId, streams);
       const createdSearch = await createSearch(search);
       const jobIds = await startJob(createdSearch, [searchTypeId], SearchExecutionState.empty());
       const result = await executeJobResult({ jobIds });

@@ -24,8 +24,6 @@ import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
-import org.graylog.grn.GRNType;
-import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -33,8 +31,6 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
-import org.graylog.security.GrantDTO;
-import org.graylog.security.shares.EntityGrantLookup;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -55,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -66,7 +61,7 @@ import java.util.stream.Stream;
 
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
 
-public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, ViewSummaryDTO> {
+public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, ViewSummaryDTO>, UpdatableEntityFacade<ViewDTO> {
     private static final Logger LOG = LoggerFactory.getLogger(ViewFacade.class);
 
     private final ObjectMapper objectMapper;
@@ -74,21 +69,18 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     private final SearchDbService searchDbService;
     private final ViewSummaryService viewSummaryService;
     protected final UserService userService;
-    private final EntityGrantLookup grantLookup;
 
     @Inject
     public ViewFacade(ObjectMapper objectMapper,
                       SearchDbService searchDbService,
                       ViewService viewService,
                       ViewSummaryService viewSummaryService,
-                      UserService userService,
-                      EntityGrantLookup grantLookup) {
+                      UserService userService) {
         this.objectMapper = objectMapper;
         this.searchDbService = searchDbService;
         this.viewService = viewService;
         this.viewSummaryService = viewSummaryService;
         this.userService = userService;
-        this.grantLookup = grantLookup;
     }
 
     @Override
@@ -164,6 +156,32 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
     }
 
     @Override
+    public void updateNativeEntity(Entity entity, NativeEntity<ViewDTO> existingEntity,
+                                   Map<String, ValueReference> parameters,
+                                   Map<EntityDescriptor, Object> nativeEntities, String username) {
+        ensureV1(entity);
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final ViewDTO existingView = existingEntity.entity();
+        final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
+
+        final Map<String, ViewStateDTO> viewStateMap = new LinkedHashMap<>(viewEntity.state().size());
+        for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {
+            viewStateMap.put(entry.getKey(), entry.getValue().toNativeEntity(parameters, nativeEntities));
+        }
+
+        final ViewDTO.Builder viewBuilder = viewEntity.toNativeEntity(parameters, nativeEntities);
+        viewBuilder.id(existingView.id());
+        viewBuilder.state(viewStateMap);
+
+        final Search search = viewEntity.search().toNativeEntity(parameters, nativeEntities);
+        final Search searchWithId = search.toBuilder().id(existingView.searchId()).build();
+        searchDbService.save(searchWithId);
+
+        viewBuilder.searchId(existingView.searchId());
+        viewService.update(viewBuilder.build());
+    }
+
+    @Override
     public void delete(ViewDTO nativeEntity) {
         viewService.delete(nativeEntity.id());
     }
@@ -218,12 +236,6 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                                                 Map<EntityDescriptor, Entity> entities) {
         ensureV1(entity);
         return resolveEntityV1((EntityV1) entity, parameters, entities);
-    }
-
-    @Override
-    public List<GrantDTO> resolveGrants(ViewDTO nativeEntity) {
-        final GRNType type = nativeEntity.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
-        return grantLookup.getGrantsForTarget(type, nativeEntity.id());
     }
 
     @SuppressWarnings("UnstableApiUsage")

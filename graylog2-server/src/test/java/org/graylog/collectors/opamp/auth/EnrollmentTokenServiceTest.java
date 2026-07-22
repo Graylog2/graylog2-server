@@ -443,4 +443,26 @@ class EnrollmentTokenServiceTest {
         assertThat(updated.get().usageCount()).isEqualTo(1);
         assertThat(updated.get().lastUsedAt()).isNotNull();
     }
+
+    @Test
+    void markUsedUpdatesLastUsedWithoutIncrementingCount() {
+        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
+                "usage-fleet",
+                Duration.ofDays(1)
+        );
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
+
+        final Optional<EnrollmentTokenDTO> initial = enrollmentTokenService.validateToken(response.token());
+        assertThat(initial).isPresent();
+        assertThat(initial.get().usageCount()).isEqualTo(0);
+        assertThat(initial.get().lastUsedAt()).isNull();
+
+        enrollmentTokenService.markUsed(initial.get().id());
+
+        final Optional<EnrollmentTokenDTO> updated = enrollmentTokenService.validateToken(response.token());
+        assertThat(updated).isPresent();
+        assertThat(updated.get().usageCount()).isEqualTo(0);
+        assertThat(updated.get().lastUsedAt()).isNotNull();
+    }
 }

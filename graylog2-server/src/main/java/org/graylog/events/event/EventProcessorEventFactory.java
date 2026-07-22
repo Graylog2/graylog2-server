@@ -65,6 +65,7 @@ public class EventProcessorEventFactory implements EventFactory {
                 eventDefinition.priority(),
                 eventDefinition.alert()
         );
+        event.setTacticsTechniques(eventDefinition.tacticsTechniques());
         event.setTags(eventDefinition.tags());
         return event;
     }

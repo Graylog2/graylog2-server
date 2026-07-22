@@ -19,10 +19,11 @@ import { useCallback, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Col, ControlLabel, FormGroup, Input, Radio, Row } from 'components/bootstrap';
+import { Col, ControlLabel, FormGroup, Input, Row } from 'components/bootstrap';
+import { Radio } from 'components/common';
 import * as FormsUtils from 'util/FormsUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type User from 'logic/users/User';
 import type { EventDefinitionValidation } from 'components/event-definitions/types';
 
@@ -90,8 +91,8 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
   );
 
   const handleTypeChange = useCallback(
-    (event: React.FormEvent<Radio>) => {
-      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target as HTMLInputElement));
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target));
 
       setConditionType(nextConditionType);
       if (nextConditionType === conditionTypes.FILTER) {

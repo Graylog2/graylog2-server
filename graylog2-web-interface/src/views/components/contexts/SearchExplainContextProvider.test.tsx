@@ -40,10 +40,6 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   },
 }));
 
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore(['getInitialState', () => ({ streams: [] })]),
-}));
-
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 const explainedWidget = {

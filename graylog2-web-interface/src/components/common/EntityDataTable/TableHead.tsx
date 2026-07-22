@@ -19,7 +19,6 @@ import styled, { css } from 'styled-components';
 import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 
-import { getPinnedCellClassName } from 'components/bootstrap/Table';
 import {
   columnTransformVar,
   columnOpacityVar,
@@ -47,13 +46,16 @@ export const Th = styled.th<{
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
-    background-color: ${theme.colors.table.head.background};
     transition: var(${columnTransition()}, none);
     height: 100%; // required to be able to use height: 100% in child elements
     ${$pinningPosition
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+          background-color: ${theme.utils.flattenColorStack([
+            theme.colors.global.contentBackground,
+            theme.colors.table.head.background,
+          ])};
         `
       : ''}
 
@@ -84,7 +86,6 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       colSpan={header.colSpan}
       $colId={header.column.id}
       $hidePadding={columnMeta?.hideCellPadding}
-      className={getPinnedCellClassName(!!header.column.getIsPinned(), false)}
       $pinningPosition={header.column.getIsPinned()}>
       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
     </Th>

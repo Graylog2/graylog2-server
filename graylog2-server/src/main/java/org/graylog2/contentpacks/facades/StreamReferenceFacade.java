@@ -52,7 +52,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class StreamReferenceFacade extends StreamFacade {
+public class StreamReferenceFacade extends StreamFacade implements UpdatableEntityFacade<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(StreamReferenceFacade.class);
 
     public static final ModelType TYPE_V1 = ModelTypes.STREAM_REF_V1;
@@ -188,5 +188,18 @@ public class StreamReferenceFacade extends StreamFacade {
     @Override
     public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
         return EntityPermissions.of(RestPermissions.STREAMS_CREATE);
+    }
+
+    /**
+     * Deliberate no-op: a stream reference only points at an existing stream resolved by title.
+     * The stream itself is created and maintained outside the content pack (e.g. by the Illuminate
+     * bundle installer), so there is no content to update in place on upgrade.
+     */
+    @Override
+    public void updateNativeEntity(Entity entity,
+                                   NativeEntity<Stream> existingEntity,
+                                   Map<String, ValueReference> parameters,
+                                   Map<EntityDescriptor, Object> nativeEntities,
+                                   String username) {
     }
 }

@@ -47,3 +47,69 @@ export type StreamRule = {
   stream_id: string;
   description: string;
 };
+
+export type StreamRuleType = {
+  id: number;
+  short_desc: string;
+  long_desc: string;
+  name: string;
+};
+
+type OutputSummary = {
+  id: string;
+  title: string;
+  type: string;
+  creator_user_id: string;
+  created_at: string;
+  configuration: { [key: string]: string };
+};
+
+type AlertConditionSummary = {
+  id: string;
+  type: string;
+  creator_user_id: string;
+  created_at: string;
+  parameters: { [key: string]: any };
+  in_grace: boolean | null | undefined;
+  title: string | null | undefined;
+};
+
+export type StreamConfiguration = Pick<
+  Stream,
+  | 'index_set_id'
+  | 'title'
+  | 'matching_type'
+  | 'remove_matches_from_default_stream'
+  | 'description'
+  | 'rules'
+  | 'content_pack'
+>;
+
+type AlertReceiver = {
+  emails: string[];
+  users: string[];
+};
+
+export type StreamResponse = {
+  id: string;
+  creator_user_id: string;
+  outputs: OutputSummary[];
+  matching_type: string;
+  description: string;
+  created_at: string;
+  disabled: boolean;
+  rules: StreamRule[];
+  alert_conditions: AlertConditionSummary[];
+  alert_receivers: AlertReceiver;
+  title: string;
+  is_default: boolean | null | undefined;
+  is_editable: boolean;
+  remove_matches_from_default_stream: boolean;
+  index_set_id: string;
+  categories: string[];
+};
+
+export type MatchData = {
+  matches: boolean;
+  rules: { [id: string]: false };
+};

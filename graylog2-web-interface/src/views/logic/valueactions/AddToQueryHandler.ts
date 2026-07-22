@@ -18,7 +18,14 @@ import uniq from 'lodash/uniq';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
-import { escape, addToQuery, formatTimestamp, predicate } from 'views/logic/queries/QueryHelper';
+import {
+  escape,
+  addToQuery,
+  formatTimestamp,
+  predicate,
+  concatQueryStrings,
+  edgeClause,
+} from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
@@ -26,11 +33,20 @@ import type { RootState, ActionContexts } from 'views/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 
-const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
-  const predicateValue = type.type === 'date' ? formatTimestamp(value) : escape(value);
+const toPredicate = (field: string, value: string | number, type: FieldType) =>
+  predicate(field, type.type === 'date' ? formatTimestamp(value) : escape(value));
 
-  return addToQuery(oldQuery, predicate(field, predicateValue));
-};
+const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) =>
+  addToQuery(oldQuery, toPredicate(field, value, type));
+
+type ValueToAdd = { field: string; value: string | number; type: FieldType };
+
+// Joins each value path entry with OR into a single bracketed clause, e.g. `(source:a OR target:a)`.
+const orClause = (values: Array<ValueToAdd>) =>
+  `(${concatQueryStrings(
+    values.map(({ field, value, type }) => toPredicate(field, value, type)),
+    { operator: 'OR', withBrackets: false },
+  )})`;
 
 type Arguments = {
   queryId: string;
@@ -44,21 +60,35 @@ const AddToQueryHandler =
   ({ queryId, field, value = '', type, contexts }: Arguments) =>
   async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
-    const valuesToAdd = uniq(
-      hasMultipleValueForActions(contexts)
+    const multipleValues = hasMultipleValueForActions(contexts);
+    const valuesToAdd: Array<ValueToAdd> = uniq(
+      multipleValues
         ? contexts.valuePath.map((path) => {
             const [pathField, pathValue] = Object.entries(path)[0];
 
-            return { field: pathField, value: pathValue, type: fieldTypeFor(field, contexts?.fieldTypes) };
+            return { field: pathField, value: pathValue, type: fieldTypeFor(pathField, contexts?.fieldTypes) };
           })
         : [{ field, value, type }],
     );
 
-    const newQuery = valuesToAdd.reduce(
-      (prev, valueToAdd) =>
-        formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number, valueToAdd.type),
-      oldQuery,
-    );
+    let newQuery: string;
+
+    if (multipleValues && contexts?.valuePathOperator === 'EDGE') {
+      newQuery = addToQuery(
+        oldQuery,
+        edgeClause(
+          { field: valuesToAdd[0].field, value: valuesToAdd[0].value },
+          { field: valuesToAdd[1].field, value: valuesToAdd[1].value },
+        ),
+      );
+    } else if (multipleValues && contexts?.valuePathOperator === 'OR') {
+      newQuery = addToQuery(oldQuery, orClause(valuesToAdd));
+    } else {
+      newQuery = valuesToAdd.reduce(
+        (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value, valueToAdd.type),
+        oldQuery,
+      );
+    }
 
     await recordQueryStringUsage(newQuery, oldQuery);
 

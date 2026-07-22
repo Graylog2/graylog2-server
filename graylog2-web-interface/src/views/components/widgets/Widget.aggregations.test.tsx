@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import selectEvent from 'helpers/selectEvent';
-import MockStore from 'helpers/mocking/StoreMock';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -37,6 +36,8 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import suppressConsole from 'helpers/suppressConsole';
+import StreamsContext from 'contexts/StreamsContext';
+import type { Stream } from 'logic/streams/types';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -59,15 +60,7 @@ jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('views/hooks/useAggregationFunctions');
 
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore([
-    'getInitialState',
-    () => ({
-      streams: [{ title: 'Stream 1', id: 'stream-id-1', categories: [] }],
-      categories: [],
-    }),
-  ]),
-}));
+const streams = [{ title: 'Stream 1', id: 'stream-id-1', categories: [] }] as Array<Stream>;
 
 jest.mock('views/hooks/useViewType');
 
@@ -117,20 +110,22 @@ describe('Aggregation Widget', () => {
 
   const AggregationWidget = ({ widget: propsWidget = dataTableWidget, ...props }: AggregationWidgetProps) => (
     <TestStoreProvider>
-      <TestFieldTypesContextProvider>
-        <WidgetFocusContext.Provider value={widgetFocusContextState}>
-          <WidgetContext.Provider value={propsWidget}>
-            <Widget
-              widget={propsWidget}
-              id="widgetId"
-              onPositionsChange={() => {}}
-              title="Widget Title"
-              position={new WidgetPosition(1, 1, 1, 1)}
-              {...props}
-            />
-          </WidgetContext.Provider>
-        </WidgetFocusContext.Provider>
-      </TestFieldTypesContextProvider>
+      <StreamsContext.Provider value={streams}>
+        <TestFieldTypesContextProvider>
+          <WidgetFocusContext.Provider value={widgetFocusContextState}>
+            <WidgetContext.Provider value={propsWidget}>
+              <Widget
+                widget={propsWidget}
+                id="widgetId"
+                onPositionsChange={() => {}}
+                title="Widget Title"
+                position={new WidgetPosition(1, 1, 1, 1)}
+                {...props}
+              />
+            </WidgetContext.Provider>
+          </WidgetFocusContext.Provider>
+        </TestFieldTypesContextProvider>
+      </StreamsContext.Provider>
     </TestStoreProvider>
   );
 

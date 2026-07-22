@@ -19,13 +19,14 @@ import { render, waitFor, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
-import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import StreamsContext from 'contexts/StreamsContext';
+import type { Stream } from 'logic/streams/types';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
@@ -34,17 +35,10 @@ import WidgetContext from '../contexts/WidgetContext';
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useHotkey', () => jest.fn());
 
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore([
-    'getInitialState',
-    () => ({
-      streams: [
-        { title: 'PFLog', id: '5c2e27d6ba33a9681ad62775' },
-        { title: 'DNS Logs', id: '5d2d9649e117dc4df84cf83c' },
-      ],
-    }),
-  ]),
-}));
+const streams = [
+  { title: 'PFLog', id: '5c2e27d6ba33a9681ad62775' },
+  { title: 'DNS Logs', id: '5d2d9649e117dc4df84cf83c' },
+] as Array<Stream>;
 
 jest.mock('moment', () => {
   const mockMoment = jest.requireActual('moment');
@@ -74,11 +68,13 @@ describe('EditWidgetFrame', () => {
     const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) =>
       render(
         <TestStoreProvider>
-          <WidgetContext.Provider value={widget}>
-            <EditWidgetFrame onCancel={() => {}} onSubmit={() => Promise.resolve()} {...props}>
-              Hello World! These are some buttons!
-            </EditWidgetFrame>
-          </WidgetContext.Provider>
+          <StreamsContext.Provider value={streams}>
+            <WidgetContext.Provider value={widget}>
+              <EditWidgetFrame onCancel={() => {}} onSubmit={() => Promise.resolve()} {...props}>
+                Hello World! These are some buttons!
+              </EditWidgetFrame>
+            </WidgetContext.Provider>
+          </StreamsContext.Provider>
         </TestStoreProvider>,
       );
 

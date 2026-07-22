@@ -75,6 +75,8 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public static final String FIELD_PRIORITY = "priority";
     public static final String FIELD_ALERT = "alert";
     public static final String FIELD_CONFIG = "config";
+    public static final String FIELD_TACTICS_TECHNIQUES = "tactics_techniques";
+    public static final int MAX_TACTICS_TECHNIQUES = 64;
     public static final String FIELD_TAGS = "tags";
     public static final int MAX_TAG_LENGTH = 128;
     public static final int MAX_TAGS = 64;
@@ -172,6 +174,10 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
     public abstract String eventSummaryTemplate();
 
+    @Override
+    @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+    public abstract ImmutableList<String> tacticsTechniques();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -209,6 +215,21 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             validation.addError(FIELD_KEY_SPEC, "Event Definition key_spec can only contain fields defined in field_spec.");
         }
 
+        if (tacticsTechniques().size() > MAX_TACTICS_TECHNIQUES) {
+            validation.addError(FIELD_TACTICS_TECHNIQUES, "Event Definition cannot have more than " + MAX_TACTICS_TECHNIQUES + " tactics/techniques.");
+        }
+        if (eventDefinitionConfiguration.isTacticsTechniquesValidationEnabled()) {
+            final List<String> invalidIds = tacticsTechniques().stream()
+                    .filter(id -> !TacticsTechniquesNormalizer.isValid(id))
+                    .toList();
+            if (!invalidIds.isEmpty()) {
+                final String quoted = invalidIds.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(", "));
+                validation.addError(FIELD_TACTICS_TECHNIQUES,
+                        "Invalid tactic/technique ID" + (invalidIds.size() > 1 ? "s" : "") + ": " + quoted
+                                + ". Expected format: TA0000, T0000, or T0000.000.");
+            }
+        }
+
         if (tags().stream().anyMatch(tag -> tag.length() > MAX_TAG_LENGTH)) {
             validation.addError(FIELD_TAGS, "Event Definition tags cannot exceed " + MAX_TAG_LENGTH + " characters.");
         }
@@ -234,6 +255,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
                     .storage(ImmutableList.of())
+                    .tacticsTechniques(ImmutableList.of())
                     .tags(ImmutableSet.of())
                     .state(EventDefinition.State.DISABLED);
         }
@@ -305,12 +327,18 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
         public abstract Builder eventSummaryTemplate(@Nullable String eventSummaryTemplate);
 
+        @JsonProperty(FIELD_TACTICS_TECHNIQUES)
+        public abstract Builder tacticsTechniques(ImmutableList<String> tacticsTechniques);
+
         abstract ImmutableSet<String> tags();
+
+        abstract ImmutableList<String> tacticsTechniques();
 
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
             tags(TagNormalizer.normalize(tags()));
+            tacticsTechniques(TacticsTechniquesNormalizer.normalize(tacticsTechniques()));
             final EventDefinitionDto dto = autoBuild();
             final PersistToStreamsStorageHandler.Config withSystemEventsStream = PersistToStreamsStorageHandler.Config.createWithSystemEventsStream();
             if (dto.storage().stream().anyMatch(withSystemEventsStream::equals)) {
@@ -368,6 +396,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                 .tags(tags())
                 .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
                 .eventSummaryTemplate(ValueReference.ofNullable(eventSummaryTemplate()))
+                .tacticsTechniques(tacticsTechniques())
                 .build();
     }
 

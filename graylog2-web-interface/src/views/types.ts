@@ -68,6 +68,7 @@ import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermission
 import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
+import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -279,6 +280,10 @@ export interface ActionContexts {
   widget: Widget;
   message: Message;
   valuePath: ValuePath;
+  // How to combine the entries of `valuePath` when generating a query clause. Defaults to 'AND'
+  // (combined groupings); 'OR' is used e.g. for a network-graph node queried across all groupings;
+  // 'EDGE' builds the symmetric two-field clause for a network-graph edge.
+  valuePathOperator?: 'AND' | 'OR' | 'EDGE';
   isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
@@ -659,6 +664,10 @@ declare module 'graylog-web-plugin/plugin' {
     fieldTypeValueRenderer?: Array<{
       type: string;
       render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
+    }>;
+    visualizationKeyMappers?: Array<{
+      type: string;
+      useKeyMapper: (keys: Array<string>) => (key: Key) => Key;
     }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;

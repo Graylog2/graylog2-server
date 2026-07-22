@@ -14,10 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Table as BootstrapTable } from 'react-bootstrap';
+import React from 'react';
+import { Table as MantineTable } from '@mantine/core';
 import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
+export const TABLE_ROW_HOVER_TRANSITION = 'background-color 150ms ease-in-out';
+export const TABLE_ROW_PINNED_HOVER_BG_VAR = '--table-row-pinned-hover-bg';
+export const flattenTableBackground = (theme: DefaultTheme, color: string) =>
+  theme.utils.flattenColorStack([theme.colors.global.contentBackground, color]);
 export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
 export const PINNED_CELL_STRIPED_CLASS_NAME = 'table-pinned-cell-striped';
 
@@ -29,149 +34,105 @@ export const getPinnedCellClassName = (isPinned: boolean, isStripedRow: boolean)
   return isStripedRow ? PINNED_CELL_STRIPED_CLASS_NAME : PINNED_CELL_CLASS_NAME;
 };
 
-const variantRowStyles = css(({ theme }) => {
-  const { table } = theme.colors;
-  let styles = '';
+type Props = React.PropsWithChildren<{
+  className?: string;
+  'data-testid'?: string;
+  striped?: boolean;
+  hover?: boolean;
+  condensed?: boolean;
+  bordered?: boolean;
+  responsive?: boolean;
+}>;
 
-  const tableVariant = table.variant as Record<string, string>;
-  const tableVariantHover = table.variantHover as Record<string, string>;
+type StyledProps = {
+  $striped?: boolean;
+  $hover?: boolean;
+  $condensed?: boolean;
+  $bordered?: boolean;
+};
 
-  const variants: Record<string, { background: string; hover: string }> = {
-    active: {
-      background: tableVariant.active,
-      hover: tableVariantHover.active,
-    },
-    success: {
-      background: tableVariant.success,
-      hover: tableVariantHover.success,
-    },
-    info: {
-      background: tableVariant.info,
-      hover: tableVariantHover.info,
-    },
-    warning: {
-      background: tableVariant.warning,
-      hover: tableVariantHover.warning,
-    },
-    danger: {
-      background: tableVariant.danger,
-      hover: tableVariantHover.danger,
-    },
-  };
+const StyledTable = styled(MantineTable)<StyledProps>(
+  ({ theme, $striped, $hover, $condensed, $bordered }) => css`
+    --table-border-color: ${theme.colors.table.row.divider};
+    font-size: inherit;
+    line-height: inherit;
 
-  Object.keys(variants).forEach((variant) => {
-    const { background, hover } = variants[variant];
+    ${$bordered &&
+    css`
+      border: 1px solid ${theme.colors.table.row.divider};
+    `}
 
-    styles += `
-      &.table > thead > tr,
-      &.table > tfoot > tr,
-      &.table > tbody > tr {
-        > td.${variant},
-        > th.${variant},
-        &.${variant} > td,
-        &.${variant} > th {
-          background-color: ${background};
-        }
+    & th,
+    & td {
+      padding: ${$condensed ? '5px' : '8px'};
+      vertical-align: top;
+      border-top: 1px solid ${theme.colors.table.row.divider};
+      ${$bordered &&
+      css`
+        border: 1px solid ${theme.colors.table.row.divider};
+      `}
+    }
+
+    & thead > tr > th {
+      background-color: ${theme.colors.table.head.background};
+      white-space: nowrap;
+      vertical-align: bottom;
+      border-top: none;
+      border-bottom: 1px solid ${theme.colors.table.row.divider};
+    }
+
+    & tbody > tr {
+      background-color: ${theme.colors.global.contentBackground};
+      transition: ${TABLE_ROW_HOVER_TRANSITION};
+    }
+
+    ${$striped &&
+    css`
+      & tbody:only-of-type > tr:nth-of-type(odd) {
+        background-color: ${theme.colors.table.row.backgroundStriped};
       }
 
-      &.table-hover > tbody > tr {
-        > td.${variant}:hover,
-        > th.${variant}:hover,
-        &.${variant}:hover > td,
-        &:hover > .${variant},
-        &.${variant}:hover > th {
-          background-color: ${hover};
-        }
-      }
-    `;
-  });
-
-  return css`
-    ${styles}
-  `;
-});
-
-const tableCss = css(
-  ({ theme }) => css`
-    &.table {
-      > thead > tr,
-      > tbody > tr,
-      > tfoot > tr {
-        > th,
-        > td {
-          border-top-color: ${theme.colors.table.row.divider};
-          border-width: 1px;
-        }
-      }
-
-      > thead > tr > th {
-        background: ${theme.colors.table.head.background};
-        white-space: nowrap;
-        border-bottom-color: ${theme.colors.table.row.divider};
-        border-width: 1px;
-      }
-
-      > tbody > tr {
-        background-color: ${theme.colors.global.contentBackground};
-        transition: background-color 150ms ease-in-out;
-      }
-
-      > tbody + tbody {
-        border-top-color: ${theme.colors.table.row.divider};
-        border-width: 1px;
-      }
-
-      .table {
+      & tbody:not(:only-of-type):nth-of-type(odd) > tr {
         background-color: ${theme.colors.table.row.background};
       }
 
-      > thead > tr > th.${PINNED_CELL_CLASS_NAME} {
-        background-color: ${theme.utils.flattenColorStack([
-          theme.colors.global.contentBackground,
-          theme.colors.table.head.background,
-        ])};
+      & tbody:not(:only-of-type):nth-of-type(even) > tr {
+        background-color: ${theme.colors.table.row.backgroundStriped};
       }
+    `}
 
-      > tbody > tr > .${PINNED_CELL_CLASS_NAME}, > tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
-        background-color: ${theme.utils.flattenColorStack([
-          theme.colors.global.contentBackground,
-          theme.colors.table.row.background,
-        ])};
+    ${$hover &&
+    css`
+      & tbody > tr:hover {
+        background-color: ${theme.colors.table.row.backgroundHover};
+        ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
       }
-    }
+    `}
 
-    &.table-bordered {
-      border-color: ${theme.colors.table.row.divider};
-
-      > thead > tr,
-      > tfoot > tr,
-      > tbody > tr {
-        > td,
-        > th {
-          border-color: ${theme.colors.table.row.divider};
-        }
+    ${$striped &&
+    $hover &&
+    css`
+      & tbody:only-of-type > tr:hover,
+      & tbody:not(:only-of-type) > tr:hover {
+        background-color: ${theme.colors.table.row.backgroundHover};
+        ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
       }
+    `}
+
+    & thead > tr > th.${PINNED_CELL_CLASS_NAME} {
+      background-color: ${flattenTableBackground(theme, theme.colors.table.head.background)};
     }
 
-    &.table-striped > tbody > tr:nth-of-type(odd) {
-      background-color: ${theme.colors.table.row.backgroundStriped};
+    & tbody > tr > .${PINNED_CELL_CLASS_NAME}, & tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
+      background-color: ${flattenTableBackground(theme, theme.colors.table.row.background)};
     }
 
-    &.table > tbody > tr > .${PINNED_CELL_STRIPED_CLASS_NAME} {
-      background-color: ${theme.utils.flattenColorStack([
-        theme.colors.global.contentBackground,
-        theme.colors.table.row.backgroundStriped,
-      ])};
+    & tbody > tr > .${PINNED_CELL_STRIPED_CLASS_NAME} {
+      background-color: ${flattenTableBackground(theme, theme.colors.table.row.backgroundStriped)};
     }
-
-    &.table-hover > tbody > tr:hover {
-      background-color: ${theme.colors.table.row.backgroundHover};
-    }
-
-    ${variantRowStyles}
 
     @media print {
-      &.table > thead > tr > th {
+      & thead > tr > th {
         white-space: break-spaces;
         word-break: break-all;
       }
@@ -179,11 +140,34 @@ const tableCss = css(
   `,
 );
 
-const Table = styled(BootstrapTable)`
-  ${tableCss}
-`;
+const Table = ({
+  children = undefined,
+  className = undefined,
+  'data-testid': dataTestId = undefined,
+  striped = true,
+  hover = true,
+  condensed = undefined,
+  bordered = undefined,
+  responsive = undefined,
+}: Props) => {
+  const table = (
+    <StyledTable
+      className={className}
+      data-testid={dataTestId}
+      $striped={striped}
+      $hover={hover}
+      $condensed={condensed}
+      $bordered={bordered}>
+      {children}
+    </StyledTable>
+  );
+
+  if (responsive) {
+    return <div style={{ overflowX: 'auto' }}>{table}</div>;
+  }
+
+  return table;
+};
 
 /** @component */
 export default Table;
-
-export { tableCss };

@@ -18,6 +18,7 @@ import * as React from 'react';
 import type { Theme as SelectTheme, InputActionMeta, GroupBase, SelectInstance, ActionMeta } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import isEqual from 'lodash/isEqual';
+import { matchSorter } from 'match-sorter';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
@@ -293,6 +294,7 @@ type CustomComponents = {
 type State = {
   customComponents: CustomComponents;
   value: any;
+  inputValue: string;
 };
 
 const getCustomComponents = (
@@ -300,7 +302,7 @@ const getCustomComponents = (
   optionRenderer?: (option: Option) => React.ReactElement,
   valueRenderer?: (option: Option) => React.ReactElement,
   async?: boolean,
-): any => {
+) => {
   const customComponents: { [key: string]: any } = {};
 
   if (inputProps) {
@@ -370,6 +372,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     this.state = {
       customComponents: getCustomComponents(inputProps, optionRenderer, valueRenderer, async),
       value,
+      inputValue: '',
     };
   }
 
@@ -503,9 +506,24 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     });
   };
 
+  _onInputChange = (newValue: string, actionMeta: InputActionMeta) => {
+    this.setState({ inputValue: newValue });
+    const { onInputChange } = this.props;
+    if (onInputChange) onInputChange(newValue, actionMeta);
+  };
+
   render() {
-    const { allowCreate = false, displayKey, components, valueKey, onReactSelectChange, size, theme } = this.props;
-    const { customComponents, value } = this.state;
+    const {
+      allowCreate = false,
+      displayKey,
+      components,
+      valueKey,
+      onReactSelectChange,
+      size,
+      theme,
+      ignoreAccents,
+    } = this.props;
+    const { customComponents, value, inputValue } = this.state;
 
     const formattedValue = this._formatInputValue(value);
 
@@ -521,14 +539,24 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       valueRenderer, // Do not pass down prop
       async,
       total,
-      onInputChange,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onInputChange, // Do not pass down prop — routed through _onInputChange
       loadOptions,
       'aria-label': ariaLabel,
       placeholder,
       styles,
+      options: rawOptions,
       ...rest
     } = this.props;
     const customFilter = this.createCustomFilter();
+
+    const sortedOptions =
+      !async && inputValue
+        ? matchSorter(rawOptions, inputValue, {
+            keys: [displayKey, 'label'],
+            keepDiacritics: !ignoreAccents,
+          })
+        : rawOptions;
 
     const mergedComponents = {
       ..._components,
@@ -542,8 +570,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       total: number;
     } = {
       ...rest,
+      options: sortedOptions,
       onChange: onReactSelectChange || this._onChange,
-      onInputChange,
+      onInputChange: this._onInputChange,
+      inputValue,
       'aria-label': ariaLabel ?? placeholder,
       placeholder,
       async,
@@ -557,7 +587,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
 
         return typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v ?? '');
       },
-      filterOption: customFilter,
+      filterOption: async ? customFilter : null,
       components: mergedComponents,
       menuPortalTarget: document.body,
       isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,

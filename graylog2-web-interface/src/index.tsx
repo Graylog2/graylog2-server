@@ -45,9 +45,11 @@ import CollectorsBindings from 'components/collectors/bindings';
 import PipelinesBindings from 'components/pipelines/bindings';
 import IndicesBindings from 'components/indices/bindings';
 import LookupTablesBindings from 'components/lookup-tables/bindings';
+import SystemOverviewBindings from 'components/system-overview/bindings';
 import AuthenticationBindings from 'components/authentication/bindings';
 import ClusterConfigurationBindings from 'components/cluster-configuration/bindings';
 import ConfigurationBindings from 'components/configurations/bindings';
+import StreamsOverviewBindings from 'components/streams/StreamsOverview/bindings';
 
 import 'theme/theme-styles';
 
@@ -71,9 +73,11 @@ PluginStore.register(new PluginManifest({}, EntityCreatorBindings));
 PluginStore.register(new PluginManifest({}, PipelinesBindings));
 PluginStore.register(new PluginManifest({}, IndicesBindings));
 PluginStore.register(new PluginManifest({}, LookupTablesBindings));
+PluginStore.register(new PluginManifest({}, SystemOverviewBindings));
 PluginStore.register(new PluginManifest({}, AuthenticationBindings));
 PluginStore.register(new PluginManifest({}, ClusterConfigurationBindings));
 PluginStore.register(new PluginManifest({}, ConfigurationBindings));
+PluginStore.register(new PluginManifest({}, StreamsOverviewBindings));
 
 const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);

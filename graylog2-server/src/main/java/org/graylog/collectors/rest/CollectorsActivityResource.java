@@ -19,7 +19,6 @@ package org.graylog.collectors.rest;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -28,55 +27,32 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsPermissions;
-import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
-import org.graylog.collectors.db.CollectorInstanceDTO;
-import org.graylog.collectors.db.FleetDTO;
-import org.graylog.collectors.db.FleetReassignedPayload;
-import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
-import org.graylog.collectors.rest.RecentActivityResponse.ActivityDetails;
-import org.graylog.collectors.rest.RecentActivityResponse.FleetReassignedDetails;
-import org.graylog.collectors.rest.RecentActivityResponse.TargetInfo;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.users.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Tag(name = "Collectors/Activity")
 @Path("/collectors/activity")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@PublicCloudAPI
 public class CollectorsActivityResource extends RestResource {
 
     private static final int RECENT_ACTIVITY_LIMIT = 20;
 
     private final FleetTransactionLogService transactionLogService;
-    private final FleetService fleetService;
-    private final CollectorInstanceService instanceService;
-    private final UserService userService;
+    private final ActivityEntryMapper activityEntryMapper;
 
     @Inject
     public CollectorsActivityResource(FleetTransactionLogService transactionLogService,
-                                      FleetService fleetService,
-                                      CollectorInstanceService instanceService,
-                                      UserService userService) {
+                                      ActivityEntryMapper activityEntryMapper) {
         this.transactionLogService = transactionLogService;
-        this.fleetService = fleetService;
-        this.instanceService = instanceService;
-        this.userService = userService;
+        this.activityEntryMapper = activityEntryMapper;
     }
 
     @GET
@@ -86,137 +62,6 @@ public class CollectorsActivityResource extends RestResource {
     @RequiresPermissions(CollectorsPermissions.ACTIVITIES_READ)
     public RecentActivityResponse recent() {
         final List<TransactionMarker> markers = transactionLogService.getRecentMarkers(RECENT_ACTIVITY_LIMIT);
-        if (markers.isEmpty()) {
-            return new RecentActivityResponse(List.of());
-        }
-
-        // Batch-resolve fleet names
-        final Map<String, String> fleetNames = fleetService.getAllFleets().stream()
-                .collect(Collectors.toMap(FleetDTO::id, FleetDTO::name));
-
-        // Collect all instance UIDs from collector-targeted markers
-        final Set<String> instanceUids = new HashSet<>();
-        for (final var marker : markers) {
-            if (TransactionMarker.TARGET_COLLECTOR.equals(marker.target())) {
-                instanceUids.addAll(marker.targetIds());
-            }
-        }
-
-        // Batch-resolve instance hostnames
-        final Map<String, CollectorInstanceDTO> instances = instanceUids.isEmpty()
-                ? Map.of()
-                : instanceService.findByInstanceUids(instanceUids);
-
-        // Batch-resolve actor display names
-        final Set<String> usernames = markers.stream()
-                .map(TransactionMarker::createdByUser)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        final Map<String, String> userDisplayNames = resolveUserDisplayNames(usernames);
-
-        // Build response entries
-        final List<RecentActivityResponse.ActivityEntry> entries = new ArrayList<>();
-        for (final var marker : markers) {
-            entries.add(toActivityEntry(marker, fleetNames, instances, userDisplayNames));
-        }
-        return new RecentActivityResponse(entries);
-    }
-
-    private RecentActivityResponse.ActivityEntry toActivityEntry(
-            TransactionMarker marker,
-            Map<String, String> fleetNames,
-            Map<String, CollectorInstanceDTO> instances,
-            Map<String, String> userDisplayNames) {
-
-        // Resolve actor
-        final RecentActivityResponse.ActorInfo actor;
-        if (marker.createdByUser() != null) {
-            final String fullName = userDisplayNames.getOrDefault(marker.createdByUser(), marker.createdByUser());
-            actor = new RecentActivityResponse.ActorInfo(marker.createdByUser(), fullName);
-        } else {
-            actor = null;
-        }
-
-        // Resolve targets
-        final List<TargetInfo> targets = new ArrayList<>();
-        for (final var targetId : marker.targetIds()) {
-            final String id;
-            final String name;
-            if (TransactionMarker.TARGET_FLEET.equals(marker.target())) {
-                if (fleetNames.containsKey(targetId)) {
-                    // skip the target if it's a fleet we have no permission to
-                    if (!isPermitted(CollectorsPermissions.FLEET_READ, targetId)) {
-                        continue;
-                    }
-                    id = targetId;
-                    name = fleetNames.get(targetId);
-                } else {
-                    id = null;
-                    name = "[deleted]";
-                }
-            } else {
-                if (instances.containsKey(targetId)) {
-                    // skip the target if the user cannot see the target's fleet
-                    if (!isPermitted(CollectorsPermissions.FLEET_READ, instances.get(targetId).fleetId())) {
-                        continue;
-                    }
-                    id = targetId;
-                    name = resolveInstanceHostname(instances, targetId);
-                } else {
-                    id = null;
-                    name = "[deleted]";
-                }
-            }
-            targets.add(new TargetInfo(id, name, marker.target()));
-        }
-
-        return new RecentActivityResponse.ActivityEntry(
-                marker.seq(),
-                marker.createdAt(),
-                marker.type().name(),
-                actor,
-                targets,
-                resolveDetails(marker, fleetNames));
-    }
-
-    private String resolveInstanceHostname(Map<String, CollectorInstanceDTO> instances, String instanceUid) {
-        final var instance = instances.get(instanceUid);
-        if (instance != null && instance.nonIdentifyingAttributes().isPresent()) {
-            return instance.nonIdentifyingAttributes().get().stream()
-                    .filter(attr -> "host.name".equals(attr.key()))
-                    .map(attr -> attr.value().toString())
-                    .findFirst()
-                    .orElse(instanceUid);
-        }
-        return instanceUid;
-    }
-
-    @Nullable
-    private ActivityDetails resolveDetails(TransactionMarker marker, Map<String, String> fleetNames) {
-        if (marker.type() == MarkerType.FLEET_REASSIGNED
-                && marker.payload() instanceof FleetReassignedPayload(String newFleetId)) {
-            if (fleetNames.containsKey(newFleetId)) {
-                if (isPermitted(CollectorsPermissions.FLEET_READ, newFleetId)) {
-                    return new FleetReassignedDetails(
-                            new TargetInfo(newFleetId, fleetNames.get(newFleetId), TransactionMarker.TARGET_FLEET));
-                }
-                return null;
-            }
-            return new FleetReassignedDetails(
-                    new TargetInfo(null, "[deleted]", TransactionMarker.TARGET_FLEET));
-        }
-        return null;
-    }
-
-    private Map<String, String> resolveUserDisplayNames(Set<String> usernames) {
-        final Map<String, String> result = new HashMap<>();
-        for (final var username : usernames) {
-            final var fullName = Optional.ofNullable(userService.load(username))
-                    .or(() -> Optional.ofNullable(userService.loadById(username)))
-                    .map(user -> isPermitted(RestPermissions.USERS_READ, user.getId()) ? user.getFullName() : "Unknown")
-                    .orElse(username);
-            result.put(username, fullName);
-        }
-        return result;
+        return new RecentActivityResponse(activityEntryMapper.toEntries(markers, this::isPermitted));
     }
 }

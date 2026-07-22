@@ -65,7 +65,6 @@ import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.NoopReceiverConfig;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CoalescedActions;
-import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
@@ -83,7 +82,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
@@ -215,47 +213,99 @@ public class OpAmpService {
         };
     }
 
+    /**
+     * Handles an OpAMP enrollment request.
+     * <p>
+     * If no record exists for the instance UID, signs the CSR and inserts a new record; the token
+     * usage counter is incremented.
+     * <p>
+     * If a record already exists, performs a proof-of-possession check: the CSR's public key must
+     * match the public key in the stored active certificate. On mismatch, the request is rejected
+     * without changing any state. On match, the CSR is signed and the existing record is re-issued
+     * via {@link CollectorInstanceService#reEnroll}. The token usage counter is incremented only
+     * when the incoming token id differs from the stored token id, suppressing double-counts on
+     * phantom-write retries by the same token; in that case only the token's {@code last_used_at}
+     * timestamp is updated.
+     * <p>
+     * Re-enrollment is the intended recovery path for a collector that lost its certificate but
+     * retained its private key — including the phantom-write scenario that motivated this design.
+     *
+     * @param message the enrollment AgentToServer message
+     * @param auth    the enrollment-token-authenticated context
+     * @return the ServerToAgent response carrying the issued certificate or an error
+     */
     @WithSpan
     private ServerToAgent handleEnrollment(AgentToServer message, OpAmpAuthContext.Enrollment auth) {
         final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
 
-        // 1. Reject if already enrolled
-        if (collectorInstanceService.existsByInstanceUid(instanceUid)) {
-            LOG.warn("Rejecting enrollment: collector {} already enrolled", instanceUid);
-            return ServerToAgent.newBuilder().setInstanceUid(message.getInstanceUid()).setErrorResponse(ServerErrorResponse.newBuilder().setErrorMessage("Collector already enrolled")).build();
-        }
-
-        // 2. Extract CSR
-        final var csrBytes = getCsr(message);
-        if (csrBytes.isEmpty()) {
-            return errorResponse(message, "Missing CSR in enrollment request");
-        }
-
         try {
             final var collectorConfig = collectorsConfigService.getOrDefault();
 
-            // 3. Sign CSR with OpAMP CA
+            final var csrPem = getCsr(message);
+            if (csrPem.isEmpty()) {
+                return errorResponse(message, "Missing CSR in enrollment request");
+            }
+
+            // CSR parsing also includes verification. If parsing succeeds, the collector has proven that it possesses
+            // the private key for the contained public key.
+            final var csr = PemUtils.parseCsr(csrPem.get());
+
+            // Check if we need to prohibit re-enrollment. We only allow re-enrollment for collectors when their
+            // keypair has not changed.
+            final var existingInstance = collectorInstanceService.findByInstanceUid(instanceUid);
+            if (existingInstance.isPresent()) {
+                final var publicKeyFromExistingCollector = PemUtils.parseCertificate(
+                        existingInstance.get().activeCertificatePem()).getPublicKey();
+                final var publicKeyFromCSR = csr.publicKey();
+                if (!Arrays.equals(publicKeyFromExistingCollector.getEncoded(), publicKeyFromCSR.getEncoded())) {
+                    LOG.warn("Rejecting re-enrollment for collector {}: CSR public key does not match public key in " +
+                            "stored certificate", instanceUid);
+                    return errorResponse(message, "Enrollment rejected.");
+                }
+            }
+
+            // Sign CSR with OpAMP CA
             final CertificateEntry issuerCert = collectorCaService.getSigningCert();
-            final X509Certificate agentCert = certificateService.builder().signCsr(csrBytes.get().toByteArray(), issuerCert, instanceUid, collectorConfig.collectorCertLifetime());
+            final X509Certificate agentCert = certificateService.builder().signCsr(csr, issuerCert, instanceUid,
+                    collectorConfig.collectorCertLifetime());
+            final var issuedCert = IssuedCertificate.of(agentCert, issuerCert);
 
-            // 4. Save agent record
-            final String fingerprint = PemUtils.computeFingerprint(agentCert);
-            final String certPem = PemUtils.toPem(agentCert);
+            // (Re-)enroll
+            existingInstance.ifPresentOrElse(instance -> {
+                if (!instance.fleetId().equals(auth.token().fleetId())) {
+                    LOG.warn("Ignoring fleet {} from enrollment token for re-enrollment of existing collector {}. " +
+                                    "Current assignment to fleet {} will be kept.", auth.token().fleetId(),
+                            instance.instanceUid(), instance.fleetId());
+                }
+                final var enrolled = collectorInstanceService.reEnroll(instance.id(),
+                        instance.activeCertificateFingerprint(), issuedCert, auth.token().id());
+                LOG.info("Re-enrolled existing collector {}. Current fleet: {}", enrolled.instanceUid(),
+                        enrolled.fleetId());
+                // Don't count token usage for consecutive enrollments of the same collector, but
+                // still bump last_used_at so the token doesn't look dormant while a collector
+                // depends on it for recovery.
+                if (!Objects.equals(auth.token().id(), instance.enrollmentTokenId())) {
+                    enrollmentTokenService.incrementUsage(auth.token().id());
+                } else {
+                    enrollmentTokenService.markUsed(auth.token().id());
+                }
+            }, () -> {
+                final var enrolled = collectorInstanceService.enroll(instanceUid, auth.token().fleetId(), issuedCert,
+                        auth.token().id());
+                LOG.info("Enrolled collector {}. Assigned fleet: {}", enrolled.instanceUid(), enrolled.fleetId());
+                enrollmentTokenService.incrementUsage(auth.token().id());
+            });
 
-            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.token().fleetId(), fingerprint, certPem, agentCert.getNotAfter(), issuerCert.id(), Instant.now(), auth.token().id());
-            LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
-            enrollmentTokenService.incrementUsage(auth.token().id());
-
-            // 5. Return certificate and connection settings
+            // Return certificate and connection settings
             final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder();
-            setOpampConnectionSettings(connectionSettingsBuilder, certPem, collectorConfig.collectorHeartbeatInterval());
+            setOpampConnectionSettings(connectionSettingsBuilder, issuedCert.certPem(), collectorConfig.collectorHeartbeatInterval());
 
             return serverToAgentBuilder(message)
                     .setConnectionSettings(connectionSettingsBuilder)
                     .build();
         } catch (Exception e) {
             LOG.error("Enrollment failed for collector {}", instanceUid, e);
-            return errorResponse(message, "Enrollment failed: " + e.getMessage());
+            return errorResponse(message, "Enrollment failed");
         }
     }
 
@@ -266,24 +316,32 @@ public class OpAmpService {
     }
 
     /**
-     * Get the CSR byte value from the message. Returns an empty optional if the message doesn't contain a CSR,
-     * or the CSR is empty.
+     * Extracts the PEM-encoded CSR from the OpAMP message.
+     * <p>
+     * The OpAMP protobuf carries the CSR as opaque {@code bytes}; Graylog's collectors transmit it
+     * as PEM, and this method returns the UTF-8 decoded string for downstream parsing by
+     * {@link PemUtils#parseCsr(String)}.
      *
-     * @param message the message
-     * @return the CSR bytes or an empty optional
+     * @param message the OpAMP AgentToServer message
+     * @return the PEM-encoded CSR, or empty if the message does not carry a CSR
      */
-    private Optional<ByteString> getCsr(AgentToServer message) {
+    private Optional<String> getCsr(AgentToServer message) {
         if (!message.hasConnectionSettingsRequest()
                 || !message.getConnectionSettingsRequest().hasOpamp()
                 || !message.getConnectionSettingsRequest().getOpamp().hasCertificateRequest()) {
             return Optional.empty();
         }
 
-        final var csrBytes = message.getConnectionSettingsRequest().getOpamp().getCertificateRequest().getCsr();
-        if (csrBytes.isEmpty()) {
+        final var csrPem = message.getConnectionSettingsRequest()
+                .getOpamp()
+                .getCertificateRequest()
+                .getCsr()
+                .toStringUtf8();
+
+        if (csrPem.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(csrBytes);
+        return Optional.of(csrPem);
     }
 
     static void buildConnectionSettings(ServerToAgent.Builder builder, OtlpExporterConfig exporterConfig) {
@@ -555,15 +613,33 @@ public class OpAmpService {
         return responseBuilder.build();
     }
 
+    /**
+     * Handles a certificate renewal request sent by an already-authenticated collector inside the
+     * Identified channel.
+     * <p>
+     * Unlike enrollment, renewal arrives over a mutually-authenticated JWT session: the collector
+     * has already proven it holds its current active key. The new CSR is parsed and signed; the
+     * new cert is stored as the collector's {@code next_certificate_*} alongside the existing
+     * active cert. The collector activates it by authenticating with the new cert on a subsequent
+     * connection.
+     * <p>
+     * Failures are logged but do not tear down the OpAMP session — the collector's existing cert
+     * remains valid and it may retry renewal later.
+     *
+     * @param responseBuilder the outgoing ServerToAgent builder to add the new cert to on success
+     * @param instanceUid     the collector's OpAMP instance UID (for logging / inserting the cert)
+     * @param csrPem          the PEM-encoded renewal CSR
+     * @param configSupplier  memoized access to the collectors config (cert lifetime, heartbeat)
+     */
     private void handleRenewal(ServerToAgent.Builder responseBuilder,
                                String instanceUid,
-                               ByteString csr,
+                               String csrPem,
                                Supplier<CollectorsConfig> configSupplier) {
         LOG.info("Received CSR for certificate renewal from instance: {}", instanceUid);
         try {
             final var config = configSupplier.get();
             final var issuer = collectorCaService.getSigningCert();
-            final var cert = certificateService.builder().signCsr(csr.toByteArray(), issuer, instanceUid, config.collectorCertLifetime());
+            final var cert = certificateService.builder().signCsr(PemUtils.parseCsr(csrPem), issuer, instanceUid, config.collectorCertLifetime());
 
             final var fingerprint = PemUtils.computeFingerprint(cert);
             final var certPem = PemUtils.toPem(cert);

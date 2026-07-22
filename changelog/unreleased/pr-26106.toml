@@ -1,0 +1,4 @@
+type = "f"
+message = "Provide endpoint for deletion of non-Graylog managed outdated indices."
+
+pulls = ["26106"]

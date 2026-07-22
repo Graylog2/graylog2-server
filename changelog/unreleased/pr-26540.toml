@@ -1,0 +1,3 @@
+type = "s"
+message = "Prevent ReDoS in entity suggestion search by quoting user-supplied query so it's treated exactly as a plain-text substring rather than a regular expression"
+pulls = ["26540"]

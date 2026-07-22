@@ -18,10 +18,13 @@ import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
 
-const getEventDefinitionTableElements = (pluggableAttributes?: {
-  attributeNames?: Array<string>;
-  attributes?: Array<Attribute>;
-}) => {
+const getEventDefinitionTableElements = (
+  pluggableAttributes?: {
+    attributeNames?: Array<string>;
+    attributes?: Array<Attribute>;
+  },
+  tacticsTechniquesAttribute?: Attribute,
+) => {
   const defaultLayout = {
     entityTableId: 'event_definitions',
     defaultPageSize: 20,
@@ -35,6 +38,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'status',
       'matched_at',
       'tags',
+      ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
       ...(pluggableAttributes?.attributeNames || []),
     ],
     defaultColumnOrder: [
@@ -45,8 +49,10 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       '_entity_source.source',
       'matched_at',
       'status',
+      'type',
       'scheduling',
       'tags',
+      ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
       ...(pluggableAttributes?.attributeNames || []),
     ],
   };
@@ -58,6 +64,7 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
     { id: 'notifications', title: 'Notifications', sortable: false },
+    ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute] : []),
     ...(pluggableAttributes?.attributes || []),
   ];
 

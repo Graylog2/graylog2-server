@@ -32,3 +32,5 @@ export const ATTRIBUTE_STATUS = {
   show: 'show',
   hide: 'hide',
 } as const;
+
+export const TABLE_LAYOUT_DEFAULT_FILTERS_KEY_SPLITTER = ':';

@@ -22,6 +22,10 @@ import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputStates } from 'hooks/useInputsStates';
 import { TypeCell, NodeCell, ThroughputCell, ExpandedSectionToggleWrapper } from 'components/inputs/InputsOveriew';
 import FailuresCell from 'components/inputs/InputsOveriew/cells/FailuresCell';
+import MessageCountCell from 'components/inputs/InputsOveriew/cells/MessageCountCell';
+import ExtractorCountCell from 'components/inputs/InputsOveriew/cells/ExtractorCountCell';
+import AssociatedStreamsCell from 'components/inputs/InputsOveriew/cells/AssociatedStreamsCell';
+import { METRIC_COLUMN_IDS } from 'components/inputs/InputsOveriew/metricColumns';
 import { InputStateBadge } from 'components/inputs';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
@@ -96,6 +100,18 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
         <ExpandedSectionToggleWrapper id={input.id}>{input.attributes?.port || 'N/A'}</ExpandedSectionToggleWrapper>
       ),
       staticWidth: 'matchHeader',
+    },
+    [METRIC_COLUMN_IDS.messagesPerStream]: {
+      renderCell: (_value: unknown, input: InputSummary) => <MessageCountCell input={input} />,
+      staticWidth: 180,
+    },
+    [METRIC_COLUMN_IDS.extractorCount]: {
+      renderCell: (_value: unknown, input: InputSummary) => <ExtractorCountCell input={input} />,
+      staticWidth: 130,
+    },
+    [METRIC_COLUMN_IDS.associatedStreams]: {
+      renderCell: (_value: unknown, input: InputSummary) => <AssociatedStreamsCell input={input} />,
+      staticWidth: 180,
     },
   },
 });

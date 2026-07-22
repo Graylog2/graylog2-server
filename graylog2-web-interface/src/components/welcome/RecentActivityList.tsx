@@ -88,7 +88,7 @@ const RecentActivityList = () => {
       pageSize={pagination.per_page}
       showPageSizeSelect={false}
       hideFirstAndLastPageLinks>
-      <Table striped>
+      <Table>
         <tbody>
           {recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => (
             <tr key={id}>

@@ -14,100 +14,83 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
+import {
+  COLLECTORS_QUERY_KEY,
+  useCollectorsPaginated,
+  copyCollector,
+  deleteCollector,
+  validateCollector,
+} from 'hooks/useCollectors';
 import { Spinner } from 'components/common';
-import connect from 'stores/connect';
-import withTelemetry from 'logic/telemetry/withTelemetry';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { Collector } from 'components/sidecars/types';
 
 import CollectorList from './CollectorList';
 
-const validateCollector = (collector: Collector) => CollectorsActions.validate(collector);
+const CollectorListContainer = () => {
+  const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-const loadCollectors = () => {
-  CollectorsActions.list({});
-};
+  const { data: collectors } = useCollectorsPaginated({ query, page, pageSize });
 
-type CollectorListContainerProps = {
-  collectors?: any;
-  sendTelemetry?: (...args: any[]) => void;
-};
+  const invalidateCollectors = () => queryClient.invalidateQueries({ queryKey: COLLECTORS_QUERY_KEY });
 
-class CollectorListContainer extends React.Component<
-  CollectorListContainerProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    collectors: undefined,
-    sendTelemetry: () => {},
-  };
-
-  componentDidMount() {
-    loadCollectors();
-  }
-
-  handleClone = (collector: string, name: string, callback: () => void) => {
-    const { sendTelemetry } = this.props;
-
+  const handleClone = (collectorId: string, name: string, callback: () => void) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_CLONED, {
       app_pathname: 'sidecars',
       app_section: 'configuration',
     });
 
-    CollectorsActions.copy(collector, name).then(() => {
+    copyCollector(collectorId, name).then(() => {
+      invalidateCollectors();
       callback();
     });
   };
 
-  handleDelete = async (collector) => {
-    const { sendTelemetry } = this.props;
-
+  const handleDelete = async (collector) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_DELETED, {
       app_pathname: 'sidecars',
       app_section: 'configuration',
     });
 
-    await CollectorsActions.delete(collector);
+    await deleteCollector(collector);
+    invalidateCollectors();
   };
 
-  handlePageChange = (page: number, pageSize: number) => {
-    const { query } = this.props.collectors;
-
-    CollectorsActions.list({ query: query, page: page, pageSize: pageSize });
+  const handlePageChange = (newPage: number, newPageSize: number) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
   };
 
-  handleQueryChange = (query = '', callback = () => {}) => {
-    const { pageSize } = this.props.collectors.pagination;
-
-    CollectorsActions.list({ query: query, pageSize: pageSize }).finally(callback);
+  const handleQueryChange = (newQuery: string = '', callback: () => void = () => {}) => {
+    setQuery(newQuery);
+    setPage(1);
+    callback();
   };
 
-  render() {
-    const { collectors } = this.props;
-
-    if (!collectors || !collectors.paginatedCollectors) {
-      return <Spinner />;
-    }
-
-    return (
-      <CollectorList
-        collectors={collectors.paginatedCollectors}
-        pagination={collectors.pagination}
-        query={collectors.query}
-        total={collectors.total}
-        onPageChange={this.handlePageChange}
-        onQueryChange={this.handleQueryChange}
-        onClone={this.handleClone}
-        onDelete={this.handleDelete}
-        validateCollector={validateCollector}
-      />
-    );
+  if (!collectors || !collectors.paginatedCollectors) {
+    return <Spinner />;
   }
-}
 
-export default withTelemetry(connect(CollectorListContainer, { collectors: CollectorsStore }));
+  return (
+    <CollectorList
+      collectors={collectors.paginatedCollectors}
+      pagination={collectors.pagination}
+      query={collectors.query}
+      total={collectors.total}
+      onPageChange={handlePageChange}
+      onQueryChange={handleQueryChange}
+      onClone={handleClone}
+      onDelete={handleDelete}
+      validateCollector={validateCollector}
+    />
+  );
+};
+
+export default CollectorListContainer;

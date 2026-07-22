@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
-import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -29,9 +28,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
-import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
-import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadService.ActiveCombination;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
@@ -44,8 +40,8 @@ import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -54,25 +50,19 @@ import java.util.concurrent.ExecutorService;
 @Produces(MediaType.APPLICATION_JSON)
 public class ProcessingLoadResource extends ProxiedResource {
 
-    private final PipelineInterpreterStateUpdater stateUpdater;
-    private final RuleMetricsConfigService ruleMetricsConfigService;
+    private final ProcessingLoadBuilder processingLoadBuilder;
     private final ProcessingLoadService processingLoadService;
-    private final NodeTimerSnapshotParser snapshotParser;
 
     @Inject
     public ProcessingLoadResource(NodeService nodeService,
                                   RemoteInterfaceProvider remoteInterfaceProvider,
                                   @Context HttpHeaders httpHeaders,
                                   @Named("proxiedRequestsExecutorService") ExecutorService executorService,
-                                  PipelineInterpreterStateUpdater stateUpdater,
-                                  RuleMetricsConfigService ruleMetricsConfigService,
-                                  ProcessingLoadService processingLoadService,
-                                  NodeTimerSnapshotParser snapshotParser) {
+                                  ProcessingLoadBuilder processingLoadBuilder,
+                                  ProcessingLoadService processingLoadService) {
         super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
-        this.stateUpdater = stateUpdater;
-        this.ruleMetricsConfigService = ruleMetricsConfigService;
+        this.processingLoadBuilder = processingLoadBuilder;
         this.processingLoadService = processingLoadService;
-        this.snapshotParser = snapshotParser;
     }
 
     @GET
@@ -81,43 +71,24 @@ public class ProcessingLoadResource extends ProxiedResource {
                description = "Returns Processing Load % per pipeline-stage-rule, per pipeline, and per rule. " +
                        "Requires debug metrics enable.")
     public ProcessingLoadResponse processingLoad() {
-        if (!ruleMetricsConfigService.get().metricsEnabled()) {
-            return ProcessingLoadResponse.unavailable();
-        }
-
-        final PipelineInterpreter.State state = stateUpdater.getLatestState();
-        final List<ActiveCombination> combinations = processingLoadService.activeCombinations(state);
-
+        final List<ActiveCombination> combinations = processingLoadBuilder.activeCombinations();
         if (combinations.isEmpty()) {
             return ProcessingLoadResponse.unavailable();
         }
-
-        if (!hasAnyVisibleEntity(combinations)) {
+        if (combinations.stream().noneMatch(c -> canReadPipeline(c.pipelineId()) || canReadRule(c.ruleId()))) {
             throw new ForbiddenException("No read permission on any active pipeline or rule.");
         }
 
-        final List<String> expectedTimerNames = processingLoadService.expectedTimerNames(combinations);
-        final Map<String, NodeTimerSnapshot> perNodeSnapshots = fetchNodeSnapshots(expectedTimerNames);
-        final ProcessingLoadResponse full = processingLoadService.compute(combinations, perNodeSnapshots);
+        final ProcessingLoadResponse full = processingLoadBuilder.buildUnfiltered(combinations, this::fetchPerNodeMetrics);
         return processingLoadService.filterByPermissions(full, this::canReadPipeline, this::canReadRule);
     }
 
-    private Map<String, NodeTimerSnapshot> fetchNodeSnapshots(List<String> metricNames) {
-        final MetricsReadRequest request = MetricsReadRequest.create(metricNames);
-        final Map<String, Optional<MetricsSummaryResponse>> perNodeResponses = stripCallResult(
-                requestOnAllNodes(RemoteMetricsResource.class, r -> r.multipleMetrics(request))
-        );
-
-        final Map<String, NodeTimerSnapshot> perNodeSnapshots = Maps.newHashMapWithExpectedSize(perNodeResponses.size());
-        perNodeResponses.forEach((nodeId, response) ->
-                perNodeSnapshots.put(nodeId, response.map(snapshotParser::parse).orElseGet(NodeTimerSnapshot::empty))
-        );
-        return perNodeSnapshots;
-    }
-
-    private boolean hasAnyVisibleEntity(List<ActiveCombination> combinations) {
-        return combinations.stream()
-                .anyMatch(c -> canReadPipeline(c.pipelineId()) || canReadRule(c.ruleId()));
+    private Map<String, MetricsSummaryResponse> fetchPerNodeMetrics(List<String> timerNames) {
+        final MetricsReadRequest request = MetricsReadRequest.create(timerNames);
+        return stripCallResult(requestOnAllNodes(RemoteMetricsResource.class, r -> r.multipleMetrics(request)))
+                .entrySet().stream()
+                .filter(e -> e.getValue().isPresent())
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
     }
 
     private boolean canReadPipeline(String pipelineId) {

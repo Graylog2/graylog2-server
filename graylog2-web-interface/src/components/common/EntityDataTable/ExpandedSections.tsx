@@ -41,20 +41,25 @@ const ContentCell = styled.td`
   }
 `;
 
-const Content = styled.div`
-  position: sticky;
-  left: 0;
-  width: 100%;
-  max-width: var(${scrollContainerWidthVar}, 100%);
-  padding: ${CELL_PADDING}px;
-  background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped};
-`;
+const Content = styled.div(
+  ({ theme }) => css`
+    position: sticky;
+    left: 0;
+    width: 100%;
+    max-width: var(${scrollContainerWidthVar}, 100%);
+    padding: ${CELL_PADDING}px ${CELL_PADDING}px ${theme.spacings.md} ${theme.spacings.lg};
+    background-color: ${theme.colors.table.row.backgroundStriped};
+  `,
+);
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-`;
+const Header = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
 const Actions = styled(ButtonToolbar)`
   display: flex;
@@ -96,7 +101,7 @@ const ExpandedSections = <Entity extends EntityBase>({
                       <h3>{section.title}</h3>
                       <Actions>
                         {actions}
-                        <HideSectionButton name="close" onClick={hideSection} title="Hide section" />
+                        <HideSectionButton name="keyboard_arrow_up" onClick={hideSection} title="Collapse section" />
                       </Actions>
                     </Header>
                   ) : null}

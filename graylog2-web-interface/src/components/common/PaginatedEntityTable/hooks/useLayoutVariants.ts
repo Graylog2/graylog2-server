@@ -37,10 +37,10 @@ type LayoutVariantJSON = {
   }>;
 };
 
-type LayoutVariant = {
+export type LayoutVariant<T = string> = {
   displayName: string;
   entityListId: string;
-  layoutVariant: string;
+  layoutVariant: T;
   metrics?: Array<{
     meaning: string;
     metricName: string;
@@ -49,18 +49,17 @@ type LayoutVariant = {
 };
 
 const fetchLayoutVariants = ({ entityListId, timerange }: Props): Promise<Array<LayoutVariant>> =>
-  EntityLists.listPredefined(entityListId, timerange).then(
-    (response: Array<LayoutVariantJSON>) =>
-      response.map(({ display_name, layout_variant, entity_list_id, metrics }) => ({
-        displayName: display_name,
-        entityListId: entity_list_id,
-        layoutVariant: layout_variant,
-        metrics: metrics?.map(({ value, metric_name, meaning }) => ({
-          metricName: metric_name,
-          meaning,
-          value,
-        })),
+  EntityLists.listPredefined(entityListId, timerange).then((response: Array<LayoutVariantJSON>) =>
+    response.map(({ display_name, layout_variant, entity_list_id, metrics }) => ({
+      displayName: display_name,
+      entityListId: entity_list_id,
+      layoutVariant: layout_variant,
+      metrics: metrics?.map(({ value, metric_name, meaning }) => ({
+        metricName: metric_name,
+        meaning,
+        value,
       })),
+    })),
   );
 
 const useLayoutVariants = (props: Props) => {

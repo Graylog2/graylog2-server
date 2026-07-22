@@ -485,7 +485,7 @@ class CertificateBuilderTest {
 
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
-        final X509Certificate signedCert = builder.signCsr(csrPem, intermediateCa, "test-agent", Duration.ofDays(365));
+        final X509Certificate signedCert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), intermediateCa, "test-agent", Duration.ofDays(365));
 
         final X509Certificate intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
 
@@ -501,7 +501,7 @@ class CertificateBuilderTest {
 
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
-        final X509Certificate cert = builder.signCsr(csrPem, issuer, "my-agent-uid", Duration.ofDays(365));
+        final X509Certificate cert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), issuer, "my-agent-uid", Duration.ofDays(365));
 
         assertThat(cert.getSubjectX500Principal().getName()).contains("CN=my-agent-uid");
         assertThat(cert.getSubjectX500Principal().getName()).contains("O=Graylog");
@@ -515,7 +515,7 @@ class CertificateBuilderTest {
 
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
-        final X509Certificate cert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+        final X509Certificate cert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), issuer, "test-agent", Duration.ofDays(365));
 
         final X509Certificate issuerCert = PemUtils.parseCertificate(issuer.certificate());
         assertThatCode(() -> cert.verify(issuerCert.getPublicKey())).doesNotThrowAnyException();
@@ -528,7 +528,7 @@ class CertificateBuilderTest {
 
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
-        final X509Certificate cert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+        final X509Certificate cert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), issuer, "test-agent", Duration.ofDays(365));
 
         assertThat(cert.getBasicConstraints()).isEqualTo(-1);
     }
@@ -540,7 +540,7 @@ class CertificateBuilderTest {
 
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
-        final X509Certificate cert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+        final X509Certificate cert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), issuer, "test-agent", Duration.ofDays(365));
 
         final boolean[] keyUsage = cert.getKeyUsage();
         assertThat(keyUsage).isNotNull();
@@ -555,7 +555,7 @@ class CertificateBuilderTest {
 
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
-        final X509Certificate cert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+        final X509Certificate cert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), issuer, "test-agent", Duration.ofDays(365));
 
         assertThat(cert.getExtendedKeyUsage()).contains(KeyPurposeId.id_kp_clientAuth.getId());
     }
@@ -570,7 +570,7 @@ class CertificateBuilderTest {
         assertThat(edDsaKeyPair.getPublic().getAlgorithm()).isEqualTo("EdDSA");
 
         final byte[] csrPem = builder.createCsr(edDsaKeyPair, "eddsa-agent");
-        final X509Certificate cert = builder.signCsr(csrPem, issuer, "eddsa-agent", Duration.ofDays(365));
+        final X509Certificate cert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), issuer, "eddsa-agent", Duration.ofDays(365));
 
         assertThat(cert).isNotNull();
         assertThat(cert.getSubjectX500Principal().getName()).contains("CN=eddsa-agent");
@@ -584,7 +584,7 @@ class CertificateBuilderTest {
         final KeyPair rsaKeyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
         final byte[] csrPem = builder.createCsr(rsaKeyPair, "rsa-agent");
 
-        assertThatThrownBy(() -> builder.signCsr(csrPem, issuer, "rsa-agent", Duration.ofDays(365)))
+        assertThatThrownBy(() -> builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), issuer, "rsa-agent", Duration.ofDays(365)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Ed25519");
     }
@@ -598,7 +598,7 @@ class CertificateBuilderTest {
         // Simplest: pass garbage PEM
         final byte[] invalidCsr = "-----BEGIN CERTIFICATE REQUEST-----\ngarbage\n-----END CERTIFICATE REQUEST-----".getBytes(StandardCharsets.UTF_8);
 
-        assertThatThrownBy(() -> builder.signCsr(invalidCsr, issuer, "bad-agent", Duration.ofDays(365)))
+        assertThatThrownBy(() -> builder.signCsr(PemUtils.parseCsr(new String(invalidCsr, StandardCharsets.UTF_8)), issuer, "bad-agent", Duration.ofDays(365)))
                 .isInstanceOf(Exception.class);
     }
 
@@ -614,7 +614,7 @@ class CertificateBuilderTest {
         final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
 
         // Request 365 days, but issuer only has 30 days left
-        final X509Certificate signedCert = builder.signCsr(csrPem, shortLivedIssuer, "test-agent", Duration.ofDays(365));
+        final X509Certificate signedCert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), shortLivedIssuer, "test-agent", Duration.ofDays(365));
 
         final Duration actualValidity = Duration.between(
                 signedCert.getNotBefore().toInstant(),
@@ -631,7 +631,7 @@ class CertificateBuilderTest {
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = builder.createCsr(agentKeyPair, "test-agent");
 
-        final X509Certificate signedCert = builder.signCsr(csrPem, issuer, "test-agent", Duration.ofDays(365));
+        final X509Certificate signedCert = builder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), issuer, "test-agent", Duration.ofDays(365));
 
         final Duration actualValidity = Duration.between(
                 signedCert.getNotBefore().toInstant(),
@@ -653,7 +653,7 @@ class CertificateBuilderTest {
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final byte[] csrPem = futureBuilder.createCsr(agentKeyPair, "test-agent");
 
-        assertThatThrownBy(() -> futureBuilder.signCsr(csrPem, shortLivedIssuer, "test-agent", Duration.ofDays(365)))
+        assertThatThrownBy(() -> futureBuilder.signCsr(PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8)), shortLivedIssuer, "test-agent", Duration.ofDays(365)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("expired");
     }
