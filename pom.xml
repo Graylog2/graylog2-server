@@ -205,8 +205,6 @@
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
         <swagger.version>2.2.52</swagger.version>
-        <!-- Legacy Swagger 1.x annotations. Should match the version used by swagger-parser. -->
-        <swagger-annotations-v1.version>1.6.16</swagger-annotations-v1.version>
         <swagger-parser.version>2.1.45</swagger-parser.version>
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.10.0</threeten-extra.version>
@@ -414,11 +412,6 @@
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-runtime</artifactId>
                 <version>${antlr.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger-annotations-v1.version}</version>
             </dependency>
             <!-- Tracing dependencies. google-cloud-storage pulls in OpenTelemetry
                  artifacts, so the BOM needs to be imported here instead of in
