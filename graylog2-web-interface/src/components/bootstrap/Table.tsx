@@ -56,10 +56,13 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     --table-border-color: ${theme.colors.table.row.divider};
     font-size: inherit;
     line-height: inherit;
+    border-collapse: separate;
+    border-spacing: 0;
 
     ${$bordered &&
     css`
-      border: 1px solid ${theme.colors.table.row.divider};
+      border-top: 1px solid ${theme.colors.table.row.divider};
+      border-left: 1px solid ${theme.colors.table.row.divider};
     `}
 
     & th,
@@ -69,7 +72,9 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       border-top: 1px solid ${theme.colors.table.row.divider};
       ${$bordered &&
       css`
-        border: 1px solid ${theme.colors.table.row.divider};
+        border-top: none;
+        border-right: 1px solid ${theme.colors.table.row.divider};
+        border-bottom: 1px solid ${theme.colors.table.row.divider};
       `}
     }
 
@@ -79,6 +84,10 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       vertical-align: bottom;
       border-top: none;
       border-bottom: 1px solid ${theme.colors.table.row.divider};
+    }
+
+    & thead + tbody > tr:first-child > td {
+      border-top: none;
     }
 
     & tbody > tr {
