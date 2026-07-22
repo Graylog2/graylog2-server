@@ -77,7 +77,7 @@ class CollectorIngestHttpHandlerTest {
     }
 
     @Test
-    void postWithMissingFingerprintReturns500() {
+    void postWithMissingFingerprintReturns500AndClosesConnection() {
         final EmbeddedChannel channel = createChannel(null);
         final ExportLogsServiceRequest request = createTestRequest();
 
@@ -86,12 +86,17 @@ class CollectorIngestHttpHandlerTest {
 
         final FullHttpResponse response = channel.readOutbound();
         assertThat(response.status()).isEqualTo(HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        // The fingerprint attribute is set at the TLS handshake or never — this connection can only ever
+        // produce the same error again, so it must be closed regardless of the client's keep-alive wish.
+        assertThat(response.headers().get(HttpHeaderNames.CONNECTION))
+                .isEqualTo(HttpHeaderValues.CLOSE.toString());
+        assertThat(channel.isActive()).isFalse();
         verifyNoInteractions(input);
         response.release();
     }
 
     @Test
-    void postWithUnboundFingerprintReturns401() {
+    void postWithUnboundFingerprintReturns401AndClosesConnection() {
         final EmbeddedChannel channel = new EmbeddedChannel(new CollectorIngestHttpHandler(input, certBindingResolver));
         channel.attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).set("sha256:unbound");
         when(certBindingResolver.resolve("sha256:unbound")).thenReturn(Optional.empty());
@@ -102,6 +107,12 @@ class CollectorIngestHttpHandlerTest {
 
         final FullHttpResponse response = channel.readOutbound();
         assertThat(response.status()).isEqualTo(HttpResponseStatus.UNAUTHORIZED);
+        // A cut certificate stays cut: closing forces a re-handshake (which will be rejected with the
+        // client's backoff applying) instead of letting the agent hammer eternal 401s over a live
+        // connection.
+        assertThat(response.headers().get(HttpHeaderNames.CONNECTION))
+                .isEqualTo(HttpHeaderValues.CLOSE.toString());
+        assertThat(channel.isActive()).isFalse();
         verifyNoInteractions(input);
         response.release();
     }
