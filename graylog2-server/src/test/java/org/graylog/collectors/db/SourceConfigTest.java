@@ -137,6 +137,8 @@ class SourceConfigTest {
     void macosRoundTripAndReceiverConfig() throws Exception {
         final var original = MacOSUnifiedLoggingSourceConfig.builder()
                 .predicate("subsystem == 'com.apple.securityd'")
+                .maxPollInterval(Duration.ofSeconds(1))
+                .maxLogAge(Duration.ofSeconds(1))
                 .build();
 
         final var json = objectMapper.writeValueAsString(original);
@@ -153,11 +155,14 @@ class SourceConfigTest {
     }
 
     @Test
-    void macosUsesDefaultPredicateWhenUnset() {
-        final var config = MacOSUnifiedLoggingSourceConfig.builder().build();
+    void macosAllowsEmptyPredicate() {
+        final var config = MacOSUnifiedLoggingSourceConfig.builder()
+                .maxPollInterval(Duration.ofSeconds(1))
+                .maxLogAge(Duration.ofSeconds(1))
+                .build();
         final var macReceiver =
                 (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s").orElseThrow();
-        assertThat(macReceiver.predicate()).contains("subsystem");
+        assertThat(macReceiver.predicate()).isNull();
     }
 
     @Test
@@ -176,7 +181,10 @@ class SourceConfigTest {
 
     @Test
     void macosLeavesReceiverDefaultsWhenOptionalFieldsUnset() {
-        final var config = MacOSUnifiedLoggingSourceConfig.builder().build();
+        final var config = MacOSUnifiedLoggingSourceConfig.builder()
+                .maxPollInterval(Duration.ofSeconds(30))
+                .maxLogAge(Duration.ofHours(24))
+                .build();
 
         final var macReceiver =
                 (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s").orElseThrow();
