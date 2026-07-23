@@ -23,9 +23,10 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.NodeInfoCache;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
-import org.graylog2.indexer.indices.ReindexOutdatedIndexJobHandler;
+import org.graylog2.indexer.indices.ReindexOutdatedIndexJob;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
@@ -33,6 +34,7 @@ import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -40,8 +42,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,7 +64,7 @@ class OutdatedIndicesResourceTest {
     OutdatedIndexService outdatedIndexService;
 
     @Mock
-    ReindexOutdatedIndexJobHandler reindexOutdatedIndexJobHandler;
+    SystemJobManager systemJobManager;
 
     @Mock
     AuditEventSender auditEventSender;
@@ -101,8 +101,11 @@ class OutdatedIndicesResourceTest {
     void reindexSucceeds() {
         when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(new OutdatedIndex(".outdated1", "1.3.0", false, false, null)));
         outdatedIndexResource.reindex(".outdated1", true);
-        // Reindex is now started asynchronously via the job handler instead of being run synchronously.
-        verify(reindexOutdatedIndexJobHandler, times(1)).start(eq(".outdated1"), eq(true), anyString());
+        // Reindex is now submitted to the system job scheduler; the job guards concurrency and does the work.
+        final var captor = ArgumentCaptor.forClass(ReindexOutdatedIndexJob.Config.class);
+        verify(systemJobManager, times(1)).submit(captor.capture());
+        assertThat(captor.getValue().index()).isEqualTo(".outdated1");
+        assertThat(captor.getValue().withReplicas()).isTrue();
     }
 
     @Test

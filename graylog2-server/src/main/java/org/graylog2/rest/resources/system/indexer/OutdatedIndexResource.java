@@ -41,7 +41,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
@@ -50,7 +50,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
-import org.graylog2.indexer.indices.ReindexOutdatedIndexJobHandler;
+import org.graylog2.indexer.indices.ReindexOutdatedIndexJob;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
@@ -70,7 +70,6 @@ import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -109,17 +108,17 @@ public class OutdatedIndexResource extends RestResource {
             .build();
 
     private final OutdatedIndexService outdatedIndexService;
-    private final ReindexOutdatedIndexJobHandler reindexOutdatedIndexJobHandler;
+    private final SystemJobManager systemJobManager;
     private final AuditEventSender auditEventSender;
     private final InMemorySearchEngine<OutdatedIndex> outdatedIndexSearchService;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
     public OutdatedIndexResource(OutdatedIndexService outdatedIndexService,
-                                 ReindexOutdatedIndexJobHandler reindexOutdatedIndexJobHandler,
+                                 SystemJobManager systemJobManager,
                                  AuditEventSender auditEventSender) {
         this.outdatedIndexService = outdatedIndexService;
-        this.reindexOutdatedIndexJobHandler = reindexOutdatedIndexJobHandler;
+        this.systemJobManager = systemJobManager;
         this.auditEventSender = auditEventSender;
         final Supplier<List<OutdatedIndex>> cachingSupplier = Suppliers.memoizeWithExpiration(
                 outdatedIndexService::getOutdatedIndices,
@@ -180,14 +179,8 @@ public class OutdatedIndexResource extends RestResource {
                 .filter(i -> i.indexName().equals(index))
                 .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is no system index"));
         final String triggeredBy = String.valueOf(getSubject().getPrincipal());
-        try {
-            final JobTriggerDto trigger = reindexOutdatedIndexJobHandler.start(outdatedIndex.indexName(), withReplication, triggeredBy);
-            return Response.status(Response.Status.CREATED).entity(trigger).build();
-        } catch (IllegalStateException e) {
-            return Response.status(Response.Status.CONFLICT)
-                    .entity(Map.of("error", e.getMessage()))
-                    .build();
-        }
+        systemJobManager.submit(ReindexOutdatedIndexJob.forIndex(outdatedIndex.indexName(), withReplication, triggeredBy));
+        return Response.accepted().build();
     }
 
     @POST
@@ -211,17 +204,10 @@ public class OutdatedIndexResource extends RestResource {
                     .build();
         }
         final String triggeredBy = String.valueOf(getSubject().getPrincipal());
-        final List<JobTriggerDto> triggers = new LinkedList<>();
         for (String indexName : bulkRequest.indices()) {
-            try {
-                triggers.add(reindexOutdatedIndexJobHandler.start(indexName, bulkRequest.withReplication(), triggeredBy));
-            } catch (IllegalStateException e) {
-                return Response.status(Response.Status.CONFLICT)
-                        .entity(Map.of("error", e.getMessage()))
-                        .build();
-            }
+            systemJobManager.submit(ReindexOutdatedIndexJob.forIndex(indexName, bulkRequest.withReplication(), triggeredBy));
         }
-        return Response.status(Response.Status.CREATED).entity(triggers).build();
+        return Response.accepted().build();
     }
 
     @DELETE

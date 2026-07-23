@@ -21,11 +21,10 @@ import org.graylog2.plugin.PluginModule;
 public class OutdatedIndexModule extends PluginModule {
     @Override
     protected void configure() {
-        addSchedulerJob(
+        addSystemSchedulerJob(
                 ReindexOutdatedIndexJob.TYPE_NAME,
                 ReindexOutdatedIndexJob.class,
                 ReindexOutdatedIndexJob.Factory.class,
-                ReindexOutdatedIndexJob.Config.class,
-                ReindexOutdatedIndexJob.Data.class);
+                ReindexOutdatedIndexJob.Config.class);
     }
 }
