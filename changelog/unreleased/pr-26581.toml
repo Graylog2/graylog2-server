@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fix content pack installation failing with \"Missing Stream for widget entity\" when a view references a stream that cannot be resolved. The unresolvable stream reference is now skipped with a warning instead of aborting the whole installation."
+message = "Fix content pack installation failing when it references a stream that cannot be resolved on the target system (for example \"Missing Stream for widget entity\" or \"Stream with title <...> does not exist\"). Such unresolvable stream references are now skipped with a warning instead of aborting the whole installation."
 
 issues = ["Graylog2/graylog-plugin-enterprise#12987"]
 pulls = ["26581"]

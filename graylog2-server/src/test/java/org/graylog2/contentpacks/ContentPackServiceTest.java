@@ -68,6 +68,7 @@ import org.graylog2.contentpacks.facades.InputFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.SearchFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
+import org.graylog2.contentpacks.facades.StreamReferenceFacade;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
@@ -82,6 +83,7 @@ import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
@@ -230,6 +232,7 @@ public class ContentPackServiceTest {
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
+                ModelTypes.STREAM_REF_V1, new StreamReferenceFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService),
@@ -381,6 +384,41 @@ public class ContentPackServiceTest {
 
         when(configuration.isCloud()).thenReturn(true);
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
+        assertThat(captor.getValue().entities()).isEmpty();
+    }
+
+    @Test
+    @WithAuthorization(permissions = {RestPermissions.STREAMS_CREATE})
+    public void installContentPackSkipsUnresolvableStreamReference() throws Exception {
+        // A stream_title reference to a stream that does not exist on the target system must be skipped (with a
+        // warning) rather than aborting the whole content pack installation.
+        final EntityV1 streamReference = EntityV1.builder()
+                .id(ModelId.of("stream-ref-cp-id"))
+                .type(ModelTypes.STREAM_REF_V1)
+                .data(objectMapper.convertValue(StreamReferenceEntity.create(ValueReference.of("Missing Stream")), JsonNode.class))
+                .build();
+        final ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(ImmutableSet.of(streamReference))
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        when(streamService.loadAllByTitle("Missing Stream")).thenReturn(Collections.emptyList());
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
+
+        final ArgumentCaptor<ContentPackInstallation> captor = ArgumentCaptor.forClass(ContentPackInstallation.class);
+        when(contentPackInstallService.insert(captor.capture())).thenReturn(null);
+
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
+
         assertThat(captor.getValue().entities()).isEmpty();
     }
 

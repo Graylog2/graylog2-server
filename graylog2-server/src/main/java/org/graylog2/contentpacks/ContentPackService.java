@@ -42,6 +42,7 @@ import org.graylog2.contentpacks.exceptions.FailedConstraintsException;
 import org.graylog2.contentpacks.exceptions.InvalidParameterTypeException;
 import org.graylog2.contentpacks.exceptions.InvalidParametersException;
 import org.graylog2.contentpacks.exceptions.MissingParametersException;
+import org.graylog2.contentpacks.exceptions.SkippableEntityException;
 import org.graylog2.contentpacks.exceptions.UnexpectedEntitiesException;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
@@ -193,28 +194,34 @@ public class ContentPackService {
                     }
                 }
 
-                final Optional<? extends NativeEntity<?>> existingEntity = facade.findExisting(entity, parameters);
-                if (existingEntity.isPresent()) {
-                    LOG.trace("Found existing entity for {}", entityDescriptor);
-                    final NativeEntity<?> nativeEntity = existingEntity.get();
-                    final NativeEntityDescriptor nativeEntityDescriptor = nativeEntity.descriptor();
-                    /* Found entity on the system or we found a other installation which stated that */
-                    if (contentPackInstallationPersistenceService.countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 0 ||
-                            contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
-                        final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
-                                .foundOnSystem(true)
-                                .build();
-                        allEntityDescriptors.add(serverDescriptor);
+                try {
+                    final Optional<? extends NativeEntity<?>> existingEntity = facade.findExisting(entity, parameters);
+                    if (existingEntity.isPresent()) {
+                        LOG.trace("Found existing entity for {}", entityDescriptor);
+                        final NativeEntity<?> nativeEntity = existingEntity.get();
+                        final NativeEntityDescriptor nativeEntityDescriptor = nativeEntity.descriptor();
+                        /* Found entity on the system or we found a other installation which stated that */
+                        if (contentPackInstallationPersistenceService.countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 0 ||
+                                contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
+                            final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
+                                    .foundOnSystem(true)
+                                    .build();
+                            allEntityDescriptors.add(serverDescriptor);
+                        } else {
+                            allEntityDescriptors.add(nativeEntity.descriptor());
+                        }
+                        allEntities.put(entityDescriptor, nativeEntity.entity());
                     } else {
-                        allEntityDescriptors.add(nativeEntity.descriptor());
+                        LOG.trace("Creating new entity for {}", entityDescriptor);
+                        final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                        allEntityDescriptors.add(createdEntity.descriptor());
+                        createdEntities.put(entityDescriptor, createdEntity.entity());
+                        allEntities.put(entityDescriptor, createdEntity.entity());
                     }
-                    allEntities.put(entityDescriptor, nativeEntity.entity());
-                } else {
-                    LOG.trace("Creating new entity for {}", entityDescriptor);
-                    final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
-                    allEntityDescriptors.add(createdEntity.descriptor());
-                    createdEntities.put(entityDescriptor, createdEntity.entity());
-                    allEntities.put(entityDescriptor, createdEntity.entity());
+                } catch (SkippableEntityException e) {
+                    // An optional reference (e.g. a stream_title pointing at a stream that does not exist here) could
+                    // not be resolved. Skip it and continue rather than aborting and rolling back the whole install.
+                    LOG.debug("Skipping unresolvable entity {} during content pack installation: {}", entityDescriptor, e.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -317,42 +324,48 @@ public class ContentPackService {
                     }
                 }
 
-                final NativeEntityDescriptor oldDescriptor = oldEntityMapping.get(entity.id());
-                if (oldDescriptor != null) {
-                    final Optional<NativeEntity<?>> existingEntity = (Optional) facade.loadNativeEntity(oldDescriptor);
-                    if (existingEntity.isPresent()) {
-                        final NativeEntity nativeEntity = existingEntity.get();
-                        oldEntityObjects.put(entity.id(), nativeEntity.entity());
+                try {
+                    final NativeEntityDescriptor oldDescriptor = oldEntityMapping.get(entity.id());
+                    if (oldDescriptor != null) {
+                        final Optional<NativeEntity<?>> existingEntity = (Optional) facade.loadNativeEntity(oldDescriptor);
+                        if (existingEntity.isPresent()) {
+                            final NativeEntity nativeEntity = existingEntity.get();
+                            oldEntityObjects.put(entity.id(), nativeEntity.entity());
 
-                        if (facade instanceof UpdatableEntityFacade updatableFacade) {
-                            LOG.trace("Updating existing entity for {} (preserving ID {})", entityDescriptor, oldDescriptor.id());
-                            updatableFacade.updateNativeEntity(entity, nativeEntity, validatedParameters, allEntities, userContext.getUser().getName());
-                            allEntityDescriptors.add(nativeEntity.descriptor());
-                            allEntities.put(entityDescriptor, nativeEntity.entity());
+                            if (facade instanceof UpdatableEntityFacade updatableFacade) {
+                                LOG.trace("Updating existing entity for {} (preserving ID {})", entityDescriptor, oldDescriptor.id());
+                                updatableFacade.updateNativeEntity(entity, nativeEntity, validatedParameters, allEntities, userContext.getUser().getName());
+                                allEntityDescriptors.add(nativeEntity.descriptor());
+                                allEntities.put(entityDescriptor, nativeEntity.entity());
+                            } else {
+                                // The facade doesn't support in-place updates, so fall back to
+                                // delete-and-recreate: content stays fresh, but the ID changes.
+                                LOG.debug("Entity type {} does not support in-place update, recreating entity {}",
+                                        entity.type(), entityDescriptor);
+                                facade.delete(nativeEntity.entity());
+                                final NativeEntity<?> recreatedEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                                allEntityDescriptors.add(recreatedEntity.descriptor());
+                                createdEntities.put(entityDescriptor, recreatedEntity.entity());
+                                allEntities.put(entityDescriptor, recreatedEntity.entity());
+                            }
                         } else {
-                            // The facade doesn't support in-place updates, so fall back to
-                            // delete-and-recreate: content stays fresh, but the ID changes.
-                            LOG.debug("Entity type {} does not support in-place update, recreating entity {}",
-                                    entity.type(), entityDescriptor);
-                            facade.delete(nativeEntity.entity());
-                            final NativeEntity<?> recreatedEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
-                            allEntityDescriptors.add(recreatedEntity.descriptor());
-                            createdEntities.put(entityDescriptor, recreatedEntity.entity());
-                            allEntities.put(entityDescriptor, recreatedEntity.entity());
+                            LOG.trace("Old entity {} no longer exists in DB, creating new", entityDescriptor);
+                            final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                            allEntityDescriptors.add(createdEntity.descriptor());
+                            createdEntities.put(entityDescriptor, createdEntity.entity());
+                            allEntities.put(entityDescriptor, createdEntity.entity());
                         }
                     } else {
-                        LOG.trace("Old entity {} no longer exists in DB, creating new", entityDescriptor);
+                        LOG.trace("Creating new entity for {}", entityDescriptor);
                         final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
                         allEntityDescriptors.add(createdEntity.descriptor());
                         createdEntities.put(entityDescriptor, createdEntity.entity());
                         allEntities.put(entityDescriptor, createdEntity.entity());
                     }
-                } else {
-                    LOG.trace("Creating new entity for {}", entityDescriptor);
-                    final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
-                    allEntityDescriptors.add(createdEntity.descriptor());
-                    createdEntities.put(entityDescriptor, createdEntity.entity());
-                    allEntities.put(entityDescriptor, createdEntity.entity());
+                } catch (SkippableEntityException e) {
+                    // An optional reference (e.g. a stream_title pointing at a stream that does not exist here) could
+                    // not be resolved. Skip it and continue rather than aborting and rolling back the whole upgrade.
+                    LOG.debug("Skipping unresolvable entity {} during content pack upgrade: {}", entityDescriptor, e.getMessage());
                 }
             }
         } catch (Exception e) {
