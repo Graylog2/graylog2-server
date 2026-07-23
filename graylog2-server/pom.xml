@@ -159,6 +159,17 @@
             <artifactId>okhttp-jvm</artifactId>
         </dependency>
 
+        <!-- kotlin-stdlib is on the server classpath transitively (e.g. via okhttp). Kotlin's reflection
+             lookup runs on the classloader that loaded kotlin-stdlib, so kotlin-reflect must live on the
+             SAME (server) classpath. The enterprise Agent Workflow plugin bundles kotlin-reflect, but that
+             sits in the isolated plugin classloader where the server-loaded kotlin-stdlib can't see it,
+             causing KotlinReflectionNotSupportedError when Koog reflects over @Tool methods. Version is
+             managed by the kotlin-bom. -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
