@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed OpenSearch metrics datastream creation failures not being retried."
+
+pulls = ["26558"]
