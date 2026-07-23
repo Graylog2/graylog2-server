@@ -39,18 +39,29 @@ public class DynamicTransport implements OpenSearchTransport {
 
     private final AtomicReference<OpenSearchTransport> current;
     private final ScheduledExecutorService scheduler;
+    private final Runnable beforeRequest;
     private final AtomicLong swapGeneration = new AtomicLong(0);
     private volatile long drainedGeneration = 0;
 
     public DynamicTransport(OpenSearchTransport initial, ScheduledExecutorService scheduler) {
+        this(initial, scheduler, () -> {});
+    }
+
+    /**
+     * @param beforeRequest hook run before every request is dispatched. Lets an owner lazily
+     *                      rotate the underlying transport (e.g. to refresh an expiring client
+     *                      certificate). Must be cheap and idempotent, as it runs on the request path.
+     */
+    public DynamicTransport(OpenSearchTransport initial, ScheduledExecutorService scheduler, Runnable beforeRequest) {
         this.current = new AtomicReference<>(initial);
         this.scheduler = scheduler;
+        this.beforeRequest = beforeRequest;
     }
 
     public void swap(OpenSearchTransport newTransport) {
         final OpenSearchTransport old = current.getAndSet(newTransport);
         final long generation = swapGeneration.incrementAndGet();
-        LOG.info("OpenSearch transport swapped due to node list update (generation {}). Draining old transport.", generation);
+        LOG.info("OpenSearch transport swapped (generation {}). Draining old transport.", generation);
         try {
             scheduler.schedule(() -> {
                 drainedGeneration = generation;
@@ -80,6 +91,7 @@ public class DynamicTransport implements OpenSearchTransport {
             RequestT request,
             Endpoint<RequestT, ResponseT, ErrorT> endpoint,
             TransportOptions options) throws IOException {
+        beforeRequest.run();
         try {
             return current.get().performRequest(request, endpoint, options);
         } catch (IOException e) {
@@ -92,6 +104,11 @@ public class DynamicTransport implements OpenSearchTransport {
             RequestT request,
             Endpoint<RequestT, ResponseT, ErrorT> endpoint,
             TransportOptions options) {
+        try {
+            beforeRequest.run();
+        } catch (RuntimeException e) {
+            return CompletableFuture.failedFuture(e);
+        }
         return current.get().performRequestAsync(request, endpoint, options)
                 .exceptionally(t -> {
                     final Throwable cause = unwrapCompletionException(t);

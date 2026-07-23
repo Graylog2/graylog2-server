@@ -30,10 +30,13 @@ import { extractErrorMessage } from 'util/extractErrorMessage';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import useHistory from 'routing/useHistory';
 import UserNotification from 'util/UserNotification';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
   const defaultInterval = useDefaultInterval();
@@ -41,10 +44,14 @@ const CollectorsOnboardingInstancePage = () => {
   // using useEffect to guard that the default is actually there when we call the navigate
   useEffect(() => {
     if (instance && defaultInterval) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
+        app_section: 'collectors-onboarding',
+        app_action_value: 'collector-onboarding-completed',
+      });
       history.push(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
       UserNotification.success('Collector connected successfully! Showing received messages ...');
     }
-  }, [defaultInterval, instance, history]);
+  }, [defaultInterval, instance, history, sendTelemetry]);
 
   const content = () => {
     if (isLoading) return <Spinner />;
