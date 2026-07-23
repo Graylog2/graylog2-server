@@ -126,7 +126,7 @@ There are two things to know about how this applies to your inputs:
     "Use single DynamoDB table for state tracking" input option.  
 
 To let you migrate existing inputs on your own schedule, the input exposes a **Single DynamoDB table state
-tracking** option in its Advanced Options. Enabling it on an existing three-table input starts a one-way migration
+tracking** option. Enabling it on an existing three-table input starts a one-way migration
 that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
 checkpoints are preserved, so ingestion should continue without replay or gaps. 
 
