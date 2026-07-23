@@ -52,7 +52,7 @@ const Actions = styled.div<{ $isEvenRow: boolean }>(
     padding: ${CELL_PADDING}px;
     background-color: ${flattenTableBackground(theme, $isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped)};
     height: 100%;
-    align-items: flex-start;
+    align-items: center;
     transition: ${TABLE_ROW_HOVER_TRANSITION};
 
     tr:hover & {
