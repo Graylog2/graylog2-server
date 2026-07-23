@@ -108,3 +108,33 @@ Definitions rather than from the previous Sigma rules. Every Event Definition wi
 assigned is now included, and coverage reflects how many of them are enabled versus disabled (with no log
 source check that was previously present for Sigma rules). Therefore, a tactic may show a higher or lower
 percentage than it did in 7.1, without any change to the actual installed Event Definitions.
+
+## AWS Kinesis/CloudWatch Input: Single DynamoDB Table State Tracking
+
+In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5. 
+The KCL stores its coordination state in DynamoDB. Previously, this used three tables per input: the lease table, plus separate
+`<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats` tables. The AWS KCL 3.5 introduced a
+single-table format that consolidates all of this into the lease table alone (each item is tagged with an
+`entityType` attribute). This reduces the number of DynamoDB tables and helps you stay under account-level table
+limits.
+
+There are two things to know about how this applies to your inputs:
+
+- **New inputs use the single-table format automatically.** This is the AWS KCL 3.5 default for a newly created
+  consumer. A fresh input uses only the lease table regardless of the option below.
+- **Existing inputs keep their three-table layout** until you deliberately migrate them using the new
+    "Use single DynamoDB table for state tracking" input option.  
+
+To let you migrate existing inputs on your own schedule, the input exposes a **Single DynamoDB table state
+tracking** option in its Advanced Options. Enabling it on an existing three-table input starts a one-way migration
+that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
+checkpoints are preserved, so ingestion should continue without replay or gaps. 
+
+The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
+monitoring the migration until it reaches completion.
+
+For how to monitor the migration, along with the migration steps, required permissions, and how to remove the
+now-unused legacy tables afterward, see AWS's documentation:
+
+- [Single table format for KCL](https://docs.aws.amazon.com/streams/latest/dev/kcl-single-table-format.html)
+- [Migrate from KCL 2.x to KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html)

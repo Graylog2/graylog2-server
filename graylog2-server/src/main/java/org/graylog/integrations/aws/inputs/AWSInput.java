@@ -203,11 +203,7 @@ public class AWSInput extends MessageInput {
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
 
-            request.addField(new BooleanField(
-                    KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING,
-                    "Use single DynamoDB table for state tracking",
-                    true,
-                    "Store all Kinesis Client Library (KCL) state (leases, worker metrics, and coordinator state) in a single DynamoDB table. Enabling this on an existing input starts a one-way migration from the separate legacy tables, which cannot be reverted once complete. See the documentation for migration and cleanup steps."));
+            request.addField(getSingleTableStateTrackingFieldDefinition());
 
             request.addField(getOverrideSourceFieldDefinition());
 
@@ -231,5 +227,13 @@ public class AWSInput extends MessageInput {
                 "",
                 "The ARN of the Kinesis stream.",
                 ConfigurationField.Optional.OPTIONAL);
+    }
+
+    public static BooleanField getSingleTableStateTrackingFieldDefinition() {
+        return new BooleanField(
+                KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING,
+                "Use single DynamoDB table for state tracking",
+                true,
+                "Consolidates Kinesis Client Library (KCL) state into a single DynamoDB table, as supported by the KCL 3.5 update. Enabling this on an existing input starts a one-way migration that cannot be reverted once complete. See the Graylog upgrade notes for details.");
     }
 }

@@ -1,5 +1,9 @@
 type = "a"
-message = "Add option to AWS Kinesis/Cloudwatch input to store all Kinesis Client Library (KCL) state in a single DynamoDB table. Enabling it on an existing input starts a one-way migration from the separate legacy tables."
+message = "The AWS Kinesis/CloudWatch input's Kinesis Client Library (KCL) is moving toward a single DynamoDB table for its coordination state instead of three. A new \"Single DynamoDB table state tracking\" option lets you migrate an existing input to that layout on your own schedule, via a one-way merge into its lease table."
 
-issues=["14774"]
+issues = ["Graylog2/graylog-plugin-enterprise#14774"]
 pulls = ["26672"]
+
+details.user = """
+New AWS Kinesis/CloudWatch inputs already use the single DynamoDB table format. Existing inputs on the older three-table layout can opt into a one-way migration to it. See `UPGRADING.md` for important details on the migration and table cleanup.
+"""
