@@ -220,19 +220,21 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(responseCode = "500", description = "Error while saving content pack")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_CREATE)
-    @JsonView(ContentPackView.HttpView.class)
     public Response createContentPack(
             @Parameter(name = "Request body", description = "Content pack", required = true)
             @NotNull @Valid final ContentPack contentPack) {
         checkPermission(RestPermissions.CONTENT_PACK_CREATE);
         final ContentPack pack = contentPackPersistenceService.filterMissingResourcesAndInsert(contentPack)
-                .orElseThrow(() -> new BadRequestException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!"));
+                .orElseThrow(() -> new BadRequestException("Content pack " + contentPack.name()
+                        + " with id " + contentPack.id() + " and revision " + contentPack.revision() + " already exists."));
 
         final URI packUri = getUriBuilderToSelf().path(ContentPackResource.class)
                 .path("{contentPackId}")
                 .build(pack.id());
 
-        return Response.created(packUri).build();
+        return Response.created(packUri)
+                .entity(new ContentPackCreateResponse(pack.id(), pack.revision(), pack.name()))
+                .build();
     }
 
     @DELETE
@@ -398,4 +400,9 @@ public class ContentPackResource extends RestResource {
     public record ContentPackUninstallResponse(
             @JsonProperty("content_pack") ContentPack contentPack,
             @JsonProperty("uninstalled") ContentPackUninstallation uninstalled) {}
+
+    public record ContentPackCreateResponse(
+            @JsonProperty("id") ModelId id,
+            @JsonProperty("rev") int rev,
+            @JsonProperty("name") String name) {}
 }

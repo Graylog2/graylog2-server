@@ -15,14 +15,85 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
+import { createContentPack } from 'hooks/useContentPackMutations';
+import UserNotification from 'util/UserNotification';
+import useHistory from 'routing/useHistory';
+import mockHistory from 'helpers/mocking/mockHistory';
+import asMock from 'helpers/mocking/AsMock';
+import Routes from 'routing/Routes';
+
+jest.mock('hooks/useContentPackMutations', () => ({
+  createContentPack: jest.fn(),
+}));
+
+jest.mock('util/UserNotification', () => ({
+  success: jest.fn(),
+  error: jest.fn(),
+}));
+
+jest.mock('routing/useHistory');
+
+const uploadFile = async (contents: string) => {
+  const file = new File([contents], 'content-pack.json', { type: 'application/json' });
+
+  await userEvent.click(await screen.findByRole('button', { name: /upload/i }));
+
+  const fileInput = await screen.findByLabelText(/choose file/i);
+  await userEvent.upload(fileInput, file);
+
+  // The trigger and the modal submit button share the "Upload" label — submit the last one (the modal button).
+  const uploadButtons = screen.getAllByRole('button', { name: /^upload$/i });
+  await userEvent.click(uploadButtons[uploadButtons.length - 1]);
+};
 
 describe('<ContentPackUploadControls />', () => {
+  const history = mockHistory();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    asMock(useHistory).mockReturnValue(history);
+  });
+
   it('should render', async () => {
     render(<ContentPackUploadControls />);
 
     await screen.findByRole('button', { name: /upload/i });
+  });
+
+  it('shows a success notification including the pack name and redirects to its details page', async () => {
+    asMock(createContentPack).mockResolvedValue({ id: 'pack-id-1', rev: 1, name: 'My Content Pack' });
+    render(<ContentPackUploadControls />);
+
+    await uploadFile('{ "v": 1 }');
+
+    await waitFor(() =>
+      expect(UserNotification.success).toHaveBeenCalledWith(
+        'Content pack "My Content Pack" imported successfully',
+        'Success!',
+      ),
+    );
+
+    expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.CONTENTPACKS.show('pack-id-1'));
+  });
+
+  it('appends the server error detail as plain text when the upload fails', async () => {
+    asMock(createContentPack).mockRejectedValue({
+      additional: { body: { message: 'A content pack named "My Content Pack" with revision 1 already exists.' } },
+    });
+    render(<ContentPackUploadControls />);
+
+    await uploadFile('{ "v": 1 }');
+
+    await waitFor(() => expect(UserNotification.error).toHaveBeenCalled());
+
+    const [message, title] = asMock(UserNotification.error).mock.calls[0];
+    expect(message).toContain('A content pack named "My Content Pack" with revision 1 already exists.');
+    expect(message).not.toContain('<');
+    expect(title).toBe('Could not import content pack');
+    expect(history.push).not.toHaveBeenCalled();
   });
 });
