@@ -15,16 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
+import { OrderedMap } from 'immutable';
 
 import { Collectors } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
+import type { SearchParams } from 'stores/PaginationTypes';
 
-import { useInstance } from './useInstanceQueries';
+import { fetchPaginatedInstances, useInstance } from './useInstanceQueries';
 
 jest.mock('@graylog/server-api', () => ({
   Collectors: {
     getInstance: jest.fn(),
+    findInstances: jest.fn(),
   },
 }));
 
@@ -87,5 +90,49 @@ describe('useInstance', () => {
     renderHook(() => useInstance(undefined));
 
     expect(Collectors.getInstance).not.toHaveBeenCalled();
+  });
+});
+
+describe('fetchPaginatedInstances session extension', () => {
+  const searchParams = (page: number): SearchParams => ({
+    page,
+    pageSize: 50,
+    query: '',
+    sort: { attributeId: 'last_seen', direction: 'desc' },
+    filters: OrderedMap(),
+  });
+
+  const lastRequestOptions = () => asMock(Collectors.findInstances).mock.calls.at(-1)?.at(-1);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    asMock(Collectors.findInstances).mockResolvedValue({
+      elements: [],
+      pagination: { total: 0, page: 1, per_page: 50, count: 0 },
+      attributes: [],
+    } as unknown as Awaited<ReturnType<typeof Collectors.findInstances>>);
+  });
+
+  it('extends the session for user interactions but not for background refreshes', async () => {
+    // Initial load: user navigated to the table.
+    await fetchPaginatedInstances(searchParams(1));
+    expect(lastRequestOptions()).toEqual({ requestShouldExtendSession: true });
+
+    // Interval refresh: same params as before.
+    await fetchPaginatedInstances(searchParams(1));
+    expect(lastRequestOptions()).toEqual({ requestShouldExtendSession: false });
+
+    // User pages to page 2.
+    await fetchPaginatedInstances(searchParams(2));
+    expect(lastRequestOptions()).toEqual({ requestShouldExtendSession: true });
+
+    // Interval refresh of page 2.
+    await fetchPaginatedInstances(searchParams(2));
+    expect(lastRequestOptions()).toEqual({ requestShouldExtendSession: false });
+
+    // User pages back to page 1 — a repeat of earlier params still counts as an interaction,
+    // only consecutive repeats are background refreshes.
+    await fetchPaginatedInstances(searchParams(1));
+    expect(lastRequestOptions()).toEqual({ requestShouldExtendSession: true });
   });
 });

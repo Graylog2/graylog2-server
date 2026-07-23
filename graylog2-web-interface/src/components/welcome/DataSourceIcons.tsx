@@ -17,7 +17,9 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { BrandIcon, Card, Icon } from 'components/common';
+import { BrandIcon, Icon } from 'components/common';
+
+import IconCard from './IconCard';
 
 type DataSource =
   | { type: 'brand'; name: 'google' | 'aws' | 'microsoft' | 'paloalto'; label: string }
@@ -40,31 +42,6 @@ const Sources = styled.div(
   `,
 );
 
-const SourceCard = styled(Card)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const IconContainer = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-
-  /* BrandIcon has its own 20x20 container — scale it to match */
-  > div {
-    width: 24px;
-    height: 24px;
-
-    svg {
-      width: 24px;
-      height: 24px;
-    }
-  }
-`;
-
 const MaterialIcon = styled(Icon)`
   && {
     font-size: 24px;
@@ -73,7 +50,7 @@ const MaterialIcon = styled(Icon)`
 
 const AndMore = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -84,9 +61,7 @@ const renderIcon = (source: DataSource) =>
 const DataSourceIcons = () => (
   <Sources>
     {DATA_SOURCES.map((source) => (
-      <SourceCard key={source.label} padding="sm">
-        <IconContainer title={source.label}>{renderIcon(source)}</IconContainer>
-      </SourceCard>
+      <IconCard key={source.label} title={source.label}>{renderIcon(source)}</IconCard>
     ))}
     <AndMore>And more</AndMore>
   </Sources>

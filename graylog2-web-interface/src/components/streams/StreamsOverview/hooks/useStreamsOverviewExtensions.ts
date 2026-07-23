@@ -24,6 +24,11 @@ import type { ExtensionMetricFields } from 'components/streams/StreamsOverview/m
 const entityName = 'stream';
 const streamOverviewTableElementsExport = 'components.streams.overview.tableElements';
 
+export type ExtensionColumnGroups = {
+  routing: Array<string>;
+  performance: Array<string>;
+};
+
 const useStreamsOverviewExtensions = (): {
   columnRenderers: ColumnRenderersByAttribute<Stream>;
   attributes: {
@@ -31,6 +36,7 @@ const useStreamsOverviewExtensions = (): {
     defaultDisplayedAttributeNames: Array<string>;
     attributes: Array<Attribute>;
   };
+  columnGroups: ExtensionColumnGroups;
   expandedSections: { [sectionName: string]: ExpandedSectionRenderer<Stream> };
   metricFields: ExtensionMetricFields;
 } => {
@@ -53,6 +59,20 @@ const useStreamsOverviewExtensions = (): {
       defaultDisplayedAttributeNames: pluginTableElements.map(({ attributeName }) => attributeName),
       attributes: [...pluginTableElements.flatMap(({ attributes }) => attributes), ...pluggableAttributes.attributes],
     },
+    columnGroups: pluginTableElements.reduce<ExtensionColumnGroups>(
+      (acc, curr) => {
+        const group: 'routing' | 'performance' | undefined = curr.group;
+
+        if (group !== 'routing' && group !== 'performance') {
+          return acc;
+        }
+
+        const ids = (curr.attributes ?? []).map(({ id }: { id: string }) => id);
+
+        return { ...acc, [group]: [...acc[group], ...ids] };
+      },
+      { routing: [], performance: [] },
+    ),
     expandedSections: pluggableExpandedSections,
     // Optional per-plugin map of column id → backend metric fields. Lets enterprise plug
     // columns like `failure_count` into the open-source `/streams/metrics` request.

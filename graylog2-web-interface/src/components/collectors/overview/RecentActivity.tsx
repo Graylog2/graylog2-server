@@ -17,13 +17,10 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Icon, Link, RelativeTime, Spinner, NoEntitiesExist } from 'components/common';
-import type { IconName } from 'components/common/Icon/types';
-import Routes from 'routing/Routes';
-import { naturalSortIgnoreCase } from 'util/SortUtils';
+import { Spinner, NoEntitiesExist } from 'components/common';
 
+import ActivityEntryList from '../common/ActivityEntryList';
 import { useRecentActivity } from '../hooks';
-import type { ActivityEntry, TargetInfo } from '../types';
 
 const SectionTitle = styled.h3(
   ({ theme }) => css`
@@ -42,121 +39,6 @@ const SectionHeader = styled.div(
   `,
 );
 
-const ActivityList = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`;
-
-const ActivityRow = styled.li(
-  ({ theme }) => css`
-    display: flex;
-    align-items: baseline;
-    gap: ${theme.spacings.sm};
-    padding: ${theme.spacings.xs} 0;
-    border-bottom: 1px solid ${theme.colors.gray[90]};
-
-    &:last-child {
-      border-bottom: none;
-    }
-  `,
-);
-
-const Description = styled.span`
-  flex: 1;
-`;
-
-const MutedText = styled.span(
-  ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
-    white-space: nowrap;
-  `,
-);
-
-const ICON_MAP: Record<ActivityEntry['type'], IconName> = {
-  CONFIG_CHANGED: 'settings',
-  INGEST_CONFIG_CHANGED: 'settings',
-  RESTART: 'refresh',
-  DISCOVERY_RUN: 'search',
-  FLEET_REASSIGNED: 'shuffle',
-};
-
-const targetLink = (target: TargetInfo) => {
-  if (!target.id) {
-    return <MutedText>[deleted]</MutedText>;
-  }
-
-  if (target.type === 'fleet') {
-    return <Link to={Routes.SYSTEM.COLLECTORS.FLEET(target.id)}>{target.name}</Link>;
-  }
-
-  return <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>{target.name}</Link>;
-};
-
-const additionalTargetText = (targets: TargetInfo[]) => {
-  if (targets.length <= 1) {
-    return null;
-  }
-  if (targets.length === 2) {
-    return <span> and 1 other {targets[0].type}</span>;
-  }
-
-  return (
-    <span>
-      {' '}
-      and {targets.length - 1} other {targets[0].type}s
-    </span>
-  );
-};
-
-const renderDescription = (entry: ActivityEntry) => {
-  const sortedTargets = entry.targets.toSorted((a, b) => naturalSortIgnoreCase(a.name, b.name));
-  const target = sortedTargets[0];
-
-  if (!target) {
-    return <span>{entry.type}</span>;
-  }
-
-  switch (entry.type) {
-    case 'CONFIG_CHANGED':
-      return (
-        <span>
-          Configuration updated for {target.type} {targetLink(target)}
-          {additionalTargetText(sortedTargets)}
-        </span>
-      );
-    case 'INGEST_CONFIG_CHANGED':
-      return (
-        <span>
-          Ingest configuration updated for {target.type} {targetLink(target)}
-          {additionalTargetText(sortedTargets)}
-        </span>
-      );
-    case 'RESTART':
-      return (
-        <span>
-          Restart requested for {target.type} {targetLink(target)}
-          {additionalTargetText(sortedTargets)}
-        </span>
-      );
-    case 'DISCOVERY_RUN':
-      return (
-        <span>
-          Discovery run triggered for {target.type} {targetLink(target)}
-          {additionalTargetText(sortedTargets)}
-        </span>
-      );
-    case 'FLEET_REASSIGNED': {
-      return (
-        <span>
-          Collector {targetLink(target)} reassigned
-          {entry.details && <> to fleet {targetLink(entry.details.destination_fleet)}</>}
-        </span>
-      );
-    }
-  }
-};
-
 const RecentActivity = () => {
   const { data, isLoading } = useRecentActivity();
 
@@ -172,22 +54,7 @@ const RecentActivity = () => {
         <NoEntitiesExist>No recent activity.</NoEntitiesExist>
       )}
 
-      {!isLoading && data?.activities && data.activities.length > 0 && (
-        <ActivityList>
-          {data.activities.map((entry) => (
-            <ActivityRow key={entry.seq}>
-              <Icon name={ICON_MAP[entry.type] ?? 'info'} />
-              <Description>{renderDescription(entry)}</Description>
-              <MutedText>{entry.actor ? `by ${entry.actor.full_name}` : 'by System'}</MutedText>
-              {entry.timestamp && (
-                <MutedText>
-                  <RelativeTime dateTime={entry.timestamp} />
-                </MutedText>
-              )}
-            </ActivityRow>
-          ))}
-        </ActivityList>
-      )}
+      {!isLoading && data?.activities && data.activities.length > 0 && <ActivityEntryList entries={data.activities} />}
     </div>
   );
 };

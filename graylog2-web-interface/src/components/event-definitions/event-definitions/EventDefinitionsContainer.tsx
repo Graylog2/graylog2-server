@@ -33,6 +33,7 @@ import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell
 import ExpandedNotificationsSection from './ExpandedNotificationsSection';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
+import useEventDefinitionOverviewSections from './useEventDefinitionOverviewSections';
 
 import type { EventDefinition } from '../event-definitions-types';
 import type { TacticsTechniquesColumnPlugin } from '../types';
@@ -144,22 +145,28 @@ const EventDefinitionsContainer = () => {
     }),
     [pluggableExpandedSections],
   );
+  const overviewSections = useEventDefinitionOverviewSections();
 
   return (
-    <PaginatedEntityTable<EventDefinition>
-      humanName="event definitions"
-      additionalAttributes={additionalAttributes}
-      queryHelpComponent={<QueryHelper entityName="event definition" />}
-      tableLayout={defaultLayout}
-      fetchEntities={fetchEventDefinitions}
-      entityActions={renderEventDefinitionActions}
-      keyFn={keyFn}
-      entityAttributesAreCamelCase={false}
-      expandedSectionRenderers={expandedSections}
-      filterValueRenderers={FilterValueRenderers}
-      columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
-      bulkSelection={bulkSelection}
-    />
+    <>
+      {overviewSections.map(({ key, component: Component }) => (
+        <Component key={key} />
+      ))}
+      <PaginatedEntityTable<EventDefinition>
+        humanName="event definitions"
+        additionalAttributes={additionalAttributes}
+        queryHelpComponent={<QueryHelper entityName="event definition" />}
+        tableLayout={defaultLayout}
+        fetchEntities={fetchEventDefinitions}
+        entityActions={renderEventDefinitionActions}
+        keyFn={keyFn}
+        entityAttributesAreCamelCase={false}
+        expandedSectionRenderers={expandedSections}
+        filterValueRenderers={FilterValueRenderers}
+        columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
+        bulkSelection={bulkSelection}
+      />
+    </>
   );
 };
 

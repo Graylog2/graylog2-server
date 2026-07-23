@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 
 import { ClusterInputState } from '@graylog/server-api';
 
+import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -62,7 +62,7 @@ const StartInputStep = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
-  const navigateTo = useNavigate();
+  const { push } = useHistory();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const isIlluminateFlow = wizardData.flow === INPUT_WIZARD_FLOWS.ILLUMINATE;
 
@@ -274,7 +274,7 @@ const StartInputStep = () => {
 
     if (!input) return;
 
-    navigateTo(Routes.SYSTEM.INPUT_DIAGNOSIS(input.id));
+    push(Routes.SYSTEM.INPUT_DIAGNOSIS(input.id));
   };
 
   const handleBackClick = () => {

@@ -17,7 +17,7 @@
 import type { SyntheticEvent } from 'react';
 
 import type { StepsType } from 'components/common/Wizard';
-import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 
 type Provider = {
@@ -68,7 +68,7 @@ export type SearchFilter = {
 export type EventProcessorConfig = {
   type: string;
   query?: string;
-  query_parameters?: LookupTableParameterJson[];
+  query_parameters?: ParameterJson[];
   filters?: SearchFilter[];
   streams?: string[];
   stream_categories?: string[];

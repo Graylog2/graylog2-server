@@ -409,6 +409,34 @@ public class CollectorInstanceService {
         return extractOSType(report.nonIdentifyingAttributes().orElse(List.of()).stream());
     }
 
+    /**
+     * Builds a MongoDB filter selecting the instances that have pending changes, given a
+     * {@link PendingChangesLookup}: an instance matches when its {@code last_processed_txn_seq} is
+     * behind the newest marker sequence for its fleet or for the instance itself, or below the
+     * lookup's {@code highestPurgedSeq} (matching {@link PendingChangesLookup#isPending}). Negate
+     * the result (e.g. {@link Filters#nor}) to select instances that are in sync. When there are no
+     * markers and nothing was ever purged, nothing is pending: the only remaining clause is
+     * {@code last_processed_txn_seq < 0}, which matches no document.
+     */
+    public static Bson hasPendingChangesFilter(PendingChangesLookup pendingChangesLookup) {
+        final List<Bson> clauses = new ArrayList<>();
+
+        pendingChangesLookup.maxByInstanceUid().forEach((uid, maxSeq) ->
+                clauses.add(Filters.and(
+                        Filters.eq(FIELD_INSTANCE_UID, uid),
+                        Filters.lt(FIELD_LAST_PROCESSED_TXN_SEQ, maxSeq))
+                ));
+        pendingChangesLookup.maxByFleetId().forEach((fleetId, maxSeq) ->
+                clauses.add(Filters.and(
+                        Filters.eq(FIELD_FLEET_ID, fleetId),
+                        Filters.lt(FIELD_LAST_PROCESSED_TXN_SEQ, maxSeq))
+                ));
+
+        clauses.add(Filters.lt(FIELD_LAST_PROCESSED_TXN_SEQ, pendingChangesLookup.highestPurgedSeq()));
+
+        return Filters.or(clauses);
+    }
+
     private static CollectorOSType extractOSType(Stream<Attribute> attributes) {
         return attributes.filter(a -> OS_TYPE_KEY.equals(a.key()))
                 .map(Attribute::value)

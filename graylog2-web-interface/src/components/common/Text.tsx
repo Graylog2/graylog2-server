@@ -17,11 +17,16 @@
 import * as React from 'react';
 import type { TextProps } from '@mantine/core';
 import { Text as MantineText } from '@mantine/core';
+import styled from 'styled-components';
 
 type Props = {
   children: string;
 } & TextProps;
 
-const Text = ({ ...props }: Props) => <MantineText {...props} />;
+const StyledMantineText = styled(MantineText)`
+  line-height: 1.25;
+`;
+
+const Text = ({ ...props }: Props) => <StyledMantineText {...props} />;
 
 export default Text;
