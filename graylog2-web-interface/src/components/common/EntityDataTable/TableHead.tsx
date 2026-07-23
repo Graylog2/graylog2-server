@@ -26,7 +26,11 @@ import {
   columnTransition,
   displayScrollRightIndicatorVar,
 } from 'components/common/EntityDataTable/CSSVariables';
-import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import {
+  ACTIONS_COL_ID,
+  CELL_PADDING_VERTICAL,
+  CELL_PADDING_HORIZONTAL,
+} from 'components/common/EntityDataTable/Constants';
 import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
 import type { EntityBase, ColumnMetaContext } from './types';
@@ -48,6 +52,10 @@ export const Th = styled.th<{
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
     transition: var(${columnTransition()}, none);
     height: 100%; // required to be able to use height: 100% in child elements
+    && {
+      padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
+    }
+
     ${$pinningPosition
       ? css`
           position: sticky;
