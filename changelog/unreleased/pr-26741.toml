@@ -1,4 +1,0 @@
-type = "f"
-message = "Fix entity data table resetting manually resized column widths when a column's visibility was toggled."
-
-pulls = ["26741"]
