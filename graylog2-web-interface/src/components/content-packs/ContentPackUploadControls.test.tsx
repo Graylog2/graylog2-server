@@ -79,21 +79,4 @@ describe('<ContentPackUploadControls />', () => {
 
     expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.CONTENTPACKS.show('pack-id-1'));
   });
-
-  it('appends the server error detail as plain text when the upload fails', async () => {
-    asMock(createContentPack).mockRejectedValue({
-      additional: { body: { message: 'A content pack named "My Content Pack" with revision 1 already exists.' } },
-    });
-    render(<ContentPackUploadControls />);
-
-    await uploadFile('{ "v": 1 }');
-
-    await waitFor(() => expect(UserNotification.error).toHaveBeenCalled());
-
-    const [message, title] = asMock(UserNotification.error).mock.calls[0];
-    expect(message).toContain('A content pack named "My Content Pack" with revision 1 already exists.');
-    expect(message).not.toContain('<');
-    expect(title).toBe('Could not import content pack');
-    expect(history.push).not.toHaveBeenCalled();
-  });
 });

@@ -220,6 +220,7 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(responseCode = "500", description = "Error while saving content pack")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_CREATE)
+    @JsonView(ContentPackView.HttpView.class)
     public Response createContentPack(
             @Parameter(name = "Request body", description = "Content pack", required = true)
             @NotNull @Valid final ContentPack contentPack) {
