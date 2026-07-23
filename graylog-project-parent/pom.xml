@@ -62,11 +62,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.github.rholder</groupId>
                 <artifactId>guava-retrying</artifactId>
                 <version>${guava-retrying.version}</version>
@@ -80,11 +75,6 @@
                 <groupId>org.graylog.repackaged</groupId>
                 <artifactId>semver4j</artifactId>
                 <version>${semver4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.ben-manes.caffeine</groupId>
-                <artifactId>caffeine</artifactId>
-                <version>${caffeine.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.cryptomator</groupId>
@@ -133,11 +123,6 @@
                 <version>${hibernate-validator.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
-            </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
@@ -310,11 +295,6 @@
                 <version>${os-platform-finder.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hdrhistogram</groupId>
-                <artifactId>HdrHistogram</artifactId>
-                <version>${HdrHistogram.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
@@ -331,7 +311,7 @@
             </dependency>
             <dependency>
                 <groupId>io.swagger.parser.v3</groupId>
-                <artifactId>swagger-parser</artifactId>
+                <artifactId>swagger-parser-v3</artifactId>
                 <version>${swagger-parser.version}</version>
             </dependency>
             <dependency>
@@ -365,11 +345,6 @@
                 <version>${cef-parser.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-runtime</artifactId>
-                <version>${antlr.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jool</artifactId>
                 <version>${jool.version}</version>
@@ -401,13 +376,6 @@
             </dependency>
 
             <!-- Tracing dependencies -->
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-bom</artifactId>
-                <version>${opentelemetry.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>

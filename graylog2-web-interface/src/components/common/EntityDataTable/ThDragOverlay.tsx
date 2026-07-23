@@ -25,7 +25,7 @@ import Icon from 'components/common/Icon';
 import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING_HORIZONTAL, CELL_PADDING_VERTICAL } from 'components/common/EntityDataTable/Constants';
 import { ThInner, LeftCol } from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
 import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
@@ -34,7 +34,7 @@ const CustomDragOverlay = styled.div<{ $minWidth: number }>(
   ({ theme, $minWidth }) => css`
     background-color: ${theme.colors.global.contentBackground};
     z-index: ${zIndices.dropdownMenu};
-    padding: ${CELL_PADDING}px;
+    padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
     width: ${$minWidth}px;
     min-width: fit-content;
     font-weight: bold;
