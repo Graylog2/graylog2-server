@@ -19,31 +19,43 @@ package org.graylog.collectors.periodical;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.FleetTransactionLogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PurgeExpiredCollectorInstancesPeriodicalTest {
+class CollectorRetentionPeriodicalTest {
+
+    private static final Instant NOW = Instant.parse("2026-07-10T12:00:00Z");
 
     @Mock
     private CollectorInstanceService collectorInstanceService;
     @Mock
     private CollectorsConfigService collectorsConfigService;
+    @Mock
+    private FleetTransactionLogService txnLogService;
 
-    private PurgeExpiredCollectorInstancesPeriodical periodical;
+    private CollectorRetentionPeriodical periodical;
 
     @BeforeEach
     void setUp() {
-        periodical = new PurgeExpiredCollectorInstancesPeriodical(collectorInstanceService, collectorsConfigService);
+        periodical = new CollectorRetentionPeriodical(collectorInstanceService, collectorsConfigService,
+                txnLogService, Clock.fixed(NOW, ZoneOffset.UTC));
     }
 
     @Test
@@ -68,6 +80,30 @@ class PurgeExpiredCollectorInstancesPeriodicalTest {
         periodical.doRun();
 
         verify(collectorInstanceService).deleteExpired(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD);
+    }
+
+    @Test
+    void doRunPurgesTransactionLogWithMarginOverExpiration() {
+        final var config = CollectorsConfig.createDefaultBuilder("host")
+                .collectorExpirationThreshold(Duration.ofDays(3))
+                .build();
+
+        when(collectorsConfigService.getOrDefault()).thenReturn(config);
+
+        periodical.doRun();
+
+        verify(txnLogService).purgeMarkers(NOW.minus(Duration.ofDays(3 + 30)), 100);
+    }
+
+    @Test
+    void doRunPurgesExpiredInstancesBeforeTransactionLog() {
+        when(collectorsConfigService.getOrDefault()).thenReturn(CollectorsConfig.createDefault("localhost"));
+
+        periodical.doRun();
+
+        final var order = inOrder(collectorInstanceService, txnLogService);
+        order.verify(collectorInstanceService).deleteExpired(any());
+        order.verify(txnLogService).purgeMarkers(any(), anyInt());
     }
 
     @Test
