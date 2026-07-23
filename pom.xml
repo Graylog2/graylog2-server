@@ -131,11 +131,13 @@
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.69.0</gcs.version>
         <azure-blob-storage.version>12.35.0</azure-blob-storage.version>
+        <azure-json.version>1.5.1</azure-json.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.1.0</geoip2.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.82.2</grpc.version>
+        <gson.version>2.13.2</gson.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.6.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -153,6 +155,11 @@
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
+        <!-- Should match the version required by hibernate-validator. See the comment on jersey.version below. -->
+        <jboss-logging.version>3.6.3.Final</jboss-logging.version>
+        <!-- Jersey 4.0.2 is built against hibernate-validator 8.x and declares jboss-logging 3.6.1, while
+             hibernate-validator 9.x requires jboss-logging 3.6.3. When bumping Jersey, check if it aligns with
+             hibernate-validator 9.x, so the explicit jboss-logging dependency management can be removed. -->
         <jersey.version>4.0.2</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.14.2</joda-time.version>
@@ -160,8 +167,10 @@
         <json-org.version>20260522</json-org.version>
         <json-path.version>3.0.0</json-path.version>
         <jsoup.version>1.22.2</jsoup.version>
+        <jsr305.version>3.0.2</jsr305.version>
         <kafka.version>4.3.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
+        <jetbrains-annotations.version>26.0.2-1</jetbrains-annotations.version>
         <kotlin.version>2.3.21</kotlin.version>
         <kotlinx-serialization.version>1.11.0</kotlinx-serialization.version>
         <kotlinx-coroutines.version>1.11.0</kotlinx-coroutines.version>
@@ -178,10 +187,13 @@
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.63.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.29.0</opentelemetry-instrumentation.version>
+        <opentelemetry-semconv.version>1.29.0-alpha</opentelemetry-semconv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>4.35.1</protobuf.version>
+        <proto-google-common-protos.version>2.72.0</proto-google-common-protos.version>
+        <reactor.version>3.7.19</reactor.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
@@ -206,6 +218,8 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
+        <!-- mcp-core 2.0.0 pulls in an older reactor-core than azure-core requires. When bumping, check if the
+             explicit reactor-core dependency management can be removed. -->
         <mcp-bom.version>2.0.0</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
@@ -334,6 +348,92 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-storage-blob</artifactId>
                 <version>${azure-blob-storage.version}</version>
+            </dependency>
+            <!-- msal4j pulls in an older azure-json than azure-core requires -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-json</artifactId>
+                <version>${azure-json.version}</version>
+            </dependency>
+            <!-- mcp-core pulls in an older reactor-core than azure-core requires -->
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-core</artifactId>
+                <version>${reactor.version}</version>
+            </dependency>
+            <!-- The guice-bom import pins outdated versions of these annotation
+                 libraries. Override them with the versions required by our other
+                 dependencies. -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>${jsr305.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${error-prone.version}</version>
+            </dependency>
+            <!-- grpc-protobuf pulls in an older proto-google-common-protos than
+                 google-cloud-storage requires -->
+            <dependency>
+                <groupId>com.google.api.grpc</groupId>
+                <artifactId>proto-google-common-protos</artifactId>
+                <version>${proto-google-common-protos.version}</version>
+            </dependency>
+            <!-- Shared libraries that are pulled in transitively at conflicting
+                 versions by different dependencies -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hdrhistogram</groupId>
+                <artifactId>HdrHistogram</artifactId>
+                <version>${HdrHistogram.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-runtime</artifactId>
+                <version>${antlr.version}</version>
+            </dependency>
+            <!-- Tracing dependencies. google-cloud-storage pulls in OpenTelemetry
+                 artifacts, so the BOM needs to be imported here instead of in
+                 graylog-project-parent to also cover the plugin modules. -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${opentelemetry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Not part of the OpenTelemetry BOM -->
+            <dependency>
+                <groupId>io.opentelemetry.semconv</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>${opentelemetry-semconv.version}</version>
+            </dependency>
+            <!-- jersey-bean-validation pulls in an older jboss-logging than hibernate-validator requires -->
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>${jboss-logging.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -471,11 +571,6 @@
                 <version>${okhttp.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-jvm</artifactId><!-- This one is not in the bom as of 5.0.0 -->
-                <version>${okhttp.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jsoup</groupId>
@@ -644,6 +739,13 @@
                 <version>${kotlinx-coroutines.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- kotlin-stdlib pulls in an older org.jetbrains:annotations than
+                 other dependencies (e.g. amazon-kinesis-client) require -->
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>${jetbrains-annotations.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -943,6 +1045,7 @@
                                         <ignore>org.graylog.plugins</ignore>
                                     </ignores>
                                 </banDynamicVersions>
+                                <requireUpperBoundDeps/>
                                 <RestrictImports>
                                     <groups>
                                         <group>
