@@ -370,6 +370,44 @@ describe('<EntityDataTable />', () => {
     });
   });
 
+  it('should preserve custom column widths when toggling column visibility', async () => {
+    const onLayoutPreferencesChange = jest.fn();
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        layoutPreferences={{
+          attributes: {
+            description: { status: ATTRIBUTE_STATUS.show, width: 350 },
+            status: { status: ATTRIBUTE_STATUS.show },
+            title: { status: ATTRIBUTE_STATUS.show },
+          },
+          order: [],
+        }}
+        defaultDisplayedColumns={['description', 'status', 'title']}
+        defaultColumnOrder={['description', 'status', 'stream', 'title']}
+        onLayoutPreferencesChange={onLayoutPreferencesChange}
+      />,
+    );
+
+    await screen.findByRole('columnheader', { name: /title/i });
+    await screen.findByRole('columnheader', { name: /status/i });
+    await screen.findByRole('columnheader', { name: /description/i });
+
+    await userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /show stream/i }));
+
+    expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
+      attributes: {
+        description: { status: ATTRIBUTE_STATUS.show, width: 350 },
+        status: { status: ATTRIBUTE_STATUS.show },
+        stream: { status: ATTRIBUTE_STATUS.show },
+        title: { status: ATTRIBUTE_STATUS.show },
+      },
+      order: ['description', 'status', 'stream', 'title'],
+    });
+  });
+
   it('if there are user preferences, only selected columns should be displayed', async () => {
     const onLayoutPreferencesChange = jest.fn();
 
