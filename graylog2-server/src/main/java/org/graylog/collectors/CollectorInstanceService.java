@@ -412,9 +412,11 @@ public class CollectorInstanceService {
     /**
      * Builds a MongoDB filter selecting the instances that have pending changes, given a
      * {@link PendingChangesLookup}: an instance matches when its {@code last_processed_txn_seq} is
-     * behind the newest marker sequence for its fleet or for the instance itself. Negate the result
-     * (e.g. {@link Filters#nor}) to select instances that are in sync. When the lookup is empty (no
-     * markers anywhere), nothing is pending, so the returned filter matches no document.
+     * behind the newest marker sequence for its fleet or for the instance itself, or below the
+     * lookup's {@code highestPurgedSeq} (matching {@link PendingChangesLookup#isPending}). Negate
+     * the result (e.g. {@link Filters#nor}) to select instances that are in sync. When there are no
+     * markers and nothing was ever purged, nothing is pending: the only remaining clause is
+     * {@code last_processed_txn_seq < 0}, which matches no document.
      */
     public static Bson hasPendingChangesFilter(PendingChangesLookup pendingChangesLookup) {
         final List<Bson> clauses = new ArrayList<>();
@@ -430,7 +432,9 @@ public class CollectorInstanceService {
                         Filters.lt(FIELD_LAST_PROCESSED_TXN_SEQ, maxSeq))
                 ));
 
-        return clauses.isEmpty() ? Filters.in(FIELD_ID, List.of()) : Filters.or(clauses);
+        clauses.add(Filters.lt(FIELD_LAST_PROCESSED_TXN_SEQ, pendingChangesLookup.highestPurgedSeq()));
+
+        return Filters.or(clauses);
     }
 
     private static CollectorOSType extractOSType(Stream<Attribute> attributes) {

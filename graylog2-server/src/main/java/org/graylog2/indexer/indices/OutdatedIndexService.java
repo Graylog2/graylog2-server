@@ -19,12 +19,16 @@ package org.graylog2.indexer.indices;
 
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.security.IndexerAdminCert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +39,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.mongodb.client.model.Filters.in;
 
 @Singleton
 public class OutdatedIndexService {
@@ -43,12 +52,17 @@ public class OutdatedIndexService {
 
     private final IndicesAdapter indicesAdapter;
     private final IndexSetRegistry indexSetRegistry;
+    private final IndexRangeService indexRangeService;
+    private final EventBus eventBus;
     private final Cluster cluster;
 
     @Inject
-    public OutdatedIndexService(@IndexerAdminCert IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry, Cluster cluster) {
+    public OutdatedIndexService(@IndexerAdminCert IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry,
+                                IndexRangeService indexRangeService, EventBus eventBus, Cluster cluster) {
         this.indicesAdapter = indicesAdapter;
         this.indexSetRegistry = indexSetRegistry;
+        this.indexRangeService = indexRangeService;
+        this.eventBus = eventBus;
         this.cluster = cluster;
     }
 
@@ -61,10 +75,23 @@ public class OutdatedIndexService {
                         throw new IllegalStateException("Cluster version cannot be determined: " + version);
                     }
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
-        return indicesAdapter.getOutdatedIndices(currentMajorVersion).stream()
+        final List<OutdatedIndex> outdatedIndices = indicesAdapter.getOutdatedIndices(currentMajorVersion).stream()
                 .map(index -> index.asManaged(indexSetRegistry.isManagedIndex(index.indexName())))
                 .map(index -> index.asActiveWriteIndex(isActiveWriteIndexForSet(index.indexName())))
+                .toList();
+        final Map<String, IndexRange> ranges = findRanges(outdatedIndices);
+        return outdatedIndices.stream()
+                .map(index -> index.withRange(ranges.get(index.indexName())))
                 .sorted().toList();
+    }
+
+    private Map<String, IndexRange> findRanges(List<OutdatedIndex> indices) {
+        final Set<String> indexNames = indices.stream().map(OutdatedIndex::indexName).collect(Collectors.toSet());
+        if (indexNames.isEmpty()) {
+            return Map.of();
+        }
+        return indexRangeService.find(in(IndexRange.FIELD_INDEX_NAME, indexNames)).stream()
+                .collect(Collectors.toMap(IndexRange::indexName, Function.identity(), (existing, replacement) -> existing));
     }
 
     public String isActiveWriteIndexForSet(String index) {
@@ -160,5 +187,7 @@ public class OutdatedIndexService {
 
     public void delete(@NotNull String index) {
         indicesAdapter.delete(index);
+        // Mirror Indices#delete so listeners clean up index ranges and cached field types for managed indices.
+        eventBus.post(IndicesDeletedEvent.create(index));
     }
 }

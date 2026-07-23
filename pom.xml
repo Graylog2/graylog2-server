@@ -791,7 +791,7 @@
                 <plugin>
                     <groupId>org.openrewrite.maven</groupId>
                     <artifactId>rewrite-maven-plugin</artifactId>
-                    <version>6.43.0</version>
+                    <version>6.44.0</version>
                     <configuration>
                         <!-- do not set <configLocation> here, otherwise it cannot be overridden by a system property later -->
                         <exclusions>
@@ -808,7 +808,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.86.5</version>
+                            <version>8.87.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
@@ -818,17 +818,17 @@
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-migrate-java</artifactId>
-                            <version>3.39.0</version>
+                            <version>3.40.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.38.0</version>
+                            <version>2.39.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-joda</artifactId>
-                            <version>0.9.2</version>
+                            <version>0.9.3</version>
                         </dependency>
                     </dependencies>
                 </plugin>

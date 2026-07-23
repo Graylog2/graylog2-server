@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import com.google.common.base.Preconditions;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
@@ -42,6 +43,7 @@ import org.graylog2.plugin.system.NodeId;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,7 +200,7 @@ public class FleetTransactionLogService {
             }
         });
 
-        return new PendingChangesLookup(maxByFleetId, maxByInstanceUid);
+        return new PendingChangesLookup(maxByFleetId, maxByInstanceUid, highestPurgedSeq());
     }
 
     @Nullable
@@ -229,8 +231,59 @@ public class FleetTransactionLogService {
                 .into(new ArrayList<>());
     }
 
-    public CoalescedActions coalesce(List<TransactionMarker> markers) {
-        return doCoalesce(markers);
+    /**
+     * Returns whether a collector at {@code lastProcessedSeq} still has changes to apply: an
+     * unprocessed marker exists for its fleet or the instance itself (including {@code UNKNOWN}
+     * markers), or its cursor lies below {@link #highestPurgedSeq()} so that markers it never
+     * processed may have been purged.
+     */
+    public boolean hasPendingChanges(@Nullable String fleetId,
+                                     @Nullable String instanceUid,
+                                     long lastProcessedSeq) {
+
+        final var markers = getUnprocessedMarkers(fleetId, instanceUid, lastProcessedSeq);
+        return hasPendingChanges(markers, lastProcessedSeq, highestPurgedSeq());
+    }
+
+    /**
+     * Variant of {@link #hasPendingChanges(String, String, long)} for callers that already hold the
+     * unprocessed markers and the purge state. {@code highestPurgedSeq} must have been read
+     * <em>after</em> fetching the markers (it only ever increases, so this order turns a concurrent
+     * purge into a false positive instead of a false negative).
+     */
+    public boolean hasPendingChanges(List<TransactionMarker> markers,
+                                     long lastProcessedSeq,
+                                     long highestPurgedSeq) {
+        if (!markers.isEmpty()) {
+            return true;
+        }
+        return lastProcessedSeq < highestPurgedSeq;
+    }
+
+    /**
+     * Coalesces the given unprocessed markers of a collector at {@code lastProcessedSeq} into
+     * actionable flags, forcing a full config recompute when the cursor lies below
+     * {@link #highestPurgedSeq()}: markers the collector never processed may have been purged and
+     * cannot be replayed. Since callers fetch the markers before calling this, the purge state is
+     * always read after the marker fetch and a concurrent purge causes at most an unnecessary
+     * recompute.
+     */
+    public CoalescedActions coalesce(List<TransactionMarker> markers, long lastProcessedSeq) {
+        return coalesce(markers, lastProcessedSeq, highestPurgedSeq());
+    }
+
+    /**
+     * Variant of {@link #coalesce(List, long)} for callers that already hold the purge state.
+     * {@code highestPurgedSeq} must have been read <em>after</em> fetching the markers (it only
+     * ever increases, so this order turns a concurrent purge into an unnecessary recompute instead
+     * of silently losing the purged changes).
+     */
+    public CoalescedActions coalesce(List<TransactionMarker> markers, long lastProcessedSeq, long highestPurgedSeq) {
+        final var coalesced = doCoalesce(markers);
+        if (lastProcessedSeq < highestPurgedSeq) {
+            return coalesced.withForcedRecompute(highestPurgedSeq);
+        }
+        return coalesced;
     }
 
     // Package-private static for direct unit testing without MongoDB
@@ -302,5 +355,52 @@ public class FleetTransactionLogService {
     // Package-private for test access
     MongoCollection<TransactionMarker> getCollection() {
         return collection;
+    }
+
+    /**
+     * The highest sequence number that may have been deleted by {@link #purgeMarkers}. Purging
+     * only ever removes markers below a boundary sequence number — a deleted marker is never left
+     * above a surviving one — so a collector whose {@code lastProcessedTxnSeq} is below this value
+     * may have missed markers that no longer exist and needs a full config recompute. Returns 0 when nothing was ever purged — unambiguous
+     * because purging always retains markers, so an empty log means nothing was ever written.
+     */
+    public long highestPurgedSeq() {
+        final var lowestRetained = collection.find().sort(Sorts.ascending(FIELD_ID)).limit(1).first();
+        return lowestRetained == null ? 0L : Math.max(0, lowestRetained.seq() - 1);
+    }
+
+    /**
+     * Deletes markers older than {@code cutoff}, always retaining every marker younger than the
+     * cutoff and at least the {@code numToKeep} newest markers overall, regardless of age. Only
+     * ever deletes markers below a single boundary sequence number — a deleted marker is never
+     * left above a surviving one — which is what keeps {@link #highestPurgedSeq()} meaningful.
+     *
+     * @param numToKeep must be positive
+     * @return the number of deleted markers
+     * @throws IllegalArgumentException if {@code numToKeep} is not positive
+     */
+    public long purgeMarkers(Instant cutoff, int numToKeep) {
+        Preconditions.checkArgument(numToKeep > 0, "numToKeep must be positive");
+
+        final var oldestToKeepByCount = collection.find()
+                .sort(Sorts.descending(FIELD_ID))
+                .skip(numToKeep - 1)
+                .limit(1)
+                .first();
+
+        if (oldestToKeepByCount == null) {
+            return 0;
+        }
+
+        final var oldestToKeepByAge = collection.find(Filters.gte(FIELD_CREATED_AT, Date.from(cutoff)))
+                .sort(Sorts.ascending(FIELD_ID))
+                .limit(1)
+                .first();
+
+        final var lowestSeqToKeep = oldestToKeepByAge == null
+                ? oldestToKeepByCount.seq()
+                : Math.min(oldestToKeepByCount.seq(), oldestToKeepByAge.seq());
+
+        return collection.deleteMany(Filters.lt(FIELD_ID, lowestSeqToKeep)).getDeletedCount();
     }
 }
