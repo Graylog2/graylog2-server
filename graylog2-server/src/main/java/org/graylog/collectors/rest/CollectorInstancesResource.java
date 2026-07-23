@@ -281,8 +281,8 @@ public class CollectorInstancesResource extends RestResource {
         final Duration offlineThreshold = getOfflineThreshold();
         final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
 
-        final var hasPendingChanges = !txnLogService.getUnprocessedMarkers(
-                dto.fleetId(), dto.instanceUid(), dto.lastProcessedTxnSeq()).isEmpty();
+        final var hasPendingChanges = txnLogService.hasPendingChanges(dto.fleetId(), dto.instanceUid(),
+                dto.lastProcessedTxnSeq());
 
         return toResponse(dto, offlineCutoff, hasPendingChanges);
     }
@@ -325,15 +325,14 @@ public class CollectorInstancesResource extends RestResource {
 
         final var markers = txnLogService.getUnprocessedMarkers(collector.fleetId(), collector.instanceUid(),
                 collector.lastProcessedTxnSeq());
-        final var coalesced = txnLogService.coalesce(markers);
+        final var highestPurgedSeq = txnLogService.highestPurgedSeq();
+        final var coalesced = txnLogService.coalesce(markers, collector.lastProcessedTxnSeq(), highestPurgedSeq);
+        final var hasPendingChanges = txnLogService.hasPendingChanges(markers, collector.lastProcessedTxnSeq(), highestPurgedSeq);
         final var activities = activityEntryMapper.toEntries(
                 markers.stream().filter(marker -> marker.type() != MarkerType.UNKNOWN).toList(),
                 this::isPermitted);
-
-        // Any unprocessed marker (including UNKNOWN, which is excluded from `activities`) means the
-        // instance is still pending — matching the instances table's "Sync" column.
-        return new PendingChangesResponse(!markers.isEmpty(),
-                PendingChangesResponse.CoalescedActionsView.from(coalesced), activities);
+        return new PendingChangesResponse(
+                hasPendingChanges, PendingChangesResponse.CoalescedActionsView.from(coalesced), activities);
     }
 
     @POST

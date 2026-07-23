@@ -110,8 +110,9 @@ class CollectorInstancesResourceTest {
         final var unknown = new TransactionMarker(7L, TransactionMarker.TARGET_FLEET, Set.of("fleet-1"),
                 MarkerType.UNKNOWN, null, Instant.now(), "node-1", null);
         when(txnLogService.getUnprocessedMarkers("fleet-1", "uid-1", 5L)).thenReturn(List.of(reassign, unknown));
-        // coalesce() is stateless and delegates to the static doCoalesce — run the real logic
-        when(txnLogService.coalesce(anyList())).thenCallRealMethod();
+        // coalesce()/hasPendingChanges() are stateless given the purge state — run the real logic
+        when(txnLogService.coalesce(anyList(), anyLong(), anyLong())).thenCallRealMethod();
+        when(txnLogService.hasPendingChanges(anyList(), anyLong(), anyLong())).thenCallRealMethod();
 
         final var mappedEntries = List.of(new RecentActivityResponse.ActivityEntry(
                 6L, Instant.now(), "FLEET_REASSIGNED", null, List.of(), null));
@@ -138,7 +139,8 @@ class CollectorInstancesResourceTest {
         when(collectorInstanceService.findByInstanceUid("uid-1"))
                 .thenReturn(Optional.of(instance("uid-1", "fleet-1", 9L)));
         when(txnLogService.getUnprocessedMarkers("fleet-1", "uid-1", 9L)).thenReturn(List.of());
-        when(txnLogService.coalesce(anyList())).thenCallRealMethod();
+        when(txnLogService.coalesce(anyList(), anyLong(), anyLong())).thenCallRealMethod();
+        when(txnLogService.hasPendingChanges(anyList(), anyLong(), anyLong())).thenCallRealMethod();
         when(activityEntryMapper.toEntries(anyList(), any())).thenReturn(List.of());
 
         final var response = resource.instancePendingChanges("uid-1");
@@ -159,7 +161,8 @@ class CollectorInstancesResourceTest {
         final var unknown = new TransactionMarker(6L, TransactionMarker.TARGET_FLEET, Set.of("fleet-1"),
                 MarkerType.UNKNOWN, null, Instant.now(), "node-1", null);
         when(txnLogService.getUnprocessedMarkers("fleet-1", "uid-1", 5L)).thenReturn(List.of(unknown));
-        when(txnLogService.coalesce(anyList())).thenCallRealMethod();
+        when(txnLogService.coalesce(anyList(), anyLong(), anyLong())).thenCallRealMethod();
+        when(txnLogService.hasPendingChanges(anyList(), anyLong(), anyLong())).thenCallRealMethod();
         when(activityEntryMapper.toEntries(anyList(), any())).thenReturn(List.of());
 
         final var response = resource.instancePendingChanges("uid-1");
@@ -168,6 +171,26 @@ class CollectorInstancesResourceTest {
         assertThat(response.hasPendingChanges()).isTrue();
         assertThat(response.activities()).isEmpty();
         assertThat(response.coalesced().recomputeConfig()).isFalse();
+    }
+
+    @Test
+    void pendingChangesReportedWhenUnprocessedMarkersWerePurged() {
+        when(collectorInstanceService.findByInstanceUid("uid-1"))
+                .thenReturn(Optional.of(instance("uid-1", "fleet-1", 5L)));
+        when(txnLogService.getUnprocessedMarkers("fleet-1", "uid-1", 5L)).thenReturn(List.of());
+        when(txnLogService.highestPurgedSeq()).thenReturn(10L);
+        when(txnLogService.coalesce(anyList(), anyLong(), anyLong())).thenCallRealMethod();
+        when(txnLogService.hasPendingChanges(anyList(), anyLong(), anyLong())).thenCallRealMethod();
+        when(activityEntryMapper.toEntries(anyList(), any())).thenReturn(List.of());
+
+        final var response = resource.instancePendingChanges("uid-1");
+
+        // no retained markers, but the cursor lies below the purged range: a full config recompute
+        // is pending — the activity list stays empty because the specifics are gone
+        assertThat(response.hasPendingChanges()).isTrue();
+        assertThat(response.activities()).isEmpty();
+        assertThat(response.coalesced().recomputeConfig()).isTrue();
+        assertThat(response.coalesced().recomputeIngestConfig()).isTrue();
     }
 
     @Test
@@ -196,10 +219,10 @@ class CollectorInstancesResourceTest {
     void findInstancesSharesOneSnapshotBetweenPendingChangesFilterAndFlags() {
         stubOfflineThreshold();
         // Fleet marker with seq 7: uid-1 (processed up to 5) is pending, uid-2 (processed up to 7) is in sync.
-        final var lookup = new PendingChangesLookup(Map.of("fleet-1", 7L), Map.of("uid-9", 3L));
+        final var lookup = new PendingChangesLookup(Map.of("fleet-1", 7L), Map.of("uid-9", 3L), 0L);
         // Any further lookup would observe a drifted (here: emptied) transaction log. A buggy second
         // fetch therefore computes flags that contradict the filter, tripping the assertions below.
-        final var driftedLookup = new PendingChangesLookup(Map.of(), Map.of());
+        final var driftedLookup = new PendingChangesLookup(Map.of(), Map.of(), 0L);
         when(txnLogService.pendingChangesLookup()).thenReturn(lookup, driftedLookup);
         when(collectorInstanceService.findPaginated(any(), any(), anyInt(), anyInt(), any()))
                 .thenReturn(new PaginatedList<>(
@@ -227,7 +250,7 @@ class CollectorInstancesResourceTest {
         stubOfflineThreshold();
         when(collectorInstanceService.findByInstanceUid("uid-1"))
                 .thenReturn(Optional.of(instance("uid-1", "fleet-1", Instant.now())));
-        when(txnLogService.getUnprocessedMarkers("fleet-1", "uid-1", 0L)).thenReturn(List.of());
+        when(txnLogService.hasPendingChanges("fleet-1", "uid-1", 0L)).thenReturn(false);
 
         final var result = resource.getInstance("uid-1");
 
@@ -245,7 +268,7 @@ class CollectorInstancesResourceTest {
         final var staleLastSeen = Instant.now().minus(Duration.ofMinutes(10));
         when(collectorInstanceService.findByInstanceUid("uid-1"))
                 .thenReturn(Optional.of(instance("uid-1", "fleet-1", staleLastSeen)));
-        when(txnLogService.getUnprocessedMarkers("fleet-1", "uid-1", 0L)).thenReturn(List.of());
+        when(txnLogService.hasPendingChanges("fleet-1", "uid-1", 0L)).thenReturn(false);
 
         final var result = resource.getInstance("uid-1");
 
@@ -267,7 +290,7 @@ class CollectorInstancesResourceTest {
         stubOfflineThreshold();
         when(collectorInstanceService.findByInstanceUid("uid-1"))
                 .thenReturn(Optional.of(instance("uid-1", "fleet-1", Instant.now())));
-        when(txnLogService.getUnprocessedMarkers("fleet-1", "uid-1", 0L)).thenReturn(List.of());
+        when(txnLogService.hasPendingChanges("fleet-1", "uid-1", 0L)).thenReturn(false);
 
         final var result = resource.getInstance("uid-1");
 

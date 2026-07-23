@@ -44,7 +44,7 @@ import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useCol
 import useColumnRenderers from 'components/common/EntityDataTable/hooks/useColumnRenderers';
 import useAuthorizedColumnSchemas from 'components/common/EntityDataTable/hooks/useAuthorizedColumnSchemas';
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 import useInternalLayoutPreferences from 'components/common/EntityDataTable/hooks/useInternalLayoutPreferences';
 
@@ -107,7 +107,7 @@ const ScrollRightIndicator = styled.div`
   top: 0;
   bottom: 0;
   right: 0;
-  width: ${CELL_PADDING}px;
+  width: ${CELL_PADDING_HORIZONTAL}px;
   pointer-events: none;
   z-index: 2;
 `;

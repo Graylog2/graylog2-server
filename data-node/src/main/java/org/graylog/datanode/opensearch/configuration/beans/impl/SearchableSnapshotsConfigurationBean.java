@@ -59,7 +59,6 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     private static final Logger LOG = LoggerFactory.getLogger(SearchableSnapshotsConfigurationBean.class);
 
     private final Configuration localConfiguration;
-    private final DatanodeConfiguration datanodeConfiguration;
 
     private final Set<RepositoryConfiguration> repositoryConfigurations;
 
@@ -73,14 +72,13 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             Set<RepositoryConfiguration> repositoryConfigurations,
             Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
-        this.datanodeConfiguration = datanodeConfiguration;
         this.repositoryConfigurations = repositoryConfigurations;
         this.usableSpaceProvider = usableSpaceProvider;
     }
 
     @Override
-    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
-        final String searchableSnapshotsRole = datanodeConfiguration.opensearchDistribution().distributionProperties().searchableSnapshotsRole();
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
+        final String searchableSnapshotsRole = configurationParams.datanodeConfiguration().opensearchDistribution().distributionProperties().searchableSnapshotsRole();
 
         final Set<RepositoryConfiguration> enabledRepositories = repositoryConfigurations.stream()
                 .filter(RepositoryConfiguration::isRepositoryEnabled)
@@ -98,7 +96,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             }
             return builder
                     .properties(properties(searchRoleEnabled, enabledRepositories))
-                    .keystoreItems(keystoreItems(enabledRepositories))
+                    .keystoreItems(keystoreItems(enabledRepositories, configurationParams))
                     .build();
         } else if (searchRoleExplicitlyConfigured(searchableSnapshotsRole)) {
             throw new OpensearchConfigurationException("Your configuration contains the search node role in node_roles but there is no" +
@@ -182,9 +180,9 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         return builder.build();
     }
 
-    private Collection<OpensearchKeystoreItem> keystoreItems(Set<RepositoryConfiguration> enabledRepositories) {
+    private Collection<OpensearchKeystoreItem> keystoreItems(Set<RepositoryConfiguration> enabledRepositories, OpensearchConfigurationParams configurationParams) {
         return enabledRepositories.stream()
-                .flatMap(repo -> repo.keystoreItems(datanodeConfiguration.datanodeDirectories()).stream())
+                .flatMap(repo -> repo.keystoreItems(configurationParams.datanodeConfiguration().datanodeDirectories()).stream())
                 .collect(Collectors.toSet());
     }
 }
