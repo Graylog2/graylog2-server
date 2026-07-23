@@ -29,7 +29,6 @@ import Field from 'views/components/Field';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import FieldSortIcon from './FieldSortIcon';
 import MessageTableEntry from './MessageTableEntry';
