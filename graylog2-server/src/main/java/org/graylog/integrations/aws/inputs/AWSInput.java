@@ -232,8 +232,8 @@ public class AWSInput extends MessageInput {
     public static BooleanField getSingleTableStateTrackingFieldDefinition() {
         return new BooleanField(
                 KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING,
-                "Use single DynamoDB table for state tracking",
-                true,
-                "Consolidates Kinesis Client Library (KCL) state into a single DynamoDB table, as supported by the KCL 3.5 update. Enabling this on an existing input starts a one-way migration that cannot be reverted once complete. See the Graylog upgrade notes for details.");
+                "Migrate to single DynamoDB table for state tracking",
+                false,
+                "Consolidates Kinesis Client Library (KCL) state into a single DynamoDB table, as supported by the KCL 3.5 update. This option is only relevant for Kinesis inputs created before Graylog 7.2. Enabling it starts a one-way migration that cannot be reverted once complete. See the Graylog upgrade notes for details.");
     }
 }
