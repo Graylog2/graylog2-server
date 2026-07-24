@@ -34,7 +34,6 @@ export const exampleFormDataWithKeySecretAuth = {
   awsEndpointKinesis: { value: undefined },
   awsSecretKey: { value: 'mysecret' },
   overrideSource: { value: '' },
-  awsKinesisSingleTableStateTracking: { value: true },
 };
 
 export const exampleFormDataWithAutomaticAuth = {
@@ -53,7 +52,6 @@ export const exampleFormDataWithAutomaticAuth = {
   awsEndpointIAM: { value: undefined },
   awsEndpointKinesis: { value: undefined },
   overrideSource: { value: '' },
-  awsKinesisSingleTableStateTracking: { value: true },
   key: 'mykey',
   secret: 'mysecret',
 };

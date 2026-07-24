@@ -118,12 +118,10 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     awsEndpointIAM = { value: undefined },
     awsEndpointKinesis = { value: undefined },
     overrideSource = { value: undefined },
-    awsKinesisSingleTableStateTracking = { value: true },
   } = formData;
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
-  const singleTableTracking = !!awsKinesisSingleTableStateTracking?.value;
   const awsCloudwatchKinesisStreamArn = formData.awsCloudwatchKinesisStreamArn?.value ?? '';
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
@@ -147,7 +145,6 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
       aws_external_id: awsExternalId.value ?? '',
       override_source: overrideSource?.value ?? '',
-      kinesis_single_table_state_tracking: singleTableTracking,
     }),
   );
 
@@ -300,12 +297,6 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <strong>Add Flow Log prefix to field names</strong>
             <span>
               <StatusIcon active={addPrefix} />
-            </span>
-          </li>
-          <li>
-            <strong>Use single DynamoDB table for state tracking</strong>
-            <span>
-              <StatusIcon active={singleTableTracking} />
             </span>
           </li>
           {overrideSource.value && (

@@ -44,7 +44,6 @@ describe('formDataAdapter', () => {
       iam_endpoint: 'awsEndpointIAM',
       kinesis_endpoint: 'awsEndpointKinesis',
       kinesis_record_batch_size: 'awsCloudWatchBatchSize',
-      kinesis_single_table_state_tracking: 'awsKinesisSingleTableStateTracking',
       kinesis_stream_name: 'awsCloudWatchKinesisStream',
       throttling_allowed: 'awsCloudWatchThrottleEnabled',
       override_source: 'overrideSource',
@@ -176,19 +175,5 @@ describe('formDataAdapter', () => {
     const request = testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
 
     expect(request).toBeDefined();
-  });
-
-  it('defaults kinesis_single_table_state_tracking to true when field is absent', () => {
-    const { awsKinesisSingleTableStateTracking: _omitted, ...formDataWithoutField } = exampleFormDataWithKeySecretAuth;
-    const request = toGenericInputCreateRequest(formDataWithoutField);
-
-    expect(request.configuration.kinesis_single_table_state_tracking).toBe(true);
-  });
-
-  it('sets kinesis_single_table_state_tracking to false when explicitly disabled', () => {
-    const formData = { ...exampleFormDataWithKeySecretAuth, awsKinesisSingleTableStateTracking: { value: false } };
-    const request = toGenericInputCreateRequest(formData);
-
-    expect(request.configuration.kinesis_single_table_state_tracking).toBe(false);
   });
 });

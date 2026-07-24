@@ -121,12 +121,13 @@ limits.
 There are two things to know about how this applies to your inputs:
 
 - **New inputs use the single-table format automatically.** This is the AWS KCL 3.5 default for a newly created
-  consumer. A fresh input uses only the lease table regardless of the option below.
+  consumer. A fresh input always uses a single lease table.
 - **Existing inputs keep their three-table layout** until you deliberately migrate them using the new
-    "Use single DynamoDB table for state tracking" input option.  
+    "Migrate to single DynamoDB table for state tracking" input option.  
 
-To let you migrate existing inputs on your own schedule, the input exposes a **Single DynamoDB table state
-tracking** option. Enabling it on an existing three-table input starts a one-way migration
+To let you migrate existing inputs on your own schedule, the input's **edit page** exposes a 
+**Migrate to single DynamoDB table for state tracking** option. This option is only relevant for inputs created before Graylog 7.2.
+Enabling it on such an input starts a one-way migration
 that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
 checkpoints are preserved, so ingestion should continue without replay or gaps. 
 
