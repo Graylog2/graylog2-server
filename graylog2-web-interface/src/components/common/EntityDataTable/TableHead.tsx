@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css, createGlobalStyle } from 'styled-components';
 import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
@@ -47,8 +47,9 @@ export const Th = styled.th<{
   $colId: string;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
+  $revealHeaderActions: boolean;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, theme }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, $revealHeaderActions, theme }) => css`
     position: relative;
     padding: 0 !important;
     z-index: 1;
@@ -62,6 +63,13 @@ export const Th = styled.th<{
     && {
       background-color: transparent;
     }
+
+    ${$revealHeaderActions &&
+    css`
+      .header-action {
+        opacity: 1;
+      }
+    `}
 
     ${$pinningPosition
       ? css`
@@ -134,6 +142,7 @@ const ResizeCursorGlobalStyle = createGlobalStyle`
 const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
   const forceUpdate = useForceUpdate();
+  const [isHoveringResizeHandle, setIsHoveringResizeHandle] = useState(false);
 
   const bindResizeHandler = useCallback(
     (handler: (event: unknown) => void) => (event: unknown) => {
@@ -160,12 +169,15 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       colSpan={header.colSpan}
       $colId={header.column.id}
       $hidePadding={columnMeta?.hideCellPadding}
-      $pinningPosition={header.column.getIsPinned()}>
+      $pinningPosition={header.column.getIsPinned()}
+      $revealHeaderActions={isHoveringResizeHandle || header.column.getIsResizing()}>
       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
       {header.column.getCanResize() && (
         <ResizeHitArea
           onMouseDown={bindResizeHandler(header.getResizeHandler())}
           onTouchStart={bindResizeHandler(header.getResizeHandler())}
+          onMouseEnter={() => setIsHoveringResizeHandle(true)}
+          onMouseLeave={() => setIsHoveringResizeHandle(false)}
           $isResizing={header.column.getIsResizing()}
           role="separator"
           aria-label={`Resize ${columnMeta?.label ?? header.column.id} column`}
