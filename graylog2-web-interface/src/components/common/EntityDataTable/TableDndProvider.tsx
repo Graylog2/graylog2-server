@@ -27,6 +27,7 @@ import {
   MouseSensor,
   TouchSensor,
   KeyboardSensor,
+  KeyboardCode,
   DragOverlay,
 } from '@dnd-kit/core';
 import type { Table } from '@tanstack/react-table';
@@ -54,10 +55,24 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
   );
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(PointerSensor, {}),
-    useSensor(KeyboardSensor, {}),
+    // Without an activation constraint, a sensor activates the drag on pointerdown alone, which makes
+    // dnd-kit swallow the click that follows (it suppresses the next `click` event to stop a drag-drop
+    // from also triggering a click). The whole header is now the drag surface and also contains
+    // clickable elements (sort icon, actions dropdown), so a plain click needs to survive as a click.
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    // Enter is deliberately left out: the header cell also opens its actions menu on Enter (see
+    // AttributeHeader), and dnd-kit's default keyboard codes include both Space and Enter for
+    // picking up/dropping a drag, which would make Enter do two different things on the same
+    // element. Space alone matches the drag handle's own label ("press space to reorder").
+    useSensor(KeyboardSensor, {
+      keyboardCodes: {
+        start: [KeyboardCode.Space],
+        cancel: [KeyboardCode.Esc],
+        end: [KeyboardCode.Space, KeyboardCode.Tab],
+      },
+    }),
   );
   const handleDragStart = useCallback(
     ({ active }: DragStartEvent) => {

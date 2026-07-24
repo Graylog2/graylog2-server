@@ -24,9 +24,13 @@ import zIndices from 'theme/z-indices';
 import Icon from 'components/common/Icon';
 import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
-import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
-import { CELL_PADDING_HORIZONTAL, CELL_PADDING_VERTICAL } from 'components/common/EntityDataTable/Constants';
-import { ThInner, LeftCol } from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
+import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
+import {
+  ThInner,
+  LeftCol,
+  RightCol,
+  DragIcon,
+} from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
 import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
@@ -34,10 +38,9 @@ const CustomDragOverlay = styled.div<{ $minWidth: number }>(
   ({ theme, $minWidth }) => css`
     background-color: ${theme.colors.global.contentBackground};
     z-index: ${zIndices.dropdownMenu};
-    padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
     width: ${$minWidth}px;
     min-width: fit-content;
-    font-weight: bold;
+    min-height: ${CELL_PADDING_HORIZONTAL * 2 + 24}px;
     white-space: nowrap;
     max-width: 300px;
     box-shadow:
@@ -48,21 +51,15 @@ const CustomDragOverlay = styled.div<{ $minWidth: number }>(
     border-radius: 3px;
     border: 1px solid ${theme.colors.input.borderFocus};
     display: flex;
-    align-items: center;
-    line-height: 0;
+    // Not "center": ThInner's height:100% can't reliably resolve against this auto-height
+    // parent, so it sizes to its own content instead; centering a shorter ThInner here would
+    // throw off the absolutely-positioned DragIcon, which is anchored to ThInner's own top edge.
+    align-items: stretch;
   `,
 );
 
-const DragHandle = styled.div<{ $isDragging: boolean }>(
-  ({ $isDragging, theme }) => css`
-    display: inline-block;
-    cursor: ${$isDragging ? 'grabbing' : 'grab'};
-    margin-right: ${theme.spacings.xxs};
-  `,
-);
-
-const DragIcon = styled(Icon)`
-  color: ${({ theme }) => theme.colors.text.secondary};
+const StyledDragIcon = styled(DragIcon)`
+  top: -1px;
 `;
 
 const ActiveSliceIcon = styled(Icon)(
@@ -83,29 +80,32 @@ const ThGhostInner = <Entity extends EntityBase>(
   const columnLabel = columnMeta?.label ?? column.id;
   const canSlice = columnMeta?.enableSlicing;
   const canSort = column.getCanSort();
+  const canHideColumn = column.getCanHide();
   const isSliceActive = Boolean(canSlice && activeSliceCol === column.id);
   const sortDirection = column.getIsSorted();
 
   return (
     <CustomDragOverlay ref={ref} $minWidth={column.getSize()}>
       <ThInner>
+        <StyledDragIcon name="drag_indicator" size="xs" $isDragging />
         <LeftCol>
-          <DragHandle $isDragging>
-            <DragIcon name="drag_indicator" />
-          </DragHandle>
           <HeaderActionsDropdown
             label={columnLabel}
             activeSort={sortDirection}
             isSliceActive={isSliceActive}
             onChangeSlicing={canSlice ? () => {} : undefined}
             sliceColumnId={column.id}
-            onSort={canSort ? () => {} : undefined}>
+            onSort={canSort ? () => {} : undefined}
+            onHideColumn={canHideColumn ? () => {} : undefined}>
             {columnLabel}
           </HeaderActionsDropdown>
           {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} />}
-          {sortDirection && <SortIcon<Entity> column={column} />}
         </LeftCol>
-        {column.getCanResize() && <ResizeHandle colTitle={columnLabel} />}
+        {sortDirection && (
+          <RightCol>
+            <SortIcon<Entity> column={column} />
+          </RightCol>
+        )}
       </ThInner>
     </CustomDragOverlay>
   );

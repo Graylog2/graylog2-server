@@ -16,28 +16,45 @@
  */
 
 import * as React from 'react';
+import { forwardRef } from 'react';
+import { createPortal } from 'react-dom';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
-import Icon from 'components/common/Icon';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MenuItem } from 'components/bootstrap';
 
-const DropdownTrigger = styled.button(
+// A plain (non-focusable) span: the header cell itself (ThInner, see AttributeHeader) is the one
+// focusable/clickable element for opening this menu, so this only renders the label -- it must
+// not be its own tab stop, or focusing the header would take two Tab presses instead of one.
+const DropdownTrigger = styled.span(
   ({ theme }) => css`
-    background: transparent;
-    border: 0;
-    padding: 0;
     display: inline-flex;
     align-items: center;
     gap: ${theme.spacings.xxs};
     line-height: inherit;
-
-    &:focus-visible {
-      outline-offset: 2px;
-    }
   `,
+);
+
+const StyledMenuAnchor = styled.div`
+  position: fixed;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+`;
+
+// Zero-size and invisible: it only exists to be the Menu's positioning anchor, moved to the
+// clicked point (see AttributeHeader) so the dropdown opens exactly where the header was clicked,
+// rather than anchored to the DropdownTrigger's own position.
+//
+// Rendered through a portal straight into <body>: the header (Th) always has a CSS `transform`
+// set (even when idle, it falls back to `translate3d(0, 0, 0)` -- see TableHead.tsx), and any
+// transformed ancestor becomes the containing block for a `position: fixed` descendant. Left in
+// place, this anchor's "fixed" coordinates would resolve relative to that header's own box
+// instead of the viewport, landing nowhere near the actual click.
+const MenuAnchor = forwardRef<HTMLDivElement, { style?: React.CSSProperties }>(({ style = undefined, ...rest }, ref) =>
+  createPortal(<StyledMenuAnchor ref={ref} style={style} {...rest} />, document.body),
 );
 
 const MenuItemLabel = styled.span<{ $active: boolean }>(
@@ -55,6 +72,10 @@ type Props = {
   sliceColumnId?: string;
   appSection?: string;
   onSort?: (desc: boolean) => void;
+  onHideColumn?: () => void;
+  opened?: boolean;
+  onOpenChange?: (opened: boolean) => void;
+  anchorPosition?: { x: number; y: number } | null;
 };
 
 const HeaderActionsDropdown = ({
@@ -66,9 +87,13 @@ const HeaderActionsDropdown = ({
   sliceColumnId = undefined,
   appSection = undefined,
   onSort = undefined,
+  onHideColumn = undefined,
+  opened = undefined,
+  onOpenChange = undefined,
+  anchorPosition = undefined,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const hasActions = Boolean(onChangeSlicing || onSort);
+  const hasActions = Boolean(onChangeSlicing || onSort || onHideColumn);
 
   const onToggleSlicing = () => {
     if (isSliceActive) {
@@ -94,13 +119,14 @@ const HeaderActionsDropdown = ({
   }
 
   return (
-    <Menu shadow="md" withinPortal position="bottom-start">
+    <Menu shadow="md" withinPortal position="bottom-start" opened={opened} onChange={onOpenChange}>
       <Menu.Target>
-        <DropdownTrigger type="button" title={`Toggle ${label} actions`} aria-label={`Toggle ${label} actions`}>
-          <span>{children}</span>
-          <Icon name="arrow_drop_down" size="xs" />
-        </DropdownTrigger>
+        <MenuAnchor style={{ left: anchorPosition?.x ?? 0, top: anchorPosition?.y ?? 0 }} />
       </Menu.Target>
+      {/* Not the Menu.Target: opening/positioning is driven by the whole header's click handler
+          (see AttributeHeader) so this only needs to render the label -- clicking it still opens
+          the menu, since the click bubbles up to that handler. */}
+      <DropdownTrigger title={`Toggle ${label} actions`}>{children}</DropdownTrigger>
       <Menu.Dropdown>
         {onSort && (
           <MenuItem onClick={() => onSort(false)} icon="arrow_upward">
@@ -116,6 +142,12 @@ const HeaderActionsDropdown = ({
         {onChangeSlicing && (
           <MenuItem onClick={onToggleSlicing} icon="surgical">
             {isSliceActive ? 'No slicing' : 'Slice by values'}
+          </MenuItem>
+        )}
+        {(onSort || onChangeSlicing) && onHideColumn && <MenuItem divider />}
+        {onHideColumn && (
+          <MenuItem onClick={onHideColumn} icon="visibility_off">
+            Hide column
           </MenuItem>
         )}
       </Menu.Dropdown>
