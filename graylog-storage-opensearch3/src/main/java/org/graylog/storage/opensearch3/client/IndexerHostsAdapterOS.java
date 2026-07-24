@@ -72,7 +72,7 @@ public class IndexerHostsAdapterOS implements IndexerHostsAdapter {
             final int port = Integer.parseInt(matcher.group(2));
             return URI.create(f("%s://%s:%d", defaultScheme, hostname, port));
         } else {
-            // otherwise use the "ip:port" value and prepend schema
+            // otherwise use the "ip:port" value and prepend scheme
             return URI.create(f("%s://%s", defaultScheme, address));
         }
     }
