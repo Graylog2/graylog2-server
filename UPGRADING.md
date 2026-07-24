@@ -144,6 +144,22 @@ Enabling it on such an input starts a one-way migration
 that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
 checkpoints are preserved, so ingestion should continue without replay or gaps. 
 
+### Migration steps for a Kinesis input that existed before Graylog 7.2
+
+1. Upgrade to Graylog 7.2 and let the input run normally with the option **off**. KCL 3.5 requires the input to run
+   steadily for at least one hour before it will accept the migration. This readiness period is fixed by KCL 3.5 and
+   cannot be shortened.
+2. Before enabling the option, confirm the input is ready. In DynamoDB, open the input's coordinator-state table
+   (`graylog-aws-plugin-<stream-name>-CoordinatorState`), find the `TableMigration3.5` item, and check its `tm`
+   attribute. It must read `TABLE_MIGRATION_STATUS_DEPLOYED`. If it still reads `TABLE_MIGRATION_STATUS_INIT`, the
+   readiness period has not elapsed yet; wait and re-check. Enabling the option before this point causes the input
+   to fail to start.
+3. Enable the **Migrate to single DynamoDB table for state tracking** option on the input's edit page and save. The
+   migration begins.
+4. Verify completion. KCL 3.5 bakes for 24 hours (the default) before finalizing. After that period, check the same
+   `TableMigration3.5` item again; its `tm` attribute should read `TABLE_MIGRATION_STATUS_COMPLETE`. Once complete,
+   the legacy `-CoordinatorState` and `-WorkerMetricStats` tables are no longer used and can be deleted.
+
 The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
 monitoring the migration until it reaches completion.
 

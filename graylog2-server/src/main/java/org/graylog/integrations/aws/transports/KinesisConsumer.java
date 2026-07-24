@@ -194,8 +194,6 @@ public class KinesisConsumer implements Runnable {
             if (migrateToSingleTable) {
                 LOG.info("Enabling one-time KCL metadata migration to the lease table.");
                 coordinatorConfig.migrateAllEntitiesToLeaseTable(true);
-                // TODO: test only — shortens the migration bake time from the 24h default to the 1h minimum. Remove before merging.
-                coordinatorConfig.tableMigrationCompleteBakeTimeSeconds(3600);
             }
             final LeaseManagementConfig leaseManagementConfig = configsBuilder.leaseManagementConfig();
             final LifecycleConfig lifecycleConfig = configsBuilder.lifecycleConfig()
