@@ -146,9 +146,9 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
 
 ### Migration steps for a Kinesis input that existed before Graylog 7.2
 
-1. Upgrade to Graylog 7.2 and let the input run normally with the option **off**. KCL 3.5 requires the input to run
-   steadily for at least one hour before it will accept the migration. This readiness period is fixed by KCL 3.5 and
-   cannot be shortened.
+1. Upgrade to Graylog 7.2 and allow the input to start and run for one hour with the **Migrate to single DynamoDB
+   table for state tracking** option off. KCL 3.5 requires the input to run steadily for a whole hour before it will
+   accept the migration. This readiness period is fixed by KCL 3.5 and cannot be shortened.
 2. Before enabling the option, confirm the input is ready. In DynamoDB, open the input's coordinator-state table
    (`graylog-aws-plugin-<stream-name>-CoordinatorState`), find the `TableMigration3.5` item, and check its `tm`
    attribute. It must read `TABLE_MIGRATION_STATUS_DEPLOYED`. If it still reads `TABLE_MIGRATION_STATUS_INIT`, the
