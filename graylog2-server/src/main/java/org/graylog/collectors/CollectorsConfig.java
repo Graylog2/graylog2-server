@@ -35,7 +35,7 @@ public abstract class CollectorsConfig {
 
     public static final Duration DEFAULT_OFFLINE_THRESHOLD = Duration.ofMinutes(5);
     public static final Duration DEFAULT_VISIBILITY_THRESHOLD = Duration.ofDays(1);
-    public static final Duration DEFAULT_EXPIRATION_THRESHOLD = Duration.ofDays(7);
+    public static final Duration DEFAULT_EXPIRATION_THRESHOLD = Duration.ofDays(90);
     private static final Duration DEFAULT_COLLECTOR_CERT_LIFETIME = Duration.ofDays(365);
     private static final Duration DEFAULT_COLLECTOR_HEARTBEAT_INTERVAL = Duration.ofSeconds(30);
     private static final int DEFAULT_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES = Ints.saturatedCast(Size.megabytes(10).toBytes());
