@@ -24,6 +24,11 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MenuItem } from 'components/bootstrap';
 
+export const DropdownCaret = styled(Icon)`
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+`;
+
 const DropdownTrigger = styled.button(
   ({ theme }) => css`
     background: transparent;
@@ -36,6 +41,12 @@ const DropdownTrigger = styled.button(
 
     &:focus-visible {
       outline-offset: 2px;
+    }
+
+    &:hover .header-action,
+    &:focus-within .header-action,
+    &[aria-expanded='true'] .header-action {
+      opacity: 1;
     }
   `,
 );
@@ -55,6 +66,8 @@ type Props = {
   sliceColumnId?: string;
   appSection?: string;
   onSort?: (desc: boolean) => void;
+  onHideColumn?: () => void;
+  textAlign?: string;
 };
 
 const HeaderActionsDropdown = ({
@@ -66,9 +79,11 @@ const HeaderActionsDropdown = ({
   sliceColumnId = undefined,
   appSection = undefined,
   onSort = undefined,
+  onHideColumn = undefined,
+  textAlign = undefined,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const hasActions = Boolean(onChangeSlicing || onSort);
+  const hasActions = Boolean(onChangeSlicing || onSort || onHideColumn);
 
   const onToggleSlicing = () => {
     if (isSliceActive) {
@@ -97,8 +112,9 @@ const HeaderActionsDropdown = ({
     <Menu shadow="md" withinPortal position="bottom-start">
       <Menu.Target>
         <DropdownTrigger type="button" title={`Toggle ${label} actions`} aria-label={`Toggle ${label} actions`}>
+          {textAlign === 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
           <span>{children}</span>
-          <Icon name="arrow_drop_down" size="xs" />
+          {textAlign !== 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
         </DropdownTrigger>
       </Menu.Target>
       <Menu.Dropdown>
@@ -116,6 +132,12 @@ const HeaderActionsDropdown = ({
         {onChangeSlicing && (
           <MenuItem onClick={onToggleSlicing} icon="surgical">
             {isSliceActive ? 'No slicing' : 'Slice by values'}
+          </MenuItem>
+        )}
+        {(onSort || onChangeSlicing) && onHideColumn && <MenuItem divider />}
+        {onHideColumn && (
+          <MenuItem onClick={onHideColumn} icon="visibility_off">
+            Hide column
           </MenuItem>
         )}
       </Menu.Dropdown>

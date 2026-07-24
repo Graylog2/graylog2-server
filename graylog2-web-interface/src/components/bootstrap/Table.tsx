@@ -69,7 +69,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     & th,
     & td {
       padding: ${$condensed ? '5px' : '8px'};
-      vertical-align: top;
+      vertical-align: middle;
       border-top: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
       ${$bordered &&
       css`
@@ -96,7 +96,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     & thead > tr > th {
       background-color: ${theme.colors.table.head.background};
       white-space: nowrap;
-      vertical-align: bottom;
+      vertical-align: middle;
       border-top: none;
       border-bottom: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
       font-weight: normal;

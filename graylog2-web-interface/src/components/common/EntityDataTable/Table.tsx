@@ -60,9 +60,11 @@ const Td = styled.td<{
   $colId: string;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
+  $textAlign: string;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, $textAlign }) => css`
     word-break: break-word;
+    ${$textAlign && css`text-align: ${$textAlign};`}
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
@@ -122,7 +124,8 @@ const Table = <Entity extends EntityBase>({
               key={cell.id}
               $colId={cell.column.id}
               $pinningPosition={cell.column.getIsPinned()}
-              $hidePadding={columnMeta?.hideCellPadding}>
+              $hidePadding={columnMeta?.hideCellPadding}
+              $textAlign={columnMeta?.columnRenderer?.textAlign}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           );

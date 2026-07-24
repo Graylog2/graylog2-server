@@ -85,6 +85,7 @@ const columnRenderers: ColumnRenderers<DataAdapterEntity> = {
     throughput: {
       staticWidth: 150,
       renderCell: (_arg: unknown, adapter: DataAdapterEntity) => <ThroughputCol adapter={adapter} />,
+      textAlign: 'right',
     },
   },
 };
