@@ -1,0 +1,5 @@
+type = "c"
+message = "Increase default Collector expiration threshold to 90 days."
+
+issues = ["26044"]
+pulls = ["26740"]

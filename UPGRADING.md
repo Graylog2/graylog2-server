@@ -54,6 +54,19 @@ old value may be removed in a future version.
 |---------------------------------------------------------------------------|-------------|
 | `org.graylog2.contentpacks.facades.EntityWithExcerptFacade#resolveGrants` | removed     |
 
+## Plugin Builds: New `requireUpperBoundDeps` Maven Enforcer Rule
+
+Plugin builds inheriting from the `graylog-plugin-parent` or `graylog-plugin-web-parent` Maven parent
+POM now run the
+[`requireUpperBoundDeps`](https://maven.apache.org/enforcer/enforcer-rules/requireUpperBoundDeps.html)
+enforcer rule. It fails the build when a transitive dependency resolves to a *lower* version than
+another of the plugin's dependencies requires.
+
+Such conflicts can usually be fixed by updating the outdated dependency, or by adding a
+`<dependencyManagement>` entry for the flagged artifact using the highest required version shown in
+the error message. Plugin authors who are unable to align their dependencies can override the
+`enforce-versions` execution of the `maven-enforcer-plugin` in their own POM.
+
 ## Sigma Rules Folded into Event Definitions
 
 Prior to 7.2, Sigma rules were first order entities that could be managed directly. Each rule was also

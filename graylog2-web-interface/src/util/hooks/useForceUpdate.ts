@@ -14,18 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled from 'styled-components';
+// eslint-disable-next-line no-restricted-imports
+import { useForceUpdate } from '@mantine/hooks';
 
-const StyledCell = styled.td`
-  &&& {
-    width: 24px;
-    min-width: auto;
-  }
-`;
-
-const BulkSelectCell = ({ children = null }: React.PropsWithChildren) => (
-  <StyledCell onClick={(event) => event.stopPropagation()}>{children}</StyledCell>
-);
-
-export default BulkSelectCell;
+export default useForceUpdate;
