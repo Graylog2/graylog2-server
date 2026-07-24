@@ -27,6 +27,7 @@ import {
   MouseSensor,
   TouchSensor,
   KeyboardSensor,
+  KeyboardCode,
   DragOverlay,
 } from '@dnd-kit/core';
 import type { Table } from '@tanstack/react-table';
@@ -54,10 +55,16 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
   );
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(PointerSensor, {}),
-    useSensor(KeyboardSensor, {}),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, {
+      keyboardCodes: {
+        start: [KeyboardCode.Space],
+        cancel: [KeyboardCode.Esc],
+        end: [KeyboardCode.Space, KeyboardCode.Tab],
+      },
+    }),
   );
   const handleDragStart = useCallback(
     ({ active }: DragStartEvent) => {

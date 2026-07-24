@@ -68,15 +68,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
   descId = 'Descending',
   className = '',
 }: Props<AscDirection, DescDirection>) => {
-  const handleSortChange = useCallback(
-    (event: React.MouseEvent) => {
-      // Stops the click from also reaching an ancestor that opens a header actions menu on click
-      // (EntityDataTable) -- this icon already has its own dedicated sort-toggle behavior.
-      event.stopPropagation();
-      onChange(activeDirection);
-    },
-    [activeDirection, onChange],
-  );
+  const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
   const isAscSort = activeDirection === ascId && activeDirection !== descId;
 
   const sortActive = !!activeDirection;

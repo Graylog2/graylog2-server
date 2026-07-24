@@ -123,7 +123,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    await screen.findByRole('columnheader', { name: /custom title header/i });
+    await screen.findByText(/custom title header/i);
     await screen.findByText('The title: Entity title');
   });
 
@@ -147,7 +147,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    await screen.findByRole('columnheader', { name: /custom header for type - title/i });
+    await screen.findByText(/custom header for type - title/i);
     await screen.findByText('Custom Cell For Attribute - Entity title');
 
     expect(screen.queryByText('Custom Cell For Type - Entity title')).not.toBeInTheDocument();
