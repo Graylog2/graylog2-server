@@ -42,6 +42,7 @@ const pipelineRenderer = {
   pipelines: {
     renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
     staticWidth: 'matchHeader' as const,
+    textAlign: 'right',
   },
 };
 const customColumnRenderers = (
@@ -70,6 +71,7 @@ const customColumnRenderers = (
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
       staticWidth: 'matchHeader' as const,
+      textAlign: 'right',
     },
     ...(isPipelineColumnPermitted ? pipelineRenderer : {}),
     outputs: {

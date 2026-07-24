@@ -14,21 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const modalBase = 1040;
-const sidebar = 6;
-const tableHeaderCell = 100;
+// eslint-disable-next-line no-restricted-imports
+import { useForceUpdate } from '@mantine/hooks';
 
-const zIndices = {
-  sidebar: sidebar,
-  sidebarContentColumn: sidebar + 1,
-  sidebarOverlay: sidebar - 1,
-  tableHeaderCell: tableHeaderCell,
-  tableHeaderCellPinned: tableHeaderCell + 100,
-  modalOverlay: modalBase,
-  modalBody: modalBase + 10,
-  confirmModalOverlay: modalBase + 11,
-  confirmModalBody: modalBase + 12,
-  notifications: modalBase + 13,
-  dropdownMenu: modalBase + 13,
-} as const;
-export default zIndices;
+export default useForceUpdate;
