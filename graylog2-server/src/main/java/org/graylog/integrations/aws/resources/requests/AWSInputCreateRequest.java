@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
-import javax.annotation.Nullable;
 
 /**
  * This request is used to save a new Kinesis AWS input. Each type of AWS input will use it's own request
@@ -39,7 +38,6 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String ADD_FLOW_LOG_PREFIX = "add_flow_log_prefix";
     private static final String OVERRIDE_SOURCE = "override_source";
-    private static final String KINESIS_SINGLE_TABLE_STATE_TRACKING = "kinesis_single_table_state_tracking";
 
     @JsonProperty(NAME)
     public abstract String name();
@@ -64,10 +62,6 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
     @JsonProperty(ADD_FLOW_LOG_PREFIX)
     public abstract boolean addFlowLogPrefix();
-
-    @JsonProperty(KINESIS_SINGLE_TABLE_STATE_TRACKING)
-    @Nullable
-    public abstract Boolean kinesisSingleTableStateTracking();
 
     public static Builder builder() {
         return Builder.create();
@@ -103,9 +97,6 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
         @JsonProperty(ADD_FLOW_LOG_PREFIX)
         public abstract Builder addFlowLogPrefix(boolean addFlowLogPrefix);
-
-        @JsonProperty(KINESIS_SINGLE_TABLE_STATE_TRACKING)
-        public abstract Builder kinesisSingleTableStateTracking(@Nullable Boolean kinesisSingleTableStateTracking);
 
         public abstract AWSInputCreateRequest build();
     }

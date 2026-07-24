@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class AWSService {
@@ -145,8 +144,6 @@ public class AWSService {
             configuration.put(KinesisTransport.CK_KINESIS_STREAM_NAME, request.streamName());
             configuration.put(KinesisTransport.CK_KINESIS_STREAM_ARN, request.streamArn());
             configuration.put(KinesisTransport.CK_KINESIS_RECORD_BATCH_SIZE, request.batchSize());
-            configuration.put(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING,
-                    Objects.requireNonNullElse(request.kinesisSingleTableStateTracking(), false));
         } else {
             throw new Exception("The specified input type is not supported.");
         }

@@ -57,7 +57,7 @@ public class KinesisTransportTest {
 
         final ConfigurationField field = request.getField(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING);
         assertThat(field).isInstanceOf(BooleanField.class);
-        // New inputs should default to the single-table layout.
-        assertThat(field.getDefaultValue()).isEqualTo(true);
+        // The field defaults to false so editing an existing input does not trigger the migration.
+        assertThat(field.getDefaultValue()).isEqualTo(false);
     }
 }
