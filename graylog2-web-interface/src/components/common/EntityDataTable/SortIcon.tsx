@@ -24,7 +24,7 @@ import type { ColumnMetaContext, EntityBase } from 'components/common/EntityData
 
 const StyledCommonSortIcon = styled(CommonSortIcon)(
   ({ theme }) => css`
-    display: inline-block;
+    display: inline-flex;
     margin-left: ${theme.spacings.xs};
     padding: 0;
     cursor: pointer;
