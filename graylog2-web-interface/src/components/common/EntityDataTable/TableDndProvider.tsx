@@ -30,6 +30,7 @@ import {
   KeyboardCode,
   DragOverlay,
 } from '@dnd-kit/core';
+import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import type { Table } from '@tanstack/react-table';
 import { createPortal } from 'react-dom';
 
@@ -100,7 +101,7 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
         <DndStylesProvider>{children}</DndStylesProvider>
       </SortableContext>
       {createPortal(
-        <DragOverlay dropAnimation={null} zIndex={zIndices.modalBody}>
+        <DragOverlay dropAnimation={null} zIndex={zIndices.modalBody} modifiers={[snapCenterToCursor]}>
           {activeColumn ? <ThDragOverlay<Entity> column={activeColumn} /> : null}
         </DragOverlay>,
         document.body,
