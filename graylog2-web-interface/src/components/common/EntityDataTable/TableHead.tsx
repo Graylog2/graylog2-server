@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, createGlobalStyle } from 'styled-components';
 import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 
@@ -123,6 +123,14 @@ const ResizeHitArea = styled.div<{ $isResizing: boolean }>(
   `,
 );
 
+const RESIZING_BODY_CLASS = 'entity-data-table-resizing-column';
+
+const ResizeCursorGlobalStyle = createGlobalStyle`
+  body.${RESIZING_BODY_CLASS}, body.${RESIZING_BODY_CLASS} * {
+    cursor: col-resize !important;
+  }
+`;
+
 const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
   const forceUpdate = useForceUpdate();
@@ -131,9 +139,11 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
     (handler: (event: unknown) => void) => (event: unknown) => {
       handler(event);
       forceUpdate();
+      document.body.classList.add(RESIZING_BODY_CLASS);
 
       const stopResizing = () => {
         forceUpdate();
+        document.body.classList.remove(RESIZING_BODY_CLASS);
         window.removeEventListener('mouseup', stopResizing);
         window.removeEventListener('touchend', stopResizing);
       };
@@ -172,6 +182,7 @@ type Props<Entity extends EntityBase> = {
 
 const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
   <Thead>
+    <ResizeCursorGlobalStyle />
     {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
