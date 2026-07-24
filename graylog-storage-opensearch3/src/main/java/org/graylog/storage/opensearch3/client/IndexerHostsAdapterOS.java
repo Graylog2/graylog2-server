@@ -68,8 +68,8 @@ public class IndexerHostsAdapterOS implements IndexerHostsAdapter {
         final Matcher matcher = HOST_PORT_PATTERN.matcher(address);
         if (matcher.matches()) {
             // publish_address is in "hostname/ip:port" format — prefer the host:port part
-            String hostname = matcher.group(1);
-            int port = Integer.parseInt(matcher.group(2));
+            final String hostname = matcher.group(1);
+            final int port = Integer.parseInt(matcher.group(2));
             return URI.create(f("%s://%s:%d", defaultScheme, hostname, port));
         } else {
             // otherwise use the "ip:port" value and prepend schema
