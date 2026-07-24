@@ -24,7 +24,6 @@ import zIndices from 'theme/z-indices';
 import Icon from 'components/common/Icon';
 import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
-import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 import {
   ThInner,
   LeftCol,
@@ -40,7 +39,6 @@ const CustomDragOverlay = styled.div<{ $minWidth: number }>(
     z-index: ${zIndices.dropdownMenu};
     width: ${$minWidth}px;
     min-width: fit-content;
-    min-height: ${CELL_PADDING_HORIZONTAL * 2 + 24}px;
     white-space: nowrap;
     max-width: 300px;
     box-shadow:
@@ -80,28 +78,49 @@ const ThGhostInner = <Entity extends EntityBase>(
   const canHideColumn = column.getCanHide();
   const isSliceActive = Boolean(canSlice && activeSliceCol === column.id);
   const sortDirection = column.getIsSorted();
+  // Matches AttributeHeader: for right-aligned (numeric) columns, the indicator icons and title
+  // are mirrored (indicators first, title last) instead of title-then-indicators, and the caret
+  // inside the title button itself moves to the other side of the label too (see textAlign below).
+  const textAlign = columnMeta?.columnRenderer?.textAlign;
+  const isRightAligned = textAlign === 'right';
+
+  const titleGroup = (
+    <LeftCol>
+      <HeaderActionsDropdown
+        label={columnLabel}
+        activeSort={sortDirection}
+        isSliceActive={isSliceActive}
+        onChangeSlicing={canSlice ? () => {} : undefined}
+        sliceColumnId={column.id}
+        onSort={canSort ? () => {} : undefined}
+        onHideColumn={canHideColumn ? () => {} : undefined}
+        textAlign={textAlign}>
+        {columnLabel}
+      </HeaderActionsDropdown>
+    </LeftCol>
+  );
+
+  const indicatorIcons = (
+    <IndicatorCol>
+      {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} />}
+      {sortDirection && <SortIcon<Entity> column={column} />}
+    </IndicatorCol>
+  );
 
   return (
     <CustomDragOverlay ref={ref} $minWidth={column.getSize()}>
       <ThInner>
         <StyledDragIcon name="drag_indicator" size="xs" $isDragging />
-        <LeftCol>
-          <HeaderActionsDropdown
-            label={columnLabel}
-            activeSort={sortDirection}
-            isSliceActive={isSliceActive}
-            onChangeSlicing={canSlice ? () => {} : undefined}
-            sliceColumnId={column.id}
-            onSort={canSort ? () => {} : undefined}
-            onHideColumn={canHideColumn ? () => {} : undefined}>
-            {columnLabel}
-          </HeaderActionsDropdown>
-        </LeftCol>
-        {(isSliceActive || sortDirection) && (
-          <IndicatorCol>
-            {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} />}
-            {sortDirection && <SortIcon<Entity> column={column} />}
-          </IndicatorCol>
+        {isRightAligned ? (
+          <>
+            {indicatorIcons}
+            {titleGroup}
+          </>
+        ) : (
+          <>
+            {titleGroup}
+            {indicatorIcons}
+          </>
         )}
       </ThInner>
     </CustomDragOverlay>
