@@ -36,6 +36,10 @@ import type { EntityBase, ColumnMetaContext } from './types';
 const Thead = styled.thead(
   ({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
+
+    tr {
+      background-color: ${theme.colors.table.head.background};
+    }
   `,
 );
 
@@ -55,15 +59,14 @@ export const Th = styled.th<{
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
     transition: var(${columnTransition()}, none);
     height: 100%; // required to be able to use height: 100% in child elements
+    && {
+      background-color: transparent;
+    }
 
     ${$pinningPosition
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
-          background-color: ${theme.utils.flattenColorStack([
-            theme.colors.global.contentBackground,
-            theme.colors.table.head.background,
-          ])};
           ${$pinningPosition === 'right' &&
           css`
             box-shadow: inset -1px 0 0 ${theme.colors.table.row.divider};
@@ -124,11 +127,6 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
   const forceUpdate = useForceUpdate();
 
-  // header.column.getIsResizing() is the source of truth, but nothing here re-renders on its own
-  // when it changes: Table is wrapped in React.memo, and its headerGroups/rows props don't change
-  // just because a column is being resized. Forcing a local re-render on resize start/end (rather
-  // than tracking "is resizing" as its own bit of state) keeps this cell in sync without duplicating
-  // what react-table already knows.
   const bindResizeHandler = useCallback(
     (handler: (event: unknown) => void) => (event: unknown) => {
       handler(event);
