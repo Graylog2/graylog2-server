@@ -22,10 +22,18 @@ import type { Column } from '@tanstack/react-table';
 import CommonSortIcon from 'components/common/SortIcon';
 import type { ColumnMetaContext, EntityBase } from 'components/common/EntityDataTable/types';
 
-const StyledCommonSortIcon = styled(CommonSortIcon)(
-  ({ theme }) => css`
+const StyledCommonSortIcon = styled(CommonSortIcon)<{ $isRightAligned?: boolean }>(
+  ({ theme, $isRightAligned }) => css`
     display: inline-flex;
-    margin-left: ${theme.spacings.xs};
+    // Mirrors the rest of the header for right-aligned (numeric) columns: the indicator icons sit
+    // on the other side of the title there, so the margin needs to face the other way too.
+    ${$isRightAligned
+      ? css`
+          margin-right: ${theme.spacings.xs};
+        `
+      : css`
+          margin-left: ${theme.spacings.xs};
+        `}
     padding: 0;
     cursor: pointer;
   `,
@@ -44,6 +52,7 @@ const SORT_ORDER_NAMES = {
 const SortIcon = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
   const nextSortDirection = column.getNextSortingOrder() || SORT_DIRECTIONS.ASC;
   const columnMeta = column.columnDef.meta as ColumnMetaContext<Entity>;
+  const isRightAligned = columnMeta?.columnRenderer?.textAlign === 'right';
 
   return (
     <StyledCommonSortIcon
@@ -52,6 +61,7 @@ const SortIcon = <Entity extends EntityBase>({ column }: { column: Column<Entity
       title={`Sort ${columnMeta.label.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
       ascId={SORT_DIRECTIONS.ASC}
       descId={SORT_DIRECTIONS.DESC}
+      $isRightAligned={isRightAligned}
     />
   );
 };

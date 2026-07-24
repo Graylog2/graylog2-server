@@ -43,9 +43,9 @@ const DropdownTrigger = styled.button(
       outline-offset: 2px;
     }
 
-    &:hover .header-actions,
-    &:focus-within .header-actions,
-    &[aria-expanded='true'] .header-actions {
+    &:hover .header-action,
+    &:focus-within .header-action,
+    &[aria-expanded='true'] .header-action {
       opacity: 1;
     }
   `,

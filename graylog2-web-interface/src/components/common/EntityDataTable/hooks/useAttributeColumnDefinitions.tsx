@@ -96,9 +96,15 @@ export const IndicatorCol = styled.div`
   height: 100%;
 `;
 
-const ActiveSliceIcon = styled(Icon)(
-  ({ theme }) => css`
-    margin-left: ${theme.spacings.xs};
+const ActiveSliceIcon = styled(Icon)<{ $isRightAligned?: boolean }>(
+  ({ theme, $isRightAligned }) => css`
+    ${$isRightAligned
+      ? css`
+          margin-right: ${theme.spacings.xs};
+        `
+      : css`
+          margin-left: ${theme.spacings.xs};
+        `}
     color: ${theme.colors.gray[20]};
   `,
 );
@@ -159,10 +165,29 @@ const AttributeHeader = <Entity extends EntityBase>({
       ? `${DRAG_HANDLE_DEFAULT_TITLE} ${columnLabel.toLocaleLowerCase()}`
       : DRAG_HANDLE_DEFAULT_TITLE;
 
+  const sliceIndicator = isSliceActive && (
+    <ActiveSliceIcon
+      name="surgical"
+      title={`Slicing by ${columnLabel}`}
+      size="xs"
+      $isRightAligned={isRightAligned}
+    />
+  );
+  const sortIndicator = sortDirection && <SortIcon<Entity> column={ctx.header.column} />;
+
   const indicatorIcons = (
     <IndicatorCol ref={rightRef}>
-      {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" />}
-      {sortDirection && <SortIcon<Entity> column={ctx.header.column} />}
+      {isRightAligned ? (
+        <>
+          {sortIndicator}
+          {sliceIndicator}
+        </>
+      ) : (
+        <>
+          {sliceIndicator}
+          {sortIndicator}
+        </>
+      )}
     </IndicatorCol>
   );
 

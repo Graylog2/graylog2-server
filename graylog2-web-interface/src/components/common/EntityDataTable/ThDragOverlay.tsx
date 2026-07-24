@@ -57,10 +57,16 @@ const StyledDragIcon = styled(DragIcon)`
   top: -1px;
 `;
 
-const ActiveSliceIcon = styled(Icon)(
-  ({ theme }) => css`
+const ActiveSliceIcon = styled(Icon)<{ $isRightAligned?: boolean }>(
+  ({ theme, $isRightAligned }) => css`
     display: inline-flex;
-    margin-left: ${theme.spacings.xs};
+    ${$isRightAligned
+      ? css`
+          margin-right: ${theme.spacings.xs};
+        `
+      : css`
+          margin-left: ${theme.spacings.xs};
+        `}
     color: ${theme.colors.text.secondary};
     cursor: default;
   `,
@@ -100,10 +106,24 @@ const ThGhostInner = <Entity extends EntityBase>(
     </LeftCol>
   );
 
+  const sliceIndicator = isSliceActive && (
+    <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} $isRightAligned={isRightAligned} />
+  );
+  const sortIndicator = sortDirection && <SortIcon<Entity> column={column} />;
+
   const indicatorIcons = (
     <IndicatorCol>
-      {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} />}
-      {sortDirection && <SortIcon<Entity> column={column} />}
+      {isRightAligned ? (
+        <>
+          {sortIndicator}
+          {sliceIndicator}
+        </>
+      ) : (
+        <>
+          {sliceIndicator}
+          {sortIndicator}
+        </>
+      )}
     </IndicatorCol>
   );
 
