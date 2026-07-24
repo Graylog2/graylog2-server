@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export const CELL_PADDING = 5; // px
+export const CELL_PADDING_HORIZONTAL = 8; // px, left/right cell padding
+export const CELL_PADDING_VERTICAL = 6; // px, top/bottom cell padding
 export const DEFAULT_COL_MIN_WIDTH = 150; // px
 export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.
 export const MORE_ACTIONS_TITLE = 'More';
 export const MORE_ACTIONS_HOVER_TITLE = 'More actions';
 
-export const BULK_SELECT_COLUMN_WIDTH = 15 + CELL_PADDING * 2; // px
+export const BULK_SELECT_COLUMN_WIDTH = 15 + CELL_PADDING_HORIZONTAL * 2; // px
 export const BULK_SELECT_COL_ID = 'bulk-select';
 
 export const ACTIONS_COL_ID = 'actions';
