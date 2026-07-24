@@ -30,6 +30,7 @@ import {
 import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 import useForceUpdate from 'util/hooks/useForceUpdate';
+import zIndices from 'theme/z-indices';
 
 import type { EntityBase, ColumnMetaContext } from './types';
 
@@ -48,11 +49,12 @@ export const Th = styled.th<{
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
   $revealHeaderActions: boolean;
+  $zIndex: number;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, $revealHeaderActions, theme }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, $revealHeaderActions, $zIndex, theme }) => css`
     position: relative;
     padding: 0 !important;
-    z-index: 1;
+    z-index: ${$pinningPosition ? zIndices.tableHeaderCellPinned : $zIndex};
     font-weight: normal; // override the browser default bold th styling
     border-right-color: ${theme.colors.table.row.divider} !important;
     width: var(${columnWidthVar($colId)});
@@ -106,7 +108,7 @@ const ResizeHitArea = styled.div<{ $isResizing: boolean }>(
     top: 0;
     bottom: 0;
     right: -7px;
-    width: 12px;
+    width: 14px;
     cursor: col-resize;
     touch-action: none;
     user-select: none;
@@ -170,6 +172,7 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       $colId={header.column.id}
       $hidePadding={columnMeta?.hideCellPadding}
       $pinningPosition={header.column.getIsPinned()}
+      $zIndex={zIndices.tableHeaderCell - header.index}
       $revealHeaderActions={isHoveringResizeHandle || header.column.getIsResizing()}>
       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
       {header.column.getCanResize() && (
