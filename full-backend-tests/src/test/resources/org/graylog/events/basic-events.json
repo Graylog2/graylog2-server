@@ -1,0 +1,494 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEASTR7FQZ2ATX425VE"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEASTR7FQZ2ATX425VE",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:33dc44c1-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.035",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEAXN9Z9N813H22GVKE"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEAXN9Z9N813H22GVKE",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:33f8cd71-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.223",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEAK42THBQXGVBNDWV7"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEAK42THBQXGVBNDWV7",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:33fd6151-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.247",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEAREQREDD2K7PKDK7Q"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEAREQREDD2K7PKDK7Q",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:3407e8a1-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.315",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEAJWEM0HF6TK8VJG11"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEAJWEM0HF6TK8VJG11",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:3418b181-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.438",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEA4017TWRAPZNNAQG2"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEA4017TWRAPZNNAQG2",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:342c1271-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.555",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEAEY243H7RKZFMC88Z"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEAEY243H7RKZFMC88Z",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:342f1fb1-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.583",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEA4KVAHCENWR88ABTH"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEA4KVAHCENWR88ABTH",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:34373600-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.631",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEAP4A3ERTHWTBHXGB0"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEAP4A3ERTHWTBHXGB0",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:3441e461-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.697",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "01HQT8DVEA5EBS43EWC0W44X6M"
+          }
+        },
+        {
+          "data": {
+            "id": "01HQT8DVEA5EBS43EWC0W44X6M",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "65b3b6c7fb75676f62da9a79",
+            "origin_context": "urn:graylog:message:es:graylog2_60:344f03c1-d6f1-11ee-a5af-32f020c28ce8",
+            "timestamp": "2024-02-29 10:56:34.794",
+            "timestamp_processing": "2024-02-29 11:01:39.914",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "000000000000000000000001"
+            ],
+            "message": "adsd",
+            "source": "church.home.int",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 4
+            },
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": {
+              "timerange_start": "2024-02-29T10:56:33.933Z",
+              "timerange_end": "2024-02-29T11:01:33.933Z",
+              "query": "",
+              "streams": [
+                "000000000000000000000001"
+              ],
+              "filters": []
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
