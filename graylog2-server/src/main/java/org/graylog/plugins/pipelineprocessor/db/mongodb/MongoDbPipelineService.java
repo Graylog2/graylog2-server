@@ -131,7 +131,10 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public void delete(String id) {
+        // Delete the pipeline first so non-deletable system pipelines (e.g. Default Routing)
+        // fail before any stream connections are modified. See #21008.
         scopedEntityMongoUtils.deleteById(id);
+        pipelineStreamConnectionsService.deleteConnectionsForPipeline(id);
         clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
     }
 

@@ -108,6 +108,25 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
     }
 
     @Override
+    public void deleteConnectionsForPipeline(String pipelineId) {
+        for (PipelineConnections connections : loadByPipelineId(pipelineId)) {
+            final Set<String> remainingPipelineIds = connections.pipelineIds().stream()
+                    .filter(id -> !id.equals(pipelineId))
+                    .collect(Collectors.toSet());
+
+            if (remainingPipelineIds.isEmpty()) {
+                log.debug("Removing pipeline connections for stream {}", connections.streamId());
+                delete(connections.streamId());
+            } else {
+                final PipelineConnections updated = connections.toBuilder()
+                        .pipelineIds(remainingPipelineIds)
+                        .build();
+                save(updated);
+            }
+        }
+    }
+
+    @Override
     public Map<String, PipelineConnections> loadByStreamIds(Collection<String> streamIds) {
         try (final var stream = MongoUtils.stream(collection.find(in("stream_id", streamIds)))) {
             return stream.collect(Collectors.toMap(PipelineConnections::streamId, conn -> conn));

@@ -105,9 +105,9 @@ public class PipelineFacadeTest {
         entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope()));
 
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
-        pipelineService = new MongoDbPipelineService(
-                mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class), mock(PipelineStreamConnectionsService.class));
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoCollections, clusterEventBus);
+        pipelineService = new MongoDbPipelineService(
+                mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class), connectionsService);
 
         facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);
     }
@@ -265,11 +265,13 @@ public class PipelineFacadeTest {
         final PipelineDao pipelineDao = pipelineService.load("5a85c4854b900afd5d662be3");
 
         assertThat(pipelineService.loadAll()).hasSize(2);
+        assertThat(connectionsService.loadByPipelineId("5a85c4854b900afd5d662be3")).isNotEmpty();
         facade.delete(pipelineDao);
         assertThat(pipelineService.loadAll()).hasSize(1);
 
         assertThatThrownBy(() -> pipelineService.load("5a85c4854b900afd5d662be3"))
                 .isInstanceOf(NotFoundException.class);
+        assertThat(connectionsService.loadByPipelineId("5a85c4854b900afd5d662be3")).isEmpty();
     }
 
     @Test
