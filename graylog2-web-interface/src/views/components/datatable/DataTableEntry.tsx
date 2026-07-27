@@ -137,7 +137,7 @@ const DataTableEntry = ({
 }: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
-  const isStripedRow = striped && index % 2 !== 0;
+  const isStripedRow = striped && index % 2 === 0;
 
   const fieldColumns = fields
     .toArray()
