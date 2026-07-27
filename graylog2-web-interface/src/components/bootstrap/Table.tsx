@@ -27,6 +27,14 @@ export const flattenTableBackground = (theme: DefaultTheme, color: string) =>
 export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
 export const PINNED_CELL_STRIPED_CLASS_NAME = 'table-pinned-cell-striped';
 
+// Single source of truth for which rows count as striped, shared with the `& tbody:only-of-type > tr:nth-of-type`
+// selector below. Callers that need to know a row's striped state outside of CSS (e.g. to style a pinned cell that
+// can't rely on `nth-of-type`) must derive it from this same constant instead of re-deriving the parity themselves.
+const STRIPED_ROW_NTH_OF_TYPE: 'odd' | 'even' = 'even';
+
+export const isStripedRowIndex = (index: number) =>
+  STRIPED_ROW_NTH_OF_TYPE === 'even' ? index % 2 === 0 : index % 2 !== 0;
+
 export const getPinnedCellClassName = (isPinned: boolean, isStripedRow: boolean) => {
   if (!isPinned) {
     return undefined;
@@ -113,7 +121,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
 
     ${$striped &&
     css`
-      & tbody:only-of-type > tr:nth-of-type(even) {
+      & tbody:only-of-type > tr:nth-of-type(${STRIPED_ROW_NTH_OF_TYPE}) {
         background-color: ${theme.colors.table.row.backgroundStriped};
       }
 

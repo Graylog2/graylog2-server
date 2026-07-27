@@ -22,7 +22,7 @@ import flatten from 'lodash/flatten';
 import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
-import { getPinnedCellClassName } from 'components/bootstrap/Table';
+import { getPinnedCellClassName, isStripedRowIndex } from 'components/bootstrap/Table';
 import Value from 'views/components/Value';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -137,7 +137,7 @@ const DataTableEntry = ({
 }: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
-  const isStripedRow = striped && index % 2 === 0;
+  const isStripedRow = striped && isStripedRowIndex(index);
 
   const fieldColumns = fields
     .toArray()
