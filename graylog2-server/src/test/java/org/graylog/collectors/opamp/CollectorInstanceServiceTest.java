@@ -816,7 +816,7 @@ class CollectorInstanceServiceTest {
 
         final var lookup = new PendingChangesLookup(
                 Map.of("fleet-1", 5L),
-                Map.of("uid-pending-self", 4L));
+                Map.of("uid-pending-self", 4L), 0L);
 
         assertThat(collectorUids(CollectorInstanceService.hasPendingChangesFilter(lookup)))
                 .containsExactlyInAnyOrder("uid-pending-fleet", "uid-pending-self");
@@ -828,10 +828,24 @@ class CollectorInstanceServiceTest {
         insertInstance("uid-insync", "fleet-1", 5L);
         insertInstance("uid-untouched", "fleet-3", 0L);
 
-        final var lookup = new PendingChangesLookup(Map.of("fleet-1", 5L), Map.of());
+        final var lookup = new PendingChangesLookup(Map.of("fleet-1", 5L), Map.of(), 0L);
 
         assertThat(collectorUids(Filters.nor(CollectorInstanceService.hasPendingChangesFilter(lookup))))
                 .containsExactlyInAnyOrder("uid-insync", "uid-untouched");
+    }
+
+    @Test
+    void hasPendingChangesFilterSelectsInstancesBelowHighestPurgedSeq() {
+        insertInstance("uid-below", "fleet-1", 3L);   // below highestPurgedSeq (4): may have missed purged markers
+        insertInstance("uid-at", "fleet-1", 4L);      // saw everything that was purged
+        insertInstance("uid-above", "fleet-1", 9L);
+
+        final var lookup = new PendingChangesLookup(Map.of(), Map.of(), 4L);
+
+        assertThat(collectorUids(CollectorInstanceService.hasPendingChangesFilter(lookup)))
+                .containsExactly("uid-below");
+        assertThat(collectorUids(Filters.nor(CollectorInstanceService.hasPendingChangesFilter(lookup))))
+                .containsExactlyInAnyOrder("uid-at", "uid-above");
     }
 
     @Test
@@ -839,7 +853,7 @@ class CollectorInstanceServiceTest {
         insertInstance("uid-1", "fleet-1", 0L);
         insertInstance("uid-2", "fleet-2", 7L);
 
-        final var filter = CollectorInstanceService.hasPendingChangesFilter(new PendingChangesLookup(Map.of(), Map.of()));
+        final var filter = CollectorInstanceService.hasPendingChangesFilter(new PendingChangesLookup(Map.of(), Map.of(), 0L));
 
         assertThat(collectorUids(filter)).isEmpty();
         assertThat(collectorUids(Filters.nor(filter))).containsExactlyInAnyOrder("uid-1", "uid-2");

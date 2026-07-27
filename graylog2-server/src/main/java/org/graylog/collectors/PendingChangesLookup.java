@@ -30,8 +30,13 @@ import java.util.Objects;
  *
  * @param maxByFleetId     highest marker sequence per fleet id (fleet-scoped changes)
  * @param maxByInstanceUid highest marker sequence per collector instance uid (collector-scoped changes)
+ * @param highestPurgedSeq highest sequence deleted by transaction log purging, 0 if nothing was
+ *                         ever purged (see {@link FleetTransactionLogService#highestPurgedSeq()})
  */
-public record PendingChangesLookup(Map<String, Long> maxByFleetId, Map<String, Long> maxByInstanceUid) {
+public record PendingChangesLookup(Map<String, Long> maxByFleetId,
+                                   Map<String, Long> maxByInstanceUid,
+                                   long highestPurgedSeq
+) {
     public PendingChangesLookup {
         Objects.requireNonNull(maxByFleetId, "maxByFleetId must not be null");
         Objects.requireNonNull(maxByInstanceUid, "maxByInstanceUid must not be null");
@@ -40,12 +45,14 @@ public record PendingChangesLookup(Map<String, Long> maxByFleetId, Map<String, L
     /**
      * Returns whether the given instance has pending changes: {@code true} when the newest marker
      * targeting its current fleet or the instance itself is newer than the instance's last applied
-     * sequence ({@link CollectorInstanceDTO#lastProcessedTxnSeq()}).
+     * sequence ({@link CollectorInstanceDTO#lastProcessedTxnSeq()}), or when that sequence lies
+     * below {@link #highestPurgedSeq()} — markers the instance never applied may have been purged,
+     * so it cannot be assumed to be in sync.
      */
     public boolean isPending(CollectorInstanceDTO instance) {
         final var maxSeq = Math.max(
                 maxByFleetId.getOrDefault(instance.fleetId(), 0L),
                 maxByInstanceUid.getOrDefault(instance.instanceUid(), 0L));
-        return (maxSeq > instance.lastProcessedTxnSeq());
+        return maxSeq > instance.lastProcessedTxnSeq() || instance.lastProcessedTxnSeq() < highestPurgedSeq();
     }
 }

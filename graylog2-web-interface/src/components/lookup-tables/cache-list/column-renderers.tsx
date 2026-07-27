@@ -132,14 +132,17 @@ const columnRenderers: ColumnRenderers<CacheEntity> = {
     entries: {
       staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <EntriesCol cache={cache} />,
+      textAlign: 'right',
     },
     hit_rate: {
       staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <HitRateCol cache={cache} />,
+      textAlign: 'right',
     },
     throughput: {
       staticWidth: 150,
       renderCell: (_arg: unknown, cache: CacheEntity) => <ThroughputCol cache={cache} />,
+      textAlign: 'right',
     },
   },
 };

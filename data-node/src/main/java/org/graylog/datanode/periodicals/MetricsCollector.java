@@ -228,7 +228,7 @@ public class MetricsCollector extends Periodical {
             CompletableFuture<IndexResponse> response = client.asyncWithoutErrorMapping().index(indexRequest);
             response.whenComplete((indexResponse, throwable) -> {
                 if (Objects.nonNull(throwable)) {
-                    LOG.error("Error indexing metrics");
+                    LOG.error("Error indexing metrics into datastream {}", indexRequest.index(), throwable);
                 }
             });
         } catch (IOException e) {

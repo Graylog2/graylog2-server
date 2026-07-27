@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { ClusterDeflector, IndexerIndices } from '@graylog/server-api';
+import { ClusterDeflector, IndexerIndices, SystemIndexerIndices } from '@graylog/server-api';
 
 import type { StyleProps } from 'components/bootstrap/Button';
 import type { IndexArchiveBinding } from 'components/indices/archive/types';
@@ -51,9 +51,9 @@ type ActionDefinition = {
 };
 
 const deleteIncompatibleIndex = (index: IncompatibleIndex) =>
-  index.managed_index ? IndexerIndices.remove(index.index_name) : IndexerIndices.deleteOutdated(index.index_name);
+  index.managed_index ? IndexerIndices.remove(index.index_name) : SystemIndexerIndices.deleteOutdated(index.index_name);
 
-const reindexSystemIndex = (index: IncompatibleIndex) => IndexerIndices.reindex(index.index_name);
+const reindexSystemIndex = (index: IncompatibleIndex) => SystemIndexerIndices.reindex(index.index_name);
 
 const rotateWriteIndex = (index: IncompatibleIndex) => ClusterDeflector.cycleByindexSetId(index.active_write_index);
 
@@ -97,7 +97,9 @@ export const CORE_ACTION_DEFINITIONS: Record<Exclude<IndexAction, 'archive-delet
           <strong>{index.index_name}</strong> is the active write index of its index set and still receives new
           messages. Rotating starts a new write index on the current OpenSearch version.
         </p>
-        <p>Afterwards, <strong>{index.index_name}</strong> can be archived or deleted.</p>
+        <p>
+          Afterwards, <strong>{index.index_name}</strong> can be archived or deleted.
+        </p>
       </div>
     ),
     run: rotateWriteIndex,
@@ -118,7 +120,9 @@ const archiveDeleteDefinition = (archive: IndexArchiveBinding | undefined): Acti
     </p>
   ),
   run: (index) =>
-    archive ? archive.archiveAndDeleteIndex(index.index_name) : Promise.reject(new Error('Archiving is not available.')),
+    archive
+      ? archive.archiveAndDeleteIndex(index.index_name)
+      : Promise.reject(new Error('Archiving is not available.')),
   successMessage: (index) => `Archive and delete job for "${index.index_name}" was started.`,
   telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
   getPendingArchiveTracking: (index, response) => ({

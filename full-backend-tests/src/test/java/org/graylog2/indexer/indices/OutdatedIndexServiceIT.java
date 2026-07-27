@@ -43,7 +43,7 @@ public class OutdatedIndexServiceIT extends SearchServerBaseTest {
     public void setUp() throws Exception {
         indicesAdapter = searchServer().adapters().indicesAdapter();
         countsAdapter = searchServer().adapters().countsAdapter();
-        outdatedIndexService = new OutdatedIndexService(indicesAdapter, null, null);
+        outdatedIndexService = new OutdatedIndexService(indicesAdapter, null, null, null, null);
     }
 
     @FullBackendTest

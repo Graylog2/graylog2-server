@@ -22,7 +22,11 @@ import styled, { css } from 'styled-components';
 import { Table as BaseTable } from 'components/bootstrap';
 import EntityTableOverrideRow from 'components/common/EntityDataTable/EntityTableOverrideRow';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import {
+  ACTIONS_COL_ID,
+  CELL_PADDING_VERTICAL,
+  CELL_PADDING_HORIZONTAL,
+} from 'components/common/EntityDataTable/Constants';
 import type {
   EntityBase,
   ExpandedSectionRenderers,
@@ -56,13 +60,19 @@ const Td = styled.td<{
   $colId: string;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
+  $textAlign: string;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, $textAlign }) => css`
     word-break: break-word;
+    ${$textAlign && css`text-align: ${$textAlign};`}
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
     height: 100%; // required to be able to use height: 100% in child elements
+    && {
+      padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
+    }
+
     ${$pinningPosition
       ? css`
           position: sticky;
@@ -101,7 +111,7 @@ const Table = <Entity extends EntityBase>({
   const isRowExpanded = (rowId: string) => !!expandedSections?.[rowId];
 
   return (
-    <StyledTable condensed>
+    <StyledTable condensed bordered>
       <TableHead headerGroups={headerGroups} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
@@ -114,7 +124,8 @@ const Table = <Entity extends EntityBase>({
               key={cell.id}
               $colId={cell.column.id}
               $pinningPosition={cell.column.getIsPinned()}
-              $hidePadding={columnMeta?.hideCellPadding}>
+              $hidePadding={columnMeta?.hideCellPadding}
+              $textAlign={columnMeta?.columnRenderer?.textAlign}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           );
