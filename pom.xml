@@ -134,6 +134,11 @@
         <azure-json.version>1.5.1</azure-json.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.1.0</geoip2.version>
+        <google-api-common.version>2.65.0</google-api-common.version>
+        <google-auth-library.version>1.49.0</google-auth-library.version>
+        <google-cloud-core.version>2.72.0</google-cloud-core.version>
+        <google-gax.version>2.82.0</google-gax.version>
+        <google-http-client.version>2.1.1</google-http-client.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.82.2</grpc.version>
@@ -192,7 +197,8 @@
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>4.35.1</protobuf.version>
-        <proto-google-common-protos.version>2.72.0</proto-google-common-protos.version>
+        <proto-google-common-protos.version>2.73.0</proto-google-common-protos.version>
+        <proto-google-iam-v1.version>1.68.0</proto-google-iam-v1.version>
         <reactor.version>3.7.19</reactor.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
@@ -374,12 +380,75 @@
                 <artifactId>error_prone_annotations</artifactId>
                 <version>${error-prone.version}</version>
             </dependency>
-            <!-- grpc-protobuf pulls in an older proto-google-common-protos than
-                 google-cloud-storage requires -->
+            <!-- Shared Google API client libraries that are pulled in transitively
+                 at conflicting versions by grpc and the google-cloud-* libraries
+                 used in the server and the plugins (e.g., google-cloud-storage,
+                 google-cloud-logging, google-cloud-bigquery). They are released in
+                 lockstep and need to be pinned to the highest required version. -->
+            <dependency>
+                <groupId>com.google.api</groupId>
+                <artifactId>api-common</artifactId>
+                <version>${google-api-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.api</groupId>
+                <artifactId>gax</artifactId>
+                <version>${google-gax.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.api</groupId>
+                <artifactId>gax-grpc</artifactId>
+                <version>${google-gax.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.api</groupId>
+                <artifactId>gax-httpjson</artifactId>
+                <version>${google-gax.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.api.grpc</groupId>
                 <artifactId>proto-google-common-protos</artifactId>
                 <version>${proto-google-common-protos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.api.grpc</groupId>
+                <artifactId>proto-google-iam-v1</artifactId>
+                <version>${proto-google-iam-v1.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auth</groupId>
+                <artifactId>google-auth-library-credentials</artifactId>
+                <version>${google-auth-library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auth</groupId>
+                <artifactId>google-auth-library-oauth2-http</artifactId>
+                <version>${google-auth-library.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-core</artifactId>
+                <version>${google-cloud-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-core-grpc</artifactId>
+                <version>${google-cloud-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-core-http</artifactId>
+                <version>${google-cloud-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.http-client</groupId>
+                <artifactId>google-http-client</artifactId>
+                <version>${google-http-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.http-client</groupId>
+                <artifactId>google-http-client-gson</artifactId>
+                <version>${google-http-client.version}</version>
             </dependency>
             <!-- Shared libraries that are pulled in transitively at conflicting
                  versions by different dependencies -->
