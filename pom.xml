@@ -133,7 +133,7 @@
         <azure-blob-storage.version>12.35.0</azure-blob-storage.version>
         <azure-json.version>1.5.1</azure-json.version>
         <gelfclient.version>1.5.1</gelfclient.version>
-        <geoip2.version>5.1.0</geoip2.version>
+        <geoip2.version>5.2.0</geoip2.version>
         <google-api-common.version>2.65.0</google-api-common.version>
         <google-auth-library.version>1.49.0</google-auth-library.version>
         <google-cloud-core.version>2.72.0</google-cloud-core.version>
