@@ -74,7 +74,8 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         final String nodeName = localConfiguration.getDatanodeNodeName();
         properties.put("node.name", nodeName);
 
-        LOG.info("Opensearch networking: bind host: {}, publish host: {}, node name: {}", bindHost, publishHost, nodeName);
+        final String hostname = localConfiguration.getHostname();
+        LOG.info("Opensearch networking: bind host: {}, publish host: {}, node name: {}, hostname: {}", bindHost, publishHost, nodeName, hostname);
 
         final String initialClusterManagerNodes = getInitialClusterManagerNodes();
         properties.put("cluster.initial_cluster_manager_nodes", initialClusterManagerNodes);
