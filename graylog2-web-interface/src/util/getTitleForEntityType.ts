@@ -35,6 +35,7 @@ const supportedTypes = new Set([
   'sigma_rule',
   'event_procedure',
   'event_procedure_step',
+  'collection',
 ]);
 
 const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {

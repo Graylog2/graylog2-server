@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.startpage.recentActivities;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -40,6 +42,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -57,6 +61,7 @@ public class RecentActivityServiceTest {
     RecentActivityService recentActivityService;
     TestUserService testUserService;
     GRNRegistry grnRegistry;
+    EventBus eventBus;
 
     PermissionAndRoleResolver permissionAndRoleResolver;
 
@@ -94,10 +99,11 @@ public class RecentActivityServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
+        this.eventBus = new EventBus();
         this.recentActivityService = new RecentActivityService(
                 mongoCollections,
                 mongodb.mongoConnection(),
-               null,
+                eventBus,
                 grnRegistry,
                 permissionAndRoleResolver,
                 MAXIMUM,
@@ -186,5 +192,40 @@ public class RecentActivityServiceTest {
 
         assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemGrn().entity(), "2")).toList().size()).isEqualTo(1);
         assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemGrn().entity(), "3")).toList().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testCreateWithTitleStoresTheGivenTitle() {
+        final var collector = new RecentActivityEventCollector();
+        eventBus.register(collector);
+
+        recentActivityService.create("1", GRNTypes.DASHBOARD, "My Dashboard", user);
+
+        assertThat(collector.events).singleElement().satisfies(event -> {
+            assertThat(event.activityType()).isEqualTo(ActivityType.CREATE);
+            assertThat(event.itemTitle()).isEqualTo("My Dashboard");
+        });
+    }
+
+    @Test
+    public void testUpdateWithTitleStoresTheGivenTitle() {
+        final var collector = new RecentActivityEventCollector();
+        eventBus.register(collector);
+
+        recentActivityService.update("1", GRNTypes.DASHBOARD, "My Dashboard", user);
+
+        assertThat(collector.events).singleElement().satisfies(event -> {
+            assertThat(event.activityType()).isEqualTo(ActivityType.UPDATE);
+            assertThat(event.itemTitle()).isEqualTo("My Dashboard");
+        });
+    }
+
+    static class RecentActivityEventCollector {
+        final List<RecentActivityEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void handle(RecentActivityEvent event) {
+            events.add(event);
+        }
     }
 }
