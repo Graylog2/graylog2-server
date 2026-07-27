@@ -21,7 +21,7 @@ import camelCase from 'lodash/camelCase';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
-import { ColorPickerPopover, TimezoneSelect } from 'components/common';
+import { ColorPickerPopover, TimezoneSelect, URLAllowListInput } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import type { SelectCallback } from 'components/bootstrap/types';
 import DocsHelper from 'util/DocsHelper';
@@ -127,6 +127,10 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
     this.propagateChange(name, getValueFromInput(event.target));
   };
 
+  handleWebhookUrlChange = (event: any) => {
+    this.propagateChange('webhook_url', getValueFromInput(event.target));
+  };
+
   render() {
     const { config, validation } = this.props;
     const { isBacklogSizeEnabled, backlogSize } = this.state;
@@ -155,16 +159,13 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
           </div>
           <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
         </FormGroup>
-        <Input
-          id="notification-webhookUrl"
-          name="webhook_url"
+        <URLAllowListInput
           label="Webhook URL"
-          type="text"
-          bsStyle={validation.errors.webhook_url ? 'error' : null}
-          help={get(validation, 'errors.webhook_url[0]', 'Teams "Incoming Webhook" URL')}
-          value={config.webhook_url || ''}
-          onChange={this.handleChange}
-          required
+          onChange={this.handleWebhookUrlChange}
+          validationState={validation.errors.webhook_url ? 'error' : null}
+          validationMessage={get(validation, 'errors.webhook_url[0]', 'Teams "Incoming Webhook" URL')}
+          url={config.webhook_url || ''}
+          autofocus={false}
         />
         <Input
           id="notification-customMessage"
@@ -196,6 +197,7 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
               <input
                 id="toggle_backlog_size"
                 type="checkbox"
+                aria-label="Enable message backlog limit"
                 checked={isBacklogSizeEnabled}
                 onChange={this.toggleBacklogSize}
               />

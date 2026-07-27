@@ -33,6 +33,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.StringUtils;
+import org.graylog2.system.urlallowlist.UrlAllowlistValidator;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,19 +53,22 @@ public class TeamsEventNotificationV2 implements EventNotification {
     private final NodeId nodeId;
     private final RequestClient requestClient;
     private final TemplateModelProvider templateModelProvider;
+    private final UrlAllowlistValidator urlAllowlistValidator;
 
     @Inject
     public TeamsEventNotificationV2(EventNotificationService notificationCallbackService,
                                     @Named("JsonSafe") Engine jsonTemplateEngine,
                                     NotificationService notificationService,
                                     NodeId nodeId, RequestClient requestClient,
-                                    TemplateModelProvider templateModelProvider) {
+                                    TemplateModelProvider templateModelProvider,
+                                    UrlAllowlistValidator urlAllowlistValidator) {
         this.notificationCallbackService = notificationCallbackService;
         this.jsonTemplateEngine = requireNonNull(jsonTemplateEngine);
         this.notificationService = requireNonNull(notificationService);
         this.nodeId = requireNonNull(nodeId);
         this.requestClient = requireNonNull(requestClient);
         this.templateModelProvider = templateModelProvider;
+        this.urlAllowlistValidator = requireNonNull(urlAllowlistValidator);
     }
 
     /**
@@ -79,6 +83,7 @@ public class TeamsEventNotificationV2 implements EventNotification {
         LOG.debug("TeamsEventNotificationV2 backlog size in method execute is [{}]", config.backlogSize());
 
         try {
+            urlAllowlistValidator.validateUrl(config.webhookUrl(), ctx);
             final String requestBody = generateBody(ctx, config);
             requestClient.send(requestBody, config.webhookUrl());
         } catch (TemporaryEventNotificationException exp) {

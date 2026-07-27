@@ -31,7 +31,7 @@ import {
   InputGroup,
   Row,
 } from 'components/bootstrap';
-import { ColorPickerPopover, TimezoneSelect } from 'components/common';
+import { ColorPickerPopover, TimezoneSelect, URLAllowListInput } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import DocumentationLink from 'components/support/DocumentationLink';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -159,6 +159,10 @@ class SlackNotificationForm extends React.Component<Props, any> {
     this.propagateChange(name, getValueFromInput(event.target));
   };
 
+  handleWebhookUrlChange = (event) => {
+    this.propagateChange('webhook_url', getValueFromInput(event.target));
+  };
+
   handleTimeZoneChange = (nextValue) => {
     this.propagateChange('time_zone', nextValue);
   };
@@ -191,16 +195,13 @@ class SlackNotificationForm extends React.Component<Props, any> {
           </div>
           <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
         </FormGroup>
-        <Input
-          id="notification-webhookUrl"
-          name="webhook_url"
+        <URLAllowListInput
           label="Webhook URL"
-          type="text"
-          bsStyle={validation.errors.webhook_url ? 'error' : null}
-          help={validation?.errors?.webhook_url?.[0] || 'Slack "Incoming Webhook" URL'}
-          value={config.webhook_url || ''}
-          onChange={this.handleChange}
-          required
+          onChange={this.handleWebhookUrlChange}
+          validationState={validation.errors.webhook_url ? 'error' : null}
+          validationMessage={validation?.errors?.webhook_url?.[0] || 'Slack "Incoming Webhook" URL'}
+          url={config.webhook_url || ''}
+          autofocus={false}
         />
         <Input
           id="notification-channel"
@@ -247,6 +248,7 @@ class SlackNotificationForm extends React.Component<Props, any> {
               <input
                 id="toggle_backlog_size"
                 type="checkbox"
+                aria-label="Enable message backlog limit"
                 checked={isBacklogSizeEnabled}
                 onChange={this.toggleBacklogSize}
               />
