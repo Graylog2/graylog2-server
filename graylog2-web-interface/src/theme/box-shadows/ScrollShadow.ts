@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { css } from 'styled-components';
+
 import { COLOR_SCHEME_LIGHT } from 'theme/constants';
 
 const SIZE = 5;
