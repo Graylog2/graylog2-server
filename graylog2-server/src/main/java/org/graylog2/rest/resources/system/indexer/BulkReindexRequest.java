@@ -14,22 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
 
-import { Onboarding } from '@graylog/server-api';
+package org.graylog2.rest.resources.system.indexer;
 
-export const ONBOARDING_ELIGIBILITY_QUERY_KEY = ['onboarding', 'eligibility'];
+import java.util.List;
 
-const fetchOnboardingEligibility = () => Onboarding.get();
+public record BulkReindexRequest(List<String> indices, boolean withReplication) {
 
-const useOnboardingEligibility = (enabled: boolean = true) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ONBOARDING_ELIGIBILITY_QUERY_KEY,
-    queryFn: fetchOnboardingEligibility,
-    enabled,
-  });
+    public BulkReindexRequest(List<String> indices) {
+        this(indices, true);
+    }
 
-  return { data, isLoading };
-};
-
-export default useOnboardingEligibility;
+}

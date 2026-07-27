@@ -23,8 +23,10 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.NodeInfoCache;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
+import org.graylog2.indexer.indices.ReindexOutdatedIndexJob;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
@@ -32,6 +34,7 @@ import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -59,6 +62,9 @@ class OutdatedIndicesResourceTest {
 
     @Mock
     OutdatedIndexService outdatedIndexService;
+
+    @Mock
+    SystemJobManager systemJobManager;
 
     @Mock
     AuditEventSender auditEventSender;
@@ -95,7 +101,11 @@ class OutdatedIndicesResourceTest {
     void reindexSucceeds() {
         when(outdatedIndexService.getOutdatedIndices()).thenReturn(List.of(new OutdatedIndex(".outdated1", "1.3.0", false, false, null)));
         outdatedIndexResource.reindex(".outdated1", true);
-        verify(outdatedIndexService, times(1)).reindex(".outdated1", true);
+        // Reindex is now submitted to the system job scheduler; the job guards concurrency and does the work.
+        final var captor = ArgumentCaptor.forClass(ReindexOutdatedIndexJob.Config.class);
+        verify(systemJobManager, times(1)).submit(captor.capture());
+        assertThat(captor.getValue().index()).isEqualTo(".outdated1");
+        assertThat(captor.getValue().withReplicas()).isTrue();
     }
 
     @Test

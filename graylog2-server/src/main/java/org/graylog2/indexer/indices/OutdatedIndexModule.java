@@ -14,22 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+package org.graylog2.indexer.indices;
 
-import { Onboarding } from '@graylog/server-api';
+import org.graylog2.plugin.PluginModule;
 
-export const ONBOARDING_ELIGIBILITY_QUERY_KEY = ['onboarding', 'eligibility'];
-
-const fetchOnboardingEligibility = () => Onboarding.get();
-
-const useOnboardingEligibility = (enabled: boolean = true) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ONBOARDING_ELIGIBILITY_QUERY_KEY,
-    queryFn: fetchOnboardingEligibility,
-    enabled,
-  });
-
-  return { data, isLoading };
-};
-
-export default useOnboardingEligibility;
+public class OutdatedIndexModule extends PluginModule {
+    @Override
+    protected void configure() {
+        addSystemSchedulerJob(
+                ReindexOutdatedIndexJob.TYPE_NAME,
+                ReindexOutdatedIndexJob.class,
+                ReindexOutdatedIndexJob.Factory.class,
+                ReindexOutdatedIndexJob.Config.class);
+    }
+}

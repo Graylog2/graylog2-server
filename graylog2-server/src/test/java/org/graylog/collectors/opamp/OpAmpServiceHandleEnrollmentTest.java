@@ -131,7 +131,7 @@ class OpAmpServiceHandleEnrollmentTest {
         assertThat(response.hasErrorResponse()).isFalse();
         assertThat(response.hasConnectionSettings()).isTrue();
         verify(collectorInstanceService).enroll(eq(instanceUuid.toString()), eq("new-fleet-id"), any(IssuedCertificate.class), eq("new-token-id"));
-        verify(collectorInstanceService, never()).reEnroll(any(), any(), any(), any());
+        verify(collectorInstanceService, never()).reEnroll(any(), any(), any());
         verify(enrollmentTokenService).incrementUsage("new-token-id");
         verify(enrollmentTokenService, never()).markUsed(any());
     }
@@ -146,14 +146,13 @@ class OpAmpServiceHandleEnrollmentTest {
 
         final CollectorInstanceDTO existing = existingRecordFor(instanceUuid.toString(), keyPair, "original-token-id", "original-fleet-id");
         when(collectorInstanceService.findByInstanceUid(instanceUuid.toString())).thenReturn(Optional.of(existing));
-        when(collectorInstanceService.reEnroll(any(), any(), any(), any())).thenReturn(existing);
+        when(collectorInstanceService.reEnroll(any(), any(), any())).thenReturn(existing);
 
         final var response = opAmpService.handleMessage(message, auth);
 
         assertThat(response.hasErrorResponse()).isFalse();
         assertThat(response.hasConnectionSettings()).isTrue();
-        verify(collectorInstanceService).reEnroll(eq(existing.id()), eq(existing.activeCertificateFingerprint()),
-                any(IssuedCertificate.class), eq("new-token-id"));
+        verify(collectorInstanceService).reEnroll(eq(existing), any(IssuedCertificate.class), eq("new-token-id"));
         verify(collectorInstanceService, never()).enroll(any(), any(), any(), any());
         verify(enrollmentTokenService).incrementUsage("new-token-id");
         verify(enrollmentTokenService, never()).markUsed(any());
@@ -168,13 +167,12 @@ class OpAmpServiceHandleEnrollmentTest {
 
         final CollectorInstanceDTO existing = existingRecordFor(instanceUuid.toString(), keyPair, "same-token-id", "same-fleet-id");
         when(collectorInstanceService.findByInstanceUid(instanceUuid.toString())).thenReturn(Optional.of(existing));
-        when(collectorInstanceService.reEnroll(any(), any(), any(), any())).thenReturn(existing);
+        when(collectorInstanceService.reEnroll(any(), any(), any())).thenReturn(existing);
 
         final var response = opAmpService.handleMessage(message, auth);
 
         assertThat(response.hasErrorResponse()).isFalse();
-        verify(collectorInstanceService).reEnroll(eq(existing.id()), eq(existing.activeCertificateFingerprint()),
-                any(IssuedCertificate.class), eq("same-token-id"));
+        verify(collectorInstanceService).reEnroll(eq(existing), any(IssuedCertificate.class), eq("same-token-id"));
         verify(enrollmentTokenService, never()).incrementUsage(any());
         // The skipped increment must not freeze the token's last_used_at — it would look dormant
         // to operators even though a collector still relies on it for recovery.
@@ -198,7 +196,7 @@ class OpAmpServiceHandleEnrollmentTest {
         assertThat(response.hasErrorResponse()).isTrue();
         assertThat(response.getErrorResponse().getErrorMessage()).isEqualTo("Enrollment rejected.");
         verify(collectorInstanceService, never()).enroll(any(), any(), any(), any());
-        verify(collectorInstanceService, never()).reEnroll(any(), any(), any(), any());
+        verify(collectorInstanceService, never()).reEnroll(any(), any(), any());
         verify(enrollmentTokenService, never()).incrementUsage(any());
         verify(enrollmentTokenService, never()).markUsed(any());
     }
@@ -215,7 +213,7 @@ class OpAmpServiceHandleEnrollmentTest {
         assertThat(response.hasErrorResponse()).isTrue();
         assertThat(response.getErrorResponse().getErrorMessage()).contains("Missing CSR");
         verify(collectorInstanceService, never()).enroll(any(), any(), any(), any());
-        verify(collectorInstanceService, never()).reEnroll(any(), any(), any(), any());
+        verify(collectorInstanceService, never()).reEnroll(any(), any(), any());
         verify(enrollmentTokenService, never()).incrementUsage(any());
         verify(enrollmentTokenService, never()).markUsed(any());
     }

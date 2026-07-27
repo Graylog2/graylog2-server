@@ -49,6 +49,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -191,21 +192,30 @@ class OutdatedIndexServiceTest {
         when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
         when(indicesAdapter.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
         when(indicesAdapter.waitForRecovery("my_index")).thenReturn(HealthStatus.Green);
+        // Equal counts everywhere so both safety checks pass: source == temp == recreated.
+        OutdatedIndexService spiedService = spy(outdatedIndexService);
+        when(spiedService.numberOfMessages("my_index")).thenReturn(10L);
+        when(spiedService.numberOfMessages(".gltmp_my_index")).thenReturn(10L);
 
-        outdatedIndexService.reindex("my_index", true);
+        spiedService.reindex("my_index", true);
 
-        InOrder inOrder = inOrder(indicesAdapter, indicesAdapter);
+        InOrder inOrder = inOrder(spiedService, indicesAdapter);
         inOrder.verify(indicesAdapter).waitForRecovery("my_index", 2);
         inOrder.verify(indicesAdapter).getStructuredIndexSettings("my_index");
         inOrder.verify(indicesAdapter).getIndexMapping("my_index");
+        inOrder.verify(spiedService).numberOfMessages("my_index"); // capture source count before any destructive step
         inOrder.verify(indicesAdapter).exists(".gltmp_my_index");
         inOrder.verify(indicesAdapter).create(eq(".gltmp_my_index"), any(IndexSettings.class), eq(sourceMapping));
         inOrder.verify(indicesAdapter).waitForRecovery(".gltmp_my_index");
         inOrder.verify(indicesAdapter).reindex(eq("my_index"), eq(".gltmp_my_index"), any());
+        inOrder.verify(indicesAdapter).refresh(".gltmp_my_index");
+        inOrder.verify(spiedService).numberOfMessages(".gltmp_my_index"); // verify temp copy is complete before deleting source
         inOrder.verify(indicesAdapter).delete("my_index");
         inOrder.verify(indicesAdapter).create(eq("my_index"), any(IndexSettings.class), eq(sourceMapping));
         inOrder.verify(indicesAdapter).waitForRecovery("my_index");
         inOrder.verify(indicesAdapter).reindex(eq(".gltmp_my_index"), eq("my_index"), any());
+        inOrder.verify(indicesAdapter).refresh("my_index");
+        inOrder.verify(spiedService).numberOfMessages("my_index"); // verify recreated index is complete before deleting temp
         inOrder.verify(indicesAdapter).delete(".gltmp_my_index");
     }
 
