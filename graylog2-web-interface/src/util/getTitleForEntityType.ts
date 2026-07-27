@@ -36,6 +36,7 @@ const supportedTypes = new Set([
   'event_procedure',
   'event_procedure_step',
   'collection',
+  'collection_entities',
 ]);
 
 const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
