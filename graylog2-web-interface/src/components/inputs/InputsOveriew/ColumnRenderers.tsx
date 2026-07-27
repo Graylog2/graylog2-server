@@ -78,6 +78,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
         </ExpandedSectionToggleWrapper>
       ),
       staticWidth: 180,
+      textAlign: 'right',
     },
     input_failures: {
       renderCell: (_failures: string, input: InputSummary) => (
@@ -86,6 +87,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
         </ExpandedSectionToggleWrapper>
       ),
       staticWidth: 130,
+      textAlign: 'right',
     },
     address: {
       renderCell: (_address: string, input: InputSummary) => (
@@ -104,6 +106,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     [METRIC_COLUMN_IDS.messagesPerStream]: {
       renderCell: (_value: unknown, input: InputSummary) => <MessageCountCell input={input} />,
       staticWidth: 180,
+      textAlign: 'right',
     },
     [METRIC_COLUMN_IDS.extractorCount]: {
       renderCell: (_value: unknown, input: InputSummary) => <ExtractorCountCell input={input} />,
@@ -112,6 +115,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     [METRIC_COLUMN_IDS.associatedStreams]: {
       renderCell: (_value: unknown, input: InputSummary) => <AssociatedStreamsCell input={input} />,
       staticWidth: 180,
+      textAlign: 'right',
     },
   },
 });

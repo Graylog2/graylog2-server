@@ -29,6 +29,15 @@ const DefaultColumnRenderers = {
     STRING: {
       renderCell: (text: string) => <TextOverflowEllipsis>{text}</TextOverflowEllipsis>,
     },
+    DOUBLE: {
+      textAlign: 'right',
+    },
+    INT: {
+      textAlign: 'right',
+    },
+    LONG: {
+      textAlign: 'right',
+    },
   },
   attributes: {
     description: {

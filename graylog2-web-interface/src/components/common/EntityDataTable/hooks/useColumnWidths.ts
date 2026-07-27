@@ -17,6 +17,7 @@
 import { useState, useLayoutEffect, useMemo, useRef } from 'react';
 import isEqual from 'lodash/isEqual';
 
+import { TABLE_BORDER_WIDTH } from 'components/bootstrap/Table';
 import {
   DEFAULT_COL_MIN_WIDTH,
   DEFAULT_COL_WIDTH,
@@ -41,7 +42,9 @@ const calculateAssignableWidth = ({
 }) => {
   const staticColWidths = columnIds.reduce((total, id) => total + (staticColumnWidths[id] ?? 0), 0);
 
-  return scrollContainerWidth - bulkSelectColWidth - actionsColMinWidth - staticColWidths;
+  // The table's own outer border (left edge) is real box-model width under border-collapse: separate,
+  // so it must be reserved here or the assigned column widths overflow the scroll container.
+  return scrollContainerWidth - TABLE_BORDER_WIDTH - bulkSelectColWidth - actionsColMinWidth - staticColWidths;
 };
 
 const calculateColumnWidths = ({
