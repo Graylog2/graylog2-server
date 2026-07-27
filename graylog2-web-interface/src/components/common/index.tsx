@@ -26,6 +26,7 @@ export { default as Autocomplete } from './Autocomplete/Autocomplete';
 export { default as BrowserTime } from './BrowserTime';
 export { default as Box } from './Box';
 export { default as BrandIcon } from './BrandIcon';
+export { default as Breadcrumbs } from './Breadcrumbs';
 export { default as Card } from './Card';
 export { default as Center } from './Center';
 export { default as ClearFloat } from './ClearFloat';
