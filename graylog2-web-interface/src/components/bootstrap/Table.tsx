@@ -27,9 +27,6 @@ export const flattenTableBackground = (theme: DefaultTheme, color: string) =>
 export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
 export const PINNED_CELL_STRIPED_CLASS_NAME = 'table-pinned-cell-striped';
 
-// Single source of truth for which rows count as striped, shared with the `& tbody:only-of-type > tr:nth-of-type`
-// selector below. Callers that need to know a row's striped state outside of CSS (e.g. to style a pinned cell that
-// can't rely on `nth-of-type`) must derive it from this same constant instead of re-deriving the parity themselves.
 const STRIPED_ROW_NTH_OF_TYPE: 'odd' | 'even' = 'even';
 
 export const isStripedRowIndex = (index: number) =>
