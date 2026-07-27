@@ -209,7 +209,7 @@
         <oshi.version>7.3.2</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.18</slf4j.version>
-        <streamex.version>0.8.4</streamex.version>
+        <streamex.version>0.9.0</streamex.version>
         <swagger.version>2.2.52</swagger.version>
         <swagger-parser.version>2.1.45</swagger-parser.version>
         <syslog4j.version>0.9.63</syslog4j.version>
