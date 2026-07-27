@@ -221,7 +221,7 @@ public class ContentPackService {
                 } catch (SkippableEntityException e) {
                     // An optional reference (e.g. a stream_title pointing at a stream that does not exist here) could
                     // not be resolved. Skip it and continue rather than aborting and rolling back the whole install.
-                    LOG.debug("Skipping unresolvable entity {} during content pack installation: {}", entityDescriptor, e.getMessage());
+                    LOG.info("Skipping unresolvable entity {} during content pack installation: {}", entityDescriptor, e.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -343,7 +343,19 @@ public class ContentPackService {
                                 LOG.debug("Entity type {} does not support in-place update, recreating entity {}",
                                         entity.type(), entityDescriptor);
                                 facade.delete(nativeEntity.entity());
-                                final NativeEntity<?> recreatedEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                                final NativeEntity<?> recreatedEntity;
+                                try {
+                                    recreatedEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
+                                } catch (SkippableEntityException e) {
+                                    // The old entity has already been deleted, so silently skipping here would lose it
+                                    // and still report success. Escalate to a hard failure so the upgrade aborts and
+                                    // rolls back instead. Not reachable today: the only SkippableEntityException source
+                                    // (StreamReferenceFacade) is an UpdatableEntityFacade and takes the update branch
+                                    // above, so it never enters delete-and-recreate; this guards a future non-updatable
+                                    // tolerant facade.
+                                    throw new ContentPackException(
+                                            "Entity " + entityDescriptor + " was deleted during upgrade but could not be recreated", e);
+                                }
                                 allEntityDescriptors.add(recreatedEntity.descriptor());
                                 createdEntities.put(entityDescriptor, recreatedEntity.entity());
                                 allEntities.put(entityDescriptor, recreatedEntity.entity());
@@ -365,7 +377,7 @@ public class ContentPackService {
                 } catch (SkippableEntityException e) {
                     // An optional reference (e.g. a stream_title pointing at a stream that does not exist here) could
                     // not be resolved. Skip it and continue rather than aborting and rolling back the whole upgrade.
-                    LOG.debug("Skipping unresolvable entity {} during content pack upgrade: {}", entityDescriptor, e.getMessage());
+                    LOG.info("Skipping unresolvable entity {} during content pack upgrade: {}", entityDescriptor, e.getMessage());
                 }
             }
         } catch (Exception e) {

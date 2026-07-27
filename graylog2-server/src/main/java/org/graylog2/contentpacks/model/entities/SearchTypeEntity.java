@@ -222,8 +222,9 @@ public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
      * Resolves a single stream reference from the search type's {@code streams} set to the native stream id.
      * <p>
      * A reference that cannot be resolved (e.g. a dangling reference left over in an exported content pack) is
-     * skipped with a warning rather than aborting the whole content pack installation. This mirrors the export
-     * side, which also silently drops stream references it cannot map.
+     * skipped with a warning rather than aborting the whole content pack installation. Note this import side is
+     * deliberately more tolerant than the export side ({@code SearchType.mappedStreams}), which still throws on an
+     * unresolvable reference.
      */
     default Optional<String> resolveStreamReference(String streamId, Map<EntityDescriptor, Object> nativeEntities) {
         final Object object = resolveStreamEntityObject(streamId, nativeEntities);

@@ -62,6 +62,7 @@ import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.exceptions.SkippableEntityException;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.InputFacade;
@@ -729,6 +730,28 @@ public class ContentPackServiceTest {
                 .hasMessageContaining("upgrade");
 
         verify(patternService, never()).delete(any());
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackAbortsWhenNonUpdatableEntityCannotBeRecreatedAfterDelete() throws Exception {
+        // A non-updatable facade upgrades via delete-and-recreate. If createNativeEntity then throws
+        // SkippableEntityException, the old entity has already been deleted, so silently skipping it would lose the
+        // entity while still reporting success. The upgrade must abort (and roll back) instead of swallowing it.
+        GrokPattern existingPattern = GrokPattern.builder().id("dead-beef1").name("NAME").pattern("\\w").build();
+        when(patternService.load("dead-beef1")).thenReturn(existingPattern);
+        when(patternService.save(any())).thenThrow(new SkippableEntityException("simulated unresolvable reference"));
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        assertThatThrownBy(() -> contentPackService.upgradeContentPack(
+                contentPack, contentPackInstallation, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY))
+                .isInstanceOf(ContentPackException.class)
+                .hasMessageContaining("upgrade");
+
+        // The old entity was already deleted as part of the recreate attempt.
+        verify(patternService).delete("dead-beef1");
     }
 
     @Test

@@ -158,7 +158,9 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                                   final Object object = resolveStreamEntityObject(streamFilter.streamId(), nativeEntities);
                                   if (object == null) {
                                       // Skip a dangling stream reference instead of aborting the whole content pack
-                                      // installation. This mirrors the export side, which also drops unresolvable references.
+                                      // installation. Note this import side is deliberately more tolerant than the
+                                      // export side (Query.shallowMappedFilter), which still throws on an unresolvable
+                                      // reference.
                                       LOG.warn("Skipping unresolvable stream reference <{}> in query filter for query <{}> during content pack installation",
                                               streamFilter.streamId(), id());
                                       return null;
