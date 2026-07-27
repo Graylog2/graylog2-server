@@ -19,25 +19,40 @@ import type { Table, Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import * as React from 'react';
 import { useMemo } from 'react';
+import styled from 'styled-components';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
-import { BULK_SELECT_COL_ID } from 'components/common/EntityDataTable/Constants';
+import {
+  BULK_SELECT_COL_ID,
+  CELL_PADDING_VERTICAL,
+  CELL_PADDING_HORIZONTAL,
+} from 'components/common/EntityDataTable/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+
+// th no longer has its own padding, so the header needs to supply it itself, same as other headers.
+const HeaderCheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
+`;
 
 const BulkSelectHeader = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => {
   const { isSomeRowsSelected, isAllRowsSelected } = useSelectedEntities();
   const title = `${isAllRowsSelected ? 'Deselect' : 'Select'} all visible entities`;
 
   return (
-    <RowCheckbox
-      onChange={table.getToggleAllRowsSelectedHandler()}
-      checked={isAllRowsSelected}
-      indeterminate={isSomeRowsSelected}
-      title={title}
-      disabled={!table.options?.data?.length}
-      aria-label={title}
-    />
+    <HeaderCheckboxContainer>
+      <RowCheckbox
+        onChange={table.getToggleAllRowsSelectedHandler()}
+        checked={isAllRowsSelected}
+        indeterminate={isSomeRowsSelected}
+        title={title}
+        disabled={!table.options?.data?.length}
+        aria-label={title}
+      />
+    </HeaderCheckboxContainer>
   );
 };
 

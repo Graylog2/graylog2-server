@@ -42,6 +42,7 @@ const pipelineRenderer = {
   pipelines: {
     renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
     staticWidth: 'matchHeader' as const,
+    textAlign: 'right',
   },
 };
 const customColumnRenderers = (
@@ -61,6 +62,7 @@ const customColumnRenderers = (
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
       staticWidth: 'matchHeader' as const,
+      textAlign: 'right',
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
@@ -69,6 +71,7 @@ const customColumnRenderers = (
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
       staticWidth: 'matchHeader' as const,
+      textAlign: 'right',
     },
     ...(isPipelineColumnPermitted ? pipelineRenderer : {}),
     outputs: {
@@ -98,10 +101,12 @@ const customColumnRenderers = (
     [METRIC_COLUMN_IDS.associatedInputs]: {
       renderCell: (_value: unknown, stream) => <AssociatedInputsCell stream={stream} />,
       staticWidth: 180,
+      textAlign: 'right',
     },
     [METRIC_COLUMN_IDS.routingPipelines]: {
       renderCell: (_value: unknown, stream) => <RoutingPipelinesCell stream={stream} />,
       staticWidth: 160,
+      textAlign: 'right',
     },
     ...(extensionColumnRenderers || {}),
   },

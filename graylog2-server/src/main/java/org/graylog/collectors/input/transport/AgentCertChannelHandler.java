@@ -29,18 +29,18 @@ import javax.net.ssl.SSLSession;
 import java.security.cert.X509Certificate;
 
 /**
- * A Netty {@link ChannelInboundHandlerAdapter} that extracts the agent's instance_uid from the
- * client certificate CN after TLS handshake and stores it as a channel attribute.
+ * A Netty {@link ChannelInboundHandlerAdapter} that computes the fingerprint of the agent's
+ * client certificate after TLS handshake and stores it as a channel attribute.
  * <p>
  * This handler listens for {@link SslHandshakeCompletionEvent} and, on success, retrieves the
- * peer certificate from the {@link SslHandler}'s SSL session. The extracted CN is stored under
- * {@link #AGENT_INSTANCE_UID} for later handlers to read on a per-request basis.
+ * peer certificate from the {@link SslHandler}'s SSL session. The fingerprint is stored under
+ * {@link #AGENT_CERT_FINGERPRINT} for later handlers to read on a per-request basis.
  */
 public class AgentCertChannelHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(AgentCertChannelHandler.class);
 
-    public static final AttributeKey<String> AGENT_INSTANCE_UID =
-            AttributeKey.valueOf("agent-instance-uid");
+    public static final AttributeKey<String> AGENT_CERT_FINGERPRINT =
+            AttributeKey.valueOf("agent-cert-fingerprint");
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
@@ -49,9 +49,9 @@ public class AgentCertChannelHandler extends ChannelInboundHandlerAdapter {
             final SSLSession session = sslHandler.engine().getSession();
             try {
                 final X509Certificate cert = (X509Certificate) session.getPeerCertificates()[0];
-                ctx.channel().attr(AGENT_INSTANCE_UID).set(PemUtils.extractCn(cert));
+                ctx.channel().attr(AGENT_CERT_FINGERPRINT).set(PemUtils.computeFingerprint(cert));
             } catch (Exception e) {
-                LOG.warn("Failed to extract agent identity from client certificate", e);
+                LOG.warn("Failed to compute fingerprint for client certificate", e);
             }
         }
         ctx.fireUserEventTriggered(evt);
