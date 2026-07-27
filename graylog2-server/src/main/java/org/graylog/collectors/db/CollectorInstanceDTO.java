@@ -17,6 +17,7 @@
 package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -29,9 +30,13 @@ import org.graylog2.jackson.MongoInstantSerializer;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @AutoValue
 @JsonDeserialize(builder = CollectorInstanceDTO.Builder.class)
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public abstract class CollectorInstanceDTO implements BuildableMongoEntity<CollectorInstanceDTO, CollectorInstanceDTO.Builder> {
     public static final String FIELD_INSTANCE_UID = "instance_uid";
     public static final String FIELD_MESSAGE_SEQ_NUM = "message_seq_num";
@@ -44,6 +49,10 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     public static final String FIELD_NEXT_CERTIFICATE_FINGERPRINT = "next_certificate_fingerprint";
     public static final String FIELD_NEXT_CERTIFICATE_PEM = "next_certificate_pem";
     public static final String FIELD_NEXT_CERTIFICATE_EXPIRES_AT = "next_certificate_expires_at";
+    public static final String FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT = "previous_certificate_fingerprint";
+    public static final String FIELD_PREVIOUS_CERTIFICATE_PEM = "previous_certificate_pem";
+    public static final String FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT = "previous_certificate_expires_at";
+    public static final String FIELD_CERTIFICATES_ROTATED_AT = "certificates_rotated_at";
     public static final String FIELD_ISSUING_CA_ID = "issuing_ca_id";
     public static final String FIELD_ENROLLED_AT = "enrolled_at";
     public static final String FIELD_IDENTIFYING_ATTRIBUTES = "identifying_attributes";
@@ -91,6 +100,22 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     @JsonDeserialize(contentUsing = MongoInstantDeserializer.class)
     public abstract Optional<Instant> nextCertificateExpiresAt();
 
+    @JsonProperty(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT)
+    public abstract Optional<String> previousCertificateFingerprint();
+
+    @JsonProperty(FIELD_PREVIOUS_CERTIFICATE_PEM)
+    public abstract Optional<String> previousCertificatePem();
+
+    @JsonProperty(FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT)
+    @JsonSerialize(contentUsing = MongoInstantSerializer.class)
+    @JsonDeserialize(contentUsing = MongoInstantDeserializer.class)
+    public abstract Optional<Instant> previousCertificateExpiresAt();
+
+    @JsonProperty(FIELD_CERTIFICATES_ROTATED_AT)
+    @JsonSerialize(contentUsing = MongoInstantSerializer.class)
+    @JsonDeserialize(contentUsing = MongoInstantDeserializer.class)
+    public abstract Optional<Instant> certificatesRotatedAt();
+
     @JsonProperty(FIELD_ISSUING_CA_ID)
     public abstract String issuingCaId();
 
@@ -113,6 +138,14 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
 
     public static Builder builder() {
         return AutoValue_CollectorInstanceDTO.Builder.create();
+    }
+
+    public Set<String> allCertFingerprints() {
+        return Stream.of(
+                previousCertificateFingerprint(),
+                Optional.of(activeCertificateFingerprint()),
+                nextCertificateFingerprint()
+        ).flatMap(Optional::stream).collect(Collectors.toSet());
     }
 
 
@@ -158,6 +191,18 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
 
         @JsonProperty(FIELD_NEXT_CERTIFICATE_EXPIRES_AT)
         public abstract Builder nextCertificateExpiresAt(@Nullable Instant nextCertificateExpiresAt);
+
+        @JsonProperty(FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT)
+        public abstract Builder previousCertificateFingerprint(@Nullable String previousCertificateFingerprint);
+
+        @JsonProperty(FIELD_PREVIOUS_CERTIFICATE_PEM)
+        public abstract Builder previousCertificatePem(@Nullable String previousCertificatePem);
+
+        @JsonProperty(FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT)
+        public abstract Builder previousCertificateExpiresAt(@Nullable Instant previousCertificateExpiresAt);
+
+        @JsonProperty(FIELD_CERTIFICATES_ROTATED_AT)
+        public abstract Builder certificatesRotatedAt(@Nullable Instant certificatesRotatedAt);
 
         @JsonProperty(FIELD_ISSUING_CA_ID)
         public abstract Builder issuingCaId(String issuingCaId);

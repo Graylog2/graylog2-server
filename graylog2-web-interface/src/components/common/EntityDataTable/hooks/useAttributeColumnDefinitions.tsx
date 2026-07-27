@@ -28,23 +28,61 @@ import type {
   ColumnMetaContext,
 } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
-import DragHandle from 'components/common/SortableList/DragHandle';
+import { CELL_PADDING_HEADER } from 'components/common/EntityDataTable/Constants';
+import { DRAG_HANDLE_DEFAULT_TITLE } from 'components/common/SortableList/DragHandle';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
-import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
 import Icon from 'components/common/Icon';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
 import SortIcon from '../SortIcon';
 
-export const ThInner = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-`;
+export const DragIcon = styled(Icon)<{ $isDragging?: boolean }>(
+  ({ theme, $isDragging }) => css`
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) rotate(90deg);
+    color: ${theme.colors.text.secondary};
+    opacity: ${$isDragging ? 1 : 0};
+    transition: opacity 0.15s ease-in-out;
+    pointer-events: none;
+    font-size: 12px;
+  `,
+);
+
+export const ThInner = styled.div<{
+  $isDraggable?: boolean;
+  $isDragging?: boolean;
+  $isResizingAnyColumn?: boolean;
+}>(
+  ({ $isDraggable, $isDragging, $isResizingAnyColumn }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: ${CELL_PADDING_HEADER};
+
+    ${!$isResizingAnyColumn &&
+    css`
+      &:hover .header-action {
+        opacity: 1;
+      }
+    `}
+
+    ${$isDraggable &&
+    css`
+      cursor: ${$isDragging ? 'grabbing' : 'grab'};
+
+      &:focus-visible .header-action {
+        opacity: 1;
+      }
+    `}
+  `,
+);
 
 export const LeftCol = styled.div`
   display: flex;
@@ -52,21 +90,28 @@ export const LeftCol = styled.div`
   height: 100%;
 `;
 
-const RightCol = styled.div`
+export const IndicatorCol = styled.div`
   display: flex;
   align-items: center;
+  height: 100%;
 `;
 
-const ActiveSliceIcon = styled(Icon)(
-  ({ theme }) => css`
-    margin-left: ${theme.spacings.xs};
+const ActiveSliceIcon = styled(Icon)<{ $isRightAligned?: boolean }>(
+  ({ theme, $isRightAligned }) => css`
+    ${$isRightAligned
+      ? css`
+          margin-right: ${theme.spacings.xs};
+        `
+      : css`
+          margin-left: ${theme.spacings.xs};
+        `}
     color: ${theme.colors.gray[20]};
   `,
 );
 
 const useSortableCol = (colId: string, disabled: boolean) => {
   const { setColumnTransform } = useContext(DndStylesContext);
-  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
+  const { attributes, isDragging, listeners, setNodeRef, transform } = useSortable({
     id: colId,
     disabled,
   });
@@ -85,7 +130,6 @@ const useSortableCol = (colId: string, disabled: boolean) => {
     isDragging,
     listeners,
     setNodeRef,
-    setActivatorNodeRef,
   };
 };
 
@@ -103,52 +147,88 @@ const AttributeHeader = <Entity extends EntityBase>({
   const activeSliceCol = useContext(ActiveSliceColContext);
   const colId = ctx.header.column.id;
   const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
-  const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
-    colId,
-    !columnMeta?.enableColumnOrdering,
-  );
+  const isDraggable = Boolean(columnMeta?.enableColumnOrdering);
+  const isResizingAnyColumn = Boolean(ctx.table.getState().columnSizingInfo.isResizingColumn);
+  const { attributes, isDragging, listeners, setNodeRef } = useSortableCol(colId, !isDraggable);
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
   const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
   const columnLabel = columnMeta?.label ?? colId;
   const canSlice = columnMeta?.enableSlicing;
   const isSliceActive = activeSliceCol === colId;
   const canSort = ctx.header.column.getCanSort();
+  const canHideColumn = ctx.header.column.getCanHide();
   const sortDirection = ctx.header.column.getIsSorted();
+  const textAlign = columnMeta?.columnRenderer?.textAlign;
+  const isRightAligned = textAlign === 'right';
+  const dragTitle =
+    typeof columnLabel === 'string'
+      ? `${DRAG_HANDLE_DEFAULT_TITLE} ${columnLabel.toLocaleLowerCase()}`
+      : DRAG_HANDLE_DEFAULT_TITLE;
+
+  const sliceIndicator = isSliceActive && (
+    <ActiveSliceIcon
+      name="surgical"
+      title={`Slicing by ${columnLabel}`}
+      size="xs"
+      $isRightAligned={isRightAligned}
+    />
+  );
+  const sortIndicator = sortDirection && <SortIcon<Entity> column={ctx.header.column} />;
+
+  const indicatorIcons = (
+    <IndicatorCol ref={rightRef}>
+      {isRightAligned ? (
+        <>
+          {sortIndicator}
+          {sliceIndicator}
+        </>
+      ) : (
+        <>
+          {sliceIndicator}
+          {sortIndicator}
+        </>
+      )}
+    </IndicatorCol>
+  );
+
+  const titleGroup = (
+    <LeftCol ref={leftRef}>
+      <HeaderActionsDropdown
+        label={columnLabel}
+        activeSort={sortDirection}
+        isSliceActive={isSliceActive}
+        onChangeSlicing={canSlice ? onChangeSlicing : undefined}
+        sliceColumnId={colId}
+        appSection={appSection}
+        textAlign={textAlign}
+        onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}
+        onHideColumn={canHideColumn ? () => ctx.header.column.toggleVisibility() : undefined}>
+        {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
+      </HeaderActionsDropdown>
+    </LeftCol>
+  );
 
   return (
-    <ThInner ref={setNodeRef}>
-      <LeftCol ref={leftRef}>
-        {columnMeta?.enableColumnOrdering && (
-          <DragHandle
-            ref={setActivatorNodeRef}
-            index={ctx.header.index}
-            dragHandleProps={{ ...attributes, ...listeners }}
-            isDragging={isDragging}
-            itemTitle={columnLabel}
-          />
-        )}
-        <HeaderActionsDropdown
-          label={columnLabel}
-          activeSort={sortDirection}
-          isSliceActive={isSliceActive}
-          onChangeSlicing={canSlice ? onChangeSlicing : undefined}
-          sliceColumnId={colId}
-          appSection={appSection}
-          onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}>
-          {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
-        </HeaderActionsDropdown>
-        {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" />}
-        {sortDirection && <SortIcon<Entity> column={ctx.header.column} />}
-      </LeftCol>
-      <RightCol ref={rightRef}>
-        {ctx.header.column.getCanResize() && (
-          <ResizeHandle
-            onMouseDown={ctx.header.getResizeHandler()}
-            onTouchStart={ctx.header.getResizeHandler()}
-            colTitle={columnLabel}
-          />
-        )}
-      </RightCol>
+    <ThInner
+      ref={setNodeRef}
+      $isDraggable={isDraggable}
+      $isDragging={isDragging}
+      $isResizingAnyColumn={isResizingAnyColumn}
+      title={isDraggable ? dragTitle : undefined}
+      aria-label={isDraggable ? dragTitle : undefined}
+      {...(isDraggable ? { ...attributes, ...listeners } : {})}>
+      {isDraggable && <DragIcon name="drag_indicator" size="xs" $isDragging={isDragging} className="header-action" />}
+      {isRightAligned ? (
+        <>
+          {indicatorIcons}
+          {titleGroup}
+        </>
+      ) : (
+        <>
+          {titleGroup}
+          {indicatorIcons}
+        </>
+      )}
     </ThInner>
   );
 };
@@ -214,7 +294,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           header,
           size: columnWidths[col.id],
           enableHiding: true,
-          enableResizing: !columnRenderersByAttribute[col.id].staticWidth,
+          enableResizing: true,
           meta: {
             label: col.title,
             enableSlicing: enableSlicing && col.sliceable,

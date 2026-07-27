@@ -19,6 +19,7 @@ package org.graylog.collectors.input.transport;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.IngestEndpointConfig;
+import org.graylog2.inputs.transports.AbstractHttpTransport;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,18 @@ class CollectorIngestHttpTransportConfigTest {
         final var portField = transportConfig.getRequestedConfiguration().getField(NettyTransport.CK_PORT);
 
         assertThat(portField.getAttributes()).contains("is_port_number");
+    }
+
+    @Test
+    void idleWriterTimeoutIsNotExposed() {
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
+
+        final var transportConfig = new CollectorIngestHttpTransport.Config(collectorsConfigService);
+
+        // The idle connection timeout is forced by the transport (it backs the fingerprint-cache hit
+        // guarantee), so it must not be offered as a user-configurable field.
+        assertThat(transportConfig.getRequestedConfiguration().getFields())
+                .doesNotContainKey(AbstractHttpTransport.CK_IDLE_WRITER_TIMEOUT);
     }
 
     @Test
