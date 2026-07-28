@@ -39,17 +39,20 @@ unaffected by the change.
 ### Changed parsing for Okta Log Events `securityContext.userBehaviors` field
 
 Due to a [bug in the Okta SDK](https://github.com/okta/okta-sdk-java/issues/1689), a workaround was introduced in 7.1
-to stringify the `securityContext.userBehaviors` field in logs pulled in from the `Okta Log Events` input. The
-updated SDK now properly serializes that field as a list of objects and the workaround has been removed. Custom parsing
-on `Okta Log Events`, specifically on the `securityContext.userBehaviors` field, that is expecting the field to be a
-string will need to be modified to expect a list of objects, per the Okta API. An example of the serialization across
+to stringify the objects in the `securityContext.userBehaviors` array in logs pulled in from the `Okta Log Events` input. The
+updated SDK now properly serializes that field as an array of objects and the workaround has been removed. Custom parsing
+on `Okta Log Events` messages that is expecting the `securityContext.userBehaviors` field to be an array of
+strings will need to be modified to expect an array of objects, per the Okta API. An example of the serialization across
 versions:
 
 7.1:
 ```json
 {
   "securityContext": {
-    "userBehaviors": "[{\"name\":\"New City\",\"id\":\"bbbbbbbbbbbbbbbbbbbb\",\"result\":\"NEGATIVE\"},{\"name\":\"New Country\",\"id\":\"aaaaaaaaaaaaaaaaaaaa\",\"result\":\"NEGATIVE\"}]"
+    "userBehaviors": [
+      "{\"name\":\"New City\",\"id\":\"bbbbbbbbbbbbbbbbbbbb\",\"result\":\"NEGATIVE\"}",
+      "{\"name\":\"New Country\",\"id\":\"aaaaaaaaaaaaaaaaaaaa\",\"result\":\"NEGATIVE\"}"
+    ]
   }
 }
 ```
