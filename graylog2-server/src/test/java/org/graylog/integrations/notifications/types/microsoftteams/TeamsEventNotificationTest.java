@@ -35,7 +35,6 @@ import org.graylog.integrations.notifications.types.util.RequestClient;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.system.urlallowlist.UrlAllowlistValidator;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.TestMessageFactory;
@@ -86,9 +85,6 @@ public class TeamsEventNotificationTest {
     @Mock
     EventNotificationService notificationCallbackService;
 
-    @Mock
-    UrlAllowlistValidator mockUrlAllowlistValidator;
-
     private TeamsEventNotificationConfig teamsEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
     private final MessageFactory messageFactory = new TestMessageFactory();
@@ -112,8 +108,7 @@ public class TeamsEventNotificationTest {
                 nodeId,
                 mockrequestClient,
                 new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration()),
-                customizationConfig,
-                mockUrlAllowlistValidator);
+                customizationConfig);
     }
 
     private void getDummyTeamsNotificationConfig() {
@@ -359,8 +354,7 @@ public class TeamsEventNotificationTest {
                 nodeId,
                 mockrequestClient,
                 new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration()),
-                customizationConfig,
-                mockUrlAllowlistValidator);
+                customizationConfig);
 
         TeamsMessage actual = teamsEventNotification.createTeamsMessage(eventNotificationContext, TeamsEventNotificationConfig.builder().iconUrl(expectedImage).build());
         assertThat(actual.sections())
