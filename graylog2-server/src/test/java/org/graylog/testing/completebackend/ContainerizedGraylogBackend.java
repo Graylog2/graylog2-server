@@ -168,21 +168,6 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     }
 
     @Override
-    public void importMongoDBFixture(String resourcePath, Class<?> testClass) {
-        services.getMongoDBInstance().importFixture(resourcePath, testClass);
-    }
-
-    @Override
-    public long countDocumentsInMongoDBCollection(final String collection) {
-        return services.getMongoDBInstance().mongoCollection(collection).countDocuments();
-    }
-
-    @Override
-    public void dropCollection(String collectionName) {
-        services.getMongoDBInstance().mongoCollection(collectionName).drop();
-    }
-
-    @Override
     public String uri() {
         return node.uri();
     }
@@ -241,5 +226,10 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public SearchServerInstance searchServerInstance() {
         return services.getSearchServerInstance();
+    }
+
+    @Override
+    public DataBaseInstance dataBaseInstance() {
+        return services.getMongoDBInstance();
     }
 }

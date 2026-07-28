@@ -20,6 +20,7 @@ import com.google.common.io.Resources;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.graylog.testing.completebackend.DataBaseInstance;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionImpl;
@@ -38,7 +39,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Provides a MongoDB database service for tests.
  */
-public class MongoDBTestService implements AutoCloseable {
+public class MongoDBTestService implements DataBaseInstance {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBTestService.class);
 
     private static final String DEFAULT_DATABASE_NAME = "graylog";
@@ -127,6 +128,27 @@ public class MongoDBTestService implements AutoCloseable {
      */
     public MongoCollection<Document> mongoCollection(String name) {
         return mongoDatabase().getCollection(name);
+    }
+
+    /**
+     * Count documents in a collection.
+     *
+     * @param collection the collection name
+     * @return the count of documents
+     */
+    @Override
+    public long countDocuments(String collection) {
+        return mongoCollection(collection).countDocuments();
+    }
+
+    /**
+     * Drop a collection by name.
+     *
+     * @param collectionName the collection name
+     */
+    @Override
+    public void dropCollection(String collectionName) {
+        mongoCollection(collectionName).drop();
     }
 
     /**

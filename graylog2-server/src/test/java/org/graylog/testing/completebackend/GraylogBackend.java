@@ -28,13 +28,9 @@ public interface GraylogBackend {
 
     SearchServerInstance searchServerInstance();
 
+    DataBaseInstance dataBaseInstance();
+
     int mappedPortFor(int originalPort);
-
-    void importMongoDBFixture(String resourcePath, Class<?> testClass);
-
-    long countDocumentsInMongoDBCollection(String collection);
-
-    void dropCollection(String collectionName);
 
     void importElasticsearchFixture(String resourcePath, Class<?> testClass);
 
