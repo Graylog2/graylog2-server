@@ -21,7 +21,10 @@ import asMock from 'helpers/mocking/AsMock';
 import useDataNodeUpgradeStatus from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import useOpenSearchClusterStats from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchClusterStats';
 import { useCurrentRollingRestart } from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchRollingRestart';
-import type { RollingRestartJob, RollingRestartState } from 'components/datanode/opensearch-upgrade/rollingRestartTypes';
+import type {
+  RollingRestartJob,
+  RollingRestartState,
+} from 'components/datanode/opensearch-upgrade/rollingRestartTypes';
 
 import DataNodeUpgradePage from './DataNodeUpgradePage';
 

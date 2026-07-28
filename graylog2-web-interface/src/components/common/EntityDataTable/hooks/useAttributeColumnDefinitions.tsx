@@ -232,12 +232,7 @@ const AttributeHeader = <Entity extends EntityBase>({
   };
 
   const sliceIndicator = isSliceActive && (
-    <ActiveSliceIcon
-      name="surgical"
-      title={`Slicing by ${columnLabel}`}
-      size="xs"
-      $isRightAligned={isRightAligned}
-    />
+    <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" $isRightAligned={isRightAligned} />
   );
   const sortIndicator = sortDirection && <SortIcon<Entity> column={ctx.header.column} />;
 

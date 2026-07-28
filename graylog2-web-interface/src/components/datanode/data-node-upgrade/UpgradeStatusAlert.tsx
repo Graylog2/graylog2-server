@@ -59,8 +59,8 @@ const OpenSearchStatusLine = ({ currentOpenSearchVersion, status, unavailableDat
     case 'unconfirmed':
       return (
         <p>
-          <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch state cannot be confirmed
-          while {unavailableDataNodeCount} Data {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable.
+          <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch state cannot be confirmed while{' '}
+          {unavailableDataNodeCount} Data {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable.
         </p>
       );
     case 'up-to-date':

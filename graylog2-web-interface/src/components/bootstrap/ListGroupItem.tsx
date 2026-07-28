@@ -135,14 +135,31 @@ type ItemBodyProps = StyledProps & {
   onKeyDown?: React.KeyboardEventHandler;
 };
 
-const ItemBody = ({ href = undefined, disabled = undefined, onClick = undefined, onKeyDown = undefined, children, ...styledProps }: ItemBodyProps) => {
+const ItemBody = ({
+  href = undefined,
+  disabled = undefined,
+  onClick = undefined,
+  onKeyDown = undefined,
+  children,
+  ...styledProps
+}: ItemBodyProps) => {
   if (href) {
-    return <InnerContainer as="a" href={href} {...styledProps}>{children}</InnerContainer>;
+    return (
+      <InnerContainer as="a" href={href} {...styledProps}>
+        {children}
+      </InnerContainer>
+    );
   }
 
   if (onClick) {
     return (
-      <InnerContainer as="button" type="button" disabled={disabled} onClick={onClick} onKeyDown={onKeyDown} {...styledProps}>
+      <InnerContainer
+        as="button"
+        type="button"
+        disabled={disabled}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        {...styledProps}>
         {children}
       </InnerContainer>
     );
