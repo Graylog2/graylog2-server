@@ -27,6 +27,8 @@ import org.graylog.datanode.process.configuration.files.TextConfigFile;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -36,7 +38,9 @@ import java.util.stream.Collectors;
 
 public class OpensearchClusterConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
-    public static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchClusterConfigurationBean.class);
+
+    private static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
 
     private final Configuration localConfiguration;
     private final NodeService<DataNodeDto> nodeService;
@@ -51,8 +55,11 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
         ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
 
-        properties.put("network.bind_host", localConfiguration.getBindAddress());
-        properties.put("network.publish_host", localConfiguration.getHostname());
+        final String bindHost = localConfiguration.getBindAddress();
+        properties.put("network.bind_host", bindHost);
+
+        final String publishHost = localConfiguration.getHostname();
+        properties.put("network.publish_host", publishHost);
 
         if (localConfiguration.getClustername() != null && !localConfiguration.getClustername().isBlank()) {
             properties.put("cluster.name", localConfiguration.getClustername());
@@ -64,13 +71,16 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         properties.put("http.port", String.valueOf(localConfiguration.getOpensearchHttpPort()));
         properties.put("transport.port", String.valueOf(localConfiguration.getOpensearchTransportPort()));
 
-        properties.put("node.name", localConfiguration.getDatanodeNodeName());
+        final String nodeName = localConfiguration.getDatanodeNodeName();
+        properties.put("node.name", nodeName);
 
-        if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
-            properties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
-        } else {
-            properties.put("cluster.initial_cluster_manager_nodes", buildInitialManagerNodesList());
-        }
+        final String hostname = localConfiguration.getHostname();
+        LOG.info("Opensearch networking: bind host: {}, publish host: {}, node name: {}, hostname: {}", bindHost, publishHost, nodeName, hostname);
+
+        final String initialClusterManagerNodes = getInitialClusterManagerNodes();
+        properties.put("cluster.initial_cluster_manager_nodes", initialClusterManagerNodes);
+        LOG.info("Opensearch initial cluster manager nodes: {}", initialClusterManagerNodes);
+
 
         final List<String> discoverySeedHosts = localConfiguration.getOpensearchDiscoverySeedHosts();
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
@@ -79,6 +89,7 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
             properties.put("discovery.seed_providers", "file");
         }
         Set<String> seedHosts = resolveDiscoverySeedHosts();
+        LOG.info("Opensearch discovery seeds hosts: {}", seedHosts);
 
         // set default number of replicas to 0 if only one node is known.
         // this does not affect replicas for Graylog managed indices, but resolves some problems for system managed indices.
@@ -93,6 +104,14 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
                 .properties(properties.build())
                 .withConfigFile(new TextConfigFile(UNICAST_HOSTS_FILE, String.join("\n", seedHosts)))
                 .build();
+    }
+
+    private String getInitialClusterManagerNodes() {
+        if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
+            return localConfiguration.getInitialClusterManagerNodes();
+        } else {
+            return buildInitialManagerNodesList();
+        }
     }
 
     @Nonnull
