@@ -76,11 +76,7 @@ const getConditionType = (config: EventDefinition['config']) => {
     : 'aggregation';
 };
 
-const QueryParameters = ({
-  queryParameters,
-}: {
-  queryParameters: Array<ParameterJson & { embryonic?: boolean }>;
-}) => {
+const QueryParameters = ({ queryParameters }: { queryParameters: Array<ParameterJson & { embryonic?: boolean }> }) => {
   if (queryParameters.some((p) => p.embryonic)) {
     const undeclaredParameters = queryParameters
       .filter((p) => p.embryonic)
