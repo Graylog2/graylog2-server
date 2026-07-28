@@ -137,6 +137,11 @@ const StyledTable = styled(MantineTable)<StyledProps>(
         background-color: ${theme.colors.table.row.backgroundHover};
         ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
       }
+
+      & tbody > tr:hover > .${PINNED_CELL_CLASS_NAME},
+      & tbody > tr:hover > .${PINNED_CELL_STRIPED_CLASS_NAME} {
+        background-color: var(${TABLE_ROW_PINNED_HOVER_BG_VAR});
+      }
     `}
 
     ${$striped &&
@@ -155,10 +160,12 @@ const StyledTable = styled(MantineTable)<StyledProps>(
 
     & tbody > tr > .${PINNED_CELL_CLASS_NAME}, & tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
       background-color: ${flattenTableBackground(theme, theme.colors.table.row.background)};
+      transition: ${TABLE_ROW_HOVER_TRANSITION};
     }
 
     & tbody > tr > .${PINNED_CELL_STRIPED_CLASS_NAME} {
       background-color: ${flattenTableBackground(theme, theme.colors.table.row.backgroundStriped)};
+      transition: ${TABLE_ROW_HOVER_TRANSITION};
     }
 
     @media print {
