@@ -28,6 +28,7 @@ type Props = {
   onChange: (filters: OrderedMap<string, SearchFilter>) => void;
   hideFiltersPreview?: (val: boolean) => void;
   queryString?: string;
+  isParentMutable?: boolean;
 };
 
 // Keeps the isolated Formik's `queryString` field in sync with the manually-entered query
@@ -42,7 +43,13 @@ const SyncQueryString = ({ queryString }: { queryString: string }) => {
   return null;
 };
 
-function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () => {}, queryString = '' }: Props) {
+function SearchFiltersFormControls({
+  filters,
+  onChange,
+  hideFiltersPreview = () => {},
+  queryString = '',
+  isParentMutable = true,
+}: Props) {
   const searchFiltersPlugin = usePluginEntities('eventDefinitions.components.searchForm') ?? [];
   const pluggableControls = searchFiltersPlugin.map((controlFn) => controlFn()).filter((control) => !!control);
 
@@ -73,7 +80,7 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () 
     <Formik onSubmit={handleSearchFiltersChange} initialValues={initialFilters}>
       <>
         <SyncQueryString queryString={queryString} />
-        <SearchFiltersComponent />
+        <SearchFiltersComponent isParentMutable={isParentMutable} />
       </>
     </Formik>
   );

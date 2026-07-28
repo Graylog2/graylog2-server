@@ -62,6 +62,7 @@ import type { StreamsAndCategoriesSelection } from 'views/components/common/Stre
 import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import QueryValidationDisplay from 'views/components/searchbar/queryvalidation/QueryValidationDisplay';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -217,6 +218,9 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const [cronDescription, setCronDescription] = useState<string>(
     currentConfig.cron_expression ? describeExpression(currentConfig.cron_expression) : '',
   );
+
+  const { scopePermissions } = useScopePermissions(eventDefinition);
+  const isMutable = useMemo(() => scopePermissions?.is_mutable, [scopePermissions]);
 
   const validateQueryString = useCallback(
     (
@@ -585,6 +589,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               onChange={handleSearchFiltersChange}
               hideFiltersPreview={hideFiltersPreview}
               queryString={currentConfig.query}
+              isParentMutable={isMutable}
             />
           </div>
         </FormGroup>
