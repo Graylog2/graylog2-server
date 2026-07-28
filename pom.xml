@@ -989,7 +989,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.87.4</version>
+                            <version>8.87.5</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
