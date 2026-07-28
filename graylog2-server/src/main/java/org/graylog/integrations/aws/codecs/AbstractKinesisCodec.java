@@ -78,6 +78,9 @@ public abstract class AbstractKinesisCodec extends AbstractCodec {
         if (CollectionUtils.isNotEmpty(logEvent.subscriptionFilters())) {
             result.addField(FIELD_SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
         }
+        if (configuration.getBoolean(AWSCodec.CK_STORE_FULL_MESSAGE, false)) {
+            result.addField(Message.FIELD_FULL_MESSAGE, logEvent.message());
+        }
     }
 
     @Nonnull

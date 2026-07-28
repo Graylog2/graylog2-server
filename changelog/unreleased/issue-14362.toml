@@ -1,0 +1,5 @@
+type = "a"
+message = "Add optional store_full_message field to AWS Kinesis/CloudWatch input."
+
+issues = ["14362"]
+pulls = [""]

@@ -36,6 +36,7 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     private static final String BATCH_SIZE = "batch_size";
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String ADD_FLOW_LOG_PREFIX = "add_flow_log_prefix";
+    private static final String STORE_FULL_MESSAGE = "store_full_message";
     private static final String OVERRIDE_SOURCE = "override_source";
 
     @JsonProperty(NAME)
@@ -61,6 +62,9 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
     @JsonProperty(ADD_FLOW_LOG_PREFIX)
     public abstract boolean addFlowLogPrefix();
+
+    @JsonProperty(STORE_FULL_MESSAGE)
+    public abstract boolean storeFullMessage();
 
     public static Builder builder() {
         return Builder.create();
@@ -96,6 +100,9 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
         @JsonProperty(ADD_FLOW_LOG_PREFIX)
         public abstract Builder addFlowLogPrefix(boolean addFlowLogPrefix);
+
+        @JsonProperty(STORE_FULL_MESSAGE)
+        public abstract Builder storeFullMessage(boolean storeFullMessage);
 
         public abstract AWSInputCreateRequest build();
     }
