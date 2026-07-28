@@ -138,7 +138,7 @@
         <google-auth-library.version>1.49.0</google-auth-library.version>
         <google-cloud-core.version>2.72.0</google-cloud-core.version>
         <google-gax.version>2.82.0</google-gax.version>
-        <google-http-client.version>2.1.1</google-http-client.version>
+        <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.82.2</grpc.version>
