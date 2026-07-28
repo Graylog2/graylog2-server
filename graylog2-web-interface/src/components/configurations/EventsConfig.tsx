@@ -40,6 +40,7 @@ type Config = {
   events_notification_default_backlog: number;
   events_catchup_window: number;
   events_notification_tcp_keepalive: boolean;
+  events_notification_enforce_url_allowlist: boolean;
 };
 
 const DEFAULT_CONFIG = {
@@ -48,6 +49,7 @@ const DEFAULT_CONFIG = {
   events_notification_default_backlog: 50,
   events_catchup_window: DEFAULT_CATCH_UP_WINDOW,
   events_notification_tcp_keepalive: false,
+  events_notification_enforce_url_allowlist: false,
 };
 
 const EventsConfig = () => {
@@ -129,6 +131,11 @@ const EventsConfig = () => {
     propagateChanges('events_notification_tcp_keepalive', value);
   };
 
+  const onEnforceUrlAllowlistUpdate = (event) => {
+    const value = getValueFromInput(event.target);
+    propagateChanges('events_notification_enforce_url_allowlist', value);
+  };
+
   const titleCase = (str) => capitalize(str);
 
   if (!loaded || !viewConfig) {
@@ -141,6 +148,7 @@ const EventsConfig = () => {
   const eventsCatchupWindow = (config) => extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
   const eventsNotificationDefaultBacklog = (config) => config.events_notification_default_backlog;
   const eventsNotificationTcpKeepalive = (config) => config.events_notification_tcp_keepalive;
+  const eventsNotificationEnforceUrlAllowlist = (config) => config.events_notification_enforce_url_allowlist;
 
   return (
     <div>
@@ -165,6 +173,8 @@ const EventsConfig = () => {
         </dd>
         <dt>TCP keep-alive probes:</dt>
         <dd>{eventsNotificationTcpKeepalive(viewConfig) ? 'enabled' : 'disabled'}</dd>
+        <dt>Enforce URL Allowlist:</dt>
+        <dd>{eventsNotificationEnforceUrlAllowlist(viewConfig) ? 'enabled' : 'disabled'}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
@@ -241,6 +251,19 @@ const EventsConfig = () => {
                 checked={eventsNotificationTcpKeepalive(formConfig)}
               />
               <HelpBlock>If enabled, http connections for notifications will send TCP keep-alive probes</HelpBlock>
+            </FormGroup>
+            <FormGroup controlId="notification-enforce-url-allowlist-field">
+              <Input
+                id="notification-enforce-url-allowlist-field"
+                label="Enforce URL Allowlist for notification webhook URLs"
+                type="checkbox"
+                onChange={onEnforceUrlAllowlistUpdate}
+                checked={eventsNotificationEnforceUrlAllowlist(formConfig)}
+              />
+              <HelpBlock>
+                When enabled, Slack and Microsoft Teams notifications will fail if their webhook URL is not in the URL
+                allowlist. When disabled, a warning is logged instead.
+              </HelpBlock>
             </FormGroup>
           </fieldset>
         </BootstrapModalForm>

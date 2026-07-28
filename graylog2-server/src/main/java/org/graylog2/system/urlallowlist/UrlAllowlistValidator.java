@@ -18,8 +18,10 @@ package org.graylog2.system.urlallowlist;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.NotificationTestData;
+import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,27 +32,32 @@ public class UrlAllowlistValidator {
 
     private final UrlAllowlistService allowlistService;
     private final UrlAllowlistNotificationService allowlistNotificationService;
+    private final EventsConfigurationProvider eventsConfigurationProvider;
 
     @Inject
     public UrlAllowlistValidator(UrlAllowlistService allowlistService,
-                                 UrlAllowlistNotificationService allowlistNotificationService) {
+                                 UrlAllowlistNotificationService allowlistNotificationService,
+                                 EventsConfigurationProvider eventsConfigurationProvider) {
         this.allowlistService = allowlistService;
         this.allowlistNotificationService = allowlistNotificationService;
+        this.eventsConfigurationProvider = eventsConfigurationProvider;
     }
 
-    public void validateUrl(String url, EventNotificationContext ctx) {
+    public void validateUrl(String url, EventNotificationContext ctx) throws TemporaryEventNotificationException {
         if (!allowlistService.isAllowlisted(url)) {
-            LOG.warn("Notification is using a URL which is not allowlisted. " +
-                    "A future version of Graylog will block this request. [url: {}, notification: {}]",
-                    url, ctx.notificationId());
             if (!NotificationTestData.TEST_NOTIFICATION_ID.equals(ctx.notificationId())) {
                 final String eventDefTitle = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Unnamed");
                 final String description = "The alert notification " + eventDefTitle +
                         " is trying to access a URL which is not allowlisted. Please add it to the URL allowlist. " +
-                        "A future version of Graylog will block requests to non-allowlisted URLs. [url: " +
-                        url + "]";
+                        "[url: " + url + "]";
                 allowlistNotificationService.publishAllowlistFailure(description);
             }
+            if (eventsConfigurationProvider.get().notificationsEnforceUrlAllowlist()) {
+                throw new TemporaryEventNotificationException("URL <" + url + "> is not allowlisted.");
+            }
+            LOG.warn("Notification is using a URL which is not allowlisted. " +
+                    "Enable \"Enforce URL Allowlist\" in System > Configurations > Events to block non-allowlisted URLs. " +
+                    "[url: {}, notification: {}]", url, ctx.notificationId());
         }
     }
 }
