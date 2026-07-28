@@ -67,35 +67,29 @@ describe('ConnectionSuccess', () => {
   });
 
   it('shows real instance data', () => {
-    render(<ConnectionSuccess platformId="linux" instance={instance} fleetName="Default Fleet" />);
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
     expect(screen.getByText('web-prod-01')).toBeInTheDocument();
-    expect(screen.getByText(/1\.2\.3/)).toBeInTheDocument();
-    expect(screen.getByText('Default Fleet')).toBeInTheDocument();
+    expect(screen.getByText('1.2.3')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Default Fleet' })).toBeInTheDocument();
   });
 
   it('previews source logs for the connected instance', () => {
-    render(<ConnectionSuccess platformId="linux" instance={instance} fleetName="Default Fleet" />);
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
     expect(useCollectorLogPreview).toHaveBeenCalledWith('uid-42');
     expect(screen.getByText(/a source log line/)).toBeInTheDocument();
   });
 
-  it('shows the message total from the source logs preview', () => {
-    render(<ConnectionSuccess platformId="linux" instance={instance} fleetName="Default Fleet" />);
-
-    expect(screen.getByText('23')).toBeInTheDocument();
-  });
-
   it('shows the fleet source count', () => {
-    render(<ConnectionSuccess platformId="linux" instance={instance} fleetName="Default Fleet" />);
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
     expect(useSources).toHaveBeenCalledWith('fleet-1');
-    expect(screen.getAllByText('2').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/2 configured/)).toBeInTheDocument();
   });
 
   it('renders the self-logs section collapsed', () => {
-    render(<ConnectionSuccess platformId="linux" instance={instance} fleetName="Default Fleet" />);
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
     expect(screen.getByRole('heading', { name: /collector logs/i })).toBeInTheDocument();
     expect(screen.getByTestId('collapseButton')).toBeInTheDocument();
@@ -103,16 +97,17 @@ describe('ConnectionSuccess', () => {
 
   it('falls back to the instance uid when hostname is missing', () => {
     render(
-      <ConnectionSuccess platformId="linux" instance={{ ...instance, hostname: null }} fleetName="Default Fleet" />,
+      <ConnectionSuccess instance={{ ...instance, hostname: null }} fleetName="Default Fleet" />,
     );
 
     expect(screen.getByText('uid-42')).toBeInTheDocument();
   });
 
-  it('omits the platform chip when platformId is not known', () => {
+  it('renders the what-is-next links', () => {
     render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
-    expect(screen.queryByText('Linux')).not.toBeInTheDocument();
-    expect(screen.getByText('web-prod-01')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Manage Fleets' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Configure Sources' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View Instances' })).toBeInTheDocument();
   });
 });

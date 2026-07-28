@@ -15,157 +15,116 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import { Alert, Label } from 'components/bootstrap';
-import { AccessibleCard } from 'components/common';
-import useHistory from 'routing/useHistory';
+import {Label} from 'components/bootstrap';
+import {Icon, Link, RelativeTime, Section, SimpleGrid, Stack} from 'components/common';
 import Routes from 'routing/Routes';
-import type { CollectorInstanceView } from 'components/collectors/types';
-import { useSources } from 'components/collectors/hooks/useSourceQueries';
+import {defaultCompare} from 'logic/DefaultCompare';
+import type {CollectorInstanceView} from 'components/collectors/types';
+import {useSources} from 'components/collectors/hooks/useSourceQueries';
 
-import type { PlatformId } from './platforms';
-import PLATFORMS from './platforms';
 import useCollectorLogPreview from './useCollectorLogPreview';
 import LogPreviewSection from './LogPreviewSection';
 
-import StatCard from '../../common/StatCard';
+import {DetailLabel, DetailRow} from '../../common/DetailRow';
+import {IconRow, IconRowList} from '../../common/IconRowList';
+import InstanceStatusLabel from '../../common/InstanceStatusLabel';
+import collectorOsName from '../../common/collectorOsName';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
+import {COLLECTOR_INSTANCE_UID_FIELD} from '../../common/fields';
+import {SOURCE_TYPE_LABELS} from '../../sources/Constants';
 
 type Props = {
-  platformId?: PlatformId;
   instance: CollectorInstanceView;
   fleetName: string | undefined;
 };
 
-// Asset auto-detection has no backend yet — intentionally stays mocked until that feature ships.
-const MOCK_ASSETS = [
-  { type: 'host', name: 'example-host' },
-  { type: 'user', name: 'root' },
-];
-
-const SummaryRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.sm};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const StatsRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const SectionTitle = styled.h3(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.h3};
-    margin: 0 0 ${theme.spacings.sm} 0;
-  `,
-);
-
-const AssetsGrid = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const AssetCard = styled(AccessibleCard)(
-  ({ theme }) => css`
-    min-width: 150px;
-    padding: ${theme.spacings.md};
-  `,
-);
-
-const AssetType = styled.div(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
-    text-transform: uppercase;
-    margin-bottom: ${theme.spacings.xxs};
-  `,
-);
-
-const AssetName = styled.div`
-  font-weight: 500;
-`;
-
-const NextGrid = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
-  `,
-);
-
-const NextCard = styled(AccessibleCard)(
-  ({ theme }) => css`
-    flex: 1;
-    min-width: 180px;
-    padding: ${theme.spacings.md};
-
-    h4 {
-      margin: 0 0 ${theme.spacings.xxs} 0;
-      font-size: ${theme.fonts.size.large};
-    }
-
-    p {
-      margin: 0;
-      font-size: ${theme.fonts.size.small};
-      color: ${theme.colors.gray[60]};
-    }
-  `,
-);
-
-const LogPreviewsWrapper = styled.div(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const ConnectionSuccess = ({ platformId = undefined, instance, fleetName }: Props) => {
-  const history = useHistory();
-  const platform = PLATFORMS.find((p) => p.id === platformId);
-  const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
+const ConnectionSuccess = ({instance, fleetName}: Props) => {
+  const {selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading} = useCollectorLogPreview(
     instance.instance_uid,
   );
-  const { data: sources } = useSources(instance.fleet_id);
+  const {data: sources} = useSources(instance.fleet_id);
+
+  const attributes = [
+    ...Object.entries(instance.identifying_attributes ?? {}),
+    ...Object.entries(instance.non_identifying_attributes ?? {}),
+  ].sort((attr1, attr2) => defaultCompare(attr1[0], attr2[0]));
 
   return (
-    <div>
-      <Alert bsStyle="success">
-        Collector connected &mdash; <strong>{instance.hostname ?? instance.instance_uid}</strong>
-        {instance.version && (
-          <>
-            {' '}
-            running <strong>v{instance.version}</strong>
-          </>
-        )}
-      </Alert>
+    <Stack gap="lg">
+      <Section title={'Collector'}>
+        <SimpleGrid cols={{base: 1, md: 3}} spacing="md">
+          <Section title={`Host ${instance.hostname ?? instance.instance_uid}`} titleAs="h3">
+            <DetailRow>
+              <DetailLabel>Status:</DetailLabel>
+              <InstanceStatusLabel status={instance.status} />
+            </DetailRow>
+            <DetailRow>
+              <DetailLabel>OS:</DetailLabel>
+              <span>{collectorOsName(instance)}</span>
+            </DetailRow>
+            <DetailRow>
+              <DetailLabel>Version:</DetailLabel>
+              <span>{instance.version || 'Unknown'}</span>
+            </DetailRow>
+            <DetailRow>
+              <DetailLabel>Last seen:</DetailLabel>
+              <RelativeTime dateTime={instance.last_seen} />
+            </DetailRow>
+            <DetailRow>
+              <DetailLabel>Enrolled:</DetailLabel>
+              <RelativeTime dateTime={instance.enrolled_at} />
+            </DetailRow>
 
-      <SummaryRow>
-        {fleetName && <Label>{fleetName}</Label>}
-        {platform && <Label>{platform.label}</Label>}
-        <Label>{sources?.length ?? 0} sources</Label>
-      </SummaryRow>
+            {attributes.map(([key, value]) => (
+              <DetailRow key={key}>
+                <DetailLabel>{key}</DetailLabel>
+                <span>{String(value)}</span>
+              </DetailRow>
+            ))}
+          </Section>
 
-      <StatsRow>
-        <StatCard value={instance.status === 'online' ? 1 : 0} label="Online" variant="success" />
-        <StatCard value={sourceLogs?.total ?? 0} label="Messages (15 min)" />
-        <StatCard value={sources?.length ?? 0} label="Sources" />
-      </StatsRow>
+          <Section title="Fleet" titleAs="h3">
+            <DetailRow>
+              <DetailLabel>Name:</DetailLabel>
+              <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName ?? 'Unknown'}</Link>
+            </DetailRow>
+            <DetailRow>
+              <DetailLabel>Sources:</DetailLabel>
+              <span>{sources?.length ?? 0} configured</span>
+            </DetailRow>
 
-      <LogPreviewsWrapper>
+            <IconRowList>
+              {sources?.map((source) => (
+                <IconRow key={source.id}>
+                  <Label bsStyle="info">{SOURCE_TYPE_LABELS[source.type] ?? source.type}</Label>
+                  <span>{source.name}</span>
+                </IconRow>
+              ))}
+            </IconRowList>
+          </Section>
+
+          <Section title="What's next?" titleAs="h3">
+            <IconRowList>
+              <IconRow>
+                <Icon name="hub" />
+                <Link to={Routes.SYSTEM.COLLECTORS.FLEETS}>Manage Fleets</Link>
+              </IconRow>
+              <IconRow>
+                <Icon name="settings" />
+                <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>Configure Sources</Link>
+              </IconRow>
+              <IconRow>
+                <Icon name="dns" />
+                <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>View Instances</Link>
+              </IconRow>
+            </IconRowList>
+          </Section>
+        </SimpleGrid>
+      </Section>
+      {/* Zero gap: each `Section` already carries its own bottom margin. */}
+      <Stack gap={0}>
         <LogPreviewSection
           title="Your log sources"
           searchUrl={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}
@@ -182,34 +141,8 @@ const ConnectionSuccess = ({ platformId = undefined, instance, fleetName }: Prop
           error={selfLogsError}
           collapsible
         />
-      </LogPreviewsWrapper>
-
-      <SectionTitle>Auto-detected assets</SectionTitle>
-      <AssetsGrid>
-        {MOCK_ASSETS.map((asset) => (
-          <AssetCard key={`${asset.type}-${asset.name}`}>
-            <AssetType>{asset.type}</AssetType>
-            <AssetName>{asset.name}</AssetName>
-          </AssetCard>
-        ))}
-      </AssetsGrid>
-
-      <SectionTitle>What&apos;s next?</SectionTitle>
-      <NextGrid>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
-          <h4>Manage Fleets</h4>
-          <p>Group collectors by environment or team.</p>
-        </NextCard>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id))}>
-          <h4>Configure Sources</h4>
-          <p>Add file paths, journald, or Windows Event Log sources.</p>
-        </NextCard>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}>
-          <h4>View Instances</h4>
-          <p>Monitor all connected collector instances.</p>
-        </NextCard>
-      </NextGrid>
-    </div>
+      </Stack>
+    </Stack>
   );
 };
 
