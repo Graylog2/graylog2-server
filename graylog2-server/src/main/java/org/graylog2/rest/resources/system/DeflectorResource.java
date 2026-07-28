@@ -69,8 +69,6 @@ public class DeflectorResource extends RestResource {
 
     private final IndexSetRegistry indexSetRegistry;
     private final ActivityWriter activityWriter;
-    private final AuditEventSender auditEventSender;
-    private final ObjectMapper objectMapper;
     private final BulkExecutor<IndexSet, UserContext> bulkCycleExecutor;
 
     @Inject
@@ -80,8 +78,6 @@ public class DeflectorResource extends RestResource {
                              ObjectMapper objectMapper) {
         this.indexSetRegistry = indexSetRegistry;
         this.activityWriter = activityWriter;
-        this.auditEventSender = auditEventSender;
-        this.objectMapper = objectMapper;
         this.bulkCycleExecutor = new SequentialBulkExecutor<>(this::cycleInner, auditEventSender, objectMapper);
     }
 
