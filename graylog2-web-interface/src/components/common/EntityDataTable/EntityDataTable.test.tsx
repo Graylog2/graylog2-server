@@ -215,7 +215,9 @@ describe('<EntityDataTable />', () => {
 
     render(<EntityDataTable {...defaultProps} onSortChange={onSortChange} />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    // The whole header cell opens the actions menu now (not a dedicated per-title button); its
+    // accessible name is still the drag-handle description, since dragging is the header's other role.
+    await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /sort ascending/i }));
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
@@ -223,12 +225,27 @@ describe('<EntityDataTable />', () => {
     expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', direction: 'asc' });
   });
 
+  it('should open header actions menu with the Enter key, leaving Space free for column drag', async () => {
+    render(<EntityDataTable {...defaultProps} />);
+
+    const descriptionHeader = await screen.findByRole('button', {
+      name: /drag or press space to reorder description/i,
+    });
+    descriptionHeader.focus();
+
+    await userEvent.keyboard('{Enter}');
+
+    await screen.findByRole('menuitem', { name: /sort ascending/i });
+  });
+
   it('should slice by column using header action', async () => {
     const onChangeSlicing = jest.fn(() => {});
 
     render(<EntityDataTable {...defaultProps} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    // The whole header cell opens the actions menu now (not a dedicated per-title button); its
+    // accessible name is still the drag-handle description, since dragging is the header's other role.
+    await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /slice by values/i }));
 
     expect(onChangeSlicing).toHaveBeenCalledWith('description');
@@ -246,7 +263,9 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    // The whole header cell opens the actions menu now (not a dedicated per-title button); its
+    // accessible name is still the drag-handle description, since dragging is the header's other role.
+    await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /no slicing/i }));
 
     expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
