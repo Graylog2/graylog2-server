@@ -15,28 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useCallback } from 'react';
 
 import { isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { Icon } from 'components/common';
-import { Label } from 'components/bootstrap';
 import useStreamMutations from 'hooks/useStreamMutations';
 import type { Stream } from 'logic/streams/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const InnerContainer = styled.span`
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-`;
+const StatusContainer = styled.span<{ $clickable: boolean }>(
+  ({ theme, $clickable }) => css`
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 
-const Spacer = styled.div`
-  border-left: 1px solid currentColor;
-  height: 0.8em;
+    ${$clickable &&
+    css`
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 1px 4px;
+
+      &:hover {
+        background-color: ${theme.colors.gray[80]};
+      }
+    `}
+  `,
+);
+
+const Dot = styled.span<{ $success: boolean }>`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: ${({ theme, $success }) =>
+    $success ? theme.colors.variant.success : theme.colors.variant.warning};
 `;
 
 const _title = (disabled: boolean, disabledChange: boolean, description: string) => {
@@ -72,7 +87,6 @@ const StatusCell = ({ stream }: Props) => {
       },
     });
 
-    // The api fns handle the error toast on rejection, so we swallow it here to avoid an unhandled rejection.
     if (stream.disabled) {
       await resumeStream(stream.id).catch(() => {});
     }
@@ -84,21 +98,15 @@ const StatusCell = ({ stream }: Props) => {
   }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream]);
 
   return (
-    <Label
-      bsStyle={stream.disabled ? 'warning' : 'success'}
+    <StatusContainer
       onClick={disableChange ? undefined : toggleStreamStatus}
       title={title}
-      aria-label={title}>
-      <InnerContainer>
-        {stream.disabled ? 'Paused' : 'Running'}
-        {!disableChange && (
-          <>
-            <Spacer />
-            <Icon name={stream.disabled ? 'play_arrow' : 'pause'} size="xs" />
-          </>
-        )}
-      </InnerContainer>
-    </Label>
+      aria-label={title}
+      $clickable={!disableChange}>
+      <Dot $success={!stream.disabled} />
+      {description}
+      {!disableChange && <Icon name={stream.disabled ? 'play_arrow' : 'pause'} size="xs" />}
+    </StatusContainer>
   );
 };
 
