@@ -77,11 +77,9 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
                         dependencyGraph.predecessors(dependency).stream().anyMatch(
                                 predecessor -> !ModelTypes.STREAM_V1.equals(predecessor.type()))
                 )
-                // Ignore lookup tables, adapters, and caches as dependencies. Lookup tables don't have a corresponding
-                // GRN type registered and cannot be resolved for permission checks.
-                .filter(dependency -> !ModelTypes.LOOKUP_TABLE_V1.equals(dependency.type()) &&
-                        !ModelTypes.LOOKUP_ADAPTER_V1.equals(dependency.type()) &&
-                        !ModelTypes.LOOKUP_CACHE_V1.equals(dependency.type()))
+                // Ignore dependency types that have no corresponding GRN type registered and therefore cannot
+                // be resolved for permission checks (lookup tables, adapters, caches - see ignoredDependencyTypes()).
+                .filter(dependency -> !ignoredDependencyTypes().contains(dependency.type()))
                 // TODO: Work around from using the content pack dependency resolver:
                 //  We've added stream_title content pack entities in https://github.com/Graylog2/graylog2-server/pull/17089,
                 //  but in this context we want to return the actual dependent Stream to add additional permissions to.
@@ -96,6 +94,16 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
         return dependencies.stream()
                 .map(dependency -> descriptorFromGRN(dependency, entityExcerpts, owners))
                 .collect(ImmutableSet.toImmutableSet());
+    }
+
+    /**
+     * Content pack dependency types to exclude from permission dependency resolution: they have no
+     * corresponding GRN type registered and therefore cannot be resolved for permission checks. Lookup
+     * tables, adapters, and caches are excluded here because their access is not permission-gated in this
+     * context; subclasses may extend this for plugin-specific reference-only types.
+     */
+    protected Set<ModelType> ignoredDependencyTypes() {
+        return Set.of(ModelTypes.LOOKUP_TABLE_V1, ModelTypes.LOOKUP_ADAPTER_V1, ModelTypes.LOOKUP_CACHE_V1);
     }
 
     @Override

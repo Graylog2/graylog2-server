@@ -27,6 +27,7 @@ import {
   TABLE_ROW_HOVER_TRANSITION,
   TABLE_ROW_PINNED_HOVER_BG_VAR,
   flattenTableBackground,
+  isStripedRowIndex,
 } from 'components/bootstrap/Table';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import {
@@ -54,14 +55,14 @@ const HeaderBackground = styled(BackgroundFoundation)(
   `,
 );
 
-const Actions = styled.div<{ $isEvenRow: boolean }>(
-  ({ $isEvenRow, theme }) => css`
+const Actions = styled.div<{ $isStripedRow: boolean }>(
+  ({ $isStripedRow, theme }) => css`
     display: flex;
     justify-content: flex-end;
     padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
     background-color: ${flattenTableBackground(
       theme,
-      $isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped,
+      $isStripedRow ? theme.colors.table.row.backgroundStriped : theme.colors.table.row.background,
     )};
     height: 100%;
     align-items: center;
@@ -95,7 +96,7 @@ const ActionCell = <Entity extends EntityBase>({
   return (
     <AlignRight>
       <BackgroundFoundation>
-        <Actions $isEvenRow={row.index % 2 === 0}>
+        <Actions $isStripedRow={isStripedRowIndex(row.index + 1)}>
           <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
         </Actions>
       </BackgroundFoundation>

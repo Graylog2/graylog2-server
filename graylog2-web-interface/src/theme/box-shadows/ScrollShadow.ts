@@ -16,6 +16,8 @@
  */
 import { css } from 'styled-components';
 
+import { COLOR_SCHEME_LIGHT } from 'theme/constants';
+
 const SIZE = 5;
 type Side = 'left' | 'right' | 'top' | 'bottom';
 
@@ -74,7 +76,7 @@ const ScrollShadow = (side: Side) => {
       position: absolute;
       pointer-events: none;
       z-index: -1;
-      box-shadow: ${x}px ${y}px 8px rgb(0 0 0 / 10%);
+      box-shadow: ${x}px ${y}px 8px rgb(0 0 0 / ${({ theme }) => (theme.mode === COLOR_SCHEME_LIGHT ? '10%' : '40%')});
       ${sideGeometry(side)}
     }
   `;

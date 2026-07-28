@@ -53,7 +53,10 @@ describe('CreateButton', () => {
   });
 
   it('renders button for user with the required permission', () => {
-    const user = adminUser.toBuilder().permissions(Immutable.List(['streams:create'])).build();
+    const user = adminUser
+      .toBuilder()
+      .permissions(Immutable.List(['streams:create']))
+      .build();
     asMock(useCurrentUser).mockReturnValue(user);
 
     render(<CreateButton entityKey="Stream" />);
