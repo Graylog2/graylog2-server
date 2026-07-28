@@ -51,12 +51,12 @@ const updateColumnPreferences = (
 
   // All currently visible columns will be marked as 'show'
   visibleAttributeColumns.forEach((col) => {
-    updatedPreferences[col] = { status: ATTRIBUTE_STATUS.show };
+    updatedPreferences[col] = { ...updatedPreferences[col], status: ATTRIBUTE_STATUS.show };
   });
 
   // Only explicitly hidden columns will be marked as 'hide'
   removedColumns.forEach((col) => {
-    updatedPreferences[col] = { status: ATTRIBUTE_STATUS.hide };
+    updatedPreferences[col] = { ...updatedPreferences[col], status: ATTRIBUTE_STATUS.hide };
   });
 
   return updatedPreferences;
