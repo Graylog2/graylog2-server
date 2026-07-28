@@ -41,9 +41,10 @@ const IncompatibleIndicesModal = ({ show, onClose }: Props) => {
         {!isLoading && !isError && incompatibleIndices.length > 0 && (
           <>
             <Alert bsStyle="info">
-              Found <strong>{incompatibleIndices.length}</strong> {incompatibleIndices.length === 1 ? 'index' : 'indices'} that
-              were created with an incompatible, previous major version of OpenSearch. These indices may need to be
-              re-indexed for compatibility with future OpenSearch major versions.
+              Found <strong>{incompatibleIndices.length}</strong>{' '}
+              {incompatibleIndices.length === 1 ? 'index' : 'indices'} that were created with an incompatible, previous
+              major version of OpenSearch. These indices may need to be re-indexed for compatibility with future
+              OpenSearch major versions.
             </Alert>
             <Table condensed>
               <thead>

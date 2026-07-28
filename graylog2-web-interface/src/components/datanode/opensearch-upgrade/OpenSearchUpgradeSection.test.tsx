@@ -91,7 +91,10 @@ const mockRollingRestart = (overrides: RollingRestartHookOverrides = {}) => {
   } as unknown as ReturnType<typeof useOpenSearchRollingRestart>);
 };
 
-const mockIncompatibleIndices = (data: Array<unknown> = [], overrides: { isLoading?: boolean; isError?: boolean } = {}) =>
+const mockIncompatibleIndices = (
+  data: Array<unknown> = [],
+  overrides: { isLoading?: boolean; isError?: boolean } = {},
+) =>
   asMock(useIncompatibleIndices).mockReturnValue({
     data,
     isError: false,

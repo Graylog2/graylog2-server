@@ -64,7 +64,10 @@ const Td = styled.td<{
 }>(
   ({ $colId, $hidePadding, $pinningPosition, $textAlign }) => css`
     word-break: break-word;
-    ${$textAlign && css`text-align: ${$textAlign};`}
+    ${$textAlign &&
+    css`
+      text-align: ${$textAlign};
+    `}
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
@@ -77,6 +80,7 @@ const Td = styled.td<{
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+
           ${ScrollShadow('left')}
           &::before {
             display: var(${displayScrollRightIndicatorVar}, none);

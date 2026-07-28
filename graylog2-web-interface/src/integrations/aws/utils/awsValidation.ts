@@ -23,10 +23,7 @@
  * @param externalId - The External ID value
  * @returns An error message if validation fails, undefined if valid
  */
-export const validateExternalIdRequiresArn = (
-  assumeRoleArn?: string,
-  externalId?: string,
-): string | undefined => {
+export const validateExternalIdRequiresArn = (assumeRoleArn?: string, externalId?: string): string | undefined => {
   const hasExternalId = externalId && externalId.trim().length > 0;
   const hasAssumeRoleArn = assumeRoleArn && assumeRoleArn.trim().length > 0;
 

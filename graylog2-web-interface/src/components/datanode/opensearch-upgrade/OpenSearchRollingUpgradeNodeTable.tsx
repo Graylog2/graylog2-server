@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, {css} from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import {Label, Table} from 'components/bootstrap';
-import {Icon} from 'components/common';
+import { Label, Table } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
-import type {OpenSearchVersionNode} from './hooks/useOpenSearchClusterStats';
-import type {RollingRestartNode, RollingRestartNodeStatus} from './rollingRestartTypes';
+import type { OpenSearchVersionNode } from './hooks/useOpenSearchClusterStats';
+import type { RollingRestartNode, RollingRestartNodeStatus } from './rollingRestartTypes';
 
 export type RollingUpgradeNodeWithContext = {
   node: RollingRestartNode;
@@ -86,26 +86,18 @@ const NodeIdentityCell = ({
     <td>
       <div>
         {nodeName(node, versionNode)}&nbsp;
-        {isManagerNode && (
-          <Label bsStyle="default">
-            manager
-          </Label>
-        )}
+        {isManagerNode && <Label bsStyle="default">manager</Label>}
         {isCurrent && (
           <>
             &nbsp;
-            <Label bsStyle="primary">
-              current
-            </Label>
+            <Label bsStyle="primary">current</Label>
           </>
         )}
       </div>
       {ip && <CellDetail>{ip}</CellDetail>}
       {node.last_error && (
         <div>
-          <Label bsStyle="danger">
-            {node.last_error}
-          </Label>
+          <Label bsStyle="danger">{node.last_error}</Label>
         </div>
       )}
     </td>

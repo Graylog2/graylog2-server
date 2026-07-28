@@ -23,8 +23,6 @@ type Props = {
   title: string;
 };
 
-const ProcessingTimeBadge = ({ ms, title }: Props) => (
-  <span title={title}>{formatProcessingTime(ms)}</span>
-);
+const ProcessingTimeBadge = ({ ms, title }: Props) => <span title={title}>{formatProcessingTime(ms)}</span>;
 
 export default ProcessingTimeBadge;

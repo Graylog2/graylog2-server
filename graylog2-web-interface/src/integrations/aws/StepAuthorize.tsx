@@ -112,10 +112,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
   }, [setStreamsFetch]);
 
   const handleSubmit = () => {
-    const arnError = validateExternalIdRequiresArn(
-      formData?.awsAssumeRoleARN?.value,
-      formData?.awsExternalId?.value,
-    );
+    const arnError = validateExternalIdRequiresArn(formData?.awsAssumeRoleARN?.value, formData?.awsExternalId?.value);
 
     if (arnError) {
       setExternalIdError(arnError);
@@ -137,9 +134,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
     };
   }, [clearSidebar, setSidebar, sidebarComponent]);
 
-  const formError = externalIdError
-    ? { full_message: externalIdError, nice_message: externalIdError }
-    : fetchError;
+  const formError = externalIdError ? { full_message: externalIdError, nice_message: externalIdError } : fetchError;
 
   const authType = formData.awsAuthenticationType && formData.awsAuthenticationType.value;
   const isFormValid = formValidation.isFormValid(
