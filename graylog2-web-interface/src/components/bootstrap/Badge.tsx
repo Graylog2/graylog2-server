@@ -34,7 +34,8 @@ const mapFontSize: Record<SupportedMantineSize, 'tiny' | 'small' | 'body'> = {
   lg: 'body',
 };
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize }>(
+const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize;}
+>(
   ({ theme, color, size }) => css`
     text-transform: none;
     background-color: ${color};
@@ -54,6 +55,9 @@ const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedM
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    &.uppercase {
+      text-transform: uppercase;
+    }
   `,
 );
 
@@ -69,6 +73,7 @@ type Props = React.PropsWithChildren<{
   role?: string;
   style?: React.CSSProperties;
   title?: string;
+  uppercase?: boolean;
 }>;
 
 const Badge = (
@@ -85,6 +90,7 @@ const Badge = (
     style = undefined,
     title = undefined,
     bsSize = 'md',
+    uppercase = false,
   }: Props,
   ref: React.ForwardedRef<HTMLElement>,
 ) => {
@@ -95,7 +101,7 @@ const Badge = (
   const sharedProps = {
     'aria-label': ariaLabel,
     color,
-    className,
+    className: uppercase ? `${className ?? ''} uppercase` : className,
     title,
     'data-testid': dataTestid,
     role,
@@ -120,7 +126,10 @@ const Badge = (
   }
 
   return (
-    <StyledBadge {...sharedProps} component="span" ref={ref as React.Ref<HTMLSpanElement>}>
+    <StyledBadge
+      {...sharedProps}
+      component="span"
+      ref={ref as React.Ref<HTMLSpanElement>}>
       {children}
     </StyledBadge>
   );

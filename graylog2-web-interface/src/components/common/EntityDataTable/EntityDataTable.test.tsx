@@ -123,7 +123,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    await screen.findByRole('columnheader', { name: /custom title header/i });
+    await screen.findByText(/custom title header/i);
     await screen.findByText('The title: Entity title');
   });
 
@@ -147,7 +147,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    await screen.findByRole('columnheader', { name: /custom header for type - title/i });
+    await screen.findByText(/custom header for type - title/i);
     await screen.findByText('Custom Cell For Attribute - Entity title');
 
     expect(screen.queryByText('Custom Cell For Type - Entity title')).not.toBeInTheDocument();
@@ -362,6 +362,44 @@ describe('<EntityDataTable />', () => {
     expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
       attributes: {
         description: { status: ATTRIBUTE_STATUS.show },
+        status: { status: ATTRIBUTE_STATUS.show },
+        stream: { status: ATTRIBUTE_STATUS.show },
+        title: { status: ATTRIBUTE_STATUS.show },
+      },
+      order: ['description', 'status', 'stream', 'title'],
+    });
+  });
+
+  it('should preserve custom column widths when toggling column visibility', async () => {
+    const onLayoutPreferencesChange = jest.fn();
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        layoutPreferences={{
+          attributes: {
+            description: { status: ATTRIBUTE_STATUS.show, width: 350 },
+            status: { status: ATTRIBUTE_STATUS.show },
+            title: { status: ATTRIBUTE_STATUS.show },
+          },
+          order: [],
+        }}
+        defaultDisplayedColumns={['description', 'status', 'title']}
+        defaultColumnOrder={['description', 'status', 'stream', 'title']}
+        onLayoutPreferencesChange={onLayoutPreferencesChange}
+      />,
+    );
+
+    await screen.findByRole('columnheader', { name: /title/i });
+    await screen.findByRole('columnheader', { name: /status/i });
+    await screen.findByRole('columnheader', { name: /description/i });
+
+    await userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /show stream/i }));
+
+    expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
+      attributes: {
+        description: { status: ATTRIBUTE_STATUS.show, width: 350 },
         status: { status: ATTRIBUTE_STATUS.show },
         stream: { status: ATTRIBUTE_STATUS.show },
         title: { status: ATTRIBUTE_STATUS.show },

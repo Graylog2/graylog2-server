@@ -294,17 +294,28 @@ describe('StreamsOverview', () => {
     expect(screen.queryByText(/1 connected output\./i)).not.toBeInTheDocument();
   });
 
-  it('should render stream overview table elements from plugins', async () => {
+  it('should only show grouped plugin table elements in their matching view', async () => {
     const plugin = new PluginManifest(
       {},
       {
         'components.streams.overview.tableElements': [
           {
-            attributeName: 'data_lake',
-            attributes: [{ id: 'data_lake', title: 'Data Lake' }],
+            attributeName: 'my_plugin_column',
+            group: 'routing',
+            attributes: [{ id: 'my_plugin_column', title: 'My Plugin Column' }],
             columnRenderers: {
-              data_lake: {
-                renderCell: () => 'Preview logs',
+              my_plugin_column: {
+                renderCell: () => 'plugin cell',
+                staticWidth: 'matchHeader',
+              },
+            },
+          },
+          {
+            attributeName: 'my_ungrouped_column',
+            attributes: [{ id: 'my_ungrouped_column', title: 'My Ungrouped Column' }],
+            columnRenderers: {
+              my_ungrouped_column: {
+                renderCell: () => 'ungrouped cell',
                 staticWidth: 'matchHeader',
               },
             },
@@ -327,8 +338,15 @@ describe('StreamsOverview', () => {
     try {
       renderSut();
 
-      await screen.findByText('Data Lake');
-      await screen.findByText('Preview logs');
+      await screen.findByText('Title');
+      expect(screen.queryByText('My Plugin Column')).not.toBeInTheDocument();
+      expect(screen.queryByText('My Ungrouped Column')).not.toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Routing' }));
+
+      await screen.findByText('My Plugin Column');
+      expect(screen.getByText('plugin cell')).toBeInTheDocument();
+      expect(screen.queryByText('My Ungrouped Column')).not.toBeInTheDocument();
     } finally {
       PluginStore.unregister(plugin);
     }

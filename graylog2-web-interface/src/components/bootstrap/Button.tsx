@@ -183,6 +183,10 @@ const StyledButton = styled(MantineButton)<{
     &:focus {
       color: ${color};
       text-decoration: none;
+
+      &:not(:focus-visible) {
+        outline: none;
+      }
     }
 
     ${$active && activeStyles(theme.colors, $bsStyle)}
@@ -202,6 +206,7 @@ const StyledButton = styled(MantineButton)<{
 
 type Props = React.PropsWithChildren<{
   active?: boolean;
+  allowClickWhenDisabled?: boolean;
   'aria-label'?: string;
   bsStyle?: StyleProps;
   bsSize?: BsSize;
@@ -226,6 +231,7 @@ type Props = React.PropsWithChildren<{
 const Button = (
   {
     'aria-label': ariaLabel,
+    allowClickWhenDisabled = false,
     bsStyle = 'default',
     bsSize = undefined,
     className = undefined,
@@ -263,7 +269,8 @@ const Button = (
     variant: active ? 'outline' : 'filled',
     color,
     'data-testid': dataTestId,
-    disabled,
+    disabled: allowClickWhenDisabled ? false : disabled,
+    'data-disabled': (allowClickWhenDisabled && disabled) || undefined,
     role,
     size: sizeForMantine(bsSize),
     tabIndex,

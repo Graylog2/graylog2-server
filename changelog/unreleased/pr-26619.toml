@@ -1,0 +1,5 @@
+type = "a"
+message = "Warn when Slack or Microsoft Teams notification webhook URLs are not in the URL allowlist. A future release will block non-allowlisted URLs."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14748"]
+pulls = ["26619"]

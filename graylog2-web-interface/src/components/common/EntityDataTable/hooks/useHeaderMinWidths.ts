@@ -17,7 +17,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 
 const useHeaderMinWidths = () => {
   const [headerSectionsWidth, setHeaderSectionsWidth] = useState<{
@@ -28,7 +28,7 @@ const useHeaderMinWidths = () => {
       Object.fromEntries(
         Object.entries(headerSectionsWidth).map(([colId, { left = 0, right = 0 }]) => [
           colId,
-          Math.round(left + right) + CELL_PADDING * 2,
+          Math.round(left + right) + CELL_PADDING_HORIZONTAL * 2,
         ]),
       ),
     [headerSectionsWidth],

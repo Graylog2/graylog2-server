@@ -566,6 +566,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.compat.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.compat.version}/opensearch-${opensearch.compat.version}-linux-x64.tar.gz
                             </url>
@@ -588,6 +590,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.compat.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.compat.version}/opensearch-${opensearch.compat.version}-linux-arm64.tar.gz
                             </url>
@@ -671,6 +675,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.latest.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.latest.version}/opensearch-${opensearch.latest.version}-linux-x64.tar.gz
                             </url>
@@ -693,6 +699,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.latest.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.latest.version}/opensearch-${opensearch.latest.version}-linux-arm64.tar.gz
                             </url>
@@ -799,6 +807,64 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stage-log4j-replacement-jars</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-api</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-core</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-slf4j2-impl</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-jul</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.logging.log4j</groupId>
+                                    <artifactId>log4j-1.2-api</artifactId>
+                                    <version>${opensearch.log4j.replacement.version}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/log4j-replacement</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
@@ -897,64 +963,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeScope>runtime</includeScope>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stage-log4j-replacement-jars</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-api</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-core</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-slf4j2-impl</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-jul</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.logging.log4j</groupId>
-                                    <artifactId>log4j-1.2-api</artifactId>
-                                    <version>${opensearch.log4j.replacement.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/log4j-replacement</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <finalName>graylog-datanode-${project.version}</finalName>
@@ -1033,6 +1041,27 @@
                         </goals>
                         <configuration>
                             <propertyPrefix>maven</propertyPrefix>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>check-opensearch-unpack-state</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>bsh-property</goal>
+                        </goals>
+                        <configuration>
+                            <source><![CDATA[
+                                String dir = project.getBuild().getDirectory();
+                                String cv = project.getProperties().getProperty("opensearch.compat.version");
+                                String lv = project.getProperties().getProperty("opensearch.latest.version");
+                                boolean compat = new java.io.File(dir, "opensearch/opensearch-" + cv + "-linux-x64").isDirectory()
+                                              && new java.io.File(dir, "opensearch/opensearch-" + cv + "-linux-aarch64").isDirectory();
+                                boolean latest = new java.io.File(dir, "opensearch/opensearch-" + lv + "-linux-x64").isDirectory()
+                                              && new java.io.File(dir, "opensearch/opensearch-" + lv + "-linux-aarch64").isDirectory();
+                                project.getProperties().setProperty("opensearch.unpack.compat.skip", compat ? "true" : "false");
+                                project.getProperties().setProperty("opensearch.unpack.latest.skip", latest ? "true" : "false");
+                                log.info("OpenSearch unpack skip flags: compat=" + compat + " latest=" + latest);
+                            ]]></source>
                         </configuration>
                     </execution>
                 </executions>
