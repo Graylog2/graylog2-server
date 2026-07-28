@@ -30,8 +30,11 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.services.sts.StsClientBuilder;
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
+import software.amazon.awssdk.services.sts.auth.StsCredentialsProvider;
 import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
+import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.utils.SdkAutoCloseable;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -96,6 +99,29 @@ public class AWSAuthFactory {
                                          @Nullable String assumeRoleArn,
                                          @Nullable String externalId,
                                          @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
+        // Discards the STS client handle. Callers on this overload cannot close the STS client backing an
+        // assume-role provider, so its connection pool leaks for the process lifetime; see createCloseable.
+        return createCloseable(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, externalId, stsHttpClientBuilder)
+                .provider();
+    }
+
+    /**
+     * Same resolution as {@link #create(boolean, String, String, String, String, String, ApacheHttpClient.Builder)},
+     * but returns a {@link CredentialsProviderHandle} so the caller can close the STS client backing an assume-role
+     * provider.
+     *
+     * <p>For an assume-role configuration the STS client is created here and handed to
+     * {@link StsAssumeRoleCredentialsProvider}, which never closes it: {@link StsCredentialsProvider#close()} only
+     * clears the session cache. Callers that build a fresh provider per operation must therefore close the handle,
+     * or the STS client's Apache connection pool leaks on every call.
+     */
+    public CredentialsProviderHandle createCloseable(boolean requireKeySecret,
+                                                     @Nullable String stsRegion,
+                                                     @Nullable String accessKey,
+                                                     @Nullable String secretKey,
+                                                     @Nullable String assumeRoleArn,
+                                                     @Nullable String externalId,
+                                                     @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
         AwsCredentialsProvider awsCredentials = requireKeySecret ? getKeySecretCredentialsProvider(accessKey, secretKey) :
                 getAwsCredentialsProvider(accessKey, secretKey);
 
@@ -109,7 +135,7 @@ public class AWSAuthFactory {
             return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey, externalId, stsHttpClientBuilder);
         }
 
-        return awsCredentials;
+        return new CredentialsProviderHandle(awsCredentials, null);
     }
 
     private static AwsCredentialsProvider getAwsCredentialsProvider(String accessKey, String secretKey) {
@@ -135,10 +161,10 @@ public class AWSAuthFactory {
      * Note: In order to assume a role, a role must be provided to the AWS STS client a role that has the "sts:AssumeRole"
      * permission, which provides authorization for a role to be assumed.
      */
-    private static AwsCredentialsProvider buildStsCredentialsProvider(AwsCredentialsProvider awsCredentials, String stsRegion,
-                                                                       String assumeRoleArn, @Nullable String accessKey,
-                                                                       @Nullable String externalId,
-                                                                       @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
+    private static CredentialsProviderHandle buildStsCredentialsProvider(AwsCredentialsProvider awsCredentials, String stsRegion,
+                                                                         String assumeRoleArn, @Nullable String accessKey,
+                                                                         @Nullable String externalId,
+                                                                         @Nullable ApacheHttpClient.Builder stsHttpClientBuilder) {
 
         final StsClientBuilder stsClientBuilder = StsClient.builder()
                 .region(Region.of(stsRegion))
@@ -166,9 +192,41 @@ public class AWSAuthFactory {
         if (!isNullOrEmpty(externalId)) {
             assumeRoleRequestBuilder.externalId(externalId);
         }
-        return StsAssumeRoleCredentialsProvider.builder()
+        final StsAssumeRoleCredentialsProvider provider = StsAssumeRoleCredentialsProvider.builder()
                 .refreshRequest(assumeRoleRequestBuilder.build())
                 .stsClient(stsClient)
                 .build();
+        return new CredentialsProviderHandle(provider, stsClient);
+    }
+
+    /**
+     * A resolved {@link AwsCredentialsProvider} paired with the STS client backing an assume-role provider, if any.
+     *
+     * <p>{@link StsCredentialsProvider#close()} only clears the provider's session cache; the {@link StsClient} it
+     * was handed is caller-supplied and {@code final}, so it is never closed and its Apache connection pool leaks.
+     * This handle owns both resources so a caller can release them together. {@link #close()} closes the credentials
+     * provider first -- stopping its background session refresh -- and then the STS client.
+     */
+    public static final class CredentialsProviderHandle implements AutoCloseable {
+        private final AwsCredentialsProvider provider;
+        @Nullable
+        private final SdkAutoCloseable stsClient;
+
+        CredentialsProviderHandle(AwsCredentialsProvider provider, @Nullable SdkAutoCloseable stsClient) {
+            this.provider = provider;
+            this.stsClient = stsClient;
+        }
+
+        public AwsCredentialsProvider provider() {
+            return provider;
+        }
+
+        @Override
+        public void close() {
+            if (provider instanceof SdkAutoCloseable closeableProvider) {
+                IoUtils.closeQuietly(closeableProvider, LOG);
+            }
+            IoUtils.closeQuietly(stsClient, LOG);
+        }
     }
 }
