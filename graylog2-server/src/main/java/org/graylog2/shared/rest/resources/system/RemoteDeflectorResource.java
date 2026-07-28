@@ -16,9 +16,11 @@
  */
 package org.graylog2.shared.rest.resources.system;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
@@ -30,5 +32,5 @@ public interface RemoteDeflectorResource {
     Call<Void> cycleIndexSet(@Path("indexSetId") String indexSetId);
 
     @POST("system/deflector/bulk_cycle")
-    Call<Void> bulkCycle(@Parameter(name = "Entities to cycle", required = true) final BulkOperationRequest bulkOperationRequest);
+    Call<BulkOperationResponse> bulkCycle(@Body @Valid final BulkOperationRequest bulkOperationRequest);
 }

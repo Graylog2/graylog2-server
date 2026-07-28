@@ -34,6 +34,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteDeflectorResource;
@@ -78,7 +79,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
     @Operation(summary = "Finds leader node and triggers deflector cycle")
     @Path("/bulk_cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
-    public void bulkcycle(@Parameter(name = "Entities to cycle", required = true) final BulkOperationRequest bulkOperationRequest) throws IOException {
-        requestOnLeader(c -> c.bulkCycle(bulkOperationRequest), RemoteDeflectorResource.class);
+    public NodeResponse<BulkOperationResponse> bulkcycle(@Parameter(name = "Entities to cycle", required = true) final BulkOperationRequest bulkOperationRequest) throws IOException {
+        return requestOnLeader(c -> c.bulkCycle(bulkOperationRequest), RemoteDeflectorResource.class);
     }
 }
