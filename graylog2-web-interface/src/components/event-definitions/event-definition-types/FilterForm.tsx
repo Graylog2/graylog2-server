@@ -131,9 +131,7 @@ const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLoo
   );
 
   if (!userCanViewLookupTables) {
-    return (
-      <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>
-    );
+    return <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>;
   }
 
   const parameterButtons = queryParameters.map((queryParam) => {

@@ -52,7 +52,9 @@ describe('rollingRestartStartError', () => {
   });
 
   it('uses the error body message when there are no failed checks', () => {
-    const result = rollingRestartStartError(fetchErrorWithBody(409, { error: 'Another rolling restart job is already active' }));
+    const result = rollingRestartStartError(
+      fetchErrorWithBody(409, { error: 'Another rolling restart job is already active' }),
+    );
 
     expect(result.canRetryWithForce).toBe(false);
     expect(result.failedChecks).toEqual([]);
