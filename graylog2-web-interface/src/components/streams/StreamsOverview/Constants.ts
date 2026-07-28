@@ -70,13 +70,7 @@ const getStreamTableElements = (
     METRIC_COLUMN_IDS.maxProcessingTime,
   ];
 
-  const defaultColumnOrder = [
-    ...defaultCols,
-    ...routingCols,
-    ...performanceCols,
-    ...ungroupedExtNames,
-    'created_at',
-  ];
+  const defaultColumnOrder = [...defaultCols, ...routingCols, ...performanceCols, ...ungroupedExtNames, 'created_at'];
 
   const defaultVariantLayout = {
     ...SHARED_LAYOUT,
@@ -119,7 +113,11 @@ const getStreamTableElements = (
     { id: 'outputs', title: 'Outputs' },
     ...(extensionAttributes?.attributes || []),
     { id: 'archiving', title: 'Archiving' },
-    { id: METRIC_COLUMN_IDS.messageCount, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messageCount], type: 'LONG' as const },
+    {
+      id: METRIC_COLUMN_IDS.messageCount,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messageCount],
+      type: 'LONG' as const,
+    },
     {
       id: METRIC_COLUMN_IDS.avgProcessingTime,
       title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.avgProcessingTime],

@@ -41,10 +41,7 @@ import { MoreActions } from 'components/common/EntityDataTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
 import type { EventDefinition } from '../event-definitions-types';
-import {
-  isAggregationEventDefinition,
-  isSystemEventDefinition,
-} from '../event-definitions-types';
+import { isAggregationEventDefinition, isSystemEventDefinition } from '../event-definitions-types';
 
 type Props = {
   eventDefinition: EventDefinition;
