@@ -15,133 +15,149 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import styled, { css } from 'styled-components';
 
-import {Label} from 'components/bootstrap';
-import {Icon, Link, RelativeTime, Section, SimpleGrid, Stack} from 'components/common';
+import { Button } from 'components/bootstrap';
+import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
 import Routes from 'routing/Routes';
-import {defaultCompare} from 'logic/DefaultCompare';
-import type {CollectorInstanceView} from 'components/collectors/types';
-import {useSources} from 'components/collectors/hooks/useSourceQueries';
+import type { CollectorInstanceView } from 'components/collectors/types';
+import { useSources } from 'components/collectors/hooks/useSourceQueries';
+import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
 
 import useCollectorLogPreview from './useCollectorLogPreview';
 import LogPreviewSection from './LogPreviewSection';
+import OnboardingTimeline from './OnboardingTimeline';
+import NextSteps from './NextSteps';
+import CollectorFactsSection from './CollectorFactsSection';
+import SourceStatusSection from './SourceStatusSection';
 
-import {DetailLabel, DetailRow} from '../../common/DetailRow';
-import {IconRow, IconRowList} from '../../common/IconRowList';
 import InstanceStatusLabel from '../../common/InstanceStatusLabel';
-import collectorOsName from '../../common/collectorOsName';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
-import {COLLECTOR_INSTANCE_UID_FIELD} from '../../common/fields';
-import {SOURCE_TYPE_LABELS} from '../../sources/Constants';
+import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
 
 type Props = {
   instance: CollectorInstanceView;
   fleetName: string | undefined;
 };
 
-const ConnectionSuccess = ({instance, fleetName}: Props) => {
-  const {selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading} = useCollectorLogPreview(
+const Title = styled.h2`
+  margin: 0;
+`;
+
+const Subtitle = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.xxs};
+    color: ${theme.colors.gray[60]};
+  `,
+);
+
+// The guided timeline gets a fixed rail; the detail sections take the rest. Below the tablet
+// breakpoint the rail stacks on top instead of squeezing the sections.
+const Columns = styled.div(
+  ({ theme }) => css`
+    display: grid;
+    grid-template-columns: minmax(280px, 400px) minmax(0, 1fr);
+    gap: ${theme.spacings.xl};
+    align-items: start;
+
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  `,
+);
+
+const ConnectionSuccess = ({ instance, fleetName }: Props) => {
+  const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
     instance.instance_uid,
   );
-  const {data: sources} = useSources(instance.fleet_id);
+  const { data: sources } = useSources(instance.fleet_id);
+  const queryClient = useQueryClient();
 
-  const attributes = [
-    ...Object.entries(instance.identifying_attributes ?? {}),
-    ...Object.entries(instance.non_identifying_attributes ?? {}),
-  ].sort((attr1, attr2) => defaultCompare(attr1[0], attr2[0]));
+  const online = instance.status === 'online';
+  const receiving = (sourceLogs?.total ?? 0) > 0;
+  const sourceLogsUrl = collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid);
+
+  const subtitle = () => {
+    if (!online)
+      return (
+        <>
+          The collector connected once but hasn&apos;t reported in since{' '}
+          <RelativeTime dateTime={instance.last_seen} />.
+        </>
+      );
+    if (receiving) return <>The collector is connected and delivering messages.</>;
+
+    return <>Almost there &mdash; the collector is connected and we&apos;re listening for its first messages.</>;
+  };
 
   return (
     <Stack gap="lg">
-      <Section title={'Collector'}>
-        <SimpleGrid cols={{base: 1, md: 3}} spacing="md">
-          <Section title={`Host ${instance.hostname ?? instance.instance_uid}`} titleAs="h3">
-            <DetailRow>
-              <DetailLabel>Status:</DetailLabel>
-              <InstanceStatusLabel status={instance.status} />
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>OS:</DetailLabel>
-              <span>{collectorOsName(instance)}</span>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Version:</DetailLabel>
-              <span>{instance.version || 'Unknown'}</span>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Last seen:</DetailLabel>
-              <RelativeTime dateTime={instance.last_seen} />
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Enrolled:</DetailLabel>
-              <RelativeTime dateTime={instance.enrolled_at} />
-            </DetailRow>
+      <Group justify="space-between" align="flex-start">
+        <div>
+          <Group gap="sm">
+            <Title>Setting up {instance.hostname ?? instance.instance_uid}</Title>
+            {!online && <InstanceStatusLabel status={instance.status} />}
+          </Group>
+          <Subtitle>{subtitle()}</Subtitle>
+        </div>
+        {online ? (
+          <LinkContainer to={sourceLogsUrl}>
+            <Button bsStyle="success">Open in search</Button>
+          </LinkContainer>
+        ) : (
+          <Group gap="xs">
+            <LinkContainer to={Routes.SYSTEM.COLLECTORS.INSTANCES}>
+              <Button>View instances</Button>
+            </LinkContainer>
+            <Button
+              bsStyle="info"
+              onClick={() => queryClient.invalidateQueries({ queryKey: instanceKeyFn(instance.instance_uid) })}>
+              Check again
+            </Button>
+          </Group>
+        )}
+      </Group>
 
-            {attributes.map(([key, value]) => (
-              <DetailRow key={key}>
-                <DetailLabel>{key}</DetailLabel>
-                <span>{String(value)}</span>
-              </DetailRow>
-            ))}
-          </Section>
+      <Columns>
+        <div>
+          <OnboardingTimeline
+            instance={instance}
+            fleetName={fleetName}
+            sourceCount={sources?.length ?? 0}
+            receivedTotal={sourceLogs?.total}
+          />
+          <NextSteps instance={instance} />
+        </div>
 
-          <Section title="Fleet" titleAs="h3">
-            <DetailRow>
-              <DetailLabel>Name:</DetailLabel>
-              <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName ?? 'Unknown'}</Link>
-            </DetailRow>
-            <DetailRow>
-              <DetailLabel>Sources:</DetailLabel>
-              <span>{sources?.length ?? 0} configured</span>
-            </DetailRow>
+        <Stack gap="md">
+          <CollectorFactsSection instance={instance} fleetName={fleetName} />
+          <SourceStatusSection instance={instance} sources={sources} receiving={receiving} />
+        </Stack>
+      </Columns>
 
-            <IconRowList>
-              {sources?.map((source) => (
-                <IconRow key={source.id}>
-                  <Label bsStyle="info">{SOURCE_TYPE_LABELS[source.type] ?? source.type}</Label>
-                  <span>{source.name}</span>
-                </IconRow>
-              ))}
-            </IconRowList>
-          </Section>
-
-          <Section title="What's next?" titleAs="h3">
-            <IconRowList>
-              <IconRow>
-                <Icon name="hub" />
-                <Link to={Routes.SYSTEM.COLLECTORS.FLEETS}>Manage Fleets</Link>
-              </IconRow>
-              <IconRow>
-                <Icon name="settings" />
-                <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>Configure Sources</Link>
-              </IconRow>
-              <IconRow>
-                <Icon name="dns" />
-                <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>View Instances</Link>
-              </IconRow>
-            </IconRowList>
-          </Section>
-        </SimpleGrid>
-      </Section>
-      {/* Zero gap: each `Section` already carries its own bottom margin. */}
-      <Stack gap={0}>
+      {/* While healthy the preview tails what the collector delivers; once it drops offline the
+          collector's own logs usually hold the reason, so they take over. */}
+      {online ? (
         <LogPreviewSection
-          title="Your log sources"
-          searchUrl={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}
+          title="Log preview"
+          searchUrl={sourceLogsUrl}
           preview={sourceLogs}
           isLoading={isLoading}
           error={sourceLogsError}
+          caption="Showing the newest messages from this collector &middot; refreshed every few seconds"
         />
-
+      ) : (
         <LogPreviewSection
-          title="Collector logs"
+          title="Log preview"
           searchUrl={collectorSystemLogsUrl(instance.instance_uid)}
           preview={selfLogs}
           isLoading={isLoading}
           error={selfLogsError}
-          collapsible
+          caption="Showing the collector's own logs &mdash; the last entries before it went offline"
         />
-      </Stack>
+      )}
     </Stack>
   );
 };

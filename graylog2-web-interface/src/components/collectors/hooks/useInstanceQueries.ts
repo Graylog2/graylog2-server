@@ -29,6 +29,7 @@ import type { CollectorInstanceView } from '../types';
 const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 export const INSTANCES_KEY_PREFIX = ['collectors', 'instances'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, 'paginated', searchParams];
+export const instanceKeyFn = (instanceUid: string | undefined) => [...INSTANCES_KEY_PREFIX, 'single', instanceUid];
 
 type ApiInstanceResponse = Awaited<ReturnType<typeof Collectors.findInstances>>['elements'][number];
 
@@ -120,7 +121,7 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
 
 export const useInstance = (instanceUid: string | undefined) => {
   const { data, isLoading, error, isError } = useQuery<CollectorInstanceView>({
-    queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
+    queryKey: instanceKeyFn(instanceUid),
     queryFn: () =>
       defaultOnError(
         Collectors.getInstance(instanceUid).then((response) => toView(response)),
