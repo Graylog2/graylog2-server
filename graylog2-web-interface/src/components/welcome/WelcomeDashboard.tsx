@@ -55,11 +55,6 @@ const StyledSearchContainer = styled.div`
   .${widgetDragHandleClass}, .${widgetActionsMenuClass} {
     display: none;
   }
-
-  .react-grid-layout,
-  .container-fluid > .row:first-of-type {
-    pointer-events: none;
-  }
 `;
 
 const Container = styled.div`
