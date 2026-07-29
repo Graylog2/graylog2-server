@@ -32,7 +32,6 @@ import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStr
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
 import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamOutputs from 'hooks/useStreamOutputs';
-
 import useStreamMetrics from 'hooks/useStreamMetrics';
 
 import StreamsOverview from './StreamsOverview';
