@@ -15,17 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Badge from 'components/bootstrap/Badge';
 
-const StyledBadge = styled(Badge)(
-  ({ theme }) => css`
-    background-color: ${theme.colors.variant.light.danger};
-    vertical-align: middle;
-  `,
-);
+const StyledBadge = styled(Badge)`
+  vertical-align: middle;
+`;
 
-const BetaBadge = () => <StyledBadge>Beta</StyledBadge>;
+const BetaBadge = () => <StyledBadge bsStyle="danger">Beta</StyledBadge>;
 
 export default BetaBadge;
