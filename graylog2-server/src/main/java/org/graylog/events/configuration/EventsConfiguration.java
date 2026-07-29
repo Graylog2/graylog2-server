@@ -32,14 +32,12 @@ public abstract class EventsConfiguration {
     private static final String FIELD_NOTIFICATIONS_DEFAULT_BACKLOG = "events_notification_default_backlog";
     private static final String FIELD_CATCHUP_WINDOW = "events_catchup_window";
     private static final String FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE = "events_notification_tcp_keepalive";
-    private static final String FIELD_NOTIFICATIONS_ENFORCE_URL_ALLOWLIST = "events_notification_enforce_url_allowlist";
 
     private static final long DEFAULT_SEARCH_TIMEOUT_MS = 60000;
     private static final long DEFAULT_NOTIFICATIONS_RETRY_MS = 300000;
     private static final long DEFAULT_NOTIFICATIONS_BACKLOG = 50;
     public static final long DEFAULT_CATCH_UP_WINDOW_MS = Duration.standardHours(1).getMillis();
     private static final boolean DEFAULT_NOTIFICATIONS_KEEP_ALIVE_PROBE = false;
-    private static final boolean DEFAULT_NOTIFICATIONS_ENFORCE_URL_ALLOWLIST = false;
 
     @JsonProperty(FIELD_SEARCH_TIMEOUT)
     public abstract long eventsSearchTimeout();
@@ -56,9 +54,6 @@ public abstract class EventsConfiguration {
     @JsonProperty(FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE)
     public abstract boolean notificationsKeepAliveProbe();
 
-    @JsonProperty(FIELD_NOTIFICATIONS_ENFORCE_URL_ALLOWLIST)
-    public abstract boolean notificationsEnforceUrlAllowlist();
-
     public static Builder builder() {
         return Builder.create();
     }
@@ -74,8 +69,7 @@ public abstract class EventsConfiguration {
                     .eventNotificationsRetry(DEFAULT_NOTIFICATIONS_RETRY_MS)
                     .eventNotificationsBacklog(DEFAULT_NOTIFICATIONS_BACKLOG)
                     .eventCatchupWindow(DEFAULT_CATCH_UP_WINDOW_MS)
-                    .notificationsKeepAliveProbe(DEFAULT_NOTIFICATIONS_KEEP_ALIVE_PROBE)
-                    .notificationsEnforceUrlAllowlist(DEFAULT_NOTIFICATIONS_ENFORCE_URL_ALLOWLIST);
+                    .notificationsKeepAliveProbe(DEFAULT_NOTIFICATIONS_KEEP_ALIVE_PROBE);
         }
 
         @JsonProperty(FIELD_SEARCH_TIMEOUT)
@@ -92,9 +86,6 @@ public abstract class EventsConfiguration {
 
         @JsonProperty(FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE)
         public abstract Builder notificationsKeepAliveProbe(boolean enabled);
-
-        @JsonProperty(FIELD_NOTIFICATIONS_ENFORCE_URL_ALLOWLIST)
-        public abstract Builder notificationsEnforceUrlAllowlist(boolean enforceUrlAllowlist);
 
         public abstract EventsConfiguration build();
     }

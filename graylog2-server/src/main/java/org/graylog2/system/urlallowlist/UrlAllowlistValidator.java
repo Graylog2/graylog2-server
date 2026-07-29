@@ -18,7 +18,6 @@ package org.graylog2.system.urlallowlist;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
@@ -32,15 +31,12 @@ public class UrlAllowlistValidator {
 
     private final UrlAllowlistService allowlistService;
     private final UrlAllowlistNotificationService allowlistNotificationService;
-    private final EventsConfigurationProvider eventsConfigurationProvider;
 
     @Inject
     public UrlAllowlistValidator(UrlAllowlistService allowlistService,
-                                 UrlAllowlistNotificationService allowlistNotificationService,
-                                 EventsConfigurationProvider eventsConfigurationProvider) {
+                                 UrlAllowlistNotificationService allowlistNotificationService) {
         this.allowlistService = allowlistService;
         this.allowlistNotificationService = allowlistNotificationService;
-        this.eventsConfigurationProvider = eventsConfigurationProvider;
     }
 
     public void validateUrl(String url, EventNotificationContext ctx) throws TemporaryEventNotificationException {
@@ -52,11 +48,11 @@ public class UrlAllowlistValidator {
                         "[url: " + url + "]";
                 allowlistNotificationService.publishAllowlistFailure(description);
             }
-            if (eventsConfigurationProvider.get().notificationsEnforceUrlAllowlist()) {
+            if (allowlistService.getAllowlist().enforceForNotifications()) {
                 throw new TemporaryEventNotificationException("URL <" + url + "> is not allowlisted.");
             }
             LOG.warn("Notification is using a URL which is not allowlisted. " +
-                    "Enable \"Enforce URL Allowlist\" in System > Configurations > Events to block non-allowlisted URLs. " +
+                    "Enable \"Enforce for Slack & Teams notifications\" in System > Configurations > URL Allowlist to block non-allowlisted URLs. " +
                     "[url: {}, notification: {}]", url, ctx.notificationId());
         }
     }

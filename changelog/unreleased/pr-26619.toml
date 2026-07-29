@@ -1,5 +1,5 @@
 type = "a"
-message = "Warn when Slack or Microsoft Teams notification webhook URLs are not in the URL allowlist. Added a global option in System > Configurations > Events to enforce the URL allowlist (block non-allowlisted URLs) for notification webhooks."
+message = "Warn when Slack or Microsoft Teams notification webhook URLs are not in the URL allowlist. Added a global option in System > Configurations > URL Allowlist to enforce the allowlist (block non-allowlisted URLs) for Slack and Teams notification webhooks."
 
 issues = ["Graylog2/graylog-plugin-enterprise#14748"]
 pulls = ["26619"]
