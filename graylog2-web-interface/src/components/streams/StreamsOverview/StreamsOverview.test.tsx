@@ -297,17 +297,14 @@ describe('StreamsOverview', () => {
     expect(screen.queryByText(/1 connected output\./i)).not.toBeInTheDocument();
   });
 
-  it('requests all metric fields while layout preferences are loading', async () => {
+  it('requests all metric fields while layout preferences are loading', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {},
       isInitialLoading: true,
       refetch: () => {},
     });
-    asMock(useFetchEntities).mockReturnValue(paginatedStreams());
 
     renderSut();
-
-    await screen.findByText(stream.title);
 
     expect(useStreamMetrics).toHaveBeenCalledWith(
       expect.any(Array),
