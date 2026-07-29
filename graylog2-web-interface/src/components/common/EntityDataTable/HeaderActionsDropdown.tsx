@@ -16,11 +16,10 @@
  */
 
 import * as React from 'react';
-import { forwardRef } from 'react';
-import { createPortal } from 'react-dom';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
+import { MenuAnchor } from 'components/bootstrap/useClickToOpenMenu';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MenuItem } from 'components/bootstrap';
@@ -38,30 +37,10 @@ const DropdownTrigger = styled.span(
   `,
 );
 
-const StyledMenuAnchor = styled.div`
-  position: fixed;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-`;
-
 export const DropdownCaret = styled(Icon)`
   opacity: 0;
   transition: opacity 0.15s ease-in-out;
 `;
-
-// Zero-size and invisible: it only exists to be the Menu's positioning anchor, moved to the
-// clicked point (see AttributeHeader) so the dropdown opens exactly where the header was clicked,
-// rather than anchored to the DropdownTrigger's own position.
-//
-// Rendered through a portal straight into <body>: the header (Th) always has a CSS `transform`
-// set (even when idle, it falls back to `translate3d(0, 0, 0)` -- see TableHead.tsx), and any
-// transformed ancestor becomes the containing block for a `position: fixed` descendant. Left in
-// place, this anchor's "fixed" coordinates would resolve relative to that header's own box
-// instead of the viewport, landing nowhere near the actual click.
-const MenuAnchor = forwardRef<HTMLDivElement, { style?: React.CSSProperties }>(({ style = undefined, ...rest }, ref) =>
-  createPortal(<StyledMenuAnchor ref={ref} style={style} {...rest} />, document.body),
-);
 
 const MenuItemLabel = styled.span<{ $active: boolean }>(
   ({ $active }) => css`

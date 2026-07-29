@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useMemo, useContext, useLayoutEffect } from 'react';
 import type { createColumnHelper, Row, Column, HeaderContext, CellContext } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
 import { useSortable } from '@dnd-kit/sortable';
@@ -33,6 +33,7 @@ import { DRAG_HANDLE_DEFAULT_TITLE } from 'components/common/SortableList/DragHa
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
 import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
+import useClickToOpenMenu from 'components/bootstrap/useClickToOpenMenu';
 import Icon from 'components/common/Icon';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 import useMergedRef from 'util/hooks/useMergedRef';
@@ -153,8 +154,8 @@ const AttributeHeader = <Entity extends EntityBase>({
   const isDraggable = Boolean(columnMeta?.enableColumnOrdering);
   const isResizingAnyColumn = Boolean(ctx.table.getState().columnSizingInfo.isResizingColumn);
   const { attributes, isDragging, listeners, setNodeRef } = useSortableCol(colId, !isDraggable);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const mergedHeaderRef = useMergedRef(setNodeRef, headerRef);
+  const { triggerRef, opened, onOpenChange, anchorPosition, onClick, onKeyDown } = useClickToOpenMenu<HTMLDivElement>();
+  const mergedHeaderRef = useMergedRef(setNodeRef, triggerRef);
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
   const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
   const columnLabel = columnMeta?.label ?? colId;
@@ -170,45 +171,6 @@ const AttributeHeader = <Entity extends EntityBase>({
       ? `${DRAG_HANDLE_DEFAULT_TITLE} ${columnLabel.toLocaleLowerCase()}`
       : DRAG_HANDLE_DEFAULT_TITLE;
   const hasHeaderActions = Boolean(canSort || canSlice || canHideColumn);
-  const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
-  const [menuAnchorPosition, setMenuAnchorPosition] = useState<{ x: number; y: number } | null>(null);
-
-  // Mantine's own dropdowns return focus to the button that opened them once they close; its
-  // built-in mechanism for that (Popover's `returnFocus`) just remembers `document.activeElement`
-  // at open time and refocuses it at close time, independent of the target/anchor element -- but it
-  // isn't landing back on the header reliably for us here (likely something about the anchor being
-  // a portaled, non-focusable virtual point rather than the actual visible button Mantine expects).
-  // Doing it ourselves is simple and matches that same "usual dropdown" behavior: closing the menu,
-  // for any reason (an action, Escape, an outside click, or clicking the header again), always
-  // returns focus to the header cell itself.
-  const onActionsMenuOpenChange = (nextOpen: boolean) => {
-    setIsActionsMenuOpen(nextOpen);
-
-    if (!nextOpen) {
-      headerRef.current?.focus({ preventScroll: true });
-    }
-  };
-
-  const openActionsMenuAt = (position: { x: number; y: number }) => {
-    if (isActionsMenuOpen) {
-      onActionsMenuOpenChange(false);
-
-      return;
-    }
-
-    setMenuAnchorPosition(position);
-    setIsActionsMenuOpen(true);
-  };
-
-  const onHeaderClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    // A keyboard-triggered click (Enter/Space on a focused native button) reports (0, 0) here, so
-    // fall back to anchoring at the header's own position instead of the top-left of the viewport.
-    const { clientX, clientY } = event;
-    const hasPointerPosition = clientX !== 0 || clientY !== 0;
-    const rect = event.currentTarget.getBoundingClientRect();
-
-    openActionsMenuAt(hasPointerPosition ? { x: clientX, y: clientY } : { x: rect.left, y: rect.bottom });
-  };
 
   // Space is reserved for picking up the column drag (dnd-kit's keyboard sensor is configured to
   // only start on Space, see TableDndProvider), so Enter opens the actions menu instead -- matching
@@ -217,18 +179,11 @@ const AttributeHeader = <Entity extends EntityBase>({
   const onHeaderKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     listeners?.onKeyDown?.(event);
 
-    // Only for a keydown on the header itself, not one that bubbled up from a focused descendant
-    // (the sort icon, or -- since Menu.Dropdown is rendered through a portal into <body>, React's
-    // synthetic events still bubble along the *React* tree, not the DOM tree -- a focused menu
-    // item). Otherwise Enter on either of those would open/close this menu instead of letting the
-    // sort icon's or menu item's own onClick run.
-    if (event.target !== event.currentTarget || isDragging || !hasHeaderActions || event.key !== 'Enter') {
+    if (isDragging || !hasHeaderActions) {
       return;
     }
 
-    event.preventDefault();
-    const rect = event.currentTarget.getBoundingClientRect();
-    openActionsMenuAt({ x: rect.left, y: rect.bottom });
+    onKeyDown(event);
   };
 
   const sliceIndicator = isSliceActive && (
@@ -266,9 +221,9 @@ const AttributeHeader = <Entity extends EntityBase>({
         appSection={appSection}
         onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}
         onHideColumn={canHideColumn ? () => ctx.header.column.toggleVisibility() : undefined}
-        opened={isActionsMenuOpen}
-        onOpenChange={onActionsMenuOpenChange}
-        anchorPosition={menuAnchorPosition}>
+        opened={opened}
+        onOpenChange={onOpenChange}
+        anchorPosition={anchorPosition}>
         {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
       </HeaderActionsDropdown>
     </LeftCol>
@@ -293,7 +248,7 @@ const AttributeHeader = <Entity extends EntityBase>({
       // Opens the actions menu on a click anywhere in the header, not just on the title itself, and
       // toggles it closed on a second click. Elements with their own dedicated click behavior (the
       // sort icon) stop propagation so this doesn't also react to a click they already handled.
-      onClick={hasHeaderActions ? onHeaderClick : undefined}
+      onClick={hasHeaderActions ? onClick : undefined}
       // Overrides the onKeyDown that `listeners` above may have set, so dnd-kit's own Space/Enter
       // drag-pickup handling still runs (see onHeaderKeyDown, which calls it explicitly) alongside
       // our Enter-opens-the-menu behavior.
