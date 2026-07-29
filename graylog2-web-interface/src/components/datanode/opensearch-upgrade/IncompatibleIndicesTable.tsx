@@ -116,6 +116,8 @@ const IncompatibleIndicesTable = () => {
         canArchive={archiveActionsAvailable}
         pendingIndexStatuses={pendingIndexStatuses}
         archivedIndexNames={archivedIndexNames}
+        addArchiveDeleteAction={addArchiveDeleteAction}
+        refetchClusterJobs={refetchClusterJobs}
         refetch={refetch}
       />
     ),
