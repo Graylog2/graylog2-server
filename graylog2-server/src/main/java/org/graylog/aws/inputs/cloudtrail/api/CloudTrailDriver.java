@@ -161,7 +161,6 @@ public class CloudTrailDriver {
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());
             final String newInputId = inputService.save(input);
-            LOG.info("New CloudTrail input created. id [{}] request [{}]", newInputId, request);
 
             return inputService.find(newInputId);
         } catch (NoSuchInputTypeException e) {
