@@ -19,7 +19,7 @@ package org.graylog.storage.opensearch3.client;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.ShardFailure;
+import org.opensearch.client.opensearch._types.ShardSearchFailure;
 import org.opensearch.client.opensearch._types.ShardStatistics;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +37,7 @@ class CustomOpenSearchClientTest {
 
     @Test
     void throwOnShardFailuresDoesNothingWhenSomeShardsFailedButOthersSucceeded() {
-        final ShardFailure failure = ShardFailure.of(b -> b
+        final ShardSearchFailure failure = ShardSearchFailure.of(b -> b
                 .index("graylog_0")
                 .shard(2)
                 .reason(ErrorCause.of(c -> c.type("query_shard_exception").reason("parse error")))
@@ -54,7 +54,7 @@ class CustomOpenSearchClientTest {
 
     @Test
     void throwOnShardFailuresThrowsWhenAllShardsFailed() {
-        final ShardFailure failure = ShardFailure.of(b -> b
+        final ShardSearchFailure failure = ShardSearchFailure.of(b -> b
                 .index("graylog_0")
                 .shard(2)
                 .reason(ErrorCause.of(c -> c.type("query_shard_exception").reason("parse error")))

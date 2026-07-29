@@ -50,7 +50,9 @@ const renderPlatformIcon = (icon: PlatformIcon) => {
 const PlatformIcons = () => (
   <Icons>
     {PLATFORMS.map((platform) => (
-      <IconCard key={platform.id} title={platform.label}>{renderPlatformIcon(platform.icon)}</IconCard>
+      <IconCard key={platform.id} title={platform.label}>
+        {renderPlatformIcon(platform.icon)}
+      </IconCard>
     ))}
   </Icons>
 );

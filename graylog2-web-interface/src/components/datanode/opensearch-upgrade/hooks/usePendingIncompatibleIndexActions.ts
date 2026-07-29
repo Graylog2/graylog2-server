@@ -148,7 +148,13 @@ const reconcileActions = (
   return unchanged ? current : next;
 };
 
-const usePendingIncompatibleIndexActions = ({ incompatibleIndices, isLoading, isError, refetch, canArchive }: Params) => {
+const usePendingIncompatibleIndexActions = ({
+  incompatibleIndices,
+  isLoading,
+  isError,
+  refetch,
+  canArchive,
+}: Params) => {
   const archive = useIndexArchive();
   const [pendingActions, setPendingActions] = useState<Array<PendingIncompatibleIndexAction>>(readStoredActions);
 
@@ -163,7 +169,8 @@ const usePendingIncompatibleIndexActions = ({ incompatibleIndices, isLoading, is
   } = useClusterJobs({ enabled: canArchive || hasActiveTrackedActions, poll: hasActiveTrackedActions });
 
   const isArchiveJobRunning =
-    !!archive && Array.from(jobsById.values()).some((job) => isRunningArchiveSystemJob(job, archive.archiveSystemJobName));
+    !!archive &&
+    Array.from(jobsById.values()).some((job) => isRunningArchiveSystemJob(job, archive.archiveSystemJobName));
 
   const pendingIndexStatuses = new Map<string, PendingIndexStatus>();
   trackedActions.forEach((pendingAction) => {

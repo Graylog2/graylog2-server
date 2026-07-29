@@ -1,0 +1,4 @@
+type = "c"
+message = "Simplify entity data table header interactions: drag the whole header to reorder columns, resize from the column border, and reveal header actions on hover."
+
+pulls = ["26760"]

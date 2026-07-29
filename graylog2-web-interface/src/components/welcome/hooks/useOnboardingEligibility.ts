@@ -20,7 +20,6 @@ import { Onboarding } from '@graylog/server-api';
 
 export const ONBOARDING_ELIGIBILITY_QUERY_KEY = ['onboarding', 'eligibility'];
 
-// TODO: Replace with a real backend call once the eligibility endpoint exists.
 const fetchOnboardingEligibility = () => Onboarding.get();
 
 const useOnboardingEligibility = (enabled: boolean = true) => {

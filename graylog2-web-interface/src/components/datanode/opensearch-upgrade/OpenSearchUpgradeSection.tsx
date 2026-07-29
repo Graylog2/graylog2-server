@@ -149,8 +149,8 @@ const OpenSearchUpgradeSection = () => {
         />
         <Alert bsStyle="warning">
           Incompatible indices and upgrade status cannot be checked while {unavailableDataNodeCount} Data{' '}
-          {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all
-          Data Nodes are available.
+          {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all Data
+          Nodes are available.
         </Alert>
       </Section>
     );

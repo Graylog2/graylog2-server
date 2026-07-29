@@ -141,13 +141,9 @@ const ClusterHealthInfo = ({ data, numberOfNodes, showShardReplication }: Props)
           <dd>
             <ShardReplicationContainer>
               {data?.shard_replication_enabled ? (
-                <Label bsStyle="success">
-                  Enabled
-                </Label>
+                <Label bsStyle="success">Enabled</Label>
               ) : (
-                <Label bsStyle="warning">
-                  Disabled
-                </Label>
+                <Label bsStyle="warning">Disabled</Label>
               )}
               &nbsp;
               <HelpPopoverButton helpText={shardReplicationHelp(!!data?.shard_replication_enabled)} />

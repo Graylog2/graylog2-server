@@ -166,7 +166,12 @@ describe('InstanceDetailDrawer', () => {
     const staleInstance = { ...mockInstance, has_pending_changes: false };
 
     render(
-      <InstanceDetailDrawer instance={staleInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer
+        instance={staleInstance}
+        sources={mockSources}
+        fleetName="production"
+        onClose={jest.fn()}
+      />,
     );
 
     await screen.findByText('Synchronization');
