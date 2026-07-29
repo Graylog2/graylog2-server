@@ -172,10 +172,6 @@ const AttributeHeader = <Entity extends EntityBase>({
       : DRAG_HANDLE_DEFAULT_TITLE;
   const hasHeaderActions = Boolean(canSort || canSlice || canHideColumn);
 
-  // Space is reserved for picking up the column drag (dnd-kit's keyboard sensor is configured to
-  // only start on Space, see TableDndProvider), so Enter opens the actions menu instead -- matching
-  // every other Mantine dropdown button in the app (focus it, press Enter). Only relevant before a
-  // drag is picked up: once dragging, arrow keys move the column and Space/Tab drop it in place.
   const onHeaderKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     listeners?.onKeyDown?.(event);
 
@@ -229,10 +225,6 @@ const AttributeHeader = <Entity extends EntityBase>({
     </LeftCol>
   );
 
-  // dnd-kit's own `attributes` already provide role="button"/tabIndex=0 when the column is
-  // draggable; when it isn't, supply the same thing ourselves whenever there's a menu to reach --
-  // this is the header's one focus stop (DropdownTrigger, in HeaderActionsDropdown, deliberately
-  // isn't focusable, so Tab doesn't land on the header twice).
   const nonDraggableA11yProps = !isDraggable && hasHeaderActions ? { role: 'button' as const, tabIndex: 0 } : {};
 
   return (
@@ -245,13 +237,7 @@ const AttributeHeader = <Entity extends EntityBase>({
       aria-label={isDraggable ? dragTitle : undefined}
       {...(isDraggable ? { ...attributes, ...listeners } : {})}
       {...nonDraggableA11yProps}
-      // Opens the actions menu on a click anywhere in the header, not just on the title itself, and
-      // toggles it closed on a second click. Elements with their own dedicated click behavior (the
-      // sort icon) stop propagation so this doesn't also react to a click they already handled.
       onClick={hasHeaderActions ? onClick : undefined}
-      // Overrides the onKeyDown that `listeners` above may have set, so dnd-kit's own Space/Enter
-      // drag-pickup handling still runs (see onHeaderKeyDown, which calls it explicitly) alongside
-      // our Enter-opens-the-menu behavior.
       onKeyDown={isDraggable || hasHeaderActions ? onHeaderKeyDown : undefined}>
       {isDraggable && <DragIcon name="drag_indicator" size="xs" $isDragging={isDragging} className="header-action" />}
       {isRightAligned ? (

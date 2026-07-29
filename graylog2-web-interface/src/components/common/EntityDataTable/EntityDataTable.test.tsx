@@ -215,8 +215,6 @@ describe('<EntityDataTable />', () => {
 
     render(<EntityDataTable {...defaultProps} onSortChange={onSortChange} />);
 
-    // The whole header cell opens the actions menu now (not a dedicated per-title button); its
-    // accessible name is still the drag-handle description, since dragging is the header's other role.
     await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /sort ascending/i }));
 
@@ -243,8 +241,6 @@ describe('<EntityDataTable />', () => {
 
     render(<EntityDataTable {...defaultProps} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />);
 
-    // The whole header cell opens the actions menu now (not a dedicated per-title button); its
-    // accessible name is still the drag-handle description, since dragging is the header's other role.
     await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /slice by values/i }));
 
@@ -263,8 +259,6 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    // The whole header cell opens the actions menu now (not a dedicated per-title button); its
-    // accessible name is still the drag-handle description, since dragging is the header's other role.
     await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /no slicing/i }));
 
