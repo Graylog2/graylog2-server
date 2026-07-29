@@ -28,6 +28,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { carol, sam } from 'fixtures/users';
 
 jest.mock('components/content-stream/ContentStreamSection', () => 'content-stream-section');
+jest.mock('components/welcome/WelcomeDashboard', () => () => <div data-testid="welcome-dashboard" />);
 
 jest.mock('components/welcome/hooks/useLastOpened', () =>
   jest.fn(() => ({
