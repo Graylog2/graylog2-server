@@ -48,7 +48,7 @@ import java.util.List;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 
 @RequiresAuthentication
-@Tag(name = "DataNodes/API", description = "Proxy direct access to Data Node's API")
+@Tag(name = "DataNodes/API", description = "Proxy direct access to Data Node's Opensearch API")
 @Produces(MediaType.APPLICATION_JSON)
 @Timed
 @Path("/datanodes/{hostname}/opensearch/{path: .*}")
@@ -71,7 +71,7 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     @GET
-    @Operation(summary = "GET request to Data Node's API")
+    @Operation(summary = "GET request to Data Node's Opensearch API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestGet(@Parameter(name = "path", required = true)
                                @PathParam("path") String path,
@@ -82,7 +82,7 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     @POST
-    @Operation(summary = "POST request to Data Node's API")
+    @Operation(summary = "POST request to Data Node's Opensearch API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestPost(@Parameter(name = "path", required = true)
                                 @PathParam("path") String path,
@@ -93,7 +93,7 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     @PUT
-    @Operation(summary = "PUT request to Data Node's API")
+    @Operation(summary = "PUT request to Data Node's Opensearch API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestPut(@Parameter(name = "path", required = true)
                                @PathParam("path") String path,
@@ -104,7 +104,7 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     @DELETE
-    @Operation(summary = "DELETE request to Data Node's API")
+    @Operation(summary = "DELETE request to Data Node's Opensearch API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestDelete(@Parameter(name = "path", required = true)
                                   @PathParam("path") String path,
