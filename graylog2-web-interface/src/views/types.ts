@@ -482,7 +482,7 @@ export interface HandlerContext {
 }
 
 export interface SearchBarControl {
-  component: React.ComponentType<{ isParentMutable?: boolean }>;
+  component: React.ComponentType;
   id: string;
   onSearchSubmit?: <T extends Query | undefined>(
     values: CombinedSearchBarFormValues,

@@ -220,7 +220,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   );
 
   const { scopePermissions } = useScopePermissions(eventDefinition);
-  const isMutable = useMemo(() => scopePermissions?.is_mutable, [scopePermissions]);
+  const isMutable = scopePermissions?.is_mutable;
 
   const validateQueryString = useCallback(
     (
