@@ -73,6 +73,7 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
                     final int kernelMinorVersion = Objects.requireNonNullElse(Ints.tryParse(kernelVersion[1]), 0);
 
                     if (kernelMajorVersion >= 7 || (kernelMajorVersion == 6 && kernelMinorVersion >= 19)) {
+                        LOG.info("Applying MongoDB 8.x workaround (running on Linux {})", System.getProperty("os.version"));
                         withEnv("GLIBC_TUNABLES", "glibc.pthread.rseq=1");
                     }
                 }
