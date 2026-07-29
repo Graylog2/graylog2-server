@@ -24,6 +24,7 @@ import Menu from 'components/bootstrap/Menu';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MenuItem } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 
 // A plain (non-focusable) span: the header cell itself (ThInner, see AttributeHeader) is the one
 // focusable/clickable element for opening this menu, so this only renders the label -- it must
@@ -42,6 +43,11 @@ const StyledMenuAnchor = styled.div`
   width: 0;
   height: 0;
   pointer-events: none;
+`;
+
+export const DropdownCaret = styled(Icon)`
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
 `;
 
 // Zero-size and invisible: it only exists to be the Menu's positioning anchor, moved to the
@@ -76,6 +82,7 @@ type Props = {
   opened?: boolean;
   onOpenChange?: (opened: boolean) => void;
   anchorPosition?: { x: number; y: number } | null;
+  textAlign: 'right' | 'left';
 };
 
 const HeaderActionsDropdown = ({
@@ -91,6 +98,7 @@ const HeaderActionsDropdown = ({
   opened = undefined,
   onOpenChange = undefined,
   anchorPosition = undefined,
+  textAlign,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const hasActions = Boolean(onChangeSlicing || onSort || onHideColumn);
@@ -126,7 +134,10 @@ const HeaderActionsDropdown = ({
       {/* Not the Menu.Target: opening/positioning is driven by the whole header's click handler
           (see AttributeHeader) so this only needs to render the label -- clicking it still opens
           the menu, since the click bubbles up to that handler. */}
+      {textAlign === 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
       <DropdownTrigger title={`Toggle ${label} actions`}>{children}</DropdownTrigger>
+      {textAlign !== 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
+
       <Menu.Dropdown>
         {onSort && (
           <MenuItem onClick={() => onSort(false)} icon="arrow_upward">

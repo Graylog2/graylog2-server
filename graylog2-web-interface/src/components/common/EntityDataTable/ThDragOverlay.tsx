@@ -87,12 +87,13 @@ const ThGhostInner = <Entity extends EntityBase>(
   // Matches AttributeHeader: for right-aligned (numeric) columns, the indicator icons and title
   // are mirrored (indicators first, title last) instead of title-then-indicators, and the caret
   // inside the title button itself moves to the other side of the label too (see textAlign below).
-  const textAlign = columnMeta?.columnRenderer?.textAlign;
+  const textAlign = columnMeta?.columnRenderer?.textAlign as 'left' | 'right';
   const isRightAligned = textAlign === 'right';
 
   const titleGroup = (
     <LeftCol>
       <HeaderActionsDropdown
+        textAlign={textAlign}
         label={columnLabel}
         activeSort={sortDirection}
         isSliceActive={isSliceActive}

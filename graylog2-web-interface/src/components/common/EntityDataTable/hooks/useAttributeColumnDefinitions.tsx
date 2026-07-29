@@ -163,7 +163,7 @@ const AttributeHeader = <Entity extends EntityBase>({
   const canSort = ctx.header.column.getCanSort();
   const canHideColumn = ctx.header.column.getCanHide();
   const sortDirection = ctx.header.column.getIsSorted();
-  const textAlign = columnMeta?.columnRenderer?.textAlign;
+  const textAlign = columnMeta?.columnRenderer?.textAlign as 'left' | 'right';
   const isRightAligned = textAlign === 'right';
   const dragTitle =
     typeof columnLabel === 'string'
@@ -257,6 +257,7 @@ const AttributeHeader = <Entity extends EntityBase>({
   const titleGroup = (
     <LeftCol ref={leftRef}>
       <HeaderActionsDropdown
+        textAlign={textAlign}
         label={columnLabel}
         activeSort={sortDirection}
         isSliceActive={isSliceActive}
