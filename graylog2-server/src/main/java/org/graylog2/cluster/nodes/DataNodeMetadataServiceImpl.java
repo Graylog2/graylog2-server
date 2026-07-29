@@ -26,8 +26,12 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DataNodeMetadataServiceImpl implements DataNodeMetadataService {
 
@@ -60,6 +64,17 @@ public class DataNodeMetadataServiceImpl implements DataNodeMetadataService {
         return Optional.ofNullable(
                 collection.find(Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId)).first()
         );
+    }
+
+    @Override
+    public Map<String, DataNodeMetadata> findByNodeIds(Collection<String> nodeIds) {
+        if (nodeIds.isEmpty()) {
+            return Map.of();
+        }
+        return collection.find(Filters.in(DataNodeMetadata.FIELD_NODE_ID, nodeIds))
+                .into(new ArrayList<>())
+                .stream()
+                .collect(Collectors.toMap(DataNodeMetadata::nodeId, Function.identity(), (first, ignored) -> first));
     }
 
     @Override

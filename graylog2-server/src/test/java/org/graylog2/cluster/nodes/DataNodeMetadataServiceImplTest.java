@@ -22,6 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
@@ -75,6 +77,27 @@ class DataNodeMetadataServiceImplTest {
             assertThat(metadata.nodeId()).isEqualTo(NODE_ID);
             assertThat(metadata.currentOpensearchVersion()).isEqualTo("2.19.5");
         });
+    }
+
+    @Test
+    void findByNodeIdsReturnsEmptyMapForEmptyInput() {
+        service.setOpensearchVersions(NODE_ID, "2.19.5", null);
+
+        assertThat(service.findByNodeIds(List.of())).isEmpty();
+    }
+
+    @Test
+    void findByNodeIdsOnlyReturnsRequestedNodesThatHaveMetadata() {
+        final String otherNodeId = "other-node-0000-0000-0000-000000000000";
+        final String unknownNodeId = "unknown-node-0000-0000-0000-000000000000";
+
+        service.setOpensearchVersions(NODE_ID, "2.19.5", null);
+        service.setOpensearchVersions(otherNodeId, "2.18.0", null);
+
+        assertThat(service.findByNodeIds(List.of(NODE_ID, unknownNodeId)))
+                .hasSize(1)
+                .extractingByKey(NODE_ID)
+                .satisfies(metadata -> assertThat(metadata.currentOpensearchVersion()).isEqualTo("2.19.5"));
     }
 
     @Test

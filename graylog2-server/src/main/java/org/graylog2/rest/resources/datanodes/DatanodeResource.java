@@ -31,8 +31,11 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeMetadata;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.cluster.nodes.DataNodePaginatedService;
 import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -48,6 +51,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,6 +63,7 @@ import java.util.stream.Collectors;
 public class DatanodeResource extends RestResource {
 
     private final DataNodePaginatedService dataNodePaginatedService;
+    private final DataNodeMetadataService dataNodeMetadataService;
     private final SearchQueryParser searchQueryParser;
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
@@ -74,6 +80,8 @@ public class DatanodeResource extends RestResource {
             EntityAttribute.builder().id(DataNodeDto.FIELD_CLUSTER_ADDRESS).title("Transport address").type(SearchQueryField.Type.STRING).searchable(true).sortable(true).build(),
             EntityAttribute.builder().id(DataNodeDto.FIELD_CERT_VALID_UNTIL).title("Certificate valid until").type(SearchQueryField.Type.DATE).sortable(true).build(),
             EntityAttribute.builder().id(DataNodeDto.FIELD_DATANODE_VERSION).title("Version").type(SearchQueryField.Type.STRING).sortable(true).build(),
+            // Not sortable: the OpenSearch version is stored in a separate collection and joined in after paging.
+            EntityAttribute.builder().id(DataNodeWithOpensearchVersion.FIELD_OPENSEARCH_VERSION).title("OpenSearch version").type(SearchQueryField.Type.STRING).sortable(false).build(),
             EntityAttribute.builder().id(DataNodeDto.FIELD_OPENSEARCH_ROLES).title("Roles").type(SearchQueryField.Type.STRING).sortable(true).build()
     );
 
@@ -86,32 +94,45 @@ public class DatanodeResource extends RestResource {
             .build();
 
     @Inject
-    public DatanodeResource(DataNodePaginatedService dataNodePaginatedService) {
+    public DatanodeResource(DataNodePaginatedService dataNodePaginatedService,
+                            DataNodeMetadataService dataNodeMetadataService) {
         this.dataNodePaginatedService = dataNodePaginatedService;
+        this.dataNodeMetadataService = dataNodeMetadataService;
         this.searchQueryParser = new SearchQueryParser("hostname", SEARCH_FIELD_MAPPING);
     }
 
     @GET
     @Timed
     @Operation(summary = "Get a paginated list of all datanodes in this cluster")
-    public PageListResponse<DataNodeDto> dataNodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                   @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                   @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                   @Parameter(name = "sort",
-                                                             description = "The field to sort the result on",
-                                                             required = true,
-                                                             schema = @Schema(allowableValues = {"hostname", "data_node_status", "transport_address", "cert_valid_until", "datanode_version"}))
-                                                   @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                   @Parameter(name = "order", description = "The sort direction",
-                                                             schema = @Schema(allowableValues = {"asc", "desc"}))
-                                                   @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
+    public PageListResponse<DataNodeWithOpensearchVersion> dataNodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                                     @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                                     @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                                     @Parameter(name = "sort",
+                                                                               description = "The field to sort the result on",
+                                                                               required = true,
+                                                                               schema = @Schema(allowableValues = {"hostname", "data_node_status", "transport_address", "cert_valid_until", "datanode_version"}))
+                                                                     @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                                     @Parameter(name = "order", description = "The sort direction",
+                                                                               schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                                     @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
 
     ) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<DataNodeDto> result = dataNodePaginatedService.searchPaginated(searchQuery, order.toBsonSort(sort), page, perPage);
 
-
         return PageListResponse.create(query, result.pagination(),
-                result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
+                result.grandTotal().orElse(0L), sort, order, withOpensearchVersions(result), attributes, settings);
+    }
+
+    private List<DataNodeWithOpensearchVersion> withOpensearchVersions(List<DataNodeDto> dataNodes) {
+        final Map<String, DataNodeMetadata> metadata = dataNodeMetadataService.findByNodeIds(
+                dataNodes.stream().map(NodeDto::getNodeId).toList());
+
+        return dataNodes.stream()
+                .map(dataNode -> new DataNodeWithOpensearchVersion(dataNode,
+                        Optional.ofNullable(metadata.get(dataNode.getNodeId()))
+                                .map(DataNodeMetadata::currentOpensearchVersion)
+                                .orElse(null)))
+                .toList();
     }
 }

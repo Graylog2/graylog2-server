@@ -18,6 +18,8 @@ package org.graylog2.cluster.nodes;
 
 import jakarta.annotation.Nullable;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 public interface DataNodeMetadataService {
@@ -25,6 +27,8 @@ public interface DataNodeMetadataService {
     void setOpensearchVersions(String nodeId, String currentVersion, @Nullable String latestAvailableVersion);
 
     Optional<DataNodeMetadata> findByNodeId(String nodeId);
+    
+    Map<String, DataNodeMetadata> findByNodeIds(Collection<String> nodeIds);
 
     OpensearchVersionsOverview getVersionsOverview();
 }

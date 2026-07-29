@@ -51,4 +51,27 @@ describe('DataNodesColumnConfiguration', () => {
     expect(screen.getByText('8.0.0')).toBeInTheDocument();
     expect(screen.queryByTitle(warningMessage)).not.toBeInTheDocument();
   });
+
+  const renderOpensearchVersionCell = (opensearchVersion: string | undefined) => {
+    const { attributes } = createColumnRenderers(productName);
+    const cell = attributes.opensearch_version.renderCell(
+      undefined,
+      { opensearch_version: opensearchVersion } as ClusterDataNode,
+      undefined,
+    );
+
+    render(<>{cell}</>);
+  };
+
+  it('shows the OpenSearch version the data node is running', () => {
+    renderOpensearchVersionCell('2.19.5');
+
+    expect(screen.getByText('2.19.5')).toBeInTheDocument();
+  });
+
+  it('shows a placeholder when the OpenSearch version is unknown', () => {
+    renderOpensearchVersionCell(undefined);
+
+    expect(screen.getByText('N/A')).toBeInTheDocument();
+  });
 });

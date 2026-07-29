@@ -61,6 +61,7 @@ export type DataNode = {
   cert_valid_until: string | null;
   error_msg?: string;
   datanode_version: string;
+  opensearch_version?: string;
   version_compatible: boolean;
   object_id?: string;
   cluster_address: string;

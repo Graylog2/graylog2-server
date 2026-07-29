@@ -22,9 +22,11 @@ import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.cluster.nodes.OpensearchVersionsOverview;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 class InMemoryDataNodeMetadataService implements DataNodeMetadataService {
 
@@ -41,6 +43,13 @@ class InMemoryDataNodeMetadataService implements DataNodeMetadataService {
     @Override
     public Optional<DataNodeMetadata> findByNodeId(String nodeId) {
         return Optional.ofNullable(store.get(nodeId));
+    }
+
+    @Override
+    public Map<String, DataNodeMetadata> findByNodeIds(Collection<String> nodeIds) {
+        return store.entrySet().stream()
+                .filter(entry -> nodeIds.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override

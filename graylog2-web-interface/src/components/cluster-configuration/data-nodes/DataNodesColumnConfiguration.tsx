@@ -35,6 +35,7 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   'hostname',
   'opensearch_roles',
   'datanode_version',
+  'opensearch_version',
   'datanode_status',
   'cpu',
   'memory',
@@ -166,6 +167,14 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
         );
       },
       minWidth: 200,
+    },
+    opensearch_version: {
+      renderCell: (_value, entity) => (
+        <SecondaryText>
+          <span>{entity.opensearch_version ?? 'N/A'}</span>
+        </SecondaryText>
+      ),
+      minWidth: 180,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
