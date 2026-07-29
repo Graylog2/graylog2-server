@@ -103,6 +103,22 @@ class DataNodeApiProxyResourceTest {
     }
 
     @Test
+    void allowlistBlocksPathTraversalOutOfAllowedPrefix() throws IOException {
+        final var adapter = new RecordingAdapter(null);
+        final Response response = resource(adapter, true).requestGet("_cluster/../../_nodes/stats", "myhost", requestContext);
+        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+        assertThat(adapter.lastRequest).isNull();
+    }
+
+    @Test
+    void allowlistForwardsNormalizedPathForAllowedRequest() throws IOException {
+        final var adapter = new RecordingAdapter(OK_RESPONSE);
+        final Response response = resource(adapter, true).requestGet("_cluster/./health", "myhost", requestContext);
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(adapter.lastRequest.path()).isEqualTo("_cluster/health");
+    }
+
+    @Test
     void allowlistBlocksMappingPost() throws IOException {
         when(requestContext.getMethod()).thenReturn("POST");
         final var adapter = new RecordingAdapter(null);

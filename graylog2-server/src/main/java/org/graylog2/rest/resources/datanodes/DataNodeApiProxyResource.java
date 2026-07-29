@@ -44,7 +44,6 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 
@@ -55,20 +54,20 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 @Path("/datanodes/{hostname}/opensearch/{path: .*}")
 @RequiresPermissions(RestPermissions.DATANODE_OPENSEARCH_PROXY)
 public class DataNodeApiProxyResource extends RestResource {
-    private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
+    private static final DataNodeProxyAllowlist RESTRICTED_ALLOWLIST = new DataNodeProxyAllowlist(List.of(
             request -> request.path().startsWith("_cluster"),
             request -> request.path().startsWith("_cat"),
             request -> request.path().startsWith("_mapping") && request.method().equals("GET")
-    );
+    ));
 
     private final ProxyRequestAdapter proxyRequestAdapter;
-    private final boolean enableAllowlist;
+    private final DataNodeProxyAllowlist allowlist;
 
     @Inject
     public DataNodeApiProxyResource(ProxyRequestAdapter proxyRequestAdapter,
                                     @Named("datanode_proxy_api_allowlist") boolean enableAllowlist) {
         this.proxyRequestAdapter = proxyRequestAdapter;
-        this.enableAllowlist = enableAllowlist;
+        this.allowlist = enableAllowlist ? RESTRICTED_ALLOWLIST : DataNodeProxyAllowlist.allowAll();
     }
 
     @GET
@@ -118,14 +117,14 @@ public class DataNodeApiProxyResource extends RestResource {
     private Response request(ContainerRequestContext context, String path, String hostname) throws IOException {
         final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters());
 
-        if (enableAllowlist && allowList.stream().noneMatch(condition -> condition.test(request))) {
+        try {
+            final var response = proxyRequestAdapter.request(allowlist.authorize(request));
+            return Response.status(response.status()).type(response.contentType()).entity(response.response()).build();
+        } catch (RequestNotAllowedException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("This request is not allowed.")
                     .type(MediaType.TEXT_PLAIN_TYPE)
                     .build();
         }
-
-        final var response = proxyRequestAdapter.request(request);
-        return Response.status(response.status()).type(response.contentType()).entity(response.response()).build();
     }
 }
