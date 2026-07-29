@@ -31,8 +31,6 @@ import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
 import javax.annotation.Nonnull;
@@ -46,7 +44,6 @@ import static org.graylog.integrations.aws.inputs.AWSInput.getOverrideSourceFiel
 public class AWSCodec extends AbstractCodec {
 
     public static final String NAME = "AWSCodec";
-    private static final Logger LOG = LoggerFactory.getLogger(AWSCodec.class);
 
     /**
      * Specifies one of the {@code AWSInputType} choices, which indicates which codec and transport
