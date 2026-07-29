@@ -148,6 +148,9 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
   return (
     <TelemetryContext.Provider value={TelemetryContextValue}>
       {children}
+      {showTelemetryInfo && (
+        <TelemetryInfoModal show={showTelemetryInfo} onConfirm={() => handleConfirmTelemetryDialog()} />
+      )}
     </TelemetryContext.Provider>
   );
 };
