@@ -20,14 +20,14 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.NotificationTestData;
-import org.graylog.events.notifications.TemporaryEventNotificationException;
+import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // Validates webhook URLs against the URL allowlist for Slack and Teams notifications.
 // By default, non-allowlisted URLs log a warning. When UrlAllowlist.enforceForNotifications()
-// is enabled, non-allowlisted URLs throw TemporaryEventNotificationException instead.
+// is enabled, non-allowlisted URLs throw PermanentEventNotificationException instead.
 // Called from SlackEventNotification, TeamsEventNotification, and TeamsEventNotificationV2.
 // To remove: delete this class, the enforceForNotifications field on UrlAllowlist, the
 // validateUrl calls in the three notification classes, and the frontend checkbox in UrlAllowListForm.
@@ -45,7 +45,7 @@ public class UrlAllowlistValidator {
         this.allowlistNotificationService = allowlistNotificationService;
     }
 
-    public void validateUrl(String url, EventNotificationContext ctx) throws TemporaryEventNotificationException {
+    public void validateUrl(String url, EventNotificationContext ctx) throws PermanentEventNotificationException {
         if (!allowlistService.isAllowlisted(url)) {
             if (!NotificationTestData.TEST_NOTIFICATION_ID.equals(ctx.notificationId())) {
                 final String eventDefTitle = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Unnamed");
@@ -55,7 +55,9 @@ public class UrlAllowlistValidator {
                 allowlistNotificationService.publishAllowlistFailure(description);
             }
             if (allowlistService.getAllowlist().enforceForNotifications()) {
-                throw new TemporaryEventNotificationException("URL <" + url + "> is not allowlisted.");
+                LOG.warn("Blocking notification because webhook URL is not allowlisted. " +
+                        "[url: {}, notification: {}]", url, ctx.notificationId());
+                throw new PermanentEventNotificationException("URL <" + url + "> is not allowlisted.");
             }
             LOG.warn("Notification is using a URL which is not allowlisted. " +
                     "Enable \"Enforce for Slack & Teams notifications\" in System > Configurations > URL Allowlist to block non-allowlisted URLs. " +
