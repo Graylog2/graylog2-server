@@ -243,7 +243,9 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
             newTab
           />
         </IfDashboard>
-        <ExtraMenuWidgetActions widget={widget} />
+      </IfInteractive>
+      <ExtraMenuWidgetActions widget={widget} />
+      <IfInteractive>
         {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
         {!isFocused && (
           <>

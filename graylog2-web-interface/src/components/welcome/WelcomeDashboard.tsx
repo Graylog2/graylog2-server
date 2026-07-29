@@ -39,10 +39,20 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { widgetDragHandleClass, widgetActionsMenuClass } from 'views/components/widgets/Constants';
+import { widgetDragHandleClass } from 'views/components/widgets/Constants';
 import { TIMESTAMP_FIELD } from 'views/Constants';
+import WidgetActionsContext from 'views/components/widgets/WidgetActionsContext';
+
+import replayLinkWidgetAction from './ReplayLinkWidgetAction';
 
 const LAST_24_HOURS = { type: 'relative' as const, from: 86400 };
+const WIDGET_ACTIONS = [replayLinkWidgetAction];
+
+const MESSAGES_TODAY_LINK = '/search?q=&rangetype=relative&from=300';
+const ALERTS_LINK =
+  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dtrue';
+const EVENTS_LINK =
+  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dfalse';
 
 const StyledSearchContainer = styled.div`
   footer,
@@ -52,7 +62,7 @@ const StyledSearchContainer = styled.div`
   .react-resizable-handle,
   button:has(.fa-copy),
   button:has(.fa-chevron-down),
-  .${widgetDragHandleClass}, .${widgetActionsMenuClass} {
+  .${widgetDragHandleClass} {
     display: none;
   }
 `;
@@ -65,11 +75,12 @@ const SearchAreaContainer = forwardRef<HTMLDivElement, React.PropsWithChildren>(
   <StyledSearchContainer ref={ref}>{children}</StyledSearchContainer>
 ));
 
-const numberWidget = (title: string) => ({
+const numberWidget = (title: string, link: string) => ({
   title,
   widget: AggregationWidget.builder()
     .id(generateId())
     .timerange(LAST_24_HOURS)
+    .context(link)
     .config(
       AggregationWidgetConfig.builder()
         .series([Series.forFunction('count()')])
@@ -106,9 +117,9 @@ const topSourcesWidget = () => {
 
 const buildViewState = () => {
   const entries = [
-    numberWidget('Messages Today'),
-    numberWidget('Messages Today'),
-    numberWidget('Messages Today'),
+    numberWidget('Messages Today', MESSAGES_TODAY_LINK),
+    numberWidget('Messages Today', ALERTS_LINK),
+    numberWidget('Messages Today', EVENTS_LINK),
     topSourcesWidget(),
   ];
   const [first, second, third, sources] = entries;
@@ -156,9 +167,11 @@ const WelcomeDashboard = () => {
   return (
     <Container>
       <InteractiveContext.Provider value={false}>
-        <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
-          <SearchPage view={view} isNew={false} skipNoStreamsCheck />
-        </SearchPageLayoutProvider>
+        <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
+          <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
+            <SearchPage view={view} isNew={false} skipNoStreamsCheck />
+          </SearchPageLayoutProvider>
+        </WidgetActionsContext.Provider>
       </InteractiveContext.Provider>
     </Container>
   );
