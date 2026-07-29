@@ -20,7 +20,8 @@ import styled from 'styled-components';
 import Badge from 'components/bootstrap/Badge';
 
 const StyledBadge = styled(Badge)`
-  vertical-align: top;
+  vertical-align: middle;
+  margin-top: -2%;
 `;
 
 const PreviewBadge = () => <StyledBadge bsStyle="info">Preview</StyledBadge>;
