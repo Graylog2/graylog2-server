@@ -66,7 +66,7 @@ const customColumnRenderers = (
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
-      staticWidth: 100,
+      staticWidth: 120,
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
