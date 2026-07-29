@@ -37,7 +37,9 @@ type Props = {
 /**
  * Component that signals text overflow to users by using an ellipsis.
  * The parent component needs a concrete width.
- * Shows the full text in a tooltip on hover, but only when it is actually truncated.
+ * Shows the full text in a tooltip on hover when it is actually truncated.
+ * A `titleOverride` is always shown on hover, since it usually surfaces additional
+ * information rather than just the untruncated version of the visible text.
  */
 const TextOverflowEllipsis = ({ children, titleOverride = undefined, className = undefined }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -49,7 +51,7 @@ const TextOverflowEllipsis = ({ children, titleOverride = undefined, className =
   }, [children, width]);
 
   return (
-    <Tooltip label={titleOverride || children} disabled={!isTruncated} multiline maw={400}>
+    <Tooltip label={titleOverride || children} disabled={titleOverride === undefined && !isTruncated} multiline maw={400}>
       <Wrapper ref={ref} className={className}>
         {children}
       </Wrapper>
