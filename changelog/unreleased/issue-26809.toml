@@ -1,0 +1,5 @@
+type = "a"
+message = "Add the version of OpenSearch running in data nodes to the cluster configuration page table."
+
+pulls = ["26821"]
+issues = ["26809"]
