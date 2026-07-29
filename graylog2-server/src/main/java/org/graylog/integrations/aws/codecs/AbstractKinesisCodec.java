@@ -43,10 +43,12 @@ public abstract class AbstractKinesisCodec extends AbstractCodec {
     private static final String FIELD_OWNER = "aws_owner";
 
     private final ObjectMapper objectMapper;
+    private final boolean storeFullMessage;
 
     AbstractKinesisCodec(Configuration configuration, ObjectMapper objectMapper) {
         super(configuration);
         this.objectMapper = objectMapper;
+        this.storeFullMessage = configuration.getBoolean(AWSCodec.CK_STORE_FULL_MESSAGE, false);
     }
 
     @Override
@@ -78,7 +80,7 @@ public abstract class AbstractKinesisCodec extends AbstractCodec {
         if (CollectionUtils.isNotEmpty(logEvent.subscriptionFilters())) {
             result.addField(FIELD_SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
         }
-        if (configuration.getBoolean(AWSCodec.CK_STORE_FULL_MESSAGE, false)) {
+        if (storeFullMessage) {
             result.addField(Message.FIELD_FULL_MESSAGE, logEvent.message());
         }
     }

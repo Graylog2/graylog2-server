@@ -75,7 +75,8 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     public static abstract class Builder implements AWSRequest.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_AWSInputCreateRequest.Builder();
+            return new AutoValue_AWSInputCreateRequest.Builder()
+                    .storeFullMessage(false);
         }
 
         @JsonProperty(NAME)
