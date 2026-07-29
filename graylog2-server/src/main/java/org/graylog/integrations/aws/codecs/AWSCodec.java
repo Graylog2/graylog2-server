@@ -72,8 +72,10 @@ public class AWSCodec extends AbstractCodec {
 
         // Load the codec by message type.
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(CK_AWS_MESSAGE_TYPE));
+        LOG.debug("Using AWS codec for message type: {}", awsMessageType);
         final Codec.Factory<? extends Codec> codecFactory = this.availableCodecs.get(awsMessageType.getCodecName());
         if (codecFactory == null) {
+            LOG.error("Codec not found for AWS message type {}", awsMessageType);
             throw InputProcessingException.create("A codec with name [%s] could not be found.".formatted(awsMessageType.getCodecName()),
                     rawMessage, new String(rawMessage.getPayload(), charset));
         }
