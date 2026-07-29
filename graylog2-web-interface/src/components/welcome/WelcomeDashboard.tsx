@@ -29,6 +29,7 @@ import ViewState from 'views/logic/views/ViewState';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import Search from 'views/logic/search/Search';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -53,6 +54,7 @@ const ALERTS_LINK =
   '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dtrue';
 const EVENTS_LINK =
   '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dfalse';
+const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
 
 const StyledSearchContainer = styled.div`
   footer,
@@ -75,18 +77,34 @@ const SearchAreaContainer = forwardRef<HTMLDivElement, React.PropsWithChildren>(
   <StyledSearchContainer ref={ref}>{children}</StyledSearchContainer>
 ));
 
-const numberWidget = (title: string, link: string) => ({
+type NumberWidgetOptions = {
+  title: string;
+  link: string;
+  queryString?: string;
+  streams?: Array<string>;
+  trendPreference?: 'HIGHER' | 'LOWER' | 'NEUTRAL';
+};
+
+const numberWidget = ({
+  title,
+  link,
+  queryString = '',
+  streams = [],
+  trendPreference = 'HIGHER',
+}: NumberWidgetOptions) => ({
   title,
   widget: AggregationWidget.builder()
     .id(generateId())
     .timerange(LAST_24_HOURS)
+    .query(createElasticsearchQueryString(queryString))
+    .streams(streams)
     .context(link)
     .config(
       AggregationWidgetConfig.builder()
         .series([Series.forFunction('count()')])
         .visualization('numeric')
-        .visualizationConfig(NumberVisualizationConfig.create(true, 'HIGHER'))
-        .rollup(true)
+        .visualizationConfig(NumberVisualizationConfig.create(true, trendPreference))
+        .rollup(false)
         .build(),
     )
     .build(),
@@ -117,9 +135,21 @@ const topSourcesWidget = () => {
 
 const buildViewState = () => {
   const entries = [
-    numberWidget('Messages Today', MESSAGES_TODAY_LINK),
-    numberWidget('Messages Today', ALERTS_LINK),
-    numberWidget('Messages Today', EVENTS_LINK),
+    numberWidget({ title: 'Messages Today', link: MESSAGES_TODAY_LINK }),
+    numberWidget({
+      title: 'Alerts Today',
+      link: ALERTS_LINK,
+      queryString: 'alert:true',
+      streams: ALERTS_EVENTS_STREAMS,
+      trendPreference: 'LOWER',
+    }),
+    numberWidget({
+      title: 'Events Today',
+      link: EVENTS_LINK,
+      queryString: 'alert:false',
+      streams: ALERTS_EVENTS_STREAMS,
+      trendPreference: 'LOWER',
+    }),
     topSourcesWidget(),
   ];
   const [first, second, third, sources] = entries;
