@@ -84,13 +84,15 @@ const StreamsOverview = ({ indexSets }: Props) => {
     );
   };
 
-  const { data: layoutPreferences } = useUserLayoutPreferences(activeLayout.entityTableId, activeLayoutVariant);
+  const { data: layoutPreferences, isInitialLoading: isLoadingPrefs } = useUserLayoutPreferences(activeLayout.entityTableId, activeLayoutVariant);
   const userPrefs = layoutPreferences?.attributes ?? {};
   const userSelection = Object.entries(userPrefs)
     .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
     .map(([attributeId]) => attributeId);
   const visibleColumns = userSelection.length > 0 ? userSelection : activeLayout.defaultDisplayedAttributes;
-  const requestedFields = backendFieldsForVisibleColumns(visibleColumns, extensionMetricFields);
+  // Use all columns while prefs load so metric fields are fetched before the user's selection is known.
+  const columnsForFields = isLoadingPrefs ? activeLayout.defaultColumnOrder : visibleColumns;
+  const requestedFields = backendFieldsForVisibleColumns(columnsForFields, extensionMetricFields);
 
   return (
     <StreamMetricsProvider streamIds={visibleStreamIds} fields={requestedFields}>
