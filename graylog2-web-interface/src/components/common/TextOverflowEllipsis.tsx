@@ -15,7 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useRef, useState, useLayoutEffect } from 'react';
 import styled from 'styled-components';
+
+import Tooltip from 'components/common/Tooltip';
+import useElementDimensions from 'hooks/useElementDimensions';
 
 const Wrapper = styled.div`
   overflow: hidden;
@@ -33,11 +37,24 @@ type Props = {
 /**
  * Component that signals text overflow to users by using an ellipsis.
  * The parent component needs a concrete width.
+ * Shows the full text in a tooltip on hover, but only when it is actually truncated.
  */
-const TextOverflowEllipsis = ({ children, titleOverride = undefined, className = undefined }: Props) => (
-  <Wrapper title={titleOverride || children} className={className}>
-    {children}
-  </Wrapper>
-);
+const TextOverflowEllipsis = ({ children, titleOverride = undefined, className = undefined }: Props) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { width } = useElementDimensions(ref);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useLayoutEffect(() => {
+    setIsTruncated(!!ref.current && ref.current.scrollWidth > ref.current.clientWidth);
+  }, [children, width]);
+
+  return (
+    <Tooltip label={titleOverride || children} disabled={!isTruncated} multiline maw={400}>
+      <Wrapper ref={ref} className={className}>
+        {children}
+      </Wrapper>
+    </Tooltip>
+  );
+};
 
 export default TextOverflowEllipsis;
