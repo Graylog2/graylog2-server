@@ -35,7 +35,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
+import java.util.Optional;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
 
@@ -117,10 +119,19 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
             if (node.nodeVersion() != null) {
                 final Version nodeVersion = Version.parse(node.nodeVersion());
                 if (!OpensearchUtils.isCompatible(currentVersion, nodeVersion)) {
-                    final String error = String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, nodeVersion);
+                    final String error = f("Current version %s of Opensearch is not compatible with index version %s", currentVersion, nodeVersion);
                     throw new IncompatibleIndexVersionException(error);
                 }
             }
+            node.indices().forEach(index -> {
+                final Version indexVersion = Optional.ofNullable(index.indexVersionCreated())
+                        .map(Version::parse)
+                        .orElseThrow(() -> new IncompatibleIndexVersionException(f("Unknown index version for index %s", index.indexName())));
+                if (!OpensearchUtils.isCompatible(currentVersion, indexVersion)) {
+                    final String error = f("Current version %s is not compatible with index version %s of index %s", currentVersion, indexVersion, index.indexName());
+                    throw new IncompatibleIndexVersionException(error);
+                }
+            });
         }
     }
 
