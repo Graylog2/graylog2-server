@@ -90,7 +90,6 @@ const StreamsOverview = ({ indexSets }: Props) => {
     .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
     .map(([attributeId]) => attributeId);
   const visibleColumns = userSelection.length > 0 ? userSelection : activeLayout.defaultDisplayedAttributes;
-  // Use all columns while prefs load so metric fields are fetched before the user's selection is known.
   const columnsForFields = isLoadingPrefs ? activeLayout.defaultColumnOrder : visibleColumns;
   const requestedFields = backendFieldsForVisibleColumns(columnsForFields, extensionMetricFields);
 
