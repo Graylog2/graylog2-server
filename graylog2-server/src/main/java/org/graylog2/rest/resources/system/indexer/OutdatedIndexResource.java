@@ -37,9 +37,11 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
@@ -48,6 +50,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
+import org.graylog2.indexer.indices.ReindexOutdatedIndexJob;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
@@ -105,13 +108,17 @@ public class OutdatedIndexResource extends RestResource {
             .build();
 
     private final OutdatedIndexService outdatedIndexService;
+    private final SystemJobManager systemJobManager;
     private final AuditEventSender auditEventSender;
     private final InMemorySearchEngine<OutdatedIndex> outdatedIndexSearchService;
     private final SearchQueryParser searchQueryParser;
 
     @Inject
-    public OutdatedIndexResource(OutdatedIndexService outdatedIndexService, AuditEventSender auditEventSender) {
+    public OutdatedIndexResource(OutdatedIndexService outdatedIndexService,
+                                 SystemJobManager systemJobManager,
+                                 AuditEventSender auditEventSender) {
         this.outdatedIndexService = outdatedIndexService;
+        this.systemJobManager = systemJobManager;
         this.auditEventSender = auditEventSender;
         final Supplier<List<OutdatedIndex>> cachingSupplier = Suppliers.memoizeWithExpiration(
                 outdatedIndexService::getOutdatedIndices,
@@ -165,13 +172,42 @@ public class OutdatedIndexResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDICES_REINDEX)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
-    public void reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
-                        @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
+    public Response reindex(@Parameter(name = "index") @PathParam("index") @NotNull String index,
+                            @Parameter(name = "withReplication") @QueryParam("withReplication") @DefaultValue("true") boolean withReplication) {
         OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
                 .filter(OutdatedIndex::isSystemIndex)
                 .filter(i -> i.indexName().equals(index))
                 .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is no system index"));
-        outdatedIndexService.reindex(outdatedIndex.indexName(), withReplication);
+        final String triggeredBy = String.valueOf(getSubject().getPrincipal());
+        systemJobManager.submit(ReindexOutdatedIndexJob.forIndex(outdatedIndex.indexName(), withReplication, triggeredBy));
+        return Response.accepted().build();
+    }
+
+    @POST
+    @Path("/bulkreindex")
+    @Operation(summary = "Bulk reindexes the given indices to make them compatible with the next major version of OpenSearch")
+    @RequiresPermissions(RestPermissions.INDICES_REINDEX)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_REINDEX)
+    public Response bulkReindex(@Parameter(name = "indices", required = true) BulkReindexRequest bulkRequest) {
+        final List<OutdatedIndex> allOutdatedIndices = getOutdatedIndices();
+        final Set<String> outdatedIndexNames = allOutdatedIndices.stream()
+                .filter(OutdatedIndex::isSystemIndex)
+                .map(OutdatedIndex::indexName)
+                .collect(Collectors.toSet());
+        final List<String> unknownIndices = bulkRequest.indices().stream()
+                .filter(i -> !outdatedIndexNames.contains(i))
+                .toList();
+        if (!unknownIndices.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", "The following indices were not found or are no system indices: " + unknownIndices))
+                    .build();
+        }
+        final String triggeredBy = String.valueOf(getSubject().getPrincipal());
+        for (String indexName : bulkRequest.indices()) {
+            systemJobManager.submit(ReindexOutdatedIndexJob.forIndex(indexName, bulkRequest.withReplication(), triggeredBy));
+        }
+        return Response.accepted().build();
     }
 
     @DELETE

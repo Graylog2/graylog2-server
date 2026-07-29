@@ -62,12 +62,14 @@ import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.exceptions.SkippableEntityException;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.InputFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.SearchFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
+import org.graylog2.contentpacks.facades.StreamReferenceFacade;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
@@ -82,6 +84,7 @@ import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
@@ -230,6 +233,7 @@ public class ContentPackServiceTest {
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
+                ModelTypes.STREAM_REF_V1, new StreamReferenceFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService),
@@ -381,6 +385,41 @@ public class ContentPackServiceTest {
 
         when(configuration.isCloud()).thenReturn(true);
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
+        assertThat(captor.getValue().entities()).isEmpty();
+    }
+
+    @Test
+    @WithAuthorization(permissions = {RestPermissions.STREAMS_CREATE})
+    public void installContentPackSkipsUnresolvableStreamReference() throws Exception {
+        // A stream_title reference to a stream that does not exist on the target system must be skipped (with a
+        // warning) rather than aborting the whole content pack installation.
+        final EntityV1 streamReference = EntityV1.builder()
+                .id(ModelId.of("stream-ref-cp-id"))
+                .type(ModelTypes.STREAM_REF_V1)
+                .data(objectMapper.convertValue(StreamReferenceEntity.create(ValueReference.of("Missing Stream")), JsonNode.class))
+                .build();
+        final ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(ImmutableSet.of(streamReference))
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        when(streamService.loadAllByTitle("Missing Stream")).thenReturn(Collections.emptyList());
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
+
+        final ArgumentCaptor<ContentPackInstallation> captor = ArgumentCaptor.forClass(ContentPackInstallation.class);
+        when(contentPackInstallService.insert(captor.capture())).thenReturn(null);
+
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
+
         assertThat(captor.getValue().entities()).isEmpty();
     }
 
@@ -691,6 +730,28 @@ public class ContentPackServiceTest {
                 .hasMessageContaining("upgrade");
 
         verify(patternService, never()).delete(any());
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackAbortsWhenNonUpdatableEntityCannotBeRecreatedAfterDelete() throws Exception {
+        // A non-updatable facade upgrades via delete-and-recreate. If createNativeEntity then throws
+        // SkippableEntityException, the old entity has already been deleted, so silently skipping it would lose the
+        // entity while still reporting success. The upgrade must abort (and roll back) instead of swallowing it.
+        GrokPattern existingPattern = GrokPattern.builder().id("dead-beef1").name("NAME").pattern("\\w").build();
+        when(patternService.load("dead-beef1")).thenReturn(existingPattern);
+        when(patternService.save(any())).thenThrow(new SkippableEntityException("simulated unresolvable reference"));
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        assertThatThrownBy(() -> contentPackService.upgradeContentPack(
+                contentPack, contentPackInstallation, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY))
+                .isInstanceOf(ContentPackException.class)
+                .hasMessageContaining("upgrade");
+
+        // The old entity was already deleted as part of the recreate attempt.
+        verify(patternService).delete("dead-beef1");
     }
 
     @Test

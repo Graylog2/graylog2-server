@@ -34,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -245,8 +244,14 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void stop() {
+        // Close the admin client while the broker is still reachable. A leaked client outliving the container spins in
+        // the Kafka 4.x metadata rebootstrap loop forever, flooding the log until the JVM exits.
+        if (adminClient != null) {
+            adminClient.close(Duration.ofSeconds(10));
+            adminClient = null;
+        }
+        super.stop();
         network.close();
     }
 }

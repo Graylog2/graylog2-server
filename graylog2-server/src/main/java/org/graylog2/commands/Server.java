@@ -95,6 +95,7 @@ import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.FieldTypeManagementModule;
 import org.graylog2.indexer.IndexerBindings;
+import org.graylog2.indexer.indices.OutdatedIndexModule;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
@@ -217,6 +218,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new JobSchedulerModule(),
                 new EventsModule(),
                 new RollingRestartModule(),
+                new OutdatedIndexModule(),
                 new EnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
