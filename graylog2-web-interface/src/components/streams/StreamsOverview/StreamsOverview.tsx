@@ -84,14 +84,13 @@ const StreamsOverview = ({ indexSets }: Props) => {
     );
   };
 
-  const { data: layoutPreferences, isInitialLoading: isLoadingPrefs } = useUserLayoutPreferences(activeLayout.entityTableId, activeLayoutVariant);
+  const { data: layoutPreferences } = useUserLayoutPreferences(activeLayout.entityTableId, activeLayoutVariant || undefined);
   const userPrefs = layoutPreferences?.attributes ?? {};
   const userSelection = Object.entries(userPrefs)
     .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
     .map(([attributeId]) => attributeId);
   const visibleColumns = userSelection.length > 0 ? userSelection : activeLayout.defaultDisplayedAttributes;
-  const columnsForFields = isLoadingPrefs ? activeLayout.defaultColumnOrder : visibleColumns;
-  const requestedFields = backendFieldsForVisibleColumns(columnsForFields, extensionMetricFields);
+  const requestedFields = backendFieldsForVisibleColumns(visibleColumns, extensionMetricFields);
 
   return (
     <StreamMetricsProvider streamIds={visibleStreamIds} fields={requestedFields}>

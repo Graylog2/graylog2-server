@@ -297,10 +297,15 @@ describe('StreamsOverview', () => {
     expect(screen.queryByText(/1 connected output\./i)).not.toBeInTheDocument();
   });
 
-  it('requests all metric fields while layout preferences are loading', () => {
+  it('requests metric fields for columns that are visible in preferences', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
-      data: {},
-      isInitialLoading: true,
+      data: {
+        attributes: {
+          title: { status: 'show' },
+          message_count: { status: 'show' },
+        },
+      },
+      isInitialLoading: false,
       refetch: () => {},
     });
 
@@ -308,7 +313,7 @@ describe('StreamsOverview', () => {
 
     expect(useStreamMetrics).toHaveBeenCalledWith(
       expect.any(Array),
-      expect.arrayContaining(['message_count', 'avg_processing_time_ms', 'max_processing_time_ms']),
+      expect.arrayContaining(['message_count']),
     );
   });
 

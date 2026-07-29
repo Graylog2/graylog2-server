@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fixed metric columns in the Streams overview (message count, processing time) sometimes not populating on initial page load."
+message = "Fixed metric columns in the Streams overview (message count, processing time) not showing data after being added to the view without a page reload."
 
 issues = ["26724"]
 pulls = ["26824"]
