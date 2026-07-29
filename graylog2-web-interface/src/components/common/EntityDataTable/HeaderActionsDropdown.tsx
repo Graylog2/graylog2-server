@@ -134,9 +134,11 @@ const HeaderActionsDropdown = ({
       {/* Not the Menu.Target: opening/positioning is driven by the whole header's click handler
           (see AttributeHeader) so this only needs to render the label -- clicking it still opens
           the menu, since the click bubbles up to that handler. */}
-      {textAlign === 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
-      <DropdownTrigger title={`Toggle ${label} actions`}>{children}</DropdownTrigger>
-      {textAlign !== 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
+      <DropdownTrigger title={`Toggle ${label} actions`}>
+        {textAlign === 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
+        {children}
+        {textAlign !== 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
+      </DropdownTrigger>
 
       <Menu.Dropdown>
         {onSort && (
