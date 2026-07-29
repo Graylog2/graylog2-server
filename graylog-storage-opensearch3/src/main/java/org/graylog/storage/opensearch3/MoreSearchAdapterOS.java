@@ -249,7 +249,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
                         return dh;
                     })
-                    .aggregations(TERMS_AGGREGATION_NAME, Aggregation.builder().terms(terms -> terms.minDocCount(0).field(EventDto.FIELD_ALERT)).build())
+                    .aggregations(TERMS_AGGREGATION_NAME, Aggregation.builder().terms(terms -> terms.minDocCount(0L).field(EventDto.FIELD_ALERT)).build())
                     .build();
 
             builder.aggregations(HISTOGRAM_AGGREGATION_NAME, histogramAggregation);

@@ -98,7 +98,7 @@
 
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
-        <opensearch.client.version>3.2.0</opensearch.client.version>
+        <opensearch.client.version>3.9.0</opensearch.client.version>
         <airline.version>3.3.0</airline.version>
         <amqp-client.version>5.32.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
@@ -111,7 +111,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.46.0</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.48.4</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.0</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.7</aws-msk-iam-auth.version>
         <bouncycastle.version>1.85</bouncycastle.version>
