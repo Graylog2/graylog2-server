@@ -111,8 +111,8 @@ const UrlAllowListConfig = () => {
         Allowlist administrative access is separate from data adapters and event notification configuration.
       </p>
       <p>
-        <b>Enforce for Slack &amp; Teams notifications:</b>{' '}
-        {enforceForNotifications ? <span>(Enabled)</span> : <span>(Disabled)</span>}
+        <b>Enforce for Slack &amp; Teams notifications</b>{' '}
+        <small className="text-muted">{enforceForNotifications ? '(Enabled)' : '(Disabled)'}</small>
         <br />
         <small>
           When enabled, Slack and Microsoft Teams notifications will fail if their webhook URL is not in the URL

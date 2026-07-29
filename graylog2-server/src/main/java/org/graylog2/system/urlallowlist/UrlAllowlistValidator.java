@@ -25,6 +25,12 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// Validates webhook URLs against the URL allowlist for Slack and Teams notifications.
+// By default, non-allowlisted URLs log a warning. When UrlAllowlist.enforceForNotifications()
+// is enabled, non-allowlisted URLs throw TemporaryEventNotificationException instead.
+// Called from SlackEventNotification, TeamsEventNotification, and TeamsEventNotificationV2.
+// To remove: delete this class, the enforceForNotifications field on UrlAllowlist, the
+// validateUrl calls in the three notification classes, and the frontend checkbox in UrlAllowListForm.
 @Singleton
 public class UrlAllowlistValidator {
     private static final Logger LOG = LoggerFactory.getLogger(UrlAllowlistValidator.class);
