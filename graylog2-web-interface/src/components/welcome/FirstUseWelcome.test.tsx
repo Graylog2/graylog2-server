@@ -36,10 +36,10 @@ beforeEach(() => {
 });
 
 describe('FirstUseWelcome', () => {
-  it('links the "Set up Collector" button to the collectors overview', async () => {
+  it('links the "Enroll Collector" button to the collectors overview', async () => {
     render(<FirstUseWelcome />);
 
-    const link = await screen.findByRole('link', { name: /Set up Collector/i });
+    const link = await screen.findByRole('link', { name: /Enroll Collector/i });
 
     expect(link).toHaveAttribute('href', '/system/collectors');
   });

@@ -82,8 +82,8 @@ const resources: Resource[] = [
     iconName: 'acute',
   },
   {
-    title: 'Video: Sidecar',
-    description: 'Setup Install and configure your first collector agent.',
+    title: 'Video: Collector',
+    description: 'Enroll and configure your first collector agent.',
     link: 'https://www.graylog.org',
     iconName: 'arrow_or_edge',
   },
@@ -193,16 +193,16 @@ const FirstUseWelcome = () => {
           <ActionsHeadline>Where would you like to start?</ActionsHeadline>
           <ActionsSection>
             <StyledSectionBox
-              title="Set up Collectors"
+              title="Enroll Collector"
               titleAs="h3"
               header={
                 <>
-                  Set up Collectors <PreviewBadge />
+                  Enroll Collector <PreviewBadge />
                 </>
               }>
               <Description>
-                Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
-                configuration automatically.
+                The {productName} Collector simplifies getting data from your servers. Enroll this lightweight agent
+                once, then manage its configuration centrally from {productName}.
               </Description>
               <PlatformIcons />
               <BoxActions>
@@ -215,15 +215,16 @@ const FirstUseWelcome = () => {
                         app_action_value: 'setup-collector-button',
                       })
                     }>
-                    Set up Collector
+                    Enroll Collector
                   </Button>
                 </LinkContainer>
               </BoxActions>
             </StyledSectionBox>
             <HideOnCloud>
-              <StyledSectionBox title="Set up Other Sources" titleAs="h3">
+              <StyledSectionBox title="Set up Input" titleAs="h3">
                 <Description>
-                  Open a network listener that accepts logs directly over GELF, Syslog, Beats, or other protocols.
+                  Inputs are network listeners on your {productName} nodes that receive logs directly from your
+                  infrastructure over protocols like Syslog or GELF.
                 </Description>
                 <DataSourceIcons />
                 <BoxActions>
