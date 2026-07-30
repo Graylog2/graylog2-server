@@ -61,7 +61,7 @@ const logPreview = {
     messages: [{ id: 'm2', timestamp: '2026-06-10T12:00:10.000Z', text: 'collector started' }],
     total: 7,
   },
-  sourceCounts: undefined,
+  sourceCounts: { s1: 1204, s2: 38 },
   selfLogsError: null,
   sourceLogsError: null,
   isLoading: false,
@@ -103,6 +103,7 @@ describe('ConnectionSuccess', () => {
     asMock(useCollectorLogPreview).mockReturnValue({
       ...logPreview,
       sourceLogs: { messages: [], total: 0 },
+      sourceCounts: undefined,
     });
 
     render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
@@ -235,5 +236,14 @@ describe('ConnectionSuccess', () => {
     rerender(<ConnectionSuccess instance={{ ...instance, status: 'offline' }} fleetName="Default Fleet" />);
 
     expect(screen.getByText(/Showing the collector's own logs/)).toBeInTheDocument();
+  });
+
+  it('shows per-source message counts from the aggregation', () => {
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+    expect(screen.getByText('1,204')).toBeInTheDocument();
+    expect(screen.getByText('38')).toBeInTheDocument();
+    // s3 is the windows_event_log source, which cannot collect on this Linux host.
+    expect(screen.getByText('Not applicable on Linux')).toBeInTheDocument();
   });
 });

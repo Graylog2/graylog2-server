@@ -60,7 +60,7 @@ const ColContainer = styled.div`
 `;
 
 const ConnectionSuccess = ({ instance, fleetName }: Props) => {
-  const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
+  const { selfLogs, sourceLogs, sourceCounts, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
     instance.instance_uid,
   );
   const { data: sources } = useSources(instance.fleet_id);
@@ -125,7 +125,12 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
         <Grid.Col span="auto">
           <Stack gap="md">
             <CollectorFactsSection instance={instance} fleetName={fleetName} />
-            <SourceStatusSection instance={instance} sources={sources} receiving={receiving} />
+            <SourceStatusSection
+              instance={instance}
+              sources={sources}
+              receiving={receiving}
+              sourceCounts={sourceCounts}
+            />
           </Stack>
         </Grid.Col>
         <Grid.Col span="content">
