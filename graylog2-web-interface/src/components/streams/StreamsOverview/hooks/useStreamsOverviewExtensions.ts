@@ -33,6 +33,7 @@ const useStreamsOverviewExtensions = (): {
   columnRenderers: ColumnRenderersByAttribute<Stream>;
   attributes: {
     attributeNames: Array<string>;
+    defaultDisplayedAttributeNames: Array<string>;
     attributes: Array<Attribute>;
   };
   columnGroups: ExtensionColumnGroups;
@@ -55,6 +56,7 @@ const useStreamsOverviewExtensions = (): {
         ...pluginTableElements.map(({ attributeName }) => attributeName),
         ...pluggableAttributes.attributeNames,
       ],
+      defaultDisplayedAttributeNames: pluginTableElements.map(({ attributeName }) => attributeName),
       attributes: [...pluginTableElements.flatMap(({ attributes }) => attributes), ...pluggableAttributes.attributes],
     },
     columnGroups: pluginTableElements.reduce<ExtensionColumnGroups>(
