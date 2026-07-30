@@ -99,7 +99,7 @@ describe('useCollectorLogPreview', () => {
                   messages: [resultMessage('m1', '2026-06-10T12:00:00.000Z', 'a source log line')],
                   total: 42,
                 },
-                [searchTypeIdByType(sourceQuery, 'aggregation')]: {
+                [searchTypeIdByType(sourceQuery, 'pivot')]: {
                   type: 'pivot',
                   total: 42,
                   rows: [
@@ -231,10 +231,13 @@ describe('useCollectorLogPreview', () => {
     const { sourceQuery } = splitQueries(search);
     // Query.searchTypes is a plain Array<SearchType>; the union's `type` field isn't a narrowing
     // discriminant (it's typed as `string`), so the aggregation-only fields need this assertion.
-    const aggregation = sourceQuery.searchTypes.find((st) => st.type === 'aggregation') as
-      | AggregationSearchType
-      | undefined;
+    const aggregation = sourceQuery.searchTypes.find((st) => st.type === 'pivot') as AggregationSearchType | undefined;
 
+    // The wire discriminator must be `pivot` (`Pivot.NAME` server-side), not the frontend's
+    // `PluggableSearchType` key `aggregation`. Sending `aggregation` deserialises to
+    // `SearchType.Fallback`, whose null `filters` makes the search filter normalizer throw and fails
+    // the entire search, so this assertion is load-bearing rather than cosmetic.
+    expect(aggregation.type).toBe('pivot');
     expect(aggregation.row_groups).toEqual([{ type: 'values', fields: ['collector_source_id'], limit: 100 }]);
     // A `count` series must carry no field: count(<field>) counts occurrences of that field.
     expect(aggregation.series).toEqual([{ id: 'count()', type: 'count' }]);
@@ -268,7 +271,7 @@ describe('useCollectorLogPreview', () => {
                     messages: [],
                     total: 0,
                   },
-                  [searchTypeIdByType(sourceQuery, 'aggregation')]: {
+                  [searchTypeIdByType(sourceQuery, 'pivot')]: {
                     type: 'pivot',
                     total: 0,
                     rows: [],
@@ -426,7 +429,7 @@ describe('useCollectorLogPreview', () => {
 
     asMock(executeJobResult).mockImplementation(async () => {
       const { sourceQuery, selfQuery } = splitQueries(getCreatedSearch());
-      const aggregationSearchTypeId = searchTypeIdByType(sourceQuery, 'aggregation');
+      const aggregationSearchTypeId = searchTypeIdByType(sourceQuery, 'pivot');
 
       return asExecutionResult({
         result: {

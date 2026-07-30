@@ -93,7 +93,11 @@ const messagesSearchType = (id: string): MessagesSearchType => ({
 
 const sourceCountsSearchType = (id: string): AggregationSearchType => ({
   id,
-  type: 'aggregation',
+  // `pivot`, not `aggregation`: the wire discriminator is `Pivot.NAME` server-side. `aggregation` is
+  // only the frontend's `PluggableSearchType` key — it coincides with the wire name for `messages`
+  // but not here. An unrecognised type deserialises to `SearchType.Fallback`, whose `filters` is a
+  // plain nullable field, and the search filter normalizer then NPEs on it and fails the whole search.
+  type: 'pivot',
   row_groups: [{ type: 'values', fields: [COLLECTOR_SOURCE_ID_FIELD], limit: SOURCE_BUCKET_LIMIT }],
   column_groups: [],
   series: COUNT_SERIES,
