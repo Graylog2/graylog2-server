@@ -22,7 +22,7 @@ import URI from 'urijs';
 
 import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
 import { ConfirmDialog, Link, LinkContainer, Spinner } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
@@ -239,7 +239,7 @@ const FleetDetail = ({ fleetId }: Props) => {
     <div>
       <Header>
         <h2>
-          {fleet.name} <BetaBadge />
+          {fleet.name} <PreviewBadge />
         </h2>
       </Header>
 
