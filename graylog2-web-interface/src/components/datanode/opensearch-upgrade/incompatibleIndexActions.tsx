@@ -36,7 +36,7 @@ export type ConfirmedAction = {
 
 export type PendingArchiveTracking = {
   indexName: string;
-  systemJobId?: string;
+  systemJobId: string;
 };
 
 type ActionDefinition = {
@@ -129,7 +129,7 @@ const archiveDeleteDefinition = (archive: IndexArchiveBinding | undefined): Acti
   telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
   getPendingArchiveTracking: (index, response) => ({
     indexName: index.index_name,
-    systemJobId: (response as { systemJobId?: string })?.systemJobId,
+    systemJobId: (response as { systemJobId: string }).systemJobId,
   }),
   isArchiveJobConflict: (errorMessage) => archive?.isArchiveJobConflict(errorMessage) ?? false,
 });
@@ -147,8 +147,7 @@ export const isIndexArchived = (
   indexName: string,
   pendingStatus: PendingIndexStatus | undefined,
   archivedIndexNames: ReadonlySet<string>,
-): boolean =>
-  pendingStatus?.state !== 'archiving' && (archivedIndexNames.has(indexName) || pendingStatus?.state === 'archived');
+): boolean => pendingStatus?.state !== 'archiving' && archivedIndexNames.has(indexName);
 
 export const getAvailableActions = (
   index: IncompatibleIndex,

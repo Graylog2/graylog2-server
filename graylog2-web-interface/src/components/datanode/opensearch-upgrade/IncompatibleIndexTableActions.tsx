@@ -121,7 +121,7 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
         addReindexAction({ indexName: index.index_name });
       }
 
-      if (confirmedAction === 'delete') {
+      if (confirmedAction !== 'rotate') {
         deselectEntity(index.id);
       }
 

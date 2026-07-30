@@ -79,16 +79,20 @@ const isValidStoredAction = (value: unknown): value is PendingIncompatibleIndexA
 };
 
 const readStoredActions = (): Array<PendingIncompatibleIndexAction> => {
-  const stored = Store.get(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY);
+  try {
+    const stored = Store.get(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY);
 
-  return Array.isArray(stored) ? stored.filter(isValidStoredAction) : [];
+    return Array.isArray(stored) ? stored.filter(isValidStoredAction) : [];
+  } catch {
+    return [];
+  }
 };
 
 const storeActions = (actions: Array<PendingIncompatibleIndexAction>) => {
   try {
     Store.set(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY, actions);
   } catch {
-    // Ignore write failures (e.g. storage full / disabled) — tracking degrades to this session only.
+    return;
   }
 };
 
@@ -149,18 +153,18 @@ const reconcileActions = (
   jobs: Pick<ClusterJobsResult, 'jobsById' | 'jobsUpdatedAt'>,
 ): Array<PendingIncompatibleIndexAction> => {
   const next = current.flatMap((pendingAction): Array<PendingIncompatibleIndexAction> => {
-    if (!incompatibleIndexNames.has(pendingAction.indexName)) {
-      return [];
-    }
-
     const resolution = resolveAction(pendingAction, jobs);
 
     if (resolution.kind === 'done') {
       return [];
     }
 
-    if (resolution.kind === 'archived' && pendingAction.state !== 'archived') {
-      return [{ ...pendingAction, state: 'archived' }];
+    if (resolution.kind === 'archived') {
+      if (!incompatibleIndexNames.has(pendingAction.indexName)) {
+        return [];
+      }
+
+      return pendingAction.state === 'archived' ? [pendingAction] : [{ ...pendingAction, state: 'archived' }];
     }
 
     return [pendingAction];
@@ -184,13 +188,12 @@ const usePendingIncompatibleIndexActions = ({
 
   const incompatibleIndexNames = new Set(incompatibleIndices.map((index) => index.index_name));
   const trackedActions = pendingActions.filter((pendingAction) => incompatibleIndexNames.has(pendingAction.indexName));
-  const activeTrackedActions = trackedActions.filter((pendingAction) => pendingAction.state !== 'archived');
-  const hasActiveTrackedActions = activeTrackedActions.length > 0;
+  const hasActiveActions = pendingActions.some((pendingAction) => pendingAction.state !== 'archived');
   const {
     jobsById,
     jobsUpdatedAt,
     refetch: refetchClusterJobs,
-  } = useClusterJobs({ enabled: canArchive || hasActiveTrackedActions, poll: hasActiveTrackedActions });
+  } = useClusterJobs({ enabled: canArchive || hasActiveActions, poll: hasActiveActions });
 
   const isArchiveJobRunning =
     !!archive &&
@@ -221,7 +224,7 @@ const usePendingIncompatibleIndexActions = ({
       action,
     ]);
 
-  const addArchiveDeleteAction = ({ indexName, systemJobId }: { indexName: string; systemJobId?: string }) =>
+  const addArchiveDeleteAction = ({ indexName, systemJobId }: { indexName: string; systemJobId: string }) =>
     addPendingAction({ action: 'archive-delete', indexName, systemJobId, startedAt: new Date().toISOString() });
 
   const addReindexAction = ({ indexName }: { indexName: string }) =>
@@ -240,7 +243,7 @@ const usePendingIncompatibleIndexActions = ({
   }, [pendingActions]);
 
   useEffect(() => {
-    if (!hasActiveTrackedActions) {
+    if (!hasActiveActions) {
       return undefined;
     }
 
@@ -249,7 +252,7 @@ const usePendingIncompatibleIndexActions = ({
     }, ARCHIVE_POLL_INTERVAL_MS);
 
     return () => window.clearInterval(polling);
-  }, [hasActiveTrackedActions, refetch]);
+  }, [hasActiveActions, refetch]);
 
   return { pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, isArchiveJobRunning, refetchClusterJobs };
 };

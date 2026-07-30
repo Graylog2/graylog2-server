@@ -30,6 +30,7 @@ import UserNotification from 'util/UserNotification';
 import IncompatibleIndicesBulkActions from './IncompatibleIndicesBulkActions';
 import IncompatibleIndicesContext from './IncompatibleIndicesContext';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
+import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
 
 jest.mock('@graylog/server-api', () => ({
   SystemIndexerIndices: {
@@ -97,13 +98,17 @@ describe('IncompatibleIndicesBulkActions', () => {
   const addReindexAction = jest.fn();
   const refetchClusterJobs = jest.fn();
 
-  const renderBulkActions = (rows: Array<IncompatibleIndexRow> = indices, canArchive = false) =>
+  const renderBulkActions = (
+    rows: Array<IncompatibleIndexRow> = indices,
+    canArchive = false,
+    pendingIndexStatuses: Map<string, PendingIndexStatus> = new Map(),
+  ) =>
     render(
       <IncompatibleIndicesContext.Provider
         value={{
           archiveActionsAvailable: canArchive,
           archivedIndexNames: new Set<string>(),
-          pendingIndexStatuses: new Map(),
+          pendingIndexStatuses,
           addArchiveDeleteAction,
           addReindexAction,
           refetchClusterJobs,
@@ -224,6 +229,14 @@ describe('IncompatibleIndicesBulkActions', () => {
       );
       expect(setSelectedEntities).not.toHaveBeenCalled();
       expect(refetch).not.toHaveBeenCalled();
+    });
+
+    it('excludes an index that is already reindexing from the bulk candidates', async () => {
+      renderBulkActions(systemIndices, false, new Map([['gl-system-events_0', { state: 'reindexing' }]]));
+
+      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
+
+      expect(await screen.findByRole('menuitem', { name: /reindex all \(1\)/i })).toBeInTheDocument();
     });
   });
 

@@ -26,8 +26,8 @@ const archivePlugin = new PluginManifest(
       {
         useCanArchive: () => true,
         useArchivedIndexNames: () => new Set<string>(),
-        archiveAndDeleteIndex: () => Promise.resolve({}),
-        archiveAndDeleteIndices: () => Promise.resolve({}),
+        archiveAndDeleteIndex: () => Promise.resolve({ systemJobId: 'job-id' }),
+        archiveAndDeleteIndices: () => Promise.resolve({ systemJobId: 'job-id' }),
         isArchiveJobConflict: () => false,
         archiveSystemJobName: 'archive-job',
       },

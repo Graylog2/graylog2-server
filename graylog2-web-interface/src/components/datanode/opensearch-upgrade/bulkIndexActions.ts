@@ -105,7 +105,8 @@ export const buildPartialBulkNotification = ({
     : { type: 'error', message, title: failureTitle };
 };
 
-const isArchiveInProgress = (pendingStatus: PendingIndexStatus | undefined) => pendingStatus?.state === 'archiving';
+const isActionInProgress = (pendingStatus: PendingIndexStatus | undefined) =>
+  pendingStatus?.state === 'archiving' || pendingStatus?.state === 'reindexing';
 
 export const getBulkIndexActionCandidates = ({
   indices,
@@ -125,7 +126,7 @@ export const getBulkIndexActionCandidates = ({
           index,
           canArchive,
           isIndexArchived(index.index_name, pendingIndexStatuses.get(index.index_name), archivedIndexNames),
-        ).includes(action) && !isArchiveInProgress(pendingIndexStatuses.get(index.index_name)),
+        ).includes(action) && !isActionInProgress(pendingIndexStatuses.get(index.index_name)),
     );
 
     return {
