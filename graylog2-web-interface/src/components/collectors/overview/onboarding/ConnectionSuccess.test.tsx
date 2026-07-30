@@ -247,8 +247,8 @@ describe('ConnectionSuccess', () => {
   it('shows per-source message counts from the aggregation', () => {
     render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
-    expect(screen.getByText('1,204')).toBeInTheDocument();
-    expect(screen.getByText('38')).toBeInTheDocument();
+    expect(screen.getByText('1,204 messages')).toBeInTheDocument();
+    expect(screen.getByText('38 messages')).toBeInTheDocument();
     // s3 is the windows_event_log source, which cannot collect on this Linux host.
     expect(screen.getByText('Not applicable on Linux')).toBeInTheDocument();
   });

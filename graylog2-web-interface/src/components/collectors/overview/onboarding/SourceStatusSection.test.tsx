@@ -17,9 +17,14 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import type { CollectorInstanceView, Source } from 'components/collectors/types';
+import type { CollectorInstanceView, Source, SourceType } from 'components/collectors/types';
 
 import SourceStatusSection from './SourceStatusSection';
+
+// A type the API returns but the frontend does not know yet, because its definition is still on an
+// unmerged branch. Widened through `string` on purpose: the `SourceType` union claims this value
+// cannot exist, which is precisely the situation being tested.
+const UNRECOGNISED_TYPE = 'macos_unified_logging' as string as SourceType;
 
 const instance = {
   id: 'uid-42',
@@ -124,6 +129,83 @@ describe('SourceStatusSection', () => {
     expect(screen.queryByText('Not applicable on Linux')).not.toBeInTheDocument();
   });
 
+  it('declines to guess at a source type it does not recognise', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[source({ id: 's1', name: 'macOS Unified Log', type: UNRECOGNISED_TYPE })]}
+        receiving={false}
+        sourceCounts={{}}
+      />,
+    );
+
+    expect(screen.getByText('Unrecognised source type')).toBeInTheDocument();
+    // It must not pretend to be waiting on messages for a source it cannot reason about.
+    expect(screen.queryByText('Waiting for first messages...')).not.toBeInTheDocument();
+    expect(screen.queryByText('No messages yet')).not.toBeInTheDocument();
+    // Nor claim a definite incompatibility, which is what the platform copy asserts.
+    expect(screen.queryByText(/Not applicable/)).not.toBeInTheDocument();
+  });
+
+  it('claims no message count for an unrecognised source type', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[source({ id: 's1', name: 'macOS Unified Log', type: UNRECOGNISED_TYPE })]}
+        receiving
+        sourceCounts={{ s1: 1204 }}
+      />,
+    );
+
+    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByText('1,204 messages')).not.toBeInTheDocument();
+    expect(screen.queryByText('Receiving')).not.toBeInTheDocument();
+  });
+
+  it('prefers the disabled status over the unrecognised one', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[source({ id: 's1', type: UNRECOGNISED_TYPE, enabled: false })]}
+        receiving={false}
+      />,
+    );
+
+    expect(screen.getByText('Disabled')).toBeInTheDocument();
+    expect(screen.queryByText('Unrecognised source type')).not.toBeInTheDocument();
+  });
+
+  it('prefers the unrecognised status over the offline one', () => {
+    render(
+      <SourceStatusSection
+        instance={offlineInstance}
+        sources={[source({ id: 's1', type: UNRECOGNISED_TYPE })]}
+        receiving={false}
+      />,
+    );
+
+    expect(screen.getByText('Unrecognised source type')).toBeInTheDocument();
+    expect(screen.queryByText('Paused — collector offline')).not.toBeInTheDocument();
+  });
+
+  it('still recognises every type the frontend knows about', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[
+          source({ id: 's1', name: 'Syslog', type: 'file' }),
+          source({ id: 's2', name: 'System Journal', type: 'journald' }),
+        ]}
+        receiving
+        sourceCounts={{ s1: 1, s2: 2 }}
+      />,
+    );
+
+    // Guards against the membership check accidentally rejecting known types.
+    expect(screen.queryByText('Unrecognised source type')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Receiving')).toHaveLength(2);
+  });
+
   it('prefers the platform status over the offline one', () => {
     render(
       <SourceStatusSection
@@ -147,8 +229,8 @@ describe('SourceStatusSection', () => {
       />,
     );
 
-    expect(screen.getByText('1,204')).toBeInTheDocument();
-    expect(screen.getByText('38')).toBeInTheDocument();
+    expect(screen.getByText('1,204 messages')).toBeInTheDocument();
+    expect(screen.getByText('38 messages')).toBeInTheDocument();
     expect(screen.getAllByText('Receiving')).toHaveLength(2);
   });
 

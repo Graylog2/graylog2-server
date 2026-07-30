@@ -26,6 +26,7 @@ import QuietSection from './QuietSection';
 
 import { DividedIconRow, IconRowList } from '../../common/IconRowList';
 import { OS_LABELS } from '../../common/Constants';
+import { SOURCE_TYPE_LABELS } from '../../sources/Constants';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -87,12 +88,38 @@ const SOURCE_PLATFORM: Partial<Record<SourceType, string>> = {
   windows_event_log: 'windows',
 };
 
+/**
+ * Whether the frontend knows this source type at all.
+ *
+ * Types can exist in the database before the frontend learns about them — a source type whose
+ * definition is still on an unmerged branch is stored and returned by the API while `SourceType` and
+ * `SOURCE_TYPE_LABELS` have no entry for it. `SOURCE_TYPE_LABELS` is exhaustive over `SourceType`, so
+ * membership in it is the registry of known types; `SOURCE_PLATFORM` is not, because types that run
+ * everywhere are legitimately absent from it.
+ *
+ * This is a runtime check against a case the `SourceType` union claims cannot happen, which is why it
+ * tests the object rather than comparing to a list of literals.
+ */
+const isRecognised = (type: SourceType) => Object.hasOwn(SOURCE_TYPE_LABELS, type);
+
 const NO_COUNT = '—';
 
+const countLabel = (count: number | undefined) => {
+  if (count === undefined) {
+    return NO_COUNT;
+  }
+
+  // A zero would sit right next to "No messages yet" or "Waiting for first messages...", which
+  // already say it; the digit only adds noise.
+  if (count === 0) {
+    return '';
+  }
+
+  return `${formatNumber(count)} messages`;
+};
+
 /** The count for a source, or an em dash when a number would be meaningless or unknown. */
-const SourceCountCell = ({ count }: { count: number | undefined }) => (
-  <SourceCount>{count === undefined ? NO_COUNT : (count === 0 ? '' : `${formatNumber(count)} messages`)}</SourceCount>
-);
+const SourceCountCell = ({ count }: { count: number | undefined }) => <SourceCount>{countLabel(count)}</SourceCount>;
 
 const SourceStatus = ({
   source,
@@ -108,6 +135,12 @@ const SourceStatus = ({
 
   if (instance.os && requiredPlatform && requiredPlatform !== instance.os) {
     return <RowStatus>Not applicable on {OS_LABELS[instance.os] ?? instance.os}</RowStatus>;
+  }
+
+  // Deliberately not "Not applicable": that asserts a definite incompatibility, whereas an
+  // unrecognised type may well be collecting perfectly well server-side. We only decline to guess.
+  if (!isRecognised(source.type)) {
+    return <RowStatus>Unrecognised source type</RowStatus>;
   }
 
   if (instance.status !== 'online') {
@@ -155,11 +188,13 @@ const SourceStatusSection = ({ instance, sources, receiving, sourceCounts = unde
             // A present map with no entry for this source means it produced nothing; an absent map
             // means the aggregation is unavailable and no number should be claimed.
             const count = sourceCounts ? (sourceCounts[source.id] ?? 0) : undefined;
-            // Mirrors status rules 1–2 only. A source restricted to a *matching* platform is still
-            // collecting, so testing `SOURCE_PLATFORM[source.type]` alone would be too strict.
+            // Mirrors the structural status rules only. A source restricted to a *matching* platform
+            // is still collecting, so testing `SOURCE_PLATFORM[source.type]` alone would be too
+            // strict. An unrecognised type claims no number either: we cannot say whether a zero
+            // means "silent" or "we do not understand this source".
             const requiredPlatform = SOURCE_PLATFORM[source.type];
             const mismatched = Boolean(instance.os && requiredPlatform && requiredPlatform !== instance.os);
-            const collecting = source.enabled && !mismatched;
+            const collecting = source.enabled && !mismatched && isRecognised(source.type);
 
             return (
               <DividedIconRow key={source.id}>
