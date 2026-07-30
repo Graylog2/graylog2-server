@@ -50,6 +50,17 @@ const Container = styled.div(
 const ResourceTile = styled.div`
   margin: 0;
   flex: 1;
+  display: flex;
+`;
+
+const StyledResourceCol = styled(Col)`
+  display: flex;
+`;
+
+const ResourceTileBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
 `;
 
 const DismissButton = styled(Button)`
@@ -141,11 +152,12 @@ const ResourceTileContent = styled.div(
   `,
 );
 
-const ActionsSection = styled(Section)``;
+const BoxActions = styled.div`
+  margin-top: auto;
+`;
 
-const BoxActions = styled.div(
+const SourcesBoxActions = styled(BoxActions)(
   ({ theme }) => css`
-    margin-top: auto;
     padding-top: ${theme.spacings.lg};
   `,
 );
@@ -191,7 +203,7 @@ const FirstUseWelcome = () => {
       <Row className={'content'}>
         <Col xs={12}>
           <ActionsHeadline>Where would you like to start?</ActionsHeadline>
-          <ActionsSection>
+          <Section>
             <StyledSectionBox
               title="Enroll Collector"
               titleAs="h3"
@@ -205,7 +217,7 @@ const FirstUseWelcome = () => {
                 once, then manage its configuration centrally from {productName}.
               </Description>
               <PlatformIcons />
-              <BoxActions>
+              <SourcesBoxActions>
                 <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
                   <Button
                     bsStyle="primary"
@@ -218,7 +230,7 @@ const FirstUseWelcome = () => {
                     Enroll Collector
                   </Button>
                 </LinkContainer>
-              </BoxActions>
+              </SourcesBoxActions>
             </StyledSectionBox>
             <HideOnCloud>
               <StyledSectionBox title="Set up Input" titleAs="h3">
@@ -243,7 +255,7 @@ const FirstUseWelcome = () => {
                 </BoxActions>
               </StyledSectionBox>
             </HideOnCloud>
-          </ActionsSection>
+          </Section>
         </Col>
       </Row>
 
@@ -252,28 +264,30 @@ const FirstUseWelcome = () => {
       <Container>
         {resources.map((resource) => (
           <ResourceTile className="content" key={resource.title}>
-            <Col>
+            <StyledResourceCol>
               <ResourceTileContent>
                 <IconCard>
                   <Icon name={resource.iconName} />
                 </IconCard>
-                <div>
+                <ResourceTileBody>
                   <ResourceTitle>{resource.title}</ResourceTitle>
                   <ResourceDescription>{resource.description}</ResourceDescription>
-                  <ExternalLinkButton
-                    href={resource.link}
-                    bsSize="xs"
-                    onClick={() =>
-                      sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
-                        app_section: 'welcome',
-                        app_action_value: resource.title,
-                      })
-                    }>
-                    Continue
-                  </ExternalLinkButton>
-                </div>
+                  <BoxActions>
+                    <ExternalLinkButton
+                      href={resource.link}
+                      bsSize="xs"
+                      onClick={() =>
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
+                          app_section: 'welcome',
+                          app_action_value: resource.title,
+                        })
+                      }>
+                      Continue
+                    </ExternalLinkButton>
+                  </BoxActions>
+                </ResourceTileBody>
               </ResourceTileContent>
-            </Col>
+            </StyledResourceCol>
           </ResourceTile>
         ))}
       </Container>
