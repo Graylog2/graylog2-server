@@ -215,8 +215,7 @@ const useCollectorLogPreview = (instanceUid: string) => {
       // aggregation search type would otherwise be misattributed to the healthy messages pane, since
       // both search types now live on the same (source) query.
       const errorForSearchType = (queryId: string, searchTypeId: string) =>
-        errors.find((e) => e.queryId === queryId && (!e.searchTypeId || e.searchTypeId === searchTypeId))
-          ?.description;
+        errors.find((e) => e.queryId === queryId && (!e.searchTypeId || e.searchTypeId === searchTypeId))?.description;
 
       return {
         selfLogs: toPreview(
