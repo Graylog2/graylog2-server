@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.filesystem.index;
 
+import jakarta.annotation.Nullable;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 
 import java.nio.file.Path;
@@ -24,21 +25,29 @@ import java.util.List;
 /**
  * Outcome of an {@link OpensearchDataDirCompatibilityService#check()} run.
  *
- * @param errors   reasons why the data directory can't be used with {@code opensearchVersion}. Empty if compatible.
- * @param warnings problems that don't prevent usage of the data directory, but the user should know about them.
+ * @param requiredDistribution the opensearch distribution that could read the directory, {@code null} if it
+ *                             couldn't be read at all. Needing
+ *                             {@link RequiredOpensearchDistribution#COMPAT} is not an error on its own — the data is
+ *                             readable, it just predates the current distribution.
+ * @param errors               reasons why the data directory can't be used with {@code opensearchVersion}. Empty if
+ *                             compatible.
+ * @param warnings             problems that don't prevent usage of the data directory, but the user should know
+ *                             about them.
  */
 public record OpensearchDataDirCompatibility(Path dataDir,
                                              String opensearchVersion,
                                              IndexerDirectoryInformation info,
+                                             @Nullable RequiredOpensearchDistribution requiredDistribution,
                                              List<String> errors,
                                              List<String> warnings) {
 
     /**
-     * The data directory couldn't be inspected at all, e.g. because it's not readable or its content can't be parsed.
+     * The data directory couldn't be inspected at all, e.g. because it's not readable, or because neither the
+     * current nor the compatibility distribution could make sense of its content.
      */
     public static OpensearchDataDirCompatibility failed(Path dataDir, String opensearchVersion, String error) {
         return new OpensearchDataDirCompatibility(dataDir, opensearchVersion, IndexerDirectoryInformation.empty(dataDir),
-                List.of(error), List.of());
+                null, List.of(error), List.of());
     }
 
     public boolean isCompatible() {

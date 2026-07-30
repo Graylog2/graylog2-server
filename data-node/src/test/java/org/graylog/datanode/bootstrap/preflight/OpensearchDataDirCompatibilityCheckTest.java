@@ -23,11 +23,13 @@ import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
+import org.graylog.datanode.filesystem.index.IndicesDirectoryParseResult;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
 import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibilityService;
 import org.graylog.datanode.filesystem.index.OpensearchUtils;
-import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
+import org.graylog.datanode.filesystem.index.indexreader.Lucene9ShardStatsParser;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
+import org.graylog.datanode.filesystem.index.statefile.Lucene9StateFileParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
@@ -47,14 +49,10 @@ class OpensearchDataDirCompatibilityCheckTest {
     void testCompatibilityCheckSkipping(@TempDir Path tempDir) throws IOException {
         writeCheckFile(tempDir, OPENSEARCH_VERSION);
 
-        final IndicesDirectoryParser parser = new IndicesDirectoryParser(null, null) {
-            @Override
-            public IndexerDirectoryInformation parse(Path path) {
-                throw new AssertionError("Should not be called");
-            }
-        };
+        final OpensearchDataDirCompatibilityCheck check =
+                checkFor(tempDir, OPENSEARCH_VERSION, neverCalledParser("Should not be called"));
 
-        Assertions.assertThatCode(checkFor(tempDir, OPENSEARCH_VERSION, parser)::runCheck).doesNotThrowAnyException();
+        Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
     }
 
     @Test
@@ -69,14 +67,10 @@ class OpensearchDataDirCompatibilityCheckTest {
     void testCompatibilityCheckSkipsOnMinorVersionChange(@TempDir Path dataDir) throws IOException {
         writeCheckFile(dataDir, "2.18.0");
 
-        final IndicesDirectoryParser parser = new IndicesDirectoryParser(null, null) {
-            @Override
-            public IndexerDirectoryInformation parse(Path path) {
-                throw new AssertionError("Should not be called on minor version change");
-            }
-        };
+        final OpensearchDataDirCompatibilityCheck check = checkFor(dataDir, OPENSEARCH_VERSION,
+                neverCalledParser("Should not be called on minor version change"));
 
-        Assertions.assertThatCode(checkFor(dataDir, OPENSEARCH_VERSION, parser)::runCheck).doesNotThrowAnyException();
+        Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
     }
 
     @Test
@@ -103,9 +97,9 @@ class OpensearchDataDirCompatibilityCheckTest {
 
     @Test
     void testCompatibilityCheckFailsForIncompatibleIndexVersion(@TempDir Path dataDir) {
-        final IndicesDirectoryParser parser = new IndicesDirectoryParser(null, null) {
+        final IndicesDirectoryParser parser = new IndicesDirectoryParser(null, null, null, null) {
             @Override
-            public IndexerDirectoryInformation parse(Path path) {
+            public IndicesDirectoryParseResult parse(Path path) {
                 throw new IncompatibleIndexVersionException("Index data version is not compatible");
             }
         };
@@ -139,6 +133,19 @@ class OpensearchDataDirCompatibilityCheckTest {
         return OpensearchUtils.isCompatible(Version.parse(current), Version.parse(node));
     }
 
+    /**
+     * A parser that fails the test if the check reaches it at all, for the cases where the marker file has to
+     * short-circuit the whole scan.
+     */
+    private static IndicesDirectoryParser neverCalledParser(String message) {
+        return new IndicesDirectoryParser(null, null, null, null) {
+            @Override
+            public IndicesDirectoryParseResult parse(Path path) {
+                throw new AssertionError(message);
+            }
+        };
+    }
+
     private OpensearchDataDirCompatibilityCheck checkFor(Path dataDir, String opensearchVersion, IndicesDirectoryParser parser) {
         final DatanodeConfiguration configuration = configFor(dataDir, opensearchVersion);
         return new OpensearchDataDirCompatibilityCheck(configuration,
@@ -151,7 +158,8 @@ class OpensearchDataDirCompatibilityCheckTest {
     }
 
     private IndicesDirectoryParser realParser() {
-        return new IndicesDirectoryParser(new StateFileParserImpl(), new ShardStatsParserImpl());
+        return new IndicesDirectoryParser(new StateFileParserImpl(), new ShardStatsParserImpl(),
+                new Lucene9StateFileParser(), new Lucene9ShardStatsParser());
     }
 
     private void writeCheckFile(Path dataDir, String version) throws IOException {

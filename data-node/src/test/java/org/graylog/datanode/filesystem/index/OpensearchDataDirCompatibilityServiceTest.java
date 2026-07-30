@@ -20,7 +20,9 @@ import org.assertj.core.api.Assertions;
 import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.filesystem.index.indexreader.Lucene9ShardStatsParser;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
+import org.graylog.datanode.filesystem.index.statefile.Lucene9StateFileParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.junit.jupiter.api.Test;
@@ -33,12 +35,13 @@ class OpensearchDataDirCompatibilityServiceTest {
 
     @Test
     void testCompatibleDataDir() throws URISyntaxException {
-        final OpensearchDataDirCompatibility compatibility = serviceFor(opensearch2Fixture(), "2.19.0").check();
+        final OpensearchDataDirCompatibility compatibility = serviceFor(fixture("opensearch2"), "2.19.0").check();
 
         Assertions.assertThat(compatibility.isCompatible()).isTrue();
         Assertions.assertThat(compatibility.errors()).isEmpty();
         Assertions.assertThat(compatibility.warnings()).isEmpty();
         Assertions.assertThat(compatibility.indicesCount()).isEqualTo(6);
+        Assertions.assertThat(compatibility.requiredDistribution()).isEqualTo(RequiredOpensearchDistribution.CURRENT);
     }
 
     /**
@@ -48,7 +51,7 @@ class OpensearchDataDirCompatibilityServiceTest {
      */
     @Test
     void testIncompatibleDataDirReportsNodeAndIndexErrors() throws URISyntaxException {
-        final OpensearchDataDirCompatibility compatibility = serviceFor(opensearch2Fixture(), "4.0.0").check();
+        final OpensearchDataDirCompatibility compatibility = serviceFor(fixture("opensearch2"), "4.0.0").check();
 
         Assertions.assertThat(compatibility.isCompatible()).isFalse();
         Assertions.assertThat(compatibility.errors())
@@ -57,6 +60,33 @@ class OpensearchDataDirCompatibilityServiceTest {
                         .isEqualTo("Current version 4.0.0 of Opensearch is not compatible with index version 2.10.0"))
                 .anySatisfy(error -> Assertions.assertThat(error)
                         .isEqualTo("Current version 4.0.0 is not compatible with index version 2.10.0 of index graylog_0"));
+    }
+
+    /**
+     * Opensearch 1.x wrote Lucene 8 segments, which only the compatibility distribution can open. That is recorded in the
+     * result but is not an error on its own — the version comparison still decides compatibility.
+     */
+    @Test
+    void testCompatDistributionIsRecordedAndIsNotAnError() throws URISyntaxException {
+        final OpensearchDataDirCompatibility compatibility = serviceFor(fixture("opensearch1"), "2.19.0").check();
+
+        Assertions.assertThat(compatibility.requiredDistribution()).isEqualTo(RequiredOpensearchDistribution.COMPAT);
+        Assertions.assertThat(compatibility.errors()).isEmpty();
+        Assertions.assertThat(compatibility.isCompatible()).isTrue();
+        Assertions.assertThat(compatibility.indicesCount()).isEqualTo(1);
+    }
+
+    /**
+     * Elasticsearch 6 wrote Lucene 7 segments, out of reach for both distributions, so this is the case that does produce
+     * an error.
+     */
+    @Test
+    void testUnreadableByBothDistributionsIsAnError() throws URISyntaxException {
+        final OpensearchDataDirCompatibility compatibility = serviceFor(fixture("elasticsearch6"), "2.19.0").check();
+
+        Assertions.assertThat(compatibility.isCompatible()).isFalse();
+        Assertions.assertThat(compatibility.errors()).hasSize(1);
+        Assertions.assertThat(compatibility.requiredDistribution()).isNull();
     }
 
     @Test
@@ -79,10 +109,11 @@ class OpensearchDataDirCompatibilityServiceTest {
                 .singleElement()
                 .satisfies(error -> Assertions.assertThat(error).contains("nonexistent"));
         Assertions.assertThat(compatibility.info().nodes()).isEmpty();
+        Assertions.assertThat(compatibility.requiredDistribution()).isNull();
     }
 
-    private Path opensearch2Fixture() throws URISyntaxException {
-        return Path.of(getClass().getResource("/indices/opensearch2").toURI());
+    private Path fixture(String name) throws URISyntaxException {
+        return Path.of(getClass().getResource("/indices/" + name).toURI());
     }
 
     private OpensearchDataDirCompatibilityService serviceFor(Path dataDir, String opensearchVersion) {
@@ -90,6 +121,7 @@ class OpensearchDataDirCompatibilityServiceTest {
                 new OpensearchDistribution(Path.of("/opensearch"), opensearchVersion),
                 DatanodeTestUtils.tempDirectories(dataDir), 0, IndexerJwtAuthToken.disabled());
         return new OpensearchDataDirCompatibilityService(configuration,
-                new IndicesDirectoryParser(new StateFileParserImpl(), new ShardStatsParserImpl()));
+                new IndicesDirectoryParser(new StateFileParserImpl(), new ShardStatsParserImpl(),
+                        new Lucene9StateFileParser(), new Lucene9ShardStatsParser()));
     }
 }

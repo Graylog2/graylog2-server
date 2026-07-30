@@ -62,14 +62,23 @@ public class OpensearchDataDirCompatibilityService {
     /**
      * Parses the opensearch data directory and collects all compatibility problems it can find. Never throws, a
      * directory that can't be read or parsed at all is reported as a single error instead.
+     * <p>
+     * The parser falls back to the compatibility distribution for data written by older indexers, so needing that
+     * fallback is recorded in the result rather than reported as an error. Only a directory that neither distribution
+     * can read produces an error.
      */
     public OpensearchDataDirCompatibility check() {
         final Path dataDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
         final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
         try {
             directoryReadableValidator.validate(dataDir.toUri().toString(), dataDir);
-            final IndexerDirectoryInformation info = indicesDirectoryParser.parse(dataDir);
-            return new OpensearchDataDirCompatibility(dataDir, opensearchVersion, info,
+            final IndicesDirectoryParseResult parseResult = indicesDirectoryParser.parse(dataDir);
+            final IndexerDirectoryInformation info = parseResult.info();
+            if (parseResult.requiredDistribution() == RequiredOpensearchDistribution.COMPAT) {
+                LOG.info("Opensearch data directory {} needs the compatibility opensearch distribution, its indices " +
+                        "were written by an older indexer", dataDir);
+            }
+            return new OpensearchDataDirCompatibility(dataDir, opensearchVersion, info, parseResult.requiredDistribution(),
                     collectErrors(Version.parse(opensearchVersion), info),
                     collectWarnings(dataDir, info));
         } catch (Exception e) {
