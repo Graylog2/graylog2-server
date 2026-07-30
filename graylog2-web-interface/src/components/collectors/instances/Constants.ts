@@ -22,6 +22,6 @@ export const DEFAULT_LAYOUT = {
   entityTableId: ENTITY_TABLE_ID,
   defaultPageSize: 20,
   defaultSort: { attributeId: 'last_seen', direction: 'desc' } as Sort,
-  defaultDisplayedAttributes: ['status', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
-  defaultColumnOrder: ['status', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
+  defaultDisplayedAttributes: ['status', 'has_pending_changes', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
+  defaultColumnOrder: ['status', 'has_pending_changes', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
 };

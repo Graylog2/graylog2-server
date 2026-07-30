@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.resources;
 
+import com.google.common.base.Strings;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
@@ -81,10 +82,10 @@ public class DashboardResourceProvider extends ResourceProvider {
         if (!permissionHelper.getSearchUser().canReadView(dashboard)) {
             return Optional.empty();
         }
-        return Optional.of(McpSchema.Resource.builder()
-                .name(dashboard.title())
+        // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+        final String name = Strings.isNullOrEmpty(dashboard.title()) ? dashboard.id() : dashboard.title();
+        return Optional.of(McpSchema.Resource.builder(grn.toString(), name)
                 .description(dashboard.description())
-                .uri(grn.toString())
                 .build());
     }
 
@@ -98,15 +99,13 @@ public class DashboardResourceProvider extends ResourceProvider {
 
         try (resultStream) {
             return resultStream
-                    .map(dashboard -> new McpSchema.Resource(
-                            GRN_TYPE.toGRN(dashboard.id()).toString(),
-                            dashboard.title(),
-                            dashboard.title(),
-                            dashboard.description(),
-                            null,
-                            null,
-                            null,
-                            null))
+                    .map(dashboard -> McpSchema.Resource.builder(
+                                    GRN_TYPE.toGRN(dashboard.id()).toString(),
+                                    // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+                                    Strings.isNullOrEmpty(dashboard.title()) ? dashboard.id() : dashboard.title())
+                            .title(dashboard.title())
+                            .description(dashboard.description())
+                            .build())
                     .toList();
         }
     }

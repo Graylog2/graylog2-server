@@ -27,7 +27,7 @@ const getDashboardTableElements = (pluggableAttributes?: {
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
     defaultDisplayedAttributes: hideAdditionalColumns
       ? ['title', 'description', 'summary']
-      : ['title', 'description', 'summary', 'favorite', ...(pluggableAttributes?.attributeNames || [])],
+      : ['title', 'description', 'summary', 'favorite'],
     defaultColumnOrder: [
       'title',
       'summary',

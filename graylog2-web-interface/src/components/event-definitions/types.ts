@@ -19,7 +19,7 @@ import type React from 'react';
 
 import type { SearchBarControl } from 'views/types';
 import type User from 'logic/users/User';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
 import type { Attribute } from 'stores/PaginationTypes';
 
 export type AlertType = 'alert' | 'event' | 'event_definition';
@@ -59,6 +59,8 @@ export interface EventDefinitionType {
   }>;
   useCondition: () => boolean;
   hideFieldsStep?: boolean;
+  // Hides the type from the create wizard's dropdown while still listing it as a filter option.
+  hideFromCreation?: boolean;
 }
 export type TacticsTechniquesEditorPlugin = {
   component: React.ComponentType<{
@@ -96,6 +98,16 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
     'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
     'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.overviewPageSections'?: Array<{
+      key: string;
+      component: React.ComponentType;
+      order?: number;
+    }>;
+    'eventDefinitions.components.detailPageSections'?: Array<{
+      key: string;
+      component: React.ComponentType<{ eventDefinition: EventDefinition }>;
+      order?: number;
+    }>;
     'eventDefinitions.components.tacticsTechniquesEditor'?: Array<TacticsTechniquesEditorPlugin>;
     'eventDefinitions.components.tacticsTechniquesColumn'?: Array<TacticsTechniquesColumnPlugin>;
     'eventDefinitions.components.tacticsTechniquesSummary'?: Array<TacticsTechniquesSummaryPlugin>;
@@ -103,5 +115,9 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitions.components.sigmaGitImport'?: Array<{ component: React.FC; key: string }>;
     'eventDefinitions.components.sigmaFileUpload'?: Array<{ component: React.FC; key: string }>;
     'eventDefinitions.components.sigmaOptions'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.searchQueryPreview'?: Array<{
+      component: React.ComponentType<{ queryString: string; filters: SearchFilter[] }>;
+      key: string;
+    }>;
   }
 }

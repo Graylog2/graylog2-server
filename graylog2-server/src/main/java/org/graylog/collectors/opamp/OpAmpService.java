@@ -64,7 +64,6 @@ import org.graylog.collectors.config.processor.ResourceProcessorConfig;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.NoopReceiverConfig;
 import org.graylog.collectors.db.Attribute;
-import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
@@ -277,8 +276,7 @@ public class OpAmpService {
                                     "Current assignment to fleet {} will be kept.", auth.token().fleetId(),
                             instance.instanceUid(), instance.fleetId());
                 }
-                final var enrolled = collectorInstanceService.reEnroll(instance.id(),
-                        instance.activeCertificateFingerprint(), issuedCert, auth.token().id());
+                final var enrolled = collectorInstanceService.reEnroll(instance, issuedCert, auth.token().id());
                 LOG.info("Re-enrolled existing collector {}. Current fleet: {}", enrolled.instanceUid(),
                         enrolled.fleetId());
                 // Don't count token usage for consecutive enrollments of the same collector, but
@@ -551,7 +549,9 @@ public class OpAmpService {
             final String fleetId = previousState.fleetId();
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
-            final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
+
+            final var coalesced = txnLogService.coalesce(unprocessedMarkers, lastProcessedTxnSeq);
+
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 

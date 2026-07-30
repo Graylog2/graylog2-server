@@ -19,6 +19,7 @@ package org.graylog.integrations.aws.service;
 import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.inputs.AWSInput;
@@ -118,6 +119,10 @@ public class AWSService {
      */
     public Input saveInput(AWSInputCreateRequest request, User user, boolean isSetupWizard) throws Exception {
 
+        if (StringUtils.isNotBlank(request.externalId()) && StringUtils.isBlank(request.assumeRoleArn())) {
+            throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
+        }
+
         // Transpose the SaveAWSInputRequest to the needed InputCreateRequest
         final HashMap<String, Object> configuration = new HashMap<>();
         configuration.put(AWSCodec.CK_AWS_MESSAGE_TYPE, request.awsMessageType());
@@ -127,6 +132,7 @@ public class AWSService {
         configuration.put(AWSInput.CK_ACCESS_KEY, request.awsAccessKeyId());
         configuration.put(AWSInput.CK_SECRET_KEY, request.awsSecretAccessKey());
         configuration.put(AWSInput.CK_ASSUME_ROLE_ARN, request.assumeRoleArn());
+        configuration.put(AWSInput.CK_EXTERNAL_ID, request.externalId());
         configuration.put(AWSInput.CK_CLOUDWATCH_ENDPOINT, request.cloudwatchEndpoint());
         configuration.put(AWSInput.CK_DYNAMODB_ENDPOINT, request.dynamodbEndpoint());
         configuration.put(AWSInput.CK_IAM_ENDPOINT, request.iamEndpoint());
@@ -153,7 +159,6 @@ public class AWSService {
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());
             final String newInputId = inputService.save(input);
-            LOG.debug("New AWS input created. id [{}] request [{}]", newInputId, request);
             return inputService.find(newInputId);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);

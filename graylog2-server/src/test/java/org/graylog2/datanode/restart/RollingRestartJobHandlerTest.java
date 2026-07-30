@@ -20,7 +20,6 @@ import org.bson.conversions.Bson;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
-import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -28,7 +27,9 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
 import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.cluster.nodes.OpensearchVersionsOverview;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -70,14 +72,19 @@ class RollingRestartJobHandlerTest {
     Lock lock;
     @Mock
     ClusterState clusterState;
+    @Mock
+    DataNodeMetadataService dataNodeMetadataService;
 
     private RollingRestartJobHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new RollingRestartJobHandler(jobDefinitionService, jobTriggerService, actions, clock, lockService);
+        OpensearchVersionsOverview versionOverview = mock(OpensearchVersionsOverview.class);
+        lenient().when(versionOverview.highestAvailableVersion()).thenReturn(Optional.of("999.999.999"));
+        lenient().when(dataNodeMetadataService.getVersionsOverview()).thenReturn(versionOverview);
+        handler = new RollingRestartJobHandler(jobDefinitionService, jobTriggerService, actions, clock, lockService, dataNodeMetadataService);
         // Default: lock acquisition succeeds for most tests; tests that exercise contention override.
-        lenient().when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE)).thenReturn(Optional.of(lock));
+        lenient().when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE, 1)).thenReturn(Optional.of(lock));
         lenient().when(clock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
     }
 
@@ -120,7 +127,7 @@ class RollingRestartJobHandlerTest {
 
     @Test
     void start_failsWhenLockNotAcquired() {
-        when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE)).thenReturn(Optional.empty());
+        when(lockService.lock(RollingRestartJobHandler.START_LOCK_RESOURCE, 1)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(IllegalStateException.class)
@@ -134,10 +141,11 @@ class RollingRestartJobHandlerTest {
         greenClusterWithThreeNodes();
         final var existing = buildExistingTrigger(
                 RollingRestartExecutionJob.Data.builder()
-                        .smState(RollingRestartState.STOPPING_NODE)
+                        .smState(RollingRestartState.UPGRADING_NODE)
                         .nodes(List.of())
                         .triggeredBy("bob")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -149,16 +157,34 @@ class RollingRestartJobHandlerTest {
     }
 
     @Test
-    void start_failsWhenFewerThanThreeNodes() {
+    void start_failsWhenNoNodes() {
         mockNoActiveTrigger();
-        when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a"), node("b", "node-b")));
-        when(actions.getClusterState()).thenReturn(clusterState);
-        when(clusterState.status()).thenReturn(HealthStatus.Green);
+        when(actions.liveDataNodes()).thenReturn(List.of());
 
         assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(RollingRestartPreconditionsException.class)
                 .extracting("failedChecks").asList()
-                .anyMatch(c -> ((String) c).contains("at least 3 DataNodes"));
+                .anyMatch(c -> ((String) c).contains("No active DataNodes"));
+    }
+
+    @Test
+    void start_smallCluster_startsInPausingProcessingState() {
+        mockNoActiveTrigger();
+        when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a"), node("b", "node-b")));
+        when(actions.getClusterState()).thenReturn(clusterState);
+        when(clusterState.status()).thenReturn(HealthStatus.Green);
+        when(jobDefinitionService.get(RollingRestartExecutionJob.DEFINITION_INSTANCE.id()))
+                .thenReturn(Optional.of(RollingRestartExecutionJob.DEFINITION_INSTANCE));
+        when(jobTriggerService.create(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        final var created = handler.start("alice", false);
+
+        final var data = (RollingRestartExecutionJob.Data) created.data().orElseThrow();
+        assertThat(data.smState()).isEqualTo(RollingRestartState.PAUSING_PROCESSING);
+        assertThat(data.pauseProcessing()).isTrue();
+        // No credential is persisted — only the triggering username, used to mint an ephemeral token at run time.
+        assertThat(data.triggeredBy()).isEqualTo("alice");
+        assertThat(data.nodes()).hasSize(2);
     }
 
     @Test
@@ -191,6 +217,7 @@ class RollingRestartJobHandlerTest {
         assertThat(created).isNotNull();
         final var data = (RollingRestartExecutionJob.Data) created.data().orElseThrow();
         assertThat(data.smState()).isEqualTo(RollingRestartState.PREPARING_CLUSTER);
+        assertThat(data.pauseProcessing()).isFalse();
         assertThat(data.triggeredBy()).isEqualTo("alice");
         assertThat(data.nodes()).hasSize(3);
     }
@@ -213,7 +240,7 @@ class RollingRestartJobHandlerTest {
     @Test
     void start_releasesLock_onPreconditionFailure() {
         when(jobTriggerService.streamByQuery(any(Bson.class))).thenReturn(Stream.empty());
-        when(actions.liveDataNodes()).thenReturn(List.of(node("a", "node-a"))); // too few
+        when(actions.liveDataNodes()).thenReturn(List.of()); // no nodes → precondition failure
 
         assertThatThrownBy(() -> handler.start("alice", false))
                 .isInstanceOf(RollingRestartPreconditionsException.class);
@@ -244,6 +271,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -269,6 +297,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -288,6 +317,7 @@ class RollingRestartJobHandlerTest {
                         .triggeredBy("alice")
                         .waitingGreenSince(oldTs)
                         .pausedReason("stuck")
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -309,6 +339,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         mockActiveTrigger(existing);
 
@@ -332,6 +363,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         // First streamByQuery (findActive) returns the trigger. We don't need any second query.
         when(jobTriggerService.streamByQuery(any(Bson.class))).thenReturn(Stream.of(existing));
@@ -347,6 +379,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build());
         when(jobTriggerService.streamByQuery(any(Bson.class)))
                 .thenReturn(Stream.empty())     // findActive — none
@@ -366,6 +399,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("alice")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build())
                 .toBuilder()
                 .createdAt(DateTime.now(DateTimeZone.UTC).minusDays(1))
@@ -376,6 +410,7 @@ class RollingRestartJobHandlerTest {
                         .nodes(List.of())
                         .triggeredBy("bob")
                         .waitingGreenSince(java.time.Instant.now())
+                        .targetOpensearchVersion("any")
                         .build())
                 .toBuilder()
                 .createdAt(DateTime.now(DateTimeZone.UTC))

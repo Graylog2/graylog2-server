@@ -18,6 +18,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import type { GetState } from 'views/types';
 
 export type WidgetsState = {
   newWidget: string | undefined;
@@ -28,18 +29,23 @@ const widgetsSlice = createSlice({
     newWidget: undefined,
   },
   reducers: {
-    setNewWidget: (state, action: PayloadAction<string>) => ({
+    setNewWidget: (state, action: PayloadAction<string | undefined>) => ({
       ...state,
       newWidget: action.payload,
     }),
   },
 });
 export const widgetsSliceReducer = widgetsSlice.reducer;
-export const setNewWidget = (id: string) => (dispatch: ViewsDispatch) => {
-  const result = dispatch(widgetsSlice.actions.setNewWidget(id));
-  setTimeout(() => dispatch(widgetsSlice.actions.setNewWidget(undefined)), 1000);
+export const setNewWidget = (id: string) => (dispatch: ViewsDispatch) =>
+  dispatch(widgetsSlice.actions.setNewWidget(id));
 
-  return result;
+// Widgets stay flagged as "new" until the grid actually scrolls them into view (or finds them
+// already visible) rather than after a fixed delay, since the widget-creation/edit round trip
+// (including a full search re-execution) can easily take longer than any fixed guess.
+export const clearNewWidget = (id: string) => (dispatch: ViewsDispatch, getState: GetState) => {
+  if (getState().widgets.newWidget === id) {
+    dispatch(widgetsSlice.actions.setNewWidget(undefined));
+  }
 };
 
 export const selectNewWidget = (state: { widgets: WidgetsState }) => state.widgets.newWidget;

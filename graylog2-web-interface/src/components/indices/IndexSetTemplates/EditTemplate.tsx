@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -32,7 +32,7 @@ type Props = {
 
 const EditTemplate = ({ template }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const { pathname } = useLocation();
   const { updateTemplate } = useTemplateMutation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
@@ -45,10 +45,10 @@ const EditTemplate = ({ template }: Props) => {
           app_action_value: 'edit-index-set-template-edited',
         });
 
-        navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
+        push(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
       });
     },
-    [updateTemplate, navigate, template.id, sendTelemetry, telemetryPathName],
+    [updateTemplate, push, template.id, sendTelemetry, telemetryPathName],
   );
 
   useEffect(() => {
@@ -63,8 +63,8 @@ const EditTemplate = ({ template }: Props) => {
       app_pathname: telemetryPathName,
       app_action_value: 'edit-index-set-template-cancelled',
     });
-    navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
-  }, [navigate, sendTelemetry, telemetryPathName]);
+    push(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
+  }, [push, sendTelemetry, telemetryPathName]);
 
   return (
     <TemplateForm

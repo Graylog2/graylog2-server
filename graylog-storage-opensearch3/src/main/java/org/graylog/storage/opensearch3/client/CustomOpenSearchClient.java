@@ -20,7 +20,7 @@ import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.ShardFailure;
+import org.opensearch.client.opensearch._types.ShardSearchFailure;
 import org.opensearch.client.opensearch._types.ShardStatistics;
 import org.opensearch.client.opensearch.core.MsearchResponse;
 import org.opensearch.client.opensearch.core.SearchRequest;
@@ -68,7 +68,7 @@ public class CustomOpenSearchClient extends OpenSearchClient {
         }
         final var reason = String.format(Locale.ROOT, "%d of %d shards failed", shards.failed(), shards.total());
         final var rootCauses = shards.failures().stream()
-                .map(ShardFailure::reason)
+                .map(ShardSearchFailure::reason)
                 .toList();
         throw new OpenSearchException(ErrorResponse.of(r -> r
                 .status(500)

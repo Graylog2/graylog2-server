@@ -18,6 +18,7 @@ package org.graylog.collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -317,7 +318,8 @@ class CollectorCaServiceTest {
     void newServerSslContextBuilder_returnsConfiguredBuilder() throws Exception {
         initConfig();
         final var cache = new CollectorCaCache(collectorCaService, certificateService, encryptedValueService, new EventBus(), TestClocks.fixedEpoch());
-        final var tlsUtils = new CollectorTLSUtils(new CollectorCaKeyManager(cache), new CollectorCaTrustManager(cache, clock));
+        final var tlsUtils = new CollectorTLSUtils(new CollectorCaKeyManager(cache),
+                new CollectorCaTrustManager(cache, mock(CertBindingResolver.class), clock), MoreExecutors.directExecutor());
         final SslContextBuilder builder = tlsUtils.newServerSslContextBuilder();
         assertThat(builder).isNotNull();
 

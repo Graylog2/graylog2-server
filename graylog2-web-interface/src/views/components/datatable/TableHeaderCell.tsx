@@ -16,11 +16,11 @@
  */
 import styled, { css } from 'styled-components';
 
-const TableHeaderCell = styled.th<{ $isNumeric?: boolean; $borderedHeader?: boolean }>(
-  ({ $isNumeric, $borderedHeader, theme }) => css`
+const TableHeaderCell = styled.th<{ $isNumeric?: boolean; $borderedHeader?: boolean; $noMinWidth?: boolean }>(
+  ({ $isNumeric, $borderedHeader, $noMinWidth, theme }) => css`
     && {
       background-color: ${theme.colors.table.head.background};
-      min-width: 50px;
+      ${$noMinWidth ? '' : 'min-width: 50px;'}
       border: ${$borderedHeader ? `1px solid ${theme.colors.table.row.divider}` : '0'};
       border-top: 0;
       padding: 0 5px;

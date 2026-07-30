@@ -136,7 +136,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
                         .setAuthenticationEnabled(true)
         );
 
-        builder.setChunkedEnabled(clientConfiguration.compressionEnabled());
+        builder.setCompressionEnabled(clientConfiguration.compressionEnabled());
 
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             final PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = PoolingAsyncClientConnectionManagerBuilder.create()

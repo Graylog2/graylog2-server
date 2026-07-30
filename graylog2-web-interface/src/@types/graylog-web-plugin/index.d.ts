@@ -19,6 +19,7 @@ import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
 import type User from 'logic/users/User';
@@ -28,6 +29,7 @@ import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTab
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
+import type { RightSidebarContextType } from 'contexts/RightSidebarContext';
 
 type PluginNavigationLink = {
   path: QualifiedUrl<string>;
@@ -40,6 +42,13 @@ interface PluginNavigationItems {
 interface GlobalNotification {
   key: string;
   component: React.ComponentType;
+}
+
+interface NavigationBadge {
+  key: string;
+  component: React.ComponentType;
+  // Active badges replace the built-in notification badge, so they must render the notification count themselves.
+  useCondition: () => boolean;
 }
 
 interface PluginPages {
@@ -201,6 +210,7 @@ type IndexRetentionConfig = {
 
 type StreamsOverviewTableElement = {
   attributeName: string;
+  group?: 'routing' | 'performance';
   attributes: Array<Attribute>;
   columnRenderers: ColumnRenderersByAttribute<Stream>;
   // Optional map of column id → backend metric fields. Plugins use this to plug their
@@ -236,10 +246,12 @@ declare module 'graylog-web-plugin/plugin' {
     api_browser: 'read';
     authentication: 'edit';
     buffers: 'read';
+    collectors: 'create';
     // Do we need both of the following?
     clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';
     clusterconfiguration: 'read';
+    clusterhealth: 'read';
     collector_fleets: 'read';
     collectors_config: 'read';
     contentpack: 'read';
@@ -389,6 +401,17 @@ declare module 'graylog-web-plugin/plugin' {
     useCondition?: () => boolean;
   } & (PluginNavigationLink | PluginNavigationDropdown);
 
+  type EntityLinkOnClickContext = {
+    openSidebar: RightSidebarContextType['openSidebar'];
+  };
+
+  type EntityLinkResolver = {
+    uriSegment: string;
+    resolve: (
+      trailingSegments: ReadonlyArray<string>,
+    ) => { grnType: string; id: string } | { onClick: (context: EntityLinkOnClickContext) => void } | null;
+  };
+
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
     /**
@@ -404,6 +427,7 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
@@ -434,9 +458,11 @@ declare module 'graylog-web-plugin/plugin' {
       useCondition?: () => boolean;
     }>;
     indexRetentionConfig?: Array<IndexRetentionConfig>;
+    'indices.archive'?: Array<IndexArchiveBinding>;
     inputsBadgeProviders?: Array<{
       useCondition: () => { hasIssues: boolean; title: string };
     }>;
+    'markdown.entityLinkResolvers'?: Array<EntityLinkResolver>;
   }
   interface PluginMetadata {
     name?: string;

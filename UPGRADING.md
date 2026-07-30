@@ -3,6 +3,15 @@ Upgrading to Graylog 7.2.x
 
 ## Breaking Changes
 
+### Entity Suggestion Search: Regex No Longer Supported in Query Parameter
+
+The `query` parameter of the entity suggestion endpoint is now treated as a plain-text substring
+rather than a regular expression. Previously, passing a regex pattern (e.g. `foo.*bar`) would be
+evaluated by MongoDB, which allowed ReDoS attacks via crafted inputs.
+
+After upgrading, queries containing regex metacharacters (`.`, `*`, `+`, `?`, `(`, `)`, etc.) will
+be matched literally instead of being interpreted as a pattern.
+
 ### Paginated REST APIs: Case-Insensitive Matching and Sorting
 
 Paginated entity endpoints (e.g. Streams, Event Definitions, Notifications, Lookup Tables, Dashboards,
@@ -18,11 +27,86 @@ After upgrading:
   matched only `test` now also matches `Test` and `TEST`. API clients relying on exact-case matching
   via paginated endpoints will see additional results.
 
+### `gl2_accounted_message_size` can now be `0` for restored Data Lake messages
+
+When messages are restored from the Data Lake, those that do not count against your license traffic
+now have their `gl2_accounted_message_size` field set to `0`. Previously the field always held the
+message's accounted size, regardless of whether the restore counted against the license.
+
+This field is informational and is not used to compute license usage, so your license consumption is
+unaffected by the change.
+
+### Changed parsing for Okta Log Events `securityContext.userBehaviors` field
+
+Due to a [bug in the Okta SDK](https://github.com/okta/okta-sdk-java/issues/1689), a workaround was introduced in 7.1
+to stringify the objects in the `securityContext.userBehaviors` array in logs pulled in from the `Okta Log Events` input. The
+updated SDK now properly serializes that field as an array of objects and the workaround has been removed. Custom parsing
+on `Okta Log Events` messages that is expecting the `securityContext.userBehaviors` field to be an array of
+strings will need to be modified to expect an array of objects, per the Okta API. An example of the serialization across
+versions:
+
+7.1:
+```json
+{
+  "securityContext": {
+    "userBehaviors": [
+      "{\"name\":\"New City\",\"id\":\"bbbbbbbbbbbbbbbbbbbb\",\"result\":\"NEGATIVE\"}",
+      "{\"name\":\"New Country\",\"id\":\"aaaaaaaaaaaaaaaaaaaa\",\"result\":\"NEGATIVE\"}"
+    ]
+  }
+}
+```
+
+7.2:
+```json
+{
+  "securityContext": {
+    "userBehaviors": [
+      {
+        "name": "New City",
+        "id": "bbbbbbbbbbbbbbbbbbbb",
+        "result": "NEGATIVE"
+      },
+      {
+        "name": "New Country",
+        "id": "aaaaaaaaaaaaaaaaaaaa",
+        "result": "NEGATIVE"
+      }
+    ]
+  }
+}
+```
+
+## Web Interface Changes
+
+### Event Definition "Fields" step renamed to "Additional Details"
+
+The "Fields" step on the Event Definition wizard has been renamed to "Additional Details" to better reflect its
+content, which now covers more than event fields (e.g. tags). Along with the visible label, the step's `step` query
+parameter changed from `fields` to `additional-details`, so the URL for that step is now
+`.../edit?step=additional-details`. Existing bookmarked links using the old `?step=fields` value will continue to
+work, since they are mapped to the renamed step. You should update them to the new value, because support for the
+old value may be removed in a future version.
+
+
 ## Java API Changes
 
 | File/method                                                               | Description |
 |---------------------------------------------------------------------------|-------------|
 | `org.graylog2.contentpacks.facades.EntityWithExcerptFacade#resolveGrants` | removed     |
+
+## Plugin Builds: New `requireUpperBoundDeps` Maven Enforcer Rule
+
+Plugin builds inheriting from the `graylog-plugin-parent` or `graylog-plugin-web-parent` Maven parent
+POM now run the
+[`requireUpperBoundDeps`](https://maven.apache.org/enforcer/enforcer-rules/requireUpperBoundDeps.html)
+enforcer rule. It fails the build when a transitive dependency resolves to a *lower* version than
+another of the plugin's dependencies requires.
+
+Such conflicts can usually be fixed by updating the outdated dependency, or by adding a
+`<dependencyManagement>` entry for the flagged artifact using the highest required version shown in
+the error message. Plugin authors who are unable to align their dependencies can override the
+`enforce-versions` execution of the `maven-enforcer-plugin` in their own POM.
 
 ## Sigma Rules Folded into Event Definitions
 
@@ -43,6 +127,24 @@ definition can be created after the rules are imported to create the same tempor
 All previously imported Sigma rules, including correlation rules, will be migrated to the new Event Definition pattern
 on upgrade and work as they did before.
 
+Two additional changes to fired events result from this rework:
+
+- The `sigma_rule_tag_*` fields are no longer added to fired events. Previously, fired events included
+  `sigma_rule_tag_1`, `sigma_rule_tag_2`, etc. in their Additional Fields. MITRE information recognized by Graylog is
+  now stored on the Event Definition as `tactics_techniques`, and any other tag values are moved to a dedicated `tags`
+  field. Both `tactics_techniques` and `tags` are multi-valued (array) fields, unlike the individual
+  `sigma_rule_tag_N` fields they replace. If you rely on the `sigma_rule_tag_*` fields in summary templates,
+  notification bodies, or downstream processing, you will need to update those references.
+- The `Sigma: ` prefix is no longer added to fired event titles. Events already stored in the index keep their
+  original title, but newly fired events will not include the prefix.
+
+For previously imported Sigma rules, the upgrade migration applies these changes to the Event Definitions
+automatically: each source Sigma rule's tag values are written onto its Event Definition (MITRE references into
+`tactics_techniques`, all other tags into `tags`), and the `Sigma: ` prefix is removed from the Event Definition
+title. You do not need to re-import or reconfigure your rules. Note that events already stored in the index are not
+rewritten — they keep the original `sigma_rule_tag_*` Additional Fields and titles they were fired with; the changes
+above apply to events fired after the upgrade.
+
 The following REST API changes are a direct result of this rework:
 
 | Endpoint                                                                       | Description                                                                              |
@@ -51,3 +153,59 @@ The following REST API changes are a direct result of this rework:
 | `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/import`       | Moved to `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/import/bulk/import`  |
 | `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/upload`       | Moved to `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/import/bulk/upload`  |
 | All other `/plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/...`     | Deleted                                                                                  |
+
+## Threat Coverage Percentages May Change After Upgrade
+
+Due to the migration of Sigma rules to Event Definitions in 7.2, the percentages displayed in the Threat
+Coverage widget may be different from what they were in 7.1. Coverage is now computed directly from Event
+Definitions rather than from the previous Sigma rules. Every Event Definition with MITRE tactics/techniques
+assigned is now included, and coverage reflects how many of them are enabled versus disabled (with no log
+source check that was previously present for Sigma rules). Therefore, a tactic may show a higher or lower
+percentage than it did in 7.1, without any change to the actual installed Event Definitions.
+
+## AWS Kinesis/CloudWatch Input: Single DynamoDB Table State Tracking
+
+In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5. 
+The KCL stores its coordination state in DynamoDB. Previously, this used three tables per input: the lease table, plus separate
+`<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats` tables. The AWS KCL 3.5 introduced a
+single-table format that consolidates all of this into the lease table alone (each item is tagged with an
+`entityType` attribute). This reduces the number of DynamoDB tables and helps you stay under account-level table
+limits.
+
+There are two things to know about how this applies to your inputs:
+
+- **New inputs use the single-table format automatically.** This is the AWS KCL 3.5 default for a newly created
+  consumer. A fresh input always uses a single lease table.
+- **Existing inputs keep their three-table layout** until you deliberately migrate them using the new
+    "Migrate to single DynamoDB table for state tracking" input option.  
+
+To let you migrate existing inputs on your own schedule, the input's **edit page** exposes a 
+**Migrate to single DynamoDB table for state tracking** option. This option is only relevant for inputs created before Graylog 7.2.
+Enabling it on such an input starts a one-way migration
+that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
+checkpoints are preserved, so ingestion should continue without replay or gaps. 
+
+### Migration steps for a Kinesis input that existed before Graylog 7.2
+
+1. Upgrade to Graylog 7.2 and allow the input to start and run for one hour with the **Migrate to single DynamoDB
+   table for state tracking** option off. KCL 3.5 requires the input to run steadily for a whole hour before it will
+   accept the migration. This readiness period is fixed by KCL 3.5 and cannot be shortened.
+2. Before enabling the option, confirm the input is ready. In DynamoDB, open the input's coordinator-state table
+   (`graylog-aws-plugin-<stream-name>-CoordinatorState`), find the `TableMigration3.5` item, and check its `tm`
+   attribute. It must read `TABLE_MIGRATION_STATUS_DEPLOYED`. If it still reads `TABLE_MIGRATION_STATUS_INIT`, the
+   readiness period has not elapsed yet; wait and re-check. Enabling the option before this point causes the input
+   to fail to start.
+3. Enable the **Migrate to single DynamoDB table for state tracking** option on the input's edit page and save. The
+   migration begins.
+4. Verify completion. KCL 3.5 bakes for 24 hours (the default) before finalizing. After that period, check the same
+   `TableMigration3.5` item again; its `tm` attribute should read `TABLE_MIGRATION_STATUS_COMPLETE`. Once complete,
+   the legacy `-CoordinatorState` and `-WorkerMetricStats` tables are no longer used and can be deleted.
+
+The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
+monitoring the migration until it reaches completion.
+
+For how to monitor the migration, along with the migration steps, required permissions, and how to remove the
+now-unused legacy tables afterward, see AWS's documentation:
+
+- [Single table format for KCL](https://docs.aws.amazon.com/streams/latest/dev/kcl-single-table-format.html)
+- [Migrate from KCL 2.x to KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html)

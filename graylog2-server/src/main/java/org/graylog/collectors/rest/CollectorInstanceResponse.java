@@ -34,5 +34,6 @@ public record CollectorInstanceResponse(
         @JsonProperty("next_certificate_fingerprint") @Nullable String nextCertificateFingerprint,
         @JsonProperty("next_certificate_expires_at") @Nullable Instant nextCertificateExpiresAt,
         @JsonProperty("identifying_attributes") Map<String, Object> identifyingAttributes,
-        @JsonProperty("non_identifying_attributes") Map<String, Object> nonIdentifyingAttributes) {
+        @JsonProperty("non_identifying_attributes") Map<String, Object> nonIdentifyingAttributes,
+        @JsonProperty("has_pending_changes") boolean hasPendingChanges) {
 }

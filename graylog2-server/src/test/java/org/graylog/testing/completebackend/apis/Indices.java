@@ -26,6 +26,8 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.joda.time.Duration;
 import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -37,6 +39,9 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class Indices implements GraylogRestApi {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
+
     private final GraylogApis api;
 
     public Indices(GraylogApis api) {
@@ -142,6 +147,7 @@ public class Indices implements GraylogRestApi {
         if(response.statusCode() == 200) {
             return new GraylogApiResponse(response.then()).properJSONPath().read("indices.*.index_name");
         } else {
+            LOG.info("Failed to obtain open indices of index set {}. Error: {}. Returning empty list.", indexSetId, response.statusLine());
             return List.of();
         }
     }

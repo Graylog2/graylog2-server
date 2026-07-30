@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import type { Location } from 'history';
 import { defaultUser } from 'defaultMockValues';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { asMock } from 'helpers/mocking';
@@ -80,5 +81,49 @@ describe('Navigation', () => {
     await screen.findByRole('button', { name: /help/i });
 
     expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument();
+  });
+
+  describe('with a plugin navigation badge', () => {
+    const badgePlugin = (useCondition: () => boolean) =>
+      new PluginManifest(
+        {},
+        {
+          'navigation.badges': [
+            {
+              key: 'org.graylog.plugins.test.PluginBadge',
+              component: () => <span data-testid="plugin-badge" />,
+              useCondition,
+            },
+          ],
+        },
+      );
+
+    let plugin: PluginManifest;
+
+    afterEach(() => {
+      PluginStore.unregister(plugin);
+    });
+
+    it('replaces the notification badge when the plugin badge is active', async () => {
+      plugin = badgePlugin(() => true);
+      PluginStore.register(plugin);
+
+      render(<SUT />);
+
+      await screen.findByTestId('plugin-badge');
+
+      expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument();
+    });
+
+    it('falls back to the notification badge when the plugin badge is inactive', async () => {
+      plugin = badgePlugin(() => false);
+      PluginStore.register(plugin);
+
+      render(<SUT />);
+
+      await screen.findByTestId('notification-badge');
+
+      expect(screen.queryByTestId('plugin-badge')).not.toBeInTheDocument();
+    });
   });
 });

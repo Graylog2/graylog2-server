@@ -1,0 +1,4 @@
+type = "c"
+message = "Integrate OpenSearch upgrade step into the DataNode rolling restart process"
+
+pulls = ["26486"]

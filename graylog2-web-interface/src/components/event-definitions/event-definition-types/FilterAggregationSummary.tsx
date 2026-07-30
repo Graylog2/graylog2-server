@@ -33,7 +33,7 @@ import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
 import type { Stream } from 'logic/streams/types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import StreamsContext from 'contexts/StreamsContext';
 
 import AggregationConditionSummary from './AggregationConditionSummary';
@@ -76,11 +76,7 @@ const getConditionType = (config: EventDefinition['config']) => {
     : 'aggregation';
 };
 
-const QueryParameters = ({
-  queryParameters,
-}: {
-  queryParameters: Array<LookupTableParameterJson & { embryonic?: boolean }>;
-}) => {
+const QueryParameters = ({ queryParameters }: { queryParameters: Array<ParameterJson & { embryonic?: boolean }> }) => {
   if (queryParameters.some((p) => p.embryonic)) {
     const undeclaredParameters = queryParameters
       .filter((p) => p.embryonic)

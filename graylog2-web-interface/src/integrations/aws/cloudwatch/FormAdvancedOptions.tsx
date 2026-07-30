@@ -30,8 +30,12 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { awsCloudWatchBatchSize, overrideSource, awsCloudWatchThrottleEnabled, awsCloudWatchAddFlowLogPrefix } =
-    formData;
+  const {
+    awsCloudWatchBatchSize,
+    overrideSource,
+    awsCloudWatchThrottleEnabled,
+    awsCloudWatchAddFlowLogPrefix,
+  } = formData;
 
   const handleToggle = (visible) => {
     setAdvancedOptionsVisibility(visible);

@@ -20,15 +20,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
-import io.modelcontextprotocol.spec.McpSchema;
-import jakarta.inject.Inject;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The base class for MCP tools.
@@ -44,7 +42,7 @@ public abstract class Tool<P, O> {
     private final String name;
     private final String title;
     private final String description;
-    private final McpSchema.JsonSchema inputSchema;
+    private final Map<String, Object> inputSchema;
     private final Map<String, Object> outputSchema;
 
     @Deprecated
@@ -92,11 +90,10 @@ public abstract class Tool<P, O> {
 
         // we can precompute the schema for our parameters, it's statically known
         final var inputSchemaNode = generator.generateSchema(parameterType.getType());
-        if (inputSchemaNode.isEmpty()) {
-            this.inputSchema = null;
-        } else {
-            this.inputSchema = objectMapper.convertValue(inputSchemaNode, McpSchema.JsonSchema.class);
-        }
+        // MCP requires every tool to declare an input schema; a parameterless tool gets an empty object schema.
+        this.inputSchema = inputSchemaNode.isEmpty()
+                ? Map.of("type", "object")
+                : objectMapper.convertValue(inputSchemaNode, new TypeReference<Map<String, Object>>() {});
         // if our tool produces anything other than a String, we want to create a JSON schema for it
         if (String.class.equals(outputType.getType())) {
             this.outputSchema = null;
@@ -114,6 +111,8 @@ public abstract class Tool<P, O> {
         return objectMapper;
     }
 
+    public abstract Set<String> checkedPermissions();
+
     @JsonProperty
     public String name() {
         return name;
@@ -130,8 +129,8 @@ public abstract class Tool<P, O> {
     }
 
     @JsonProperty
-    public Optional<McpSchema.JsonSchema> inputSchema() {
-        return Optional.ofNullable(inputSchema);
+    public Map<String, Object> inputSchema() {
+        return inputSchema;
     }
 
     @JsonProperty

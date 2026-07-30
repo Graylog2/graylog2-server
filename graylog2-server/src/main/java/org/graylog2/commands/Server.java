@@ -43,6 +43,7 @@ import org.graylog.plugins.formatting.units.UnitsModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
+import org.graylog.plugins.onboarding.OnboardingModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
@@ -94,6 +95,7 @@ import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.FieldTypeManagementModule;
 import org.graylog2.indexer.IndexerBindings;
+import org.graylog2.indexer.indices.OutdatedIndexModule;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
@@ -216,6 +218,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new JobSchedulerModule(),
                 new EventsModule(),
                 new RollingRestartModule(),
+                new OutdatedIndexModule(),
                 new EnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
@@ -237,10 +240,13 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new McpServerModule(),
                 new QuickJumpModule(featureFlags),
                 new MongoSequenceModule(),
-                new CollectorsModule(featureFlags)
+                new CollectorsModule(featureFlags, configuration)
         );
 
         modules.add(new FieldTypeManagementModule());
+        if (featureFlags.isOn("onboarding_experience")) {
+            modules.add(new OnboardingModule());
+        }
 
         return modules.build();
     }

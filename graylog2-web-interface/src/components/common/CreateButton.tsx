@@ -67,7 +67,7 @@ const CreateButton = ({ disabled = false, entityKey }: Props) => {
   }, [entityCreator, pathname, sendTelemetry]);
 
   return (
-    <PermissionWrapper>
+    <PermissionWrapper permissions={entityCreator?.permissions}>
       <LinkContainer to={entityCreator.path}>
         <Button bsSize="md" bsStyle="primary" onClick={_onClick} disabled={disabled}>
           {entityCreator.title}
