@@ -54,7 +54,7 @@ const ShareButton = ({
         onClick={onClick}
         disabled={!!disabledInfo || hasMissingPermissions}
         title="Share">
-        <Icon name="person_add" /> {title ?? 'Share'}{' '}
+        <Icon name="person_add" /> {title}{' '}
         {(!!disabledInfo || hasMissingPermissions) && (
           <SharingDisabledPopover type={entityType} description={disabledInfo} />
         )}
