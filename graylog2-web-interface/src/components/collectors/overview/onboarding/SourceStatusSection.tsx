@@ -91,7 +91,7 @@ const NO_COUNT = '—';
 
 /** The count for a source, or an em dash when a number would be meaningless or unknown. */
 const SourceCountCell = ({ count }: { count: number | undefined }) => (
-  <SourceCount>{count === undefined ? NO_COUNT : formatNumber(count)}</SourceCount>
+  <SourceCount>{count === undefined ? NO_COUNT : (count === 0 ? '' : `${formatNumber(count)} messages`)}</SourceCount>
 );
 
 const SourceStatus = ({
