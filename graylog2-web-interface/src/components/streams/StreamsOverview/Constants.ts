@@ -49,6 +49,7 @@ const getStreamTableElements = (
 
   const defaultCols = [
     'title',
+    'description',
     'index_set_title',
     'rules',
     ...(isPipelineColumnPermitted ? ['pipelines'] : []),
