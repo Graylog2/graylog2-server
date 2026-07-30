@@ -22,6 +22,7 @@ import { startJob, executeJobResult } from 'views/logic/slices/executeJobResult'
 import type Search from 'views/logic/search/Search';
 import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
+import type Query from 'views/logic/queries/Query';
 
 import useCollectorLogPreview from './useCollectorLogPreview';
 
@@ -55,6 +56,8 @@ describe('useCollectorLogPreview', () => {
       selfQuery: queries.find((q) => !q.query.query_string.includes('NOT collector_receiver_type')),
     };
   };
+
+  const searchTypeIdByType = (query: Query, type: string) => query.searchTypes.find((st) => st.type === type).id;
 
   // Lets executeJobResult mocks reference the search that createSearch received.
   const captureCreatedSearch = () => {
@@ -90,7 +93,7 @@ describe('useCollectorLogPreview', () => {
           if (queryId === sourceQuery.id) {
             return {
               searchTypes: {
-                [sourceQuery.searchTypes[0].id]: {
+                [searchTypeIdByType(sourceQuery, 'messages')]: {
                   type: 'messages',
                   messages: [resultMessage('m1', '2026-06-10T12:00:00.000Z', 'a source log line')],
                   total: 42,
@@ -102,7 +105,7 @@ describe('useCollectorLogPreview', () => {
           if (queryId === selfQuery.id) {
             return {
               searchTypes: {
-                [selfQuery.searchTypes[0].id]: {
+                [searchTypeIdByType(selfQuery, 'messages')]: {
                   type: 'messages',
                   messages: [resultMessage('m2', '2026-06-10T11:59:00.000Z', 'collector started')],
                   total: 7,
