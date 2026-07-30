@@ -27,6 +27,7 @@ import org.graylog.collectors.PendingChangesLookup;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.collectors.db.ComponentHealthDTO;
 import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
@@ -1002,6 +1003,198 @@ class CollectorInstanceServiceTest {
         collectorInstanceService.updateFromReport(report);
 
         assertFieldIsDate("date-uid", CollectorInstanceDTO.FIELD_LAST_SEEN);
+    }
+
+    // ----- health snapshot + healthy_changed_at handling in updateFromReport -----
+
+    @Test
+    void updateFromReportFirstHealthReportCreatesEnvelopeWithTimestamp() throws Exception {
+        final var uid = "health-first";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(true, null)));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t0);
+                    assertThat(stored.componentHealth()).isEqualTo(health(true, null));
+                }));
+
+        // The timestamp must be stored as a BSON Date, not a String.
+        final var healthDoc = findRawDocument(uid).orElseThrow()
+                .get(CollectorInstanceDTO.FIELD_HEALTH, Document.class);
+        assertThat(healthDoc.get("healthy_changed_at")).isInstanceOf(Date.class);
+    }
+
+    @Test
+    void updateFromReportIdenticalHealthResendKeepsTimestamp() throws Exception {
+        // Reconnects and ReportFullState re-deliver unchanged health; the transition timestamp
+        // must not move ("unhealthy since X" would otherwise reset on every reconnect).
+        final var uid = "health-resend";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "connection refused")));
+
+        clock.setInstant(t0.plus(Duration.ofHours(1)));
+        collectorInstanceService.updateFromReport(healthReport(uid, 2L, health(false, "connection refused")));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t0);
+                    assertThat(stored.componentHealth()).isEqualTo(health(false, "connection refused"));
+                }));
+    }
+
+    @Test
+    void updateFromReportHealthyFlipUpdatesTreeAndTimestamp() throws Exception {
+        final var uid = "health-flip";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        final var t1 = t0.plus(Duration.ofHours(1));
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(true, null)));
+
+        clock.setInstant(t1);
+        collectorInstanceService.updateFromReport(healthReport(uid, 2L, health(false, "connection refused")));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t1);
+                    assertThat(stored.componentHealth()).isEqualTo(health(false, "connection refused"));
+                }));
+    }
+
+    @Test
+    void updateFromReportTreeChangeWithoutFlipUpdatesTreeButKeepsTimestamp() throws Exception {
+        // An unhealthy collector whose error text changes is still "unhealthy since t0" — the
+        // snapshot must refresh, the transition timestamp must not.
+        final var uid = "health-no-flip";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "error A")));
+
+        clock.setInstant(t0.plus(Duration.ofHours(1)));
+        collectorInstanceService.updateFromReport(healthReport(uid, 2L, health(false, "error B")));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t0);
+                    assertThat(stored.componentHealth()).isEqualTo(health(false, "error B"));
+                }));
+    }
+
+    @Test
+    void updateFromReportWithoutHealthLeavesStoredHealthUntouched() throws Exception {
+        // Health is compression-eligible in OpAMP: a message without the field means "unchanged",
+        // never "no health".
+        final var uid = "health-absent";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "connection refused")));
+
+        clock.setInstant(t0.plus(Duration.ofHours(1)));
+        collectorInstanceService.updateFromReport(healthReport(uid, 2L, null));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t0);
+                    assertThat(stored.componentHealth()).isEqualTo(health(false, "connection refused"));
+                }));
+    }
+
+    @Test
+    void updateFromReportReturnsPreviousHealthState() throws Exception {
+        final var uid = "health-previous";
+        enroll(uid);
+
+        final var first = collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(true, null)));
+        assertThat(first.health()).isNull();
+
+        final var second = collectorInstanceService.updateFromReport(healthReport(uid, 2L, health(false, "boom")));
+        assertThat(second.health()).isNotNull();
+        assertThat(second.health().componentHealth()).isEqualTo(health(true, null));
+    }
+
+    @Test
+    void updateFromReportRoundTripsRecursiveHealthTree() throws Exception {
+        final var uid = "health-tree";
+        enroll(uid);
+
+        final var pipeline = ComponentHealthDTO.builder()
+                .healthy(false)
+                .status("StatusPermanentError")
+                .lastError("exporter failed")
+                .statusTime(Instant.parse("2025-06-01T09:59:00Z"))
+                .build();
+        final var collector = ComponentHealthDTO.builder()
+                .healthy(false)
+                .status("StatusRecoverableError")
+                .startTime(Instant.parse("2025-06-01T08:00:00Z"))
+                .components(Map.of("pipeline:logs/abc", pipeline))
+                .build();
+        final var root = ComponentHealthDTO.builder()
+                .healthy(true)
+                .status("StatusOK")
+                .components(Map.of("collector", collector))
+                .build();
+
+        clock.setInstant(Instant.parse("2025-06-01T10:00:00Z"));
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, root));
+
+        // Fresh read exercises the full serialize/deserialize path including the recursion.
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored ->
+                        assertThat(stored.componentHealth()).isEqualTo(root)));
+    }
+
+    @Test
+    void healthDocumentOmitsAbsentFieldsAndEmptyComponents() throws Exception {
+        // Guards the @JsonInclude(NON_EMPTY) convention on ComponentHealthDTO: absent optionals
+        // and empty components maps are omitted from the stored document — while healthy=false,
+        // being a boolean, must NOT be treated as "empty" (NON_DEFAULT would break this).
+        final var uid = "health-shape";
+        enroll(uid);
+
+        clock.setInstant(Instant.parse("2025-06-01T10:00:00Z"));
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "connection refused")));
+
+        final var componentHealthDoc = findRawDocument(uid).orElseThrow()
+                .get(CollectorInstanceDTO.FIELD_HEALTH, Document.class)
+                .get("component_health", Document.class);
+
+        assertThat(componentHealthDoc.getBoolean("healthy")).isFalse();
+        assertThat(componentHealthDoc.getString("last_error")).isEqualTo("connection refused");
+        assertThat(componentHealthDoc.containsKey("status")).isFalse();
+        assertThat(componentHealthDoc.containsKey("start_time")).isFalse();
+        assertThat(componentHealthDoc.containsKey("status_time")).isFalse();
+        assertThat(componentHealthDoc.containsKey("components")).isFalse();
+    }
+
+    private static CollectorInstanceReport healthReport(String uid, long seqNum, @jakarta.annotation.Nullable ComponentHealthDTO health) {
+        final var builder = CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .messageSeqNum(seqNum)
+                .capabilities(0L);
+        if (health != null) {
+            builder.health(health);
+        }
+        return builder.build();
+    }
+
+    private static ComponentHealthDTO health(boolean healthy, @jakarta.annotation.Nullable String lastError) {
+        return ComponentHealthDTO.builder()
+                .healthy(healthy)
+                .lastError(lastError)
+                .build();
     }
 
     @Test
