@@ -103,7 +103,7 @@ describe('ConnectionSuccess', () => {
     asMock(useCollectorLogPreview).mockReturnValue({
       ...logPreview,
       sourceLogs: { messages: [], total: 0 },
-      sourceCounts: undefined,
+      sourceCounts: {},
     });
 
     render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
