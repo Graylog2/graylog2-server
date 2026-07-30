@@ -24,6 +24,7 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
+import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibilityService;
 import org.graylog.datanode.filesystem.index.OpensearchUtils;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
@@ -53,16 +54,12 @@ class OpensearchDataDirCompatibilityCheckTest {
             }
         };
 
-        final OpensearchDataDirCompatibilityCheck check =
-                new OpensearchDataDirCompatibilityCheck(configFor(tempDir, OPENSEARCH_VERSION), parser);
-
-        Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
+        Assertions.assertThatCode(checkFor(tempDir, OPENSEARCH_VERSION, parser)::runCheck).doesNotThrowAnyException();
     }
 
     @Test
     void testCompatibilityCheckInitialRun(@TempDir Path tempDir) throws IOException {
-        final OpensearchDataDirCompatibilityCheck check =
-                new OpensearchDataDirCompatibilityCheck(configFor(tempDir, OPENSEARCH_VERSION), realParser());
+        final OpensearchDataDirCompatibilityCheck check = checkFor(tempDir, OPENSEARCH_VERSION, realParser());
 
         Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
         Assertions.assertThat(readCheckFile(tempDir)).isEqualTo(OPENSEARCH_VERSION);
@@ -79,10 +76,7 @@ class OpensearchDataDirCompatibilityCheckTest {
             }
         };
 
-        final OpensearchDataDirCompatibilityCheck check =
-                new OpensearchDataDirCompatibilityCheck(configFor(dataDir, OPENSEARCH_VERSION), parser);
-
-        Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
+        Assertions.assertThatCode(checkFor(dataDir, OPENSEARCH_VERSION, parser)::runCheck).doesNotThrowAnyException();
     }
 
     @Test
@@ -90,8 +84,7 @@ class OpensearchDataDirCompatibilityCheckTest {
         writeCheckFile(dataDir, "2.19.0");
         final String nextMajorVersion = "3.0.0";
 
-        final OpensearchDataDirCompatibilityCheck check =
-                new OpensearchDataDirCompatibilityCheck(configFor(dataDir, nextMajorVersion), realParser());
+        final OpensearchDataDirCompatibilityCheck check = checkFor(dataDir, nextMajorVersion, realParser());
 
         Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
         Assertions.assertThat(readCheckFile(dataDir)).isEqualTo(nextMajorVersion);
@@ -101,8 +94,7 @@ class OpensearchDataDirCompatibilityCheckTest {
     void testCompatibilityCheckFailsForNonExistentDirectory() {
         final Path nonExistentDir = Path.of("/nonexistent/opensearch/data");
 
-        final OpensearchDataDirCompatibilityCheck check =
-                new OpensearchDataDirCompatibilityCheck(configFor(nonExistentDir, OPENSEARCH_VERSION), realParser());
+        final OpensearchDataDirCompatibilityCheck check = checkFor(nonExistentDir, OPENSEARCH_VERSION, realParser());
 
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
@@ -118,12 +110,12 @@ class OpensearchDataDirCompatibilityCheckTest {
             }
         };
 
-        final OpensearchDataDirCompatibilityCheck check =
-                new OpensearchDataDirCompatibilityCheck(configFor(dataDir, OPENSEARCH_VERSION), parser);
+        final OpensearchDataDirCompatibilityCheck check = checkFor(dataDir, OPENSEARCH_VERSION, parser);
 
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(PreflightCheckException.class)
-                .hasMessageContaining("is not compatible with current version " + OPENSEARCH_VERSION);
+                .hasMessageContaining("is not compatible with current version " + OPENSEARCH_VERSION)
+                .hasMessageContaining("Index data version is not compatible");
     }
 
     @Test
@@ -145,6 +137,12 @@ class OpensearchDataDirCompatibilityCheckTest {
 
     private static boolean isCompatible(String current, String node) {
         return OpensearchUtils.isCompatible(Version.parse(current), Version.parse(node));
+    }
+
+    private OpensearchDataDirCompatibilityCheck checkFor(Path dataDir, String opensearchVersion, IndicesDirectoryParser parser) {
+        final DatanodeConfiguration configuration = configFor(dataDir, opensearchVersion);
+        return new OpensearchDataDirCompatibilityCheck(configuration,
+                new OpensearchDataDirCompatibilityService(configuration, parser));
     }
 
     private DatanodeConfiguration configFor(Path dataDir, String opensearchVersion) {

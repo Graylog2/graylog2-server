@@ -16,16 +16,11 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import com.github.joschi.jadconfig.ValidationException;
 import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
-import org.graylog.datanode.DirectoryReadableValidator;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
-import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
-import org.graylog.datanode.filesystem.index.OpensearchUtils;
-import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
-import org.graylog.datanode.filesystem.index.dto.NodeInformation;
+import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibility;
+import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibilityService;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
@@ -35,7 +30,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -50,13 +44,13 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
     static final String COMPATIBILITY_CHECK_FILENAME = ".dn-compat-check";
 
     private final DatanodeConfiguration datanodeConfiguration;
-    private final IndicesDirectoryParser indicesDirectoryParser;
-    private final DirectoryReadableValidator directoryReadableValidator = new DirectoryReadableValidator();
+    private final OpensearchDataDirCompatibilityService compatibilityService;
 
     @Inject
-    public OpensearchDataDirCompatibilityCheck(DatanodeConfiguration datanodeConfiguration, IndicesDirectoryParser indicesDirectoryParser) {
+    public OpensearchDataDirCompatibilityCheck(DatanodeConfiguration datanodeConfiguration,
+                                               OpensearchDataDirCompatibilityService compatibilityService) {
         this.datanodeConfiguration = datanodeConfiguration;
-        this.indicesDirectoryParser = indicesDirectoryParser;
+        this.compatibilityService = compatibilityService;
     }
 
     @Override
@@ -73,19 +67,17 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
             return;
         }
 
-        try {
-            directoryReadableValidator.validate(opensearchDataDir.toUri().toString(), opensearchDataDir);
-            final IndexerDirectoryInformation info = indicesDirectoryParser.parse(opensearchDataDir);
-            checkCompatibility(opensearchVersion, info);
-            final int indicesCount = info.nodes().stream().mapToInt(n -> n.indices().size()).sum();
-            LOG.info("Found {} indices and all of them are valid with current opensearch version {}", indicesCount, opensearchVersion);
-            // The check succeeded, let's remember this configuration and skip next time
-            writeCompatibilityCheckResult(opensearchDataDir, opensearchVersion);
-        } catch (IncompatibleIndexVersionException e) {
-            throw new PreflightCheckException("Index directory is not compatible with current version " + opensearchVersion + " of Opensearch, terminating.", e);
-        } catch (ValidationException e) {
-            throw new PreflightCheckException(e);
+        final OpensearchDataDirCompatibility compatibility = compatibilityService.check();
+        compatibility.warnings().forEach(LOG::warn);
+
+        if (!compatibility.isCompatible()) {
+            throw new PreflightCheckException(f("Index directory %s is not compatible with current version %s of Opensearch, terminating. %s",
+                    opensearchDataDir, opensearchVersion, String.join(" ", compatibility.errors())));
         }
+
+        LOG.info("Found {} indices and all of them are valid with current opensearch version {}", compatibility.indicesCount(), opensearchVersion);
+        // The check succeeded, let's remember this configuration and skip next time
+        writeCompatibilityCheckResult(opensearchDataDir, opensearchVersion);
     }
 
     private boolean isCompatibilityAlreadyVerified(Path opensearchDataDir, String opensearchVersion) {
@@ -112,28 +104,4 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
             LOG.warn("Failed to write compatibility check result, check will re-run on next startup", e);
         }
     }
-
-    private void checkCompatibility(String opensearchVersion, IndexerDirectoryInformation info) {
-        final Version currentVersion = Version.parse(opensearchVersion);
-        for (NodeInformation node : info.nodes()) {
-            if (node.nodeVersion() != null) {
-                final Version nodeVersion = Version.parse(node.nodeVersion());
-                if (!OpensearchUtils.isCompatible(currentVersion, nodeVersion)) {
-                    final String error = f("Current version %s of Opensearch is not compatible with index version %s", currentVersion, nodeVersion);
-                    throw new IncompatibleIndexVersionException(error);
-                }
-            }
-            node.indices().forEach(index -> {
-                final Version indexVersion = Optional.ofNullable(index.indexVersionCreated())
-                        .map(Version::parse)
-                        .orElseThrow(() -> new IncompatibleIndexVersionException(f("Unknown index version for index %s", index.indexName())));
-                if (!OpensearchUtils.isCompatible(currentVersion, indexVersion)) {
-                    final String error = f("Current version %s is not compatible with index version %s of index %s", currentVersion, indexVersion, index.indexName());
-                    throw new IncompatibleIndexVersionException(error);
-                }
-            });
-        }
-    }
-
-
 }
