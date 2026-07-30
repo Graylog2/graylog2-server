@@ -34,7 +34,7 @@ const ActionsToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
-const ArchivingIndicator = styled.div`
+const PendingIndicator = styled.div`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -54,7 +54,7 @@ type Props = {
 };
 
 const IncompatibleIndexTableActions = ({ index }: Props) => {
-  const { archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, addArchiveDeleteAction, refetchClusterJobs, refetch } =
+  const { archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, refetchClusterJobs, refetch } =
     useIncompatibleIndicesContext();
   const actionDefinitions = useIncompatibleIndexActionDefinitions();
   const sendTelemetry = useSendTelemetry();
@@ -68,7 +68,7 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
 
   if (pendingStatus?.state === 'archiving') {
     return (
-      <ArchivingIndicator>
+      <PendingIndicator>
         {pendingStatus.percent > 0 ? (
           <ArchiveProgressBar
             bars={[
@@ -84,7 +84,15 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
         ) : (
           <Label bsStyle="warning">Archiving...</Label>
         )}
-      </ArchivingIndicator>
+      </PendingIndicator>
+    );
+  }
+
+  if (pendingStatus?.state === 'reindexing') {
+    return (
+      <PendingIndicator>
+        <Label bsStyle="primary">Reindexing...</Label>
+      </PendingIndicator>
     );
   }
 
@@ -108,6 +116,10 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
       }
 
       UserNotification.success(actionDefinition.successMessage(index));
+
+      if (confirmedAction === 'reindex-system-index') {
+        addReindexAction({ indexName: index.index_name });
+      }
 
       if (confirmedAction === 'delete') {
         deselectEntity(index.id);
@@ -139,7 +151,7 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
     <ActionsToolbar>
       {pendingStatus?.state === 'failed' && (
         <Label bsStyle="danger" title={pendingStatus.message}>
-          Archive failed
+          {pendingStatus.label}
         </Label>
       )}
       {actions.map((action) => {

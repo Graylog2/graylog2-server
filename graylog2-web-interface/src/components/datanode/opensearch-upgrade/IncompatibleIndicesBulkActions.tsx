@@ -80,9 +80,13 @@ const bulkDeleteIndices = async (bulkAction: BulkIndexActionCandidate): Promise<
   return entityIds.filter((id) => !failedIds.has(id));
 };
 
-const bulkReindexIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
+const bulkReindexIndices = async (
+  bulkAction: BulkIndexActionCandidate,
+  addReindexAction: (tracking: { indexName: string }) => void,
+): Promise<Array<string>> => {
   const indexNames = bulkAction.targetIndices.map((index) => index.index_name);
   await SystemIndexerIndices.bulkReindex({ indices: indexNames, with_replication: true });
+  indexNames.forEach((indexName) => addReindexAction({ indexName }));
   showNotification({ type: 'success', message: bulkAction.successMessage(indexNames.length) });
 
   return indexNames;
@@ -148,7 +152,7 @@ const bulkArchiveDeleteIndices = async (
 };
 
 const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
-  const { archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, addArchiveDeleteAction, refetchClusterJobs, refetch } =
+  const { archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, refetchClusterJobs, refetch } =
     useIncompatibleIndicesContext();
   const sendTelemetry = useSendTelemetry();
   const archive = useIndexArchive();
@@ -189,7 +193,7 @@ const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
           succeededIds = await bulkDeleteIndices(confirmedBulkAction);
           break;
         case 'reindex-system-index':
-          succeededIds = await bulkReindexIndices(confirmedBulkAction);
+          succeededIds = await bulkReindexIndices(confirmedBulkAction, addReindexAction);
           break;
         case 'rotate':
           succeededIds = await bulkRotateIndices(confirmedBulkAction);

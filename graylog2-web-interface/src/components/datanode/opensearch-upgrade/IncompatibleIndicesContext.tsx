@@ -24,6 +24,7 @@ export type IncompatibleIndicesContextValue = {
   archivedIndexNames: ReadonlySet<string>;
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
   addArchiveDeleteAction: (tracking: PendingArchiveTracking) => void;
+  addReindexAction: (tracking: { indexName: string }) => void;
   refetchClusterJobs?: () => void;
   refetch: () => void;
 };

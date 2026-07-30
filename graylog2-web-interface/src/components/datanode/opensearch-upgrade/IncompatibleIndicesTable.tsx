@@ -59,11 +59,12 @@ const IncompatibleIndicesTable = () => {
   const [hasLoaded, setHasLoaded] = useState(false);
 
   const refetch = () => queryClient.invalidateQueries({ queryKey: INCOMPATIBLE_INDICES_QUERY_KEY });
-  const selectedIndices = Object.values(selectedIndicesData);
-  const trackedIndices = Object.values({ ...selectedIndicesData, ...keyBy(loadedIndices, 'id') });
+  const loadedIndicesById = keyBy(loadedIndices, 'id');
+  const selectedIndices = Object.keys(selectedIndicesData).map((id) => loadedIndicesById[id] ?? selectedIndicesData[id]);
+  const trackedIndices = Object.values({ ...selectedIndicesData, ...loadedIndicesById });
   const incompatibleIndexNames = trackedIndices.map((index) => index.index_name);
   const archivedIndexNames = useArchivedIndexNames(incompatibleIndexNames, canArchive);
-  const { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs } =
+  const { pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, isArchiveJobRunning, refetchClusterJobs } =
     usePendingIncompatibleIndexActions({
       incompatibleIndices: trackedIndices,
       isLoading: !hasLoaded,
@@ -86,6 +87,7 @@ const IncompatibleIndicesTable = () => {
     archivedIndexNames,
     pendingIndexStatuses,
     addArchiveDeleteAction,
+    addReindexAction,
     refetchClusterJobs,
     refetch,
   };

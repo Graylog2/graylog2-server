@@ -94,6 +94,7 @@ describe('IncompatibleIndicesBulkActions', () => {
   const setSelectedEntities = jest.fn();
   const refetch = jest.fn();
   const addArchiveDeleteAction = jest.fn();
+  const addReindexAction = jest.fn();
   const refetchClusterJobs = jest.fn();
 
   const renderBulkActions = (rows: Array<IncompatibleIndexRow> = indices, canArchive = false) =>
@@ -104,6 +105,7 @@ describe('IncompatibleIndicesBulkActions', () => {
           archivedIndexNames: new Set<string>(),
           pendingIndexStatuses: new Map(),
           addArchiveDeleteAction,
+          addReindexAction,
           refetchClusterJobs,
           refetch,
         }}>
@@ -199,15 +201,16 @@ describe('IncompatibleIndicesBulkActions', () => {
 
       await confirmBulkReindex();
 
-      await waitFor(() => {
-        expect(SystemIndexerIndices.bulkReindex).toHaveBeenCalledWith({
-          indices: ['gl-system-events_0', 'gl-system-events_1'],
-          with_replication: true,
-        });
-        expect(UserNotification.success).toHaveBeenCalledWith('Reindex started for 2 system indices.');
-        expect(setSelectedEntities).toHaveBeenCalledWith([]);
-        expect(refetch).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(refetch).toHaveBeenCalledTimes(1));
+
+      expect(SystemIndexerIndices.bulkReindex).toHaveBeenCalledWith({
+        indices: ['gl-system-events_0', 'gl-system-events_1'],
+        with_replication: true,
       });
+      expect(addReindexAction).toHaveBeenCalledWith({ indexName: 'gl-system-events_0' });
+      expect(addReindexAction).toHaveBeenCalledWith({ indexName: 'gl-system-events_1' });
+      expect(UserNotification.success).toHaveBeenCalledWith('Reindex started for 2 system indices.');
+      expect(setSelectedEntities).toHaveBeenCalledWith([]);
     });
 
     it('reports request failures without changing the selection or refreshing', async () => {

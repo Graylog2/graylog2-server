@@ -87,6 +87,7 @@ describe('IncompatibleIndicesTable', () => {
     asMock(usePendingIncompatibleIndexActions).mockReturnValue({
       pendingIndexStatuses: new Map(),
       addArchiveDeleteAction: jest.fn(),
+      addReindexAction: jest.fn(),
       isArchiveJobRunning: false,
       refetchClusterJobs: jest.fn(),
     });
@@ -172,6 +173,31 @@ describe('IncompatibleIndicesTable', () => {
       expect.objectContaining({ incompatibleIndices: [secondPageIndex] }),
     );
   });
+
+  it('feeds bulk actions the freshly fetched attributes of selected indices, not the selection snapshot', () => {
+    const { default: PaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(PaginatedEntityTable);
+    const asWriteIndex = makeIndex({ id: 'graylog_5', index_name: 'graylog_5', active_write_index: 'set-1' });
+    const afterRotation = makeIndex({ id: 'graylog_5', index_name: 'graylog_5', active_write_index: null });
+
+    render(<IncompatibleIndicesTable />);
+
+    act(() => {
+      latestTableProps(mockPaginatedEntityTable).onDataLoaded?.(makeResponse([asWriteIndex]));
+    });
+    act(() => {
+      latestTableProps(mockPaginatedEntityTable).bulkSelection.onChangeSelection?.(['graylog_5'], [asWriteIndex]);
+    });
+    act(() => {
+      latestTableProps(mockPaginatedEntityTable).onDataLoaded?.(makeResponse([afterRotation]));
+    });
+
+    const bulkActions = latestTableProps(mockPaginatedEntityTable).bulkSelection.actions as React.ReactElement<{
+      indices: Array<IncompatibleIndexRow>;
+    }>;
+
+    expect(bulkActions.props.indices).toEqual([afterRotation]);
+  });
 });
 
 describe('fetchIncompatibleIndices', () => {
@@ -209,6 +235,7 @@ describe('createColumnRenderers', () => {
     archivedIndexNames: new Set(),
     pendingIndexStatuses: new Map(),
     addArchiveDeleteAction: jest.fn(),
+    addReindexAction: jest.fn(),
     refetchClusterJobs: jest.fn(),
     refetch: jest.fn(),
     ...overrides,
