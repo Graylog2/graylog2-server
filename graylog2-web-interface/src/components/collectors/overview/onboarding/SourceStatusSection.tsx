@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { Icon, Link, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView, Source, SourceType } from 'components/collectors/types';
+import { formatNumber } from 'util/NumberFormatting';
 
 import QuietSection from './QuietSection';
 
@@ -31,6 +32,8 @@ type Props = {
   sources: Source[] | undefined;
   /** Whether the collector delivered any source messages in the preview window. */
   receiving: boolean;
+  /** Message count per source id for the preview window. `undefined` when the aggregation failed. */
+  sourceCounts?: Record<string, number>;
 };
 
 const SourceName = styled.span`
@@ -39,7 +42,7 @@ const SourceName = styled.span`
 
 const RowStatus = styled.span<{ $variant?: 'muted' | 'success' | 'warning' }>(
   ({ $variant = 'muted', theme }) => css`
-    margin-left: auto;
+    min-width: 12rem;
     display: inline-flex;
     align-items: center;
     gap: ${theme.spacings.xxs};
@@ -49,6 +52,17 @@ const RowStatus = styled.span<{ $variant?: 'muted' | 'success' | 'warning' }>(
       success: theme.colors.variant.success,
       warning: theme.colors.variant.darker.warning,
     }[$variant]};
+  `,
+);
+
+const SourceCount = styled.span(
+  ({ theme }) => css`
+    margin-left: auto;
+    min-width: 6ch;
+    text-align: right;
+    font-size: ${theme.fonts.size.small};
+    font-variant-numeric: tabular-nums;
+    color: ${theme.colors.gray[60]};
   `,
 );
 
@@ -66,7 +80,19 @@ const SOURCE_PLATFORM: Partial<Record<SourceType, string>> = {
   windows_event_log: 'windows',
 };
 
-const SourceStatus = ({ source, instance, receiving }: { source: Source } & Omit<Props, 'sources'>) => {
+const NO_COUNT = '—';
+
+/** The count for a source, or an em dash when a number would be meaningless or unknown. */
+const SourceCountCell = ({ count }: { count: number | undefined }) => (
+  <SourceCount>{count === undefined ? NO_COUNT : formatNumber(count)}</SourceCount>
+);
+
+const SourceStatus = ({
+  source,
+  instance,
+  receiving,
+  count,
+}: { source: Source; count: number | undefined } & Omit<Props, 'sources' | 'sourceCounts'>) => {
   const requiredPlatform = SOURCE_PLATFORM[source.type];
 
   if (!source.enabled) {
@@ -81,14 +107,18 @@ const SourceStatus = ({ source, instance, receiving }: { source: Source } & Omit
     return <RowStatus $variant="warning">Paused &mdash; collector offline</RowStatus>;
   }
 
-  // The preview search counts messages per collector, not per source, so once anything arrives
-  // every active source reads as receiving. Honest per-source rates need backend support.
-  if (receiving) {
+  if (count === undefined ? receiving : count > 0) {
     return (
       <RowStatus $variant="success">
         <Icon name="check_circle" /> Receiving
       </RowStatus>
     );
+  }
+
+  // Once the collector is proven to be delivering, a silent source is a steady state rather than a
+  // pending one, so it gets no spinner.
+  if (receiving) {
+    return <RowStatus>No messages yet</RowStatus>;
   }
 
   return (
@@ -102,7 +132,7 @@ const SourceStatus = ({ source, instance, receiving }: { source: Source } & Omit
  * The fleet's sources with a per-source status: what should be collecting on this host, what
  * cannot apply to its platform, and whether messages are flowing yet.
  */
-const SourceStatusSection = ({ instance, sources, receiving }: Props) => {
+const SourceStatusSection = ({ instance, sources, receiving, sourceCounts = undefined }: Props) => {
   const online = instance.status === 'online';
 
   return (
@@ -114,15 +144,29 @@ const SourceStatusSection = ({ instance, sources, receiving }: Props) => {
         <Footer>No sources configured for this fleet yet.</Footer>
       ) : (
         <IconRowList>
-          {sources.map((source) => (
-            <DividedIconRow key={source.id}>
-              <SourceName>{source.name}</SourceName>
-              <SourceStatus source={source} instance={instance} receiving={receiving} />
-            </DividedIconRow>
-          ))}
+          {sources.map((source) => {
+            // A present map with no entry for this source means it produced nothing; an absent map
+            // means the aggregation is unavailable and no number should be claimed.
+            const count = sourceCounts ? (sourceCounts[source.id] ?? 0) : undefined;
+            // Mirrors status rules 1–2 only. A source restricted to a *matching* platform is still
+            // collecting, so testing `SOURCE_PLATFORM[source.type]` alone would be too strict.
+            const requiredPlatform = SOURCE_PLATFORM[source.type];
+            const mismatched = Boolean(instance.os && requiredPlatform && requiredPlatform !== instance.os);
+            const collecting = source.enabled && !mismatched;
+
+            return (
+              <DividedIconRow key={source.id}>
+                <SourceName>{source.name}</SourceName>
+                <SourceCountCell count={collecting ? count : undefined} />
+                <SourceStatus source={source} instance={instance} receiving={receiving} count={count} />
+              </DividedIconRow>
+            );
+          })}
         </IconRowList>
       )}
-      {online && !receiving && <Footer>Checking every few seconds</Footer>}
+      {online && (
+        <Footer>Messages received in the last 15 minutes{!receiving && ' · checking every few seconds'}</Footer>
+      )}
     </QuietSection>
   );
 };

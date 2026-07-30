@@ -52,7 +52,7 @@ describe('SourceStatusSection', () => {
 
     expect(screen.getByText('Syslog')).toBeInTheDocument();
     expect(screen.getByText('Waiting for first messages...')).toBeInTheDocument();
-    expect(screen.getByText('Checking every few seconds')).toBeInTheDocument();
+    expect(screen.getByText(/checking every few seconds/)).toBeInTheDocument();
   });
 
   it('reports sources as receiving once messages arrive', () => {
@@ -60,14 +60,14 @@ describe('SourceStatusSection', () => {
 
     expect(screen.getByText('Receiving')).toBeInTheDocument();
     // The polling hint is only useful while we are still waiting for something to show up.
-    expect(screen.queryByText('Checking every few seconds')).not.toBeInTheDocument();
+    expect(screen.queryByText(/checking every few seconds/)).not.toBeInTheDocument();
   });
 
   it('pauses every source while the collector is offline', () => {
     render(<SourceStatusSection instance={offlineInstance} sources={[source({})]} receiving={false} />);
 
     expect(screen.getByText('Paused — collector offline')).toBeInTheDocument();
-    expect(screen.queryByText('Checking every few seconds')).not.toBeInTheDocument();
+    expect(screen.queryByText(/checking every few seconds/)).not.toBeInTheDocument();
   });
 
   it('marks sources that cannot run on the collector platform', () => {
@@ -132,5 +132,93 @@ describe('SourceStatusSection', () => {
 
     expect(screen.getByText('Not applicable on Linux')).toBeInTheDocument();
     expect(screen.queryByText('Paused — collector offline')).not.toBeInTheDocument();
+  });
+
+  it('shows each source its own message count', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[source({ id: 's1', name: 'Syslog' }), source({ id: 's2', name: 'System Journal' })]}
+        receiving
+        sourceCounts={{ s1: 1204, s2: 38 }}
+      />,
+    );
+
+    expect(screen.getByText('1,204')).toBeInTheDocument();
+    expect(screen.getByText('38')).toBeInTheDocument();
+    expect(screen.getAllByText('Receiving')).toHaveLength(2);
+  });
+
+  it('does not claim a source is receiving when only its siblings are', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[source({ id: 's1', name: 'Syslog' }), source({ id: 's2', name: 'Nginx Access' })]}
+        receiving
+        sourceCounts={{ s1: 1204 }}
+      />,
+    );
+
+    expect(screen.getByText('Receiving')).toBeInTheDocument();
+    // s2 has no bucket, so it produced nothing even though the collector is delivering.
+    expect(screen.getByText('No messages yet')).toBeInTheDocument();
+    expect(screen.queryByText('Waiting for first messages...')).not.toBeInTheDocument();
+  });
+
+  it('waits for first messages when nothing has arrived for the collector at all', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[source({ id: 's1', name: 'Syslog' })]}
+        receiving={false}
+        sourceCounts={{}}
+      />,
+    );
+
+    expect(screen.getByText('Waiting for first messages...')).toBeInTheDocument();
+    expect(screen.queryByText('No messages yet')).not.toBeInTheDocument();
+  });
+
+  it('falls back to the aggregate status when counts are unavailable', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[source({ id: 's1', name: 'Syslog' })]}
+        receiving
+        sourceCounts={undefined}
+      />,
+    );
+
+    // No count is known, so the row must not claim zero.
+    expect(screen.getByText('Receiving')).toBeInTheDocument();
+    expect(screen.queryByText('No messages yet')).not.toBeInTheDocument();
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+  });
+
+  it('shows no count for sources that cannot be collecting', () => {
+    render(
+      <SourceStatusSection
+        instance={instance}
+        sources={[
+          source({ id: 's1', name: 'Old Debug Source', enabled: false }),
+          source({ id: 's2', name: 'Windows Event Log', type: 'windows_event_log' }),
+        ]}
+        receiving
+        sourceCounts={{ s1: 5, s2: 7 }}
+      />,
+    );
+
+    // Structural non-collection must not read as a throughput number.
+    expect(screen.queryByText('5')).not.toBeInTheDocument();
+    expect(screen.queryByText('7')).not.toBeInTheDocument();
+    expect(screen.getAllByText('—')).toHaveLength(2);
+  });
+
+  it('explains the window the counts cover', () => {
+    render(
+      <SourceStatusSection instance={instance} sources={[source({ id: 's1' })]} receiving sourceCounts={{ s1: 3 }} />,
+    );
+
+    expect(screen.getByText(/Messages received in the last 15 minutes/)).toBeInTheDocument();
   });
 });
