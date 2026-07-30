@@ -48,6 +48,9 @@ public class Auditor {
     private static final String RESPONSE_ENTITY = "response_entity";
     private static final String ERROR = "error";
 
+    public static final Predicate<Object> SUCCESS_ON_TRUE = Boolean.TRUE::equals;
+    public static final Predicate<Object> SUCCESS_ON_NON_NULL = Objects::nonNull;
+
     private final AuditEventSender sender;
     private final ResponseEntityConverter converter;
 
@@ -61,14 +64,14 @@ public class Auditor {
                          final String eventType,
                          final Object actionInput,
                          final Supplier<T> auditableAction) {
-        return audited(username, eventType, actionInput, auditableAction, Objects::nonNull);
+        return audited(username, eventType, actionInput, auditableAction, SUCCESS_ON_NON_NULL);
     }
 
     public <T> T audited(final String username,
                          final String eventType,
                          final Object actionInput,
                          final Supplier<T> auditableAction,
-                         final Predicate<T> isSuccess) {
+                         final Predicate<? super T> isSuccess) {
         final T result;
         try {
             result = auditableAction.get();
