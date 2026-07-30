@@ -25,12 +25,6 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// Validates webhook URLs against the URL allowlist for Slack and Teams notifications.
-// By default, non-allowlisted URLs log a warning. When UrlAllowlist.enforceForNotifications()
-// is enabled, non-allowlisted URLs throw PermanentEventNotificationException instead.
-// Called from SlackEventNotification, TeamsEventNotification, and TeamsEventNotificationV2.
-// To remove: delete this class, the enforceForNotifications field on UrlAllowlist, the
-// validateUrl calls in the three notification classes, and the frontend checkbox in UrlAllowListForm.
 @Singleton
 public class UrlAllowlistValidator {
     private static final Logger LOG = LoggerFactory.getLogger(UrlAllowlistValidator.class);
@@ -45,6 +39,15 @@ public class UrlAllowlistValidator {
         this.allowlistNotificationService = allowlistNotificationService;
     }
 
+    /**
+     * Validates a notification webhook URL against the URL allowlist. If the URL is not allowlisted,
+     * a system notification is published (unless this is a test notification). When enforcement is
+     * enabled, throws {@link PermanentEventNotificationException}; otherwise logs a warning.
+     *
+     * @param url the webhook URL to validate
+     * @param ctx the event notification context
+     * @throws PermanentEventNotificationException if the URL is not allowlisted and enforcement is enabled
+     */
     public void validateUrl(String url, EventNotificationContext ctx) throws PermanentEventNotificationException {
         if (!allowlistService.isAllowlisted(url)) {
             if (!NotificationTestData.TEST_NOTIFICATION_ID.equals(ctx.notificationId())) {

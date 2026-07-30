@@ -35,9 +35,8 @@ public abstract class UrlAllowlist {
     @JsonProperty("disabled")
     public abstract boolean disabled();
 
-    // Opt-in flag: when true, Slack & Teams notifications with non-allowlisted webhook URLs are blocked.
-    // When false (default), a warning is logged instead. See UrlAllowlistValidator.
-    // Controlled via System > Configurations > URL Allowlist in the UI.
+    // Temporary fix (PR #26814): only used by Slack and Teams notifications via UrlAllowlistValidator.
+    // TODO: Remove in a major release.
     @JsonProperty("enforce_for_notifications")
     public abstract boolean enforceForNotifications();
 
