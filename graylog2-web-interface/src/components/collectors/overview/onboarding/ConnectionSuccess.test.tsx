@@ -111,7 +111,7 @@ describe('ConnectionSuccess', () => {
     expect(screen.getAllByText('Waiting for first messages...').length).toBeGreaterThan(0);
     // The source status footer and the empty log preview both surface this hint while nothing has
     // arrived yet, so more than one match is expected here.
-    expect(screen.getAllByText(/checking every few seconds/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/checking every few seconds/)).toHaveLength(2);
   });
 
   it('marks sources that cannot apply to the collector platform', () => {
