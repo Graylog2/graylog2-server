@@ -17,14 +17,14 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Label } from 'components/bootstrap';
-import { Icon, Link, Section, Spinner } from 'components/common';
+import { Icon, Link, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView, Source, SourceType } from 'components/collectors/types';
 
+import QuietSection from './QuietSection';
+
 import { DividedIconRow, IconRowList } from '../../common/IconRowList';
 import { OS_LABELS } from '../../common/Constants';
-import { SOURCE_TYPE_LABELS } from '../../sources/Constants';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -106,7 +106,7 @@ const SourceStatusSection = ({ instance, sources, receiving }: Props) => {
   const online = instance.status === 'online';
 
   return (
-    <Section
+    <QuietSection
       title="Log sources"
       titleAs="h3"
       actions={<Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>Configure sources</Link>}>
@@ -116,7 +116,6 @@ const SourceStatusSection = ({ instance, sources, receiving }: Props) => {
         <IconRowList>
           {sources.map((source) => (
             <DividedIconRow key={source.id}>
-              <Label bsStyle="info">{SOURCE_TYPE_LABELS[source.type] ?? source.type}</Label>
               <SourceName>{source.name}</SourceName>
               <SourceStatus source={source} instance={instance} receiving={receiving} />
             </DividedIconRow>
@@ -124,7 +123,7 @@ const SourceStatusSection = ({ instance, sources, receiving }: Props) => {
         </IconRowList>
       )}
       {online && !receiving && <Footer>Checking every few seconds</Footer>}
-    </Section>
+    </QuietSection>
   );
 };
 

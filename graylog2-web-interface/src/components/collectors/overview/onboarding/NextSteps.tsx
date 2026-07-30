@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import useProductName from 'brand-customization/useProductName';
 import { Icon, Link } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
@@ -29,15 +30,6 @@ import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
 type Props = {
   instance: CollectorInstanceView;
 };
-
-/** Separates this panel from the timeline above it. */
-const Panel = styled.div(
-  ({ theme }) => css`
-    margin-top: ${theme.spacings.lg};
-    padding-top: ${theme.spacings.md};
-    border-top: 1px solid ${theme.colors.gray[90]};
-  `,
-);
 
 const PanelTitle = styled.h4(
   ({ theme }) => css`
@@ -99,21 +91,22 @@ const nextLinks = (instance: CollectorInstanceView): Array<NextLink> => [
  * healthy, or recovery steps when the collector has gone offline.
  */
 const NextSteps = ({ instance }: Props) => {
+  const productName = useProductName();
   if (instance.status !== 'online') {
     return (
-      <Panel>
+      <div>
         <PanelTitle>Get it back online</PanelTitle>
         <TroubleshootingList>
           <li>Check that the collector service is running on the host.</li>
-          <li>Verify the host can reach this Graylog server.</li>
+          <li>Verify the host can reach this {productName} server.</li>
           <li>Review the collector&apos;s own logs in the preview below for connection errors.</li>
         </TroubleshootingList>
-      </Panel>
+      </div>
     );
   }
 
   return (
-    <Panel>
+    <div>
       <PanelTitle>What&apos;s next</PanelTitle>
       <IconRowList>
         {nextLinks(instance).map(({ icon, title, description, to }) => (
@@ -126,7 +119,7 @@ const NextSteps = ({ instance }: Props) => {
           </IconRow>
         ))}
       </IconRowList>
-    </Panel>
+    </div>
   );
 };
 

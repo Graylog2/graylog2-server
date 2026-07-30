@@ -17,9 +17,11 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import asMock from 'helpers/mocking/AsMock';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
+import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
 import type { CollectorInstanceView, Source } from 'components/collectors/types';
 
 import ConnectionSuccess from './ConnectionSuccess';
@@ -152,5 +154,83 @@ describe('ConnectionSuccess', () => {
     // The preview switches from source messages to the collector's own logs.
     expect(screen.getByText(/collector started/)).toBeInTheDocument();
     expect(screen.queryByText(/a source log line/)).not.toBeInTheDocument();
+  });
+
+  it('invalidates the instance query when checking again', async () => {
+    // A real client so the assertion covers the key itself: invalidating a key that matches no
+    // query is a silent no-op, so a mismatch here would leave the button looking functional.
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const decoyKey = ['collectors', 'instances', 'unrelated'];
+    queryClient.setQueryData(instanceKeyFn('uid-42'), { instance_uid: 'uid-42' });
+    queryClient.setQueryData(decoyKey, { untouched: true });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ConnectionSuccess instance={{ ...instance, status: 'offline' }} fleetName="Default Fleet" />
+      </QueryClientProvider>,
+    );
+
+    expect(queryClient.getQueryState(instanceKeyFn('uid-42'))?.isInvalidated).toBe(false);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Check again' }));
+
+    expect(queryClient.getQueryState(instanceKeyFn('uid-42'))?.isInvalidated).toBe(true);
+    // Only this instance is refreshed, not every collector query in the cache.
+    expect(queryClient.getQueryState(decoyKey)?.isInvalidated).toBe(false);
+  });
+
+  it('shows the empty state when the fleet has no sources', () => {
+    asMock(useSources).mockReturnValue({ data: [] } as ReturnType<typeof useSources>);
+
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+    expect(screen.getByText(/0 sources from fleet/)).toBeInTheDocument();
+    expect(screen.getByText('No sources configured for this fleet yet.')).toBeInTheDocument();
+  });
+
+  it('uses singular wording for a single source and a single message', () => {
+    asMock(useSources).mockReturnValue({
+      data: [sources[0]],
+    } as ReturnType<typeof useSources>);
+    asMock(useCollectorLogPreview).mockReturnValue({
+      ...logPreview,
+      sourceLogs: { messages: logPreview.sourceLogs.messages, total: 1 },
+    });
+
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+    expect(screen.getByText(/1 source from fleet/)).toBeInTheDocument();
+    expect(screen.getByText(/1 message in the last 15 minutes/)).toBeInTheDocument();
+  });
+
+  it('keeps listening while the first log search is still running', () => {
+    asMock(useCollectorLogPreview).mockReturnValue({ ...logPreview, sourceLogs: undefined });
+
+    render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+    expect(screen.getByText('Listening... usually under a minute')).toBeInTheDocument();
+  });
+
+  it('falls back to Unknown for a missing fleet name', () => {
+    render(<ConnectionSuccess instance={instance} fleetName={undefined} />);
+
+    // The fleet is linked from both the timeline step and the collector facts.
+    expect(screen.getAllByRole('link', { name: 'Unknown' })).toHaveLength(2);
+  });
+
+  it('falls back to Unknown for a missing collector version', () => {
+    render(<ConnectionSuccess instance={{ ...instance, version: null }} fleetName="Default Fleet" />);
+
+    expect(screen.getByText('Unknown')).toBeInTheDocument();
+  });
+
+  it('captions the preview differently depending on the collector status', () => {
+    const { rerender } = render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+    expect(screen.getByText(/Showing the newest messages from this collector/)).toBeInTheDocument();
+
+    rerender(<ConnectionSuccess instance={{ ...instance, status: 'offline' }} fleetName="Default Fleet" />);
+
+    expect(screen.getByText(/Showing the collector's own logs/)).toBeInTheDocument();
   });
 });

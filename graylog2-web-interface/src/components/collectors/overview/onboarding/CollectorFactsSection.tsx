@@ -19,10 +19,12 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
-import { Link, RelativeTime, Section, SimpleGrid } from 'components/common';
+import { Link, RelativeTime, SimpleGrid } from 'components/common';
 import Routes from 'routing/Routes';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { CollectorInstanceView } from 'components/collectors/types';
+
+import QuietSection from './QuietSection';
 
 import collectorOsName from '../../common/collectorOsName';
 
@@ -84,7 +86,7 @@ const CollectorFactsSection = ({ instance, fleetName }: Props) => {
   ].sort((attr1, attr2) => defaultCompare(attr1[0], attr2[0]));
 
   return (
-    <Section title="Collector" titleAs="h3">
+    <QuietSection title="Collector" titleAs="h3">
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md" verticalSpacing="sm">
         <Fact label="Host">{instance.hostname ?? instance.instance_uid}</Fact>
         <Fact label="OS">{collectorOsName(instance)}</Fact>
@@ -111,7 +113,7 @@ const CollectorFactsSection = ({ instance, fleetName }: Props) => {
           {showAttributes ? 'Hide attributes' : `Show all ${attributes.length} attributes`}
         </ToggleButton>
       )}
-    </Section>
+    </QuietSection>
   );
 };
 

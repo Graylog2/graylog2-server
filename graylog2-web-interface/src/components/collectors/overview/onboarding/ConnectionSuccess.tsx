@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
+import { Grid } from '@mantine/core';
 
 import { Button } from 'components/bootstrap';
 import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
@@ -53,20 +54,10 @@ const Subtitle = styled.div(
   `,
 );
 
-// The guided timeline gets a fixed rail; the detail sections take the rest. Below the tablet
-// breakpoint the rail stacks on top instead of squeezing the sections.
-const Columns = styled.div(
-  ({ theme }) => css`
-    display: grid;
-    grid-template-columns: minmax(280px, 400px) minmax(0, 1fr);
-    gap: ${theme.spacings.xl};
-    align-items: start;
-
-    @media (max-width: ${theme.breakpoints.max.md}) {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  `,
-);
+// The timeline and next-steps rails keep a readable width; the detail column takes what is left.
+const ColContainer = styled.div`
+  min-width: 350px;
+`;
 
 const ConnectionSuccess = ({ instance, fleetName }: Props) => {
   const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
@@ -83,8 +74,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
     if (!online)
       return (
         <>
-          The collector connected once but hasn&apos;t reported in since{' '}
-          <RelativeTime dateTime={instance.last_seen} />.
+          The collector connected once but hasn&apos;t reported in since <RelativeTime dateTime={instance.last_seen} />.
         </>
       );
     if (receiving) return <>The collector is connected and delivering messages.</>;
@@ -120,22 +110,30 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
         )}
       </Group>
 
-      <Columns>
-        <div>
-          <OnboardingTimeline
-            instance={instance}
-            fleetName={fleetName}
-            sourceCount={sources?.length ?? 0}
-            receivedTotal={sourceLogs?.total}
-          />
-          <NextSteps instance={instance} />
-        </div>
+      <Grid gutter="xl">
+        <Grid.Col span="content">
+          <ColContainer>
+            <OnboardingTimeline
+              instance={instance}
+              fleetName={fleetName}
+              sourceCount={sources?.length ?? 0}
+              receivedTotal={sourceLogs?.total}
+            />
+          </ColContainer>
+        </Grid.Col>
 
-        <Stack gap="md">
-          <CollectorFactsSection instance={instance} fleetName={fleetName} />
-          <SourceStatusSection instance={instance} sources={sources} receiving={receiving} />
-        </Stack>
-      </Columns>
+        <Grid.Col span="auto">
+          <Stack gap="md">
+            <CollectorFactsSection instance={instance} fleetName={fleetName} />
+            <SourceStatusSection instance={instance} sources={sources} receiving={receiving} />
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span="content">
+          <ColContainer>
+            <NextSteps instance={instance} />
+          </ColContainer>
+        </Grid.Col>
+      </Grid>
 
       {/* While healthy the preview tails what the collector delivers; once it drops offline the
           collector's own logs usually hold the reason, so they take over. */}
