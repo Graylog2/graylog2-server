@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 
-import { ShareButton, IfPermitted, HoverForHelp, LinkContainer } from 'components/common';
+import { ShareButton, IfPermitted, HoverForHelp, LinkContainer, Icon } from 'components/common';
 import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type { Stream } from 'logic/streams/types';
 import useStreamMutations from 'hooks/useStreamMutations';
@@ -173,17 +173,17 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
   return (
     <ButtonToolbar>
       <IfPermitted permissions={`streams:read:${stream.id}`}>
-        <LinkContainer to={Routes.stream_view(stream.id)}>
+        <LinkContainer to={Routes.stream_search(stream.id)}>
           <Button
             disabled={isNotEditable}
-            bsStyle="primary"
             bsSize="xsmall"
+            title="Search in stream"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
                 app_pathname: 'stream',
               });
             }}>
-            Data routing
+            <Icon name="search" />
           </Button>
         </LinkContainer>
       </IfPermitted>
