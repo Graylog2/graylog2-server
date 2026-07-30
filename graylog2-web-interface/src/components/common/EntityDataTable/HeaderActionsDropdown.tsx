@@ -19,37 +19,28 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
-import Icon from 'components/common/Icon';
+import { MenuAnchor } from 'components/bootstrap/useClickToOpenMenu';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { MenuItem } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
+
+// A plain (non-focusable) span: the header cell itself (ThInner, see AttributeHeader) is the one
+// focusable/clickable element for opening this menu, so this only renders the label -- it must
+// not be its own tab stop, or focusing the header would take two Tab presses instead of one.
+const DropdownTrigger = styled.span(
+  ({ theme }) => css`
+    display: inline-flex;
+    align-items: center;
+    gap: ${theme.spacings.xxs};
+    line-height: inherit;
+  `,
+);
 
 export const DropdownCaret = styled(Icon)`
   opacity: 0;
   transition: opacity 0.15s ease-in-out;
 `;
-
-const DropdownTrigger = styled.button(
-  ({ theme }) => css`
-    background: transparent;
-    border: 0;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: ${theme.spacings.xxs};
-    line-height: inherit;
-
-    &:focus-visible {
-      outline-offset: 2px;
-    }
-
-    &:hover .header-action,
-    &:focus-within .header-action,
-    &[aria-expanded='true'] .header-action {
-      opacity: 1;
-    }
-  `,
-);
 
 const MenuItemLabel = styled.span<{ $active: boolean }>(
   ({ $active }) => css`
@@ -67,7 +58,10 @@ type Props = {
   appSection?: string;
   onSort?: (desc: boolean) => void;
   onHideColumn?: () => void;
-  textAlign?: string;
+  opened?: boolean;
+  onOpenChange?: (opened: boolean) => void;
+  anchorPosition?: { x: number; y: number } | null;
+  textAlign: 'right' | 'left';
 };
 
 const HeaderActionsDropdown = ({
@@ -80,7 +74,10 @@ const HeaderActionsDropdown = ({
   appSection = undefined,
   onSort = undefined,
   onHideColumn = undefined,
-  textAlign = undefined,
+  opened = undefined,
+  onOpenChange = undefined,
+  anchorPosition = undefined,
+  textAlign,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const hasActions = Boolean(onChangeSlicing || onSort || onHideColumn);
@@ -109,14 +106,19 @@ const HeaderActionsDropdown = ({
   }
 
   return (
-    <Menu shadow="md" withinPortal position="bottom-start">
+    <Menu shadow="md" withinPortal position="bottom-start" opened={opened} onChange={onOpenChange}>
       <Menu.Target>
-        <DropdownTrigger type="button" title={`Toggle ${label} actions`} aria-label={`Toggle ${label} actions`}>
-          {textAlign === 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
-          <span>{children}</span>
-          {textAlign !== 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
-        </DropdownTrigger>
+        <MenuAnchor style={{ left: anchorPosition?.x ?? 0, top: anchorPosition?.y ?? 0 }} />
       </Menu.Target>
+      {/* Not the Menu.Target: opening/positioning is driven by the whole header's click handler
+          (see AttributeHeader) so this only needs to render the label -- clicking it still opens
+          the menu, since the click bubbles up to that handler. */}
+      <DropdownTrigger title={`Toggle ${label} actions`}>
+        {textAlign === 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
+        {children}
+        {textAlign !== 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
+      </DropdownTrigger>
+
       <Menu.Dropdown>
         {onSort && (
           <MenuItem onClick={() => onSort(false)} icon="arrow_upward">
