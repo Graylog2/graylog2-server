@@ -67,4 +67,12 @@ public class DatanodeRestProxyIT {
                 .assertThat().body("opensearch.node.node_name", Matchers.equalTo("indexer"));
 
     }
+
+    @FullBackendTest
+    void testPathTraversalAboveRootIsRejectedEvenWithAllowlistDisabled() {
+        // The allowlist is disabled for this test class, but a path that traverses above its own root
+        // must still be rejected - normalization isn't part of the allowlist rules, it's a baseline check.
+        final String message = apis.get("/datanodes/any/rest/../secret", 400).extract().body().asString();
+        Assertions.assertThat(message).contains("This request is not allowed");
+    }
 }
