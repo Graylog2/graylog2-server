@@ -78,19 +78,19 @@ const resources: Resource[] = [
   {
     title: 'Quickstart Guide',
     description: 'End-to-end walkthrough to your first search in 10 minutes.',
-    link: 'https://www.graylog.org',
+    link: 'https://community.graylog.org/',
     iconName: 'acute',
   },
   {
     title: 'Video: Collector',
     description: 'Enroll and configure your first collector agent.',
-    link: 'https://www.graylog.org',
+    link: 'https://community.graylog.org/',
     iconName: 'arrow_or_edge',
   },
   {
     title: 'Community Forum',
     description: 'Ask questions and browse solutions from other Graylog users.',
-    link: 'https://www.graylog.org',
+    link: 'https://community.graylog.org/',
     iconName: 'chat',
   },
 ];
