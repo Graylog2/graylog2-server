@@ -14,15 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+// eslint-disable-next-line no-restricted-imports
+import { useMergedRef } from '@mantine/hooks';
 
-import Badge from 'components/bootstrap/Badge';
-
-const StyledBadge = styled(Badge)`
-  vertical-align: top;
-`;
-
-const BetaBadge = () => <StyledBadge bsStyle="danger">Beta</StyledBadge>;
-
-export default BetaBadge;
+export default useMergedRef;
