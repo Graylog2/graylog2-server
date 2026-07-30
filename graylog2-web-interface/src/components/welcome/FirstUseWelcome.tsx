@@ -30,12 +30,12 @@ import type { IconName } from 'components/common/Icon/types';
 import { Button, Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
+import PreviewBadge from 'components/common/PreviewBadge';
+import PageHeader from 'components/common/PageHeader';
 
 import useDismissOnboarding from './hooks/useDismissOnboarding';
 import DataSourceIcons from './DataSourceIcons';
 import IconCard from './IconCard';
-
-import PageHeader from '../common/PageHeader';
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -192,7 +192,14 @@ const FirstUseWelcome = () => {
         <Col xs={12}>
           <ActionsHeadline>Where would you like to start?</ActionsHeadline>
           <ActionsSection>
-            <StyledSectionBox title="Set up Collectors" titleAs="h3">
+            <StyledSectionBox
+              title="Set up Collectors"
+              titleAs="h3"
+              header={
+                <>
+                  Set up Collectors <PreviewBadge />
+                </>
+              }>
               <Description>
                 Install a lightweight agent on your servers, VMs, or containers. {productName} Sidecar manages the
                 configuration automatically.
