@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { describeExpression } from 'util/CronUtils';
-import { OverlayTrigger, Icon, Timestamp, IconButton } from 'components/common';
+import { OverlayTrigger, Icon, Timestamp } from 'components/common';
 import Button from 'components/bootstrap/Button';
 import {
   clearNotificationQueue,
