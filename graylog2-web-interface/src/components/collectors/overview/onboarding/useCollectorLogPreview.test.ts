@@ -250,6 +250,53 @@ describe('useCollectorLogPreview', () => {
     expect(result.current.sourceCounts).toBeUndefined();
   });
 
+  it('reports an empty aggregation as an empty object, distinct from an unavailable one', async () => {
+    const getCreatedSearch = captureCreatedSearch();
+
+    asMock(executeJobResult).mockImplementation(async () => {
+      const { sourceQuery, selfQuery } = splitQueries(getCreatedSearch());
+
+      return asExecutionResult({
+        result: {
+          errors: [],
+          forId: (queryId: string) => {
+            if (queryId === sourceQuery.id) {
+              return {
+                searchTypes: {
+                  [searchTypeIdByType(sourceQuery, 'messages')]: {
+                    type: 'messages',
+                    messages: [],
+                    total: 0,
+                  },
+                  [searchTypeIdByType(sourceQuery, 'aggregation')]: {
+                    type: 'pivot',
+                    total: 0,
+                    rows: [],
+                  },
+                },
+              };
+            }
+
+            if (queryId === selfQuery.id) {
+              return { searchTypes: {} };
+            }
+
+            return undefined;
+          },
+        },
+      });
+    });
+
+    const { result } = renderHook(() => useCollectorLogPreview('uid-42'));
+
+    await waitFor(() => expect(result.current.sourceLogs).toBeDefined());
+
+    // The aggregation ran and returned no rows: every source is confirmed silent, which must stay
+    // distinguishable from "the aggregation didn't run at all" (`undefined`).
+    expect(result.current.sourceCounts).toEqual({});
+    expect(result.current.sourceCounts).not.toBeUndefined();
+  });
+
   it('executes the created search with the execution helpers', async () => {
     mockEmptyResults();
 
@@ -372,5 +419,49 @@ describe('useCollectorLogPreview', () => {
     expect(result.current.selfLogsError.message).toBe('denied');
     expect(result.current.sourceLogs.messages).toHaveLength(1);
     expect(result.current.sourceLogsError).toBeNull();
+  });
+
+  it('an aggregation-scoped error does not poison the healthy messages pane on the same query', async () => {
+    const getCreatedSearch = captureCreatedSearch();
+
+    asMock(executeJobResult).mockImplementation(async () => {
+      const { sourceQuery, selfQuery } = splitQueries(getCreatedSearch());
+      const aggregationSearchTypeId = searchTypeIdByType(sourceQuery, 'aggregation');
+
+      return asExecutionResult({
+        result: {
+          errors: [{ queryId: sourceQuery.id, searchTypeId: aggregationSearchTypeId, description: 'agg failed' }],
+          forId: (queryId: string) => {
+            if (queryId === sourceQuery.id) {
+              return {
+                searchTypes: {
+                  [searchTypeIdByType(sourceQuery, 'messages')]: {
+                    type: 'messages',
+                    messages: [resultMessage('m1', '2026-06-10T12:00:00.000Z', 'a source log line')],
+                    total: 42,
+                  },
+                },
+              };
+            }
+
+            if (queryId === selfQuery.id) {
+              return { searchTypes: {} };
+            }
+
+            return undefined;
+          },
+        },
+      });
+    });
+
+    const { result } = renderHook(() => useCollectorLogPreview('uid-42'));
+
+    await waitFor(() => expect(result.current.sourceLogs).toBeDefined());
+
+    // The failure belongs to the aggregation search type on the source query, not to the messages
+    // search type that shares that query, so the messages pane must stay healthy.
+    expect(result.current.sourceLogsError).toBeNull();
+    expect(result.current.sourceLogs.messages).toHaveLength(1);
+    expect(result.current.sourceLogs.messages[0].text).toBe('a source log line');
   });
 });

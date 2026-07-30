@@ -38,6 +38,13 @@ type Props = {
 
 const SourceName = styled.span`
   font-weight: 600;
+
+  /* A long source name is otherwise the only row member with no size floor, so nothing shrinks
+     and the row overflows the section; a flex child also defaults to min-width auto and would
+     refuse to shrink below its content's width without this. */
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 `;
 
 const RowStatus = styled.span<{ $variant?: 'muted' | 'success' | 'warning' }>(

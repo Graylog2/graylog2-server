@@ -110,7 +110,15 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
   );
 };
 
-const LogPreviewSection = ({ title, searchUrl, preview, isLoading, error, collapsible = false, caption = undefined }: Props) => (
+const LogPreviewSection = ({
+  title,
+  searchUrl,
+  preview,
+  isLoading,
+  error,
+  collapsible = false,
+  caption = undefined,
+}: Props) => (
   <Section
     title={title}
     collapsible={collapsible}

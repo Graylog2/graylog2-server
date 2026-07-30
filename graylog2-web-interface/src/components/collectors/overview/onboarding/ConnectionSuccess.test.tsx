@@ -32,19 +32,25 @@ jest.mock('components/collectors/hooks/useSourceQueries', () => ({
   useSources: jest.fn(),
 }));
 
-const instance = {
+const instance: CollectorInstanceView = {
   id: 'uid-42',
   instance_uid: 'uid-42',
   fleet_id: 'fleet-1',
+  capabilities: 15,
   enrolled_at: '2026-06-10T12:00:00Z',
   last_seen: '2026-06-10T12:01:00Z',
+  active_certificate_fingerprint: 'aa:bb:cc',
+  active_certificate_expires_at: '2027-06-10T12:00:00Z',
+  next_certificate_fingerprint: null,
+  next_certificate_expires_at: null,
   status: 'online',
   identifying_attributes: { 'service.instance.id': 'uid-42' },
   non_identifying_attributes: { 'host.arch': 'arm64' },
   hostname: 'web-prod-01',
   os: 'linux',
   version: '1.2.3',
-} as unknown as CollectorInstanceView;
+  has_pending_changes: false,
+};
 
 const sources = [
   { id: 's1', name: 'Syslog', type: 'file', enabled: true },

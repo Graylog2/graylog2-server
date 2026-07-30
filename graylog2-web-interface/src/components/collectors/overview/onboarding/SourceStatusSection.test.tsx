@@ -27,7 +27,7 @@ const instance = {
   fleet_id: 'fleet-1',
   status: 'online',
   os: 'linux',
-} as unknown as CollectorInstanceView;
+} as CollectorInstanceView;
 
 const offlineInstance = { ...instance, status: 'offline' } as CollectorInstanceView;
 
@@ -41,7 +41,10 @@ describe('SourceStatusSection', () => {
     expect(screen.getByText('No sources configured for this fleet yet.')).toBeInTheDocument();
   });
 
-  it('tells the user when the sources are still loading', () => {
+  it('shows the empty-fleet copy when sources is undefined (loading is not yet distinguished from empty)', () => {
+    // Known gap: the component currently treats `sources === undefined` (still loading) the same
+    // as an empty fleet. A real loading state (e.g. a Spinner) is a separate scoping decision for
+    // a human to make, not something to add here.
     render(<SourceStatusSection instance={instance} sources={undefined} receiving={false} />);
 
     expect(screen.getByText('No sources configured for this fleet yet.')).toBeInTheDocument();

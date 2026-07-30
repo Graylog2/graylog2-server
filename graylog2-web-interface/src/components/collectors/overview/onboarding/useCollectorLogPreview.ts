@@ -210,7 +210,13 @@ const useCollectorLogPreview = (instanceUid: string) => {
         throw new Error(errors[0].description ?? 'Search failed');
       }
 
-      const errorForQuery = (queryId: string) => errors.find((e) => e.queryId === queryId)?.description;
+      // A query-level error (no searchTypeId) applies to every pane of that query; a search-type-scoped
+      // error applies only to the pane backed by that search type. Without this, a failure in the
+      // aggregation search type would otherwise be misattributed to the healthy messages pane, since
+      // both search types now live on the same (source) query.
+      const errorForSearchType = (queryId: string, searchTypeId: string) =>
+        errors.find((e) => e.queryId === queryId && (!e.searchTypeId || e.searchTypeId === searchTypeId))
+          ?.description;
 
       return {
         selfLogs: toPreview(
@@ -222,8 +228,8 @@ const useCollectorLogPreview = (instanceUid: string) => {
         sourceCounts: toSourceCounts(
           result.forId(ids.sourceQueryId)?.searchTypes?.[ids.sourceCountsSearchTypeId] as RawPivotResult | undefined,
         ),
-        selfLogsError: errorForQuery(ids.selfQueryId),
-        sourceLogsError: errorForQuery(ids.sourceQueryId),
+        selfLogsError: errorForSearchType(ids.selfQueryId, ids.selfSearchTypeId),
+        sourceLogsError: errorForSearchType(ids.sourceQueryId, ids.sourceSearchTypeId),
       };
     },
   });

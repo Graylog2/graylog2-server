@@ -25,8 +25,9 @@ import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorOsName from '../common/collectorOsName';
 import type { CollectorInstanceView } from '../types';
 
-const OsName = ({instance}: { instance?: CollectorInstanceView }) => {
+const OsName = ({ instance }: { instance: CollectorInstanceView }) => {
   const label = collectorOsName(instance);
+
   return <span title={label}>{label}</span>;
 };
 
