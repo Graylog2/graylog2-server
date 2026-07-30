@@ -175,7 +175,6 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
       <IfPermitted permissions={`streams:read:${stream.id}`}>
         <LinkContainer to={Routes.stream_search(stream.id)}>
           <Button
-            disabled={isNotEditable}
             bsSize="xsmall"
             title="Search in stream"
             onClick={() => {
