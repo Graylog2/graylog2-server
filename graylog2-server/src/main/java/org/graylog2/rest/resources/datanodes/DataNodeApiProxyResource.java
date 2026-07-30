@@ -115,7 +115,7 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     private Response request(ContainerRequestContext context, String path, String hostname) throws IOException {
-        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters());
+        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters(), getSubject());
 
         try {
             final var response = proxyRequestAdapter.request(allowlist.authorize(request));
