@@ -61,6 +61,7 @@ const logPreview = {
     messages: [{ id: 'm2', timestamp: '2026-06-10T12:00:10.000Z', text: 'collector started' }],
     total: 7,
   },
+  sourceCounts: undefined,
   selfLogsError: null,
   sourceLogsError: null,
   isLoading: false,

@@ -23,6 +23,7 @@ import type Search from 'views/logic/search/Search';
 import MessageSortConfig from 'views/logic/searchtypes/messages/MessageSortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type Query from 'views/logic/queries/Query';
+import type { AggregationSearchType } from 'views/logic/queries/SearchType';
 
 import useCollectorLogPreview from './useCollectorLogPreview';
 
@@ -98,6 +99,22 @@ describe('useCollectorLogPreview', () => {
                   messages: [resultMessage('m1', '2026-06-10T12:00:00.000Z', 'a source log line')],
                   total: 42,
                 },
+                [searchTypeIdByType(sourceQuery, 'aggregation')]: {
+                  type: 'pivot',
+                  total: 42,
+                  rows: [
+                    {
+                      source: 'leaf',
+                      key: ['s1'],
+                      values: [{ source: 'row-leaf', key: ['count()'], value: 40, rollup: false }],
+                    },
+                    {
+                      source: 'leaf',
+                      key: ['s2'],
+                      values: [{ source: 'row-leaf', key: ['count()'], value: 2, rollup: false }],
+                    },
+                  ],
+                },
               },
             };
           }
@@ -172,8 +189,10 @@ describe('useCollectorLogPreview', () => {
 
     queries.forEach((q) => {
       expect(q.timerange).toEqual({ type: 'relative', from: 900 });
-      expect(q.searchTypes).toHaveLength(1);
-      expect(q.searchTypes[0]).toEqual(
+
+      const messagesSearchType = q.searchTypes.find((st) => st.type === 'messages');
+
+      expect(messagesSearchType).toEqual(
         expect.objectContaining({
           type: 'messages',
           limit: 10,
@@ -182,6 +201,53 @@ describe('useCollectorLogPreview', () => {
         }),
       );
     });
+
+    // The self-query only ever needs message previews; the source query also carries the
+    // per-source aggregation used to compute sourceCounts.
+    expect(selfQuery.searchTypes).toHaveLength(1);
+    expect(sourceQuery.searchTypes).toHaveLength(2);
+  });
+
+  it('aggregates message counts per source', async () => {
+    const getCreatedSearch = captureCreatedSearch();
+
+    asMock(executeJobResult).mockImplementation(async () => asExecutionResult(makeResultsMock(getCreatedSearch())));
+
+    const { result } = renderHook(() => useCollectorLogPreview('uid-42'));
+
+    await waitFor(() => expect(result.current.sourceCounts).toBeDefined());
+
+    expect(result.current.sourceCounts).toEqual({ s1: 40, s2: 2 });
+  });
+
+  it('groups the source counts by source id with an explicit bucket limit', async () => {
+    mockEmptyResults();
+
+    renderHook(() => useCollectorLogPreview('uid-42'));
+
+    await waitFor(() => expect(createSearch).toHaveBeenCalledTimes(1));
+
+    const search: Search = asMock(createSearch).mock.calls[0][0];
+    const { sourceQuery } = splitQueries(search);
+    // Query.searchTypes is a plain Array<SearchType>; the union's `type` field isn't a narrowing
+    // discriminant (it's typed as `string`), so the aggregation-only fields need this assertion.
+    const aggregation = sourceQuery.searchTypes.find((st) => st.type === 'aggregation') as
+      | AggregationSearchType
+      | undefined;
+
+    expect(aggregation.row_groups).toEqual([{ type: 'values', fields: ['collector_source_id'], limit: 100 }]);
+    // A `count` series must carry no field: count(<field>) counts occurrences of that field.
+    expect(aggregation.series).toEqual([{ id: 'count()', type: 'count' }]);
+  });
+
+  it('reports unknown source counts as undefined rather than as all-zero', async () => {
+    mockEmptyResults();
+
+    const { result } = renderHook(() => useCollectorLogPreview('uid-42'));
+
+    await waitFor(() => expect(result.current.sourceLogs).toBeDefined());
+
+    expect(result.current.sourceCounts).toBeUndefined();
   });
 
   it('executes the created search with the execution helpers', async () => {
