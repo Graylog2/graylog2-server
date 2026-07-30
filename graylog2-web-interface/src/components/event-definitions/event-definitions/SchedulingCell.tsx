@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { describeExpression } from 'util/CronUtils';
-import { OverlayTrigger, Icon, Timestamp } from 'components/common';
+import { OverlayTrigger, Icon, Timestamp, IconButton } from 'components/common';
 import Button from 'components/bootstrap/Button';
 import {
   clearNotificationQueue,
@@ -51,8 +51,8 @@ const DetailValue = styled.dd(
   `,
 );
 
-const DetailsButton = styled(Button)`
-  padding: 6px 8px;
+const DetailsOverlayTrigger = styled(OverlayTrigger)`
+  vertical-align: bottom;
 `;
 
 const getTimeRange = (scheduler: Scheduler) => {
@@ -144,17 +144,15 @@ const SchedulingInfo = ({
   return (
     <>
       {`Runs ${executeEveryFormatted}${searchWithinMessage} `}
-      <OverlayTrigger
+      <DetailsOverlayTrigger
         trigger="click"
         rootClose
         placement="left"
         title={`${title} details.`}
         overlay={detailsPopover(scheduler, clearNotifications)}
         width={500}>
-        <DetailsButton bsStyle="link">
-          <Icon name="info" />
-        </DetailsButton>
-      </OverlayTrigger>
+        <Icon name="info" title={`${title} details.`} bsStyle={'info'} />
+      </DetailsOverlayTrigger>
     </>
   );
 };
