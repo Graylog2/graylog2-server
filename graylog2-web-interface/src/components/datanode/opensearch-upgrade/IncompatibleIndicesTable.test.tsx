@@ -27,6 +27,8 @@ import type { SearchParams } from 'stores/PaginationTypes';
 
 import IncompatibleIndicesTable from './IncompatibleIndicesTable';
 import { createColumnRenderers } from './IncompatibleIndicesColumnRenderers';
+import IncompatibleIndicesContext from './IncompatibleIndicesContext';
+import type { IncompatibleIndicesContextValue } from './IncompatibleIndicesContext';
 import { fetchIncompatibleIndices, incompatibleIndicesKeyFn } from './fetchIncompatibleIndices';
 import type { IncompatibleIndexRow, IncompatibleIndicesResponse } from './fetchIncompatibleIndices';
 import useArchivedIndexNames from './hooks/useArchivedIndexNames';
@@ -200,7 +202,24 @@ describe('fetchIncompatibleIndices', () => {
 });
 
 describe('createColumnRenderers', () => {
-  const renderers = createColumnRenderers(new Map(), new Set());
+  const renderers = createColumnRenderers();
+
+  const contextValue = (overrides: Partial<IncompatibleIndicesContextValue> = {}): IncompatibleIndicesContextValue => ({
+    archiveActionsAvailable: false,
+    archivedIndexNames: new Set(),
+    pendingIndexStatuses: new Map(),
+    addArchiveDeleteAction: jest.fn(),
+    refetchClusterJobs: jest.fn(),
+    refetch: jest.fn(),
+    ...overrides,
+  });
+
+  const renderIndexNameCell = (index: IncompatibleIndexRow, ctx: Partial<IncompatibleIndicesContextValue> = {}) =>
+    render(
+      <IncompatibleIndicesContext.Provider value={contextValue(ctx)}>
+        <div>{renderers.attributes.index_name.renderCell(index.index_name, index, undefined)}</div>
+      </IncompatibleIndicesContext.Provider>,
+    );
 
   it('falls back to "Unknown" for a missing version', () => {
     expect(renderers.attributes.version.renderCell(undefined, makeIndex({ version: '' }), undefined)).toBe('Unknown');
@@ -209,11 +228,19 @@ describe('createColumnRenderers', () => {
   it('renders the index name with status badges (not type badges)', () => {
     const index = makeIndex({ index_name: 'graylog_2', warm_index: true, active_write_index: 'index-set-id' });
 
-    render(<div>{renderers.attributes.index_name.renderCell(index.index_name, index, undefined)}</div>);
+    renderIndexNameCell(index);
 
     expect(screen.getByText('graylog_2')).toBeInTheDocument();
     expect(screen.getByText('active write index')).toBeInTheDocument();
     expect(screen.queryByText('Warm')).not.toBeInTheDocument();
+  });
+
+  it('shows the "archived already" badge based on the context archived set', () => {
+    const index = makeIndex({ index_name: 'graylog_2' });
+
+    renderIndexNameCell(index, { archivedIndexNames: new Set(['graylog_2']) });
+
+    expect(screen.getByText('archived already')).toBeInTheDocument();
   });
 
   it('renders the primary type as a single badge in the category column', () => {

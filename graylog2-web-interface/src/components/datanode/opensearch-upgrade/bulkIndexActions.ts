@@ -17,7 +17,7 @@
 import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 
 import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
-import { getAvailableActions } from './incompatibleIndexActions';
+import { getAvailableActions, isIndexArchived } from './incompatibleIndexActions';
 
 const BULK_ACTION_ORDER = ['reindex-system-index', 'archive-delete', 'delete', 'rotate'] as const;
 
@@ -73,7 +73,6 @@ const BULK_ACTION_COPY: Record<BulkCapableIndexAction, BulkActionCopy> = {
   },
 };
 
-// Shared by the bulk actions whose backend reports per-entity failures (delete, rotate).
 export const buildPartialBulkNotification = ({
   succeeded,
   failures,
@@ -123,8 +122,11 @@ export const getBulkIndexActionCandidates = ({
   BULK_ACTION_ORDER.map((action) => {
     const targetIndices = indices.filter(
       (index) =>
-        getAvailableActions(index, canArchive, archivedIndexNames.has(index.index_name)).includes(action) &&
-        !isArchiveInProgress(pendingIndexStatuses.get(index.index_name)),
+        getAvailableActions(
+          index,
+          canArchive,
+          isIndexArchived(index.index_name, pendingIndexStatuses.get(index.index_name), archivedIndexNames),
+        ).includes(action) && !isArchiveInProgress(pendingIndexStatuses.get(index.index_name)),
     );
 
     return {

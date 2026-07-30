@@ -25,6 +25,8 @@ import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatible
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
+import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
+
 export type IndexAction = 'delete' | 'archive-delete' | 'reindex-system-index' | 'rotate';
 
 export type ConfirmedAction = {
@@ -140,6 +142,13 @@ export const useIncompatibleIndexActionDefinitions = (): Record<IndexAction, Act
     'archive-delete': archiveDeleteDefinition(archive),
   };
 };
+
+export const isIndexArchived = (
+  indexName: string,
+  pendingStatus: PendingIndexStatus | undefined,
+  archivedIndexNames: ReadonlySet<string>,
+): boolean =>
+  pendingStatus?.state !== 'archiving' && (archivedIndexNames.has(indexName) || pendingStatus?.state === 'archived');
 
 export const getAvailableActions = (
   index: IncompatibleIndex,

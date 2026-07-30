@@ -32,19 +32,13 @@ import UserNotification from 'util/UserNotification';
 import { TELEMETRY_DEFAULTS } from './telemetry';
 import BulkIndexActionConfirmDialog from './BulkIndexActionConfirmDialog';
 import type { PendingArchiveTracking } from './incompatibleIndexActions';
+import { useIncompatibleIndicesContext } from './IncompatibleIndicesContext';
 import { buildPartialBulkNotification, getBulkIndexActionCandidates } from './bulkIndexActions';
 import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
-import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
 
 type Props = {
   indices: Array<IncompatibleIndexRow>;
-  canArchive: boolean;
-  pendingIndexStatuses: Map<string, PendingIndexStatus>;
-  archivedIndexNames: ReadonlySet<string>;
-  addArchiveDeleteAction: (tracking: PendingArchiveTracking) => void;
-  refetchClusterJobs?: () => void;
-  refetch: () => void;
 };
 
 const BULK_ACTION_TELEMETRY: Record<BulkIndexActionCandidate['action'], TelemetryEventType> = {
@@ -94,8 +88,6 @@ const bulkReindexIndices = async (bulkAction: BulkIndexActionCandidate): Promise
   return indexNames;
 };
 
-// The deflector cycles a whole index set, so the request/failures are keyed by index-set id
-// (the write index's `active_write_index`); we map those back to index names for the user.
 const bulkRotateIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
   const namesByIndexSet = new Map<string, Array<string>>();
   bulkAction.targetIndices.forEach((index) => {
@@ -155,15 +147,9 @@ const bulkArchiveDeleteIndices = async (
   return indexNames;
 };
 
-const IncompatibleIndicesBulkActions = ({
-  indices,
-  canArchive,
-  pendingIndexStatuses,
-  archivedIndexNames,
-  addArchiveDeleteAction,
-  refetchClusterJobs = undefined,
-  refetch,
-}: Props) => {
+const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
+  const { archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, addArchiveDeleteAction, refetchClusterJobs, refetch } =
+    useIncompatibleIndicesContext();
   const sendTelemetry = useSendTelemetry();
   const archive = useIndexArchive();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
@@ -172,7 +158,7 @@ const IncompatibleIndicesBulkActions = ({
 
   const candidates = getBulkIndexActionCandidates({
     indices,
-    canArchive,
+    canArchive: archiveActionsAvailable,
     pendingIndexStatuses,
     archivedIndexNames,
   });

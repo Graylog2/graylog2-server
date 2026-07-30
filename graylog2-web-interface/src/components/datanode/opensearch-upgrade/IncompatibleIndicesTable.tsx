@@ -32,6 +32,7 @@ import type { IncompatibleIndexRow, IncompatibleIndicesResponse } from './fetchI
 import { createColumnRenderers, DEFAULT_DISPLAYED_COLUMNS } from './IncompatibleIndicesColumnRenderers';
 import IncompatibleIndexTableActions from './IncompatibleIndexTableActions';
 import IncompatibleIndicesBulkActions from './IncompatibleIndicesBulkActions';
+import IncompatibleIndicesContext from './IncompatibleIndicesContext';
 import useArchivedIndexNames from './hooks/useArchivedIndexNames';
 import usePendingIncompatibleIndexActions from './hooks/usePendingIncompatibleIndexActions';
 
@@ -78,26 +79,18 @@ const IncompatibleIndicesTable = () => {
     setHasLoaded(true);
   };
 
-  const columnRenderers = createColumnRenderers(pendingIndexStatuses, archivedIndexNames);
+  const columnRenderers = createColumnRenderers();
 
-  const renderActions = (index: IncompatibleIndexRow) => {
-    const pendingStatus = pendingIndexStatuses.get(index.index_name);
-    const isArchived =
-      pendingStatus?.state !== 'archiving' &&
-      (archivedIndexNames.has(index.index_name) || pendingStatus?.state === 'archived');
-
-    return (
-      <IncompatibleIndexTableActions
-        index={index}
-        canArchive={archiveActionsAvailable}
-        pendingStatus={pendingStatus}
-        isArchived={isArchived}
-        addArchiveDeleteAction={addArchiveDeleteAction}
-        refetchClusterJobs={refetchClusterJobs}
-        refetch={refetch}
-      />
-    );
+  const contextValue = {
+    archiveActionsAvailable,
+    archivedIndexNames,
+    pendingIndexStatuses,
+    addArchiveDeleteAction,
+    refetchClusterJobs,
+    refetch,
   };
+
+  const renderActions = (index: IncompatibleIndexRow) => <IncompatibleIndexTableActions index={index} />;
 
   const bulkSelection = {
     onChangeSelection: (selectedItemsIds: Array<string>, list: Readonly<Array<IncompatibleIndexRow>>) => {
@@ -110,21 +103,11 @@ const IncompatibleIndicesTable = () => {
         return { ...selectedCurrentItems, ...currentEntriesById };
       });
     },
-    actions: (
-      <IncompatibleIndicesBulkActions
-        indices={selectedIndices}
-        canArchive={archiveActionsAvailable}
-        pendingIndexStatuses={pendingIndexStatuses}
-        archivedIndexNames={archivedIndexNames}
-        addArchiveDeleteAction={addArchiveDeleteAction}
-        refetchClusterJobs={refetchClusterJobs}
-        refetch={refetch}
-      />
-    ),
+    actions: <IncompatibleIndicesBulkActions indices={selectedIndices} />,
   };
 
   return (
-    <>
+    <IncompatibleIndicesContext.Provider value={contextValue}>
       <Heading>Incompatible indices</Heading>
       <PaginatedEntityTable<IncompatibleIndexRow>
         humanName="incompatible indices"
@@ -137,7 +120,7 @@ const IncompatibleIndicesTable = () => {
         onDataLoaded={handleDataLoaded}
         entityAttributesAreCamelCase={false}
       />
-    </>
+    </IncompatibleIndicesContext.Provider>
   );
 };
 

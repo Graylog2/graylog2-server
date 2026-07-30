@@ -28,6 +28,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import UserNotification from 'util/UserNotification';
 
 import IncompatibleIndicesBulkActions from './IncompatibleIndicesBulkActions';
+import IncompatibleIndicesContext from './IncompatibleIndicesContext';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
 
 jest.mock('@graylog/server-api', () => ({
@@ -97,15 +98,17 @@ describe('IncompatibleIndicesBulkActions', () => {
 
   const renderBulkActions = (rows: Array<IncompatibleIndexRow> = indices, canArchive = false) =>
     render(
-      <IncompatibleIndicesBulkActions
-        indices={rows}
-        canArchive={canArchive}
-        pendingIndexStatuses={new Map()}
-        archivedIndexNames={new Set()}
-        addArchiveDeleteAction={addArchiveDeleteAction}
-        refetchClusterJobs={refetchClusterJobs}
-        refetch={refetch}
-      />,
+      <IncompatibleIndicesContext.Provider
+        value={{
+          archiveActionsAvailable: canArchive,
+          archivedIndexNames: new Set<string>(),
+          pendingIndexStatuses: new Map(),
+          addArchiveDeleteAction,
+          refetchClusterJobs,
+          refetch,
+        }}>
+        <IncompatibleIndicesBulkActions indices={rows} />
+      </IncompatibleIndicesContext.Provider>,
     );
 
   const confirmBulkDelete = async () => {

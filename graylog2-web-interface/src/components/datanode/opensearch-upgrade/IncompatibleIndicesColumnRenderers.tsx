@@ -23,7 +23,8 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
-import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
+import { useIncompatibleIndicesContext } from './IncompatibleIndicesContext';
+import { isIndexArchived } from './incompatibleIndexActions';
 
 export const DEFAULT_DISPLAYED_COLUMNS = ['index_name', 'category', 'version', 'begin', 'end'];
 
@@ -42,12 +43,6 @@ const typeBadges = (index: IncompatibleIndex): Array<Badge> => [
   ...(index.warm_index ? [{ text: 'Warm', style: 'default' as const }] : []),
 ];
 
-const isIndexArchived = (
-  indexName: string,
-  pendingStatus: PendingIndexStatus | undefined,
-  archivedIndexNames: ReadonlySet<string>,
-) => pendingStatus?.state !== 'archiving' && (archivedIndexNames.has(indexName) || pendingStatus?.state === 'archived');
-
 const statusBadges = (index: IncompatibleIndex, isArchived: boolean): Array<Badge> => [
   ...(index.active_write_index ? [{ text: 'active write index', style: 'default' as const }] : []),
   ...(isArchived ? [{ text: 'archived already', style: 'success' as const }] : []),
@@ -65,28 +60,24 @@ const renderBadges = (badges: Array<Badge>) =>
 
 const renderRange = (value: unknown) => (value ? <Timestamp dateTime={value as string} /> : <span>&mdash;</span>);
 
-export const createColumnRenderers = (
-  pendingIndexStatuses: Map<string, PendingIndexStatus>,
-  archivedIndexNames: ReadonlySet<string>,
-): ColumnRenderers<IncompatibleIndexRow> => ({
+const IndexNameCell = ({ index }: { index: IncompatibleIndexRow }) => {
+  const { archivedIndexNames, pendingIndexStatuses } = useIncompatibleIndicesContext();
+  const isArchived = isIndexArchived(index.index_name, pendingIndexStatuses.get(index.index_name), archivedIndexNames);
+
+  return (
+    <span>
+      {index.index_name}
+      &nbsp;
+      {renderBadges(statusBadges(index, isArchived))}
+    </span>
+  );
+};
+
+export const createColumnRenderers = (): ColumnRenderers<IncompatibleIndexRow> => ({
   attributes: {
     index_name: {
       minWidth: 300,
-      renderCell: (_value, index) => {
-        const isArchived = isIndexArchived(
-          index.index_name,
-          pendingIndexStatuses.get(index.index_name),
-          archivedIndexNames,
-        );
-
-        return (
-          <span>
-            {index.index_name}
-            &nbsp;
-            {renderBadges(statusBadges(index, isArchived))}
-          </span>
-        );
-      },
+      renderCell: (_value, index) => <IndexNameCell index={index} />,
     },
     category: {
       staticWidth: 200,
