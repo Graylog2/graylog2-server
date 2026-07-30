@@ -31,7 +31,8 @@ public record CollectorInstanceReport(
         OptionalLong lastProcessedTxnSeq,
         Instant lastSeen,
         Optional<List<Attribute>> identifyingAttributes,
-        Optional<List<Attribute>> nonIdentifyingAttributes
+        Optional<List<Attribute>> nonIdentifyingAttributes,
+        Optional<ComponentHealthDTO> health
 ) {
     @AutoBuilder
     public interface Builder {
@@ -48,6 +49,8 @@ public record CollectorInstanceReport(
         Builder identifyingAttributes(List<Attribute> identifyingAttributes);
 
         Builder nonIdentifyingAttributes(List<Attribute> nonIdentifyingAttributes);
+
+        Builder health(ComponentHealthDTO health);
 
         CollectorInstanceReport build();
 

@@ -35,6 +35,7 @@ import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
@@ -42,8 +43,10 @@ import org.bson.BsonType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.db.Attribute;
+import org.graylog.collectors.db.CollectorHealthDTO;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.collectors.db.ComponentHealthDTO;
 import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
 import org.graylog.collectors.opamp.IssuedCertificate;
 import org.graylog2.database.MongoCollection;
@@ -85,6 +88,7 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CAPABILITIES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ENROLLMENT_TOKEN_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_FLEET_ID;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_HEALTH;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_IDENTIFYING_ATTRIBUTES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_INSTANCE_UID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ISSUING_CA_ID;
@@ -198,13 +202,36 @@ public class CollectorInstanceService {
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.BEFORE)
                         .projection(Projections.fields(
-                                Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID),
+                                Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID, FIELD_HEALTH),
                                 Projections.elemMatch(FIELD_NON_IDENTIFYING_ATTRIBUTES, Filters.eq(Attribute.FIELD_KEY, OS_TYPE_KEY))
                         )));
 
         if (previousInstanceDto == null) {
             // If there was no existing document, the instance was not enrolled.
             throw new IllegalArgumentException("Instance not enrolled: " + update.instanceUid());
+        }
+
+        if (update.health().isPresent()) {
+            // If health changed, update the document and set the changed_at timestamp correctly
+            final var previousComponentHealth = Optional.ofNullable(previousInstanceDto.health())
+                    .map(CollectorHealthDTO::componentHealth);
+
+            if (!update.health().equals(previousComponentHealth)) {
+                final var healthUpdates = new ArrayList<Bson>();
+                healthUpdates.add(set(f("%s.%s", FIELD_HEALTH, CollectorHealthDTO.FIELD_COMPONENT_HEALTH),
+                        update.health().get()));
+
+                final var healthyChanged = !update.health().map(ComponentHealthDTO::healthy)
+                        .equals(previousComponentHealth.map(ComponentHealthDTO::healthy));
+                if (healthyChanged) {
+                    healthUpdates.add(
+                            set(f("%s.%s", FIELD_HEALTH, CollectorHealthDTO.FIELD_HEALTHY_CHANGED_AT),
+                                    Date.from(clock.instant())));
+                }
+
+                collection.updateOne(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
+                        Updates.combine(healthUpdates));
+            }
         }
 
         return previousInstanceDto;
@@ -660,7 +687,8 @@ public class CollectorInstanceService {
                                               @JsonProperty(FIELD_FLEET_ID) String fleetId,
                                               @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
                                               @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq,
-                                              @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes) {
+                                              @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes,
+                                              @JsonProperty(FIELD_HEALTH) @Nullable CollectorHealthDTO health) {
         public CollectorOSType osType() {
             if (nonIdentifyingAttributes == null) {
                 return CollectorOSType.UNKNOWN;
