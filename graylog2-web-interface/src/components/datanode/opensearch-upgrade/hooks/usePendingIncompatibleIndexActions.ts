@@ -103,7 +103,6 @@ const resolveArchiveAction = (
   const job = action.systemJobId ? jobsById.get(action.systemJobId) : undefined;
 
   if (job?.job_status === 'error') {
-    // `||` (not `??`) on purpose: an empty `info` should fall back to the description.
     return { kind: 'failed', message: job.info || job.description, label: 'Archive failed' };
   }
 
@@ -115,7 +114,6 @@ const resolveArchiveAction = (
     return { kind: 'done' };
   }
 
-  // A jobs list fetched before the action started cannot prove the job is gone — keep waiting.
   if (action.systemJobId && !job && jobsUpdatedAt > Date.parse(action.startedAt)) {
     return { kind: 'archived' };
   }
@@ -229,8 +227,6 @@ const usePendingIncompatibleIndexActions = ({
   const addReindexAction = ({ indexName }: { indexName: string }) =>
     addPendingAction({ action: 'reindex', indexName, startedAt: new Date().toISOString() });
 
-  // Guarded state adjustment during render instead of an effect:
-  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
   if (!isLoading && !isError) {
     const reconciled = reconcileActions(pendingActions, incompatibleIndexNames, { jobsById, jobsUpdatedAt });
 
@@ -243,7 +239,6 @@ const usePendingIncompatibleIndexActions = ({
     storeActions(pendingActions);
   }, [pendingActions]);
 
-  // Plain interval: react-query's refetchInterval would need a state round-trip for a flag derived here.
   useEffect(() => {
     if (!hasActiveTrackedActions) {
       return undefined;

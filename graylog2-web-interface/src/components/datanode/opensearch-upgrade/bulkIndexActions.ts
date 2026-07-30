@@ -105,7 +105,6 @@ export const buildPartialBulkNotification = ({
     : { type: 'error', message, title: failureTitle };
 };
 
-// Deleting mid-archive is racy; an already-archived index stays deletable.
 const isArchiveInProgress = (pendingStatus: PendingIndexStatus | undefined) => pendingStatus?.state === 'archiving';
 
 export const getBulkIndexActionCandidates = ({
