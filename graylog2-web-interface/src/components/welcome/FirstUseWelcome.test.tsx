@@ -36,10 +36,10 @@ beforeEach(() => {
 });
 
 describe('FirstUseWelcome', () => {
-  it('links the "Set up Collector" button to the collectors overview', async () => {
+  it('links the "Enroll Collector" button to the collectors overview', async () => {
     render(<FirstUseWelcome />);
 
-    const link = await screen.findByRole('link', { name: /Set up Collector/i });
+    const link = await screen.findByRole('link', { name: /Enroll Collector/i });
 
     expect(link).toHaveAttribute('href', '/system/collectors');
   });
@@ -71,7 +71,7 @@ describe('FirstUseWelcome', () => {
 
     const links = screen.getAllByRole('link', { name: /continue/i });
 
-    expect(links[0]).toHaveAttribute('href', 'https://www.graylog.org');
+    expect(links[0]).toHaveAttribute('href', 'https://community.graylog.org/');
     expect(links[0]).toHaveAttribute('target', '_blank');
   });
 
@@ -93,16 +93,16 @@ describe('FirstUseWelcome', () => {
     expect(mockDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it('shows the "Set up Other Sources" section when not on cloud', () => {
+  it('shows the "Set up Input" section when not on cloud', () => {
     render(<FirstUseWelcome />);
 
-    expect(screen.getByRole('heading', { name: /set up other sources/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /set up input/i })).toBeInTheDocument();
   });
 
-  it('hides the "Set up Other Sources" section on cloud', () => {
+  it('hides the "Set up Input" section on cloud', () => {
     asMock(AppConfig.isCloud).mockReturnValue(true);
     render(<FirstUseWelcome />);
 
-    expect(screen.queryByRole('heading', { name: /set up other sources/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /set up input/i })).not.toBeInTheDocument();
   });
 });

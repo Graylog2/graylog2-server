@@ -21,12 +21,15 @@ import UserNotification from 'util/UserNotification';
 import { BootstrapModalForm, Input, Button } from 'components/bootstrap';
 import { createContentPack } from 'hooks/useContentPackMutations';
 import useProductName from 'brand-customization/useProductName';
+import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
 
 import style from './ContentPackUploadControls.css';
 
 const ContentPackUploadControls = () => {
   const productName = useProductName();
   const queryClient = useQueryClient();
+  const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const uploadInputRef = useRef(null);
 
@@ -47,9 +50,10 @@ const ContentPackUploadControls = () => {
       const request = evt.target.result;
 
       createContentPack(request as string).then(
-        () => {
-          UserNotification.success('Content pack imported successfully', 'Success!');
+        (contentPack) => {
+          UserNotification.success(`Content pack "${contentPack.name}" imported successfully`, 'Success!');
           queryClient.invalidateQueries({ queryKey: ['content-packs'] });
+          history.push(Routes.SYSTEM.CONTENTPACKS.show(contentPack.id));
         },
         (response) => {
           const message = `Error importing content pack, please ensure it is a valid JSON file. Check your ${productName} server logs for more information.`;
@@ -57,7 +61,7 @@ const ContentPackUploadControls = () => {
           let smallMessage = '';
 
           if (response.additional && response.additional.body && response.additional.body.message) {
-            smallMessage = `<br /><small>${response.additional.body.message}</small>`;
+            smallMessage = ` ${response.additional.body.message}`;
           }
 
           UserNotification.error(message + smallMessage, title);
