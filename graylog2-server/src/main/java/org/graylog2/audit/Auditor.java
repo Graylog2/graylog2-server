@@ -72,32 +72,35 @@ public class Auditor {
                          final Object actionInput,
                          final Supplier<T> auditableAction,
                          final Predicate<? super T> isSuccess) {
-        final T result;
+        final T actionResult;
         try {
-            result = auditableAction.get();
+            actionResult = auditableAction.get();
         } catch (RuntimeException e) {
-            recordFailure(username, eventType, actionInput, null,
+            recordFailure(username,
+                    eventType,
+                    actionInput,
+                    null,
                     Map.of(ERROR, String.valueOf(e.getMessage())));
             throw e;
         }
-        if (isSuccess.test(result)) {
-            recordSuccess(username, eventType, actionInput, result, null);
+        if (isSuccess.test(actionResult)) {
+            recordSuccess(username, eventType, actionInput, actionResult, null);
         } else {
-            recordFailure(username, eventType, actionInput, result, null);
+            recordFailure(username, eventType, actionInput, actionResult, null);
         }
-        return result;
+        return actionResult;
     }
 
     public void recordSuccess(final String username,
                               final String eventType,
                               final Object actionInput,
-                              final Object actionOutput,
+                              final Object actionResult,
                               final Map<String, Object> extra) {
         try {
             sender.success(
                     AuditActor.user(username),
                     AuditEventType.create(eventType),
-                    buildContext(actionInput, actionOutput, extra)
+                    buildContext(actionInput, actionResult, extra)
             );
         } catch (Exception auditLogStoreException) {
             LOG.error("Failed to store audit success event of type {}", eventType, auditLogStoreException);
@@ -107,13 +110,13 @@ public class Auditor {
     public void recordFailure(final String username,
                               final String eventType,
                               final Object actionInput,
-                              final Object actionOutput,
+                              final Object actionResult,
                               final Map<String, Object> extra) {
         try {
             sender.failure(
                     AuditActor.user(username),
                     AuditEventType.create(eventType),
-                    buildContext(actionInput, actionOutput, extra)
+                    buildContext(actionInput, actionResult, extra)
             );
         } catch (Exception auditLogStoreException) {
             LOG.error("Failed to store audit failure event of type {}", eventType, auditLogStoreException);
@@ -121,11 +124,11 @@ public class Auditor {
     }
 
     private Map<String, Object> buildContext(final Object actionInput,
-                                             final Object actionOutput,
+                                             final Object actionResult,
                                              final Map<String, Object> extra) {
         final Map<String, Object> ctx = new LinkedHashMap<>();
         addEntity(ctx, REQUEST_ENTITY, actionInput);
-        addEntity(ctx, RESPONSE_ENTITY, actionOutput);
+        addEntity(ctx, RESPONSE_ENTITY, actionResult);
         if (extra != null) {
             ctx.putAll(extra);
         }
