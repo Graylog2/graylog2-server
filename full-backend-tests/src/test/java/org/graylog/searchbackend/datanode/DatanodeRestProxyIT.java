@@ -68,7 +68,7 @@ public class DatanodeRestProxyIT {
 
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testPathTraversalAboveRootIsRejectedEvenWithAllowlistDisabled() {
         // The allowlist is disabled for this test class, but a path that traverses above its own root
         // must still be rejected - normalization isn't part of the allowlist rules, it's a baseline check.
