@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.filesystem.index;
 
+import com.github.zafarkhaja.semver.Version;
+
 /**
  * Which of the two opensearch distributions shipped with the datanode is able to open an index directory. An index
  * format is only readable by the opensearch release that wrote it and the one following it, so data written by an
@@ -26,17 +28,27 @@ public enum RequiredOpensearchDistribution {
     /**
      * The current opensearch distribution can open the directory directly.
      */
-    CURRENT("3.x"),
+    CURRENT("3.x.x"),
 
     /**
      * The directory predates the current distribution and has to be opened by the bundled compatibility
      * distribution ({@code opensearch.compat.version}) first. This is not an error, only a migration step.
      */
-    COMPAT("");
+    COMPAT("2.x.x");
 
     public final String versionSelector;
+    private final long majorVersion;
 
     RequiredOpensearchDistribution(String versionSelector) {
         this.versionSelector = versionSelector;
+        this.majorVersion = Long.parseLong(versionSelector.substring(0, versionSelector.indexOf('.')));
+    }
+
+    /**
+     * Whether the given opensearch version belongs to this tier. Only the major version is compared — the selectors
+     * above are the single place to edit when a new generation ships and the tiers move up.
+     */
+    public boolean matches(String opensearchVersion) {
+        return Version.parse(opensearchVersion).majorVersion() == majorVersion;
     }
 }

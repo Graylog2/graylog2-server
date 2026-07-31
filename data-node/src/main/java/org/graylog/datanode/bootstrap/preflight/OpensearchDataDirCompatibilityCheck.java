@@ -19,6 +19,7 @@ package org.graylog.datanode.bootstrap.preflight;
 import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.filesystem.index.DataDirVerificationMarker;
 import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibility;
 import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibilityService;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
@@ -26,9 +27,6 @@ import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -37,20 +35,17 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchDataDirCompatibilityCheck.class);
 
-    /**
-     * Name of the marker file written into the opensearch data directory after a successful compatibility check.
-     * The file contains the opensearch version string; the path context is implicit from the file's location.
-     */
-    static final String COMPATIBILITY_CHECK_FILENAME = ".dn-compat-check";
-
     private final DatanodeConfiguration datanodeConfiguration;
     private final OpensearchDataDirCompatibilityService compatibilityService;
+    private final DataDirVerificationMarker verificationMarker;
 
     @Inject
     public OpensearchDataDirCompatibilityCheck(DatanodeConfiguration datanodeConfiguration,
-                                               OpensearchDataDirCompatibilityService compatibilityService) {
+                                               OpensearchDataDirCompatibilityService compatibilityService,
+                                               DataDirVerificationMarker verificationMarker) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.compatibilityService = compatibilityService;
+        this.verificationMarker = verificationMarker;
     }
 
     @Override
@@ -59,10 +54,11 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         final Path opensearchDataDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
         final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
 
-        // We want to run the compatibility check only once per major opensearch version for this data dir. Let's memorize
-        // the run and skip every time we are starting with the same major version in the same data dir.
-        // A change in the major version will re-run the full check; minor/patch upgrades are skipped.
-        if (isCompatibilityAlreadyVerified(opensearchDataDir, opensearchVersion)) {
+        // We want to run the compatibility check only once per major opensearch version for this data dir. The marker
+        // file tells us which major already opened it successfully, so we can skip the full scan when nothing about
+        // the format can have changed. A change in the major version re-runs the full check; minor/patch upgrades are
+        // skipped. The marker itself is written once opensearch is actually up, see OpensearchVersionTracer.
+        if (verificationMarker.isVerifiedFor(opensearchDataDir, opensearchVersion)) {
             LOG.info("Opensearch data directory compatibility already successfully verified for data directory {} and opensearch major version {}, skipping check", opensearchDataDir, Version.parse(opensearchVersion).majorVersion());
             return;
         }
@@ -76,32 +72,5 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         }
 
         LOG.info("Found {} indices and all of them are valid with current opensearch version {}", compatibility.indicesCount(), opensearchVersion);
-        // The check succeeded, let's remember this configuration and skip next time
-        writeCompatibilityCheckResult(opensearchDataDir, opensearchVersion);
-    }
-
-    private boolean isCompatibilityAlreadyVerified(Path opensearchDataDir, String opensearchVersion) {
-        final Path checkFile = opensearchDataDir.resolve(COMPATIBILITY_CHECK_FILENAME);
-        if (!Files.exists(checkFile)) {
-            return false;
-        }
-        try {
-            final String storedVersion = Files.readString(checkFile, StandardCharsets.UTF_8).trim();
-            final long storedMajor = Version.parse(storedVersion).majorVersion();
-            final long currentMajor = Version.parse(opensearchVersion).majorVersion();
-            return storedMajor == currentMajor;
-        } catch (Exception e) {
-            LOG.warn("Failed to read compatibility check file, re-running check", e);
-            return false;
-        }
-    }
-
-    private void writeCompatibilityCheckResult(Path opensearchDataDir, String opensearchVersion) {
-        final Path checkFile = opensearchDataDir.resolve(COMPATIBILITY_CHECK_FILENAME);
-        try {
-            Files.writeString(checkFile, opensearchVersion, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            LOG.warn("Failed to write compatibility check result, check will re-run on next startup", e);
-        }
     }
 }

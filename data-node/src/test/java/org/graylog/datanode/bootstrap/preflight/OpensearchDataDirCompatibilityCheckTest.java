@@ -22,6 +22,7 @@ import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.filesystem.index.DataDirVerificationMarker;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParseResult;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
@@ -45,9 +46,11 @@ class OpensearchDataDirCompatibilityCheckTest {
 
     private static final String OPENSEARCH_VERSION = "2.19.0";
 
+    private final DataDirVerificationMarker marker = new DataDirVerificationMarker();
+
     @Test
-    void testCompatibilityCheckSkipping(@TempDir Path tempDir) throws IOException {
-        writeCheckFile(tempDir, OPENSEARCH_VERSION);
+    void testCompatibilityCheckSkipping(@TempDir Path tempDir) {
+        marker.record(tempDir, OPENSEARCH_VERSION);
 
         final OpensearchDataDirCompatibilityCheck check =
                 checkFor(tempDir, OPENSEARCH_VERSION, neverCalledParser("Should not be called"));
@@ -55,17 +58,21 @@ class OpensearchDataDirCompatibilityCheckTest {
         Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
     }
 
+    /**
+     * The marker is written once opensearch actually reaches a running state, not by the check itself — see
+     * {@code OpensearchVersionTracer}. Passing the check is only a prediction.
+     */
     @Test
-    void testCompatibilityCheckInitialRun(@TempDir Path tempDir) throws IOException {
+    void testCompatibilityCheckDoesNotWriteTheMarker(@TempDir Path tempDir) {
         final OpensearchDataDirCompatibilityCheck check = checkFor(tempDir, OPENSEARCH_VERSION, realParser());
 
         Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
-        Assertions.assertThat(readCheckFile(tempDir)).isEqualTo(OPENSEARCH_VERSION);
+        Assertions.assertThat(marker.verifiedMajorVersion(tempDir)).isEmpty();
     }
 
     @Test
-    void testCompatibilityCheckSkipsOnMinorVersionChange(@TempDir Path dataDir) throws IOException {
-        writeCheckFile(dataDir, "2.18.0");
+    void testCompatibilityCheckSkipsOnMinorVersionChange(@TempDir Path dataDir) {
+        marker.record(dataDir, "2.18.0");
 
         final OpensearchDataDirCompatibilityCheck check = checkFor(dataDir, OPENSEARCH_VERSION,
                 neverCalledParser("Should not be called on minor version change"));
@@ -74,14 +81,15 @@ class OpensearchDataDirCompatibilityCheckTest {
     }
 
     @Test
-    void testCompatibilityCheckRerunsForMajorVersionChange(@TempDir Path dataDir) throws IOException {
-        writeCheckFile(dataDir, "2.19.0");
+    void testCompatibilityCheckRerunsForMajorVersionChange(@TempDir Path dataDir) {
+        marker.record(dataDir, "2.19.0");
         final String nextMajorVersion = "3.0.0";
 
         final OpensearchDataDirCompatibilityCheck check = checkFor(dataDir, nextMajorVersion, realParser());
 
         Assertions.assertThatCode(check::runCheck).doesNotThrowAnyException();
-        Assertions.assertThat(readCheckFile(dataDir)).isEqualTo(nextMajorVersion);
+        // Still the old major: only a confirmed opensearch startup advances the marker
+        Assertions.assertThat(marker.verifiedMajorVersion(dataDir)).contains(2L);
     }
 
     @Test
@@ -149,7 +157,7 @@ class OpensearchDataDirCompatibilityCheckTest {
     private OpensearchDataDirCompatibilityCheck checkFor(Path dataDir, String opensearchVersion, IndicesDirectoryParser parser) {
         final DatanodeConfiguration configuration = configFor(dataDir, opensearchVersion);
         return new OpensearchDataDirCompatibilityCheck(configuration,
-                new OpensearchDataDirCompatibilityService(configuration, parser));
+                new OpensearchDataDirCompatibilityService(configuration, parser), marker);
     }
 
     private DatanodeConfiguration configFor(Path dataDir, String opensearchVersion) {
@@ -162,11 +170,4 @@ class OpensearchDataDirCompatibilityCheckTest {
                 new Lucene9StateFileParser(), new Lucene9ShardStatsParser());
     }
 
-    private void writeCheckFile(Path dataDir, String version) throws IOException {
-        Files.writeString(dataDir.resolve(OpensearchDataDirCompatibilityCheck.COMPATIBILITY_CHECK_FILENAME), version, StandardCharsets.UTF_8);
-    }
-
-    private String readCheckFile(Path dataDir) throws IOException {
-        return Files.readString(dataDir.resolve(OpensearchDataDirCompatibilityCheck.COMPATIBILITY_CHECK_FILENAME), StandardCharsets.UTF_8);
-    }
 }
