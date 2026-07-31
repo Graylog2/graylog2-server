@@ -54,6 +54,10 @@ const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedM
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
+    &.uppercase {
+      text-transform: uppercase;
+    }
   `,
 );
 
@@ -69,6 +73,7 @@ type Props = React.PropsWithChildren<{
   role?: string;
   style?: React.CSSProperties;
   title?: string;
+  uppercase?: boolean;
 }>;
 
 const Badge = (
@@ -85,6 +90,7 @@ const Badge = (
     style = undefined,
     title = undefined,
     bsSize = 'md',
+    uppercase = false,
   }: Props,
   ref: React.ForwardedRef<HTMLElement>,
 ) => {
@@ -95,7 +101,7 @@ const Badge = (
   const sharedProps = {
     'aria-label': ariaLabel,
     color,
-    className,
+    className: uppercase ? `${className ?? ''} uppercase` : className,
     title,
     'data-testid': dataTestid,
     role,

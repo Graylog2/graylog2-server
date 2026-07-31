@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix setting compression in OpenSearch client when enabled using `elasticsearch_compression_enabled`."
+
+pulls = ["26633"]

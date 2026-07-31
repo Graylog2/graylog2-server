@@ -23,6 +23,7 @@ export { default as Accordion } from './Accordion';
 export { default as AccordionItem } from './AccordionItem';
 export { default as Affix } from './Affix';
 export { default as Autocomplete } from './Autocomplete/Autocomplete';
+export { default as BetaBadge } from './BetaBadge';
 export { default as BrowserTime } from './BrowserTime';
 export { default as Box } from './Box';
 export { default as BrandIcon } from './BrandIcon';
@@ -108,6 +109,7 @@ export { default as PaginatedItemOverview } from './PaginatedItemOverview/Pagina
 export { default as PaginatedList } from './PaginatedList';
 export { default as Pagination } from './Pagination';
 export { default as Pluralize } from './Pluralize';
+export { default as PreviewBadge } from './PreviewBadge';
 export { default as Progress } from './Progress';
 export { default as ProgressBar } from './ProgressBar';
 export { default as ProgressAnimation } from './ProgressAnimation';

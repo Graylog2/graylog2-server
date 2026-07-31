@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -125,6 +126,9 @@ public class AWSServiceTest {
         assertEquals("us-east-1", input.configuration().get(AWSInput.CK_AWS_REGION));
         assertEquals("a-stream", input.configuration().get(KinesisTransport.CK_KINESIS_STREAM_NAME));
         assertEquals(10000, input.configuration().get(KinesisTransport.CK_KINESIS_RECORD_BATCH_SIZE));
+        // The single-table flag is not part of the create request, so it must not be written into the
+        // input configuration. A newly created input therefore never triggers the one-way migration.
+        assertNull(input.configuration().get(KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING));
     }
 
     @Test

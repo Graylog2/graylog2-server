@@ -17,10 +17,11 @@
 import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputStates } from 'hooks/useInputsStates';
-import { TypeCell, NodeCell, ThroughputCell, ExpandedSectionToggleWrapper } from 'components/inputs/InputsOveriew';
+import { TypeCell, NodeCell, ThroughputCell } from 'components/inputs/InputsOveriew';
 import FailuresCell from 'components/inputs/InputsOveriew/cells/FailuresCell';
 import MessageCountCell from 'components/inputs/InputsOveriew/cells/MessageCountCell';
 import ExtractorCountCell from 'components/inputs/InputsOveriew/cells/ExtractorCountCell';
@@ -29,6 +30,8 @@ import { METRIC_COLUMN_IDS } from 'components/inputs/InputsOveriew/metricColumns
 import { InputStateBadge } from 'components/inputs';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
+
+const EXPANDED_SECTION = 'EXPANDED_SECTION';
 
 type Props = {
   inputTypes: InputTypesSummary;
@@ -39,7 +42,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
   attributes: {
     title: {
       renderCell: (_title: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>
+        <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION}>
           <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)} title={`show input diagnosis for ${input.title}`}>
             {input.title}
           </Link>
@@ -49,7 +52,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     },
     type: {
       renderCell: (type: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>
+        <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION}>
           <TypeCell type={type} inputTypes={inputTypes} />
         </ExpandedSectionToggleWrapper>
       ),
@@ -57,7 +60,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     },
     desired_state: {
       renderCell: (_state: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>
+        <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION}>
           <InputStateBadge input={input} inputStates={inputStates} />
         </ExpandedSectionToggleWrapper>
       ),
@@ -65,7 +68,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     },
     node_id: {
       renderCell: (_type: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>
+        <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION}>
           <NodeCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
@@ -73,23 +76,25 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     },
     traffic: {
       renderCell: (_traffic: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>
+        <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION} align="right">
           <ThroughputCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
       staticWidth: 180,
+      textAlign: 'right',
     },
     input_failures: {
       renderCell: (_failures: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>
+        <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION} align="right">
           <FailuresCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
       staticWidth: 130,
+      textAlign: 'right',
     },
     address: {
       renderCell: (_address: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>
+        <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION}>
           {input.attributes?.bind_address || 'N/A'}
         </ExpandedSectionToggleWrapper>
       ),
@@ -97,13 +102,16 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     },
     port: {
       renderCell: (_port: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>{input.attributes?.port || 'N/A'}</ExpandedSectionToggleWrapper>
+        <ExpandedSectionToggleWrapper id={input.id} section={EXPANDED_SECTION} align="right">
+          {input.attributes?.port || 'N/A'}
+        </ExpandedSectionToggleWrapper>
       ),
       staticWidth: 'matchHeader',
     },
     [METRIC_COLUMN_IDS.messagesPerStream]: {
       renderCell: (_value: unknown, input: InputSummary) => <MessageCountCell input={input} />,
       staticWidth: 180,
+      textAlign: 'right',
     },
     [METRIC_COLUMN_IDS.extractorCount]: {
       renderCell: (_value: unknown, input: InputSummary) => <ExtractorCountCell input={input} />,
@@ -112,6 +120,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     [METRIC_COLUMN_IDS.associatedStreams]: {
       renderCell: (_value: unknown, input: InputSummary) => <AssociatedStreamsCell input={input} />,
       staticWidth: 180,
+      textAlign: 'right',
     },
   },
 });

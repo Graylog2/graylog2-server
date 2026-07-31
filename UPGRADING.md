@@ -36,6 +36,47 @@ message's accounted size, regardless of whether the restore counted against the 
 This field is informational and is not used to compute license usage, so your license consumption is
 unaffected by the change.
 
+### Changed parsing for Okta Log Events `securityContext.userBehaviors` field
+
+Due to a [bug in the Okta SDK](https://github.com/okta/okta-sdk-java/issues/1689), a workaround was introduced in 7.1
+to stringify the objects in the `securityContext.userBehaviors` array in logs pulled in from the `Okta Log Events` input. The
+updated SDK now properly serializes that field as an array of objects and the workaround has been removed. Custom parsing
+on `Okta Log Events` messages that is expecting the `securityContext.userBehaviors` field to be an array of
+strings will need to be modified to expect an array of objects, per the Okta API. An example of the serialization across
+versions:
+
+7.1:
+```json
+{
+  "securityContext": {
+    "userBehaviors": [
+      "{\"name\":\"New City\",\"id\":\"bbbbbbbbbbbbbbbbbbbb\",\"result\":\"NEGATIVE\"}",
+      "{\"name\":\"New Country\",\"id\":\"aaaaaaaaaaaaaaaaaaaa\",\"result\":\"NEGATIVE\"}"
+    ]
+  }
+}
+```
+
+7.2:
+```json
+{
+  "securityContext": {
+    "userBehaviors": [
+      {
+        "name": "New City",
+        "id": "bbbbbbbbbbbbbbbbbbbb",
+        "result": "NEGATIVE"
+      },
+      {
+        "name": "New Country",
+        "id": "aaaaaaaaaaaaaaaaaaaa",
+        "result": "NEGATIVE"
+      }
+    ]
+  }
+}
+```
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"
@@ -53,6 +94,19 @@ old value may be removed in a future version.
 | File/method                                                               | Description |
 |---------------------------------------------------------------------------|-------------|
 | `org.graylog2.contentpacks.facades.EntityWithExcerptFacade#resolveGrants` | removed     |
+
+## Plugin Builds: New `requireUpperBoundDeps` Maven Enforcer Rule
+
+Plugin builds inheriting from the `graylog-plugin-parent` or `graylog-plugin-web-parent` Maven parent
+POM now run the
+[`requireUpperBoundDeps`](https://maven.apache.org/enforcer/enforcer-rules/requireUpperBoundDeps.html)
+enforcer rule. It fails the build when a transitive dependency resolves to a *lower* version than
+another of the plugin's dependencies requires.
+
+Such conflicts can usually be fixed by updating the outdated dependency, or by adding a
+`<dependencyManagement>` entry for the flagged artifact using the highest required version shown in
+the error message. Plugin authors who are unable to align their dependencies can override the
+`enforce-versions` execution of the `maven-enforcer-plugin` in their own POM.
 
 ## Sigma Rules Folded into Event Definitions
 
@@ -108,3 +162,50 @@ Definitions rather than from the previous Sigma rules. Every Event Definition wi
 assigned is now included, and coverage reflects how many of them are enabled versus disabled (with no log
 source check that was previously present for Sigma rules). Therefore, a tactic may show a higher or lower
 percentage than it did in 7.1, without any change to the actual installed Event Definitions.
+
+## AWS Kinesis/CloudWatch Input: Single DynamoDB Table State Tracking
+
+In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5. 
+The KCL stores its coordination state in DynamoDB. Previously, this used three tables per input: the lease table, plus separate
+`<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats` tables. The AWS KCL 3.5 introduced a
+single-table format that consolidates all of this into the lease table alone (each item is tagged with an
+`entityType` attribute). This reduces the number of DynamoDB tables and helps you stay under account-level table
+limits.
+
+There are two things to know about how this applies to your inputs:
+
+- **New inputs use the single-table format automatically.** This is the AWS KCL 3.5 default for a newly created
+  consumer. A fresh input always uses a single lease table.
+- **Existing inputs keep their three-table layout** until you deliberately migrate them using the new
+    "Migrate to single DynamoDB table for state tracking" input option.  
+
+To let you migrate existing inputs on your own schedule, the input's **edit page** exposes a 
+**Migrate to single DynamoDB table for state tracking** option. This option is only relevant for inputs created before Graylog 7.2.
+Enabling it on such an input starts a one-way migration
+that consolidates the `-CoordinatorState` and `-WorkerMetricStats` entities into the input's lease table. Stream
+checkpoints are preserved, so ingestion should continue without replay or gaps. 
+
+### Migration steps for a Kinesis input that existed before Graylog 7.2
+
+1. Upgrade to Graylog 7.2 and allow the input to start and run for one hour with the **Migrate to single DynamoDB
+   table for state tracking** option off. KCL 3.5 requires the input to run steadily for a whole hour before it will
+   accept the migration. This readiness period is fixed by KCL 3.5 and cannot be shortened.
+2. Before enabling the option, confirm the input is ready. In DynamoDB, open the input's coordinator-state table
+   (`graylog-aws-plugin-<stream-name>-CoordinatorState`), find the `TableMigration3.5` item, and check its `tm`
+   attribute. It must read `TABLE_MIGRATION_STATUS_DEPLOYED`. If it still reads `TABLE_MIGRATION_STATUS_INIT`, the
+   readiness period has not elapsed yet; wait and re-check. Enabling the option before this point causes the input
+   to fail to start.
+3. Enable the **Migrate to single DynamoDB table for state tracking** option on the input's edit page and save. The
+   migration begins.
+4. Verify completion. KCL 3.5 bakes for 24 hours (the default) before finalizing. After that period, check the same
+   `TableMigration3.5` item again; its `tm` attribute should read `TABLE_MIGRATION_STATUS_COMPLETE`. Once complete,
+   the legacy `-CoordinatorState` and `-WorkerMetricStats` tables are no longer used and can be deleted.
+
+The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
+monitoring the migration until it reaches completion.
+
+For how to monitor the migration, along with the migration steps, required permissions, and how to remove the
+now-unused legacy tables afterward, see AWS's documentation:
+
+- [Single table format for KCL](https://docs.aws.amazon.com/streams/latest/dev/kcl-single-table-format.html)
+- [Migrate from KCL 2.x to KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html)

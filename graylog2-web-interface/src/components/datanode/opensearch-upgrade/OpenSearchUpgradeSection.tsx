@@ -49,6 +49,12 @@ const DisabledHint = styled.p(
   `,
 );
 
+const ActionsRow = styled(Row)(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.md};
+  `,
+);
+
 const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
 const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
 
@@ -143,8 +149,8 @@ const OpenSearchUpgradeSection = () => {
         />
         <Alert bsStyle="warning">
           Incompatible indices and upgrade status cannot be checked while {unavailableDataNodeCount} Data{' '}
-          {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all
-          Data Nodes are available.
+          {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all Data
+          Nodes are available.
         </Alert>
       </Section>
     );
@@ -169,7 +175,7 @@ const OpenSearchUpgradeSection = () => {
         </Row>
       )}
 
-      <Row>
+      <ActionsRow>
         <Col xs={12}>
           <ButtonToolbar>
             {showStartAction && (
@@ -197,7 +203,7 @@ const OpenSearchUpgradeSection = () => {
             <DisabledHint>Data Nodes&apos; embedded OpenSearch is already up to date.</DisabledHint>
           )}
         </Col>
-      </Row>
+      </ActionsRow>
 
       {showRollingUpgradeStatus && (
         <Row>
