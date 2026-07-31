@@ -1,0 +1,4 @@
+type = "c"
+message = "Stream titles in the streams overview no longer include the description text underneath; descriptions are shown in their own column again."
+
+pulls = ["26826"]

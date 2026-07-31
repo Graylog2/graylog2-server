@@ -1,0 +1,5 @@
+type = "changed"
+message = "Redirect to the content pack details page after a content pack is uploaded successfully."
+
+issues = ["23797", "15802", "23431"]
+pulls = ["26754"]
