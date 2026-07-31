@@ -53,6 +53,8 @@ const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
     os: (allAttributes?.['os.type'] as string) ?? null,
     version: (allAttributes?.['service.version'] as string) ?? null,
     has_pending_changes: dto.has_pending_changes,
+    // Absent on the wire for never-reported instances; normalize to the declared null.
+    health: dto.health ?? null,
   };
 };
 

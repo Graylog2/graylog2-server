@@ -45,6 +45,7 @@ const mockInstance: CollectorInstanceView = {
   version: '1.2.0',
   status: 'online',
   has_pending_changes: false,
+  health: null,
 };
 
 const mockSources: Source[] = [

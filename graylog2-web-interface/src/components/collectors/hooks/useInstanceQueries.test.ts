@@ -91,6 +91,33 @@ describe('useInstance', () => {
 
     expect(Collectors.getInstance).not.toHaveBeenCalled();
   });
+
+  it('maps health to the view', async () => {
+    const health = {
+      healthy_changed_at: '2026-07-31T10:00:00.000+0000',
+      component_health: { healthy: false, last_error: 'connection refused' },
+    };
+    asMock(Collectors.getInstance).mockResolvedValue({
+      ...dto('uid-42'),
+      health,
+    } as unknown as Awaited<ReturnType<typeof Collectors.getInstance>>);
+
+    const { result } = renderHook(() => useInstance('uid-42'));
+
+    await waitFor(() => expect(result.current.data).toBeTruthy());
+
+    expect(result.current.data.health).toEqual(health);
+  });
+
+  it('normalizes absent health to null', async () => {
+    asMock(Collectors.getInstance).mockResolvedValue(asInstanceResponse('uid-42'));
+
+    const { result } = renderHook(() => useInstance('uid-42'));
+
+    await waitFor(() => expect(result.current.data).toBeTruthy());
+
+    expect(result.current.data.health).toBeNull();
+  });
 });
 
 describe('fetchPaginatedInstances session extension', () => {
