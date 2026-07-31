@@ -73,7 +73,10 @@ const ErrorBlock = styled.pre(
     margin-top: ${theme.spacings.xs};
     margin-bottom: 0;
     padding: ${theme.spacings.xs} ${theme.spacings.sm};
-    overflow-x: auto;
+    /* Agent errors are often long single lines; wrap instead of forcing a
+       horizontal scroller inside the narrow drawer. */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   `,
 );
 
