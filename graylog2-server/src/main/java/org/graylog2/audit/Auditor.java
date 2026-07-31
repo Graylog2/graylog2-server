@@ -50,6 +50,7 @@ public class Auditor {
 
     public static final Predicate<Object> SUCCESS_ON_TRUE = Boolean.TRUE::equals;
     public static final Predicate<Object> SUCCESS_ON_NON_NULL = Objects::nonNull;
+    public static final Predicate<Object> SUCCESS_ON_NO_EXCEPTION = x -> true;
 
     private final AuditEventSender sender;
     private final ResponseEntityConverter converter;
