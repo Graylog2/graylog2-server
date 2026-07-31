@@ -128,7 +128,14 @@ export const useInstance = (
     // eslint-disable-next-line @tanstack/query/exhaustive-deps -- silent only affects the error-reporting wrapper, not the cached data; callers deliberately share one cache entry regardless of the flag
     queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
     queryFn: () => {
-      const promise = Collectors.getInstance(instanceUid).then((response) => toView(response));
+      // Polling callers are background refreshes and must not keep the session
+      // alive (module convention, see NO_SESSION_EXT above); one-shot callers
+      // are user-initiated and extend it as usual.
+      const request =
+        options.refetchInterval !== undefined
+          ? Collectors.getInstance(instanceUid, NO_SESSION_EXT)
+          : Collectors.getInstance(instanceUid);
+      const promise = request.then((response) => toView(response));
 
       return options.silent
         ? promise

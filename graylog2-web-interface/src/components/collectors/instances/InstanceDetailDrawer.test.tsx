@@ -368,5 +368,7 @@ describe('InstanceDetailDrawer', () => {
     );
 
     await screen.findByText('Online');
+    // Guards the polling wiring: silent (no toast spam) on the shared collector cadence.
+    expect(useInstance).toHaveBeenCalledWith('uid-1', { refetchInterval: 5000, silent: true });
   });
 });
