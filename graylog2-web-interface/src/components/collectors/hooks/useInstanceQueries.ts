@@ -120,16 +120,26 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
     refetchInterval: options.refetchInterval,
   });
 
-export const useInstance = (instanceUid: string | undefined) => {
+export const useInstance = (
+  instanceUid: string | undefined,
+  options: { refetchInterval?: number; silent?: boolean } = {},
+) => {
   const { data, isLoading, error, isError } = useQuery<CollectorInstanceView>({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- silent only affects the error-reporting wrapper, not the cached data; callers deliberately share one cache entry regardless of the flag
     queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
-    queryFn: () =>
-      defaultOnError(
-        Collectors.getInstance(instanceUid).then((response) => toView(response)),
-        'Loading Collector instance failed with status',
-        'Could not load Collector instance',
-      ),
+    queryFn: () => {
+      const promise = Collectors.getInstance(instanceUid).then((response) => toView(response));
+
+      return options.silent
+        ? promise
+        : defaultOnError(
+            promise,
+            'Loading Collector instance failed with status',
+            'Could not load Collector instance',
+          );
+    },
     enabled: !!instanceUid,
+    refetchInterval: options.refetchInterval,
   });
 
   return { data, isLoading, error, isError };

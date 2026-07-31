@@ -33,7 +33,7 @@ import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
-import { useInstancePendingChanges } from '../hooks';
+import { useInstance, useInstancePendingChanges, useCollectorRefetchInterval } from '../hooks';
 import type { CoalescedActions, CollectorInstanceView, Source, TargetInfo } from '../types';
 
 type Props = {
@@ -135,7 +135,13 @@ const pendingActions = (coalesced: CoalescedActions): PendingAction[] => {
   return actions;
 };
 
-const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
+const InstanceDetailDrawer = ({ instance: instanceProp, sources, fleetName, onClose }: Props) => {
+  const refetchInterval = useCollectorRefetchInterval();
+  // The prop is a row snapshot frozen at drawer-open; poll the instance itself so
+  // Status, Last Seen, and Health stay live (same pattern as the sync section below).
+  // silent: errors here are non-fatal — we keep rendering the last known instance.
+  const { data: freshInstance } = useInstance(instanceProp.instance_uid, { refetchInterval, silent: true });
+  const instance = freshInstance ?? instanceProp;
   const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
   const { data: pendingDetail, isError: pendingError } = useInstancePendingChanges(instance.instance_uid);
   // Use the backend's authoritative flag (consistent with the table); fall back to the table row's
