@@ -75,13 +75,13 @@ public class DatanodeOpensearchProxyIT {
         Assertions.assertThat(message).contains("This request is not allowed");
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testPathTraversalAboveRootIsRejected() {
         final String message = apis.get("/datanodes/any/opensearch/_cluster/../../_search", 400).extract().body().asString();
         Assertions.assertThat(message).contains("This request is not allowed");
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testPathTraversalOutOfAllowedPrefixIsRejected() {
         // "_cat/../_search" textually starts with the allowed "_cat" prefix, but resolves to the
         // disallowed "_search" endpoint once the ".." segment is applied - the allowlist must reject it.
