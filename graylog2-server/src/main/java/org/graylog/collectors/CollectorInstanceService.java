@@ -117,7 +117,7 @@ public class CollectorInstanceService {
 
     private final MongoCollection<CollectorInstanceDTO> collection;
     private final MongoPaginationHelper<CollectorInstanceDTO> paginationHelper;
-    private final com.mongodb.client.MongoCollection<MinimalCollectorInstanceDTO> projectedCollection;
+    private final com.mongodb.client.MongoCollection<ReportUpdateState> reportUpdateCollection;
 
     private final MongoCollections mongoCollections;
     private final ClusterEventBus clusterEventBus;
@@ -126,7 +126,7 @@ public class CollectorInstanceService {
     @Inject
     public CollectorInstanceService(MongoCollections mongoCollections, ClusterEventBus clusterEventBus, Clock clock) {
         collection = mongoCollections.collection(COLLECTION_NAME, CollectorInstanceDTO.class);
-        projectedCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, MinimalCollectorInstanceDTO.class);
+        reportUpdateCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, ReportUpdateState.class);
         paginationHelper = mongoCollections.paginationHelper(collection);
         this.mongoCollections = mongoCollections;
         this.clusterEventBus = clusterEventBus;
@@ -193,18 +193,25 @@ public class CollectorInstanceService {
             updateOps.add(set(FIELD_NON_IDENTIFYING_ATTRIBUTES, update.nonIdentifyingAttributes().get()));
         }
 
+        final var projectedFields = new ArrayList<Bson>();
+        projectedFields.add(Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID));
+        projectedFields.add(
+                Projections.elemMatch(FIELD_NON_IDENTIFYING_ATTRIBUTES, Filters.eq(Attribute.FIELD_KEY, OS_TYPE_KEY)));
+        // on an incoming health report, request the original health field, to determine if it needs to be updated
+        if (update.health().isPresent()) {
+            projectedFields.add(Projections.include(FIELD_HEALTH));
+        }
+
         // we request the ReturnDocument.BEFORE here to avoid having to load the previous document in full just
         // to retrieve the previous `message_seq_num`, which we need to determine what to do next.
         // the result is not the full CollectorInstanceDTO as we have it, but the minimal set of fields necessary to
         // determine next steps
-        final var previousInstanceDto = projectedCollection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
+        final var previousInstanceDto = reportUpdateCollection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
                 combine(updateOps),
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.BEFORE)
-                        .projection(Projections.fields(
-                                Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID, FIELD_HEALTH),
-                                Projections.elemMatch(FIELD_NON_IDENTIFYING_ATTRIBUTES, Filters.eq(Attribute.FIELD_KEY, OS_TYPE_KEY))
-                        )));
+                        .projection(Projections.fields(projectedFields))
+        );
 
         if (previousInstanceDto == null) {
             // If there was no existing document, the instance was not enrolled.
@@ -212,10 +219,10 @@ public class CollectorInstanceService {
         }
 
         if (update.health().isPresent()) {
-            // If health changed, update the document and set the changed_at timestamp correctly
             final var previousComponentHealth = Optional.ofNullable(previousInstanceDto.health())
                     .map(CollectorHealthDTO::componentHealth);
 
+            // If health changed, update the document and set the changed_at timestamp correctly
             if (!update.health().equals(previousComponentHealth)) {
                 final var healthUpdates = new ArrayList<Bson>();
                 healthUpdates.add(set(f("%s.%s", FIELD_HEALTH, CollectorHealthDTO.FIELD_COMPONENT_HEALTH),
@@ -234,7 +241,13 @@ public class CollectorInstanceService {
             }
         }
 
-        return previousInstanceDto;
+        return new MinimalCollectorInstanceDTO(
+                previousInstanceDto.id(),
+                previousInstanceDto.fleetId(),
+                previousInstanceDto.messageSeqNum(),
+                previousInstanceDto.lastProcessTxnSeq(),
+                previousInstanceDto.nonIdentifyingAttributes()
+        );
     }
 
     /**
@@ -683,12 +696,19 @@ public class CollectorInstanceService {
                 .orElse(CollectorOSType.UNKNOWN);
     }
 
+    record ReportUpdateState(@Id @JsonProperty(FIELD_ID) String id,
+                             @JsonProperty(FIELD_FLEET_ID) String fleetId,
+                             @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
+                             @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq,
+                             @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes,
+                             // health will only be populated by our projection if the incoming report included health
+                             @JsonProperty(FIELD_HEALTH) @Nullable CollectorHealthDTO health) {}
+
     public record MinimalCollectorInstanceDTO(@Id @JsonProperty(FIELD_ID) String id,
                                               @JsonProperty(FIELD_FLEET_ID) String fleetId,
                                               @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
                                               @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq,
-                                              @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes,
-                                              @JsonProperty(FIELD_HEALTH) @Nullable CollectorHealthDTO health) {
+                                              @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) List<Attribute> nonIdentifyingAttributes) {
         public CollectorOSType osType() {
             if (nonIdentifyingAttributes == null) {
                 return CollectorOSType.UNKNOWN;

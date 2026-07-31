@@ -1112,19 +1112,6 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
-    void updateFromReportReturnsPreviousHealthState() throws Exception {
-        final var uid = "health-previous";
-        enroll(uid);
-
-        final var first = collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(true, null)));
-        assertThat(first.health()).isNull();
-
-        final var second = collectorInstanceService.updateFromReport(healthReport(uid, 2L, health(false, "boom")));
-        assertThat(second.health()).isNotNull();
-        assertThat(second.health().componentHealth()).isEqualTo(health(true, null));
-    }
-
-    @Test
     void updateFromReportRoundTripsRecursiveHealthTree() throws Exception {
         final var uid = "health-tree";
         enroll(uid);

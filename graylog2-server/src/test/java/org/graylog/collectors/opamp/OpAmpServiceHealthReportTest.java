@@ -91,7 +91,7 @@ class OpAmpServiceHealthReportTest {
         lenient().when(clusterIdService.getString()).thenReturn("clusterId");
         // Previous seq 0 vs message seq 10: non-consecutive on purpose, see class javadoc.
         when(collectorInstanceService.updateFromReport(any())).thenReturn(
-                new MinimalCollectorInstanceDTO("id-1", "fleet-A", 0L, 0L, null, null));
+                new MinimalCollectorInstanceDTO("id-1", "fleet-A", 0L, 0L, null));
         opAmpService = new OpAmpService(enrollmentTokenService, agentTokenService, collectorCaService,
                 certificateService, collectorInstanceService, collectorsConfigService, clusterIdService,
                 fleetTransactionLogService, sourceService);

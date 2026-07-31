@@ -93,7 +93,8 @@ class OpAmpServiceTransactionLogTruncationTest {
     private OpAmpService opAmpService;
 
     @BeforeEach
-    @SuppressWarnings("MustBeClosedChecker") // stubbing streamAllByFleet on a mock opens no resource
+    @SuppressWarnings("MustBeClosedChecker")
+        // stubbing streamAllByFleet on a mock opens no resource
     void setUp() {
         lenient().when(clusterIdService.getString()).thenReturn("clusterId");
         // the exporter config is built on every identified exchange, forced recompute or not
@@ -157,7 +158,8 @@ class OpAmpServiceTransactionLogTruncationTest {
     }
 
     @Test
-    @SuppressWarnings("MustBeClosedChecker") // stubbing streamAllByFleet on a mock opens no resource
+    @SuppressWarnings("MustBeClosedChecker")
+        // stubbing streamAllByFleet on a mock opens no resource
     void forcedRecomputePreservesRetainedFleetReassignment() {
         stubPreviousState(5L);
         stubMarkers(5L, List.of());
@@ -186,7 +188,7 @@ class OpAmpServiceTransactionLogTruncationTest {
 
     private void stubPreviousState(long lastProcessedTxnSeq) {
         when(collectorInstanceService.updateFromReport(any())).thenReturn(
-                new MinimalCollectorInstanceDTO("id-1", FLEET_ID, SEQUENCE_NUM - 1, lastProcessedTxnSeq, null, null));
+                new MinimalCollectorInstanceDTO("id-1", FLEET_ID, SEQUENCE_NUM - 1, lastProcessedTxnSeq, null));
     }
 
     private void stubMarkers(long lastProcessedTxnSeq, List<org.graylog.collectors.db.TransactionMarker> markers) {
