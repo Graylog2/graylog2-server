@@ -32,7 +32,7 @@ describe('InstanceHealthSection', () => {
 
     await screen.findByText('Unknown');
     await screen.findByText(/has not reported health information/i);
-    expect(screen.queryByText(/for the past/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/\bfor\b/i)).not.toBeInTheDocument();
   });
 
   it('renders Unknown even when the instance is offline', async () => {
@@ -46,14 +46,15 @@ describe('InstanceHealthSection', () => {
     render(<InstanceHealthSection health={health(true)} online />);
 
     await screen.findByText('Healthy');
-    await screen.findByText(/for the past/i);
+    await screen.findByText(/\bfor\b/i);
+    expect(screen.queryByText(/for the past/i)).not.toBeInTheDocument();
   });
 
   it('renders Unhealthy with duration and error for an unhealthy online instance', async () => {
     render(<InstanceHealthSection health={health(false, 'connection refused')} online />);
 
     await screen.findByText('Unhealthy');
-    await screen.findByText(/for the past/i);
+    await screen.findByText(/\bfor\b/i);
     await screen.findByText('connection refused');
   });
 
@@ -75,7 +76,7 @@ describe('InstanceHealthSection', () => {
     render(<InstanceHealthSection health={health(false, 'connection refused')} online={false} />);
 
     await screen.findByText('Last known: Unhealthy');
-    await screen.findByText(/for the past/i);
+    await screen.findByText(/\bfor\b/i);
     // Error stays available for post-mortems even when offline.
     await screen.findByText('connection refused');
   });

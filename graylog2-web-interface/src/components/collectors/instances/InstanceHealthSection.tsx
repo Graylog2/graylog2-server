@@ -99,7 +99,7 @@ const InstanceHealthSection = ({ health, online }: Props) => {
           <Label bsStyle="default">Last known: {stateText}</Label>
         )}{' '}
         <Duration>
-          for the past <RelativeTime dateTime={health.healthy_changed_at} withoutSuffix />
+          for <RelativeTime dateTime={health.healthy_changed_at} withoutSuffix />
         </Duration>
         {lastError && <ErrorBlock data-testid="health-error">{lastError}</ErrorBlock>}
       </Body>
