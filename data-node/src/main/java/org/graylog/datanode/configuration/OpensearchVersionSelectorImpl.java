@@ -74,6 +74,7 @@ public class OpensearchVersionSelectorImpl implements OpensearchVersionSelector 
         this.nodeId = nodeId;
     }
 
+    @Override
     public OpensearchDistribution select(final List<OpensearchDistribution> candidates) {
         final Path dataDir = dataDir();
         final Optional<String> recordedVersion = dataNodeMetadataService.findByNodeId(nodeId.getNodeId())
@@ -134,23 +135,39 @@ public class OpensearchVersionSelectorImpl implements OpensearchVersionSelector 
     }
 
     /**
-     * Restricts the candidates to those that can actually open the directory. Only a directory that needs the
-     * compatibility reader constrains anything; everything else stays eligible.
+     * Restricts the candidates to those that can actually open the directory.
+     * <p>
+     * Two constraints, each applied only when it has something to say. The versions that wrote the data are the
+     * precise signal and bound the choice in both directions — a distribution a generation behind the data cannot
+     * read it at all, which is what an in-place migration from a current-generation cluster runs into. The
+     * compatibility tier is the coarser fallback, and still carries the answer for a directory old enough that its
+     * state files needed the compatibility reader.
+     * <p>
+     * An empty result means nothing shipped here can serve the directory. Rather than guess, we hand back every
+     * candidate and let the preflight check fail with a message naming the offending indices.
      */
     private List<OpensearchDistribution> withinBound(List<OpensearchDistribution> candidates,
                                                      Optional<IndicesDirectoryParseResult> parseResult) {
-        final boolean needsCompat = parseResult
-                .map(result -> result.requiredDistribution() == RequiredOpensearchDistribution.COMPAT)
-                .orElse(false);
-        if (!needsCompat) {
+        if (parseResult.isEmpty()) {
             return candidates;
         }
-        final List<OpensearchDistribution> bound = candidates.stream()
-                .filter(d -> RequiredOpensearchDistribution.COMPAT.matches(d.version()))
-                .toList();
-        LOG.info("The opensearch data directory requires the {} compatibility distribution",
-                RequiredOpensearchDistribution.COMPAT.versionSelector);
-        return bound.isEmpty() ? candidates : bound;
+        final IndicesDirectoryParseResult result = parseResult.get();
+
+        List<OpensearchDistribution> bound = candidates;
+        if (result.requiredDistribution() == RequiredOpensearchDistribution.COMPAT) {
+            LOG.info("The opensearch data directory requires the {} compatibility distribution",
+                    RequiredOpensearchDistribution.COMPAT.versionSelector);
+            bound = bound.stream()
+                    .filter(d -> RequiredOpensearchDistribution.COMPAT.matches(d.version()))
+                    .toList();
+        }
+        bound = bound.stream().filter(d -> result.canBeOpenedBy(d.version())).toList();
+
+        if (bound.isEmpty()) {
+            LOG.warn("None of the available opensearch distributions can open the data in {}", result.info().path());
+            return candidates;
+        }
+        return bound;
     }
 
     private Optional<IndicesDirectoryParseResult> parse(Path dataDir) {
