@@ -31,7 +31,7 @@ import { InputStateBadge } from 'components/inputs';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
 
-const EXPANDED_SECTION = 'EXPANDED_SECTION';
+const EXPANDED_SECTION = 'configuration';
 
 type Props = {
   inputTypes: InputTypesSummary;
