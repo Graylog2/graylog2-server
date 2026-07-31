@@ -183,7 +183,7 @@
         <lucene.version>10.5.0</lucene.version>
         <lz4.version>1.11.1</lz4.version>
         <metrics.version>4.2.39</metrics.version>
-        <mongodb-driver.version>5.9.0</mongodb-driver.version>
+        <mongodb-driver.version>5.9.1</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.16.Final</netty.version>
@@ -191,7 +191,7 @@
         <okhttp.version>5.4.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.64.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.29.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.30.0</opentelemetry-instrumentation.version>
         <opentelemetry-semconv.version>1.43.0</opentelemetry-semconv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
@@ -248,7 +248,7 @@
         <yarn.version>v1.22.22</yarn.version>
 
         <!-- Plugin versions -->
-        <license-maven.version>5.0.0</license-maven.version>
+        <license-maven.version>5.1.1</license-maven.version>
         <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
@@ -989,7 +989,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.87.5</version>
+                            <version>8.87.7</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>

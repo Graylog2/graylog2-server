@@ -36,6 +36,47 @@ message's accounted size, regardless of whether the restore counted against the 
 This field is informational and is not used to compute license usage, so your license consumption is
 unaffected by the change.
 
+### Changed parsing for Okta Log Events `securityContext.userBehaviors` field
+
+Due to a [bug in the Okta SDK](https://github.com/okta/okta-sdk-java/issues/1689), a workaround was introduced in 7.1
+to stringify the objects in the `securityContext.userBehaviors` array in logs pulled in from the `Okta Log Events` input. The
+updated SDK now properly serializes that field as an array of objects and the workaround has been removed. Custom parsing
+on `Okta Log Events` messages that is expecting the `securityContext.userBehaviors` field to be an array of
+strings will need to be modified to expect an array of objects, per the Okta API. An example of the serialization across
+versions:
+
+7.1:
+```json
+{
+  "securityContext": {
+    "userBehaviors": [
+      "{\"name\":\"New City\",\"id\":\"bbbbbbbbbbbbbbbbbbbb\",\"result\":\"NEGATIVE\"}",
+      "{\"name\":\"New Country\",\"id\":\"aaaaaaaaaaaaaaaaaaaa\",\"result\":\"NEGATIVE\"}"
+    ]
+  }
+}
+```
+
+7.2:
+```json
+{
+  "securityContext": {
+    "userBehaviors": [
+      {
+        "name": "New City",
+        "id": "bbbbbbbbbbbbbbbbbbbb",
+        "result": "NEGATIVE"
+      },
+      {
+        "name": "New Country",
+        "id": "aaaaaaaaaaaaaaaaaaaa",
+        "result": "NEGATIVE"
+      }
+    ]
+  }
+}
+```
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"
