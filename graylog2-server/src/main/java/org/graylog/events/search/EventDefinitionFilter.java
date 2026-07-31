@@ -16,16 +16,7 @@
  */
 package org.graylog.events.search;
 
-import org.apache.shiro.subject.Subject;
-import org.graylog.grn.GRN;
-import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNTypes;
-import org.graylog.security.DBGrantService;
-import org.graylog.security.PermissionAndRoleResolver;
-import org.graylog2.shared.security.RestPermissions;
-
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Controls event definition filtering for event searches based on user permissions.
