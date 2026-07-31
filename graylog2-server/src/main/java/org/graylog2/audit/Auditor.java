@@ -109,6 +109,13 @@ public class Auditor {
 
     public void recordFailure(final String username,
                               final String eventType,
+                              final Object actionInput) {
+        recordFailure(username, eventType, actionInput, null, null);
+    }
+
+
+    public void recordFailure(final String username,
+                              final String eventType,
                               final Object actionInput,
                               final Object actionResult,
                               final Map<String, Object> extra) {
