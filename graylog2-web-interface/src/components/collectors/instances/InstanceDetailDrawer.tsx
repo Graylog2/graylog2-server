@@ -25,6 +25,8 @@ import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
+import InstanceHealthSection from './InstanceHealthSection';
+
 import ActivityEntryList from '../common/ActivityEntryList';
 import { IconRow, IconRowList } from '../common/IconRowList';
 import SyncStateIndicator from '../common/SyncStateIndicator';
@@ -219,6 +221,8 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
           </Link>
         </DetailRow>
       </Section>
+
+      <InstanceHealthSection health={instance.health} online={instance.status === 'online'} />
 
       <Section>
         <SectionTitle>Attributes</SectionTitle>

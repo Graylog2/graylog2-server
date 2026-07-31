@@ -308,4 +308,22 @@ describe('InstanceDetailDrawer', () => {
     await screen.findByText(/and 1 other collector/i);
     expect(screen.queryByRole('link', { name: 'aaa-other-host' })).not.toBeInTheDocument();
   });
+
+  it('renders the health section from the instance health', async () => {
+    const unhealthy: CollectorInstanceView = {
+      ...mockInstance,
+      health: {
+        healthy_changed_at: '2026-07-31T10:00:00.000+0000',
+        component_health: { healthy: false, last_error: 'connection refused' },
+      },
+    };
+
+    render(
+      <InstanceDetailDrawer instance={unhealthy} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Health');
+    await screen.findByText('Unhealthy');
+    await screen.findByText('connection refused');
+  });
 });
