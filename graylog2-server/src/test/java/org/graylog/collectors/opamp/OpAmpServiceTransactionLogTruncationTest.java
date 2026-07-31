@@ -93,8 +93,7 @@ class OpAmpServiceTransactionLogTruncationTest {
     private OpAmpService opAmpService;
 
     @BeforeEach
-    @SuppressWarnings("MustBeClosedChecker")
-        // stubbing streamAllByFleet on a mock opens no resource
+    @SuppressWarnings("MustBeClosedChecker") // stubbing streamAllByFleet on a mock opens no resource
     void setUp() {
         lenient().when(clusterIdService.getString()).thenReturn("clusterId");
         // the exporter config is built on every identified exchange, forced recompute or not
@@ -158,8 +157,7 @@ class OpAmpServiceTransactionLogTruncationTest {
     }
 
     @Test
-    @SuppressWarnings("MustBeClosedChecker")
-        // stubbing streamAllByFleet on a mock opens no resource
+    @SuppressWarnings("MustBeClosedChecker") // stubbing streamAllByFleet on a mock opens no resource
     void forcedRecomputePreservesRetainedFleetReassignment() {
         stubPreviousState(5L);
         stubMarkers(5L, List.of());
