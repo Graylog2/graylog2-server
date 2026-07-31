@@ -172,14 +172,6 @@ describe('createColumnRenderers', () => {
     expect(screen.getByText('archived already')).toBeInTheDocument();
   });
 
-  it('does not show the "archived already" badge from a transient pending status alone', () => {
-    const index = makeIndex({ index_name: 'graylog_2' });
-
-    renderIndexNameCell(index, { pendingIndexStatuses: new Map([['graylog_2', { state: 'archived' }]]) });
-
-    expect(screen.queryByText('archived already')).not.toBeInTheDocument();
-  });
-
   it('renders the primary type as a single badge in the category column', () => {
     const cases: Array<[Partial<IncompatibleIndexRow>, string]> = [
       [{ managed_index: true }, 'Graylog'],

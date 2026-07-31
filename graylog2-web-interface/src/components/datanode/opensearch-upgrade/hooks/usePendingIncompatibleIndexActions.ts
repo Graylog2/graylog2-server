@@ -34,18 +34,15 @@ export type PendingIncompatibleIndexAction = {
   indexName: string;
   startedAt: string;
   systemJobId?: string;
-  state?: 'archived';
 };
 
 export type PendingIndexStatus =
   | { state: 'archiving'; percent: number }
-  | { state: 'archived' }
   | { state: 'reindexing' }
   | { state: 'failed'; message: string; label: string };
 
 type ActionResolution =
   | { kind: 'archiving'; percent: number }
-  | { kind: 'archived' }
   | { kind: 'reindexing' }
   | { kind: 'failed'; message: string; label: string }
   | { kind: 'done' };
@@ -74,7 +71,7 @@ const isValidStoredAction = (value: unknown): value is PendingIncompatibleIndexA
     typeof candidate.startedAt === 'string' &&
     !Number.isNaN(Date.parse(candidate.startedAt)) &&
     (candidate.systemJobId === undefined || typeof candidate.systemJobId === 'string') &&
-    (candidate.state === undefined || candidate.state === 'archived')
+    candidate.state === undefined
   );
 };
 
@@ -100,10 +97,6 @@ const resolveArchiveAction = (
   action: PendingIncompatibleIndexAction,
   { jobsById, jobsUpdatedAt }: ClusterJobsResult,
 ): ActionResolution => {
-  if (action.state === 'archived') {
-    return { kind: 'archived' };
-  }
-
   const job = action.systemJobId ? jobsById.get(action.systemJobId) : undefined;
 
   if (job?.job_status === 'error') {
@@ -111,7 +104,7 @@ const resolveArchiveAction = (
   }
 
   if (job?.job_status === 'complete') {
-    return { kind: 'archived' };
+    return { kind: 'done' };
   }
 
   if (job?.job_status === 'cancelled') {
@@ -119,7 +112,7 @@ const resolveArchiveAction = (
   }
 
   if (action.systemJobId && !job && jobsUpdatedAt > Date.parse(action.startedAt)) {
-    return { kind: 'archived' };
+    return { kind: 'done' };
   }
 
   return { kind: 'archiving', percent: job?.percent_complete ?? 0 };
@@ -149,7 +142,6 @@ const resolveAction = (action: PendingIncompatibleIndexAction, jobs: ClusterJobs
 
 const reconcileActions = (
   current: Array<PendingIncompatibleIndexAction>,
-  incompatibleIndexNames: Set<string>,
   jobs: Pick<ClusterJobsResult, 'jobsById' | 'jobsUpdatedAt'>,
 ): Array<PendingIncompatibleIndexAction> => {
   const next = current.flatMap((pendingAction): Array<PendingIncompatibleIndexAction> => {
@@ -157,14 +149,6 @@ const reconcileActions = (
 
     if (resolution.kind === 'done') {
       return [];
-    }
-
-    if (resolution.kind === 'archived') {
-      if (!incompatibleIndexNames.has(pendingAction.indexName)) {
-        return [];
-      }
-
-      return pendingAction.state === 'archived' ? [pendingAction] : [{ ...pendingAction, state: 'archived' }];
     }
 
     return [pendingAction];
@@ -188,7 +172,7 @@ const usePendingIncompatibleIndexActions = ({
 
   const incompatibleIndexNames = new Set(incompatibleIndices.map((index) => index.index_name));
   const trackedActions = pendingActions.filter((pendingAction) => incompatibleIndexNames.has(pendingAction.indexName));
-  const hasActiveActions = pendingActions.some((pendingAction) => pendingAction.state !== 'archived');
+  const hasActiveActions = pendingActions.length > 0;
   const {
     jobsById,
     jobsUpdatedAt,
@@ -205,8 +189,6 @@ const usePendingIncompatibleIndexActions = ({
 
     if (resolution.kind === 'archiving') {
       pendingIndexStatuses.set(pendingAction.indexName, { state: 'archiving', percent: resolution.percent });
-    } else if (resolution.kind === 'archived') {
-      pendingIndexStatuses.set(pendingAction.indexName, { state: 'archived' });
     } else if (resolution.kind === 'reindexing') {
       pendingIndexStatuses.set(pendingAction.indexName, { state: 'reindexing' });
     } else if (resolution.kind === 'failed') {
@@ -231,7 +213,7 @@ const usePendingIncompatibleIndexActions = ({
     addPendingAction({ action: 'reindex', indexName, startedAt: new Date().toISOString() });
 
   if (!isLoading && !isError) {
-    const reconciled = reconcileActions(pendingActions, incompatibleIndexNames, { jobsById, jobsUpdatedAt });
+    const reconciled = reconcileActions(pendingActions, { jobsById, jobsUpdatedAt });
 
     if (reconciled !== pendingActions) {
       setPendingActions(reconciled);

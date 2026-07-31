@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import Store from 'logic/local-storage/Store';
@@ -65,5 +65,41 @@ describe('usePendingIncompatibleIndexActions', () => {
 
     expect(asMock(Store.set).mock.calls.at(-1)?.[1]).toEqual([action]);
     expect(useClusterJobs).toHaveBeenCalledWith(expect.objectContaining({ poll: true }));
+  });
+
+  it('discards a persisted action with the removed archived state', async () => {
+    asMock(Store.get).mockReturnValue([
+      {
+        action: 'archive-delete',
+        indexName: 'graylog_0',
+        startedAt: '2026-01-01T00:00:00.000Z',
+        systemJobId: 'job-1',
+        state: 'archived',
+      },
+    ]);
+
+    renderPendingActions();
+
+    await waitFor(() => expect(asMock(Store.set).mock.calls.at(-1)?.[1]).toEqual([]));
+    expect(useClusterJobs).toHaveBeenCalledWith(expect.objectContaining({ poll: false }));
+  });
+
+  it('clears terminal archive tracking from storage', async () => {
+    const action = {
+      action: 'archive-delete',
+      indexName: 'graylog_0',
+      startedAt: '2026-01-01T00:00:00.000Z',
+      systemJobId: 'job-1',
+    };
+    asMock(Store.get).mockReturnValue([action]);
+    asMock(useClusterJobs).mockReturnValue({
+      jobsById: new Map(),
+      jobsUpdatedAt: Date.parse(action.startedAt) + 1,
+      refetch: jest.fn(),
+    });
+
+    renderPendingActions();
+
+    await waitFor(() => expect(asMock(Store.set).mock.calls.at(-1)?.[1]).toEqual([]));
   });
 });
