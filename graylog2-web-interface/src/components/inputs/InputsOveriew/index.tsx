@@ -25,7 +25,6 @@ export { default as FailuresCell } from './cells/FailuresCell';
 export { default as MessageCountCell } from './cells/MessageCountCell';
 export { default as ExtractorCountCell } from './cells/ExtractorCountCell';
 export { default as AssociatedStreamsCell } from './cells/AssociatedStreamsCell';
-export { default as ExpandedSectionToggleWrapper } from './ExpandedSectionToggleWrapper';
 export { default as ThroughputSection } from './expanded-sections/ThroughputSection';
 export { default as Connections } from './expanded-sections/Connections';
 export { default as NetworkIOStats } from './expanded-sections/NetworkIOStats';

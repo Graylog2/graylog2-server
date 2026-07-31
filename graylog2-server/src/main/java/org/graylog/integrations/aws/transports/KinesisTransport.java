@@ -59,6 +59,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.graylog.integrations.aws.inputs.AWSInput.getKinesisStreamARNDefinition;
+import static org.graylog.integrations.aws.inputs.AWSInput.getSingleTableStateTrackingFieldDefinition;
 
 public class KinesisTransport extends ThrottleableTransport2 {
 
@@ -71,6 +72,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
     public static final String CK_KINESIS_STREAM_NAME = "kinesis_stream_name";
     public static final String CK_KINESIS_STREAM_ARN = "kinesis_stream_arn";
     public static final String CK_KINESIS_RECORD_BATCH_SIZE = "kinesis_record_batch_size";
+    public static final String CK_KINESIS_SINGLE_TABLE_STATE_TRACKING = "kinesis_single_table_state_tracking";
 
     public static final int DEFAULT_BATCH_SIZE = 10000;
 
@@ -148,9 +150,11 @@ public class KinesisTransport extends ThrottleableTransport2 {
         final int batchSize = configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE);
         final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
+        final boolean migrateToSingleTable = configuration.getBoolean(CK_KINESIS_SINGLE_TABLE_STATE_TRACKING, false);
 
         this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, input::processRawMessage,
-                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder);
+                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder,
+                migrateToSingleTable);
 
         LOG.debug("Starting Kinesis reader thread for input {}", input.toIdentifier());
         executor.submit(this.kinesisConsumer);
@@ -251,6 +255,8 @@ public class KinesisTransport extends ThrottleableTransport2 {
                     "The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time.",
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
+
+            r.addField(getSingleTableStateTrackingFieldDefinition());
 
             return r;
         }

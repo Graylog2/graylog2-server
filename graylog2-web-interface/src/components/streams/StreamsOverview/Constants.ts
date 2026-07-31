@@ -35,18 +35,21 @@ const getStreamTableElements = (
   isPipelineColumnPermitted: boolean,
   extensionAttributes?: {
     attributeNames?: Array<string>;
+    defaultDisplayedAttributeNames?: Array<string>;
     attributes?: Array<Attribute>;
   },
   extensionColumnGroups?: ExtensionColumnGroups,
 ) => {
+
   const extRouting = extensionColumnGroups?.routing ?? [];
   const extPerformance = extensionColumnGroups?.performance ?? [];
 
   const groupedIds = new Set([...extRouting, ...extPerformance]);
-  const ungroupedExtNames = (extensionAttributes?.attributeNames ?? []).filter((id) => !groupedIds.has(id));
+  const ungroupedExtNames = (extensionAttributes?.defaultDisplayedAttributeNames ?? []).filter((id) => !groupedIds.has(id));
 
   const defaultCols = [
     'title',
+    'description',
     'index_set_title',
     'rules',
     ...(isPipelineColumnPermitted ? ['pipelines'] : []),
@@ -70,13 +73,7 @@ const getStreamTableElements = (
     METRIC_COLUMN_IDS.maxProcessingTime,
   ];
 
-  const defaultColumnOrder = [
-    ...defaultCols,
-    ...routingCols,
-    ...performanceCols,
-    ...ungroupedExtNames,
-    'created_at',
-  ];
+  const defaultColumnOrder = [...defaultCols, ...routingCols, ...performanceCols, ...ungroupedExtNames, 'created_at'];
 
   const defaultVariantLayout = {
     ...SHARED_LAYOUT,
@@ -119,7 +116,11 @@ const getStreamTableElements = (
     { id: 'outputs', title: 'Outputs' },
     ...(extensionAttributes?.attributes || []),
     { id: 'archiving', title: 'Archiving' },
-    { id: METRIC_COLUMN_IDS.messageCount, title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messageCount], type: 'LONG' as const },
+    {
+      id: METRIC_COLUMN_IDS.messageCount,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messageCount],
+      type: 'LONG' as const,
+    },
     {
       id: METRIC_COLUMN_IDS.avgProcessingTime,
       title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.avgProcessingTime],

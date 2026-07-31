@@ -28,6 +28,7 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
@@ -202,6 +203,8 @@ public class AWSInput extends MessageInput {
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
 
+            request.addField(getSingleTableStateTrackingFieldDefinition());
+
             request.addField(getOverrideSourceFieldDefinition());
 
             return request;
@@ -224,5 +227,13 @@ public class AWSInput extends MessageInput {
                 "",
                 "The ARN of the Kinesis stream.",
                 ConfigurationField.Optional.OPTIONAL);
+    }
+
+    public static BooleanField getSingleTableStateTrackingFieldDefinition() {
+        return new BooleanField(
+                KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING,
+                "Migrate to single DynamoDB table for state tracking",
+                false,
+                "Consolidates Kinesis Client Library (KCL) state into a single DynamoDB table, as supported by the KCL 3.5 update. This option is only relevant for Kinesis inputs created before Graylog 7.2. Enabling it starts a one-way migration that cannot be reverted once complete. See the Graylog upgrade notes for details.");
     }
 }
