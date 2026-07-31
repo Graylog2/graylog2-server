@@ -37,8 +37,9 @@ export type ComponentHealth = {
 };
 
 export type CollectorHealth = {
-  // Server-clocked timestamp of the last root-`healthy` transition. Rendered by the backend
-  // with a `+0000`-style offset (unlike the other timestamps' `Z`) — fine for RelativeTime,
+  // Server-clocked timestamp of the last root-`healthy` transition. All health timestamps
+  // (`healthy_changed_at`, `start_time`, `status_time`) are backend-rendered with a
+  // `+0000`-style offset, unlike the instance-level timestamps' `Z` — fine for RelativeTime,
   // never string-compare timestamps.
   healthy_changed_at: string;
   component_health: ComponentHealth;
