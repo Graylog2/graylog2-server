@@ -58,18 +58,14 @@ const Duration = styled.span(
   `,
 );
 
-// Code-block chrome per this feature's convention (see InstallCommand's CommandBlock),
-// except the wrapping: break-word keeps words intact and only splits tokens (URLs)
-// that would otherwise overflow the narrow drawer.
+// The global theme styles own the code-block look (fill, border, text color —
+// theme-aware, same as e.g. ShowMessagePage's error rendering). Only the wrapping
+// is adjusted: Bootstrap's pre defaults to no wrapping and word-break: break-all,
+// neither of which suits long single-line agent errors in a narrow drawer.
 const ErrorBlock = styled.pre(
   ({ theme }) => css`
-    padding: ${theme.spacings.sm};
-    background: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.cards.border};
-    border-radius: ${theme.spacings.xs};
-    font-family: ${theme.fonts.family.monospace};
-    font-size: ${theme.fonts.size.small};
     white-space: pre-wrap;
+    word-break: normal;
     overflow-wrap: break-word;
     margin-top: ${theme.spacings.xs};
     margin-bottom: 0;
