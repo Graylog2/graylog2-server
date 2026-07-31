@@ -20,7 +20,7 @@ import { useEffect } from 'react';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
@@ -83,7 +83,7 @@ const CollectorsOnboardingInstancePage = () => {
       <PageHeader
         title={
           <>
-            Collector Onboarding <BetaBadge />
+            Collector Onboarding <PreviewBadge />
           </>
         }>
         <span>Status of your newly connected collector.</span>
