@@ -58,25 +58,21 @@ const Duration = styled.span(
   `,
 );
 
-// Stale (offline) health is shown but must not read as a live signal.
-const Body = styled.div<{ $stale: boolean }>(
-  ({ $stale }) => css`
-    opacity: ${$stale ? 0.6 : 1};
-  `,
-);
-
+// Code-block chrome per this feature's convention (see InstallCommand's CommandBlock),
+// except the wrapping: break-word keeps words intact and only splits tokens (URLs)
+// that would otherwise overflow the narrow drawer.
 const ErrorBlock = styled.pre(
   ({ theme }) => css`
+    padding: ${theme.spacings.sm};
+    background: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.cards.border};
+    border-radius: ${theme.spacings.xs};
     font-family: ${theme.fonts.family.monospace};
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.variant.danger};
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
     margin-top: ${theme.spacings.xs};
     margin-bottom: 0;
-    padding: ${theme.spacings.xs} ${theme.spacings.sm};
-    /* Agent errors are often long single lines; wrap instead of forcing a
-       horizontal scroller inside the narrow drawer. */
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
   `,
 );
 
@@ -95,17 +91,20 @@ const InstanceHealthSection = ({ health, online }: Props) => {
     const stateText = healthy ? 'Healthy' : 'Unhealthy';
 
     body = (
-      <Body $stale={!online}>
+      <>
         {online ? (
           <Label bsStyle={healthy ? 'success' : 'danger'}>{stateText}</Label>
         ) : (
+          // Stale (offline) health must not read as a live signal: the muted default
+          // label + "Last known:" wording carry the de-emphasis (theme-safe, unlike
+          // opacity dimming, which has no precedent in the product).
           <Label bsStyle="default">Last known: {stateText}</Label>
         )}{' '}
         <Duration>
           for <RelativeTime dateTime={health.healthy_changed_at} withoutSuffix />
         </Duration>
         {lastError && <ErrorBlock data-testid="health-error">{lastError}</ErrorBlock>}
-      </Body>
+      </>
     );
   }
 
