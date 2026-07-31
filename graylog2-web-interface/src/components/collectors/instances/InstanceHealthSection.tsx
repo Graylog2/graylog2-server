@@ -99,11 +99,21 @@ const InstanceHealthSection = ({ health, online }: Props) => {
           // label + "Last known:" wording carry the de-emphasis (theme-safe, unlike
           // opacity dimming, which has no precedent in the product).
           <Label bsStyle="default">Last known: {stateText}</Label>
-        )}{' '}
-        <Duration>
-          for <RelativeTime dateTime={health.healthy_changed_at} withoutSuffix />
-        </Duration>
-        {lastError && <ErrorBlock data-testid="health-error">{lastError}</ErrorBlock>}
+        )}
+        {online && (
+          <>
+            {' '}
+            {/* Only while online: offline time would silently inflate the duration
+                (healthy for 1h, then offline 3 days is not "Healthy for 3 days");
+                the Last Seen row above conveys staleness for offline instances. */}
+            <Duration>
+              for <RelativeTime dateTime={health.healthy_changed_at} withoutSuffix />
+            </Duration>
+          </>
+        )}
+        {/* Guard against malformed/stale reports carrying last_error alongside
+            healthy: true — a green badge must not trail an unexplained error. */}
+        {!healthy && lastError && <ErrorBlock data-testid="health-error">{lastError}</ErrorBlock>}
       </>
     );
   }

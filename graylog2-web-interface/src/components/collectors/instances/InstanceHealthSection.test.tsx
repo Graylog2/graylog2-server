@@ -72,11 +72,13 @@ describe('InstanceHealthSection', () => {
     await screen.findByText(nasty);
   });
 
-  it('renders dimmed last-known health for an offline instance', async () => {
+  it('renders last-known health without a duration for an offline instance', async () => {
     render(<InstanceHealthSection health={health(false, 'connection refused')} online={false} />);
 
     await screen.findByText('Last known: Unhealthy');
-    await screen.findByText(/\bfor\b/i);
+    // The duration would silently include offline time (healthy for 1h, then offline
+    // 3 days ≠ "for 3 days"); the Last Seen row above conveys staleness instead.
+    expect(screen.queryByText(/\bfor\b/i)).not.toBeInTheDocument();
     // Error stays available for post-mortems even when offline.
     await screen.findByText('connection refused');
   });
@@ -85,5 +87,15 @@ describe('InstanceHealthSection', () => {
     render(<InstanceHealthSection health={health(true)} online={false} />);
 
     await screen.findByText('Last known: Healthy');
+    expect(screen.queryByText(/\bfor\b/i)).not.toBeInTheDocument();
+  });
+
+  it('renders no error block when the last known state is healthy', async () => {
+    // Defensive: a malformed or stale report may carry last_error alongside
+    // healthy: true — a green badge must not be followed by an unexplained error.
+    render(<InstanceHealthSection health={health(true, 'stale leftover error')} online />);
+
+    await screen.findByText('Healthy');
+    expect(screen.queryByTestId('health-error')).not.toBeInTheDocument();
   });
 });
