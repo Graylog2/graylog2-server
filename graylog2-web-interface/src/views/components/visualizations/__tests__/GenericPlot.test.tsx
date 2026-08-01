@@ -45,7 +45,8 @@ describe('GenericPlot', () => {
       await userEvent.click(await screen.findByRole('button', { name: 'Zoom' }));
 
       expect(onZoom).toHaveBeenCalled();
-      expect(onZoom).toHaveBeenCalledWith(23, 42);
+      // The relayout ranges are normalized to strings, matching onZoom's declared signature.
+      expect(onZoom).toHaveBeenCalledWith('23', '42');
     });
 
     it('not calling onZoom prop if axis have not changed', async () => {
