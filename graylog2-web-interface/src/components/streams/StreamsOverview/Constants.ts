@@ -40,12 +40,13 @@ const getStreamTableElements = (
   },
   extensionColumnGroups?: ExtensionColumnGroups,
 ) => {
-
   const extRouting = extensionColumnGroups?.routing ?? [];
   const extPerformance = extensionColumnGroups?.performance ?? [];
 
   const groupedIds = new Set([...extRouting, ...extPerformance]);
-  const ungroupedExtNames = (extensionAttributes?.defaultDisplayedAttributeNames ?? []).filter((id) => !groupedIds.has(id));
+  const ungroupedExtNames = (extensionAttributes?.defaultDisplayedAttributeNames ?? []).filter(
+    (id) => !groupedIds.has(id),
+  );
 
   const defaultCols = [
     'title',
