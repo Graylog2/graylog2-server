@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed editing, excluding and removing search filters in event definitions when the filter is not saved in \"My Filters\"."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14990"]
