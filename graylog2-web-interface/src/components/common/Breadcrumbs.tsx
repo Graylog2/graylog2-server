@@ -14,24 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { styled } from 'styled-components';
+import * as React from 'react';
+import { Breadcrumbs as MantineBreadcrumbs } from '@mantine/core';
 
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+const Breadcrumbs = ({ ...props }: React.ComponentProps<typeof MantineBreadcrumbs>) => (
+  <MantineBreadcrumbs {...props} />
+);
 
-const StyledWrapper = styled.div`
-  cursor: pointer;
-`;
-
-type Props = React.PropsWithChildren<{
-  id: string;
-}>;
-
-const ExpandedRowToggleWrapper = ({ id, children = undefined }: Props) => {
-  const { toggleSection } = useExpandedSections();
-  const _toggleSection = () => toggleSection(id, 'overriddenProfile');
-
-  return <StyledWrapper onClick={_toggleSection}>{children}</StyledWrapper>;
-};
-
-export default ExpandedRowToggleWrapper;
+export default Breadcrumbs;

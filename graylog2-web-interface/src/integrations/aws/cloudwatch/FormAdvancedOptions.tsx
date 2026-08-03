@@ -35,6 +35,7 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
     overrideSource,
     awsCloudWatchThrottleEnabled,
     awsCloudWatchAddFlowLogPrefix,
+    awsCloudWatchStoreFullMessage,
   } = formData;
 
   const handleToggle = (visible) => {
@@ -57,6 +58,16 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         onChange={onChange}
         label="Add Flow Log field name prefix"
         help='Add field with the Flow Log prefix e. g. "src_addr" -> "flow_log_src_addr".'
+      />
+
+      <Input
+        id="awsCloudWatchStoreFullMessage"
+        type="checkbox"
+        value="enable-store-full-message"
+        defaultChecked={awsCloudWatchStoreFullMessage?.value}
+        onChange={onChange}
+        label="Store full message?"
+        help="Store the original Kinesis/CloudWatch log event payload in the full_message field."
       />
 
       <Input
