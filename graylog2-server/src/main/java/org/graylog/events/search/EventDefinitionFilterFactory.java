@@ -54,7 +54,7 @@ public class EventDefinitionFilterFactory {
                         id -> subject.isPermitted(EVENT_DEFINITIONS_READ + ":" + id)
                 ).stream()
                 .map(ObjectId::toHexString)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toUnmodifiableSet());
         return EventDefinitionFilter.allowList(ids);
     }
 }
