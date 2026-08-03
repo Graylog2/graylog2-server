@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog.events.configuration.EventsConfigurationProvider;
@@ -27,6 +28,13 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.security.RestPermissions.EVENT_DEFINITIONS_READ;
 
+/**
+ * Resolves the {@link EventDefinitionFilter} to apply to a subject's event searches.
+ * <p>
+ * Stateless and safe to share: permissions are evaluated inside {@link #forSubject(Subject)} on every call, so grant
+ * changes (for example removing a collaborator from an event definition) take effect immediately.
+ */
+@Singleton
 public class EventDefinitionFilterFactory {
     private final EventsConfigurationProvider eventsConfiguration;
     private final DBEventDefinitionService eventDefinitionService;
