@@ -55,6 +55,7 @@ export const toAWSRequest = (formData, options) => {
 export const toGenericInputCreateRequest = ({
   awsAuthenticationType,
   awsCloudWatchAddFlowLogPrefix = { value: undefined },
+  awsCloudWatchStoreFullMessage = { value: undefined },
   awsAssumeRoleARN = { value: undefined },
   awsExternalId = { value: undefined },
   awsAccessKey = { value: undefined },
@@ -88,6 +89,7 @@ export const toGenericInputCreateRequest = ({
     aws_message_type: awsCloudWatchKinesisInputType.value,
     throttling_allowed: !!awsCloudWatchThrottleEnabled.value,
     aws_flow_log_prefix: !!awsCloudWatchAddFlowLogPrefix.value,
+    store_full_message: !!awsCloudWatchStoreFullMessage?.value,
     aws_region: awsCloudWatchAwsRegion.value,
     aws_assume_role_arn: awsAssumeRoleARN?.value,
     aws_external_id: awsExternalId?.value,
