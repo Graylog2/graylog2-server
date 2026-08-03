@@ -78,11 +78,11 @@ public class MoreSearch {
     /**
      * Executes an events search for the given parameters.
      *
-     * @param parameters              event search parameters
-     * @param filterString            filter string
-     * @param eventStreams             event streams to search in
-     * @param sourceStreamFilter      controls source stream filtering based on user permissions
-     * @param eventDefinitionFilter   controls event definition filtering based on user permissions
+     * @param parameters            event search parameters
+     * @param filterString          filter string
+     * @param eventStreams          event streams to search in
+     * @param sourceStreamFilter    controls source stream filtering based on user permissions
+     * @param eventDefinitionFilter controls event definition filtering based on user permissions
      * @return the result
      */
     // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams. (because of Searches#extractStreamId())
@@ -117,11 +117,11 @@ public class MoreSearch {
     /**
      * Creates a histogram over events for the given parameters.
      *
-     * @param parameters              event search parameters
-     * @param filterString            filter string
-     * @param eventStreams             event streams to search in
-     * @param sourceStreamFilter      controls source stream filtering based on user permissions
-     * @param eventDefinitionFilter   controls event definition filtering based on user permissions
+     * @param parameters            event search parameters
+     * @param filterString          filter string
+     * @param eventStreams          event streams to search in
+     * @param sourceStreamFilter    controls source stream filtering based on user permissions
+     * @param eventDefinitionFilter controls event definition filtering based on user permissions
      * @return the result
      */
     // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams. (because of Searches#extractStreamId())
@@ -207,9 +207,9 @@ public class MoreSearch {
 
 
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timeRange, Set<String> eventStreams,
-                                       String filterString, SourceStreamFilter sourceStreamFilter,
-                                       EventDefinitionFilter eventDefinitionFilter,
-                                       String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+                                                String filterString, SourceStreamFilter sourceStreamFilter,
+                                                EventDefinitionFilter eventDefinitionFilter,
+                                                String slicingColumn, Map<String, Object> meta, int maxBuckets) {
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return List.of();
@@ -220,9 +220,9 @@ public class MoreSearch {
     }
 
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timeRange, Set<String> eventStreams,
-                                                  String filterString, SourceStreamFilter sourceStreamFilter,
-                                                  EventDefinitionFilter eventDefinitionFilter,
-                                                  String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
+                                                    String filterString, SourceStreamFilter sourceStreamFilter,
+                                                    EventDefinitionFilter eventDefinitionFilter,
+                                                    String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return List.of();
@@ -232,15 +232,15 @@ public class MoreSearch {
     }
 
     public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timeRange,
-                                                              String groupByField, String termsField,
-                                                              int maxBuckets, int maxSubBuckets) {
+                                                                String groupByField, String termsField,
+                                                                int maxBuckets, int maxSubBuckets) {
         return aggregateGroupedTerms(queryString, timeRange, groupByField, termsField, maxBuckets, maxSubBuckets, Set.of());
     }
 
     public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timeRange,
-                                                              String groupByField, String termsField,
-                                                              int maxBuckets, int maxSubBuckets,
-                                                              Collection<String> includeTerms) {
+                                                                String groupByField, String termsField,
+                                                                int maxBuckets, int maxSubBuckets,
+                                                                Collection<String> includeTerms) {
         final Set<String> affectedIndices = getAffectedIndices(Set.of(), timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return Map.of();

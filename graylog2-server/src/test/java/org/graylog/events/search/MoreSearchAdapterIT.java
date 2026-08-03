@@ -18,7 +18,6 @@ package org.graylog.events.search;
 
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.graylog.events.search.EventDefinitionFilter;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Sorting;

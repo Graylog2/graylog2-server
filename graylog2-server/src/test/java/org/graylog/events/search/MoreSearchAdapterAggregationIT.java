@@ -16,7 +16,6 @@
  */
 package org.graylog.events.search;
 
-import org.graylog.events.search.EventDefinitionFilter;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.resources.entities.Slice;
