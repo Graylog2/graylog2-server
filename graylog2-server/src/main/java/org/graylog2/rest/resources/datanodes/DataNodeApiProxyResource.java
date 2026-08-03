@@ -44,35 +44,34 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 
 @RequiresAuthentication
-@Api(value = "DataNodes/API", description = "Proxy direct access to Data Node's API")
+@Api(value = "DataNodes/API", description = "Proxy direct access to Data Node's Opensearch API")
 @Produces(MediaType.APPLICATION_JSON)
 @Timed
 @Path("/datanodes/{hostname}/opensearch/{path: .*}")
 @RequiresPermissions(RestPermissions.DATANODE_OPENSEARCH_PROXY)
 public class DataNodeApiProxyResource extends RestResource {
-    private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
+    private static final DataNodeProxyAllowlist RESTRICTED_ALLOWLIST = new DataNodeProxyAllowlist(List.of(
             request -> request.path().startsWith("_cluster"),
             request -> request.path().startsWith("_cat"),
             request -> request.path().startsWith("_mapping") && request.method().equals("GET")
-    );
+    ));
 
     private final ProxyRequestAdapter proxyRequestAdapter;
-    private final boolean enableAllowlist;
+    private final DataNodeProxyAllowlist allowlist;
 
     @Inject
     public DataNodeApiProxyResource(ProxyRequestAdapter proxyRequestAdapter,
                                     @Named("datanode_proxy_api_allowlist") boolean enableAllowlist) {
         this.proxyRequestAdapter = proxyRequestAdapter;
-        this.enableAllowlist = enableAllowlist;
+        this.allowlist = enableAllowlist ? RESTRICTED_ALLOWLIST : DataNodeProxyAllowlist.allowAll();
     }
 
     @GET
-    @ApiOperation(value = "GET request to Data Node's API")
+    @ApiOperation(value = "GET request to Data Node's Opensearch API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestGet(@ApiParam(name = "path", required = true)
                                        @PathParam("path") String path,
@@ -83,7 +82,7 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     @POST
-    @ApiOperation(value = "POST request to Data Node's API")
+    @ApiOperation(value = "POST request to Data Node's Opensearch API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestPost(@ApiParam(name = "path", required = true)
                                         @PathParam("path") String path,
@@ -94,7 +93,7 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     @PUT
-    @ApiOperation(value = "PUT request to Data Node's API")
+    @ApiOperation(value = "PUT request to Data Node's Opensearch API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestPut(@ApiParam(name = "path", required = true)
                                @PathParam("path") String path,
@@ -105,7 +104,7 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     @DELETE
-    @ApiOperation(value = "DELETE request to Data Node's API")
+    @ApiOperation(value = "DELETE request to Data Node's Opensearch API")
     @AuditEvent(type = DATANODE_API_REQUEST)
     public Response requestDelete(@ApiParam(name = "path", required = true)
                                   @PathParam("path") String path,
@@ -116,16 +115,16 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     private Response request(ContainerRequestContext context, String path, String hostname) throws IOException {
-        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters());
+        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters(), getSubject());
 
-        if (enableAllowlist && allowList.stream().noneMatch(condition -> condition.test(request))) {
+        try {
+            final var response = proxyRequestAdapter.request(allowlist.authorize(request));
+            return Response.status(response.status()).type(response.contentType()).entity(response.response()).build();
+        } catch (RequestNotAllowedException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("This request is not allowed.")
                     .type(MediaType.TEXT_PLAIN_TYPE)
                     .build();
         }
-
-        final var response = proxyRequestAdapter.request(request);
-        return Response.status(response.status()).type(response.contentType()).entity(response.response()).build();
     }
 }
