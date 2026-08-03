@@ -18,6 +18,7 @@ package org.graylog.events.search;
 
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
+import org.bson.types.ObjectId;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.DBEventDefinitionService;
 
@@ -44,7 +45,7 @@ public class EventDefinitionFilterFactory {
         final Set<String> ids = eventDefinitionService.findPermittedIds(
                         id -> subject.isPermitted(EVENT_DEFINITIONS_READ + ":" + id)
                 ).stream()
-                .map(org.bson.types.ObjectId::toHexString)
+                .map(ObjectId::toHexString)
                 .collect(Collectors.toSet());
         return EventDefinitionFilter.allowList(ids);
     }
