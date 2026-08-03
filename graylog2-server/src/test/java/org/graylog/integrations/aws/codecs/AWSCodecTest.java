@@ -98,5 +98,42 @@ public class AWSCodecTest {
         Assertions.assertEquals("aws-kinesis-raw-logs", message.getField("source"));
         Assertions.assertEquals("This a raw message", message.getField("message"));
         Assertions.assertEquals(timestamp, message.getTimestamp());
+        Assertions.assertNull(message.getField(Message.FIELD_FULL_MESSAGE));
+    }
+
+    @Test
+    public void testKinesisFlowLogCodecStoresFullMessage() throws JsonProcessingException {
+
+        final HashMap<String, Object> configMap = new HashMap<>();
+        configMap.put(AWSCodec.CK_AWS_MESSAGE_TYPE, AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString());
+        configMap.put(AWSCodec.CK_STORE_FULL_MESSAGE, true);
+        final Configuration configuration = new Configuration(configMap);
+        final AWSCodec codec = new AWSCodec(configuration, AWSTestingUtils.buildTestCodecs());
+
+        final String rawFlowLog = "2 423432432432 eni-3244234 172.1.1.2 172.1.1.2 80 2264 6 1 52 1559738144 1559738204 ACCEPT OK";
+        final DateTime timestamp = DateTime.now(DateTimeZone.UTC);
+        final KinesisLogEntry kinesisLogEntry = KinesisLogEntry.create("a-stream", "log-group", "log-stream", timestamp,
+                rawFlowLog, "123456789", "", new ArrayList<>());
+
+        final Message message = codec.decodeSafe(new RawMessage(objectMapper.writeValueAsBytes(kinesisLogEntry))).get();
+        Assertions.assertEquals(rawFlowLog, message.getField(Message.FIELD_FULL_MESSAGE));
+    }
+
+    @Test
+    public void testKinesisRawCodecStoresFullMessage() throws JsonProcessingException {
+
+        final HashMap<String, Object> configMap = new HashMap<>();
+        configMap.put(AWSCodec.CK_AWS_MESSAGE_TYPE, AWSMessageType.KINESIS_RAW.toString());
+        configMap.put(AWSCodec.CK_STORE_FULL_MESSAGE, true);
+        final Configuration configuration = new Configuration(configMap);
+        final AWSCodec codec = new AWSCodec(configuration, AWSTestingUtils.buildTestCodecs());
+
+        final String rawMessage = "This a raw message";
+        final DateTime timestamp = DateTime.now(DateTimeZone.UTC);
+        final KinesisLogEntry kinesisLogEntry = KinesisLogEntry.create("a-stream", "log-group", "log-stream", timestamp,
+                rawMessage, "123456789", "", new ArrayList<>());
+
+        final Message message = codec.decodeSafe(new RawMessage(objectMapper.writeValueAsBytes(kinesisLogEntry))).get();
+        Assertions.assertEquals(rawMessage, message.getField(Message.FIELD_FULL_MESSAGE));
     }
 }
