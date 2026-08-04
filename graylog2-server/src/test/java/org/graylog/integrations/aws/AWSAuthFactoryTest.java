@@ -34,9 +34,12 @@ import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class AWSAuthFactoryTest {
@@ -213,5 +216,72 @@ public class AWSAuthFactoryTest {
         final AwsCredentialsProvider withExternalId = awsAuthFactory.create(false, null, "key", "secret", "some-external-id", (String) null);
         assertThat(withoutExternalId).isExactlyInstanceOf(StaticCredentialsProvider.class);
         assertThat(withExternalId).isExactlyInstanceOf(StaticCredentialsProvider.class);
+    }
+
+    // --- createCloseable: the returned handle must close the STS client that the credentials provider never owns.
+    // StsCredentialsProvider.close() only clears the session cache, leaving the StsClient's Apache connection pool
+    // to leak on every call; the handle is what lets a caller release it. ---
+
+    @Test
+    public void createCloseable_assumeRole_closeClosesStsClientAndProvider() {
+        final StsClient mockStsClient = buildMockStsClient();
+        final StsClientBuilder mockStsClientBuilder = mock(StsClientBuilder.class);
+        when(mockStsClientBuilder.region(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.credentialsProvider(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.build()).thenReturn(mockStsClient);
+
+        final StsAssumeRoleCredentialsProvider mockProvider = mock(StsAssumeRoleCredentialsProvider.class);
+        final StsAssumeRoleCredentialsProvider.Builder mockProviderBuilder = mock(StsAssumeRoleCredentialsProvider.Builder.class);
+        when(mockProviderBuilder.refreshRequest(any(AssumeRoleRequest.class))).thenReturn(mockProviderBuilder);
+        when(mockProviderBuilder.stsClient(any())).thenReturn(mockProviderBuilder);
+        when(mockProviderBuilder.build()).thenReturn(mockProvider);
+
+        try (MockedStatic<StsClient> mockedStsClient = mockStatic(StsClient.class);
+             MockedStatic<StsAssumeRoleCredentialsProvider> mockedProvider = mockStatic(StsAssumeRoleCredentialsProvider.class)) {
+            mockedStsClient.when(StsClient::builder).thenReturn(mockStsClientBuilder);
+            mockedProvider.when(StsAssumeRoleCredentialsProvider::builder).thenReturn(mockProviderBuilder);
+
+            final AWSAuthFactory.CredentialsProviderHandle handle = awsAuthFactory.createCloseable(
+                    false, "us-east-1", "key", "secret", "arn:aws:iam::123456789012:role/TestRole", null, (ApacheHttpClient.Builder) null);
+
+            assertThat(handle.provider()).isSameAs(mockProvider);
+
+            handle.close();
+
+            verify(mockStsClient).close();
+            verify(mockProvider).close();
+        }
+    }
+
+    @Test
+    public void createCloseable_staticCredentials_hasNoStsClientAndCloseIsSafe() {
+        final AWSAuthFactory.CredentialsProviderHandle handle = awsAuthFactory.createCloseable(
+                false, null, "key", "secret", null, null, (ApacheHttpClient.Builder) null);
+
+        assertThat(handle.provider()).isExactlyInstanceOf(StaticCredentialsProvider.class);
+        assertThatCode(handle::close).doesNotThrowAnyException();
+    }
+
+    // getCallerIdentity() throws before the handle exists, so the client must be closed directly or it leaks.
+    @Test
+    public void createCloseable_assumeRole_closesStsClientWhenGetCallerIdentityThrows() {
+        final StsClient mockStsClient = mock(StsClient.class);
+        final RuntimeException failure = new RuntimeException("STS unavailable");
+        when(mockStsClient.getCallerIdentity(any(GetCallerIdentityRequest.class))).thenThrow(failure);
+
+        final StsClientBuilder mockStsClientBuilder = mock(StsClientBuilder.class);
+        when(mockStsClientBuilder.region(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.credentialsProvider(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.build()).thenReturn(mockStsClient);
+
+        try (MockedStatic<StsClient> mockedStsClient = mockStatic(StsClient.class)) {
+            mockedStsClient.when(StsClient::builder).thenReturn(mockStsClientBuilder);
+
+            assertThatThrownBy(() -> awsAuthFactory.createCloseable(
+                    false, "us-east-1", "key", "secret", "arn:aws:iam::123456789012:role/TestRole", null, (ApacheHttpClient.Builder) null))
+                    .isSameAs(failure);
+
+            verify(mockStsClient).close();
+        }
     }
 }
