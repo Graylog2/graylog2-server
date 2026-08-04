@@ -35,6 +35,7 @@ const getStreamTableElements = (
   isPipelineColumnPermitted: boolean,
   extensionAttributes?: {
     attributeNames?: Array<string>;
+    defaultDisplayedAttributeNames?: Array<string>;
     attributes?: Array<Attribute>;
   },
   extensionColumnGroups?: ExtensionColumnGroups,
@@ -43,10 +44,13 @@ const getStreamTableElements = (
   const extPerformance = extensionColumnGroups?.performance ?? [];
 
   const groupedIds = new Set([...extRouting, ...extPerformance]);
-  const ungroupedExtNames = (extensionAttributes?.attributeNames ?? []).filter((id) => !groupedIds.has(id));
+  const ungroupedExtNames = (extensionAttributes?.defaultDisplayedAttributeNames ?? []).filter(
+    (id) => !groupedIds.has(id),
+  );
 
   const defaultCols = [
     'title',
+    'description',
     'index_set_title',
     'rules',
     ...(isPipelineColumnPermitted ? ['pipelines'] : []),

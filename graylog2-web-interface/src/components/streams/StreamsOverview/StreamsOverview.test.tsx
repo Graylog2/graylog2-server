@@ -55,7 +55,6 @@ const attributes = [
     id: 'description',
     title: 'Description',
     sortable: true,
-    hidden: true,
   },
 ];
 
