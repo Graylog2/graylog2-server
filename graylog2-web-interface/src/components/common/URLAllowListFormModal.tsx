@@ -125,7 +125,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   };
 
   if (urlAllowListConfig) {
-    const { entries, disabled } = config;
+    const { entries, disabled, enforce_for_notifications: enforceForNotifications } = config;
 
     return (
       <>
@@ -147,6 +147,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
             key={newUrlEntryId}
             urls={entries}
             disabled={disabled}
+            enforceForNotifications={enforceForNotifications}
             onUpdate={handleUpdate}
             newEntryId={newUrlEntryId}
           />
