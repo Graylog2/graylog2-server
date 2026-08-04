@@ -32,9 +32,11 @@ import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStr
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
 import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamOutputs from 'hooks/useStreamOutputs';
+import useStreamMetrics from 'hooks/useStreamMetrics';
 
 import StreamsOverview from './StreamsOverview';
 
+jest.mock('hooks/useStreamMetrics');
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/streams/hooks/useStreamRuleTypes');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
@@ -90,6 +92,7 @@ describe('StreamsOverview', () => {
       refetch: () => {},
     });
 
+    asMock(useStreamMetrics).mockReturnValue({ metricsByStreamId: {}, isInitialLoading: false, isError: false });
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
     asMock(useStreamRulesInputs).mockReturnValue({
       data: [{ id: 'my-id', title: 'input title', name: 'name' }],
@@ -291,6 +294,26 @@ describe('StreamsOverview', () => {
     await userEvent.click(within(tableRow).getByTitle('Hide stream outputs'));
 
     expect(screen.queryByText(/1 connected output\./i)).not.toBeInTheDocument();
+  });
+
+  it('requests metric fields for columns that are visible in preferences', () => {
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: {
+        attributes: {
+          title: { status: 'show' },
+          message_count: { status: 'show' },
+        },
+      },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+
+    renderSut();
+
+    expect(useStreamMetrics).toHaveBeenCalledWith(
+      expect.any(Array),
+      expect.arrayContaining(['message_count']),
+    );
   });
 
   it('should only show grouped plugin table elements in their matching view', async () => {
