@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
+import { act, renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { OrderedMap } from 'immutable';
 
 import { Collectors } from '@graylog/server-api';
@@ -61,7 +61,8 @@ describe('useInstance', () => {
 
     await waitFor(() => expect(result.current.data).toBeTruthy());
 
-    expect(Collectors.getInstance).toHaveBeenCalledWith('uid-42');
+    // The query polls, so it must not keep an idle user's session alive.
+    expect(Collectors.getInstance).toHaveBeenCalledWith('uid-42', { requestShouldExtendSession: false });
 
     expect(result.current.data).toEqual(
       expect.objectContaining({
@@ -90,6 +91,34 @@ describe('useInstance', () => {
     renderHook(() => useInstance(undefined));
 
     expect(Collectors.getInstance).not.toHaveBeenCalled();
+  });
+
+  // A collector that stops reporting in is marked offline server-side, with no user interaction to
+  // trigger a refetch. Without polling, a page rendered while the collector was healthy keeps
+  // asserting "online" forever.
+  it('picks up a status change without any user interaction', async () => {
+    jest.useFakeTimers();
+
+    asMock(Collectors.getInstance).mockResolvedValue(asInstanceResponse('uid-42'));
+
+    const { result } = renderHook(() => useInstance('uid-42'));
+
+    await waitFor(() => expect(result.current.data?.status).toBe('online'));
+
+    asMock(Collectors.getInstance).mockResolvedValue({
+      ...dto('uid-42'),
+      status: 'offline',
+    } as unknown as Awaited<ReturnType<typeof Collectors.getInstance>>);
+
+    // Past the fallback heartbeat cadence used until the collectors config has loaded. Wrapped in
+    // `act` because the refetch it triggers re-renders the hook outside React's own scheduling.
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(31_000);
+    });
+
+    await waitFor(() => expect(result.current.data?.status).toBe('offline'));
+
+    jest.useRealTimers();
   });
 });
 

@@ -31,6 +31,8 @@ type Props = {
   isLoading: boolean;
   error: Error | null;
   collapsible?: boolean;
+  /** Explains what the preview is showing (and when it refreshes), rendered below the messages. */
+  caption?: React.ReactNode;
 };
 
 const MessageRow = styled.div(
@@ -58,6 +60,14 @@ const EmptyState = styled.div(
     gap: ${theme.spacings.sm};
     color: ${theme.colors.gray[60]};
     padding: ${theme.spacings.sm} 0;
+  `,
+);
+
+const Caption = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.sm};
+    font-size: ${theme.fonts.size.small};
+    color: ${theme.colors.gray[60]};
   `,
 );
 
@@ -100,7 +110,15 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
   );
 };
 
-const LogPreviewSection = ({ title, searchUrl, preview, isLoading, error, collapsible = false }: Props) => (
+const LogPreviewSection = ({
+  title,
+  searchUrl,
+  preview,
+  isLoading,
+  error,
+  collapsible = false,
+  caption = undefined,
+}: Props) => (
   <Section
     title={title}
     collapsible={collapsible}
@@ -108,6 +126,7 @@ const LogPreviewSection = ({ title, searchUrl, preview, isLoading, error, collap
     headerLeftSection={collapsible ? <Label bsStyle="default">{preview ? preview.total : '—'}</Label> : undefined}
     actions={<Link to={searchUrl}>Open in search</Link>}>
     <PreviewBody preview={preview} isLoading={isLoading} error={error} />
+    {caption && <Caption>{caption}</Caption>}
   </Section>
 );
 

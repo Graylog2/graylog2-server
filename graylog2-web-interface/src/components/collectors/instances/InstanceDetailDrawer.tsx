@@ -26,7 +26,10 @@ import Routes from 'routing/Routes';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import ActivityEntryList from '../common/ActivityEntryList';
+import { DetailRow, DetailLabel } from '../common/DetailRow';
 import { IconRow, IconRowList } from '../common/IconRowList';
+import InstanceStatusLabel from '../common/InstanceStatusLabel';
+import collectorOsName from '../common/collectorOsName';
 import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
@@ -54,23 +57,6 @@ const SectionTitle = styled.h4(
     font-weight: 600;
     border-bottom: 1px solid ${theme.colors.gray[80]};
     padding-bottom: ${theme.spacings.xs};
-  `,
-);
-
-const DetailRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacings.xs};
-    margin-bottom: ${theme.spacings.xs};
-  `,
-);
-
-const Title = styled.span(
-  ({ theme }) => css`
-    font-weight: 500;
-    min-width: 120px;
-    font-size: ${theme.fonts.size.small};
   `,
 );
 
@@ -134,7 +120,6 @@ const pendingActions = (coalesced: CoalescedActions): PendingAction[] => {
 };
 
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
-  const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
   const { data: pendingDetail, isError: pendingError } = useInstancePendingChanges(instance.instance_uid);
   // Use the backend's authoritative flag (consistent with the table); fall back to the table row's
   // value until the detail loads. Deriving from activities.length would wrongly show "In sync" for an
@@ -171,49 +156,47 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
     <Drawer title={instance.hostname || instance.instance_uid} onClose={onClose} size="md">
       <Section>
         <DetailRow>
-          <Title>Status:</Title>
-          <Label bsStyle={instance.status === 'online' ? 'success' : 'default'}>
-            {instance.status === 'online' ? 'Online' : 'Offline'}
-          </Label>
+          <DetailLabel>Status:</DetailLabel>
+          <InstanceStatusLabel status={instance.status} />
         </DetailRow>
 
         <DetailRow>
-          <Title>Sync:</Title>
+          <DetailLabel>Sync:</DetailLabel>
           <SyncStateIndicator pending={hasPendingChanges} withLabel />
         </DetailRow>
 
         <DetailRow>
-          <Title>Fleet:</Title>
+          <DetailLabel>Fleet:</DetailLabel>
           <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName}</Link>
         </DetailRow>
 
         <DetailRow>
-          <Title>OS:</Title>
-          <span>{osDescription || instance.os || 'Unknown'}</span>
+          <DetailLabel>OS:</DetailLabel>
+          <span>{collectorOsName(instance)}</span>
         </DetailRow>
 
         <DetailRow>
-          <Title>Last Seen:</Title>
+          <DetailLabel>Last Seen:</DetailLabel>
           <RelativeTime dateTime={instance.last_seen} />
         </DetailRow>
 
         <DetailRow>
-          <Title>Enrolled:</Title>
+          <DetailLabel>Enrolled:</DetailLabel>
           <RelativeTime dateTime={instance.enrolled_at} />
         </DetailRow>
 
         <DetailRow>
-          <Title>Version:</Title>
+          <DetailLabel>Version:</DetailLabel>
           <span>{instance.version || 'Unknown'}</span>
         </DetailRow>
 
         <DetailRow>
-          <Title>Logs:</Title>
+          <DetailLabel>Logs:</DetailLabel>
           <Link to={collectorSystemLogsUrl(instance.instance_uid)}>View System Logs</Link>
         </DetailRow>
 
         <DetailRow>
-          <Title>Messages:</Title>
+          <DetailLabel>Messages:</DetailLabel>
           <Link to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
             Received messages
           </Link>
