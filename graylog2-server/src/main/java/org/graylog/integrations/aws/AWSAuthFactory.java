@@ -173,30 +173,35 @@ public class AWSAuthFactory {
             stsClientBuilder.httpClientBuilder(stsHttpClientBuilder);
         }
         final StsClient stsClient = stsClientBuilder.build();
+        // getCallerIdentity() can throw before the handle owns the client; close it here or it leaks.
+        try {
+            // The custom roleSessionName is extra metadata, which will be logged in AWS CloudTrail with each request
+            // to help with auditing and debugging.
+            final String roleSessionName;
+            if (accessKey != null) {
+                roleSessionName = String.format(Locale.ROOT, "ACCESS_KEY_%s@ACCOUNT_%s", accessKey,
+                        stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
+            } else {
+                roleSessionName = String.format(Locale.ROOT, "ACCOUNT_%s",
+                        stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
+            }
 
-        // The custom roleSessionName is extra metadata, which will be logged in AWS CloudTrail with each request
-        // to help with auditing and debugging.
-        final String roleSessionName;
-        if (accessKey != null) {
-            roleSessionName = String.format(Locale.ROOT, "ACCESS_KEY_%s@ACCOUNT_%s", accessKey,
-                    stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
-        } else {
-            roleSessionName = String.format(Locale.ROOT, "ACCOUNT_%s",
-                    stsClient.getCallerIdentity(GetCallerIdentityRequest.builder().build()).account());
+            LOG.debug("Cross account role session name: " + roleSessionName);
+            final AssumeRoleRequest.Builder assumeRoleRequestBuilder = AssumeRoleRequest.builder()
+                    .roleSessionName(roleSessionName)
+                    .roleArn(assumeRoleArn);
+            if (!isNullOrEmpty(externalId)) {
+                assumeRoleRequestBuilder.externalId(externalId);
+            }
+            final StsAssumeRoleCredentialsProvider provider = StsAssumeRoleCredentialsProvider.builder()
+                    .refreshRequest(assumeRoleRequestBuilder.build())
+                    .stsClient(stsClient)
+                    .build();
+            return new CredentialsProviderHandle(provider, stsClient);
+        } catch (RuntimeException e) {
+            IoUtils.closeQuietly(stsClient, LOG);
+            throw e;
         }
-
-        LOG.debug("Cross account role session name: " + roleSessionName);
-        final AssumeRoleRequest.Builder assumeRoleRequestBuilder = AssumeRoleRequest.builder()
-                .roleSessionName(roleSessionName)
-                .roleArn(assumeRoleArn);
-        if (!isNullOrEmpty(externalId)) {
-            assumeRoleRequestBuilder.externalId(externalId);
-        }
-        final StsAssumeRoleCredentialsProvider provider = StsAssumeRoleCredentialsProvider.builder()
-                .refreshRequest(assumeRoleRequestBuilder.build())
-                .stsClient(stsClient)
-                .build();
-        return new CredentialsProviderHandle(provider, stsClient);
     }
 
     /**

@@ -35,6 +35,7 @@ import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -259,5 +260,28 @@ public class AWSAuthFactoryTest {
 
         assertThat(handle.provider()).isExactlyInstanceOf(StaticCredentialsProvider.class);
         assertThatCode(handle::close).doesNotThrowAnyException();
+    }
+
+    // getCallerIdentity() throws before the handle exists, so the client must be closed directly or it leaks.
+    @Test
+    public void createCloseable_assumeRole_closesStsClientWhenGetCallerIdentityThrows() {
+        final StsClient mockStsClient = mock(StsClient.class);
+        final RuntimeException failure = new RuntimeException("STS unavailable");
+        when(mockStsClient.getCallerIdentity(any(GetCallerIdentityRequest.class))).thenThrow(failure);
+
+        final StsClientBuilder mockStsClientBuilder = mock(StsClientBuilder.class);
+        when(mockStsClientBuilder.region(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.credentialsProvider(any())).thenReturn(mockStsClientBuilder);
+        when(mockStsClientBuilder.build()).thenReturn(mockStsClient);
+
+        try (MockedStatic<StsClient> mockedStsClient = mockStatic(StsClient.class)) {
+            mockedStsClient.when(StsClient::builder).thenReturn(mockStsClientBuilder);
+
+            assertThatThrownBy(() -> awsAuthFactory.createCloseable(
+                    false, "us-east-1", "key", "secret", "arn:aws:iam::123456789012:role/TestRole", null, (ApacheHttpClient.Builder) null))
+                    .isSameAs(failure);
+
+            verify(mockStsClient).close();
+        }
     }
 }
