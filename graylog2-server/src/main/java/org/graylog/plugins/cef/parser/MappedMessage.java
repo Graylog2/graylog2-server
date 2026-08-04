@@ -47,14 +47,21 @@ public class MappedMessage implements Message {
             }
 
             final CEFMapping fieldMapping = CEFMapping.forKeyName(keyName);
+            final String value = extension.getValue();
             if (fieldMapping != null) {
                 try {
-                    mappedExtensions.put(getLabel(keyName, fieldMapping.getFullName(), extensions), fieldMapping.convert(extension.getValue()));
+                    final Object converted = fieldMapping.convert(value);
+                    if (converted == null) {
+                        LOG.trace("CEF field [{}] has an empty value. Skipping.", keyName);
+                    } else {
+                        mappedExtensions.put(getLabel(keyName, fieldMapping.getFullName(), extensions), converted);
+                    }
                 } catch (Exception e) {
-                    LOG.warn("Could not transform CEF field [{}] according to standard. Skipping.", keyName, e);
+                    LOG.warn("Could not transform CEF field [{}] with value [{}] according to standard. Skipping.",
+                            keyName, value);
                 }
             } else {
-                mappedExtensions.put(getLabel(keyName, keyName, extensions), extension.getValue());
+                mappedExtensions.put(getLabel(keyName, keyName, extensions), value);
             }
 
         }
