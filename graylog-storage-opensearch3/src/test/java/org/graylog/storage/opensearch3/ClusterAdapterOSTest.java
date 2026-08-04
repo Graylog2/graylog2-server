@@ -78,6 +78,14 @@ class ClusterAdapterOSTest {
     }
 
     @Test
+    void boundedHealthReportsAnErroringClusterAsUnreachableRatherThanPropagating() {
+        // The un-timed variant catches only IOException, so a well-formed error response escapes it as a runtime
+        // OpenSearchException. A caller on a deadline cannot act on that difference, so the bounded variant folds
+        // both into empty.
+        assertThat(clusterAdapter.health(java.time.Duration.ofSeconds(1))).isEmpty();
+    }
+
+    @Test
     void testFileDescriptorStats() {
         final Set<NodeFileDescriptorStats> nodeFileDescriptorStats = clusterAdapter.fileDescriptorStats();
 

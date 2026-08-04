@@ -20,8 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Cancellable;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.index.search.SimpleQueryStringQueryParser;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cat.IndexSummaryResponse;
@@ -48,6 +52,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ClusterAdapterOS2Test {
@@ -115,6 +120,33 @@ class ClusterAdapterOS2Test {
         when(client.execute(any())).thenThrow(new OpenSearchException("Exception"));
         final Optional<HealthStatus> healthStatus = clusterAdapter.health();
         assertThat(healthStatus).isEmpty();
+    }
+
+    @Test
+    void boundedHealthGivesUpAndCancelsWhenTheClusterDoesNotAnswerInTime() {
+        // The listener is never notified: a cluster that accepted the connection and then went quiet.
+        final Cancellable cancellable = mock(Cancellable.class);
+        when(client.clusterHealthAsync(any(), any())).thenReturn(cancellable);
+
+        final Optional<HealthStatus> healthStatus = clusterAdapter.health(java.time.Duration.ofMillis(50));
+
+        assertThat(healthStatus).isEmpty();
+        // Cancelling matters as much as giving up: an abandoned request would otherwise keep working through the
+        // client's remaining hosts long after the caller stopped waiting.
+        verify(cancellable).cancel();
+    }
+
+    @Test
+    void boundedHealthMapsTheClusterStatusWhenItAnswersInTime() {
+        final ClusterHealthResponse response = mock(ClusterHealthResponse.class);
+        when(response.getStatus()).thenReturn(ClusterHealthStatus.YELLOW);
+        when(client.clusterHealthAsync(any(), any())).thenAnswer(invocation -> {
+            final ActionListener<ClusterHealthResponse> listener = invocation.getArgument(1);
+            listener.onResponse(response);
+            return mock(Cancellable.class);
+        });
+
+        assertThat(clusterAdapter.health(java.time.Duration.ofSeconds(5))).contains(HealthStatus.Yellow);
     }
 
     @Test

@@ -89,6 +89,11 @@ public class ClusterAdapterOS implements ClusterAdapter {
         return clusterHealth().map(this::healthStatusFrom);
     }
 
+    @Override
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterHealth(timeout).map(this::healthStatusFrom);
+    }
+
     private HealthStatus healthStatusFrom(HealthResponse response) {
         return switch (response.status()) {
             case Red -> HealthStatus.Red;
@@ -360,6 +365,31 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
+    /**
+     * Bounded counterpart of {@link #clusterHealth()}, routed through the client's per-request response timeout and
+     * its own {@code get(timeout)} safety net so the wait cannot outlive the caller's budget. The request's
+     * cluster-manager timeout is pulled down to match: it defaults to 30s, so a cluster with no elected manager
+     * would otherwise sit server-side well past that budget. Unlike the un-timed variant this also catches the
+     * runtime {@code OpenSearchException} an error response produces, since to a caller on a deadline "answered with
+     * an error" and "did not answer" are the same fact.
+     */
+    private Optional<HealthResponse> clusterHealth(java.time.Duration timeout) {
+        final Time bound = new Time.Builder().time(timeout.toMillis() + "ms").build();
+        try {
+            final HealthResponse health = opensearchClient.executeWithClientTimeout(
+                    asyncClient -> asyncClient.cluster().health(HealthRequest.builder()
+                            .timeout(bound)
+                            .clusterManagerTimeout(bound)
+                            .build()),
+                    "Unable to retrieve cluster health",
+                    Duration.milliseconds(timeout.toMillis()));
+            return Optional.of(health);
+        } catch (Exception e) {
+            logHealthFailure(e);
+            return Optional.empty();
+        }
+    }
+
     private Optional<HealthResponse> clusterHealth() {
         final Time timeout = new Time.Builder().time(requestTimeout.toSeconds() + "s").build();
         try {
@@ -369,12 +399,17 @@ public class ClusterAdapterOS implements ClusterAdapter {
             );
             return Optional.of(health);
         } catch (IOException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
-            } else {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
-            }
+            logHealthFailure(e);
             return Optional.empty();
+        }
+    }
+
+    private void logHealthFailure(Exception e) {
+        final String cause = Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a");
+        if (LOG.isDebugEnabled()) {
+            LOG.error("{} ({})", e.getMessage(), cause, e);
+        } else {
+            LOG.error("{} ({})", e.getMessage(), cause);
         }
     }
 
