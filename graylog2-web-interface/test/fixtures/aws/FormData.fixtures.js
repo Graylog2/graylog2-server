@@ -19,6 +19,7 @@ import { AWS_AUTH_TYPES, DEFAULT_KINESIS_LOG_TYPE } from 'integrations/aws/commo
 export const exampleFormDataWithKeySecretAuth = {
   awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
   awsCloudWatchAddFlowLogPrefix: { value: true },
+  awsCloudWatchStoreFullMessage: { value: false },
   awsAssumeRoleARN: { value: '' },
   awsExternalId: { value: '' },
   awsAccessKey: { value: 'mykey' },
@@ -39,6 +40,7 @@ export const exampleFormDataWithKeySecretAuth = {
 export const exampleFormDataWithAutomaticAuth = {
   awsAuthenticationType: { value: AWS_AUTH_TYPES.automatic },
   awsCloudWatchAddFlowLogPrefix: { value: true },
+  awsCloudWatchStoreFullMessage: { value: false },
   awsAssumeRoleARN: { value: '' },
   awsExternalId: { value: '' },
   awsCloudWatchAwsRegion: { value: 'us-east-1' },
