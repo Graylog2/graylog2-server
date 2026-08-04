@@ -138,8 +138,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
         ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
       }
 
-      & tbody > tr:hover > .${PINNED_CELL_CLASS_NAME},
-      & tbody > tr:hover > .${PINNED_CELL_STRIPED_CLASS_NAME} {
+      & tbody > tr:hover > .${PINNED_CELL_CLASS_NAME}, & tbody > tr:hover > .${PINNED_CELL_STRIPED_CLASS_NAME} {
         background-color: var(${TABLE_ROW_PINNED_HOVER_BG_VAR});
       }
     `}

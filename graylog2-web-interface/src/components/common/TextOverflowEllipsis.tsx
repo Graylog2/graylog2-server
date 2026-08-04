@@ -51,7 +51,11 @@ const TextOverflowEllipsis = ({ children, titleOverride = undefined, className =
   }, [children, width]);
 
   return (
-    <Tooltip label={titleOverride || children} disabled={titleOverride === undefined && !isTruncated} multiline maw={400}>
+    <Tooltip
+      label={titleOverride || children}
+      disabled={titleOverride === undefined && !isTruncated}
+      multiline
+      maw={400}>
       <Wrapper ref={ref} className={className}>
         {children}
       </Wrapper>
