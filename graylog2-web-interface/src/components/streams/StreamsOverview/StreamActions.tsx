@@ -176,7 +176,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         <LinkContainer to={Routes.stream_search(stream.id)}>
           <Button
             bsSize="xsmall"
-            title="Search in stream"
+            title="Show received messages"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
                 app_pathname: 'stream',
