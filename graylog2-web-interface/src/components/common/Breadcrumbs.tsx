@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import EntityDataTable from './EntityDataTable';
-import MoreActions from './MoreActions';
-import type { ColumnRenderers, ColumnSchema } from './types';
-import ExpandedSectionToggleWrapper from './ExpandedSectionToggleWrapper';
+import * as React from 'react';
+import { Breadcrumbs as MantineBreadcrumbs } from '@mantine/core';
 
-export { default as useTableEventHandlers } from './hooks/useTableEventHandlers';
+const Breadcrumbs = ({ ...props }: React.ComponentProps<typeof MantineBreadcrumbs>) => (
+  <MantineBreadcrumbs {...props} />
+);
 
-export { ColumnRenderers, ColumnSchema, MoreActions, ExpandedSectionToggleWrapper };
-export default EntityDataTable;
+export default Breadcrumbs;
