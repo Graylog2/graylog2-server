@@ -76,12 +76,28 @@ yarn tsgo && yarn lint:changes && yarn test
 - **Nullish coalescing (`??`)** over logical OR (`||`) for default values.
 - **`Object.fromEntries`** over `Array.reduce` for constructing objects from arrays (performance).
 - Treat ESLint and Stylelint rules as authoritative for code style and patterns in this repo.
-- Wrapper components from `components/graylog` instead of direct react-bootstrap imports.
+- Use react-query for API calls.
+- Use typed API stubs from @graylog/server-api and @graylog/enterprise-api.
+- React Compiler handles render optimization. Do not add useMemo or useCallback only for optimization.
+
+## Components
+
+- Use styled-components, Mantine, and the local component abstractions.
+- Reuse shared components before creating new ones.
+- Shared components live in - src/components/common.
+- Wrapped Mantine components live in src/components/common/bootstrap.
 - Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components before creating new ones.
 
 ## Testing Guidelines
 
 - Follow `CONTRIBUTING.md` for testing conventions, test placement, and mocking guidelines.
+- Test feature behavior and public interfaces, not internal implementation details.
+- One feature test per feature (e.g. an entity data table) covers its components and hooks together. Separate unit tests per file are not the goal.
+- Only add a dedicated unit test for a hook or helper if it has logic that a feature test can't reach or verify cleanly.
+- Check existing tests first.
+- Adjust tests when behavior changes.
+- Extend tests for important missing scenarios.
+- Add tests when a changed feature has no useful coverage.
 
 ## Browser Compatibility
 
@@ -104,7 +120,6 @@ yarn tsgo && yarn lint:changes && yarn test
 ## Finishing work
 
 Before finishing current work, please make sure that:
-
-  - Type-checking passes
-  - Tests are passing (use `yarn test`, never `yarn jest`)
-  - Generated code is adhering our frontend style guide (as laid out on `CONTRIBUTING.md`)
+- Type-checking passes
+- Tests are passing (use `yarn test`, never `yarn jest`)
+- Generated code is adhering our frontend style guide (as laid out on `CONTRIBUTING.md`)
