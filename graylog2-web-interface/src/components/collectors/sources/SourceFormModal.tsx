@@ -15,20 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import type {FormikTouched, FormikErrors} from 'formik';
-import {Formik, Form} from 'formik';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { FormikTouched, FormikErrors } from 'formik';
+import { Formik, Form } from 'formik';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 
-import {HelpBlock, Input} from 'components/bootstrap';
+import { HelpBlock, Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
-import {FormikInput, InputDescription} from 'components/common';
-import TimeUnitInput, {extractDurationAndUnit} from 'components/common/TimeUnitInput';
+import { FormikInput, InputDescription } from 'components/common';
+import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import ModalSubmit from 'components/common/ModalSubmit';
-import {TELEMETRY_EVENT_TYPE} from 'logic/telemetry/Constants';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import {SOURCE_TYPE_LABELS} from './Constants';
+import { SOURCE_TYPE_LABELS } from './Constants';
 
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type {
@@ -56,19 +56,20 @@ const defaultConfigs: Record<
   journald: { read_mode: 'end', priority: 'info' },
   windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end' },
   macos_unified_logging: {
-    predicate: 'subsystem IN {\n' +
-      '\'com.apple.opendirectoryd\',\n' +
-      '\'com.apple.authorization\',\n' +
-      '\'com.apple.loginwindow\',\n' +
-      '\'com.apple.securityd\',\n' +
-      '\'com.apple.TCC\',\n' +
-      '\'com.apple.alf\',\n' +
-      '\'com.apple.networkextension\',\n' +
-      '\'com.apple.DiskManagement\',\n' +
-      '\'com.apple.CoreStorage\',\n' +
-      '\'com.apple.endpointsecurity\',\n' +
-      '\'com.apple.syspolicyd\',\n' +
-      '\'com.apple.launchd\'\n' +
+    predicate:
+      'subsystem IN {\n' +
+      "'com.apple.opendirectoryd',\n" +
+      "'com.apple.authorization',\n" +
+      "'com.apple.loginwindow',\n" +
+      "'com.apple.securityd',\n" +
+      "'com.apple.TCC',\n" +
+      "'com.apple.alf',\n" +
+      "'com.apple.networkextension',\n" +
+      "'com.apple.DiskManagement',\n" +
+      "'com.apple.CoreStorage',\n" +
+      "'com.apple.endpointsecurity',\n" +
+      "'com.apple.syspolicyd',\n" +
+      "'com.apple.launchd'\n" +
       '} AND messageType >= error',
     max_log_age: 'PT24H',
     max_poll_interval: 'PT30S',
@@ -276,14 +277,12 @@ const MacOSUnifiedLoggingConfigFields = ({
   const logAge = extractDurationAndUnit(config.max_log_age, LOG_AGE_UNITS);
 
   // TimeUnitInput reports (value, unit, checked). Unchecked clears the field so the backend default applies.
-  const updateDuration =
-    (field: 'max_poll_interval' | 'max_log_age') =>
-      (value: number, unit: string) => {
-        setFieldValue('config', {
-        ...config,
-        [field]: moment.duration(value, unit as moment.unitOfTime.DurationConstructor).toISOString(),
-      });
-    };
+  const updateDuration = (field: 'max_poll_interval' | 'max_log_age') => (value: number, unit: string) => {
+    setFieldValue('config', {
+      ...config,
+      [field]: moment.duration(value, unit as moment.unitOfTime.DurationConstructor).toISOString(),
+    });
+  };
 
   return (
     <>
@@ -291,7 +290,12 @@ const MacOSUnifiedLoggingConfigFields = ({
         id="macos-predicate"
         type="textarea"
         label="Predicate"
-        help="Optional macOS unified logging filter predicate passed to the `log` command. Leave empty to use the secure default (security-relevant subsystems, error severity and above). Example: subsystem == 'com.apple.securityd'"
+        help={
+          <span>
+            Optional macOS unified logging filter predicate passed to the <code>log</code> command. Leaving this empty
+            collects all logs from the system! Example: <code>subsystem == 'com.apple.securityd'</code>
+          </span>
+        }
         value={config.predicate || ''}
         onChange={(e) => setFieldValue('config', { ...config, predicate: e.target.value || undefined })}
       />
@@ -303,7 +307,10 @@ const MacOSUnifiedLoggingConfigFields = ({
         units={POLL_INTERVAL_UNITS}
         required
       />
-      <InputDescription error={errors?.max_poll_interval} help="How often the Collector checks for new log entries. Must be at least 1 second." />
+      <InputDescription
+        error={errors?.max_poll_interval}
+        help="How often the Collector checks for new log entries. Must be at least 1 second."
+      />
       <TimeUnitInput
         label="Max log age"
         update={updateDuration('max_log_age')}
@@ -312,7 +319,10 @@ const MacOSUnifiedLoggingConfigFields = ({
         units={LOG_AGE_UNITS}
         required
       />
-      <InputDescription error={errors?.max_log_age} help="On first start, how far back to backfill logs. Set to 0 to disable backfilling." />
+      <InputDescription
+        error={errors?.max_log_age}
+        help="On first start, how far back to backfill logs. Set to 0 to disable backfilling."
+      />
     </>
   );
 };
@@ -452,7 +462,9 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                   <HelpBlock>Collect events from Windows Event Viewer channels.</HelpBlock>
                 )}
                 {values.source_type === 'macos_unified_logging' && (
-                  <HelpBlock>Collect from the macOS unified logging system via the `log` command (macOS only).</HelpBlock>
+                  <HelpBlock>
+                    Collect from the macOS unified logging system via the <code>log</code> command (macOS only).
+                  </HelpBlock>
                 )}
                 <FormikInput id="source-name" label="Name" name="name" required />
                 <FormikInput id="source-description" label="Description" name="description" type="textarea" />

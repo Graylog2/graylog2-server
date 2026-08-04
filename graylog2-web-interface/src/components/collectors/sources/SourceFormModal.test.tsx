@@ -80,7 +80,6 @@ describe('SourceFormModal', () => {
     await screen.findByLabelText(/Max poll interval/i);
     await screen.findByLabelText(/Max log age/i);
   });
-
 });
 
 describe('splitToList', () => {
