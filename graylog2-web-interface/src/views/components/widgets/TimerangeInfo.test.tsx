@@ -36,12 +36,16 @@ import OriginalTimerangeInfo from './TimerangeInfo';
 
 jest.mock('views/hooks/useView');
 jest.mock('views/hooks/useGlobalOverride');
-jest.mock('components/common/Tooltip', () => ({ children, label }: { children: React.ReactNode; label: React.ReactNode }) => (
-  <>
-    {children}
-    <div data-testid="tooltip-label">{label}</div>
-  </>
-));
+jest.mock(
+  'components/common/Tooltip',
+  () =>
+    ({ children, label }: { children: React.ReactNode; label: React.ReactNode }) => (
+      <>
+        {children}
+        <div data-testid="tooltip-label">{label}</div>
+      </>
+    ),
+);
 
 const defaultSearchResult = {
   execution: {
