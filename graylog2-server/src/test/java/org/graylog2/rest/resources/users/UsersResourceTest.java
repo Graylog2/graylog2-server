@@ -48,6 +48,7 @@ import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
@@ -78,6 +79,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.shared.security.RestPermissions.ROLES_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -149,6 +151,7 @@ public class UsersResourceTest {
         lenient().when(userContext.getUser()).thenReturn(user);
         lenient().when(user.getName()).thenReturn("username");
         lenient().when(user.getId()).thenReturn("userId");
+        lenient().when(subject.isPermitted(ROLES_READ + ":" + ALLOWED_ROLE_LOWER_CASE)).thenReturn(true);
     }
 
     /**
@@ -184,9 +187,10 @@ public class UsersResourceTest {
         Role adminRole = mock(Role.class);
         when(adminRole.getId()).thenReturn(new ObjectId().toHexString());
         when(adminRole.getName()).thenReturn("admin");
+        when(subject.isPermitted(ROLES_READ + ":admin")).thenReturn(true);
 
         when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
-        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD), userContext));
@@ -221,9 +225,87 @@ public class UsersResourceTest {
     @Test
     void createFailureOnWrongRoleAssignPermission() {
         String testRole = "forbiddenRole";
+        lenient().when(subject.isPermitted(ROLES_READ + ":forbiddenrole")).thenReturn(true);
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD), userContext));
+    }
+
+    @Test
+    void createFailsWhenAssigningPermissionTheCreatingUserDoesNotHave() throws NotFoundException {
+        // The creating user is allowed to create users, but does not hold `inputs:create` itself.
+        lenient().when(subject.isPermitted(RestPermissions.USERS_CREATE)).thenReturn(true);
+        lenient().when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
+
+        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of());
+        lenient().when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        lenient().when(userService.loadById("creator")).thenReturn(creator);
+        lenient().when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        final CreateUserRequest request = buildCreateUserRequest(List.of(), PASSWORD, List.of(RestPermissions.INPUTS_CREATE));
+        assertThrows(BadRequestException.class, () -> usersResource.create(request, userContext));
+    }
+
+    @Test
+    void createFailsWhenAssigningRoleContainingPermissionTheCreatingUserDoesNotHave() throws NotFoundException {
+        // The role itself is assignable by the creating user, but it grants `inputs:create`, which the creating user
+        // does not hold itself.
+        final Role roleWithInputsCreate = mock(Role.class);
+        lenient().when(roleWithInputsCreate.getId()).thenReturn(new ObjectId().toHexString());
+        lenient().when(roleWithInputsCreate.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+        lenient().when(roleWithInputsCreate.getPermissions()).thenReturn(Set.of(RestPermissions.INPUTS_CREATE));
+
+        lenient().when(subject.isPermitted(RestPermissions.USERS_CREATE)).thenReturn(true);
+        lenient().when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
+
+        lenient().when(roleService.loadByNames(List.of(ALLOWED_ROLE_LOWER_CASE))).thenReturn(Set.of(roleWithInputsCreate));
+        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, roleWithInputsCreate));
+        lenient().when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        lenient().when(userService.loadById("creator")).thenReturn(creator);
+        lenient().when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        final CreateUserRequest request = buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), PASSWORD, List.of());
+        final var exception = assertThrows(BadRequestException.class, () -> usersResource.create(request, userContext));
+        assertThat(exception).hasMessage("Cannot assign permissions/roles to new user that current user does not have: inputs:create");
+    }
+
+    @Test
+    void createSucceedsWithoutRoles() throws ValidationException, NotFoundException {
+        lenient().when(subject.isPermitted(RestPermissions.USERS_CREATE)).thenReturn(true);
+        lenient().when(roleService.loadAllIdMap()).thenReturn(Map.of());
+        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        lenient().when(userService.loadById("creator")).thenReturn(creator);
+        lenient().when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        // `roles` is @Nullable in CreateUserRequest, so the validation must cope with a missing list.
+        final Response response = usersResource.create(buildCreateUserRequest(null, PASSWORD, List.of()), userContext);
+
+        assertEquals(201, response.getStatus());
+        verify(userManagementService).create(isA(UserImpl.class), eq(creator));
+    }
+
+    @Test
+    void changeUserSucceedsWithoutPermissionsAndRoles() throws ValidationException, NotFoundException {
+        final String userId = "targetId";
+        final var targetUser = userImplFactory.create(Map.of(UserImpl.USERNAME, "target"));
+        when(userManagementService.loadById(userId)).thenReturn(targetUser);
+        when(subject.isPermitted(RestPermissions.USERS_EDIT + ":target")).thenReturn(true);
+        lenient().when(roleService.loadAllIdMap()).thenReturn(Map.of());
+
+        // Both `permissions` and `roles` are @Nullable in ChangeUserRequest, so a request that touches neither must not
+        // fail the validation.
+        final var request = ChangeUserRequest.create(EMAIL, FIRST_NAME, LAST_NAME, null, TIMEZONE, null, null, null, null);
+        usersResource.changeUser(userId, request, userContext);
+
+        verify(userManagementService).update(targetUser, request);
     }
 
     @Test
@@ -448,8 +530,12 @@ public class UsersResourceTest {
     }
 
     private CreateUserRequest buildCreateUserRequest(List<String> roles, String password) {
+        return buildCreateUserRequest(roles, password, Collections.emptyList());
+    }
+
+    private CreateUserRequest buildCreateUserRequest(List<String> roles, String password, List<String> permissions) {
         return CreateUserRequest.create(USERNAME, password, EMAIL,
-                FIRST_NAME, LAST_NAME, Collections.singletonList(""),
+                FIRST_NAME, LAST_NAME, permissions,
                 TIMEZONE, SESSION_TIMEOUT,
                 new DashboardStartPage("dashboard-id"), roles, false);
     }

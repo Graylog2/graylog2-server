@@ -130,6 +130,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
+import static org.graylog2.shared.security.RestPermissions.ROLES_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
@@ -388,7 +389,7 @@ public class UsersResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@RequestBody(description = "Must contain username, full_name, email, password and a list of permissions.", required = true)
-                               @Valid @NotNull CreateUserRequest cr,
+                           @Valid @NotNull CreateUserRequest cr,
                            @Context UserContext userContext) throws ValidationException {
         if (isUserNameInUse(cr.username())) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
@@ -398,6 +399,7 @@ public class UsersResource extends RestResource {
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
+        validatePermissionsAndRoles(cr, userContext);
         validatePasswordComplexity(cr.password());
 
         // Create user.
@@ -432,6 +434,47 @@ public class UsersResource extends RestResource {
                 .build(user.getName());
 
         return Response.created(userUri).build();
+    }
+
+    private void validatePermissionsAndRoles(@NotNull CreateUserRequest cr, UserContext userContext) {
+        validatePermissionsAndRoles(cr.roles(), cr.permissions(), userContext);
+    }
+
+    private void validatePermissionsAndRoles(@NotNull ChangeUserRequest cr, UserContext userContext) {
+        validatePermissionsAndRoles(cr.roles(), cr.permissions(), userContext);
+    }
+
+    private void validatePermissionsAndRoles(List<String> requestRoles, List<String> requestPermissions, UserContext userContext) {
+        try {
+            final var missingPermissions = permissionsCurrentUserMisses(requestRoles, requestPermissions, userContext);
+            if (!missingPermissions.isEmpty()) {
+                throw new BadRequestException("Cannot assign permissions/roles to new user that current user does not have: " + String.join(", ", missingPermissions));
+            }
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new BadRequestException(e);
+        }
+    }
+
+    private Set<String> permissionsCurrentUserMisses(List<String> requestRoles, List<String> requestPermissions, UserContext user) throws org.graylog2.database.NotFoundException {
+        final var normalizedRoles = Optional.ofNullable(requestRoles).orElse(Collections.emptyList())
+                .stream()
+                .map(role -> role.toLowerCase(Locale.ENGLISH))
+                .toList();
+        final var deniedRoles = normalizedRoles
+                .stream()
+                .filter(role -> !isPermitted(ROLES_READ, role))
+                .toList();
+        if (!deniedRoles.isEmpty()) {
+            throw new ForbiddenException("Not allowed to read roles: " + String.join(", ", deniedRoles));
+        }
+        final var roles = roleService.loadByNames(normalizedRoles);
+        final var rolePermissions = roles.stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .collect(Collectors.toSet());
+        final var normalizedPermissions = Optional.ofNullable(requestPermissions).orElse(Collections.emptyList());
+        return Stream.concat(normalizedPermissions.stream(), rolePermissions.stream())
+                .filter(permission -> !user.isPermitted(permission))
+                .collect(Collectors.toSet());
     }
 
     @GET
@@ -546,10 +589,12 @@ public class UsersResource extends RestResource {
         final User user = loadUserById(userId);
         final String username = user.getName();
         checkPermission(USERS_EDIT, username);
-
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot modify readonly user " + username);
         }
+
+        validatePermissionsAndRoles(cr, userContext);
+
         // We only allow setting a subset of the fields in ChangeUserRequest
         if (!user.isExternalUser()) {
             if (cr.email() != null) {
