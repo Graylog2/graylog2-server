@@ -89,6 +89,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -306,6 +307,55 @@ public class UsersResourceTest {
         usersResource.changeUser(userId, request, userContext);
 
         verify(userManagementService).update(targetUser, request);
+    }
+
+    @Test
+    void changeUserFailsWhenAssigningPermissionTheEditingUserDoesNotHave() throws ValidationException {
+        final String userId = "targetId";
+        final var targetUser = userImplFactory.create(Map.of(UserImpl.USERNAME, "target"));
+        when(userManagementService.loadById(userId)).thenReturn(targetUser);
+        when(subject.isPermitted(RestPermissions.USERS_EDIT + ":target")).thenReturn(true);
+        // The editing user is allowed to edit permissions, so the submitted list would be applied.
+        lenient().when(subject.isPermitted(RestPermissions.USERS_PERMISSIONSEDIT + ":target")).thenReturn(true);
+
+        // The editing user holds `streams:read`, but not `inputs:create`.
+        lenient().when(userContext.isPermitted(RestPermissions.STREAMS_READ)).thenReturn(true);
+        lenient().when(userContext.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
+
+        final var request = buildChangeUserRequest(null, List.of(RestPermissions.STREAMS_READ, RestPermissions.INPUTS_CREATE));
+        final var exception = assertThrows(BadRequestException.class, () -> usersResource.changeUser(userId, request, userContext));
+
+        assertThat(exception)
+                .hasMessageContaining(RestPermissions.INPUTS_CREATE)
+                .hasMessageNotContaining(RestPermissions.STREAMS_READ);
+        verify(userManagementService, never()).update(isA(UserImpl.class), isA(ChangeUserRequest.class));
+    }
+
+    @Test
+    void changeUserFailsWhenAssigningRoleContainingPermissionTheEditingUserDoesNotHave() throws NotFoundException, ValidationException {
+        final String userId = "targetId";
+        final var targetUser = userImplFactory.create(Map.of(UserImpl.USERNAME, "target"));
+        when(userManagementService.loadById(userId)).thenReturn(targetUser);
+        when(subject.isPermitted(RestPermissions.USERS_EDIT + ":target")).thenReturn(true);
+
+        // The editing user is allowed to edit roles, and the role itself is assignable by them.
+        lenient().when(subject.isPermitted(RestPermissions.USERS_ROLESEDIT + ":target")).thenReturn(true);
+
+        final Role roleWithInputsCreate = mock(Role.class);
+        lenient().when(roleWithInputsCreate.getId()).thenReturn(new ObjectId().toHexString());
+        lenient().when(roleWithInputsCreate.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+        lenient().when(roleWithInputsCreate.getPermissions()).thenReturn(Set.of(RestPermissions.INPUTS_CREATE));
+        // The role is looked up by its lowercased name, no matter how the request spells it.
+        lenient().when(roleService.loadByNames(List.of(ALLOWED_ROLE_LOWER_CASE))).thenReturn(Set.of(roleWithInputsCreate));
+        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, roleWithInputsCreate));
+
+        lenient().when(userContext.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
+
+        final var request = buildChangeUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), null);
+        final var exception = assertThrows(BadRequestException.class, () -> usersResource.changeUser(userId, request, userContext));
+
+        assertThat(exception).hasMessageContaining(RestPermissions.INPUTS_CREATE);
+        verify(userManagementService, never()).update(isA(UserImpl.class), isA(ChangeUserRequest.class));
     }
 
     @Test
@@ -527,6 +577,10 @@ public class UsersResourceTest {
         when(userManagementService.getWildcardPermissionsForUser(user)).thenReturn(basePerms);
         when(userManagementService.getGRNPermissionsForUser(user)).thenReturn(List.of());
         return user;
+    }
+
+    private ChangeUserRequest buildChangeUserRequest(List<String> roles, List<String> permissions) {
+        return ChangeUserRequest.create(EMAIL, FIRST_NAME, LAST_NAME, permissions, TIMEZONE, null, null, roles, null);
     }
 
     private CreateUserRequest buildCreateUserRequest(List<String> roles, String password) {
