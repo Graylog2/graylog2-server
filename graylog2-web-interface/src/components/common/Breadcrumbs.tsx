@@ -15,14 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import { Breadcrumbs as MantineBreadcrumbs } from '@mantine/core';
 
-import Badge from 'components/bootstrap/Badge';
+const Breadcrumbs = ({ ...props }: React.ComponentProps<typeof MantineBreadcrumbs>) => (
+  <MantineBreadcrumbs {...props} />
+);
 
-const StyledBadge = styled(Badge)`
-  vertical-align: top;
-`;
-
-const BetaBadge = () => <StyledBadge bsStyle="danger">Beta</StyledBadge>;
-
-export default BetaBadge;
+export default Breadcrumbs;

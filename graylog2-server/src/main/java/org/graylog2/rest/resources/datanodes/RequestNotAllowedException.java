@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+package org.graylog2.rest.resources.datanodes;
 
-import Badge from 'components/bootstrap/Badge';
-
-const StyledBadge = styled(Badge)`
-  vertical-align: top;
-`;
-
-const BetaBadge = () => <StyledBadge bsStyle="danger">Beta</StyledBadge>;
-
-export default BetaBadge;
+public class RequestNotAllowedException extends Exception {
+    public RequestNotAllowedException(String message) {
+        super(message);
+    }
+}
