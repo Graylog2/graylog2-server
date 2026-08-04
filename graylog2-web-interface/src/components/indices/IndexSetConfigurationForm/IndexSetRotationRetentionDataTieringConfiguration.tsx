@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import { DataTieringVisualisation, DataTieringConfiguration } from 'components/indices/data-tiering';
 import type { IndexSetFormValues } from 'stores/indices/IndexSetsStore';
@@ -25,6 +26,12 @@ type Props = {
   immutableFields?: string[];
   ignoreFieldRestrictions: boolean;
 };
+
+const DataTieringConfigContainer = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.lg};
+  `,
+);
 
 const IndexSetRotationRetentionDataTieringConfiguration = ({
   values,
@@ -41,11 +48,13 @@ const IndexSetRotationRetentionDataTieringConfiguration = ({
       archiveData={values.data_tiering?.archive_before_deletion}
     />
     {(!hiddenFields.includes('data_tiering') || ignoreFieldRestrictions) && (
-      <DataTieringConfiguration
-        hiddenFields={hiddenFields}
-        immutableFields={immutableFields}
-        ignoreFieldRestrictions={ignoreFieldRestrictions}
-      />
+      <DataTieringConfigContainer>
+        <DataTieringConfiguration
+          hiddenFields={hiddenFields}
+          immutableFields={immutableFields}
+          ignoreFieldRestrictions={ignoreFieldRestrictions}
+        />
+      </DataTieringConfigContainer>
     )}
   </>
 );

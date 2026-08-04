@@ -25,7 +25,6 @@ import moment from 'moment';
 import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
@@ -40,10 +39,10 @@ import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
+import usePluginEntities from 'hooks/usePluginEntities';
 import RelativeTime from 'components/common/RelativeTime';
-import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
-import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
-import { fetchAllLookupTables } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
+import Parameter from 'views/logic/parameters/Parameter';
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
@@ -69,7 +68,7 @@ import commonStyles from '../common/commonStyles.css';
 
 export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
-export type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
+export type LookupTableParameterJsonEmbryonic = Partial<ParameterJson> & {
   embryonic?: boolean;
 };
 const LOOKUP_PERMISSIONS: Permission[] = ['lookuptables:read'];
@@ -81,7 +80,7 @@ const InputRow = styled.div`
 `;
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
-  name: name,
+  name,
   embryonic: true,
   type: 'lut-parameter-v1',
   data_type: 'any',
@@ -116,19 +115,14 @@ const WarmTierTimeStamp = () => {
 type QueryParametersProps = {
   eventDefinition: EventDefinition;
   onChange: (config: EventDefinitionConfig) => void;
-  userCanViewLookupTables: boolean;
   validation: Props['validation'];
+  userCanViewLookupTables: boolean;
 };
-const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, validation }: QueryParametersProps) => {
-  const { data: tables = [] } = useQuery({
-    queryKey: ['lookup-tables', 'all'],
-    queryFn: () => fetchAllLookupTables(),
-    enabled: userCanViewLookupTables,
-  });
+const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLookupTables }: QueryParametersProps) => {
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
   const onChangeQueryParameters = useCallback(
-    (newQueryParameters: Array<LookupTableParameterJson>) => {
+    (newQueryParameters: Array<ParameterJson>) => {
       const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
 
       return onChange(newConfig);
@@ -140,16 +134,25 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
     return <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>;
   }
 
-  const parameterButtons = queryParameters.map((queryParam) => (
-    <EditQueryParameterModal
-      key={queryParam.name}
-      queryParameter={LookupTableParameter.fromJSON(queryParam)}
-      embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
-      queryParameters={queryParameters}
-      lookupTables={tables}
-      onChange={onChangeQueryParameters}
-    />
-  ));
+  const parameterButtons = queryParameters.map((queryParam) => {
+    let parsed;
+
+    try {
+      parsed = Parameter.fromJSON(queryParam as ParameterJson);
+    } catch {
+      return null;
+    }
+
+    return (
+      <EditQueryParameterModal
+        key={queryParam.name}
+        queryParameter={parsed}
+        embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
+        queryParameters={queryParameters}
+        onChange={onChangeQueryParameters}
+      />
+    );
+  });
 
   if (isEmpty(parameterButtons)) {
     return null;
@@ -179,6 +182,7 @@ const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, v
 const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
+  const searchQueryPreviews = usePluginEntities('eventDefinitions.components.searchQueryPreview') ?? [];
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
   const { userTimezone } = useUserDateTime();
@@ -553,12 +557,20 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         </FormGroup>
       )}
 
+      {/* Extension point (filled by the enterprise search-filters plugin) for a read-only preview of the
+          effective query beneath the Search Query. Scoped (Illuminate) definitions hide the base query, so
+          the preview is not rendered for them. */}
+      {onlyFilters ||
+        searchQueryPreviews.map(({ component: SearchQueryPreview, key }) => (
+          <SearchQueryPreview key={key} queryString={currentConfig.query ?? ''} filters={currentConfig.filters ?? []} />
+        ))}
+
       {onlyFilters || (
         <QueryParameters
           eventDefinition={eventDefinition}
           onChange={propagateChange}
-          userCanViewLookupTables={userCanViewLookupTables}
           validation={validation}
+          userCanViewLookupTables={userCanViewLookupTables}
         />
       )}
 
@@ -572,6 +584,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               filters={eventDefinition.config.filters}
               onChange={handleSearchFiltersChange}
               hideFiltersPreview={hideFiltersPreview}
+              queryString={currentConfig.query}
             />
           </div>
         </FormGroup>

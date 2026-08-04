@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { DropdownButton } from 'components/bootstrap';
-import type { StyleProps } from 'components/bootstrap/Button';
 
-import Icon from './Icon';
 import type { SizeProp } from './Icon';
+import Icon from './Icon';
 
 type MoreActionsIconProps = {
   size?: SizeProp;
@@ -31,7 +29,6 @@ export const MoreActionsIcon = ({ size = undefined }: MoreActionsIconProps) => <
 type MoreActionsMenuProps = {
   'aria-label'?: string;
   size?: SizeProp;
-  bsStyle?: StyleProps;
   className?: string;
   id?: string;
   keepMounted?: boolean;
@@ -39,13 +36,10 @@ type MoreActionsMenuProps = {
   title?: string;
   solid?: boolean;
 };
-const StyledDropdownButton = styled(DropdownButton)<{ $transparent?: boolean }>`
-  ${({ $transparent }) => ($transparent ? 'background-color: transparent;' : '')}
-`;
+
 export const MoreActionsMenu = ({
   'aria-label': ariaLabel,
   size = 'xs',
-  bsStyle = undefined,
   children = undefined,
   className = undefined,
   id = undefined,
@@ -54,10 +48,9 @@ export const MoreActionsMenu = ({
   title = 'More Actions',
   solid = false,
 }: React.PropsWithChildren<MoreActionsMenuProps>) => (
-  <StyledDropdownButton
-    $transparent={!solid}
+  <DropdownButton
     aria-label={ariaLabel}
-    bsStyle={bsStyle}
+    bsStyle={solid ? undefined : 'transparent'}
     buttonTitle={title}
     className={className}
     id={id}
@@ -67,5 +60,5 @@ export const MoreActionsMenu = ({
     title={<MoreActionsIcon size={size} />}
     withinPortal>
     {children}
-  </StyledDropdownButton>
+  </DropdownButton>
 );

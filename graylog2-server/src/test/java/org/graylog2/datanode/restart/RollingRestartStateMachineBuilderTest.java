@@ -26,23 +26,24 @@ import static org.graylog2.datanode.restart.RollingRestartState.COMPLETED;
 import static org.graylog2.datanode.restart.RollingRestartState.FAILED;
 import static org.graylog2.datanode.restart.RollingRestartState.FINALIZING;
 import static org.graylog2.datanode.restart.RollingRestartState.PAUSED_WAITING_GREEN;
+import static org.graylog2.datanode.restart.RollingRestartState.PAUSING_PROCESSING;
 import static org.graylog2.datanode.restart.RollingRestartState.PREPARING_CLUSTER;
+import static org.graylog2.datanode.restart.RollingRestartState.RESUMING_PROCESSING;
 import static org.graylog2.datanode.restart.RollingRestartState.REENABLING_ALLOCATION;
 import static org.graylog2.datanode.restart.RollingRestartState.SELECTING_NEXT_NODE;
-import static org.graylog2.datanode.restart.RollingRestartState.STARTING_NODE;
-import static org.graylog2.datanode.restart.RollingRestartState.STOPPING_NODE;
 import static org.graylog2.datanode.restart.RollingRestartState.UPGRADING_NODE;
 import static org.graylog2.datanode.restart.RollingRestartState.WAITING_GREEN;
 import static org.graylog2.datanode.restart.RollingRestartState.WAITING_NODE_JOINED;
-import static org.graylog2.datanode.restart.RollingRestartState.WAITING_NODE_LEFT;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.ABORT;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.CLUSTER_GREEN;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.ERROR;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.GREEN_TIMEOUT;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.MORE_NODES;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.NODE_JOINED;
+import static org.graylog2.datanode.restart.RollingRestartTrigger.NODE_JOINED_NO_REPLICATION;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.NODE_LEFT;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.NO_MORE_NODES;
+import static org.graylog2.datanode.restart.RollingRestartTrigger.NO_MORE_NODES_RESUME;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.PROCEED;
 import static org.graylog2.datanode.restart.RollingRestartTrigger.RESUME;
 
@@ -81,29 +82,8 @@ class RollingRestartStateMachineBuilderTest {
     }
 
     @Test
-    void upgradingNode_moreNodes_goesToStoppingNode() {
-        final var sm = from(UPGRADING_NODE);
-        sm.fire(PROCEED);
-        assertThat(sm.getState()).isEqualTo(STOPPING_NODE);
-    }
-
-    @Test
-    void stoppingNode_proceed_goesToWaitingNodeLeft() {
-        final var sm = from(STOPPING_NODE);
-        sm.fire(PROCEED);
-        assertThat(sm.getState()).isEqualTo(WAITING_NODE_LEFT);
-    }
-
-    @Test
-    void waitingNodeLeft_nodeLeft_goesToStartingNode() {
-        final var sm = from(WAITING_NODE_LEFT);
-        sm.fire(NODE_LEFT);
-        assertThat(sm.getState()).isEqualTo(STARTING_NODE);
-    }
-
-    @Test
     void startingNode_proceed_goesToWaitingNodeJoined() {
-        final var sm = from(STARTING_NODE);
+        final var sm = from(UPGRADING_NODE);
         sm.fire(PROCEED);
         assertThat(sm.getState()).isEqualTo(WAITING_NODE_JOINED);
     }
@@ -146,6 +126,36 @@ class RollingRestartStateMachineBuilderTest {
     @Test
     void finalizing_proceed_goesToCompleted() {
         final var sm = from(FINALIZING);
+        sm.fire(PROCEED);
+        assertThat(sm.getState()).isEqualTo(COMPLETED);
+    }
+
+    // ====== small-cluster (message-processing) path ======
+
+    @Test
+    void pausingProcessing_proceed_goesToSelectingNextNode() {
+        final var sm = from(PAUSING_PROCESSING);
+        sm.fire(PROCEED);
+        assertThat(sm.getState()).isEqualTo(SELECTING_NEXT_NODE);
+    }
+
+    @Test
+    void selectingNextNode_noMoreNodesResume_goesToResumingProcessing() {
+        final var sm = from(SELECTING_NEXT_NODE);
+        sm.fire(NO_MORE_NODES_RESUME);
+        assertThat(sm.getState()).isEqualTo(RESUMING_PROCESSING);
+    }
+
+    @Test
+    void waitingNodeJoined_nodeJoinedNoReplication_goesToSelectingNextNode() {
+        final var sm = from(WAITING_NODE_JOINED);
+        sm.fire(NODE_JOINED_NO_REPLICATION);
+        assertThat(sm.getState()).isEqualTo(SELECTING_NEXT_NODE);
+    }
+
+    @Test
+    void resumingProcessing_proceed_goesToCompleted() {
+        final var sm = from(RESUMING_PROCESSING);
         sm.fire(PROCEED);
         assertThat(sm.getState()).isEqualTo(COMPLETED);
     }

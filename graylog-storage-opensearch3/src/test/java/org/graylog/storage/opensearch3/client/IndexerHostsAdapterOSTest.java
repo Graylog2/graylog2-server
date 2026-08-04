@@ -80,8 +80,8 @@ class IndexerHostsAdapterOSTest {
         final List<URI> hosts = adapter.getActiveHosts();
 
         assertThat(hosts).containsExactlyInAnyOrder(
-                URI.create("https://172.18.0.2:9200"),
-                URI.create("https://172.18.0.3:9200")
+                URI.create("https://datanode1:9200"),
+                URI.create("https://datanode2:9200")
         );
     }
 

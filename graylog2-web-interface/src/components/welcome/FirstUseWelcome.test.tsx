@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useDismissOnboarding from 'components/welcome/hooks/useDismissOnboarding';
+import AppConfig from 'util/AppConfig';
 
 import FirstUseWelcome from './FirstUseWelcome';
 
@@ -31,13 +32,14 @@ beforeEach(() => {
   asMock(useDismissOnboarding).mockReturnValue({ mutate: mockDismiss } as unknown as ReturnType<
     typeof useDismissOnboarding
   >);
+  asMock(AppConfig.isCloud).mockReturnValue(false);
 });
 
 describe('FirstUseWelcome', () => {
-  it('links the "Set up Collector" button to the collectors overview', async () => {
+  it('links the "Enroll Collector" button to the collectors overview', async () => {
     render(<FirstUseWelcome />);
 
-    const link = await screen.findByRole('link', { name: /Set up Collector/i });
+    const link = await screen.findByRole('link', { name: /Enroll Collector/i });
 
     expect(link).toHaveAttribute('href', '/system/collectors');
   });
@@ -64,19 +66,19 @@ describe('FirstUseWelcome', () => {
     expect(screen.getByTitle('AWS')).toBeInTheDocument();
   });
 
-  it('renders resource panels as links that open in a new tab', () => {
+  it('renders resource panels with a continue link that opens in a new tab', () => {
     render(<FirstUseWelcome />);
 
-    const link = screen.getByRole('link', { name: /Quickstart Guide/i });
+    const links = screen.getAllByRole('link', { name: /continue/i });
 
-    expect(link).toHaveAttribute('href', 'https://www.graylog.org');
-    expect(link).toHaveAttribute('target', '_blank');
+    expect(links[0]).toHaveAttribute('href', 'https://community.graylog.org/');
+    expect(links[0]).toHaveAttribute('target', '_blank');
   });
 
   it('asks for confirmation before dismissing the onboarding', async () => {
     render(<FirstUseWelcome />);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    await userEvent.click(screen.getByRole('button', { name: /dismiss onboarding/i }));
 
     expect(await screen.findByRole('button', { name: /Dismiss for everyone/i })).toBeInTheDocument();
     expect(mockDismiss).not.toHaveBeenCalled();
@@ -85,9 +87,22 @@ describe('FirstUseWelcome', () => {
   it('dismisses the onboarding after confirming', async () => {
     render(<FirstUseWelcome />);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    await userEvent.click(screen.getByRole('button', { name: /dismiss onboarding/i }));
     await userEvent.click(await screen.findByRole('button', { name: /Dismiss for everyone/i }));
 
     expect(mockDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the "Set up Input" section when not on cloud', () => {
+    render(<FirstUseWelcome />);
+
+    expect(screen.getByRole('heading', { name: /set up input/i })).toBeInTheDocument();
+  });
+
+  it('hides the "Set up Input" section on cloud', () => {
+    asMock(AppConfig.isCloud).mockReturnValue(true);
+    render(<FirstUseWelcome />);
+
+    expect(screen.queryByRole('heading', { name: /set up input/i })).not.toBeInTheDocument();
   });
 });

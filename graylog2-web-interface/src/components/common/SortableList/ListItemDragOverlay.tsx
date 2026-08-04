@@ -22,6 +22,7 @@ import { createPortal } from 'react-dom';
 
 import zIndices from 'theme/z-indices';
 import ListItem from 'components/common/SortableList/ListItem';
+import { ListGroup } from 'components/bootstrap';
 import type { CustomContentRender, CustomListItemRender, ListItemType } from 'components/common/SortableList/types';
 
 const SortableListItemOverlay = styled(ListItem)`
@@ -54,15 +55,17 @@ const ListItemDragOverlay = <ItemType extends ListItemType>({
   const dragOverlay = (
     <DragOverlay zIndex={zIndices.modalBody}>
       {activeItem ? (
-        <SortableListItemOverlay
-          isDragging
-          alignItemContent={alignItemContent}
-          customContentRender={customContentRender}
-          customListItemRender={customListItemRender}
-          dragHandleProps={{}}
-          index={activeItemIndex}
-          item={activeItem}
-        />
+        <ListGroup>
+          <SortableListItemOverlay
+            isDragging
+            alignItemContent={alignItemContent}
+            customContentRender={customContentRender}
+            customListItemRender={customListItemRender}
+            dragHandleProps={{}}
+            index={activeItemIndex}
+            item={activeItem}
+          />
+        </ListGroup>
       ) : null}
     </DragOverlay>
   );

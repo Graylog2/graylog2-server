@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { MenuItem, DeleteMenuItem, BootstrapModalConfirm } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -37,11 +37,11 @@ function Actions({ lut }: ActionsProps) {
   const sendTelemetry = useSendTelemetry();
   const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(lut);
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const handleEdit = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
-  }, [lut, navigate]);
+    push(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
+  }, [lut, push]);
 
   const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {

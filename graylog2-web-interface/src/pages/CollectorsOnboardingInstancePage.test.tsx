@@ -18,11 +18,14 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
+
+jest.mock('logic/telemetry/useSendTelemetry');
 
 jest.mock('components/collectors/hooks/useInstanceQueries', () => ({
   useInstance: jest.fn(),
@@ -91,6 +94,7 @@ describe('CollectorsOnboardingInstancePage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    asMock(useSendTelemetry).mockReturnValue(jest.fn());
     mockUseLocation.mockReturnValue({ state: null });
     mockInstanceLookup();
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);

@@ -16,11 +16,14 @@
  */
 const modalBase = 1040;
 const sidebar = 6;
+const tableHeaderCell = 100;
 
 const zIndices = {
   sidebar: sidebar,
   sidebarContentColumn: sidebar + 1,
   sidebarOverlay: sidebar - 1,
+  tableHeaderCell: tableHeaderCell,
+  tableHeaderCellPinned: tableHeaderCell + 100,
   modalOverlay: modalBase,
   modalBody: modalBase + 10,
   confirmModalOverlay: modalBase + 11,

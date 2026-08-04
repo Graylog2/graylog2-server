@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { CacheView } from 'components/lookup-tables';
@@ -43,7 +43,7 @@ const FlexCol = styled(Col)`
 `;
 
 function LUTCacheDetailsPage() {
-  const navigate = useNavigate();
+  const { goBack } = useHistory();
 
   return (
     <FlexContainer>
@@ -52,7 +52,7 @@ function LUTCacheDetailsPage() {
         pageTitle="Caches Details for Lookup Tables"
         pageDescription="Caches store values for lookup tables to improve performance."
         actions={
-          <Button bsStyle="primary" onClick={() => navigate(-1)}>
+          <Button bsStyle="primary" onClick={() => goBack()}>
             Back to list
           </Button>
         }>

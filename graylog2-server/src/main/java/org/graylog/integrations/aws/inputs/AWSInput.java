@@ -28,6 +28,7 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
@@ -55,6 +56,7 @@ public class AWSInput extends MessageInput {
     public static final String CK_DYNAMODB_ENDPOINT = "dynamodb_endpoint";
     public static final String CK_IAM_ENDPOINT = "iam_endpoint";
     public static final String CK_KINESIS_ENDPOINT = "kinesis_endpoint";
+    public static final String CK_EXTERNAL_ID = "aws_external_id";
 
     public static final String CK_OVERRIDE_SOURCE = "override_source";
 
@@ -151,6 +153,13 @@ public class AWSInput extends MessageInput {
                     ConfigurationField.Optional.OPTIONAL));
 
             request.addField(new TextField(
+                    CK_EXTERNAL_ID,
+                    "AWS External ID (optional)",
+                    "",
+                    "An external ID that is required to assume the role. This prevents the confused deputy problem in cross-account scenarios.",
+                    ConfigurationField.Optional.OPTIONAL));
+
+            request.addField(new TextField(
                     CK_CLOUDWATCH_ENDPOINT,
                     "AWS CloudWatch Override Endpoint",
                     "",
@@ -194,6 +203,8 @@ public class AWSInput extends MessageInput {
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
 
+            request.addField(getSingleTableStateTrackingFieldDefinition());
+
             request.addField(getOverrideSourceFieldDefinition());
 
             return request;
@@ -216,5 +227,13 @@ public class AWSInput extends MessageInput {
                 "",
                 "The ARN of the Kinesis stream.",
                 ConfigurationField.Optional.OPTIONAL);
+    }
+
+    public static BooleanField getSingleTableStateTrackingFieldDefinition() {
+        return new BooleanField(
+                KinesisTransport.CK_KINESIS_SINGLE_TABLE_STATE_TRACKING,
+                "Migrate to single DynamoDB table for state tracking",
+                false,
+                "Consolidates Kinesis Client Library (KCL) state into a single DynamoDB table, as supported by the KCL 3.5 update. This option is only relevant for Kinesis inputs created before Graylog 7.2. Enabling it starts a one-way migration that cannot be reverted once complete. See the Graylog upgrade notes for details.");
     }
 }

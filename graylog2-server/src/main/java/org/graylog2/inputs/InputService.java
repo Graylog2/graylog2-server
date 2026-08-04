@@ -51,8 +51,6 @@ public interface InputService {
 
     String save(Input model) throws ValidationException;
 
-    String saveWithoutEvents(Input input) throws ValidationException;
-
     String update(Input input) throws ValidationException;
 
     int destroy(Input input);
