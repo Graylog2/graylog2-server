@@ -46,12 +46,23 @@ const Thead = styled.thead(
 
 export const Th = styled.th<{
   $colId: string;
+  $hideEmptyTailBorder: boolean;
+  $hideEmptyTailPinShadow: boolean;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
   $revealHeaderActions: boolean;
   $zIndex: number;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, $revealHeaderActions, $zIndex, theme }) => css`
+  ({
+    $colId,
+    $hideEmptyTailBorder,
+    $hideEmptyTailPinShadow,
+    $hidePadding,
+    $pinningPosition,
+    $revealHeaderActions,
+    $zIndex,
+    theme,
+  }) => css`
     position: relative;
     padding: 0 !important;
     z-index: ${$pinningPosition ? zIndices.tableHeaderCellPinned : $zIndex};
@@ -78,6 +89,7 @@ export const Th = styled.th<{
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
           ${$pinningPosition === 'right' &&
+          !$hideEmptyTailPinShadow &&
           css`
             box-shadow: inset -1px 0 0 ${theme.colors.table.row.divider};
           `}
@@ -148,8 +160,17 @@ const ResizeCursorGlobalStyle = createGlobalStyle`
   }
 `;
 
-const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
+const TableHeaderCell = <Entity extends EntityBase>({
+  header,
+  isTailColumnEmpty,
+  constrainResizeOverhang,
+}: {
+  header: Header<Entity, unknown>;
+  isTailColumnEmpty: boolean;
+  constrainResizeOverhang: boolean;
+}) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
+  const isActionsColumn = header.column.id === ACTIONS_COL_ID;
   const forceUpdate = useForceUpdate();
   const [isHoveringResizeHandle, setIsHoveringResizeHandle] = useState(false);
 
@@ -177,6 +198,8 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       key={header.id}
       colSpan={header.colSpan}
       $colId={header.column.id}
+      $hideEmptyTailBorder={isActionsColumn && isTailColumnEmpty}
+      $hideEmptyTailPinShadow={isActionsColumn && !header.column.columnDef.header}
       $hidePadding={columnMeta?.hideCellPadding}
       $pinningPosition={header.column.getIsPinned()}
       $zIndex={zIndices.tableHeaderCell - header.index}
@@ -189,6 +212,7 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
           onMouseEnter={() => setIsHoveringResizeHandle(true)}
           onMouseLeave={() => setIsHoveringResizeHandle(false)}
           $isResizing={header.column.getIsResizing()}
+          $constrainOverhang={constrainResizeOverhang}
           role="separator"
           aria-label={`Resize ${columnMeta?.label ?? header.column.id} column`}
           title={`Resize ${columnMeta?.label ?? header.column.id} column`}
@@ -199,20 +223,30 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
 };
 
 type Props<Entity extends EntityBase> = {
+  columnWidths: { [colId: string]: number };
   headerGroups: Array<HeaderGroup<Entity>>;
 };
 
-const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
-  <Thead>
-    <ResizeCursorGlobalStyle />
-    {headerGroups.map((headerGroup) => (
-      <tr key={headerGroup.id}>
-        {headerGroup.headers.map((header) => (
-          <TableHeaderCell key={header.id} header={header} />
-        ))}
-      </tr>
-    ))}
-  </Thead>
-);
+const TableHead = <Entity extends EntityBase>({ columnWidths, headerGroups }: Props<Entity>) => {
+  const isTailColumnEmpty = !columnWidths[ACTIONS_COL_ID];
+
+  return (
+    <Thead>
+      <ResizeCursorGlobalStyle />
+      {headerGroups.map((headerGroup) => (
+        <tr key={headerGroup.id}>
+          {headerGroup.headers.map((header, index) => (
+            <TableHeaderCell
+              key={header.id}
+              header={header}
+              isTailColumnEmpty={isTailColumnEmpty}
+              constrainResizeOverhang={isTailColumnEmpty && index === headerGroup.headers.length - 2}
+            />
+          ))}
+        </tr>
+      ))}
+    </Thead>
+  );
+};
 
 export default TableHead;
