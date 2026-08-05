@@ -45,8 +45,13 @@ public class NodeMetricsCollectorTest {
     @Test
     public void getNodeMetrics() {
         Map<String, Object> nodeMetrics = collector.getNodeMetrics(NODENAME);
+        // The collector returns the raw OpenSearch stat values. Unit conversion (bytes -> GiB/MiB) for the
+        // metrics index/dashboards is applied later, so byte metrics must stay in bytes here to match the
+        // "*_in_bytes" metric-registry gauges consumed by the /rest/metrics/multiple endpoint.
         assertThat(nodeMetrics.get("cpu_load")).isEqualTo(26.4873046875);
-        assertThat(nodeMetrics.get("disk_free")).isEqualTo(572.1824f);
+        assertThat(nodeMetrics.get("mem_total")).isEqualTo(34359738368L);
+        assertThat(nodeMetrics.get("disk_free")).isEqualTo(614376128512L);
+        assertThat(nodeMetrics.get("disk_used")).isEqualTo(994662584320L);
         String[] allMetrics = Arrays.stream(NodeStatMetrics.values()).map(NodeStatMetrics::getFieldName).toArray(String[]::new);
         assertThat(nodeMetrics).containsKeys(allMetrics);
     }
