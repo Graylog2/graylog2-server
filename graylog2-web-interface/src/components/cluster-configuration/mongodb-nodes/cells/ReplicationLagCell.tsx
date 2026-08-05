@@ -63,7 +63,7 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
   if (upperRole && NO_REPLICATION_LAG_ROLES.has(upperRole as MongodbRoleType)) {
     return (
       <MetricsColumn>
-        <MetricsRow>
+        <MetricsRow $rightAligned>
           <span>-</span>
         </MetricsRow>
       </MetricsColumn>
