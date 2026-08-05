@@ -78,10 +78,12 @@ class ClusterAdapterOSTest {
     }
 
     @Test
-    void boundedHealthReportsAnErroringClusterAsUnreachableRatherThanPropagating() {
-        // The un-timed variant catches only IOException, so a well-formed error response escapes it as a runtime
-        // OpenSearchException. A caller on a deadline cannot act on that difference, so the bounded variant folds
-        // both into empty.
+    void boundedHealthReportsAnErroringClusterAsUnreachable() {
+        // The mocked transport delivers the stubbed 500 as an IOException, so this only pins that the bounded variant
+        // folds an error response into empty (as the un-timed variant does). The extra runtime OpenSearchException the
+        // bounded variant additionally catches, and the deadline firing itself, are not exercised here -- both would
+        // need a transport that produces a runtime error or never completes. See the OS2/ES7 adapter tests for the
+        // give-up-and-cancel path.
         assertThat(clusterAdapter.health(java.time.Duration.ofSeconds(1))).isEmpty();
     }
 
