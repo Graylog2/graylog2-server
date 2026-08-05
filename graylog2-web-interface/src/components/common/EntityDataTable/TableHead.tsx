@@ -127,7 +127,7 @@ const ResizeHitArea = styled.div<{ $isResizing: boolean; $constrainOverhang: boo
     top: 0;
     bottom: 0;
     right: ${$constrainOverhang ? 0 : -RESIZE_HIT_AREA_OVERHANG}px;
-    width: ${RESIZE_HIT_AREA_OVERHANG * 2}px;
+    width: ${RESIZE_HIT_AREA_OVERHANG * ($constrainOverhang ? 1 : 2)}px;
     cursor: col-resize;
     touch-action: none;
     user-select: none;
@@ -138,12 +138,18 @@ const ResizeHitArea = styled.div<{ $isResizing: boolean; $constrainOverhang: boo
       position: absolute;
       top: 0;
       bottom: 0;
-      left: 50%;
       width: 3px;
       transform: translateX(-50%);
       background-color: ${theme.colors.variant.info};
       opacity: ${$isResizing ? 1 : 0};
       transition: opacity 0.15s ease-in-out;
+      ${$constrainOverhang
+        ? css`
+            right: -2px;
+          `
+        : css`
+            left: 50%;
+          `};
     }
 
     &:hover::after {
