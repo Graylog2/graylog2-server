@@ -390,6 +390,13 @@ public class ClusterAdapterOS implements ClusterAdapter {
         }
     }
 
+    @Override
+    public int countOfClusterManagerEligibleNodes() {
+        return (int)nodesInfo().values().stream()
+                .filter(node -> node.roles().contains("cluster_manager") || node.roles().contains("master"))
+                .count();
+    }
+
     private Optional<HealthResponse> clusterHealth() {
         final Time timeout = new Time.Builder().time(requestTimeout.toSeconds() + "s").build();
         try {
