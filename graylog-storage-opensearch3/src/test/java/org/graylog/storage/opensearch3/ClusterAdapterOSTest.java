@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
+import org.assertj.core.api.Assertions;
 import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
@@ -45,6 +46,7 @@ class ClusterAdapterOSTest {
 
         final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
                 .stubResponse("GET", "/_nodes/*", Resources.getResource("nodes-response-without-host-field.json"))
+                .stubResponse("GET", "/_nodes", Resources.getResource("nodes-response-without-host-field.json"))
                 .stubResponse("GET", "/_cat/nodes", Resources.getResource("cat_nodes.json"))
                 .stubResponse("GET", "/_cluster/settings", Resources.getResource("cluster_settings.json"))
                 .stubResponse("GET", "/_cat/allocation", Resources.getResource("cat_allocation.json"))
@@ -137,5 +139,11 @@ class ClusterAdapterOSTest {
         assertThat(clusterShardAllocation.nodeShardAllocations())
                 .extracting(NodeShardAllocation::shards)
                 .containsExactly(15, 16);
+    }
+
+    @Test
+    void testManagerEligibleNodesCount() {
+        Assertions.assertThat(clusterAdapter.countOfClusterManagerEligibleNodes())
+                .isEqualTo(3); // there are 3 nodes with role "master" in nodes-response-without-host-field.json
     }
 }
