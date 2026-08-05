@@ -159,6 +159,17 @@
             <artifactId>okhttp-jvm</artifactId>
         </dependency>
 
+        <!-- kotlin-reflect must be present on the server classpath, not just version-managed:
+             kotlin-stdlib (pulled in transitively, e.g. by okhttp above) is loaded by the parent
+             (server) classloader, and its reflection bootstrap resolves ReflectionFactoryImpl
+             against that same classloader. The enterprise AI-agent plugin (koog) uses Kotlin
+             reflection (ToolRegistry -> asTools); without kotlin-reflect here it fails at runtime
+             with KotlinReflectionNotSupportedError. Version is managed by the kotlin-bom. -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
