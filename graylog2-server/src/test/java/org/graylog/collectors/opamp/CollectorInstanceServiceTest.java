@@ -1170,7 +1170,8 @@ class CollectorInstanceServiceTest {
         final var builder = CollectorInstanceReport.builder()
                 .instanceUid(uid)
                 .messageSeqNum(seqNum)
-                .capabilities(0L);
+                .capabilities(0L)
+                .reportsHealth(true);
         if (health != null) {
             builder.health(health);
         }

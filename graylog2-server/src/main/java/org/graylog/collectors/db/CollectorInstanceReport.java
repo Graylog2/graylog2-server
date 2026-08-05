@@ -32,6 +32,7 @@ public record CollectorInstanceReport(
         Instant lastSeen,
         Optional<List<Attribute>> identifyingAttributes,
         Optional<List<Attribute>> nonIdentifyingAttributes,
+        boolean reportsHealth,
         Optional<ComponentHealthDTO> health
 ) {
     @AutoBuilder
@@ -50,6 +51,8 @@ public record CollectorInstanceReport(
 
         Builder nonIdentifyingAttributes(List<Attribute> nonIdentifyingAttributes);
 
+        Builder reportsHealth(boolean reportsHealth);
+
         Builder health(ComponentHealthDTO health);
 
         CollectorInstanceReport build();
@@ -57,6 +60,8 @@ public record CollectorInstanceReport(
     }
 
     public static Builder builder() {
-        return new AutoBuilder_CollectorInstanceReport_Builder().lastSeen(Instant.now());
+        return new AutoBuilder_CollectorInstanceReport_Builder()
+                .lastSeen(Instant.now())
+                .reportsHealth(false);
     }
 }

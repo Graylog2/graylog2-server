@@ -479,9 +479,13 @@ public class OpAmpService {
         LOG.debug("[{}/{}] Handling OpAMP message from collector: {}", instanceUid, sequenceNum, message);
 
         var appliedTxnSeq = OptionalLong.empty();
-        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder().instanceUid(instanceUid).messageSeqNum(sequenceNum).capabilities(message.getCapabilities());
-
         final EnumSet<Opamp.AgentCapabilities> agentCapabilities = fromBitmask(message.getCapabilities());
+        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder()
+                .instanceUid(instanceUid)
+                .messageSeqNum(sequenceNum)
+                .capabilities(message.getCapabilities())
+                .reportsHealth(agentCapabilities.contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsHealth));
+
         for (Opamp.AgentCapabilities cap : agentCapabilities) {
             switch (cap) {
                 case AgentCapabilities_ReportsStatus -> {
