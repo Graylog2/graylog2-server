@@ -14,4 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as CollectorsPageNavigation } from './CollectorsPageNavigation';
+import * as React from 'react';
+import { Breadcrumbs as MantineBreadcrumbs } from '@mantine/core';
+
+const Breadcrumbs = ({ ...props }: React.ComponentProps<typeof MantineBreadcrumbs>) => (
+  <MantineBreadcrumbs {...props} />
+);
+
+export default Breadcrumbs;
