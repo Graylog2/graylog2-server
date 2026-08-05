@@ -197,7 +197,7 @@ public class ElasticsearchClientConfiguration {
     private String defaultPasswordForDiscoveredNodes = null;
 
     @Documentation("""
-            Enable payload compression for Elasticsearch requests.
+            Enable payload compression for Elasticsearch requests and responses.
 
             Default: false
             """)

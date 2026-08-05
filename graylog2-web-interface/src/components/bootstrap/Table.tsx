@@ -21,10 +21,16 @@ import type { DefaultTheme } from 'styled-components';
 
 export const TABLE_ROW_HOVER_TRANSITION = 'background-color 150ms ease-in-out';
 export const TABLE_ROW_PINNED_HOVER_BG_VAR = '--table-row-pinned-hover-bg';
+export const TABLE_BORDER_WIDTH = 1;
 export const flattenTableBackground = (theme: DefaultTheme, color: string) =>
   theme.utils.flattenColorStack([theme.colors.global.contentBackground, color]);
 export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
 export const PINNED_CELL_STRIPED_CLASS_NAME = 'table-pinned-cell-striped';
+
+const STRIPED_ROW_NTH_OF_TYPE: 'odd' | 'even' = 'even';
+
+export const isStripedRowIndex = (index: number) =>
+  STRIPED_ROW_NTH_OF_TYPE === 'even' ? index % 2 === 0 : index % 2 !== 0;
 
 export const getPinnedCellClassName = (isPinned: boolean, isStripedRow: boolean) => {
   if (!isPinned) {
@@ -56,29 +62,53 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     --table-border-color: ${theme.colors.table.row.divider};
     font-size: inherit;
     line-height: inherit;
+    border-collapse: separate;
+    border-spacing: 0;
 
     ${$bordered &&
     css`
-      border: 1px solid ${theme.colors.table.row.divider};
+      border-top: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+      border-left: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
     `}
 
     & th,
     & td {
       padding: ${$condensed ? '5px' : '8px'};
-      vertical-align: top;
-      border-top: 1px solid ${theme.colors.table.row.divider};
+      vertical-align: middle;
+      border-top: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
       ${$bordered &&
       css`
-        border: 1px solid ${theme.colors.table.row.divider};
+        border-top: none;
+        border-bottom: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
       `}
     }
+
+    ${$bordered &&
+    css`
+      & th {
+        border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+      }
+
+      & td {
+        border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.column.divider};
+      }
+
+      & tr > td:last-child {
+        border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+      }
+    `}
 
     & thead > tr > th {
       background-color: ${theme.colors.table.head.background};
       white-space: nowrap;
-      vertical-align: bottom;
+      vertical-align: middle;
       border-top: none;
-      border-bottom: 1px solid ${theme.colors.table.row.divider};
+      border-bottom: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+      font-weight: normal;
+    }
+
+    & thead + tbody > tr:first-child > td {
+      border-top: none;
     }
 
     & tbody > tr {
@@ -88,7 +118,7 @@ const StyledTable = styled(MantineTable)<StyledProps>(
 
     ${$striped &&
     css`
-      & tbody:only-of-type > tr:nth-of-type(odd) {
+      & tbody:only-of-type > tr:nth-of-type(${STRIPED_ROW_NTH_OF_TYPE}) {
         background-color: ${theme.colors.table.row.backgroundStriped};
       }
 
@@ -106,6 +136,10 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       & tbody > tr:hover {
         background-color: ${theme.colors.table.row.backgroundHover};
         ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
+      }
+
+      & tbody > tr:hover > .${PINNED_CELL_CLASS_NAME}, & tbody > tr:hover > .${PINNED_CELL_STRIPED_CLASS_NAME} {
+        background-color: var(${TABLE_ROW_PINNED_HOVER_BG_VAR});
       }
     `}
 
@@ -125,10 +159,12 @@ const StyledTable = styled(MantineTable)<StyledProps>(
 
     & tbody > tr > .${PINNED_CELL_CLASS_NAME}, & tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
       background-color: ${flattenTableBackground(theme, theme.colors.table.row.background)};
+      transition: ${TABLE_ROW_HOVER_TRANSITION};
     }
 
     & tbody > tr > .${PINNED_CELL_STRIPED_CLASS_NAME} {
       background-color: ${flattenTableBackground(theme, theme.colors.table.row.backgroundStriped)};
+      transition: ${TABLE_ROW_HOVER_TRANSITION};
     }
 
     @media print {

@@ -73,5 +73,10 @@ public interface ClusterAdapter {
 
     ShardStats shardStats();
 
+    /**
+     * The cluster health response has no such field, so implementations derive it from each node's roles.
+     */
+    int countOfClusterManagerEligibleNodes();
+
     Optional<HealthStatus> deflectorHealth(Collection<String> indices);
 }

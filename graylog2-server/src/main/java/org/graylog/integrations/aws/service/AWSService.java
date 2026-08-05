@@ -128,6 +128,7 @@ public class AWSService {
         configuration.put(AWSCodec.CK_AWS_MESSAGE_TYPE, request.awsMessageType());
         configuration.put(ThrottleableTransport.CK_THROTTLING_ALLOWED, request.throttlingAllowed());
         configuration.put(AWSCodec.CK_FLOW_LOG_PREFIX, request.addFlowLogPrefix());
+        configuration.put(AWSCodec.CK_STORE_FULL_MESSAGE, request.storeFullMessage());
         configuration.put(AWSInput.CK_AWS_REGION, request.region());
         configuration.put(AWSInput.CK_ACCESS_KEY, request.awsAccessKeyId());
         configuration.put(AWSInput.CK_SECRET_KEY, request.awsSecretAccessKey());
@@ -159,7 +160,6 @@ public class AWSService {
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());
             final String newInputId = inputService.save(input);
-            LOG.debug("New AWS input created. id [{}] request [{}]", newInputId, request);
             return inputService.find(newInputId);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);

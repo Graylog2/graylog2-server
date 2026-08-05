@@ -16,7 +16,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { IndexerIndices } from '@graylog/server-api';
+import { SystemIndexerIndices } from '@graylog/server-api';
 
 export type IncompatibleIndex = {
   index_name: string;
@@ -24,8 +24,9 @@ export type IncompatibleIndex = {
   warm_index: boolean;
   managed_index: boolean;
   system_index: boolean;
-  /** Id of the index set this index is the active write index of, `null` for all other indices. */
   active_write_index: string | null;
+  begin?: string | null;
+  end?: string | null;
 };
 
 const ERROR_REFETCH_INTERVAL_MS = 30000;
@@ -38,8 +39,7 @@ const useIncompatibleIndices = () => {
     refetch,
   } = useQuery({
     queryKey: ['incompatibleIndices'],
-    // No error toast: the panels render a persistent error state, and background retries would spam toasts.
-    queryFn: () => IndexerIndices.getOutdatedIndices() as Promise<Array<IncompatibleIndex>>,
+    queryFn: () => SystemIndexerIndices.getOutdatedIndices() as Promise<Array<IncompatibleIndex>>,
     retry: 2,
     refetchInterval: (query) => (query.state.status === 'error' ? ERROR_REFETCH_INTERVAL_MS : false),
   });

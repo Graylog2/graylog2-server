@@ -346,6 +346,13 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
+    @Override
+    public int countOfClusterManagerEligibleNodes() {
+        return (int) nodesInfo().values().stream()
+                .filter(node -> node.roles().contains("cluster_manager") || node.roles().contains("master"))
+                .count();
+    }
+
     private Optional<ClusterHealthResponse> clusterHealth() {
         try {
             final ClusterHealthRequest request = new ClusterHealthRequest()

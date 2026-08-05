@@ -23,7 +23,7 @@ import com.github.oxo42.stateless4j.StateMachineConfig;
  * Defines the valid transitions between RollingRestartStates.
  *
  * Pure transition validator — no side effects. Side effects are dispatched by
- * {@link RollingRestartService#advance} based on the observed current state.
+ * {@code RollingRestartExecutionJob#advance} based on the observed current state.
  */
 public final class RollingRestartStateMachineBuilder {
 
@@ -33,13 +33,20 @@ public final class RollingRestartStateMachineBuilder {
     public static StateMachineConfig<RollingRestartState, RollingRestartTrigger> configure() {
         final StateMachineConfig<RollingRestartState, RollingRestartTrigger> c = new StateMachineConfig<>();
 
+        // Large clusters (>= 3 DataNodes) toggle shard replication per node.
         c.configure(RollingRestartState.PREPARING_CLUSTER)
+                .permit(RollingRestartTrigger.PROCEED, RollingRestartState.SELECTING_NEXT_NODE)
+                .permit(RollingRestartTrigger.ERROR, RollingRestartState.FAILED);
+
+        // Small clusters (1-2 DataNodes) pause message processing instead of toggling replication.
+        c.configure(RollingRestartState.PAUSING_PROCESSING)
                 .permit(RollingRestartTrigger.PROCEED, RollingRestartState.SELECTING_NEXT_NODE)
                 .permit(RollingRestartTrigger.ERROR, RollingRestartState.FAILED);
 
         c.configure(RollingRestartState.SELECTING_NEXT_NODE)
                 .permit(RollingRestartTrigger.MORE_NODES, RollingRestartState.UPGRADING_NODE)
                 .permit(RollingRestartTrigger.NO_MORE_NODES, RollingRestartState.FINALIZING)
+                .permit(RollingRestartTrigger.NO_MORE_NODES_RESUME, RollingRestartState.RESUMING_PROCESSING)
                 .permit(RollingRestartTrigger.ABORT, RollingRestartState.ABORTED)
                 .permit(RollingRestartTrigger.ERROR, RollingRestartState.FAILED);
 
@@ -49,6 +56,7 @@ public final class RollingRestartStateMachineBuilder {
 
         c.configure(RollingRestartState.WAITING_NODE_JOINED)
                 .permit(RollingRestartTrigger.NODE_JOINED, RollingRestartState.REENABLING_ALLOCATION)
+                .permit(RollingRestartTrigger.NODE_JOINED_NO_REPLICATION, RollingRestartState.SELECTING_NEXT_NODE)
                 .permit(RollingRestartTrigger.ERROR, RollingRestartState.FAILED);
 
         c.configure(RollingRestartState.REENABLING_ALLOCATION)
@@ -64,6 +72,10 @@ public final class RollingRestartStateMachineBuilder {
                 .permit(RollingRestartTrigger.RESUME, RollingRestartState.WAITING_GREEN);
 
         c.configure(RollingRestartState.FINALIZING)
+                .permit(RollingRestartTrigger.PROCEED, RollingRestartState.COMPLETED)
+                .permit(RollingRestartTrigger.ERROR, RollingRestartState.FAILED);
+
+        c.configure(RollingRestartState.RESUMING_PROCESSING)
                 .permit(RollingRestartTrigger.PROCEED, RollingRestartState.COMPLETED)
                 .permit(RollingRestartTrigger.ERROR, RollingRestartState.FAILED);
 

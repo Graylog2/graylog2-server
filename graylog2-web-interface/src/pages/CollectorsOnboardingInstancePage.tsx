@@ -15,43 +15,48 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import collectorReceivedMessagesUrl from 'components/collectors/common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
+import { useFleet } from 'components/collectors/hooks/useFleetQueries';
+import ConnectionSuccess from 'components/collectors/overview/onboarding/ConnectionSuccess';
+import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
 import Routes from 'routing/Routes';
+import useLocation from 'routing/useLocation';
 import { extractErrorMessage } from 'util/extractErrorMessage';
-import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
-import useHistory from 'routing/useHistory';
-import UserNotification from 'util/UserNotification';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
-  const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const location = useLocation<{ platformId?: PlatformId; fleetName?: string } | null>();
+  // Set by the onboarding wizard's history push; absent on direct visits.
+  const platformId = location.state?.platformId;
+  const stateFleetName = location.state?.fleetName;
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
-  const defaultInterval = useDefaultInterval();
+  const { data: fleet } = useFleet(instance?.fleet_id ?? '');
 
-  // using useEffect to guard that the default is actually there when we call the navigate
+  const { mutate: finish } = useFinishOnboarding();
+  const sendTelemetry = useSendTelemetry();
+
+  // using useEffect to guard that the instance is actually there before we finish the onboarding
   useEffect(() => {
-    if (instance && defaultInterval) {
+    if (instance) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
         app_section: 'collectors-onboarding',
         app_action_value: 'collector-onboarding-completed',
       });
-      history.push(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
-      UserNotification.success('Collector connected successfully! Showing received messages ...');
+
+      finish();
     }
-  }, [defaultInterval, instance, history, sendTelemetry]);
+  }, [instance, finish, sendTelemetry]);
 
   const content = () => {
     if (isLoading) return <Spinner />;
@@ -69,7 +74,7 @@ const CollectorsOnboardingInstancePage = () => {
       );
     }
 
-    return <Spinner />;
+    return <ConnectionSuccess platformId={platformId} instance={instance} fleetName={fleet?.name ?? stateFleetName} />;
   };
 
   return (
@@ -78,7 +83,7 @@ const CollectorsOnboardingInstancePage = () => {
       <PageHeader
         title={
           <>
-            Collector Onboarding <BetaBadge />
+            Collector Onboarding <PreviewBadge />
           </>
         }>
         <span>Status of your newly connected collector.</span>

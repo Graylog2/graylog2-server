@@ -183,6 +183,10 @@ const StyledButton = styled(MantineButton)<{
     &:focus {
       color: ${color};
       text-decoration: none;
+
+      &:not(:focus-visible) {
+        outline: none;
+      }
     }
 
     ${$active && activeStyles(theme.colors, $bsStyle)}
