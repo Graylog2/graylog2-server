@@ -17,12 +17,13 @@
 package org.graylog2.system.stats.elasticsearch;
 
 /**
- * Live per-node runtime stats of a search-cluster node, read from {@code _nodes/stats/os,jvm}. Distinct from
- * {@link NodeOSInfo} (static OS facts): these are the sampled utilization percentages the health reporters window.
+ * Live per-node runtime utilization of a search-cluster node, read from {@code _nodes/stats/os,jvm}. Distinct from
+ * {@link NodeOSInfo} (static OS facts) and the cluster-wide node counts in {@link NodesStats}: these are the sampled
+ * utilization percentages the health reporters window.
  *
  * @param name                the node's display name (from {@code /name}).
  * @param cpuPercent          OS CPU utilization {@code 0..100}, or {@code -1} when the source did not report it.
  * @param jvmHeapUsedPercent  JVM heap used {@code 0..100} (OpenSearch reports the percentage directly), or {@code -1}.
  */
-public record NodeStats(String name, double cpuPercent, double jvmHeapUsedPercent) {
+public record NodeUtilization(String name, double cpuPercent, double jvmHeapUsedPercent) {
 }

@@ -29,7 +29,7 @@ import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.system.stats.elasticsearch.NodeStats;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -176,13 +176,13 @@ class ClusterAdapterES7Test {
     }
 
     @Test
-    void nodesStatsParsesPerNodeCpuAndHeapPercent() throws IOException {
+    void nodesUtilizationParsesPerNodeCpuAndHeapPercent() throws IOException {
         when(jsonApi.perform(any(), anyString())).thenReturn(objectMapper.readTree("""
                 {"nodes":{
                   "nodeId1":{"name":"es01","os":{"cpu":{"percent":42}},"jvm":{"mem":{"heap_used_percent":73}}}
                 }}"""));
 
-        final NodeStats stats = clusterAdapter.nodesStats().get("nodeId1");
+        final NodeUtilization stats = clusterAdapter.nodesUtilization().get("nodeId1");
 
         assertThat(stats.name()).isEqualTo("es01");
         assertThat(stats.cpuPercent()).isEqualTo(42.0);

@@ -28,7 +28,7 @@ import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
-import org.graylog2.system.stats.elasticsearch.NodeStats;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,8 +92,8 @@ public class Cluster {
         return clusterAdapter.diskUsageStats();
     }
 
-    public Map<String, NodeStats> getNodesStats() {
-        return clusterAdapter.nodesStats();
+    public Map<String, NodeUtilization> getNodesUtilization() {
+        return clusterAdapter.nodesUtilization();
     }
 
     public ClusterAllocationDiskSettings getClusterAllocationDiskSettings() {
