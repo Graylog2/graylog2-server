@@ -5,5 +5,9 @@ issues = ["Graylog2/graylog-plugin-enterprise#15073"]
 pulls = ["26898"]
 
 details.user = """
-When the IAM role used by an AWS Kinesis/CloudWatch input was missing a required DynamoDB permission, the input logged an authorization error every few seconds indefinitely while consuming no records, and still reported as running. It now stops after a few consecutive denials and reports a failure naming the denied action and resource, so the missing permission can be granted and the input started again.
+When the IAM role used by an AWS Kinesis/CloudWatch input was missing a required DynamoDB permission, the input logged an authorization error every few seconds indefinitely while consuming no records, and still reported as running. The input now reports a failure naming the denied action and resource, and stops its consumer, once the same call has been denied for two minutes and no records have been processed in that time. Grant the missing permission, then stop and start the input. An input that keeps ingesting despite a denial is left running.
+"""
+
+details.ops = """
+This changes what an incorrectly permissioned AWS Kinesis/CloudWatch input does: where it previously kept running while consuming nothing, its consumer now stops and the input reports a failure. Inputs that are still ingesting are unaffected. Note that KCL 3.5 requires DynamoDB actions KCL 2.x did not, most notably `dynamodb:Query` on `table/graylog-aws-plugin-*/index/*` and `dynamodb:UpdateTable` on the lease table. See the AWS Kinesis/CloudWatch section of `UPGRADING.md` for the full list.
 """

@@ -62,7 +62,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -87,7 +89,14 @@ public class KinesisConsumer implements Runnable {
     private final AWSClientBuilderUtil awsClientBuilderUtil;
     private final InputFailureRecorder inputFailureRecorder;
     private final boolean migrateToSingleTable;
+    private final LongSupplier nanoClock;
     private final AtomicBoolean authorizationFailureHandled = new AtomicBoolean();
+
+    /**
+     * When KCL last completed a record-processing task. Seeded at construction so that a consumer which never
+     * processes anything counts as stalled from the start.
+     */
+    private final AtomicLong lastProcessSuccessNanos;
     private Scheduler kinesisScheduler;
 
     KinesisConsumer(NodeId nodeId,
@@ -100,9 +109,28 @@ public class KinesisConsumer implements Runnable {
                     AWSClientBuilderUtil awsClientBuilderUtil,
                     InputFailureRecorder inputFailureRecorder,
                     boolean migrateToSingleTable) {
+        this(nodeId, transport, objectMapper, handleMessageCallback, kinesisStreamName, awsMessageType,
+                recordBatchSize, request, awsClientBuilderUtil, inputFailureRecorder, migrateToSingleTable,
+                System::nanoTime);
+    }
+
+    @VisibleForTesting
+    KinesisConsumer(NodeId nodeId,
+                    KinesisTransport transport,
+                    ObjectMapper objectMapper,
+                    Consumer<RawMessage> handleMessageCallback,
+                    String kinesisStreamName,
+                    AWSMessageType awsMessageType,
+                    int recordBatchSize, AWSRequest request,
+                    AWSClientBuilderUtil awsClientBuilderUtil,
+                    InputFailureRecorder inputFailureRecorder,
+                    boolean migrateToSingleTable,
+                    LongSupplier nanoClock) {
         Preconditions.checkArgument(StringUtils.isNotBlank(kinesisStreamName), "A Kinesis stream name is required.");
         Preconditions.checkNotNull(awsMessageType, "A AWSMessageType is required.");
 
+        this.nanoClock = requireNonNull(nanoClock, "nanoClock");
+        this.lastProcessSuccessNanos = new AtomicLong(nanoClock.getAsLong());
         this.nodeId = requireNonNull(nodeId, "nodeId");
         this.transport = transport;
         this.handleMessageCallback = handleMessageCallback;
@@ -120,45 +148,21 @@ public class KinesisConsumer implements Runnable {
     public void run() {
 
         LOG.debug("Starting the Kinesis Consumer.");
-        AwsCredentialsProvider credentialsProvider = awsClientBuilderUtil.createCredentialsProviderWithStsProxy(request);
+        final AwsCredentialsProvider credentialsProvider = awsClientBuilderUtil.createCredentialsProviderWithStsProxy(request);
 
-        final Region region = Region.of(request.region());
-
-        // One detector per client: a success against one service must not reset the denial count of another,
-        // or a healthy Kinesis poll would mask a permanent DynamoDB denial forever. CloudWatch is deliberately
-        // left out: losing metrics is not a reason to fail an input that is otherwise ingesting fine.
-        final AWSAuthorizationFailureDetector dynamoDbAuthFailures =
-                new AWSAuthorizationFailureDetector(this::handleAuthorizationFailure);
-        final AWSAuthorizationFailureDetector kinesisAuthFailures =
-                new AWSAuthorizationFailureDetector(this::handleAuthorizationFailure);
-
-        final DynamoDbAsyncClientBuilder dynamoDbClientBuilder = DynamoDbAsyncClient.builder();
-        awsClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
-        dynamoDbClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
-        dynamoDbClientBuilder.overrideConfiguration(c -> c.addExecutionInterceptor(dynamoDbAuthFailures));
-        final CloudWatchAsyncClientBuilder cloudwatchClientBuilder = CloudWatchAsyncClient.builder();
-        awsClientBuilderUtil.initializeBuilder(cloudwatchClientBuilder, request.cloudwatchEndpoint(), region, credentialsProvider);
-        cloudwatchClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
-
-        // The Kinesis Client Library normally configures the async client through
-        // KinesisClientUtil.createKinesisAsyncClient(), but that installs its own HTTP client builder and would discard
-        // our proxy configuration. We therefore apply the proxy-aware, HTTP/2-enabled builder ourselves.
-        final KinesisAsyncClientBuilder kinesisAsyncClientBuilder = KinesisAsyncClient.builder();
-        awsClientBuilderUtil.initializeBuilder(kinesisAsyncClientBuilder, request.kinesisEndpoint(), region, credentialsProvider);
-        kinesisAsyncClientBuilder.httpClientBuilder(awsClientBuilderUtil.kinesisAsyncHttpClientBuilder());
-        kinesisAsyncClientBuilder.overrideConfiguration(c -> c.addExecutionInterceptor(kinesisAuthFailures));
+        final ClientBuilders clientBuilders = createClientBuilders(Region.of(request.region()), credentialsProvider);
 
         // All three clients are kept open for the lifetime of the KCL Scheduler (kinesisScheduler.run() blocks).
         // Try-with-resources ensures the Netty event loop groups and connection pools are released when the scheduler
         // exits, whether normally or due to an exception.
-        try (DynamoDbAsyncClient dynamoClient = dynamoDbClientBuilder.build();
-             CloudWatchAsyncClient cloudWatchClient = cloudwatchClientBuilder.build();
-             KinesisAsyncClient kinesisAsyncClient = kinesisAsyncClientBuilder.build()) {
+        try (DynamoDbAsyncClient dynamoClient = clientBuilders.dynamoDb().build();
+             CloudWatchAsyncClient cloudWatchClient = clientBuilders.cloudWatch().build();
+             KinesisAsyncClient kinesisAsyncClient = clientBuilders.kinesis().build()) {
 
             final String workerId = String.format(Locale.ENGLISH, "graylog-node-%s", nodeId.anonymize());
             LOG.debug("Using workerId [{}].", workerId);
 
-            // The application name needs to be unique per input/consumer.
+            // The application name is per stream, so two inputs on the same stream share a KCL lease table.
             final String applicationName = applicationName(kinesisStreamName);
             LOG.debug("Using Kinesis applicationName [{}].", applicationName);
 
@@ -228,6 +232,47 @@ public class KinesisConsumer implements Runnable {
     }
 
     /**
+     * The three async client builders KCL needs, with an authorization-failure detector attached to the two clients
+     * whose denials are fatal. Extracted from {@link #run()} so a test can assert that wiring: which clients are
+     * watched, that each gets its own detector, and that CloudWatch gets none.
+     */
+    @VisibleForTesting
+    ClientBuilders createClientBuilders(Region region, AwsCredentialsProvider credentialsProvider) {
+        // One detector per client: operation names are not unique across services, so a shared map could conflate
+        // two services' calls.
+        final DynamoDbAsyncClientBuilder dynamoDbClientBuilder = DynamoDbAsyncClient.builder();
+        awsClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
+        dynamoDbClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
+        dynamoDbClientBuilder.overrideConfiguration(c -> c.addExecutionInterceptor(newAuthorizationFailureDetector()));
+
+        // No detector on CloudWatch: losing metrics is not a reason to fail an input that is otherwise ingesting.
+        final CloudWatchAsyncClientBuilder cloudwatchClientBuilder = CloudWatchAsyncClient.builder();
+        awsClientBuilderUtil.initializeBuilder(cloudwatchClientBuilder, request.cloudwatchEndpoint(), region, credentialsProvider);
+        cloudwatchClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
+
+        // The Kinesis Client Library normally configures the async client through
+        // KinesisClientUtil.createKinesisAsyncClient(), but that installs its own HTTP client builder and would discard
+        // our proxy configuration. We therefore apply the proxy-aware, HTTP/2-enabled builder ourselves.
+        final KinesisAsyncClientBuilder kinesisAsyncClientBuilder = KinesisAsyncClient.builder();
+        awsClientBuilderUtil.initializeBuilder(kinesisAsyncClientBuilder, request.kinesisEndpoint(), region, credentialsProvider);
+        kinesisAsyncClientBuilder.httpClientBuilder(awsClientBuilderUtil.kinesisAsyncHttpClientBuilder());
+        kinesisAsyncClientBuilder.overrideConfiguration(c -> c.addExecutionInterceptor(newAuthorizationFailureDetector()));
+
+        return new ClientBuilders(dynamoDbClientBuilder, cloudwatchClientBuilder, kinesisAsyncClientBuilder);
+    }
+
+    private AWSAuthorizationFailureDetector newAuthorizationFailureDetector() {
+        return new AWSAuthorizationFailureDetector(this::handleAuthorizationFailure, lastProcessSuccessNanos::get,
+                nanoClock);
+    }
+
+    @VisibleForTesting
+    record ClientBuilders(DynamoDbAsyncClientBuilder dynamoDb,
+                          CloudWatchAsyncClientBuilder cloudWatch,
+                          KinesisAsyncClientBuilder kinesis) {
+    }
+
+    /**
      * Hook that allows tests to tune KCL coordination timings (e.g. lease failover, polling intervals)
      * before the {@link Scheduler} is built. KCL's defaults are appropriate for production but make
      * integration tests needlessly slow. Production code must not override this.
@@ -251,35 +296,41 @@ public class KinesisConsumer implements Runnable {
     }
 
     /**
-     * KCL keeps draining already-owned leases while it shuts down, and each successful PROCESS task would
-     * otherwise report the input healthy again. A terminal authorization failure must survive that, or the input
-     * ends up displaying RUNNING with no consumer behind it.
+     * Records that KCL is still doing useful work, which both clears a transient failure and tells
+     * {@link AWSAuthorizationFailureDetector} that a denial has not stalled the consumer. The timestamp is updated
+     * unconditionally: it must keep advancing while the input drains, or a later denial would look like a stall.
+     * Terminality is enforced by {@link InputFailureRecorder}, so a task completing concurrently with a terminal
+     * failure cannot report the input healthy again.
      */
     @VisibleForTesting
     void recordTaskSuccess() {
-        if (authorizationFailureHandled.get()) {
-            return;
-        }
+        lastProcessSuccessNanos.set(nanoClock.getAsLong());
         inputFailureRecorder.setRunning();
     }
 
     /**
-     * Fails the input and stops the KCL scheduler after an AWS authorization denial that retrying cannot fix.
-     * Without this, KCL retries such calls on a fixed schedule for as long as the input is running, logging an
-     * ERROR with a stack trace every time while consuming no records.
+     * Fails the input and stops the KCL scheduler after an AWS authorization denial that retrying cannot fix and that
+     * has stopped the consumer making progress. Without this, KCL retries such calls on a fixed schedule for as long
+     * as the input is running, logging an ERROR with a stack trace every time while consuming no records.
      */
     @VisibleForTesting
     void handleAuthorizationFailure(Throwable cause) {
         if (!authorizationFailureHandled.compareAndSet(false, true)) {
             return;
         }
-        inputFailureRecorder.setFailing(KinesisConsumer.class, String.format(Locale.ROOT,
-                "AWS authorization failure for Kinesis stream <%s>. The input was stopped because retrying "
-                        + "cannot resolve a missing permission. Grant it, then start the input again.",
-                kinesisStreamName), cause);
+        // Terminal: this message has to replace any earlier transient failure, or the denied action and resource -
+        // the only actionable part - stay hidden behind a generic "Errors for Kinesis stream" message forever.
+        // The remediation differs for a rejected credential, so the two cases must not share a message.
+        final String remedy = AWSAuthorizationFailureDetector.indicatesRejectedCredentials(cause)
+                ? "AWS rejected the configured credentials. Correct them, then stop and start the input."
+                : "Retrying cannot resolve a missing permission. Grant it, then stop and start the input.";
+        inputFailureRecorder.setTerminallyFailing(KinesisConsumer.class, String.format(Locale.ROOT,
+                        "AWS authorization failure for Kinesis input <%s>. The consumer was stopped. %s",
+                        kinesisStreamName, remedy), cause);
 
-        // This runs on an AWS SDK event loop thread, and stop() blocks while KCL shuts down using that same
-        // event loop, so it must not be called inline.
+        // stop() blocks for up to 20s. It runs here on the client's shared SDK response-completion pool
+        // (sdk-async-response), and on that pool's rejection path directly on the HTTP thread, so occupying one for
+        // that long would stall unrelated completions on the same client.
         final Thread shutdownThread = new Thread(() -> {
             try {
                 stop();
@@ -287,9 +338,17 @@ public class KinesisConsumer implements Runnable {
                 LOG.error("Failed to stop the Kinesis consumer for stream <{}> after an AWS authorization failure.",
                         kinesisStreamName, e);
             }
-        }, "aws-kinesis-auth-failure-shutdown");
+        }, shutdownThreadName(kinesisStreamName));
         shutdownThread.setDaemon(true);
         shutdownThread.start();
+    }
+
+    /**
+     * Per-stream so that concurrent failures are distinguishable in a thread dump.
+     */
+    @VisibleForTesting
+    static String shutdownThreadName(String kinesisStreamName) {
+        return String.format(Locale.ENGLISH, "aws-kinesis-auth-failure-shutdown-%s", kinesisStreamName);
     }
 
     /**
@@ -307,7 +366,11 @@ public class KinesisConsumer implements Runnable {
             } catch (ExecutionException e) {
                 LOG.error("Exception while executing graceful shutdown.", e);
             } catch (TimeoutException e) {
-                LOG.error("Timeout while waiting for shutdown.  Scheduler may not have exited.");
+                // Not necessarily a failure: KCL holds its scheduler lock across the whole of its initialization
+                // retry loop, so a stop requested while that is still running has to wait for it.
+                LOG.warn("Kinesis Consumer for stream <{}> did not shut down within {} seconds. Forcing shutdown, "
+                                + "which waits for any in-progress KCL initialization to finish.",
+                        kinesisStreamName, GRACEFUL_SHUTDOWN_TIMEOUT);
                 kinesisScheduler.shutdown();
             }
         }
