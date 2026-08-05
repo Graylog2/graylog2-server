@@ -33,10 +33,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,67 +59,87 @@ class RecentActivityUpdatesListenerTest {
     @BeforeEach
     void setUp() {
         listener = new RecentActivityUpdatesListener(new EventBus(), recentActivityService, grnDescriptorService);
+    }
+
+    @Test
+    void sharingAndUnsharingStoreTheResolvedTitleAndResolveItOnlyOnce() {
         when(user.getFullName()).thenReturn("Jane Doe");
-    }
-
-    @Test
-    void sharingAnEntityStoresItsResolvedTitle() {
         final GRN entity = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
-        final GRN grantee = grnRegistry.newGRN(GRNTypes.USER, "jane");
-        when(grnDescriptorService.getDescriptor(entity)).thenReturn(GRNDescriptor.create(entity, "My Collection"));
+        final GRN jane = grnRegistry.newGRN(GRNTypes.USER, "jane");
+        final GRN john = grnRegistry.newGRN(GRNTypes.USER, "john");
+        final GRN team = grnRegistry.newGRN(GRNTypes.BUILTIN_TEAM, "ops");
+        when(grnDescriptorService.getDescriptor(entity)).thenReturn(GRNDescriptor.create(entity, "My Dashboard"));
 
         listener.createRecentActivityFor(EntitySharesUpdateEvent.create(user, entity,
-                List.of(EntitySharesUpdateEvent.Share.create(grantee, Capability.VIEW, null)),
-                List.of(), List.of()));
-
-        final var captor = ArgumentCaptor.forClass(RecentActivityDTO.class);
-        verify(recentActivityService).save(captor.capture());
-        assertThat(captor.getValue()).satisfies(dto -> {
-            assertThat(dto.activityType()).isEqualTo(ActivityType.SHARE);
-            assertThat(dto.itemGrn()).isEqualTo(entity);
-            assertThat(dto.itemTitle()).isEqualTo("My Collection");
-            assertThat(dto.userName()).isEqualTo("Jane Doe");
-            assertThat(dto.grantee()).isEqualTo(grantee.toString());
-        });
-    }
-
-    @Test
-    void unsharingAnEntityStoresItsResolvedTitle() {
-        final GRN entity = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
-        final GRN grantee = grnRegistry.newGRN(GRNTypes.USER, "jane");
-        when(grnDescriptorService.getDescriptor(entity)).thenReturn(GRNDescriptor.create(entity, "My Collection"));
-
-        listener.createRecentActivityFor(EntitySharesUpdateEvent.create(user, entity,
-                List.of(),
-                List.of(EntitySharesUpdateEvent.Share.create(grantee, Capability.VIEW, null)),
+                List.of(share(jane), share(john), share(jane)),
+                List.of(share(team)),
                 List.of()));
 
+        // Resolved once per event, not once per row.
+        verify(grnDescriptorService, times(1)).getDescriptor(entity);
+
         final var captor = ArgumentCaptor.forClass(RecentActivityDTO.class);
-        verify(recentActivityService).save(captor.capture());
-        assertThat(captor.getValue()).satisfies(dto -> {
-            assertThat(dto.activityType()).isEqualTo(ActivityType.UNSHARE);
-            assertThat(dto.itemTitle()).isEqualTo("My Collection");
+        verify(recentActivityService, times(3)).save(captor.capture());
+        assertThat(captor.getAllValues()).allSatisfy(dto -> {
+            assertThat(dto.itemGrn()).isEqualTo(entity);
+            assertThat(dto.itemTitle()).isEqualTo("My Dashboard");
+            assertThat(dto.userName()).isEqualTo("Jane Doe");
         });
+        // The duplicate grantee in creates() is filtered out.
+        assertThat(captor.getAllValues())
+                .extracting(RecentActivityDTO::activityType, RecentActivityDTO::grantee)
+                .containsExactly(
+                        tuple(ActivityType.SHARE, jane.toString()),
+                        tuple(ActivityType.SHARE, john.toString()),
+                        tuple(ActivityType.UNSHARE, team.toString()));
     }
 
     @Test
-    void stillRecordsWithoutATitleWhenTheTypeHasNoDescriptorProvider() {
-        final GRN entity = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
-        final GRN grantee = grnRegistry.newGRN(GRNTypes.USER, "jane");
-        when(grnDescriptorService.getDescriptor(entity))
-                .thenThrow(new IllegalStateException("Missing GRN descriptor provider for GRN type: dashboard"));
-
+    void storesNoTitleWhenTheGrnTypeHasNoDescriptorProvider() {
+        when(user.getFullName()).thenReturn("Jane Doe");
+        // Outputs are shareable (content pack installs share them) but have no registered descriptor provider, so
+        // getDescriptor really throws here instead of being stubbed to.
+        final var listenerWithoutProviders = new RecentActivityUpdatesListener(new EventBus(), recentActivityService,
+                new GRNDescriptorService(Map.of()));
+        final GRN entity = grnRegistry.newGRN(GRNTypes.OUTPUT, "1");
         final var event = EntitySharesUpdateEvent.create(user, entity,
-                List.of(EntitySharesUpdateEvent.Share.create(grantee, Capability.VIEW, null)),
-                List.of(), List.of());
+                List.of(share(grnRegistry.newGRN(GRNTypes.USER, "jane"))), List.of(), List.of());
 
-        assertThatCode(() -> listener.createRecentActivityFor(event)).doesNotThrowAnyException();
+        assertThatCode(() -> listenerWithoutProviders.createRecentActivityFor(event)).doesNotThrowAnyException();
 
         final var captor = ArgumentCaptor.forClass(RecentActivityDTO.class);
         verify(recentActivityService).save(captor.capture());
-        assertThat(captor.getValue()).satisfies(dto -> {
-            assertThat(dto.activityType()).isEqualTo(ActivityType.SHARE);
-            assertThat(dto.itemTitle()).isNull();
-        });
+        assertThat(captor.getValue().activityType()).isEqualTo(ActivityType.SHARE);
+        assertThat(captor.getValue().itemTitle()).isNull();
+    }
+
+    @Test
+    void storesThePlaceholderTitleWhenTheProviderCannotResolveTheEntity() {
+        when(user.getFullName()).thenReturn("Jane Doe");
+        final GRN entity = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        // Providers report a missing entity with a placeholder title instead of throwing, and we deliberately store it
+        // as-is: filtering it would blank legitimate titles that happen to look like a placeholder.
+        when(grnDescriptorService.getDescriptor(entity)).thenReturn(GRNDescriptor.empty(entity));
+
+        listener.createRecentActivityFor(EntitySharesUpdateEvent.create(user, entity,
+                List.of(share(grnRegistry.newGRN(GRNTypes.USER, "jane"))), List.of(), List.of()));
+
+        final var captor = ArgumentCaptor.forClass(RecentActivityDTO.class);
+        verify(recentActivityService).save(captor.capture());
+        assertThat(captor.getValue().itemTitle()).isEqualTo(entity.toString());
+    }
+
+    @Test
+    void recordsNothingAndResolvesNoTitleWhenOnlyCapabilitiesChanged() {
+        final GRN entity = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+
+        listener.createRecentActivityFor(EntitySharesUpdateEvent.create(user, entity,
+                List.of(), List.of(), List.of(share(grnRegistry.newGRN(GRNTypes.USER, "jane")))));
+
+        verifyNoInteractions(recentActivityService, grnDescriptorService);
+    }
+
+    private EntitySharesUpdateEvent.Share share(GRN grantee) {
+        return EntitySharesUpdateEvent.Share.create(grantee, Capability.VIEW, null);
     }
 }

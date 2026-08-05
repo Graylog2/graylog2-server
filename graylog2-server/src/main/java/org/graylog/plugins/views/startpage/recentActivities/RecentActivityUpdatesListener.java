@@ -67,6 +67,11 @@ public class RecentActivityUpdatesListener {
 
     @Subscribe
     public void createRecentActivityFor(final EntitySharesUpdateEvent event) {
+        // Capability-only changes and unchanged re-saves post an event with nothing to record.
+        if (event.creates().isEmpty() && event.deletes().isEmpty()) {
+            return;
+        }
+
         // Store the title now: types without a content pack facade (e.g. collections) can not be resolved from the
         // catalog at read time, so they would otherwise render as a raw id.
         final String title = resolveTitle(event.entity());
@@ -93,13 +98,17 @@ public class RecentActivityUpdatesListener {
                         .build()));
     }
 
-    // Best-effort: a GRN type with no registered descriptor provider keeps a null title and falls back to read-time
-    // catalog resolution, as before. Never let title lookup stop the activity from being recorded.
+    // Best-effort. The read path prefers catalog resolution and only uses the stored title when the catalog has no
+    // entry, so a null title keeps today's behaviour. Never let title lookup stop the activity from being recorded.
     private String resolveTitle(GRN entity) {
         try {
             return grnDescriptorService.getDescriptor(entity).title();
+        } catch (IllegalStateException e) {
+            // Expected: some shareable GRN types have no descriptor provider (e.g. outputs in a content pack).
+            LOG.debug("No descriptor provider to resolve a title for recent activity on entity <{}>", entity, e);
+            return null;
         } catch (Exception e) {
-            LOG.debug("Could not resolve a title for recent activity on entity <{}>", entity, e);
+            LOG.warn("Could not resolve a title for recent activity on entity <{}>", entity, e);
             return null;
         }
     }
