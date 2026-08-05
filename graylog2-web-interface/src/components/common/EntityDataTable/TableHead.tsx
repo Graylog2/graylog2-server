@@ -27,7 +27,7 @@ import {
   columnTransition,
   displayScrollRightIndicatorVar,
 } from 'components/common/EntityDataTable/CSSVariables';
-import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { ACTIONS_COL_ID, RESIZE_HIT_AREA_OVERHANG } from 'components/common/EntityDataTable/Constants';
 import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 import useForceUpdate from 'util/hooks/useForceUpdate';
 import zIndices from 'theme/z-indices';
@@ -99,16 +99,23 @@ export const Th = styled.th<{
         display: var(${displayScrollRightIndicatorVar}, none);
       }
     `}
+
+    ${$hideEmptyTailBorder &&
+    css`
+      && {
+        border-right: none;
+      }
+    `}
   `,
 );
 
-const ResizeHitArea = styled.div<{ $isResizing: boolean }>(
-  ({ theme, $isResizing }) => css`
+const ResizeHitArea = styled.div<{ $isResizing: boolean; $constrainOverhang: boolean }>(
+  ({ theme, $isResizing, $constrainOverhang }) => css`
     position: absolute;
     top: 0;
     bottom: 0;
-    right: -7px;
-    width: 14px;
+    right: ${$constrainOverhang ? 0 : -RESIZE_HIT_AREA_OVERHANG}px;
+    width: ${RESIZE_HIT_AREA_OVERHANG * 2}px;
     cursor: col-resize;
     touch-action: none;
     user-select: none;
