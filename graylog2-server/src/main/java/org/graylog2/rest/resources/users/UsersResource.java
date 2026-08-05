@@ -440,22 +440,28 @@ public class UsersResource extends RestResource {
         validatePermissionsAndRoles(cr.roles(), cr.permissions(), userContext);
     }
 
-    private void validatePermissionsAndRoles(@NotNull ChangeUserRequest cr, UserContext userContext) {
-        validatePermissionsAndRoles(cr.roles(), cr.permissions(), userContext);
+    private void validateRolePermissions(List<String> requestRoles, UserContext userContext) {
+        validatePermissionsAndRoles(requestRoles, List.of(), userContext);
     }
 
     private void validatePermissionsAndRoles(List<String> requestRoles, List<String> requestPermissions, UserContext userContext) {
         try {
-            final var missingPermissions = permissionsCurrentUserMisses(requestRoles, requestPermissions, userContext);
-            if (!missingPermissions.isEmpty()) {
-                throw new BadRequestException("Cannot assign permissions/roles to new user that current user does not have: " + String.join(", ", missingPermissions));
-            }
+            final var rolePermissions = extractPermissionsFromRoles(requestRoles);
+            final var joinedPermissions = Stream.concat(rolePermissions.stream(), requestPermissions.stream()).collect(Collectors.toSet());
+            validatePermissions(joinedPermissions, userContext);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new BadRequestException(e);
         }
     }
 
-    private Set<String> permissionsCurrentUserMisses(List<String> requestRoles, List<String> requestPermissions, UserContext user) throws org.graylog2.database.NotFoundException {
+    private void validatePermissions(Collection<String> permissions, UserContext userContext) {
+        final var missingPermissions = permissionsCurrentUserMisses(permissions, userContext);
+        if (!missingPermissions.isEmpty()) {
+            throw new BadRequestException("Cannot assign permissions/roles to new user that current user does not have: " + String.join(", ", missingPermissions));
+        }
+    }
+
+    private Set<String> extractPermissionsFromRoles(List<String> requestRoles) throws org.graylog2.database.NotFoundException {
         final var normalizedRoles = Optional.ofNullable(requestRoles).orElse(Collections.emptyList())
                 .stream()
                 .map(role -> role.toLowerCase(Locale.ENGLISH))
@@ -468,11 +474,14 @@ public class UsersResource extends RestResource {
             throw new ForbiddenException("Not allowed to read roles: " + String.join(", ", deniedRoles));
         }
         final var roles = roleService.loadByNames(normalizedRoles);
-        final var rolePermissions = roles.stream()
+        return roles.stream()
                 .flatMap(role -> role.getPermissions().stream())
                 .collect(Collectors.toSet());
+    }
+
+    private Set<String> permissionsCurrentUserMisses(Collection<String> requestPermissions, UserContext user) {
         final var normalizedPermissions = Optional.ofNullable(requestPermissions).orElse(Collections.emptyList());
-        return Stream.concat(normalizedPermissions.stream(), rolePermissions.stream())
+        return normalizedPermissions.stream()
                 .filter(permission -> !user.isPermitted(permission))
                 .collect(Collectors.toSet());
     }
@@ -593,8 +602,6 @@ public class UsersResource extends RestResource {
             throw new BadRequestException("Cannot modify readonly user " + username);
         }
 
-        validatePermissionsAndRoles(cr, userContext);
-
         // We only allow setting a subset of the fields in ChangeUserRequest
         if (!user.isExternalUser()) {
             if (cr.email() != null) {
@@ -606,11 +613,13 @@ public class UsersResource extends RestResource {
         }
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
         if (permitted && cr.permissions() != null) {
+            validatePermissions(cr.permissions(), userContext);
             user.setPermissions(getEffectiveUserPermissions(user, cr.permissions()));
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
             checkAdminRoleForServiceAccount(cr, user);
+            validateRolePermissions(cr.roles(), userContext);
             setUserRoles(cr.roles(), user, userContext);
         }
 
@@ -726,12 +735,14 @@ public class UsersResource extends RestResource {
     public void editPermissions(@Parameter(name = "username", description = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
                                 @RequestBody(description = "The list of permissions to assign to the user.", required = true)
-                                @Valid @NotNull PermissionEditRequest permissionRequest) throws ValidationException {
+                                @Valid @NotNull PermissionEditRequest permissionRequest,
+                                @Context UserContext userContext) throws ValidationException {
         final User user = userManagementService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
 
+        validatePermissions(permissionRequest.permissions(), userContext);
         user.setPermissions(getEffectiveUserPermissions(user, permissionRequest.permissions()));
         userManagementService.save(user);
     }
