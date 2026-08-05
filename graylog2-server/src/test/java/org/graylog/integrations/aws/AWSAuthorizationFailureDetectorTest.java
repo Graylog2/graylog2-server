@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
 class AWSAuthorizationFailureDetectorTest {
 
     private static final String QUERY = "Query";
+    private static final String GET_RECORDS = "GetRecords";
     private static final String UPDATE_ITEM = "UpdateItem";
 
     /**
@@ -60,17 +61,11 @@ class AWSAuthorizationFailureDetectorTest {
     private final List<Throwable> reportedFailures = new ArrayList<>();
     private final AtomicLong clock = new AtomicLong();
 
-    /**
-     * Left at zero by default, so the consumer counts as stalled once the clock passes the two-minute mark. Tests
-     * that need a working consumer advance it explicitly.
-     */
-    private final AtomicLong lastProgress = new AtomicLong();
-
     private final AWSAuthorizationFailureDetector detector =
-            new AWSAuthorizationFailureDetector(reportedFailures::add, lastProgress::get, clock::get);
+            new AWSAuthorizationFailureDetector(reportedFailures::add, clock::get);
 
     @Test
-    void reportsOnceDenialsSpanTwoMinutesAndTheConsumerIsStalled() {
+    void reportsOnceDenialsSpanTwoMinutes() {
         final DynamoDbException denial = accessDenied(
                 "User: arn:aws:sts::123456789012:assumed-role/graylog/x is not authorized to perform: "
                         + "dynamodb:Query on resource: arn:aws:dynamodb:eu-west-1:123456789012:"
@@ -119,45 +114,40 @@ class AWSAuthorizationFailureDetectorTest {
     }
 
     /**
-     * KCL absorbs several denials and keeps delivering records from the leases it already holds - a stalled metadata
-     * migration, a lease-rebalancing scan, a table description it needs only for scan sizing. Stopping an input that
-     * is still ingesting would be a worse bug than the log spam this class exists to stop.
+     * KCL absorbs denials of these and keeps delivering records from the leases it already holds - a stalled metadata
+     * migration, a lease-rebalancing scan, a table description it needs only for scan sizing, worker metrics. Stopping
+     * an input that is still ingesting would be a worse bug than the log spam this class exists to stop, so only the
+     * operations the consumer cannot work without are reported. Twenty minutes of continuous denial here changes
+     * nothing.
      */
-    @Test
-    void neverReportsWhileTheConsumerIsStillProcessingRecords() {
-        final DynamoDbException denial = accessDenied("denied");
-
-        for (int i = 0; i < 30; i++) {
-            detector.recordFailure(QUERY, denial);
-            lastProgress.set(clock.get());
-            advance(WIDE_SPACING);
-        }
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Scan",
+            "DescribeTable",
+            "TransactWriteItems",
+            "UpdateItem",
+            "GetItem",
+            "PutItem"})
+    void neverReportsAnOperationKclAbsorbs(String operation) {
+        denyRepeatedly(operation, 60, WIDE_SPACING);
 
         assertThat(reportedFailures).isEmpty();
     }
 
     /**
-     * The other half of the same rule: once the denial has also stopped the consumer, it is reported.
+     * The Kinesis half of the essential set. {@code PrefetchRecordsPublisher} swallows every SDK exception and
+     * re-polls every 1.5s, so a denied fetch never fails a task and would otherwise leave the input reporting RUNNING
+     * while consuming nothing.
      */
     @Test
-    void reportsOnceTheConsumerStopsMakingProgress() {
-        final DynamoDbException denial = accessDenied("denied");
-
-        for (int i = 0; i < 3; i++) {
-            detector.recordFailure(QUERY, denial);
-            lastProgress.set(clock.get());
-            advance(WIDE_SPACING);
-        }
-        assertThat(reportedFailures).isEmpty();
-
-        // Records stop arriving; the denials continue.
-        denyRepeatedly(QUERY, 8, WIDE_SPACING);
+    void reportsADeniedRecordFetch() {
+        denyRepeatedly(GET_RECORDS, 100, Duration.ofMillis(1500));
 
         assertThat(reportedFailures).isNotEmpty();
     }
 
     /**
-     * An operation issued twice a second must not fail an input over a short-lived denial, such as the seconds of
+     * An operation issued every 1.5s must not fail an input over a short-lived denial, such as the seconds of
      * {@code AccessDeniedException} that IAM's eventual consistency can produce after a policy edit.
      */
     @Test
@@ -268,8 +258,8 @@ class AWSAuthorizationFailureDetectorTest {
     }
 
     /**
-     * Matching has to be exact: loosening it to a prefix or substring test would make the self-healing
-     * {@code KMSDisabledException} match the terminal {@code KMSAccessDeniedException}.
+     * Matching has to be exact: the allowlist carries the short code {@code AccessDenied}, which is a substring of
+     * unrelated error codes, so a prefix or substring test would treat those as terminal.
      */
     @Test
     void matchesErrorCodesExactly() {

@@ -62,7 +62,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 
@@ -89,14 +88,12 @@ public class KinesisConsumer implements Runnable {
     private final AWSClientBuilderUtil awsClientBuilderUtil;
     private final InputFailureRecorder inputFailureRecorder;
     private final boolean migrateToSingleTable;
-    private final LongSupplier nanoClock;
-    private final AtomicBoolean authorizationFailureHandled = new AtomicBoolean();
 
     /**
-     * When KCL last completed a record-processing task. Seeded at construction so that a consumer which never
-     * processes anything counts as stalled from the start.
+     * Monotonic clock handed to the authorization-failure detectors, so a test can drive their threshold.
      */
-    private final AtomicLong lastProcessSuccessNanos;
+    private final LongSupplier nanoClock;
+    private final AtomicBoolean authorizationFailureHandled = new AtomicBoolean();
     private Scheduler kinesisScheduler;
 
     KinesisConsumer(NodeId nodeId,
@@ -130,7 +127,6 @@ public class KinesisConsumer implements Runnable {
         Preconditions.checkNotNull(awsMessageType, "A AWSMessageType is required.");
 
         this.nanoClock = requireNonNull(nanoClock, "nanoClock");
-        this.lastProcessSuccessNanos = new AtomicLong(nanoClock.getAsLong());
         this.nodeId = requireNonNull(nodeId, "nodeId");
         this.transport = transport;
         this.handleMessageCallback = handleMessageCallback;
@@ -262,8 +258,7 @@ public class KinesisConsumer implements Runnable {
     }
 
     private AWSAuthorizationFailureDetector newAuthorizationFailureDetector() {
-        return new AWSAuthorizationFailureDetector(this::handleAuthorizationFailure, lastProcessSuccessNanos::get,
-                nanoClock);
+        return new AWSAuthorizationFailureDetector(this::handleAuthorizationFailure, nanoClock);
     }
 
     @VisibleForTesting
@@ -296,22 +291,19 @@ public class KinesisConsumer implements Runnable {
     }
 
     /**
-     * Records that KCL is still doing useful work, which both clears a transient failure and tells
-     * {@link AWSAuthorizationFailureDetector} that a denial has not stalled the consumer. The timestamp is updated
-     * unconditionally: it must keep advancing while the input drains, or a later denial would look like a stall.
-     * Terminality is enforced by {@link InputFailureRecorder}, so a task completing concurrently with a terminal
-     * failure cannot report the input healthy again.
+     * Clears a transient failure once KCL completes a record-processing task. Terminality is enforced by
+     * {@link InputFailureRecorder}, so a task completing concurrently with a terminal failure cannot report the input
+     * healthy again.
      */
     @VisibleForTesting
     void recordTaskSuccess() {
-        lastProcessSuccessNanos.set(nanoClock.getAsLong());
         inputFailureRecorder.setRunning();
     }
 
     /**
-     * Fails the input and stops the KCL scheduler after an AWS authorization denial that retrying cannot fix and that
-     * has stopped the consumer making progress. Without this, KCL retries such calls on a fixed schedule for as long
-     * as the input is running, logging an ERROR with a stack trace every time while consuming no records.
+     * Fails the input and stops the KCL scheduler after an AWS authorization denial that retrying cannot fix. Without
+     * this, KCL retries such calls on a fixed schedule for as long as the input is running, logging an ERROR with a
+     * stack trace every time while consuming no records.
      */
     @VisibleForTesting
     void handleAuthorizationFailure(Throwable cause) {

@@ -32,23 +32,22 @@ import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 
 /**
- * Watches an AWS client for authorization denials that no amount of retrying will fix, and reports one when a single
- * operation has been denied for {@link #MIN_DENIAL_PERIOD} <em>and</em> the consumer has made no progress in that
- * time.
+ * Watches an AWS client for authorization denials that no amount of retrying will fix, and reports one once an
+ * operation the consumer cannot work without has been denied for {@link #MIN_DENIAL_PERIOD}.
  *
  * <p>The Kinesis Client Library reschedules its own calls forever and only logs the failure, so a missing IAM
  * permission produces an endless ERROR loop while the input consumes nothing. KCL exposes no hook for those failures,
  * but we build the AWS clients it uses, so an interceptor on them sees every denial the service returns.
  *
- * <p>Two conditions, because a denial alone does not mean the input is broken. KCL absorbs several denials and keeps
- * ingesting - a stalled metadata migration, a lease-rebalancing scan, a table description it only needs for scan
- * sizing - so reporting on the denial alone would stop inputs that are working. Requiring the consumer to have gone
- * quiet as well distinguishes "denied and dead" from "denied and degraded".
+ * <p>Only {@link #ESSENTIAL_OPERATIONS} are reported, because a denial alone does not mean the input is broken. KCL
+ * absorbs several denials and keeps ingesting - a stalled metadata migration, a lease-rebalancing scan, a table
+ * description it needs only for scan sizing - so reporting on any denial would stop inputs that are working.
  *
  * <p>Denials are tracked per operation, not per client: one client carries many schedules at very different rates, so
  * state shared across operations would be cleared by healthy traffic before any threshold was reached. Note this keys
- * on the operation <em>name</em> while IAM authorizes on (action, resource), so a permitted call to a different table
- * under the same operation name does clear the streak.
+ * on the operation <em>name</em> while IAM authorizes on (action, resource), so a permitted call to a different
+ * resource under the same operation name does clear the streak. Neither essential operation has a second resource on
+ * the clients we build.
  *
  * <p>The threshold is a duration rather than a number of attempts because cadences on one client differ by more than
  * an order of magnitude, so a fixed count would mean seconds for one operation and many minutes for another.
@@ -67,6 +66,25 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
     private static final Duration STREAK_RESET_GAP = MIN_DENIAL_PERIOD.multipliedBy(2);
 
     private static final int MAX_CAUSE_DEPTH = 10;
+
+    /**
+     * The operations whose denial KCL retries forever while surfacing nothing, and which the consumer cannot work
+     * without. Both are on fast retry paths - lease discovery every ~10s, record fetching every 1.5s - so the
+     * threshold takes many attempts rather than two.
+     *
+     * <p>Everything else is left alone deliberately. KCL absorbs a denied lease-rebalancing {@code Scan}, a
+     * scan-sizing {@code DescribeTable} or a single-table-migration {@code TransactWriteItems} and keeps delivering
+     * records, so reporting those stops inputs that are ingesting normally. Failures KCL does surface, such as a
+     * denied {@code GetShardIterator} aborting a shard consumer, already reach the input through
+     * {@code TaskExecutionListener}.
+     */
+    private static final Set<String> ESSENTIAL_OPERATIONS = Set.of(
+            // DynamoDB lease discovery, the call denied in the case this class exists for. KCL 3.x has no other way
+            // to learn which leases it has been assigned, so a worker denied this consumes nothing.
+            "Query",
+            // The Kinesis read path, including the KMS failures an encrypted stream returns through it.
+            // PrefetchRecordsPublisher swallows every SdkException and re-polls, so no task ever fails.
+            "GetRecords");
 
     /**
      * Credentials that AWS rejects outright. Terminal for the same reason a denied action is, but the remediation is
@@ -98,22 +116,16 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
             "KMSOptInRequired");
 
     private final Consumer<Throwable> onTerminalFailure;
-    private final LongSupplier lastProgressNanos;
     private final LongSupplier nanoClock;
     private final Map<String, DenialStreak> denialsByOperation = new ConcurrentHashMap<>();
 
     /**
      * @param onTerminalFailure called when a denial is judged unrecoverable. May be called more than once; the caller
      *                          is responsible for acting at most once.
-     * @param lastProgressNanos timestamp of the last sign that the consumer is still doing useful work.
-     * @param nanoClock         monotonic clock. Must be the same clock {@code lastProgressNanos} is stamped from, or
-     *                          the two are not comparable.
+     * @param nanoClock         monotonic clock, {@code System::nanoTime} outside tests.
      */
-    public AWSAuthorizationFailureDetector(Consumer<Throwable> onTerminalFailure,
-                                           LongSupplier lastProgressNanos,
-                                           LongSupplier nanoClock) {
+    public AWSAuthorizationFailureDetector(Consumer<Throwable> onTerminalFailure, LongSupplier nanoClock) {
         this.onTerminalFailure = onTerminalFailure;
-        this.lastProgressNanos = lastProgressNanos;
         this.nanoClock = nanoClock;
     }
 
@@ -146,6 +158,9 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
 
     @VisibleForTesting
     void recordFailure(String operation, Throwable throwable) {
+        if (!ESSENTIAL_OPERATIONS.contains(operation)) {
+            return;
+        }
         final AwsServiceException denial = denialWithCodeIn(throwable, TERMINAL_ERROR_CODES);
         if (denial == null) {
             return;
@@ -153,7 +168,7 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
         final long now = nanoClock.getAsLong();
         final DenialStreak streak = denialsByOperation.compute(operation,
                 (ignored, current) -> current == null ? DenialStreak.first(now) : current.next(now));
-        if (streak.isTerminal() && madeNoProgress(now)) {
+        if (streak.isTerminal()) {
             onTerminalFailure.accept(denial);
         }
     }
@@ -161,15 +176,6 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
     @VisibleForTesting
     void recordSuccess(String operation) {
         denialsByOperation.remove(operation);
-    }
-
-    /**
-     * Whether the consumer has gone quiet for as long as the denial has persisted. KCL keeps delivering records from
-     * the leases it already holds even while a coordination call is denied, and an input that is still ingesting must
-     * not be stopped.
-     */
-    private boolean madeNoProgress(long nowNanos) {
-        return nowNanos - lastProgressNanos.getAsLong() >= MIN_DENIAL_PERIOD.toNanos();
     }
 
     /**
