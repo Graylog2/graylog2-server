@@ -163,6 +163,43 @@ assigned is now included, and coverage reflects how many of them are enabled ver
 source check that was previously present for Sigma rules). Therefore, a tactic may show a higher or lower
 percentage than it did in 7.1, without any change to the actual installed Event Definitions.
 
+## AWS Kinesis/CloudWatch Input: Required DynamoDB Permissions
+
+In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5, which calls
+DynamoDB actions KCL 2.x did not. **This applies to every Kinesis/CloudWatch input, whether it is new or existed
+before 7.2**, so a policy written for an earlier Graylog release can look correct and still deny the input. A policy
+that grants only the actions KCL 2.x needed leaves the input logging an authorization error on a fixed schedule while
+consuming no records.
+
+In addition to the actions the lease table already needed (`CreateTable`, `DescribeTable`, `GetItem`, `PutItem`,
+`Scan`, `UpdateItem`, `DeleteItem`), KCL 3.5 requires:
+
+- **`dynamodb:Query` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*/index/*`.** KCL 3.5 discovers
+  leases through a global secondary index on the lease table. An index is a separate IAM resource from its table, so
+  granting `Query` on the table alone still denies this call.
+- **`dynamodb:UpdateTable` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*`.** KCL creates that
+  index on first start. If this is denied the index is never created, and the input starts but consumes nothing.
+
+The two legacy tables, `<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats`, also need
+access, and how much depends on the input:
+
+- **An input created on 7.2 or later** needs only `dynamodb:DescribeTable` on both. KCL checks whether they exist on
+  every start and treats anything other than "table not found" as a failure, so a policy scoped to the lease table
+  alone prevents the input from starting even though it never had these tables.
+- **An input that existed before 7.2** keeps using both tables until you complete the single-table migration described
+  in the next section. Until then they need the same item-level actions as the lease table (`GetItem`, `PutItem`,
+  `UpdateItem`, `DeleteItem`, `Scan`) in addition to `DescribeTable`: KCL holds its leader lock in
+  `-CoordinatorState` and writes worker metrics to `-WorkerMetricStats` every 30 seconds.
+
+A policy whose resource is `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*` covers the lease table and
+both legacy tables, because their names share that prefix.
+
+If you enable **Migrate to single DynamoDB table for state tracking**, the migration moves state entities in a
+DynamoDB transaction, which additionally requires `dynamodb:ConditionCheckItem` on the `-CoordinatorState` table
+alongside the item-level actions above. `ConditionCheckItem` is used only by transactions, so policies written for
+non-transactional access usually omit it, and without it the migration never reaches
+`TABLE_MIGRATION_STATUS_COMPLETE` while reporting nothing in the Graylog UI.
+
 ## AWS Kinesis/CloudWatch Input: Single DynamoDB Table State Tracking
 
 In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5. 
@@ -203,29 +240,6 @@ checkpoints are preserved, so ingestion should continue without replay or gaps.
 
 The migration is **one-way and cannot be reverted once complete.** It is also not instantaneous, and AWS recommends
 monitoring the migration until it reaches completion.
-
-### Required DynamoDB permissions
-
-KCL 3.5 calls DynamoDB actions that KCL 2.x did not, so a policy written for an earlier Graylog release can look
-correct and still deny the input. A policy that grants only the actions KCL 2.x needed leaves the input logging an
-authorization error on a fixed schedule while consuming no records.
-
-In addition to the actions the lease table already needed (`CreateTable`, `DescribeTable`, `GetItem`, `PutItem`,
-`Scan`, `UpdateItem`, `DeleteItem`), KCL 3.5 requires:
-
-- **`dynamodb:Query` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*/index/*`.** KCL 3.5 discovers
-  leases through a global secondary index on the lease table. An index is a separate IAM resource from its table, so
-  granting `Query` on the table alone still denies this call.
-- **`dynamodb:UpdateTable` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*`.** KCL creates that
-  index on first start. If this is denied the index is never created, and the input starts but consumes nothing.
-- **`dynamodb:DescribeTable` on the `-CoordinatorState` and `-WorkerMetricStats` tables**, even for inputs that never
-  had them. KCL checks whether they exist on every start, and treats anything other than "table not found" as a
-  failure, so a policy scoped to the lease table alone prevents the input from starting.
-
-If you enable **Migrate to single DynamoDB table for state tracking**, the migration moves state entities in a
-DynamoDB transaction, which additionally requires `dynamodb:PutItem` on the lease table and `dynamodb:DeleteItem`
-plus `dynamodb:ConditionCheckItem` on the `-CoordinatorState` table. `ConditionCheckItem` is used only by
-transactions, so policies written for non-transactional access usually omit it.
 
 For how to monitor the migration, along with the migration steps, required permissions, and how to remove the
 now-unused legacy tables afterward, see AWS's documentation:
