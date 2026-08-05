@@ -124,7 +124,10 @@ export const useInstance = (
   options: { refetchInterval?: number; silent?: boolean } = {},
 ) => {
   const { data, isLoading, error, isError } = useQuery<CollectorInstanceView>({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- silent only affects the error-reporting wrapper, not the cached data; callers deliberately share one cache entry regardless of the flag
+    // `silent` and the session-extension choice affect request behavior, not the cached data, so
+    // callers deliberately share one cache entry. If observers with different options coexist,
+    // whichever observer initiates a fetch determines both behaviors for that request.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- Options do not affect cached data.
     queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
     queryFn: () => {
       // Polling callers are background refreshes and must not keep the session
