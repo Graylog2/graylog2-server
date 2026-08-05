@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.integrations.aws.AWSAuthorizationFailureDetector;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
@@ -60,6 +61,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
@@ -85,6 +87,7 @@ public class KinesisConsumer implements Runnable {
     private final AWSClientBuilderUtil awsClientBuilderUtil;
     private final InputFailureRecorder inputFailureRecorder;
     private final boolean migrateToSingleTable;
+    private final AtomicBoolean authorizationFailureHandled = new AtomicBoolean();
     private Scheduler kinesisScheduler;
 
     KinesisConsumer(NodeId nodeId,
@@ -121,9 +124,18 @@ public class KinesisConsumer implements Runnable {
 
         final Region region = Region.of(request.region());
 
+        // One detector per client: a success against one service must not reset the denial count of another,
+        // or a healthy Kinesis poll would mask a permanent DynamoDB denial forever. CloudWatch is deliberately
+        // left out: losing metrics is not a reason to fail an input that is otherwise ingesting fine.
+        final AWSAuthorizationFailureDetector dynamoDbAuthFailures =
+                new AWSAuthorizationFailureDetector(this::handleAuthorizationFailure);
+        final AWSAuthorizationFailureDetector kinesisAuthFailures =
+                new AWSAuthorizationFailureDetector(this::handleAuthorizationFailure);
+
         final DynamoDbAsyncClientBuilder dynamoDbClientBuilder = DynamoDbAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
         dynamoDbClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
+        dynamoDbClientBuilder.overrideConfiguration(c -> c.addExecutionInterceptor(dynamoDbAuthFailures));
         final CloudWatchAsyncClientBuilder cloudwatchClientBuilder = CloudWatchAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(cloudwatchClientBuilder, request.cloudwatchEndpoint(), region, credentialsProvider);
         cloudwatchClientBuilder.httpClientBuilder(awsClientBuilderUtil.asyncHttpClientBuilder());
@@ -134,6 +146,7 @@ public class KinesisConsumer implements Runnable {
         final KinesisAsyncClientBuilder kinesisAsyncClientBuilder = KinesisAsyncClient.builder();
         awsClientBuilderUtil.initializeBuilder(kinesisAsyncClientBuilder, request.kinesisEndpoint(), region, credentialsProvider);
         kinesisAsyncClientBuilder.httpClientBuilder(awsClientBuilderUtil.kinesisAsyncHttpClientBuilder());
+        kinesisAsyncClientBuilder.overrideConfiguration(c -> c.addExecutionInterceptor(kinesisAuthFailures));
 
         // All three clients are kept open for the lifetime of the KCL Scheduler (kinesisScheduler.run() blocks).
         // Try-with-resources ensures the Netty event loop groups and connection pools are released when the scheduler
@@ -180,7 +193,7 @@ public class KinesisConsumer implements Runnable {
                         inputFailureRecorder.setFailing(KinesisConsumer.class,
                                 String.format(Locale.ROOT, "Errors for Kinesis stream <%s>!", kinesisStreamName));
                     } else if (TaskOutcome.SUCCESSFUL.equals(input.taskOutcome()) && TaskType.PROCESS.equals(input.taskType())) {
-                        inputFailureRecorder.setRunning();
+                        recordTaskSuccess();
                     }
                 }
             };
@@ -235,6 +248,48 @@ public class KinesisConsumer implements Runnable {
     @VisibleForTesting
     static String applicationName(String kinesisStreamName) {
         return String.format(Locale.ENGLISH, "graylog-aws-plugin-%s", kinesisStreamName);
+    }
+
+    /**
+     * KCL keeps draining already-owned leases while it shuts down, and each successful PROCESS task would
+     * otherwise report the input healthy again. A terminal authorization failure must survive that, or the input
+     * ends up displaying RUNNING with no consumer behind it.
+     */
+    @VisibleForTesting
+    void recordTaskSuccess() {
+        if (authorizationFailureHandled.get()) {
+            return;
+        }
+        inputFailureRecorder.setRunning();
+    }
+
+    /**
+     * Fails the input and stops the KCL scheduler after an AWS authorization denial that retrying cannot fix.
+     * Without this, KCL retries such calls on a fixed schedule for as long as the input is running, logging an
+     * ERROR with a stack trace every time while consuming no records.
+     */
+    @VisibleForTesting
+    void handleAuthorizationFailure(Throwable cause) {
+        if (!authorizationFailureHandled.compareAndSet(false, true)) {
+            return;
+        }
+        inputFailureRecorder.setFailing(KinesisConsumer.class, String.format(Locale.ROOT,
+                "AWS authorization failure for Kinesis stream <%s>. The input was stopped because retrying "
+                        + "cannot resolve a missing permission. Grant it, then start the input again.",
+                kinesisStreamName), cause);
+
+        // This runs on an AWS SDK event loop thread, and stop() blocks while KCL shuts down using that same
+        // event loop, so it must not be called inline.
+        final Thread shutdownThread = new Thread(() -> {
+            try {
+                stop();
+            } catch (Exception e) {
+                LOG.error("Failed to stop the Kinesis consumer for stream <{}> after an AWS authorization failure.",
+                        kinesisStreamName, e);
+            }
+        }, "aws-kinesis-auth-failure-shutdown");
+        shutdownThread.setDaemon(true);
+        shutdownThread.start();
     }
 
     /**
