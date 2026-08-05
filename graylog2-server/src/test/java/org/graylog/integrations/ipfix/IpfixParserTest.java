@@ -19,13 +19,16 @@ package org.graylog.integrations.ipfix;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Maps.immutableEntry;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +42,37 @@ public class IpfixParserTest {
 
     @TempDir
     public File temporaryFolder;
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    public void parseMessage_undefinedInformationElement_doesNotLoop() {
+        final byte[] packetBytes = hexToBytes("000a00240000000000000001000000000002000c0100000103e800040100000841414141");
+        final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+        assertThat(message.flows()).hasSize(1);
+        assertThat(message.flows().getFirst().fields()).isEmpty();
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    public void parseMessage_basicListZeroLengthElement_doesNotLoop() {
+        final byte[] packetBytes = hexToBytes("000a00270000000000000001000000000002000c01000001012300080100000b06000001000041");
+        final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+        assertThat(message.flows()).hasSize(1);
+        assertThat(message.flows().getFirst().fields()).isEmpty();
+    }
+
+    private static byte[] hexToBytes(final String hex) {
+        final int len = hex.length();
+        final byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4) + Character.digit(hex.charAt(i + 1), 16));
+        }
+        return data;
+    }
 
     @Test
     public void shallowParsePacket() throws IOException {
