@@ -37,16 +37,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface MoreSearchAdapter {
     default MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
-                                          int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter) {
-        return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString, sourceStreamFilter, Map.of());
+                                          int page, int perPage, Set<String> eventStreams, String filterString,
+                                          SourceStreamFilter sourceStreamFilter, EventDefinitionFilter eventDefinitionFilter) {
+        return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString,
+                sourceStreamFilter, eventDefinitionFilter, Map.of());
     }
+
     MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
-                                  int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                  int page, int perPage, Set<String> eventStreams, String filterString,
+                                  SourceStreamFilter sourceStreamFilter, EventDefinitionFilter eventDefinitionFilter,
                                   Map<String, Set<String>> extraFilters);
 
     MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
                                         Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                        ZoneId timeZone, Map<String, Set<String>> extraFilters);
+                                        EventDefinitionFilter eventDefinitionFilter, ZoneId timeZone,
+                                        Map<String, Set<String>> extraFilters);
 
     interface ScrollEventsCallback {
         void accept(List<ResultMessage> results, AtomicBoolean requestContinue) throws EventProcessorException;
@@ -57,10 +62,12 @@ public interface MoreSearchAdapter {
 
     List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                 Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                EventDefinitionFilter eventDefinitionFilter,
                                 Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets);
 
     List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                            Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                           EventDefinitionFilter eventDefinitionFilter,
                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges);
 
     // The aggregation methods below do not perform stream-based permission filtering.
