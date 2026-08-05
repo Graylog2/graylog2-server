@@ -18,6 +18,7 @@ package org.graylog.collectors.opamp;
 
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.client.model.Filters;
+import jakarta.annotation.Nullable;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -1166,7 +1167,7 @@ class CollectorInstanceServiceTest {
         assertThat(componentHealthDoc.containsKey("components")).isFalse();
     }
 
-    private static CollectorInstanceReport healthReport(String uid, long seqNum, @jakarta.annotation.Nullable ComponentHealthDTO health) {
+    private static CollectorInstanceReport healthReport(String uid, long seqNum, @Nullable ComponentHealthDTO health) {
         final var builder = CollectorInstanceReport.builder()
                 .instanceUid(uid)
                 .messageSeqNum(seqNum)
@@ -1178,7 +1179,7 @@ class CollectorInstanceServiceTest {
         return builder.build();
     }
 
-    private static ComponentHealthDTO health(boolean healthy, @jakarta.annotation.Nullable String lastError) {
+    private static ComponentHealthDTO health(boolean healthy, @Nullable String lastError) {
         return ComponentHealthDTO.builder()
                 .healthy(healthy)
                 .lastError(lastError)
