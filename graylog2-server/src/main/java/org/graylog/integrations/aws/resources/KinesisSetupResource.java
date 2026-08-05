@@ -24,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
+import org.graylog.integrations.aws.inputs.AWSInput;
 import org.graylog.integrations.aws.resources.requests.CreateLogSubscriptionRequest;
 import org.graylog.integrations.aws.resources.requests.CreateRolePermissionRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisNewStreamRequest;
@@ -36,6 +37,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +77,7 @@ public class KinesisSetupResource extends RestResource implements PluginRestReso
     @Timed
     @Path("/create_stream")
     @ApiOperation(value = "Step 1: Attempt to create a new kinesis stream and wait for it to be ready.")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @RequiresPermissions({AWSPermissions.AWS_READ, RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_SETUP_CREATE_STREAM)
     public KinesisNewStreamResponse createNewKinesisStream(@ApiParam(name = "JSON body", required = true)
                                                            @Valid @NotNull KinesisNewStreamRequest request) {
@@ -93,7 +95,7 @@ public class KinesisSetupResource extends RestResource implements PluginRestReso
     @Timed
     @Path("/create_subscription_policy")
     @ApiOperation(value = "Step 2: Create AWS IAM policy needed for CloudWatch to write logs to Kinesis")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @RequiresPermissions({AWSPermissions.AWS_READ, RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_SETUP_CREATE_POLICY)
     public CreateRolePermissionResponse autoKinesisPermissions(@ApiParam(name = "JSON body", required = true)
                                                                @Valid @NotNull CreateRolePermissionRequest request) {
@@ -105,7 +107,7 @@ public class KinesisSetupResource extends RestResource implements PluginRestReso
     @Timed
     @Path("/create_subscription")
     @ApiOperation(value = "Step 3: Subscribe a Kinesis stream to a CloudWatch log group")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @RequiresPermissions({AWSPermissions.AWS_READ, RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_SETUP_CREATE_SUBSCRIPTION)
     public CreateLogSubscriptionResponse createSubscription(@ApiParam(name = "JSON body", required = true)
                                                             @Valid @NotNull CreateLogSubscriptionRequest request) {

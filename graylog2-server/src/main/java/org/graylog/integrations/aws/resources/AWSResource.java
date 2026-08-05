@@ -37,6 +37,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
+import org.graylog.integrations.aws.inputs.AWSInput;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog.integrations.aws.resources.requests.KinesisRequest;
@@ -84,7 +85,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Timed
     @Path("/regions")
     @ApiOperation(value = "Get all available AWS regions")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @RequiresPermissions({AWSPermissions.AWS_READ, RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     public RegionsResponse getAwsRegions() {
         return awsService.getAvailableRegions();
     }
@@ -93,7 +94,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Timed
     @Path("/cloudwatch/log_groups")
     @ApiOperation(value = "Get all available AWS CloudWatch log groups names for the specified region.")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @RequiresPermissions({AWSPermissions.AWS_READ, RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     @NoAuditEvent("This does not change any data")
     public LogGroupsResponse getLogGroupNames(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl request) {
         return cloudWatchService.getLogGroupNames(request);
@@ -103,7 +104,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Timed
     @Path("/kinesis/streams")
     @ApiOperation(value = "Get all available Kinesis streams for the specified region.")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @RequiresPermissions({AWSPermissions.AWS_READ, RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     @NoAuditEvent("This does not change any data")
     public StreamsResponse getKinesisStreams(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl request) throws ExecutionException {
         return kinesisService.getKinesisStreamNames(request);
@@ -113,7 +114,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Timed
     @Path("/kinesis/stream_arn")
     @ApiOperation(value = "Get stream ARN for the specified stream and region.")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @RequiresPermissions({AWSPermissions.AWS_READ, RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     @NoAuditEvent("This does not change any data")
     public Response getStreamArn(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisRequest request) {
         String response;
@@ -133,7 +134,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
             value = "Attempt to retrieve logs from the indicated AWS log group with the specified credentials.",
             response = KinesisHealthCheckResponse.class
     )
-    @RequiresPermissions(AWSPermissions.AWS_READ)
+    @RequiresPermissions({AWSPermissions.AWS_READ, RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     @NoAuditEvent("This does not change any data")
     public Response kinesisHealthCheck(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisRequest heathCheckRequest) throws ExecutionException, IOException {
 
@@ -146,7 +147,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Path("/inputs")
     @ApiOperation(value = "Create a new AWS input.")
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_INPUT_CREATE)
-    @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":org.graylog.integrations.aws.inputs.AWSInput"})
+    @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":" + AWSInput.TYPE})
     public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
                            @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull AWSInputCreateRequest saveRequest) throws Exception {
