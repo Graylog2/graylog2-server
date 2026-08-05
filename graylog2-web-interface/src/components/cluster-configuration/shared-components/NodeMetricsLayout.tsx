@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const MetricsColumn = styled.div`
   display: flex;
@@ -23,17 +23,20 @@ export const MetricsColumn = styled.div`
   gap: 4px;
 `;
 
-export const MetricsRow = styled.div`
-  font-size: small;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+export const MetricsRow = styled.div<{ $rightAligned?: boolean }>(
+  ({ $rightAligned }) => css`
+    font-size: small;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: ${$rightAligned ? 'flex-end' : 'flex-start'};
 
-  span {
-    font-size: inherit;
-  }
-`;
+    span {
+      font-size: inherit;
+    }
+  `,
+);
 
 export const SecondaryText = styled.div`
   font-size: small;

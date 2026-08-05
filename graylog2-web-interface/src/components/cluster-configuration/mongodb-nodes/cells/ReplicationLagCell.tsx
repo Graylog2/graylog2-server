@@ -82,7 +82,7 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
   if (!exceedsDanger && !exceedsWarning) {
     return (
       <MetricsColumn>
-        <MetricsRow>
+        <MetricsRow $rightAligned>
           <span title={exactValueTitle}>{formatted}</span>
         </MetricsRow>
       </MetricsColumn>
@@ -91,7 +91,7 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
 
   return (
     <MetricsColumn>
-      <MetricsRow>
+      <MetricsRow $rightAligned>
         <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs" title={exactValueTitle}>
           {formatted}
         </Label>
