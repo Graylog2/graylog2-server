@@ -64,6 +64,8 @@ final class ComponentHealthExtractor {
 
         final Map<String, ComponentHealthDTO> components = new LinkedHashMap<>();
         if (level < MAX_LEVELS) {
+            // Protobuf map order is undefined, so the retained subset can vary when the node limit is reached.
+            // Do not sort here: stopping at the budget avoids traversing and sorting the full agent-controlled map.
             for (final var entry : health.getComponentHealthMapMap().entrySet()) {
                 final var componentName = truncate(entry.getKey(), MAX_COMPONENT_NAME_LENGTH);
                 // Keep the first component health if two truncated names aren't unique anymore.
