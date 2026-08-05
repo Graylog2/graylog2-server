@@ -58,7 +58,6 @@ import static org.mockito.Mockito.when;
 class KinesisConsumerTest {
 
     private static final String STREAM = "test-stream";
-    private static final String SHUTDOWN_THREAD_NAME = "aws-kinesis-auth-failure-shutdown-" + STREAM;
 
     private final InputFailureRecorder inputFailureRecorder = mock(InputFailureRecorder.class);
     private final AWSClientBuilderUtil awsClientBuilderUtil = mock(AWSClientBuilderUtil.class);
@@ -102,10 +101,10 @@ class KinesisConsumerTest {
         assertThat(stopCalled.await(5, TimeUnit.SECONDS)).isTrue();
         // stop() blocks for up to 20s on a shared SDK response-completion thread, so it must not run inline. The name
         // carries the stream so that concurrent failures are distinguishable in a thread dump.
-        assertThat(stopThreadName.get()).isEqualTo(SHUTDOWN_THREAD_NAME);
+        assertThat(stopThreadName.get()).isEqualTo(KinesisConsumer.shutdownThreadName(STREAM));
     }
 
-    // The two tests below let the real stop() run on the shutdown thread. That is safe and immediate: the scheduler
+    // Several tests here let the real stop() run on the shutdown thread. That is safe and immediate: the scheduler
     // was never started, so stop() returns without touching it.
 
     @Test

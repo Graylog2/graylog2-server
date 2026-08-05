@@ -66,7 +66,7 @@ public class InputFailureRecorder {
         if (terminallyFailed || inputState.getState().equals(IOState.Type.FAILING)) {
             return;
         }
-        applyFailure(loggingClass, error, e, false);
+        applyFailure(loggingClass, error, e);
     }
 
     /**
@@ -74,23 +74,27 @@ public class InputFailureRecorder {
      * failure already recorded and blocking any later {@link #setRunning()}.
      * <p>
      * Use this when the message carries the only actionable detail, so that it is neither hidden behind an earlier
-     * transient message nor cleared by work that continues while the input drains.
+     * transient message nor cleared by work that continues while the input drains. Like {@link #setFailing}, the first
+     * message wins: a second unrecoverable failure does not replace it.
      * @param loggingClass the calling class which will be used to log the error
      * @param error the error message
      * @param e the exception leading to the error
      */
     public synchronized void setTerminallyFailing(Class<?> loggingClass, String error, @Nullable Throwable e) {
+        if (terminallyFailed) {
+            return;
+        }
         terminallyFailed = true;
-        applyFailure(loggingClass, error, e, true);
+        applyFailure(loggingClass, error, e);
     }
 
-    private void applyFailure(Class<?> loggingClass, String error, @Nullable Throwable e, boolean terminal) {
+    private void applyFailure(Class<?> loggingClass, String error, @Nullable Throwable e) {
         if (e != null) {
             inputState.setState(IOState.Type.FAILING, error + ": (" + e.getMessage() + ")");
         } else {
             inputState.setState(IOState.Type.FAILING, error);
         }
-        if (terminal) {
+        if (terminallyFailed) {
             // ERROR, not WARN: this is the line that explains why an error loop stopped and why the input is down.
             LoggerFactory.getLogger(loggingClass).error(error, e);
         } else {

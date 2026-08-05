@@ -123,6 +123,20 @@ class InputFailureRecorderTest {
         assertThat(inputState.getDetailedMessage()).isEqualTo("AWS authorization failure");
     }
 
+    /**
+     * The at-most-once property is the caller's to enforce, but the recorder must not turn a repeated report into a
+     * stream of state writes: every published event costs a system message, a notification rebuild and a Mongo upsert.
+     */
+    @Test
+    void setTerminallyFailingKeepsTheFirstTerminalMessage() {
+        recorder.setTerminallyFailing(getClass(), "first terminal failure", null);
+
+        recorder.setTerminallyFailing(getClass(), "second terminal failure", null);
+
+        assertThat(inputState.getDetailedMessage()).isEqualTo("first terminal failure");
+        assertThat(stateChanges.events).hasSize(1);
+    }
+
     @Test
     void setFailingDoesNotOverwriteATerminalFailure() {
         recorder.setTerminallyFailing(getClass(), "AWS authorization failure", null);

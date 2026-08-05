@@ -317,7 +317,7 @@ public class KinesisConsumer implements Runnable {
                 ? "AWS rejected the configured credentials. Correct them, then stop and start the input."
                 : "Retrying cannot resolve a missing permission. Grant it, then stop and start the input.";
         inputFailureRecorder.setTerminallyFailing(KinesisConsumer.class, String.format(Locale.ROOT,
-                        "AWS authorization failure for Kinesis input <%s>. The consumer was stopped. %s",
+                        "AWS authorization failure for Kinesis stream <%s>. Stopping the consumer. %s",
                         kinesisStreamName, remedy), cause);
 
         // stop() blocks for up to 20s. It runs here on the client's shared SDK response-completion pool

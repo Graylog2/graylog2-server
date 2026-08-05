@@ -224,7 +224,8 @@ class AWSAuthorizationFailureDetectorTest {
             "SignatureDoesNotMatch",
             "KMSAccessDeniedException",
             "KMSNotFoundException",
-            "KMSOptInRequired"})
+            "KMSOptInRequired",
+            "KMSDisabledException"})
     void treatsDeniedActionsUnusableCredentialsAndUnusableKeysAsTerminal(String errorCode) {
         for (int i = 0; i < 10; i++) {
             detector.recordFailure(QUERY, withErrorCode(errorCode, "denied"));
@@ -235,9 +236,10 @@ class AWSAuthorizationFailureDetectorTest {
     }
 
     /**
-     * Expired session credentials, throttling and a temporarily unavailable KMS key arrive as authorization-shaped
-     * errors but recover on their own. Failing an input over any of them would be a worse bug than the log spam this
-     * class exists to stop.
+     * Expired session credentials and throttling arrive as authorization-shaped errors but recover on their own.
+     * Failing an input over either would be a worse bug than the log spam this class exists to stop.
+     * {@code KMSInvalidStateException} is here because its service documentation does not say which key states
+     * produce it, so an allowlist has to fail safe.
      */
     @ParameterizedTest
     @ValueSource(strings = {
@@ -246,7 +248,6 @@ class AWSAuthorizationFailureDetectorTest {
             "ProvisionedThroughputExceededException",
             "ThrottlingException",
             "RequestLimitExceeded",
-            "KMSDisabledException",
             "KMSInvalidStateException"})
     void neverReportsSelfHealingErrors(String errorCode) {
         for (int i = 0; i < 10; i++) {

@@ -17,6 +17,7 @@
 package org.graylog.integrations.aws;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.interceptor.Context;
 import software.amazon.awssdk.core.interceptor.ExecutionAttributes;
@@ -101,19 +102,20 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
      * errors but recover on their own, and failing an input over a credential rotation would be worse than the log
      * spam this class exists to stop. The signature codes are included because a signature error that survives the
      * SDK's own retry-and-clock-adjust means a bad key, not skew.
+     *
+     * <p>Derived from {@link #CREDENTIAL_ERROR_CODES} rather than repeating it, so the two cannot drift: a code in
+     * only one of them would either never be reported or be reported with the wrong remedy.
      */
-    private static final Set<String> TERMINAL_ERROR_CODES = Set.of(
+    private static final Set<String> TERMINAL_ERROR_CODES = Sets.union(CREDENTIAL_ERROR_CODES, Set.of(
             "AccessDeniedException",
             "AccessDenied",
-            "UnrecognizedClientException",
-            "InvalidClientTokenId",
-            "InvalidSignatureException",
-            "SignatureDoesNotMatch",
-            // Unrecoverable KMS failures on an encrypted stream. KMSDisabledException and KMSInvalidStateException
-            // are deliberately absent: those do recover on their own.
+            // KMS failures on an encrypted stream that need an operator to act. KMSInvalidStateException is
+            // deliberately absent: its service documentation does not say which key states produce it, so we cannot
+            // show it is unrecoverable, and an allowlist should fail safe.
             "KMSAccessDeniedException",
             "KMSNotFoundException",
-            "KMSOptInRequired");
+            "KMSOptInRequired",
+            "KMSDisabledException"));
 
     private final Consumer<Throwable> onTerminalFailure;
     private final LongSupplier nanoClock;
