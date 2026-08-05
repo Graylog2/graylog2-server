@@ -44,7 +44,6 @@ import opamp.proto.Opamp.OpAMPConnectionSettings;
 import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
-import org.apache.commons.lang3.StringUtils;
 import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorOSType;
@@ -66,7 +65,6 @@ import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.NoopReceiverConfig;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceReport;
-import org.graylog.collectors.db.ComponentHealthDTO;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.collectors.opamp.auth.AgentTokenService;
@@ -83,7 +81,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
@@ -94,7 +91,6 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
@@ -107,6 +103,7 @@ public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
     public static final String REMOTE_CONFIG_KEY = "collector.yaml";
 
+    private static final ComponentHealthExtractor COMPONENT_HEALTH_EXTRACTOR = new ComponentHealthExtractor();
     private static final JsonFormat.Printer PROTO_PRINTER = JsonFormat.printer().omittingInsignificantWhitespace();
 
     private final EnrollmentTokenService enrollmentTokenService;
@@ -508,7 +505,7 @@ public class OpAmpService {
                                 .addArgument(() -> toProtoString(message.getHealth()))
                                 .log();
 
-                        updateBuilder.health(extractHealth(message.getHealth()));
+                        updateBuilder.health(COMPONENT_HEALTH_EXTRACTOR.extract(message.getHealth()));
                     }
                 }
                 case AgentCapabilities_ReportsHeartbeat -> {
@@ -621,29 +618,6 @@ public class OpAmpService {
         getCsr(message).ifPresent(csr -> handleRenewal(responseBuilder, instanceUid, csr, configSupplier));
 
         return responseBuilder.build();
-    }
-
-    private ComponentHealthDTO extractHealth(Opamp.ComponentHealth health) {
-        final var builder = ComponentHealthDTO.builder();
-
-        builder.healthy(health.getHealthy());
-        if (health.getStartTimeUnixNano() > 0) {
-            builder.startTime(Instant.ofEpochSecond(0, health.getStartTimeUnixNano()));
-        }
-        if (StringUtils.isNotBlank(health.getLastError())) {
-            builder.lastError(health.getLastError());
-        }
-        if (StringUtils.isNotBlank(health.getStatus())) {
-            builder.status(health.getStatus());
-        }
-        if (health.getStatusTimeUnixNano() > 0) {
-            builder.statusTime(Instant.ofEpochSecond(0, health.getStatusTimeUnixNano()));
-        }
-
-        builder.components(health.getComponentHealthMapMap().entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, e -> extractHealth(e.getValue()))));
-
-        return builder.build();
     }
 
     /**
