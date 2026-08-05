@@ -34,6 +34,7 @@ type Props = {
 
 const Card = styled(AccessibleCard)<{ $variant: ColorVariant }>(
   ({ theme, $variant }) => css`
+  text-align: center;
   display: flex;
   flex-direction: column;
   gap: ${theme.spacings.xs};
