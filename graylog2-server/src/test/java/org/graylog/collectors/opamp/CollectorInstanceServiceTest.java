@@ -1113,6 +1113,25 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
+    void updateFromReportWithoutReportsHealthCapabilityRemovesStoredHealth() throws Exception {
+        final var uid = "health-capability-removed";
+        enroll(uid);
+
+        clock.setInstant(Instant.parse("2025-06-01T10:00:00Z"));
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "connection refused")));
+
+        collectorInstanceService.updateFromReport(CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .messageSeqNum(2L)
+                .capabilities(0L)
+                .build());
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).isEmpty());
+        assertThat(findRawDocument(uid).orElseThrow().containsKey(CollectorInstanceDTO.FIELD_HEALTH)).isFalse();
+    }
+
+    @Test
     void updateFromReportRoundTripsRecursiveHealthTree() throws Exception {
         final var uid = "health-tree";
         enroll(uid);

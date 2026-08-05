@@ -35,8 +35,9 @@ import java.util.Optional;
 @JsonDeserialize(builder = ComponentHealthDTO.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public abstract class ComponentHealthDTO {
+    public static final String HEALTHY_FIELD = "healthy";
 
-    @JsonProperty("healthy")
+    @JsonProperty(HEALTHY_FIELD)
     public abstract boolean healthy();
 
     @JsonProperty("start_time")
@@ -69,7 +70,7 @@ public abstract class ComponentHealthDTO {
                     .components(Collections.emptyMap());
         }
 
-        @JsonProperty("healthy")
+        @JsonProperty(HEALTHY_FIELD)
         public abstract Builder healthy(boolean healthy);
 
         @JsonProperty("start_time")

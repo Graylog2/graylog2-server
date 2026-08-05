@@ -201,7 +201,10 @@ class OpAmpServiceHealthReportTest {
 
         opAmpService.handleMessage(message, AUTH);
 
-        assertThat(capturedReport().health()).isEmpty();
+        assertThat(capturedReport()).satisfies(report -> {
+            assertThat(report.reportsHealth()).isTrue();
+            assertThat(report.health()).isEmpty();
+        });
     }
 
     @Test
@@ -214,7 +217,10 @@ class OpAmpServiceHealthReportTest {
 
         opAmpService.handleMessage(message, AUTH);
 
-        assertThat(capturedReport().health()).isEmpty();
+        assertThat(capturedReport()).satisfies(report -> {
+            assertThat(report.reportsHealth()).isFalse();
+            assertThat(report.health()).isEmpty();
+        });
     }
 
     private CollectorInstanceReport capturedReport() {
