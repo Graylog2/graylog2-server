@@ -315,6 +315,7 @@ public class ClusterAdapterOS implements ClusterAdapter {
 
     private org.graylog2.system.stats.elasticsearch.NodeInfo createNodeInfo(JsonNode nodesJson) {
         return org.graylog2.system.stats.elasticsearch.NodeInfo.builder()
+                .name(nodesJson.at("/name").asText())
                 .version(nodesJson.at("/version").asText())
                 .os(nodesJson.at("/os"))
                 .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
