@@ -88,6 +88,10 @@ public class LookupTableTesterResource extends RestResource {
 
     private void validateUserHasAccessToLookupTable(@NotEmpty String lookupTableName) {
         final var table = lookupTableService.getTable(lookupTableName);
-        checkPermission(RestPermissions.LOOKUP_TABLES_READ, table.id());
+        // Tables which aren't loaded can't be read through the tester either, so the caller only gets to know that
+        // the lookup didn't return anything.
+        if (table != null) {
+            checkPermission(RestPermissions.LOOKUP_TABLES_READ, table.id());
+        }
     }
 }

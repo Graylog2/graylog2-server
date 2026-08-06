@@ -136,6 +136,17 @@ class LookupTableTesterResourceTest {
         assertThat(response.value()).isNull();
     }
 
+    @Test
+    void returnsErrorResponseForUnknownLookupTable() {
+        when(lookupTableService.getTable(TABLE_NAME)).thenReturn(null);
+        when(lookupTableService.hasTable(TABLE_NAME)).thenReturn(false);
+
+        final LookupTableTesterResponse response = resource.grokTest(TABLE_NAME, "foo");
+
+        assertThat(response.error()).isTrue();
+        assertThat(response.errorMessage()).contains(TABLE_NAME);
+    }
+
     private LookupTable existingTable() {
         final LookupTable table = mock(LookupTable.class);
         when(table.id()).thenReturn(TABLE_ID);
