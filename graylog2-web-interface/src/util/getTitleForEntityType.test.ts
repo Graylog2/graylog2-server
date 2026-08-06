@@ -14,24 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { styled } from 'styled-components';
+import getTitleForEntityType from 'util/getTitleForEntityType';
 
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+describe('getTitleForEntityType', () => {
+  it('returns a readable title for a collection', () => {
+    expect(getTitleForEntityType('collection')).toBe('collection');
+  });
 
-const StyledWrapper = styled.div`
-  cursor: pointer;
-`;
-
-type Props = React.PropsWithChildren<{
-  id: string;
-}>;
-
-const ExpandedRowToggleWrapper = ({ id, children = undefined }: Props) => {
-  const { toggleSection } = useExpandedSections();
-  const _toggleSection = () => toggleSection(id, 'overriddenProfile');
-
-  return <StyledWrapper onClick={_toggleSection}>{children}</StyledWrapper>;
-};
-
-export default ExpandedRowToggleWrapper;
+  it('returns a readable title for collection entities, which is what sharing a collection records', () => {
+    expect(getTitleForEntityType('collection_entities')).toBe('collection entities');
+  });
+});
