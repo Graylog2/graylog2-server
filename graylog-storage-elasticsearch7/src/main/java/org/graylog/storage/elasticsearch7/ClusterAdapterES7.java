@@ -284,6 +284,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     private NodeInfo createNodeInfo(JsonNode nodesJson) {
         return NodeInfo.builder()
+                .name(nodesJson.at("/name").asText())
                 .version(nodesJson.at("/version").asText())
                 .os(nodesJson.at("/os"))
                 .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
