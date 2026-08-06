@@ -34,20 +34,21 @@ type Props = {
 
 const Card = styled(AccessibleCard)<{ $variant: ColorVariant }>(
   ({ theme, $variant }) => css`
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacings.xs};
-  min-width: 100px;
-  padding: ${theme.spacings.md};
-  color: inherit;
-  font: inherit;
-  ${$variant !== 'default' &&
-  css`
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.xs};
+    min-width: 100px;
+    padding: ${theme.spacings.md};
+    color: inherit;
+    font: inherit;
+    ${$variant !== 'default' &&
+    css`
       border-left: 3px solid ${theme.colors.variant[$variant]};
- `}
-  position: relative;
-`);
+    `}
+    position: relative;
+  `,
+);
 
 const HelpCorner = styled.div(
   ({ theme }) => css`
@@ -61,27 +62,38 @@ const HelpCorner = styled.div(
 
 const CardLabel = styled.div(
   ({ theme }) => css`
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.fonts.size.small};
-  font-weight: 600;
-`);
+    color: ${theme.colors.text.secondary};
+    font-size: ${theme.fonts.size.small};
+    font-weight: 600;
+  `,
+);
 
 const CardValue = styled.div(
   ({ theme }) => css`
-  color: ${theme.colors.text.primary};
-  font-size: ${theme.fonts.size.huge};
-  font-weight: 700;
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-`);
+    color: ${theme.colors.text.primary};
+    font-size: ${theme.fonts.size.huge};
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  `,
+);
 
 const CardSubValue = styled.div(
   ({ theme }) => css`
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.fonts.size.small};
-`);
+    color: ${theme.colors.text.secondary};
+    font-size: ${theme.fonts.size.small};
+  `,
+);
 
-const StatCard = ({ value, label, subValue = null, helpText = undefined, variant = 'default', onClick = undefined, className = undefined }: Props) => (
+const StatCard = ({
+  value,
+  label,
+  subValue = null,
+  helpText = undefined,
+  variant = 'default',
+  onClick = undefined,
+  className = undefined,
+}: Props) => (
   <Card $variant={variant} onClick={onClick} className={className}>
     {helpText && (
       <HelpCorner>
