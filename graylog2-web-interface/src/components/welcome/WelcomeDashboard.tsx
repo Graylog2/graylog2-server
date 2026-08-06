@@ -33,15 +33,14 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
-import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { widgetDragHandleClass } from 'views/components/widgets/Constants';
-import { TIMESTAMP_FIELD } from 'views/Constants';
+import { TIMESTAMP_FIELD, DEFAULT_INTERPOLATION } from 'views/Constants';
 import WidgetActionsContext from 'views/components/widgets/WidgetActionsContext';
 
 import replayLinkWidgetAction from './ReplayLinkWidgetAction';
@@ -110,28 +109,23 @@ const numberWidget = ({
     .build(),
 });
 
-const topSourcesWidget = () => {
-  const series = Series.forFunction('count()');
-
-  return {
-    title: 'Top 5 Sources',
-    widget: AggregationWidget.builder()
-      .id(generateId())
-      .timerange(LAST_24_HOURS)
-      .config(
-        AggregationWidgetConfig.builder()
-          .rowPivots([pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], []))])
-          .columnPivots([Pivot.createValues(['source'], { limit: 5, skip_empty_values: false })])
-          .series([series])
-          .sort([SortConfig.fromSeries(series)])
-          .visualization('bar')
-          .visualizationConfig(BarVisualizationConfig.create('stack'))
-          .rollup(false)
-          .build(),
-      )
-      .build(),
-  };
-};
+const topSourcesWidget = () => ({
+  title: 'Top 5 Sources',
+  widget: AggregationWidget.builder()
+    .id(generateId())
+    .timerange(LAST_24_HOURS)
+    .config(
+      AggregationWidgetConfig.builder()
+        .rowPivots([pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], []))])
+        .columnPivots([Pivot.createValues(['source'], { limit: 5, skip_empty_values: false })])
+        .series([Series.forFunction('count()')])
+        .visualization('area')
+        .visualizationConfig(AreaVisualizationConfig.create(DEFAULT_INTERPOLATION))
+        .rollup(false)
+        .build(),
+    )
+    .build(),
+});
 
 const buildViewState = () => {
   const entries = [
