@@ -14,4 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as CollectorsPageNavigation } from './CollectorsPageNavigation';
+import getTitleForEntityType from 'util/getTitleForEntityType';
+
+describe('getTitleForEntityType', () => {
+  it('returns a readable title for a collection', () => {
+    expect(getTitleForEntityType('collection')).toBe('collection');
+  });
+
+  it('returns a readable title for collection entities, which is what sharing a collection records', () => {
+    expect(getTitleForEntityType('collection_entities')).toBe('collection entities');
+  });
+});
