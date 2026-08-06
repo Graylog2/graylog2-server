@@ -71,6 +71,7 @@ public class LookupTableTesterResource extends RestResource {
     }
 
     private LookupTableTesterResponse doTestLookupTable(String string, String lookupTableName) {
+        validateUserHasAccessToLookupTable(lookupTableName);
         if (!lookupTableService.hasTable(lookupTableName)) {
             return LookupTableTesterResponse.error("Lookup table <" + lookupTableName + "> doesn't exist");
         }
@@ -83,5 +84,10 @@ public class LookupTableTesterResource extends RestResource {
         }
 
         return LookupTableTesterResponse.result(string, result);
+    }
+
+    private void validateUserHasAccessToLookupTable(@NotEmpty String lookupTableName) {
+        final var table = lookupTableService.getTable(lookupTableName);
+        checkPermission(RestPermissions.LOOKUP_TABLES_READ, table.id());
     }
 }
