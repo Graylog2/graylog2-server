@@ -51,9 +51,7 @@ class PermissionsValidatorTest {
 
     // Role names are deliberately spelled in mixed/upper case, because the validator is expected to normalize them.
     private static final String READER_ROLE = "Reader";
-    private static final String READER_ROLE_NORMALIZED = "reader";
     private static final String ADMIN_ROLE = "ADMIN";
-    private static final String ADMIN_ROLE_NORMALIZED = "admin";
 
     @Mock
     private RoleService roleService;
@@ -143,8 +141,8 @@ class PermissionsValidatorTest {
     @Test
     void validateRolePermissionsPassesWhenCurrentUserHoldsEveryPermissionGrantedByTheRoles() throws NotFoundException {
         final Role readerRole = roleGranting(STREAMS_READ);
-        allowReadingRoles(READER_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(READER_ROLE_NORMALIZED))).thenReturn(Set.of(readerRole));
+        allowReadingRoles(READER_ROLE);
+        when(roleService.loadByNames(List.of(READER_ROLE))).thenReturn(Set.of(readerRole));
         currentUserHolds(STREAMS_READ);
 
         assertThatCode(() -> validator.validateRolePermissions(List.of(READER_ROLE), userContext))
@@ -154,8 +152,8 @@ class PermissionsValidatorTest {
     @Test
     void validateRolePermissionsRejectsPermissionGrantedByRoleThatCurrentUserMisses() throws NotFoundException {
         final Role readerRole = roleGranting(INPUTS_CREATE);
-        allowReadingRoles(READER_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(READER_ROLE_NORMALIZED))).thenReturn(Set.of(readerRole));
+        allowReadingRoles(READER_ROLE);
+        when(roleService.loadByNames(List.of(READER_ROLE))).thenReturn(Set.of(readerRole));
 
         assertThatThrownBy(() -> validator.validateRolePermissions(List.of(READER_ROLE), userContext))
                 .isInstanceOf(BadRequestException.class)
@@ -166,8 +164,8 @@ class PermissionsValidatorTest {
     void validateRolePermissionsAggregatesPermissionsAcrossAllRequestedRoles() throws NotFoundException {
         final Role readerRole = roleGranting(STREAMS_READ);
         final Role adminRole = roleGranting(INPUTS_CREATE);
-        allowReadingRoles(READER_ROLE_NORMALIZED, ADMIN_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(READER_ROLE_NORMALIZED, ADMIN_ROLE_NORMALIZED)))
+        allowReadingRoles(READER_ROLE, ADMIN_ROLE);
+        when(roleService.loadByNames(List.of(READER_ROLE, ADMIN_ROLE)))
                 .thenReturn(Set.of(readerRole, adminRole));
         currentUserHolds(STREAMS_READ);
 
@@ -180,8 +178,8 @@ class PermissionsValidatorTest {
     @Test
     void validateRolePermissionsPassesForRolesThatGrantNothing() throws NotFoundException {
         final Role emptyRole = roleGranting();
-        allowReadingRoles(READER_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(READER_ROLE_NORMALIZED))).thenReturn(Set.of(emptyRole));
+        allowReadingRoles(READER_ROLE);
+        when(roleService.loadByNames(List.of(READER_ROLE))).thenReturn(Set.of(emptyRole));
 
         assertThatCode(() -> validator.validateRolePermissions(List.of(READER_ROLE), userContext))
                 .doesNotThrowAnyException();
@@ -189,38 +187,38 @@ class PermissionsValidatorTest {
 
     @Test
     void validateRolePermissionsLooksUpRolesByTheirLowercasedName() throws NotFoundException {
-        allowReadingRoles(READER_ROLE_NORMALIZED, ADMIN_ROLE_NORMALIZED);
+        allowReadingRoles(READER_ROLE, ADMIN_ROLE);
         when(roleService.loadByNames(any())).thenReturn(Set.of());
 
         validator.validateRolePermissions(List.of(READER_ROLE, ADMIN_ROLE), userContext);
 
-        verify(roleService).loadByNames(List.of(READER_ROLE_NORMALIZED, ADMIN_ROLE_NORMALIZED));
+        verify(roleService).loadByNames(List.of(READER_ROLE, ADMIN_ROLE));
     }
 
     @Test
     void validateRolePermissionsChecksReadAccessUsingTheLowercasedRoleName() throws NotFoundException {
-        allowReadingRoles(ADMIN_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(ADMIN_ROLE_NORMALIZED))).thenReturn(Set.of());
+        allowReadingRoles(ADMIN_ROLE);
+        when(roleService.loadByNames(List.of(ADMIN_ROLE))).thenReturn(Set.of());
 
         validator.validateRolePermissions(List.of(ADMIN_ROLE), userContext);
 
-        verify(userContext).isPermitted(ROLES_READ, ADMIN_ROLE_NORMALIZED);
+        verify(userContext).isPermitted(ROLES_READ, ADMIN_ROLE);
     }
 
     @Test
     void validateRolePermissionsDeniesRolesTheCurrentUserCannotRead() {
-        allowReadingRoles(READER_ROLE_NORMALIZED);
+        allowReadingRoles(READER_ROLE);
 
         assertThatThrownBy(() -> validator.validateRolePermissions(List.of(READER_ROLE, ADMIN_ROLE), userContext))
                 .isInstanceOf(ForbiddenException.class)
-                .hasMessage("Not allowed to read roles: " + ADMIN_ROLE_NORMALIZED);
+                .hasMessage("Not allowed to read roles: " + ADMIN_ROLE);
     }
 
     @Test
     void validateRolePermissionsListsEveryUnreadableRole() {
         assertThatThrownBy(() -> validator.validateRolePermissions(List.of(ADMIN_ROLE, READER_ROLE), userContext))
                 .isInstanceOf(ForbiddenException.class)
-                .hasMessage("Not allowed to read roles: " + ADMIN_ROLE_NORMALIZED + ", " + READER_ROLE_NORMALIZED);
+                .hasMessage("Not allowed to read roles: " + ADMIN_ROLE + ", " + READER_ROLE);
     }
 
     @Test
@@ -249,8 +247,8 @@ class PermissionsValidatorTest {
     @Test
     void validateRolePermissionsTranslatesUnknownRolesIntoBadRequest() throws NotFoundException {
         final NotFoundException notFound = new NotFoundException("Couldn't find roles");
-        allowReadingRoles(ADMIN_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(ADMIN_ROLE_NORMALIZED))).thenThrow(notFound);
+        allowReadingRoles(ADMIN_ROLE);
+        when(roleService.loadByNames(List.of(ADMIN_ROLE))).thenThrow(notFound);
 
         assertThatThrownBy(() -> validator.validateRolePermissions(List.of(ADMIN_ROLE), userContext))
                 .isInstanceOf(BadRequestException.class)
@@ -264,8 +262,8 @@ class PermissionsValidatorTest {
     @Test
     void validatePermissionsAndRolesPassesWhenCurrentUserHoldsRoleAndDirectPermissions() throws NotFoundException {
         final Role readerRole = roleGranting(STREAMS_READ);
-        allowReadingRoles(READER_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(READER_ROLE_NORMALIZED))).thenReturn(Set.of(readerRole));
+        allowReadingRoles(READER_ROLE);
+        when(roleService.loadByNames(List.of(READER_ROLE))).thenReturn(Set.of(readerRole));
         currentUserHolds(STREAMS_READ, DASHBOARDS_CREATE);
 
         final var request = createUserRequest(List.of(READER_ROLE), List.of(DASHBOARDS_CREATE));
@@ -276,8 +274,8 @@ class PermissionsValidatorTest {
     @Test
     void validatePermissionsAndRolesRejectsDirectPermissionTheCurrentUserMisses() throws NotFoundException {
         final Role readerRole = roleGranting(STREAMS_READ);
-        allowReadingRoles(READER_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(READER_ROLE_NORMALIZED))).thenReturn(Set.of(readerRole));
+        allowReadingRoles(READER_ROLE);
+        when(roleService.loadByNames(List.of(READER_ROLE))).thenReturn(Set.of(readerRole));
         currentUserHolds(STREAMS_READ);
 
         final var request = createUserRequest(List.of(READER_ROLE), List.of(INPUTS_CREATE));
@@ -292,8 +290,8 @@ class PermissionsValidatorTest {
         // The role is readable, but it grants the wildcard permission, which the creating user does not hold.
         // This is the escalation the validator exists to prevent.
         final Role adminRole = roleGranting("*");
-        allowReadingRoles(ADMIN_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(ADMIN_ROLE_NORMALIZED))).thenReturn(Set.of(adminRole));
+        allowReadingRoles(ADMIN_ROLE);
+        when(roleService.loadByNames(List.of(ADMIN_ROLE))).thenReturn(Set.of(adminRole));
 
         final var request = createUserRequest(List.of(ADMIN_ROLE), List.of());
 
@@ -305,8 +303,8 @@ class PermissionsValidatorTest {
     @Test
     void validatePermissionsAndRolesReportsMissingRoleAndDirectPermissionsTogether() throws NotFoundException {
         final Role adminRole = roleGranting(INPUTS_CREATE);
-        allowReadingRoles(ADMIN_ROLE_NORMALIZED);
-        when(roleService.loadByNames(List.of(ADMIN_ROLE_NORMALIZED))).thenReturn(Set.of(adminRole));
+        allowReadingRoles(ADMIN_ROLE);
+        when(roleService.loadByNames(List.of(ADMIN_ROLE))).thenReturn(Set.of(adminRole));
 
         final var request = createUserRequest(List.of(ADMIN_ROLE), List.of(DASHBOARDS_CREATE));
 
@@ -342,7 +340,7 @@ class PermissionsValidatorTest {
 
         assertThatThrownBy(() -> validator.validatePermissionsAndRoles(request, userContext))
                 .isInstanceOf(ForbiddenException.class)
-                .hasMessage("Not allowed to read roles: " + ADMIN_ROLE_NORMALIZED);
+                .hasMessage("Not allowed to read roles: " + ADMIN_ROLE);
     }
 
     // ----------------------------------------------------------------------------------------------------

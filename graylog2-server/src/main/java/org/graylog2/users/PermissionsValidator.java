@@ -26,7 +26,6 @@ import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
