@@ -14,16 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import * as React from 'react';
 
-import usePluginEntities from 'hooks/usePluginEntities';
-import WidgetActionsContext from 'views/components/widgets/WidgetActionsContext';
+import type { WidgetActionType } from 'views/components/widgets/Types';
 
-const useWidgetActions = () => {
-  const providedActions = useContext(WidgetActionsContext);
-  const pluginWidgetActions = usePluginEntities('views.widgets.actions');
+// Overrides the plugin-registered widget actions (`views.widgets.actions`) for a subtree.
+// Leave unset to keep the default, registry-driven behaviour used by the Search and Dashboard pages.
+const WidgetActionsContext = React.createContext<Array<WidgetActionType> | undefined>(undefined);
 
-  return providedActions ?? pluginWidgetActions;
-};
-
-export default useWidgetActions;
+export default WidgetActionsContext;

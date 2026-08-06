@@ -17,10 +17,10 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { Table } from 'components/bootstrap';
+import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import { NoSearchResult, PaginatedList, RelativeTime, Spinner, Link } from 'components/common';
-import { StyledLabel } from 'components/welcome/EntityListItem';
+import { StyledListGroupItem, TimeInfo } from 'components/welcome/EntityListItem';
 import type { RecentActivityType } from 'components/welcome/types';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 import getTitleForEntityType from 'util/getTitleForEntityType';
@@ -88,22 +88,16 @@ const RecentActivityList = () => {
       pageSize={pagination.per_page}
       showPageSizeSelect={false}
       hideFirstAndLastPageLinks>
-      <Table>
-        <tbody>
-          {recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => (
-            <tr key={id}>
-              <td style={{ width: 110 }}>
-                <StyledLabel bsStyle="primary">
-                  <RelativeTime dateTime={timestamp} />
-                </StyledLabel>
-              </td>
-              <td>
-                <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <ListGroup>
+        {recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => (
+          <StyledListGroupItem key={id}>
+            <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
+            <TimeInfo>
+              <RelativeTime dateTime={timestamp} />
+            </TimeInfo>
+          </StyledListGroupItem>
+        ))}
+      </ListGroup>
     </PaginatedList>
   );
 };
