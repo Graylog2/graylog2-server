@@ -43,14 +43,18 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 
 public class RoleServiceImpl implements RoleService {
     private static final Logger log = LoggerFactory.getLogger(RoleServiceImpl.class);
@@ -151,6 +155,21 @@ public class RoleServiceImpl implements RoleService {
             throw new NotFoundException("No role found with name " + roleName);
         }
         return role;
+    }
+
+    @Override
+    public Set<Role> loadByNames(Collection<String> roleNames) throws NotFoundException {
+        final var normalizedRoleNames = roleNames.stream()
+                .map(roleName -> roleName.toLowerCase(Locale.ENGLISH))
+                .collect(Collectors.toSet());
+        final Set<Role> roles = collection.find(in(NAME_LOWER, normalizedRoleNames)).into(new HashSet<>());
+        final var retrievedRoles = roles.stream().map(Role::getName).map(name -> name.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
+        final var missingRoles = Sets.difference(normalizedRoleNames, retrievedRoles);
+        if (!missingRoles.isEmpty()) {
+            throw new NotFoundException("No roles found with name " + String.join(", ", missingRoles));
+        }
+
+        return roles;
     }
 
     @Override
