@@ -32,7 +32,7 @@ const PercentRatioCell = ({ percent, warningThreshold, dangerThreshold }: Props)
 
   return (
     <MetricsColumn>
-      <MetricsRow>
+      <MetricsRow $rightAligned>
         <RatioIndicator ratio={percent / 100} warningThreshold={warningThreshold} dangerThreshold={dangerThreshold} />
       </MetricsRow>
     </MetricsColumn>
