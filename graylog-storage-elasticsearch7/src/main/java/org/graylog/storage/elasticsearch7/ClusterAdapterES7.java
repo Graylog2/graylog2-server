@@ -49,6 +49,7 @@ import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
@@ -307,6 +308,24 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         );
     }
 
+    @Override
+    public Map<String, NodeUtilization> nodesUtilization() {
+        final Request request = new Request("GET", "/_nodes/stats/os,jvm");
+        final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Elasticsearch nodes stats data!");
+
+        final JsonNode nodes = nodesJson.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeUtilization(nodes.get(name))));
+    }
+
+    private NodeUtilization createNodeUtilization(JsonNode nodeJson) {
+        return new NodeUtilization(
+                nodeJson.at("/name").asText(),
+                nodeJson.at("/os/cpu/percent").asDouble(-1),
+                nodeJson.at("/jvm/mem/heap_used_percent").asDouble(-1)
+        );
+    }
+
     public <T> Stream<T> toStream(Iterator<T> iterator) {
         return StreamSupport.stream(((Iterable<T>) () -> iterator).spliterator(), false);
     }
@@ -325,6 +344,13 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                         response.isTimedOut()
                 ))
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
+    }
+
+    @Override
+    public int countOfClusterManagerEligibleNodes() {
+        return (int) nodesInfo().values().stream()
+                .filter(node -> node.roles().contains("cluster_manager") || node.roles().contains("master"))
+                .count();
     }
 
     private Optional<ClusterHealthResponse> clusterHealth() {
