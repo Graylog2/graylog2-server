@@ -35,15 +35,22 @@ import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.BsonDocument;
+import org.bson.BsonDocumentWriter;
 import org.bson.BsonType;
 import org.bson.Document;
+import org.bson.codecs.Codec;
+import org.bson.codecs.EncoderContext;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.db.Attribute;
+import org.graylog.collectors.db.CollectorHealthDTO;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.collectors.db.ComponentHealthDTO;
 import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
 import org.graylog.collectors.opamp.IssuedCertificate;
 import org.graylog2.database.MongoCollection;
@@ -85,6 +92,7 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CAPABILITIES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ENROLLMENT_TOKEN_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_FLEET_ID;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_HEALTH;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_IDENTIFYING_ATTRIBUTES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_INSTANCE_UID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ISSUING_CA_ID;
@@ -114,6 +122,7 @@ public class CollectorInstanceService {
     private final MongoCollection<CollectorInstanceDTO> collection;
     private final MongoPaginationHelper<CollectorInstanceDTO> paginationHelper;
     private final com.mongodb.client.MongoCollection<MinimalCollectorInstanceDTO> projectedCollection;
+    private final Codec<ReportUpdateValues> reportUpdateValuesCodec;
 
     private final MongoCollections mongoCollections;
     private final ClusterEventBus clusterEventBus;
@@ -123,6 +132,7 @@ public class CollectorInstanceService {
     public CollectorInstanceService(MongoCollections mongoCollections, ClusterEventBus clusterEventBus, Clock clock) {
         collection = mongoCollections.collection(COLLECTION_NAME, CollectorInstanceDTO.class);
         projectedCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, MinimalCollectorInstanceDTO.class);
+        reportUpdateValuesCodec = mongoCollections.getCodecFor(ReportUpdateValues.class);
         paginationHelper = mongoCollections.paginationHelper(collection);
         this.mongoCollections = mongoCollections;
         this.clusterEventBus = clusterEventBus;
@@ -174,33 +184,42 @@ public class CollectorInstanceService {
      * @throws IllegalArgumentException when the instance is not enrolled
      */
     public MinimalCollectorInstanceDTO updateFromReport(CollectorInstanceReport update) {
-        final List<Bson> updateOps = new ArrayList<>();
-
-        updateOps.add(set(FIELD_LAST_SEEN, Date.from(update.lastSeen())));
-        updateOps.add(set(FIELD_MESSAGE_SEQ_NUM, update.messageSeqNum()));
-        updateOps.add(set(FIELD_CAPABILITIES, update.capabilities()));
+        final var encodedValues = encodeStructuredReportValues(update);
+        // We are using an aggregation pipeline for the update so we can atomically update the health status.
+        // The aggregation pipeline allows us to use conditions to compare values in the existing document.
+        // (see #addHealthUpdate method)
+        // Dates and numbers are BSON-native and only need protection from expression evaluation.
+        final var setFields = new Document()
+                .append(FIELD_LAST_SEEN, literal(Date.from(update.lastSeen())))
+                .append(FIELD_MESSAGE_SEQ_NUM, literal(update.messageSeqNum()))
+                .append(FIELD_CAPABILITIES, literal(update.capabilities()));
         if (update.lastProcessedTxnSeq().isPresent()) {
-            updateOps.add(set(FIELD_LAST_PROCESSED_TXN_SEQ, update.lastProcessedTxnSeq().getAsLong()));
+            setFields.append(FIELD_LAST_PROCESSED_TXN_SEQ, literal(update.lastProcessedTxnSeq().getAsLong()));
         }
         if (update.identifyingAttributes().isPresent()) {
-            updateOps.add(set(FIELD_IDENTIFYING_ATTRIBUTES, update.identifyingAttributes().get()));
+            setFields.append(FIELD_IDENTIFYING_ATTRIBUTES, literal(encodedValues.get(FIELD_IDENTIFYING_ATTRIBUTES)));
         }
         if (update.nonIdentifyingAttributes().isPresent()) {
-            updateOps.add(set(FIELD_NON_IDENTIFYING_ATTRIBUTES, update.nonIdentifyingAttributes().get()));
+            setFields.append(FIELD_NON_IDENTIFYING_ATTRIBUTES, literal(encodedValues.get(FIELD_NON_IDENTIFYING_ATTRIBUTES)));
         }
+        addHealthUpdate(setFields, update, encodedValues);
+
+        final var projectedFields = List.of(
+                Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID),
+                Projections.elemMatch(FIELD_NON_IDENTIFYING_ATTRIBUTES, Filters.eq(Attribute.FIELD_KEY, OS_TYPE_KEY))
+        );
 
         // we request the ReturnDocument.BEFORE here to avoid having to load the previous document in full just
         // to retrieve the previous `message_seq_num`, which we need to determine what to do next.
         // the result is not the full CollectorInstanceDTO as we have it, but the minimal set of fields necessary to
         // determine next steps
-        final var previousInstanceDto = projectedCollection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
-                combine(updateOps),
+        final var previousInstanceDto = projectedCollection.findOneAndUpdate(
+                Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
+                List.of(new Document("$set", setFields)),
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.BEFORE)
-                        .projection(Projections.fields(
-                                Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID),
-                                Projections.elemMatch(FIELD_NON_IDENTIFYING_ATTRIBUTES, Filters.eq(Attribute.FIELD_KEY, OS_TYPE_KEY))
-                        )));
+                        .projection(Projections.fields(projectedFields))
+        );
 
         if (previousInstanceDto == null) {
             // If there was no existing document, the instance was not enrolled.
@@ -208,6 +227,56 @@ public class CollectorInstanceService {
         }
 
         return previousInstanceDto;
+    }
+
+    private void addHealthUpdate(Document setFields,
+                                 CollectorInstanceReport update,
+                                 BsonDocument encodedValues) {
+        // If the Collector stops reporting health information, we remove the health field so we don't show
+        // outdated information.
+        if (!update.reportsHealth()) {
+            setFields.append(FIELD_HEALTH, "$$REMOVE");
+            return;
+        }
+
+        // Preserve the stored snapshot when the capability is present but this report omits health; otherwise replace
+        // it and calculate the transition timestamp from the pre-update value in the same atomic operation.
+        update.health().ifPresent(health -> {
+            final var componentHealthField = f("%s.%s", FIELD_HEALTH, CollectorHealthDTO.FIELD_COMPONENT_HEALTH);
+            final var healthyChangedAtField = f("%s.%s", FIELD_HEALTH, CollectorHealthDTO.FIELD_HEALTHY_CHANGED_AT);
+            final var now = Date.from(clock.instant());
+            final var healthyUnchanged = new Document("$eq", List.of(
+                    "$" + componentHealthField + "." + ComponentHealthDTO.HEALTHY_FIELD,
+                    health.healthy()
+            ));
+            final var existingTimestampOrNow = new Document("$ifNull", List.of(
+                    "$" + healthyChangedAtField,
+                    now
+            ));
+
+            setFields.append(componentHealthField, literal(encodedValues.get(FIELD_HEALTH)));
+            setFields.append(healthyChangedAtField, new Document("$cond", List.of(healthyUnchanged, existingTimestampOrNow, now)));
+        });
+    }
+
+    private BsonDocument encodeStructuredReportValues(CollectorInstanceReport update) {
+        // The aggregation pipeline is built as a generic Document. Its codec handles BSON-native values, but it
+        // does not know how Graylog's Attribute and ComponentHealthDTO types must be stored. Encode those values
+        // through a MongoJack-backed wrapper first so custom field names and serializers are applied. The caller
+        // then extracts only the present fields and inserts their already-encoded BsonValues as pipeline literals.
+        final var values = new ReportUpdateValues(
+                update.identifyingAttributes().orElse(null),
+                update.nonIdentifyingAttributes().orElse(null),
+                update.health().orElse(null)
+        );
+        try (final var writer = new BsonDocumentWriter(new BsonDocument())) {
+            reportUpdateValuesCodec.encode(writer, values, EncoderContext.builder().build());
+            return writer.getDocument();
+        }
+    }
+
+    private static Document literal(Object value) {
+        return new Document("$literal", value);
     }
 
     /**
@@ -655,6 +724,11 @@ public class CollectorInstanceService {
                 .findFirst()
                 .orElse(CollectorOSType.UNKNOWN);
     }
+
+    record ReportUpdateValues(
+            @JsonProperty(FIELD_IDENTIFYING_ATTRIBUTES) @Nullable List<Attribute> identifyingAttributes,
+            @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES) @Nullable List<Attribute> nonIdentifyingAttributes,
+            @JsonProperty(FIELD_HEALTH) @Nullable ComponentHealthDTO health) {}
 
     public record MinimalCollectorInstanceDTO(@Id @JsonProperty(FIELD_ID) String id,
                                               @JsonProperty(FIELD_FLEET_ID) String fleetId,
