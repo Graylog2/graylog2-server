@@ -58,11 +58,13 @@ const StyledTable = styled(BaseTable)(
 
 const Td = styled.td<{
   $colId: string;
+  $hideEmptyTailBorder: boolean;
   $hidePadding: boolean;
+  $isLastVisibleColumn: boolean;
   $pinningPosition: ColumnPinningPosition;
   $textAlign: string;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, $textAlign }) => css`
+  ({ $colId, $hideEmptyTailBorder, $hidePadding, $isLastVisibleColumn, $pinningPosition, $textAlign, theme }) => css`
     word-break: break-word;
     ${$textAlign &&
     css`
@@ -94,10 +96,25 @@ const Td = styled.td<{
         padding: 0;
       }
     `}
+
+    ${$hideEmptyTailBorder &&
+    css`
+      &&& {
+        border-right: none;
+      }
+    `}
+
+    ${$isLastVisibleColumn &&
+    css`
+      && {
+        border-right-color: ${theme.colors.table.row.divider};
+      }
+    `}
   `,
 );
 
 type Props<Entity extends EntityBase> = {
+  columnWidths: { [colId: string]: number };
   expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
   rowOverride?: RowOverride<Entity>;
   headerGroups: Array<HeaderGroup<Entity>>;
@@ -105,6 +122,7 @@ type Props<Entity extends EntityBase> = {
 };
 
 const Table = <Entity extends EntityBase>({
+  columnWidths,
   expandedSectionRenderers,
   rowOverride = undefined,
   headerGroups,
@@ -114,9 +132,13 @@ const Table = <Entity extends EntityBase>({
 
   const isRowExpanded = (rowId: string) => !!expandedSections?.[rowId];
 
+  const isTailColumnEmpty = !columnWidths[ACTIONS_COL_ID];
+  const leafHeaders = headerGroups[headerGroups.length - 1]?.headers ?? [];
+  const lastVisibleColumnId = isTailColumnEmpty ? leafHeaders[leafHeaders.length - 2]?.column.id : undefined;
+
   return (
     <StyledTable condensed bordered>
-      <TableHead headerGroups={headerGroups} />
+      <TableHead columnWidths={columnWidths} headerGroups={headerGroups} />
       {rows.map((row) => {
         const visibleCells = row.getVisibleCells();
         const visibleCellCount = visibleCells.length;
@@ -127,6 +149,8 @@ const Table = <Entity extends EntityBase>({
             <Td
               key={cell.id}
               $colId={cell.column.id}
+              $hideEmptyTailBorder={cell.column.id === ACTIONS_COL_ID && isTailColumnEmpty}
+              $isLastVisibleColumn={cell.column.id === lastVisibleColumnId}
               $pinningPosition={cell.column.getIsPinned()}
               $hidePadding={columnMeta?.hideCellPadding}
               $textAlign={columnMeta?.columnRenderer?.textAlign}>
