@@ -194,6 +194,15 @@ class KinesisConsumerIT {
                     cause != null ? cause : new RuntimeException(invocation.getArgument(1, String.class)));
             return null;
         }).when(failureRecorder).setFailing(any(), anyString(), any());
+        // setTerminallyFailing() is the other terminal signal (an unrecoverable AWS authorization denial). Without
+        // this stub such a failure would be swallowed and the test would block until its deadline instead of
+        // reporting the cause.
+        doAnswer(invocation -> {
+            final Throwable cause = invocation.getArgument(2, Throwable.class);
+            consumerFailure.compareAndSet(null,
+                    cause != null ? cause : new RuntimeException(invocation.getArgument(1, String.class)));
+            return null;
+        }).when(failureRecorder).setTerminallyFailing(any(), anyString(), any());
 
         // Anonymous subclass tunes KCL's coordination timings, which default to production
         // values (10s failover, 10s shard polling, LATEST initial position) that would make

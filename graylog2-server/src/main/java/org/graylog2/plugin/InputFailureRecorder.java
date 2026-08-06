@@ -31,12 +31,21 @@ import javax.annotation.Nullable;
 public class InputFailureRecorder {
     private final IOState<MessageInput> inputState;
 
+    /**
+     * Set once a failure that retrying cannot resolve has been recorded. Guarded by {@code this} together with every
+     * state write, so that a concurrent {@link #setRunning()} cannot undo a terminal failure.
+     */
+    private boolean terminallyFailed = false;
+
     public InputFailureRecorder(IOState<MessageInput> inputState) {
         this.inputState = inputState;
     }
 
     /**
      * Set the input into the FAILING state.
+     * <p>
+     * Keeps the message of a failure that is already recorded: if the input is already FAILING, this call is a no-op.
+     * Use {@link #setTerminallyFailing} when the new message must win.
      * @param loggingClass the calling class which will be used to log the error
      * @param error the error message
      */
@@ -46,28 +55,59 @@ public class InputFailureRecorder {
 
     /**
      * Set the input into the FAILING state.
+     * <p>
+     * Keeps the message of a failure that is already recorded: if the input is already FAILING, this call is a no-op.
+     * Use {@link #setTerminallyFailing} when the new message must win.
      * @param loggingClass the calling class which will be used to log the error
      * @param error the error message
      * @param e the exception leading to the error
      */
-    public void setFailing(Class<?> loggingClass, String error, @Nullable Throwable e) {
-        if (inputState.getState().equals(IOState.Type.FAILING)) {
+    public synchronized void setFailing(Class<?> loggingClass, String error, @Nullable Throwable e) {
+        if (terminallyFailed || inputState.getState().equals(IOState.Type.FAILING)) {
             return;
         }
+        applyFailure(loggingClass, error, e);
+    }
+
+    /**
+     * Set the input into the FAILING state for a failure that retrying cannot resolve, replacing the message of any
+     * failure already recorded and blocking any later {@link #setRunning()}.
+     * <p>
+     * Use this when the message carries the only actionable detail, so that it is neither hidden behind an earlier
+     * transient message nor cleared by work that continues while the input drains. Like {@link #setFailing}, the first
+     * message wins: a second unrecoverable failure does not replace it.
+     * @param loggingClass the calling class which will be used to log the error
+     * @param error the error message
+     * @param e the exception leading to the error
+     */
+    public synchronized void setTerminallyFailing(Class<?> loggingClass, String error, @Nullable Throwable e) {
+        if (terminallyFailed) {
+            return;
+        }
+        terminallyFailed = true;
+        applyFailure(loggingClass, error, e);
+    }
+
+    private void applyFailure(Class<?> loggingClass, String error, @Nullable Throwable e) {
         if (e != null) {
             inputState.setState(IOState.Type.FAILING, error + ": (" + e.getMessage() + ")");
         } else {
             inputState.setState(IOState.Type.FAILING, error);
         }
-        LoggerFactory.getLogger(loggingClass).warn(error, e);
+        if (terminallyFailed) {
+            // ERROR, not WARN: this is the line that explains why an error loop stopped and why the input is down.
+            LoggerFactory.getLogger(loggingClass).error(error, e);
+        } else {
+            LoggerFactory.getLogger(loggingClass).warn(error, e);
+        }
     }
 
     /**
      * Set the input back into RUNNING state.
-     * Call this once the error has resolved itself.
+     * Call this once the error has resolved itself. Has no effect after {@link #setTerminallyFailing}.
      */
-    public void setRunning() {
-        if (inputState.getState() == IOState.Type.RUNNING) {
+    public synchronized void setRunning() {
+        if (terminallyFailed || inputState.getState() == IOState.Type.RUNNING) {
             return;
         }
         inputState.setState(IOState.Type.RUNNING);
