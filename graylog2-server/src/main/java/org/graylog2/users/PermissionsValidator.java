@@ -69,10 +69,7 @@ public class PermissionsValidator {
     }
 
     private Set<String> extractPermissionsFromRoles(List<String> requestRoles, BiPredicate<String, String> isPermitted) throws org.graylog2.database.NotFoundException {
-        final var normalizedRoles = Optional.ofNullable(requestRoles).orElse(Collections.emptyList())
-                .stream()
-                .map(role -> role.toLowerCase(Locale.ENGLISH))
-                .toList();
+        final var normalizedRoles = Optional.ofNullable(requestRoles).orElse(Collections.emptyList());
         final var deniedRoles = normalizedRoles
                 .stream()
                 .filter(role -> !isPermitted.test(ROLES_READ, role))
