@@ -98,7 +98,7 @@ const UrlAllowListConfig = () => {
     return <Spinner />;
   }
 
-  const { entries, disabled } = formConfig;
+  const { entries, disabled, enforce_for_notifications: enforceForNotifications } = formConfig;
 
   return (
     <div>
@@ -109,6 +109,15 @@ const UrlAllowListConfig = () => {
         the {productName} servers, they might be able to reach more sensitive systems than an external user would have
         access to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others.
         Allowlist administrative access is separate from data adapters and event notification configuration.
+      </p>
+      <p>
+        <b>Enforce for Slack &amp; Teams notifications</b>{' '}
+        <small className="text-muted">{enforceForNotifications ? '(Enabled)' : '(Disabled)'}</small>
+        <br />
+        <small>
+          When enabled, Slack and Microsoft Teams notifications will fail if their webhook URL is not in the URL
+          allowlist. When disabled, a warning is logged instead.
+        </small>
       </p>
       <Table bordered condensed className="top-margin">
         <thead>
@@ -136,7 +145,7 @@ const UrlAllowListConfig = () => {
           submitButtonDisabled={!isValid}
           submitButtonText="Update configuration">
           <h3>Allowlist URLs</h3>
-          <UrlAllowListForm urls={entries} disabled={disabled} onUpdate={update} />
+          <UrlAllowListForm urls={entries} disabled={disabled} enforceForNotifications={enforceForNotifications} onUpdate={update} />
         </BootstrapModalForm>
       )}
     </div>
