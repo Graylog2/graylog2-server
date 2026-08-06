@@ -54,6 +54,7 @@ import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
+import org.graylog2.users.PermissionsValidator;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
@@ -152,7 +153,7 @@ public class UsersResourceTest {
         lenient().when(userContext.getUser()).thenReturn(user);
         lenient().when(user.getName()).thenReturn("username");
         lenient().when(user.getId()).thenReturn("userId");
-        lenient().when(subject.isPermitted(ROLES_READ + ":" + ALLOWED_ROLE_LOWER_CASE)).thenReturn(true);
+        lenient().when(userContext.isPermitted(ROLES_READ, ALLOWED_ROLE_LOWER_CASE)).thenReturn(true);
     }
 
     /**
@@ -188,7 +189,7 @@ public class UsersResourceTest {
         Role adminRole = mock(Role.class);
         when(adminRole.getId()).thenReturn(new ObjectId().toHexString());
         when(adminRole.getName()).thenReturn("admin");
-        when(subject.isPermitted(ROLES_READ + ":admin")).thenReturn(true);
+        when(userContext.isPermitted(ROLES_READ, "admin")).thenReturn(true);
 
         when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
         when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of()));
@@ -226,7 +227,7 @@ public class UsersResourceTest {
     @Test
     void createFailureOnWrongRoleAssignPermission() {
         String testRole = "forbiddenRole";
-        lenient().when(subject.isPermitted(ROLES_READ + ":forbiddenrole")).thenReturn(true);
+        lenient().when(userContext.isPermitted(ROLES_READ, "forbiddenrole")).thenReturn(true);
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD), userContext));
@@ -660,7 +661,7 @@ public class UsersResourceTest {
                                  DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig,
                                  ClusterConfigService clusterConfigService, UserService userService) {
             super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
-                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, mock(AuditEventSender.class));
+                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, mock(AuditEventSender.class), new PermissionsValidator(roleService));
             this.subject = subject;
             super.configuration = configuration;
             super.userService = userService;
