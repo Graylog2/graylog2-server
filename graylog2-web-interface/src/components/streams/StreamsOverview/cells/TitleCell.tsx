@@ -32,7 +32,11 @@ const DefaultLabel = styled(Label)`
 
 const TitleCell = ({ stream }: Props) => (
   <>
-    <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
+    {stream.is_editable ? (
+      <Link to={Routes.stream_view(stream.id)}>{stream.title}</Link>
+    ) : (
+      <span>{stream.title}</span>
+    )}
     {stream.is_default && (
       <DefaultLabel bsStyle="primary" bsSize="xsmall">
         Default

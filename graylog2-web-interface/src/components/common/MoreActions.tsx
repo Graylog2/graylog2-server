@@ -24,7 +24,7 @@ import Icon from './Icon';
 type MoreActionsIconProps = {
   size?: SizeProp;
 };
-export const MoreActionsIcon = ({ size = undefined }: MoreActionsIconProps) => <Icon name="more_horiz" size={size} />;
+export const MoreActionsIcon = ({ size = undefined }: MoreActionsIconProps) => <Icon name="more_vert" size={size} />;
 
 type MoreActionsMenuProps = {
   'aria-label'?: string;
@@ -35,6 +35,8 @@ type MoreActionsMenuProps = {
   pullRight?: boolean;
   title?: string;
   solid?: boolean;
+  disabled?: boolean;
+  bsSize?: 'xsmall';
 };
 
 export const MoreActionsMenu = ({
@@ -47,8 +49,12 @@ export const MoreActionsMenu = ({
   pullRight = undefined,
   title = 'More Actions',
   solid = false,
+  disabled = false,
+  bsSize = undefined,
 }: React.PropsWithChildren<MoreActionsMenuProps>) => (
   <DropdownButton
+    bsSize={bsSize}
+    disabled={disabled}
     aria-label={ariaLabel}
     bsStyle={solid ? undefined : 'transparent'}
     buttonTitle={title}

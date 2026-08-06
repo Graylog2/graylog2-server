@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
-import { ConfirmDialog, LinkContainer } from 'components/common';
+import { ConfirmDialog, LinkContainer, Icon } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -57,7 +57,9 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
     <>
       <ButtonToolbar>
         <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
-          <Button bsSize="xsmall">Received messages</Button>
+          <Button bsSize="xsmall" title="Show received messages">
+            <Icon name="search" />
+          </Button>
         </LinkContainer>
         <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
           <Button

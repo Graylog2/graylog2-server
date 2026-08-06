@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
-import { ConfirmDialog, IfPermitted, LinkContainer } from 'components/common';
+import { ConfirmDialog, IfPermitted, LinkContainer, Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
@@ -138,7 +138,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
                 app_action_value: 'show-received-messages',
               });
             }}>
-            Received messages
+            <Icon name="search" />
           </Button>
         </LinkContainer>
       </IfPermitted>

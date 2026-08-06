@@ -15,22 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { MoreActionsMenu } from 'components/common';
 
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
-
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from './Constants';
+import { MORE_ACTIONS_HOVER_TITLE } from './Constants';
 
 type Props = React.PropsWithChildren<{
   disabled?: boolean;
 }>;
 const MoreActions = ({ children = undefined, disabled = false }: Props) => (
-  <OverlayDropdownButton
-    title={MORE_ACTIONS_TITLE}
-    bsSize="xsmall"
-    buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-    disabled={disabled}>
+  <MoreActionsMenu bsSize="xsmall" title={MORE_ACTIONS_HOVER_TITLE} disabled={disabled} solid>
     {children}
-  </OverlayDropdownButton>
+  </MoreActionsMenu>
 );
 
 export default MoreActions;
