@@ -65,7 +65,6 @@ public class LookupTableTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test lookup tables")
-    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public LookupTableTesterResponse testLookupTable(@Valid @NotNull LookupTableTestRequest lookupTableTestRequest) {
         return doTestLookupTable(lookupTableTestRequest.string(), lookupTableTestRequest.lookupTableName());
     }
@@ -88,8 +87,6 @@ public class LookupTableTesterResource extends RestResource {
 
     private void validateUserHasAccessToLookupTable(@NotEmpty String lookupTableName) {
         final var table = lookupTableService.getTable(lookupTableName);
-        // Tables which aren't loaded can't be read through the tester either, so the caller only gets to know that
-        // the lookup didn't return anything.
         if (table != null) {
             checkPermission(RestPermissions.LOOKUP_TABLES_READ, table.id());
         }
