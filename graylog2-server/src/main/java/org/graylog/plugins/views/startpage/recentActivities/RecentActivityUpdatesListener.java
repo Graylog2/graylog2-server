@@ -18,7 +18,11 @@ package org.graylog.plugins.views.startpage.recentActivities;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNDescriptorService;
 import org.graylog.security.events.EntitySharesUpdateEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 
@@ -28,11 +32,15 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class RecentActivityUpdatesListener {
+    private static final Logger LOG = LoggerFactory.getLogger(RecentActivityUpdatesListener.class);
+
     private final RecentActivityService recentActivityService;
+    private final GRNDescriptorService grnDescriptorService;
 
     @Inject
-    public RecentActivityUpdatesListener(EventBus eventBus, RecentActivityService recentActivityService) {
+    public RecentActivityUpdatesListener(EventBus eventBus, RecentActivityService recentActivityService, GRNDescriptorService grnDescriptorService) {
         this.recentActivityService = recentActivityService;
+        this.grnDescriptorService = grnDescriptorService;
         eventBus.register(this);
     }
 
@@ -59,11 +67,21 @@ public class RecentActivityUpdatesListener {
 
     @Subscribe
     public void createRecentActivityFor(final EntitySharesUpdateEvent event) {
+        // Capability-only changes and unchanged re-saves post an event with nothing to record.
+        if (event.creates().isEmpty() && event.deletes().isEmpty()) {
+            return;
+        }
+
+        // Store the title now: types without a content pack facade (e.g. collections) can not be resolved from the
+        // catalog at read time, so they would otherwise render as a raw id.
+        final String title = resolveTitle(event.entity());
+
         // TODO: maybe remove the filter again? It should be unnecessary, was just a try to remove creation of duplicates
         event.creates().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.SHARE)
                         .itemGrn(event.entity())
+                        .itemTitle(title)
                         .userName(event.user().getFullName())
                         .grantee(e.grantee().toString())
                         .build())
@@ -74,9 +92,25 @@ public class RecentActivityUpdatesListener {
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.UNSHARE)
                         .itemGrn(event.entity())
+                        .itemTitle(title)
                         .userName(event.user().getFullName())
                         .grantee(e.grantee().toString())
                         .build()));
+    }
+
+    // Best-effort. The read path prefers catalog resolution and only uses the stored title when the catalog has no
+    // entry, so a null title keeps today's behaviour. Never let title lookup stop the activity from being recorded.
+    private String resolveTitle(GRN entity) {
+        try {
+            return grnDescriptorService.getDescriptor(entity).title();
+        } catch (IllegalStateException e) {
+            // Expected: some shareable GRN types have no descriptor provider (e.g. outputs in a content pack).
+            LOG.debug("No descriptor provider to resolve a title for recent activity on entity <{}>", entity, e);
+            return null;
+        } catch (Exception e) {
+            LOG.warn("Could not resolve a title for recent activity on entity <{}>", entity, e);
+            return null;
+        }
     }
 
 }
