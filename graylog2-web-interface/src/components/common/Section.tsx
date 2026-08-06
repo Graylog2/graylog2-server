@@ -19,27 +19,29 @@ import styled, { css } from 'styled-components';
 import { Collapse } from '@mantine/core';
 
 import useDisclosure from 'util/hooks/useDisclosure';
+import sizeForMantine from 'theme/utils/sizeForMantine';
+import type { BsSize } from 'components/bootstrap/types';
 
 import IconButton from './IconButton';
 
-const Container = styled.div<{ $collapsible: boolean; $opened: boolean }>(
-  ({ $collapsible, $opened, theme }) => css`
+const Container = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize: BsSize }>(
+  ({ $collapsible, $opened, $bsSize, theme }) => css`
     background-color: ${theme.colors.section.filled.background};
     border: 1px solid ${theme.colors.section.filled.border};
     border-radius: 10px;
-    padding: ${$collapsible && !$opened ? 0 : theme.spacings.md};
+    padding: ${$collapsible && !$opened ? 0 : theme.spacings[sizeForMantine($bsSize)]};
     margin-bottom: ${theme.spacings.xxs};
   `,
 );
 
-const Header = styled.div<{ $collapsible: boolean; $opened: boolean }>(
-  ({ $collapsible, $opened, theme }) => css`
+const Header = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize: BsSize }>(
+  ({ $collapsible, $opened, $bsSize, theme }) => css`
     display: flex;
     justify-content: space-between;
     gap: ${theme.spacings.xs};
     align-items: center;
     border-radius: 10px;
-    padding: ${$collapsible && !$opened ? theme.spacings.md : 0};
+    padding: ${$collapsible && !$opened ? theme.spacings[sizeForMantine($bsSize)] : 0};
     flex-wrap: wrap;
 
     &:hover {
@@ -59,7 +61,7 @@ const FlexWrapper = styled.div(
 
 type Props = React.PropsWithChildren<{
   title: string;
-  titleAs?: 'h2' | 'h3';
+  titleAs?: 'h2' | 'h3' | 'h4' | 'h5';
   header?: React.ReactNode;
   actions?: React.ReactNode;
   preHeaderSection?: React.ReactNode;
@@ -70,6 +72,7 @@ type Props = React.PropsWithChildren<{
   disableCollapseButton?: boolean;
   collapseButtonPosition?: 'left' | 'right';
   className?: string;
+  bsSize?: BsSize;
 }>;
 
 /**
@@ -89,6 +92,7 @@ const Section = ({
   collapseButtonPosition = 'left',
   children = null,
   className = undefined,
+  bsSize = 'md',
 }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
 
@@ -117,8 +121,8 @@ const Section = ({
   );
 
   return (
-    <Container $opened={opened} $collapsible={collapsible} className={className}>
-      <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
+    <Container $opened={opened} $collapsible={collapsible} className={className} $bsSize={bsSize}>
+      <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick} $bsSize={bsSize}>
         <FlexWrapper>
           {collapseButtonPosition === 'left' && collapseButton}
           {preHeaderSection && (
