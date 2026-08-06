@@ -27,23 +27,24 @@ import { ARCHIVE_POLL_INTERVAL_MS } from '../constants';
 
 export const PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY = 'datanode-pending-incompatible-index-actions';
 
+const REINDEX_JOB_TYPE = 'reindex-outdated-index-v1';
+
 export type PendingIncompatibleIndexAction = {
-  action: 'archive-delete';
+  action: 'archive-delete' | 'reindex';
   indexName: string;
   startedAt: string;
   systemJobId?: string;
-  state?: 'archived';
 };
 
 export type PendingIndexStatus =
   | { state: 'archiving'; percent: number }
-  | { state: 'archived' }
-  | { state: 'failed'; message: string };
+  | { state: 'reindexing' }
+  | { state: 'failed'; message: string; label: string };
 
 type ActionResolution =
   | { kind: 'archiving'; percent: number }
-  | { kind: 'archived' }
-  | { kind: 'failed'; message: string }
+  | { kind: 'reindexing' }
+  | { kind: 'failed'; message: string; label: string }
   | { kind: 'done' };
 
 type Params = {
@@ -65,78 +66,89 @@ const isValidStoredAction = (value: unknown): value is PendingIncompatibleIndexA
   const candidate = value as Record<string, unknown>;
 
   return (
-    candidate.action === 'archive-delete' &&
+    (candidate.action === 'archive-delete' || candidate.action === 'reindex') &&
     typeof candidate.indexName === 'string' &&
     typeof candidate.startedAt === 'string' &&
     !Number.isNaN(Date.parse(candidate.startedAt)) &&
     (candidate.systemJobId === undefined || typeof candidate.systemJobId === 'string') &&
-    (candidate.state === undefined || candidate.state === 'archived')
+    candidate.state === undefined
   );
 };
 
 const readStoredActions = (): Array<PendingIncompatibleIndexAction> => {
-  const stored = Store.get(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY);
+  try {
+    const stored = Store.get(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY);
 
-  return Array.isArray(stored) ? stored.filter(isValidStoredAction) : [];
+    return Array.isArray(stored) ? stored.filter(isValidStoredAction) : [];
+  } catch {
+    return [];
+  }
 };
 
 const storeActions = (actions: Array<PendingIncompatibleIndexAction>) => {
   try {
     Store.set(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY, actions);
   } catch {
-    // Ignore write failures (e.g. storage full / disabled) — tracking degrades to this session only.
+    return;
   }
 };
 
-const resolveAction = (
+const resolveArchiveAction = (
   action: PendingIncompatibleIndexAction,
   { jobsById, jobsUpdatedAt }: ClusterJobsResult,
 ): ActionResolution => {
-  if (action.state === 'archived') {
-    return { kind: 'archived' };
-  }
-
   const job = action.systemJobId ? jobsById.get(action.systemJobId) : undefined;
 
   if (job?.job_status === 'error') {
-    // `||` (not `??`) on purpose: an empty `info` should fall back to the description.
-    return { kind: 'failed', message: job.info || job.description };
+    return { kind: 'failed', message: job.info || job.description, label: 'Archive failed' };
   }
 
   if (job?.job_status === 'complete') {
-    return { kind: 'archived' };
+    return { kind: 'done' };
   }
 
   if (job?.job_status === 'cancelled') {
     return { kind: 'done' };
   }
 
-  // A jobs list fetched before the action started cannot prove the job is gone — keep waiting.
   if (action.systemJobId && !job && jobsUpdatedAt > Date.parse(action.startedAt)) {
-    return { kind: 'archived' };
+    return { kind: 'done' };
   }
 
   return { kind: 'archiving', percent: job?.percent_complete ?? 0 };
 };
 
+const resolveReindexAction = (
+  action: PendingIncompatibleIndexAction,
+  { jobsById, jobsUpdatedAt }: ClusterJobsResult,
+): ActionResolution => {
+  const job = Array.from(jobsById.values()).find(
+    (candidate) => candidate.name === REINDEX_JOB_TYPE && !!candidate.info?.includes(`<${action.indexName}>`),
+  );
+
+  if (job?.job_status === 'error') {
+    return { kind: 'failed', message: job.info || job.description, label: 'Reindex failed' };
+  }
+
+  if (!job && jobsUpdatedAt > Date.parse(action.startedAt)) {
+    return { kind: 'done' };
+  }
+
+  return { kind: 'reindexing' };
+};
+
+const resolveAction = (action: PendingIncompatibleIndexAction, jobs: ClusterJobsResult): ActionResolution =>
+  action.action === 'reindex' ? resolveReindexAction(action, jobs) : resolveArchiveAction(action, jobs);
+
 const reconcileActions = (
   current: Array<PendingIncompatibleIndexAction>,
-  incompatibleIndexNames: Set<string>,
   jobs: Pick<ClusterJobsResult, 'jobsById' | 'jobsUpdatedAt'>,
 ): Array<PendingIncompatibleIndexAction> => {
   const next = current.flatMap((pendingAction): Array<PendingIncompatibleIndexAction> => {
-    if (!incompatibleIndexNames.has(pendingAction.indexName)) {
-      return [];
-    }
-
     const resolution = resolveAction(pendingAction, jobs);
 
     if (resolution.kind === 'done') {
       return [];
-    }
-
-    if (resolution.kind === 'archived' && pendingAction.state !== 'archived') {
-      return [{ ...pendingAction, state: 'archived' }];
     }
 
     return [pendingAction];
@@ -160,13 +172,12 @@ const usePendingIncompatibleIndexActions = ({
 
   const incompatibleIndexNames = new Set(incompatibleIndices.map((index) => index.index_name));
   const trackedActions = pendingActions.filter((pendingAction) => incompatibleIndexNames.has(pendingAction.indexName));
-  const activeTrackedActions = trackedActions.filter((pendingAction) => pendingAction.state !== 'archived');
-  const hasActiveTrackedActions = activeTrackedActions.length > 0;
+  const hasActiveActions = pendingActions.length > 0;
   const {
     jobsById,
     jobsUpdatedAt,
     refetch: refetchClusterJobs,
-  } = useClusterJobs({ enabled: canArchive || hasActiveTrackedActions, poll: hasActiveTrackedActions });
+  } = useClusterJobs({ enabled: canArchive || hasActiveActions, poll: hasActiveActions });
 
   const isArchiveJobRunning =
     !!archive &&
@@ -178,24 +189,31 @@ const usePendingIncompatibleIndexActions = ({
 
     if (resolution.kind === 'archiving') {
       pendingIndexStatuses.set(pendingAction.indexName, { state: 'archiving', percent: resolution.percent });
-    } else if (resolution.kind === 'archived') {
-      pendingIndexStatuses.set(pendingAction.indexName, { state: 'archived' });
+    } else if (resolution.kind === 'reindexing') {
+      pendingIndexStatuses.set(pendingAction.indexName, { state: 'reindexing' });
     } else if (resolution.kind === 'failed') {
-      pendingIndexStatuses.set(pendingAction.indexName, { state: 'failed', message: resolution.message });
+      pendingIndexStatuses.set(pendingAction.indexName, {
+        state: 'failed',
+        message: resolution.message,
+        label: resolution.label,
+      });
     }
   });
 
-  const addArchiveDeleteAction = ({ indexName, systemJobId }: { indexName: string; systemJobId?: string }) => {
+  const addPendingAction = (action: PendingIncompatibleIndexAction) =>
     setPendingActions((current) => [
-      ...current.filter((pendingAction) => pendingAction.indexName !== indexName),
-      { action: 'archive-delete', indexName, systemJobId, startedAt: new Date().toISOString() },
+      ...current.filter((pendingAction) => pendingAction.indexName !== action.indexName),
+      action,
     ]);
-  };
 
-  // Guarded state adjustment during render instead of an effect:
-  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const addArchiveDeleteAction = ({ indexName, systemJobId }: { indexName: string; systemJobId: string }) =>
+    addPendingAction({ action: 'archive-delete', indexName, systemJobId, startedAt: new Date().toISOString() });
+
+  const addReindexAction = ({ indexName }: { indexName: string }) =>
+    addPendingAction({ action: 'reindex', indexName, startedAt: new Date().toISOString() });
+
   if (!isLoading && !isError) {
-    const reconciled = reconcileActions(pendingActions, incompatibleIndexNames, { jobsById, jobsUpdatedAt });
+    const reconciled = reconcileActions(pendingActions, { jobsById, jobsUpdatedAt });
 
     if (reconciled !== pendingActions) {
       setPendingActions(reconciled);
@@ -206,9 +224,8 @@ const usePendingIncompatibleIndexActions = ({
     storeActions(pendingActions);
   }, [pendingActions]);
 
-  // Plain interval: react-query's refetchInterval would need a state round-trip for a flag derived here.
   useEffect(() => {
-    if (!hasActiveTrackedActions) {
+    if (!hasActiveActions) {
       return undefined;
     }
 
@@ -217,9 +234,9 @@ const usePendingIncompatibleIndexActions = ({
     }, ARCHIVE_POLL_INTERVAL_MS);
 
     return () => window.clearInterval(polling);
-  }, [hasActiveTrackedActions, refetch]);
+  }, [hasActiveActions, refetch]);
 
-  return { pendingIndexStatuses, addArchiveDeleteAction, isArchiveJobRunning, refetchClusterJobs };
+  return { pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, isArchiveJobRunning, refetchClusterJobs };
 };
 
 export default usePendingIncompatibleIndexActions;
