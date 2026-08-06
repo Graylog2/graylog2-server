@@ -23,13 +23,13 @@ import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
+import StatCard from 'components/common/StatCard/StatCard';
 
 import type { PlatformId } from './platforms';
 import PLATFORMS from './platforms';
 import useCollectorLogPreview from './useCollectorLogPreview';
 import LogPreviewSection from './LogPreviewSection';
 
-import StatCard from '../../common/StatCard';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
