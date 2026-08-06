@@ -117,8 +117,8 @@
         <bouncycastle.version>1.85</bouncycastle.version>
         <caffeine.version>3.2.4</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.184</classgraph.version>
-        <commons-codec.version>1.22.0</commons-codec.version>
+        <classgraph.version>4.8.185</classgraph.version>
+        <commons-codec.version>1.22.1</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.6.0</commons-exec.version>
@@ -148,7 +148,7 @@
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
-        <hibernate-validator.version>9.1.2.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.1.3.Final</hibernate-validator.version>
         <hk2.version>4.0.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.22.1</jackson.version>
         <jadconfig.version>1.1.0</jadconfig.version>
@@ -167,7 +167,7 @@
              hibernate-validator 9.x, so the explicit jboss-logging dependency management can be removed. -->
         <jersey.version>4.0.2</jersey.version>
         <jmte.version>7.0.3</jmte.version>
-        <joda-time.version>2.14.2</joda-time.version>
+        <joda-time.version>2.14.3</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-org.version>20260719</json-org.version>
         <json-path.version>3.0.0</json-path.version>
@@ -206,7 +206,7 @@
         <shiro.version>2.2.1</shiro.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>7.4.1</oshi.version>
+        <oshi.version>7.4.2</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
@@ -218,7 +218,7 @@
         <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-11</zstd.version>
+        <zstd.version>1.5.7-12</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -241,7 +241,7 @@
         <restassured.version>6.0.1</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
-        <graalvm.version>25.1.3</graalvm.version>
+        <graalvm.version>25.2.4</graalvm.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v24.13.0</nodejs.version>
