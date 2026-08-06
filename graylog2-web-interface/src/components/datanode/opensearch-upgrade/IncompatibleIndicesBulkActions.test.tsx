@@ -120,7 +120,7 @@ describe('IncompatibleIndicesBulkActions', () => {
 
   const confirmBulkDelete = async () => {
     await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: /delete all \(2\)/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /^delete$/i }));
     await userEvent.click(await screen.findByRole('button', { name: /^delete all$/i }));
   };
 
@@ -189,7 +189,7 @@ describe('IncompatibleIndicesBulkActions', () => {
   describe('bulk reindex', () => {
     const confirmBulkReindex = async () => {
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
-      await userEvent.click(await screen.findByRole('menuitem', { name: /reindex all \(2\)/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /reindex system indices/i }));
       await userEvent.click(await screen.findByRole('button', { name: /^reindex all$/i }));
     };
 
@@ -235,15 +235,16 @@ describe('IncompatibleIndicesBulkActions', () => {
       renderBulkActions(systemIndices, false, new Map([['gl-system-events_0', { state: 'reindexing' }]]));
 
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /reindex system indices/i }));
 
-      expect(await screen.findByRole('menuitem', { name: /reindex all \(1\)/i })).toBeInTheDocument();
+      expect(await screen.findByText(/this will reindex 1 incompatible index\./i)).toBeInTheDocument();
     });
   });
 
   describe('bulk rotate', () => {
     const confirmBulkRotate = async () => {
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
-      await userEvent.click(await screen.findByRole('menuitem', { name: /rotate all \(2\)/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /rotate active write indices/i }));
       await userEvent.click(await screen.findByRole('button', { name: /^rotate all$/i }));
     };
 
@@ -296,7 +297,7 @@ describe('IncompatibleIndicesBulkActions', () => {
 
     const confirmBulkArchive = async () => {
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
-      await userEvent.click(await screen.findByRole('menuitem', { name: /archive and delete all \(2\)/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /^archive and delete$/i }));
       await userEvent.click(await screen.findByRole('button', { name: /^archive and delete all$/i }));
     };
 

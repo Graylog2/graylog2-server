@@ -44,28 +44,28 @@ export type BulkIndexActionNotification = {
 
 const BULK_ACTION_COPY: Record<BulkCapableIndexAction, BulkActionCopy> = {
   delete: {
-    buttonLabel: 'Delete all',
+    buttonLabel: 'Delete',
     confirmTitle: 'Delete incompatible indices',
     confirmText: 'Delete all',
     targetVerb: 'delete',
     successMessage: (count) => `${count} incompatible ${count === 1 ? 'index was' : 'indices were'} deleted.`,
   },
   'reindex-system-index': {
-    buttonLabel: 'Reindex all',
+    buttonLabel: 'Reindex system indices',
     confirmTitle: 'Reindex system indices',
     confirmText: 'Reindex all',
     targetVerb: 'reindex',
     successMessage: (count) => `Reindex started for ${count} system ${count === 1 ? 'index' : 'indices'}.`,
   },
   'archive-delete': {
-    buttonLabel: 'Archive and delete all',
+    buttonLabel: 'Archive and delete',
     confirmTitle: 'Archive and delete indices',
     confirmText: 'Archive and delete all',
     targetVerb: 'archive and delete',
     successMessage: (count) => `Archive and delete started for ${count} ${count === 1 ? 'index' : 'indices'}.`,
   },
   rotate: {
-    buttonLabel: 'Rotate all',
+    buttonLabel: 'Rotate active write indices',
     confirmTitle: 'Rotate active write indices',
     confirmText: 'Rotate all',
     targetVerb: 'rotate',

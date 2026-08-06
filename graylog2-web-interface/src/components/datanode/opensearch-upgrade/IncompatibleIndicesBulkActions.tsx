@@ -234,7 +234,7 @@ const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
       <BulkActionsDropdown>
         {candidates.map((candidate) => (
           <MenuItem key={candidate.action} onSelect={() => setConfirmedBulkAction(candidate)}>
-            {candidate.buttonLabel} ({candidate.targetIndices.length})
+            {candidate.buttonLabel}
           </MenuItem>
         ))}
       </BulkActionsDropdown>
