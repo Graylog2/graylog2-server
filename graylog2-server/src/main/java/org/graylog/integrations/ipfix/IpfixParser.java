@@ -341,8 +341,14 @@ public class IpfixParser {
         // Thus, it is much simpler to catch the exception and return the flows we have collected so far.
 
         int flowNum = 1;
+        int previousStart = -1;
         readFlows:
         while (setContent.isReadable()) {
+            final int setStart = setContent.readerIndex();
+            if (setStart == previousStart) {
+                throw new IpfixException("Parser made no progress reading flow data set, discarding remaining bytes");
+            }
+            previousStart = setStart;
             try {
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("Parsing flow {}", flowNum);
@@ -356,7 +362,9 @@ public class IpfixParser {
                         LOG.error("Unable to find info element definition due to incomplete field definitions: id [{}] PEN [{}]. " +
                                         HOW_TO_FIX_MISSING_FIELD_DEF_ERROR,
                                 informationElement.id(), informationElement.enterpriseNumber());
-                        continue readFlows; // skip this element, since the template cannot be obtained for it.
+                        final int skipLength = informationElement.length() == 65535 ? getVarLength(setContent) : informationElement.length();
+                        setContent.skipBytes(skipLength);
+                        continue;
                     }
                     switch (desc.dataType()) {
                         // these are special because they can use reduced-size encoding (RFC 7011 Sec 6.2)
@@ -534,10 +542,19 @@ public class IpfixParser {
                                         element.id(), element.enterpriseNumber());
                                 break;
                             } else {
+                                if (element.length() == 0) {
+                                    LOG.error("basicList element declares zero length for id [{}] PEN [{}], discarding basicList",
+                                            element.id(), element.enterpriseNumber());
+                                    break;
+                                }
                                 LOG.warn("Skipping basicList data ({} bytes)", informationElement.length());
                                 while (listBuffer.isReadable()) {
+                                    final int before = listBuffer.readerIndex();
                                     // simply discard the bytes for now
                                     listBuffer.skipBytes(element.length());
+                                    if (listBuffer.readerIndex() == before) {
+                                        throw new IpfixException("basicList element consumed no bytes, discarding set");
+                                    }
                                 }
                             }
                             break;
