@@ -181,7 +181,7 @@
         <kotlinx-coroutines.version>1.11.0</kotlinx-coroutines.version>
         <log4j.version>2.26.1</log4j.version>
         <lucene.version>10.5.0</lucene.version>
-        <lz4.version>1.11.1</lz4.version>
+        <lz4.version>1.11.2</lz4.version>
         <metrics.version>4.2.39</metrics.version>
         <mongodb-driver.version>5.9.1</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
