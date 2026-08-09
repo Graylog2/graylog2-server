@@ -22,7 +22,7 @@ import URI from 'urijs';
 
 import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
 import { ConfirmDialog, Link, LinkContainer, Spinner } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
@@ -30,6 +30,7 @@ import useQuery from 'routing/useQuery';
 import Routes from 'routing/Routes';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import StatCard from 'components/common/StatCard/StatCard';
 
 import FleetSettings from './FleetSettings';
 
@@ -47,7 +48,6 @@ import {
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_FLEET_ID_FIELD, COLLECTOR_SOURCE_ID_FIELD } from '../common/fields';
-import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
 import InstanceActions from '../instances/InstanceActions';
@@ -239,7 +239,7 @@ const FleetDetail = ({ fleetId }: Props) => {
     <div>
       <Header>
         <h2>
-          {fleet.name} <BetaBadge />
+          {fleet.name} <PreviewBadge />
         </h2>
       </Header>
 

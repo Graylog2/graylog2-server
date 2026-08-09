@@ -28,13 +28,7 @@ export type RollingRestartState =
   | 'ABORTED'
   | 'FAILED';
 
-export type RollingRestartNodeStatus =
-  | 'PENDING'
-  | 'RESTARTING'
-  | 'STARTED'
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'SKIPPED';
+export type RollingRestartNodeStatus = 'PENDING' | 'RESTARTING' | 'STARTED' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
 
 export type RollingRestartJobStatus = 'runnable' | 'running' | 'complete' | 'paused' | 'error' | 'cancelled';
 

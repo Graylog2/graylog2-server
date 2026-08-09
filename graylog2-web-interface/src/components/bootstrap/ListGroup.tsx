@@ -42,7 +42,12 @@ const ListGroup = ({
   'data-testid': dataTestId = undefined,
   style = undefined,
 }: Props) => (
-  <StyledList as={componentClass} aria-label={ariaLabel} className={`${className ?? ''} ${bsClass ?? ''}`} style={style} data-testid={dataTestId}>
+  <StyledList
+    as={componentClass}
+    aria-label={ariaLabel}
+    className={`${className ?? ''} ${bsClass ?? ''}`}
+    style={style}
+    data-testid={dataTestId}>
     {children}
   </StyledList>
 );

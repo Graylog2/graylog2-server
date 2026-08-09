@@ -17,6 +17,7 @@
 
 export const CELL_PADDING_HORIZONTAL = 8; // px, left/right cell padding
 export const CELL_PADDING_VERTICAL = 6; // px, top/bottom cell padding
+export const CELL_PADDING_HEADER = `${CELL_PADDING_HORIZONTAL}px ${CELL_PADDING_HORIZONTAL}px ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px`;
 export const DEFAULT_COL_MIN_WIDTH = 150; // px
 export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.
 export const MORE_ACTIONS_TITLE = 'More';
@@ -26,6 +27,8 @@ export const BULK_SELECT_COLUMN_WIDTH = 15 + CELL_PADDING_HORIZONTAL * 2; // px
 export const BULK_SELECT_COL_ID = 'bulk-select';
 
 export const ACTIONS_COL_ID = 'actions';
+
+export const RESIZE_HIT_AREA_OVERHANG = 7;
 
 export const UTILITY_COLUMNS = new Set([BULK_SELECT_COL_ID, ACTIONS_COL_ID]);
 

@@ -45,7 +45,6 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.OutdatedIndexService;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
@@ -79,14 +78,12 @@ public class IndicesResource extends RestResource {
     private final Indices indices;
     private final NodeInfoCache nodeInfoCache;
     private final IndexSetRegistry indexSetRegistry;
-    private final OutdatedIndexService outdatedIndexService;
 
     @Inject
-    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry, OutdatedIndexService outdatedIndexService) {
+    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry) {
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
-        this.outdatedIndexService = outdatedIndexService;
     }
 
     @GET

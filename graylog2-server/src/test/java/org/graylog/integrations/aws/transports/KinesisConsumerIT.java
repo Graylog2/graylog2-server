@@ -208,7 +208,8 @@ class KinesisConsumerIT {
                 10_000,
                 request,
                 clientBuilderUtil,
-                failureRecorder) {
+                failureRecorder,
+                false) {
             @Override
             void customizeSchedulerConfigs(CoordinatorConfig coordinatorConfig,
                                            LeaseManagementConfig leaseManagementConfig,

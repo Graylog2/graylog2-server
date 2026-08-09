@@ -165,7 +165,7 @@ const MessageTable = ({
             <tr>
               {displayBulkSelectCol && (
                 <TableHeaderCell $noMinWidth>
-                    <BulkSelectHead />
+                  <BulkSelectHead />
                 </TableHeaderCell>
               )}
               {selectedFields

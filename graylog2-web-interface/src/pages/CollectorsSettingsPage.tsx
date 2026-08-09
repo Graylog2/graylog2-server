@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsSettings from 'components/collectors/settings/CollectorsSettings';
 
@@ -27,7 +27,7 @@ const CollectorsSettingsPage = () => (
     <PageHeader
       title={
         <>
-          Collectors Settings <BetaBadge />
+          Collectors Settings <PreviewBadge />
         </>
       }>
       <span>
