@@ -119,12 +119,28 @@ public class RecentActivityService {
         postRecentActivity(new RecentActivityEvent(ActivityType.CREATE, grnRegistry.newGRN(grn, id), user.getFullName()));
     }
 
+    /**
+     * Records a creation and stores the given title with it. Use this for entity types that cannot be resolved
+     * through the {@link org.graylog2.lookup.Catalog} later on, i.e. those without a content pack facade.
+     */
+    public void create(String id, GRNType grn, String title, User user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.CREATE, grnRegistry.newGRN(grn, id), title, user.getFullName()));
+    }
+
     public void update(String id, GRNType grn, SearchUser user) {
         update(id, grn, user.getUser());
     }
 
     public void update(String id, GRNType grn, User user) {
         postRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, grnRegistry.newGRN(grn, id), user.getFullName()));
+    }
+
+    /**
+     * Records an update and stores the given title with it. Use this for entity types that cannot be resolved
+     * through the {@link org.graylog2.lookup.Catalog} later on, i.e. those without a content pack facade.
+     */
+    public void update(String id, GRNType grn, String title, User user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, grnRegistry.newGRN(grn, id), title, user.getFullName()));
     }
 
     public void delete(String id, GRNType grn, String title, SearchUser user) {
