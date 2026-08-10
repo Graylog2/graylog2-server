@@ -1,0 +1,2 @@
+type = "s"
+message = "Fix path traversal in the web interface and preflight asset resources. See [GHSA-7v9x-j5xj-57rq](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-7v9x-j5xj-57rq) for details."
