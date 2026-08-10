@@ -73,10 +73,10 @@ describe('FleetDetail telemetry', () => {
     ['Sources', { card: 'sources', value: 2, variant: 'default', navigates_to: 'sources' }],
   ])('emits STAT_CARD_CLICKED on %s card click', async (label, expected) => {
     render(<FleetDetail fleetId="f-1" />);
-    // StatCards render as <button>; multiple elements may match by label so narrow by role+regex.
+    // StatCards render as <button>; multiple elements may match by label so narrow by value.
     const card = screen
       .getAllByRole('button', { name: new RegExp(label) })
-      .find((el) => el.textContent?.match(new RegExp(`${expected.value}\\s*${label}`)));
+      .find((el) => el.textContent?.includes(String(expected.value)));
     if (!card) throw new Error(`Card matching ${label} with value ${expected.value} not found`);
     await userEvent.click(card);
 
