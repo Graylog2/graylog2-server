@@ -42,6 +42,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { widgetDragHandleClass } from 'views/components/widgets/Constants';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import WidgetActionsContext from 'views/components/widgets/WidgetActionsContext';
+import DefaultChartColorsContext from 'views/components/widgets/DefaultChartColorsContext';
 
 import replayLinkWidgetAction from './ReplayLinkWidgetAction';
 
@@ -54,6 +55,8 @@ const ALERTS_LINK =
 const EVENTS_LINK =
   '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dfalse';
 const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
+// TODO: replace with colors from the styled-components theme once available.
+const AREA_CHART_COLORS = ['#0C50A5', '#9A6BFE', '#4396FF', '#03C2FF', '#C2F0FF'];
 
 const StyledSearchContainer = styled.div`
   footer,
@@ -184,9 +187,11 @@ const WelcomeDashboard = () => {
     <Container>
       <InteractiveContext.Provider value={false}>
         <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
-          <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
-            <SearchPage view={view} isNew={false} skipNoStreamsCheck />
-          </SearchPageLayoutProvider>
+          <DefaultChartColorsContext.Provider value={AREA_CHART_COLORS}>
+            <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
+              <SearchPage view={view} isNew={false} skipNoStreamsCheck />
+            </SearchPageLayoutProvider>
+          </DefaultChartColorsContext.Provider>
         </WidgetActionsContext.Provider>
       </InteractiveContext.Provider>
     </Container>
