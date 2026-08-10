@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed dropped plaintext messages on HTTP inputs with bulk receiving enabled, and reduced the framing overhead for bulk payloads."
+
+issues = ["Graylog2/graylog-plugin-enterprise#12599"]

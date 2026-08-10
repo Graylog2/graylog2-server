@@ -19,7 +19,6 @@ package org.graylog2.inputs.transports;
 import com.github.joschi.jadconfig.util.Size;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
-import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
@@ -29,10 +28,9 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Named;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
+import org.graylog2.inputs.transports.netty.HttpBulkFrameDecoder;
 import org.graylog2.inputs.transports.netty.HttpForwardedForHandler;
 import org.graylog2.inputs.transports.netty.HttpHandler;
-import org.graylog2.inputs.transports.netty.JsonArrayFrameDecoder;
-import org.graylog2.inputs.transports.netty.LenientDelimiterBasedFrameDecoder;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -181,11 +179,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
         handlers.put("http-handler",
                 () -> new HttpHandler(enableCors, authorizationHeader, authorizationHeaderValues, path));
         if (enableBulkReceiving) {
-            handlers.put("http-bulk-newline-decoder",
-                    () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize,
-                            Delimiters.lineDelimiter()));
-            handlers.put("http-json-array-decoder",
-                    () -> new JsonArrayFrameDecoder(maxChunkSize));
+            handlers.put("http-bulk-decoder", () -> new HttpBulkFrameDecoder(maxChunkSize));
         }
         handlers.putAll(super.getCustomChildChannelHandlers(input));
         return handlers;
