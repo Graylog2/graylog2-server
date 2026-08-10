@@ -187,7 +187,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           </Button>
         </LinkContainer>
       </IfPermitted>
-      <ShareButton entityId={stream.id} entityType="stream" onClick={toggleEntityShareModal} bsSize="xsmall" />
+      <ShareButton entityId={stream.id} entityType="stream" onClick={toggleEntityShareModal} bsSize="xs" />
       <MoreActions disabled={isNotEditable}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
           <MenuItem onSelect={onToggleStreamStatus} disabled={isDefaultStream || isNotEditable}>

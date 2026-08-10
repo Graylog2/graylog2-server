@@ -16,12 +16,9 @@
  */
 import * as React from 'react';
 
-import type { StyleProps } from 'components/bootstrap/Button';
-import Button from 'components/bootstrap/Button';
 import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import HasOwnership from 'components/common/HasOwnership';
-import Icon from 'components/common/Icon';
-import type { BsSize } from 'components/bootstrap/types';
+import IconButton from 'components/common/IconButton';
 
 type Props = {
   /**
@@ -32,33 +29,34 @@ type Props = {
   entityId: string;
   entityType: string;
   onClick: () => void;
-  bsStyle?: StyleProps;
-  bsSize?: BsSize;
-  title?: string;
+  bsStyle?: 'default';
+  bsSize?: 'xs' | 'xsmall' | 'md' | 'medium';
 };
 
 const ShareButton = ({
-  bsStyle = 'default',
-  bsSize = undefined,
   entityId,
+  bsSize = undefined,
+  bsStyle = 'default',
   entityType,
   onClick,
   disabledInfo = undefined,
-  title = undefined,
 }: Props) => (
   <HasOwnership id={entityId} type={entityType}>
     {({ disabled: hasMissingPermissions }) => (
-      <Button
-        bsStyle={bsStyle}
-        bsSize={bsSize}
-        onClick={onClick}
-        disabled={!!disabledInfo || hasMissingPermissions}
-        title="Share">
-        <Icon name="person_add" /> {title ?? 'Share'}{' '}
+      <>
+        <IconButton
+          name="person_add"
+          title="Share"
+          bsStyle={bsStyle}
+          size={bsSize}
+          iconSize={null}
+          onClick={onClick}
+          disabled={!!disabledInfo || hasMissingPermissions}
+        />
         {(!!disabledInfo || hasMissingPermissions) && (
           <SharingDisabledPopover type={entityType} description={disabledInfo} />
         )}
-      </Button>
+      </>
     )}
   </HasOwnership>
 );

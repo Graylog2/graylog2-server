@@ -24,11 +24,17 @@ import { Button } from 'components/bootstrap';
 import Tooltip from 'components/common/Tooltip';
 
 const Wrapper = styled(Button)<{ disabled: boolean }>(
-  ({ theme, disabled, bsStyle }) => css`
-    height: 25px;
-    width: 25px;
-    padding: 0;
-    font-size: ${theme.fonts.size.large};
+  ({ theme, disabled, bsStyle, bsSize }) => css`
+    ${(bsSize === 'xsmall' || bsSize === 'xs') &&
+    css`
+      padding: 0 3px;
+    `}
+
+    ${(bsSize === 'xsmall' || bsSize === 'xs') &&
+    css`
+      padding-top: 0;
+      padding-bottom: 0;
+    `}
 
     ${bsStyle === 'transparent' &&
     css`
@@ -47,7 +53,9 @@ type Props = {
   disabled?: boolean;
   rotation?: RotateProp;
   'data-testid'?: string;
-  size?: SizeProp;
+  size?: 'xs' | 'xsmall';
+  bsStyle?: 'transparent' | 'default';
+  iconSize?: 'lg' | null;
 };
 
 const handleClick = (
@@ -67,7 +75,10 @@ const IconButton = (
     className = undefined,
     disabled = false,
     iconType = undefined,
+    bsStyle = 'transparent',
     'data-testid': dataTestId = undefined,
+    size = 'xs',
+    iconSize = 'lg',
     ...rest
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
@@ -81,9 +92,10 @@ const IconButton = (
       onClick={(e) => handleClick(onClick, e)}
       className={className}
       type="button"
-      bsStyle="transparent"
+      bsSize={size}
+      bsStyle={bsStyle}
       disabled={disabled}>
-      <Icon type={iconType} {...rest} />
+      <Icon type={iconType} size={iconSize} {...rest} />
     </Wrapper>
   </Tooltip>
 );
