@@ -35,18 +35,27 @@ public abstract class UrlAllowlist {
     @JsonProperty("disabled")
     public abstract boolean disabled();
 
+    // Temporary fix (PR #26814): only used by Slack and Teams notifications via UrlAllowlistValidator.
+    // TODO: Remove in a major release.
+    @JsonProperty("enforce_for_notifications")
+    public abstract boolean enforceForNotifications();
+
     @JsonCreator
     public static UrlAllowlist create(@JsonProperty("entries") List<AllowlistEntry> entries,
-                                      @JsonProperty("disabled") boolean disabled) {
+                                      @JsonProperty("disabled") boolean disabled,
+                                      @JsonProperty("enforce_for_notifications") boolean enforceForNotifications) {
         return builder().entries(entries)
                 .disabled(disabled)
+                .enforceForNotifications(enforceForNotifications)
                 .build();
     }
 
+    public static UrlAllowlist create(List<AllowlistEntry> entries, boolean disabled) {
+        return create(entries, disabled, false);
+    }
+
     public static UrlAllowlist createEnabled(List<AllowlistEntry> entries) {
-        return builder().entries(entries)
-                .disabled(false)
-                .build();
+        return create(entries, false, false);
     }
 
     public abstract Builder toBuilder();
@@ -75,6 +84,8 @@ public abstract class UrlAllowlist {
         public abstract Builder entries(List<AllowlistEntry> entries);
 
         public abstract Builder disabled(boolean disabled);
+
+        public abstract Builder enforceForNotifications(boolean enforceForNotifications);
 
         public abstract UrlAllowlist autoBuild();
 
