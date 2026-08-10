@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.NotificationTestData;
+import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,19 +39,32 @@ public class UrlAllowlistValidator {
         this.allowlistNotificationService = allowlistNotificationService;
     }
 
-    public void validateUrl(String url, EventNotificationContext ctx) {
+    /**
+     * Validates a notification webhook URL against the URL allowlist. If the URL is not allowlisted,
+     * a system notification is published (unless this is a test notification). When enforcement is
+     * enabled, throws {@link PermanentEventNotificationException}; otherwise logs a warning.
+     *
+     * @param url the webhook URL to validate
+     * @param ctx the event notification context
+     * @throws PermanentEventNotificationException if the URL is not allowlisted and enforcement is enabled
+     */
+    public void validateUrl(String url, EventNotificationContext ctx) throws PermanentEventNotificationException {
         if (!allowlistService.isAllowlisted(url)) {
-            LOG.warn("Notification is using a URL which is not allowlisted. " +
-                    "A future version of Graylog will block this request. [url: {}, notification: {}]",
-                    url, ctx.notificationId());
             if (!NotificationTestData.TEST_NOTIFICATION_ID.equals(ctx.notificationId())) {
                 final String eventDefTitle = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Unnamed");
                 final String description = "The alert notification " + eventDefTitle +
                         " is trying to access a URL which is not allowlisted. Please add it to the URL allowlist. " +
-                        "A future version of Graylog will block requests to non-allowlisted URLs. [url: " +
-                        url + "]";
+                        "[url: " + url + "]";
                 allowlistNotificationService.publishAllowlistFailure(description);
             }
+            if (allowlistService.getAllowlist().enforceForNotifications()) {
+                LOG.warn("Blocking notification because webhook URL is not allowlisted. " +
+                        "[url: {}, notification: {}]", url, ctx.notificationId());
+                throw new PermanentEventNotificationException("URL <" + url + "> is not allowlisted.");
+            }
+            LOG.warn("Notification is using a URL which is not allowlisted. " +
+                    "Enable \"Enforce for Slack & Teams notifications\" in System > Configurations > URL Allowlist to block non-allowlisted URLs. " +
+                    "[url: {}, notification: {}]", url, ctx.notificationId());
         }
     }
 }
