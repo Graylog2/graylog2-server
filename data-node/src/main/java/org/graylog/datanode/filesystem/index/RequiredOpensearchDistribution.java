@@ -28,25 +28,30 @@ public enum RequiredOpensearchDistribution {
     /**
      * The current opensearch distribution can open the directory directly.
      */
-    CURRENT("3.x.x"),
+    CURRENT(3),
 
     /**
      * The directory predates the current distribution and has to be opened by the bundled compatibility
      * distribution ({@code opensearch.compat.version}) first. This is not an error, only a migration step.
      */
-    COMPAT("2.x.x");
+    COMPAT(2);
 
-    public final String versionSelector;
     private final long majorVersion;
 
-    RequiredOpensearchDistribution(String versionSelector) {
-        this.versionSelector = versionSelector;
-        this.majorVersion = Long.parseLong(versionSelector.substring(0, versionSelector.indexOf('.')));
+    RequiredOpensearchDistribution(long majorVersion) {
+        this.majorVersion = majorVersion;
     }
 
     /**
-     * Whether the given opensearch version belongs to this tier. Only the major version is compared — the selectors
-     * above are the single place to edit when a new generation ships and the tiers move up.
+     * The opensearch major version this tier stands for. These two constants are the single place to edit when a new
+     * generation ships and the tiers move up.
+     */
+    public long majorVersion() {
+        return majorVersion;
+    }
+
+    /**
+     * Whether the given opensearch version belongs to this tier. Only the major version is compared.
      */
     public boolean matches(String opensearchVersion) {
         return Version.parse(opensearchVersion).majorVersion() == majorVersion;
