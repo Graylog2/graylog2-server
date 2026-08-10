@@ -19,9 +19,10 @@ import styled, { css } from 'styled-components';
 import { forwardRef } from 'react';
 
 import Icon from 'components/common/Icon';
-import type { IconName, RotateProp, IconType, SizeProp } from 'components/common/Icon';
+import type { IconName, RotateProp, IconType } from 'components/common/Icon';
 import { Button } from 'components/bootstrap';
 import Tooltip from 'components/common/Tooltip';
+import type { BsSize } from 'components/bootstrap/types';
 
 const Wrapper = styled(Button)<{ disabled: boolean }>(
   ({ theme, disabled, bsStyle }) => css`
@@ -43,7 +44,7 @@ type Props = {
   disabled?: boolean;
   rotation?: RotateProp;
   'data-testid'?: string;
-  size?: 'xs' | 'xsmall' | 'sm' | 'small' | 'md' | 'medium';
+  size?: BsSize;
   bsStyle?: 'transparent' | 'default';
   iconSize?: 'lg' | 'inherit';
 };

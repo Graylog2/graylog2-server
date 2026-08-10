@@ -19,7 +19,6 @@ import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { IconButton } from 'components/common';
-import { theme } from 'views/components/visualizations/utils/__tests__/fixtures';
 
 const Container = styled.div(
   ({ theme }) => css`
