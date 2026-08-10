@@ -155,8 +155,10 @@ public class OpensearchVersionSelectorImpl implements OpensearchVersionSelector 
 
         List<OpensearchDistribution> bound = candidates;
         if (result.requiredDistribution() == RequiredOpensearchDistribution.COMPAT) {
-            LOG.info("The opensearch data directory requires the {} compatibility distribution",
-                    RequiredOpensearchDistribution.COMPAT.versionSelector);
+            // Debug rather than info: this is re-evaluated on every configuration rebuild, and the outcome is already
+            // visible from the distribution the provider reports as selected.
+            LOG.debug("The opensearch data directory requires the {}.x compatibility distribution",
+                    RequiredOpensearchDistribution.COMPAT.majorVersion());
             bound = bound.stream()
                     .filter(d -> RequiredOpensearchDistribution.COMPAT.matches(d.version()))
                     .toList();
@@ -198,7 +200,9 @@ public class OpensearchVersionSelectorImpl implements OpensearchVersionSelector 
     }
 
     private Path dataDir() {
-        return DatanodeDirectories.fromConfiguration(localConfiguration, nodeId).getDataTargetDir();
+        // Deliberately not DatanodeDirectories.fromConfiguration: this runs on every configuration rebuild, and that
+        // method logs the full directory report each time.
+        return DatanodeDirectories.dataTargetDirFromConfiguration(localConfiguration, nodeId);
     }
 
     private static int compareVersions(final String v1, final String v2) {
