@@ -21,6 +21,7 @@ import { forwardRef } from 'react';
 import Icon from 'components/common/Icon';
 import type { IconName, RotateProp, IconType } from 'components/common/Icon';
 import { Button } from 'components/bootstrap';
+import type { StyleProps } from 'components/bootstrap/Button';
 import Tooltip from 'components/common/Tooltip';
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -45,8 +46,9 @@ type Props = {
   rotation?: RotateProp;
   'data-testid'?: string;
   size?: BsSize;
-  bsStyle?: 'transparent' | 'default';
+  bsStyle?: StyleProps;
   iconSize?: 'lg' | 'inherit';
+  showTitle?: boolean;
 };
 
 const handleClick = (
@@ -73,11 +75,12 @@ const IconButton = (
     bsStyle = 'transparent',
     'data-testid': dataTestId = undefined,
     size = 'xs',
+    showTitle = false,
     ...rest
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
-) => (
-  <Tooltip label={title} position="top">
+) => {
+  const button = (
     <Wrapper
       ref={ref}
       tabIndex={focusable ? 0 : -1}
@@ -90,8 +93,19 @@ const IconButton = (
       bsStyle={bsStyle}
       disabled={disabled}>
       <StyledIcon type={iconType} size={bsStyle === 'transparent' ? 'lg' : undefined} {...rest} />
+      {showTitle && ` ${title}`}
     </Wrapper>
-  </Tooltip>
-);
+  );
+
+  if (showTitle && !disabled) {
+    return button;
+  }
+
+  return (
+    <Tooltip label={title} position="top">
+      {button}
+    </Tooltip>
+  );
+};
 
 export default forwardRef(IconButton);

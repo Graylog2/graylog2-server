@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import HasOwnership from 'components/common/HasOwnership';
 import IconButton from 'components/common/IconButton';
+import type { StyleProps } from 'components/bootstrap/Button';
 
 type Props = {
   /**
@@ -28,9 +29,11 @@ type Props = {
   entityId: string;
   entityType: string;
   onClick: () => void;
-  bsStyle?: 'default';
+  bsStyle?: StyleProps;
   bsSize?: 'xs' | 'xsmall' | 'md' | 'medium';
   title?: string;
+  /** Show the title text next to the icon, e.g. when multiple share buttons appear together and the icon alone can't tell them apart. */
+  showTitle?: boolean;
 };
 
 const ShareButton = ({
@@ -41,6 +44,7 @@ const ShareButton = ({
   bsSize = undefined,
   bsStyle = 'default',
   title = 'Share',
+  showTitle = false,
 }: Props) => (
   <HasOwnership id={entityId} type={entityType}>
     {({ disabled: hasMissingPermissions }) => {
@@ -58,6 +62,7 @@ const ShareButton = ({
           size={bsSize}
           onClick={onClick}
           disabled={isDisabled}
+          showTitle={showTitle}
         />
       );
     }}
