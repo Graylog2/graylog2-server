@@ -20,11 +20,10 @@ import { Collapse } from '@mantine/core';
 
 import useDisclosure from 'util/hooks/useDisclosure';
 import sizeForMantine from 'theme/utils/sizeForMantine';
-import type { BsSize } from 'components/bootstrap/types';
 
 import IconButton from './IconButton';
 
-const Container = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize: BsSize }>(
+const Container = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize: SectionBsSize }>(
   ({ $collapsible, $opened, $bsSize, theme }) => css`
     background-color: ${theme.colors.section.filled.background};
     border: 1px solid ${theme.colors.section.filled.border};
@@ -34,7 +33,7 @@ const Container = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize:
   `,
 );
 
-const Header = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize: BsSize }>(
+const Header = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize: SectionBsSize }>(
   ({ $collapsible, $opened, $bsSize, theme }) => css`
     display: flex;
     justify-content: space-between;
@@ -59,6 +58,8 @@ const FlexWrapper = styled.div(
   `,
 );
 
+type SectionBsSize = 'md' | 'xs';
+
 type Props = React.PropsWithChildren<{
   title: string;
   titleAs?: 'h2' | 'h3' | 'h4' | 'h5';
@@ -72,7 +73,7 @@ type Props = React.PropsWithChildren<{
   disableCollapseButton?: boolean;
   collapseButtonPosition?: 'left' | 'right';
   className?: string;
-  bsSize?: BsSize;
+  bsSize?: SectionBsSize;
 }>;
 
 /**
