@@ -19,6 +19,7 @@ import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { IconButton } from 'components/common';
+import { theme } from 'views/components/visualizations/utils/__tests__/fixtures';
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -54,8 +55,7 @@ const ElementActions = styled.div`
 `;
 
 const StyledIconButton = styled(IconButton)`
-  width: fit-content;
-  height: fit-content;
+  line-height: normal;
 `;
 
 const ElementConfiguration = styled.div`
@@ -79,7 +79,7 @@ const ElementConfigurationContainer = (
   <Container className={className} ref={ref}>
     <ElementActions>
       {dragHandle}
-      {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
+      {onRemove && <StyledIconButton size="xs" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
     </ElementActions>
     <ElementConfiguration>{children}</ElementConfiguration>
   </Container>
