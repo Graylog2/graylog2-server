@@ -28,12 +28,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchDataDirCompatibilityCheck.class);
+
+    /**
+     * How many individual compatibility problems the abort message spells out before it starts counting instead.
+     */
+    private static final int MAX_REPORTED_ERRORS = 5;
 
     private final DatanodeConfiguration datanodeConfiguration;
     private final OpensearchDataDirCompatibilityService compatibilityService;
@@ -67,10 +73,22 @@ public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
         compatibility.warnings().forEach(LOG::warn);
 
         if (!compatibility.isCompatible()) {
+            // One error per incompatible index, so a large cluster can produce thousands. The full list goes to the
+            // log, the exception message carries only the first few so it stays readable and within log/event size
+            // limits.
+            compatibility.errors().forEach(LOG::error);
             throw new PreflightCheckException(f("Index directory %s is not compatible with current version %s of Opensearch, terminating. %s",
-                    opensearchDataDir, opensearchVersion, String.join(" ", compatibility.errors())));
+                    opensearchDataDir, opensearchVersion, abbreviate(compatibility.errors())));
         }
 
         LOG.info("Found {} indices and all of them are valid with current opensearch version {}", compatibility.indicesCount(), opensearchVersion);
+    }
+
+    private static String abbreviate(List<String> errors) {
+        if (errors.size() <= MAX_REPORTED_ERRORS) {
+            return String.join(" ", errors);
+        }
+        return f("%s ... and %d more problems, see the log for the complete list.",
+                String.join(" ", errors.subList(0, MAX_REPORTED_ERRORS)), errors.size() - MAX_REPORTED_ERRORS);
     }
 }

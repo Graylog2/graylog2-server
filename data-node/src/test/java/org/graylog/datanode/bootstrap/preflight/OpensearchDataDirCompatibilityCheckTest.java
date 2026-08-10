@@ -37,9 +37,7 @@ import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 class OpensearchDataDirCompatibilityCheckTest {
@@ -135,6 +133,23 @@ class OpensearchDataDirCompatibilityCheckTest {
         Assertions.assertThat(isCompatible("1.0.0", "3.5.0")).isFalse();
         Assertions.assertThat(isCompatible("3.5.0", "1.0.0")).isFalse();
         Assertions.assertThat(isCompatible("4.0.0", "2.0.0")).isFalse();
+    }
+
+    /**
+     * There is one error per incompatible index, so a real cluster can produce thousands. The abort message has to
+     * stay a readable size while the log keeps the complete list.
+     */
+    @Test
+    void testAbortMessageIsTruncatedWhenManyIndicesAreIncompatible() throws URISyntaxException {
+        // The fixture holds six indices and this version is two generations ahead of them, so the service reports the
+        // node version plus one error per index.
+        final Path dataDir = Path.of(getClass().getResource("/indices/opensearch2").toURI());
+
+        final OpensearchDataDirCompatibilityCheck check = checkFor(dataDir, "4.0.0", realParser());
+
+        Assertions.assertThatThrownBy(check::runCheck)
+                .isInstanceOf(PreflightCheckException.class)
+                .hasMessageContaining("and 2 more problems, see the log for the complete list.");
     }
 
     private static boolean isCompatible(String current, String node) {
