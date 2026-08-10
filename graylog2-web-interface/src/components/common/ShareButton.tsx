@@ -30,6 +30,7 @@ type Props = {
   onClick: () => void;
   bsStyle?: 'default';
   bsSize?: 'xs' | 'xsmall' | 'md' | 'medium';
+  title?: string;
 };
 
 const ShareButton = ({
@@ -39,18 +40,19 @@ const ShareButton = ({
   disabledInfo = undefined,
   bsSize = undefined,
   bsStyle = 'default',
+  title = 'Share',
 }: Props) => (
   <HasOwnership id={entityId} type={entityType}>
     {({ disabled: hasMissingPermissions }) => {
       const isDisabled = !!disabledInfo || hasMissingPermissions;
-      const title = isDisabled
+      const tooltipLabel = isDisabled
         ? disabledInfo || `Only owners of this ${entityType.replaceAll('_', ' ')} can share it.`
-        : 'Share';
+        : title;
 
       return (
         <IconButton
           name="person_add"
-          title={title}
+          title={tooltipLabel}
           bsStyle={bsStyle}
           iconSize="inherit"
           size={bsSize}
