@@ -47,7 +47,7 @@ interface GlobalNotification {
 interface NavigationBadge {
   key: string;
   component: React.ComponentType;
-  // Active badges replace the built-in notification badge, so they must render the notification count themselves.
+  // Active badges render alongside the built-in notification badge, so they must not duplicate its count.
   useCondition: () => boolean;
 }
 

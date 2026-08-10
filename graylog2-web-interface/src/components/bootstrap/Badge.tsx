@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
+import type { BadgeVariant } from '@mantine/core';
 import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
@@ -34,11 +35,19 @@ const mapFontSize: Record<SupportedMantineSize, 'tiny' | 'small' | 'body'> = {
   lg: 'body',
 };
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant; size: SupportedMantineSize }>(
-  ({ theme, color, size }) => css`
+const StyledBadge = styled(MantineBadge)<{
+  color: ColorVariant;
+  size: SupportedMantineSize;
+  variant: BadgeVariant;
+}>(
+  ({ theme, color, size, variant }) => css`
     text-transform: none;
-    background-color: ${color};
-    color: ${theme.utils.contrastingColor(color)};
+    ${variant === 'filled'
+      ? css`
+          background-color: ${color};
+          color: ${theme.utils.contrastingColor(color)};
+        `
+      : ''}
 
     /* Let the badge shrink below its content width — as a flex/grid item (min-width: 0) and
        capped to its container (max-width: 100%) instead of Mantine's default width: fit-content.
@@ -74,6 +83,7 @@ type Props = React.PropsWithChildren<{
   style?: React.CSSProperties;
   title?: string;
   uppercase?: boolean;
+  variant?: BadgeVariant;
 }>;
 
 const Badge = (
@@ -91,6 +101,7 @@ const Badge = (
     title = undefined,
     bsSize = 'md',
     uppercase = false,
+    variant = 'filled',
   }: Props,
   ref: React.ForwardedRef<HTMLElement>,
 ) => {
@@ -106,7 +117,7 @@ const Badge = (
     'data-testid': dataTestid,
     role,
     style,
-    variant: 'filled' as const,
+    variant,
     onMouseEnter,
     onMouseLeave,
     size,
