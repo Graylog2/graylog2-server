@@ -21,6 +21,7 @@ import { forwardRef } from 'react';
 import Icon from 'components/common/Icon';
 import type { IconName, RotateProp, IconType, SizeProp } from 'components/common/Icon';
 import { Button } from 'components/bootstrap';
+import Tooltip from 'components/common/Tooltip';
 
 const Wrapper = styled(Button)<{ disabled: boolean }>(
   ({ theme, disabled, bsStyle }) => css`
@@ -71,19 +72,20 @@ const IconButton = (
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
 ) => (
-  <Wrapper
-    ref={ref}
-    tabIndex={focusable ? 0 : -1}
-    data-testid={dataTestId}
-    title={title}
-    aria-label={title}
-    onClick={(e) => handleClick(onClick, e)}
-    className={className}
-    type="button"
-    bsStyle="transparent"
-    disabled={disabled}>
-    <Icon type={iconType} {...rest} />
-  </Wrapper>
+  <Tooltip label={title} position="top">
+    <Wrapper
+      ref={ref}
+      tabIndex={focusable ? 0 : -1}
+      data-testid={dataTestId}
+      aria-label={title}
+      onClick={(e) => handleClick(onClick, e)}
+      className={className}
+      type="button"
+      bsStyle="transparent"
+      disabled={disabled}>
+      <Icon type={iconType} {...rest} />
+    </Wrapper>
+  </Tooltip>
 );
 
 export default forwardRef(IconButton);
