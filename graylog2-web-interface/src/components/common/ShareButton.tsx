@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 
-import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import HasOwnership from 'components/common/HasOwnership';
 import IconButton from 'components/common/IconButton';
 
@@ -35,29 +34,31 @@ type Props = {
 
 const ShareButton = ({
   entityId,
-  bsSize = undefined,
-  bsStyle = 'default',
   entityType,
   onClick,
   disabledInfo = undefined,
+  bsSize = undefined,
+  bsStyle = 'default',
 }: Props) => (
   <HasOwnership id={entityId} type={entityType}>
-    {({ disabled: hasMissingPermissions }) => (
-      <>
+    {({ disabled: hasMissingPermissions }) => {
+      const isDisabled = !!disabledInfo || hasMissingPermissions;
+      const title = isDisabled
+        ? disabledInfo || `Only owners of this ${entityType.replaceAll('_', ' ')} can share it.`
+        : 'Share';
+
+      return (
         <IconButton
           name="person_add"
-          title="Share"
+          title={title}
           bsStyle={bsStyle}
-          size={bsSize}
           iconSize={null}
+          size={bsSize}
           onClick={onClick}
-          disabled={!!disabledInfo || hasMissingPermissions}
+          disabled={isDisabled}
         />
-        {(!!disabledInfo || hasMissingPermissions) && (
-          <SharingDisabledPopover type={entityType} description={disabledInfo} />
-        )}
-      </>
-    )}
+      );
+    }}
   </HasOwnership>
 );
 
