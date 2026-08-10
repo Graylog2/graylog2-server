@@ -15,37 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-// TODO: Consider hoisting NumberCard from enterprise/src/web/security-app/components/Welcome/Grid/NumberCard.tsx
-//       to components/common and using it here instead. NumberCard has more features (icon, sublabel, clickable).
-
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import type { ColorVariant } from '@graylog/sawmill';
 
 import { HoverForHelp, AccessibleCard } from 'components/common';
-export type Variant = 'default' | 'success' | 'warning' | 'danger';
+export type Variant = 'default' | 'success' | 'warning' | 'danger' | 'primary';
 
 type Props = {
-  value: number;
-  label: string;
+  value: number | React.ReactNode;
+  label: string | React.ReactNode;
+  subValue?: string | React.ReactNode;
   helpText?: React.ReactNode;
-  variant?: Variant;
+  variant?: ColorVariant;
   onClick?: () => void;
+  className?: string;
 };
 
-const StyledCard = styled(AccessibleCard)<{ $variant: Variant }>(
+const Card = styled(AccessibleCard)<{ $variant: ColorVariant }>(
   ({ theme, $variant }) => css`
-    position: relative;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.xs};
     min-width: 100px;
     padding: ${theme.spacings.md};
-    font: inherit;
     color: inherit;
-    width: auto;
-
+    font: inherit;
     ${$variant !== 'default' &&
     css`
       border-left: 3px solid ${theme.colors.variant[$variant]};
     `}
+    position: relative;
   `,
 );
 
@@ -54,28 +55,46 @@ const HelpCorner = styled.div(
     position: absolute;
     top: ${theme.spacings.xs};
     right: ${theme.spacings.xs};
-    color: ${theme.colors.gray[70]};
+    color: ${theme.colors.text.secondary};
     font-size: 0.7em;
   `,
 );
 
-const Value = styled.div(
+const CardLabel = styled.div(
   ({ theme }) => css`
-    font-size: ${theme.fonts.size.huge};
-    font-weight: bold;
-    line-height: 1.2;
-  `,
-);
-
-const Label = styled.div(
-  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    font-weight: 600;
   `,
 );
 
-const StatCard = ({ value, label, helpText = undefined, variant = 'default', onClick = undefined }: Props) => (
-  <StyledCard $variant={variant} onClick={onClick}>
+const CardValue = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.text.primary};
+    font-size: ${theme.fonts.size.huge};
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  `,
+);
+
+const CardSubValue = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
+    font-size: ${theme.fonts.size.small};
+  `,
+);
+
+const StatCard = ({
+  value,
+  label,
+  subValue = null,
+  helpText = undefined,
+  variant = 'default',
+  onClick = undefined,
+  className = undefined,
+}: Props) => (
+  <Card $variant={variant} onClick={onClick} className={className}>
     {helpText && (
       <HelpCorner>
         <HoverForHelp title={label} triggerTitle="More info" placement="right" pullRight={false}>
@@ -83,9 +102,10 @@ const StatCard = ({ value, label, helpText = undefined, variant = 'default', onC
         </HoverForHelp>
       </HelpCorner>
     )}
-    <Value>{value}</Value>
-    <Label>{label}</Label>
-  </StyledCard>
+    <CardLabel>{label}</CardLabel>
+    <CardValue>{value}</CardValue>
+    <CardSubValue>{subValue}</CardSubValue>
+  </Card>
 );
 
 export default StatCard;
