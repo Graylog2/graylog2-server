@@ -47,6 +47,11 @@ import DefaultChartColorsContext from 'views/components/widgets/DefaultChartColo
 import replayLinkWidgetAction from './ReplayLinkWidgetAction';
 
 const LAST_24_HOURS = { type: 'relative' as const, from: 86400 };
+const AREA_CHART_TIMERANGE = {
+  type: 'absolute' as const,
+  from: '2026-08-09T13:00:00.000Z',
+  to: '2026-08-10T12:00:00.000Z',
+};
 const WIDGET_ACTIONS = [replayLinkWidgetAction];
 
 const MESSAGES_TODAY_LINK = '/search?q=&rangetype=relative&from=300';
@@ -109,7 +114,7 @@ const topSourcesWidget = () => ({
   title: 'Top 5 Sources',
   widget: AggregationWidget.builder()
     .id(generateId())
-    .timerange(LAST_24_HOURS)
+    .timerange(AREA_CHART_TIMERANGE)
     .query(createElasticsearchQueryString('NOT source:example.org'))
     .config(
       AggregationWidgetConfig.builder()
