@@ -40,7 +40,7 @@ import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizat
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { widgetDragHandleClass } from 'views/components/widgets/Constants';
-import { TIMESTAMP_FIELD, DEFAULT_INTERPOLATION } from 'views/Constants';
+import { TIMESTAMP_FIELD } from 'views/Constants';
 import WidgetActionsContext from 'views/components/widgets/WidgetActionsContext';
 
 import replayLinkWidgetAction from './ReplayLinkWidgetAction';
@@ -81,16 +81,9 @@ type NumberWidgetOptions = {
   link: string;
   queryString?: string;
   streams?: Array<string>;
-  trendPreference?: 'HIGHER' | 'LOWER' | 'NEUTRAL';
 };
 
-const numberWidget = ({
-  title,
-  link,
-  queryString = '',
-  streams = [],
-  trendPreference = 'HIGHER',
-}: NumberWidgetOptions) => ({
+const numberWidget = ({ title, link, queryString = '', streams = [] }: NumberWidgetOptions) => ({
   title,
   widget: AggregationWidget.builder()
     .id(generateId())
@@ -102,7 +95,7 @@ const numberWidget = ({
       AggregationWidgetConfig.builder()
         .series([Series.forFunction('count()')])
         .visualization('numeric')
-        .visualizationConfig(NumberVisualizationConfig.create(true, trendPreference))
+        .visualizationConfig(NumberVisualizationConfig.create(true, 'NEUTRAL'))
         .rollup(false)
         .build(),
     )
@@ -114,13 +107,14 @@ const topSourcesWidget = () => ({
   widget: AggregationWidget.builder()
     .id(generateId())
     .timerange(LAST_24_HOURS)
+    .query(createElasticsearchQueryString('NOT source:example.org'))
     .config(
       AggregationWidgetConfig.builder()
         .rowPivots([pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], []))])
         .columnPivots([Pivot.createValues(['source'], { limit: 5, skip_empty_values: false })])
         .series([Series.forFunction('count()')])
         .visualization('area')
-        .visualizationConfig(AreaVisualizationConfig.create(DEFAULT_INTERPOLATION))
+        .visualizationConfig(AreaVisualizationConfig.create('spline'))
         .rollup(false)
         .build(),
     )
@@ -135,14 +129,12 @@ const buildViewState = () => {
       link: ALERTS_LINK,
       queryString: 'alert:true',
       streams: ALERTS_EVENTS_STREAMS,
-      trendPreference: 'LOWER',
     }),
     numberWidget({
       title: 'Events Today',
       link: EVENTS_LINK,
       queryString: 'alert:false',
       streams: ALERTS_EVENTS_STREAMS,
-      trendPreference: 'LOWER',
     }),
     topSourcesWidget(),
   ];
@@ -153,10 +145,10 @@ const buildViewState = () => {
     .titles({ widget: Object.fromEntries(entries.map(({ widget, title }) => [widget.id, title])) })
     .widgets(entries.map(({ widget }) => widget))
     .widgetPositions({
-      [first.widget.id]: new WidgetPosition(1, 1, 2, 4),
-      [second.widget.id]: new WidgetPosition(5, 1, 2, 4),
-      [third.widget.id]: new WidgetPosition(9, 1, 2, 4),
-      [sources.widget.id]: new WidgetPosition(1, 3, 3, 12),
+      [first.widget.id]: new WidgetPosition(1, 1, 1.6, 4),
+      [second.widget.id]: new WidgetPosition(5, 1, 1.6, 4),
+      [third.widget.id]: new WidgetPosition(9, 1, 1.6, 4),
+      [sources.widget.id]: new WidgetPosition(1, 2.75, 3, 12),
     })
     .build();
 };
