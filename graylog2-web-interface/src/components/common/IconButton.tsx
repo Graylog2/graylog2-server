@@ -20,27 +20,19 @@ import { forwardRef } from 'react';
 
 import Icon from 'components/common/Icon';
 import type { IconName, RotateProp, IconType, SizeProp } from 'components/common/Icon';
+import { Button } from 'components/bootstrap';
 
-const Wrapper = styled.button<{ disabled: boolean }>(
-  ({ theme, disabled }) => css`
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
+const Wrapper = styled(Button)<{ disabled: boolean }>(
+  ({ theme, disabled, bsStyle }) => css`
     height: 25px;
     width: 25px;
-    border: 0;
-    background-color: transparent;
-    cursor: pointer;
-    color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
+    padding: 0;
     font-size: ${theme.fonts.size.large};
 
-    &:hover {
-      background-color: ${theme.colors.gray[80]};
-    }
-
-    &:active {
-      background-color: ${theme.colors.gray[70]};
-    }
+    ${bsStyle === 'transparent' &&
+    css`
+      color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
+    `}
   `,
 );
 
@@ -88,6 +80,7 @@ const IconButton = (
     onClick={(e) => handleClick(onClick, e)}
     className={className}
     type="button"
+    bsStyle="transparent"
     disabled={disabled}>
     <Icon type={iconType} {...rest} />
   </Wrapper>

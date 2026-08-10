@@ -21,6 +21,12 @@ import { MenuItem } from 'components/bootstrap';
 import Menu from 'components/bootstrap/Menu';
 import StopPropagation from 'views/components/common/StopPropagation';
 import { widgetActionsDropdownOpenClass } from 'views/components/widgets/Constants';
+import styled from 'styled-components';
+
+const Container = styled(StopPropagation)`
+  display: inline-block;
+  vertical-align: middle;
+`;
 
 type Props = {
   children: React.ReactNode;
@@ -35,7 +41,7 @@ const ActionDropdown = ({ children, element, 'data-testid': dataTestid = undefin
   const toggleIsOpen = (newIsOpen: boolean) => setIsOpen(newIsOpen);
 
   return (
-    <StopPropagation data-testid={dataTestid}>
+    <Container data-testid={dataTestid}>
       <span className={isOpen ? widgetActionsDropdownOpenClass : ''}>
         <Menu position="bottom" withinPortal onChange={toggleIsOpen}>
           <Menu.Target>{element}</Menu.Target>
@@ -45,7 +51,7 @@ const ActionDropdown = ({ children, element, 'data-testid': dataTestid = undefin
           </Menu.Dropdown>
         </Menu>
       </span>
-    </StopPropagation>
+    </Container>
   );
 };
 
