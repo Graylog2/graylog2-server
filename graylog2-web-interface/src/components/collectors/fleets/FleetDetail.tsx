@@ -30,6 +30,7 @@ import useQuery from 'routing/useQuery';
 import Routes from 'routing/Routes';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import StatCard from 'components/common/StatCard/StatCard';
 
 import FleetSettings from './FleetSettings';
 
@@ -47,7 +48,6 @@ import {
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_FLEET_ID_FIELD, COLLECTOR_SOURCE_ID_FIELD } from '../common/fields';
-import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
 import InstanceActions from '../instances/InstanceActions';

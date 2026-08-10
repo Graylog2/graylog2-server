@@ -25,6 +25,7 @@ import Routes from 'routing/Routes';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
 import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
+import StatCard from 'components/common/StatCard/StatCard';
 
 import useCollectorLogPreview from './useCollectorLogPreview';
 import LogPreviewSection from './LogPreviewSection';
