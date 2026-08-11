@@ -58,7 +58,10 @@ describe('NotificationBadge', () => {
   it('links to the system notifications page', async () => {
     render(<NotificationBadge />);
 
-    expect(await screen.findByRole('link')).toHaveAttribute('href', '/system/notifications');
+    expect(await screen.findByRole('link', { name: 'No unread system notifications' })).toHaveAttribute(
+      'href',
+      '/system/notifications',
+    );
   });
 
   it('shows the icon without a count when there are no unread notifications', async () => {
@@ -119,8 +122,8 @@ describe('NotificationBadge', () => {
 
     rerender(<NotificationBadge />);
 
-    await waitFor(async () => {
-      expect(await screen.findByTestId(BADGE_ID)).toHaveTextContent('23');
+    await waitFor(() => {
+      expect(screen.getByTestId(BADGE_ID)).toHaveTextContent('23');
     });
   });
 });
