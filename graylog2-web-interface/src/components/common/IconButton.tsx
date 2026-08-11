@@ -123,7 +123,7 @@ const IconButton = (
   }
 
   return (
-    <Tooltip label={title} position="top">
+    <Tooltip label={title} position="top" openDelay={750}>
       {button}
     </Tooltip>
   );
