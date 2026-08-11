@@ -17,14 +17,14 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Icon, Link, Spinner } from 'components/common';
+import { Icon, LinkContainer, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView, Source, SourceType } from 'components/collectors/types';
 import { formatNumber } from 'util/NumberFormatting';
+import { Button } from 'components/bootstrap';
 
 import QuietSection from './QuietSection';
 
-import { DividedIconRow, IconRowList } from '../../common/IconRowList';
 import { OS_LABELS } from '../../common/Constants';
 import { SOURCE_TYPE_LABELS } from '../../sources/Constants';
 
@@ -36,6 +36,29 @@ type Props = {
   /** Message count per source id for the preview window. `undefined` when the aggregation failed. */
   sourceCounts?: Record<string, number>;
 };
+
+/* The rows are a three-part flex layout, not a table: the name takes the flexible space, the
+   count right-aligns against the status, and the status occupies a fixed-width end column so the
+   rows line up. Auto-sized table columns cannot express the count/status alignment. */
+const SourceList = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+`;
+
+const SourceRow = styled.li(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.sm};
+    padding: ${theme.spacings.xs} 0;
+    border-bottom: 1px solid ${theme.colors.gray[90]};
+
+    &:last-child {
+      border-bottom: none;
+    }
+  `,
+);
 
 const SourceName = styled.span`
   font-weight: 600;
@@ -179,11 +202,15 @@ const SourceStatusSection = ({ instance, sources, receiving, sourceCounts = unde
     <QuietSection
       title="Log sources"
       titleAs="h3"
-      actions={<Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>Configure sources</Link>}>
+      actions={
+        <LinkContainer to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>
+          <Button bsSize="xsmall">Configure sources</Button>
+        </LinkContainer>
+      }>
       {!sources?.length ? (
         <Footer>No sources configured for this fleet yet.</Footer>
       ) : (
-        <IconRowList>
+        <SourceList>
           {sources.map((source) => {
             // A present map with no entry for this source means it produced nothing; an absent map
             // means the aggregation is unavailable and no number should be claimed.
@@ -197,14 +224,14 @@ const SourceStatusSection = ({ instance, sources, receiving, sourceCounts = unde
             const collecting = source.enabled && !mismatched && isRecognised(source.type);
 
             return (
-              <DividedIconRow key={source.id}>
+              <SourceRow key={source.id}>
                 <SourceName>{source.name}</SourceName>
                 <SourceCountCell count={collecting ? count : undefined} />
                 <SourceStatus source={source} instance={instance} receiving={receiving} count={count} />
-              </DividedIconRow>
+              </SourceRow>
             );
           })}
-        </IconRowList>
+        </SourceList>
       )}
       {online && (
         <Footer>Messages received in the last 15 minutes{!receiving && ' · checking every few seconds'}</Footer>

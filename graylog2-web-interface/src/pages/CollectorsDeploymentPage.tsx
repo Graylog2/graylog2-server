@@ -73,7 +73,13 @@ const CollectorsDeploymentPage = () => {
             <Tabs.List>
               <Tabs.Tab value="deploy">Deploy</Tabs.Tab>
               <Tabs.Tab value="tokens">
-                Enrollment tokens{tokenCount !== undefined && <> <Badge>{tokenCount}</Badge></>}
+                Enrollment tokens
+                {tokenCount !== undefined && (
+                  <>
+                    {' '}
+                    <Badge>{tokenCount}</Badge>
+                  </>
+                )}
               </Tabs.Tab>
             </Tabs.List>
             <Tabs.Panel value="deploy">

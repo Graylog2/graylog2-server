@@ -31,6 +31,12 @@ const QuietSection = styled(Section)(
   ({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
     border-color: ${theme.colors.cards.border};
+
+    /* Section renders its header (the Container's first child) flush against the content;
+       without the fill separating them the title needs some air below. */
+    > div:first-child {
+      margin-bottom: ${theme.spacings.sm};
+    }
   `,
 );
 

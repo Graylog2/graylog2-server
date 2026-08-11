@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, HelpBlock, Input, SegmentedControl } from 'components/bootstrap';
+import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
 import MutedText from 'components/collectors/common/MutedText';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -49,7 +49,9 @@ const OptionsBox = styled.div(
     border: 1px solid ${theme.colors.cards.border};
     border-radius: ${theme.spacings.xs};
     padding: ${theme.spacings.md};
-    max-width: 760px;
+
+    /* Half the step width, matching the fleet step's box (FleetChoice inline). */
+    max-width: 50%;
     margin-bottom: ${theme.spacings.sm};
   `,
 );
@@ -77,8 +79,14 @@ const CustomFields = styled.div(
     margin-top: ${theme.spacings.sm};
 
     /* The name input owns its own bottom margin via form-group; align the control with it. */
-    > div:last-child {
+    > div:first-child {
       margin-bottom: ${theme.spacings.md};
+    }
+
+    /* The name input takes whatever width the fixed-size expiry control leaves over. */
+    > .form-group {
+      flex: 1;
+      min-width: 200px;
     }
   `,
 );
@@ -92,7 +100,9 @@ const SummaryBox = styled.div(
     border: 1px solid ${theme.colors.cards.border};
     border-radius: ${theme.spacings.xs};
     padding: ${theme.spacings.sm} ${theme.spacings.md};
-    max-width: 760px;
+
+    /* Half the step width, matching the fleet step's box (FleetChoice inline). */
+    max-width: 50%;
   `,
 );
 
@@ -182,15 +192,6 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
         </ModeRow>
         {mode === 'custom' && (
           <CustomFields>
-            <Input
-              type="text"
-              id="custom-token-name"
-              name="custom-token-name"
-              label="Name"
-              placeholder="e.g. web-servers rollout"
-              value={effectiveName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomName(e.target.value)}
-            />
             <div>
               <SegmentedControl
                 value={expiry}
@@ -209,9 +210,18 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
                 ]}
               />
             </div>
+            <Input
+              type="text"
+              id="custom-token-name"
+              name="custom-token-name"
+              label="Name"
+              placeholder="e.g. web-servers rollout"
+              value={effectiveName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomName(e.target.value)}
+            />
           </CustomFields>
         )}
-        <HelpBlock>Custom tokens appear on the Enrollment tokens tab and can be revoked any time.</HelpBlock>
+        <MutedText>Custom tokens appear on the Enrollment tokens tab and can be revoked any time.</MutedText>
       </OptionsBox>
       <Button bsStyle="primary" onClick={handleGenerate} disabled={!canGenerate || isCreatingEnrollmentToken}>
         {isCreatingEnrollmentToken ? 'Generating...' : 'Generate token'}
