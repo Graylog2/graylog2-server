@@ -19,7 +19,7 @@ import React from 'react';
 import NumberUtils from 'util/NumberUtils';
 import { Label } from 'components/bootstrap';
 
-import { MetricPlaceholder, MetricsColumn, MetricsRow } from '../../shared-components/NodeMetricsLayout';
+import { MetricPlaceholder, MetricsColumn, MetricsRow, GrowContainer } from '../../shared-components/NodeMetricsLayout';
 import { MongodbRole, type MongodbRoleType } from '../fetchClusterMongodbNodes';
 
 type Props = {
@@ -63,8 +63,8 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
   if (upperRole && NO_REPLICATION_LAG_ROLES.has(upperRole as MongodbRoleType)) {
     return (
       <MetricsColumn>
-        <MetricsRow $rightAligned>
-          <span>-</span>
+        <MetricsRow>
+          <GrowContainer>-</GrowContainer>
         </MetricsRow>
       </MetricsColumn>
     );
@@ -82,8 +82,8 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
   if (!exceedsDanger && !exceedsWarning) {
     return (
       <MetricsColumn>
-        <MetricsRow $rightAligned>
-          <span title={exactValueTitle}>{formatted}</span>
+        <MetricsRow>
+          <GrowContainer title={exactValueTitle}>{formatted}</GrowContainer>
         </MetricsRow>
       </MetricsColumn>
     );
@@ -91,7 +91,7 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
 
   return (
     <MetricsColumn>
-      <MetricsRow $rightAligned>
+      <MetricsRow>
         <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs" title={exactValueTitle}>
           {formatted}
         </Label>

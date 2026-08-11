@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 export const MetricsColumn = styled.div`
   display: flex;
@@ -23,20 +23,17 @@ export const MetricsColumn = styled.div`
   gap: 4px;
 `;
 
-export const MetricsRow = styled.div<{ $rightAligned?: boolean }>(
-  ({ $rightAligned }) => css`
-    font-size: small;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: ${$rightAligned ? 'flex-end' : 'flex-start'};
+export const MetricsRow = styled.div`
+  font-size: small;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 
-    span {
-      font-size: inherit;
-    }
-  `,
-);
+  span {
+    font-size: inherit;
+  }
+`;
 
 export const SecondaryText = styled.div`
   font-size: small;
@@ -50,6 +47,10 @@ export const SecondaryText = styled.div`
   }
 `;
 
+export const GrowContainer = styled.div`
+  flex-grow: 1;
+`;
+
 export const NodePrimary = styled.div`
   display: flex;
   flex-direction: column;
@@ -59,7 +60,7 @@ export const NodePrimary = styled.div`
 export const MetricPlaceholder = () => (
   <MetricsColumn>
     <SecondaryText>
-      <span>N/A</span>
+      <GrowContainer>N/A</GrowContainer>
     </SecondaryText>
   </MetricsColumn>
 );
