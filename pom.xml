@@ -137,6 +137,7 @@
         <google-api-common.version>2.66.0</google-api-common.version>
         <google-auth-library.version>1.50.0</google-auth-library.version>
         <google-cloud-core.version>2.73.0</google-cloud-core.version>
+        <google-conscrypt.version>2.6.1</google-conscrypt.version>
         <google-gax.version>2.83.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
@@ -459,6 +460,14 @@
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-gson</artifactId>
                 <version>${google-http-client.version}</version>
+            </dependency>
+            <!-- io.grpc:grpc-* and google-cloud-* both depend on conscrypt.
+                 the grpc libs sometimes lag behind but are the nearest
+                 declaration and would trigger an upper-bounds error. -->
+            <dependency>
+                <groupId>org.conscrypt</groupId>
+                <artifactId>conscrypt-openjdk-uber</artifactId>
+                <version>${google-conscrypt.version}</version>
             </dependency>
             <!-- Shared libraries that are pulled in transitively at conflicting
                  versions by different dependencies -->
