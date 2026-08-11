@@ -111,7 +111,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.48.4</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.50.3</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.0</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.7</aws-msk-iam-auth.version>
         <bouncycastle.version>1.85</bouncycastle.version>
@@ -171,7 +171,7 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20260719</json-org.version>
         <json-path.version>3.0.0</json-path.version>
-        <jsoup.version>1.22.2</jsoup.version>
+        <jsoup.version>1.23.1</jsoup.version>
         <jsr305.version>3.0.2</jsr305.version>
         <kafka.version>4.3.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
@@ -206,11 +206,11 @@
         <shiro.version>2.2.1</shiro.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>7.4.2</oshi.version>
+        <oshi.version>7.4.3</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
-        <swagger.version>2.2.52</swagger.version>
+        <swagger.version>2.2.53</swagger.version>
         <swagger-parser.version>2.1.45</swagger-parser.version>
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.10.0</threeten-extra.version>
@@ -957,7 +957,7 @@
                 <plugin>
                     <groupId>org.cyclonedx</groupId>
                     <artifactId>cyclonedx-maven-plugin</artifactId>
-                    <version>2.9.2</version>
+                    <version>2.9.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
