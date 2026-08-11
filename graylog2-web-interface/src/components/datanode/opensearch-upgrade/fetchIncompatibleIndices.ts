@@ -38,7 +38,9 @@ export const fetchIncompatibleIndices = (searchParams: SearchParams): Promise<In
   const sort = (searchParams.sort?.attributeId ?? 'index_name') as ListOutdatedIndicesSort;
   const order = (searchParams.sort?.direction ?? 'asc') as ListOutdatedIndicesOrder;
 
-  return SystemIndexerIndices.listOutdatedIndices(sort, searchParams.page, searchParams.pageSize, query, order).then(
+  return SystemIndexerIndices.listOutdatedIndices(sort, searchParams.page, searchParams.pageSize, query, order, {
+    requestShouldExtendSession: false,
+  }).then(
     ({ elements, attributes, pagination }) => ({
       list: elements.map((element) => ({ ...element, id: element.index_name })) as Array<IncompatibleIndexRow>,
       pagination: { total: pagination.total },

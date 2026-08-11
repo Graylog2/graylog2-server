@@ -355,6 +355,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $scrollContainerWidth={scrollContainerWidth}>
                     <InnerContainer>
                       <Table<Entity>
+                        columnWidths={columnWidths}
                         expandedSectionRenderers={expandedSectionRenderers}
                         headerGroups={headerGroups}
                         rowOverride={rowOverride}
