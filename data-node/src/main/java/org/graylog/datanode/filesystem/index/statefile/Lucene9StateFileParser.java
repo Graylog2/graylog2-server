@@ -17,28 +17,33 @@
 package org.graylog.datanode.filesystem.index.statefile;
 
 import jakarta.inject.Singleton;
-import org.apache.lucene.backward_codecs.store.EndiannessReverserUtil;
-import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.IOContext;
-import org.apache.lucene.store.IndexInput;
+import org.graylog.shaded.lucene9.org.apache.lucene.backward_codecs.store.EndiannessReverserUtil;
+import org.graylog.shaded.lucene9.org.apache.lucene.codecs.CodecUtil;
+import org.graylog.shaded.lucene9.org.apache.lucene.store.Directory;
+import org.graylog.shaded.lucene9.org.apache.lucene.store.IOContext;
+import org.graylog.shaded.lucene9.org.apache.lucene.store.IndexInput;
+import org.graylog.shaded.lucene9.org.apache.lucene.store.NIOFSDirectory;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
+/**
+ * Counterpart of {@code Lucene9ShardStatsParser} for state files: reads the codec frame with the relocated
+ * Lucene 9 ({@code org.graylog.shaded:lucene9}) so that state files written by opensearch 1.x and
+ * elasticsearch 7.x can be read even when the Lucene we compile against rejects them.
+ */
 @Singleton
-public class StateFileParserImpl extends AbstractStateFileParser {
+public class Lucene9StateFileParser extends AbstractStateFileParser {
 
     @Override
     protected byte[] readPayload(Path file) throws IOException {
         final Path dir = file.getParent();
         final String filename = file.getFileName().toString();
         try (
-                FSDirectory directory = FSDirectory.open(dir);
-                // IOContext.READONCE signals sequential single-pass access, enabling read-ahead
+                // See Lucene9ShardStatsParser for why this doesn't use FSDirectory.open()
+                Directory directory = new NIOFSDirectory(dir);
                 IndexInput indexInput = EndiannessReverserUtil.openInput(directory, filename, IOContext.READONCE)
         ) {
-            // We checksum the entire file before we even go and parse it. If it's corrupted we barf right here.
             CodecUtil.checksumEntireFile(indexInput);
             CodecUtil.checkHeader(indexInput, STATE_FILE_CODEC, MIN_COMPATIBLE_STATE_FILE_VERSION, STATE_FILE_VERSION);
             indexInput.skipBytes(Integer.BYTES); // xcontentType, not used
