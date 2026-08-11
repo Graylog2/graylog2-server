@@ -40,7 +40,7 @@ class ShardStatsParserTest {
         final URI shard = getClass().getResource("/indices/opensearch2/nodes/0/indices/7z16oEKPTjivI0qd4tv36Q/0").toURI();
         final ShardStats stats = shardStatsParser.read(Path.of(shard));
         Assertions.assertThat(stats.documentsCount()).isEqualTo(1);
-        Assertions.assertThat(stats.minSegmentLuceneVersion().toString()).isEqualTo("9.7.0");
+        Assertions.assertThat(stats.minSegmentLuceneVersion()).isEqualTo("9.7.0");
     }
 
     @Test
@@ -63,7 +63,7 @@ class ShardStatsParserTest {
         final Path shardPath = Path.of(shardUri);
         final ShardStats stats = shardStatsParser.read(shardPath);
         Assertions.assertThat(stats.documentsCount()).isGreaterThan(1);
-        Assertions.assertThat(stats.minSegmentLuceneVersion().toString()).isEqualTo("9.7.0");
+        Assertions.assertThat(stats.minSegmentLuceneVersion()).isEqualTo("9.7.0");
         Assertions.assertThat(stats.path()).isEqualTo(shardPath);
     }
 
