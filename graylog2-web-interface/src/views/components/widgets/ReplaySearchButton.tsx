@@ -35,6 +35,7 @@ import type { FiltersType } from 'views/types';
 const NeutralLink = styled.a`
   display: inline-flex;
   align-items: center;
+  vertical-align: middle;
   color: inherit;
   text-decoration: none;
 
