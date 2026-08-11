@@ -23,7 +23,8 @@ import { formatDuration } from 'util/ISODurationUtils';
 type Props = {
   command: string;
   platformLabel: string;
-  tokenDuration: string;
+  tokenDuration: string | null;
+  actions?: React.ReactNode;
 };
 
 const Container = styled.div(
@@ -70,16 +71,27 @@ const Note = styled.p(
   `,
 );
 
-const InstallCommand = ({ command, platformLabel, tokenDuration }: Props) => (
+const HeaderActions = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+  `,
+);
+
+const InstallCommand = ({ command, platformLabel, tokenDuration, actions = undefined }: Props) => (
   <Container>
     <Header>
       <Title>Run this on {platformLabel}</Title>
-      <ClipboardButton text={command} title="Copy command" bsSize="sm" />
+      <HeaderActions>
+        {actions}
+        <ClipboardButton text={command} title="Copy command" bsSize="sm" />
+      </HeaderActions>
     </Header>
     <CommandBlock>{command}</CommandBlock>
     <Note>
-      Downloads the collector, enrolls it in the selected fleet, and starts collecting immediately. Token expires in{' '}
-      {formatDuration(tokenDuration, () => true)}.
+      Downloads the collector, enrolls it in the selected fleet, and starts collecting immediately.{' '}
+      {tokenDuration ? <>Token expires in {formatDuration(tokenDuration, () => true)}.</> : 'This token never expires.'}
     </Note>
   </Container>
 );
