@@ -17,35 +17,39 @@
 package org.graylog.datanode.filesystem.index.indexreader;
 
 import jakarta.inject.Singleton;
-import org.apache.lucene.index.IndexFormatTooOldException;
-import org.apache.lucene.index.SegmentCommitInfo;
-import org.apache.lucene.index.SegmentInfos;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndexerInformationParserException;
+import org.graylog.shaded.lucene9.org.apache.lucene.index.IndexFormatTooOldException;
+import org.graylog.shaded.lucene9.org.apache.lucene.index.SegmentCommitInfo;
+import org.graylog.shaded.lucene9.org.apache.lucene.index.SegmentInfos;
+import org.graylog.shaded.lucene9.org.apache.lucene.store.Directory;
+import org.graylog.shaded.lucene9.org.apache.lucene.store.NIOFSDirectory;
+import org.graylog.shaded.lucene9.org.apache.lucene.util.Version;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * Reads shards with the Lucene version the datanode compiles against. Anything older than the previous major
- * index format fails with {@link IncompatibleIndexVersionException}; {@link Lucene9ShardStatsParser} is the
- * fallback for those.
+ * Reads shards that {@link ShardStatsParserImpl} can't open. Lucene supports only the current and the previous
+ * major index format, so the Lucene we compile against is limited to Lucene 9 and 10 segments. This implementation
+ * uses a relocated Lucene 9 ({@code org.graylog.shaded:lucene9}) and therefore additionally reads Lucene 8
+ * segments, which is what opensearch 1.x and elasticsearch 7.x wrote.
+ * <p>
+ * Lucene 7 and older (elasticsearch 6.x and below) remains unreadable and still fails with
+ * {@link IncompatibleIndexVersionException}.
  */
 @Singleton
-public class ShardStatsParserImpl implements ShardStatsParser {
+public class Lucene9ShardStatsParser implements ShardStatsParser {
+
     @Override
     public ShardStats read(Path shardPath) throws IncompatibleIndexVersionException {
-        try (Directory directory = FSDirectory.open(shardPath.resolve("index"))) {
-            // SegmentInfos.readLatestCommit reads only the segments_N file and per-segment
-            // .si metadata files — it does not open any codec readers (stored fields, doc
-            // values, postings, etc.), making it far cheaper than DirectoryReader.open().
+        // NIOFSDirectory instead of FSDirectory.open(): the latter picks MMapDirectory, which loads its
+        // IndexInput provider from the multi-release part of the Lucene jar. We only read a handful of small
+        // metadata files once during startup, so plain NIO keeps the shaded jar's surface as small as possible.
+        try (Directory directory = new NIOFSDirectory(shardPath.resolve("index"))) {
             final SegmentInfos segmentInfos = SegmentInfos.readLatestCommit(directory);
-            final int documentsCount = computeDocumentsCount(segmentInfos);
-            return new ShardStats(shardPath, documentsCount, minSegmentLuceneVersion(segmentInfos));
+            return new ShardStats(shardPath, computeDocumentsCount(segmentInfos), minSegmentLuceneVersion(segmentInfos));
         } catch (IndexFormatTooOldException e) {
             throw new IncompatibleIndexVersionException(e);
         } catch (IOException e) {

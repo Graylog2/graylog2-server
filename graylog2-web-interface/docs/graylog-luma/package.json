@@ -11,12 +11,12 @@
     "build-storybook": "storybook build"
   },
   "devDependencies": {
-    "@storybook/addon-docs": "^10.5.5",
+    "@storybook/addon-docs": "^10.5.6",
     "@storybook/addon-webpack5-compiler-swc": "^4.0.3",
-    "@storybook/react-webpack5": "^10.5.5",
-    "eslint-plugin-storybook": "^10.5.5",
+    "@storybook/react-webpack5": "^10.5.6",
+    "eslint-plugin-storybook": "^10.5.6",
     "mermaid": "^11.16.1",
-    "storybook": "^10.5.5",
+    "storybook": "^10.5.6",
     "storybook-dark-mode": "^5.0.0",
     "typescript": "^5.8.2"
   },
