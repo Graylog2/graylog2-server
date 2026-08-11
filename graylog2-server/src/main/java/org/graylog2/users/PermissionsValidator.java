@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.RestPermissions.ROLES_READ;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class PermissionsValidator {
     private final RoleService roleService;
@@ -63,7 +64,7 @@ public class PermissionsValidator {
     public void validatePermissions(Collection<String> permissions, UserContext userContext) {
         final var missingPermissions = permissionsCurrentUserMisses(permissions, userContext);
         if (!missingPermissions.isEmpty()) {
-            throw new BadRequestException("Cannot assign permissions/roles to new user that current user does not have: " + String.join(", ", missingPermissions));
+            throw new BadRequestException(f("Cannot assign permissions/roles to new user that current user does not have: %s", String.join(", ", missingPermissions)));
         }
     }
 
@@ -74,7 +75,7 @@ public class PermissionsValidator {
                 .filter(role -> !isPermitted.test(ROLES_READ, role))
                 .toList();
         if (!deniedRoles.isEmpty()) {
-            throw new ForbiddenException("Not allowed to read roles: " + String.join(", ", deniedRoles));
+            throw new ForbiddenException(f("Not allowed to read roles: %s", String.join(", ", deniedRoles)));
         }
         final var roles = roleService.loadByNames(normalizedRoles);
         return roles.stream()

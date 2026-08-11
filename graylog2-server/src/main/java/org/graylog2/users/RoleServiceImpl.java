@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class RoleServiceImpl implements RoleService {
     private static final Logger log = LoggerFactory.getLogger(RoleServiceImpl.class);
@@ -166,7 +167,7 @@ public class RoleServiceImpl implements RoleService {
         final var retrievedRoles = roles.stream().map(Role::getName).map(name -> name.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
         final var missingRoles = Sets.difference(normalizedRoleNames, retrievedRoles);
         if (!missingRoles.isEmpty()) {
-            throw new NotFoundException("No roles found with name " + String.join(", ", missingRoles));
+            throw new NotFoundException(f("No roles found with names %s", String.join(", ", missingRoles)));
         }
 
         return roles;
