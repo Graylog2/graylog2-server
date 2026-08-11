@@ -171,7 +171,7 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20260719</json-org.version>
         <json-path.version>3.0.0</json-path.version>
-        <jsoup.version>1.22.2</jsoup.version>
+        <jsoup.version>1.23.1</jsoup.version>
         <jsr305.version>3.0.2</jsr305.version>
         <kafka.version>4.3.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
