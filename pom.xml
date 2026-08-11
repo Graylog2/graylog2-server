@@ -212,8 +212,6 @@
         <streamex.version>0.9.0</streamex.version>
         <swagger.version>2.2.53</swagger.version>
         <swagger-parser.version>2.1.46</swagger-parser.version>
-        <swagger.version>2.2.53</swagger.version>
-        <swagger-parser.version>2.1.45</swagger-parser.version>
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.10.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
