@@ -40,7 +40,11 @@ type Props = {
 
 const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate = () => {} }: Props) => {
   const prevNewUrlEntry = useRef<string>();
-  const [config, setConfig] = useState<AllowListConfig>({ entries: [], disabled: false, enforce_for_notifications: false });
+  const [config, setConfig] = useState<AllowListConfig>({
+    entries: [],
+    disabled: false,
+    enforce_for_notifications: false,
+  });
   const [isValid, setIsValid] = useState<boolean>(false);
   const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);

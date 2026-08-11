@@ -145,7 +145,12 @@ const UrlAllowListConfig = () => {
           submitButtonDisabled={!isValid}
           submitButtonText="Update configuration">
           <h3>Allowlist URLs</h3>
-          <UrlAllowListForm urls={entries} disabled={disabled} enforceForNotifications={enforceForNotifications} onUpdate={update} />
+          <UrlAllowListForm
+            urls={entries}
+            disabled={disabled}
+            enforceForNotifications={enforceForNotifications}
+            onUpdate={update}
+          />
         </BootstrapModalForm>
       )}
     </div>

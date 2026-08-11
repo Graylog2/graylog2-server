@@ -31,17 +31,19 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;
 import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -54,12 +56,12 @@ class ClusterEventServicePerformanceTest {
     private static final int CONSUMER_COUNT = 10;
     private static final int PRODUCER_COUNT = 5;
     private static final int EVENTS_PER_PRODUCER = 1000;
-    private final AtomicBoolean running = new AtomicBoolean(true);
     private final ThreadFactory threadFactory = r -> {
         Thread t = new Thread(r);
         t.setDaemon(true);
         return t;
     };
+    private final List<ClusterEventService> services = new ArrayList<>();
     private MongoDBTestService mongodb;
     private MongoJackObjectMapperProvider objectMapperProvider;
     private Offset offset;
@@ -70,6 +72,17 @@ class ClusterEventServicePerformanceTest {
         this.mongodb = mongodb;
         this.objectMapperProvider = objectMapperProvider;
         this.offset = new OffsetFromCurrentMongoDBTimeProvider(mongodb.mongoConnection()).get();
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        // Stop all services before the MongoDB client gets closed. Otherwise the service threads keep retrying
+        // against the closed client for the rest of the JVM's lifetime, flooding the logs.
+        services.forEach(ClusterEventService::stopAsync);
+        for (final var service : services) {
+            service.awaitTerminated(10, TimeUnit.SECONDS);
+        }
+        services.clear();
     }
 
     class EventSubscriber {
@@ -105,13 +118,11 @@ class ClusterEventServicePerformanceTest {
         final var producerStopwatch = Stopwatch.createStarted();
         final var consumerStopwatch = Stopwatch.createStarted();
 
-        final var totalCount = 2 * (2 * CONSUMER_COUNT + 2 * PRODUCER_COUNT);
-        final var threadPool = Executors.newFixedThreadPool(totalCount, threadFactory);
+        final var threadPool = Executors.newFixedThreadPool(PRODUCER_COUNT, threadFactory);
         for (int i = 0; i < CONSUMER_COUNT; i++) {
             final var serverEventBus = new EventBus();
             final var clusterEventBus = new ClusterEventBus();
-            final var periodical = createClusterEventService(new SimpleNodeId("consumer-" + i), serverEventBus, clusterEventBus);
-            threadPool.submit(periodical::run);
+            services.add(createClusterEventService(new SimpleNodeId("consumer-" + i), serverEventBus, clusterEventBus));
 
             serverEventBus.register(new EventSubscriber(consumerCountdown::countDown));
         }
@@ -120,9 +131,7 @@ class ClusterEventServicePerformanceTest {
             final var serverEventBus = new EventBus();
             final var clusterEventBus = new ClusterEventBus();
             final var nodeId = new SimpleNodeId("producer-" + i);
-            final var periodical = createClusterEventService(nodeId, serverEventBus, clusterEventBus);
-
-            threadPool.submit(periodical::run);
+            services.add(createClusterEventService(nodeId, serverEventBus, clusterEventBus));
 
             threadPool.submit(() -> {
                 for (int count = 0; count < EVENTS_PER_PRODUCER; count++) {
@@ -138,7 +147,7 @@ class ClusterEventServicePerformanceTest {
         assertThat(consumerCountdown.await(10, TimeUnit.MINUTES)).as("Consumer latch has not timed out").isTrue();
         LOG.info("Consumers have finished, took: " + consumerStopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms.");
 
-        running.set(false);
+        threadPool.shutdown();
 
         printStatistics(mongodb.mongoDatabase());
     }

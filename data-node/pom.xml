@@ -46,6 +46,7 @@
         <opensearch.compat.version>2.19.5</opensearch.compat.version>
         <opensearch.compat.mac.jdk.version>21.0.7</opensearch.compat.mac.jdk.version>
         <opensearch.compat.mac.jdk.build>6</opensearch.compat.mac.jdk.build>
+        <lucene.compat.version>9.12.3-1</lucene.compat.version>
 
         <!-- SHA512 checksums for OpenSearch 2.x downloads -->
         <opensearch.compat.sha512.linux.x64>5594746235bc1321e8bfdccb23375c6b7f10b4cd5145bca6ff275abef4cc2a954b4381955f8dca66c0804446bbf58eaf812b2ac16e123d79f0bd6f4a976edfa6</opensearch.compat.sha512.linux.x64>
@@ -273,6 +274,11 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-backward-codecs</artifactId>
             <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>lucene9</artifactId>
+            <version>${lucene.compat.version}</version>
         </dependency>
 
         <dependency>

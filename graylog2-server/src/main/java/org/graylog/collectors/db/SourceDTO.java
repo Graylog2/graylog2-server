@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog2.database.BuildableMongoEntity;
 
@@ -55,9 +56,9 @@ public abstract class SourceDTO implements BuildableMongoEntity<SourceDTO, Sourc
         return AutoValue_SourceDTO.Builder.create();
     }
 
-    public Optional<CollectorReceiverConfig> toReceiverConfig() {
+    public Optional<CollectorReceiverConfig> toReceiverConfig(CollectorOSType osType) {
         if (enabled()) {
-            return config().toReceiverConfig(id());
+            return config().toReceiverConfig(id(), osType);
         }
         return Optional.empty();
     }

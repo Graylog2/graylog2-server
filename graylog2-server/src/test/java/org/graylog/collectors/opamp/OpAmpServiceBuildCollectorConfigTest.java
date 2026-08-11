@@ -23,6 +23,7 @@ import org.graylog.collectors.config.TLSConfigurationSettings;
 import org.graylog.collectors.config.exporter.OtlpExporterConfig;
 import org.graylog.collectors.config.exporter.OtlpHttpExporterConfig;
 import org.graylog.collectors.config.processor.ResourceProcessorConfig;
+import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.JournaldSourceConfig;
 import org.graylog.collectors.db.SourceDTO;
@@ -209,6 +210,24 @@ class OpAmpServiceBuildCollectorConfigTest {
         assertThat(config.receivers()).containsOnlyKeys("file_log/enabled");
         assertThat(config.processors()).containsOnlyKeys("resource/enabled");
         assertThat(config.service().pipelines()).containsOnlyKeys("logs/enabled");
+    }
+
+    @Test
+    void fileLogReceiverDisablesFileOwnerOptionsOnWindows() {
+        // The file_log receiver fails collector startup on Windows when the file owner options are enabled.
+        final var windowsConfig = OpAmpService.buildCollectorConfig(
+                FLEET_ID, List.of(fileSource("abc123")), CollectorOSType.WINDOWS, exporterConfig());
+
+        final var windowsReceiver = (FilelogReceiverConfig) windowsConfig.receivers().get("file_log/abc123");
+        assertThat(windowsReceiver.includeFileOwnerName()).isFalse();
+        assertThat(windowsReceiver.includeFileOwnerGroupName()).isFalse();
+
+        final var linuxConfig = OpAmpService.buildCollectorConfig(
+                FLEET_ID, List.of(fileSource("abc123")), CollectorOSType.LINUX, exporterConfig());
+
+        final var linuxReceiver = (FilelogReceiverConfig) linuxConfig.receivers().get("file_log/abc123");
+        assertThat(linuxReceiver.includeFileOwnerName()).isTrue();
+        assertThat(linuxReceiver.includeFileOwnerGroupName()).isTrue();
     }
 
     @Test
