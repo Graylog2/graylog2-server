@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public record NodeInformation(@JsonIgnore java.nio.file.Path nodePath, List<IndexInformation> indices,
@@ -45,6 +46,11 @@ public record NodeInformation(@JsonIgnore java.nio.file.Path nodePath, List<Inde
     }
 
     private String parseFromIndices() {
-        return indices.stream().map(IndexInformation::indexVersionCreated).distinct().findFirst().orElse(null);
+        // Indices without a state file have no version, Stream#findFirst would throw on those
+        return indices.stream()
+                .map(IndexInformation::indexVersionCreated)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 }
