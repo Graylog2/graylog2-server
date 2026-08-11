@@ -23,9 +23,9 @@ import asMock from 'helpers/mocking/AsMock';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
 import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
 import type { CollectorInstanceView, Source } from 'components/collectors/types';
+import { useCollectorLogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
 
 import ConnectionSuccess from './ConnectionSuccess';
-import { useCollectorLogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
 
 jest.mock('components/collectors/hooks/useCollectorLogPreview');
 jest.mock('components/collectors/hooks/useSourceQueries', () => ({
