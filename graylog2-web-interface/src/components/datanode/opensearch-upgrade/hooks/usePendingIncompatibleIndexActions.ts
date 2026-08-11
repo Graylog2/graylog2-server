@@ -89,6 +89,7 @@ const storeActions = (actions: Array<PendingIncompatibleIndexAction>) => {
   try {
     Store.set(PENDING_INCOMPATIBLE_INDEX_ACTIONS_STORAGE_KEY, actions);
   } catch {
+    // localStorage writes can throw when browser settings or policies block storage access.
     return;
   }
 };
@@ -103,11 +104,7 @@ const resolveArchiveAction = (
     return { kind: 'failed', message: job.info || job.description, label: 'Archive failed' };
   }
 
-  if (job?.job_status === 'complete') {
-    return { kind: 'done' };
-  }
-
-  if (job?.job_status === 'cancelled') {
+  if (job?.job_status === 'complete' || job?.job_status === 'cancelled') {
     return { kind: 'done' };
   }
 
@@ -128,6 +125,10 @@ const resolveReindexAction = (
 
   if (job?.job_status === 'error') {
     return { kind: 'failed', message: job.info || job.description, label: 'Reindex failed' };
+  }
+
+  if (job?.job_status === 'complete' || job?.job_status === 'cancelled') {
+    return { kind: 'done' };
   }
 
   if (!job && jobsUpdatedAt > Date.parse(action.startedAt)) {

@@ -290,10 +290,14 @@ describe('IncompatibleIndicesBulkActions', () => {
   describe('bulk archive and delete', () => {
     const setSelectedEntitiesArchive = jest.fn();
 
-    const archiveBinding = {
+    const archiveBinding: jest.Mocked<IndexArchiveBinding> = {
+      useCanArchive: jest.fn().mockReturnValue(true),
+      useArchivedIndexNames: jest.fn().mockReturnValue(new Set<string>()),
+      archiveAndDeleteIndex: jest.fn(),
       archiveAndDeleteIndices: jest.fn(),
       isArchiveJobConflict: jest.fn().mockReturnValue(false),
-    } as unknown as IndexArchiveBinding;
+      archiveSystemJobName: 'archive-job',
+    };
 
     const confirmBulkArchive = async () => {
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
@@ -306,6 +310,7 @@ describe('IncompatibleIndicesBulkActions', () => {
         managedIndices.map(({ id }) => id),
         setSelectedEntitiesArchive,
       );
+      archiveBinding.isArchiveJobConflict.mockReturnValue(false);
       asMock(useIndexArchive).mockReturnValue(archiveBinding);
     });
 

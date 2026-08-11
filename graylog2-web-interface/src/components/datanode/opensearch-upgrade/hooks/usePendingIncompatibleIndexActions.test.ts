@@ -23,10 +23,13 @@ import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatible
 
 import usePendingIncompatibleIndexActions from './usePendingIncompatibleIndexActions';
 import useClusterJobs from './useClusterJobs';
+import type { ClusterJobsResult } from './useClusterJobs';
 
 jest.mock('logic/local-storage/Store');
 jest.mock('components/indices/archive/useIndexArchive');
 jest.mock('./useClusterJobs');
+
+type ClusterJob = ClusterJobsResult['jobsById'] extends Map<string, infer Job> ? Job : never;
 
 const renderPendingActions = (incompatibleIndices: Array<IncompatibleIndex> = []) =>
   renderHook(() =>
@@ -39,17 +42,44 @@ const renderPendingActions = (incompatibleIndices: Array<IncompatibleIndex> = []
     }),
   );
 
+const reindexJob = (indexName: string, jobStatus: ClusterJob['job_status']): ClusterJob => ({
+  id: `job-${indexName}`,
+  description: 'Reindexes an outdated index to the current major OpenSearch version.',
+  name: 'reindex-outdated-index-v1',
+  info: `Reindexing outdated index <${indexName}>.`,
+  node_id: 'node-1',
+  started_at: '2026-01-01T00:00:00.000Z',
+  execution_duration: 'PT0.003S',
+  percent_complete: 0,
+  is_cancelable: false,
+  provides_progress: false,
+  job_status: jobStatus,
+});
+
 describe('usePendingIncompatibleIndexActions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useIndexArchive).mockReturnValue(undefined);
     asMock(useClusterJobs).mockReturnValue({ jobsById: new Map(), jobsUpdatedAt: 0, refetch: jest.fn() });
     asMock(Store.get).mockReturnValue([]);
+    asMock(Store.set).mockImplementation(() => undefined);
   });
 
   it('does not crash when reading pending actions from blocked storage', () => {
     asMock(Store.get).mockImplementation(() => {
       throw new Error('storage blocked');
+    });
+
+    const { result } = renderPendingActions();
+
+    expect(result.current.pendingIndexStatuses.size).toBe(0);
+  });
+
+  it('does not crash when storing pending actions fails', () => {
+    const action = { action: 'reindex', indexName: 'off_page_index', startedAt: '2026-01-01T00:00:00.000Z' };
+    asMock(Store.get).mockReturnValue([action]);
+    asMock(Store.set).mockImplementation(() => {
+      throw new Error('quota exceeded');
     });
 
     const { result } = renderPendingActions();
@@ -94,6 +124,20 @@ describe('usePendingIncompatibleIndexActions', () => {
     asMock(Store.get).mockReturnValue([action]);
     asMock(useClusterJobs).mockReturnValue({
       jobsById: new Map(),
+      jobsUpdatedAt: Date.parse(action.startedAt) + 1,
+      refetch: jest.fn(),
+    });
+
+    renderPendingActions();
+
+    await waitFor(() => expect(asMock(Store.set).mock.calls.at(-1)?.[1]).toEqual([]));
+  });
+
+  it.each(['complete', 'cancelled'] as const)('clears %s reindex tracking from storage', async (jobStatus) => {
+    const action = { action: 'reindex', indexName: 'graylog_0', startedAt: '2026-01-01T00:00:00.000Z' };
+    asMock(Store.get).mockReturnValue([action]);
+    asMock(useClusterJobs).mockReturnValue({
+      jobsById: new Map([['job-1', reindexJob(action.indexName, jobStatus)]]),
       jobsUpdatedAt: Date.parse(action.startedAt) + 1,
       refetch: jest.fn(),
     });
