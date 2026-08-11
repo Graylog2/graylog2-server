@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.db;
 
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 import org.junit.jupiter.api.Test;
@@ -64,12 +65,12 @@ public class MacOSUnifiedLoggingSourceConfigTest {
                 .maxLogAge(Duration.ZERO)
                 .maxPollInterval(Duration.ofSeconds(1))
                 .build()
-                .toReceiverConfig("test-1");
+                .toReceiverConfig("test-1", CollectorOSType.MACOS);
 
         assertThat(receiverConfigOpt).isNotEmpty();
         final CollectorReceiverConfig receiverConfig = receiverConfigOpt.get();
         assertThat(receiverConfig).isInstanceOf(MacOSUnifiedLoggingReceiverConfig.class);
-        final MacOSUnifiedLoggingReceiverConfig macConfig  = (MacOSUnifiedLoggingReceiverConfig) receiverConfig;
+        final MacOSUnifiedLoggingReceiverConfig macConfig = (MacOSUnifiedLoggingReceiverConfig) receiverConfig;
         assertThat(macConfig.maxLogAge()).isEqualTo(Duration.ZERO);
         assertThat(macConfig.maxPollInterval()).isEqualTo(Duration.ofSeconds(1));
         assertThat(macConfig.predicate()).isNull();

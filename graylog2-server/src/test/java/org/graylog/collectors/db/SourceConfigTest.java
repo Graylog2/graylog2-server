@@ -18,6 +18,7 @@ package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -145,7 +146,7 @@ class SourceConfigTest {
         final var deserialized = objectMapper.readValue(json, SourceConfig.class);
         assertThat(deserialized).isEqualTo(original);
 
-        final var receiver = original.toReceiverConfig("src-1").orElseThrow();
+        final var receiver = original.toReceiverConfig("src-1", CollectorOSType.MACOS).orElseThrow();
         assertThat(receiver.type()).isEqualTo("macos_unified_logging");
         assertThat(receiver.name()).isEqualTo("macos_unified_logging/src-1");
         assertThat(receiver).isInstanceOf(MacOSUnifiedLoggingReceiverConfig.class);
@@ -161,7 +162,7 @@ class SourceConfigTest {
                 .maxLogAge(Duration.ofSeconds(1))
                 .build();
         final var macReceiver =
-                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s").orElseThrow();
+                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s", CollectorOSType.MACOS).orElseThrow();
         assertThat(macReceiver.predicate()).isNull();
     }
 
@@ -173,7 +174,7 @@ class SourceConfigTest {
                 .build();
 
         final var macReceiver =
-                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("src-1").orElseThrow();
+                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("src-1", CollectorOSType.MACOS).orElseThrow();
 
         assertThat(macReceiver.maxPollInterval()).isEqualTo(Duration.ofSeconds(15));
         assertThat(macReceiver.maxLogAge()).isEqualTo(Duration.ofHours(6));
@@ -187,7 +188,7 @@ class SourceConfigTest {
                 .build();
 
         final var macReceiver =
-                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s").orElseThrow();
+                (MacOSUnifiedLoggingReceiverConfig) config.toReceiverConfig("s", CollectorOSType.MACOS).orElseThrow();
 
         assertThat(macReceiver.maxPollInterval()).isEqualTo(Duration.ofSeconds(30));
         assertThat(macReceiver.maxLogAge()).isEqualTo(Duration.ofHours(24));
