@@ -31,14 +31,16 @@ type Props = {
   selectedFleet: Fleet | null;
   onSelect: (choice: FleetChoiceValue) => void;
   onChange: () => void;
-  disabled: boolean;
+  disabled?: boolean;
+  // Embedded in a surrounding flow (e.g. the deploy wizard steps): left-aligned, no own heading.
+  inline?: boolean;
 };
 
-const Container = styled.div(
-  ({ theme }) => css`
-    max-width: 700px;
-    margin: 0 auto ${theme.spacings.md};
-    text-align: center;
+const Container = styled.div<{ $inline: boolean }>(
+  ({ theme, $inline }) => css`
+    max-width: ${$inline ? '560px' : '700px'};
+    margin: ${$inline ? '0' : `0 auto ${theme.spacings.md}`};
+    text-align: ${$inline ? 'left' : 'center'};
   `,
 );
 
@@ -50,11 +52,11 @@ const Heading = styled.h3(
 );
 
 // Button and dropdown sit side by side, separated by an "or".
-const Row = styled.div(
-  ({ theme }) => css`
+const Row = styled.div<{ $inline: boolean }>(
+  ({ theme, $inline }) => css`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: ${$inline ? 'flex-start' : 'center'};
     gap: ${theme.spacings.md};
   `,
 );
@@ -110,11 +112,11 @@ const FleetDescription = styled.div(
 
 const FLEET_SELECT_ID = 'onboarding-fleet-select';
 
-const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled }: Props) => {
+const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled = false, inline = false }: Props) => {
   if (selectedFleet) {
     return (
-      <Container>
-        <Heading>Fleet for this collector</Heading>
+      <Container $inline={inline}>
+        {!inline && <Heading>Fleet for this collector</Heading>}
         <SelectedBox>
           <div>
             <FleetName>{selectedFleet.name}</FleetName>
@@ -131,9 +133,9 @@ const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled }: Pr
   const options = fleets.map((fleet) => ({ label: fleet.name, value: fleet.id }));
 
   return (
-    <Container>
-      <Heading>Choose a fleet for this collector</Heading>
-      <Row>
+    <Container $inline={inline}>
+      {!inline && <Heading>Choose a fleet for this collector</Heading>}
+      <Row $inline={inline}>
         <Button bsStyle="primary" onClick={() => onSelect({ kind: 'create-new' })} disabled={disabled}>
           Create new fleet
         </Button>

@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
 import { Tabs } from 'components/bootstrap';
 import { ClipboardButton } from 'components/common';
+import MutedText from 'components/collectors/common/MutedText';
 import InstallCommand from 'components/collectors/overview/onboarding/InstallCommand';
 import PLATFORMS from 'components/collectors/overview/onboarding/platforms';
 import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
@@ -35,19 +35,12 @@ type Props = {
   onPlatformChange: (id: PlatformId) => void;
 };
 
-const LockedNote = styled.p(
-  ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
-    margin: ${theme.spacings.sm} 0 0;
-  `,
-);
-
 const InstallStep = ({ token, platformId, onPlatformChange }: Props) => {
   const { data: config } = useCollectorsConfig();
   const sendTelemetry = useSendCollectorsTelemetry();
 
   if (!token) {
-    return <LockedNote>Generate a token above to see the install command.</LockedNote>;
+    return <MutedText>Generate a token above to see the install command.</MutedText>;
   }
 
   return (

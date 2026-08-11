@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import { Table } from 'components/bootstrap';
 import { Link, RelativeTime } from 'components/common';
 import InstanceStatusLabel from 'components/collectors/common/InstanceStatusLabel';
+import MutedText from 'components/collectors/common/MutedText';
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
 import PulsingDot from 'components/collectors/overview/onboarding/PulsingDot';
 import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
@@ -73,14 +74,6 @@ const Subtitle = styled.span(
   ({ theme }) => css`
     color: ${theme.colors.gray[60]};
     font-size: ${theme.fonts.size.small};
-  `,
-);
-
-const Hint = styled.p(
-  ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
-    font-size: ${theme.fonts.size.small};
-    margin: 0;
   `,
 );
 
@@ -156,9 +149,11 @@ const EnrollingHostsList = ({ fleetId, fleetName, platformId }: Props) => {
           </tbody>
         </Table>
       ) : (
-        <Hint>Hosts running the command appear here as they check in.</Hint>
+        <MutedText>Hosts running the command appear here as they check in.</MutedText>
       )}
-      {Boolean(error) && <Hint role="status">Having trouble reaching the server &mdash; retrying automatically</Hint>}
+      {Boolean(error) && (
+        <MutedText role="status">Having trouble reaching the server &mdash; retrying automatically</MutedText>
+      )}
     </Container>
   );
 };

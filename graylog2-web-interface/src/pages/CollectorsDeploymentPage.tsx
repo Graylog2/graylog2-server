@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { Navigate } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
 import { Row, Col, Tabs, Badge } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -23,7 +24,22 @@ import PreviewBadge from 'components/common/PreviewBadge';
 import { DeployTab, EnrollmentTokenList } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useCollectorsConfig, useEnrollmentTokenCount } from 'components/collectors/hooks';
+import { COLOR_SCHEME_LIGHT } from 'theme/constants';
 import Routes from 'routing/Routes';
+
+// Mantine's default --tab-border-color (gray-3 / dark-4) is too high-contrast against the content
+// background. The palette vars don't flip with the color scheme, so pick per theme mode. Mantine
+// defines the var via `[data-mantine-color-scheme] .class` (0-2-0), so the override needs higher
+// specificity than a single class.
+const SoftBorderTabs = styled(Tabs)(
+  ({ theme }) => css`
+    &&& {
+      --tab-border-color: var(
+        ${theme.mode === COLOR_SCHEME_LIGHT ? '--mantine-color-gray-1' : '--mantine-color-dark-5'}
+      );
+    }
+  `,
+);
 
 const CollectorsDeploymentPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
@@ -53,7 +69,7 @@ const CollectorsDeploymentPage = () => {
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          <Tabs defaultValue="deploy">
+          <SoftBorderTabs defaultValue="deploy">
             <Tabs.List>
               <Tabs.Tab value="deploy">Deploy</Tabs.Tab>
               <Tabs.Tab value="tokens">
@@ -70,7 +86,7 @@ const CollectorsDeploymentPage = () => {
               </p>
               <EnrollmentTokenList />
             </Tabs.Panel>
-          </Tabs>
+          </SoftBorderTabs>
         </Col>
       </Row>
     </DocumentTitle>

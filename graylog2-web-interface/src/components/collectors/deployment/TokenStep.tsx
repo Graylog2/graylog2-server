@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Button, HelpBlock, Input, SegmentedControl } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
+import MutedText from 'components/collectors/common/MutedText';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useCollectorsMutations } from '../hooks';
@@ -53,12 +54,27 @@ const OptionsBox = styled.div(
   `,
 );
 
+const ModeRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.lg};
+    flex-wrap: wrap;
+
+    /* The radio inputs come wrapped in form-groups with their own bottom margin. */
+    .form-group {
+      margin-bottom: 0;
+    }
+  `,
+);
+
 const CustomFields = styled.div(
   ({ theme }) => css`
     display: flex;
     gap: ${theme.spacings.md};
     align-items: flex-end;
     flex-wrap: wrap;
+    margin-top: ${theme.spacings.sm};
 
     /* The name input owns its own bottom margin via form-group; align the control with it. */
     > div:last-child {
@@ -142,22 +158,24 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
   return (
     <div>
       <OptionsBox>
-        <Input
-          type="radio"
-          id="token-mode-short-lived"
-          name="token-mode"
-          label="Short-lived token (expires in 1 day)"
-          checked={mode === 'short-lived'}
-          onChange={() => setMode('short-lived')}
-        />
-        <Input
-          type="radio"
-          id="token-mode-custom"
-          name="token-mode"
-          label="Custom token"
-          checked={mode === 'custom'}
-          onChange={() => setMode('custom')}
-        />
+        <ModeRow>
+          <Input
+            type="radio"
+            id="token-mode-short-lived"
+            name="token-mode"
+            label="Short-lived token (expires in 1 day)"
+            checked={mode === 'short-lived'}
+            onChange={() => setMode('short-lived')}
+          />
+          <Input
+            type="radio"
+            id="token-mode-custom"
+            name="token-mode"
+            label="Custom token"
+            checked={mode === 'custom'}
+            onChange={() => setMode('custom')}
+          />
+        </ModeRow>
         {mode === 'custom' && (
           <CustomFields>
             <Input
@@ -194,7 +212,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
       <Button bsStyle="primary" onClick={handleGenerate} disabled={!canGenerate || isCreatingEnrollmentToken}>
         {isCreatingEnrollmentToken ? 'Generating...' : 'Generate token'}
       </Button>
-      {!fleet && <HelpBlock>Select a fleet above first.</HelpBlock>}
+      {!fleet && <MutedText>Select a fleet above first.</MutedText>}
     </div>
   );
 };

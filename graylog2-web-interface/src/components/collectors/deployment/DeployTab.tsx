@@ -35,29 +35,11 @@ import { useFleets } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
-const Intro = styled.p(
-  ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
-    margin-bottom: ${theme.spacings.md};
-  `,
-);
-
 const StepBody = styled.div(
   ({ theme }) => css`
-    padding: ${theme.spacings.xs} 0 ${theme.spacings.lg};
+    padding: ${theme.spacings.md} 0 0 0;
   `,
 );
-
-// FleetChoice centers itself for the first-run onboarding; inside the timeline the step content
-// is left-aligned, so undo the centering without forking the component.
-const LeftAligned = styled.div`
-  text-align: left;
-
-  > div {
-    margin-left: 0;
-    text-align: left;
-  }
-`;
 
 const CheckBullet = () => <Icon name="check" size="sm" />;
 
@@ -103,25 +85,21 @@ const DeployTab = () => {
 
   return (
     <div>
-      <Intro>
-        Run the command on any number of hosts &mdash; they enroll into the fleet you pick and appear below as they
-        check in.
-      </Intro>
+      {/* Done steps get the filled check bullet; pending steps get Mantine's default hollow
+          circle — same look as the first-run onboarding timeline. */}
       <Timeline active={activeStep} bulletSize={26} color="success">
-        <Timeline.Item title="Select Fleet" bullet={resolvedFleet ? <CheckBullet /> : <span>1</span>}>
+        <Timeline.Item title="Select Fleet" bullet={resolvedFleet ? <CheckBullet /> : undefined}>
           <StepBody>
-            <LeftAligned>
-              <FleetChoice
-                fleets={fleets ?? []}
-                selectedFleet={resolvedFleet}
-                onSelect={handleFleetSelect}
-                onChange={handleChangeFleet}
-                disabled={false}
-              />
-            </LeftAligned>
+            <FleetChoice
+              fleets={fleets ?? []}
+              selectedFleet={resolvedFleet}
+              onSelect={handleFleetSelect}
+              onChange={handleChangeFleet}
+              inline
+            />
           </StepBody>
         </Timeline.Item>
-        <Timeline.Item title="Generate Token" bullet={generatedToken ? <CheckBullet /> : <span>2</span>}>
+        <Timeline.Item title="Generate Token" bullet={generatedToken ? <CheckBullet /> : undefined}>
           <StepBody>
             <TokenStep
               fleet={resolvedFleet}
@@ -131,7 +109,7 @@ const DeployTab = () => {
             />
           </StepBody>
         </Timeline.Item>
-        <Timeline.Item title="Install the Collector" bullet={<span>3</span>}>
+        <Timeline.Item title="Install the Collector">
           <StepBody>
             <InstallStep token={generatedToken} platformId={platformId} onPlatformChange={setPlatformId} />
             {generatedToken && resolvedFleet && (
