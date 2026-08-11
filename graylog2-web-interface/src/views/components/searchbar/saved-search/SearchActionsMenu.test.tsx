@@ -62,7 +62,7 @@ jest.mock('api/entity-share', () => ({
   updateEntityShare: jest.fn(() => Promise.resolve()),
   loadUserSharesPaginated: jest.fn(() =>
     Promise.resolve({
-      list: require('immutable').List(),
+      list: Immutable.List(),
       pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
     }),
   ),

@@ -180,7 +180,7 @@ describe('DashboardActionsMenu', () => {
 
     await findByTitle(/Save dashboard/);
     await findByTitle(/Save as new dashboard/);
-    await findByTitle(/Share/);
+    await findByRole('button', { name: /Share/i });
     await findByRole('button', { name: /more actions/i });
   });
 
@@ -190,7 +190,7 @@ describe('DashboardActionsMenu', () => {
     );
 
     const saveButton = queryByTitle(/Save dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
@@ -207,7 +207,7 @@ describe('DashboardActionsMenu', () => {
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();

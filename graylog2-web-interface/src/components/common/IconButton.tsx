@@ -38,6 +38,8 @@ const Wrapper = styled(Button)<{ disabled: boolean }>(
 type Props = {
   focusable?: boolean;
   title: string;
+  /** Stable accessible name, independent of the tooltip content. Defaults to `title`. */
+  ariaLabel?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   name: IconName;
@@ -49,6 +51,9 @@ type Props = {
   bsStyle?: StyleProps;
   iconSize?: 'lg' | 'inherit';
   showTitle?: boolean;
+  href?: string;
+  target?: '_blank';
+  rel?: 'noopener noreferrer';
 };
 
 const handleClick = (
@@ -67,6 +72,7 @@ const StyledIcon = styled(Icon)`
 const IconButton = (
   {
     title,
+    ariaLabel = undefined,
     onClick = undefined,
     focusable = true,
     className = undefined,
@@ -76,6 +82,9 @@ const IconButton = (
     'data-testid': dataTestId = undefined,
     size = 'xs',
     showTitle = false,
+    href = undefined,
+    target = undefined,
+    rel = undefined,
     ...rest
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
@@ -85,12 +94,15 @@ const IconButton = (
       ref={ref}
       tabIndex={focusable ? 0 : -1}
       data-testid={dataTestId}
-      aria-label={title}
+      aria-label={ariaLabel ?? title}
       onClick={(e) => handleClick(onClick, e)}
       className={className}
       type="button"
       bsSize={size}
       bsStyle={bsStyle}
+      href={href}
+      target={target}
+      rel={rel}
       disabled={disabled}>
       <StyledIcon type={iconType} size={bsStyle === 'transparent' ? 'lg' : undefined} {...rest} />
       {showTitle && ` ${title}`}

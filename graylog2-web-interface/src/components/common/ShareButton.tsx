@@ -57,6 +57,7 @@ const ShareButton = ({
         <IconButton
           name="person_add"
           title={tooltipLabel}
+          ariaLabel={title}
           bsStyle={bsStyle}
           iconSize="inherit"
           size={bsSize}

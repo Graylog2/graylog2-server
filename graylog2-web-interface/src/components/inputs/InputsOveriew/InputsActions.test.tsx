@@ -156,7 +156,7 @@ describe('InputsActions', () => {
 
   it('renders Received messages button with correct query for standard input', () => {
     renderSUT();
-    expect(screen.getByText('Received messages')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Received messages' })).toBeInTheDocument();
   });
 
   it('opens wizard via InputStateControl button', async () => {
@@ -236,7 +236,7 @@ describe('InputsActions', () => {
       type: 'org.graylog.plugins.forwarder.input.ForwarderServiceInput',
     };
     renderSUT(input);
-    const btn = screen.getByText('Received messages');
+    const btn = screen.getByRole('link', { name: 'Received messages' });
     expect(btn).toBeInTheDocument();
     await setupUser().click(btn);
     expect(telemetryMock).toHaveBeenCalledWith(
