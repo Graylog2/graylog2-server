@@ -108,13 +108,14 @@ describe('DeployTab', () => {
     await user.click(screen.getByRole('option', { name: /web-servers/i }));
 
     await user.click(screen.getByRole('radio', { name: /custom token/i }));
-    await user.type(screen.getByRole('textbox', { name: /name/i }), 'web-servers-rollout');
+    await user.clear(screen.getByRole('textbox', { name: /name/i }));
+    await user.type(screen.getByRole('textbox', { name: /name/i }), 'my own name');
     await user.click(screen.getByRole('radio', { name: /30 days/i }));
     await user.click(screen.getByRole('button', { name: /generate token/i }));
 
     await waitFor(() => {
       expect(createEnrollmentToken).toHaveBeenCalledWith({
-        name: 'web-servers-rollout',
+        name: 'my own name',
         fleetId: 'fleet-1',
         expiresIn: 'P30D',
       });
@@ -122,6 +123,28 @@ describe('DeployTab', () => {
 
     // Summary row with change-token escape hatch
     expect(await screen.findByRole('button', { name: /change token/i })).toBeInTheDocument();
+  });
+
+  it('defaults the custom token name to the selected fleet', async () => {
+    const user = userEvent.setup();
+    render(<DeployTab />);
+
+    await user.click(screen.getByRole('combobox', { name: /select existing fleet/i }));
+    await user.click(screen.getByRole('option', { name: /web-servers/i }));
+
+    await user.click(screen.getByRole('radio', { name: /custom token/i }));
+
+    expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('web-servers rollout');
+
+    await user.click(screen.getByRole('button', { name: /generate token/i }));
+
+    await waitFor(() => {
+      expect(createEnrollmentToken).toHaveBeenCalledWith({
+        name: 'web-servers rollout',
+        fleetId: 'fleet-1',
+        expiresIn: 'P7D',
+      });
+    });
   });
 
   it('preselects the fleet from the ?fleet URL parameter', () => {

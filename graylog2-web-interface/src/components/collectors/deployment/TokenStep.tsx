@@ -101,10 +101,14 @@ const SHORT_LIVED_NAME = 'deployment';
 
 const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props) => {
   const [mode, setMode] = useState<'short-lived' | 'custom'>('short-lived');
-  const [customName, setCustomName] = useState('');
+  // null = the user has not touched the field; the displayed name then follows the selected
+  // fleet ("<fleet> rollout"). Anything the user typed (even an emptied field) wins.
+  const [customName, setCustomName] = useState<string | null>(null);
   const [expiry, setExpiry] = useState<TokenExpiry>('P7D');
   const { createEnrollmentToken, isCreatingEnrollmentToken } = useCollectorsMutations();
   const sendTelemetry = useSendCollectorsTelemetry();
+
+  const effectiveName = customName ?? (fleet ? `${fleet.name} rollout` : '');
 
   if (generatedToken) {
     return (
@@ -134,7 +138,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
   const handleGenerate = async () => {
     if (!fleet) return;
 
-    const name = mode === 'custom' ? customName.trim() : SHORT_LIVED_NAME;
+    const name = mode === 'custom' ? effectiveName.trim() : SHORT_LIVED_NAME;
     const customExpiresIn = expiry === 'never' ? null : expiry;
     const expiresIn = mode === 'custom' ? customExpiresIn : SHORT_LIVED_EXPIRY;
 
@@ -153,7 +157,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
     }
   };
 
-  const canGenerate = Boolean(fleet) && (mode === 'short-lived' || customName.trim().length > 0);
+  const canGenerate = Boolean(fleet) && (mode === 'short-lived' || effectiveName.trim().length > 0);
 
   return (
     <div>
@@ -183,8 +187,8 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
               id="custom-token-name"
               name="custom-token-name"
               label="Name"
-              placeholder="e.g. web-servers-rollout"
-              value={customName}
+              placeholder="e.g. web-servers rollout"
+              value={effectiveName}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomName(e.target.value)}
             />
             <div>
