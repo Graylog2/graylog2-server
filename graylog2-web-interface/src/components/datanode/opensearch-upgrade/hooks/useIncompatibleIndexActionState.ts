@@ -40,7 +40,13 @@ const useIncompatibleIndexActionState = ({ trackedIndices, isLoading }: Params):
     canArchive,
   );
   const { pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, isArchiveJobRunning, refetchClusterJobs } =
-    usePendingIncompatibleIndexActions({ incompatibleIndices: trackedIndices, isLoading, isError: false, refetch, canArchive });
+    usePendingIncompatibleIndexActions({
+      incompatibleIndices: trackedIndices,
+      isLoading,
+      isError: false,
+      refetch,
+      canArchive,
+    });
 
   return {
     archiveActionsAvailable: canArchive && !isArchiveJobRunning,

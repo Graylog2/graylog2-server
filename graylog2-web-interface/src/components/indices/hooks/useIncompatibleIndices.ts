@@ -40,7 +40,9 @@ const useIncompatibleIndices = () => {
   } = useQuery({
     queryKey: ['incompatibleIndices'],
     queryFn: () =>
-      SystemIndexerIndices.getOutdatedIndices({ requestShouldExtendSession: false }) as Promise<Array<IncompatibleIndex>>,
+      SystemIndexerIndices.getOutdatedIndices({ requestShouldExtendSession: false }) as Promise<
+        Array<IncompatibleIndex>
+      >,
     retry: 2,
     refetchInterval: (query) => (query.state.status === 'error' ? ERROR_REFETCH_INTERVAL_MS : false),
   });

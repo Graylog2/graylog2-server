@@ -152,8 +152,15 @@ const bulkArchiveDeleteIndices = async (
 };
 
 const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
-  const { archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, refetchClusterJobs, refetch } =
-    useIncompatibleIndicesContext();
+  const {
+    archiveActionsAvailable,
+    archivedIndexNames,
+    pendingIndexStatuses,
+    addArchiveDeleteAction,
+    addReindexAction,
+    refetchClusterJobs,
+    refetch,
+  } = useIncompatibleIndicesContext();
   const sendTelemetry = useSendTelemetry();
   const archive = useIndexArchive();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
