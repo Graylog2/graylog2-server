@@ -159,6 +159,18 @@ describe('InputsActions', () => {
     expect(screen.getByRole('link', { name: 'Received messages' })).toBeInTheDocument();
   });
 
+  it('shows a tooltip for the Received messages button on hover', async () => {
+    renderSUT();
+    const link = screen.getByRole('link', { name: 'Received messages' });
+
+    await setupUser().hover(link);
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+
+    await screen.findByText('Received messages', { selector: 'div,span' });
+  });
+
   it('opens wizard via InputStateControl button', async () => {
     const setupInput = {
       ...baseInput,

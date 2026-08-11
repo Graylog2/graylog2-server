@@ -100,26 +100,19 @@ export const ReplaySearchButtonComponent = ({
   newTab?: boolean;
 }) => {
   const title = 'Replay search';
+  const newTabProps = newTab
+    ? { href: searchLink, target: '_blank' as const, rel: 'noopener noreferrer' as const }
+    : {};
 
-  const content = children ? (
-    <>
+  const button = children ? (
+    <Component title={title} onClick={onClick} {...newTabProps}>
       {children} <StyledIcon name={iconName} />
-    </>
-  ) : (
-    <IconButton name={iconName} focusable={false} title={title} />
-  );
-
-  return newTab ? (
-    <Component href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
-      {content}
     </Component>
   ) : (
-    <LinkContainer to={searchLink}>
-      <Component title={title} onClick={onClick}>
-        {content}
-      </Component>
-    </LinkContainer>
+    <IconButton name={iconName} title={title} onClick={onClick} {...newTabProps} />
   );
+
+  return newTab ? button : <LinkContainer to={searchLink}>{button}</LinkContainer>;
 };
 
 type Props = {

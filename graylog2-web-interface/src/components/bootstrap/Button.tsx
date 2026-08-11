@@ -306,6 +306,7 @@ const Button = (
   if (href) {
     return (
       <StyledButton
+        ref={ref as unknown as React.Ref<HTMLAnchorElement>}
         component={Link}
         to={href}
         target={target}
