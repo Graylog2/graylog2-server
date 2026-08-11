@@ -90,7 +90,7 @@ const InstallCommand = ({ command, platformLabel, tokenDuration, actions = undef
     </Header>
     <CommandBlock>{command}</CommandBlock>
     <Note>
-      Downloads the collector, enrolls it in the selected fleet, and starts collecting immediately.{' '}
+      Runs the collector, enrolls it in the selected fleet, and starts collecting immediately.{' '}
       {tokenDuration ? <>Token expires in {formatDuration(tokenDuration, () => true)}.</> : 'This token never expires.'}
     </Note>
   </Container>

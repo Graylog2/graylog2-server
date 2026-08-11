@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
+import useFleetReceivingCounts from 'components/collectors/hooks/useFleetReceivingCounts';
 import useQuery from 'routing/useQuery';
 import useHistory from 'routing/useHistory';
 
@@ -32,6 +33,7 @@ import type { Fleet } from '../types';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 jest.mock('components/collectors/hooks/useInstanceQueries');
+jest.mock('components/collectors/hooks/useFleetReceivingCounts');
 jest.mock('../hooks');
 jest.mock('routing/useQuery');
 jest.mock('routing/useHistory');
@@ -58,6 +60,7 @@ describe('DeployTab', () => {
       isLoading: false,
     } as ReturnType<typeof useCollectorsConfig>);
     asMock(useInstances).mockReturnValue({ data: [], error: null } as ReturnType<typeof useInstances>);
+    asMock(useFleetReceivingCounts).mockReturnValue({ counts: undefined, error: null });
     asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({ createEnrollmentToken }));
 
     createEnrollmentToken.mockResolvedValue({
@@ -92,9 +95,9 @@ describe('DeployTab', () => {
       });
     });
 
-    // Step 3 unlocked: command contains the token (Linux and macOS share the same curl template,
+    // Step 3 unlocked: command contains the token (Linux and macOS share the same template,
     // and inactive tab panels stay mounted, so the command shows up once per unix-y platform)
-    expect((await screen.findAllByText(/ENROLLMENT_TOKEN=the-token-value/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/enroll-token the-token-value/)).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('button', { name: /copy token only/i }).length).toBeGreaterThan(0);
     // Enrolling hosts list is live
     expect(screen.getByText(/enrolling hosts/i)).toBeInTheDocument();
@@ -147,6 +150,22 @@ describe('DeployTab', () => {
     });
   });
 
+  it('lets the user leave the auto-selected lone fleet via "Change fleet"', async () => {
+    const user = userEvent.setup();
+    asMock(useFleets).mockReturnValue({ data: [fleets[0]], isLoading: false } as ReturnType<typeof useFleets>);
+
+    render(<DeployTab />);
+
+    // The lone fleet is auto-selected
+    expect(screen.getByText('web-servers')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /change fleet/i }));
+
+    // Auto-selection must not kick back in — the chooser stays visible
+    expect(screen.getByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create new fleet/i })).toBeInTheDocument();
+  });
+
   it('preselects the fleet from the ?fleet URL parameter', () => {
     asMock(useQuery).mockReturnValue({ fleet: 'fleet-2' });
 
@@ -174,7 +193,7 @@ describe('DeployTab', () => {
     await user.click(screen.getByRole('option', { name: /web-servers/i }));
     await user.click(screen.getByRole('button', { name: /generate token/i }));
 
-    expect((await screen.findAllByText(/ENROLLMENT_TOKEN=the-token-value/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/enroll-token the-token-value/)).length).toBeGreaterThan(0);
 
     await user.click(screen.getByRole('button', { name: /change fleet/i }));
 

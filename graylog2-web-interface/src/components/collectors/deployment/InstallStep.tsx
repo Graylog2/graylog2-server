@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import { Tabs } from 'components/bootstrap';
 import { ClipboardButton } from 'components/common';
+import enrollEndpointUrl from 'components/collectors/common/enrollEndpointUrl';
 import MutedText from 'components/collectors/common/MutedText';
 import InstallCommand from 'components/collectors/overview/onboarding/InstallCommand';
 import PLATFORMS from 'components/collectors/overview/onboarding/platforms';
@@ -56,7 +57,7 @@ const InstallStep = ({ token, platformId, onPlatformChange }: Props) => {
         <Tabs.Panel key={platform.id} value={platform.id}>
           {config && (
             <InstallCommand
-              command={platform.commandTemplate(config.http.hostname, config.http.port, token.token)}
+              command={platform.commandTemplate(enrollEndpointUrl(config.http.hostname), token.token)}
               platformLabel={platform.label}
               tokenDuration={token.expiresIn}
               actions={

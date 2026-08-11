@@ -33,6 +33,7 @@ import PLATFORMS from './onboarding/platforms';
 import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
 
+import enrollEndpointUrl from '../common/enrollEndpointUrl';
 import { useCollectorsConfig, useCollectorsMutations, useFleets } from '../hooks';
 // Imported from the concrete module (not the hooks index) so tests that automock the index
 // still see the real cache key.
@@ -85,7 +86,7 @@ const FirstOnboarding = () => {
 
       if (!platform) return '';
 
-      return platform.commandTemplate(config.http.hostname, config.http.port, token);
+      return platform.commandTemplate(enrollEndpointUrl(config.http.hostname), token);
     },
     [config],
   );
