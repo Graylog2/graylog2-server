@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
+import URI from 'urijs';
 
 import { Icon, Spinner, Timeline } from 'components/common';
 import FleetChoice from 'components/collectors/overview/onboarding/FleetChoice';
@@ -24,6 +25,7 @@ import type { FleetChoiceValue } from 'components/collectors/overview/onboarding
 import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useHistory from 'routing/useHistory';
+import useQuery from 'routing/useQuery';
 import Routes from 'routing/Routes';
 
 import EnrollingHostsList from './EnrollingHostsList';
@@ -33,7 +35,6 @@ import type { GeneratedToken } from './TokenStep';
 
 import { useFleets } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
-import type { Fleet } from '../types';
 
 const StepBody = styled.div(
   ({ theme }) => css`
@@ -44,7 +45,12 @@ const StepBody = styled.div(
 const CheckBullet = () => <Icon name="check" size="sm" />;
 
 const DeployTab = () => {
-  const [fleetChoice, setFleetChoice] = useState<Fleet | null>(null);
+  // The selected fleet lives in the URL (?fleet=<id>) so other pages can deep-link into the
+  // wizard with a fleet preselected. Same state-seeded-from-URL pattern as FleetDetail's tabs.
+  const { fleet: fleetParam } = useQuery();
+  const [selectedFleetId, setSelectedFleetId] = useState<string | null>(
+    typeof fleetParam === 'string' ? fleetParam : null,
+  );
   const [generatedToken, setGeneratedToken] = useState<GeneratedToken | null>(null);
   const [platformId, setPlatformId] = useState<PlatformId>('linux');
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
@@ -55,7 +61,16 @@ const DeployTab = () => {
 
   // A lone fleet is auto-selected (same rule as FirstOnboarding.autoChoice); the box stays
   // visible so the user still sees which fleet the hosts will join.
-  const resolvedFleet = fleetChoice ?? ((fleets?.length ?? 0) === 1 ? fleets![0] : null);
+  const resolvedFleet =
+    (selectedFleetId ? fleets?.find((f) => f.id === selectedFleetId) : null) ??
+    ((fleets?.length ?? 0) === 1 ? fleets![0] : null);
+
+  const pushFleetUrl = (fleetId: string | null) => {
+    let newUrl = new URI(window.location.href).removeSearch('fleet');
+    if (fleetId) newUrl = newUrl.addSearch('fleet', fleetId);
+
+    history.push(newUrl.resource());
+  };
 
   const handleFleetSelect = (choice: FleetChoiceValue) => {
     if (choice.kind === 'create-new') {
@@ -64,20 +79,20 @@ const DeployTab = () => {
       return;
     }
 
-    const fleet = fleets?.find((f) => f.id === choice.fleetId) ?? null;
-
     sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
       app_action_value: 'deployment-fleet',
       fleet_id: choice.fleetId,
     });
 
-    setFleetChoice(fleet);
+    setSelectedFleetId(choice.fleetId);
     setGeneratedToken(null); // fleet changed -> the previous token no longer applies
+    pushFleetUrl(choice.fleetId);
   };
 
   const handleChangeFleet = () => {
-    setFleetChoice(null);
+    setSelectedFleetId(null);
     setGeneratedToken(null);
+    pushFleetUrl(null);
   };
 
   const fleetStepDone = resolvedFleet ? 1 : 0;

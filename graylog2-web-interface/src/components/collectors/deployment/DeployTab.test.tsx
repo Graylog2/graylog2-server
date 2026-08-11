@@ -21,6 +21,8 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
+import useQuery from 'routing/useQuery';
+import useHistory from 'routing/useHistory';
 
 import DeployTab from './DeployTab';
 
@@ -31,6 +33,8 @@ import type { Fleet } from '../types';
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 jest.mock('components/collectors/hooks/useInstanceQueries');
 jest.mock('../hooks');
+jest.mock('routing/useQuery');
+jest.mock('routing/useHistory');
 jest.mock('util/copyToClipboard', () => jest.fn(() => Promise.resolve()));
 jest.mock('components/common/Tooltip', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
 
@@ -41,9 +45,12 @@ const fleets: Fleet[] = [
 
 describe('DeployTab', () => {
   const createEnrollmentToken = jest.fn();
+  const historyPush = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
+    asMock(useQuery).mockReturnValue({});
+    asMock(useHistory).mockReturnValue({ push: historyPush } as unknown as ReturnType<typeof useHistory>);
     asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
     asMock(useFleets).mockReturnValue({ data: fleets, isLoading: false } as ReturnType<typeof useFleets>);
     asMock(useCollectorsConfig).mockReturnValue({
@@ -115,6 +122,25 @@ describe('DeployTab', () => {
 
     // Summary row with change-token escape hatch
     expect(await screen.findByRole('button', { name: /change token/i })).toBeInTheDocument();
+  });
+
+  it('preselects the fleet from the ?fleet URL parameter', () => {
+    asMock(useQuery).mockReturnValue({ fleet: 'fleet-2' });
+
+    render(<DeployTab />);
+
+    expect(screen.getByText('db-servers')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /change fleet/i })).toBeInTheDocument();
+  });
+
+  it('pushes the selected fleet to the URL', async () => {
+    const user = userEvent.setup();
+    render(<DeployTab />);
+
+    await user.click(screen.getByRole('combobox', { name: /select existing fleet/i }));
+    await user.click(screen.getByRole('option', { name: /web-servers/i }));
+
+    expect(historyPush).toHaveBeenCalledWith(expect.stringContaining('fleet=fleet-1'));
   });
 
   it('clears the generated token when the fleet changes', async () => {
