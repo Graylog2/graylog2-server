@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 
 import { MenuItem } from 'components/bootstrap';
 import Menu from 'components/bootstrap/Menu';
 import StopPropagation from 'views/components/common/StopPropagation';
 import { widgetActionsDropdownOpenClass } from 'views/components/widgets/Constants';
-import styled from 'styled-components';
 
 const Container = styled(StopPropagation)`
   display: inline-block;
