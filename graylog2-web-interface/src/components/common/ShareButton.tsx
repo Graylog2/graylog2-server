@@ -64,6 +64,7 @@ const ShareButton = ({
           onClick={onClick}
           disabled={isDisabled}
           showTitle={showTitle}
+          allowClickWhenDisabled
         />
       );
     }}

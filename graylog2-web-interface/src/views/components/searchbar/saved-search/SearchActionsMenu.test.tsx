@@ -334,7 +334,7 @@ describe('SearchActionsMenu', () => {
 
         const shareButton = await findShareButton();
 
-        expect(shareButton).toBeDisabled();
+        expect(shareButton).toHaveAttribute('aria-disabled', 'true');
       });
 
       it('which should be enabled if current user is permitted to edit search', async () => {
@@ -385,7 +385,7 @@ describe('SearchActionsMenu', () => {
 
         render(<SimpleSearchActionsMenu />);
 
-        expect(await findShareButton()).toBeDisabled();
+        expect(await findShareButton()).toHaveAttribute('aria-disabled', 'true');
       });
     });
   });

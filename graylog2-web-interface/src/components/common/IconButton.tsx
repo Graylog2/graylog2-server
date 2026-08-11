@@ -54,12 +54,18 @@ type Props = {
   href?: string;
   target?: '_blank';
   rel?: 'noopener noreferrer';
+  allowClickWhenDisabled?: boolean;
 };
 
 const handleClick = (
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void | undefined,
+  disabled: boolean,
   e: React.MouseEvent<HTMLButtonElement>,
 ) => {
+  if (disabled) {
+    return;
+  }
+
   if (typeof onClick === 'function') {
     onClick(e);
   }
@@ -85,6 +91,7 @@ const IconButton = (
     href = undefined,
     target = undefined,
     rel = undefined,
+    allowClickWhenDisabled = false,
     ...rest
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
@@ -95,7 +102,8 @@ const IconButton = (
       tabIndex={focusable ? 0 : -1}
       data-testid={dataTestId}
       aria-label={ariaLabel ?? title}
-      onClick={(e) => handleClick(onClick, e)}
+      aria-disabled={disabled}
+      onClick={(e) => handleClick(onClick, disabled, e)}
       className={className}
       type="button"
       bsSize={size}
@@ -103,6 +111,7 @@ const IconButton = (
       href={href}
       target={target}
       rel={rel}
+      allowClickWhenDisabled={allowClickWhenDisabled}
       disabled={disabled}>
       <StyledIcon type={iconType} size={bsStyle === 'transparent' ? 'lg' : undefined} {...rest} />
       {showTitle && ` ${title}`}
