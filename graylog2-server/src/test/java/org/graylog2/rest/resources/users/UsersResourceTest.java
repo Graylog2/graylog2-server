@@ -153,7 +153,7 @@ public class UsersResourceTest {
         lenient().when(userContext.getUser()).thenReturn(user);
         lenient().when(user.getName()).thenReturn("username");
         lenient().when(user.getId()).thenReturn("userId");
-        lenient().when(userContext.isPermitted(ROLES_READ, ALLOWED_ROLE_LOWER_CASE)).thenReturn(true);
+        lenient().when(userContext.isPermitted(ROLES_READ, TestUsersResource.ALLOWED_ROLE)).thenReturn(true);
     }
 
     /**
@@ -189,7 +189,8 @@ public class UsersResourceTest {
         Role adminRole = mock(Role.class);
         when(adminRole.getId()).thenReturn(new ObjectId().toHexString());
         when(adminRole.getName()).thenReturn("admin");
-        when(userContext.isPermitted(ROLES_READ, "admin")).thenReturn(true);
+        when(userContext.isPermitted(ROLES_READ, TestUsersResource.ALLOWED_ROLE)).thenReturn(true);
+        when(userContext.isPermitted(ROLES_READ, forbiddenRole)).thenReturn(true);
 
         when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
         when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of()));
@@ -227,7 +228,7 @@ public class UsersResourceTest {
     @Test
     void createFailureOnWrongRoleAssignPermission() {
         String testRole = "forbiddenRole";
-        lenient().when(userContext.isPermitted(ROLES_READ, "forbiddenrole")).thenReturn(true);
+        lenient().when(userContext.isPermitted(ROLES_READ, testRole)).thenReturn(true);
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD), userContext));
@@ -263,8 +264,8 @@ public class UsersResourceTest {
         lenient().when(subject.isPermitted(RestPermissions.USERS_CREATE)).thenReturn(true);
         lenient().when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
 
-        lenient().when(roleService.loadByNames(List.of(ALLOWED_ROLE_LOWER_CASE))).thenReturn(Set.of(roleWithInputsCreate));
-        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, roleWithInputsCreate));
+        lenient().when(roleService.loadByNames(List.of(TestUsersResource.ALLOWED_ROLE))).thenReturn(Set.of(roleWithInputsCreate));
+        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE, roleWithInputsCreate));
         lenient().when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
@@ -347,8 +348,8 @@ public class UsersResourceTest {
         lenient().when(roleWithInputsCreate.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
         lenient().when(roleWithInputsCreate.getPermissions()).thenReturn(Set.of(RestPermissions.INPUTS_CREATE));
         // The role is looked up by its lowercased name, no matter how the request spells it.
-        lenient().when(roleService.loadByNames(List.of(ALLOWED_ROLE_LOWER_CASE))).thenReturn(Set.of(roleWithInputsCreate));
-        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, roleWithInputsCreate));
+        lenient().when(roleService.loadByNames(List.of(TestUsersResource.ALLOWED_ROLE))).thenReturn(Set.of(roleWithInputsCreate));
+        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE, roleWithInputsCreate));
 
         lenient().when(userContext.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
 
