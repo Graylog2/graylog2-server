@@ -156,6 +156,13 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_heap", validators = {JavaHeapSizeValidator.class})
     private String opensearchHeap = "1g";
 
+    @Documentation("""
+            Warn if the configured opensearch heap size appears too small compared to the memory available
+            to this data node. Set to false to suppress the warning.
+            """)
+    @Parameter(value = "data_node_heap_size_warning_enabled")
+    private boolean dataNodeHeapSizeWarningEnabled = true;
+
     @Documentation("HTTP port on which the embedded opensearch listens")
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
@@ -742,6 +749,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public String getOpensearchHeap() {
         return opensearchHeap;
+    }
+
+    public boolean isDataNodeHeapSizeWarningEnabled() {
+        return dataNodeHeapSizeWarningEnabled;
     }
 
     @Override
