@@ -16,29 +16,36 @@
  */
 import React, { useState } from 'react';
 
-import { SystemIndexerIndices } from '@graylog/server-api';
+import { ClusterDeflector, SystemIndexerIndices } from '@graylog/server-api';
 
 import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useIndexArchive from 'components/indices/archive/useIndexArchive';
+import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
 
 import { TELEMETRY_DEFAULTS } from './telemetry';
 import BulkIndexActionConfirmDialog from './BulkIndexActionConfirmDialog';
-import { CORE_ACTION_DEFINITIONS } from './incompatibleIndexActions';
-import { getBulkIndexActionCandidates, getBulkIndexActionNotification, runBulkIndexAction } from './bulkIndexActions';
+import type { PendingArchiveTracking } from './incompatibleIndexActions';
+import { useIncompatibleIndicesContext } from './IncompatibleIndicesContext';
+import { buildPartialBulkNotification, getBulkIndexActionCandidates } from './bulkIndexActions';
 import type { BulkIndexActionCandidate, BulkIndexActionNotification } from './bulkIndexActions';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
-import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
 
 type Props = {
   indices: Array<IncompatibleIndexRow>;
-  canArchive: boolean;
-  pendingIndexStatuses: Map<string, PendingIndexStatus>;
-  archivedIndexNames: ReadonlySet<string>;
-  refetch: () => void;
+};
+
+const BULK_ACTION_TELEMETRY: Record<BulkIndexActionCandidate['action'], TelemetryEventType> = {
+  delete: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_DELETE_CONFIRMED,
+  'reindex-system-index': TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.SYSTEM_INDEX_REINDEX_CONFIRMED,
+  'archive-delete': TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
+  rotate: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.WRITE_INDEX_ROTATE_CONFIRMED,
 };
 
 const showNotification = ({ type, message, title }: BulkIndexActionNotification) => {
@@ -54,58 +61,108 @@ const showNotification = ({ type, message, title }: BulkIndexActionNotification)
 const bulkDeleteIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
   const entityIds = bulkAction.targetIndices.map((index) => index.index_name);
   const { failures } = await SystemIndexerIndices.bulkDeleteOutdated({ entity_ids: entityIds });
-  const failedIds = (failures ?? []).map(({ entity_id }) => entity_id);
-  const succeeded = entityIds.length - failedIds.length;
+  const failedIds = new Set((failures ?? []).map(({ entity_id }) => entity_id));
+  const succeeded = entityIds.length - failedIds.size;
 
-  if (failedIds.length === 0) {
-    showNotification({
-      type: 'success',
-      message: `${succeeded} ${succeeded === 1 ? 'index was' : 'indices were'} deleted.`,
-    });
-  } else {
-    const details = (failures ?? [])
-      .slice(0, 3)
-      .map(({ entity_id, failure_explanation }) => `${entity_id}: ${failure_explanation}`)
-      .join('\n');
-    const more = failedIds.length > 3 ? `\n...and ${failedIds.length - 3} more.` : '';
-    const message =
-      succeeded > 0
-        ? `${succeeded} succeeded, ${failedIds.length} failed.\n${details}${more}`
-        : `${failedIds.length} ${failedIds.length === 1 ? 'index' : 'indices'} failed.\n${details}${more}`;
+  showNotification(
+    buildPartialBulkNotification({
+      succeeded,
+      failures: (failures ?? []).map(({ entity_id, failure_explanation }) => ({
+        name: entity_id,
+        explanation: failure_explanation,
+      })),
+      successMessage: `${succeeded} ${succeeded === 1 ? 'index was' : 'indices were'} deleted.`,
+      partialSuccessTitle: 'Some indices could not be deleted',
+      failureTitle: 'Could not delete indices',
+    }),
+  );
 
-    showNotification(
-      succeeded > 0
-        ? { type: 'warning', message, title: 'Some indices could not be deleted' }
-        : { type: 'error', message, title: 'Could not delete indices' },
-    );
+  return entityIds.filter((id) => !failedIds.has(id));
+};
+
+const bulkReindexIndices = async (
+  bulkAction: BulkIndexActionCandidate,
+  addReindexAction: (tracking: { indexName: string }) => void,
+): Promise<Array<string>> => {
+  const indexNames = bulkAction.targetIndices.map((index) => index.index_name);
+  await SystemIndexerIndices.bulkReindex({ indices: indexNames, with_replication: true });
+  indexNames.forEach((indexName) => addReindexAction({ indexName }));
+  showNotification({ type: 'success', message: bulkAction.successMessage(indexNames.length) });
+
+  return indexNames;
+};
+
+const bulkRotateIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
+  const namesByIndexSet = new Map<string, Array<string>>();
+  bulkAction.targetIndices.forEach((index) => {
+    const names = namesByIndexSet.get(index.active_write_index) ?? [];
+    names.push(index.index_name);
+    namesByIndexSet.set(index.active_write_index, names);
+  });
+
+  const { success, entity, error_text } = await ClusterDeflector.bulkcycle({
+    entity_ids: Array.from(namesByIndexSet.keys()),
+  });
+
+  if (!success) {
+    throw new Error(error_text || 'Bulk rotation request failed.');
   }
 
-  return entityIds.filter((id) => !failedIds.includes(id));
+  const explanationByIndexSet = new Map((entity?.failures ?? []).map((f) => [f.entity_id, f.failure_explanation]));
+  const succeededNames: Array<string> = [];
+  const failures: Array<{ name: string; explanation: string }> = [];
+  namesByIndexSet.forEach((names, indexSetId) => {
+    const explanation = explanationByIndexSet.get(indexSetId);
+
+    if (explanation !== undefined) {
+      names.forEach((name) => failures.push({ name, explanation }));
+    } else {
+      succeededNames.push(...names);
+    }
+  });
+
+  showNotification(
+    buildPartialBulkNotification({
+      succeeded: succeededNames.length,
+      failures,
+      successMessage: `${succeededNames.length} ${succeededNames.length === 1 ? 'index was' : 'indices were'} rotated.`,
+      partialSuccessTitle: 'Some indices could not be rotated',
+      failureTitle: 'Could not rotate indices',
+    }),
+  );
+
+  return succeededNames;
 };
 
-const bulkReindexIndices = async (bulkAction: BulkIndexActionCandidate): Promise<Array<string>> => {
-  const result = await runBulkIndexAction({ action: bulkAction.action, indices: bulkAction.targetIndices });
-  showNotification(getBulkIndexActionNotification(bulkAction, result));
+const bulkArchiveDeleteIndices = async (
+  bulkAction: BulkIndexActionCandidate,
+  archive: IndexArchiveBinding | undefined,
+  addArchiveDeleteAction: (tracking: PendingArchiveTracking) => void,
+): Promise<Array<string>> => {
+  if (!archive) {
+    throw new Error('Archiving is not available.');
+  }
 
-  return result.successes.map(({ index }) => index.index_name);
+  const indexNames = bulkAction.targetIndices.map((index) => index.index_name);
+  const { systemJobId } = await archive.archiveAndDeleteIndices(indexNames);
+  indexNames.forEach((indexName) => addArchiveDeleteAction({ indexName, systemJobId }));
+  showNotification({ type: 'success', message: bulkAction.successMessage(indexNames.length) });
+
+  return indexNames;
 };
 
-const IncompatibleIndicesBulkActions = ({
-  indices,
-  canArchive,
-  pendingIndexStatuses,
-  archivedIndexNames,
-  refetch,
-}: Props) => {
+const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
+  const { archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, refetchClusterJobs, refetch } =
+    useIncompatibleIndicesContext();
   const sendTelemetry = useSendTelemetry();
+  const archive = useIndexArchive();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const [confirmedBulkAction, setConfirmedBulkAction] = useState<BulkIndexActionCandidate | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selectedIndices = indices.filter((index) => selectedEntities.includes(index.id));
   const candidates = getBulkIndexActionCandidates({
-    indices: selectedIndices,
-    canArchive,
+    indices,
+    canArchive: archiveActionsAvailable,
     pendingIndexStatuses,
     archivedIndexNames,
   });
@@ -121,7 +178,7 @@ const IncompatibleIndicesBulkActions = ({
       return;
     }
 
-    sendTelemetry(CORE_ACTION_DEFINITIONS[confirmedBulkAction.action].telemetryEventType, {
+    sendTelemetry(BULK_ACTION_TELEMETRY[confirmedBulkAction.action], {
       ...TELEMETRY_DEFAULTS,
       app_action_value: 'bulk',
       bulk_count: confirmedBulkAction.targetIndices.length,
@@ -129,19 +186,44 @@ const IncompatibleIndicesBulkActions = ({
     setIsSubmitting(true);
 
     try {
-      const succeededIds =
-        confirmedBulkAction.action === 'delete'
-          ? await bulkDeleteIndices(confirmedBulkAction)
-          : await bulkReindexIndices(confirmedBulkAction);
+      let succeededIds: Array<string>;
+
+      switch (confirmedBulkAction.action) {
+        case 'delete':
+          succeededIds = await bulkDeleteIndices(confirmedBulkAction);
+          break;
+        case 'reindex-system-index':
+          succeededIds = await bulkReindexIndices(confirmedBulkAction, addReindexAction);
+          break;
+        case 'rotate':
+          succeededIds = await bulkRotateIndices(confirmedBulkAction);
+          break;
+        default:
+          succeededIds = await bulkArchiveDeleteIndices(confirmedBulkAction, archive, addArchiveDeleteAction);
+          break;
+      }
 
       setSelectedEntities(selectedEntities.filter((id) => !succeededIds.includes(id)));
       refetch();
+
+      if (confirmedBulkAction.action === 'archive-delete') {
+        refetchClusterJobs?.();
+      }
+
       setConfirmedBulkAction(undefined);
     } catch (errorThrown) {
-      UserNotification.error(
-        extractErrorMessage(errorThrown),
-        `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`,
-      );
+      const errorMessage = extractErrorMessage(errorThrown);
+
+      if (confirmedBulkAction.action === 'archive-delete' && archive?.isArchiveJobConflict(errorMessage)) {
+        UserNotification.warning(
+          'Another archive job is already running. New archive jobs can be started after it finishes.',
+          'Archive job already running',
+        );
+        refetchClusterJobs?.();
+        setConfirmedBulkAction(undefined);
+      } else {
+        UserNotification.error(errorMessage, `Could not ${confirmedBulkAction.confirmText.toLowerCase()}.`);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -152,7 +234,7 @@ const IncompatibleIndicesBulkActions = ({
       <BulkActionsDropdown>
         {candidates.map((candidate) => (
           <MenuItem key={candidate.action} onSelect={() => setConfirmedBulkAction(candidate)}>
-            {candidate.buttonLabel} ({candidate.targetIndices.length})
+            {candidate.buttonLabel}
           </MenuItem>
         ))}
       </BulkActionsDropdown>
