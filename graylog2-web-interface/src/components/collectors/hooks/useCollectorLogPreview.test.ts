@@ -25,7 +25,7 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 import type Query from 'views/logic/queries/Query';
 import type { AggregationSearchType } from 'views/logic/queries/SearchType';
 
-import useCollectorLogPreview from './useCollectorLogPreview';
+import {useCollectorLogPreview} from './useCollectorLogPreview';
 
 jest.mock('views/logic/slices/createSearch');
 jest.mock('views/logic/slices/executeJobResult', () => ({

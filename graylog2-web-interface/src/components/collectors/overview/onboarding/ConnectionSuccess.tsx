@@ -24,10 +24,9 @@ import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
+import { useCollectorLogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
 import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
-import StatCard from 'components/common/StatCard/StatCard';
 
-import useCollectorLogPreview from './useCollectorLogPreview';
 import LogPreviewSection from './LogPreviewSection';
 import OnboardingTimeline from './OnboardingTimeline';
 import NextSteps from './NextSteps';

@@ -179,7 +179,7 @@ const toSourceCounts = (searchTypeResult: RawPivotResult | undefined): Record<st
   );
 };
 
-const useCollectorLogPreview = (instanceUid: string) => {
+export const useCollectorLogPreview = (instanceUid: string) => {
   const { data: created, error: createError } = useQuery<PreviewSearch>({
     queryKey: [...ONBOARDING_KEY_PREFIX, 'preview-search', instanceUid],
     queryFn: async () => {
@@ -250,4 +250,4 @@ const useCollectorLogPreview = (instanceUid: string) => {
   };
 };
 
-export default useCollectorLogPreview;
+

@@ -25,9 +25,9 @@ import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
 import type { CollectorInstanceView, Source } from 'components/collectors/types';
 
 import ConnectionSuccess from './ConnectionSuccess';
-import useCollectorLogPreview from './useCollectorLogPreview';
+import { useCollectorLogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
 
-jest.mock('./useCollectorLogPreview');
+jest.mock('components/collectors/hooks/useCollectorLogPreview');
 jest.mock('components/collectors/hooks/useSourceQueries', () => ({
   useSources: jest.fn(),
 }));

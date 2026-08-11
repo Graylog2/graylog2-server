@@ -20,9 +20,9 @@ import styled, { css } from 'styled-components';
 import { Alert, Label } from 'components/bootstrap';
 import { Link, Section, Spinner, Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
+import type { LogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
 
 import PulsingDot from './PulsingDot';
-import type { LogPreview } from './useCollectorLogPreview';
 
 type Props = {
   title: string;
