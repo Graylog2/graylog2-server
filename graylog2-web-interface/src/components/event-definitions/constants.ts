@@ -39,7 +39,6 @@ const getEventDefinitionTableElements = (
       'matched_at',
       'tags',
       ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
-      ...(pluggableAttributes?.attributeNames || []),
     ],
     defaultColumnOrder: [
       'title',

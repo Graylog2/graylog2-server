@@ -33,8 +33,10 @@ import { DRAG_HANDLE_DEFAULT_TITLE } from 'components/common/SortableList/DragHa
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
 import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
+import useClickToOpenMenu from 'components/bootstrap/useClickToOpenMenu';
 import Icon from 'components/common/Icon';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
+import useMergedRef from 'util/hooks/useMergedRef';
 
 import SortIcon from '../SortIcon';
 
@@ -73,9 +75,11 @@ export const ThInner = styled.div<{
       }
     `}
 
+    /* pointer, not grab, below: a plain click opens the actions menu, which is the more common
+       interaction, so the cursor hints at that instead of the (still available) drag-to-reorder. */
     ${$isDraggable &&
     css`
-      cursor: ${$isDragging ? 'grabbing' : 'grab'};
+      cursor: ${$isDragging ? 'grabbing' : 'pointer'};
 
       &:focus-visible .header-action {
         opacity: 1;
@@ -150,6 +154,8 @@ const AttributeHeader = <Entity extends EntityBase>({
   const isDraggable = Boolean(columnMeta?.enableColumnOrdering);
   const isResizingAnyColumn = Boolean(ctx.table.getState().columnSizingInfo.isResizingColumn);
   const { attributes, isDragging, listeners, setNodeRef } = useSortableCol(colId, !isDraggable);
+  const { triggerRef, opened, onOpenChange, anchorPosition, onClick, onKeyDown } = useClickToOpenMenu<HTMLDivElement>();
+  const mergedHeaderRef = useMergedRef(setNodeRef, triggerRef);
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
   const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
   const columnLabel = columnMeta?.label ?? colId;
@@ -158,12 +164,23 @@ const AttributeHeader = <Entity extends EntityBase>({
   const canSort = ctx.header.column.getCanSort();
   const canHideColumn = ctx.header.column.getCanHide();
   const sortDirection = ctx.header.column.getIsSorted();
-  const textAlign = columnMeta?.columnRenderer?.textAlign;
+  const textAlign = columnMeta?.columnRenderer?.textAlign as 'left' | 'right';
   const isRightAligned = textAlign === 'right';
   const dragTitle =
     typeof columnLabel === 'string'
       ? `${DRAG_HANDLE_DEFAULT_TITLE} ${columnLabel.toLocaleLowerCase()}`
       : DRAG_HANDLE_DEFAULT_TITLE;
+  const hasHeaderActions = Boolean(canSort || canSlice || canHideColumn);
+
+  const onHeaderKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    listeners?.onKeyDown?.(event);
+
+    if (isDragging || !hasHeaderActions) {
+      return;
+    }
+
+    onKeyDown(event);
+  };
 
   const sliceIndicator = isSliceActive && (
     <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" $isRightAligned={isRightAligned} />
@@ -171,7 +188,9 @@ const AttributeHeader = <Entity extends EntityBase>({
   const sortIndicator = sortDirection && <SortIcon<Entity> column={ctx.header.column} />;
 
   const indicatorIcons = (
-    <IndicatorCol ref={rightRef}>
+    // Stops the sort icon's own click from also bubbling up to the header's onClick (which would
+    // toggle the actions menu open/closed right after the sort click already did its own thing).
+    <IndicatorCol ref={rightRef} onClick={(event) => event.stopPropagation()}>
       {isRightAligned ? (
         <>
           {sortIndicator}
@@ -189,29 +208,37 @@ const AttributeHeader = <Entity extends EntityBase>({
   const titleGroup = (
     <LeftCol ref={leftRef}>
       <HeaderActionsDropdown
+        textAlign={textAlign}
         label={columnLabel}
         activeSort={sortDirection}
         isSliceActive={isSliceActive}
         onChangeSlicing={canSlice ? onChangeSlicing : undefined}
         sliceColumnId={colId}
         appSection={appSection}
-        textAlign={textAlign}
         onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}
-        onHideColumn={canHideColumn ? () => ctx.header.column.toggleVisibility() : undefined}>
+        onHideColumn={canHideColumn ? () => ctx.header.column.toggleVisibility() : undefined}
+        opened={opened}
+        onOpenChange={onOpenChange}
+        anchorPosition={anchorPosition}>
         {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
       </HeaderActionsDropdown>
     </LeftCol>
   );
 
+  const nonDraggableA11yProps = !isDraggable && hasHeaderActions ? { role: 'button' as const, tabIndex: 0 } : {};
+
   return (
     <ThInner
-      ref={setNodeRef}
+      ref={mergedHeaderRef}
       $isDraggable={isDraggable}
       $isDragging={isDragging}
       $isResizingAnyColumn={isResizingAnyColumn}
       title={isDraggable ? dragTitle : undefined}
       aria-label={isDraggable ? dragTitle : undefined}
-      {...(isDraggable ? { ...attributes, ...listeners } : {})}>
+      {...(isDraggable ? { ...attributes, ...listeners } : {})}
+      {...nonDraggableA11yProps}
+      onClick={hasHeaderActions ? onClick : undefined}
+      onKeyDown={isDraggable || hasHeaderActions ? onHeaderKeyDown : undefined}>
       {isDraggable && <DragIcon name="drag_indicator" size="xs" $isDragging={isDragging} className="header-action" />}
       {isRightAligned ? (
         <>

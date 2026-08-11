@@ -19,7 +19,7 @@ import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { DeploymentForm, EnrollmentTokenList } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useCollectorsConfig } from 'components/collectors/hooks';
@@ -42,7 +42,7 @@ const CollectorsDeploymentPage = () => {
       <PageHeader
         title={
           <>
-            Deploy Collectors <BetaBadge />
+            Deploy Collectors <PreviewBadge />
           </>
         }>
         <span>

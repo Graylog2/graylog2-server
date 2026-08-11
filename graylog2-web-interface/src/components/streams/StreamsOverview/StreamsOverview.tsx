@@ -84,7 +84,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
     );
   };
 
-  const { data: layoutPreferences } = useUserLayoutPreferences(activeLayout.entityTableId, activeLayoutVariant);
+  const { data: layoutPreferences } = useUserLayoutPreferences(
+    activeLayout.entityTableId,
+    activeLayoutVariant || undefined,
+  );
   const userPrefs = layoutPreferences?.attributes ?? {};
   const userSelection = Object.entries(userPrefs)
     .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
