@@ -119,7 +119,8 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
     if (!fleet) return;
 
     const name = mode === 'custom' ? customName.trim() : SHORT_LIVED_NAME;
-    const expiresIn = mode === 'custom' ? (expiry === 'never' ? null : expiry) : SHORT_LIVED_EXPIRY;
+    const customExpiresIn = expiry === 'never' ? null : expiry;
+    const expiresIn = mode === 'custom' ? customExpiresIn : SHORT_LIVED_EXPIRY;
 
     try {
       const response = await createEnrollmentToken({ name, fleetId: fleet.id, expiresIn });
