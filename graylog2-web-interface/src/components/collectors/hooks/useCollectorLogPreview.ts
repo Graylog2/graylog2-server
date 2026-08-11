@@ -38,8 +38,8 @@ import type { MessagesSearchType, AggregationSearchType } from 'views/logic/quer
 // ['collectors'] wholesale on every mutation, which would re-create the backend search.
 export const ONBOARDING_KEY_PREFIX = ['collector-onboarding'];
 
-const REFRESH_INTERVAL_MS = 5000;
-const PREVIEW_RANGE_SECONDS = 900; // last 15 minutes
+export const REFRESH_INTERVAL_MS = 5000;
+export const PREVIEW_RANGE_SECONDS = 900; // last 15 minutes
 const PREVIEW_MESSAGE_LIMIT = 10;
 // A `values` bucket returns only buckets that exist, capped at this limit, so the limit must exceed
 // the fleet's source count: absent-from-the-result is read as zero, and truncated buckets would be
@@ -51,7 +51,7 @@ const SOURCE_BUCKET_LIMIT = 100;
 // (`Count.field()` is Optional server-side). Widening that shared views type is deferred, so the
 // series is asserted here instead. Do not "fix" this by adding a field: `count(<field>)` counts
 // occurrences of that field and is a different aggregation from `count()`.
-const COUNT_SERIES = [{ id: 'count()', type: 'count' }] as AggregationSearchType['series'];
+export const COUNT_SERIES = [{ id: 'count()', type: 'count' }] as AggregationSearchType['series'];
 
 export type PreviewMessage = {
   id: string;
@@ -154,7 +154,7 @@ type RawResultMessage = { message: { _id: string; timestamp: string; message: un
 type RawMessagesResult = { messages?: Array<RawResultMessage>; total?: number };
 type RawPivotValue = { source: string; value: unknown };
 type RawPivotRow = { source: string; key: Array<string>; values?: Array<RawPivotValue> };
-type RawPivotResult = { rows?: Array<RawPivotRow> };
+export type RawPivotResult = { rows?: Array<RawPivotRow> };
 
 const toPreview = (searchTypeResult: RawMessagesResult | undefined): LogPreview => ({
   messages: (searchTypeResult?.messages ?? []).map((m) => ({
@@ -166,8 +166,8 @@ const toPreview = (searchTypeResult: RawMessagesResult | undefined): LogPreview 
 });
 
 // A missing result means the aggregation was unavailable, which must stay distinguishable from
-// "every source produced nothing" — the caller falls back to the aggregate status in that case.
-const toSourceCounts = (searchTypeResult: RawPivotResult | undefined): Record<string, number> | undefined => {
+// "every bucket produced nothing" — callers fall back to an aggregate status in that case.
+export const parsePivotCounts = (searchTypeResult: RawPivotResult | undefined): Record<string, number> | undefined => {
   if (!searchTypeResult?.rows) {
     return undefined;
   }
@@ -228,7 +228,7 @@ export const useCollectorLogPreview = (instanceUid: string) => {
         sourceLogs: toPreview(
           result.forId(ids.sourceQueryId)?.searchTypes?.[ids.sourceSearchTypeId] as RawMessagesResult | undefined,
         ),
-        sourceCounts: toSourceCounts(
+        sourceCounts: parsePivotCounts(
           result.forId(ids.sourceQueryId)?.searchTypes?.[ids.sourceCountsSearchTypeId] as RawPivotResult | undefined,
         ),
         selfLogsError: errorForSearchType(ids.selfQueryId, ids.selfSearchTypeId),
@@ -249,5 +249,3 @@ export const useCollectorLogPreview = (instanceUid: string) => {
     isLoading: !createError && (!created || isLoading),
   };
 };
-
-

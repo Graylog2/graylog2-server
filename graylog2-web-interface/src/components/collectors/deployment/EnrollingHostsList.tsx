@@ -18,22 +18,23 @@ import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Table } from 'components/bootstrap';
+import { Button, Table } from 'components/bootstrap';
 import { Link, RelativeTime } from 'components/common';
 import InstanceStatusLabel from 'components/collectors/common/InstanceStatusLabel';
 import MutedText from 'components/collectors/common/MutedText';
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
+import useFleetReceivingCounts from 'components/collectors/hooks/useFleetReceivingCounts';
 import PulsingDot from 'components/collectors/overview/onboarding/PulsingDot';
-import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import Routes from 'routing/Routes';
+
+import EnrollingHostSetup from './EnrollingHostSetup';
 
 const POLL_INTERVAL_MS = 3000;
 
 type Props = {
   fleetId: string;
   fleetName: string;
-  platformId: PlatformId | null;
 };
 
 const Container = styled.div(
@@ -77,16 +78,35 @@ const Subtitle = styled.span(
   `,
 );
 
+const Receiving = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.success};
+  `,
+);
+
+const FirstMessagesCell = ({ count }: { count: number | undefined }) => {
+  if ((count ?? 0) > 0) {
+    return <Receiving>Receiving</Receiving>;
+  }
+
+  return <MutedText as="span">Listening&hellip;</MutedText>;
+};
+
 /**
  * Live list of the hosts that enrolled since this component mounted. The parent remounts it per
  * generated token (via `key`), so the baseline snapshot always means "instances that existed
  * before this token could have been used". Diffing ids instead of comparing enrolled_at against
  * browser time avoids clock-skew bugs (same approach as WaitingForConnection).
  */
-const EnrollingHostsList = ({ fleetId, fleetName, platformId }: Props) => {
+const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
   const { data: instances, error } = useInstances(fleetId, { refetchInterval: POLL_INTERVAL_MS, silent: true });
+  // One aggregation for all hosts, not a query per row.
+  const { counts: receivingCounts } = useFleetReceivingCounts(fleetId);
   const baseline = useRef<Set<string> | null>(null);
   const [enrolling, setEnrolling] = useState<CollectorInstanceView[]>([]);
+  // Expanding shows the concise connection-success view inline instead of navigating to the
+  // detail page — leaving the wizard would lose the generated token and install command.
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!instances) return;
@@ -125,27 +145,44 @@ const EnrollingHostsList = ({ fleetId, fleetName, platformId }: Props) => {
             <tr>
               <th>Host</th>
               <th>Status</th>
+              <th>First messages</th>
               <th>Enrolled</th>
+              <th aria-label="Actions" />
             </tr>
           </thead>
           <tbody>
-            {enrolling.map((i) => (
-              <tr key={i.id}>
-                <td>
-                  <Link
-                    to={Routes.SYSTEM.COLLECTORS.ONBOARDING_INSTANCE(i.instance_uid)}
-                    state={{ platformId, fleetName }}>
-                    {i.hostname ?? i.instance_uid}
-                  </Link>
-                </td>
-                <td>
-                  <InstanceStatusLabel status={i.status} />
-                </td>
-                <td>
-                  <RelativeTime dateTime={i.enrolled_at} />
-                </td>
-              </tr>
-            ))}
+            {enrolling.map((i) => {
+              const expanded = expandedId === i.id;
+
+              return (
+                <React.Fragment key={i.id}>
+                  <tr>
+                    <td>{i.hostname ?? i.instance_uid}</td>
+                    <td>
+                      <InstanceStatusLabel status={i.status} />
+                    </td>
+                    <td>
+                      <FirstMessagesCell count={receivingCounts?.[i.instance_uid]} />
+                    </td>
+                    <td>
+                      <RelativeTime dateTime={i.enrolled_at} />
+                    </td>
+                    <td>
+                      <Button bsStyle="link" bsSize="xsmall" onClick={() => setExpandedId(expanded ? null : i.id)}>
+                        {expanded ? 'Hide setup' : 'View setup'}
+                      </Button>
+                    </td>
+                  </tr>
+                  {expanded && (
+                    <tr>
+                      <td colSpan={5}>
+                        <EnrollingHostSetup instance={i} fleetName={fleetName} />
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </tbody>
         </Table>
       ) : (

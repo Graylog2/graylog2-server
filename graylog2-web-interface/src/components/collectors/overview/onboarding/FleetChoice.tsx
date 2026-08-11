@@ -38,7 +38,8 @@ type Props = {
 
 const Container = styled.div<{ $inline: boolean }>(
   ({ theme, $inline }) => css`
-    max-width: ${$inline ? '560px' : '700px'};
+    /* Inline (deploy wizard): half the step width, matching the token step's boxes. */
+    max-width: ${$inline ? '50%' : '700px'};
     margin: ${$inline ? '0' : `0 auto ${theme.spacings.md}`};
     text-align: ${$inline ? 'left' : 'center'};
   `,

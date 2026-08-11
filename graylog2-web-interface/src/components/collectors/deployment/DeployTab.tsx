@@ -47,9 +47,11 @@ const CheckBullet = () => <Icon name="check" size="sm" />;
 const DeployTab = () => {
   // The selected fleet lives in the URL (?fleet=<id>) so other pages can deep-link into the
   // wizard with a fleet preselected. Same state-seeded-from-URL pattern as FleetDetail's tabs.
+  // `undefined` = no decision yet (a lone fleet auto-selects); `null` = the user explicitly
+  // cleared the selection ("Change fleet"), so auto-selection must not kick back in.
   const { fleet: fleetParam } = useQuery();
-  const [selectedFleetId, setSelectedFleetId] = useState<string | null>(
-    typeof fleetParam === 'string' ? fleetParam : null,
+  const [selectedFleetId, setSelectedFleetId] = useState<string | null | undefined>(
+    typeof fleetParam === 'string' ? fleetParam : undefined,
   );
   const [generatedToken, setGeneratedToken] = useState<GeneratedToken | null>(null);
   const [platformId, setPlatformId] = useState<PlatformId>('linux');
@@ -59,11 +61,12 @@ const DeployTab = () => {
 
   if (isFleetsLoading) return <Spinner />;
 
-  // A lone fleet is auto-selected (same rule as FirstOnboarding.autoChoice); the box stays
-  // visible so the user still sees which fleet the hosts will join.
+  // A lone fleet is auto-selected while the user has made no decision (same rule as
+  // FirstOnboarding.autoChoice); the box stays visible so the user still sees which fleet the
+  // hosts will join.
+  const autoFleet = (fleets?.length ?? 0) === 1 ? fleets![0] : null;
   const resolvedFleet =
-    (selectedFleetId ? fleets?.find((f) => f.id === selectedFleetId) : null) ??
-    ((fleets?.length ?? 0) === 1 ? fleets![0] : null);
+    selectedFleetId === undefined ? autoFleet : (fleets?.find((f) => f.id === selectedFleetId) ?? null);
 
   const pushFleetUrl = (fleetId: string | null) => {
     let newUrl = new URI(window.location.href).removeSearch('fleet');
@@ -132,7 +135,6 @@ const DeployTab = () => {
                 key={generatedToken.token}
                 fleetId={resolvedFleet.id}
                 fleetName={resolvedFleet.name}
-                platformId={platformId}
               />
             )}
           </StepBody>

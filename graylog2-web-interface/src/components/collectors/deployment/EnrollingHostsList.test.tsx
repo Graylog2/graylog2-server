@@ -16,15 +16,29 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
+import { useCollectorLogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
+import useFleetReceivingCounts from 'components/collectors/hooks/useFleetReceivingCounts';
+import { useSources } from 'components/collectors/hooks/useSourceQueries';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import EnrollingHostsList from './EnrollingHostsList';
 
 jest.mock('components/collectors/hooks/useInstanceQueries', () => ({
   useInstances: jest.fn(),
+}));
+
+jest.mock('components/collectors/hooks/useFleetReceivingCounts');
+
+jest.mock('components/collectors/hooks/useCollectorLogPreview', () => ({
+  useCollectorLogPreview: jest.fn(),
+}));
+
+jest.mock('components/collectors/hooks/useSourceQueries', () => ({
+  useSources: jest.fn(),
 }));
 
 const instance = (id: string, hostname: string, enrolledAt: string): CollectorInstanceView =>
@@ -43,13 +57,25 @@ const instance = (id: string, hostname: string, enrolledAt: string): CollectorIn
   }) as CollectorInstanceView;
 
 describe('EnrollingHostsList', () => {
-  const defaultProps = { fleetId: 'fleet-1', fleetName: 'web-servers', platformId: 'linux' as const };
+  const defaultProps = { fleetId: 'fleet-1', fleetName: 'web-servers' };
 
   const mockInstances = (data: CollectorInstanceView[] | undefined, error: Error | null = null) =>
     asMock(useInstances).mockReturnValue({ data, error } as ReturnType<typeof useInstances>);
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    asMock(useCollectorLogPreview).mockReturnValue({
+      selfLogs: undefined,
+      sourceLogs: undefined,
+      sourceCounts: undefined,
+      selfLogsError: null,
+      sourceLogsError: null,
+      isLoading: false,
+    } as unknown as ReturnType<typeof useCollectorLogPreview>);
+
+    asMock(useSources).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useSources>);
+    asMock(useFleetReceivingCounts).mockReturnValue({ counts: undefined, error: null });
   });
 
   it('polls instances for the fleet silently', () => {
@@ -66,10 +92,10 @@ describe('EnrollingHostsList', () => {
     render(<EnrollingHostsList {...defaultProps} />);
 
     expect(screen.getByText(/hosts running the command appear here/i)).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'old-host' })).not.toBeInTheDocument();
+    expect(screen.queryByText('old-host')).not.toBeInTheDocument();
   });
 
-  it('lists hosts that appear after the baseline, linking to the onboarding detail', () => {
+  it('lists hosts that appear after the baseline', () => {
     mockInstances([]);
 
     const { rerender } = render(<EnrollingHostsList {...defaultProps} />);
@@ -78,10 +104,47 @@ describe('EnrollingHostsList', () => {
 
     rerender(<EnrollingHostsList {...defaultProps} />);
 
-    const hostLink = screen.getByRole('link', { name: 'web-prod-02' });
-
-    expect(hostLink).toHaveAttribute('href', expect.stringContaining('uid-fresh'));
+    expect(screen.getByText('web-prod-02')).toBeInTheDocument();
     expect(screen.getByText(/1 connected/i)).toBeInTheDocument();
+  });
+
+  it('shows per-host receiving status from the fleet-wide aggregation', () => {
+    asMock(useFleetReceivingCounts).mockReturnValue({ counts: { 'uid-loud': 12, 'uid-quiet': 0 }, error: null });
+    mockInstances([]);
+
+    const { rerender } = render(<EnrollingHostsList {...defaultProps} />);
+
+    mockInstances([
+      instance('loud', 'host-loud', '2026-08-11T10:00:00Z'),
+      instance('quiet', 'host-quiet', '2026-08-11T10:01:00Z'),
+    ]);
+
+    rerender(<EnrollingHostsList {...defaultProps} />);
+
+    expect(useFleetReceivingCounts).toHaveBeenCalledWith('fleet-1');
+    expect(screen.getByText('Receiving')).toBeInTheDocument();
+    expect(screen.getByText(/listening…/i)).toBeInTheDocument();
+  });
+
+  it('expands a row into the inline setup view and collapses it again', async () => {
+    const user = userEvent.setup();
+    mockInstances([]);
+
+    const { rerender } = render(<EnrollingHostsList {...defaultProps} />);
+
+    mockInstances([instance('fresh', 'web-prod-02', '2026-08-11T10:00:00Z')]);
+
+    rerender(<EnrollingHostsList {...defaultProps} />);
+
+    await user.click(screen.getByRole('button', { name: /view setup/i }));
+
+    // The concise connection-success view: onboarding timeline + collector facts
+    expect(screen.getByText('Sources configured')).toBeInTheDocument();
+    expect(useCollectorLogPreview).toHaveBeenCalledWith('uid-fresh');
+
+    await user.click(screen.getByRole('button', { name: /hide setup/i }));
+
+    expect(screen.queryByText('Sources configured')).not.toBeInTheDocument();
   });
 
   it('orders enrolling hosts newest first', () => {
@@ -96,9 +159,9 @@ describe('EnrollingHostsList', () => {
 
     rerender(<EnrollingHostsList {...defaultProps} />);
 
-    const links = screen.getAllByRole('link', { name: /host-/ });
+    const hosts = screen.getAllByText(/host-/);
 
-    expect(links.map((link) => link.textContent)).toEqual(['host-newer', 'host-older']);
+    expect(hosts.map((host) => host.textContent)).toEqual(['host-newer', 'host-older']);
   });
 
   it('shows an inline notice when polling fails, and keeps listening', () => {
