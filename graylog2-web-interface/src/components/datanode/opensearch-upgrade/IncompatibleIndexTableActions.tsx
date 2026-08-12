@@ -27,7 +27,11 @@ import UserNotification from 'util/UserNotification';
 import { TELEMETRY_DEFAULTS } from './telemetry';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
 import { useIncompatibleIndicesContext } from './IncompatibleIndicesContext';
-import { getAvailableActions, isIndexArchived, useIncompatibleIndexActionDefinitions } from './incompatibleIndexActions';
+import {
+  getAvailableActions,
+  isIndexArchived,
+  useIncompatibleIndexActionDefinitions,
+} from './incompatibleIndexActions';
 import type { IndexAction } from './incompatibleIndexActions';
 
 const ActionsToolbar = styled(ButtonToolbar)`
@@ -54,8 +58,15 @@ type Props = {
 };
 
 const IncompatibleIndexTableActions = ({ index }: Props) => {
-  const { archiveActionsAvailable, archivedIndexNames, pendingIndexStatuses, addArchiveDeleteAction, addReindexAction, refetchClusterJobs, refetch } =
-    useIncompatibleIndicesContext();
+  const {
+    archiveActionsAvailable,
+    archivedIndexNames,
+    pendingIndexStatuses,
+    addArchiveDeleteAction,
+    addReindexAction,
+    refetchClusterJobs,
+    refetch,
+  } = useIncompatibleIndicesContext();
   const actionDefinitions = useIncompatibleIndexActionDefinitions();
   const sendTelemetry = useSendTelemetry();
   const { deselectEntity } = useSelectedEntities();

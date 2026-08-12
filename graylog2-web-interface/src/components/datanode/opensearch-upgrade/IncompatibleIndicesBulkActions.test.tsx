@@ -332,9 +332,7 @@ describe('IncompatibleIndicesBulkActions', () => {
 
     it('warns about a running archive job without changing the selection or refreshing', async () => {
       asMock(archiveBinding.isArchiveJobConflict).mockReturnValue(true);
-      asMock(archiveBinding.archiveAndDeleteIndices).mockRejectedValue(
-        new Error('An archive job is already running!'),
-      );
+      asMock(archiveBinding.archiveAndDeleteIndices).mockRejectedValue(new Error('An archive job is already running!'));
       renderBulkActions(managedIndices, true);
 
       await confirmBulkArchive();
