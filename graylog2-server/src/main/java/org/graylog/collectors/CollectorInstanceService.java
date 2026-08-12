@@ -260,6 +260,11 @@ public class CollectorInstanceService {
     }
 
     private BsonDocument encodeStructuredReportValues(CollectorInstanceReport update) {
+        // Avoid Jackson encode of completely empty ReportUpdateValues.
+        if (update.identifyingAttributes().isEmpty() && update.nonIdentifyingAttributes().isEmpty() && update.health().isEmpty()) {
+            return new BsonDocument();
+        }
+
         // The aggregation pipeline is built as a generic Document. Its codec handles BSON-native values, but it
         // does not know how Graylog's Attribute and ComponentHealthDTO types must be stored. Encode those values
         // through a MongoJack-backed wrapper first so custom field names and serializers are applied. The caller
