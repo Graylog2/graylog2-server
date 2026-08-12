@@ -35,6 +35,7 @@ const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean 
     overflow: hidden;
     flex-grow: 3;
     height: ${$enabled ? 'initial' : 'min-content'};
+    grid-column: span 2;
 
     @media (max-width: ${theme.breakpoints.max.md}) {
       flex-grow: 1;
@@ -111,7 +112,7 @@ const ContentStreamSection = () => {
   };
 
   return (
-    <SectionGrid $columns="2fr 1fr">
+    <SectionGrid $columns="1fr 1fr 1fr">
       {isNewsSectionEnabledForBrand && (
         <StyledNewsSectionComponent
           title="News"

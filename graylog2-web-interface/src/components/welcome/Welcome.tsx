@@ -77,24 +77,24 @@ const Welcome = () => {
       </PageHeader>
       {AppConfig.welcomePageMetricsEnabled() && <WelcomeMetrics />}
       {onboardingEnabled && <OnboardingBanner />}
-      <SectionGrid>
-        <StyledSectionComponent title="Last Opened">
-          <p className="description">Overview of recently visited saved searches and dashboards.</p>
-          <LastOpenList />
-        </StyledSectionComponent>
+      <SectionGrid $columns="1fr 1fr 1fr">
         <StyledSectionComponent title="Favorite Items">
           <p className="description">Overview of your favorite saved searches and dashboards.</p>
           <FavoriteItemsList />
         </StyledSectionComponent>
+        <StyledSectionComponent title="Recent Activity">
+          <p className="description">
+            {isAdmin
+              ? 'This list includes all actions users performed, like creating or sharing an entity.'
+              : 'Overview of actions you made with entities or somebody else made with entities which relates to you, like creating or sharing an entity.'}
+          </p>
+          <RecentActivityList />
+        </StyledSectionComponent>
+        <StyledSectionComponent title="Last Opened">
+          <p className="description">Overview of recently visited saved searches and dashboards.</p>
+          <LastOpenList />
+        </StyledSectionComponent>
       </SectionGrid>
-      <StyledSectionComponent title="Recent Activity">
-        <p className="description">
-          {isAdmin
-            ? 'This list includes all actions users performed, like creating or sharing an entity.'
-            : 'Overview of actions you made with entities or somebody else made with entities which relates to you, like creating or sharing an entity.'}
-        </p>
-        <RecentActivityList />
-      </StyledSectionComponent>
       <ContentStreamContainer />
     </>
   );
