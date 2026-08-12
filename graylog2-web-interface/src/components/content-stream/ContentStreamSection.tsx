@@ -39,6 +39,7 @@ const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean 
 
     @media (max-width: ${theme.breakpoints.max.md}) {
       flex-grow: 1;
+      grid-column: span 1;
     }
   `,
 );
