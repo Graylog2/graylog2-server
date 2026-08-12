@@ -14,22 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext } from 'react';
 
-import useHasAccessToAnyStream from 'hooks/useHasAccessToAnyStream';
-import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
+import StreamsContext from 'contexts/StreamsContext';
 
-type Props = {
-  children: React.ReactElement;
-  skipNoStreamsCheck?: boolean;
+const useHasAccessToAnyStream = () => {
+  const streams = useContext(StreamsContext);
+
+  return !!streams && streams.length > 0;
 };
 
-export default ({ children, skipNoStreamsCheck = false }: Props) => {
-  const hasAccessToAnyStream = useHasAccessToAnyStream();
-
-  if (skipNoStreamsCheck) {
-    return children;
-  }
-
-  return hasAccessToAnyStream ? children : <UserHasNoStreamAccess />;
-};
+export default useHasAccessToAnyStream;

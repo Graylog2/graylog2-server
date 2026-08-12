@@ -31,6 +31,7 @@ import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 import OnboardingBanner from './OnboardingBanner';
+import WelcomeDashboard from './WelcomeDashboard';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -73,6 +74,7 @@ const Welcome = () => {
       <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
+      <WelcomeDashboard />
       {onboardingEnabled && <OnboardingBanner />}
       <SectionGrid>
         <StyledSectionComponent title="Last Opened">
