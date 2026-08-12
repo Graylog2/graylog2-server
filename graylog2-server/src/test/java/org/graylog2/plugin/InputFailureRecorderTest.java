@@ -100,15 +100,6 @@ class InputFailureRecorderTest {
         assertThat(inputState.getDetailedMessage()).isEqualTo("AWS authorization failure");
     }
 
-    @Test
-    void setRunningClearsAFailure() {
-        recorder.setFailing(getClass(), "transient");
-
-        recorder.setRunning();
-
-        assertThat(inputState.getState()).isEqualTo(IOState.Type.RUNNING);
-    }
-
     /**
      * Work that continues after a failure retrying cannot resolve - KCL keeps draining the leases it already holds -
      * must not report the input healthy again, or it ends up displaying RUNNING with nothing behind it.

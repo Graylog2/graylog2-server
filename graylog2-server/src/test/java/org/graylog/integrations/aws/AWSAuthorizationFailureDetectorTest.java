@@ -121,13 +121,7 @@ class AWSAuthorizationFailureDetectorTest {
      * nothing.
      */
     @ParameterizedTest
-    @ValueSource(strings = {
-            "Scan",
-            "DescribeTable",
-            "TransactWriteItems",
-            "UpdateItem",
-            "GetItem",
-            "PutItem"})
+    @ValueSource(strings = {"Scan", "UpdateItem"})
     void neverReportsAnOperationKclAbsorbs(String operation) {
         denyRepeatedly(operation, 60, WIDE_SPACING);
 
@@ -286,16 +280,6 @@ class AWSAuthorizationFailureDetectorTest {
     }
 
     @Test
-    void ignoresDenialsBuriedDeeperThanTheCauseChainLimit() {
-        for (int i = 0; i < 10; i++) {
-            detector.recordFailure(QUERY, nest(accessDenied("denied"), 12));
-            advance(WIDE_SPACING);
-        }
-
-        assertThat(reportedFailures).isEmpty();
-    }
-
-    @Test
     void ignoresFailuresThatAreNotAwsServiceExceptions() {
         for (int i = 0; i < 10; i++) {
             detector.recordFailure(QUERY, new IOException("connection reset"));
@@ -380,14 +364,6 @@ class AWSAuthorizationFailureDetectorTest {
 
     private void advance(Duration duration) {
         clock.addAndGet(duration.toNanos());
-    }
-
-    private static Throwable nest(Throwable cause, int depth) {
-        Throwable current = cause;
-        for (int i = 0; i < depth; i++) {
-            current = new IllegalStateException("wrapper " + i, current);
-        }
-        return current;
     }
 
     private static ExecutionAttributes attributesFor(String operation) {

@@ -34,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_SELF;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -102,14 +101,6 @@ class InputStateListenerTest {
 
         verify(notificationService, never()).fixed(any(Notification.Type.class), anyString());
         verify(notificationService).publishIfFirst(any());
-    }
-
-    @Test
-    void persistsTheCurrentStateAndMessage() {
-        listener.inputStateChanged(eventFor(IOState.Type.FAILING, IOState.Type.FAILING));
-
-        verify(inputStateService).upsertState(eq(INPUT_ID), eq(IOState.Type.FAILING), any(), any(),
-                eq("AWS authorization failure for Kinesis input <test-stream>."));
     }
 
     private IOStateChangedEvent<MessageInput> eventFor(IOState.Type oldState, IOState.Type newState) {

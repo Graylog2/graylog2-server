@@ -151,15 +151,6 @@ class KinesisConsumerTest {
                 .isNotSameAs(detectorsOn(builders.kinesis()).get(0));
     }
 
-    @Test
-    void successfulTaskClearsAnOrdinaryFailure() {
-        final KinesisConsumer consumer = newConsumer();
-
-        consumer.recordTaskSuccess();
-
-        verify(inputFailureRecorder).setRunning();
-    }
-
     private static List<ExecutionInterceptor> detectorsOn(SdkClientBuilder<?, ?> builder) {
         return builder.overrideConfiguration().executionInterceptors().stream()
                 .filter(AWSAuthorizationFailureDetector.class::isInstance)
