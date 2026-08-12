@@ -27,7 +27,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { GeneratedToken } from './TokenStep';
 
-import { useCollectorsConfig } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
 type Props = {
@@ -37,7 +36,6 @@ type Props = {
 };
 
 const InstallStep = ({ token, platformId, onPlatformChange }: Props) => {
-  const { data: config } = useCollectorsConfig();
   const sendTelemetry = useSendCollectorsTelemetry();
 
   if (!token) {
@@ -55,25 +53,23 @@ const InstallStep = ({ token, platformId, onPlatformChange }: Props) => {
       </Tabs.List>
       {PLATFORMS.map((platform) => (
         <Tabs.Panel key={platform.id} value={platform.id}>
-          {config && (
-            <InstallCommand
-              command={platform.commandTemplate(enrollEndpointUrl(config.http.hostname), token.token)}
-              platformLabel={platform.label}
-              tokenDuration={token.expiresIn}
-              actions={
-                <ClipboardButton
-                  text={token.token}
-                  title="Copy token only"
-                  bsSize="sm"
-                  onSuccess={() =>
-                    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
-                      app_action_value: 'deployment-copy-token',
-                    })
-                  }
-                />
-              }
-            />
-          )}
+          <InstallCommand
+            command={platform.commandTemplate(enrollEndpointUrl(), token.token)}
+            platformLabel={platform.label}
+            tokenDuration={token.expiresIn}
+            actions={
+              <ClipboardButton
+                text={token.token}
+                title="Copy token only"
+                bsSize="sm"
+                onSuccess={() =>
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+                    app_action_value: 'deployment-copy-token',
+                  })
+                }
+              />
+            }
+          />
         </Tabs.Panel>
       ))}
     </Tabs>

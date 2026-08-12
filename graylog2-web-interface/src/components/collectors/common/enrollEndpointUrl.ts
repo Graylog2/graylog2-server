@@ -14,29 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import URI from 'urijs';
-
-import AppConfig from 'util/AppConfig';
 import { qualifyUrl } from 'util/URLUtils';
 
 /**
- * The URL a collector enrolls against: the admin-configured hostname from the collectors config,
- * plus the scheme and port of the Graylog API (e.g. http://…:9000 in dev — taken from the
- * qualified server URL, which resolves a relative `gl2ServerUrl` against the current location),
- * and the app path prefix appended when Graylog is served under a subpath. The collector figures
- * out the API path itself, so the prefix is the app prefix, not the API path.
+ * The URL a collector enrolls against: the Graylog server URL without the API path. The
+ * qualified server URL always points at the API — the server generates it as the external
+ * base URI (including any app path prefix) plus the trailing `api/` segment (see
+ * `AppConfigResource`) — and the collector figures out the API path itself, so enrolling
+ * happens against everything before that segment.
  */
-const enrollEndpointUrl = (hostname: string): string => {
-  const apiUrl = new URI(qualifyUrl(''));
-  const scheme = apiUrl.protocol() || 'https';
-  const port = apiUrl.port();
-  const pathPrefix = (AppConfig.gl2AppPathPrefix() ?? '').replace(/^\/+|\/+$/g, '');
-
-  let url = new URI(`${scheme}://${hostname}`);
-  if (port) url = url.port(port);
-  if (pathPrefix) url = url.path(pathPrefix);
-
-  return url.toString().replace(/\/+$/, '');
-};
+const enrollEndpointUrl = (): string =>
+  qualifyUrl('')
+    .replace(/\/api\/?$/, '')
+    .replace(/\/+$/, '');
 
 export default enrollEndpointUrl;

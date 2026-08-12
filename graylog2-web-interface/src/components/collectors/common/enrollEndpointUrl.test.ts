@@ -15,40 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-import AppConfig from 'util/AppConfig';
 import { qualifyUrl } from 'util/URLUtils';
 
 import enrollEndpointUrl from './enrollEndpointUrl';
 
-jest.mock('util/AppConfig');
 jest.mock('util/URLUtils');
 
 describe('enrollEndpointUrl', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('');
     asMock(qualifyUrl).mockReturnValue('http://localhost:9000/api/');
   });
 
-  it('uses the scheme and API port from the qualified server URL', () => {
-    expect(enrollEndpointUrl('collectors.example.org')).toBe('http://collectors.example.org:9000');
+  it('strips the API path from the qualified server URL', () => {
+    expect(enrollEndpointUrl()).toBe('http://localhost:9000');
   });
 
-  it('omits the port when the API URL has none', () => {
-    asMock(qualifyUrl).mockReturnValue('https://graylog.example.org/api/');
+  it('handles an API URL without a trailing slash', () => {
+    asMock(qualifyUrl).mockReturnValue('https://graylog.example.org/api');
 
-    expect(enrollEndpointUrl('collectors.example.org')).toBe('https://collectors.example.org');
+    expect(enrollEndpointUrl()).toBe('https://graylog.example.org');
   });
 
-  it('appends the app path prefix when Graylog is served under a subpath', () => {
-    asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/graylog/');
+  it('keeps the app path prefix when Graylog is served under a subpath', () => {
+    asMock(qualifyUrl).mockReturnValue('https://graylog.example.org/graylog/api/');
 
-    expect(enrollEndpointUrl('collectors.example.org')).toBe('http://collectors.example.org:9000/graylog');
+    expect(enrollEndpointUrl()).toBe('https://graylog.example.org/graylog');
   });
 
-  it('ignores a bare "/" path prefix', () => {
-    asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/');
+  it('only strips a whole trailing api segment', () => {
+    asMock(qualifyUrl).mockReturnValue('https://graylog.example.org/customapi/');
 
-    expect(enrollEndpointUrl('collectors.example.org')).toBe('http://collectors.example.org:9000');
+    expect(enrollEndpointUrl()).toBe('https://graylog.example.org/customapi');
+  });
+
+  it('strips a bare trailing slash when there is no api segment', () => {
+    asMock(qualifyUrl).mockReturnValue('https://graylog.example.org/');
+
+    expect(enrollEndpointUrl()).toBe('https://graylog.example.org');
   });
 });

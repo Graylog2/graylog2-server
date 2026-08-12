@@ -34,7 +34,7 @@ import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
 
 import enrollEndpointUrl from '../common/enrollEndpointUrl';
-import { useCollectorsConfig, useCollectorsMutations, useFleets } from '../hooks';
+import { useCollectorsMutations, useFleets } from '../hooks';
 // Imported from the concrete module (not the hooks index) so tests that automock the index
 // still see the real cache key.
 import { INSTANCES_KEY_PREFIX } from '../hooks/useInstanceQueries';
@@ -73,23 +73,17 @@ const FirstOnboarding = () => {
   const queryClient = useQueryClient();
   const history = useHistory();
 
-  const { data: config, isLoading: isConfigLoading } = useCollectorsConfig();
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
   const { createFleet, isCreatingFleet, createSource, createEnrollmentToken, isCreatingEnrollmentToken } =
     useCollectorsMutations();
 
-  const buildCommand = useCallback(
-    (platformId: PlatformId, token: string) => {
-      if (!config) return '';
+  const buildCommand = useCallback((platformId: PlatformId, token: string) => {
+    const platform = PLATFORMS.find((p) => p.id === platformId);
 
-      const platform = PLATFORMS.find((p) => p.id === platformId);
+    if (!platform) return '';
 
-      if (!platform) return '';
-
-      return platform.commandTemplate(enrollEndpointUrl(config.http.hostname), token);
-    },
-    [config],
-  );
+    return platform.commandTemplate(enrollEndpointUrl(), token);
+  }, []);
 
   const createOnboardingFleet = useCallback(async () => {
     const version = getMajorAndMinorVersion();
@@ -181,7 +175,7 @@ const FirstOnboarding = () => {
     [queryClient, history, selectedPlatform, resolvedFleet?.name],
   );
 
-  if (isConfigLoading || isFleetsLoading) return <Spinner />;
+  if (isFleetsLoading) return <Spinner />;
 
   const isBusy = isCreatingFleet || isCreatingEnrollmentToken;
   // Show the fleet box whenever an existing fleet could be chosen. With exactly one fleet it
