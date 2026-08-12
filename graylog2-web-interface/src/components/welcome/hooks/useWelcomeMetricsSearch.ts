@@ -72,7 +72,7 @@ const topSourcesWidget = () => ({
   widget: AggregationWidget.builder()
     .id(generateId())
     .timerange(LAST_24_HOURS)
-    .query(createElasticsearchQueryString('NOT source:example.org'))
+    .query(createElasticsearchQueryString(''))
     .config(
       AggregationWidgetConfig.builder()
         .rowPivots([pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], []))])
