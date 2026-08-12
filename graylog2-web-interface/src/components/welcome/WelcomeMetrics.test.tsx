@@ -41,12 +41,40 @@ const renderWithStreams = (streams: Array<Stream>) =>
     </StreamsContext.Provider>,
   );
 
-const widgetTitlesOfLastRenderedView = async () => {
+const lastRenderedView = async () => {
   const viewPromise = asMock(SearchPage).mock.calls.at(-1)[0].view as Promise<View>;
-  const view = await viewPromise;
+
+  return viewPromise;
+};
+
+const widgetTitlesOfLastRenderedView = async () => {
+  const view = await lastRenderedView();
   const widgetTitles = view.state.flatMap((state) => state.titles.get('widget'));
 
   return widgetTitles.valueSeq().toArray();
+};
+
+const widgetIdByTitle = async (title: string) => {
+  const view = await lastRenderedView();
+  const widgetTitles = view.state.flatMap((state) => state.titles.get('widget'));
+
+  return widgetTitles.findKey((widgetTitle) => widgetTitle === title);
+};
+
+const widgetWidthByTitle = async (title: string) => {
+  const view = await lastRenderedView();
+  const widgetPositions = view.state.flatMap((state) => state.widgetPositions);
+  const widgetId = await widgetIdByTitle(title);
+
+  return widgetPositions.get(widgetId).width;
+};
+
+const widgetByTitle = async (title: string) => {
+  const view = await lastRenderedView();
+  const widgets = view.state.valueSeq().flatMap((state) => state.widgets);
+  const widgetId = await widgetIdByTitle(title);
+
+  return widgets.find((widget) => widget.id === widgetId);
 };
 
 describe('WelcomeMetrics', () => {
@@ -67,9 +95,10 @@ describe('WelcomeMetrics', () => {
 
     expect(titles).toContain('Alerts Today');
     expect(titles).toContain('Events Today');
+    expect(await widgetWidthByTitle('Messages Today')).toBe(4);
   });
 
-  it('hides Alerts and Events widgets when the user is missing access to a stream', async () => {
+  it('shows placeholder widgets explaining missing permissions instead of Alerts and Events widgets when the user is missing access to a stream', async () => {
     asMock(usePermissions).mockReturnValue({ isPermitted: () => false, isAnyPermitted: () => false });
 
     renderWithStreams([accessibleStream]);
@@ -77,10 +106,21 @@ describe('WelcomeMetrics', () => {
     await waitFor(() => expect(asMock(SearchPage)).toHaveBeenCalled());
     const titles = await widgetTitlesOfLastRenderedView();
 
-    expect(titles).not.toContain('Alerts Today');
-    expect(titles).not.toContain('Events Today');
+    expect(titles).toContain('Alerts Today');
+    expect(titles).toContain('Events Today');
     expect(titles).toContain('Messages Today');
     expect(titles).toContain('Top 5 Sources');
+    expect(await widgetWidthByTitle('Messages Today')).toBe(4);
+    expect(await widgetWidthByTitle('Alerts Today')).toBe(4);
+    expect(await widgetWidthByTitle('Events Today')).toBe(4);
+
+    const alertsWidget = await widgetByTitle('Alerts Today');
+    const eventsWidget = await widgetByTitle('Events Today');
+
+    expect(alertsWidget.type).toBe('text');
+    expect(alertsWidget.config.text).toContain('do not have access');
+    expect(eventsWidget.type).toBe('text');
+    expect(eventsWidget.config.text).toContain('do not have access');
   });
 
   it('shows a message instead of any widgets when the user has no access to any stream', async () => {
