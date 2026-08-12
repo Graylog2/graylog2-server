@@ -19,6 +19,7 @@ import * as React from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
 import type * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
+import styled from 'styled-components';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
@@ -86,6 +87,11 @@ type Props = {
   navigationItem: PluginNavigation;
 };
 
+const NavListItem = styled.li`
+  // TODO: Replace with variable from theme?
+  padding: 15px;
+`;
+
 const NavigationItem = ({
   navigationItem: { requiredFeatureFlag, permissions, children, BadgeComponent, description, path },
   pathname,
@@ -109,7 +115,14 @@ const NavigationItem = ({
   }
 
   return (
-    <NavigationLink key={description} description={renderLinkTitle(description, BadgeComponent)} path={path} topLevel />
+    <NavListItem>
+      <NavigationLink
+        key={description}
+        description={renderLinkTitle(description, BadgeComponent)}
+        path={path}
+        topLevel
+      />
+    </NavListItem>
   );
 };
 

@@ -14,82 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Nav as BootstrapNav } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import navTabsStyles from './styles/nav-tabs';
-
-const Nav = styled(BootstrapNav)(
-  ({ theme }) => css`
-  &.nav {
-    > li {
-      > a {
-        transition: background-color 150ms ease-in-out;
-
-        &:hover,
-        &:focus {
-          background-color: ${theme.colors.variant.lightest.default};
-        }
-      }
-
-      &.disabled > a {
-        color: ${theme.colors.variant.light.default};
-
-        &:hover,
-        &:focus {
-          color: ${theme.colors.variant.light.default};
-        }
-      }
-    }
-
-    .open > a {
-      &,
-      &:hover,
-      &:focus {
-        background-color: ${theme.colors.variant.lightest.default};
-        border-color: ${theme.colors.variant.primary};
-      }
-    }
-
-    &.nav-pills {
-      > li {
-        &.active > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${theme.utils.contrastingColor(theme.colors.global.link)};
-            background-color: ${theme.colors.global.link};
-          }
-        }
-      }
-    }
-    
-    &.nav-sm {
-      > li > a {
-        padding: 8px 12px;
-        font-size: ${theme.fonts.size.small};
-      }
-    };
-
-    &.nav-xs {
-      > li > a {
-        padding: 2px 6px;
-        font-size: ${theme.fonts.size.small};
-      }
-    };
-
-    &.nav-lg {
-      > li > a {
-        padding: 14px 18px;
-        font-size: ${theme.fonts.size.large};
-      }
-    };
-
-    &${navTabsStyles} /* This is a known non-issue that stylelint won't ignore but will hopefully be patched soon https://github.com/stylelint/stylelint/issues/4574 */
-  }
-`,
-);
+const Nav = styled.ul`
+  display: flex;
+  padding-left: 0;
+  align-items: center;
+`;
 
 /** @component */
 export default Nav;

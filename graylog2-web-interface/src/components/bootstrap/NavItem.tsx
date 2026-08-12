@@ -15,15 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { NavItem as BootstrapNavItem } from 'react-bootstrap';
+import styled, { css } from 'styled-components';
 
 import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
 
+const NavigationLink = styled.a(
+  ({ theme }) => css`
+    color: ${theme.colors.text.primary};
+
+    &:hover,
+    &:focus {
+      color: ${theme.colors.variant.darker.default};
+      background-color: transparent;
+    }
+  `,
+);
 const NavItem = ({ children = undefined, ...props }: React.ComponentProps<typeof NavItem>) => (
-  <BootstrapNavItem {...props}>
+  <NavigationLink {...props}>
     <NavItemStateIndicator>{children}</NavItemStateIndicator>
-  </BootstrapNavItem>
+  </NavigationLink>
 );
 
 NavItem.displayName = 'NavItem';

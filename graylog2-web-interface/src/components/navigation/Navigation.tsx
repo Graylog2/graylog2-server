@@ -19,14 +19,13 @@ import styled, { css } from 'styled-components';
 
 import useLocation from 'routing/useLocation';
 import { Link, LinkContainer } from 'components/common';
+import { Navbar } from 'components/bootstrap';
 import AppConfig from 'util/AppConfig';
-import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
 import BrandNavLogo from 'components/navigation/NavigationBrand';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
-import { FEATURE_FLAG } from 'components/quick-jump/Constants';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import UserMenu from './UserMenu';
@@ -35,7 +34,6 @@ import NotificationBadge from './NotificationBadge';
 import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
 import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
-import StyledNavbar from './Navigation.styles';
 
 import { QuickJumpModalContainer } from '../quick-jump';
 
@@ -59,59 +57,58 @@ const BrandLink = styled(Link)(
   `,
 );
 
+const Brand = styled.div`
+  flex: 0 0 auto;
+`;
+
+const Icons = styled.nav`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex: 0 0 auto;
+`;
+
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
-  const pluginBadges = usePluginEntities('navigation.badges');
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const activePluginBadges = pluginBadges.filter(({ useCondition }) => useCondition());
 
   return (
-    <StyledNavbar fluid fixedTop collapseOnSelect>
-      <Navbar.Header>
-        <Navbar.Brand>
-          <BrandLink to={Routes.WELCOME} aria-label="Welcome">
-            <BrandNavLogo />
-          </BrandLink>
-        </Navbar.Brand>
-        <Navbar.Toggle />
-        <DevelopmentHeaderBadge smallScreen />
-        {pluginItems.map(({ key, component: Item }) => (
-          <Item key={key} smallScreen />
-        ))}
-      </Navbar.Header>
-      <Navbar.Collapse>
-        <MainNavbar pathname={pathname} />
+    <Navbar>
+      <Brand>
+        <BrandLink to={Routes.WELCOME} aria-label="Welcome">
+          <BrandNavLogo />
+        </BrandLink>
+      </Brand>
+      {pluginItems.map(({ key, component: Item }) => (
+        <Item key={key} smallScreen />
+      ))}
+      <MainNavbar pathname={pathname} />
+      <NotificationBadge />
 
-        {activePluginBadges.map(({ key, component: PluginBadge }) => (
-          <PluginBadge key={key} />
-        ))}
-        {activePluginBadges.length === 0 && <NotificationBadge />}
+      <Icons>
+        <QuickJumpModalContainer />
 
-        <Nav pullRight className="header-meta-nav">
-          {AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}
+        {AppConfig.isCloud() ? (
+          <GlobalThroughput disabled />
+        ) : (
+          <LinkContainer to={Routes.SYSTEM.CLUSTER.NODES}>
+            <GlobalThroughput />
+          </LinkContainer>
+        )}
 
-          {AppConfig.isCloud() ? (
-            <GlobalThroughput disabled />
-          ) : (
-            <LinkContainer to={Routes.SYSTEM.CLUSTER.NODES}>
-              <GlobalThroughput />
-            </LinkContainer>
-          )}
+        <InactiveNavItem>
+          <DevelopmentHeaderBadge />
+          {pluginItems.map(({ key, component: Item }) => (
+            <Item key={key} />
+          ))}
+        </InactiveNavItem>
+        <ScratchpadToggle />
 
-          <InactiveNavItem className="dev-badge-wrap">
-            <DevelopmentHeaderBadge />
-            {pluginItems.map(({ key, component: Item }) => (
-              <Item key={key} />
-            ))}
-          </InactiveNavItem>
-          <ScratchpadToggle />
+        <HelpMenu />
 
-          <HelpMenu />
-
-          <UserMenu />
-        </Nav>
-      </Navbar.Collapse>
-    </StyledNavbar>
+        <UserMenu />
+      </Icons>
+    </Navbar>
   );
 });
 

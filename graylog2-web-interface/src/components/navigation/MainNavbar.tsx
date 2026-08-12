@@ -83,7 +83,7 @@ const MainNavbar = ({ pathname }: { pathname: string }) => {
   const navigationItems = useNavigationItems();
 
   return (
-    <Nav className="navbar-main">
+    <Nav>
       {navigationItems.map((navigationItem) => (
         <NavigationItem navigationItem={navigationItem} pathname={pathname} key={navigationItem.description} />
       ))}
