@@ -39,7 +39,13 @@ const useTrackedIncompatibleIndices = (): TrackedIncompatibleIndices => {
   const onDataLoaded = (data: IncompatibleIndicesResponse) => {
     setLoadedIndices(data.list);
     setHasLoaded(true);
-    setSelectedIndicesData((cur) => ({ ...cur, ...keyBy(data.list.filter(({ id }) => Object.hasOwn(cur, id)), 'id') }));
+    setSelectedIndicesData((cur) => ({
+      ...cur,
+      ...keyBy(
+        data.list.filter(({ id }) => Object.hasOwn(cur, id)),
+        'id',
+      ),
+    }));
   };
 
   const onChangeSelection = (selectedItemsIds: Array<string>, list: Readonly<Array<IncompatibleIndexRow>>) => {

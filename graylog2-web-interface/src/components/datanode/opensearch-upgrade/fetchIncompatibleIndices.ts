@@ -40,13 +40,11 @@ export const fetchIncompatibleIndices = (searchParams: SearchParams): Promise<In
 
   return SystemIndexerIndices.listOutdatedIndices(sort, searchParams.page, searchParams.pageSize, query, order, {
     requestShouldExtendSession: false,
-  }).then(
-    ({ elements, attributes, pagination }) => ({
-      list: elements.map((element) => ({ ...element, id: element.index_name })) as Array<IncompatibleIndexRow>,
-      pagination: { total: pagination.total },
-      attributes,
-    }),
-  );
+  }).then(({ elements, attributes, pagination }) => ({
+    list: elements.map((element) => ({ ...element, id: element.index_name })) as Array<IncompatibleIndexRow>,
+    pagination: { total: pagination.total },
+    attributes,
+  }));
 };
 
 export const incompatibleIndicesKeyFn = (searchParams?: SearchParams) => [

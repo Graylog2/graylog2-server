@@ -104,7 +104,6 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
         />
       ),
       staticWidth: 130,
-      textAlign: 'right',
     },
     jvm: {
       renderCell: (_value, entity) => (
@@ -116,7 +115,6 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
         />
       ),
       staticWidth: 130,
-      textAlign: 'right',
     },
     cpu: {
       renderCell: (_value, entity) => (
@@ -128,7 +126,6 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
         />
       ),
       staticWidth: 130,
-      textAlign: 'right',
     },
     indexing: {
       renderCell: (_value, entity) => (
@@ -138,7 +135,6 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
         />
       ),
       staticWidth: 130,
-      textAlign: 'right',
     },
     storage: {
       renderCell: (_value, entity) => (
@@ -150,7 +146,6 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
         />
       ),
       staticWidth: 130,
-      textAlign: 'right',
     },
     datanode_version: {
       renderCell: (_value, entity) => {

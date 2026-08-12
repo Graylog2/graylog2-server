@@ -102,7 +102,6 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         />
       ),
       staticWidth: 130,
-      textAlign: 'right',
     },
     journal: {
       renderCell: (_value, entity) => (
@@ -115,7 +114,6 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         />
       ),
       staticWidth: 130,
-      textAlign: 'right',
     },
     dataLakeJournal: {
       renderCell: (_value, entity) => (
@@ -127,7 +125,6 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         />
       ),
       staticWidth: 'matchHeader',
-      textAlign: 'right',
     },
     jvm: {
       renderCell: (_value, entity) => (
@@ -138,17 +135,14 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         />
       ),
       staticWidth: 130,
-      textAlign: 'right',
     },
     buffers: {
       renderCell: (_value, entity) => <BuffersMetricsCell node={entity} warningThreshold={BUFFER_WARNING_THRESHOLD} />,
       staticWidth: 130,
-      textAlign: 'right',
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
       staticWidth: 'matchHeader',
-      textAlign: 'right',
     },
   },
 });
