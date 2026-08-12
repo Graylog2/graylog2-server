@@ -67,7 +67,7 @@ describe('WelcomeMetrics', () => {
     await screen.findByText('Events Today');
   });
 
-  it('shows only Messages Today and Top 5 Sources widgets, without Alerts and Events, when the user is missing access to the alerts/events streams', async () => {
+  it('shows only Messages Today and Top 5 Sources widgets, without Alerts and Events, when the user is missing access to both the alerts and events streams', async () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions([]).build());
 
     renderWithStreams([accessibleStream]);
@@ -76,6 +76,17 @@ describe('WelcomeMetrics', () => {
     await screen.findByText('Top 5 Sources');
     expect(screen.queryByText('Alerts Today')).not.toBeInTheDocument();
     expect(screen.queryByText('Events Today')).not.toBeInTheDocument();
+  });
+
+  it('still shows Alerts and Events widgets when the user only has access to one of the two underlying streams', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      defaultUser.toBuilder().permissions(['streams:read:000000000000000000000002']).build(),
+    );
+
+    renderWithStreams([accessibleStream]);
+
+    await screen.findByText('Alerts Today');
+    await screen.findByText('Events Today');
   });
 
   it('uses the configured query time range limit as the widgets time range when it is lower than 24 hours', async () => {

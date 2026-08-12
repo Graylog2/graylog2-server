@@ -87,11 +87,11 @@ const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
     .build(),
 });
 
-const buildViewState = (canViewAlertsEventsStreams: boolean, timeRange: RelativeTimeRangeWithEnd) => {
+const buildViewState = (permittedAlertsEventsStreams: Array<string>, timeRange: RelativeTimeRangeWithEnd) => {
   const messages = numberWidget({ title: 'Messages Today', timeRange });
   const sources = topSourcesWidget(timeRange);
 
-  if (!canViewAlertsEventsStreams) {
+  if (permittedAlertsEventsStreams.length === 0) {
     const entries = [messages, sources];
 
     return ViewState.create()
@@ -107,8 +107,18 @@ const buildViewState = (canViewAlertsEventsStreams: boolean, timeRange: Relative
 
   const numberWidgets = [
     messages,
-    numberWidget({ title: 'Alerts Today', timeRange, queryString: 'alert:true', streams: ALERTS_EVENTS_STREAMS }),
-    numberWidget({ title: 'Events Today', timeRange, queryString: 'alert:false', streams: ALERTS_EVENTS_STREAMS }),
+    numberWidget({
+      title: 'Alerts Today',
+      timeRange,
+      queryString: 'alert:true',
+      streams: permittedAlertsEventsStreams,
+    }),
+    numberWidget({
+      title: 'Events Today',
+      timeRange,
+      queryString: 'alert:false',
+      streams: permittedAlertsEventsStreams,
+    }),
   ];
   const entries = [...numberWidgets, sources];
 
@@ -125,14 +135,14 @@ const buildViewState = (canViewAlertsEventsStreams: boolean, timeRange: Relative
     .build();
 };
 
-const buildView = (canViewAlertsEventsStreams: boolean, timeRange: RelativeTimeRangeWithEnd) => {
+const buildView = (permittedAlertsEventsStreams: Array<string>, timeRange: RelativeTimeRangeWithEnd) => {
   const query = QueryGenerator(undefined, undefined, undefined, timeRange);
   const search = Search.create().toBuilder().queries([query]).build();
   const view = View.create()
     .toBuilder()
     .newId()
     .type(View.Type.Dashboard)
-    .state({ [query.id]: buildViewState(canViewAlertsEventsStreams, timeRange) })
+    .state({ [query.id]: buildViewState(permittedAlertsEventsStreams, timeRange) })
     .search(search)
     .build();
 
@@ -141,11 +151,14 @@ const buildView = (canViewAlertsEventsStreams: boolean, timeRange: RelativeTimeR
 
 const useWelcomeMetricsSearch = (rangeSeconds: number = DEFAULT_TIME_RANGE_SECONDS) => {
   const { isPermitted } = usePermissions();
-  const canViewAlertsEventsStreams = ALERTS_EVENTS_STREAMS.every((streamId) => isPermitted(`streams:read:${streamId}`));
+  const permittedAlertsEventsStreams = useMemo(
+    () => ALERTS_EVENTS_STREAMS.filter((streamId) => isPermitted(`streams:read:${streamId}`)),
+    [isPermitted],
+  );
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
   const viewPromise = useMemo(
-    () => buildView(canViewAlertsEventsStreams, timeRange),
-    [canViewAlertsEventsStreams, timeRange],
+    () => buildView(permittedAlertsEventsStreams, timeRange),
+    [permittedAlertsEventsStreams, timeRange],
   );
 
   return useCreateSearch(viewPromise);
