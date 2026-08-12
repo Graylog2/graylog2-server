@@ -48,7 +48,9 @@ public class PaloAltoParser {
     private static final DateTimeFormatter SYSLOG_TIMESTAMP_FORMATTER = DateTimeFormat.forPattern("MMM d HH:mm:ss YYYY").withLocale(Locale.US);
 
     // <14>1 2018-09-19T11:50:32-05:00 Panorama--2 - - - - 1,2018/09/19...
-    private static final Pattern PANORAMA_SYSLOG_PARSER = Pattern.compile("<\\d+>[0-9] (.+?) (.+?)\\s[-]\\s[-]\\s[-]\\s[-]\\s(\\d,.*)");
+    // NOTE: (\S+) is used for the timestamp and hostname groups — both tokens are
+    // guaranteed to be whitespace-free, so \S+ is fully equivalent to the original (.+?).
+    private static final Pattern PANORAMA_SYSLOG_PARSER = Pattern.compile("<\\d+>[0-9] (\\S+) (\\S+)\\s[-]\\s[-]\\s[-]\\s[-]\\s(\\d,.*)");
 
     // Syslog with host name.
     // <14>Aug 22 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22...
