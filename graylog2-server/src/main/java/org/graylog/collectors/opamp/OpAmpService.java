@@ -387,7 +387,7 @@ public class OpAmpService {
         final Map<String, CollectorPipelineConfig> pipelines = Maps.newHashMap();
 
         sources.stream().filter(SourceDTO::enabled).forEach(source -> {
-            final var receiverConfig = source.toReceiverConfig()
+            final var receiverConfig = source.toReceiverConfig(osType)
                     .filter(config -> config.osSupport().contains(osType))
                     .orElse(null);
 

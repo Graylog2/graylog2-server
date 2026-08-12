@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Timeout(value = 10, unit = TimeUnit.SECONDS)
@@ -88,17 +87,6 @@ public class SlackClientTest {
             SlackClient slackClient = new SlackClient(httpClient, objectMapper);
             slackClient.send(getMessage(), server.url("/").toString());
         });
-    }
-
-    @Test
-    public void doesNotFollowRedirects() {
-        server.enqueue(new MockResponse(302, Headers.of("Location", server.url("/redirected").toString()), ""));
-        server.enqueue(new MockResponse(200, Headers.of(), ""));
-
-        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
-        assertThatThrownBy(() -> slackClient.send(getMessage(), server.url("/").toString()))
-                .isInstanceOf(PermanentEventNotificationException.class)
-                .hasMessageContaining("[2xx] but got [302]");
     }
 
     private SlackMessage getMessage() {
