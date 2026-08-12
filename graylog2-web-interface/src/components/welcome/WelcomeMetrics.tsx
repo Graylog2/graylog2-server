@@ -17,10 +17,12 @@
 import * as React from 'react';
 import { forwardRef, useMemo } from 'react';
 import styled from 'styled-components';
+import moment from 'moment';
 
 import generateId from 'logic/generateId';
 import usePermissions from 'hooks/usePermissions';
 import useHasAccessToAnyStream from 'hooks/useHasAccessToAnyStream';
+import useIsQueryTimeRangeLimitTooLow from 'hooks/useIsQueryTimeRangeLimitTooLow';
 import { Alert, Row, Col } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { BLANK } from 'views/components/contexts/SearchPageLayoutContext';
@@ -181,12 +183,27 @@ const MetricsSearchPage = () => {
 
 const WelcomeMetrics = () => {
   const hasAccessToAnyStream = useHasAccessToAnyStream();
+  const { isTimeRangeLimitTooLow, queryTimeRangeLimit } = useIsQueryTimeRangeLimitTooLow(LAST_24_HOURS.from);
 
   if (!hasAccessToAnyStream) {
     return (
       <Row className="content">
         <Col xs={12}>
           <StyledAlert>Once you have access to a stream, your message metrics will show up here.</StyledAlert>
+        </Col>
+      </Row>
+    );
+  }
+
+  if (isTimeRangeLimitTooLow) {
+    return (
+      <Row className="content">
+        <Col xs={12}>
+          <StyledAlert bsStyle="warning" title="Metrics unavailable">
+            These widgets require a query time range of at least 24 hours, but the configured query time range limit is{' '}
+            {moment.duration(queryTimeRangeLimit).humanize()}. Please increase the{' '}
+            <b>Query Time Range Limit</b> in the <em>Search</em> configuration to at least 24 hours, or disable it.
+          </StyledAlert>
         </Col>
       </Row>
     );

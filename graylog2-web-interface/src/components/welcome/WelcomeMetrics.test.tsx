@@ -19,16 +19,19 @@ import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import usePermissions from 'hooks/usePermissions';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import StreamsContext from 'contexts/StreamsContext';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import type View from 'views/logic/views/View';
 import SearchPage from 'views/pages/SearchPage';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { Stream } from 'logic/streams/types';
+import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import WelcomeMetrics from './WelcomeMetrics';
 
 jest.mock('hooks/usePermissions');
+jest.mock('hooks/useSearchConfiguration');
 jest.mock('views/hooks/useCreateSearch');
 jest.mock('views/pages/SearchPage', () => jest.fn(() => <div>Search Page</div>));
 
@@ -83,6 +86,7 @@ describe('WelcomeMetrics', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useCreateSearch).mockImplementation((viewPromise: Promise<View>) => viewPromise);
+    asMock(useSearchConfiguration).mockReturnValue({ config: undefined, refresh: () => {}, isInitialLoading: false });
   });
 
   it('shows Alerts and Events widgets when the user has access to both underlying streams', async () => {
@@ -121,6 +125,35 @@ describe('WelcomeMetrics', () => {
     expect(alertsWidget.config.text).toContain('do not have access');
     expect(eventsWidget.type).toBe('text');
     expect(eventsWidget.config.text).toContain('do not have access');
+  });
+
+  it('shows an alert instead of widgets when the configured query time range limit is lower than 24 hours', async () => {
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: { query_time_range_limit: 'PT1H' } as SearchesConfig,
+      refresh: () => {},
+      isInitialLoading: false,
+    });
+
+    renderWithStreams([accessibleStream]);
+
+    expect(await screen.findByText('Metrics unavailable')).toBeInTheDocument();
+    expect(screen.queryByText('Search Page')).not.toBeInTheDocument();
+    expect(useCreateSearch).not.toHaveBeenCalled();
+  });
+
+  it('does not show an alert when the configured query time range limit is unlimited', async () => {
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: { query_time_range_limit: 'PT0S' } as SearchesConfig,
+      refresh: () => {},
+      isInitialLoading: false,
+    });
+
+    renderWithStreams([accessibleStream]);
+
+    await waitFor(() => expect(asMock(SearchPage)).toHaveBeenCalled());
+    expect(screen.queryByText('Metrics unavailable')).not.toBeInTheDocument();
   });
 
   it('shows a message instead of any widgets when the user has no access to any stream', async () => {
