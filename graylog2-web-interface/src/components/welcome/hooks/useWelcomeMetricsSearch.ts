@@ -25,6 +25,7 @@ import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import Search from 'views/logic/search/Search';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -36,22 +37,24 @@ import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizatio
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
-export const LAST_24_HOURS = { type: 'relative' as const, from: 86400 };
+export const DEFAULT_TIME_RANGE_SECONDS = 86400;
 const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
 
 const numberWidget = ({
   title,
+  timeRange,
   queryString = '',
   streams = [],
 }: {
   title: string;
+  timeRange: RelativeTimeRangeWithEnd;
   queryString?: string;
   streams?: Array<string>;
 }) => ({
   title,
   widget: AggregationWidget.builder()
     .id(generateId())
-    .timerange(LAST_24_HOURS)
+    .timerange(timeRange)
     .query(createElasticsearchQueryString(queryString))
     .streams(streams)
     .config(
@@ -65,11 +68,11 @@ const numberWidget = ({
     .build(),
 });
 
-const topSourcesWidget = () => ({
+const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
   title: 'Top 5 Sources',
   widget: AggregationWidget.builder()
     .id(generateId())
-    .timerange(LAST_24_HOURS)
+    .timerange(timeRange)
     .query(createElasticsearchQueryString(''))
     .config(
       AggregationWidgetConfig.builder()
@@ -84,9 +87,9 @@ const topSourcesWidget = () => ({
     .build(),
 });
 
-const buildViewState = (canViewAlertsEventsStreams: boolean) => {
-  const messages = numberWidget({ title: 'Messages Today' });
-  const sources = topSourcesWidget();
+const buildViewState = (canViewAlertsEventsStreams: boolean, timeRange: RelativeTimeRangeWithEnd) => {
+  const messages = numberWidget({ title: 'Messages Today', timeRange });
+  const sources = topSourcesWidget(timeRange);
 
   if (!canViewAlertsEventsStreams) {
     const entries = [messages, sources];
@@ -104,8 +107,8 @@ const buildViewState = (canViewAlertsEventsStreams: boolean) => {
 
   const numberWidgets = [
     messages,
-    numberWidget({ title: 'Alerts Today', queryString: 'alert:true', streams: ALERTS_EVENTS_STREAMS }),
-    numberWidget({ title: 'Events Today', queryString: 'alert:false', streams: ALERTS_EVENTS_STREAMS }),
+    numberWidget({ title: 'Alerts Today', timeRange, queryString: 'alert:true', streams: ALERTS_EVENTS_STREAMS }),
+    numberWidget({ title: 'Events Today', timeRange, queryString: 'alert:false', streams: ALERTS_EVENTS_STREAMS }),
   ];
   const entries = [...numberWidgets, sources];
 
@@ -122,24 +125,28 @@ const buildViewState = (canViewAlertsEventsStreams: boolean) => {
     .build();
 };
 
-const buildView = (canViewAlertsEventsStreams: boolean) => {
-  const query = QueryGenerator(undefined, undefined, undefined, LAST_24_HOURS);
+const buildView = (canViewAlertsEventsStreams: boolean, timeRange: RelativeTimeRangeWithEnd) => {
+  const query = QueryGenerator(undefined, undefined, undefined, timeRange);
   const search = Search.create().toBuilder().queries([query]).build();
   const view = View.create()
     .toBuilder()
     .newId()
     .type(View.Type.Dashboard)
-    .state({ [query.id]: buildViewState(canViewAlertsEventsStreams) })
+    .state({ [query.id]: buildViewState(canViewAlertsEventsStreams, timeRange) })
     .search(search)
     .build();
 
   return Promise.resolve(UpdateSearchForWidgets(view));
 };
 
-const useWelcomeMetricsSearch = () => {
+const useWelcomeMetricsSearch = (rangeSeconds: number = DEFAULT_TIME_RANGE_SECONDS) => {
   const { isPermitted } = usePermissions();
   const canViewAlertsEventsStreams = ALERTS_EVENTS_STREAMS.every((streamId) => isPermitted(`streams:read:${streamId}`));
-  const viewPromise = useMemo(() => buildView(canViewAlertsEventsStreams), [canViewAlertsEventsStreams]);
+  const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
+  const viewPromise = useMemo(
+    () => buildView(canViewAlertsEventsStreams, timeRange),
+    [canViewAlertsEventsStreams, timeRange],
+  );
 
   return useCreateSearch(viewPromise);
 };

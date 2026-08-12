@@ -78,7 +78,7 @@ describe('WelcomeMetrics', () => {
     expect(screen.queryByText('Events Today')).not.toBeInTheDocument();
   });
 
-  it('shows an alert instead of widgets when the configured query time range limit is lower than 24 hours', async () => {
+  it('uses the configured query time range limit as the widgets time range when it is lower than 24 hours', async () => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: { query_time_range_limit: 'PT1H' } as SearchesConfig,
       refresh: () => {},
@@ -87,12 +87,11 @@ describe('WelcomeMetrics', () => {
 
     renderWithStreams([accessibleStream]);
 
-    await screen.findByText('Metrics unavailable');
-    expect(screen.queryByText('Messages Today')).not.toBeInTheDocument();
-    expect(useCreateSearch).not.toHaveBeenCalled();
+    await screen.findByText('Messages Today');
+    expect(await screen.findAllByText('1 hour ago - Now')).not.toHaveLength(0);
   });
 
-  it('does not show an alert when the configured query time range limit is unlimited', async () => {
+  it('falls back to a 24 hour widgets time range when the configured query time range limit is unlimited', async () => {
     asMock(useSearchConfiguration).mockReturnValue({
       config: { query_time_range_limit: 'PT0S' } as SearchesConfig,
       refresh: () => {},
@@ -102,7 +101,7 @@ describe('WelcomeMetrics', () => {
     renderWithStreams([accessibleStream]);
 
     await screen.findByText('Messages Today');
-    expect(screen.queryByText('Metrics unavailable')).not.toBeInTheDocument();
+    expect(await screen.findAllByText('1 day ago - Now')).not.toHaveLength(0);
   });
 
   it('shows a message instead of any widgets when the user has no access to any stream', async () => {

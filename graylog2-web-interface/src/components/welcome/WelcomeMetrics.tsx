@@ -17,18 +17,18 @@
 import * as React from 'react';
 import { forwardRef, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import moment from 'moment';
 
 import useHasAccessToAnyStream from 'hooks/useHasAccessToAnyStream';
-import useIsQueryTimeRangeLimitTooLow from 'hooks/useIsQueryTimeRangeLimitTooLow';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { Alert, Row, Col } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
 import Store from 'logic/local-storage/Store';
+import { durationInSeconds } from 'util/DateTime';
 
-import useWelcomeMetricsSearch, { LAST_24_HOURS } from './hooks/useWelcomeMetricsSearch';
+import useWelcomeMetricsSearch, { DEFAULT_TIME_RANGE_SECONDS } from './hooks/useWelcomeMetricsSearch';
 
 const NO_STREAM_ACCESS_DISMISSED_KEY = 'welcome-metrics-no-stream-access-dismissed';
 
@@ -44,8 +44,8 @@ const SearchAreaContainer = forwardRef<HTMLDivElement, React.PropsWithChildren>(
   <div ref={ref}>{children}</div>
 ));
 
-const MetricsSearchPage = () => {
-  const view = useWelcomeMetricsSearch();
+const MetricsSearchPage = ({ rangeSeconds }: { rangeSeconds: number }) => {
+  const view = useWelcomeMetricsSearch(rangeSeconds);
 
   const searchPageLayoutContextValue = useMemo(
     () => ({
@@ -67,7 +67,8 @@ const MetricsSearchPage = () => {
 
 const WelcomeMetrics = () => {
   const hasAccessToAnyStream = useHasAccessToAnyStream();
-  const { isTimeRangeLimitTooLow, queryTimeRangeLimit } = useIsQueryTimeRangeLimitTooLow(LAST_24_HOURS.from);
+  const { config } = useSearchConfiguration();
+  const queryTimeRangeLimitSeconds = durationInSeconds(config?.query_time_range_limit ?? '');
   const [noStreamAccessDismissed, setNoStreamAccessDismissed] = useState(!!Store.get(NO_STREAM_ACCESS_DISMISSED_KEY));
 
   const onDismissNoStreamAccess = () => {
@@ -91,23 +92,14 @@ const WelcomeMetrics = () => {
     );
   }
 
-  if (isTimeRangeLimitTooLow) {
-    return (
-      <Row className="content">
-        <Col xs={12}>
-          <StyledAlert bsStyle="warning" title="Metrics unavailable">
-            These widgets require a query time range of at least 24 hours, but the configured query time range limit is{' '}
-            {moment.duration(queryTimeRangeLimit).humanize()}. Please increase the <b>Query Time Range Limit</b> in the{' '}
-            <em>Search</em> configuration to at least 24 hours, or disable it.
-          </StyledAlert>
-        </Col>
-      </Row>
-    );
-  }
+  const rangeSeconds =
+    queryTimeRangeLimitSeconds > 0 && queryTimeRangeLimitSeconds < DEFAULT_TIME_RANGE_SECONDS
+      ? queryTimeRangeLimitSeconds
+      : DEFAULT_TIME_RANGE_SECONDS;
 
   return (
     <Container>
-      <MetricsSearchPage />
+      <MetricsSearchPage rangeSeconds={rangeSeconds} />
     </Container>
   );
 };
