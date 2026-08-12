@@ -57,8 +57,8 @@ describe('<ClusterConfigurationNodes />', () => {
 
     render(<ClusterConfigurationNodes />);
 
-    expect(screen.getAllByRole('table')).toHaveLength(3);
-    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(3);
+    expect(screen.getAllByRole('table')).toHaveLength(4);
+    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(4);
   });
 
   it('switches to a specific node type when segmented control is used', async () => {
