@@ -19,8 +19,6 @@ import { forwardRef, useMemo } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 
-import generateId from 'logic/generateId';
-import usePermissions from 'hooks/usePermissions';
 import useHasAccessToAnyStream from 'hooks/useHasAccessToAnyStream';
 import useIsQueryTimeRangeLimitTooLow from 'hooks/useIsQueryTimeRangeLimitTooLow';
 import { Alert, Row, Col } from 'components/bootstrap';
@@ -28,28 +26,8 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
-import useCreateSearch from 'views/hooks/useCreateSearch';
-import View from 'views/logic/views/View';
-import ViewState from 'views/logic/views/ViewState';
-import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import Search from 'views/logic/search/Search';
-import QueryGenerator from 'views/logic/queries/QueryGenerator';
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Series from 'views/logic/aggregationbuilder/Series';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
-import FieldType from 'views/logic/fieldtypes/FieldType';
-import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import TextWidget from 'views/logic/widgets/TextWidget';
-import TextWidgetConfig from 'views/logic/widgets/TextWidgetConfig';
-import { TIMESTAMP_FIELD } from 'views/Constants';
 
-const LAST_24_HOURS = { type: 'relative' as const, from: 86400 };
-const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
+import useWelcomeMetricsSearch, { LAST_24_HOURS } from './hooks/useWelcomeMetricsSearch';
 
 const Container = styled.div`
   margin-bottom: 6.4px;
@@ -63,105 +41,8 @@ const SearchAreaContainer = forwardRef<HTMLDivElement, React.PropsWithChildren>(
   <div ref={ref}>{children}</div>
 ));
 
-const numberWidget = ({
-  title,
-  queryString = '',
-  streams = [],
-}: {
-  title: string;
-  queryString?: string;
-  streams?: Array<string>;
-}) => ({
-  title,
-  widget: AggregationWidget.builder()
-    .id(generateId())
-    .timerange(LAST_24_HOURS)
-    .query(createElasticsearchQueryString(queryString))
-    .streams(streams)
-    .config(
-      AggregationWidgetConfig.builder()
-        .series([Series.forFunction('count()')])
-        .visualization('numeric')
-        .visualizationConfig(NumberVisualizationConfig.create(true, 'NEUTRAL'))
-        .rollup(false)
-        .build(),
-    )
-    .build(),
-});
-
-const topSourcesWidget = () => ({
-  title: 'Top 5 Sources',
-  widget: AggregationWidget.builder()
-    .id(generateId())
-    .timerange(LAST_24_HOURS)
-    .query(createElasticsearchQueryString('NOT source:example.org'))
-    .config(
-      AggregationWidgetConfig.builder()
-        .rowPivots([pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], []))])
-        .columnPivots([Pivot.createValues(['source'], { limit: 5, skip_empty_values: false })])
-        .series([Series.forFunction('count()')])
-        .visualization('area')
-        .visualizationConfig(AreaVisualizationConfig.create('spline'))
-        .rollup(false)
-        .build(),
-    )
-    .build(),
-});
-
-const missingPermissionsWidget = (title: string) => ({
-  title,
-  widget: TextWidget.builder()
-    .id(generateId())
-    .timerange(LAST_24_HOURS)
-    .config(new TextWidgetConfig('You do not have access to the stream used for this widget yet.'))
-    .build(),
-});
-
-const buildViewState = (canViewAlertsEventsStreams: boolean) => {
-  const numberWidgets = [
-    numberWidget({ title: 'Messages Today' }),
-    canViewAlertsEventsStreams
-      ? numberWidget({ title: 'Alerts Today', queryString: 'alert:true', streams: ALERTS_EVENTS_STREAMS })
-      : missingPermissionsWidget('Alerts Today'),
-    canViewAlertsEventsStreams
-      ? numberWidget({ title: 'Events Today', queryString: 'alert:false', streams: ALERTS_EVENTS_STREAMS })
-      : missingPermissionsWidget('Events Today'),
-  ];
-  const sources = topSourcesWidget();
-  const entries = [...numberWidgets, sources];
-
-  return ViewState.create()
-    .toBuilder()
-    .titles({ widget: Object.fromEntries(entries.map(({ widget, title }) => [widget.id, title])) })
-    .widgets(entries.map(({ widget }) => widget))
-    .widgetPositions({
-      ...Object.fromEntries(
-        numberWidgets.map(({ widget }, index) => [widget.id, new WidgetPosition(1 + index * 4, 1, 1.6, 4)]),
-      ),
-      [sources.widget.id]: new WidgetPosition(1, 2.75, 3, 12),
-    })
-    .build();
-};
-
-const buildView = (canViewAlertsEventsStreams: boolean) => {
-  const query = QueryGenerator(undefined, undefined, undefined, LAST_24_HOURS);
-  const search = Search.create().toBuilder().queries([query]).build();
-  const view = View.create()
-    .toBuilder()
-    .newId()
-    .type(View.Type.Dashboard)
-    .state({ [query.id]: buildViewState(canViewAlertsEventsStreams) })
-    .search(search)
-    .build();
-
-  return Promise.resolve(UpdateSearchForWidgets(view));
-};
-
 const MetricsSearchPage = () => {
-  const { isPermitted } = usePermissions();
-  const canViewAlertsEventsStreams = ALERTS_EVENTS_STREAMS.every((streamId) => isPermitted(`streams:read:${streamId}`));
-  const viewPromise = useMemo(() => buildView(canViewAlertsEventsStreams), [canViewAlertsEventsStreams]);
-  const view = useCreateSearch(viewPromise);
+  const view = useWelcomeMetricsSearch();
 
   const searchPageLayoutContextValue = useMemo(
     () => ({
