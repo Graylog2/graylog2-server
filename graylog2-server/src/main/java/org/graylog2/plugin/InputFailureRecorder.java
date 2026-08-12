@@ -90,7 +90,7 @@ public class InputFailureRecorder {
 
     private void applyFailure(Class<?> loggingClass, String error, @Nullable Throwable e) {
         if (e != null) {
-            inputState.setState(IOState.Type.FAILING, error + ": (" + e.getMessage() + ")");
+            inputState.setState(IOState.Type.FAILING, error + ": (" + (e.getMessage() != null ? e.getMessage() : e.toString()) + ")");
         } else {
             inputState.setState(IOState.Type.FAILING, error);
         }
