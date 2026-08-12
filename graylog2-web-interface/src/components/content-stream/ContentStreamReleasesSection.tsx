@@ -31,11 +31,14 @@ const StyledListGroupItem = styled(ListGroupItem)(
     display: flex;
     gap: ${theme.spacings.md};
     align-items: flex-start;
+    justify-content: space-between;
   `,
 );
-const LastOpenedTime = styled.i(
+const LastOpenedTime = styled.span(
   ({ theme }: { theme: DefaultTheme }) => css`
-    color: ${theme.colors.gray[60]};
+    flex-shrink: 0;
+    white-space: nowrap;
+    color: ${theme.colors.text.secondary};
   `,
 );
 export const StyledLabel = styled(Label)`
