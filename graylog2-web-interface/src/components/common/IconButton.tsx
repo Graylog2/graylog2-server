@@ -55,6 +55,7 @@ type Props = {
   target?: '_blank';
   rel?: 'noopener noreferrer';
   allowClickWhenDisabled?: boolean;
+  showTooltip?: boolean;
 };
 
 const handleClick = (
@@ -92,6 +93,7 @@ const IconButton = (
     target = undefined,
     rel = undefined,
     allowClickWhenDisabled = false,
+    showTooltip = true,
     ...rest
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
@@ -118,7 +120,7 @@ const IconButton = (
     </Wrapper>
   );
 
-  if (showTitle && !disabled) {
+  if (!showTooltip || (showTitle && !disabled)) {
     return button;
   }
 
