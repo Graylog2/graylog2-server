@@ -84,6 +84,35 @@ class ComponentHealthExtractorTest {
         assertThat(extracted.components()).containsOnlyKeys(componentName.substring(0, 256));
     }
 
+    @Test
+    void replacesNulCharactersInComponentNames() {
+        final var root = Opamp.ComponentHealth.newBuilder()
+                .setHealthy(true)
+                .putComponentHealthMap("disk\u0000check",
+                        Opamp.ComponentHealth.newBuilder().setHealthy(true).build())
+                .build();
+
+        final var extracted = extractor.extract(root);
+
+        assertThat(extracted.components()).containsOnlyKeys("disk�check");
+    }
+
+    @Test
+    void keepsSingleComponentWhenSanitizedNamesCollide() {
+        final var root = Opamp.ComponentHealth.newBuilder()
+                .setHealthy(true)
+                .putComponentHealthMap("disk\u0000check",
+                        Opamp.ComponentHealth.newBuilder().setHealthy(true).build())
+                .putComponentHealthMap("disk�check",
+                        Opamp.ComponentHealth.newBuilder().setHealthy(false).build())
+                .build();
+
+        final var extracted = extractor.extract(root);
+
+        // Protobuf map order is undefined, so only the surviving key is deterministic, not its value.
+        assertThat(extracted.components()).containsOnlyKeys("disk�check");
+    }
+
     private static int countHealthNodes(ComponentHealthDTO health) {
         return 1 + health.components().values().stream()
                 .mapToInt(ComponentHealthExtractorTest::countHealthNodes)

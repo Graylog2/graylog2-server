@@ -28,7 +28,8 @@ import java.util.Map;
  * Converts an OpAMP component-health tree to the representation stored with a collector instance.
  * The extractor bounds agent-controlled data by retaining at most three levels and 128 nodes,
  * including the root. It also truncates component names to 256 Unicode code points and status and
- * error text to 4,096 Unicode code points.
+ * error text to 4,096 Unicode code points, and replaces NUL characters in component names, which
+ * BSON field names cannot contain.
  */
 final class ComponentHealthExtractor {
     // The level and node limits include the root health component.
@@ -67,7 +68,7 @@ final class ComponentHealthExtractor {
             // Protobuf map order is undefined, so the retained subset can vary when the node limit is reached.
             // Do not sort here: stopping at the budget avoids traversing and sorting the full agent-controlled map.
             for (final var entry : health.getComponentHealthMapMap().entrySet()) {
-                final var componentName = truncate(entry.getKey(), MAX_COMPONENT_NAME_LENGTH);
+                final var componentName = sanitizeName(truncate(entry.getKey(), MAX_COMPONENT_NAME_LENGTH));
                 // Keep the first component health if two truncated names aren't unique anymore.
                 if (components.containsKey(componentName)) {
                     continue;
@@ -93,6 +94,16 @@ final class ComponentHealthExtractor {
             return value;
         }
         return value.substring(0, value.offsetByCodePoints(0, maxCodePoints));
+    }
+
+    /**
+     * BSON encodes field names as NUL-terminated cstrings, so a name containing U+0000 makes the
+     * driver throw on encoding, which would abort the whole report update. Replace instead of
+     * strip so names that differ only by NUL position stay distinct and the mangling stays
+     * visible.
+     */
+    private static String sanitizeName(String value) {
+        return value.replace('\u0000', '�');
     }
 
     private static final class ExtractionBudget {
