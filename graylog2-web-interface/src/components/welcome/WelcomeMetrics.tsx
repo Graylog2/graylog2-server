@@ -138,7 +138,7 @@ const buildViewState = (canViewAlertsEventsStreams: boolean) => {
     .build();
 };
 
-const buildWelcomeDashboard = (canViewAlertsEventsStreams: boolean) => {
+const buildView = (canViewAlertsEventsStreams: boolean) => {
   const query = QueryGenerator(undefined, undefined, undefined, LAST_24_HOURS);
   const search = Search.create().toBuilder().queries([query]).build();
   const view = View.create()
@@ -152,11 +152,10 @@ const buildWelcomeDashboard = (canViewAlertsEventsStreams: boolean) => {
   return Promise.resolve(UpdateSearchForWidgets(view));
 };
 
-const WelcomeDashboard = () => {
+const MetricsSearchPage = () => {
   const { isPermitted } = usePermissions();
-  const hasAccessToAnyStream = useHasAccessToAnyStream();
   const canViewAlertsEventsStreams = ALERTS_EVENTS_STREAMS.every((streamId) => isPermitted(`streams:read:${streamId}`));
-  const viewPromise = useMemo(() => buildWelcomeDashboard(canViewAlertsEventsStreams), [canViewAlertsEventsStreams]);
+  const viewPromise = useMemo(() => buildView(canViewAlertsEventsStreams), [canViewAlertsEventsStreams]);
   const view = useCreateSearch(viewPromise);
 
   const searchPageLayoutContextValue = useMemo(
@@ -167,6 +166,18 @@ const WelcomeDashboard = () => {
     }),
     [],
   );
+
+  return (
+    <InteractiveContext.Provider value={false}>
+      <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
+        <SearchPage view={view} isNew={false} skipNoStreamsCheck />
+      </SearchPageLayoutProvider>
+    </InteractiveContext.Provider>
+  );
+};
+
+const WelcomeMetrics = () => {
+  const hasAccessToAnyStream = useHasAccessToAnyStream();
 
   if (!hasAccessToAnyStream) {
     return (
@@ -180,13 +191,9 @@ const WelcomeDashboard = () => {
 
   return (
     <Container>
-      <InteractiveContext.Provider value={false}>
-        <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
-          <SearchPage view={view} isNew={false} skipNoStreamsCheck />
-        </SearchPageLayoutProvider>
-      </InteractiveContext.Provider>
+      <MetricsSearchPage />
     </Container>
   );
 };
 
-export default WelcomeDashboard;
+export default WelcomeMetrics;

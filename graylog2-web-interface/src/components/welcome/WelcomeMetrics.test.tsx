@@ -26,7 +26,7 @@ import SearchPage from 'views/pages/SearchPage';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { Stream } from 'logic/streams/types';
 
-import WelcomeDashboard from './WelcomeDashboard';
+import WelcomeMetrics from './WelcomeMetrics';
 
 jest.mock('hooks/usePermissions');
 jest.mock('views/hooks/useCreateSearch');
@@ -37,7 +37,7 @@ const accessibleStream = { id: 'stream-id-1', title: 'Test Stream' } as Stream;
 const renderWithStreams = (streams: Array<Stream>) =>
   render(
     <StreamsContext.Provider value={streams}>
-      <WelcomeDashboard />
+      <WelcomeMetrics />
     </StreamsContext.Provider>,
   );
 
@@ -49,10 +49,11 @@ const widgetTitlesOfLastRenderedView = async () => {
   return widgetTitles.valueSeq().toArray();
 };
 
-describe('WelcomeDashboard', () => {
+describe('WelcomeMetrics', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    jest.clearAllMocks();
     asMock(useCreateSearch).mockImplementation((viewPromise: Promise<View>) => viewPromise);
   });
 
@@ -91,5 +92,6 @@ describe('WelcomeDashboard', () => {
       await screen.findByText('Once you have access to a stream, your message metrics will show up here.'),
     ).toBeInTheDocument();
     expect(screen.queryByText('Search Page')).not.toBeInTheDocument();
+    expect(useCreateSearch).not.toHaveBeenCalled();
   });
 });
