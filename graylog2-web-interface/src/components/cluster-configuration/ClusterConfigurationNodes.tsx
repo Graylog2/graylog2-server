@@ -24,6 +24,7 @@ import useProductName from 'brand-customization/useProductName';
 import GraylogNodesExpandable from './graylog-nodes/GraylogNodesExpandable';
 import DataNodesExpandable from './data-nodes/DataNodesExpandable';
 import MongodbNodesExpandable from './mongodb-nodes/MongodbNodesExpandable';
+import OpensearchNodesExpandable from './opensearch-nodes/OpensearchNodesExpandable';
 
 const SectionCol = styled(Col)`
   margin-top: 12px;
@@ -42,7 +43,7 @@ const ControlsWrapper = styled.div`
   gap: 12px;
 `;
 
-type NodeType = 'all' | 'graylog' | 'data' | 'mongodb';
+type NodeType = 'all' | 'graylog' | 'data' | 'mongodb' | 'opensearch';
 
 const ALL_NODES_PAGE_SIZE = 10;
 const SINGLE_NODE_TYPE_PAGE_SIZE = 100;
@@ -59,6 +60,7 @@ const ClusterConfigurationNodes = () => {
       { label: `${productName} Nodes`, value: 'graylog' },
       { label: 'Data Nodes', value: 'data' },
       { label: 'MongoDB Nodes', value: 'mongodb' },
+      { label: 'OpenSearch Nodes', value: 'opensearch' },
     ],
     [productName],
   );
@@ -69,6 +71,7 @@ const ClusterConfigurationNodes = () => {
   const showGraylogNodes = activeNodeType === 'all' || activeNodeType === 'graylog';
   const showDataNodes = activeNodeType === 'all' || activeNodeType === 'data';
   const showMongodbNodes = activeNodeType === 'all' || activeNodeType === 'mongodb';
+  const showOpensearchNodes = activeNodeType === 'all' || activeNodeType === 'opensearch';
   const isAllNodesView = activeNodeType === 'all';
   const pageSizeLimit = isAllNodesView ? ALL_NODES_PAGE_SIZE : SINGLE_NODE_TYPE_PAGE_SIZE;
   const refetchInterval = isAllNodesView ? ALL_NODES_REFETCH_INTERVAL : SINGLE_NODE_TYPE_REFETCH_INTERVAL;
@@ -123,6 +126,17 @@ const ClusterConfigurationNodes = () => {
             pageSizeLimit={pageSizeLimit}
             refetchInterval={refetchInterval}
             onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('mongodb') : undefined}
+          />
+        </SectionCol>
+      )}
+      {showOpensearchNodes && (
+        <SectionCol md={12}>
+          <OpensearchNodesExpandable
+            collapsible={activeNodeType === 'all'}
+            searchQuery={normalizedSearch}
+            pageSizeLimit={pageSizeLimit}
+            refetchInterval={refetchInterval}
+            onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('opensearch') : undefined}
           />
         </SectionCol>
       )}
