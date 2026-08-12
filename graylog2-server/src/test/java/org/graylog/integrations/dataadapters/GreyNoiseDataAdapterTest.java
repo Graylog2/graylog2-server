@@ -16,18 +16,25 @@
  */
 package org.graylog.integrations.dataadapters;
 
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.assertj.core.api.Assertions;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class GreyNoiseDataAdapterTest {
 
@@ -35,14 +42,26 @@ public class GreyNoiseDataAdapterTest {
     Response mockResponse;
     String stringResponse;
 
+    private GreyNoiseQuickIPDataAdapter adapter;
+
     @BeforeEach
     public void setUp() throws Exception {
 
-        stringResponse = "{\"ip\":\"192.168.1.1\",\"noise\":true,\"code\":\"0x01\"}";
+        stringResponse = "{\"ip\":\"192.168.1.1\","
+                + "\"business_service_intelligence\":{\"found\":true,\"trust_level\":\"1\"},"
+                + "\"internet_scanner_intelligence\":{\"found\":true,\"classification\":\"malicious\"}}";
 
         mockRequest = new Request.Builder()
-                .url("https://api.greynoise.io/v2/noise/quick/")
+                .url("https://api.greynoise.io/v3/ip/")
                 .build();
+
+        final GreyNoiseQuickIPDataAdapter.Config config = GreyNoiseQuickIPDataAdapter.Config.builder()
+                .type(GreyNoiseQuickIPDataAdapter.NAME)
+                .apiToken(EncryptedValue.createUnset())
+                .build();
+        adapter = new GreyNoiseQuickIPDataAdapter("id", "name", config, new MetricRegistry(),
+                mock(EncryptedValueService.class), mock(OkHttpClient.class), mock(CustomizationConfig.class),
+                new ObjectMapper());
     }
 
     private void getvalidResponse() {
@@ -59,15 +78,17 @@ public class GreyNoiseDataAdapterTest {
     public void parseBodyWithMultiValue(){
         getvalidResponse();
 
-        final LookupResult result = GreyNoiseQuickIPDataAdapter.parseResponse(mockResponse);
+        final LookupResult result = adapter.parseResponse(mockResponse);
         assertThat(result, notNullValue());
         Assertions.assertThat(result.isEmpty()).isFalse();
         Assertions.assertThat(result.hasError()).isFalse();
         Assertions.assertThat(result.singleValue()).isEqualTo(null);
         Assertions.assertThat(result.multiValue()).isNotNull();
-        Assertions.assertThat(result.multiValue().containsValue("192.168.1.1")).isTrue();
-        Assertions.assertThat(result.multiValue().containsValue("0x01")).isTrue();
-        Assertions.assertThat(result.multiValue().containsValue(true)).isTrue();
+        Assertions.assertThat(result.multiValue().get("ip")).isEqualTo("192.168.1.1");
+        Assertions.assertThat(result.multiValue().get("noise")).isEqualTo(true);
+        Assertions.assertThat(result.multiValue().get("riot")).isEqualTo(true);
+        Assertions.assertThat(result.multiValue().get("classification")).isEqualTo("malicious");
+        Assertions.assertThat(result.multiValue().get("trust_level")).isEqualTo("1");
     }
 
 }

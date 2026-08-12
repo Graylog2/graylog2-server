@@ -63,7 +63,7 @@ public class CertificateGenerator {
 
     public KeyPair generateKeyPair(CertRequest request) throws CertIOException, CertificateException, OperatorCreationException {
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
-        final X500Name name = getX500Name(request.cnName());
+        final X500Name name = getX500Name(trim(request.cnName()));
 
         BigInteger serialNumber = new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16);
         Instant validFrom = Instant.now();
@@ -104,6 +104,10 @@ public class CertificateGenerator {
         X509CertificateHolder certHolder = builder.build(signer);
         X509Certificate cert = new JcaX509CertificateConverter().getCertificate(certHolder);
         return new KeyPair(certKeyPair.getPrivate(), certKeyPair.getPublic(), cert);
+    }
+
+    private String trim(String s) {
+        return s.length() > CertConstants.CN_MAX_LENGTH ? s.substring(0, CertConstants.CN_MAX_LENGTH) : s;
     }
 
     private static X500Name getX500Name(String cname) {

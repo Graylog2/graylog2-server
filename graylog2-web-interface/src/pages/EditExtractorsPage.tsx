@@ -22,17 +22,16 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
+import { useExtractor } from 'hooks/useExtractors';
 import { fetchInput } from 'hooks/useInputs';
 import universalSearch from 'stores/search/UniversalSearch';
-import { useStore } from 'stores/connect';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 
 const EditExtractorsPage = () => {
   const history = useHistory();
-  const { extractor } = useStore(ExtractorsStore);
   const { inputId, extractorId, nodeId } = useParams<{ inputId: string; extractorId: string; nodeId: string }>();
+  const { data: extractor } = useExtractor(inputId, extractorId);
   const [exampleMessage, setExampleMessage] = useState<{ fields?: { [key: string]: any } }>({});
   const { data: input } = useQuery({
     queryKey: ['inputs', inputId],
@@ -40,8 +39,6 @@ const EditExtractorsPage = () => {
   });
 
   useEffect(() => {
-    ExtractorsActions.get(inputId, extractorId);
-
     universalSearch(
       'relative',
       `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,

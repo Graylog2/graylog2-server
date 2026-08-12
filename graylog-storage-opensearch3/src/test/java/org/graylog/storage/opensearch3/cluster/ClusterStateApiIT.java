@@ -22,6 +22,7 @@ import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.storage.opensearch3.testing.OpenSearchTestServerExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.core.BulkRequest;
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
 
@@ -38,6 +39,7 @@ class ClusterStateApiIT {
     private static final String MY_INDEX_NAME = "my_index_0";
     private static final String MY_OTHER_INDEX_NAME = "my_other_index_0";
     private static final String MY_EMPTY_INDEX_NAME = "my_empty_index_0";
+    private static final String MY_META_ONLY_INDEX_NAME = "my_meta_only_index_0";
 
     @Test
     void testFields(OpenSearchInstance opensearch) {
@@ -58,6 +60,26 @@ class ClusterStateApiIT {
         Assertions.assertThat(fields).containsEntry(MY_OTHER_INDEX_NAME, Set.of("value", "created"));
 
         Assertions.assertThat(clusterStateApi.fields(Set.of(MY_EMPTY_INDEX_NAME))).isEmpty();
+    }
+
+    @Test
+    void doesNotFailOnIndexWithMappingsButNoProperties(OpenSearchInstance opensearch) {
+        final OfficialOpensearchClient client = opensearch.getOfficialOpensearchClient();
+
+        // Create an index whose mapping has `_meta` set but no `properties` block. In the cluster
+        // state response the mapping is then present but its `properties` field is absent — the
+        // same shape OpenSearch returns for some system indices, which used to NPE inside
+        // `ClusterStateApi.fields` (see PR #26140).
+        client.sync(
+                c -> c.indices().create(r -> r
+                        .index(MY_META_ONLY_INDEX_NAME)
+                        .mappings(m -> m.meta("version", JsonData.of("1")))),
+                "Failed to create index " + MY_META_ONLY_INDEX_NAME);
+
+        opensearch.client().refreshNode();
+        final ClusterStateApi clusterStateApi = new ClusterStateApi(client);
+
+        Assertions.assertThat(clusterStateApi.fields(Set.of(MY_META_ONLY_INDEX_NAME))).isEmpty();
     }
 
     private <T> void generateIndex(OfficialOpensearchClient client, String indexName, int documentsCount, Function<Integer, T> documentCreator) {

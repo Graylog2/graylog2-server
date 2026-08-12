@@ -393,7 +393,7 @@
         </dependency>
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
-            <artifactId>swagger-parser</artifactId>
+            <artifactId>swagger-parser-v3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -658,6 +658,11 @@
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
         </dependency>
+        <!-- Explicitly declare lz4 since kafka-clients depends on it and we exclude it from the declaration. -->
+        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
@@ -729,6 +734,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Netty async HTTP client, used by the AWS async clients (DynamoDB, CloudWatch, Kinesis) for the Kinesis
+             input. Required for HTTP/2 (Kinesis Client Library) and proxy support on the async clients. -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>netty-nio-client</artifactId>
+        </dependency>
         <!-- additional integrations dependencies -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -761,6 +772,13 @@
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- Glue schema support pulls in outdated Kotlin dependencies. ATM we don't support integrating
+                 Amazon Kinesis Data Streams with the AWS Glue Schema Registry, so we can skip the dependency.
+                 Once we add support, this exclusion has to be revisited. -->
+                <exclusion>
+                    <groupId>software.amazon.glue</groupId>
+                    <artifactId>schema-registry-serde</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -1374,6 +1392,7 @@
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
                             <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
+                            <installDirectory>${webInterface.path}</installDirectory>
                         </configuration>
 
                         <executions>
@@ -1408,13 +1427,13 @@
                             </execution>
 
                             <execution>
-                                <id>yarn tsc</id>
+                                <id>yarn tsgo</id>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
                                 <phase>compile</phase>
                                 <configuration>
-                                    <arguments>tsc</arguments>
+                                    <arguments>tsgo</arguments>
                                 </configuration>
                             </execution>
 
@@ -1437,6 +1456,30 @@
                                 </goals>
                                 <configuration>
                                     <arguments>run build:preflight</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>luma: yarn install</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>luma: yarn tsc</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>tsc</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
                                 </configuration>
                             </execution>
 

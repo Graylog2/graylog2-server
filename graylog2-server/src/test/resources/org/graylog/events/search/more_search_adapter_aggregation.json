@@ -1,0 +1,79 @@
+{
+  "documents": [
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "agg-0" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "msg1",
+            "timestamp": "2024-01-01 01:00:00.000",
+            "streams": ["stream-a"],
+            "gl2_source_input": "input-1",
+            "processing_time": 100.0
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "agg-1" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "msg2",
+            "timestamp": "2024-01-01 02:00:00.000",
+            "streams": ["stream-a"],
+            "gl2_source_input": "input-1",
+            "processing_time": 200.0
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "agg-2" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "msg3",
+            "timestamp": "2024-01-01 03:00:00.000",
+            "streams": ["stream-a", "stream-b"],
+            "gl2_source_input": "input-2",
+            "processing_time": 300.0
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "agg-3" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "msg4",
+            "timestamp": "2024-01-01 04:00:00.000",
+            "streams": ["stream-b"],
+            "gl2_source_input": "input-2",
+            "processing_time": 400.0
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "agg-4" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "msg5",
+            "timestamp": "2024-01-01 05:00:00.000",
+            "streams": ["stream-b"],
+            "gl2_source_input": "input-3",
+            "processing_time": 500.0
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -42,7 +42,7 @@ class OpensearchCommonConfigurationBeanTest {
                 datanodeConfiguration
         );
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("bootstrap.memory_lock", "false");
@@ -57,7 +57,7 @@ class OpensearchCommonConfigurationBeanTest {
                 datanodeConfiguration
         );
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("bootstrap.memory_lock", "false");
@@ -72,15 +72,45 @@ class OpensearchCommonConfigurationBeanTest {
                 datanodeConfiguration
         );
 
-        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("bootstrap.memory_lock", "true");
     }
 
+    @Test
+    void insecureStartupProducesWarning(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final DatanodeConfiguration datanodeConfiguration = mockDatanodeConfiguration(tempDir);
+
+        final OpensearchCommonConfigurationBean bean = new OpensearchCommonConfigurationBean(
+                DatanodeTestUtils.datanodeConfiguration(Map.of("insecure_startup", "true"), tempDir),
+                datanodeConfiguration
+        );
+
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
+
+        Assertions.assertThat(configurationPart.warnings())
+                .hasSize(1)
+                .first().asString().contains("insecure_startup=true");
+    }
+
+    @Test
+    void secureStartupProducesNoWarning(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final DatanodeConfiguration datanodeConfiguration = mockDatanodeConfiguration(tempDir);
+
+        final OpensearchCommonConfigurationBean bean = new OpensearchCommonConfigurationBean(
+                DatanodeTestUtils.datanodeConfiguration(Map.of("insecure_startup", "false"), tempDir),
+                datanodeConfiguration
+        );
+
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
+
+        Assertions.assertThat(configurationPart.warnings()).isEmpty();
+    }
+
     private DatanodeConfiguration mockDatanodeConfiguration(Path tempDir) {
         return new DatanodeConfiguration(
-                () -> new OpensearchDistribution(tempDir, "2.19.5"),
+                new OpensearchDistribution(tempDir, "2.19.5"),
                 DatanodeTestUtils.tempDirectories(tempDir),
                 100,
                 IndexerJwtAuthToken.disabled()

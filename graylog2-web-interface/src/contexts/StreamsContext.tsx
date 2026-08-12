@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 
 const StreamsContext = React.createContext<Array<Stream> | undefined>(undefined);
 

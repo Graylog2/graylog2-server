@@ -23,11 +23,11 @@ import AppConfig from 'util/AppConfig';
 
 import HideOnCloud from './HideOnCloud';
 
-jest.mock('util/AppConfig', () => ({
-  isCloud: jest.fn(() => false),
-}));
-
 describe('HideOnCloud', () => {
+  beforeEach(() => {
+    asMock(AppConfig.isCloud).mockReturnValue(false);
+  });
+
   it('does not display children on cloud', () => {
     asMock(AppConfig.isCloud).mockReturnValue(true);
 
@@ -37,8 +37,6 @@ describe('HideOnCloud', () => {
   });
 
   it('displays children when not on cloud', () => {
-    asMock(AppConfig.isCloud).mockReturnValue(false);
-
     render(<HideOnCloud>The Content</HideOnCloud>);
 
     expect(screen.getByText('The Content')).toBeInTheDocument();
@@ -46,7 +44,6 @@ describe('HideOnCloud', () => {
 
   it('forwards props to its children', async () => {
     const onClick = jest.fn();
-    asMock(AppConfig.isCloud).mockReturnValue(false);
 
     render(
       <HideOnCloud onClick={onClick}>

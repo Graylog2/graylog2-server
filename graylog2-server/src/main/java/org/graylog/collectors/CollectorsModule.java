@@ -16,9 +16,16 @@
  */
 package org.graylog.collectors;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import jakarta.inject.Singleton;
+import org.graylog.collectors.cloud.CloudCollectorIngestService;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
 import org.graylog.collectors.config.receiver.WindowsEventLogReceiverConfig;
@@ -37,19 +44,30 @@ import org.graylog.collectors.input.processor.FilelogRecordProcessor;
 import org.graylog.collectors.input.processor.JournaldRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
+import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.opamp.OpAmpModule;
 import org.graylog.collectors.periodical.CollectorCaRenewalPeriodical;
-import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
+import org.graylog.collectors.periodical.CollectorRetentionPeriodical;
 import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog.collectors.rest.CollectorsActivityResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.collectors.rest.FleetResource;
 import org.graylog.collectors.rest.SourceResource;
+import org.graylog2.Configuration;
 import org.graylog2.database.SequenceTopics;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.template.IndexTemplateProvider;
 import org.graylog2.plugin.PluginModule;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import static com.codahale.metrics.MetricRegistry.name;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class CollectorsModule extends PluginModule {
     private static final String OTLP_DUMP_FLAG = "collector_otlp_traffic_dump";
@@ -57,10 +75,12 @@ public class CollectorsModule extends PluginModule {
 
     private final boolean collectorsEnabled;
     private final boolean otlpDumpEnabled;
+    private final boolean isCloud;
 
-    public CollectorsModule(FeatureFlags featureFlags) {
+    public CollectorsModule(FeatureFlags featureFlags, Configuration configuration) {
         this.collectorsEnabled = featureFlags.isOn(COLLECTORS_FLAG);
         this.otlpDumpEnabled = featureFlags.isOn(OTLP_DUMP_FLAG);
+        this.isCloud = configuration.isCloud();
     }
 
     @Override
@@ -83,6 +103,12 @@ public class CollectorsModule extends PluginModule {
         addMessageInput(CollectorIngestHttpInput.class);
         addTransport(CollectorIngestHttpTransport.NAME, CollectorIngestHttpTransport.class);
         addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
+        install(new FactoryModuleBuilder().build(CollectorIngestHttpHandler.Factory.class));
+        addInitializer(CertBindingResolver.class);
+
+        if (isCloud) {
+            serviceBinder().addBinding().to(CloudCollectorIngestService.class).in(Scopes.SINGLETON);
+        }
 
         final var logRecordProcessorBinder = MapBinder.newMapBinder(binder(), String.class, LogRecordProcessor.class);
 
@@ -122,7 +148,7 @@ public class CollectorsModule extends PluginModule {
         addSystemRestResource(CollectorsActivityResource.class);
 
         // Periodicals
-        addPeriodical(PurgeExpiredCollectorInstancesPeriodical.class);
+        addPeriodical(CollectorRetentionPeriodical.class);
         addPeriodical(CollectorCaRenewalPeriodical.class);
 
         // Fleet permissions
@@ -142,5 +168,55 @@ public class CollectorsModule extends PluginModule {
                 .to(CollectorLogsIndexTemplateProvider.class);
 
         addTelemetryMetricProvider("Collector Metrics", CollectorMetricsSupplier.class);
+    }
+
+    /**
+     * Executor for collector mTLS certificate verification (see {@link CollectorCertVerificationExecutor}).
+     * <p>
+     * Handshakes are latency-sensitive work someone waits on, so overload must <em>shed</em>: with pool
+     * and bounded queue full, {@code execute} rejects, failing the TLS handshake so the collector retries
+     * with backoff — bounded admission instead of latency-unbounded queueing. The fixed thread count also
+     * caps concurrent MongoDB lookups during a reconnect storm.
+     */
+    @Provides
+    @Singleton
+    @CollectorCertVerificationExecutor
+    Executor collectorCertVerificationExecutor(MetricRegistry metricRegistry) {
+        final var maxThreads = Math.max(2, Runtime.getRuntime().availableProcessors() / 2);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("collector-cert-verification-%d")
+                .setDaemon(true)
+                .build();
+        final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(1024);
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(maxThreads, maxThreads, 60L, SECONDS, queue,
+                threadFactory);
+        executor.allowCoreThreadTimeOut(true);
+        return new InstrumentedExecutorService(executor, metricRegistry,
+                name("collector-cert-verification", "executor-service"));
+    }
+
+    /**
+     * Executor for the {@link CertBindingResolver}'s background cache work — refreshes and prewarm
+     * (see {@link CollectorCertCacheRefreshExecutor} for why it must not share the verification pool).
+     * <p>
+     * Nobody waits on these tasks, so the overload policy is the inverse of the verification pool's:
+     * <em>queue</em> instead of shed. The queue is unbounded but intrinsically capped by Caffeine's
+     * per-key reload coalescing, and the fixed two-thread pool is the throttle towards MongoDB.
+     */
+    @Provides
+    @Singleton
+    @CollectorCertCacheRefreshExecutor
+    Executor collectorCertCacheRefreshExecutor(MetricRegistry metricRegistry) {
+        final var maxThreads = 2;
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("collector-cert-refresh-%d")
+                .setDaemon(true)
+                .build();
+        final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(maxThreads, maxThreads, 60L, SECONDS, queue,
+                threadFactory);
+        executor.allowCoreThreadTimeOut(true);
+        return new InstrumentedExecutorService(executor, metricRegistry,
+                name("collector-cert-cache-refresh", "executor-service"));
     }
 }

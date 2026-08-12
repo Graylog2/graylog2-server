@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useCollectorsConfig } from 'components/collectors/hooks';
-import Routes from 'routing/Routes';
+
+import CollectorsSettingsPage from './CollectorsSettingsPage';
 
 const CollectorsOverviewPage = () => {
   const productName = useProductName();
@@ -39,7 +39,7 @@ const CollectorsOverviewPage = () => {
   }
 
   if (!config?.signing_cert_id) {
-    return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
+    return <CollectorsSettingsPage />;
   }
 
   return (
@@ -48,7 +48,7 @@ const CollectorsOverviewPage = () => {
       <PageHeader
         title={
           <>
-            Collectors Overview <BetaBadge />
+            Collectors Overview <PreviewBadge />
           </>
         }>
         <span>

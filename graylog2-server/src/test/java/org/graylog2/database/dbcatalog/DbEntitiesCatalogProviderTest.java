@@ -17,7 +17,7 @@
 package org.graylog2.database.dbcatalog;
 
 
-import org.graylog2.cluster.nodes.ServerNodeEntity;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
@@ -46,14 +46,14 @@ class DbEntitiesCatalogProviderTest {
 
     @Test
     void testHandlesEntitiesWithDefaultReadPermissionFieldProperly() {
-        DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(ServerNodeEntity.class));
+        DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(ServerNodeDto.class));
         final DbEntitiesCatalog dbEntitiesCatalog = provider.get();
 
         final DbEntityCatalogEntry entry = dbEntitiesCatalog.getByCollectionName("nodes").get();
 
         assertThat(entry.collection()).isEqualTo("nodes");
         assertThat(entry.titleField()).isEqualTo("node_id");
-        assertThat(entry.modelClass()).isEqualTo(ServerNodeEntity.class);
+        assertThat(entry.modelClass()).isEqualTo(ServerNodeDto.class);
         assertThat(entry.readPermission()).isEqualTo(NOBODY_ALLOWED);
         assertThat(entry.readableFields()).isNotEmpty();
     }

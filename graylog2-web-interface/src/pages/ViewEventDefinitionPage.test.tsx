@@ -23,13 +23,13 @@ import type { Permission } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
-import mockAction from 'helpers/mocking/MockAction';
-import MockStore from 'helpers/mocking/StoreMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { useEventDefinitionWithContext } from 'components/event-definitions/hooks/useEventDefinitions';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
 
@@ -42,25 +42,15 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('hooks/useCurrentUser');
 
-jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
-  EventDefinitionsActions: {
-    get: mockAction(
-      jest.fn(() =>
-        Promise.resolve({
-          event_definition: mockEventDefinition,
-          context: { scheduler: { is_scheduled: true } },
-          is_mutable: true,
-        }),
-      ),
-    ),
-  },
+jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
+  ...jest.requireActual('components/event-definitions/hooks/useEventDefinitions'),
+  useEventDefinitionWithContext: jest.fn(),
+  copyEventDefinition: jest.fn(() => Promise.resolve({ id: 'new-id', title: 'New copy' })),
 }));
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: {
-    listAll: mockAction(),
-  },
-  EventNotificationsStore: MockStore(['getInitialState', () => ({ all: [] })]),
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] as Array<EventNotification> }, isFetched: true })),
 }));
 
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () =>
@@ -71,6 +61,14 @@ jest.mock('hooks/usePluginEntities');
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(useEventDefinitionWithContext).mockReturnValue({
+      data: {
+        eventDefinition: mockEventDefinition,
+        context: { scheduler: { is_scheduled: true } },
+        is_mutable: true,
+      },
+      isFetching: false,
+    });
     asMock(usePluginEntities).mockImplementation(
       (entityKey) =>
         ({
@@ -90,7 +88,7 @@ describe('<ViewEventDefinitionPage />', () => {
   it('should display the event definition page', async () => {
     render(<ViewEventDefinitionPage />);
 
-    await screen.findByText(/View Event Definition/);
+    await screen.findByText(/View "Event Definition 1" Event Definition/);
   });
 
   it('should display event details when permitted', async () => {

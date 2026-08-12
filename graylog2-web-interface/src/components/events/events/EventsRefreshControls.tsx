@@ -28,12 +28,12 @@ import RefreshControls from 'components/common/RefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
-import useTableFetchContext from '../../common/PaginatedEntityTable/useTableFetchContext';
+import useTableFilterContext from '../../common/PaginatedEntityTable/useTableFilterContext';
 
 const useDisableRefreshWhileSlicing = () => {
-  const tableFetchContext = useTableFetchContext();
+  const { searchParams } = useTableFilterContext();
   const { refreshConfig, stopAutoRefresh } = useAutoRefresh();
-  const isSlicingEnabled = Boolean(tableFetchContext?.searchParams.sliceCol);
+  const isSlicingEnabled = Boolean(searchParams.sliceCol);
 
   useEffect(() => {
     if (isSlicingEnabled && refreshConfig?.enabled) {

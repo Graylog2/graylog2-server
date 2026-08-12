@@ -16,108 +16,79 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import com.github.joschi.jadconfig.ValidationException;
+import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
-import org.graylog.datanode.DirectoryReadableValidator;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
-import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
-import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
-import org.graylog.datanode.filesystem.index.dto.NodeInformation;
-import org.graylog.shaded.opensearch2.org.opensearch.Version;
+import org.graylog.datanode.filesystem.index.DataDirVerificationMarker;
+import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibility;
+import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibilityService;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
+import java.util.List;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class OpensearchDataDirCompatibilityCheck implements PreflightCheck {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchDataDirCompatibilityCheck.class);
 
     /**
-     * Name of the marker file written into the opensearch data directory after a successful compatibility check.
-     * The file contains the opensearch version string; the path context is implicit from the file's location.
+     * How many individual compatibility problems the abort message spells out before it starts counting instead.
      */
-    static final String COMPATIBILITY_CHECK_FILENAME = ".dn-compat-check";
+    private static final int MAX_REPORTED_ERRORS = 5;
 
     private final DatanodeConfiguration datanodeConfiguration;
-    private final IndicesDirectoryParser indicesDirectoryParser;
-    private final DirectoryReadableValidator directoryReadableValidator = new DirectoryReadableValidator();
+    private final OpensearchDataDirCompatibilityService compatibilityService;
+    private final DataDirVerificationMarker verificationMarker;
 
     @Inject
-    public OpensearchDataDirCompatibilityCheck(DatanodeConfiguration datanodeConfiguration, IndicesDirectoryParser indicesDirectoryParser) {
+    public OpensearchDataDirCompatibilityCheck(DatanodeConfiguration datanodeConfiguration,
+                                               OpensearchDataDirCompatibilityService compatibilityService,
+                                               DataDirVerificationMarker verificationMarker) {
         this.datanodeConfiguration = datanodeConfiguration;
-        this.indicesDirectoryParser = indicesDirectoryParser;
+        this.compatibilityService = compatibilityService;
+        this.verificationMarker = verificationMarker;
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
 
         final Path opensearchDataDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
-        final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
+        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
 
-        // We want to run the compatibility check only once per major opensearch version for this data dir. Let's memorize
-        // the run and skip every time we are starting with the same major version in the same data dir.
-        // A change in the major version will re-run the full check; minor/patch upgrades are skipped.
-        if (isCompatibilityAlreadyVerified(opensearchDataDir, opensearchVersion)) {
-            LOG.info("Opensearch data directory compatibility already successfully verified for data directory {} and opensearch major version {}, skipping check", opensearchDataDir, Version.fromString(opensearchVersion).major);
+        // We want to run the compatibility check only once per major opensearch version for this data dir. The marker
+        // file tells us which major already opened it successfully, so we can skip the full scan when nothing about
+        // the format can have changed. A change in the major version re-runs the full check; minor/patch upgrades are
+        // skipped. The marker itself is written once opensearch is actually up, see OpensearchVersionTracer.
+        if (verificationMarker.isVerifiedFor(opensearchDataDir, opensearchVersion)) {
+            LOG.info("Opensearch data directory compatibility already successfully verified for data directory {} and opensearch major version {}, skipping check", opensearchDataDir, Version.parse(opensearchVersion).majorVersion());
             return;
         }
 
-        try {
-            directoryReadableValidator.validate(opensearchDataDir.toUri().toString(), opensearchDataDir);
-            final IndexerDirectoryInformation info = indicesDirectoryParser.parse(opensearchDataDir);
-            checkCompatibility(opensearchVersion, info);
-            final int indicesCount = info.nodes().stream().mapToInt(n -> n.indices().size()).sum();
-            LOG.info("Found {} indices and all of them are valid with current opensearch version {}", indicesCount, opensearchVersion);
-            // The check succeeded, let's remember this configuration and skip next time
-            writeCompatibilityCheckResult(opensearchDataDir, opensearchVersion);
-        } catch (IncompatibleIndexVersionException e) {
-            throw new PreflightCheckException("Index directory is not compatible with current version " + opensearchVersion + " of Opensearch, terminating.", e);
-        } catch (ValidationException e) {
-            throw new PreflightCheckException(e);
+        final OpensearchDataDirCompatibility compatibility = compatibilityService.check();
+        compatibility.warnings().forEach(LOG::warn);
+
+        if (!compatibility.isCompatible()) {
+            // One error per incompatible index, so a large cluster can produce thousands. The full list goes to the
+            // log, the exception message carries only the first few so it stays readable and within log/event size
+            // limits.
+            compatibility.errors().forEach(LOG::error);
+            throw new PreflightCheckException(f("Index directory %s is not compatible with current version %s of Opensearch, terminating. %s",
+                    opensearchDataDir, opensearchVersion, abbreviate(compatibility.errors())));
         }
+
+        LOG.info("Found {} indices and all of them are valid with current opensearch version {}", compatibility.indicesCount(), opensearchVersion);
     }
 
-    private boolean isCompatibilityAlreadyVerified(Path opensearchDataDir, String opensearchVersion) {
-        final Path checkFile = opensearchDataDir.resolve(COMPATIBILITY_CHECK_FILENAME);
-        if (!Files.exists(checkFile)) {
-            return false;
+    private static String abbreviate(List<String> errors) {
+        if (errors.size() <= MAX_REPORTED_ERRORS) {
+            return String.join(" ", errors);
         }
-        try {
-            final String storedVersion = Files.readString(checkFile, StandardCharsets.UTF_8).trim();
-            final int storedMajor = Version.fromString(storedVersion).major;
-            final int currentMajor = Version.fromString(opensearchVersion).major;
-            return storedMajor == currentMajor;
-        } catch (Exception e) {
-            LOG.warn("Failed to read compatibility check file, re-running check", e);
-            return false;
-        }
-    }
-
-    private void writeCompatibilityCheckResult(Path opensearchDataDir, String opensearchVersion) {
-        final Path checkFile = opensearchDataDir.resolve(COMPATIBILITY_CHECK_FILENAME);
-        try {
-            Files.writeString(checkFile, opensearchVersion, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            LOG.warn("Failed to write compatibility check result, check will re-run on next startup", e);
-        }
-    }
-
-    private void checkCompatibility(String opensearchVersion, IndexerDirectoryInformation info) {
-        final Version currentVersion = Version.fromString(opensearchVersion);
-        for (NodeInformation node : info.nodes()) {
-            final Version nodeVersion = Version.fromString(node.nodeVersion());
-            if (node.nodeVersion() != null && !currentVersion.isCompatible(nodeVersion)) {
-                final String error = String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, nodeVersion);
-                throw new IncompatibleIndexVersionException(error);
-            }
-        }
+        return f("%s ... and %d more problems, see the log for the complete list.",
+                String.join(" ", errors.subList(0, MAX_REPORTED_ERRORS)), errors.size() - MAX_REPORTED_ERRORS);
     }
 }

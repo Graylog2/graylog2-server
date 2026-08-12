@@ -16,7 +16,8 @@
  */
 
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import URI from 'urijs';
 
 import type { ConfigurationFormData } from 'components/configurationforms';
 import { ConfigurationForm } from 'components/configurationforms';
@@ -24,6 +25,8 @@ import type { Output } from 'hooks/useOutputs';
 import { Button } from 'components/bootstrap';
 import { Icon, IfPermitted } from 'components/common';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
+import useQuery from 'routing/useQuery';
+import useHistory from 'routing/useHistory';
 
 type Props = {
   output: Output;
@@ -35,6 +38,9 @@ type Props = {
 const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinition }: Props) => {
   const [typeDefinition, setTypeDefinition] = useState<AvailableOutputRequestedConfiguration>(undefined);
   const configFormRef = useRef(null);
+  const { edit_output: editOutputParam } = useQuery();
+  const history = useHistory();
+  const autoOpenedRef = useRef(false);
 
   const onClick = () => {
     setTypeDefinition(getTypeDefinition(output.type));
@@ -43,6 +49,19 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
       configFormRef.current?.open();
     }
   };
+
+  useEffect(() => {
+    if (disabled || autoOpenedRef.current || editOutputParam !== output.id) {
+      return;
+    }
+
+    autoOpenedRef.current = true;
+    setTypeDefinition(getTypeDefinition(output.type));
+    configFormRef.current?.open();
+
+    const cleanedUrl = new URI(window.location.href).removeSearch('edit_output').resource();
+    history.replace(cleanedUrl);
+  }, [disabled, editOutputParam, output.id, output.type, getTypeDefinition, history]);
 
   const handleUpdate = (data: ConfigurationFormData<Output['configuration']>) => onUpdate(output, data);
 

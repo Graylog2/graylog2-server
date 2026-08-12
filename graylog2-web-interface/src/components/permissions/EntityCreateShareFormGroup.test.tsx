@@ -18,24 +18,38 @@ import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
-import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import EntityCreateShareFormGroup from './EntityCreateShareFormGroup';
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
+jest.mock('domainActions/permissions/EntityShareDomain', () => ({
+  __esModule: true,
+  default: {
     prepare: jest.fn(() => Promise.resolve()),
     update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
+    loadUserSharesPaginated: jest.fn(() =>
+      Promise.resolve({
+        list: require('immutable').List(),
+        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+      }),
+    ),
   },
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 const mockEntity = {
   description: 'Search for a User or Team to add as collaborator on this stream.',
@@ -60,7 +74,7 @@ const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTim
 
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
     asMock(usePluggableEntityShareFormGroup).mockReturnValue(() => <span />);
   });
 
@@ -76,7 +90,7 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {});
+      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {});
     });
   });
 
@@ -98,7 +112,7 @@ describe('EntityCreateShareFormGroup', () => {
     await setupUser().click(addCollaborator);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith('stream', '', null, {
+      expect(EntityShareDomain.prepare).toHaveBeenCalledWith('stream', '', null, {
         selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
           [everyone.id]: viewer.id,
         }),

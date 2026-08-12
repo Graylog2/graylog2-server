@@ -17,7 +17,7 @@
 import React, { useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Tooltip } from 'components/bootstrap';
+import Tooltip from 'components/common/Tooltip';
 import copyToClipboard from 'util/copyToClipboard';
 
 const Name = styled.span`
@@ -31,14 +31,6 @@ const Value = styled.span`
   opacity: 0.5;
   transition: opacity 150ms ease-in-out;
 `;
-
-const StyledTooltip = styled(Tooltip).attrs<{ opened: boolean }>((props) => ({
-  className: props.opened ? 'in' : '' /* stylelint-disable-line */,
-}))(
-  ({ opened }) => css`
-    display: ${opened ? 'block' : 'none'};
-  `,
-);
 
 const Wrapped = styled.div`
   flex: 1;
@@ -88,17 +80,12 @@ const ColorSwatch = ({ className = undefined, color, name = '', copyText = undef
 
   return (
     <Wrapped className={className}>
-      <StyledTooltip
-        placement="top"
-        opened={opened}
-        positionTop={-32}
-        id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
-        Copied!
-      </StyledTooltip>
-      <Swatch color={color} onClick={copyCallback}>
-        <Name>{name}</Name>
-        <Value>{color}</Value>
-      </Swatch>
+      <Tooltip label="Copied!" position="top" opened={opened}>
+        <Swatch color={color} onClick={copyCallback}>
+          <Name>{name}</Name>
+          <Value>{color}</Value>
+        </Swatch>
+      </Tooltip>
     </Wrapped>
   );
 };

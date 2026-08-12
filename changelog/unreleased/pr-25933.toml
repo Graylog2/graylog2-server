@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix missing `X-Requested-By` header on API browser try-it-out requests, which caused CSRF rejections."
+issues = ["25931"]
+pulls = ["25933"]

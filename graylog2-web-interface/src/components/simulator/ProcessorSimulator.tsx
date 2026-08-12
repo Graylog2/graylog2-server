@@ -64,23 +64,21 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(undefined);
 
-  const onMessageLoad = (loadedMessage: Message | undefined, options: { inputId?: string }) => {
+  const onMessageLoad = async (loadedMessage: Message | undefined, options: { inputId?: string }) => {
     setMessage(loadedMessage);
     setSimulation(undefined);
     setLoading(true);
     setError(undefined);
 
-    if (message) {
-      simulateMessage(stream.id, loadedMessage?.fields ?? {}, options.inputId ?? '').then(
-        (response) => {
-          setSimulation(response);
-          setLoading(false);
-        },
-        (err: unknown) => {
-          setLoading(false);
-          setError(err);
-        },
-      );
+    if (loadedMessage) {
+      try {
+        const response = await simulateMessage(stream.id, loadedMessage?.fields ?? {}, options.inputId ?? '');
+        setSimulation(response);
+      } catch (e) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

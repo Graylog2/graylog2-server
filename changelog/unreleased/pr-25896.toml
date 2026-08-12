@@ -1,0 +1,4 @@
+type = "a"
+message = "Ability to assign tags to event definitions."
+
+pulls = ["25896", "25940", "26079"]

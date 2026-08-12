@@ -24,7 +24,7 @@ import {
   isTimeRange,
 } from 'views/typeGuards/timeRange';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
-import type { TimeRangePickerTimeRange } from 'views/components/time-range-picker/TimeRangePicker';
+import type { TimeRangePickerTimeRange } from 'views/components/time-range-picker/types';
 
 import type { TimeRange, NoTimeRangeOverride } from './Query';
 

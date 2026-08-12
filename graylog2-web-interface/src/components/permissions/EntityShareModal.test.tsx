@@ -20,6 +20,7 @@ import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { act } from 'react';
 import userEvent from '@testing-library/user-event';
 
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import mockEntityShareState, {
@@ -33,24 +34,37 @@ import mockEntityShareState, {
   manager,
 } from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
-import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import useEntityShareState, { useSetEntityShareState } from 'hooks/useEntityShareState';
 
 import EntityShareModal from './EntityShareModal';
 
-const mockEmptyStore = { state: undefined };
-const mockFailedStore = { state: failedEntityShareState };
+const mockEmptyResult = { data: undefined };
+const mockFailedResult = { data: failedEntityShareState };
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
+jest.mock('domainActions/permissions/EntityShareDomain', () => ({
+  __esModule: true,
+  default: {
     prepare: jest.fn(() => Promise.resolve()),
     update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
+    loadUserSharesPaginated: jest.fn(() =>
+      Promise.resolve({
+        list: require('immutable').List(),
+        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+      }),
+    ),
   },
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 jest.setTimeout(10000);
 
@@ -58,7 +72,7 @@ const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTim
 
 describe('EntityShareModal', () => {
   beforeEach(() => {
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: mockEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: mockEntityShareState } as any);
   });
 
   beforeAll(() => {
@@ -86,7 +100,7 @@ describe('EntityShareModal', () => {
     render(<SimpleEntityShareModal />);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity);
+      expect(EntityShareDomain.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity);
     });
   });
 
@@ -95,9 +109,9 @@ describe('EntityShareModal', () => {
 
     await setupUser().click(await screen.findByRole('button', { name: /update sharing/i }));
 
-    await waitFor(() => expect(EntityShareActions.update).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(EntityShareDomain.update).toHaveBeenCalledTimes(1));
 
-    expect(EntityShareActions.update).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
+    expect(EntityShareDomain.update).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
       selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities,
     });
   });
@@ -119,7 +133,7 @@ describe('EntityShareModal', () => {
 
   describe('displays', () => {
     it('loading spinner while loading entity share state', async () => {
-      asMock(EntityShareStore.getInitialState).mockReturnValue(mockEmptyStore);
+      asMock(useEntityShareState).mockReturnValue(mockEmptyResult as any);
       render(<SimpleEntityShareModal />);
 
       act(() => {
@@ -130,7 +144,7 @@ describe('EntityShareModal', () => {
     });
 
     it('displays an error if validation failed and disables submit', async () => {
-      asMock(EntityShareStore.getInitialState).mockReturnValue(mockFailedStore);
+      asMock(useEntityShareState).mockReturnValue(mockFailedResult as any);
       render(<SimpleEntityShareModal />);
 
       await screen.findByText('Removing the following owners will leave the entity ownerless:');
@@ -175,7 +189,7 @@ describe('EntityShareModal', () => {
         await setupUser().click(submitButton);
 
         await waitFor(() => {
-          expect(EntityShareActions.prepare).toHaveBeenCalledWith(
+          expect(EntityShareDomain.prepare).toHaveBeenCalledWith(
             'dashboard',
             'The title',
             mockEntityShareState.entity,
@@ -195,6 +209,31 @@ describe('EntityShareModal', () => {
         ${everyone} | ${'everyone'} | ${manager}
         ${security} | ${'team'}     | ${owner}
       `('sends new grantee $granteeType to preparation', addGrantee);
+
+      it('writes the response from prepare back into the entity share cache', async () => {
+        const updatedShareState = mockEntityShareState
+          .toBuilder()
+          .selectedGranteeCapabilities(mockEntityShareState.selectedGranteeCapabilities.merge({ [john.id]: viewer.id }))
+          .build();
+        // First call (from initial useEffect in EntityShareModal) returns the initial state;
+        // second call (from _handleSelection after clicking Add Collaborator) returns the updated state.
+        asMock(EntityShareDomain.prepare)
+          .mockResolvedValueOnce(mockEntityShareState)
+          .mockResolvedValueOnce(updatedShareState);
+
+        render(<SimpleEntityShareModal />);
+
+        await selectEvent.chooseOption('Search for users and teams', john.title);
+        await selectEvent.chooseOption('Select a capability', viewer.title);
+
+        await setupUser().click(await screen.findByRole('button', { name: /add collaborator/i }));
+
+        const setEntityShareStateMock = (useSetEntityShareState as jest.Mock).mock.results[0]?.value;
+
+        await waitFor(() => {
+          expect(setEntityShareStateMock).toHaveBeenCalledWith(mockEntityShareState.entity, updatedShareState);
+        });
+      });
     });
 
     it('shows confirmation dialog on save if a collaborator got selected, but not added', async () => {
@@ -231,7 +270,7 @@ describe('EntityShareModal', () => {
       });
 
       await waitFor(() => {
-        expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
+        expect(EntityShareDomain.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
           selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({
             [jane.id]: viewer.id,
           }),
@@ -265,7 +304,7 @@ describe('EntityShareModal', () => {
         .build();
 
       beforeEach(() => {
-        asMock(EntityShareStore.getInitialState).mockReturnValue({ state: entityShareState });
+        asMock(useEntityShareState).mockReturnValue({ data: entityShareState } as any);
       });
 
       const deleteGrantee = async ({ grantee }) => {
@@ -276,7 +315,7 @@ describe('EntityShareModal', () => {
         await setupUser().click(deleteButton);
 
         await waitFor(() => {
-          expect(EntityShareActions.prepare).toHaveBeenCalledWith(
+          expect(EntityShareDomain.prepare).toHaveBeenCalledWith(
             'dashboard',
             'The title',
             mockEntityShareState.entity,

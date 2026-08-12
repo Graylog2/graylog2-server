@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix MCP server 500 error on unknown client capability fields"
+
+issues = ["25956"]
+pulls = ["26008"]

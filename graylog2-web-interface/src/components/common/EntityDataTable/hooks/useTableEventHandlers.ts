@@ -27,11 +27,13 @@ const useTableEventHandlers = ({
   paginationQueryParameter,
   setQuery,
   appSection,
+  resetTableLayout,
 }: {
   updateTableLayout: (preferences: TableLayoutPreferences) => Promise<void>;
   paginationQueryParameter: PaginationQueryParameterResult;
   setQuery: (query: string) => void;
   appSection: string;
+  resetTableLayout: () => Promise<void>;
 }) => {
   const sendTelemetry = useSendTelemetry();
 
@@ -98,8 +100,8 @@ const useTableEventHandlers = ({
 
     paginationQueryParameter.resetPage();
 
-    return updateTableLayout({ attributes: null, order: null, sort: undefined, perPage: undefined });
-  }, [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout]);
+    return resetTableLayout();
+  }, [appSection, paginationQueryParameter, resetTableLayout, sendTelemetry]);
 
   const onSearchReset = useCallback(() => {
     onSearch('');

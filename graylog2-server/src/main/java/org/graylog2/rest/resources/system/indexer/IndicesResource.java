@@ -45,8 +45,6 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.OutdatedIndex;
-import org.graylog2.indexer.indices.OutdatedIndexService;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
@@ -80,14 +78,12 @@ public class IndicesResource extends RestResource {
     private final Indices indices;
     private final NodeInfoCache nodeInfoCache;
     private final IndexSetRegistry indexSetRegistry;
-    private final OutdatedIndexService outdatedIndexService;
 
     @Inject
-    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry, OutdatedIndexService outdatedIndexService) {
+    public IndicesResource(Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry) {
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
-        this.outdatedIndexService = outdatedIndexService;
     }
 
     @GET
@@ -311,15 +307,6 @@ public class IndicesResource extends RestResource {
                 .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
-    }
-
-    @GET
-    @Path("/outdated")
-    @Operation(summary = "Get a list of indices that were created in a OpenSearch version prior to the recent one")
-    @RequiresPermissions(RestPermissions.INDICES_READ)
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<OutdatedIndex> getOutdatedIndices() {
-        return outdatedIndexService.getOutdatedIndices();
     }
 
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {

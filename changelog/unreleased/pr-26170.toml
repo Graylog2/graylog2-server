@@ -1,0 +1,3 @@
+type = "c"
+message = "Rank dropdown options by match quality so the best prefix matches appear at the top of typeahead suggestions."
+pulls = ["26170"]

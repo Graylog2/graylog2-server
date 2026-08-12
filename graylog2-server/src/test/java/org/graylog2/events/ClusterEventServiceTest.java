@@ -53,7 +53,6 @@ import org.mockito.quality.Strictness;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,8 +60,10 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(MongoDBExtension.class)
@@ -131,7 +132,15 @@ public class ClusterEventServiceTest {
     }
 
     private void runService() {
-        clusterEventService.iterateEvents(clusterEventService.eventsIterable(initialOffset).iterator());
+        runService(initialOffset);
+    }
+
+    private void runService(Offset offset) {
+        clusterEventService = spy(clusterEventService);
+        when(clusterEventService.isRunning()).thenReturn(true);
+        try (final var cursor = clusterEventService.eventsIterable(offset).iterator()) {
+            clusterEventService.iterateEvents(cursor);
+        }
     }
 
     @Test
@@ -165,7 +174,7 @@ public class ClusterEventServiceTest {
 
         // Simulate a cursor reopen from the offset of the just-processed event.
         final var offsetAfterProcessing = new Offset(TIME.toDate(), lastId);
-        clusterEventService.iterateEvents(clusterEventService.eventsIterable(offsetAfterProcessing).iterator());
+        runService(offsetAfterProcessing);
 
         assertThat(handler.invocations).hasValue(0);
         verify(serverEventBus, never()).post(any(SimpleEvent.class));

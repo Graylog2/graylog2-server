@@ -22,6 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { MockStore } from 'helpers/mocking';
 import type { Input } from 'components/messageloaders/Types';
+import Routes from 'routing/Routes';
 
 import FormatReceivedBy from './FormatReceivedBy';
 
@@ -57,6 +58,22 @@ describe('FormatReceivedBy', () => {
   it('shows input information if present', async () => {
     render(<FormatReceivedBy isLocalNode inputs={inputs} sourceNodeId="foo" sourceInputId="bar" />);
     await screen.findByText('My awesome input');
+  });
+
+  it('renders the ephemeral collector ingest input as a "Collector Ingest" link', async () => {
+    render(
+      <FormatReceivedBy
+        isLocalNode
+        inputs={Immutable.Map()}
+        sourceNodeId="existingNode"
+        sourceInputId="000000000000000000000001"
+      />,
+    );
+
+    const link = await screen.findByRole('link', { name: 'Collector Ingest' });
+    expect(link).toHaveAttribute('href', Routes.SYSTEM.COLLECTORS.OVERVIEW);
+    // The synthetic id has no Input record, but must not fall back to "deleted input".
+    expect(screen.queryByText('deleted input')).not.toBeInTheDocument();
   });
 
   it('shows node information if present', async () => {

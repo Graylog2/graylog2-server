@@ -19,10 +19,10 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 
+import { loadRolesForUser } from 'hooks/useAuthzRoles';
 import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
 import { manager as assignedRole1, reader as assignedRole2, viewsManager as notAssignedRole } from 'fixtures/roles';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import RolesSection from './RolesSection';
 
@@ -39,11 +39,10 @@ const mockLoadRolesPromise = Promise.resolve({
   pagination: { page: 1, perPage: 10, total: 1 },
 });
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesActions: {
-    loadRolesForUser: jest.fn(() => mockRolesForUserPromise),
-    loadRolesPaginated: jest.fn(() => mockLoadRolesPromise),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  loadRolesForUser: jest.fn(() => mockRolesForUserPromise),
+  loadRolesPaginated: jest.fn(() => mockLoadRolesPromise),
 }));
 
 describe('<RolesSection />', () => {
@@ -75,9 +74,9 @@ describe('<RolesSection />', () => {
     const filterInput = screen.getByPlaceholderText('Enter query to filter');
     await userEvent.type(filterInput, 'name of an assigned role');
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(loadRolesForUser).toHaveBeenCalledTimes(2));
 
-    expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledWith(exampleUser.username, {
+    expect(loadRolesForUser).toHaveBeenCalledWith(exampleUser.username, {
       page: 1,
       perPage: 5,
       query: 'name of an assigned role',

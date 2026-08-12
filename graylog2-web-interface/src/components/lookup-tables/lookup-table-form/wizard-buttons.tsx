@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 import { useFormikContext } from 'formik';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import useScopePermissions from 'hooks/useScopePermissions';
 import { Button } from 'components/bootstrap';
@@ -42,7 +42,7 @@ type Props = {
 function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoading }: Props) {
   const { values, submitForm, resetForm, isValid } = useFormikContext<LookupTableType>();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const onFirstStep = useMemo(() => stepIds.indexOf(activeStepId) === 0, [stepIds, activeStepId]);
   const onLastStep = useMemo(() => stepIds.indexOf(activeStepId) === stepIds.length - 1, [stepIds, activeStepId]);
 
@@ -64,7 +64,7 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
 
   const onCancel = () => {
     resetForm();
-    navigate(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
+    push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   };
 
   const canModify = useMemo(

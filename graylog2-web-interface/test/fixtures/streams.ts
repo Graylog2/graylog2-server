@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-/* eslint-disable import/prefer-default-export */
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 
 export const stream: Stream = {
   content_pack: null,

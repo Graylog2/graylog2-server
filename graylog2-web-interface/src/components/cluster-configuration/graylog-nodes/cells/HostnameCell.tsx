@@ -16,11 +16,12 @@
  */
 import React from 'react';
 
+import { Label } from 'components/bootstrap';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
-import { NodePrimary, SecondaryText, StyledLabel } from '../../shared-components/NodeMetricsLayout';
+import { NodePrimary, SecondaryText } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
   node: ClusterGraylogNode;
@@ -45,7 +46,7 @@ const HostnameCell = ({ node }: Props) => {
       {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
       {node.is_leader && (
         <SecondaryText>
-          <StyledLabel bsSize="xs">Leader</StyledLabel>
+          <Label bsSize="xs">Leader</Label>
         </SecondaryText>
       )}
     </NodePrimary>

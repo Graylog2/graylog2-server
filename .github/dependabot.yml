@@ -15,13 +15,21 @@ updates:
         update-types: ["version-update:semver-patch"]
       - dependency-name: "com.amazonaws:aws-java-sdk-bom"
         update-types: ["version-update:semver-patch"]
-      # Lucene >=10 requires JDK 21
-      - dependency-name: "org.apache.lucene:lucene-*"
-        versions:
-          - ">= 10"
-      # we want to manually update the opensearch-java client as long as it requires intensive testing
+      # we want to manually update the opensearch-java client and core as long as it requires intensive testing
+      - dependency-name: "org.opensearch:opensearch-core"
       - dependency-name: "org.opensearch.client:opensearch-java"
     groups:
+      # The Google API client libraries are released in lockstep, so bumping
+      # them individually almost always trips the requireUpperBoundDeps
+      # enforcer rule. Deliberately excludes io.grpc and com.google.protobuf,
+      # which are on separate release trains.
+      google-api-libraries:
+        patterns:
+          - "com.google.api:*"
+          - "com.google.api.grpc:*"
+          - "com.google.auth:*"
+          - "com.google.cloud:*"
+          - "com.google.http-client:*"
       openrewrite:
         patterns:
           - "org.openrewrite:*"
@@ -161,4 +169,24 @@ updates:
     labels:
       - dependencies
     rebase-strategy: "disabled"
+
+  - package-ecosystem: npm
+    directory: "/graylog2-web-interface/docs/graylog-luma"
+    schedule:
+      interval: daily
+      time: "02:00"
+      timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    rebase-strategy: "disabled"
+    groups:
+      storybook:
+        patterns:
+          - "storybook"
+          - "@storybook/*"
+          - "eslint-plugin-storybook"
+          - "storybook-dark-mode"
 

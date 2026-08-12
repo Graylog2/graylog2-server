@@ -21,9 +21,8 @@ import upperCase from 'lodash/upperCase';
 
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { createGRN } from 'logic/permissions/GRN';
-import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import useEntityShareState, { useSetEntityShareState } from 'hooks/useEntityShareState';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
@@ -52,15 +51,18 @@ const EntityShareModal = ({
   onClose,
   showShareableEntityURL = true,
 }: Props) => {
-  const { state: entityShareState } = useStore(EntityShareStore);
-  const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const entityGRN = createGRN(entityType, entityId);
+  const { data: entityShareState } = useEntityShareState(entityGRN);
+  const setEntityShareState = useSetEntityShareState();
+  const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const granteesSelectFormRef = useRef<FormikProps<GranteesSelectFormValues>>();
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
-  }, [entityType, entityTitle, entityGRN]);
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN).then((state) => {
+      setEntityShareState(entityGRN, state);
+    });
+  }, [entityType, entityTitle, entityGRN, setEntityShareState]);
 
   const _handleSave = () => {
     setDisableSubmit(true);
@@ -88,7 +90,8 @@ const EntityShareModal = ({
       app_pathname: entityType,
     });
 
-    EntityShareDomain.update(entityType, entityTitle, entityGRN, payload).then(() => {
+    EntityShareDomain.update(entityType, entityTitle, entityGRN, payload).then((state) => {
+      setEntityShareState(entityGRN, state);
       setDisableSubmit(true);
       onClose();
     });

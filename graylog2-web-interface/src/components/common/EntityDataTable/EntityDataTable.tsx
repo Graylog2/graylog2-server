@@ -44,8 +44,9 @@ import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useCol
 import useColumnRenderers from 'components/common/EntityDataTable/hooks/useColumnRenderers';
 import useAuthorizedColumnSchemas from 'components/common/EntityDataTable/hooks/useAuthorizedColumnSchemas';
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
+import useInternalLayoutPreferences from 'components/common/EntityDataTable/hooks/useInternalLayoutPreferences';
 
 import type {
   ColumnRenderers,
@@ -106,7 +107,7 @@ const ScrollRightIndicator = styled.div`
   top: 0;
   bottom: 0;
   right: 0;
-  width: ${CELL_PADDING}px;
+  width: ${CELL_PADDING_HORIZONTAL}px;
   pointer-events: none;
   z-index: 2;
 `;
@@ -180,8 +181,6 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   onResetLayoutPreferences: () => Promise<void>;
   /** Active page size */
   pageSize?: number;
-  /** Required when parent container does not use contentBackground for the background */
-  parentBgColor?: string;
   appSection?: string;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
@@ -218,7 +217,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onResetLayoutPreferences,
   onSortChange,
   pageSize = undefined,
-  parentBgColor = undefined,
   appSection = undefined,
   noColumnReordering = false,
   noPageSizeSelect = false,
@@ -235,18 +233,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const scrolledToRightIndicator = useRef<HTMLDivElement>();
   const scrolledToRight = useIntersectionObserver(scrollContainerRef, scrolledToRightIndicator);
 
-  const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
-    layoutPreferences?.order ?? defaultColumnOrder,
-  );
-  const [internalColumnWidthPreferences, setInternalColumnWidthPreferences] = useState<{
-    [attributeId: string]: number;
-  }>(() =>
-    Object.fromEntries(
-      Object.entries(layoutPreferences?.attributes ?? {}).flatMap(([key, { width }]) =>
-        typeof width === 'number' ? [[key, width]] : [],
-      ),
-    ),
-  );
+  const {
+    setInternalAttributeColumnOrder,
+    setInternalColumnWidthPreferences,
+    internalColumnWidthPreferences,
+    internalAttributeColumnOrder,
+  } = useInternalLayoutPreferences({ layoutPreferences, defaultColumnOrder });
 
   const columnOrder = useVisibleColumnOrder(
     layoutPreferences?.attributes,
@@ -282,7 +274,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     onActionsWidthChange: handleActionsWidthChange,
     onChangeSlicing,
     onHeaderSectionResize: handleHeaderSectionResize,
-    parentBgColor,
     appSection,
   });
 
@@ -315,7 +306,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
       setInternalAttributeColumnOrder(defaultColumnOrder);
       setInternalColumnWidthPreferences({});
     });
-  }, [defaultColumnOrder, onResetLayoutPreferences]);
+  }, [
+    defaultColumnOrder,
+    onResetLayoutPreferences,
+    setInternalAttributeColumnOrder,
+    setInternalColumnWidthPreferences,
+  ]);
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
@@ -359,6 +355,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $scrollContainerWidth={scrollContainerWidth}>
                     <InnerContainer>
                       <Table<Entity>
+                        columnWidths={columnWidths}
                         expandedSectionRenderers={expandedSectionRenderers}
                         headerGroups={headerGroups}
                         rowOverride={rowOverride}

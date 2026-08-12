@@ -27,6 +27,7 @@ import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import scatterOnClickPopover from 'views/components/visualizations/scatter/scatterOnClickPopover';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
@@ -78,7 +79,10 @@ const LineVisualization = makeVisualization(
       return _layouts;
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
-    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('scatter', config);
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({
+      ...scatterOnClickPopover,
+      config,
+    });
 
     return (
       <>

@@ -54,6 +54,7 @@ import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.rest.URIHelperBinder;
 import org.graylog2.rest.resources.system.SlidingExpirationCookieFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.ContentTypeOptionFilter;
@@ -298,6 +299,7 @@ public class JerseyService extends AbstractIdleService {
                     }
                 })
                 .register(new UserContextBinder())
+                .register(new URIHelperBinder())
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
                 .registerResources(additionalResources);

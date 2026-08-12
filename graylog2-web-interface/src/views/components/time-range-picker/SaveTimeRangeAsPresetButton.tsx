@@ -31,7 +31,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import Routes from 'routing/Routes';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/TimeRangePicker';
+import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
 import {
   normalizeFromPickerForSearchBar,
   normalizeFromSearchBarForBackend,

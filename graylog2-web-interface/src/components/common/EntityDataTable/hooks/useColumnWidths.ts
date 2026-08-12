@@ -14,8 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState, useLayoutEffect, useMemo } from 'react';
+import { useState, useLayoutEffect, useMemo, useRef } from 'react';
+import isEqual from 'lodash/isEqual';
 
+import { TABLE_BORDER_WIDTH } from 'components/bootstrap/Table';
 import {
   DEFAULT_COL_MIN_WIDTH,
   DEFAULT_COL_WIDTH,
@@ -40,7 +42,9 @@ const calculateAssignableWidth = ({
 }) => {
   const staticColWidths = columnIds.reduce((total, id) => total + (staticColumnWidths[id] ?? 0), 0);
 
-  return scrollContainerWidth - bulkSelectColWidth - actionsColMinWidth - staticColWidths;
+  // The table's own outer border (left edge) is real box-model width under border-collapse: separate,
+  // so it must be reserved here or the assigned column widths overflow the scroll container.
+  return scrollContainerWidth - TABLE_BORDER_WIDTH - bulkSelectColWidth - actionsColMinWidth - staticColWidths;
 };
 
 const calculateColumnWidths = ({
@@ -135,6 +139,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   headerMinWidths: { [colId: string]: number };
 }) => {
   const [columnWidths, setColumnWidths] = useState({});
+  const prevColumnWidthsRef = useRef<Record<string, number>>({});
   const staticColumnWidths = useMemo(
     () =>
       calculateStaticColumnWidths({
@@ -161,18 +166,20 @@ const useColumnWidths = <Entity extends EntityBase>({
       staticColumnWidths,
     });
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setColumnWidths(
-      calculateColumnWidths({
-        actionsColMinWidth,
-        assignableWidth,
-        attributeColumnIds: columnIds,
-        attributeColumnRenderers: columnRenderersByAttribute,
-        bulkSelectColWidth,
-        staticColumnWidths,
-        headerMinWidths,
-      }),
-    );
+    const newColumnWidths = calculateColumnWidths({
+      actionsColMinWidth,
+      assignableWidth,
+      attributeColumnIds: columnIds,
+      attributeColumnRenderers: columnRenderersByAttribute,
+      bulkSelectColWidth,
+      staticColumnWidths,
+      headerMinWidths,
+    });
+
+    if (!isEqual(prevColumnWidthsRef.current, newColumnWidths)) {
+      prevColumnWidthsRef.current = newColumnWidths;
+      setColumnWidths(newColumnWidths);
+    }
   }, [
     actionsColMinWidth,
     bulkSelectColWidth,

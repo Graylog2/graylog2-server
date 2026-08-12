@@ -35,6 +35,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -59,6 +60,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,6 +151,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Path("/nodes/paginated")
     @Timed
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @Operation(summary = "Get a paginated list of all server nodes in this cluster")
     public PageListResponse<ServerNodeDto> nodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -172,6 +175,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/node")
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @Operation(summary = "Information about this node.",
                   description = "This is returning information of this node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")
@@ -182,6 +186,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/nodes/{nodeId}")
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @Operation(summary = "Information about a node.",
                   description = "This is returning information of a node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")

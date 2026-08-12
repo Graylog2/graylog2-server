@@ -36,7 +36,7 @@ yarn test
 yarn test --testPathPattern=<pattern>
 
 # Type check
-yarn tsc
+yarn tsgo
 
 # Lint changed files (requires committed changes)
 yarn lint:changes
@@ -54,7 +54,7 @@ yarn lint:styles:path <file>
 yarn format
 
 # Pre-PR verification (run before considering work complete)
-yarn tsc && yarn lint:changes && yarn test
+yarn tsgo && yarn lint:changes && yarn test
 ```
 
 ## Project Structure
@@ -76,12 +76,28 @@ yarn tsc && yarn lint:changes && yarn test
 - **Nullish coalescing (`??`)** over logical OR (`||`) for default values.
 - **`Object.fromEntries`** over `Array.reduce` for constructing objects from arrays (performance).
 - Treat ESLint and Stylelint rules as authoritative for code style and patterns in this repo.
-- Wrapper components from `components/graylog` instead of direct react-bootstrap imports.
+- Use react-query for API calls.
+- Use typed API stubs from @graylog/server-api and @graylog/enterprise-api.
+- React Compiler handles render optimization. Do not add useMemo or useCallback only for optimization.
+
+## Components
+
+- Use styled-components, Mantine, and the local component abstractions.
+- Reuse shared components before creating new ones.
+- Shared components live in - src/components/common.
+- Wrapped Mantine components live in src/components/common/bootstrap.
 - Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components before creating new ones.
 
 ## Testing Guidelines
 
 - Follow `CONTRIBUTING.md` for testing conventions, test placement, and mocking guidelines.
+- Test feature behavior and public interfaces, not internal implementation details.
+- One feature test per feature (e.g. an entity data table) covers its components and hooks together. Separate unit tests per file are not the goal.
+- Only add a dedicated unit test for a hook or helper if it has logic that a feature test can't reach or verify cleanly.
+- Check existing tests first.
+- Adjust tests when behavior changes.
+- Extend tests for important missing scenarios.
+- Add tests when a changed feature has no useful coverage.
 
 ## Browser Compatibility
 
@@ -99,11 +115,11 @@ yarn tsc && yarn lint:changes && yarn test
 - Register: `PluginStore.register(new PluginManifest({}, { key: [data] }));`
 - Consume: `usePluginEntities('key')`
 - No central documentation of plugin store keys — search the codebase for usage.
+- **Merging bindings:** whenever you combine multiple plugin bindings (`PluginExports` objects) into one — e.g. assembling a `bindings.tsx` from sub-plugins, or aggregating bindings for `PluginStore.register` — you **must** use `mergePluginBindings` from `util/mergePluginBindings`. Do **not** use `lodash/merge`, `Immutable.Map().mergeWith`, object spreads (`{ ...a, ...b }`), or hand-written per-key array concatenation: those overwrite or index-merge array-valued keys (e.g. `pageNavigation`, `routes`) and silently drop entries. `mergePluginBindings` concatenates array-valued keys while deep-merging the rest.
 
 ## Finishing work
 
 Before finishing current work, please make sure that:
-
-  - Type-checking passes
-  - Tests are passing (use `yarn test`, never `yarn jest`)
-  - Generated code is adhering our frontend style guide (as laid out on `CONTRIBUTING.md`)
+- Type-checking passes
+- Tests are passing (use `yarn test`, never `yarn jest`)
+- Generated code is adhering our frontend style guide (as laid out on `CONTRIBUTING.md`)

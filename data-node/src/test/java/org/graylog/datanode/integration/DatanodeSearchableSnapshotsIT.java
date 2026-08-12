@@ -129,6 +129,6 @@ public class DatanodeSearchableSnapshotsIT {
 
     private void waitForNode(Integer opensearchRestPort) throws ExecutionException, RetryException {
         // this instance is not using any security, no truststore or jwt tokens needed
-        new DatanodeOpensearchWait(RestOperationParameters.builder().port(opensearchRestPort).build()).waitForNodesCount(1);
+        new DatanodeOpensearchWait(RestOperationParameters.builder().port(opensearchRestPort).build()).waitForGreenStatusAndNodesCount(1);
     }
 }

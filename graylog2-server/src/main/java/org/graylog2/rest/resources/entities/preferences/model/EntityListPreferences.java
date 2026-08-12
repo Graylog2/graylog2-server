@@ -32,7 +32,8 @@ public record EntityListPreferences(@JsonProperty("display_name") String display
                                     @JsonProperty("slicing") SlicingPreferences slicing,
                                     @JsonProperty("custom_preferences") Map<String, Object> customPreferences,
                                     @JsonProperty("priority") Integer priority,
-                                    @JsonProperty("filters") List<String> filters) {
+                                    @JsonProperty("filters") List<String> filters,
+                                    @JsonProperty("metrics") List<String> metrics) {
 
     public enum DisplayStatus {
         show,

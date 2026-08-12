@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix MCP tool output schemas that did not match the actual serialized output (`DateTime` and plain `Object` values were declared as objects, nullable fields as non-nullable), which made schema-validating MCP clients reject all `search_messages`, `aggregate_messages`, and `list_fields` responses."
+
+issues = ["23980", "25314", "26402"]
+pulls = ["26556"]

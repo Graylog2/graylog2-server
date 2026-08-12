@@ -1,0 +1,98 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+
+import { Row, Col, Alert } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
+import PreviewBadge from 'components/common/PreviewBadge';
+import { CollectorsPageNavigation } from 'components/collectors/common';
+import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
+import { useFleet } from 'components/collectors/hooks/useFleetQueries';
+import ConnectionSuccess from 'components/collectors/overview/onboarding/ConnectionSuccess';
+import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
+import Routes from 'routing/Routes';
+import useLocation from 'routing/useLocation';
+import { extractErrorMessage } from 'util/extractErrorMessage';
+import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+
+const CollectorsOnboardingInstancePage = () => {
+  const { instanceUid } = useParams<{ instanceUid: string }>();
+  const location = useLocation<{ platformId?: PlatformId; fleetName?: string } | null>();
+  // Set by the onboarding wizard's history push; absent on direct visits.
+  const platformId = location.state?.platformId;
+  const stateFleetName = location.state?.fleetName;
+
+  const { data: instance, isLoading, error } = useInstance(instanceUid);
+  const { data: fleet } = useFleet(instance?.fleet_id ?? '');
+
+  const { mutate: finish } = useFinishOnboarding();
+  const sendTelemetry = useSendTelemetry();
+
+  // using useEffect to guard that the instance is actually there before we finish the onboarding
+  useEffect(() => {
+    if (instance) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
+        app_section: 'collectors-onboarding',
+        app_action_value: 'collector-onboarding-completed',
+      });
+
+      finish();
+    }
+  }, [instance, finish, sendTelemetry]);
+
+  const content = () => {
+    if (isLoading) return <Spinner />;
+
+    if (error) {
+      return <Alert bsStyle="danger">Could not load collector instance: {extractErrorMessage(error)}</Alert>;
+    }
+
+    if (!instance) {
+      return (
+        <Alert bsStyle="warning">
+          Collector instance not found. It may have been removed &mdash; see all{' '}
+          <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>Instances</Link>.
+        </Alert>
+      );
+    }
+
+    return <ConnectionSuccess platformId={platformId} instance={instance} fleetName={fleet?.name ?? stateFleetName} />;
+  };
+
+  return (
+    <DocumentTitle title="Collector Onboarding">
+      <CollectorsPageNavigation />
+      <PageHeader
+        title={
+          <>
+            Collector Onboarding <PreviewBadge />
+          </>
+        }>
+        <span>Status of your newly connected collector.</span>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>{content()}</Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
+
+export default CollectorsOnboardingInstancePage;

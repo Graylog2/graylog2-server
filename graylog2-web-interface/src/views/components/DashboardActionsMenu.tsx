@@ -172,7 +172,7 @@ const DashboardActionsMenu = () => {
         />
       )}
       {showDropDownButton && (
-        <MoreActionsMenu id="query-tab-actions-dropdown" pullRight keepMounted solid>
+        <MoreActionsMenu id="query-tab-actions-dropdown" pullRight keepMounted>
           {dashboardActions.length > 0 && (
             <>
               {dashboardActions}

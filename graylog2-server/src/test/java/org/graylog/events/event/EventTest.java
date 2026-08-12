@@ -55,6 +55,7 @@ public class EventTest {
                 .alert(false)
                 .fields(ImmutableMap.of("hello", "world"))
                 .scores(ImmutableMap.of("test", 1.2D))
+                .tags(ImmutableSet.of("phishing", "lateral-movement"))
                 .build();
 
         assertThat(Event.fromDto(eventDto)).satisfies(event -> {
@@ -76,6 +77,7 @@ public class EventTest {
             assertThat(event.getField("hello").dataType()).isEqualTo(FieldValueType.STRING);
             assertThat(event.getField("hello").value()).isEqualTo("world");
             assertThat(event.getScore("test")).isPresent().hasValue(1.2D);
+            assertThat(event.getTags()).containsExactlyInAnyOrder("phishing", "lateral-movement");
         });
     }
 }

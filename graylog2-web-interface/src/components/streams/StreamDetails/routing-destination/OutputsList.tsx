@@ -48,7 +48,7 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
   };
 
   return (
-    <Table condensed striped hover>
+    <Table condensed>
       <thead>
         <tr>
           <th colSpan={2}>Name</th>

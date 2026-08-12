@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
@@ -24,14 +24,10 @@ import debounce from 'lodash/debounce';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Spinner } from 'components/common';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import {
-  CollectorConfigurationsActions,
-  CollectorConfigurationsStore,
-} from 'stores/sidecars/CollectorConfigurationsStore';
-import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
-import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
+import { useAllCollectorConfigurations } from 'hooks/useCollectorConfigurations';
+import { useCollectorsAll } from 'hooks/useCollectors';
+import { assignConfigurations } from 'hooks/useSidecars';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
-import { useStore } from 'stores/connect';
 import type { SidecarCollectorPairType, Configuration, Collector } from 'components/sidecars/types';
 import useSidecarsAdministration, { useSetSidecarAction } from 'hooks/useSidecarsAdministration';
 
@@ -45,8 +41,8 @@ type Props = {
 const SEARCH_DEBOUNCE_THRESHOLD = 500;
 
 const CollectorsAdministrationContainer = ({ ...props }: Props) => {
-  const collectors = useStore(CollectorsStore);
-  const configurations = useStore(CollectorConfigurationsStore);
+  const { data: collectors } = useCollectorsAll();
+  const { data: configurations } = useAllCollectorConfigurations();
 
   const { page: initialPage, pageSize: initialPageSize } = props.paginationQueryParameter;
   const initialQuery = props.nodeId ? `node_id:${props.nodeId}` : '';
@@ -58,11 +54,6 @@ const CollectorsAdministrationContainer = ({ ...props }: Props) => {
 
   const { data: sidecars } = useSidecarsAdministration({ query, page, pageSize, filters });
   const { mutateAsync: setAction } = useSetSidecarAction();
-
-  useEffect(() => {
-    CollectorsActions.all();
-    CollectorConfigurationsActions.all();
-  }, []);
 
   const handlePageChange = useCallback((newPage: number, newPageSize: number) => {
     setPage(newPage);
@@ -106,7 +97,7 @@ const CollectorsAdministrationContainer = ({ ...props }: Props) => {
       selectedConfigurations: Configuration[],
       doneCallback: () => void,
     ) => {
-      SidecarsActions.assignConfigurations(selectedSidecars, selectedConfigurations).then((response) => {
+      assignConfigurations(selectedSidecars, selectedConfigurations).then((response) => {
         doneCallback();
 
         return response;
@@ -127,7 +118,7 @@ const CollectorsAdministrationContainer = ({ ...props }: Props) => {
   );
 
   const sidecarCollectors = useMemo(() => {
-    if (!collectors?.collectors || !sidecars?.sidecars || !configurations?.configurations) {
+    if (!collectors || !sidecars?.sidecars || !configurations) {
       return null;
     }
 
@@ -145,14 +136,14 @@ const CollectorsAdministrationContainer = ({ ...props }: Props) => {
         }
 
         compatibleCollectorIds
-          .map((id) => find(collectors.collectors, { id: id }))
+          .map((id) => find(collectors, { id: id }))
           .forEach((compatibleCollector) => {
             result.push({ collector: compatibleCollector, sidecar: sidecar });
           });
       });
 
     return result;
-  }, [collectors?.collectors, sidecars?.sidecars, configurations?.configurations]);
+  }, [collectors, sidecars?.sidecars, configurations]);
 
   if (!sidecarCollectors) {
     return <Spinner text="Loading collector list..." />;
@@ -161,8 +152,8 @@ const CollectorsAdministrationContainer = ({ ...props }: Props) => {
   return (
     <CollectorsAdministration
       sidecarCollectorPairs={sidecarCollectors}
-      collectors={collectors.collectors}
-      configurations={configurations.configurations}
+      collectors={collectors}
+      configurations={configurations}
       pagination={sidecars.pagination}
       query={sidecars.query}
       filters={sidecars.filters}

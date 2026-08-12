@@ -1,0 +1,5 @@
+type = "a"
+message = "Added indicator for sync status of collectors."
+
+issues = ["25341"]
+pulls = ["26295"]

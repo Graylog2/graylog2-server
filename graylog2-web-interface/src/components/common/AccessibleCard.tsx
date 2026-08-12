@@ -33,7 +33,7 @@ const Container = styled.div<{ $isActive: boolean; $isClickable: boolean }>(
 
     ${$isActive &&
     css`
-      outline: 1px solid ${theme.colors.variant.info};
+      outline: 1px solid ${theme.colors.input.borderFocus};
     `}
 
     ${$isClickable &&
@@ -41,8 +41,9 @@ const Container = styled.div<{ $isActive: boolean; $isClickable: boolean }>(
       cursor: pointer;
 
       &:hover,
-      &:focus {
-        outline: 1px solid ${theme.colors.variant.info};
+      &:focus-visible {
+        outline: 1px solid ${theme.colors.input.borderFocus};
+        box-shadow: ${theme.colors.input.boxShadow};
       }
     `}
   `,

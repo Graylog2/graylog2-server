@@ -26,6 +26,8 @@ import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
+import org.graylog2.streams.events.StreamDeletedEvent;
+import org.graylog2.streams.events.StreamRenamedEvent;
 
 /**
  * Listens on {@link ClusterEventBus} for pipeline-related events and submits
@@ -76,5 +78,15 @@ public class PipelineMetadataClusterEventHandler {
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
         systemJobManager.submit(PipelineMetadataUpdateJob.forInputRenamed(event));
+    }
+
+    @Subscribe
+    public void handleStreamRenamed(StreamRenamedEvent event) {
+        systemJobManager.submit(PipelineMetadataUpdateJob.forStreamRenamed(event));
+    }
+
+    @Subscribe
+    public void handleStreamDeleted(StreamDeletedEvent event) {
+        systemJobManager.submit(PipelineMetadataUpdateJob.forStreamDeleted(event));
     }
 }

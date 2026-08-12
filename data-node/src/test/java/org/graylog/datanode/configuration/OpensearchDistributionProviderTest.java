@@ -16,9 +16,10 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.github.zafarkhaja.semver.Version;
+import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.OpensearchDistribution;
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 
 class OpensearchDistributionProviderTest {
 
@@ -38,6 +40,9 @@ class OpensearchDistributionProviderTest {
     @TempDir
     private Path tempDirWithoutArch;
 
+    @TempDir
+    private Path multiVersionDir;
+
     @BeforeEach
     void setUp() throws IOException {
         Files.createDirectory(tempDir.resolve("opensearch-2.5.0-linux-x64"));
@@ -46,6 +51,11 @@ class OpensearchDistributionProviderTest {
 
         Files.createDirectory(tempDirWithoutArch.resolve("opensearch-2.4.1"));
         Files.createDirectory(tempDir.resolve(".config")); // just to include something which is not OS dist
+
+        Files.createDirectory(multiVersionDir.resolve("opensearch-2.19.5-linux-x64"));
+        Files.createDirectory(multiVersionDir.resolve("opensearch-2.19.5-linux-aarch64"));
+        Files.createDirectory(multiVersionDir.resolve("opensearch-3.5.0-linux-x64"));
+        Files.createDirectory(multiVersionDir.resolve("opensearch-3.5.0-linux-aarch64"));
     }
 
     @Test
@@ -95,8 +105,51 @@ class OpensearchDistributionProviderTest {
         Assertions.assertThat(dist.architecture()).isEqualTo(OpensearchArchitecture.x64);
     }
 
+    @Test
+    void testVersionSelectionDefaultsToOldest() {
+        final OpensearchDistribution x64 = provider(multiVersionDir, OpensearchArchitecture.x64).get();
+        Assertions.assertThat(x64.version()).isEqualTo("2.19.5");
+        Assertions.assertThat(x64.architecture()).isEqualTo(OpensearchArchitecture.x64);
+
+        final OpensearchDistribution aarch64 = provider(multiVersionDir, OpensearchArchitecture.aarch64).get();
+        Assertions.assertThat(aarch64.version()).isEqualTo("2.19.5");
+        Assertions.assertThat(aarch64.architecture()).isEqualTo(OpensearchArchitecture.aarch64);
+    }
+
+    @Test
+    void testVersionSelectionByExplicitVersion() {
+        final OpensearchDistribution v2 = providerWithVersion(multiVersionDir, OpensearchArchitecture.x64, "2.19.5").get();
+        Assertions.assertThat(v2.version()).isEqualTo("2.19.5");
+        Assertions.assertThat(v2.architecture()).isEqualTo(OpensearchArchitecture.x64);
+
+        final OpensearchDistribution v3 = providerWithVersion(multiVersionDir, OpensearchArchitecture.x64, "3.5.0").get();
+        Assertions.assertThat(v3.version()).isEqualTo("3.5.0");
+        Assertions.assertThat(v3.architecture()).isEqualTo(OpensearchArchitecture.x64);
+    }
+
+    @Test
+    void testVersionSelectionFailsForUnknownVersion() {
+        Assertions.assertThatThrownBy(() ->
+                        providerWithVersion(multiVersionDir, OpensearchArchitecture.x64, "9.9.9").get())
+                .hasMessageContaining("No OpenSearch distribution found for requested version '9.9.9'")
+                .hasMessageContaining("2.19.5")
+                .hasMessageContaining("3.5.0");
+    }
+
     @Nonnull
     private OpensearchDistributionProvider provider(Path dir, OpensearchArchitecture arch) {
-        return new OpensearchDistributionProvider(dir, arch);
+        return new OpensearchDistributionProvider(dir, arch, oldestVersionSelector());
+    }
+
+    @Nonnull
+    private OpensearchDistributionProvider providerWithVersion(Path dir, OpensearchArchitecture arch, String version) {
+        final OpensearchVersionSelector selector = opensearchDistributions -> opensearchDistributions.stream().filter(d -> d.version().equals(version)).findFirst().orElseThrow(() -> new IllegalArgumentException("No OpenSearch distribution found for requested version '" + version + "'"));
+        return new OpensearchDistributionProvider(dir, arch, selector);
+    }
+
+    private static OpensearchVersionSelector oldestVersionSelector() {
+        return candidates -> candidates.stream()
+                .min(Comparator.comparing(OpensearchDistribution::version, Comparator.comparing(Version::parse)))
+                .orElseThrow(() -> new IllegalArgumentException("No suitable OpenSearch distribution found"));
     }
 }

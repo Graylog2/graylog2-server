@@ -43,8 +43,10 @@ import org.graylog.plugins.formatting.units.UnitsModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
+import org.graylog.plugins.onboarding.OnboardingModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
+import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
@@ -87,16 +89,19 @@ import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.MongoSequenceModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
+import org.graylog2.datanode.restart.RollingRestartModule;
 import org.graylog2.datatiering.DataTieringModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.FieldTypeManagementModule;
 import org.graylog2.indexer.IndexerBindings;
+import org.graylog2.indexer.indices.OutdatedIndexModule;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.lookup.adapters.dnslookup.DnsLookupAdapterConfiguration;
 import org.graylog2.messageprocessors.MessageProcessorModule;
+import org.graylog2.metrics.entity.cache.MetricsCacheConfiguration;
 import org.graylog2.migrations.MigrationsModule;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -156,6 +161,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
     private final ContentStreamConfiguration contentStreamConfiguration = new ContentStreamConfiguration();
     private final DnsLookupAdapterConfiguration dnsLookupAdapterConfiguration = new DnsLookupAdapterConfiguration();
     private final EventDefinitionConfiguration eventDefinitionConfiguration = new EventDefinitionConfiguration();
+    private final MetricsCacheConfiguration metricsCacheConfiguration = new MetricsCacheConfiguration();
+    private final SidecarPluginConfiguration sidecarPluginConfiguration = new SidecarPluginConfiguration();
 
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
@@ -210,6 +217,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new ViewsBindings(),
                 new JobSchedulerModule(),
                 new EventsModule(),
+                new RollingRestartModule(),
+                new OutdatedIndexModule(),
                 new EnterpriseModule(),
                 new GRNTypesModule(),
                 new SecurityModule(),
@@ -231,10 +240,13 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new McpServerModule(),
                 new QuickJumpModule(featureFlags),
                 new MongoSequenceModule(),
-                new CollectorsModule(featureFlags)
+                new CollectorsModule(featureFlags, configuration)
         );
 
         modules.add(new FieldTypeManagementModule());
+        if (featureFlags.isOn("onboarding_experience")) {
+            modules.add(new OnboardingModule());
+        }
 
         return modules.build();
     }
@@ -259,7 +271,9 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 telemetryConfiguration,
                 contentStreamConfiguration,
                 dnsLookupAdapterConfiguration,
-                eventDefinitionConfiguration);
+                eventDefinitionConfiguration,
+                metricsCacheConfiguration,
+                sidecarPluginConfiguration);
     }
 
     @Override

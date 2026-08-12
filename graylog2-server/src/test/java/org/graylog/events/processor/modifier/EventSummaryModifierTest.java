@@ -40,6 +40,7 @@ import java.util.Set;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.events.processor.modifier.EventSummaryModifier.EMPTY_MESSAGE_AFTER_TRANSFORMATION;
 
 class EventSummaryModifierTest {
     private static final int SEARCH_WINDOW_MS = 30000;
@@ -110,6 +111,28 @@ class EventSummaryModifierTest {
         modifier.accept(eventWithContext, eventDefinitionDto);
 
         assertThat(event.getMessage()).isEqualTo("jane failed to login 5 times");
+    }
+
+    @Test
+    void emptyTemplateResultReplacedByDefaultString() throws Exception {
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), null, emptyList())
+                .toBuilder()
+                .eventSummaryTemplate("${fields.does_not_exist}")
+                .build();
+
+        final EventSummaryModifier modifier = new EventSummaryModifier(new Engine());
+
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final TestEvent event = new TestEvent(now);
+        event.setField("user", FieldValue.string("jane"));
+
+        final Message message = messageFactory.createMessage("message", "src", now);
+        message.addField("aggregation_value_count", 5);
+
+        final EventWithContext eventWithContext = EventWithContext.create(event, message);
+        modifier.accept(eventWithContext, eventDefinitionDto);
+
+        assertThat(event.getMessage()).isEqualTo(EMPTY_MESSAGE_AFTER_TRANSFORMATION);
     }
 
     private EventDefinitionDto buildEventDefinitionDto(

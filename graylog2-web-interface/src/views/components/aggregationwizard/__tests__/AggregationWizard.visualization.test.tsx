@@ -20,7 +20,6 @@ import { useContext } from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import selectEvent from 'helpers/selectEvent';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
@@ -28,6 +27,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
+import { usePlugin } from 'views/test/testPlugins';
 
 const widgetConfig = AggregationWidgetConfig.builder().visualization('table').build();
 
@@ -135,9 +135,7 @@ const expectSubmitButtonToBeDisabled = async () => {
 };
 
 describe('AggregationWizard/Visualizations', () => {
-  beforeAll(() => PluginStore.register(visualizationPlugin));
-
-  afterAll(() => PluginStore.unregister(visualizationPlugin));
+  usePlugin(visualizationPlugin);
 
   it('shows visualization section if it is present', async () => {
     render(<SimpleAggregationWizard />);

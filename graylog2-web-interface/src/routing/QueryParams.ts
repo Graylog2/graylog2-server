@@ -16,6 +16,8 @@
  */
 import { useQueryParams, useQueryParam, StringParam, NumberParam, ArrayParam } from 'use-query-params';
 
+import * as JSON from 'util/json';
+
 const parseNestedObject = (fieldQueryString: string) => {
   try {
     return JSON.parse(decodeURIComponent(fieldQueryString));

@@ -60,11 +60,12 @@ public class CollectorMetricsSupplier implements TelemetryMetricSupplier {
     public Optional<TelemetryEvent> get() {
         final CollectorsConfig collectorsConfig = collectorsConfigService.getOrDefault();
         final var enrollmentTokenStats = enrollmentTokenService.getStats();
+        final var instanceCount = collectorInstanceService.countAcrossAllFleets(Instant.now(clock).minus(collectorsConfig.collectorOfflineThreshold()));
 
         return Optional.of(TelemetryEvent.of(Map.ofEntries(
                 entry("transactions_last_day", fleetTransactionLogService.countMarkersSince(Instant.now(clock).minus(1, ChronoUnit.DAYS))),
-                entry("total_collectors", collectorInstanceService.count()),
-                entry("online_collectors", collectorInstanceService.countOnline(Instant.now(clock).minus(collectorsConfig.collectorOfflineThreshold()))),
+                entry("total_collectors", instanceCount.total()),
+                entry("online_collectors", instanceCount.online()),
                 entry("fleets", fleetService.count()),
                 entry("sources", sourceService.count()),
                 entry("source_types", sourceService.countByType()),

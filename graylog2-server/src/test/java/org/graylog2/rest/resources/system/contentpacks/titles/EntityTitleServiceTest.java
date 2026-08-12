@@ -26,6 +26,7 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitl
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
+import org.graylog2.shared.security.EntityPermissionsUtils;
 import org.graylog2.streams.StreamImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ class EntityTitleServiceTest {
 
     @BeforeEach
     void setUp() {
-        toTest = new EntityTitleServiceImpl(mongoConnection, entitiesCatalog);
+        toTest = new EntityTitleServiceImpl(mongoConnection, entitiesCatalog, new EntityPermissionsUtils(entitiesCatalog));
     }
 
     @Test

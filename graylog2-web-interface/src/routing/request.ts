@@ -27,7 +27,7 @@ export type RequestOptions = {
 };
 
 const headersFromOptions = (options: RequestOptions): Headers => {
-  if (options?.requestShouldExtendSession) {
+  if (options && 'requestShouldExtendSession' in options) {
     return { 'X-Graylog-No-Session-Extension': !(options?.requestShouldExtendSession ?? true) };
   }
 

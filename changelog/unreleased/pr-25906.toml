@@ -1,0 +1,3 @@
+type = "f"
+message = "Fix serializing message body for details in error processing stream."
+pulls = ["25906"]

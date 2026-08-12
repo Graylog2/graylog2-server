@@ -27,7 +27,7 @@ public class DatanodeOpensearchWait extends WaitingRestOperation {
         super(waitingRestOperationParameters);
     }
 
-    public ValidatableResponse waitForNodesCount(int countOfNodes) throws ExecutionException, RetryException {
+    public ValidatableResponse waitForGreenStatusAndNodesCount(int countOfNodes) throws ExecutionException, RetryException {
         return waitForResponse("/_cluster/health",
                 input -> !input.extract().body().path("discovered_cluster_manager").equals(true),
                 input -> !input.extract().body().path("status").equals("green"),

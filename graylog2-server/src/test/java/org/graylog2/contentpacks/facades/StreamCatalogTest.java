@@ -62,6 +62,7 @@ import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
+import org.graylog2.streams.StreamCache;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.streams.matchers.StreamRuleMock;
@@ -123,7 +124,7 @@ public class StreamCatalogTest {
                 clusterEventBus,
                 Set.of(),
                 new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())),
-                new EventBus());
+                new StreamCache(mongoCollections, new EventBus()));
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );

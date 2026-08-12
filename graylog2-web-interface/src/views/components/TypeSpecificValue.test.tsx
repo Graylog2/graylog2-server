@@ -75,4 +75,17 @@ describe('TypeSpecificValue', () => {
 
     await screen.findByText('Input 1');
   });
+
+  // Regression: error processing stream's message body details may contain BigInt values
+  // (deserialized by json-with-bigint), which native JSON.stringify cannot serialize.
+  it('should render object values containing BigInts without crashing', async () => {
+    const value = {
+      message: 'failed to process',
+      size: BigInt('9223372036854775807'),
+    };
+
+    render(<TypeSpecificValue field="gl2_processing_error" value={value} />);
+
+    await screen.findByText(/9223372036854775807/);
+  });
 });

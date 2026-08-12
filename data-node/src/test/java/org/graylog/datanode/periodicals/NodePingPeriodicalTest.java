@@ -21,9 +21,9 @@ import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,8 +40,8 @@ class NodePingPeriodicalTest {
     private DataNodeClusterService nodeService;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb) {
-        nodeService = new DataNodeClusterService(mongodb.mongoConnection(), new org.graylog2.Configuration());
+    void setUp(MongoCollections mongoCollections) {
+        nodeService = new DataNodeClusterService(mongoCollections, new org.graylog2.Configuration());
     }
 
     @Test
@@ -51,9 +51,6 @@ class NodePingPeriodicalTest {
         final URI uri = URI.create("http://localhost:9200");
         final String cluster = "localhost:9300";
         final String datanodeRestApi = "http://localhost:8999";
-        @SuppressWarnings("unchecked")
-
-
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,

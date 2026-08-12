@@ -22,6 +22,8 @@ import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBea
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.InputStreamConfigFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,10 +45,12 @@ import java.util.List;
 
 public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchDefaultConfigFilesBean.class);
+
     @Override
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
         return DatanodeConfigurationPart.builder()
-                .withConfigFiles(collectConfigFiles())
+                .withConfigFiles(collectConfigFiles(configurationParams))
                 // the opensearch.policy file is part of collected config files from the call above. We just need to provide it as system property
                 .javaOpt("-Djava.security.policy=" + opensearchPolicyFilePath(configurationParams.targetConfigDir()))
                 .build();
@@ -59,18 +63,28 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
         return "file://" + targetConfigDir.resolve("opensearch.policy").toAbsolutePath().toString();
     }
 
-    private List<DatanodeConfigFile> collectConfigFiles() {
-        // this is a directory in main/resources that holds all the initial configuration files needed by the opensearch
+    private List<DatanodeConfigFile> collectConfigFiles(OpensearchConfigurationParams configurationParams) {
+        List<DatanodeConfigFile> configFiles = new LinkedList<>();
+        // this is a directory in main/resources that holds all the common initial configuration files needed by the opensearch
         // we manage this directory in git. Generally we assume that this is a read-only location and we need to copy
         // its content to a read-write location for the managed opensearch process.
         // This copy happens during each opensearch process start and will override any files that already exist
         // from previous runs.
-        final Path sourceOfInitialConfiguration = Path.of("opensearch", "config");
+        final Path sourceOfInitialConfiguration = Path.of("opensearch", "config", "common");
         try {
-            return readConfigFiles(sourceOfInitialConfiguration);
+            configFiles.addAll(readConfigFiles(sourceOfInitialConfiguration));
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
+
+        final String opensearchVersion = configurationParams.datanodeConfiguration().opensearchDistribution().version();
+        LOG.info("Preparing opensearch config files for version " + opensearchVersion);
+        try {
+            configFiles.addAll(readConfigFiles(Path.of("opensearch", "config", opensearchVersion)));
+        } catch (URISyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return configFiles;
     }
 
     public List<DatanodeConfigFile> readConfigFiles(Path configRelativePath) throws URISyntaxException, IOException {

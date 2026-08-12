@@ -189,6 +189,7 @@ To prevent session expiry during user interaction, every API request using `fetc
 - Register: `PluginStore.register(new PluginManifest({}, { key: [data] }));`
 - Consume: `usePluginEntities('key')`
 - No central docs for plugin store keys — search the codebase.
+- Merging bindings: always use `mergePluginBindings` from `util/mergePluginBindings` when combining multiple `PluginExports` objects (e.g. building a `bindings.tsx` from sub-plugins, or aggregating bindings for `PluginStore.register`). Never use `lodash/merge`, `Immutable.Map().mergeWith`, object spreads, or manual per-key array concatenation — they overwrite or index-merge array-valued keys (`pageNavigation`, `routes`, …) and drop entries. `mergePluginBindings` concatenates array-valued keys and deep-merges the rest.
 - Test without plugins: `disable_plugins=true yarn start`
 - Example plugin: [graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)
 
@@ -217,7 +218,7 @@ Test thoroughly before submitting a PR:
 Run checks locally before creating a PR:
 
 ```sh
-yarn tsc && yarn lint:changes && yarn test
+yarn tsgo && yarn lint:changes && yarn test
 ```
 
 ## Browser Compatibility

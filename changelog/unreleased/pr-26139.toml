@@ -1,0 +1,4 @@
+type = "f"
+message = "Add safeguards for beats protocol frame parsing."
+
+pulls = ["26139"]

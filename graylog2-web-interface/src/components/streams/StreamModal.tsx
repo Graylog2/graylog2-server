@@ -18,7 +18,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { Formik, Form } from 'formik';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { FormikInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Modal } from 'components/bootstrap';

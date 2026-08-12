@@ -28,6 +28,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.resources.entities.Slice;
 
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,51 @@ public interface MoreSearchAdapter {
     List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                            Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                            Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges);
+
+    // The aggregation methods below do not perform stream-based permission filtering.
+    // Callers are responsible for their own permission checks (e.g. via computeForUser in descriptors).
+
+    /**
+     * Groups documents by {@code groupByField}, then performs a terms sub-aggregation on {@code termsField}
+     * within each bucket. Returns a map of group key to sub-term counts.
+     * <p>
+     * When {@code groupByField} is multi-valued (e.g. {@code streams}), pass the requested IDs as
+     * {@code includeTerms} to prevent unrequested co-occurring values from consuming bucket slots.
+     * Pass an empty collection to include all terms.
+     *
+     * @return map of group key → (sub-term key → doc count)
+     */
+    Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                         String groupByField, String termsField,
+                                                         int maxBuckets, int maxSubBuckets,
+                                                         Collection<String> includeTerms);
+
+    /**
+     * Performs a terms aggregation on {@code termsField} and returns the doc count per term.
+     * <p>
+     * Pass the requested IDs as {@code includeTerms} when aggregating on multi-valued fields.
+     * Pass an empty collection to include all terms.
+     *
+     * @return map of term value → doc count
+     */
+    Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                     String termsField, int maxBuckets,
+                                     Collection<String> includeTerms);
+
+    enum AggregationType { AVG, MAX }
+
+    /**
+     * Groups documents by {@code groupByField}, then computes a metric (avg or max) of {@code metricField}
+     * within each bucket.
+     * <p>
+     * Pass the requested IDs as {@code includeTerms} when aggregating on multi-valued fields.
+     * Pass an empty collection to include all terms.
+     *
+     * @return map of group key → metric value
+     */
+    Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                               String groupByField, AggregationType aggregationType, String metricField,
+                                               int maxBuckets, Collection<String> includeTerms);
 
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()

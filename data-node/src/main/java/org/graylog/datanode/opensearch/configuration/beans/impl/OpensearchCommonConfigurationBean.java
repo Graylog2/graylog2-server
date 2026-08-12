@@ -25,13 +25,13 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationPara
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class OpensearchCommonConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private final Configuration localConfiguration;
-    private final DatanodeConfiguration datanodeConfiguration;
 
     private static final List<String> DEFAULT_NODE_ROLES = List.of(
             OpensearchNodeRole.CLUSTER_MANAGER,
@@ -43,7 +43,6 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
     @Inject
     public OpensearchCommonConfigurationBean(Configuration localConfiguration, DatanodeConfiguration datanodeConfiguration) {
         this.localConfiguration = localConfiguration;
-        this.datanodeConfiguration = datanodeConfiguration;
     }
 
     @Override
@@ -54,7 +53,15 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
                 .javaOpt("-Xms%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Xmx%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Dopensearch.transport.cname_in_publish_address=true")
+                .withWarnings(warnings(localConfiguration))
                 .build();
+    }
+
+    private List<String> warnings(Configuration localConfiguration) {
+        if (localConfiguration.isInsecureStartup()) {
+            return Collections.singletonList("Data node is running in insecure mode(insecure_startup=true). There is neither HTTPS nor any auth enabled!");
+        }
+        return Collections.emptyList();
     }
 
     public static List<String> getNodeRoles(Configuration localConfiguration) {
@@ -70,8 +77,8 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
-        config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
+        config.put("path.data", buildParams.datanodeConfiguration().datanodeDirectories().getDataTargetDir().toString());
+        config.put("path.logs", buildParams.datanodeConfiguration().datanodeDirectories().getLogsTargetDir().toString());
 
         if (localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
             config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());

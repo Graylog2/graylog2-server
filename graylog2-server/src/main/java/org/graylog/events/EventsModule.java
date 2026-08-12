@@ -52,6 +52,7 @@ import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorExecutionMetrics;
 import org.graylog.events.processor.EventResolver;
+import org.graylog.events.processor.TacticsTechniquesValidator;
 import org.graylog.events.processor.aggregation.AggregationEventProcessor;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
@@ -98,6 +99,9 @@ public class EventsModule extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), EventResolver.class)
                 .setDefault().to(DefaultEventResolver.class);
+
+        OptionalBinder.newOptionalBinder(binder(), TacticsTechniquesValidator.class)
+                .setDefault().to(TacticsTechniquesValidator.NoOp.class);
 
         addSystemRestResource(AvailableEntityTypesResource.class);
         addSystemRestResource(EventDefinitionsResource.class);

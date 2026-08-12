@@ -22,10 +22,12 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -69,5 +71,14 @@ public class DatanodeTestUtils {
                 .isCA(false)
                 .validity(validity);
         return CERTIFICATE_GENERATOR.generateKeyPair(certRequest);
+    }
+
+    public static DatanodeConfiguration mockDatanodeConfiguration(Path tempDir) {
+        return new DatanodeConfiguration(
+                new OpensearchDistribution(tempDir, "2.19.5"),
+                DatanodeTestUtils.tempDirectories(tempDir),
+                100,
+                IndexerJwtAuthToken.disabled()
+        );
     }
 }

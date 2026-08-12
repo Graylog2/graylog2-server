@@ -24,7 +24,6 @@ export { default as Row } from './Row';
 export { default as Section } from './Section';
 export { default as Select } from './Select';
 export { default as Space } from './Space';
-export { default as Tabs } from './Tabs';
 export { default as TextInput } from './TextInput';
 export { default as Title } from './Title';
 export { Anchor, AppShell, Box, Divider, Group, NumberInput, Text, UnstyledButton, Collapse } from '@mantine/core';

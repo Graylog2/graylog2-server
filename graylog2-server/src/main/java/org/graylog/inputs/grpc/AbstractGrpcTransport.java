@@ -41,10 +41,10 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLException;
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
 import java.time.Duration;
@@ -112,11 +112,10 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             serverBuilder.intercept(new BearerTokenAuthInterceptor(token));
         }
 
-        if (!insecure) {
-            serverBuilder.sslContext(getSslContext());
-        }
-
         try {
+            if (!insecure) {
+                serverBuilder.sslContext(getSslContext());
+            }
             this.server = serverBuilder.build().start();
         } catch (Exception e) {
             throw new MisfireException("Failed to start gRPC server", e);
@@ -168,8 +167,12 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
                 contextBuilder.clientAuth(ClientAuth.REQUIRE).trustManager(new ByteArrayInputStream(clientCaCert));
             }
             return contextBuilder.build();
-        } catch (SSLException e) {
-            throw new RuntimeException(f("Failed setting up TLS for gRPC server: {}.", e.getLocalizedMessage()), e);
+        } catch (Exception e) {
+            // forServer()/trustManager() wrap certificate/key parse errors in IllegalArgumentException
+            // (cause: CertificateException), while build() throws SSLException. Catch broadly so every
+            // TLS setup failure is reported with the same prefix instead of leaking a raw wrapper.
+            throw new RuntimeException(f("Failed setting up TLS for gRPC server: %s.",
+                    ExceptionUtils.getRootCauseOrMessage(e)), e);
         }
     }
 
