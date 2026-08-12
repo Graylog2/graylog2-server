@@ -34,8 +34,6 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import TextWidget from 'views/logic/widgets/TextWidget';
-import TextWidgetConfig from 'views/logic/widgets/TextWidgetConfig';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
 export const LAST_24_HOURS = { type: 'relative' as const, from: 86400 };
@@ -86,26 +84,29 @@ const topSourcesWidget = () => ({
     .build(),
 });
 
-const missingPermissionsWidget = (title: string) => ({
-  title,
-  widget: TextWidget.builder()
-    .id(generateId())
-    .timerange(LAST_24_HOURS)
-    .config(new TextWidgetConfig('You do not have access to the stream used for this widget yet.'))
-    .build(),
-});
-
 const buildViewState = (canViewAlertsEventsStreams: boolean) => {
-  const numberWidgets = [
-    numberWidget({ title: 'Messages Today' }),
-    canViewAlertsEventsStreams
-      ? numberWidget({ title: 'Alerts Today', queryString: 'alert:true', streams: ALERTS_EVENTS_STREAMS })
-      : missingPermissionsWidget('Alerts Today'),
-    canViewAlertsEventsStreams
-      ? numberWidget({ title: 'Events Today', queryString: 'alert:false', streams: ALERTS_EVENTS_STREAMS })
-      : missingPermissionsWidget('Events Today'),
-  ];
+  const messages = numberWidget({ title: 'Messages Today' });
   const sources = topSourcesWidget();
+
+  if (!canViewAlertsEventsStreams) {
+    const entries = [messages, sources];
+
+    return ViewState.create()
+      .toBuilder()
+      .titles({ widget: Object.fromEntries(entries.map(({ widget, title }) => [widget.id, title])) })
+      .widgets(entries.map(({ widget }) => widget))
+      .widgetPositions({
+        [messages.widget.id]: new WidgetPosition(1, 1, 3, 4),
+        [sources.widget.id]: new WidgetPosition(5, 1, 3, 8),
+      })
+      .build();
+  }
+
+  const numberWidgets = [
+    messages,
+    numberWidget({ title: 'Alerts Today', queryString: 'alert:true', streams: ALERTS_EVENTS_STREAMS }),
+    numberWidget({ title: 'Events Today', queryString: 'alert:false', streams: ALERTS_EVENTS_STREAMS }),
+  ];
   const entries = [...numberWidgets, sources];
 
   return ViewState.create()

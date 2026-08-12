@@ -67,13 +67,15 @@ describe('WelcomeMetrics', () => {
     await screen.findByText('Events Today');
   });
 
-  it('shows placeholder widgets explaining missing permissions instead of Alerts and Events widgets when the user is missing access to a stream', async () => {
+  it('shows only Messages Today and Top 5 Sources widgets, without Alerts and Events, when the user is missing access to the alerts/events streams', async () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions([]).build());
 
     renderWithStreams([accessibleStream]);
 
-    await screen.findByText('Alerts Today');
-    await screen.findByText('Events Today');
+    await screen.findByText('Messages Today');
+    await screen.findByText('Top 5 Sources');
+    expect(screen.queryByText('Alerts Today')).not.toBeInTheDocument();
+    expect(screen.queryByText('Events Today')).not.toBeInTheDocument();
   });
 
   it('shows an alert instead of widgets when the configured query time range limit is lower than 24 hours', async () => {
