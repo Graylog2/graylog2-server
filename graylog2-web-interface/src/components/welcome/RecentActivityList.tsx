@@ -16,6 +16,7 @@
  */
 
 import React, { useCallback, useMemo, useState } from 'react';
+import upperFirst from 'lodash/upperFirst';
 
 import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
@@ -43,7 +44,7 @@ const ActionItem = ({ itemGrn, activityType, itemTitle, userName = null }: Props
 
   return (
     <div>
-      {`The ${entityTypeTitle} `}
+      {`${upperFirst(entityTypeTitle)} `}
       {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
       {' was '}
       {`${activityType}d`}
