@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -27,12 +28,17 @@ import type View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { Stream } from 'logic/streams/types';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+import Store from 'logic/local-storage/Store';
 
 import WelcomeMetrics from './WelcomeMetrics';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useSearchConfiguration');
 jest.mock('views/hooks/useCreateSearch');
+jest.mock('logic/local-storage/Store', () => ({
+  get: jest.fn(),
+  set: jest.fn(),
+}));
 
 const accessibleStream = { id: 'stream-id-1', title: 'Test Stream' } as Stream;
 
@@ -51,6 +57,7 @@ describe('WelcomeMetrics', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useCreateSearch).mockImplementation((viewPromise: Promise<View>) => viewPromise);
     asMock(useSearchConfiguration).mockReturnValue({ config: undefined, refresh: () => {}, isInitialLoading: false });
+    asMock(Store.get).mockReturnValue(undefined);
   });
 
   it('shows Alerts and Events widgets when the user has access to both underlying streams', async () => {
@@ -102,5 +109,25 @@ describe('WelcomeMetrics', () => {
     await screen.findByText('Once you have access to a stream, your message metrics will show up here.');
     expect(screen.queryByText('Messages Today')).not.toBeInTheDocument();
     expect(useCreateSearch).not.toHaveBeenCalled();
+  });
+
+  it('allows dismissing the message shown when the user has no access to any stream, persisting the choice', async () => {
+    renderWithStreams([]);
+
+    const alert = await screen.findByText('Once you have access to a stream, your message metrics will show up here.');
+    const dismissButton = await screen.findByRole('button', { name: /close alert/i });
+
+    await userEvent.click(dismissButton);
+
+    expect(alert).not.toBeInTheDocument();
+    expect(Store.set).toHaveBeenCalledWith('welcome-metrics-no-stream-access-dismissed', true);
+  });
+
+  it('does not show the message again if it was already dismissed', async () => {
+    asMock(Store.get).mockReturnValue(true);
+
+    renderWithStreams([]);
+
+    expect(screen.queryByText('Once you have access to a stream, your message metrics will show up here.')).toBeNull();
   });
 });
