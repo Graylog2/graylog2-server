@@ -82,8 +82,8 @@ const WelcomeMetrics = () => {
         <Col xs={12}>
           <StyledAlert bsStyle="warning" title="Metrics unavailable">
             These widgets require a query time range of at least 24 hours, but the configured query time range limit is{' '}
-            {moment.duration(queryTimeRangeLimit).humanize()}. Please increase the{' '}
-            <b>Query Time Range Limit</b> in the <em>Search</em> configuration to at least 24 hours, or disable it.
+            {moment.duration(queryTimeRangeLimit).humanize()}. Please increase the <b>Query Time Range Limit</b> in the{' '}
+            <em>Search</em> configuration to at least 24 hours, or disable it.
           </StyledAlert>
         </Col>
       </Row>

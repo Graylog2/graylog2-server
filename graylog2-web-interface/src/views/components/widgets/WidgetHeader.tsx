@@ -205,7 +205,12 @@ const WidgetHeader = ({
             <WidgetDragHandle name="drag_indicator" />
           </DragHandleContainer>
         )}
-        <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={interactive ? onRename : undefined} />
+        <WidgetTitle
+          editing={editing}
+          title={title}
+          titleIcon={titleIcon}
+          onChange={interactive ? onRename : undefined}
+        />
         {interactive && (
           <WidgetDescription editing={editing} description={description} onChange={onUpdateDescription} />
         )}
