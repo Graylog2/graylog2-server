@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 
-import { Alert, Modal, Table } from 'components/bootstrap';
+import { Alert, Button, Modal } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
+import IncompatibleIndicesTable from 'components/indices/incompatible-indices/IncompatibleIndicesTable';
 
 type Props = {
   show: boolean;
@@ -29,7 +30,7 @@ const IncompatibleIndicesModal = ({ show, onClose }: Props) => {
   const { data: incompatibleIndices, isError, isLoading } = useIncompatibleIndices();
 
   return (
-    <Modal show={show} onHide={onClose}>
+    <Modal show={show} onHide={onClose} bsSize="xl">
       <Modal.Header>
         <Modal.Title>Index Versions</Modal.Title>
       </Modal.Header>
@@ -43,29 +44,10 @@ const IncompatibleIndicesModal = ({ show, onClose }: Props) => {
             <Alert bsStyle="info">
               Found <strong>{incompatibleIndices.length}</strong>{' '}
               {incompatibleIndices.length === 1 ? 'index' : 'indices'} that were created with an incompatible, previous
-              major version of OpenSearch. These indices may need to be re-indexed for compatibility with future
-              OpenSearch major versions.
+              major version of OpenSearch. These indices need to be archived, deleted or reindexed for compatibility
+              with future OpenSearch major versions.
             </Alert>
-            <Table condensed>
-              <thead>
-                <tr>
-                  <th>Index</th>
-                  <th>Version</th>
-                  <th>Graylog-managed</th>
-                  <th>Warm</th>
-                </tr>
-              </thead>
-              <tbody>
-                {incompatibleIndices.map(({ index_name, version, warm_index, managed_index }) => (
-                  <tr key={index_name}>
-                    <td>{index_name}</td>
-                    <td>{version}</td>
-                    <td>{managed_index ? 'Yes' : 'No'}</td>
-                    <td>{warm_index ? 'Yes' : 'No'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <IncompatibleIndicesTable withoutURLParams />
           </>
         )}
 
@@ -76,6 +58,9 @@ const IncompatibleIndicesModal = ({ show, onClose }: Props) => {
           </Alert>
         )}
       </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={onClose}>Close</Button>
+      </Modal.Footer>
     </Modal>
   );
 };

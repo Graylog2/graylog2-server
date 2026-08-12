@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import { PaginatedEntityTable } from 'components/common';
 
@@ -28,13 +27,6 @@ import IncompatibleIndicesContext from './IncompatibleIndicesContext';
 import useIncompatibleIndexActionState from './hooks/useIncompatibleIndexActionState';
 import useTrackedIncompatibleIndices from './hooks/useTrackedIncompatibleIndices';
 
-const Heading = styled.h4(
-  ({ theme }) => css`
-    margin-top: ${theme.spacings.md};
-    margin-bottom: ${theme.spacings.sm};
-  `,
-);
-
 const TABLE_LAYOUT = {
   entityTableId: 'incompatible_indices',
   defaultSort: { attributeId: 'index_name', direction: 'asc' as const },
@@ -43,7 +35,11 @@ const TABLE_LAYOUT = {
   defaultColumnOrder: ['index_name', 'category', 'version', 'begin', 'end'],
 };
 
-const IncompatibleIndicesTable = () => {
+type Props = {
+  withoutURLParams?: boolean;
+};
+
+const IncompatibleIndicesTable = ({ withoutURLParams = false }: Props) => {
   const { selectedIndices, trackedIndices, hasLoaded, onDataLoaded, onChangeSelection } =
     useTrackedIncompatibleIndices();
   const contextValue = useIncompatibleIndexActionState({ trackedIndices, isLoading: !hasLoaded });
@@ -52,7 +48,6 @@ const IncompatibleIndicesTable = () => {
 
   return (
     <IncompatibleIndicesContext.Provider value={contextValue}>
-      <Heading>Incompatible indices</Heading>
       <PaginatedEntityTable<IncompatibleIndexRow>
         humanName="incompatible indices"
         tableLayout={TABLE_LAYOUT}
@@ -63,6 +58,7 @@ const IncompatibleIndicesTable = () => {
         bulkSelection={{ onChangeSelection, actions: <IncompatibleIndicesBulkActions indices={selectedIndices} /> }}
         onDataLoaded={onDataLoaded}
         entityAttributesAreCamelCase={false}
+        withoutURLParams={withoutURLParams}
       />
     </IncompatibleIndicesContext.Provider>
   );
