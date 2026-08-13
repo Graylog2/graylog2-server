@@ -355,8 +355,10 @@ declare module 'graylog-web-plugin/plugin' {
   }
 
   interface PluginArchive {
-    // Stream IDs excluded from archiving ("Streams to archive" in the archive configuration).
-    useExcludedStreams: () => Array<string>;
+    hooks: {
+      // Stream IDs excluded from archiving ("Streams to archive" in the archive configuration).
+      useExcludedStreams: () => Array<string>;
+    };
   }
 
   type HelpMenuItem = {

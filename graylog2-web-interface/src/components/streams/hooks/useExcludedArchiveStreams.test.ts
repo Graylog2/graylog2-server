@@ -39,7 +39,7 @@ describe('useExcludedArchiveStreams', () => {
   });
 
   it('returns the excluded streams provided by the archive plugin', () => {
-    asMock(PluginStore.exports).mockReturnValue([{ useExcludedStreams: () => ['stream-1', 'stream-2'] }]);
+    asMock(PluginStore.exports).mockReturnValue([{ hooks: { useExcludedStreams: () => ['stream-1', 'stream-2'] } }]);
 
     const { result } = renderHook(() => useExcludedArchiveStreams());
 
