@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 /**
@@ -24,7 +24,7 @@ import styled, { css } from 'styled-components';
  */
 
 const TOLERANCE = 0.05;
-const CHILD_SIZE_RATIO = 0.8; // Proportion of the child size in relation to the container
+const CHILD_SIZE_RATIO = 1; // Proportion of the child size in relation to the container
 
 type Alignment = 'center' | 'bottom-right';
 
@@ -32,6 +32,7 @@ const FontSize = styled.div<{ fontSize: number; $alignment: Alignment | undefine
   height: 100%;
   width: 100%;
   font-size: ${(props) => props.fontSize}px;
+  line-height: 1;
   ${(props) =>
     props.$alignment === 'center'
       ? css`
@@ -78,7 +79,7 @@ const isValidFontSize = (fontSize) => fontSize !== 0 && Number.isFinite(fontSize
 const useAutoFontSize = (target, _container, height, width) => {
   const [fontSize, setFontSize] = useState(20);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = target ? { current: { children: [target] } } : _container;
     const containerChildren = container?.current?.children;
 

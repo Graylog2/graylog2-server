@@ -70,11 +70,17 @@ const NumberBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
   padding-bottom: 10px;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const TrendBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const _extractValueAndField = (rows: Rows) => {
@@ -135,7 +141,7 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
 
   return (
     <ContainerComponent $height={heightProp} $trend={trend} data-testid="trend-background">
-      <NumberBox resizeDelay={20}>
+      <NumberBox resizeDelay={50}>
         {({ height, width }) => (
           <AutoFontSizer height={height} width={width} alignment="bottom-right">
             <CustomHighlighting field={field} value={value}>
