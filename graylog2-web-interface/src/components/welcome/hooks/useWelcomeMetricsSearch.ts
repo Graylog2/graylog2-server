@@ -44,6 +44,11 @@ import { TIMESTAMP_FIELD } from 'views/Constants';
 
 export const DEFAULT_TIME_RANGE_SECONDS = 86400;
 const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
+const MESSAGES_TODAY_LINK = '/search?q=&rangetype=relative&from=300';
+const ALERTS_LINK =
+  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dtrue';
+const EVENTS_LINK =
+  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dfalse';
 
 const messagesTodayLink = (timeRange: RelativeTimeRangeWithEnd) =>
   new URI(Routes.SEARCH).addQuery({ q: '', ...timeRangeToQueryParameter(timeRange) }).toString();
