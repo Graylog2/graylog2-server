@@ -34,16 +34,16 @@ describe('ArchivingsCell (Streams)', () => {
     asMock(useExcludedArchiveStreams).mockReturnValue([]);
   });
 
-  it('renders nothing for the default stream', () => {
+  it('shows archiving enabled for the default stream when its index set archives', () => {
     render(<ArchivingsCell stream={{ ...stream, is_default: true }} indexSets={[archivingIndexSet]} />);
 
-    expect(screen.queryByTitle('Yes')).not.toBeInTheDocument();
+    expect(screen.getByTitle('Yes')).toBeInTheDocument();
   });
 
-  it('renders nothing when the stream is not editable', () => {
+  it('shows archiving enabled for a non-editable stream when its index set archives', () => {
     render(<ArchivingsCell stream={{ ...stream, is_editable: false }} indexSets={[archivingIndexSet]} />);
 
-    expect(screen.queryByTitle('Yes')).not.toBeInTheDocument();
+    expect(screen.getByTitle('Yes')).toBeInTheDocument();
   });
 
   it('renders nothing when the index set does not archive', () => {
@@ -62,6 +62,14 @@ describe('ArchivingsCell (Streams)', () => {
     asMock(useExcludedArchiveStreams).mockReturnValue(['stream-1']);
 
     render(<ArchivingsCell stream={stream} indexSets={[archivingIndexSet]} />);
+
+    expect(screen.queryByTitle('Yes')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing for the default stream when it is excluded from archiving', () => {
+    asMock(useExcludedArchiveStreams).mockReturnValue(['stream-1']);
+
+    render(<ArchivingsCell stream={{ ...stream, is_default: true }} indexSets={[archivingIndexSet]} />);
 
     expect(screen.queryByTitle('Yes')).not.toBeInTheDocument();
   });
