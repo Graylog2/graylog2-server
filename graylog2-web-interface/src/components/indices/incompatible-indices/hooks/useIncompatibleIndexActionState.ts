@@ -19,6 +19,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import useCanArchive from 'components/indices/hooks/useCanArchive';
 
 import useArchivedIndexNames from './useArchivedIndexNames';
+import useCanReindex from './useCanReindex';
 import usePendingIncompatibleIndexActions from './usePendingIncompatibleIndexActions';
 
 import { INCOMPATIBLE_INDICES_QUERY_KEY } from '../fetchIncompatibleIndices';
@@ -33,6 +34,7 @@ type Params = {
 const useIncompatibleIndexActionState = ({ trackedIndices, isLoading }: Params): IncompatibleIndicesContextValue => {
   const queryClient = useQueryClient();
   const canArchive = useCanArchive();
+  const canReindex = useCanReindex();
   const refetch = () => queryClient.invalidateQueries({ queryKey: INCOMPATIBLE_INDICES_QUERY_KEY });
 
   const archivedIndexNames = useArchivedIndexNames(
@@ -50,6 +52,7 @@ const useIncompatibleIndexActionState = ({ trackedIndices, isLoading }: Params):
 
   return {
     archiveActionsAvailable: canArchive && !isArchiveJobRunning,
+    reindexActionsAvailable: canReindex,
     archivedIndexNames,
     pendingIndexStatuses,
     addArchiveDeleteAction,

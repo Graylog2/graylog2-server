@@ -16,7 +16,10 @@
  */
 import React from 'react';
 
+import { Alert } from 'components/bootstrap';
 import { PaginatedEntityTable } from 'components/common';
+import Routes from 'routing/Routes';
+import Link from 'components/common/Link';
 
 import { fetchIncompatibleIndices, incompatibleIndicesKeyFn } from './fetchIncompatibleIndices';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
@@ -48,6 +51,13 @@ const IncompatibleIndicesTable = ({ withoutURLParams = false }: Props) => {
 
   return (
     <IncompatibleIndicesContext.Provider value={contextValue}>
+      {!contextValue.reindexActionsAvailable && (
+        <Alert bsStyle="info">
+          System indices can only be reindexed when Graylog runs against a Data Node search backend.{' '}
+          <Link to={Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION}>Migrate to Data Nodes</Link> to reindex them before
+          upgrading to the next OpenSearch major version.
+        </Alert>
+      )}
       <PaginatedEntityTable<IncompatibleIndexRow>
         humanName="incompatible indices"
         tableLayout={TABLE_LAYOUT}

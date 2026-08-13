@@ -154,6 +154,7 @@ const bulkArchiveDeleteIndices = async (
 const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
   const {
     archiveActionsAvailable,
+    reindexActionsAvailable,
     archivedIndexNames,
     pendingIndexStatuses,
     addArchiveDeleteAction,
@@ -170,6 +171,7 @@ const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
   const candidates = getBulkIndexActionCandidates({
     indices,
     canArchive: archiveActionsAvailable,
+    canReindex: reindexActionsAvailable,
     pendingIndexStatuses,
     archivedIndexNames,
   });

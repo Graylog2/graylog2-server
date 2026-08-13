@@ -102,11 +102,13 @@ describe('IncompatibleIndicesBulkActions', () => {
     rows: Array<IncompatibleIndexRow> = indices,
     canArchive = false,
     pendingIndexStatuses: Map<string, PendingIndexStatus> = new Map(),
+    canReindex = true,
   ) =>
     render(
       <IncompatibleIndicesContext.Provider
         value={{
           archiveActionsAvailable: canArchive,
+          reindexActionsAvailable: canReindex,
           archivedIndexNames: new Set<string>(),
           pendingIndexStatuses,
           addArchiveDeleteAction,
@@ -229,6 +231,14 @@ describe('IncompatibleIndicesBulkActions', () => {
       );
       expect(setSelectedEntities).not.toHaveBeenCalled();
       expect(refetch).not.toHaveBeenCalled();
+    });
+
+    it('offers no bulk action when reindexing is unavailable', async () => {
+      renderBulkActions(systemIndices, false, new Map(), false);
+
+      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
+
+      expect(screen.queryByRole('menuitem', { name: /reindex system indices/i })).not.toBeInTheDocument();
     });
 
     it('excludes an index that is already reindexing from the bulk candidates', async () => {

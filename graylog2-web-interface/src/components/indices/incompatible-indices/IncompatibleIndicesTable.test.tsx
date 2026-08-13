@@ -64,17 +64,22 @@ const searchParams: SearchParams = {
 };
 
 describe('IncompatibleIndicesTable', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  const mockActionState = (overrides: Partial<IncompatibleIndicesContextValue> = {}) =>
     asMock(useIncompatibleIndexActionState).mockReturnValue({
       archiveActionsAvailable: true,
+      reindexActionsAvailable: true,
       archivedIndexNames: new Set(),
       pendingIndexStatuses: new Map(),
       addArchiveDeleteAction: jest.fn(),
       addReindexAction: jest.fn(),
       refetchClusterJobs: jest.fn(),
       refetch: jest.fn(),
+      ...overrides,
     });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockActionState();
   });
 
   it('wires the paginated entity table to the outdated indices endpoint', () => {
@@ -97,6 +102,24 @@ describe('IncompatibleIndicesTable', () => {
     expect(typeof callProps.entityActions).toBe('function');
     expect(callProps.bulkSelection.actions).toBeTruthy();
     expect(callProps.columnRenderers.attributes).toHaveProperty('index_name');
+  });
+
+  it('does not mention Data Node migration when system indices can be reindexed', () => {
+    render(<IncompatibleIndicesTable />);
+
+    expect(screen.queryByText(/migrate to Data Nodes/i)).not.toBeInTheDocument();
+  });
+
+  it('explains how to reindex system indices when the search backend does not support it', () => {
+    mockActionState({ reindexActionsAvailable: false });
+
+    render(<IncompatibleIndicesTable />);
+
+    expect(screen.getByText(/system indices can only be reindexed/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /migrate to Data Nodes/i })).toHaveAttribute(
+      'href',
+      '/system/cluster/datanode-migration',
+    );
   });
 });
 
@@ -134,6 +157,7 @@ describe('createColumnRenderers', () => {
 
   const contextValue = (overrides: Partial<IncompatibleIndicesContextValue> = {}): IncompatibleIndicesContextValue => ({
     archiveActionsAvailable: false,
+    reindexActionsAvailable: true,
     archivedIndexNames: new Set(),
     pendingIndexStatuses: new Map(),
     addArchiveDeleteAction: jest.fn(),
