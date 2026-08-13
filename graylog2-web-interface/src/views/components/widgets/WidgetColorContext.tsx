@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
 
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
@@ -24,6 +24,7 @@ import { setChartColor } from 'views/logic/slices/widgetActions';
 import useColorRules from './useColorRules';
 
 import ChartColorContext from '../visualizations/ChartColorContext';
+import DefaultChartColorsContext from 'views/components/contexts/DefaultChartColorsContext';
 
 type Props = {
   children: React.ReactNode;
@@ -32,14 +33,15 @@ type Props = {
 
 const WidgetColorContext = ({ children, id }: Props) => {
   const colorRules = useColorRules();
+  const defaultColors = useContext(DefaultChartColorsContext);
   const colorRulesForWidget = useMemo(() => {
-    const colorMapperBuilder = ColorMapper.builder();
+    const colorMapperBuilder = ColorMapper.builder(defaultColors);
     const colorRulesForWidgetBuilder = colorRules
       .filter(({ widgetId }) => widgetId === id)
       .reduce((prev, { name, color }) => prev.set(name, color), colorMapperBuilder);
 
     return colorRulesForWidgetBuilder.build();
-  }, [colorRules, id]);
+  }, [colorRules, defaultColors, id]);
   const dispatch = useViewsDispatch();
 
   const contextValue = useMemo(() => {
