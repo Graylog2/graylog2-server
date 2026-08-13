@@ -33,7 +33,8 @@ const PipelinesCell = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const { toggleSection, expandedSections } = useExpandedSections();
 
-  if (stream.is_default || !stream.is_editable) {
+  // Show the count for the default stream too - pipelines can connect to it (#14572).
+  if (!stream.is_editable) {
     return null;
   }
 
