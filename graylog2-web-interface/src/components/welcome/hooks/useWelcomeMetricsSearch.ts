@@ -39,22 +39,30 @@ import { TIMESTAMP_FIELD } from 'views/Constants';
 
 export const DEFAULT_TIME_RANGE_SECONDS = 86400;
 const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
+const MESSAGES_TODAY_LINK = '/search?q=&rangetype=relative&from=300';
+const ALERTS_LINK =
+  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dtrue';
+const EVENTS_LINK =
+  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dfalse';
 
 const numberWidget = ({
   title,
   timeRange,
   queryString = '',
   streams = [],
+  link,
 }: {
   title: string;
   timeRange: RelativeTimeRangeWithEnd;
   queryString?: string;
   streams?: Array<string>;
+  link?: string;
 }) => ({
   title,
   widget: AggregationWidget.builder()
     .id(generateId())
     .timerange(timeRange)
+    .context(link)
     .query(createElasticsearchQueryString(queryString))
     .streams(streams)
     .config(
@@ -88,7 +96,7 @@ const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
 });
 
 const buildViewState = (permittedAlertsEventsStreams: Array<string>, timeRange: RelativeTimeRangeWithEnd) => {
-  const messages = numberWidget({ title: 'Messages Today', timeRange });
+  const messages = numberWidget({ title: 'Messages Today', timeRange, link: MESSAGES_TODAY_LINK });
   const sources = topSourcesWidget(timeRange);
 
   if (permittedAlertsEventsStreams.length === 0) {
@@ -110,12 +118,14 @@ const buildViewState = (permittedAlertsEventsStreams: Array<string>, timeRange: 
     numberWidget({
       title: 'Alerts Today',
       timeRange,
+      link: ALERTS_LINK,
       queryString: 'alert:true',
       streams: permittedAlertsEventsStreams,
     }),
     numberWidget({
       title: 'Events Today',
       timeRange,
+      link: EVENTS_LINK,
       queryString: 'alert:false',
       streams: permittedAlertsEventsStreams,
     }),
