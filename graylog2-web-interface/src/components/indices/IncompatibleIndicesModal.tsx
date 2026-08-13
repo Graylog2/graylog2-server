@@ -31,7 +31,7 @@ const IncompatibleIndicesModal = ({ show, onClose }: Props) => (
     </Modal.Header>
     <Modal.Body>
       <Alert bsStyle="info">
-        Indices created with an incompatible, previous major version of OpenSearch need to be archived, deleted or
+        Any indices created with an incompatible, previous major version of OpenSearch need to be archived, deleted or
         reindexed before the search backend can be upgraded to the next major version.
       </Alert>
       <IncompatibleIndicesTable withoutURLParams />
