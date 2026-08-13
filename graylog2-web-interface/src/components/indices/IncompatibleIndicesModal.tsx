@@ -17,8 +17,6 @@
 import * as React from 'react';
 
 import { Alert, Button, Modal } from 'components/bootstrap';
-import { Spinner } from 'components/common';
-import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
 import IncompatibleIndicesTable from 'components/indices/incompatible-indices/IncompatibleIndicesTable';
 
 type Props = {
@@ -26,43 +24,22 @@ type Props = {
   onClose: () => void;
 };
 
-const IncompatibleIndicesModal = ({ show, onClose }: Props) => {
-  const { data: incompatibleIndices, isError, isLoading } = useIncompatibleIndices();
-
-  return (
-    <Modal show={show} onHide={onClose} bsSize="xl">
-      <Modal.Header>
-        <Modal.Title>Index Versions</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {isLoading && <Spinner />}
-
-        {!isLoading && isError && <Alert bsStyle="danger">Could not load incompatible indices.</Alert>}
-
-        {!isLoading && !isError && incompatibleIndices.length > 0 && (
-          <>
-            <Alert bsStyle="info">
-              Found <strong>{incompatibleIndices.length}</strong>{' '}
-              {incompatibleIndices.length === 1 ? 'index' : 'indices'} that were created with an incompatible, previous
-              major version of OpenSearch. These indices need to be archived, deleted or reindexed for compatibility
-              with future OpenSearch major versions.
-            </Alert>
-            <IncompatibleIndicesTable withoutURLParams />
-          </>
-        )}
-
-        {!isLoading && !isError && incompatibleIndices.length === 0 && (
-          <Alert bsStyle="success">
-            All indices are up to date. No indices created with incompatible, previous major versions of OpenSearch were
-            found.
-          </Alert>
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={onClose}>Close</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
+const IncompatibleIndicesModal = ({ show, onClose }: Props) => (
+  <Modal show={show} onHide={onClose} bsSize="xl">
+    <Modal.Header>
+      <Modal.Title>Index Versions</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <Alert bsStyle="info">
+        Indices created with an incompatible, previous major version of OpenSearch need to be archived, deleted or
+        reindexed before the search backend can be upgraded to the next major version.
+      </Alert>
+      <IncompatibleIndicesTable withoutURLParams />
+    </Modal.Body>
+    <Modal.Footer>
+      <Button onClick={onClose}>Close</Button>
+    </Modal.Footer>
+  </Modal>
+);
 
 export default IncompatibleIndicesModal;
