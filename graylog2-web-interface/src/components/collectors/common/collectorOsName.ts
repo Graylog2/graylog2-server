@@ -23,10 +23,10 @@ import type { CollectorInstanceView } from '../types';
  * reports (the most specific, e.g. "Ubuntu 22.04.3 LTS") and otherwise translates the bare `os`
  * value to a human name, keeping the raw value if it is one we do not know.
  */
-const collectorOsName = (instance: CollectorInstanceView): string => {
+const collectorOsName = (instance: CollectorInstanceView, useDescription: boolean): string => {
   const description = instance.non_identifying_attributes?.['os.description'] as string | undefined;
 
-  if (description) {
+  if (useDescription && description) {
     return description;
   }
 

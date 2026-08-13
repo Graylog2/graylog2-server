@@ -172,7 +172,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
         <DetailRow>
           <DetailLabel>OS:</DetailLabel>
-          <span>{collectorOsName(instance)}</span>
+          <span>{collectorOsName(instance, true)}</span>
         </DetailRow>
 
         <DetailRow>

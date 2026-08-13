@@ -26,7 +26,8 @@ import collectorOsName from '../common/collectorOsName';
 import type { CollectorInstanceView } from '../types';
 
 const OsName = ({ instance }: { instance: CollectorInstanceView }) => {
-  const label = collectorOsName(instance);
+  // The description can blow up the column content, so we only render the "os.type".
+  const label = collectorOsName(instance, false);
 
   return <span title={label}>{label}</span>;
 };
