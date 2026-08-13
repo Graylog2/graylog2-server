@@ -114,7 +114,9 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
   });
 
   const handleConfirm = async () => {
-    if (!confirmedAction) {
+    if (!confirmedAction || (confirmedAction === 'reindex-system-index' && !reindexActionsAvailable)) {
+      setConfirmedAction(undefined);
+
       return;
     }
 

@@ -20,6 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { SystemIndexerIndices } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
+import AppConfig from 'util/AppConfig';
 import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 
@@ -80,6 +81,8 @@ describe('IncompatibleIndicesTable', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockActionState();
+    asMock(AppConfig.isCloud).mockReturnValue(false);
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
   });
 
   it('wires the paginated entity table to the outdated indices endpoint', () => {
@@ -120,6 +123,16 @@ describe('IncompatibleIndicesTable', () => {
       'href',
       '/system/cluster/datanode-migration',
     );
+  });
+
+  it('does not link to the migration page when it is not routed', () => {
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
+    mockActionState({ reindexActionsAvailable: false });
+
+    render(<IncompatibleIndicesTable />);
+
+    expect(screen.getByText(/system indices can only be reindexed/i)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /migrate to Data Nodes/i })).not.toBeInTheDocument();
   });
 });
 

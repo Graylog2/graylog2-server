@@ -98,27 +98,28 @@ describe('IncompatibleIndicesBulkActions', () => {
   const addReindexAction = jest.fn();
   const refetchClusterJobs = jest.fn();
 
-  const renderBulkActions = (
+  const bulkActions = (
     rows: Array<IncompatibleIndexRow> = indices,
     canArchive = false,
     pendingIndexStatuses: Map<string, PendingIndexStatus> = new Map(),
     canReindex = true,
-  ) =>
-    render(
-      <IncompatibleIndicesContext.Provider
-        value={{
-          archiveActionsAvailable: canArchive,
-          reindexActionsAvailable: canReindex,
-          archivedIndexNames: new Set<string>(),
-          pendingIndexStatuses,
-          addArchiveDeleteAction,
-          addReindexAction,
-          refetchClusterJobs,
-          refetch,
-        }}>
-        <IncompatibleIndicesBulkActions indices={rows} />
-      </IncompatibleIndicesContext.Provider>,
-    );
+  ) => (
+    <IncompatibleIndicesContext.Provider
+      value={{
+        archiveActionsAvailable: canArchive,
+        reindexActionsAvailable: canReindex,
+        archivedIndexNames: new Set<string>(),
+        pendingIndexStatuses,
+        addArchiveDeleteAction,
+        addReindexAction,
+        refetchClusterJobs,
+        refetch,
+      }}>
+      <IncompatibleIndicesBulkActions indices={rows} />
+    </IncompatibleIndicesContext.Provider>
+  );
+
+  const renderBulkActions = (...args: Parameters<typeof bulkActions>) => render(bulkActions(...args));
 
   const confirmBulkDelete = async () => {
     await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
@@ -230,6 +231,19 @@ describe('IncompatibleIndicesBulkActions', () => {
         expect(UserNotification.error).toHaveBeenCalledWith('Backend unavailable', 'Could not reindex all.'),
       );
       expect(setSelectedEntities).not.toHaveBeenCalled();
+      expect(refetch).not.toHaveBeenCalled();
+    });
+
+    it('does not submit a reindex confirmed before reindexing became unavailable', async () => {
+      const { rerender } = renderBulkActions(systemIndices);
+
+      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: /reindex system indices/i }));
+
+      rerender(bulkActions(systemIndices, false, new Map(), false));
+      await userEvent.click(await screen.findByRole('button', { name: /^reindex all$/i }));
+
+      expect(SystemIndexerIndices.bulkReindex).not.toHaveBeenCalled();
       expect(refetch).not.toHaveBeenCalled();
     });
 

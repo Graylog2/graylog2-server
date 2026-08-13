@@ -20,6 +20,7 @@ import { Alert } from 'components/bootstrap';
 import { PaginatedEntityTable } from 'components/common';
 import Routes from 'routing/Routes';
 import Link from 'components/common/Link';
+import AppConfig from 'util/AppConfig';
 
 import { fetchIncompatibleIndices, incompatibleIndicesKeyFn } from './fetchIncompatibleIndices';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
@@ -38,6 +39,17 @@ const TABLE_LAYOUT = {
   defaultColumnOrder: ['index_name', 'category', 'version', 'begin', 'end'],
 };
 
+const DataNodeMigrationHint = () => {
+  const migrationRouteAvailable =
+    !AppConfig.isCloud() && AppConfig.isFeatureEnabled('data_node_migration');
+
+  return migrationRouteAvailable ? (
+    <Link to={Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION}>Migrate to Data Nodes</Link>
+  ) : (
+    <>Migrate to Data Nodes</>
+  );
+};
+
 type Props = {
   withoutURLParams?: boolean;
 };
@@ -54,8 +66,7 @@ const IncompatibleIndicesTable = ({ withoutURLParams = false }: Props) => {
       {!contextValue.reindexActionsAvailable && (
         <Alert bsStyle="info">
           System indices can only be reindexed when Graylog runs against a Data Node search backend.{' '}
-          <Link to={Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION}>Migrate to Data Nodes</Link> to reindex them before
-          upgrading to the next OpenSearch major version.
+          <DataNodeMigrationHint /> to reindex them before upgrading to the next OpenSearch major version.
         </Alert>
       )}
       <PaginatedEntityTable<IncompatibleIndexRow>

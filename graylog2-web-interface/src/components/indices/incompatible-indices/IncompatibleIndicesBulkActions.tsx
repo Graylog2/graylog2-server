@@ -187,6 +187,12 @@ const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
       return;
     }
 
+    if (confirmedBulkAction.action === 'reindex-system-index' && !reindexActionsAvailable) {
+      setConfirmedBulkAction(undefined);
+
+      return;
+    }
+
     sendTelemetry(BULK_ACTION_TELEMETRY[confirmedBulkAction.action], {
       ...TELEMETRY_DEFAULTS,
       app_action_value: 'bulk',
