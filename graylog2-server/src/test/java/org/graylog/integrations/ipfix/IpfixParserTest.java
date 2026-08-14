@@ -44,7 +44,7 @@ public class IpfixParserTest {
     public File temporaryFolder;
 
     @Test
-    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     public void parseMessage_undefinedInformationElement_doesNotLoop() {
         final byte[] packetBytes = hexToBytes("000a00240000000000000001000000000002000c0100000103e800040100000841414141");
         final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
@@ -55,7 +55,35 @@ public class IpfixParserTest {
     }
 
     @Test
-    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parseMessage_undefinedInformationElement_fixedLength_doesNotCorruptSubsequentField() {
+        // Template: IE 1000 (len=4, undefined) + IE 8 (sourceIPv4Address, len=4, defined)
+        // Data record: 4 junk bytes for IE 1000, then 192.168.1.1 for IE 8
+        final byte[] packetBytes = hexToBytes("000a002c000000000000000100000000000200100100000203e8000400080004" +
+                "0100000c41414141c0a80101");
+        final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+        assertThat(message.flows()).hasSize(1);
+        assertThat(message.flows().getFirst().fields()).containsEntry("sourceIPv4Address", "192.168.1.1");
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parseMessage_undefinedInformationElement_variableLength_doesNotCorruptSubsequentField() {
+        // Template: IE 1000 (len=65535 var-length, undefined) + IE 8 (sourceIPv4Address, len=4, defined)
+        // Data record: 0x04 (var-length prefix=4) + 4 junk bytes, then 192.168.1.1 for IE 8
+        final byte[] packetBytes = hexToBytes("000a002d000000000000000100000000000200100100000203e8ffff00080004" +
+                "0100000d0441414141c0a80101");
+        final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+        assertThat(message.flows()).hasSize(1);
+        assertThat(message.flows().getFirst().fields()).containsEntry("sourceIPv4Address", "192.168.1.1");
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     public void parseMessage_basicListZeroLengthElement_doesNotLoop() {
         final byte[] packetBytes = hexToBytes("000a00270000000000000001000000000002000c01000001012300080100000b06000001000041");
         final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);

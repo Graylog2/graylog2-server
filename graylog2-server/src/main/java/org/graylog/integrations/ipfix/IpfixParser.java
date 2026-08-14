@@ -346,7 +346,8 @@ public class IpfixParser {
         while (setContent.isReadable()) {
             final int setStart = setContent.readerIndex();
             if (setStart == previousStart) {
-                throw new IpfixException("Parser made no progress reading flow data set, discarding remaining bytes");
+                LOG.error("Parser made no progress reading flow data set, discarding remaining bytes");
+                break readFlows;
             }
             previousStart = setStart;
             try {
