@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
-import { ConfirmDialog, Link, LinkContainer, Spinner } from 'components/common';
+import { ConfirmDialog, IconButton, Link, LinkContainer, Spinner } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -111,7 +111,7 @@ export const sourceActionsFactory =
   (source: Source) => (
     <ButtonToolbar>
       <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_SOURCE_ID_FIELD, source.id)}>
-        <Button bsSize="xsmall">Received messages</Button>
+        <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
       </LinkContainer>
       <Button bsSize="xsmall" onClick={() => onEdit(source)}>
         Edit

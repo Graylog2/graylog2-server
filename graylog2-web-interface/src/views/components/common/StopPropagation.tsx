@@ -21,8 +21,11 @@ const stopPropagation = (evt: React.SyntheticEvent) => {
   evt.preventDefault();
 };
 
-const StopPropagation = ({ children }: React.PropsWithChildren) => (
-  <span role="presentation" onClick={stopPropagation} onMouseDown={stopPropagation}>
+const StopPropagation = ({
+  children = undefined,
+  className = undefined,
+}: React.PropsWithChildren<{ className?: string }>) => (
+  <span role="presentation" onClick={stopPropagation} onMouseDown={stopPropagation} className={className}>
     {children}
   </span>
 );
