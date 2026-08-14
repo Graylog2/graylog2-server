@@ -16,7 +16,10 @@
  */
 import { SystemOpensearch } from '@graylog/server-api';
 
+import type { RequestOptions } from 'routing/request';
 import type { Attribute, PaginatedResponseType, SearchParams } from 'stores/PaginationTypes';
+
+const NO_SESSION_EXTENSION: RequestOptions = { requestShouldExtendSession: false };
 
 export type OpensearchNode = {
   id: string;
@@ -54,7 +57,7 @@ export const fetchOpensearchNodes = async (
   const sort = (params.sort?.attributeId ?? 'name') as OpensearchNodesSort;
   const order = (params.sort?.direction ?? 'asc') as OpensearchNodesOrder;
 
-  return SystemOpensearch.listNodes(sort, params.page, params.pageSize, params.query, order).then(
+  return SystemOpensearch.listNodes(sort, params.page, params.pageSize, params.query, order, NO_SESSION_EXTENSION).then(
     ({ attributes, pagination, elements, query }: OpensearchNodesApiResponse) => ({
       attributes,
       list: elements as Array<OpensearchNode>,

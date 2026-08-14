@@ -87,6 +87,22 @@ describe('<ClusterConfigurationNodes />', () => {
     await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
   });
 
+  it('switches to OpenSearch node type when segmented control is used', async () => {
+    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
+
+    render(<ClusterConfigurationNodes />);
+
+    mockPaginatedEntityTable.mockClear();
+
+    await userEvent.click(screen.getByRole('radio', { name: 'OpenSearch Nodes' }));
+
+    await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
+    expect(mockPaginatedEntityTable.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ humanName: 'OpenSearch Nodes' }),
+    );
+  });
+
   it('uses child "select node type" handler to switch view', async () => {
     const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
     const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
