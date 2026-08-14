@@ -1,4 +1,5 @@
 type = "fixed"
-message = "Keep the share settings of an event definition populated when navigating between the wizard steps."
+message = "Keep the share settings of an event definition populated when navigating between wizard steps."
 
 issues = ["Graylog2/graylog-plugin-enterprise#14480"]
+pulls = ["26990"]
