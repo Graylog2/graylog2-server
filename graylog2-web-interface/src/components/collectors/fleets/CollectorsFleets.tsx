@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useMemo, useCallback } from 'react';
 
 import useLocation from 'routing/useLocation';
-import { Button, ButtonToolbar } from 'components/bootstrap';
-import { LinkContainer } from 'components/common';
+import { ButtonToolbar } from 'components/bootstrap';
+import { LinkContainer, IconButton } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
@@ -50,7 +50,7 @@ const CollectorsFleets = () => {
     (fleet: Fleet) => (
       <ButtonToolbar>
         <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
-          <Button bsSize="xsmall">Received messages</Button>
+          <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
         </LinkContainer>
       </ButtonToolbar>
     ),

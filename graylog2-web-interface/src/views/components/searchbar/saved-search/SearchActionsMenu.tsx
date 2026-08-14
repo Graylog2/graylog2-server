@@ -248,8 +248,8 @@ const SearchActionsMenu = () => {
       <ShareButton
         entityType="search"
         entityId={view.id}
+        bsSize="md"
         onClick={toggleShareSearch}
-        bsStyle="default"
         disabledInfo={isNew && 'Only saved searches can be shared.'}
       />
       <MoreActionsMenu aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight solid>
