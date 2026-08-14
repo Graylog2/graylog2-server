@@ -16,13 +16,15 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { FormikTouched } from 'formik';
+import type { FormikTouched, FormikErrors } from 'formik';
 import { Formik, Form } from 'formik';
 import isEqual from 'lodash/isEqual';
+import moment from 'moment';
 
 import { HelpBlock, Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
-import { FormikInput } from 'components/common';
+import { FormikInput, InputDescription } from 'components/common';
+import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import ModalSubmit from 'components/common/ModalSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -36,6 +38,7 @@ import type {
   JournaldSourceConfig,
   JournaldPriority,
   WindowsEventLogSourceConfig,
+  MacOSUnifiedLoggingSourceConfig,
 } from '../types';
 
 type Props = {
@@ -45,10 +48,32 @@ type Props = {
   onSave: (source: Omit<Source, 'id'>) => Promise<{ id?: string } | void>;
 };
 
-const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
+const defaultConfigs: Record<
+  SourceType,
+  FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig
+> = {
   file: { paths: [''], read_mode: 'end' },
   journald: { read_mode: 'end', priority: 'info' },
   windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end' },
+  macos_unified_logging: {
+    predicate:
+      'subsystem IN {\n' +
+      "'com.apple.opendirectoryd',\n" +
+      "'com.apple.authorization',\n" +
+      "'com.apple.loginwindow',\n" +
+      "'com.apple.securityd',\n" +
+      "'com.apple.TCC',\n" +
+      "'com.apple.alf',\n" +
+      "'com.apple.networkextension',\n" +
+      "'com.apple.DiskManagement',\n" +
+      "'com.apple.CoreStorage',\n" +
+      "'com.apple.endpointsecurity',\n" +
+      "'com.apple.syspolicyd',\n" +
+      "'com.apple.launchd'\n" +
+      '} AND messageType >= error',
+    max_log_age: 'PT24H',
+    max_poll_interval: 'PT30S',
+  },
 };
 
 type FormValues = {
@@ -56,14 +81,39 @@ type FormValues = {
   name: string;
   description: string;
   enabled: boolean;
-  config: FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig;
+  config: FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig;
+};
+
+// TimeUnitInput is not a formik field, so we need to validate against the entire form
+const validateMacOSUnifiedLogging = (
+  config: MacOSUnifiedLoggingSourceConfig,
+): FormikErrors<MacOSUnifiedLoggingSourceConfig> => {
+  const errors: FormikErrors<MacOSUnifiedLoggingSourceConfig> = {};
+
+  if (moment.duration(config.max_poll_interval).asSeconds() <= 0) {
+    errors.max_poll_interval = 'Max poll interval must be at least 1 seconds.';
+  }
+
+  if (moment.duration(config.max_log_age).asSeconds() < 0) {
+    errors.max_log_age = 'Max log age must be 0 or a positive value.';
+  }
+
+  return errors;
 };
 
 const validate = (values: FormValues) => {
-  const errors: Partial<Record<keyof FormValues, string>> = {};
+  const errors: FormikErrors<FormValues> = {};
 
   if (!values.name) {
     errors.name = 'Name is required';
+  }
+
+  if (values.source_type === 'macos_unified_logging') {
+    const configErrors = validateMacOSUnifiedLogging(values.config as MacOSUnifiedLoggingSourceConfig);
+
+    if (Object.keys(configErrors).length > 0) {
+      errors.config = configErrors;
+    }
   }
 
   return errors;
@@ -210,6 +260,74 @@ const WindowsEventLogConfigFields = ({
   );
 };
 
+// Ordered largest-first so extractDurationAndUnit renders the most readable unit (e.g. PT24H -> "1 days").
+const POLL_INTERVAL_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
+const LOG_AGE_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
+
+const MacOSUnifiedLoggingConfigFields = ({
+  config,
+  setFieldValue,
+  errors = undefined,
+}: {
+  config: MacOSUnifiedLoggingSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+  errors?: FormikErrors<MacOSUnifiedLoggingSourceConfig>;
+}) => {
+  const pollInterval = extractDurationAndUnit(config.max_poll_interval, POLL_INTERVAL_UNITS);
+  const logAge = extractDurationAndUnit(config.max_log_age, LOG_AGE_UNITS);
+
+  // TimeUnitInput reports (value, unit, checked). Unchecked clears the field so the backend default applies.
+  const updateDuration = (field: 'max_poll_interval' | 'max_log_age') => (value: number, unit: string) => {
+    setFieldValue('config', {
+      ...config,
+      [field]: moment.duration(value, unit as moment.unitOfTime.DurationConstructor).toISOString(),
+    });
+  };
+
+  return (
+    <>
+      <Input
+        id="macos-predicate"
+        type="textarea"
+        label="Predicate"
+        help={
+          <span>
+            Optional macOS unified logging filter predicate passed to the <code>log</code> command. Leaving this empty
+            collects all logs from the system! <code>info</code> or <code>debug</code> levels are not currently collected,
+            as they are very noisy and carry very little valuable information. Example: <code>subsystem == &#39;com.apple.securityd&#39;</code>
+          </span>
+        }
+        value={config.predicate || ''}
+        onChange={(e) => setFieldValue('config', { ...config, predicate: e.target.value || undefined })}
+      />
+      <TimeUnitInput
+        label="Max poll interval"
+        update={updateDuration('max_poll_interval')}
+        value={pollInterval.duration}
+        unit={pollInterval.unit}
+        units={POLL_INTERVAL_UNITS}
+        required
+      />
+      <InputDescription
+        error={errors?.max_poll_interval}
+        help="How often the Collector checks for new log entries. Must be at least 1 second."
+      />
+      <TimeUnitInput
+        label="Max log age"
+        update={updateDuration('max_log_age')}
+        value={logAge.duration}
+        unit={logAge.unit}
+        units={LOG_AGE_UNITS}
+        required
+      />
+      <InputDescription
+        error={errors?.max_log_age}
+        help="On first start, how far back to backfill logs. Set to 0 to disable backfilling."
+      />
+    </>
+  );
+};
+
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
   const isEdit = !!source;
   const sendTelemetry = useSendCollectorsTelemetry();
@@ -302,7 +420,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
   return (
     <Modal show onHide={handleClose} bsSize="lg">
       <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
-        {({ isSubmitting, isValidating, values, setFieldValue, dirty, touched }) => {
+        {({ isSubmitting, isValidating, isValid, values, setFieldValue, dirty, touched, errors }) => {
           formStateRef.current = { dirty, touched, values };
 
           return (
@@ -344,6 +462,11 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                 {values.source_type === 'windows_event_log' && (
                   <HelpBlock>Collect events from Windows Event Viewer channels.</HelpBlock>
                 )}
+                {values.source_type === 'macos_unified_logging' && (
+                  <HelpBlock>
+                    Collect from the macOS unified logging system via the <code>log</code> command (macOS only).
+                  </HelpBlock>
+                )}
                 <FormikInput id="source-name" label="Name" name="name" required />
                 <FormikInput id="source-description" label="Description" name="description" type="textarea" />
                 <FormikInput
@@ -365,13 +488,20 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                     setFieldValue={setFieldValue}
                   />
                 )}
+                {values.source_type === 'macos_unified_logging' && (
+                  <MacOSUnifiedLoggingConfigFields
+                    config={values.config as MacOSUnifiedLoggingSourceConfig}
+                    setFieldValue={setFieldValue}
+                    errors={errors.config as FormikErrors<MacOSUnifiedLoggingSourceConfig>}
+                  />
+                )}
               </Modal.Body>
               <Modal.Footer>
                 <ModalSubmit
                   submitButtonText={isEdit ? 'Update source' : 'Create source'}
                   submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
                   onCancel={handleClose}
-                  disabledSubmit={isValidating}
+                  disabledSubmit={isValidating || !isValid}
                   isSubmitting={isSubmitting}
                 />
               </Modal.Footer>

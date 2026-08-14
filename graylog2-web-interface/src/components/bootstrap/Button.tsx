@@ -208,6 +208,7 @@ type Props = React.PropsWithChildren<{
   active?: boolean;
   allowClickWhenDisabled?: boolean;
   'aria-label'?: string;
+  'aria-disabled'?: boolean;
   bsStyle?: StyleProps;
   bsSize?: BsSize;
   className?: string;
@@ -218,6 +219,13 @@ type Props = React.PropsWithChildren<{
   id?: string;
   name?: string;
   onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void);
+  onFocus?: (e: React.FocusEvent) => void;
+  onBlur?: (e: React.FocusEvent) => void;
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: (e: React.MouseEvent) => void;
+  onMouseMove?: (e: React.MouseEvent) => void;
+  onPointerDown?: (e: React.PointerEvent) => void;
+  onPointerEnter?: (e: React.PointerEvent) => void;
   rel?: 'noopener noreferrer';
   role?: string;
   showOverflow?: boolean;
@@ -231,6 +239,7 @@ type Props = React.PropsWithChildren<{
 const Button = (
   {
     'aria-label': ariaLabel,
+    'aria-disabled': ariaDisabled = undefined,
     allowClickWhenDisabled = false,
     bsStyle = 'default',
     bsSize = undefined,
@@ -238,6 +247,13 @@ const Button = (
     'data-testid': dataTestId,
     id = undefined,
     onClick = undefined,
+    onFocus = undefined,
+    onBlur = undefined,
+    onMouseEnter = undefined,
+    onMouseLeave = undefined,
+    onMouseMove = undefined,
+    onPointerDown = undefined,
+    onPointerEnter = undefined,
     disabled = false,
     href = undefined,
     title = undefined,
@@ -261,6 +277,14 @@ const Button = (
   const sharedProps = {
     id,
     'aria-label': ariaLabel,
+    'aria-disabled': ariaDisabled,
+    onFocus,
+    onBlur,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseMove,
+    onPointerDown,
+    onPointerEnter,
     className,
     ...stylesProps(style),
     $active: active,
@@ -282,6 +306,7 @@ const Button = (
   if (href) {
     return (
       <StyledButton
+        ref={ref as unknown as React.Ref<HTMLAnchorElement>}
         component={Link}
         to={href}
         target={target}
