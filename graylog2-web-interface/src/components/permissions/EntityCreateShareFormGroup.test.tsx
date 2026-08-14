@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as mockImmutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
@@ -34,7 +35,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
     update: jest.fn(() => Promise.resolve()),
     loadUserSharesPaginated: jest.fn(() =>
       Promise.resolve({
-        list: require('immutable').List(),
+        list: mockImmutable.List(),
         pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
       }),
     ),

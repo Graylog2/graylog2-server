@@ -210,6 +210,8 @@ const EntityCreateShareFormGroup = ({
             availableGrantees={entityShareState.availableGrantees}
           />
           {PluggableEntityShareFormGroup && (
+            /* Resolved from the plugin store at render time and cannot be hoisted. */
+            /* eslint-disable-next-line react-hooks/static-components */
             <PluggableEntityShareFormGroup
               entityType={entityType}
               onChange={handleAdditionalFormChange}
