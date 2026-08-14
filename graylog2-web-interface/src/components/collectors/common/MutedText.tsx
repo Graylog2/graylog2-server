@@ -23,7 +23,7 @@ import styled, { css } from 'styled-components';
  */
 const MutedText = styled.p(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.small};
     margin: ${theme.spacings.md} 0 0 0;
   `,
