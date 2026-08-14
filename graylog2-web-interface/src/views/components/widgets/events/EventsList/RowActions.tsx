@@ -77,7 +77,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
         {!!moreActions.length && (
           <Menu position="bottom-end">
             <Menu.Target>
-              <IconButton name="more_vert" title="Toggle event actions" />
+              <IconButton name="more_vert" title="Toggle event actions" showTooltip={false} />
             </Menu.Target>
             <Menu.Dropdown>{moreActions}</Menu.Dropdown>
           </Menu>
