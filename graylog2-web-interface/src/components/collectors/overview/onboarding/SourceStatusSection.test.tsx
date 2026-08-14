@@ -21,10 +21,10 @@ import type { CollectorInstanceView, Source, SourceType } from 'components/colle
 
 import SourceStatusSection from './SourceStatusSection';
 
-// A type the API returns but the frontend does not know yet, because its definition is still on an
-// unmerged branch. Widened through `string` on purpose: the `SourceType` union claims this value
-// cannot exist, which is precisely the situation being tested.
-const UNRECOGNISED_TYPE = 'macos_unified_logging' as string as SourceType;
+// A type the API may return but the frontend does not know, e.g. because its definition is on a
+// newer server version. Widened through `string` on purpose: the `SourceType` union claims this
+// value cannot exist, which is precisely the situation being tested.
+const UNRECOGNISED_TYPE = 'source_type_from_a_newer_server' as string as SourceType;
 
 const instance = {
   id: 'uid-42',
