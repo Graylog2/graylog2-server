@@ -1,5 +1,5 @@
-type="s"
-message= "Fix IPFIX loop with unreachable exit condition."
+type = "s"
+message = "Fix IPFIX loop with unreachable exit condition."
 
 issues = ["Graylog2/graylog-plugin-enterprise#15003"]
 pulls = ["26910"]

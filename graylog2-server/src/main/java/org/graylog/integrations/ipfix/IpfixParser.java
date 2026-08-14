@@ -60,6 +60,10 @@ public class IpfixParser {
     private static final int SETID_TEMPLATE = 2;
     private static final int SETID_OPTIONSTEMPLATE = 3;
     private static final String HOW_TO_FIX_MISSING_FIELD_DEF_ERROR = "To fix this error, update the IPFIX field definitions template file to include a definition for this ID.";
+    // subTemplateList records can nest (RFC 6313), and the referenced template id is read off the wire, so a crafted
+    // packet can make a template reference itself and recurse ~once per 4 bytes. Bound the depth so a malformed packet
+    // cannot exhaust the stack. Legitimate nesting is only a few levels deep.
+    private static final int MAX_SUBTEMPLATE_DEPTH = 16;
 
     private final InformationElementDefinitions infoElemDefs;
 
@@ -80,7 +84,9 @@ public class IpfixParser {
      */
     public MessageDescription shallowParseMessage(ByteBuf packet) {
         final ByteBuf buffer = packet.readSlice(MessageHeader.LENGTH);
-        LOG.debug("Shallow parse header\n{}", ByteBufUtil.prettyHexDump(buffer));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Shallow parse header\n{}", ByteBufUtil.prettyHexDump(buffer));
+        }
         final MessageHeader header = parseMessageHeader(buffer);
         final MessageDescription messageDescription = new MessageDescription(header);
 
@@ -232,15 +238,22 @@ public class IpfixParser {
      * @return
      */
     public IpfixMessage parseMessage(ByteBuf packet) {
-        LOG.debug("Attempting to parse message.");
-        LOG.debug("IPFIX message\n{}", ByteBufUtil.prettyHexDump(packet));
+        LOG.trace("Attempting to parse message.");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("IPFIX message\n{}", ByteBufUtil.prettyHexDump(packet));
+        }
         final IpfixMessage.Builder builder = IpfixMessage.builder();
         final ByteBuf headerBuffer = packet.readSlice(MessageHeader.LENGTH);
-        LOG.debug("Message header buffer\n{}", ByteBufUtil.prettyHexDump(headerBuffer));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Message header buffer\n{}", ByteBufUtil.prettyHexDump(headerBuffer));
+        }
         final MessageHeader header = parseMessageHeader(headerBuffer);
         // sanity check: we need the complete packet in the buffer
         if (header.length() > packet.readableBytes() + MessageHeader.LENGTH) {
-            LOG.error("Buffer does not contain expected IPFIX message:\n{}", ByteBufUtil.prettyHexDump(packet));
+            LOG.error("Buffer does not contain the complete IPFIX message");
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Incomplete IPFIX message:\n{}", ByteBufUtil.prettyHexDump(packet));
+            }
             throw new IpfixException("Buffer does not contain the complete IPFIX message");
         }
         // loop over all the contained sets in the message
@@ -249,7 +262,9 @@ public class IpfixParser {
         while (packet.isReadable()) {
             final int setId = packet.readUnsignedShort();
             final int setLength = packet.readUnsignedShort();
-            LOG.debug("Set id {} buffer\n{}", setId, ByteBufUtil.prettyHexDump(packet, packet.readerIndex() - 4, setLength));
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Set id {} buffer\n{}", setId, ByteBufUtil.prettyHexDump(packet, packet.readerIndex() - 4, setLength));
+            }
             // the buffer limited to the declared length of the set.
             final ByteBuf setContent = packet.readSlice(setLength - 4);
             switch (setId) {
@@ -332,6 +347,14 @@ public class IpfixParser {
      * @return collection of parsed flows
      */
     public Set<Flow> parseDataSet(ImmutableList<InformationElement> informationElements, Map<Integer, TemplateRecord> templateMap, ByteBuf setContent) {
+        return parseDataSet(informationElements, templateMap, setContent, 0);
+    }
+
+    private Set<Flow> parseDataSet(ImmutableList<InformationElement> informationElements, Map<Integer, TemplateRecord> templateMap, ByteBuf setContent, int depth) {
+        if (depth > MAX_SUBTEMPLATE_DEPTH) {
+            LOG.error("subTemplateList nesting exceeds maximum {} levels, discarding remaining nested data", MAX_SUBTEMPLATE_DEPTH);
+            return ImmutableSet.of();
+        }
         ImmutableSet.Builder<Flow> flowBuilder = ImmutableSet.builder();
 
         // Padding: data records have no header and no fixed length, but the end of a data set (which are non-delimited series of data records), there _may_ be padding
@@ -586,7 +609,6 @@ public class IpfixParser {
                             int length = informationElement.length() == 65535 ? getVarLength(setContent) : setContent.readUnsignedByte();
                             // adjust length for semantic + templateId
                             length -= 3;
-                            LOG.debug("Remaining data buffer:\n{}", ByteBufUtil.prettyHexDump(setContent));
                             // TODO add to field somehow
                             final short semantic = setContent.readUnsignedByte();
                             final int templateId = setContent.readUnsignedShort();
@@ -600,7 +622,7 @@ public class IpfixParser {
                             // if this is not readable, it's an empty list
                             final ImmutableList.Builder<Flow> flowsBuilder = ImmutableList.builder();
                             if (listContent.isReadable()) {
-                                flowsBuilder.addAll(parseDataSet(templateRecord.informationElements(), templateMap, listContent));
+                                flowsBuilder.addAll(parseDataSet(templateRecord.informationElements(), templateMap, listContent, depth + 1));
                             }
                             final ImmutableList<Flow> flows = flowsBuilder.build();
                             // flatten arrays and fields into the field name until we have support for nested objects
