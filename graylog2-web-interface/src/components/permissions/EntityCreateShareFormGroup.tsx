@@ -86,13 +86,24 @@ const EntityCreateShareFormGroup = ({
   );
   const PluggableEntityShareFormGroup = usePluggableEntityShareFormGroup();
 
+  // Callers usually build `dependenciesGRN` inline, so its identity changes on every render.
+  // Serializing it keeps it usable as an effect dependency without re-triggering the effect
+  // on every render.
+  const dependenciesKey = JSON.stringify(dependenciesGRN ?? []);
+
   useEffect(() => {
     const { selected_collections: _, ...rest } = defaultSharePayload ?? {};
+    const dependencies: Array<GRN> = JSON.parse(dependenciesKey);
+    // When a previously made selection is restored (e.g. the user navigates back to a wizard
+    // step), the dependency check has to run again as well. Otherwise the missing dependency
+    // warnings shown before would silently disappear. Mirrors what `handleSelection` sends.
+    const prepare_request =
+      (rest.selected_grantee_capabilities?.size ?? 0) > 0 && dependencies.length > 0 ? dependencies : null;
 
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, rest).then((state) => {
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, { ...rest, prepare_request }).then((state) => {
       setEntityShareState(entityGRN, state);
     });
-  }, [entityType, entityTitle, entityGRN, defaultSharePayload, setEntityShareState]);
+  }, [entityType, entityTitle, entityGRN, defaultSharePayload, dependenciesKey, setEntityShareState]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
