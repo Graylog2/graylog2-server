@@ -18,7 +18,8 @@ import { useMemo } from 'react';
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Select, Icon } from 'components/common';
+import { Select, Icon, InputDescription } from 'components/common';
+import { FormGroup, ControlLabel } from 'components/bootstrap';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 type StreamsAndCategoriesOption = {
@@ -54,6 +55,9 @@ type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>,
   showStreams?: boolean;
   showCategories?: boolean;
   grouping?: boolean;
+  label?: React.ReactNode;
+  error?: React.ReactNode;
+  help?: React.ReactNode;
 };
 
 const StreamsAndCategoriesFilter = ({
@@ -67,6 +71,9 @@ const StreamsAndCategoriesFilter = ({
   showCategories = true,
   grouping = true,
   multi = true,
+  label = undefined,
+  error = undefined,
+  help = undefined,
   ...rest
 }: StreamsAndCategoriesFilterProps) => {
   const options = useMemo(() => {
@@ -113,18 +120,22 @@ const StreamsAndCategoriesFilter = ({
   };
 
   return (
-    <Select
-      {...rest}
-      id={id}
-      onChange={() => {}}
-      onReactSelectChange={handleReactSelectChange}
-      options={options}
-      optionRenderer={renderOption}
-      valueRenderer={renderOption}
-      value={selectedOptions}
-      required={required}
-      multi={multi}
-    />
+    <FormGroup controlId={id} validationState={error ? 'error' : null}>
+      {label && <ControlLabel>{label}</ControlLabel>}
+      <Select
+        {...rest}
+        id={id}
+        onChange={() => {}}
+        onReactSelectChange={handleReactSelectChange}
+        options={options}
+        optionRenderer={renderOption}
+        valueRenderer={renderOption}
+        value={selectedOptions}
+        required={required}
+        multi={multi}
+      />
+      <InputDescription error={error} help={help} />
+    </FormGroup>
   );
 };
 
