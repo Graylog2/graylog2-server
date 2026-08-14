@@ -68,7 +68,7 @@ public class OpensearchClusterResource extends RestResource {
             EntityAttribute.builder().id(OpensearchNode.FIELD_VERSION).title("Version").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(OpensearchNode.FIELD_ROLES).title("Roles").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(OpensearchNode.FIELD_JVM_HEAP_MAX).title("JVM Heap Max").type(SearchQueryField.Type.LONG).sortable(true).hidden(true).build(),
-            EntityAttribute.builder().id(OpensearchNode.FIELD_JVM_HEAP_USED_PERCENT).title("JVM Heap").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
+            EntityAttribute.builder().id(OpensearchNode.FIELD_JVM_HEAP_USED_PERCENT).title("JVM").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
             EntityAttribute.builder().id(OpensearchNode.FIELD_CPU_USED_PERCENT).title("CPU").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
             EntityAttribute.builder().id(OpensearchNode.FIELD_DISK_USED_PERCENT).title("Disk").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
             EntityAttribute.builder().id(OpensearchNode.FIELD_DISK_USED).title("Disk Used").type(SearchQueryField.Type.LONG).sortable(true).hidden(true).build(),
