@@ -68,11 +68,6 @@ type Props = {
   navigationItem: PluginNavigation;
 };
 
-const NavListItem = styled.li`
-  // TODO: Replace with variable from theme?
-  padding: 15px;
-`;
-
 const NavigationItem = ({
   navigationItem: { requiredFeatureFlag, permissions, children, BadgeComponent, description, path },
   pathname,
@@ -96,14 +91,14 @@ const NavigationItem = ({
   }
 
   return (
-    <NavListItem>
+    <li>
       <NavigationLink
         key={description}
         description={renderLinkTitle(description, BadgeComponent)}
         path={path}
         topLevel
       />
-    </NavListItem>
+    </li>
   );
 };
 

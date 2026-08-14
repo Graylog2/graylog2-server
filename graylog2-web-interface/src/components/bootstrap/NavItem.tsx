@@ -18,10 +18,17 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
+import { NAVBAR_GAP } from 'theme/constants';
 
-const NavigationLink = styled.a(
-  ({ theme }) => css`
+const NavigationLink = styled.a<{ $hasOnClick: boolean }>(
+  ({ theme, $hasOnClick }) => css`
     color: ${theme.colors.text.primary};
+
+    ${$hasOnClick &&
+    css`
+      padding-left: ${NAVBAR_GAP}px;
+      padding-right: ${NAVBAR_GAP}px;
+    `}
 
     &:hover,
     &:focus {
@@ -31,7 +38,7 @@ const NavigationLink = styled.a(
   `,
 );
 const NavItem = ({ children = undefined, ...props }: React.ComponentProps<typeof NavItem>) => (
-  <NavigationLink {...props}>
+  <NavigationLink {...props} $hasOnClick={Boolean(props.onClick)}>
     <NavItemStateIndicator>{children}</NavItemStateIndicator>
   </NavigationLink>
 );
