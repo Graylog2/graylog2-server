@@ -18,6 +18,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 
+import { Datanode } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 
 import ClusterConfigurationNodes from './ClusterConfigurationNodes';
@@ -27,6 +29,12 @@ type MockPaginatedEntityTableProps = {
   onDataLoaded?: (data: { list: Array<unknown>; pagination?: { total?: number } }) => void;
   externalSearch?: { query?: string };
 };
+
+jest.mock('@graylog/server-api', () => ({
+  Datanode: {
+    runsWithDataNode: jest.fn(),
+  },
+}));
 
 jest.mock('components/common/PaginatedEntityTable', () => ({
   __esModule: true,
@@ -47,18 +55,25 @@ jest.mock('./mongodb-nodes/useMongodbProfilingToggle', () => ({
 }));
 
 describe('<ClusterConfigurationNodes />', () => {
+  beforeEach(() => {
+    asMock(Datanode.runsWithDataNode).mockResolvedValue(true);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders all node types with default paging and refresh settings in "all" view', () => {
+  it('renders Data Nodes instead of OpenSearch Nodes when using Data Node', async () => {
     const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
     const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
 
     render(<ClusterConfigurationNodes />);
 
-    expect(screen.getAllByRole('table')).toHaveLength(4);
-    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(4);
+    expect(await screen.findAllByRole('table')).toHaveLength(3);
+    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(3);
+    expect(screen.getByRole('radio', { name: 'Data Nodes' })).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: 'OpenSearch Nodes' })).not.toBeInTheDocument();
+    expect(Datanode.runsWithDataNode).toHaveBeenCalledWith({ requestShouldExtendSession: false });
   });
 
   it('switches to a specific node type when segmented control is used', async () => {
@@ -67,6 +82,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     render(<ClusterConfigurationNodes />);
 
+    await screen.findAllByRole('table');
     mockPaginatedEntityTable.mockClear();
 
     await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
@@ -80,6 +96,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     render(<ClusterConfigurationNodes />);
 
+    await screen.findAllByRole('table');
     mockPaginatedEntityTable.mockClear();
 
     await userEvent.click(screen.getByRole('radio', { name: 'MongoDB Nodes' }));
@@ -90,9 +107,12 @@ describe('<ClusterConfigurationNodes />', () => {
   it('switches to OpenSearch node type when segmented control is used', async () => {
     const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
     const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
+    asMock(Datanode.runsWithDataNode).mockResolvedValue(false);
 
     render(<ClusterConfigurationNodes />);
 
+    expect(await screen.findAllByRole('table')).toHaveLength(3);
+    expect(screen.queryByRole('radio', { name: 'Data Nodes' })).not.toBeInTheDocument();
     mockPaginatedEntityTable.mockClear();
 
     await userEvent.click(screen.getByRole('radio', { name: 'OpenSearch Nodes' }));
@@ -109,6 +129,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     render(<ClusterConfigurationNodes />);
 
+    await screen.findAllByRole('table');
     const calls = mockPaginatedEntityTable.mock.calls as Array<[MockPaginatedEntityTableProps]>;
     const dataNodesTableProps = calls.map(([props]) => props).find((props) => props?.humanName === 'Data Nodes');
 
@@ -132,6 +153,7 @@ describe('<ClusterConfigurationNodes />', () => {
     const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
 
     render(<ClusterConfigurationNodes />);
+    await screen.findAllByRole('table');
     mockPaginatedEntityTable.mockClear();
 
     const searchInput = screen.getByPlaceholderText('Search nodes…');

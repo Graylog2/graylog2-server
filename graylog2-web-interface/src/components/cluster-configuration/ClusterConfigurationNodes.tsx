@@ -18,13 +18,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
-import { SearchForm } from 'components/common';
+import { SearchForm, Spinner } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
 
 import GraylogNodesExpandable from './graylog-nodes/GraylogNodesExpandable';
 import DataNodesExpandable from './data-nodes/DataNodesExpandable';
 import MongodbNodesExpandable from './mongodb-nodes/MongodbNodesExpandable';
 import OpensearchNodesExpandable from './opensearch-nodes/OpensearchNodesExpandable';
+import useRunsWithDataNode from './useRunsWithDataNode';
 
 const SectionCol = styled(Col)`
   margin-top: 12px;
@@ -44,6 +45,7 @@ const ControlsWrapper = styled.div`
 `;
 
 type NodeType = 'all' | 'graylog' | 'data' | 'mongodb' | 'opensearch';
+type SearchNodeType = Extract<NodeType, 'data' | 'opensearch'>;
 
 const ALL_NODES_PAGE_SIZE = 10;
 const SINGLE_NODE_TYPE_PAGE_SIZE = 100;
@@ -54,27 +56,40 @@ const ClusterConfigurationNodes = () => {
   const productName = useProductName();
   const [activeNodeType, setActiveNodeType] = useState<NodeType>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const {
+    data: runsWithDataNode,
+    isLoading: isLoadingSearchBackend,
+    isError: isSearchBackendError,
+  } = useRunsWithDataNode();
+  const searchNodeType: SearchNodeType = runsWithDataNode ? 'data' : 'opensearch';
+  const SearchNodesExpandable = runsWithDataNode ? DataNodesExpandable : OpensearchNodesExpandable;
   const nodeTypeOptions = useMemo<Array<{ label: string; value: NodeType }>>(
     () => [
       { label: 'All Nodes', value: 'all' },
       { label: `${productName} Nodes`, value: 'graylog' },
-      { label: 'Data Nodes', value: 'data' },
+      runsWithDataNode ? { label: 'Data Nodes', value: 'data' } : { label: 'OpenSearch Nodes', value: 'opensearch' },
       { label: 'MongoDB Nodes', value: 'mongodb' },
-      { label: 'OpenSearch Nodes', value: 'opensearch' },
     ],
-    [productName],
+    [productName, runsWithDataNode],
   );
   const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);
   const handleSearch = useCallback((query: string) => setSearchQuery(query), []);
   const handleResetSearch = useCallback(() => setSearchQuery(''), []);
 
   const showGraylogNodes = activeNodeType === 'all' || activeNodeType === 'graylog';
-  const showDataNodes = activeNodeType === 'all' || activeNodeType === 'data';
+  const showSearchNodes = activeNodeType === 'all' || activeNodeType === searchNodeType;
   const showMongodbNodes = activeNodeType === 'all' || activeNodeType === 'mongodb';
-  const showOpensearchNodes = activeNodeType === 'all' || activeNodeType === 'opensearch';
   const isAllNodesView = activeNodeType === 'all';
   const pageSizeLimit = isAllNodesView ? ALL_NODES_PAGE_SIZE : SINGLE_NODE_TYPE_PAGE_SIZE;
   const refetchInterval = isAllNodesView ? ALL_NODES_REFETCH_INTERVAL : SINGLE_NODE_TYPE_REFETCH_INTERVAL;
+
+  if (isLoadingSearchBackend) {
+    return <Spinner text="Loading cluster nodes..." />;
+  }
+
+  if (isSearchBackendError || runsWithDataNode === undefined) {
+    return <p>Could not determine the configured search backend.</p>;
+  }
 
   return (
     <Row>
@@ -107,14 +122,14 @@ const ClusterConfigurationNodes = () => {
           />
         </SectionCol>
       )}
-      {showDataNodes && (
+      {showSearchNodes && (
         <SectionCol md={12}>
-          <DataNodesExpandable
+          <SearchNodesExpandable
             collapsible={activeNodeType === 'all'}
             searchQuery={normalizedSearch}
             pageSizeLimit={pageSizeLimit}
             refetchInterval={refetchInterval}
-            onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('data') : undefined}
+            onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType(searchNodeType) : undefined}
           />
         </SectionCol>
       )}
@@ -126,17 +141,6 @@ const ClusterConfigurationNodes = () => {
             pageSizeLimit={pageSizeLimit}
             refetchInterval={refetchInterval}
             onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('mongodb') : undefined}
-          />
-        </SectionCol>
-      )}
-      {showOpensearchNodes && (
-        <SectionCol md={12}>
-          <OpensearchNodesExpandable
-            collapsible={activeNodeType === 'all'}
-            searchQuery={normalizedSearch}
-            pageSizeLimit={pageSizeLimit}
-            refetchInterval={refetchInterval}
-            onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('opensearch') : undefined}
           />
         </SectionCol>
       )}
