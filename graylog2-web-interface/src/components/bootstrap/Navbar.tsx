@@ -16,7 +16,7 @@
  */
 import styled, { css } from 'styled-components';
 
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import { NAV_ITEM_HEIGHT, NAVBAR_GAP } from 'theme/constants';
 
 const Navbar = styled.header(
   ({ theme }) => css`
@@ -25,8 +25,11 @@ const Navbar = styled.header(
     min-height: auto;
     display: flex;
     align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    gap: ${NAVBAR_GAP}px;
+
+    /* The navigation menu collapses into a burger menu instead of wrapping onto a second line,
+       which the fixed height could not accommodate anyway. */
+    flex-wrap: nowrap;
     padding: 0 15px;
     background-color: ${theme.colors.global.navigationBackground};
     border: 0;

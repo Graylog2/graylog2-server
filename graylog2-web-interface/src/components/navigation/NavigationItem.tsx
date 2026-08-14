@@ -17,32 +17,13 @@
 
 import * as React from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
-import type * as Immutable from 'immutable';
-import type { Permission } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
-import { isPermitted } from 'util/PermissionsMixin';
 import { NavDropdown } from 'components/bootstrap';
 import NavigationLink from 'components/navigation/NavigationLink';
-import AppConfig from 'util/AppConfig';
-
-const shouldRender = (
-  requiredFeatureFlag: string | undefined,
-  requiredPermissions: Permission | Array<Permission> | undefined,
-  userPermissions: Immutable.List<Permission>,
-) => {
-  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
-    return false;
-  }
-
-  if (requiredPermissions && !isPermitted(userPermissions, requiredPermissions)) {
-    return false;
-  }
-
-  return true;
-};
+import shouldRenderNavigationItem from 'components/navigation/util/shouldRenderNavigationItem';
 
 const renderLinkTitle = (description: string, Badge: PluginNavigation['BadgeComponent'] | undefined) =>
   Badge ? <Badge text={description} /> : description;
@@ -59,7 +40,7 @@ const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }:
   const activeMenuItem = menuItems.filter(({ path, end }) => path && isActiveRoute(pathname, path, end));
   const title = activeMenuItem.length > 0 ? `${description} / ${activeMenuItem[0].description}` : description;
   const accessibleMenuItems = menuItems.filter(({ requiredFeatureFlag, permissions }) =>
-    shouldRender(requiredFeatureFlag, permissions, currentUser.permissions),
+    shouldRenderNavigationItem(requiredFeatureFlag, permissions, currentUser.permissions),
   );
 
   if (!accessibleMenuItems.length) {
@@ -98,7 +79,7 @@ const NavigationItem = ({
 }: Props) => {
   const currentUser = useCurrentUser();
 
-  if (!shouldRender(requiredFeatureFlag, permissions, currentUser.permissions)) {
+  if (!shouldRenderNavigationItem(requiredFeatureFlag, permissions, currentUser.permissions)) {
     return null;
   }
 

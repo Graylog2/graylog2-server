@@ -49,7 +49,7 @@ const NotificationBadge = () => {
   const { data, isLoading } = useNotificationBadgeCount({ enabled });
 
   return isLoading || !data ? null : (
-    <StyledNav navbar>
+    <StyledNav>
       <LinkContainer to={Routes.SYSTEM.NOTIFICATIONS}>
         <StyledInactiveNavItem>
           <Badge bsStyle="danger" data-testid="notification-badge" title="System Notifications">

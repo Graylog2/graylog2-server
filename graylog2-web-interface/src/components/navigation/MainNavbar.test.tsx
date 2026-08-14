@@ -212,6 +212,75 @@ describe('MainNavbar', () => {
         expect(itemWithPosition.compareDocumentPosition(targetItem)).toBe(2);
       });
     });
+
+    it('keeps the expanded menu from shrinking, so that its measured width stays meaningful', async () => {
+      render(<SUT />);
+
+      await screen.findByRole('link', { name: /perpetuum mobile/i });
+
+      expect(screen.getByRole('list')).toHaveStyleRule('flex', '0 0 auto');
+    });
+
+    describe('when collapsed', () => {
+      const openBurgerMenu = async () =>
+        userEvent.click(await screen.findByRole('button', { name: 'Toggle navigation' }));
+
+      it('replaces the navigation items with a burger toggle', async () => {
+        render(<SUT collapsed />);
+
+        await screen.findByRole('button', { name: 'Toggle navigation' });
+
+        expect(screen.queryByRole('link', { name: /perpetuum mobile/i })).not.toBeInTheDocument();
+      });
+
+      it('shows top-level items after opening the burger menu', async () => {
+        render(<SUT collapsed />);
+
+        await openBurgerMenu();
+
+        await screen.findByRole('menuitem', { name: /perpetuum mobile/i });
+      });
+
+      it('shows the children of a nested item after opening its submenu', async () => {
+        asMock(useCurrentUser).mockReturnValue(
+          adminUser
+            .toBuilder()
+            // @ts-expect-error
+            .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
+            .build(),
+        );
+
+        render(<SUT collapsed />);
+
+        await openBurgerMenu();
+
+        const submenu = await screen.findByRole('menuitem', { name: /neat stuff/i });
+
+        expect(screen.queryByRole('menuitem', { name: /something else/i })).not.toBeInTheDocument();
+
+        await userEvent.click(submenu);
+
+        await screen.findByRole('menuitem', { name: /something else/i });
+      });
+
+      it('omits items the user is not permitted to see', async () => {
+        asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
+
+        render(<SUT collapsed />);
+
+        await openBurgerMenu();
+
+        expect(screen.queryByRole('menuitem', { name: /archives/i })).not.toBeInTheDocument();
+      });
+
+      it('omits items which require a feature flag that is not enabled', async () => {
+        render(<SUT collapsed />);
+
+        await openBurgerMenu();
+
+        expect(screen.queryByRole('menuitem', { name: /feature flag test/i })).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe('uses correct permissions:', () => {

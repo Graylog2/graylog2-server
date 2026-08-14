@@ -16,78 +16,38 @@
  */
 
 import * as React from 'react';
-import { useMemo } from 'react';
-import type { PluginNavigation } from 'graylog-web-plugin';
+import styled from 'styled-components';
 
 import { Nav } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
-import usePluginEntities from 'hooks/usePluginEntities';
 import NavigationItem from 'components/navigation/NavigationItem';
-import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
-import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
-import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
+import CollapsedMainNavbar from 'components/navigation/CollapsedMainNavbar';
+import useNavigationItems from 'components/navigation/useNavigationItems';
 
-import mergeNavigationItems from './util/mergeNavigationItems';
+// Must not shrink: its measured width tells `useNavigationCollapse` how much room the menu wants,
+// which a shrunk menu would understate.
+const ExpandedNav = styled(Nav)`
+  flex: 0 0 auto;
+`;
 
-const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, description: string) => {
-  if (!navigationItems?.length) {
-    return false;
-  }
-
-  return !!navigationItems.find((value) => value.description?.toLowerCase() === description.toLowerCase());
+type Props = {
+  pathname: string;
+  collapsed?: boolean;
+  menuRef?: React.Ref<HTMLUListElement>;
 };
 
-const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, description: string) => {
-  if (!navigationItems?.length) return false;
-  const menuItem = navigationItems.find((value) => value.description?.toLowerCase() === description.toLowerCase());
-
-  return menuItem && Object.keys(menuItem).includes('useCondition') ? menuItem.useCondition() : true;
-};
-
-const useNavigationItems = () => {
-  const { permissions } = useCurrentUser();
-  const allNavigationItems = usePluginEntities('navigation');
-  const navigationItems = useMemo(() => mergeNavigationItems(allNavigationItems), [allNavigationItems]);
-
-  const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
-
-  return useMemo(() => {
-    const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_ENTERPRISE_NAV_ITEM.description);
-    const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
-    const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
-
-    if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
-      // no enterprise plugin menu, so we will add one
-      navigationItems.push(DEFAULT_ENTERPRISE_NAV_ITEM);
-    }
-
-    if ((securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) || securityLicenseInvalid) {
-      // no security plugin menu, so we will add one
-      if (!securityMenuIsMissing) {
-        // remove the existing security menu item
-        navigationItems.splice(
-          navigationItems.findIndex((item) => item.description === DEFAULT_SECURITY_NAV_ITEM.description),
-          1,
-        );
-      }
-
-      navigationItems.push(DEFAULT_SECURITY_NAV_ITEM);
-    }
-
-    return sortNavigationItems<PluginNavigation>(navigationItems);
-  }, [navigationItems, permissions, securityLicenseInvalid]);
-};
-
-const MainNavbar = ({ pathname }: { pathname: string }) => {
+const MainNavbar = ({ pathname, collapsed = false, menuRef = undefined }: Props) => {
   const navigationItems = useNavigationItems();
 
+  if (collapsed) {
+    return <CollapsedMainNavbar navigationItems={navigationItems} />;
+  }
+
   return (
-    <Nav>
+    <ExpandedNav ref={menuRef}>
       {navigationItems.map((navigationItem) => (
         <NavigationItem navigationItem={navigationItem} pathname={pathname} key={navigationItem.description} />
       ))}
-    </Nav>
+    </ExpandedNav>
   );
 };
 

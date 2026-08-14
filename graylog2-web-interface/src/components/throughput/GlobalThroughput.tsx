@@ -22,36 +22,12 @@ import { NavItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { useGlobalThroughput } from 'hooks/useMetrics';
 
-const ThroughputNavItem = styled(NavItem)`
-  > a {
-    @media (width <= 991px) {
-      height: auto;
-      display: block;
-    }
-  }
-`;
-
 const ContentWrap = styled.strong`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 0;
   height: 30px;
-
-  @media (width <= 991px) {
-    height: auto;
-    display: block;
-
-    &::before {
-      content: attr(aria-label);
-      font-weight: normal;
-    }
-
-    span,
-    &::after {
-      display: none;
-    }
-  }
 `;
 
 const ThroughputData = styled.span<{ $dataIn?: boolean }>(
@@ -109,7 +85,7 @@ const GlobalThroughput = (props) => {
     );
   }
 
-  return <ThroughputNavItem {...props}>{output}</ThroughputNavItem>;
+  return <NavItem {...props}>{output}</NavItem>;
 };
 
 export default GlobalThroughput;

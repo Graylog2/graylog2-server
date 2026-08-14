@@ -26,6 +26,7 @@ import Routes from 'routing/Routes';
 import BrandNavLogo from 'components/navigation/NavigationBrand';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
+import useNavigationCollapse from 'components/navigation/useNavigationCollapse';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import UserMenu from './UserMenu';
@@ -61,6 +62,14 @@ const Brand = styled.div`
   flex: 0 0 auto;
 `;
 
+// Always rendered, even while there is no badge to show, so that the navigation bar keeps a
+// constant number of regions for `useNavigationCollapse` to account for.
+const Badges = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+`;
+
 const Icons = styled.nav`
   display: flex;
   align-items: center;
@@ -71,21 +80,21 @@ const Icons = styled.nav`
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
+  const { navbarRef, brandRef, badgesRef, iconsRef, menuRef, collapsed } = useNavigationCollapse();
 
   return (
-    <Navbar>
-      <Brand>
+    <Navbar ref={navbarRef}>
+      <Brand ref={brandRef}>
         <BrandLink to={Routes.WELCOME} aria-label="Welcome">
           <BrandNavLogo />
         </BrandLink>
       </Brand>
-      {pluginItems.map(({ key, component: Item }) => (
-        <Item key={key} smallScreen />
-      ))}
-      <MainNavbar pathname={pathname} />
-      <NotificationBadge />
+      <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />
+      <Badges ref={badgesRef}>
+        <NotificationBadge />
+      </Badges>
 
-      <Icons>
+      <Icons ref={iconsRef}>
         <QuickJumpModalContainer />
 
         {AppConfig.isCloud() ? (
