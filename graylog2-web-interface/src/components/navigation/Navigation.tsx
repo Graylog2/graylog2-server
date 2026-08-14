@@ -84,12 +84,13 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
   return (
     <Navbar ref={navbarRef}>
+      {collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
       <Brand ref={brandRef}>
         <BrandLink to={Routes.WELCOME} aria-label="Welcome">
           <BrandNavLogo />
         </BrandLink>
       </Brand>
-      <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />
+      {!collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
       <Badges ref={badgesRef}>
         <NotificationBadge />
       </Badges>
