@@ -89,7 +89,7 @@ const CollectorFactsSection = ({ instance, fleetName }: Props) => {
     <QuietSection title="Collector" titleAs="h3">
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md" verticalSpacing="sm">
         <Fact label="Host">{instance.hostname ?? instance.instance_uid}</Fact>
-        <Fact label="OS">{collectorOsName(instance)}</Fact>
+        <Fact label="OS">{collectorOsName(instance, true)}</Fact>
         <Fact label="Version">{instance.version ?? 'Unknown'}</Fact>
         <Fact label="Fleet">
           <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName ?? 'Unknown'}</Link>
