@@ -120,11 +120,12 @@ const StreamsAndCategoriesFilter = ({
   };
 
   return (
-    <FormGroup controlId={id} validationState={error ? 'error' : null}>
+    <FormGroup controlId={rest.inputId ?? id} validationState={error ? 'error' : null}>
       {label && <ControlLabel>{label}</ControlLabel>}
       <Select
         {...rest}
         id={id}
+        inputId={rest.inputId ?? id}
         onChange={() => {}}
         onReactSelectChange={handleReactSelectChange}
         options={options}
