@@ -207,8 +207,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   default: { prepare: jest.fn(() => Promise.resolve()), update: jest.fn(() => Promise.resolve()) },
 }));
 
-// Rendered as soon as the form becomes dirty. It relies on `useBlocker`, which needs a data
-// router that the test wrapper does not set up, so it is stubbed out here.
+// Rendered once the form is dirty and relies on `useBlocker`, which needs a data router.
 jest.mock('components/common/ConfirmLeaveDialog', () => () => null);
 
 jest.mock('components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage');
@@ -373,7 +372,7 @@ describe('EventDefinitionFormContainer', () => {
   });
 
   it('keeps the selected collaborators when navigating away from and back to the Share step', async () => {
-    // Mirror the server: the prepared state reflects exactly the capabilities that were sent.
+    // Mirrors the server: the prepared state reflects exactly the capabilities that were sent.
     asMock(EntityShareDomain.prepare).mockImplementation((_type, _title, _grn, payload?: any) =>
       Promise.resolve(
         createEntityShareState
@@ -396,8 +395,6 @@ describe('EventDefinitionFormContainer', () => {
     await userEvent.click(await screen.findByRole('button', { name: /^summary$/i }));
     await userEvent.click(await screen.findByRole('button', { name: /^share$/i }));
 
-    // Re-entering the step must re-prepare with the selection made before, otherwise the
-    // freshly prepared (empty) state overwrites it and the form appears cleared.
     expect(await screen.findByText(everyone.title)).toBeVisible();
   });
 });
