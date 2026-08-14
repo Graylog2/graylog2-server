@@ -63,16 +63,16 @@ public class OpensearchClusterResource extends RestResource {
     private static final String DEFAULT_SORT_FIELD = "name";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id(OpensearchNode.FIELD_ID).title("ID").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
+            EntityAttribute.builder().id(OpensearchNode.FIELD_ID).title("ID").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).hidden(true).build(),
             EntityAttribute.builder().id(OpensearchNode.FIELD_NAME).title("Node Name").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(OpensearchNode.FIELD_VERSION).title("Version").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(OpensearchNode.FIELD_ROLES).title("Roles").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
-            EntityAttribute.builder().id(OpensearchNode.FIELD_JVM_HEAP_MAX).title("JVM Heap Max").type(SearchQueryField.Type.LONG).sortable(true).build(),
-            EntityAttribute.builder().id(OpensearchNode.FIELD_JVM_HEAP_USED_PERCENT).title("JVM Heap Used").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
-            EntityAttribute.builder().id(OpensearchNode.FIELD_CPU_USED_PERCENT).title("CPU Used").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
-            EntityAttribute.builder().id(OpensearchNode.FIELD_DISK_USED_PERCENT).title("Disk Used Percent").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
-            EntityAttribute.builder().id(OpensearchNode.FIELD_DISK_USED).title("Disk Used").type(SearchQueryField.Type.LONG).sortable(true).build(),
-            EntityAttribute.builder().id(OpensearchNode.FIELD_DISK_TOTAL).title("Disk Total").type(SearchQueryField.Type.LONG).sortable(true).build()
+            EntityAttribute.builder().id(OpensearchNode.FIELD_JVM_HEAP_MAX).title("JVM Heap Max").type(SearchQueryField.Type.LONG).sortable(true).hidden(true).build(),
+            EntityAttribute.builder().id(OpensearchNode.FIELD_JVM_HEAP_USED_PERCENT).title("JVM Heap").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
+            EntityAttribute.builder().id(OpensearchNode.FIELD_CPU_USED_PERCENT).title("CPU").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
+            EntityAttribute.builder().id(OpensearchNode.FIELD_DISK_USED_PERCENT).title("Disk").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
+            EntityAttribute.builder().id(OpensearchNode.FIELD_DISK_USED).title("Disk Used").type(SearchQueryField.Type.LONG).sortable(true).hidden(true).build(),
+            EntityAttribute.builder().id(OpensearchNode.FIELD_DISK_TOTAL).title("Disk Total").type(SearchQueryField.Type.LONG).sortable(true).hidden(true).build()
     );
 
     private static final EntityDefaults settings = EntityDefaults.builder()

@@ -17,14 +17,9 @@
 import React, { useState } from 'react';
 
 import { PaginatedEntityTable } from 'components/common';
-import type { ColumnSchema } from 'components/common/EntityDataTable';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
-import {
-  createColumnDefinitions,
-  createColumnRenderers,
-  DEFAULT_VISIBLE_COLUMNS,
-} from './OpensearchNodesColumnConfiguration';
+import { createColumnRenderers, DEFAULT_VISIBLE_COLUMNS } from './OpensearchNodesColumnConfiguration';
 import type { OpensearchNode, OpensearchNodesResponse } from './fetchClusterOpensearchNodes';
 import { clusterOpensearchNodesKeyFn, fetchOpensearchNodes } from './fetchClusterOpensearchNodes';
 
@@ -50,7 +45,6 @@ const OpensearchNodesExpandable = ({
     setTotalOpensearchNodes(data.pagination?.total ?? data.list.length);
   };
 
-  const columnSchemas: Array<ColumnSchema> = createColumnDefinitions();
   const columnRenderers = createColumnRenderers();
 
   const tableLayout = {
@@ -73,7 +67,6 @@ const OpensearchNodesExpandable = ({
         tableLayout={tableLayout}
         fetchEntities={fetchOpensearchNodes}
         keyFn={clusterOpensearchNodesKeyFn}
-        additionalAttributes={columnSchemas}
         columnRenderers={columnRenderers}
         humanName="OpenSearch Nodes"
         externalSearch={externalSearch}

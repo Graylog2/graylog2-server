@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { Label } from 'components/bootstrap';
-import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 import type { OpensearchNode } from './fetchClusterOpensearchNodes';
 
@@ -31,12 +31,13 @@ const DISK_DANGER_THRESHOLD = 0.8;
 const CPU_WARNING_THRESHOLD = 0.7;
 const CPU_DANGER_THRESHOLD = 0.9;
 
-export const DEFAULT_VISIBLE_COLUMNS = ['name', 'roles', 'version', 'cpu', 'jvm', 'disk'];
-
-export const createColumnDefinitions = (): Array<ColumnSchema> => [
-  { id: 'cpu', title: 'CPU', sortable: false, isDerived: true },
-  { id: 'jvm', title: 'JVM Heap', sortable: false, isDerived: true },
-  { id: 'disk', title: 'Disk', sortable: false, isDerived: true },
+export const DEFAULT_VISIBLE_COLUMNS = [
+  'name',
+  'roles',
+  'version',
+  'cpu_used_percent',
+  'jvm_heap_used_percent',
+  'disk_used_percent',
 ];
 
 const getRoleLabels = (roles: Array<string> | undefined | null) =>
@@ -67,7 +68,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
       renderCell: (_value, entity) => getRoleLabels(entity.roles),
       minWidth: 220,
     },
-    cpu: {
+    cpu_used_percent: {
       renderCell: (_value, entity) => (
         <CpuMetricsCell
           cpuPercent={entity.cpu_used_percent}
@@ -78,7 +79,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
       staticWidth: 130,
       textAlign: 'right',
     },
-    jvm: {
+    jvm_heap_used_percent: {
       renderCell: (_value, entity) => (
         <SizeAndRatioMetric
           used={computeJvmHeapUsedBytes(entity.jvm_heap_max, entity.jvm_heap_used_percent)}
@@ -90,7 +91,7 @@ export const createColumnRenderers = (): ColumnRenderers<OpensearchNode> => ({
       staticWidth: 130,
       textAlign: 'right',
     },
-    disk: {
+    disk_used_percent: {
       renderCell: (_value, entity) => (
         <SizeAndRatioMetric
           used={entity.disk_used}
