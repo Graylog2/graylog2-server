@@ -127,7 +127,20 @@ definition can be created after the rules are imported to create the same tempor
 All previously imported Sigma rules, including correlation rules, will be migrated to the new Event Definition pattern
 on upgrade and work as they did before.
 
-Two additional changes to fired events result from this rework:
+### Sigma Level to Event Definition Priority Correction
+
+Event definitions created from Sigma rules previously mapped to only a select set of the supported priority values.
+They now map to the full range, and all existing rules have the correct priority applied during the 7.2 upgrade.
+
+| Sigma level     | Before     | After             |
+| --------------- | ---------- | ----------------- |
+| `informational` | 1 (Low)    | 0 (Informational) |
+| `low`           | 1 (Low)    | 1 (Low)           |
+| `medium`        | 2 (Medium) | 2 (Medium)        |
+| `high`          | 3 (High)   | 3 (High)          |
+| `critical`      | 3 (High)   | 4 (Critical)      |
+
+### Changes to Sigma Events
 
 - The `sigma_rule_tag_*` fields are no longer added to fired events. Previously, fired events included
   `sigma_rule_tag_1`, `sigma_rule_tag_2`, etc. in their Additional Fields. MITRE information recognized by Graylog is
@@ -145,14 +158,14 @@ title. You do not need to re-import or reconfigure your rules. Note that events 
 rewritten — they keep the original `sigma_rule_tag_*` Additional Fields and titles they were fired with; the changes
 above apply to events fired after the upgrade.
 
-The following REST API changes are a direct result of this rework:
+### Sigma API Changes
 
 | Endpoint                                                                       | Description                                                                              |
 |--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
 | `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/validate_zip` | Moved to `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/import/validate_zip` |
 | `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/import`       | Moved to `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/import/bulk/import`  |
 | `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/upload`       | Moved to `POST /plugins/org.graylog.plugins.securityapp.sigma/sigma/import/bulk/upload`  |
-| All other `/plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/...`     | Deleted                                                                                  |
+| All other `/plugins/org.graylog.plugins.securityapp.sigma/sigma/rules/...`     | Deleted (use Event Definition API to manage)                                             |
 
 ## Threat Coverage Percentages May Change After Upgrade
 
