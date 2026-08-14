@@ -167,12 +167,12 @@ const DashboardActionsMenu = () => {
           entityType="dashboard"
           entityId={view.id}
           onClick={() => setShareViewOpen(true)}
-          bsStyle="default"
+          bsSize="md"
           disabledInfo={isNewView && 'Only saved dashboards can be shared.'}
         />
       )}
       {showDropDownButton && (
-        <MoreActionsMenu id="query-tab-actions-dropdown" pullRight keepMounted>
+        <MoreActionsMenu id="query-tab-actions-dropdown" pullRight keepMounted solid>
           {dashboardActions.length > 0 && (
             <>
               {dashboardActions}
