@@ -366,6 +366,7 @@ const AdaptableQueryTabs = ({
             eventKey={id}
             key={id}
             data-tab-id={id}
+            aria-label={title}
             onClick={() => {
               setLockedTab(undefined);
               onSelect(id);
@@ -394,7 +395,13 @@ const AdaptableQueryTabs = ({
 
       lockedItems = lockedItems.add(
         lockedTab !== id ? null : (
-          <QueryTab eventKey={id} key={id} data-tab-id={id} onClick={() => onSelect(id)} className={CLASS_LOCKED}>
+          <QueryTab
+            eventKey={id}
+            key={id}
+            data-tab-id={id}
+            aria-label={title}
+            onClick={() => onSelect(id)}
+            className={CLASS_LOCKED}>
             {tabTitle}
           </QueryTab>
         ),
