@@ -262,6 +262,37 @@ class CollectorInstancesResourceTest {
     }
 
     @Test
+    void getInstanceHandlesDuplicateAttributeKeysWithoutThrowing() {
+        // See https://github.com/Graylog2/graylog2-server/issues/26901: the extractor now
+        // de-duplicates keys before persisting, but attributesToMap() stays defensive for
+        // documents that were persisted before that de-duplication existed - plain
+        // Collectors.toMap(keyFn, valueFn) throws IllegalStateException on a duplicate key.
+        stubOfflineThreshold();
+        final var duplicateKeyInstance = CollectorInstanceDTO.builder()
+                .instanceUid("uid-1")
+                .fleetId("fleet-1")
+                .capabilities(0L)
+                .lastSeen(Instant.now())
+                .enrolledAt(Instant.now())
+                .activeCertificateFingerprint("sha256:active")
+                .activeCertificatePem("active-pem")
+                .activeCertificateExpiresAt(Instant.now().plus(Duration.ofDays(30)))
+                .issuingCaId("ca-1")
+                .enrollmentTokenId("token-1")
+                .identifyingAttributes(List.of(
+                        Attribute.of("host.name", "first"),
+                        Attribute.of("host.name", "second")))
+                .build();
+        when(collectorInstanceService.findByInstanceUid("uid-1")).thenReturn(Optional.of(duplicateKeyInstance));
+        when(txnLogService.hasPendingChanges("fleet-1", "uid-1", 0L)).thenReturn(false);
+
+        final var result = resource.getInstance("uid-1");
+
+        // The later entry in the list wins.
+        assertThat(result.identifyingAttributes()).containsEntry("host.name", "second");
+    }
+
+    @Test
     void getInstanceMarksInstanceOfflineWhenLastSeenOlderThanThreshold() {
         stubOfflineThreshold();
         // Default offline threshold is 5 minutes; a 10-minute-old heartbeat is offline.

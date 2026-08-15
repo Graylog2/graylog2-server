@@ -403,7 +403,17 @@ public class CollectorInstancesResource extends RestResource {
         return collectorsConfigService.getOrDefault().collectorOfflineThreshold();
     }
 
+    /**
+     * Converts a stored attribute list to a {@code key -> value} map.
+     * <p>
+     * The extractor that builds these lists (see {@code OpAmpService#extractAttributes}) de-duplicates
+     * keys before persisting, but this method stays defensive against duplicates regardless - e.g. for
+     * documents persisted before that de-duplication existed - since the plain {@link Collectors#toMap}
+     * two-arg form throws {@link IllegalStateException} on a duplicate key. On a duplicate, the
+     * later entry in the list wins.
+     */
     private static Map<String, Object> attributesToMap(Optional<List<Attribute>> attributes) {
-        return attributes.orElse(List.of()).stream().collect(toMap(Attribute::key, Attribute::value));
+        return attributes.orElse(List.of()).stream()
+                .collect(toMap(Attribute::key, Attribute::value, (first, second) -> second));
     }
 }
