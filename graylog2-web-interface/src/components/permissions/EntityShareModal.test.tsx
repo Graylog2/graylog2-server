@@ -49,7 +49,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
     update: jest.fn(() => Promise.resolve()),
     loadUserSharesPaginated: jest.fn(() =>
       Promise.resolve({
-        list: require('immutable').List(),
+        list: Immutable.List(),
         pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
       }),
     ),
@@ -310,7 +310,7 @@ describe('EntityShareModal', () => {
       const deleteGrantee = async ({ grantee }) => {
         render(<SimpleEntityShareModal />);
 
-        const deleteButton = await screen.findByTitle(`Remove sharing for ${grantee.title}`);
+        const deleteButton = await screen.findByRole('button', { name: `Remove sharing for ${grantee.title}` });
 
         await setupUser().click(deleteButton);
 

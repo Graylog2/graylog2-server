@@ -45,7 +45,7 @@ export type CollectorInstanceView = {
   has_pending_changes: boolean;
 };
 
-export type SourceType = 'file' | 'journald' | 'windows_event_log';
+export type SourceType = 'file' | 'journald' | 'windows_event_log' | 'macos_unified_logging';
 
 export type SourceBase = {
   id: string;
@@ -76,10 +76,21 @@ export type WindowsEventLogSourceConfig = {
   read_mode: 'beginning' | 'end';
 };
 
+export type MacOSUnifiedLoggingSourceConfig = {
+  predicate?: string;
+  // ISO-8601 durations (e.g. 'PT30S', 'PT24H')
+  max_poll_interval: string;
+  max_log_age: string;
+};
+
 export type FileSource = SourceBase & { type: 'file'; config: FileSourceConfig };
 export type JournaldSource = SourceBase & { type: 'journald'; config: JournaldSourceConfig };
 export type WindowsEventLogSource = SourceBase & { type: 'windows_event_log'; config: WindowsEventLogSourceConfig };
-export type Source = FileSource | JournaldSource | WindowsEventLogSource;
+export type MacOSUnifiedLoggingSource = SourceBase & {
+  type: 'macos_unified_logging';
+  config: MacOSUnifiedLoggingSourceConfig;
+};
+export type Source = FileSource | JournaldSource | WindowsEventLogSource | MacOSUnifiedLoggingSource;
 
 export type EnrollmentTokenCreator = {
   user_id: string;

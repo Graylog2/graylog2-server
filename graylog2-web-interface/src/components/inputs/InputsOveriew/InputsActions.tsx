@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
-import { ConfirmDialog, IfPermitted, LinkContainer } from 'components/common';
+import { ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
+import { ConfirmDialog, IfPermitted, LinkContainer, IconButton } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
@@ -130,16 +130,18 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
         <LinkContainer
           key={`received-messages-${input.id}`}
           to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
-          <Button
-            bsSize="xsmall"
+          <IconButton
+            name="search"
+            title="Received messages"
+            bsStyle="default"
+            size="xsmall"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
                 app_pathname: getPathnameWithoutId(pathname),
                 app_action_value: 'show-received-messages',
               });
-            }}>
-            Received messages
-          </Button>
+            }}
+          />
         </LinkContainer>
       </IfPermitted>
 
