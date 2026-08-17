@@ -67,8 +67,8 @@ const SourceName = styled.span`
      and the row overflows the section; a flex child also defaults to min-width auto and would
      refuse to shrink below its content's width without this. */
   flex: 1;
-  min-width: 0;
-  overflow-wrap: anywhere;
+  min-width: 50px;
+  overflow-wrap: break-word;
 `;
 
 const RowStatus = styled.span<{ $variant?: 'muted' | 'success' | 'warning' }>(
