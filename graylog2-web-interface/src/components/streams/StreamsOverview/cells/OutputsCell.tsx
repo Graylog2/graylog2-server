@@ -30,7 +30,6 @@ const OutputsCell = ({ stream }: Props) => {
   const buttonRef = useRef();
   const { toggleSection, expandedSections } = useExpandedSections();
 
-  // Show the count for the default stream too - it can have outputs attached (#14572).
   if (!stream.is_editable) {
     return null;
   }
