@@ -106,6 +106,7 @@ public class AppConfigResource {
                 .put("contentStream", toPrettyJsonString((contentStreamConfiguration.contentStreamFrontendSettings())))
                 .put("branding", toPrettyJsonString(customizationConfig))
                 .put("globalInputsOnly", configuration.isGlobalInputsOnly())
+                .put("welcomePageMetricsEnabled", configuration.isWelcomePageMetricsEnabled())
                 .build();
         return templateEngine.transform(template, model);
     }
