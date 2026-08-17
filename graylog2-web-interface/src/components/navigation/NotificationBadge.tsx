@@ -43,22 +43,24 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
   }
 `;
 
-const NotificationBadge = () => {
+const NotificationBadge = ({ ref }) => {
   const { isPermitted } = usePermissions();
   const enabled = isPermitted('notifications:read');
   const { data, isLoading } = useNotificationBadgeCount({ enabled });
 
   return isLoading || !data ? null : (
-    <StyledNav>
-      <LinkContainer to={Routes.SYSTEM.NOTIFICATIONS}>
-        <StyledInactiveNavItem>
-          <Badge bsStyle="danger" data-testid="notification-badge" title="System Notifications">
-            {data}
-          </Badge>
-        </StyledInactiveNavItem>
-      </LinkContainer>
+    <StyledNav ref={ref}>
+      <li>
+        <LinkContainer to={Routes.SYSTEM.NOTIFICATIONS}>
+          <StyledInactiveNavItem>
+            <Badge bsStyle="danger" data-testid="notification-badge" title="System Notifications">
+              {data}
+            </Badge>
+          </StyledInactiveNavItem>
+        </LinkContainer>
+      </li>
     </StyledNav>
   );
 };
 
-export default NotificationBadge;
+export default React.forwardRef(NotificationBadge);

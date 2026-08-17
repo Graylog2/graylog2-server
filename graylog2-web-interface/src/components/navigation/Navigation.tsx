@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import useLocation from 'routing/useLocation';
 import { Link, LinkContainer } from 'components/common';
-import { Navbar } from 'components/bootstrap';
+import { Nav, Navbar } from 'components/bootstrap';
 import AppConfig from 'util/AppConfig';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
@@ -27,7 +27,7 @@ import BrandNavLogo from 'components/navigation/NavigationBrand';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
 import useNavigationCollapse from 'components/navigation/useNavigationCollapse';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import { NAV_ITEM_HEIGHT, NAVBAR_GAP } from 'theme/constants';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -62,20 +62,19 @@ const Brand = styled.div`
   flex: 0 0 auto;
 `;
 
-// Always rendered, even while there is no badge to show, so that the navigation bar keeps a
-// constant number of regions for `useNavigationCollapse` to account for.
-const Badges = styled.div`
-  display: flex;
-  align-items: center;
+const Icons = styled.nav`
+  margin-left: auto;
   flex: 0 0 auto;
 `;
 
-const Icons = styled.nav`
+const MainNavAndNotificationBadge = styled.nav`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-  flex: 0 0 auto;
+`;
+
+const DevelopmentHeaderBadgeContainer = styled.div`
+  padding-left: ${NAVBAR_GAP}px;
+  padding-right: ${NAVBAR_GAP}px;
 `;
 
 const Navigation = React.memo(({ pathname }: Props) => {
@@ -90,33 +89,44 @@ const Navigation = React.memo(({ pathname }: Props) => {
           <BrandNavLogo />
         </BrandLink>
       </Brand>
-      {!collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
-      <Badges ref={badgesRef}>
-        <NotificationBadge />
-      </Badges>
+      <MainNavAndNotificationBadge aria-label="Main">
+        {!collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
+        <NotificationBadge ref={badgesRef} />
+      </MainNavAndNotificationBadge>
 
-      <Icons ref={iconsRef}>
-        <QuickJumpModalContainer />
+      <Icons ref={iconsRef} aria-label="Utility">
+        <Nav>
+          <li>
+            <QuickJumpModalContainer />
+          </li>
 
-        {AppConfig.isCloud() ? (
-          <GlobalThroughput disabled />
-        ) : (
-          <LinkContainer to={Routes.SYSTEM.CLUSTER.NODES}>
-            <GlobalThroughput />
-          </LinkContainer>
-        )}
+          <li>
+            {AppConfig.isCloud() ? (
+              <GlobalThroughput disabled />
+            ) : (
+              <LinkContainer to={Routes.SYSTEM.CLUSTER.NODES}>
+                <GlobalThroughput />
+              </LinkContainer>
+            )}
+          </li>
 
-        <InactiveNavItem>
-          <DevelopmentHeaderBadge />
-          {pluginItems.map(({ key, component: Item }) => (
-            <Item key={key} />
-          ))}
-        </InactiveNavItem>
-        <ScratchpadToggle />
+          <li>
+            <InactiveNavItem>
+              <DevelopmentHeaderBadgeContainer>
+                <DevelopmentHeaderBadge />
+              </DevelopmentHeaderBadgeContainer>
+              {pluginItems.map(({ key, component: Item }) => (
+                <Item key={key} />
+              ))}
+            </InactiveNavItem>
+          </li>
 
-        <HelpMenu />
+          <ScratchpadToggle />
 
-        <UserMenu />
+          <HelpMenu />
+
+          <UserMenu />
+        </Nav>
       </Icons>
     </Navbar>
   );

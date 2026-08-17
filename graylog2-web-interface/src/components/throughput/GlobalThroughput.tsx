@@ -21,6 +21,7 @@ import NumberUtils from 'util/NumberUtils';
 import { NavItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { useGlobalThroughput } from 'hooks/useMetrics';
+import { NAVBAR_GAP } from 'theme/constants';
 
 const ContentWrap = styled.strong`
   display: grid;
@@ -28,6 +29,8 @@ const ContentWrap = styled.strong`
   grid-template-rows: 1fr 1fr;
   gap: 0;
   height: 30px;
+  padding-left: ${NAVBAR_GAP}px;
+  padding-right: ${NAVBAR_GAP}px;
 `;
 
 const ThroughputData = styled.span<{ $dataIn?: boolean }>(
