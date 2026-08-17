@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import moment from 'moment';
 import styled, { css } from 'styled-components';
 
 import { Icon, Link, RelativeTime, Spinner, Timeline } from 'components/common';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView } from 'components/collectors/types';
+import { PREVIEW_RANGE_SECONDS } from 'components/collectors/hooks/useCollectorLogPreview';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -66,7 +68,8 @@ const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }:
       return (
         <Timeline.Item title="First messages" bullet={<CheckBullet />}>
           <StepDetail>
-            Receiving - {receivedTotal} {receivedTotal === 1 ? 'message' : 'messages'} in the last 15 minutes
+            Receiving - {receivedTotal} {receivedTotal === 1 ? 'message' : 'messages'} since{' '}
+            {moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}
           </StepDetail>
         </Timeline.Item>
       );

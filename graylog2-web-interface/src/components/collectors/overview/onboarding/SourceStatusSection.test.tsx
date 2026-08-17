@@ -304,6 +304,6 @@ describe('SourceStatusSection', () => {
       <SourceStatusSection instance={instance} sources={[source({ id: 's1' })]} receiving sourceCounts={{ s1: 3 }} />,
     );
 
-    expect(screen.getByText(/Messages received in the last 15 minutes/)).toBeInTheDocument();
+    expect(screen.getByText(/Showing messages received since an hour/)).toBeInTheDocument();
   });
 });

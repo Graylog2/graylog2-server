@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import { Grid } from '@mantine/core';
+import moment from 'moment/moment';
 
 import { Button } from 'components/bootstrap';
 import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
@@ -37,7 +38,6 @@ import InstanceStatusLabel from '../../common/InstanceStatusLabel';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
-import moment from 'moment/moment';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -150,7 +150,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
           preview={sourceLogs}
           isLoading={isLoading}
           error={sourceLogsError}
-          caption={`Showing messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${!receiving && ' - checking every few seconds'}`}
+          caption={`Showing messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
         />
       ) : (
         <LogPreviewSection
@@ -159,7 +159,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
           preview={selfLogs}
           isLoading={isLoading}
           error={selfLogsError}
-          caption={`Showing Collector system messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${!receiving && ' - checking every few seconds'}`}
+          caption={`Showing Collector system messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
         />
       )}
     </Stack>

@@ -102,7 +102,7 @@ describe('ConnectionSuccess', () => {
     expect(useSources).toHaveBeenCalledWith('fleet-1');
     expect(screen.getByText('Connected')).toBeInTheDocument();
     expect(screen.getByText(/3 sources from fleet/)).toBeInTheDocument();
-    expect(screen.getByText(/23 messages in the last 15 minutes/)).toBeInTheDocument();
+    expect(screen.getByText(/23 messages since an hour/)).toBeInTheDocument();
   });
 
   it('spins on the first-messages step until source messages arrive', () => {
@@ -116,9 +116,9 @@ describe('ConnectionSuccess', () => {
 
     expect(screen.getByText('Listening... usually under a minute')).toBeInTheDocument();
     expect(screen.getAllByText('Waiting for first messages...').length).toBeGreaterThan(0);
-    // The source status footer and the empty log preview both surface this hint while nothing has
-    // arrived yet, so more than one match is expected here.
-    expect(screen.getAllByText(/checking every few seconds/)).toHaveLength(2);
+    // The source status footer, the empty log preview and the preview caption all surface this
+    // hint while nothing has arrived yet, so more than one match is expected here.
+    expect(screen.getAllByText(/checking every few seconds/)).toHaveLength(3);
   });
 
   it('marks sources that cannot apply to the collector platform', () => {
@@ -127,20 +127,23 @@ describe('ConnectionSuccess', () => {
     expect(screen.getByText('Not applicable on Linux')).toBeInTheDocument();
   });
 
-  it('reveals all attributes behind the toggle', async () => {
+  it('lists all reported attributes', () => {
     render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
-    expect(screen.queryByText('arm64')).not.toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: 'Show all 2 attributes' }));
-
+    // The attributes sit behind a Spoiler that clips them via CSS instead of unmounting them, and
+    // its toggle only mounts once real layout measurements exceed the collapsed height — neither
+    // is observable in jsdom, so this covers the attribute rendering only.
+    expect(screen.getByText('host.arch')).toBeInTheDocument();
     expect(screen.getByText('arm64')).toBeInTheDocument();
+    expect(screen.getByText('service.instance.id')).toBeInTheDocument();
   });
 
   it('falls back to the instance uid when hostname is missing', () => {
     render(<ConnectionSuccess instance={{ ...instance, hostname: null }} fleetName="Default Fleet" />);
 
-    expect(screen.getByText('uid-42')).toBeInTheDocument();
+    // Once as the Host fact fallback, once as the service.instance.id attribute value, which the
+    // Spoiler keeps in the DOM even while collapsed.
+    expect(screen.getAllByText('uid-42')).toHaveLength(2);
   });
 
   it('renders the what-is-next links', () => {
@@ -210,7 +213,7 @@ describe('ConnectionSuccess', () => {
     render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
     expect(screen.getByText(/1 source from fleet/)).toBeInTheDocument();
-    expect(screen.getByText(/1 message in the last 15 minutes/)).toBeInTheDocument();
+    expect(screen.getByText(/1 message since an hour/)).toBeInTheDocument();
   });
 
   it('keeps listening while the first log search is still running', () => {
@@ -237,11 +240,12 @@ describe('ConnectionSuccess', () => {
   it('captions the preview differently depending on the collector status', () => {
     const { rerender } = render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
 
-    expect(screen.getByText(/Showing the newest messages from this collector/)).toBeInTheDocument();
+    // While online the source status footer shares this wording with the preview caption.
+    expect(screen.getAllByText(/Showing messages received since an hour/)).toHaveLength(2);
 
     rerender(<ConnectionSuccess instance={{ ...instance, status: 'offline' }} fleetName="Default Fleet" />);
 
-    expect(screen.getByText(/Showing the collector's own logs/)).toBeInTheDocument();
+    expect(screen.getByText(/Showing Collector system messages received since an hour/)).toBeInTheDocument();
   });
 
   it('shows per-source message counts from the aggregation', () => {

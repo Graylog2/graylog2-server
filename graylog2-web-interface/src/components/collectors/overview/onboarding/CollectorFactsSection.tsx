@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button } from 'components/bootstrap';
-import { Link, RelativeTime, SimpleGrid } from 'components/common';
+import { Link, RelativeTime, SimpleGrid, Spoiler } from 'components/common';
 import Routes from 'routing/Routes';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { CollectorInstanceView } from 'components/collectors/types';
@@ -36,8 +34,6 @@ type Props = {
 const FactLabel = styled.div(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.tiny};
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
     color: ${theme.colors.text.secondary};
   `,
 );
@@ -61,9 +57,15 @@ const StatusDot = styled.span<{ $online: boolean }>(
   `,
 );
 
-const ToggleButton = styled(Button)`
-  padding-left: 0;
-`;
+const AttributesSpoiler = styled(Spoiler)(
+  ({ theme }) => css`
+    grid-column: 1 / -1;
+
+    .mantine-Spoiler-control {
+      font-size: ${theme.fonts.size.small};
+    }
+  `,
+);
 
 const Fact = ({ label, children = undefined }: React.PropsWithChildren<{ label: string }>) => (
   <div>
@@ -78,7 +80,6 @@ const Fact = ({ label, children = undefined }: React.PropsWithChildren<{ label: 
  * stay scannable while everything the agent reported remains one click away.
  */
 const CollectorFactsSection = ({ instance, fleetName }: Props) => {
-  const [showAttributes, setShowAttributes] = useState(false);
 
   const attributes = [
     ...Object.entries(instance.identifying_attributes ?? {}),
@@ -101,17 +102,17 @@ const CollectorFactsSection = ({ instance, fleetName }: Props) => {
           <StatusDot $online={instance.status === 'online'} />
           <RelativeTime dateTime={instance.last_seen} />
         </Fact>
-        {showAttributes &&
-          attributes.map(([key, value]) => (
-            <Fact key={key} label={key}>
-              {String(value)}
-            </Fact>
-          ))}
       </SimpleGrid>
       {attributes.length > 0 && (
-        <ToggleButton bsStyle="link" bsSize="xsmall" onClick={() => setShowAttributes((show) => !show)}>
-          {showAttributes ? 'Hide attributes' : `Show all ${attributes.length} attributes`}
-        </ToggleButton>
+        <AttributesSpoiler maxHeight={0} showLabel={`Show all ${attributes.length} attributes`} hideLabel='Hide attributes'>
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md" verticalSpacing="sm">
+            {attributes.map(([key, value]) => (
+              <Fact key={key} label={key}>
+                {String(value)}
+              </Fact>
+            ))}
+          </SimpleGrid>
+        </AttributesSpoiler>
       )}
     </QuietSection>
   );

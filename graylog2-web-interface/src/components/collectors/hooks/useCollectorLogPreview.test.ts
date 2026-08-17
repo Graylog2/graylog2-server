@@ -188,7 +188,7 @@ describe('useCollectorLogPreview', () => {
     expect(sourceQuery.filter).toBeUndefined();
 
     queries.forEach((q) => {
-      expect(q.timerange).toEqual({ type: 'relative', from: 900 });
+      expect(q.timerange).toEqual({ type: 'relative', from: 3600 });
 
       const messagesSearchType = q.searchTypes.find((st) => st.type === 'messages');
 
