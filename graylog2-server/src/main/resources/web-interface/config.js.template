@@ -8,5 +8,6 @@ window.appConfig = {
   telemetry: ${telemetry},
   contentStream: ${contentStream},
   branding: ${branding},
-  globalInputsOnly: ${globalInputsOnly}
+  globalInputsOnly: ${globalInputsOnly},
+  welcomePageMetricsEnabled: ${welcomePageMetricsEnabled}
 };

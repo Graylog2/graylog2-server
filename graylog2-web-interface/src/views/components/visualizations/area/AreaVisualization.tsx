@@ -45,7 +45,7 @@ const AreaVisualization = makeVisualization(
         x: labels,
         y: values,
         fill: 'tozeroy',
-        line: { shape: toPlotly(interpolation) },
+        line: { shape: toPlotly(interpolation), smoothing: 0.5 },
         originalName,
         ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
       }),
