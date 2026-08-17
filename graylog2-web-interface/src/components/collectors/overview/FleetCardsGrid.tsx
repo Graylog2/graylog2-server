@@ -63,7 +63,7 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
 
   if (fleets.length === 0) {
     return (
-      <EmptyEntity title="No fleets yet">
+      <EmptyEntity title="No Fleets Yet">
         <p>
           Fleets let you manage groups of Collectors with shared configuration. Create your first fleet, then add
           sources to define what data its Collectors should collect. Once configured,{' '}

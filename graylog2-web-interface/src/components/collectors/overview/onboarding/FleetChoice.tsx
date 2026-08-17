@@ -117,7 +117,7 @@ const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled = fal
   if (selectedFleet) {
     return (
       <Container $inline={inline}>
-        {!inline && <Heading>Fleet for this collector</Heading>}
+        {!inline && <Heading>Fleet for This Collector</Heading>}
         <SelectedBox>
           <div>
             <FleetName>{selectedFleet.name}</FleetName>
@@ -135,7 +135,7 @@ const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled = fal
 
   return (
     <Container $inline={inline}>
-      {!inline && <Heading>Choose a fleet for this collector</Heading>}
+      {!inline && <Heading>Choose a Fleet for This Collector</Heading>}
       <Row $inline={inline}>
         <Button bsStyle="primary" onClick={() => onSelect({ kind: 'create-new' })} disabled={disabled}>
           Create new fleet

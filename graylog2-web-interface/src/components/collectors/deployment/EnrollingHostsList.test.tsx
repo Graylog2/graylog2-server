@@ -139,12 +139,12 @@ describe('EnrollingHostsList', () => {
     await user.click(screen.getByRole('button', { name: /view setup/i }));
 
     // The concise connection-success view: onboarding timeline + collector facts
-    expect(screen.getByText('Sources configured')).toBeInTheDocument();
+    expect(screen.getByText('Sources Configured')).toBeInTheDocument();
     expect(useCollectorLogPreview).toHaveBeenCalledWith('uid-fresh');
 
     await user.click(screen.getByRole('button', { name: /hide setup/i }));
 
-    expect(screen.queryByText('Sources configured')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sources Configured')).not.toBeInTheDocument();
   });
 
   it('orders enrolling hosts newest first', () => {

@@ -159,8 +159,8 @@ describe('ConnectionSuccess', () => {
   it('switches to the troubleshooting view when the collector is offline', () => {
     render(<ConnectionSuccess instance={{ ...instance, status: 'offline' }} fleetName="Default Fleet" />);
 
-    expect(screen.getByText('Connection lost')).toBeInTheDocument();
-    expect(screen.getByText('Get it back online')).toBeInTheDocument();
+    expect(screen.getByText('Connection Lost')).toBeInTheDocument();
+    expect(screen.getByText('Get It Back Online')).toBeInTheDocument();
     expect(screen.getAllByText('Paused — collector offline').length).toBeGreaterThan(0);
     expect(screen.getByRole('link', { name: 'View instances' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Check again' })).toBeInTheDocument();

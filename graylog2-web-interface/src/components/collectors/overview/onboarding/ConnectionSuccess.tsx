@@ -88,7 +88,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
       <Group justify="space-between" align="flex-start">
         <div>
           <Group gap="sm">
-            <Title>Setting up {instance.hostname ?? instance.instance_uid}</Title>
+            <Title>Setting Up {instance.hostname ?? instance.instance_uid}</Title>
             {!online && <InstanceStatusLabel status={instance.status} />}
           </Group>
           <Subtitle>{subtitle()}</Subtitle>
@@ -145,7 +145,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
           collector's own logs usually hold the reason, so they take over. */}
       {online ? (
         <LogPreviewSection
-          title="Log preview"
+          title="Log Preview"
           searchUrl={sourceLogsUrl}
           preview={sourceLogs}
           isLoading={isLoading}
@@ -154,7 +154,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
         />
       ) : (
         <LogPreviewSection
-          title="Log preview"
+          title="Log Preview"
           searchUrl={collectorSystemLogsUrl(instance.instance_uid)}
           preview={selfLogs}
           isLoading={isLoading}

@@ -132,7 +132,7 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
       <Header>
         <TitleGroup>
           <PulsingDot />
-          <Title>Enrolling hosts</Title>
+          <Title>Enrolling Hosts</Title>
           <Subtitle>
             {enrolling.length > 0 ? `${connectedCount} connected · listening for more…` : 'listening…'}
           </Subtitle>

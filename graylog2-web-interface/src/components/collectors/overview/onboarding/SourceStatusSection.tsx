@@ -16,19 +16,19 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import moment from 'moment';
 
 import { Icon, LinkContainer, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView, Source, SourceType } from 'components/collectors/types';
 import { formatNumber } from 'util/NumberFormatting';
 import { Button } from 'components/bootstrap';
+import { PREVIEW_RANGE_SECONDS } from 'components/collectors/hooks/useCollectorLogPreview';
 
 import QuietSection from './QuietSection';
 
 import { OS_LABELS } from '../../common/Constants';
 import { SOURCE_TYPE_LABELS } from '../../sources/Constants';
-import moment from 'moment';
-import { PREVIEW_RANGE_SECONDS } from 'components/collectors/hooks/useCollectorLogPreview';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -202,7 +202,7 @@ const SourceStatusSection = ({ instance, sources, receiving, sourceCounts = unde
 
   return (
     <QuietSection
-      title="Log sources"
+      title="Log Sources"
       titleAs="h3"
       actions={
         <LinkContainer to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>

@@ -56,7 +56,7 @@ const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }:
   const lastStep = () => {
     if (offline) {
       return (
-        <Timeline.Item title="Connection lost" color="warning" bullet={<Icon name="priority_high" size="sm" />}>
+        <Timeline.Item title="Connection Lost" color="warning" bullet={<Icon name="priority_high" size="sm" />}>
           <StepDetail>
             Last heartbeat <RelativeTime dateTime={instance.last_seen} />
           </StepDetail>
@@ -66,7 +66,7 @@ const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }:
 
     if (receiving) {
       return (
-        <Timeline.Item title="First messages" bullet={<CheckBullet />}>
+        <Timeline.Item title="First Messages" bullet={<CheckBullet />}>
           <StepDetail>
             Receiving - {receivedTotal} {receivedTotal === 1 ? 'message' : 'messages'} since{' '}
             {moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}
@@ -76,7 +76,7 @@ const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }:
     }
 
     return (
-      <Timeline.Item title="First messages">
+      <Timeline.Item title="First Messages">
         <StepDetail>
           <Spinner text="Listening... usually under a minute" delay={0} />
         </StepDetail>
@@ -96,7 +96,7 @@ const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }:
           Heartbeat received - <RelativeTime dateTime={instance.last_seen} />
         </StepDetail>
       </Timeline.Item>
-      <Timeline.Item title="Sources configured" bullet={<CheckBullet />}>
+      <Timeline.Item title="Sources Configured" bullet={<CheckBullet />}>
         <StepDetail>
           {sourceCount} {sourceCount === 1 ? 'source' : 'sources'} from fleet{' '}
           <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName ?? 'Unknown'}</Link>

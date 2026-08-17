@@ -95,7 +95,7 @@ const NextSteps = ({ instance }: Props) => {
   if (instance.status !== 'online') {
     return (
       <div>
-        <PanelTitle>Get it back online</PanelTitle>
+        <PanelTitle>Get It Back Online</PanelTitle>
         <TroubleshootingList>
           <li>Check that the collector service is running on the host.</li>
           <li>Verify the host can reach this {productName} server.</li>
@@ -107,7 +107,7 @@ const NextSteps = ({ instance }: Props) => {
 
   return (
     <div>
-      <PanelTitle>What&apos;s next</PanelTitle>
+      <PanelTitle>What&apos;s Next</PanelTitle>
       <IconRowList>
         {nextLinks(instance).map(({ icon, title, description, to }) => (
           <IconRow key={icon}>

@@ -82,7 +82,7 @@ const HeaderActions = styled.div(
 const InstallCommand = ({ command, platformLabel, tokenDuration, actions = undefined }: Props) => (
   <Container>
     <Header>
-      <Title>Run this on {platformLabel}</Title>
+      <Title>Run This on {platformLabel}</Title>
       <HeaderActions>
         {actions}
         <ClipboardButton text={command} title="Copy command" bsSize="sm" />
