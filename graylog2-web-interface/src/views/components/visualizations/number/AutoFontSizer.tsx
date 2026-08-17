@@ -26,7 +26,7 @@ import styled, { css } from 'styled-components';
 const TOLERANCE = 0.05;
 const CHILD_SIZE_RATIO = 1; // Proportion of the child size in relation to the container
 
-type Alignment = 'center' | 'bottom-right';
+type Alignment = 'center' | 'bottom-right' | 'bottom-left';
 
 const FontSize = styled.div<{ fontSize: number; $alignment: Alignment | undefined }>`
   height: 100%;
@@ -46,6 +46,15 @@ const FontSize = styled.div<{ fontSize: number; $alignment: Alignment | undefine
       ? css`
           display: flex;
           justify-content: flex-end;
+          align-items: flex-end;
+        `
+      : ''}
+
+  ${(props) =>
+    props.$alignment === 'bottom-left'
+      ? css`
+          display: flex;
+          justify-content: flex-start;
           align-items: flex-end;
         `
       : ''}

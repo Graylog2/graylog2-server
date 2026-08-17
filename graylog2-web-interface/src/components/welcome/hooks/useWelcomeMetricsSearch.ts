@@ -69,7 +69,7 @@ const numberWidget = ({
       AggregationWidgetConfig.builder()
         .series([Series.forFunction('count()')])
         .visualization('numeric')
-        .visualizationConfig(NumberVisualizationConfig.create(true, 'NEUTRAL'))
+        .visualizationConfig(NumberVisualizationConfig.create(true, 'NEUTRAL', 'bottom-left'))
         .rollup(false)
         .build(),
     )
