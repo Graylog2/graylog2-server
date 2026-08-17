@@ -128,15 +128,15 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
           {generatedToken.expiresAt ? (
             <>
               {' '}
-              &middot; expires <RelativeTime dateTime={generatedToken.expiresAt} />
+              - expires <RelativeTime dateTime={generatedToken.expiresAt} />
             </>
           ) : (
-            <> &middot; never expires</>
+            <> - never expires</>
           )}
           {fleet && (
             <>
               {' '}
-              &middot; scoped to fleet <strong>{fleet.name}</strong>
+              - scoped to fleet <strong>{fleet.name}</strong>
             </>
           )}
         </span>

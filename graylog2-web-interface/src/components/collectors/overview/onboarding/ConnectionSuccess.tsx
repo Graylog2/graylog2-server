@@ -24,7 +24,7 @@ import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
-import { useCollectorLogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
+import { useCollectorLogPreview, PREVIEW_RANGE_SECONDS } from 'components/collectors/hooks/useCollectorLogPreview';
 import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
 
 import LogPreviewSection from './LogPreviewSection';
@@ -37,6 +37,7 @@ import InstanceStatusLabel from '../../common/InstanceStatusLabel';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
+import moment from 'moment/moment';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -149,7 +150,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
           preview={sourceLogs}
           isLoading={isLoading}
           error={sourceLogsError}
-          caption="Showing the newest messages from this collector &middot; refreshed every few seconds"
+          caption={`Showing messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${!receiving && ' - checking every few seconds'}`}
         />
       ) : (
         <LogPreviewSection
@@ -158,7 +159,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
           preview={selfLogs}
           isLoading={isLoading}
           error={selfLogsError}
-          caption="Showing the collector's own logs &mdash; the last entries before it went offline"
+          caption={`Showing Collector system messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${!receiving && ' - checking every few seconds'}`}
         />
       )}
     </Stack>

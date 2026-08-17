@@ -39,7 +39,7 @@ import type { MessagesSearchType, AggregationSearchType } from 'views/logic/quer
 export const ONBOARDING_KEY_PREFIX = ['collector-onboarding'];
 
 export const REFRESH_INTERVAL_MS = 5000;
-export const PREVIEW_RANGE_SECONDS = 900; // last 15 minutes
+export const PREVIEW_RANGE_SECONDS = 3600; // last 60 minutes, equal to the "Open in Search" link
 const PREVIEW_MESSAGE_LIMIT = 10;
 // A `values` bucket returns only buckets that exist, capped at this limit, so the limit must exceed
 // the fleet's source count: absent-from-the-result is read as zero, and truncated buckets would be

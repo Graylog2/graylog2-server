@@ -27,6 +27,8 @@ import QuietSection from './QuietSection';
 
 import { OS_LABELS } from '../../common/Constants';
 import { SOURCE_TYPE_LABELS } from '../../sources/Constants';
+import moment from 'moment';
+import { PREVIEW_RANGE_SECONDS } from 'components/collectors/hooks/useCollectorLogPreview';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -234,7 +236,10 @@ const SourceStatusSection = ({ instance, sources, receiving, sourceCounts = unde
         </SourceList>
       )}
       {online && (
-        <Footer>Messages received in the last 15 minutes{!receiving && ' · checking every few seconds'}</Footer>
+        <Footer>
+          Showing messages received since {moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}
+          {!receiving && ' - checking every few seconds'}
+        </Footer>
       )}
     </QuietSection>
   );

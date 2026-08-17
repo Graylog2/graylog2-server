@@ -98,7 +98,7 @@ const buildCountsSearch = (fleetId: string): CountsSearch => {
 };
 
 /**
- * Message counts per collector instance for one fleet (last 15 minutes), from a single search
+ * Message counts per collector instance for one fleet, from a single search
  * execution — used to show whether each enrolling host is receiving data without issuing one
  * query per host. Returns undefined while loading or when the aggregation is unavailable.
  */

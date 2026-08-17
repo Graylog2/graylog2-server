@@ -66,7 +66,7 @@ const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }:
       return (
         <Timeline.Item title="First messages" bullet={<CheckBullet />}>
           <StepDetail>
-            Receiving &middot; {receivedTotal} {receivedTotal === 1 ? 'message' : 'messages'} in the last 15 minutes
+            Receiving - {receivedTotal} {receivedTotal === 1 ? 'message' : 'messages'} in the last 15 minutes
           </StepDetail>
         </Timeline.Item>
       );
@@ -85,12 +85,12 @@ const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }:
     <Timeline active={activeStep} bulletSize={26} color="success">
       <Timeline.Item title="Enrolled" bullet={<CheckBullet />}>
         <StepDetail>
-          Registered with an enrollment token &middot; <RelativeTime dateTime={instance.enrolled_at} />
+          Registered with an enrollment token - <RelativeTime dateTime={instance.enrolled_at} />
         </StepDetail>
       </Timeline.Item>
       <Timeline.Item title="Connected" bullet={<CheckBullet />}>
         <StepDetail>
-          Heartbeat received &middot; <RelativeTime dateTime={instance.last_seen} />
+          Heartbeat received - <RelativeTime dateTime={instance.last_seen} />
         </StepDetail>
       </Timeline.Item>
       <Timeline.Item title="Sources configured" bullet={<CheckBullet />}>
