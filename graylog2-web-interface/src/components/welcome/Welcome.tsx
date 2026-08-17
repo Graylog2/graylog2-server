@@ -26,11 +26,13 @@ import ContentStreamContainer from 'components/content-stream/ContentStreamConta
 import useProductName from 'brand-customization/useProductName';
 import { hasAdminPermission } from 'util/PermissionsMixin';
 import useFeature from 'hooks/useFeature';
+import AppConfig from 'util/AppConfig';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 import OnboardingBanner from './OnboardingBanner';
+import WelcomeMetrics from './WelcomeMetrics';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -73,6 +75,7 @@ const Welcome = () => {
       <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
+      {AppConfig.welcomePageMetricsEnabled() && <WelcomeMetrics />}
       {onboardingEnabled && <OnboardingBanner />}
       <SectionGrid>
         <StyledSectionComponent title="Last Opened">
