@@ -22,7 +22,6 @@ import { Nav } from 'components/bootstrap';
 import NavigationItem from 'components/navigation/NavigationItem';
 import CollapsedMainNavbar from 'components/navigation/CollapsedMainNavbar';
 import useNavigationItems from 'components/navigation/useNavigationItems';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 // Must not shrink: its measured width tells `useNavigationCollapse` how much room the menu wants,
 // which a shrunk menu would understate.

@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
-import styled from 'styled-components';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
