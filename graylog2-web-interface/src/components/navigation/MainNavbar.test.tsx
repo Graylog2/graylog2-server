@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 import Immutable from 'immutable';
 import * as React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
@@ -26,6 +26,7 @@ import AppConfig from 'util/AppConfig';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
+import { itemStateIndicatorSelector } from 'components/common/NavItemStateIndicator';
 
 import MainNavbar from './MainNavbar';
 
@@ -219,6 +220,46 @@ describe('MainNavbar', () => {
       await screen.findByRole('link', { name: /perpetuum mobile/i });
 
       expect(screen.getByRole('list')).toHaveStyleRule('flex', '0 0 auto');
+    });
+
+    // Bootstrap's base stylesheet, which is still loaded, underlines anchors on hover. Its own nav
+    // rules used to suppress that, but they no longer apply to the navigation bar, so a hovered link
+    // would otherwise show a line right beneath its text.
+    it('does not underline a plain link on hover', async () => {
+      render(<SUT />);
+
+      expect(await screen.findByRole('link', { name: /perpetuum mobile/i })).toHaveStyleRule(
+        'text-decoration',
+        'none',
+        { modifier: ':hover' },
+      );
+    });
+
+    // `NavItem` renders the state indicator for every navigation item, but only the item itself can
+    // decide when to show it. A dropdown trigger does so; a plain link has to do the same, or it ends
+    // up with no hover or active state at all.
+    describe('state indicator of a plain link', () => {
+      const listItemFor = async (name: RegExp) => {
+        await screen.findByRole('link', { name });
+
+        return screen.getAllByRole('listitem').find((item) => within(item).queryByRole('link', { name }));
+      };
+
+      it('is shown while the link is hovered', async () => {
+        render(<SUT />);
+
+        expect(await listItemFor(/perpetuum mobile/i)).toHaveStyleRule('border-color', /.+/, {
+          modifier: `> a:hover ${itemStateIndicatorSelector}`,
+        });
+      });
+
+      it('is shown while the link is the active route', async () => {
+        render(<SUT />);
+
+        expect(await listItemFor(/perpetuum mobile/i)).toHaveStyleRule('border-color', /.+/, {
+          modifier: `> a.active ${itemStateIndicatorSelector}`,
+        });
+      });
     });
 
     describe('when collapsed', () => {

@@ -17,12 +17,14 @@
 
 import * as React from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
+import styled, { css } from 'styled-components';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
 import { NavDropdown } from 'components/bootstrap';
 import NavigationLink from 'components/navigation/NavigationLink';
 import shouldRenderNavigationItem from 'components/navigation/util/shouldRenderNavigationItem';
+import { hoverIndicatorStyles, activeIndicatorStyles } from 'components/common/NavItemStateIndicator';
 
 const renderLinkTitle = (description: string, Badge: PluginNavigation['BadgeComponent'] | undefined) =>
   Badge ? <Badge text={description} /> : description;
@@ -67,6 +69,26 @@ type Props = {
   navigationItem: PluginNavigation;
 };
 
+/**
+ * `NavItem` renders the state indicator for every navigation item, but leaves it to the item to say
+ * when it applies. `NavDropdown` does that for a dropdown trigger; this does it for a plain link,
+ * which otherwise shows no hover or active state at all. `LinkContainer` supplies the active class.
+ */
+const NavListItem = styled.li(
+  ({ theme }) => css`
+    > a {
+      &:hover,
+      &:focus-visible {
+        ${hoverIndicatorStyles(theme)}
+      }
+
+      &.active {
+        ${activeIndicatorStyles(theme)}
+      }
+    }
+  `,
+);
+
 const NavigationItem = ({
   navigationItem: { requiredFeatureFlag, permissions, children, BadgeComponent, description, path },
   pathname,
@@ -90,14 +112,14 @@ const NavigationItem = ({
   }
 
   return (
-    <li>
+    <NavListItem>
       <NavigationLink
         key={description}
         description={renderLinkTitle(description, BadgeComponent)}
         path={path}
         topLevel
       />
-    </li>
+    </NavListItem>
   );
 };
 

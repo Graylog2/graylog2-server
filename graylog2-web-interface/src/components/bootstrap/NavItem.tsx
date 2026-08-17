@@ -34,6 +34,10 @@ const NavigationLink = styled.a<{ $hasOnClick: boolean }>(
     &:focus {
       color: ${theme.colors.variant.darker.default};
       background-color: transparent;
+
+      /* Bootstrap's base stylesheet underlines anchors on hover, which its own nav rules used to
+         suppress. Those no longer apply here, so navigation items suppress it themselves. */
+      text-decoration: none;
     }
   `,
 );
