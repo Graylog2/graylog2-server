@@ -41,7 +41,7 @@ const EmptyState = styled.div(
   ({ theme }) => css`
     text-align: center;
     padding: ${theme.spacings.xxl};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

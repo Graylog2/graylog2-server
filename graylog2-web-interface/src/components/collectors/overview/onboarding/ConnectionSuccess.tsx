@@ -50,7 +50,7 @@ const Title = styled.h2`
 const Subtitle = styled.div(
   ({ theme }) => css`
     margin-top: ${theme.spacings.xxs};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

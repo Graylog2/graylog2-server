@@ -93,7 +93,7 @@ const SourceCount = styled.span(
     text-align: right;
     font-size: ${theme.fonts.size.small};
     font-variant-numeric: tabular-nums;
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -101,7 +101,7 @@ const Footer = styled.div(
   ({ theme }) => css`
     margin-top: ${theme.spacings.sm};
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

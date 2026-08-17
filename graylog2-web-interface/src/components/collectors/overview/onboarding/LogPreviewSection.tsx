@@ -48,7 +48,7 @@ const MessageRow = styled.div(
 
 const RowTimestamp = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     margin-right: ${theme.spacings.sm};
   `,
 );
@@ -58,7 +58,7 @@ const EmptyState = styled.div(
     display: flex;
     align-items: center;
     gap: ${theme.spacings.sm};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     padding: ${theme.spacings.sm} 0;
   `,
 );
@@ -67,7 +67,7 @@ const Caption = styled.div(
   ({ theme }) => css`
     margin-top: ${theme.spacings.sm};
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

@@ -89,7 +89,7 @@ const HeroNumber = styled.div(
 const SubLabel = styled.div(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -119,7 +119,7 @@ const OfflineCount = styled.span(
 const SourceFooter = styled.div(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     margin-top: ${theme.spacings.xs};
     border-top: 1px solid ${theme.colors.gray[90]};
     padding-top: ${theme.spacings.xs};

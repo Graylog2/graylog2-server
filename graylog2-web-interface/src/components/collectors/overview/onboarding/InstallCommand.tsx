@@ -65,7 +65,7 @@ const CommandBlock = styled.pre(
 
 const Note = styled.p(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.small};
     margin: 0;
   `,

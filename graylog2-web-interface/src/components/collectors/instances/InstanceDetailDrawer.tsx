@@ -62,7 +62,7 @@ const SectionTitle = styled.h4(
 
 const EmptyText = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

@@ -38,7 +38,7 @@ const FactLabel = styled.div(
     font-size: ${theme.fonts.size.tiny};
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

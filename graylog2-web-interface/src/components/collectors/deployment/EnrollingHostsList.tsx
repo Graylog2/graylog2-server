@@ -73,7 +73,7 @@ const Title = styled.h3(
 
 const Subtitle = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.small};
   `,
 );

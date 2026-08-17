@@ -41,7 +41,7 @@ const PanelTitle = styled.h4(
 const LinkDescription = styled.div(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

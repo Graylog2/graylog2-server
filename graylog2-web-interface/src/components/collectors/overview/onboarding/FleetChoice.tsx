@@ -64,7 +64,7 @@ const Row = styled.div<{ $inline: boolean }>(
 
 const Separator = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-style: italic;
   `,
 );
@@ -106,7 +106,7 @@ const FleetName = styled.div(
 
 const FleetDescription = styled.div(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.small};
   `,
 );
