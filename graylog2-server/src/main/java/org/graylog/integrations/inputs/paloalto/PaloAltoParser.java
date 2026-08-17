@@ -48,13 +48,14 @@ public class PaloAltoParser {
     private static final DateTimeFormatter SYSLOG_TIMESTAMP_FORMATTER = DateTimeFormat.forPattern("MMM d HH:mm:ss YYYY").withLocale(Locale.US);
 
     // <14>1 2018-09-19T11:50:32-05:00 Panorama--2 - - - - 1,2018/09/19...
-    // NOTE: (\S+) is used for the timestamp and hostname groups — both tokens are
-    // guaranteed to be whitespace-free, so \S+ is fully equivalent to the original (.+?).
+    // Timestamp and hostname are single whitespace-free tokens, so \S+ matches
+    // every conformant Panorama header.
     private static final Pattern PANORAMA_SYSLOG_PARSER = Pattern.compile("<\\d+>[0-9] (\\S+) (\\S+)\\s[-]\\s[-]\\s[-]\\s[-]\\s(\\d,.*)");
 
     // Syslog with host name.
     // <14>Aug 22 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22...
-    private static final Pattern STANDARD_SYSLOG_PARSER = Pattern.compile("<\\d+>([A-Z][a-z][a-z]\\s{1,2}\\d{1,2}\\s\\d{1,2}[:]\\d{1,2}[:]\\d{2})\\s(.+?)\\s(\\d,.*)");
+    // The hostname is a single whitespace-free token, so \S+ matches every conformant syslog header.
+    private static final Pattern STANDARD_SYSLOG_PARSER = Pattern.compile("<\\d+>([A-Z][a-z][a-z]\\s{1,2}\\d{1,2}\\s\\d{1,2}[:]\\d{1,2}[:]\\d{2})\\s(\\S+)\\s(\\d,.*)");
 
     // Sometimes, the host name is missing (no idea why), so same pattern except with no host.
     // <14>Apr  8 01:47:32 1,2012/04/08...
