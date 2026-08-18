@@ -21,12 +21,23 @@ import userEvent from '@testing-library/user-event';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import { simpleEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
+import { asMock } from 'helpers/mocking';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 import FilterAggregationForm from './FilterAggregationForm';
 
 jest.mock('hooks/useHotkey', () => jest.fn());
+jest.mock('hooks/useScopePermissions');
 
 describe('FilterAggregationForm', () => {
+  beforeEach(() => {
+    asMock(useScopePermissions).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true },
+      checkPermissions: () => true,
+    });
+  });
+
   const defaultProps = {
     eventDefinition: simpleEventDefinition,
     onChange: jest.fn(),

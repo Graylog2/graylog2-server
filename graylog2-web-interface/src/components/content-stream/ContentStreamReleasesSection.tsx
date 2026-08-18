@@ -15,34 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import type { DefaultTheme } from 'styled-components';
-import styled, { css } from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
 
-import { ListGroup, ListGroupItem, Label, Alert } from 'components/bootstrap';
+import { ListGroup, Alert } from 'components/bootstrap';
 import { RelativeTime, Sanitize, Spinner, ExternalLink } from 'components/common';
+import { StyledListGroupItem, TimeInfo } from 'components/welcome/EntityListItem';
 import type { FeedItem } from 'components/content-stream/hook/useContentStream';
 import useContentStream from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-
-const StyledListGroupItem = styled(ListGroupItem)(
-  ({ theme }: { theme: DefaultTheme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    align-items: flex-start;
-  `,
-);
-const LastOpenedTime = styled.i(
-  ({ theme }: { theme: DefaultTheme }) => css`
-    color: ${theme.colors.gray[60]};
-  `,
-);
-export const StyledLabel = styled(Label)`
-  cursor: default;
-  width: 110px;
-  display: block;
-`;
 
 const ContentStreamReleasesSection = () => {
   const path = 'release-info';
@@ -83,9 +64,9 @@ const ContentStreamReleasesSection = () => {
             <Sanitize html={feed?.title} />
           </a>
           {feed?.pubDate ? (
-            <LastOpenedTime>
+            <TimeInfo>
               <RelativeTime dateTime={feed.pubDate} />
-            </LastOpenedTime>
+            </TimeInfo>
           ) : null}
         </StyledListGroupItem>
       ))}

@@ -14,22 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const mockAppConfig = {
-  contentStream: jest.fn(),
-  features: undefined,
-  gl2ServerUrl: jest.fn(() => 'http://localhost:9000/api/'),
-  gl2AppPathPrefix: jest.fn(() => '/'),
-  gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => true),
-  rootTimeZone: jest.fn(() => 'UTC'),
-  isCloud: jest.fn(() => false),
-  customThemeColors: jest.fn(() => ({})),
-  telemetry: jest.fn(),
-  publicNotifications: jest.fn(() => ({})),
-  pluginUISettings: jest.fn(() => ({})),
-  branding: jest.fn(),
-  globalInputsOnly: jest.fn(() => false),
-  welcomePageMetricsEnabled: jest.fn(() => true),
+import { useContext } from 'react';
+
+import StreamsContext from 'contexts/StreamsContext';
+
+const useHasAccessToAnyStream = () => {
+  const streams = useContext(StreamsContext);
+
+  return !!streams && streams.length > 0;
 };
 
-jest.mock('util/AppConfig', () => mockAppConfig);
+export default useHasAccessToAnyStream;

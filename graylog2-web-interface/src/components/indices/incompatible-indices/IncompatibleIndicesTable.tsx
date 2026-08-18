@@ -15,9 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
 
+import { Alert } from 'components/bootstrap';
 import { PaginatedEntityTable } from 'components/common';
+import Routes from 'routing/Routes';
+import Link from 'components/common/Link';
+import AppConfig from 'util/AppConfig';
 
 import { fetchIncompatibleIndices, incompatibleIndicesKeyFn } from './fetchIncompatibleIndices';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
@@ -28,13 +31,6 @@ import IncompatibleIndicesContext from './IncompatibleIndicesContext';
 import useIncompatibleIndexActionState from './hooks/useIncompatibleIndexActionState';
 import useTrackedIncompatibleIndices from './hooks/useTrackedIncompatibleIndices';
 
-const Heading = styled.h4(
-  ({ theme }) => css`
-    margin-top: ${theme.spacings.md};
-    margin-bottom: ${theme.spacings.sm};
-  `,
-);
-
 const TABLE_LAYOUT = {
   entityTableId: 'incompatible_indices',
   defaultSort: { attributeId: 'index_name', direction: 'asc' as const },
@@ -43,7 +39,21 @@ const TABLE_LAYOUT = {
   defaultColumnOrder: ['index_name', 'category', 'version', 'begin', 'end'],
 };
 
-const IncompatibleIndicesTable = () => {
+const DataNodeMigrationHint = () => {
+  const migrationRouteAvailable = !AppConfig.isCloud() && AppConfig.isFeatureEnabled('data_node_migration');
+
+  return migrationRouteAvailable ? (
+    <Link to={Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION}>Migrate to Data Nodes</Link>
+  ) : (
+    <>Migrate to Data Nodes</>
+  );
+};
+
+type Props = {
+  withoutURLParams?: boolean;
+};
+
+const IncompatibleIndicesTable = ({ withoutURLParams = false }: Props) => {
   const { selectedIndices, trackedIndices, hasLoaded, onDataLoaded, onChangeSelection } =
     useTrackedIncompatibleIndices();
   const contextValue = useIncompatibleIndexActionState({ trackedIndices, isLoading: !hasLoaded });
@@ -52,7 +62,12 @@ const IncompatibleIndicesTable = () => {
 
   return (
     <IncompatibleIndicesContext.Provider value={contextValue}>
-      <Heading>Incompatible indices</Heading>
+      {!contextValue.reindexActionsAvailable && (
+        <Alert bsStyle="info">
+          System indices can only be reindexed when Graylog runs against a Data Node search backend.{' '}
+          <DataNodeMigrationHint /> to reindex them before upgrading to the next OpenSearch major version.
+        </Alert>
+      )}
       <PaginatedEntityTable<IncompatibleIndexRow>
         humanName="incompatible indices"
         tableLayout={TABLE_LAYOUT}
@@ -63,6 +78,7 @@ const IncompatibleIndicesTable = () => {
         bulkSelection={{ onChangeSelection, actions: <IncompatibleIndicesBulkActions indices={selectedIndices} /> }}
         onDataLoaded={onDataLoaded}
         entityAttributesAreCamelCase={false}
+        withoutURLParams={withoutURLParams}
       />
     </IncompatibleIndicesContext.Provider>
   );

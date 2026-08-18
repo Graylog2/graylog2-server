@@ -32,7 +32,7 @@ const MaxProcessingTimeCell = ({ stream }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.max_processing_time_ms) {
+  if (isError || typeof metrics?.max_processing_time_ms !== 'number') {
     return null;
   }
 
