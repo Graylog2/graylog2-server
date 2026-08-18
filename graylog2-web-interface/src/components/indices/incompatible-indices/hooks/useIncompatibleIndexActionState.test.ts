@@ -21,12 +21,14 @@ import useCanArchive from 'components/indices/hooks/useCanArchive';
 
 import useIncompatibleIndexActionState from './useIncompatibleIndexActionState';
 import useArchivedIndexNames from './useArchivedIndexNames';
+import useCanReindex from './useCanReindex';
 import usePendingIncompatibleIndexActions from './usePendingIncompatibleIndexActions';
 
 import type { IncompatibleIndexRow } from '../fetchIncompatibleIndices';
 
 jest.mock('components/indices/hooks/useCanArchive');
 jest.mock('./useArchivedIndexNames');
+jest.mock('./useCanReindex');
 jest.mock('./usePendingIncompatibleIndexActions');
 
 const makeIndex = (indexName: string): IncompatibleIndexRow => ({
@@ -56,6 +58,7 @@ describe('useIncompatibleIndexActionState', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useCanArchive).mockReturnValue(true);
+    asMock(useCanReindex).mockReturnValue(true);
     asMock(useArchivedIndexNames).mockReturnValue(new Set(['already_archived']));
     asMock(usePendingIncompatibleIndexActions).mockReturnValue(pendingReturn);
   });
@@ -80,5 +83,12 @@ describe('useIncompatibleIndexActionState', () => {
     asMock(usePendingIncompatibleIndexActions).mockReturnValue(pendingReturn);
     asMock(useCanArchive).mockReturnValue(false);
     expect(renderState().result.current.archiveActionsAvailable).toBe(false);
+  });
+
+  it('is reindexable only when the search backend supports it', () => {
+    expect(renderState().result.current.reindexActionsAvailable).toBe(true);
+
+    asMock(useCanReindex).mockReturnValue(false);
+    expect(renderState().result.current.reindexActionsAvailable).toBe(false);
   });
 });
