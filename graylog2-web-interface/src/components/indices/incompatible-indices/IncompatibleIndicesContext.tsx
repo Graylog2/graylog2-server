@@ -21,6 +21,7 @@ import type { PendingArchiveTracking } from './incompatibleIndexActions';
 
 export type IncompatibleIndicesContextValue = {
   archiveActionsAvailable: boolean;
+  reindexActionsAvailable: boolean;
   archivedIndexNames: ReadonlySet<string>;
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
   addArchiveDeleteAction: (tracking: PendingArchiveTracking) => void;

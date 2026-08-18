@@ -33,7 +33,7 @@ const PipelinesCell = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
   const { toggleSection, expandedSections } = useExpandedSections();
 
-  if (stream.is_default || !stream.is_editable) {
+  if (!stream.is_editable) {
     return null;
   }
 

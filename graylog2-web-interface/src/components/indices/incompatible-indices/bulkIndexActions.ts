@@ -111,22 +111,28 @@ const isActionInProgress = (pendingStatus: PendingIndexStatus | undefined) =>
 export const getBulkIndexActionCandidates = ({
   indices,
   canArchive,
+  canReindex,
   pendingIndexStatuses,
   archivedIndexNames,
 }: {
   indices: Array<IncompatibleIndex>;
   canArchive: boolean;
+  canReindex: boolean;
   pendingIndexStatuses: Map<string, PendingIndexStatus>;
   archivedIndexNames: ReadonlySet<string>;
 }): Array<BulkIndexActionCandidate> =>
   BULK_ACTION_ORDER.map((action) => {
     const targetIndices = indices.filter(
       (index) =>
-        getAvailableActions(
-          index,
+        getAvailableActions(index, {
           canArchive,
-          isIndexArchived(index.index_name, pendingIndexStatuses.get(index.index_name), archivedIndexNames),
-        ).includes(action) && !isActionInProgress(pendingIndexStatuses.get(index.index_name)),
+          canReindex,
+          alreadyArchived: isIndexArchived(
+            index.index_name,
+            pendingIndexStatuses.get(index.index_name),
+            archivedIndexNames,
+          ),
+        }).includes(action) && !isActionInProgress(pendingIndexStatuses.get(index.index_name)),
     );
 
     return {
