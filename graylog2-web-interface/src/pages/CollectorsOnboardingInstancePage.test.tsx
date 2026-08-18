@@ -18,14 +18,15 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
 
-jest.mock('logic/telemetry/useSendTelemetry');
+jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 
 jest.mock('components/collectors/hooks/useInstanceQueries', () => ({
   useInstance: jest.fn(),
@@ -88,10 +89,12 @@ describe('CollectorsOnboardingInstancePage', () => {
       ...overrides,
     } as ReturnType<typeof useInstance>);
 
+  const sendTelemetry = jest.fn();
+
   beforeEach(() => {
     jest.clearAllMocks();
 
-    asMock(useSendTelemetry).mockReturnValue(jest.fn());
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
     mockUseLocation.mockReturnValue({ state: null });
     mockInstanceLookup();
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);
@@ -133,6 +136,25 @@ describe('CollectorsOnboardingInstancePage', () => {
       'href',
       expect.stringContaining('/system/collectors/instances'),
     );
+  });
+
+  it('reports onboarding completion once the instance is loaded', () => {
+    render(<CollectorsOnboardingInstancePage />);
+
+    expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
+      app_action_value: 'collector-onboarding-completed',
+      instance_id: 'uid-42',
+      fleet_id: 'fleet-1',
+      status: 'online',
+    });
+  });
+
+  it('does not report onboarding completion while the instance is still loading', () => {
+    mockInstanceLookup({ data: undefined, isLoading: true });
+
+    render(<CollectorsOnboardingInstancePage />);
+
+    expect(sendTelemetry).not.toHaveBeenCalled();
   });
 
   it('surfaces a fetch error', () => {

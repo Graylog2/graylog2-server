@@ -30,7 +30,7 @@ import useLocation from 'routing/useLocation';
 import { extractErrorMessage } from 'util/extractErrorMessage';
 import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
@@ -42,14 +42,16 @@ const CollectorsOnboardingInstancePage = () => {
   const { data: fleet } = useFleet(instance?.fleet_id ?? '');
 
   const { mutate: finish } = useFinishOnboarding();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   // using useEffect to guard that the instance is actually there before we finish the onboarding
   useEffect(() => {
     if (instance) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
-        app_section: 'collectors-onboarding',
         app_action_value: 'collector-onboarding-completed',
+        instance_id: instance.instance_uid,
+        fleet_id: instance.fleet_id,
+        status: instance.status,
       });
 
       finish();
