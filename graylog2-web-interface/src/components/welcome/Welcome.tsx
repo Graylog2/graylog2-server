@@ -26,13 +26,13 @@ import ContentStreamContainer from 'components/content-stream/ContentStreamConta
 import useProductName from 'brand-customization/useProductName';
 import { hasAdminPermission } from 'util/PermissionsMixin';
 import useFeature from 'hooks/useFeature';
-import AppConfig from 'util/AppConfig';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 import OnboardingBanner from './OnboardingBanner';
 import WelcomeMetrics from './WelcomeMetrics';
+import useWelcomePageQueriesDisabled from './hooks/useWelcomePageQueriesDisabled';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -69,13 +69,14 @@ const Welcome = () => {
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
   const isAdmin = hasAdminPermission(permissions);
   const onboardingEnabled = useFeature('onboarding_experience');
+  const welcomePageQueriesDisabled = useWelcomePageQueriesDisabled();
 
   return (
     <>
       <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
-      {AppConfig.welcomePageMetricsEnabled() && <WelcomeMetrics />}
+      {!welcomePageQueriesDisabled && <WelcomeMetrics />}
       {onboardingEnabled && <OnboardingBanner />}
       <SectionGrid $columns="1fr 1fr 1fr">
         <StyledSectionComponent title="Favorite Items">
