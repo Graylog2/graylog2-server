@@ -22,11 +22,13 @@ import moment from 'moment/moment';
 
 import { Button } from 'components/bootstrap';
 import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
 import { useCollectorLogPreview, PREVIEW_RANGE_SECONDS } from 'components/collectors/hooks/useCollectorLogPreview';
 import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 
 import LogPreviewSection from './LogPreviewSection';
 import OnboardingTimeline from './OnboardingTimeline';
@@ -66,10 +68,24 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
   );
   const { data: sources } = useSources(instance.fleet_id);
   const queryClient = useQueryClient();
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const online = instance.status === 'online';
   const receiving = (sourceLogs?.total ?? 0) > 0;
   const sourceLogsUrl = collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid);
+
+  // Which of the page's three states the user is looking at; attached to every click event so
+  // interactions can be segmented by how the onboarding actually went.
+  let outcome = 'online-silent';
+  if (!online) outcome = 'offline';
+  else if (receiving) outcome = 'online-receiving';
+
+  const reportNextStep = (appActionValue: string, link: string) =>
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED, {
+      app_action_value: appActionValue,
+      link,
+      outcome,
+    });
 
   const subtitle = () => {
     if (!online)
@@ -95,16 +111,25 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
         </div>
         {online ? (
           <LinkContainer to={sourceLogsUrl}>
-            <Button bsStyle="success">Open in search</Button>
+            <Button bsStyle="success" onClick={() => reportNextStep('onboarding-open-in-search', 'search')}>
+              Open in search
+            </Button>
           </LinkContainer>
         ) : (
           <Group gap="xs">
             <LinkContainer to={Routes.SYSTEM.COLLECTORS.INSTANCES}>
-              <Button>View instances</Button>
+              <Button onClick={() => reportNextStep('onboarding-view-instances', 'instances')}>View instances</Button>
             </LinkContainer>
             <Button
               bsStyle="info"
-              onClick={() => queryClient.invalidateQueries({ queryKey: instanceKeyFn(instance.instance_uid) })}>
+              onClick={() => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.CHECK_AGAIN_CLICKED, {
+                  app_action_value: 'onboarding-check-again',
+                  status: instance.status,
+                });
+
+                queryClient.invalidateQueries({ queryKey: instanceKeyFn(instance.instance_uid) });
+              }}>
               Check again
             </Button>
           </Group>
@@ -119,24 +144,30 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
               fleetName={fleetName}
               sourceCount={sources?.length ?? 0}
               receivedTotal={sourceLogs?.total}
+              onFleetLinkClick={() => reportNextStep('onboarding-fleet-link', 'fleet')}
             />
           </ColContainer>
         </Grid.Col>
 
         <Grid.Col span="auto">
           <Stack gap="md">
-            <CollectorFactsSection instance={instance} fleetName={fleetName} />
+            <CollectorFactsSection
+              instance={instance}
+              fleetName={fleetName}
+              onFleetLinkClick={() => reportNextStep('onboarding-fleet-link', 'fleet')}
+            />
             <SourceStatusSection
               instance={instance}
               sources={sources}
               receiving={receiving}
               sourceCounts={sourceCounts}
+              onConfigureSources={() => reportNextStep('onboarding-configure-sources', 'configure-sources')}
             />
           </Stack>
         </Grid.Col>
         <Grid.Col span="content">
           <ColContainer>
-            <NextSteps instance={instance} />
+            <NextSteps instance={instance} onLinkClick={(link) => reportNextStep('onboarding-next-step', link)} />
           </ColContainer>
         </Grid.Col>
       </Grid>
@@ -151,6 +182,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
           isLoading={isLoading}
           error={sourceLogsError}
           caption={`Showing messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
+          onOpenSearch={() => reportNextStep('onboarding-log-preview-search', 'log-preview')}
         />
       ) : (
         <LogPreviewSection
@@ -160,6 +192,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
           isLoading={isLoading}
           error={selfLogsError}
           caption={`Showing Collector system messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
+          onOpenSearch={() => reportNextStep('onboarding-log-preview-search', 'log-preview')}
         />
       )}
     </Stack>

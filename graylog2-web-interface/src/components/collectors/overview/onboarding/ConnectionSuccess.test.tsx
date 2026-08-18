@@ -20,6 +20,8 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import asMock from 'helpers/mocking/AsMock';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
 import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
 import type { CollectorInstanceView, Source } from 'components/collectors/types';
@@ -27,6 +29,7 @@ import { useCollectorLogPreview } from 'components/collectors/hooks/useCollector
 
 import ConnectionSuccess from './ConnectionSuccess';
 
+jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 jest.mock('components/collectors/hooks/useCollectorLogPreview');
 jest.mock('components/collectors/hooks/useSourceQueries', () => ({
   useSources: jest.fn(),
@@ -74,9 +77,12 @@ const logPreview = {
 };
 
 describe('ConnectionSuccess', () => {
+  const sendTelemetry = jest.fn();
+
   beforeEach(() => {
     jest.clearAllMocks();
 
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
     asMock(useCollectorLogPreview).mockReturnValue(logPreview);
     asMock(useSources).mockReturnValue({ data: sources } as ReturnType<typeof useSources>);
   });
@@ -255,5 +261,117 @@ describe('ConnectionSuccess', () => {
     expect(screen.getByText('38 messages')).toBeInTheDocument();
     // s3 is the windows_event_log source, which cannot collect on this Linux host.
     expect(screen.getByText('Not applicable on Linux')).toBeInTheDocument();
+  });
+
+  describe('telemetry', () => {
+    it('reports the primary open-in-search CTA with the receiving outcome', async () => {
+      render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      // The header CTA comes before the log preview's own open-in-search link.
+      await userEvent.click(screen.getAllByRole('link', { name: 'Open in search' })[0]);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED, {
+        app_action_value: 'onboarding-open-in-search',
+        link: 'search',
+        outcome: 'online-receiving',
+      });
+    });
+
+    it('reports the silent outcome while the collector has not delivered messages yet', async () => {
+      asMock(useCollectorLogPreview).mockReturnValue({
+        ...logPreview,
+        sourceLogs: { messages: [], total: 0 },
+        sourceCounts: {},
+      });
+
+      render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      await userEvent.click(screen.getAllByRole('link', { name: 'Open in search' })[0]);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED,
+        expect.objectContaining({ outcome: 'online-silent' }),
+      );
+    });
+
+    it('reports the log preview open-in-search link separately from the header CTA', async () => {
+      render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      await userEvent.click(screen.getAllByRole('link', { name: 'Open in search' })[1]);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED, {
+        app_action_value: 'onboarding-log-preview-search',
+        link: 'log-preview',
+        outcome: 'online-receiving',
+      });
+    });
+
+    it('reports which what-is-next link was followed', async () => {
+      render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      await userEvent.click(screen.getByRole('link', { name: 'Manage fleets' }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED, {
+        app_action_value: 'onboarding-next-step',
+        link: 'fleets',
+        outcome: 'online-receiving',
+      });
+
+      await userEvent.click(screen.getByRole('link', { name: 'Install another collector' }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED, {
+        app_action_value: 'onboarding-next-step',
+        link: 'install-another',
+        outcome: 'online-receiving',
+      });
+    });
+
+    it('reports both configure-sources entry points distinguishably', async () => {
+      render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      const links = screen.getAllByRole('link', { name: 'Configure sources' });
+      await userEvent.click(links[0]);
+      await userEvent.click(links[1]);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED,
+        expect.objectContaining({ app_action_value: 'onboarding-configure-sources', link: 'configure-sources' }),
+      );
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED,
+        expect.objectContaining({ app_action_value: 'onboarding-next-step', link: 'configure-sources' }),
+      );
+    });
+
+    it('reports the linked fleet name click', async () => {
+      render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      await userEvent.click(screen.getAllByRole('link', { name: 'Default Fleet' })[0]);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED, {
+        app_action_value: 'onboarding-fleet-link',
+        link: 'fleet',
+        outcome: 'online-receiving',
+      });
+    });
+
+    it('reports the offline recovery actions', async () => {
+      render(<ConnectionSuccess instance={{ ...instance, status: 'offline' }} fleetName="Default Fleet" />);
+
+      await userEvent.click(screen.getByRole('link', { name: 'View instances' }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED, {
+        app_action_value: 'onboarding-view-instances',
+        link: 'instances',
+        outcome: 'offline',
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: 'Check again' }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.CHECK_AGAIN_CLICKED, {
+        app_action_value: 'onboarding-check-again',
+        status: 'offline',
+      });
+    });
   });
 });

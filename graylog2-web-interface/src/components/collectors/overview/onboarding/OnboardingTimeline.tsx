@@ -29,6 +29,7 @@ type Props = {
   sourceCount: number;
   /** Source messages received in the preview window; undefined while the first search is running. */
   receivedTotal: number | undefined;
+  onFleetLinkClick?: () => void;
 };
 
 const StepDetail = styled.div(
@@ -46,7 +47,7 @@ const CheckBullet = () => <Icon name="check" size="sm" />;
  * preview sees source messages, completes once messages arrive, and turns into a warning when the
  * collector drops offline before delivering any.
  */
-const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }: Props) => {
+const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal, onFleetLinkClick = undefined }: Props) => {
   const offline = instance.status !== 'online';
   const receiving = (receivedTotal ?? 0) > 0;
   // Steps 0-2 are always in the past for an enrolled collector; step 3 joins them once messages
@@ -99,7 +100,9 @@ const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal }:
       <Timeline.Item title="Sources Configured" bullet={<CheckBullet />}>
         <StepDetail>
           {sourceCount} {sourceCount === 1 ? 'source' : 'sources'} from fleet{' '}
-          <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName ?? 'Unknown'}</Link>
+          <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)} onClick={onFleetLinkClick}>
+            {fleetName ?? 'Unknown'}
+          </Link>
         </StepDetail>
       </Timeline.Item>
       {lastStep()}
