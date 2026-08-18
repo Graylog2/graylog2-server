@@ -77,6 +77,48 @@ versions:
 }
 ```
 
+### Archive Creation Changes
+
+Archive creation was reworked in 7.2. Unless noted otherwise, the changes below apply to the archive
+creation endpoints:
+
+- `POST /plugins/org.graylog.plugins.archive/archives/{indexName}`
+- `POST /plugins/org.graylog.plugins.archive/archives/bulkcreate`
+- `POST /plugins/org.graylog.plugins.archive/cluster/archives/{indexName}`
+- `POST /plugins/org.graylog.plugins.archive/cluster/archives/bulkcreate`
+
+#### `archive_job_config` removed from the response
+
+These endpoints no longer return the `archive_job_config` field; their response now contains only the
+`system_job` field. Previously the response echoed the full archive configuration — including the configured
+backend and its encrypted S3 secret — under `archive_job_config`. API clients that read it must instead fetch
+the archive configuration from `GET /plugins/org.graylog.plugins.archive/config`.
+
+#### Jobs no longer appear in `/system/jobs`
+
+Archive creation now runs as a scheduler job instead of a legacy system job, so archive-create jobs no
+longer appear in the per-node `GET /system/jobs` response. They remain available from the cluster-wide
+`GET /cluster/jobs` endpoint. API clients that polled `GET /system/jobs` for archive-create progress must
+switch to `GET /cluster/jobs`. The job name (`org.graylog.plugins.archive.job.ArchiveCreateSystemJob`) is
+unchanged, so clients that match jobs by name keep working once they read from the cluster endpoint.
+
+#### Active write index is rejected
+
+The endpoints now reject a request naming the active write index of an index set with a 400 ("Rotate the
+index set first"). Previously such requests were accepted and archived the live index, which could silently
+miss trailing writes. API clients archiving a single index can pass `rotate=true` to have the server rotate
+the owning index set first. The flag additionally requires the deflector cycle permission, and the rotation
+is a no-op for indices that are not the active write index. The Graylog web interface uses it after a
+confirmation. Alternatively, rotate explicitly (e.g. `POST /cluster/deflector/{indexSetId}/cycle`), then
+archive the rotated index — archiving waits for the rotation to set it read-only. A non-write index that is
+not read-only (e.g. restored from a snapshot) is set read-only automatically before it is archived.
+
+#### Already-archived indices are rejected
+
+The endpoints now reject a request naming an index that is already archived in the current archive backend
+with a 400. Previously such requests were accepted, silently skipped the archiving work, and still applied
+the requested index action (for example deleting the index). Retention-driven archiving is unaffected.
+
 ## Web Interface Changes
 
 ### Event Definition "Fields" step renamed to "Additional Details"
