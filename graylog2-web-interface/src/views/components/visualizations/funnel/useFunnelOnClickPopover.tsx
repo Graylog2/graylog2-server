@@ -66,6 +66,7 @@ const useFunnelOnClickPopover = (): Result => {
 
   const popover = (
     <OnClickPopoverWrapper
+      // eslint-disable-next-line react-hooks/refs
       ref={refs.setFloating}
       isPopoverOpen={!!clickedItem}
       onPopoverChange={(open) => { if (!open) setClickedItem(null); }}

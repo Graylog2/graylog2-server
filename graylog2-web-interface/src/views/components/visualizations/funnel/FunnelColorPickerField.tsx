@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
-import { useFormikContext } from 'formik';
-import get from 'lodash/get';
+import { useField } from 'formik';
 import styled from 'styled-components';
 
 import type { CustomFieldComponentProps } from 'views/types';
-import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import ColorConfigurationPopover from 'views/components/aggregationwizard/ColorConfigurationPopover';
-
 import { DEFAULT_FUNNEL_START_COLOR } from 'views/logic/aggregationbuilder/visualizations/FunnelVisualizationConfig';
 
 const Row = styled.div`
@@ -33,12 +30,12 @@ const Row = styled.div`
 `;
 
 const FunnelColorPickerField = ({ name, title, field }: CustomFieldComponentProps) => {
-  const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
-  const curColor = (get(values, name) as string | undefined) ?? DEFAULT_FUNNEL_START_COLOR;
+  const [{ value }, , { setValue }] = useField<string>(name);
+  const curColor = value ?? DEFAULT_FUNNEL_START_COLOR;
 
   const onColorSelect = useCallback(
-    (color: string) => setFieldValue(name, color),
-    [name, setFieldValue],
+    (color: string) => setValue(color),
+    [setValue],
   );
 
   return (

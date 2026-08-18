@@ -20,7 +20,8 @@ import chroma from 'chroma-js';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
-import FunnelVisualizationConfig, {
+import type FunnelVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/FunnelVisualizationConfig';
+import {
   DEFAULT_FUNNEL_START_COLOR,
   DEFAULT_FUNNEL_END_COLOR,
 } from 'views/logic/aggregationbuilder/visualizations/FunnelVisualizationConfig';
