@@ -149,17 +149,22 @@ export const isIndexArchived = (
   archivedIndexNames: ReadonlySet<string>,
 ): boolean => pendingStatus?.state !== 'archiving' && archivedIndexNames.has(indexName);
 
+export type IndexActionAvailability = {
+  canArchive: boolean;
+  canReindex: boolean;
+  alreadyArchived: boolean;
+};
+
 export const getAvailableActions = (
   index: IncompatibleIndex,
-  canArchive: boolean,
-  alreadyArchived: boolean,
+  { canArchive, canReindex, alreadyArchived }: IndexActionAvailability,
 ): Array<IndexAction> => {
   if (index.active_write_index) {
     return ['rotate'];
   }
 
   if (index.system_index) {
-    return ['reindex-system-index'];
+    return canReindex ? ['reindex-system-index'] : [];
   }
 
   return index.managed_index && canArchive && !alreadyArchived ? ['archive-delete', 'delete'] : ['delete'];

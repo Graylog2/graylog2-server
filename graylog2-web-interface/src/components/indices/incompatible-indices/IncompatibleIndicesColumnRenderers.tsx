@@ -80,13 +80,20 @@ export const createColumnRenderers = (): ColumnRenderers<IncompatibleIndexRow> =
       renderCell: (_value, index) => <IndexNameCell index={index} />,
     },
     category: {
-      staticWidth: 200,
+      staticWidth: 100,
       renderCell: (_value, index) => <span>{renderBadges(typeBadges(index))}</span>,
     },
     version: {
+      staticWidth: 'matchHeader',
       renderCell: (_value, index) => index.version || 'Unknown',
     },
-    begin: { renderCell: renderRange },
-    end: { renderCell: renderRange },
+    begin: {
+      staticWidth: 'matchHeader',
+      renderCell: renderRange,
+    },
+    end: {
+      staticWidth: 'matchHeader',
+      renderCell: renderRange,
+    },
   },
 });
