@@ -43,7 +43,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PermissionsValidatorTest {
+class PrivilegeEscalationGuardTest {
 
     private static final String MISSING_PERMISSIONS_PREFIX =
             "Cannot assign permissions/roles to new user that current user does not have: ";
@@ -58,11 +58,11 @@ class PermissionsValidatorTest {
     @Mock
     private UserContext userContext;
 
-    private PermissionsValidator validator;
+    private PrivilegeEscalationGuard validator;
 
     @BeforeEach
     void setUp() {
-        validator = new PermissionsValidator(roleService);
+        validator = new PrivilegeEscalationGuard(roleService);
     }
 
     // ----------------------------------------------------------------------------------------------------

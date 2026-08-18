@@ -101,7 +101,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
-import org.graylog2.users.PermissionsValidator;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserConfiguration;
@@ -160,7 +160,7 @@ public class UsersResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
     private final UserSessionTerminationService sessionTerminationService;
     private final DefaultSecurityManager securityManager;
-    private final PermissionsValidator permissionsValidator;
+    private final PrivilegeEscalationGuard privilegeEscalationGuard;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
     private final ClusterConfigService clusterConfigService;
     private final AuditEventSender auditEventSender;
@@ -183,7 +183,7 @@ public class UsersResource extends RestResource {
                          GlobalAuthServiceConfig globalAuthServiceConfig,
                          ClusterConfigService clusterConfigService,
                          AuditEventSender auditEventSender,
-                         PermissionsValidator permissionsValidator) {
+                         PrivilegeEscalationGuard privilegeEscalationGuard) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -191,7 +191,7 @@ public class UsersResource extends RestResource {
         this.paginatedUserService = paginatedUserService;
         this.sessionTerminationService = sessionTerminationService;
         this.securityManager = securityManager;
-        this.permissionsValidator = permissionsValidator;
+        this.privilegeEscalationGuard = privilegeEscalationGuard;
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
         this.globalAuthServiceConfig = globalAuthServiceConfig;
         this.clusterConfigService = clusterConfigService;
@@ -402,7 +402,7 @@ public class UsersResource extends RestResource {
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
-        permissionsValidator.validatePermissionsAndRoles(cr, userContext);
+        privilegeEscalationGuard.validatePermissionsAndRoles(cr, userContext);
         validatePasswordComplexity(cr.password());
 
         // Create user.
@@ -568,13 +568,13 @@ public class UsersResource extends RestResource {
         }
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
         if (permitted && cr.permissions() != null) {
-            permissionsValidator.validatePermissions(cr.permissions(), userContext);
+            privilegeEscalationGuard.validatePermissions(cr.permissions(), userContext);
             user.setPermissions(getEffectiveUserPermissions(user, cr.permissions()));
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
             checkAdminRoleForServiceAccount(cr, user);
-            permissionsValidator.validateRolePermissions(cr.roles(), userContext);
+            privilegeEscalationGuard.validateRolePermissions(cr.roles(), userContext);
             setUserRoles(cr.roles(), user, userContext);
         }
 
@@ -697,7 +697,7 @@ public class UsersResource extends RestResource {
             throw new NotFoundException("Couldn't find user " + username);
         }
 
-        permissionsValidator.validatePermissions(permissionRequest.permissions(), userContext);
+        privilegeEscalationGuard.validatePermissions(permissionRequest.permissions(), userContext);
         user.setPermissions(getEffectiveUserPermissions(user, permissionRequest.permissions()));
         userManagementService.save(user);
     }

@@ -54,7 +54,7 @@ import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
-import org.graylog2.users.PermissionsValidator;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
@@ -662,7 +662,7 @@ public class UsersResourceTest {
                                  DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig,
                                  ClusterConfigService clusterConfigService, UserService userService) {
             super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
-                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, mock(AuditEventSender.class), new PermissionsValidator(roleService));
+                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, mock(AuditEventSender.class), new PrivilegeEscalationGuard(roleService));
             this.subject = subject;
             super.configuration = configuration;
             super.userService = userService;

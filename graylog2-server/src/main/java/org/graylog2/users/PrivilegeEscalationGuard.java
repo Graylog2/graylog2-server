@@ -35,11 +35,11 @@ import java.util.stream.Stream;
 import static org.graylog2.shared.security.RestPermissions.ROLES_READ;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class PermissionsValidator {
+public class PrivilegeEscalationGuard {
     private final RoleService roleService;
 
     @Inject
-    public PermissionsValidator(RoleService roleService) {
+    public PrivilegeEscalationGuard(RoleService roleService) {
         this.roleService = roleService;
     }
 
