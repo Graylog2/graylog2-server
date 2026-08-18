@@ -137,7 +137,9 @@ const Badge = (
   const background = status
     ? theme.colors.badges[status.color][status.variant].background
     : mapStyle(bsStyle, theme);
-  const color = status ? theme.colors.badges[status.color][status.variant].text : theme.utils.contrastingColor(background);
+  const color = status
+    ? theme.colors.badges[status.color][status.variant].text
+    : theme.utils.contrastingColor(background);
   const iconSize = iconSizeForBadge[size];
 
   let leftSection: React.ReactNode;
