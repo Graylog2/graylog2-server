@@ -20,11 +20,11 @@ import { useMemo, useContext } from 'react';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { setChartColor } from 'views/logic/slices/widgetActions';
+import DefaultChartColorsContext from 'views/components/contexts/DefaultChartColorsContext';
 
 import useColorRules from './useColorRules';
 
 import ChartColorContext from '../visualizations/ChartColorContext';
-import DefaultChartColorsContext from 'views/components/contexts/DefaultChartColorsContext';
 
 type Props = {
   children: React.ReactNode;
