@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { singleton } from 'logic/singleton';
 
 // 'sent' = posthog.capture ran; 'suppressed' = posthog gates dropped it; 'disabled' = telemetry
 // is turned off entirely and the event only exists for debugging.
@@ -30,53 +31,63 @@ export type TelemetryDebugEntry = {
 export const TELEMETRY_DEBUG_STORAGE_KEY = 'gl.telemetry-debug';
 export const MAX_ENTRIES = 500;
 
-// The flag is mirrored into memory so the per-event hot path is a boolean check, not a
-// localStorage read.
-let enabled = false;
-let entries: TelemetryDebugEntry[] = [];
-let nextId = 1;
-const listeners = new Set<() => void>();
-
-try {
-  enabled = localStorage.getItem(TELEMETRY_DEBUG_STORAGE_KEY) === 'true';
-} catch {
-  // localStorage unavailable (e.g. privacy mode) — debugging simply stays off.
-}
-
-const notify = () => listeners.forEach((listener) => listener());
-
-export const isTelemetryDebugEnabled = () => enabled;
-
-export const setTelemetryDebugEnabled = (newEnabled: boolean) => {
-  enabled = newEnabled;
+const createTelemetryDebugStore = () => {
+  // The flag is mirrored into memory so the per-event hot path is a boolean check, not a
+  // localStorage read.
+  let enabled = false;
+  let entries: TelemetryDebugEntry[] = [];
+  let nextId = 1;
+  const listeners = new Set<() => void>();
 
   try {
-    localStorage.setItem(TELEMETRY_DEBUG_STORAGE_KEY, String(newEnabled));
+    enabled = localStorage.getItem(TELEMETRY_DEBUG_STORAGE_KEY) === 'true';
   } catch {
-    // Persistence is best-effort; the in-memory flag still applies for this session.
+    // localStorage unavailable (e.g. privacy mode) — debugging simply stays off.
   }
 
-  notify();
+  const notify = () => listeners.forEach((listener) => listener());
+
+  return {
+    isTelemetryDebugEnabled: () => enabled,
+    setTelemetryDebugEnabled: (newEnabled: boolean) => {
+      enabled = newEnabled;
+
+      try {
+        localStorage.setItem(TELEMETRY_DEBUG_STORAGE_KEY, String(newEnabled));
+      } catch {
+        // Persistence is best-effort; the in-memory flag still applies for this session.
+      }
+
+      notify();
+    },
+    telemetryDebugStore: {
+      record: (eventType: string, payload: object, status: TelemetryDebugStatus) => {
+        if (!enabled) return;
+
+        entries = [...entries, { id: nextId, timestamp: Date.now(), eventType, payload, status }].slice(-MAX_ENTRIES);
+        nextId += 1;
+
+        notify();
+      },
+      getEntries: () => entries,
+      clear: () => {
+        entries = [];
+
+        notify();
+      },
+      subscribe: (listener: () => void) => {
+        listeners.add(listener);
+
+        return () => listeners.delete(listener);
+      },
+    },
+  };
 };
 
-export const telemetryDebugStore = {
-  record: (eventType: string, payload: object, status: TelemetryDebugStatus) => {
-    if (!enabled) return;
-
-    entries = [...entries, { id: nextId, timestamp: Date.now(), eventType, payload, status }].slice(-MAX_ENTRIES);
-    nextId += 1;
-
-    notify();
-  },
-  getEntries: () => entries,
-  clear: () => {
-    entries = [];
-
-    notify();
-  },
-  subscribe: (listener: () => void) => {
-    listeners.add(listener);
-
-    return () => listeners.delete(listener);
-  },
-};
+// Plugin bundles compile their own copies of core modules, so the store state must live in the
+// cross-bundle singleton registry — a provider in one bundle records into the same buffer an
+// overlay from another bundle reads (same reason TelemetryContext and App are singletons).
+export const { isTelemetryDebugEnabled, setTelemetryDebugEnabled, telemetryDebugStore } = singleton(
+  'core.TelemetryDebugStore',
+  createTelemetryDebugStore,
+);

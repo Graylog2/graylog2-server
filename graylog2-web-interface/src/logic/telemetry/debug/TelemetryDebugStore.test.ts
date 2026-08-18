@@ -122,6 +122,27 @@ describe('TelemetryDebugStore', () => {
     });
   });
 
+  describe('module duplication', () => {
+    // Plugin bundles compile their own copies of core modules (which is why TelemetryContext,
+    // useSendTelemetry, and App are singleton()-wrapped). A provider from one bundle must land
+    // its events in the same store an overlay from another bundle reads.
+    it('shares state across duplicate module copies', () => {
+      telemetryDebugStore.record('From First Copy', {}, 'sent');
+
+      let secondCopy: {
+        telemetryDebugStore: typeof telemetryDebugStore;
+        isTelemetryDebugEnabled: typeof isTelemetryDebugEnabled;
+      };
+      jest.isolateModules(() => {
+        secondCopy = jest.requireActual('./TelemetryDebugStore');
+      });
+
+      expect(secondCopy.telemetryDebugStore.getEntries()).toHaveLength(1);
+      expect(secondCopy.telemetryDebugStore.getEntries()[0].eventType).toBe('From First Copy');
+      expect(secondCopy.isTelemetryDebugEnabled()).toBe(true);
+    });
+  });
+
   describe('subscribe', () => {
     it('notifies on record, clear, and flag changes until unsubscribed', () => {
       const listener = jest.fn();
