@@ -15,27 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-import IconButton from 'components/common/IconButton';
+import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
 import type { WidgetActionType, WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
-
-const NeutralLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-  color: inherit;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: none;
-  }
-
-  &:visited {
-    color: inherit;
-  }
-`;
-
-const TITLE = 'Replay search';
 
 const ReplayLinkWidgetActionComponent = ({ widget }: WidgetMenuActionComponentProps) => {
   const href = widget.context;
@@ -44,11 +26,7 @@ const ReplayLinkWidgetActionComponent = ({ widget }: WidgetMenuActionComponentPr
     return null;
   }
 
-  return (
-    <NeutralLink href={href} target="_blank" rel="noopener noreferrer" title={TITLE}>
-      <IconButton name="play_arrow" focusable={false} title={TITLE} />
-    </NeutralLink>
-  );
+  return <ReplaySearchButtonComponent searchLink={href} newTab />;
 };
 
 const replayLinkWidgetAction: WidgetActionType = {
