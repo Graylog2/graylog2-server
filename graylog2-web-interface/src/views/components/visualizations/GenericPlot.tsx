@@ -40,6 +40,10 @@ const StyledPlot = styled(Plot)(
       padding: 0;
     }
 
+    path.js-fill {
+      fill-opacity: 0.25 !important;
+    }
+
     .hoverlayer .hovertext {
       rect {
         fill: ${theme.colors.global.contentBackground} !important;
