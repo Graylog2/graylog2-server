@@ -29,6 +29,7 @@ import collectorOsName from '../../common/collectorOsName';
 type Props = {
   instance: CollectorInstanceView;
   fleetName: string | undefined;
+  onFleetLinkClick?: () => void;
 };
 
 const FactLabel = styled.div(
@@ -79,7 +80,7 @@ const Fact = ({ label, children = undefined }: React.PropsWithChildren<{ label: 
  * full attribute list tucked behind a toggle — the handful of values that matter during onboarding
  * stay scannable while everything the agent reported remains one click away.
  */
-const CollectorFactsSection = ({ instance, fleetName }: Props) => {
+const CollectorFactsSection = ({ instance, fleetName, onFleetLinkClick = undefined }: Props) => {
 
   const attributes = [
     ...Object.entries(instance.identifying_attributes ?? {}),
@@ -93,7 +94,9 @@ const CollectorFactsSection = ({ instance, fleetName }: Props) => {
         <Fact label="OS">{collectorOsName(instance, true)}</Fact>
         <Fact label="Version">{instance.version ?? 'Unknown'}</Fact>
         <Fact label="Fleet">
-          <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName ?? 'Unknown'}</Link>
+          <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)} onClick={onFleetLinkClick}>
+            {fleetName ?? 'Unknown'}
+          </Link>
         </Fact>
         <Fact label="Enrolled">
           <RelativeTime dateTime={instance.enrolled_at} />
