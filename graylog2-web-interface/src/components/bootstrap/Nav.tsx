@@ -18,8 +18,12 @@ import styled from 'styled-components';
 
 const Nav = styled.ul`
   display: flex;
-  padding-left: 0;
   align-items: center;
+
+  /* Bootstrap's base stylesheet gives every list a bottom margin, which its own nav rules used to
+     cancel. Without this a navigation bar pushes whatever follows it down by 10px. */
+  margin: 0;
+  padding-left: 0;
 `;
 
 /** @component */

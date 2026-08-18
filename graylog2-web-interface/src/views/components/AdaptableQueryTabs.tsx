@@ -109,6 +109,15 @@ const StyledQueryNav = styled(Nav)(
       position: relative;
       padding-left: ${NAV_PADDING}px;
 
+      /* Separates the tabs from each other, which Bootstrap's nav rules did with a margin on each
+         tab of their own. */
+      gap: ${theme.spacings.sm};
+
+      /* The buttons sharing this list with the tabs are taller than a tab, so centring the items
+         would leave the selected tab floating above the content it belongs to. Bootstrap sat tabs on
+         the bottom of the bar with floats instead. */
+      align-items: flex-end;
+
       > li.${TAB_LI_CLASS} {
         > a {
           color: ${theme.colors.text.primary};
@@ -159,6 +168,9 @@ const StyledQueryNav = styled(Nav)(
 // Bootstrap's nav rules no longer suppress the underline its base stylesheet gives a hovered anchor.
 const QueryTabLink = styled.a`
   cursor: pointer;
+  /* Bootstrap's nav rules made these anchors blocks, without which their padding does not count
+     towards their height and the tabs end up shorter than they were. */
+  display: inline-block;
   padding: 10px 15px;
 
   &,
