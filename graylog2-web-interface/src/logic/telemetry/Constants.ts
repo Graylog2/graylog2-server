@@ -482,6 +482,9 @@ export const TELEMETRY_EVENT_TYPE = {
     DEPLOYMENT: {
       TAB_SELECTED: 'Collector Deployment Tab Selected',
       FLEET_CLEARED: 'Collector Deployment Fleet Cleared',
+      FIRST_HOST_ENROLLED: 'Collector Deployment First Host Enrolled',
+      HOST_SETUP_TOGGLED: 'Collector Deployment Host Setup Toggled',
+      LINK_CLICKED: 'Collector Deployment Link Clicked',
     },
     INSTALL: {
       PLATFORM_SELECTED: 'Collector Install Platform Selected',
