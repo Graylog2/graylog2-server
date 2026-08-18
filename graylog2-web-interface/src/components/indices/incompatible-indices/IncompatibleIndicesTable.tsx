@@ -40,8 +40,7 @@ const TABLE_LAYOUT = {
 };
 
 const DataNodeMigrationHint = () => {
-  const migrationRouteAvailable =
-    !AppConfig.isCloud() && AppConfig.isFeatureEnabled('data_node_migration');
+  const migrationRouteAvailable = !AppConfig.isCloud() && AppConfig.isFeatureEnabled('data_node_migration');
 
   return migrationRouteAvailable ? (
     <Link to={Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION}>Migrate to Data Nodes</Link>
