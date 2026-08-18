@@ -44,7 +44,7 @@ const Harness = ({ navbarWidth, brandWidth, badgesWidth, iconsWidth, menuWidth }
       <div ref={brandRef} data-width={brandWidth} />
       {/* Mirrors how the navigation bar stops rendering the menu once it collapses. */}
       {collapsed ? <button type="button">burger</button> : <ul ref={menuRef} data-width={menuWidth} />}
-      <div ref={badgesRef} data-width={badgesWidth} />
+      <ul ref={badgesRef} data-width={badgesWidth} />
       <nav ref={iconsRef} data-width={iconsWidth} />
       <span>{collapsed ? 'collapsed' : 'expanded'}</span>
     </header>

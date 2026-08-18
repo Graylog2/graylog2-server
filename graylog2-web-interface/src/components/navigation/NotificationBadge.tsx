@@ -43,7 +43,9 @@ const StyledInactiveNavItem = styled(InactiveNavItem)`
   }
 `;
 
-const NotificationBadge = ({ ref }) => {
+// On React 18 a forwarded ref arrives as the second argument, not as a prop, so taking it from the
+// props left it undefined and the ref was never attached.
+const NotificationBadge = (_props: unknown, ref: React.ForwardedRef<HTMLUListElement>) => {
   const { isPermitted } = usePermissions();
   const enabled = isPermitted('notifications:read');
   const { data, isLoading } = useNotificationBadgeCount({ enabled });

@@ -40,7 +40,8 @@ const MEASURE_DEBOUNCE_MS = 0;
 const useNavigationCollapse = () => {
   const navbarRef = useRef<HTMLElement>(null);
   const brandRef = useRef<HTMLDivElement>(null);
-  const badgesRef = useRef<HTMLDivElement>(null);
+  // `NotificationBadge` renders a list, which is what this ref ends up attached to.
+  const badgesRef = useRef<HTMLUListElement>(null);
   const iconsRef = useRef<HTMLElement>(null);
 
   // These four are always rendered, so a plain ref is enough to keep measuring them.
