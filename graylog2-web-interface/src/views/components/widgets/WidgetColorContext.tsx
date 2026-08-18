@@ -20,7 +20,6 @@ import { useMemo, useContext } from 'react';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { setChartColor } from 'views/logic/slices/widgetActions';
-import DefaultChartColorsContext from 'views/components/contexts/DefaultChartColorsContext';
 
 import useColorRules from './useColorRules';
 
@@ -33,15 +32,14 @@ type Props = {
 
 const WidgetColorContext = ({ children, id }: Props) => {
   const colorRules = useColorRules();
-  const defaultColors = useContext(DefaultChartColorsContext);
   const colorRulesForWidget = useMemo(() => {
-    const colorMapperBuilder = ColorMapper.builder(defaultColors);
+    const colorMapperBuilder = ColorMapper.builder();
     const colorRulesForWidgetBuilder = colorRules
       .filter(({ widgetId }) => widgetId === id)
       .reduce((prev, { name, color }) => prev.set(name, color), colorMapperBuilder);
 
     return colorRulesForWidgetBuilder.build();
-  }, [colorRules, defaultColors, id]);
+  }, [colorRules, id]);
   const dispatch = useViewsDispatch();
 
   const contextValue = useMemo(() => {

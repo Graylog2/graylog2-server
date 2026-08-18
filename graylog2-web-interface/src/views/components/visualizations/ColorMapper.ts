@@ -24,22 +24,19 @@ class ColorMapper {
 
   private _currentDefaultColor: number;
 
-  private _defaultColors: Array<string>;
-
-  constructor(colorMap = Map<string, string>(), colorIndex = -1, defaultColors: Array<string> = defaultChartColors) {
+  constructor(colorMap = Map<string, string>(), colorIndex = -1) {
     this._value = colorMap;
     this._currentDefaultColor = colorIndex;
-    this._defaultColors = defaultColors?.length ? defaultColors : defaultChartColors;
   }
 
   private _incrementColor() {
-    this._currentDefaultColor = (this._currentDefaultColor + 1) % this._defaultColors.length;
+    this._currentDefaultColor = (this._currentDefaultColor + 1) % defaultChartColors.length;
   }
 
   private _nextFreeColor() {
     this._incrementColor();
 
-    return this._defaultColors[this._currentDefaultColor];
+    return defaultChartColors[this._currentDefaultColor];
   }
 
   get(name, defaultColor?) {
@@ -75,12 +72,12 @@ class ColorMapper {
 
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(this._value, this._currentDefaultColor, this._defaultColors);
+    return new Builder(this._value, this._currentDefaultColor);
   }
 
-  static builder(defaultColors?: Array<string>) {
+  static builder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(undefined, undefined, defaultColors);
+    return new Builder();
   }
 
   static create(value = Map<string, string>()) {
@@ -93,20 +90,17 @@ class Builder {
 
   private colorIndex: number;
 
-  private defaultColors: Array<string>;
-
-  constructor(value = Map<string, string>(), colorIndex = -1, defaultColors: Array<string> = defaultChartColors) {
+  constructor(value = Map<string, string>(), colorIndex = -1) {
     this.value = value;
     this.colorIndex = colorIndex;
-    this.defaultColors = defaultColors;
   }
 
   set(name, color) {
-    return new Builder(this.value.set(name, color), this.colorIndex, this.defaultColors);
+    return new Builder(this.value.set(name, color));
   }
 
   build() {
-    return new ColorMapper(this.value, this.colorIndex, this.defaultColors);
+    return new ColorMapper(this.value, this.colorIndex);
   }
 }
 
