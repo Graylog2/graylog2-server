@@ -29,6 +29,7 @@ const mockAppConfig = {
   pluginUISettings: jest.fn(() => ({})),
   branding: jest.fn(),
   globalInputsOnly: jest.fn(() => false),
+  welcomePageMetricsEnabled: jest.fn(() => true),
 };
 
 jest.mock('util/AppConfig', () => mockAppConfig);
