@@ -1,5 +1,5 @@
 type = "a"
-message = "Show opensearch nodes in cluster configuration page"
+message = "Show OpenSearch nodes in cluster configuration page"
 
 issues = ["Graylog2/graylog-plugin-enterprise#15012"]
 pulls = ["26963"]
