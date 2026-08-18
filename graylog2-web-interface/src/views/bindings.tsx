@@ -96,6 +96,8 @@ import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import FunnelVisualization from 'views/components/visualizations/funnel/FunnelVisualization';
+import FunnelVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/FunnelVisualizationConfig';
 import ViewHeader from 'views/components/views/ViewHeader';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
@@ -156,6 +158,7 @@ VisualizationConfig.registerSubtype(HeatmapVisualization.type, HeatmapVisualizat
 VisualizationConfig.registerSubtype(NetworkGraphVisualization.type, NetworkVisualizationConfig);
 VisualizationConfig.registerSubtype(DataTable.type, DataTableVisualizationConfig);
 VisualizationConfig.registerSubtype(ScatterVisualization.type, ScatterVisualizationConfig);
+VisualizationConfig.registerSubtype(FunnelVisualization.type, FunnelVisualizationConfig);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);

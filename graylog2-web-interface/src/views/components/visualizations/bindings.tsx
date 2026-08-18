@@ -19,6 +19,7 @@ import { bindings as dataTable } from 'views/components/datatable';
 
 import areaChart from './area/bindings';
 import barChart from './bar/bindings';
+import funnelChart from './funnel/bindings';
 import heatmap from './heatmap/bindings';
 import lineChart from './line/bindings';
 import networkGraph from './network/bindings';
@@ -32,6 +33,7 @@ const visualizationBindings: Array<VisualizationType<any>> = [
   areaChart,
   barChart,
   dataTable,
+  funnelChart,
   heatmap,
   lineChart,
   networkGraph,
