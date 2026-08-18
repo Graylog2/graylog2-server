@@ -29,12 +29,12 @@ describe('ExpandedOutputsActions', () => {
     expect(manageOutputsLink).toHaveAttribute('href', `/streams/${stream.id}/view?segment=destinations`);
   });
 
-  it('disables the button when the stream is the default stream', async () => {
+  it('keeps Manage Outputs enabled for the default stream (#14572)', async () => {
     render(<ExpandedOutputsActions stream={{ ...stream, is_default: true }} />);
 
-    const manageOutputsButton = await screen.findByRole('button', { name: /manage outputs/i });
+    const manageOutputsLink = await screen.findByRole('link', { name: /manage outputs/i });
 
-    expect(manageOutputsButton).toBeDisabled();
+    expect(manageOutputsLink).toHaveAttribute('href', `/streams/${stream.id}/view?segment=destinations`);
   });
 
   it('disables the button when the stream is not editable', async () => {

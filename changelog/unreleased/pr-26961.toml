@@ -1,0 +1,4 @@
+type = "a"
+message = "Add metrics widgets (message, alert, and event counts, plus top sources) to the welcome page, configurable via a new \"welcome_page_metrics_enabled\" server setting."
+
+pulls = ["26961"]
