@@ -27,7 +27,7 @@ describe('Badge', () => {
     expect(screen.getByText('Alert')).toBeInTheDocument();
   });
 
-  it('renders as a button when onClick is set, with or without status', async () => {
+  it('renders as a button and fires onClick when both status and onClick are set', async () => {
     const onClick = jest.fn();
     render(
       <Badge status={{ color: 'success', variant: 'light' }} onClick={onClick}>
