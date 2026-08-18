@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useContext } from 'react';
+import { useMemo } from 'react';
 
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
