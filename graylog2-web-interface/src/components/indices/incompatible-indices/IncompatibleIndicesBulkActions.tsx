@@ -154,6 +154,7 @@ const bulkArchiveDeleteIndices = async (
 const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
   const {
     archiveActionsAvailable,
+    reindexActionsAvailable,
     archivedIndexNames,
     pendingIndexStatuses,
     addArchiveDeleteAction,
@@ -170,6 +171,7 @@ const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
   const candidates = getBulkIndexActionCandidates({
     indices,
     canArchive: archiveActionsAvailable,
+    canReindex: reindexActionsAvailable,
     pendingIndexStatuses,
     archivedIndexNames,
   });
@@ -182,6 +184,12 @@ const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
 
   const handleConfirm = async () => {
     if (!confirmedBulkAction || isSubmitting) {
+      return;
+    }
+
+    if (confirmedBulkAction.action === 'reindex-system-index' && !reindexActionsAvailable) {
+      setConfirmedBulkAction(undefined);
+
       return;
     }
 
