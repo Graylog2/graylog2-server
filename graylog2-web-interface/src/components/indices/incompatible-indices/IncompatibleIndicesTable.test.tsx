@@ -16,21 +16,21 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { act } from 'react';
 
 import { SystemIndexerIndices } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
+import AppConfig from 'util/AppConfig';
 import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
-import useCanArchive from 'components/indices/hooks/useCanArchive';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 import IncompatibleIndicesTable from './IncompatibleIndicesTable';
 import { createColumnRenderers } from './IncompatibleIndicesColumnRenderers';
+import IncompatibleIndicesContext from './IncompatibleIndicesContext';
+import type { IncompatibleIndicesContextValue } from './IncompatibleIndicesContext';
 import { fetchIncompatibleIndices, incompatibleIndicesKeyFn } from './fetchIncompatibleIndices';
-import type { IncompatibleIndexRow, IncompatibleIndicesResponse } from './fetchIncompatibleIndices';
-import useArchivedIndexNames from './hooks/useArchivedIndexNames';
-import usePendingIncompatibleIndexActions from './hooks/usePendingIncompatibleIndexActions';
+import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
+import useIncompatibleIndexActionState from './hooks/useIncompatibleIndexActionState';
 
 jest.mock('components/common/PaginatedEntityTable', () => ({
   __esModule: true,
@@ -41,9 +41,7 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
 jest.mock('@graylog/server-api', () => ({
   SystemIndexerIndices: { listOutdatedIndices: jest.fn() },
 }));
-jest.mock('components/indices/hooks/useCanArchive');
-jest.mock('./hooks/useArchivedIndexNames');
-jest.mock('./hooks/usePendingIncompatibleIndexActions');
+jest.mock('./hooks/useIncompatibleIndexActionState');
 
 const makeIndex = (overrides: Partial<IncompatibleIndexRow>): IncompatibleIndexRow => ({
   id: 'index',
@@ -66,28 +64,25 @@ const searchParams: SearchParams = {
   filters: undefined,
 };
 
-const makeResponse = (list: Array<IncompatibleIndexRow>): IncompatibleIndicesResponse => ({
-  list,
-  pagination: { total: list.length },
-  attributes: [],
-});
-
-const latestTableProps = (
-  mockPaginatedEntityTable: jest.Mock,
-): PaginatedEntityTableProps<IncompatibleIndexRow, unknown> =>
-  mockPaginatedEntityTable.mock.calls[mockPaginatedEntityTable.mock.calls.length - 1][0];
-
 describe('IncompatibleIndicesTable', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    asMock(useCanArchive).mockReturnValue(true);
-    asMock(useArchivedIndexNames).mockReturnValue(new Set());
-    asMock(usePendingIncompatibleIndexActions).mockReturnValue({
+  const mockActionState = (overrides: Partial<IncompatibleIndicesContextValue> = {}) =>
+    asMock(useIncompatibleIndexActionState).mockReturnValue({
+      archiveActionsAvailable: true,
+      reindexActionsAvailable: true,
+      archivedIndexNames: new Set(),
       pendingIndexStatuses: new Map(),
       addArchiveDeleteAction: jest.fn(),
-      isArchiveJobRunning: false,
+      addReindexAction: jest.fn(),
       refetchClusterJobs: jest.fn(),
+      refetch: jest.fn(),
+      ...overrides,
     });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockActionState();
+    asMock(AppConfig.isCloud).mockReturnValue(false);
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
   });
 
   it('wires the paginated entity table to the outdated indices endpoint', () => {
@@ -112,63 +107,32 @@ describe('IncompatibleIndicesTable', () => {
     expect(callProps.columnRenderers.attributes).toHaveProperty('index_name');
   });
 
-  it('retains selected index data across pages and removes deselected indices', () => {
-    const { default: PaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
-    const mockPaginatedEntityTable = asMock(PaginatedEntityTable);
-    const firstPageIndex = makeIndex({ id: 'legacy_0', index_name: 'legacy_0' });
-    const secondPageIndex = makeIndex({ id: 'legacy_1', index_name: 'legacy_1' });
+  it('does not mention Data Node migration when system indices can be reindexed', () => {
+    render(<IncompatibleIndicesTable />);
+
+    expect(screen.queryByText(/migrate to Data Nodes/i)).not.toBeInTheDocument();
+  });
+
+  it('explains how to reindex system indices when the search backend does not support it', () => {
+    mockActionState({ reindexActionsAvailable: false });
 
     render(<IncompatibleIndicesTable />);
 
-    act(() => {
-      latestTableProps(mockPaginatedEntityTable).onDataLoaded?.(makeResponse([firstPageIndex]));
-    });
-
-    act(() => {
-      latestTableProps(mockPaginatedEntityTable).bulkSelection.onChangeSelection?.(
-        [firstPageIndex.id],
-        [firstPageIndex],
-      );
-    });
-
-    act(() => {
-      latestTableProps(mockPaginatedEntityTable).onDataLoaded?.(makeResponse([secondPageIndex]));
-    });
-
-    act(() => {
-      latestTableProps(mockPaginatedEntityTable).bulkSelection.onChangeSelection?.(
-        [firstPageIndex.id, secondPageIndex.id],
-        [secondPageIndex],
-      );
-    });
-
-    const bulkActions = latestTableProps(mockPaginatedEntityTable).bulkSelection.actions as React.ReactElement<{
-      indices: Array<IncompatibleIndexRow>;
-    }>;
-
-    expect(bulkActions.props.indices.map(({ id }) => id)).toEqual(['legacy_0', 'legacy_1']);
-    expect(useArchivedIndexNames).toHaveBeenLastCalledWith(['legacy_0', 'legacy_1'], true);
-    expect(usePendingIncompatibleIndexActions).toHaveBeenLastCalledWith(
-      expect.objectContaining({ incompatibleIndices: [firstPageIndex, secondPageIndex] }),
+    expect(screen.getByText(/system indices can only be reindexed/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /migrate to Data Nodes/i })).toHaveAttribute(
+      'href',
+      '/system/cluster/datanode-migration',
     );
+  });
 
-    act(() => {
-      latestTableProps(mockPaginatedEntityTable).bulkSelection.onChangeSelection?.(
-        [secondPageIndex.id],
-        [secondPageIndex],
-      );
-    });
+  it('does not link to the migration page when it is not routed', () => {
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
+    mockActionState({ reindexActionsAvailable: false });
 
-    const actionsAfterDeselection = latestTableProps(mockPaginatedEntityTable).bulkSelection
-      .actions as React.ReactElement<{
-      indices: Array<IncompatibleIndexRow>;
-    }>;
+    render(<IncompatibleIndicesTable />);
 
-    expect(actionsAfterDeselection.props.indices).toEqual([secondPageIndex]);
-    expect(useArchivedIndexNames).toHaveBeenLastCalledWith(['legacy_1'], true);
-    expect(usePendingIncompatibleIndexActions).toHaveBeenLastCalledWith(
-      expect.objectContaining({ incompatibleIndices: [secondPageIndex] }),
-    );
+    expect(screen.getByText(/system indices can only be reindexed/i)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /migrate to Data Nodes/i })).not.toBeInTheDocument();
   });
 });
 
@@ -193,14 +157,35 @@ describe('fetchIncompatibleIndices', () => {
 
     const result = await fetchIncompatibleIndices(searchParams);
 
-    expect(listOutdatedIndices).toHaveBeenCalledWith('index_name', 2, 20, '', 'asc');
+    expect(listOutdatedIndices).toHaveBeenCalledWith('index_name', 2, 20, '', 'asc', {
+      requestShouldExtendSession: false,
+    });
     expect(result.list).toEqual([{ ...index, id: 'legacy-index' }]);
     expect(result.pagination).toEqual({ total: 42 });
   });
 });
 
 describe('createColumnRenderers', () => {
-  const renderers = createColumnRenderers(new Map(), new Set());
+  const renderers = createColumnRenderers();
+
+  const contextValue = (overrides: Partial<IncompatibleIndicesContextValue> = {}): IncompatibleIndicesContextValue => ({
+    archiveActionsAvailable: false,
+    reindexActionsAvailable: true,
+    archivedIndexNames: new Set(),
+    pendingIndexStatuses: new Map(),
+    addArchiveDeleteAction: jest.fn(),
+    addReindexAction: jest.fn(),
+    refetchClusterJobs: jest.fn(),
+    refetch: jest.fn(),
+    ...overrides,
+  });
+
+  const renderIndexNameCell = (index: IncompatibleIndexRow, ctx: Partial<IncompatibleIndicesContextValue> = {}) =>
+    render(
+      <IncompatibleIndicesContext.Provider value={contextValue(ctx)}>
+        <div>{renderers.attributes.index_name.renderCell(index.index_name, index, undefined)}</div>
+      </IncompatibleIndicesContext.Provider>,
+    );
 
   it('falls back to "Unknown" for a missing version', () => {
     expect(renderers.attributes.version.renderCell(undefined, makeIndex({ version: '' }), undefined)).toBe('Unknown');
@@ -209,11 +194,19 @@ describe('createColumnRenderers', () => {
   it('renders the index name with status badges (not type badges)', () => {
     const index = makeIndex({ index_name: 'graylog_2', warm_index: true, active_write_index: 'index-set-id' });
 
-    render(<div>{renderers.attributes.index_name.renderCell(index.index_name, index, undefined)}</div>);
+    renderIndexNameCell(index);
 
     expect(screen.getByText('graylog_2')).toBeInTheDocument();
     expect(screen.getByText('active write index')).toBeInTheDocument();
     expect(screen.queryByText('Warm')).not.toBeInTheDocument();
+  });
+
+  it('shows the "archived already" badge based on the context archived set', () => {
+    const index = makeIndex({ index_name: 'graylog_2' });
+
+    renderIndexNameCell(index, { archivedIndexNames: new Set(['graylog_2']) });
+
+    expect(screen.getByText('archived already')).toBeInTheDocument();
   });
 
   it('renders the primary type as a single badge in the category column', () => {

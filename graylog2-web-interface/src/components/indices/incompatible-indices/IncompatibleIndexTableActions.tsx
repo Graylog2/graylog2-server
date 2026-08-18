@@ -26,68 +26,97 @@ import UserNotification from 'util/UserNotification';
 
 import { TELEMETRY_DEFAULTS } from './telemetry';
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
-import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
-import { getAvailableActions, useIncompatibleIndexActionDefinitions } from './incompatibleIndexActions';
-import type { IndexAction, PendingArchiveTracking } from './incompatibleIndexActions';
+import { useIncompatibleIndicesContext } from './IncompatibleIndicesContext';
+import {
+  getAvailableActions,
+  isIndexArchived,
+  useIncompatibleIndexActionDefinitions,
+} from './incompatibleIndexActions';
+import type { IndexAction } from './incompatibleIndexActions';
 
 const ActionsToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
+const PendingIndicator = styled.div`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  white-space: nowrap;
+`;
+
 const ArchiveProgressBar = styled(ProgressBar)`
   display: inline-flex;
-  width: 120px;
+  width: 100%;
   margin-bottom: 0;
   vertical-align: middle;
 `;
 
 type Props = {
   index: IncompatibleIndexRow;
-  canArchive: boolean;
-  pendingStatus: PendingIndexStatus | undefined;
-  isArchived: boolean;
-  addArchiveDeleteAction: (tracking: PendingArchiveTracking) => void;
-  refetchClusterJobs?: () => void;
-  refetch: () => void;
 };
 
-const IncompatibleIndexTableActions = ({
-  index,
-  canArchive,
-  pendingStatus,
-  isArchived,
-  addArchiveDeleteAction,
-  refetchClusterJobs = undefined,
-  refetch,
-}: Props) => {
+const IncompatibleIndexTableActions = ({ index }: Props) => {
+  const {
+    archiveActionsAvailable,
+    reindexActionsAvailable,
+    archivedIndexNames,
+    pendingIndexStatuses,
+    addArchiveDeleteAction,
+    addReindexAction,
+    refetchClusterJobs,
+    refetch,
+  } = useIncompatibleIndicesContext();
   const actionDefinitions = useIncompatibleIndexActionDefinitions();
   const sendTelemetry = useSendTelemetry();
   const { deselectEntity } = useSelectedEntities();
   const [confirmedAction, setConfirmedAction] = useState<IndexAction | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const pendingStatus = pendingIndexStatuses.get(index.index_name);
+  const isArchived = isIndexArchived(index.index_name, pendingStatus, archivedIndexNames);
+
   if (pendingStatus?.state === 'archiving') {
-    return pendingStatus.percent > 0 ? (
-      <ArchiveProgressBar
-        bars={[
-          {
-            value: pendingStatus.percent,
-            label: `${pendingStatus.percent}%`,
-            bsStyle: 'warning',
-            animated: true,
-            striped: true,
-          },
-        ]}
-      />
-    ) : (
-      <Label bsStyle="warning">Archiving...</Label>
+    return (
+      <PendingIndicator>
+        {pendingStatus.percent > 0 ? (
+          <ArchiveProgressBar
+            bars={[
+              {
+                value: pendingStatus.percent,
+                label: `${pendingStatus.percent}%`,
+                bsStyle: 'warning',
+                animated: true,
+                striped: true,
+              },
+            ]}
+          />
+        ) : (
+          <Label bsStyle="warning">Archiving...</Label>
+        )}
+      </PendingIndicator>
     );
   }
 
-  const actions = getAvailableActions(index, canArchive, isArchived);
+  if (pendingStatus?.state === 'reindexing') {
+    return (
+      <PendingIndicator>
+        <Label bsStyle="primary">Reindexing...</Label>
+      </PendingIndicator>
+    );
+  }
+
+  const actions = getAvailableActions(index, {
+    canArchive: archiveActionsAvailable,
+    canReindex: reindexActionsAvailable,
+    alreadyArchived: isArchived,
+  });
 
   const handleConfirm = async () => {
-    if (!confirmedAction) {
+    if (!confirmedAction || (confirmedAction === 'reindex-system-index' && !reindexActionsAvailable)) {
+      setConfirmedAction(undefined);
+
       return;
     }
 
@@ -105,7 +134,11 @@ const IncompatibleIndexTableActions = ({
 
       UserNotification.success(actionDefinition.successMessage(index));
 
-      if (confirmedAction === 'delete') {
+      if (confirmedAction === 'reindex-system-index') {
+        addReindexAction({ indexName: index.index_name });
+      }
+
+      if (confirmedAction !== 'rotate') {
         deselectEntity(index.id);
       }
 
@@ -135,7 +168,7 @@ const IncompatibleIndexTableActions = ({
     <ActionsToolbar>
       {pendingStatus?.state === 'failed' && (
         <Label bsStyle="danger" title={pendingStatus.message}>
-          Archive failed
+          {pendingStatus.label}
         </Label>
       )}
       {actions.map((action) => {

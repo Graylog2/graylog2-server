@@ -25,6 +25,8 @@ import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatible
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
+import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
+
 export type IndexAction = 'delete' | 'archive-delete' | 'reindex-system-index' | 'rotate';
 
 export type ConfirmedAction = {
@@ -34,7 +36,7 @@ export type ConfirmedAction = {
 
 export type PendingArchiveTracking = {
   indexName: string;
-  systemJobId?: string;
+  systemJobId: string;
 };
 
 type ActionDefinition = {
@@ -127,7 +129,7 @@ const archiveDeleteDefinition = (archive: IndexArchiveBinding | undefined): Acti
   telemetryEventType: TELEMETRY_EVENT_TYPE.DATANODE_OPENSEARCH_UPGRADE.INDEX_ARCHIVE_AND_DELETE_CONFIRMED,
   getPendingArchiveTracking: (index, response) => ({
     indexName: index.index_name,
-    systemJobId: (response as { systemJobId?: string })?.systemJobId,
+    systemJobId: (response as { systemJobId: string }).systemJobId,
   }),
   isArchiveJobConflict: (errorMessage) => archive?.isArchiveJobConflict(errorMessage) ?? false,
 });
@@ -141,17 +143,28 @@ export const useIncompatibleIndexActionDefinitions = (): Record<IndexAction, Act
   };
 };
 
+export const isIndexArchived = (
+  indexName: string,
+  pendingStatus: PendingIndexStatus | undefined,
+  archivedIndexNames: ReadonlySet<string>,
+): boolean => pendingStatus?.state !== 'archiving' && archivedIndexNames.has(indexName);
+
+export type IndexActionAvailability = {
+  canArchive: boolean;
+  canReindex: boolean;
+  alreadyArchived: boolean;
+};
+
 export const getAvailableActions = (
   index: IncompatibleIndex,
-  canArchive: boolean,
-  alreadyArchived: boolean,
+  { canArchive, canReindex, alreadyArchived }: IndexActionAvailability,
 ): Array<IndexAction> => {
   if (index.active_write_index) {
     return ['rotate'];
   }
 
   if (index.system_index) {
-    return ['reindex-system-index'];
+    return canReindex ? ['reindex-system-index'] : [];
   }
 
   return index.managed_index && canArchive && !alreadyArchived ? ['archive-delete', 'delete'] : ['delete'];

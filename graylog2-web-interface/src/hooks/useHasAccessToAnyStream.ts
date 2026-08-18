@@ -14,8 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useContext } from 'react';
 
-export const ARCHIVE_POLL_INTERVAL_MS = 5000;
+import StreamsContext from 'contexts/StreamsContext';
 
-// Keep frontend-orchestrated bulk requests small until the backend exposes dedicated bulk endpoints.
-export const BULK_INDEX_ACTION_CONCURRENCY = 3;
+const useHasAccessToAnyStream = () => {
+  const streams = useContext(StreamsContext);
+
+  return !!streams && streams.length > 0;
+};
+
+export default useHasAccessToAnyStream;
