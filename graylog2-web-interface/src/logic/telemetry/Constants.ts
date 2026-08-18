@@ -469,11 +469,22 @@ export const TELEMETRY_EVENT_TYPE = {
     },
     ENROLLMENT_TOKEN: {
       FLEET_SELECTED: 'Collector Deployment Fleet Selected',
+      MODE_SELECTED: 'Collector Enrollment Token Mode Selected',
       EXPIRY_SELECTED: 'Collector Enrollment Token Expiry Selected',
       GENERATED: 'Collector Enrollment Token Generated',
+      GENERATE_FAILED: 'Collector Enrollment Token Generate Failed',
+      CHANGE_CLICKED: 'Collector Enrollment Token Change Clicked',
       TOKEN_COPIED: 'Collector Enrollment Token Copied',
       DELETED: 'Collector Enrollment Token Deleted',
       BULK_DELETED: 'Collector Enrollment Tokens Bulk Deleted',
+    },
+    DEPLOYMENT: {
+      TAB_SELECTED: 'Collector Deployment Tab Selected',
+      FLEET_CLEARED: 'Collector Deployment Fleet Cleared',
+    },
+    INSTALL: {
+      PLATFORM_SELECTED: 'Collector Install Platform Selected',
+      COMMAND_COPIED: 'Collector Install Command Copied',
     },
     SETTINGS: {
       UPDATED: 'Collector Settings Updated',
