@@ -17,3 +17,5 @@
 
 export type SelectCallback = (eventKey: any) => void;
 export type BsSize = 'xs' | 'xsmall' | 'sm' | 'small' | 'md' | 'medium' | 'lg' | 'large';
+export type StatusColor = 'primary' | 'danger' | 'success' | 'warning' | 'gray';
+export type StatusVariant = 'light' | 'filled';
