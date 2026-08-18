@@ -494,6 +494,8 @@ export const TELEMETRY_EVENT_TYPE = {
       DIAGNOSTICS_OPENED: 'Collector Settings Diagnostics Opened',
     },
     ONBOARDING: {
+      FLEET_CLEARED: 'Collector Onboarding Fleet Cleared',
+      CONNECTED: 'Collector Onboarding Collector Connected',
       COMPLETED: 'Collector Onboarding Completed',
     },
   },
