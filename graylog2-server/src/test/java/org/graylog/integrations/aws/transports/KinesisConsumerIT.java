@@ -23,6 +23,7 @@ import org.graylog.aws.AWSAsyncProxyConfigurationProvider;
 import org.graylog.aws.AWSProxyConfigurationProvider;
 import org.graylog.integrations.aws.AWSAuthFactory;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
+import org.graylog2.system.urlallowlist.InputUrlAllowlistValidator;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
@@ -172,7 +173,8 @@ class KinesisConsumerIT {
                 encryptedValueService,
                 new Configuration(),
                 new AWSProxyConfigurationProvider(null),
-                new AWSAsyncProxyConfigurationProvider(null));
+                new AWSAsyncProxyConfigurationProvider(null),
+                mock(InputUrlAllowlistValidator.class));
 
         final KinesisTransport transport = mock(KinesisTransport.class);
         when(transport.isThrottled()).thenReturn(false);

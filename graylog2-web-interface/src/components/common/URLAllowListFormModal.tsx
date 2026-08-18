@@ -44,6 +44,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
     entries: [],
     disabled: false,
     enforce_for_notifications: false,
+    enforce_for_inputs: false,
   });
   const [isValid, setIsValid] = useState<boolean>(false);
   const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
@@ -76,6 +77,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
         ],
         disabled: defaultUrlAllowListConfig.disabled,
         enforce_for_notifications: defaultUrlAllowListConfig.enforce_for_notifications ?? false,
+        enforce_for_inputs: defaultUrlAllowListConfig.enforce_for_inputs ?? false,
       };
       setNewUrlEntryId(id);
       setConfig(defaultConfig);
@@ -129,7 +131,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   };
 
   if (urlAllowListConfig) {
-    const { entries, disabled, enforce_for_notifications: enforceForNotifications } = config;
+    const { entries, disabled, enforce_for_notifications: enforceForNotifications, enforce_for_inputs: enforceForInputs } = config;
 
     return (
       <>
@@ -152,6 +154,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
             urls={entries}
             disabled={disabled}
             enforceForNotifications={enforceForNotifications}
+            enforceForInputs={enforceForInputs}
             onUpdate={handleUpdate}
             newEntryId={newUrlEntryId}
           />

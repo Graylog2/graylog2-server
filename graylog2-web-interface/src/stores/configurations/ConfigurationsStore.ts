@@ -68,6 +68,7 @@ export type AllowListConfig = {
   entries: Array<Url>;
   disabled: boolean;
   enforce_for_notifications: boolean;
+  enforce_for_inputs: boolean;
 };
 export type PermissionsConfigType = {
   allow_sharing_with_everyone: boolean;

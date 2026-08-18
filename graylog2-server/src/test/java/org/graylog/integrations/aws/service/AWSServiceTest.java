@@ -21,6 +21,7 @@ import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.inputs.AWSInput;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
+import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.responses.AWSRegion;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.inputs.Input;
@@ -32,6 +33,7 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.system.urlallowlist.InputUrlAllowlistValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -75,11 +78,13 @@ public class AWSServiceTest {
     MessageInputFactory messageInputFactory;
     @Mock
     EncryptedValue encryptedValue;
+    @Mock
+    InputUrlAllowlistValidator inputUrlAllowlistValidator;
 
     @BeforeEach
     public void setUp() {
 
-        awsService = new AWSService(inputService, messageInputFactory, nodeId);
+        awsService = new AWSService(inputService, messageInputFactory, nodeId, inputUrlAllowlistValidator);
     }
 
     @Test
@@ -168,6 +173,66 @@ public class AWSServiceTest {
         InputCreateRequest input = argumentCaptor.getValue();
         assertEquals("arn:aws:iam::123456789012:role/test-role", input.configuration().get(AWSInput.CK_ASSUME_ROLE_ARN));
         assertEquals("test-external-id", input.configuration().get(AWSInput.CK_EXTERNAL_ID));
+    }
+
+    @Test
+    public void testSaveInputValidatesAllFourEndpointsAgainstAllowlist() throws Exception {
+        when(inputService.save(isA(Input.class))).thenReturn("input-id");
+        when(user.getName()).thenReturn("a-user-name");
+        when(messageInputFactory.create(isA(InputCreateRequest.class), isA(String.class), isA(String.class), anyBoolean())).thenReturn(messageInput);
+        when(inputService.create(isA(HashMap.class))).thenReturn(mock(Input.class));
+
+        AWSInputCreateRequest request =
+                AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
+                        .awsAccessKeyId("a-key")
+                        .awsSecretAccessKey(encryptedValue)
+                        .name("AWS Input")
+                        .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
+                        .streamName("a-stream")
+                        .batchSize(10000)
+                        .addFlowLogPrefix(true)
+                        .throttlingAllowed(true)
+                        .streamArn("test-arn")
+                        .overrideSource("test-source")
+                        .cloudwatchEndpoint("https://cloudwatch.example.com")
+                        .dynamodbEndpoint("https://dynamodb.example.com")
+                        .iamEndpoint("https://iam.example.com")
+                        .kinesisEndpoint("https://kinesis.example.com")
+                        .build();
+        awsService.saveInput(request, user);
+
+        // Every endpoint override field must be checked against the URL allowlist on save, each
+        // labelled with its own field name so a rejection tells the user which field is at fault.
+        verify(inputUrlAllowlistValidator).validateForRequest("https://cloudwatch.example.com", AWSRequest.CLOUDWATCH_ENDPOINT);
+        verify(inputUrlAllowlistValidator).validateForRequest("https://dynamodb.example.com", AWSRequest.DYNAMODB_ENDPOINT);
+        verify(inputUrlAllowlistValidator).validateForRequest("https://iam.example.com", AWSRequest.IAM_ENDPOINT);
+        verify(inputUrlAllowlistValidator).validateForRequest("https://kinesis.example.com", AWSRequest.KINESIS_ENDPOINT);
+    }
+
+    @Test
+    public void testSaveInputPropagatesAllowlistRejection() {
+        AWSInputCreateRequest request =
+                AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
+                        .awsAccessKeyId("a-key")
+                        .awsSecretAccessKey(encryptedValue)
+                        .name("AWS Input")
+                        .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
+                        .streamName("a-stream")
+                        .batchSize(10000)
+                        .addFlowLogPrefix(true)
+                        .throttlingAllowed(true)
+                        .streamArn("test-arn")
+                        .overrideSource("test-source")
+                        .kinesisEndpoint("https://blocked.example.com")
+                        .build();
+
+        doThrow(new BadRequestException("not allowlisted"))
+                .when(inputUrlAllowlistValidator)
+                .validateForRequest("https://blocked.example.com", AWSRequest.KINESIS_ENDPOINT);
+
+        // A non-allowlisted endpoint must abort the save with the validator's BadRequestException,
+        // so the input is never persisted.
+        assertThrows(BadRequestException.class, () -> awsService.saveInput(request, user));
     }
 
     @Test

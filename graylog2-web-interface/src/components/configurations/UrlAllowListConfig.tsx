@@ -98,7 +98,7 @@ const UrlAllowListConfig = () => {
     return <Spinner />;
   }
 
-  const { entries, disabled, enforce_for_notifications: enforceForNotifications } = formConfig;
+  const { entries, disabled, enforce_for_notifications: enforceForNotifications, enforce_for_inputs: enforceForInputs } = formConfig;
 
   return (
     <div>
@@ -117,6 +117,15 @@ const UrlAllowListConfig = () => {
         <small>
           When enabled, Slack and Microsoft Teams notifications will fail if their webhook URL is not in the URL
           allowlist. When disabled, a warning is logged instead.
+        </small>
+      </p>
+      <p>
+        <b>Enforce for inputs</b>{' '}
+        <small className="text-muted">{enforceForInputs ? '(Enabled)' : '(Disabled)'}</small>
+        <br />
+        <small>
+          When enabled, inputs that use endpoint URLs not in the allowlist will fail to start. When disabled,
+          a warning is logged and a system notification is published instead.
         </small>
       </p>
       <Table bordered condensed className="top-margin">
@@ -149,6 +158,7 @@ const UrlAllowListConfig = () => {
             urls={entries}
             disabled={disabled}
             enforceForNotifications={enforceForNotifications}
+            enforceForInputs={enforceForInputs}
             onUpdate={update}
           />
         </BootstrapModalForm>

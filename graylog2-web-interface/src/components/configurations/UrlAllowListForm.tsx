@@ -76,6 +76,7 @@ type Props = {
   urls?: Array<Url>;
   disabled?: boolean;
   enforceForNotifications?: boolean;
+  enforceForInputs?: boolean;
   onUpdate?: (config: AllowListConfig, valid: boolean) => void;
   newEntryId?: string;
 };
@@ -85,6 +86,7 @@ const UrlAllowListForm = ({
   onUpdate = () => {},
   disabled = false,
   enforceForNotifications = false,
+  enforceForInputs = false,
   newEntryId = undefined,
 }: Props) => {
   const productName = useProductName();
@@ -100,6 +102,7 @@ const UrlAllowListForm = ({
     entries: urls,
     disabled,
     enforce_for_notifications: enforceForNotifications,
+    enforce_for_inputs: enforceForInputs,
   });
   const [validationState, setValidationState] = useState({ errors: [] });
   const isInitialRender = useRef<boolean>(false);
@@ -291,6 +294,14 @@ const UrlAllowListForm = ({
         checked={config.enforce_for_notifications}
         onChange={() => setConfig({ ...config, enforce_for_notifications: !config.enforce_for_notifications })}
         help="When enabled, Slack and Microsoft Teams notifications will fail if their webhook URL is not in the URL allowlist. When disabled, a warning is logged instead."
+      />
+      <Input
+        type="checkbox"
+        id="enforce-for-inputs"
+        label="Enforce for inputs"
+        checked={config.enforce_for_inputs}
+        onChange={() => setConfig({ ...config, enforce_for_inputs: !config.enforce_for_inputs })}
+        help="When enabled, inputs that use endpoint override URLs not in the allowlist will fail to start. When disabled, a warning is logged and a system notification is published instead."
       />
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
         Add Url

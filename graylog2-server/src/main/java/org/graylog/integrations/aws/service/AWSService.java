@@ -24,6 +24,7 @@ import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.inputs.AWSInput;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
+import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.responses.AWSRegion;
 import org.graylog.integrations.aws.resources.responses.RegionsResponse;
 import org.graylog.integrations.aws.transports.KinesisTransport;
@@ -38,6 +39,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.graylog2.system.urlallowlist.InputUrlAllowlistValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
@@ -56,12 +58,15 @@ public class AWSService {
     private final InputService inputService;
     private final MessageInputFactory messageInputFactory;
     private final NodeId nodeId;
+    private final InputUrlAllowlistValidator allowlistValidator;
 
     @Inject
-    public AWSService(InputService inputService, MessageInputFactory messageInputFactory, NodeId nodeId) {
+    public AWSService(InputService inputService, MessageInputFactory messageInputFactory, NodeId nodeId,
+                      InputUrlAllowlistValidator allowlistValidator) {
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
         this.nodeId = nodeId;
+        this.allowlistValidator = allowlistValidator;
     }
 
     /**
@@ -122,6 +127,11 @@ public class AWSService {
         if (StringUtils.isNotBlank(request.externalId()) && StringUtils.isBlank(request.assumeRoleArn())) {
             throw new BadRequestException("External ID can only be used when an Assume Role ARN is provided.");
         }
+
+        allowlistValidator.validateForRequest(request.cloudwatchEndpoint(), AWSRequest.CLOUDWATCH_ENDPOINT);
+        allowlistValidator.validateForRequest(request.dynamodbEndpoint(), AWSRequest.DYNAMODB_ENDPOINT);
+        allowlistValidator.validateForRequest(request.iamEndpoint(), AWSRequest.IAM_ENDPOINT);
+        allowlistValidator.validateForRequest(request.kinesisEndpoint(), AWSRequest.KINESIS_ENDPOINT);
 
         // Transpose the SaveAWSInputRequest to the needed InputCreateRequest
         final HashMap<String, Object> configuration = new HashMap<>();

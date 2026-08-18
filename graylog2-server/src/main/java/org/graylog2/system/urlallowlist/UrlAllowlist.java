@@ -40,22 +40,31 @@ public abstract class UrlAllowlist {
     @JsonProperty("enforce_for_notifications")
     public abstract boolean enforceForNotifications();
 
+    @JsonProperty("enforce_for_inputs")
+    public abstract boolean enforceForInputs();
+
     @JsonCreator
     public static UrlAllowlist create(@JsonProperty("entries") List<AllowlistEntry> entries,
                                       @JsonProperty("disabled") boolean disabled,
-                                      @JsonProperty("enforce_for_notifications") boolean enforceForNotifications) {
+                                      @JsonProperty("enforce_for_notifications") boolean enforceForNotifications,
+                                      @JsonProperty("enforce_for_inputs") boolean enforceForInputs) {
         return builder().entries(entries)
                 .disabled(disabled)
                 .enforceForNotifications(enforceForNotifications)
+                .enforceForInputs(enforceForInputs)
                 .build();
     }
 
     public static UrlAllowlist create(List<AllowlistEntry> entries, boolean disabled) {
-        return create(entries, disabled, false);
+        return create(entries, disabled, false, false);
+    }
+
+    public static UrlAllowlist create(List<AllowlistEntry> entries, boolean disabled, boolean enforceForNotifications) {
+        return create(entries, disabled, enforceForNotifications, false);
     }
 
     public static UrlAllowlist createEnabled(List<AllowlistEntry> entries) {
-        return create(entries, false, false);
+        return create(entries, false, false, false);
     }
 
     public abstract Builder toBuilder();
@@ -86,6 +95,8 @@ public abstract class UrlAllowlist {
         public abstract Builder disabled(boolean disabled);
 
         public abstract Builder enforceForNotifications(boolean enforceForNotifications);
+
+        public abstract Builder enforceForInputs(boolean enforceForInputs);
 
         public abstract UrlAllowlist autoBuild();
 

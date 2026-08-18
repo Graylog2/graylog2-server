@@ -43,6 +43,8 @@ const mockConfig = {
     },
   ],
   disabled: false,
+  enforce_for_notifications: false,
+  enforce_for_inputs: false,
 };
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({

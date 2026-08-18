@@ -48,6 +48,7 @@ import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.system.urlallowlist.InputUrlAllowlistValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
@@ -81,6 +82,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
     private final LocalMetricRegistry localRegistry;
     private final ObjectMapper objectMapper;
     private final AWSClientBuilderUtil awsClientBuilderUtil;
+    private final InputUrlAllowlistValidator allowlistValidator;
     private final ExecutorService executor;
 
     private KinesisConsumer kinesisConsumer;
@@ -91,13 +93,15 @@ public class KinesisTransport extends ThrottleableTransport2 {
                             final NodeId nodeId,
                             LocalMetricRegistry localRegistry,
                             ObjectMapper objectMapper,
-                            AWSClientBuilderUtil awsClientBuilderUtil) {
+                            AWSClientBuilderUtil awsClientBuilderUtil,
+                            InputUrlAllowlistValidator allowlistValidator) {
         super(serverEventBus, configuration);
         this.configuration = configuration;
         this.nodeId = nodeId;
         this.localRegistry = localRegistry;
         this.objectMapper = objectMapper;
         this.awsClientBuilderUtil = awsClientBuilderUtil;
+        this.allowlistValidator = allowlistValidator;
         this.executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
                 .setDaemon(true)
                 .setNameFormat("aws-kinesis-reader-%d")
@@ -134,7 +138,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
         validateEndpoint(dynamodbEndpoint, "DynamoDB");
         validateEndpoint(cloudwatchEndpoint, "CloudWatch");
         validateEndpoint(iamEndpoint, "IAM");
-        validateEndpoint(iamEndpoint, "Kinesis");
+        validateEndpoint(kinesisEndpoint, "Kinesis");
 
         final AWSRequest awsRequest = AWSRequestImpl.builder()
                 .region(region.id())
@@ -146,6 +150,15 @@ public class KinesisTransport extends ThrottleableTransport2 {
                 .dynamodbEndpoint(dynamodbEndpoint)
                 .iamEndpoint(iamEndpoint)
                 .kinesisEndpoint(kinesisEndpoint).build();
+
+        // Validate endpoint URLs against the URL allowlist before starting the consumer thread,
+        // so any violation surfaces here as a MisfireException with useful context rather than
+        // silently failing deep inside the consumer thread.
+        final String inputTitle = input.getTitle();
+        allowlistValidator.validateForStartup(cloudwatchEndpoint, AWSRequest.CLOUDWATCH_ENDPOINT, inputTitle);
+        allowlistValidator.validateForStartup(dynamodbEndpoint, AWSRequest.DYNAMODB_ENDPOINT, inputTitle);
+        allowlistValidator.validateForStartup(iamEndpoint, AWSRequest.IAM_ENDPOINT, inputTitle);
+        allowlistValidator.validateForStartup(kinesisEndpoint, AWSRequest.KINESIS_ENDPOINT, inputTitle);
 
         final int batchSize = configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE);
         final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);

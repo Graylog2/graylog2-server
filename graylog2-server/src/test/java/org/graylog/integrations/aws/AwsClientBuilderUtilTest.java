@@ -22,6 +22,7 @@ import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog2.Configuration;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.system.urlallowlist.InputUrlAllowlistValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +67,8 @@ public class AwsClientBuilderUtilTest {
     @BeforeEach
     public void setUp() throws Exception {
         awsClientBuilderUtil = new AWSClientBuilderUtil(AWSAuthFactory::new, encryptedValueService, mock(Configuration.class),
-                mock(AWSProxyConfigurationProvider.class), mock(AWSAsyncProxyConfigurationProvider.class));
+                mock(AWSProxyConfigurationProvider.class), mock(AWSAsyncProxyConfigurationProvider.class),
+                mock(InputUrlAllowlistValidator.class));
     }
 
     // Test Cases

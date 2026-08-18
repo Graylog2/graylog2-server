@@ -40,6 +40,8 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
         'org.graylog2.system.urlallowlist.UrlAllowlist': {
           entries: [],
           disabled: false,
+          enforce_for_notifications: false,
+          enforce_for_inputs: false,
         },
       },
     })),
@@ -100,6 +102,8 @@ describe('<URLAllowListFormModal>', () => {
         'org.graylog2.system.urlallowlist.UrlAllowlist': {
           entries: [{ id: '1234', title: 'localhost', value: 'http://localhost(:\\d+)?', type: 'regex' }],
           disabled: false,
+          enforce_for_notifications: false,
+          enforce_for_inputs: false,
         },
       },
       searchesClusterConfig: undefined,

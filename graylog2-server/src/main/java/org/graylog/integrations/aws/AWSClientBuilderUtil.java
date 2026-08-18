@@ -27,6 +27,8 @@ import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog2.Configuration;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.system.urlallowlist.InputUrlAllowlistValidator;
+
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.awscore.client.builder.AwsSyncClientBuilder;
@@ -63,16 +65,19 @@ public class AWSClientBuilderUtil {
     private final Configuration configuration;
     private final AWSProxyConfigurationProvider proxyConfigurationProvider;
     private final AWSAsyncProxyConfigurationProvider asyncProxyConfigurationProvider;
+    private final InputUrlAllowlistValidator allowlistValidator;
 
     @Inject
     public AWSClientBuilderUtil(Provider<AWSAuthFactory> authFactoryProvider, EncryptedValueService encryptedValueService,
                                 Configuration configuration, AWSProxyConfigurationProvider proxyConfigurationProvider,
-                                AWSAsyncProxyConfigurationProvider asyncProxyConfigurationProvider) {
+                                AWSAsyncProxyConfigurationProvider asyncProxyConfigurationProvider,
+                                InputUrlAllowlistValidator allowlistValidator) {
         this.authFactoryProvider = authFactoryProvider;
         this.encryptedValueService = encryptedValueService;
         this.configuration = configuration;
         this.proxyConfigurationProvider = proxyConfigurationProvider;
         this.asyncProxyConfigurationProvider = asyncProxyConfigurationProvider;
+        this.allowlistValidator = allowlistValidator;
     }
 
     public AwsCredentialsProvider createCredentialsProvider(AWSRequest request) {
@@ -131,6 +136,7 @@ public class AWSClientBuilderUtil {
      */
     public CloudWatchLogsClient buildClient(CloudWatchLogsClientBuilder clientBuilder, AWSRequest request) {
         Preconditions.checkNotNull(request.region(), "An AWS region is required.");
+        allowlistValidator.validateForRequest(request.cloudwatchEndpoint(), AWSRequest.CLOUDWATCH_ENDPOINT);
         initializeBuilder(clientBuilder,
                 request.cloudwatchEndpoint(),
                 Region.of(request.region()),
@@ -148,6 +154,7 @@ public class AWSClientBuilderUtil {
      * @return A fully built {@link KinesisClient}
      */
     public KinesisClient buildClient(KinesisClientBuilder clientBuilder, AWSRequest request) {
+        allowlistValidator.validateForRequest(request.kinesisEndpoint(), AWSRequest.KINESIS_ENDPOINT);
         initializeBuilder(clientBuilder,
                 request.kinesisEndpoint(),
                 Region.of(request.region()),
@@ -165,6 +172,7 @@ public class AWSClientBuilderUtil {
      * @return A fully built {@link IamClient}
      */
     public IamClient buildClient(IamClientBuilder clientBuilder, AWSRequest request) {
+        allowlistValidator.validateForRequest(request.iamEndpoint(), AWSRequest.IAM_ENDPOINT);
         Region iamRegion = Region.AWS_GLOBAL;
         if (request.region().contains("gov")) {
             iamRegion = Region.AWS_US_GOV_GLOBAL;
