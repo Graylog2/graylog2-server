@@ -277,8 +277,8 @@ public class MoreSearch {
             for (char c : searchString.toCharArray()) {
                 // These characters are part of the query syntax and must be escaped
                 if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':'
-                        || c == '^' || c == '[' || c == ']' || c == '\"' || c == '{' || c == '}' || c == '~'
-                        || c == '*' || c == '?' || c == '|' || c == '&' || c == '/') {
+                        || c == '^' || c == '[' || c == ']' || c == '"' || c == '{' || c == '}' || c == '~'
+                        || c == '*' || c == '?' || c == '|' || c == '&' || c == '/' || c == ' ') {
                     result.append('\\');
                 }
                 result.append(c);
