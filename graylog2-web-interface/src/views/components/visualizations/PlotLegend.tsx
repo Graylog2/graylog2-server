@@ -212,6 +212,7 @@ const FlexLegendContainer = styled.div`
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  padding: 4px;
 `;
 
 const NoninteractiveLegend = ({ config, fieldTypes, labels, labelFields }: LegendComponentProps) => {
