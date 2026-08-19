@@ -22,7 +22,11 @@ import type { WelcomePageConfigType } from 'components/common/types';
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 
-const useWelcomePageQueriesDisabled = (): boolean => {
+type WelcomePageConfig = { widgetsEnabled: boolean };
+
+const ENABLE_QUERIES_BY_DEFAULT = true;
+
+const useWelcomePageConfig = (): WelcomePageConfig => {
   const configuration = useStore(
     ConfigurationsStore as Store<Record<string, any>>,
     (state) => state?.configuration[ConfigurationType.WELCOME_PAGE_CONFIG] as WelcomePageConfigType,
@@ -32,7 +36,9 @@ const useWelcomePageQueriesDisabled = (): boolean => {
     ConfigurationsActions.list(ConfigurationType.WELCOME_PAGE_CONFIG);
   }, []);
 
-  return configuration?.disable_queries ?? false;
+  const disableQueries = configuration?.disable_queries;
+
+  return { widgetsEnabled: disableQueries === undefined ? ENABLE_QUERIES_BY_DEFAULT : !disableQueries };
 };
 
-export default useWelcomePageQueriesDisabled;
+export default useWelcomePageConfig;

@@ -32,7 +32,7 @@ import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 import OnboardingBanner from './OnboardingBanner';
 import WelcomeMetrics from './WelcomeMetrics';
-import useWelcomePageQueriesDisabled from './hooks/useWelcomePageQueriesDisabled';
+import useWelcomePageConfig from './hooks/useWelcomePageConfig';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -69,14 +69,14 @@ const Welcome = () => {
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
   const isAdmin = hasAdminPermission(permissions);
   const onboardingEnabled = useFeature('onboarding_experience');
-  const welcomePageQueriesDisabled = useWelcomePageQueriesDisabled();
+  const { widgetsEnabled } = useWelcomePageConfig();
 
   return (
     <>
       <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
-      {!welcomePageQueriesDisabled && <WelcomeMetrics />}
+      {widgetsEnabled && <WelcomeMetrics />}
       {onboardingEnabled && <OnboardingBanner />}
       <SectionGrid $columns="1fr 1fr 1fr">
         <StyledSectionComponent title="Favorite Items">
