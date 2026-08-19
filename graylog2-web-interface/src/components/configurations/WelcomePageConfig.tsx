@@ -55,7 +55,7 @@ const LabelSpan = styled.span(
 const configType = ConfigurationType.WELCOME_PAGE_CONFIG;
 const DEFAULT_CONFIG: WelcomePageConfigType = { disable_metrics: false };
 
-type FormValues = { queries_enabled: boolean };
+type FormValues = { metrics_enabled: boolean };
 
 const WelcomePageConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -71,7 +71,7 @@ const WelcomePageConfig = () => {
       const config = getConfig(configType, configuration) ?? DEFAULT_CONFIG;
 
       setViewConfig(config);
-      setFormConfig({ queries_enabled: !config.disable_metrics });
+      setFormConfig({ metrics_enabled: !config.disable_metrics });
     });
   }, [configuration]);
 
@@ -82,14 +82,14 @@ const WelcomePageConfig = () => {
       app_action_value: 'configuration-save',
     });
 
-    ConfigurationsActions.update(configType, { disable_metrics: !values.queries_enabled }).then(() => {
+    ConfigurationsActions.update(configType, { disable_metrics: !values.metrics_enabled }).then(() => {
       setShowModal(false);
     });
   };
 
   const resetConfig = () => {
     setShowModal(false);
-    setFormConfig({ queries_enabled: !viewConfig.disable_metrics });
+    setFormConfig({ metrics_enabled: !viewConfig.disable_metrics });
   };
 
   return (
@@ -137,8 +137,8 @@ const WelcomePageConfig = () => {
                       <Col sm={12}>
                         <FormikInput
                           type="checkbox"
-                          name="queries_enabled"
-                          id="queries_enabled"
+                          name="metrics_enabled"
+                          id="metrics_enabled"
                           label={<LabelSpan>Enable welcome page metrics</LabelSpan>}
                           help="If disabled, the message, alert, and event count widgets and the top sources chart will be hidden from the welcome page, and their underlying queries will not run. Turn this off on large or busy clusters to reduce query load."
                         />

@@ -69,14 +69,14 @@ const Welcome = () => {
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
   const isAdmin = hasAdminPermission(permissions);
   const onboardingEnabled = useFeature('onboarding_experience');
-  const { widgetsEnabled } = useWelcomePageConfig();
+  const { metricsEnabled } = useWelcomePageConfig();
 
   return (
     <>
       <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
-      {widgetsEnabled && <WelcomeMetrics />}
+      {metricsEnabled && <WelcomeMetrics />}
       {onboardingEnabled && <OnboardingBanner />}
       <SectionGrid $columns="1fr 1fr 1fr">
         <StyledSectionComponent title="Favorite Items">

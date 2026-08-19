@@ -22,9 +22,9 @@ import type { WelcomePageConfigType } from 'components/common/types';
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 
-type WelcomePageConfig = { widgetsEnabled: boolean };
+type WelcomePageConfig = { metricsEnabled: boolean };
 
-const ENABLE_QUERIES_BY_DEFAULT = true;
+const ENABLE_METRICS_BY_DEFAULT = true;
 
 const useWelcomePageConfig = (): WelcomePageConfig => {
   const configuration = useStore(
@@ -39,7 +39,7 @@ const useWelcomePageConfig = (): WelcomePageConfig => {
   const disableMetricsPreference = configuration?.disable_metrics;
 
   return {
-    widgetsEnabled: disableMetricsPreference === undefined ? ENABLE_QUERIES_BY_DEFAULT : !disableMetricsPreference,
+    metricsEnabled: disableMetricsPreference === undefined ? ENABLE_METRICS_BY_DEFAULT : !disableMetricsPreference,
   };
 };
 
