@@ -54,7 +54,7 @@ describe('WelcomePageConfig', () => {
   it('renders current configuration', async () => {
     render(<WelcomePageConfig />);
 
-    await screen.findByText('Welcome page queries:');
+    await screen.findByText('Welcome page metrics:');
     await screen.findByText('Enabled');
   });
 
@@ -65,7 +65,7 @@ describe('WelcomePageConfig', () => {
 
     await userEvent.click(editButton);
 
-    await userEvent.click(await screen.findByLabelText(/enable welcome page queries/i, { selector: 'input' }));
+    await userEvent.click(await screen.findByLabelText(/enable welcome page metrics/i, { selector: 'input' }));
 
     await userEvent.click(await screen.findByRole('button', { name: /update configuration/i }));
 

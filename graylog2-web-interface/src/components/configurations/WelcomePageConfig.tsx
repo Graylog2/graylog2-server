@@ -39,7 +39,7 @@ const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
     &&.deflist {
       dd {
         padding-left: ${theme.spacings.md};
-        margin-left: 400px;
+        margin-left: 200px;
       }
     }
   `,
@@ -95,14 +95,18 @@ const WelcomePageConfig = () => {
   return (
     <div>
       <h2>Welcome Page</h2>
-      <p>Configure whether the metrics widgets on the welcome page run their underlying queries.</p>
+      <p>
+        The welcome page can show widgets with message, alert, and event counts, plus a top sources chart. On large or
+        busy clusters, these queries add extra load every time a user opens the welcome page. Disable them below if you
+        want to avoid that load. The widgets will be hidden and their queries will not run.
+      </p>
 
       {!viewConfig ? (
         <Spinner />
       ) : (
         <>
           <StyledDefList>
-            <dt>Welcome page queries:</dt>
+            <dt>Welcome page metrics:</dt>
             <dd>{viewConfig.disable_queries ? 'Disabled' : 'Enabled'}</dd>
           </StyledDefList>
 
@@ -135,8 +139,8 @@ const WelcomePageConfig = () => {
                           type="checkbox"
                           name="queries_enabled"
                           id="queries_enabled"
-                          label={<LabelSpan>Enable welcome page queries</LabelSpan>}
-                          help="If disabled, the metrics widgets on the welcome page will not run their underlying queries. Disable this if you are concerned about the performance impact of these queries."
+                          label={<LabelSpan>Enable welcome page metrics</LabelSpan>}
+                          help="If disabled, the message, alert, and event count widgets and the top sources chart will be hidden from the welcome page, and their underlying queries will not run. Turn this off on large or busy clusters to reduce query load."
                         />
                       </Col>
                     </Row>
