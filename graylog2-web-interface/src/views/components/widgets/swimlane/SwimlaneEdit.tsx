@@ -381,7 +381,7 @@ const SwimlaneEdit = ({ children, config, onChange, onCancel }: EditWidgetCompon
                         id="lane-sort"
                         name="laneSort"
                         value={values.laneSort}
-                        onChange={(e) => handleChange('laneSort', (e.target as HTMLSelectElement).value as LaneSortMode)}
+                        onChange={(e) => handleChange('laneSort', (e.target as HTMLInputElement).value as LaneSortMode)}
                         label=""
                         formGroupClassName="">
                         {SORT_MODE_OPTIONS.map(({ value, label }) => (
