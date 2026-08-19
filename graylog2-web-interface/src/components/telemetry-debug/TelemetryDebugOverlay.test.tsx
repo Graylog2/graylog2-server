@@ -35,6 +35,14 @@ const expandOverlay = async (user: ReturnType<typeof userEvent.setup>) => {
 };
 
 describe('TelemetryDebugOverlay', () => {
+  beforeAll(() => {
+    // jsdom has no PointerEvent; without this, fireEvent.pointer* dispatches plain Events that
+    // carry no clientY, so drags would silently be no-ops.
+    if (!window.PointerEvent) {
+      (window as { PointerEvent: unknown }).PointerEvent = window.MouseEvent;
+    }
+  });
+
   beforeEach(() => {
     localStorage.clear();
     telemetryDebugStore.clear();
@@ -155,6 +163,53 @@ describe('TelemetryDebugOverlay', () => {
 
     expect(copyToClipboard).toHaveBeenCalledWith(expect.stringContaining('"fleet_id": "f2"'));
     expect(copyToClipboard).toHaveBeenCalledWith(expect.stringContaining('"fleet_id": "f1"'));
+  });
+
+  it('resizes via the drag handle and persists the height', async () => {
+    const user = userEvent.setup();
+    render(<TelemetryDebugOverlay />);
+
+    await expandOverlay(user);
+
+    const handle = screen.getByRole('separator', { name: /resize telemetry debug panel/i });
+
+    // Drag the top edge 100px upwards from the 400px default -> 500px tall.
+    await user.pointer([
+      { keys: '[MouseLeft>]', target: handle, coords: { y: 500 } },
+      { target: handle, coords: { y: 400 } },
+      { keys: '[/MouseLeft]', target: handle, coords: { y: 400 } },
+    ]);
+
+    expect(screen.getByRole('region', { name: /telemetry debug/i })).toHaveStyle({ height: '500px' });
+    expect(localStorage.getItem('gl.telemetry-debug.height')).toBe('500');
+  });
+
+  it('restores the persisted height when reopened', async () => {
+    localStorage.setItem('gl.telemetry-debug.height', '333');
+
+    const user = userEvent.setup();
+    render(<TelemetryDebugOverlay />);
+
+    await expandOverlay(user);
+
+    expect(screen.getByRole('region', { name: /telemetry debug/i })).toHaveStyle({ height: '333px' });
+  });
+
+  it('does not shrink below the minimum height', async () => {
+    const user = userEvent.setup();
+    render(<TelemetryDebugOverlay />);
+
+    await expandOverlay(user);
+
+    const handle = screen.getByRole('separator', { name: /resize telemetry debug panel/i });
+
+    await user.pointer([
+      { keys: '[MouseLeft>]', target: handle, coords: { y: 100 } },
+      { target: handle, coords: { y: 5000 } },
+      { keys: '[/MouseLeft]', target: handle, coords: { y: 5000 } },
+    ]);
+
+    expect(screen.getByRole('region', { name: /telemetry debug/i })).toHaveStyle({ height: '120px' });
   });
 
   it('flags PII-suspect payload values with the matched rule', async () => {

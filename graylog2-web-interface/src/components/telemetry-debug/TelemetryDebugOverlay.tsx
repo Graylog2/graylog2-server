@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useSyncExternalStore } from 'react';
+import { useRef, useState, useSyncExternalStore } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button, Table } from 'components/bootstrap';
@@ -47,13 +47,25 @@ const Drawer = styled.div(
     left: 0;
     right: 0;
     bottom: 0;
-    height: 40vh;
     z-index: 1050;
     display: flex;
     flex-direction: column;
     background: ${theme.colors.global.contentBackground};
     border-top: 2px solid ${theme.colors.cards.border};
     box-shadow: 0 -2px 12px rgb(0 0 0 / 25%);
+  `,
+);
+
+const ResizeHandle = styled.div(
+  ({ theme }) => css`
+    height: 6px;
+    flex-shrink: 0;
+    cursor: ns-resize;
+    touch-action: none;
+
+    &:hover {
+      background: ${theme.colors.cards.border};
+    }
   `,
 );
 
@@ -105,6 +117,23 @@ const Spacer = styled.div`
   flex: 1;
 `;
 
+const HEIGHT_STORAGE_KEY = 'gl.telemetry-debug.height';
+const DEFAULT_HEIGHT_PX = 400;
+const MIN_HEIGHT_PX = 120;
+
+const readStoredHeight = () => {
+  try {
+    const stored = Number(localStorage.getItem(HEIGHT_STORAGE_KEY));
+
+    return stored > 0 ? stored : null;
+  } catch {
+    return null;
+  }
+};
+
+const clampHeight = (height: number) =>
+  Math.min(Math.max(height, MIN_HEIGHT_PX), Math.round(window.innerHeight * 0.85));
+
 const matchesFilter = (entry: TelemetryDebugEntry, filter: string) => {
   if (!filter) return true;
 
@@ -127,6 +156,36 @@ const TelemetryDebugOverlay = () => {
   const [frozenEntries, setFrozenEntries] = useState<TelemetryDebugEntry[] | null>(null);
   const [filter, setFilter] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [height, setHeight] = useState<number>(() => readStoredHeight() ?? DEFAULT_HEIGHT_PX);
+  const dragStart = useRef<{ y: number; height: number } | null>(null);
+
+  const handleDragStart = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    dragStart.current = { y: e.clientY, height };
+  };
+
+  const draggedHeight = (e: React.PointerEvent<HTMLDivElement>) =>
+    clampHeight(dragStart.current.height + (dragStart.current.y - e.clientY));
+
+  const handleDragMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragStart.current) return;
+
+    setHeight(draggedHeight(e));
+  };
+
+  const handleDragEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragStart.current) return;
+
+    const finalHeight = draggedHeight(e);
+    dragStart.current = null;
+    setHeight(finalHeight);
+
+    try {
+      localStorage.setItem(HEIGHT_STORAGE_KEY, String(finalHeight));
+    } catch {
+      // Persistence is best-effort; the height still applies for this session.
+    }
+  };
 
   if (!enabled) return null;
 
@@ -148,7 +207,15 @@ const TelemetryDebugOverlay = () => {
   };
 
   return (
-    <Drawer>
+    <Drawer role="region" aria-label="Telemetry debug panel" style={{ height: `${height}px` }}>
+      <ResizeHandle
+        role="separator"
+        aria-orientation="horizontal"
+        aria-label="Resize telemetry debug panel"
+        onPointerDown={handleDragStart}
+        onPointerMove={handleDragMove}
+        onPointerUp={handleDragEnd}
+      />
       <Toolbar>
         <Title>Telemetry Debug ({entries.length})</Title>
         <FilterInput
