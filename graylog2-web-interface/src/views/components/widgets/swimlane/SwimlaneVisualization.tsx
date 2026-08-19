@@ -15,15 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import chroma from 'chroma-js';
 
 import type { WidgetComponentProps } from 'views/types';
 import type { MessageListResult } from 'views/components/widgets/MessageList';
+import type { BackendMessage } from 'views/components/messagelist/Types';
 import type SwimlaneWidgetConfig from 'views/logic/widgets/SwimlaneWidgetConfig';
 import Tooltip from 'components/common/Tooltip';
 import useSwimlaneClickPopover from 'views/components/widgets/swimlane/useSwimlaneClickPopover';
+import useSwimlaneTimeNav from 'views/components/widgets/swimlane/useSwimlaneTimeNav';
+import useSwimlaneDetailDrawer from 'views/components/widgets/swimlane/useSwimlaneDetailDrawer';
+import type { ShapeName } from 'views/components/widgets/swimlane/swimlaneShapes';
+import { buildShapeIndex, renderDot } from 'views/components/widgets/swimlane/swimlaneShapes';
 
 const LANE_HEIGHT = 36;
 const DOT_RADIUS = 5;
@@ -33,9 +38,17 @@ const PADDING = 8;
 
 const Wrapper = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100%;
   width: 100%;
+  overflow: hidden;
+`;
+
+const SwimlaneColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
 `;
 
@@ -44,6 +57,16 @@ const Banner = styled.div(
     padding: 4px ${theme.spacings.sm};
     background: ${theme.colors.variant.warning};
     color: ${theme.colors.variant.darkest.warning};
+    font-size: ${theme.fonts.size.small};
+    flex-shrink: 0;
+  `,
+);
+
+const ZoomBanner = styled.div(
+  ({ theme }) => css`
+    padding: 4px ${theme.spacings.sm};
+    background: ${theme.colors.variant.lightest.info};
+    color: ${theme.colors.variant.darkest.info};
     font-size: ${theme.fonts.size.small};
     flex-shrink: 0;
   `,
@@ -59,9 +82,18 @@ const EmptyState = styled.div(
   `,
 );
 
+type LaneEvent = {
+  ts: number;
+  colorValue: string | undefined;
+  shapeValue: string | undefined;
+  labelValue: string | undefined;
+  fields: Record<string, unknown>;
+  backendMessage: BackendMessage;
+};
+
 type Lane = {
   key: string;
-  events: Array<{ ts: number; colorValue: string | undefined; fields: Record<string, unknown> }>;
+  events: Array<LaneEvent>;
 };
 
 const formatTs = (ts: number): string => new Date(ts).toISOString().replace('T', ' ').slice(0, 19);
@@ -72,32 +104,36 @@ const SwimlaneVisualization = ({
   width,
 }: WidgetComponentProps<SwimlaneWidgetConfig, MessageListResult>) => {
   const theme = useTheme();
+  const svgRef = useRef<SVGSVGElement | null>(null);
   const { handleClick, popover } = useSwimlaneClickPopover();
-  const { laneField, colorField, maxLanes } = config;
+  const { openDetail, detailPanel, isOpen: isDetailOpen } = useSwimlaneDetailDrawer();
+  const { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, maxLanes, laneSort, laneSortField, laneSortAscending } = config;
   const messages = data?.messages ?? [];
   const total = data?.total ?? 0;
 
-  // Group by laneField — preserve insertion order (messages are sorted ASC by timestamp)
+  // Group by compound lane key
   const allLanes = useMemo(() => {
     const map = new Map<string, Lane['events']>();
 
-    messages.forEach(({ message }) => {
-      const key = String(message[laneField] ?? '(unknown)');
+    messages.forEach((bm) => {
+      const { message } = bm;
+      const key = laneFields.map((f) => String(message[f] ?? '(unknown)')).join(' / ');
       const ts = new Date(message.timestamp as string).getTime();
       const colorValue = colorField ? String(message[colorField] ?? '') : undefined;
+      const shapeValue = shapeField ? String(message[shapeField] ?? '') : undefined;
+      const labelValue = labelField ? String(message[labelField] ?? '') : undefined;
 
       if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push({ ts, colorValue, fields: message as Record<string, unknown> });
+      map.get(key)!.push({ ts, colorValue, shapeValue, labelValue, fields: message as Record<string, unknown>, backendMessage: bm });
     });
 
-    // Sort lanes by event count descending, cap at maxLanes
     return Array.from(map.entries())
       .map(([key, events]) => ({ key, events }))
       .sort((a, b) => b.events.length - a.events.length)
       .slice(0, maxLanes);
-  }, [messages, laneField, colorField, maxLanes]);
+  }, [messages, laneFields, colorField, shapeField, labelField, maxLanes]);
 
-  // Color scale for the colorField values
+  // Color mapping
   const colorValues = useMemo(() => {
     if (!colorField) return new Map<string, string>();
     const unique = [...new Set(allLanes.flatMap((l) => l.events.map((e) => e.colorValue ?? '')))];
@@ -106,138 +142,218 @@ const SwimlaneVisualization = ({
     return new Map(unique.map((v, i) => [v, colors[i % colors.length]]));
   }, [allLanes, colorField]);
 
-  const dotColor = (colorValue: string | undefined): string => {
+  // Shape mapping
+  const shapeIndex = useMemo((): Map<string, ShapeName> => {
+    if (!shapeField) return new Map();
+    const unique = [...new Set(allLanes.flatMap((l) => l.events.map((e) => e.shapeValue ?? '')))];
+
+    return buildShapeIndex(unique, shapeOverrides);
+  }, [allLanes, shapeField, shapeOverrides]);
+
+  const dotFill = (colorValue: string | undefined): string => {
     if (!colorField || colorValue === undefined) return theme.colors.variant.info;
 
     return colorValues.get(colorValue) ?? theme.colors.variant.info;
   };
 
-  // Time range from first/last event across all lanes
-  const { minTs, maxTs } = useMemo(() => {
+  // Sort lanes for display (top-N selection by event count stays on allLanes)
+  const displayLanes = useMemo(() => {
+    const sign = laneSortAscending ? 1 : -1;
+
+    const compare = (a: Lane, b: Lane): number => {
+      switch (laneSort) {
+        case 'activity': {
+          const aMax = a.events.length ? Math.max(...a.events.map((e) => e.ts)) : 0;
+          const bMax = b.events.length ? Math.max(...b.events.map((e) => e.ts)) : 0;
+          return aMax - bMax;
+        }
+        case 'firstOccurrence': {
+          const aMin = a.events.length ? Math.min(...a.events.map((e) => e.ts)) : 0;
+          const bMin = b.events.length ? Math.min(...b.events.map((e) => e.ts)) : 0;
+          return aMin - bMin;
+        }
+        case 'alphabetical':
+          return a.key.localeCompare(b.key);
+        case 'fieldValue': {
+          if (!laneSortField) return 0;
+          const maxVal = (lane: Lane) => {
+            const nums = lane.events.map((e) => Number(e.fields[laneSortField] ?? NaN)).filter(Number.isFinite);
+            return nums.length ? Math.max(...nums) : -Infinity;
+          };
+          return maxVal(a) - maxVal(b);
+        }
+        case 'eventCount':
+        default:
+          return a.events.length - b.events.length;
+      }
+    };
+
+    return [...allLanes].sort((a, b) => sign * compare(a, b));
+  }, [allLanes, laneSort, laneSortField, laneSortAscending]);
+
+  // Data time range
+  const { dataMinTs, dataMaxTs } = useMemo(() => {
     const allTs = allLanes.flatMap((l) => l.events.map((e) => e.ts));
+    if (allTs.length === 0) return { dataMinTs: 0, dataMaxTs: 1 };
 
-    if (allTs.length === 0) return { minTs: 0, maxTs: 1 };
-
-    return { minTs: Math.min(...allTs), maxTs: Math.max(...allTs) };
+    return { dataMinTs: Math.min(...allTs), dataMaxTs: Math.max(...allTs) };
   }, [allLanes]);
 
-  if (!laneField) {
-    return <EmptyState>Select a lane field in the widget settings.</EmptyState>;
+  const svgWidth = isDetailOpen ? Math.max(0, Math.floor(width / 2)) : width;
+  const plotW = Math.max(0, svgWidth - LABEL_WIDTH - PADDING);
+
+  const { viewMin, viewMax, xOf, brushRect, isBrushing, isViewNarrowed, mouseHandlers } = useSwimlaneTimeNav({
+    dataMinTs,
+    dataMaxTs,
+    plotW,
+    labelWidth: LABEL_WIDTH,
+    svgRef,
+  });
+
+  if (!laneFields.length) {
+    return <EmptyState>Select at least one lane field in the widget settings.</EmptyState>;
   }
 
   if (allLanes.length === 0) {
     return <EmptyState>No data. Check your search query and time range.</EmptyState>;
   }
 
-  const svgH = allLanes.length * LANE_HEIGHT + AXIS_HEIGHT + PADDING;
-  const plotW = width - LABEL_WIDTH - PADDING;
-  const tsRange = maxTs - minTs || 1;
-
-  const xOf = (ts: number) => LABEL_WIDTH + ((ts - minTs) / tsRange) * plotW;
-
+  const svgH = displayLanes.length * LANE_HEIGHT + AXIS_HEIGHT + PADDING;
+  const plotH = displayLanes.length * LANE_HEIGHT;
   const truncated = total > messages.length;
   const lanesHidden = data?.total !== undefined && allLanes.length === maxLanes;
 
   return (
-    <>
     <Wrapper>
-      {truncated && (
-        <Banner>
-          Showing first {messages.length} of {total} events — narrow your time range for more detail.
-        </Banner>
-      )}
-      {lanesHidden && !truncated && (
-        <Banner>
-          Showing top {maxLanes} lanes by event count. Increase &quot;Max lanes&quot; in settings to see more.
-        </Banner>
-      )}
+      <SwimlaneColumn>
+        {truncated && (
+          <Banner>
+            Showing first {messages.length} of {total} events — narrow your time range for more detail.
+          </Banner>
+        )}
+        {lanesHidden && !truncated && (
+          <Banner>
+            Showing top {maxLanes} lanes by event count. Increase &quot;Max lanes&quot; in settings to see more.
+          </Banner>
+        )}
+        {isViewNarrowed && (
+          <ZoomBanner>
+            Zoomed in — use the time range picker in the search bar to reset.
+          </ZoomBanner>
+        )}
 
-      <svg width={width} height={svgH} style={{ flexShrink: 0 }}>
-        {/* Lane backgrounds and labels */}
-        {allLanes.map((lane, i) => {
-          const y = PADDING + i * LANE_HEIGHT;
-          const isEven = i % 2 === 0;
+        <svg ref={svgRef} width={svgWidth} height={svgH} style={{ flexShrink: 0, cursor: 'crosshair' }} {...mouseHandlers}>
+          {displayLanes.map((lane, i) => {
+            const y = PADDING + i * LANE_HEIGHT;
+            const isEven = i % 2 === 0;
+            const primaryField = laneFields[0];
+            const primaryValue = lane.key.split(' / ')[0];
 
-          return (
-            <g key={lane.key}>
-              <rect
-                x={0}
-                y={y}
-                width={width}
-                height={LANE_HEIGHT}
-                fill={isEven ? theme.colors.global.contentBackground : theme.colors.table.row.backgroundStriped}
-              />
-              <text
-                x={LABEL_WIDTH - 8}
-                y={y + LANE_HEIGHT / 2}
-                textAnchor="end"
-                dominantBaseline="middle"
-                fontSize="0.8em"
-                fill={theme.colors.text.secondary}
-                style={{ userSelect: 'none', cursor: 'pointer' }}
-                onClick={(e) => handleClick(e, laneField, lane.key)}>
-                {lane.key.length > 22 ? `${lane.key.slice(0, 20)}…` : lane.key}
-              </text>
+            return (
+              <g key={lane.key}>
+                <rect
+                  x={0}
+                  y={y}
+                  width={svgWidth}
+                  height={LANE_HEIGHT}
+                  fill={isEven ? theme.colors.global.contentBackground : theme.colors.table.row.backgroundStriped}
+                />
+                <text
+                  x={LABEL_WIDTH - 8}
+                  y={y + LANE_HEIGHT / 2}
+                  textAnchor="end"
+                  dominantBaseline="middle"
+                  fontSize="0.8em"
+                  fill={theme.colors.text.secondary}
+                  style={{ userSelect: 'none', cursor: 'pointer' }}
+                  onClick={(e) => handleClick(e, primaryField, primaryValue)}>
+                  {lane.key.length > 22 ? `${lane.key.slice(0, 20)}…` : lane.key}
+                </text>
 
-              {/* Dots */}
-              {lane.events.map((ev, j) => {
-                const cx = xOf(ev.ts);
-                const cy = y + LANE_HEIGHT / 2;
-                const label = [
-                  `${laneField}: ${lane.key}`,
-                  `time: ${formatTs(ev.ts)}`,
-                  colorField && ev.colorValue ? `${colorField}: ${ev.colorValue}` : null,
-                ]
-                  .filter(Boolean)
-                  .join('\n');
+                {lane.events.map((ev, j) => {
+                  const cx = xOf(ev.ts);
+                  if (cx < LABEL_WIDTH - DOT_RADIUS || cx > width + DOT_RADIUS) return null;
+                  const cy = y + LANE_HEIGHT / 2;
+                  const fill = dotFill(ev.colorValue);
+                  const shape = shapeField ? (shapeIndex.get(ev.shapeValue ?? '') ?? 'circle') : 'circle';
 
-                const dotField = colorField && ev.colorValue ? colorField : laneField;
-                const dotValue = colorField && ev.colorValue ? ev.colorValue : lane.key;
+                  // Tooltip content: lane fields + time + configured tooltip fields
+                  const laneLines = laneFields.map((f, fi) => `${f}: ${lane.key.split(' / ')[fi] ?? '(unknown)'}`);
+                  const timeLine = `time: ${formatTs(ev.ts)}`;
+                  const extraLines = tooltipFields.length
+                    ? tooltipFields.filter((f) => ev.fields[f] != null).map((f) => `${f}: ${String(ev.fields[f])}`)
+                    : (colorField && ev.colorValue ? [`${colorField}: ${ev.colorValue}`] : []);
+                  const tooltipContent = [...laneLines, timeLine, ...extraLines].join('\n');
 
-                return (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <Tooltip key={j} label={<span style={{ whiteSpace: 'pre' }}>{label}</span>} withArrow position="top">
-                    <circle
-                      cx={cx}
-                      cy={cy}
-                      r={DOT_RADIUS}
-                      fill={dotColor(ev.colorValue)}
-                      opacity={0.85}
-                      style={{ cursor: 'pointer' }}
-                      onClick={(e) => handleClick(e, dotField, dotValue)}
-                    />
-                  </Tooltip>
-                );
-              })}
-            </g>
-          );
-        })}
+                  return (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Tooltip key={j} label={<span style={{ whiteSpace: 'pre' }}>{tooltipContent}</span>} withArrow position="top">
+                      <g style={{ cursor: isBrushing ? 'crosshair' : 'pointer' }}>
+                        {renderDot(shape, {
+                          cx,
+                          cy,
+                          r: DOT_RADIUS,
+                          fill,
+                          opacity: 0.85,
+                          onClick: () => { if (!isBrushing) openDetail(ev.backendMessage, lane.key); },
+                        })}
+                        {labelField && ev.labelValue && (
+                          <text
+                            x={cx}
+                            y={cy - DOT_RADIUS - 2}
+                            textAnchor="middle"
+                            fontSize="0.6em"
+                            fill={fill}
+                            style={{ pointerEvents: 'none', userSelect: 'none' }}>
+                            {ev.labelValue.slice(0, 8)}
+                          </text>
+                        )}
+                      </g>
+                    </Tooltip>
+                  );
+                })}
+              </g>
+            );
+          })}
 
-        {/* X-axis ticks */}
-        {[0, 0.25, 0.5, 0.75, 1].map((fraction) => {
-          const ts = minTs + fraction * tsRange;
-          const x = xOf(ts);
-          const axisY = PADDING + allLanes.length * LANE_HEIGHT;
+          {/* X-axis ticks from current view window */}
+          {[0, 0.25, 0.5, 0.75, 1].map((fraction) => {
+            const ts = viewMin + fraction * (viewMax - viewMin || 1);
+            const cx = xOf(ts);
+            const axisY = PADDING + allLanes.length * LANE_HEIGHT;
 
-          return (
-            <g key={fraction}>
-              <line x1={x} y1={PADDING} x2={x} y2={axisY} stroke={theme.colors.table.row.backgroundStriped} strokeWidth={1} />
-              <text
-                x={x}
-                y={axisY + 4}
-                textAnchor="middle"
-                dominantBaseline="hanging"
-                fontSize="0.7em"
-                fill={theme.colors.text.secondary}>
-                {formatTs(ts).slice(11)}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+            return (
+              <g key={fraction}>
+                <line x1={cx} y1={PADDING} x2={cx} y2={axisY} stroke={theme.colors.table.row.backgroundStriped} strokeWidth={1} />
+                <text
+                  x={cx}
+                  y={axisY + 4}
+                  textAnchor="middle"
+                  dominantBaseline="hanging"
+                  fontSize="0.7em"
+                  fill={theme.colors.text.secondary}>
+                  {formatTs(ts).slice(11)}
+                </text>
+              </g>
+            );
+          })}
+
+          {brushRect && (
+            <rect
+              x={brushRect.x}
+              y={PADDING}
+              width={brushRect.width}
+              height={plotH}
+              fill={theme.colors.variant.info}
+              opacity={0.15}
+              pointerEvents="none"
+            />
+          )}
+        </svg>
+      </SwimlaneColumn>
+      {detailPanel}
+      {popover}
     </Wrapper>
-    {popover}
-    </>
   );
 };
 
