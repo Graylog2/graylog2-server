@@ -88,6 +88,7 @@ type LaneEvent = {
   colorValue: string | undefined;
   shapeValue: string | undefined;
   labelValue: string | undefined;
+  correlationValue: string | undefined;
   fields: Record<string, unknown>;
   backendMessage: BackendMessage;
 };
@@ -112,7 +113,7 @@ const SwimlaneVisualization = ({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const { handleClick, popover } = useSwimlaneClickPopover();
   const { openDetail, detailPanel, isOpen: isDetailOpen } = useSwimlaneDetailDrawer();
-  const { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, maxLanes, laneSort, laneSortField, laneSortAscending } = config;
+  const { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, maxLanes, laneSort, laneSortField, laneSortAscending, correlationField } = config;
   const messages = data?.messages ?? [];
   const total = data?.total ?? 0;
 
@@ -127,9 +128,10 @@ const SwimlaneVisualization = ({
       const colorValue = colorField ? String(message[colorField] ?? '') : undefined;
       const shapeValue = shapeField ? String(message[shapeField] ?? '') : undefined;
       const labelValue = labelField ? String(message[labelField] ?? '') : undefined;
+      const correlationValue = correlationField ? (String(message[correlationField] ?? '') || undefined) : undefined;
 
       if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push({ ts, colorValue, shapeValue, labelValue, fields: message as Record<string, unknown>, backendMessage: bm });
+      map.get(key)!.push({ ts, colorValue, shapeValue, labelValue, correlationValue, fields: message as Record<string, unknown>, backendMessage: bm });
     });
 
     return Array.from(map.entries())
@@ -281,6 +283,62 @@ const SwimlaneVisualization = ({
   const truncated = total > messages.length;
   const lanesHidden = data?.total !== undefined && allLanes.length === maxLanes;
 
+  // Build connector elements between correlated events
+  const connectorElements: React.ReactElement[] = [];
+
+  if (correlationField) {
+    type ChainPoint = { cx: number; cy: number; ts: number; fill: string };
+    const chains = new Map<string, ChainPoint[]>();
+
+    renderItems.forEach((item) => {
+      if (item.type !== 'lane') return;
+      const cy = item.y + LANE_HEIGHT / 2;
+
+      item.lane.events.forEach((ev) => {
+        if (!ev.correlationValue) return;
+        const cx = xOf(ev.ts);
+        if (cx < LABEL_WIDTH - DOT_RADIUS || cx > svgWidth + DOT_RADIUS) return;
+        if (!chains.has(ev.correlationValue)) chains.set(ev.correlationValue, []);
+        chains.get(ev.correlationValue)!.push({ cx, cy, ts: ev.ts, fill: dotFill(ev.colorValue) });
+      });
+    });
+
+    chains.forEach((points, corrVal) => {
+      const sorted = [...points].sort((a, b) => a.ts - b.ts);
+      if (sorted.length < 2) return;
+
+      for (let i = 0; i < sorted.length - 1; i += 1) {
+        const { cx: x1, cy: y1, fill } = sorted[i];
+        const { cx: x2, cy: y2 } = sorted[i + 1];
+        const sameRow = Math.abs(y2 - y1) < 1;
+        const midY = (y1 + y2) / 2;
+        const pathD = sameRow
+          ? `M${x1},${y1} L${x2},${y2}`
+          : `M${x1},${y1} C${x1},${midY} ${x2},${midY} ${x2},${y2}`;
+
+        // Arrowhead chevron at destination dot edge, pointing in arrival direction
+        const offset = DOT_RADIUS + 2;
+        const arrowAngle = sameRow ? 0 : Math.sign(y2 - y1) * 90;
+        const ahX = sameRow ? x2 - offset : x2;
+        const ahY = sameRow ? y2 : y2 - Math.sign(y2 - y1) * offset;
+
+        connectorElements.push(
+          <g key={`conn-${corrVal}-${i}`}>
+            <path d={pathD} stroke={fill} strokeWidth={1.5} fill="none" opacity={0.45} />
+            <path
+              d="M-5,-3 L0,0 L-5,3"
+              transform={`translate(${ahX},${ahY}) rotate(${arrowAngle})`}
+              stroke={fill}
+              strokeWidth={1.5}
+              fill="none"
+              opacity={0.45}
+            />
+          </g>,
+        );
+      }
+    });
+  }
+
   return (
     <Wrapper>
       <SwimlaneColumn>
@@ -301,6 +359,7 @@ const SwimlaneVisualization = ({
         )}
 
         <svg ref={svgRef} width={svgWidth} height={svgH} style={{ flexShrink: 0, cursor: 'col-resize' }} {...mouseHandlers}>
+          {/* Layer 1: backgrounds and labels */}
           {renderItems.map((item) => {
             if (item.type === 'header') {
               return (
@@ -329,7 +388,7 @@ const SwimlaneVisualization = ({
             const isEven = rowIndex % 2 === 0;
 
             return (
-              <g key={lane.key}>
+              <g key={`bg-${lane.key}`}>
                 <rect
                   x={0}
                   y={y}
@@ -348,7 +407,20 @@ const SwimlaneVisualization = ({
                   onClick={(e) => handleClick(e, itemLabelField, labelValue)}>
                   {labelText.length > 22 ? `${labelText.slice(0, 20)}…` : labelText}
                 </text>
+              </g>
+            );
+          })}
 
+          {/* Layer 2: connectors between correlated events */}
+          {connectorElements}
+
+          {/* Layer 3: dots (rendered above connectors) */}
+          {renderItems.map((item) => {
+            if (item.type !== 'lane') return null;
+            const { lane, y } = item;
+
+            return (
+              <g key={`dots-${lane.key}`}>
                 {lane.events.map((ev, j) => {
                   const cx = xOf(ev.ts);
                   if (cx < LABEL_WIDTH - DOT_RADIUS || cx > svgWidth + DOT_RADIUS) return null;

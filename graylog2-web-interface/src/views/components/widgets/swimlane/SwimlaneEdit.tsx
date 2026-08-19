@@ -122,6 +122,7 @@ type FormValues = {
   laneSort: LaneSortMode;
   laneSortField: string;
   laneSortAscending: boolean;
+  correlationField: string;
 };
 
 const overridesToEntries = (overrides: Record<string, string>): OverrideEntry[] =>
@@ -146,9 +147,10 @@ const SwimlaneEdit = ({ children, config, onChange, onCancel }: EditWidgetCompon
     laneSort: config.laneSort,
     laneSortField: config.laneSortField ?? '',
     laneSortAscending: config.laneSortAscending,
+    correlationField: config.correlationField ?? '',
   };
 
-  const onSubmit = ({ laneFields, colorField, shapeField, shapeOverrideEntries, labelField, tooltipFields, limit, maxLanes, laneSort, laneSortField, laneSortAscending }: FormValues) => {
+  const onSubmit = ({ laneFields, colorField, shapeField, shapeOverrideEntries, labelField, tooltipFields, limit, maxLanes, laneSort, laneSortField, laneSortAscending, correlationField }: FormValues) => {
     onChange(
       config
         .toBuilder()
@@ -163,6 +165,7 @@ const SwimlaneEdit = ({ children, config, onChange, onCancel }: EditWidgetCompon
         .laneSort(laneSort || DEFAULT_LANE_SORT)
         .laneSortField(laneSortField || undefined)
         .laneSortAscending(laneSortAscending)
+        .correlationField(correlationField || undefined)
         .build(),
     );
   };
@@ -356,6 +359,19 @@ const SwimlaneEdit = ({ children, config, onChange, onCancel }: EditWidgetCompon
                       {values.tooltipFields.length < MAX_TOOLTIP_FIELDS && (
                         <Button bsSize="xs" bsStyle="link" onClick={addTooltipField}>+ Add field</Button>
                       )}
+                    </DescriptionBox>
+
+                    {/* Correlation field */}
+                    <DescriptionBox description="Correlation field (optional)">
+                      <FieldSelectBase
+                        id="correlation-field"
+                        name="correlationField"
+                        placeholder="None"
+                        clearable
+                        value={values.correlationField || undefined}
+                        options={fieldOptions}
+                        onChange={(v) => handleChange('correlationField', v ?? '')}
+                      />
                     </DescriptionBox>
 
                     {/* Lane sort */}

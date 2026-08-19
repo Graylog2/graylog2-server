@@ -36,6 +36,7 @@ type InternalState = {
   laneSort: LaneSortMode;
   laneSortField: string | undefined;
   laneSortAscending: boolean;
+  correlationField: string | undefined;
 };
 
 export type SwimlaneWidgetConfigJSON = {
@@ -52,6 +53,7 @@ export type SwimlaneWidgetConfigJSON = {
   lane_sort?: string;
   lane_sort_field?: string;
   lane_sort_ascending?: boolean;
+  correlation_field?: string;
 };
 
 export default class SwimlaneWidgetConfig extends WidgetConfig {
@@ -69,9 +71,10 @@ export default class SwimlaneWidgetConfig extends WidgetConfig {
     laneSort: LaneSortMode,
     laneSortField: string | undefined,
     laneSortAscending: boolean,
+    correlationField: string | undefined,
   ) {
     super();
-    this._value = { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, limit, maxLanes, laneSort, laneSortField, laneSortAscending };
+    this._value = { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, limit, maxLanes, laneSort, laneSortField, laneSortAscending, correlationField };
   }
 
   get laneFields() { return this._value.laneFields; }
@@ -85,6 +88,7 @@ export default class SwimlaneWidgetConfig extends WidgetConfig {
   get laneSort() { return this._value.laneSort; }
   get laneSortField() { return this._value.laneSortField; }
   get laneSortAscending() { return this._value.laneSortAscending; }
+  get correlationField() { return this._value.correlationField; }
 
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -92,7 +96,7 @@ export default class SwimlaneWidgetConfig extends WidgetConfig {
   }
 
   toJSON(): SwimlaneWidgetConfigJSON {
-    const { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, limit, maxLanes, laneSort, laneSortField, laneSortAscending } = this._value;
+    const { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, limit, maxLanes, laneSort, laneSortField, laneSortAscending, correlationField } = this._value;
 
     return {
       lane_fields: laneFields,
@@ -106,6 +110,7 @@ export default class SwimlaneWidgetConfig extends WidgetConfig {
       lane_sort: laneSort !== DEFAULT_LANE_SORT ? laneSort : undefined,
       lane_sort_field: laneSortField,
       lane_sort_ascending: laneSortAscending ? true : undefined,
+      correlation_field: correlationField,
     };
   }
 
@@ -122,7 +127,8 @@ export default class SwimlaneWidgetConfig extends WidgetConfig {
       .maxLanes(DEFAULT_MAX_LANES)
       .laneSort(DEFAULT_LANE_SORT)
       .laneSortField(undefined)
-      .laneSortAscending(false);
+      .laneSortAscending(false)
+      .correlationField(undefined);
   }
 
   static fromJSON(value: SwimlaneWidgetConfigJSON): SwimlaneWidgetConfig {
@@ -140,6 +146,7 @@ export default class SwimlaneWidgetConfig extends WidgetConfig {
       (value.lane_sort as LaneSortMode) ?? DEFAULT_LANE_SORT,
       value.lane_sort_field,
       value.lane_sort_ascending ?? false,
+      value.correlation_field,
     );
   }
 }
@@ -164,14 +171,16 @@ class Builder {
   laneSort(v: LaneSortMode) { return new Builder(this.value.set('laneSort', v)); }
   laneSortField(v: string | undefined) { return new Builder(this.value.set('laneSortField', v)); }
   laneSortAscending(v: boolean) { return new Builder(this.value.set('laneSortAscending', v)); }
+  correlationField(v: string | undefined) { return new Builder(this.value.set('correlationField', v)); }
 
   build() {
-    const { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, limit, maxLanes, laneSort, laneSortField, laneSortAscending } = this.value.toObject();
+    const { laneFields, colorField, shapeField, shapeOverrides, labelField, tooltipFields, limit, maxLanes, laneSort, laneSortField, laneSortAscending, correlationField } = this.value.toObject();
 
     return new SwimlaneWidgetConfig(
       laneFields, colorField, shapeField, shapeOverrides ?? {}, labelField, tooltipFields ?? [],
       limit, maxLanes,
       laneSort ?? DEFAULT_LANE_SORT, laneSortField, laneSortAscending ?? false,
+      correlationField,
     );
   }
 }
