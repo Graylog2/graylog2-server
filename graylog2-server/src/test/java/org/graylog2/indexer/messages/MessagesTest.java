@@ -18,6 +18,8 @@ package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IncompleteBulkResponseException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
@@ -35,6 +37,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -248,6 +251,58 @@ public class MessagesTest {
         assertThat(indexingResults.errors()).isEmpty();
 
         verifyNoInteractions(failureSubmissionService);
+    }
+
+    @Test
+    public void bulkIndexRequests_retriesWhenAdapterThrowsExceptionWithIOExceptionCause() throws Exception {
+        // given
+        final DateTime ts = Tools.nowUTC();
+        final Message message1 = message("msg-1", ts);
+
+        final List<IndexingRequest> indexingRequest = ImmutableList.of(IndexingRequest.create("", message1));
+
+        // A generic transient transport failure (e.g. a real connection problem), as any MessagesAdapter might
+        // throw it, unrelated to the more specific IncompleteBulkResponseException case tested below.
+        final ElasticsearchException transientFailure = new ElasticsearchException(
+                "Could not reach the indexer", new SocketTimeoutException("connect timed out"));
+
+        when(messagesAdapter.bulkIndex(indexingRequest))
+                .thenThrow(transientFailure)
+                .thenReturn(IndexingResults.create(List.of(new IndexingSuccess(message1, "index_1")), List.of()));
+
+        // when
+        final IndexingResults indexingResults = messages.bulkIndexRequests(indexingRequest, false);
+
+        // then
+        verify(messagesAdapter, times(2)).bulkIndex(indexingRequest);
+        assertThat(indexingResults.errors()).isEmpty();
+        assertThat(indexingResults.successes()).hasSize(1);
+    }
+
+    @Test
+    public void bulkIndexRequests_retriesWhenAdapterThrowsIncompleteBulkResponseException() throws Exception {
+        // given
+        final DateTime ts = Tools.nowUTC();
+        final Message message1 = message("msg-1", ts);
+
+        final List<IndexingRequest> indexingRequest = ImmutableList.of(IndexingRequest.create("", message1));
+
+        // What MessagesAdapterOS throws when OpenSearch returns an incomplete bulk response (e.g. a
+        // "_shards.failures[]" entry missing its "shard" field) while shards are being reallocated.
+        final IncompleteBulkResponseException transientFailure = new IncompleteBulkResponseException(
+                "Received an incomplete bulk response from OpenSearch", new RuntimeException("missing property"));
+
+        when(messagesAdapter.bulkIndex(indexingRequest))
+                .thenThrow(transientFailure)
+                .thenReturn(IndexingResults.create(List.of(new IndexingSuccess(message1, "index_1")), List.of()));
+
+        // when
+        final IndexingResults indexingResults = messages.bulkIndexRequests(indexingRequest, false);
+
+        // then
+        verify(messagesAdapter, times(2)).bulkIndex(indexingRequest);
+        assertThat(indexingResults.errors()).isEmpty();
+        assertThat(indexingResults.successes()).hasSize(1);
     }
 
     private List<IndexingSuccess> createSuccessFromMessages(List<MessageWithIndex> messageList) {
