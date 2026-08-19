@@ -124,6 +124,6 @@ public class OpensearchClusterResource extends RestResource {
         final SearchQuery parsedQuery = searchQueryParser.parse(query);
         final PaginatedList<OpensearchNode> result = opensearchNodesSearchService.search(parsedQuery, sort, order, page, perPage);
         return PageListResponse.create(query, result.pagination(),
-                result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
+                result.pagination().total(), sort, order, result.stream().toList(), attributes, settings);
     }
 }
