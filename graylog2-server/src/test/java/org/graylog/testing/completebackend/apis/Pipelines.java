@@ -72,8 +72,8 @@ public class Pipelines {
                 .statusCode(200);
     }
 
-    public ValidatableResponse parse(String source) {
-        return parse("", "", source, HttpStatus.SC_OK);
+    public ValidatableResponse parse(String title, String description, String source) {
+        return parse(title, description, source, HttpStatus.SC_OK);
     }
 
     public ValidatableResponse parse(String title, String description, String source, int expectedStatus) {
