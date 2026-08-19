@@ -65,7 +65,9 @@ const StatusCell = ({ stream }: Props) => {
 
   return (
     <Label
-      status={{ color: stream.disabled ? 'warning' : 'success', variant: 'light', dot: true }}
+      color={stream.disabled ? 'warning' : 'success'}
+      variant="light"
+      dot
       onClick={disableChange ? undefined : toggleStreamStatus}
       title={title}
       aria-label={title}

@@ -17,15 +17,15 @@
 import styled, { css } from 'styled-components';
 
 import Badge from './Badge';
-import type { StatusColor, StatusVariant } from './types';
+import type { BadgeColor } from './Badge';
 
 type LabelProps = {
-  status?: { color: StatusColor; variant: StatusVariant; dot?: boolean };
+  color?: BadgeColor;
 };
 
 const Label = styled(Badge)<LabelProps>(
-  ({ theme, status }) => css`
-    ${!status &&
+  ({ theme, color }) => css`
+    ${!color &&
     css`
       border-radius: 3px;
     `}

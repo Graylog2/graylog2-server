@@ -27,10 +27,10 @@ describe('Badge', () => {
     expect(screen.getByText('Alert')).toBeInTheDocument();
   });
 
-  it('renders as a button and fires onClick when both status and onClick are set', async () => {
+  it('renders as a button and fires onClick when both color and onClick are set', async () => {
     const onClick = jest.fn();
     render(
-      <Badge status={{ color: 'success', variant: 'light' }} onClick={onClick}>
+      <Badge color="success" variant="light" onClick={onClick}>
         Click me
       </Badge>,
     );
@@ -40,15 +40,19 @@ describe('Badge', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('renders status color/variant content', () => {
-    render(<Badge status={{ color: 'success', variant: 'light' }}>Running</Badge>);
+  it('renders color/variant content', () => {
+    render(
+      <Badge color="success" variant="light">
+        Running
+      </Badge>,
+    );
 
     expect(screen.getByText('Running')).toBeInTheDocument();
   });
 
-  it('renders a dot indicator when status.dot is set', () => {
+  it('renders a dot indicator when dot is set', () => {
     render(
-      <Badge status={{ color: 'success', variant: 'light', dot: true }}>
+      <Badge color="success" variant="light" dot>
         Running
       </Badge>,
     );
@@ -58,7 +62,7 @@ describe('Badge', () => {
 
   it('renders a left and right icon', () => {
     render(
-      <Badge status={{ color: 'warning', variant: 'light' }} leftIcon="warning" rightIcon="pause">
+      <Badge color="warning" variant="light" leftIcon="warning" rightIcon="pause">
         Paused
       </Badge>,
     );

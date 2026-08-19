@@ -20,8 +20,12 @@ import { render, screen } from 'wrappedTestingLibrary';
 import Label from './Label';
 
 describe('Label', () => {
-  it('renders status color/variant content', () => {
-    render(<Label status={{ color: 'warning', variant: 'light', dot: true }}>Paused</Label>);
+  it('renders color/variant content', () => {
+    render(
+      <Label color="warning" variant="light" dot>
+        Paused
+      </Label>,
+    );
 
     expect(screen.getByText('Paused')).toBeInTheDocument();
     expect(screen.getByTestId('badge-dot')).toBeInTheDocument();
@@ -33,8 +37,12 @@ describe('Label', () => {
     expect(screen.getByText('Legacy')).toHaveStyleRule('border-radius', '3px');
   });
 
-  it('does not force the legacy border-radius on status-driven usage', () => {
-    render(<Label status={{ color: 'success', variant: 'light' }}>Running</Label>);
+  it('does not force the legacy border-radius when color is set', () => {
+    render(
+      <Label color="success" variant="light">
+        Running
+      </Label>,
+    );
 
     expect(screen.getByText('Running')).not.toHaveStyleRule('border-radius', '3px');
   });

@@ -20,11 +20,12 @@ import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
-import type { BsSize, StatusColor, StatusVariant } from 'components/bootstrap/types';
 import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';
-import sizeForMantine from 'theme/utils/sizeForMantine';
 import type { SupportedMantineSize } from 'theme/types';
+
+export type BadgeColor = Extract<ColorVariant, 'primary' | 'danger' | 'success' | 'warning' | 'gray'>;
+export type BadgeVariant = 'light' | 'filled';
 
 const mapStyle = (style: ColorVariant, theme: DefaultTheme) =>
   style === 'default' ? theme.colors.button.gray.background : theme.colors.variant[style];
@@ -94,20 +95,23 @@ const Dot = styled.span<{ $color: string; $size: SupportedMantineSize }>(
 
 type Props = React.PropsWithChildren<{
   'aria-label'?: string;
+  /** @deprecated Legacy color variant — prefer `color`/`variant`. Only used as a fallback when `color` is not set. */
   bsStyle?: ColorVariant;
   className?: string;
+  color?: BadgeColor;
   'data-testid'?: string;
+  dot?: boolean;
   leftIcon?: IconName;
   onClick?: (e: React.MouseEvent) => void;
   onMouseEnter?: React.MouseEventHandler<HTMLElement>;
   onMouseLeave?: React.MouseEventHandler<HTMLElement>;
   rightIcon?: IconName;
   role?: string;
-  size?: BsSize;
-  status?: { color: StatusColor; variant: StatusVariant; dot?: boolean };
+  size?: SupportedMantineSize;
   style?: React.CSSProperties;
   title?: string;
   uppercase?: boolean;
+  variant?: BadgeVariant;
 }>;
 
 const Badge = (
@@ -116,7 +120,9 @@ const Badge = (
     bsStyle = 'default',
     className = undefined,
     children = undefined,
+    color = undefined,
     'data-testid': dataTestid,
+    dot = false,
     leftIcon = undefined,
     onClick = undefined,
     onMouseEnter = undefined,
@@ -124,30 +130,23 @@ const Badge = (
     rightIcon = undefined,
     role = undefined,
     size = 'md',
-    status = undefined,
     style = undefined,
     title = undefined,
     uppercase = false,
+    variant = 'light',
   }: Props,
   ref: React.ForwardedRef<HTMLElement>,
 ) => {
   const theme = useTheme();
-  const mantineSize = sizeForMantine(size);
 
-  const background = status
-    ? theme.colors.badges[status.color][status.variant].background
-    : mapStyle(bsStyle, theme);
-  const color = status
-    ? theme.colors.badges[status.color][status.variant].text
-    : theme.utils.contrastingColor(background);
-  const iconSize = iconSizeForBadge[mantineSize];
+  const background = color ? theme.colors.badges[color][variant].background : mapStyle(bsStyle, theme);
+  const textColor = color ? theme.colors.badges[color][variant].text : theme.utils.contrastingColor(background);
+  const iconSize = iconSizeForBadge[size];
 
   let leftSection: React.ReactNode;
 
-  if (status?.dot) {
-    leftSection = (
-      <Dot $color={theme.colors.badges[status.color].dot.color} $size={mantineSize} data-testid="badge-dot" />
-    );
+  if (color && dot) {
+    leftSection = <Dot $color={theme.colors.badges[color].dot.color} $size={size} data-testid="badge-dot" />;
   } else if (leftIcon) {
     leftSection = <Icon name={leftIcon} size={iconSize} />;
   }
@@ -157,7 +156,7 @@ const Badge = (
   const sharedProps = {
     'aria-label': ariaLabel,
     $background: background,
-    $color: color,
+    $color: textColor,
     className: uppercase ? `${className ?? ''} uppercase` : className,
     title,
     'data-testid': dataTestid,
@@ -168,7 +167,7 @@ const Badge = (
     rightSection,
     onMouseEnter,
     onMouseLeave,
-    size: mantineSize,
+    size,
   };
 
   if (onClick) {
@@ -191,4 +190,7 @@ const Badge = (
   );
 };
 
-export default React.forwardRef(Badge);
+const ForwardedBadge = React.forwardRef(Badge);
+ForwardedBadge.displayName = 'Badge';
+
+export default ForwardedBadge;

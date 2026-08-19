@@ -16,13 +16,14 @@
  */
 import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { fn } from 'storybook/test';
 
 import { Badge } from 'components/bootstrap';
-import type { StatusColor, StatusVariant, BsSize } from 'components/bootstrap/types';
+import type { BadgeColor, BadgeVariant } from 'components/bootstrap/Badge';
 
-const COLORS: StatusColor[] = ['primary', 'danger', 'success', 'warning', 'gray'];
-const VARIANTS: StatusVariant[] = ['light', 'filled'];
-const SIZES: BsSize[] = ['sm', 'md', 'lg'];
+const COLORS: BadgeColor[] = ['primary', 'danger', 'success', 'warning', 'gray'];
+const VARIANTS: BadgeVariant[] = ['light', 'filled'];
+const SIZES = ['sm', 'md', 'lg'] as const;
 
 const meta = {
   title: 'Components/Badges/Badge',
@@ -32,104 +33,77 @@ const meta = {
     docs: {
       description: {
         component: [
-          'A status badge matching the Luma design system. Use `status={{ color, variant, dot? }}`',
-          'for the 5 semantic colors (`primary`, `danger`, `success`, `warning`, `gray`) and the 2 style',
-          'variants (`light`, `filled`) — this is additive to the legacy `bsStyle` prop, which every',
-          'other Badge/Label consumer in the app keeps using unchanged.',
+          'A status badge matching the Luma design system. Use `color`/`variant`/`dot` for the 5',
+          'semantic colors (`primary`, `danger`, `success`, `warning`, `gray`) and the 2 style variants',
+          '(`light`, `filled`) — this is additive to the legacy `bsStyle` prop, which every other',
+          'Badge/Label consumer in the app keeps using unchanged.',
           '',
-          '- Use `variant: \'light\'` for most contexts (table cells, status columns) and `\'filled\'`',
-          '  for emphasis (e.g. a "default" marker that should stand out from a plain informational one).',
-          '- Set `status.dot: true` for a small color dot instead of an icon (used for toggleable states',
-          '  like Streams/Event Definitions).',
+          '- Use `variant="light"` for most contexts (table cells, status columns) and `"filled"` for',
+          '  emphasis (e.g. a "default" marker that should stand out from a plain informational one).',
+          '- Set `dot` for a small color dot instead of an icon (used for toggleable states like',
+          '  Streams/Event Definitions).',
           '- `leftIcon`/`rightIcon` accept any `Icon` name and render into Mantine\'s native icon slots.',
           '- Pass `onClick` to make the whole badge a real, keyboard-accessible `<button>` instead of a',
-          '  decorative `<span>` — this works identically whether or not `status` is set.',
+          '  decorative `<span>` — this works identically regardless of color system.',
         ].join('\n'),
       },
     },
   },
   tags: ['autodocs'],
   argTypes: {
-    status: { control: false },
-    size: {
-      control: { type: 'select' },
-      options: ['xs', 'sm', 'md', 'lg'],
-    },
+    bsStyle: { table: { disable: true } },
+    color: { control: { type: 'select' }, options: COLORS },
+    variant: { control: { type: 'select' }, options: VARIANTS },
+    size: { control: { type: 'select' }, options: ['xs', 'sm', 'md', 'lg'] },
+    leftIcon: { control: 'text', description: 'Icon name shown before the label, e.g. "play_arrow"' },
+    rightIcon: { control: 'text', description: 'Icon name shown after the label, e.g. "pause"' },
   },
 } satisfies Meta<typeof Badge>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-type PlaygroundArgs = {
-  text: string;
-  color: StatusColor;
-  variant: StatusVariant;
-  dot: boolean;
-  leftIcon: string;
-  rightIcon: string;
-  clickable: boolean;
-  size: BsSize;
-};
-
-export const Playground: StoryObj<Meta<PlaygroundArgs>> = {
-  argTypes: {
-    text: { control: 'text' },
-    color: { control: { type: 'select' }, options: COLORS },
-    variant: { control: { type: 'select' }, options: VARIANTS },
-    dot: { control: 'boolean', description: 'Shows a color dot as the left section (overrides leftIcon)' },
-    leftIcon: { control: 'text', description: 'Icon name shown before the label, e.g. "play_arrow" — ignored when dot is on' },
-    rightIcon: { control: 'text', description: 'Icon name shown after the label, e.g. "pause"' },
-    clickable: { control: 'boolean', description: 'Renders the badge as a real, keyboard-accessible button and fires onClick' },
-    size: { control: { type: 'select' }, options: ['xs', 'sm', 'md', 'lg'] },
-  },
+export const Playground: Story = {
   args: {
-    text: 'Running',
+    children: 'Running',
     color: 'success',
     variant: 'light',
     dot: true,
-    leftIcon: '',
     rightIcon: 'pause',
-    clickable: true,
-    size: 'md',
+    onClick: fn(),
   },
-  render: ({ text, color, variant, dot, leftIcon, rightIcon, clickable, size }) => (
-    <Badge
-      status={{ color, variant, dot }}
-      leftIcon={leftIcon || undefined}
-      rightIcon={rightIcon || undefined}
-      size={size}
-      onClick={clickable ? () => {} : undefined}>
-      {text}
-    </Badge>
-  ),
 };
 
 export const Light: Story = {
   args: {
     children: 'Running',
-    status: { color: 'success', variant: 'light' },
+    color: 'success',
+    variant: 'light',
   },
 };
 
 export const Filled: Story = {
   args: {
     children: 'Running',
-    status: { color: 'success', variant: 'filled' },
+    color: 'success',
+    variant: 'filled',
   },
 };
 
 export const WithDot: Story = {
   args: {
     children: 'Running',
-    status: { color: 'success', variant: 'light', dot: true },
+    color: 'success',
+    variant: 'light',
+    dot: true,
   },
 };
 
 export const WithIcon: Story = {
   args: {
     children: 'Paused',
-    status: { color: 'warning', variant: 'light' },
+    color: 'warning',
+    variant: 'light',
     rightIcon: 'pause',
   },
 };
@@ -137,9 +111,11 @@ export const WithIcon: Story = {
 export const Clickable: Story = {
   args: {
     children: 'Running',
-    status: { color: 'success', variant: 'light', dot: true },
+    color: 'success',
+    variant: 'light',
+    dot: true,
     rightIcon: 'pause',
-    onClick: () => {},
+    onClick: fn(),
   },
 };
 
@@ -149,7 +125,7 @@ export const AllColors: Story = {
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, max-content)', gap: '8px 24px', alignItems: 'center' }}>
       {COLORS.flatMap((color) =>
         VARIANTS.map((variant) => (
-          <Badge key={`${color}-${variant}`} status={{ color, variant }}>
+          <Badge key={`${color}-${variant}`} color={color} variant={variant}>
             {color} / {variant}
           </Badge>
         )),
@@ -163,7 +139,7 @@ export const Sizes: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
       {SIZES.map((size) => (
-        <Badge key={size} size={size} status={{ color: 'primary', variant: 'filled', dot: true }}>
+        <Badge key={size} size={size} color="primary" variant="filled" dot>
           {size}
         </Badge>
       ))}
