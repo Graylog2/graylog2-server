@@ -36,13 +36,10 @@ const StatusCell = ({ stream }: Props) => {
     `streams:edit:${stream.id}`,
   ]);
   const disableChange = stream.is_default || !stream.is_editable || !userHasPermissions;
-  const title = disableChange
-    ? stream.disabled
-      ? 'Paused'
-      : 'Running'
-    : stream.disabled
-      ? 'Start stream'
-      : 'Pause stream';
+  const statusLabel = stream.disabled ? 'Paused' : 'Running';
+  const toggleLabel = stream.disabled ? 'Start stream' : 'Pause stream';
+  const toggleIcon = stream.disabled ? 'play_arrow' : 'pause';
+  const title = disableChange ? statusLabel : toggleLabel;
   const sendTelemetry = useSendTelemetry();
   const { pauseStream, resumeStream } = useStreamMutations();
 
@@ -72,8 +69,8 @@ const StatusCell = ({ stream }: Props) => {
       onClick={disableChange ? undefined : toggleStreamStatus}
       title={title}
       aria-label={title}
-      rightIcon={disableChange ? undefined : stream.disabled ? 'play_arrow' : 'pause'}>
-      {stream.disabled ? 'Paused' : 'Running'}
+      rightIcon={disableChange ? undefined : toggleIcon}>
+      {statusLabel}
     </Label>
   );
 };
