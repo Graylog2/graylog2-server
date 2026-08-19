@@ -33,6 +33,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import type { WelcomePageConfigType } from 'components/common/types';
+import { DEFAULT_WELCOME_PAGE_CONFIG } from 'logic/welcome/welcomePageConfig';
 
 const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
   ({ theme }) => css`
@@ -53,7 +54,6 @@ const LabelSpan = styled.span(
 );
 
 const configType = ConfigurationType.WELCOME_PAGE_CONFIG;
-const DEFAULT_CONFIG: WelcomePageConfigType = { disable_metrics: false };
 
 type FormValues = { metrics_enabled: boolean };
 
@@ -68,7 +68,7 @@ const WelcomePageConfig = () => {
 
   useEffect(() => {
     ConfigurationsActions.list(configType).then(() => {
-      const config = getConfig(configType, configuration) ?? DEFAULT_CONFIG;
+      const config = getConfig(configType, configuration) ?? DEFAULT_WELCOME_PAGE_CONFIG;
 
       setViewConfig(config);
       setFormConfig({ metrics_enabled: !config.disable_metrics });

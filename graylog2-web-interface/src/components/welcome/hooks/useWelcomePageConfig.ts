@@ -19,12 +19,11 @@ import { useEffect } from 'react';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { ConfigurationsStore, ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import type { WelcomePageConfigType } from 'components/common/types';
+import { DEFAULT_WELCOME_PAGE_CONFIG } from 'logic/welcome/welcomePageConfig';
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 
 type WelcomePageConfig = { metricsEnabled: boolean };
-
-const ENABLE_METRICS_BY_DEFAULT = true;
 
 const useWelcomePageConfig = (): WelcomePageConfig => {
   const configuration = useStore(
@@ -36,11 +35,9 @@ const useWelcomePageConfig = (): WelcomePageConfig => {
     ConfigurationsActions.list(ConfigurationType.WELCOME_PAGE_CONFIG);
   }, []);
 
-  const disableMetricsPreference = configuration?.disable_metrics;
+  const disableMetrics = configuration?.disable_metrics ?? DEFAULT_WELCOME_PAGE_CONFIG.disable_metrics;
 
-  return {
-    metricsEnabled: disableMetricsPreference === undefined ? ENABLE_METRICS_BY_DEFAULT : !disableMetricsPreference,
-  };
+  return { metricsEnabled: !disableMetrics };
 };
 
 export default useWelcomePageConfig;
