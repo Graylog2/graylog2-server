@@ -51,12 +51,21 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
+    'aria-label': { table: { disable: true } },
     bsStyle: { table: { disable: true } },
+    className: { table: { disable: true } },
     color: { control: { type: 'select' }, options: COLORS },
-    variant: { control: { type: 'select' }, options: VARIANTS },
-    size: { control: { type: 'select' }, options: ['xs', 'sm', 'md', 'lg'] },
+    'data-testid': { table: { disable: true } },
     leftIcon: { control: 'text', description: 'Icon name shown before the label, e.g. "play_arrow"' },
+    onMouseEnter: { table: { disable: true } },
+    onMouseLeave: { table: { disable: true } },
     rightIcon: { control: 'text', description: 'Icon name shown after the label, e.g. "pause"' },
+    role: { table: { disable: true } },
+    size: { control: { type: 'select' }, options: ['xs', 'sm', 'md', 'lg'] },
+    style: { table: { disable: true } },
+    title: { table: { disable: true } },
+    uppercase: { table: { disable: true } },
+    variant: { control: { type: 'select' }, options: VARIANTS },
   },
 } satisfies Meta<typeof Badge>;
 
