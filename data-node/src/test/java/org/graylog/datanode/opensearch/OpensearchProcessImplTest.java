@@ -35,23 +35,28 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.PhysicalMemory;
 import oshi.hardware.VirtualMemory;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -62,7 +67,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class OpensearchProcessImplTest {
 
     OpensearchProcessImpl opensearchProcess;
@@ -88,7 +94,7 @@ public class OpensearchProcessImplTest {
     @Mock
     ClusterEventBus clusterEventBus;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         when(datanodeConfiguration.processLogsBufferSize()).thenReturn(100);
         when(configuration.getDatanodeNodeName()).thenReturn(nodeName);
@@ -145,6 +151,7 @@ public class OpensearchProcessImplTest {
     public void testHeapThresholdWarning() {
         when(configuration.getHostname()).thenReturn("datanode");
         when(configuration.getOpensearchHeap()).thenReturn("1g");
+        when(opensearchProcess.getContainerMemory()).thenReturn(Optional.empty());
         when(opensearchProcess.getGlobalMemory()).thenReturn(mockMemory(gigabytes(8), gigabytes(16)));
         opensearchProcess.checkConfiguredHeap();
         verify(clusterEventBus, times(1)).post(any(DataNodeNotficationEvent.class));
@@ -153,9 +160,73 @@ public class OpensearchProcessImplTest {
     @Test
     public void testNoHeapThresholdWarning() {
         when(configuration.getOpensearchHeap()).thenReturn("1g");
+        when(opensearchProcess.getContainerMemory()).thenReturn(Optional.empty());
         when(opensearchProcess.getGlobalMemory()).thenReturn(mockMemory(gigabytes(2), gigabytes(3)));
         opensearchProcess.checkConfiguredHeap();
         verifyNoInteractions(clusterEventBus);
+    }
+
+    @Test
+    void testGetContainerMemoryCgroupV2(@TempDir Path tempDir) throws Exception {
+        final Path memoryMax = tempDir.resolve("memory.max");
+        final Path memoryCurrent = tempDir.resolve("memory.current");
+        Files.writeString(memoryMax, "4294967296\n");
+        Files.writeString(memoryCurrent, "1073741824\n");
+
+        when(opensearchProcess.cgroupV2MemoryMaxPath()).thenReturn(memoryMax);
+        when(opensearchProcess.cgroupV2MemoryCurrentPath()).thenReturn(memoryCurrent);
+
+        final Optional<OpensearchProcessImpl.MemoryValues> memory = opensearchProcess.getContainerMemory();
+
+        Assertions.assertThat(memory).isPresent();
+        Assertions.assertThat(memory.get().total()).isEqualTo(4294967296L);
+        Assertions.assertThat(memory.get().available()).isEqualTo(3221225472L);
+    }
+
+    @Test
+    void testGetContainerMemoryCgroupV1Fallback(@TempDir Path tempDir) throws Exception {
+        final Path memoryMax = tempDir.resolve("memory.max");
+        final Path memoryCurrent = tempDir.resolve("memory.current");
+        Files.writeString(memoryMax, "max\n");
+        Files.writeString(memoryCurrent, "100\n");
+
+        final Path memoryLimit = tempDir.resolve("memory.limit_in_bytes");
+        final Path memoryUsage = tempDir.resolve("memory.usage_in_bytes");
+        Files.writeString(memoryLimit, "4294967296\n");
+        Files.writeString(memoryUsage, "1073741824\n");
+
+        when(opensearchProcess.cgroupV2MemoryMaxPath()).thenReturn(memoryMax);
+        when(opensearchProcess.cgroupV2MemoryCurrentPath()).thenReturn(memoryCurrent);
+        when(opensearchProcess.cgroupV1MemoryLimitPath()).thenReturn(memoryLimit);
+        when(opensearchProcess.cgroupV1MemoryUsagePath()).thenReturn(memoryUsage);
+
+        final Optional<OpensearchProcessImpl.MemoryValues> memory = opensearchProcess.getContainerMemory();
+
+        Assertions.assertThat(memory).isPresent();
+        Assertions.assertThat(memory.get().total()).isEqualTo(4294967296L);
+        Assertions.assertThat(memory.get().available()).isEqualTo(3221225472L);
+    }
+
+    @Test
+    void testGetContainerMemoryCgroupV1UnlimitedIgnored(@TempDir Path tempDir) throws Exception {
+        final Path memoryMax = tempDir.resolve("memory.max");
+        final Path memoryCurrent = tempDir.resolve("memory.current");
+        Files.writeString(memoryMax, "max\n");
+        Files.writeString(memoryCurrent, "100\n");
+
+        final Path memoryLimit = tempDir.resolve("memory.limit_in_bytes");
+        final Path memoryUsage = tempDir.resolve("memory.usage_in_bytes");
+        Files.writeString(memoryLimit, Long.toString(Long.MAX_VALUE));
+        Files.writeString(memoryUsage, "1073741824\n");
+
+        when(opensearchProcess.cgroupV2MemoryMaxPath()).thenReturn(memoryMax);
+        when(opensearchProcess.cgroupV2MemoryCurrentPath()).thenReturn(memoryCurrent);
+        when(opensearchProcess.cgroupV1MemoryLimitPath()).thenReturn(memoryLimit);
+        when(opensearchProcess.cgroupV1MemoryUsagePath()).thenReturn(memoryUsage);
+
+        final Optional<OpensearchProcessImpl.MemoryValues> memory = opensearchProcess.getContainerMemory();
+
+        Assertions.assertThat(memory).isEmpty();
     }
 
     private GlobalMemory mockMemory(long availableMemory, long totalMemory) {
