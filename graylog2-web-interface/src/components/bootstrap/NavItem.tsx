@@ -39,6 +39,13 @@ const NavigationLink = styled.a<{ $hasOnClick: boolean }>(
          suppress. Those no longer apply here, so navigation items suppress it themselves. */
       text-decoration: none;
     }
+
+    /* Bootstrap also rings a focused anchor whichever way it was focused, which browsers otherwise
+       avoid doing after a click, so clicking a navigation item would leave its ring behind. Reaching
+       one by keyboard still shows it. */
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
   `,
 );
 const NavItem = ({ children = undefined, ...props }: React.ComponentProps<typeof NavItem>) => (
