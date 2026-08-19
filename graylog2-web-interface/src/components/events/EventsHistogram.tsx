@@ -150,11 +150,11 @@ const EventsGraph = ({
 
   return (
     <GraphContainer>
-      <InteractiveContext.Provider value={false}>
+      <InteractiveContext.Provider value="disabled">
         <FullSizeContainer>
           {(dimensions) => (
             <PlotLegend config={config} chartData={chartData} height={height} width={dimensions.width}>
-              <InteractiveContext.Provider value>
+              <InteractiveContext.Provider value="interactive">
                 <GenericPlot chartData={chartData} layout={_layout} onZoom={onZoom} setChartColor={defaultSetColor} />
               </InteractiveContext.Provider>
             </PlotLegend>

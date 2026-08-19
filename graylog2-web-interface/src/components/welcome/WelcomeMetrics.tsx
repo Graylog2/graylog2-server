@@ -63,7 +63,7 @@ const MetricsSearchPage = ({ rangeSeconds }: { rangeSeconds: number }) => {
   );
 
   return (
-    <InteractiveContext.Provider value={false}>
+    <InteractiveContext.Provider value="read-only">
       <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
         <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
           <SearchPage view={view} isNew={false} skipNoStreamsCheck />
