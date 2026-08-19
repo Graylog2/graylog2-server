@@ -26,4 +26,16 @@ describe('Label', () => {
     expect(screen.getByText('Paused')).toBeInTheDocument();
     expect(screen.getByTestId('badge-dot')).toBeInTheDocument();
   });
+
+  it('keeps the legacy small border-radius for bsStyle-driven usage', () => {
+    render(<Label bsStyle="success">Legacy</Label>);
+
+    expect(screen.getByText('Legacy')).toHaveStyleRule('border-radius', '3px');
+  });
+
+  it('does not force the legacy border-radius on status-driven usage', () => {
+    render(<Label status={{ color: 'success', variant: 'light' }}>Running</Label>);
+
+    expect(screen.getByText('Running')).not.toHaveStyleRule('border-radius', '3px');
+  });
 });
