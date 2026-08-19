@@ -437,11 +437,26 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
        return found;
     }
 
+    private boolean isMaxQueryStringLengthException(ErrorCause cause) {
+        final var reason = cause.reason();
+        var found = reason != null
+                && (reason.contains("max_query_string_length") || reason.contains("query string length"));
+
+        if (!found && cause.causedBy() != null) {
+            return isMaxQueryStringLengthException(cause.causedBy());
+        }
+
+        return found;
+    }
+
     private final static int MAX_MSG_LENGTH = 1024;
 
     private String mapExceptionToErrorMessage(ErrorCause cause) {
         if (isMaxClauseCountException(cause)) {
             return "Your query exceeded the maxClauseCount setting of OpenSearch. This is probably due to a custom parameter filled from a lookup table. Please check you query and settings.";
+        }
+        if (isMaxQueryStringLengthException(cause)) {
+            return "Your query exceeded the search.query.max_query_string_length setting of OpenSearch. This is probably due to a parameter filled from a watchlist or lookup table. Reduce the number of entries, or raise the setting on the search cluster.";
         }
 
         // in case of the default, return the message cut down to a reasonable length so that it's shown appropriately in the FE

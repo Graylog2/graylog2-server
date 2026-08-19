@@ -29,6 +29,8 @@ import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
 import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
+import javax.annotation.Nullable;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +46,30 @@ public interface ClusterAdapter {
     Set<NodeDiskUsageStats> diskUsageStats();
 
     ClusterAllocationDiskSettings clusterAllocationDiskSettings();
+
+    /**
+     * The cluster-level {@code search.query.max_query_string_length} limit, if the backend registers it. A
+     * query string longer than this is rejected by the backend. Empty when the setting does not exist
+     * (Elasticsearch never registers it) or cannot be parsed, in which case callers must skip the check
+     * rather than assume a default - the value is admin-changeable at runtime.
+     */
+    Optional<Integer> maxQueryStringLength();
+
+    /**
+     * Cluster settings arrive as strings and may be absent (empty string). Shared by the storage backends so
+     * they agree on what an unusable value means: no limit information, not a guessed default.
+     */
+    static Optional<Integer> parseSettingAsPositiveInt(@Nullable String value) {
+        if (value == null || value.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            final int parsed = Integer.parseInt(value.trim());
+            return parsed > 0 ? Optional.of(parsed) : Optional.empty();
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
 
     Optional<String> nodeIdToName(String nodeId);
 

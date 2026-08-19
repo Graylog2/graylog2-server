@@ -143,6 +143,11 @@ class ClusterAdapterOSTest {
     }
 
     @Test
+    void testMaxQueryStringLength() {
+        assertThat(clusterAdapter.maxQueryStringLength()).contains(32000);
+    }
+
+    @Test
     void nodesUtilizationParsesPerNodeCpuAndHeapPercent() {
         final OfficialOpensearchClient statsClient = ServerlessOpenSearchClient.builder()
                 .stubResponse("GET", "/_nodes/stats/os,jvm", """

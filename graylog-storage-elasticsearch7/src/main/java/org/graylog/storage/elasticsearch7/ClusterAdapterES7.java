@@ -150,6 +150,12 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     @Override
+    public Optional<Integer> maxQueryStringLength() {
+        // Elasticsearch does not register search.query.max_query_string_length, so there is no limit to report.
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<String> nodeIdToName(String nodeId) {
         return nodeById(nodeId)
                 .map(jsonNode -> jsonNode.get("name").asText());

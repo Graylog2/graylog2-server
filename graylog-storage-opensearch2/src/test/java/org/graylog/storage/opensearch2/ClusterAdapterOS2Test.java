@@ -208,7 +208,42 @@ class ClusterAdapterOS2Test {
                 .containsExactly(1, 2);
     }
 
+    @Test
+    void maxQueryStringLengthReadsClusterSetting() {
+        when(client.execute(any())).thenReturn(new ClusterGetSettingsResponse(
+                Settings.builder().build(),
+                Settings.builder().build(),
+                Settings.builder()
+                        .put("search.query.max_query_string_length", "32000")
+                        .build()
+        ));
 
+        assertThat(clusterAdapter.maxQueryStringLength()).contains(32000);
+    }
+
+    @Test
+    void maxQueryStringLengthIsEmptyWhenSettingIsAbsent() {
+        when(client.execute(any())).thenReturn(new ClusterGetSettingsResponse(
+                Settings.builder().build(),
+                Settings.builder().build(),
+                Settings.builder().build()
+        ));
+
+        assertThat(clusterAdapter.maxQueryStringLength()).isEmpty();
+    }
+
+    @Test
+    void maxQueryStringLengthIsEmptyWhenSettingIsNotANumber() {
+        when(client.execute(any())).thenReturn(new ClusterGetSettingsResponse(
+                Settings.builder().build(),
+                Settings.builder().build(),
+                Settings.builder()
+                        .put("search.query.max_query_string_length", "unlimited")
+                        .build()
+        ));
+
+        assertThat(clusterAdapter.maxQueryStringLength()).isEmpty();
+    }
 
     @Test
     void nodesUtilizationParsesPerNodeCpuAndHeapPercent() throws IOException {

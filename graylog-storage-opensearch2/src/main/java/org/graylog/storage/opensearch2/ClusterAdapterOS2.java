@@ -159,6 +159,16 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     }
 
     @Override
+    public Optional<Integer> maxQueryStringLength() {
+        final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
+        request.includeDefaults(true);
+
+        final ClusterGetSettingsResponse response =
+                client.execute((c, requestOptions) -> c.cluster().getSettings(request, requestOptions));
+        return ClusterAdapter.parseSettingAsPositiveInt(response.getSetting("search.query.max_query_string_length"));
+    }
+
+    @Override
     public Optional<String> nodeIdToName(String nodeId) {
         return nodeById(nodeId)
                 .map(jsonNode -> jsonNode.get("name").asText());

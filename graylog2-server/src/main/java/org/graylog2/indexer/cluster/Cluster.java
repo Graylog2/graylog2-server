@@ -100,6 +100,14 @@ public class Cluster {
         return clusterAdapter.clusterAllocationDiskSettings();
     }
 
+    /**
+     * The backend's maximum allowed query string length, when the backend reports one. Read live on each call:
+     * this is a dynamic cluster setting, and callers are admin-facing UI requests, not the search path.
+     */
+    public Optional<Integer> getMaxQueryStringLength() {
+        return clusterAdapter.maxQueryStringLength();
+    }
+
     public Optional<String> nodeIdToName(String nodeId) {
         return clusterAdapter.nodeIdToName(nodeId);
     }
