@@ -23,6 +23,7 @@ import type { WidgetComponentProps } from 'views/types';
 import type { MessageListResult } from 'views/components/widgets/MessageList';
 import type SwimlaneWidgetConfig from 'views/logic/widgets/SwimlaneWidgetConfig';
 import Tooltip from 'components/common/Tooltip';
+import useSwimlaneClickPopover from 'views/components/widgets/swimlane/useSwimlaneClickPopover';
 
 const LANE_HEIGHT = 36;
 const DOT_RADIUS = 5;
@@ -71,6 +72,7 @@ const SwimlaneVisualization = ({
   width,
 }: WidgetComponentProps<SwimlaneWidgetConfig, MessageListResult>) => {
   const theme = useTheme();
+  const { handleClick, popover } = useSwimlaneClickPopover();
   const { laneField, colorField, maxLanes } = config;
   const messages = data?.messages ?? [];
   const total = data?.total ?? 0;
@@ -137,6 +139,7 @@ const SwimlaneVisualization = ({
   const lanesHidden = data?.total !== undefined && allLanes.length === maxLanes;
 
   return (
+    <>
     <Wrapper>
       {truncated && (
         <Banner>
@@ -171,7 +174,8 @@ const SwimlaneVisualization = ({
                 dominantBaseline="middle"
                 fontSize="0.8em"
                 fill={theme.colors.text.secondary}
-                style={{ userSelect: 'none' }}>
+                style={{ userSelect: 'none', cursor: 'pointer' }}
+                onClick={(e) => handleClick(e, laneField, lane.key)}>
                 {lane.key.length > 22 ? `${lane.key.slice(0, 20)}…` : lane.key}
               </text>
 
@@ -187,6 +191,9 @@ const SwimlaneVisualization = ({
                   .filter(Boolean)
                   .join('\n');
 
+                const dotField = colorField && ev.colorValue ? colorField : laneField;
+                const dotValue = colorField && ev.colorValue ? ev.colorValue : lane.key;
+
                 return (
                   // eslint-disable-next-line react/no-array-index-key
                   <Tooltip key={j} label={<span style={{ whiteSpace: 'pre' }}>{label}</span>} withArrow position="top">
@@ -197,6 +204,7 @@ const SwimlaneVisualization = ({
                       fill={dotColor(ev.colorValue)}
                       opacity={0.85}
                       style={{ cursor: 'pointer' }}
+                      onClick={(e) => handleClick(e, dotField, dotValue)}
                     />
                   </Tooltip>
                 );
@@ -228,6 +236,8 @@ const SwimlaneVisualization = ({
         })}
       </svg>
     </Wrapper>
+    {popover}
+    </>
   );
 };
 
