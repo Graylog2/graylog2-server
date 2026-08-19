@@ -31,6 +31,7 @@ import type { ShapeName } from 'views/components/widgets/swimlane/swimlaneShapes
 import { buildShapeIndex, renderDot } from 'views/components/widgets/swimlane/swimlaneShapes';
 
 const LANE_HEIGHT = 36;
+const GROUP_HEADER_HEIGHT = 24;
 const DOT_RADIUS = 5;
 const LABEL_WIDTH = 160;
 const AXIS_HEIGHT = 24;
@@ -95,6 +96,10 @@ type Lane = {
   key: string;
   events: Array<LaneEvent>;
 };
+
+type RenderItem =
+  | { type: 'header'; primaryValue: string; primaryField: string; y: number }
+  | { type: 'lane'; lane: Lane; labelText: string; labelField: string; labelValue: string; y: number; rowIndex: number };
 
 const formatTs = (ts: number): string => new Date(ts).toISOString().replace('T', ' ').slice(0, 19);
 
@@ -191,6 +196,59 @@ const SwimlaneVisualization = ({
     return [...allLanes].sort((a, b) => sign * compare(a, b));
   }, [allLanes, laneSort, laneSortField, laneSortAscending]);
 
+  // Build flat render list — group headers + lane rows when multiple lane fields
+  const isGrouped = laneFields.length > 1;
+
+  const renderItems = useMemo((): RenderItem[] => {
+    if (!isGrouped) {
+      return displayLanes.map((lane, rowIndex) => ({
+        type: 'lane' as const,
+        lane,
+        labelText: lane.key,
+        labelField: laneFields[0],
+        labelValue: lane.key,
+        y: PADDING + rowIndex * LANE_HEIGHT,
+        rowIndex,
+      }));
+    }
+
+    const items: RenderItem[] = [];
+    const seenGroups = new Set<string>();
+    let y = PADDING;
+    let rowIndex = 0;
+
+    displayLanes.forEach((lane) => {
+      const parts = lane.key.split(' / ');
+      const primaryValue = parts[0];
+
+      if (!seenGroups.has(primaryValue)) {
+        seenGroups.add(primaryValue);
+        items.push({ type: 'header', primaryValue, primaryField: laneFields[0], y });
+        y += GROUP_HEADER_HEIGHT;
+      }
+
+      const subKey = parts.slice(1).join(' / ');
+      items.push({
+        type: 'lane',
+        lane,
+        labelText: subKey,
+        labelField: laneFields[laneFields.length - 1],
+        labelValue: parts[parts.length - 1],
+        y,
+        rowIndex,
+      });
+      y += LANE_HEIGHT;
+      rowIndex += 1;
+    });
+
+    return items;
+  }, [isGrouped, displayLanes, laneFields]);
+
+  const totalPlotH = renderItems.reduce(
+    (sum, item) => sum + (item.type === 'header' ? GROUP_HEADER_HEIGHT : LANE_HEIGHT),
+    0,
+  );
+
   // Data time range
   const { dataMinTs, dataMaxTs } = useMemo(() => {
     const allTs = allLanes.flatMap((l) => l.events.map((e) => e.ts));
@@ -218,8 +276,8 @@ const SwimlaneVisualization = ({
     return <EmptyState>No data. Check your search query and time range.</EmptyState>;
   }
 
-  const svgH = displayLanes.length * LANE_HEIGHT + AXIS_HEIGHT + PADDING;
-  const plotH = displayLanes.length * LANE_HEIGHT;
+  const svgH = totalPlotH + AXIS_HEIGHT + PADDING;
+  const plotH = totalPlotH;
   const truncated = total > messages.length;
   const lanesHidden = data?.total !== undefined && allLanes.length === maxLanes;
 
@@ -242,12 +300,33 @@ const SwimlaneVisualization = ({
           </ZoomBanner>
         )}
 
-        <svg ref={svgRef} width={svgWidth} height={svgH} style={{ flexShrink: 0, cursor: 'crosshair' }} {...mouseHandlers}>
-          {displayLanes.map((lane, i) => {
-            const y = PADDING + i * LANE_HEIGHT;
-            const isEven = i % 2 === 0;
-            const primaryField = laneFields[0];
-            const primaryValue = lane.key.split(' / ')[0];
+        <svg ref={svgRef} width={svgWidth} height={svgH} style={{ flexShrink: 0, cursor: 'col-resize' }} {...mouseHandlers}>
+          {renderItems.map((item) => {
+            if (item.type === 'header') {
+              return (
+                <g key={`header-${item.primaryValue}`}>
+                  <rect x={0} y={item.y} width={svgWidth} height={GROUP_HEADER_HEIGHT}
+                    fill={theme.colors.table.row.backgroundStriped} />
+                  <rect x={0} y={item.y} width={3} height={GROUP_HEADER_HEIGHT}
+                    fill={theme.colors.variant.info} />
+                  <text
+                    x={10}
+                    y={item.y + GROUP_HEADER_HEIGHT / 2}
+                    textAnchor="start"
+                    dominantBaseline="middle"
+                    fontSize="0.78em"
+                    fontWeight="600"
+                    fill={theme.colors.text.primary}
+                    style={{ userSelect: 'none', cursor: 'pointer' }}
+                    onClick={(e) => handleClick(e, item.primaryField, item.primaryValue)}>
+                    {item.primaryValue.length > 24 ? `${item.primaryValue.slice(0, 22)}…` : item.primaryValue}
+                  </text>
+                </g>
+              );
+            }
+
+            const { lane, labelText, labelField: itemLabelField, labelValue, y, rowIndex } = item;
+            const isEven = rowIndex % 2 === 0;
 
             return (
               <g key={lane.key}>
@@ -266,18 +345,17 @@ const SwimlaneVisualization = ({
                   fontSize="0.8em"
                   fill={theme.colors.text.secondary}
                   style={{ userSelect: 'none', cursor: 'pointer' }}
-                  onClick={(e) => handleClick(e, primaryField, primaryValue)}>
-                  {lane.key.length > 22 ? `${lane.key.slice(0, 20)}…` : lane.key}
+                  onClick={(e) => handleClick(e, itemLabelField, labelValue)}>
+                  {labelText.length > 22 ? `${labelText.slice(0, 20)}…` : labelText}
                 </text>
 
                 {lane.events.map((ev, j) => {
                   const cx = xOf(ev.ts);
-                  if (cx < LABEL_WIDTH - DOT_RADIUS || cx > width + DOT_RADIUS) return null;
+                  if (cx < LABEL_WIDTH - DOT_RADIUS || cx > svgWidth + DOT_RADIUS) return null;
                   const cy = y + LANE_HEIGHT / 2;
                   const fill = dotFill(ev.colorValue);
                   const shape = shapeField ? (shapeIndex.get(ev.shapeValue ?? '') ?? 'circle') : 'circle';
 
-                  // Tooltip content: lane fields + time + configured tooltip fields
                   const laneLines = laneFields.map((f, fi) => `${f}: ${lane.key.split(' / ')[fi] ?? '(unknown)'}`);
                   const timeLine = `time: ${formatTs(ev.ts)}`;
                   const extraLines = tooltipFields.length
@@ -288,7 +366,7 @@ const SwimlaneVisualization = ({
                   return (
                     // eslint-disable-next-line react/no-array-index-key
                     <Tooltip key={j} label={<span style={{ whiteSpace: 'pre' }}>{tooltipContent}</span>} withArrow position="top">
-                      <g style={{ cursor: isBrushing ? 'crosshair' : 'pointer' }}>
+                      <g style={{ cursor: isBrushing ? 'col-resize' : 'pointer' }}>
                         {renderDot(shape, {
                           cx,
                           cy,
@@ -320,7 +398,7 @@ const SwimlaneVisualization = ({
           {[0, 0.25, 0.5, 0.75, 1].map((fraction) => {
             const ts = viewMin + fraction * (viewMax - viewMin || 1);
             const cx = xOf(ts);
-            const axisY = PADDING + allLanes.length * LANE_HEIGHT;
+            const axisY = PADDING + totalPlotH;
 
             return (
               <g key={fraction}>
