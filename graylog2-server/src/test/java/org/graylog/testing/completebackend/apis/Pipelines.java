@@ -72,6 +72,21 @@ public class Pipelines {
                 .statusCode(200);
     }
 
+    public ValidatableResponse parse(String source) {
+        return parse("", "", source, HttpStatus.SC_OK);
+    }
+
+    public ValidatableResponse parse(String title, String description, String source, int expectedStatus) {
+        return given()
+                .spec(api.requestSpecification())
+                .when()
+                .body(new CreatePipelineRequest(title, description, source))
+                .post(URL_PREFIX + "/parse")
+                .then()
+                .log().ifError()
+                .statusCode(expectedStatus);
+    }
+
     public ValidatableResponse delete(String id) {
         return api.delete(url(id), HttpStatus.SC_NO_CONTENT);
     }
