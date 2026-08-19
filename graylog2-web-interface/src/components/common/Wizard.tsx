@@ -273,6 +273,12 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{
   `,
 );
 
+/**
+ * Lets a consumer address the list of steps, which used to be possible through the `nav-pills` class
+ * react-bootstrap put on it.
+ */
+export const WIZARD_STEP_LIST_CLASS = 'wizard-step-list';
+
 // Replaces what react-bootstrap's `NavItem` used to render. The `active` and `disabled` classes are
 // the hooks `StyledNav` styles, and the button replaces the anchor react-bootstrap rendered, which
 // Bootstrap's still-loaded base stylesheet would style as a link.
@@ -460,7 +466,7 @@ class Wizard<StepKey extends BaseStepKey> extends React.Component<Props<StepKey>
 
     return (
       <SubnavigationCol md={2}>
-        <StyledNav $stacked $style={style} $justified={justified}>
+        <StyledNav className={WIZARD_STEP_LIST_CLASS} $stacked $style={style} $justified={justified}>
           {steps.map((navItem) => (
             <StepItem
               key={navItem.key}
@@ -524,7 +530,7 @@ class Wizard<StepKey extends BaseStepKey> extends React.Component<Props<StepKey>
             </HorizontalButtonToolbar>
           </div>
         )}
-        <StyledNav $style={style} $justified={justified}>
+        <StyledNav className={WIZARD_STEP_LIST_CLASS} $style={style} $justified={justified}>
           {steps.map((navItem) => (
             <StepItem
               key={navItem.key}
