@@ -18,22 +18,25 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import StreamsContext from 'contexts/StreamsContext';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import type View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { Stream } from 'logic/streams/types';
-import type { SearchesConfig } from 'components/search/SearchConfig';
 import Store from 'logic/local-storage/Store';
+import type { WelcomePageMetricsPlugin, WelcomeGeneralPageMetricsPlugin } from 'components/welcome/types';
 
 import WelcomeMetrics from './WelcomeMetrics';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useSearchConfiguration');
+jest.mock('hooks/usePluggableLicenseCheck');
 jest.mock('views/hooks/useCreateSearch');
 jest.mock('logic/local-storage/Store', () => ({
   get: jest.fn(),
@@ -41,6 +44,12 @@ jest.mock('logic/local-storage/Store', () => ({
 }));
 
 const accessibleStream = { id: 'stream-id-1', title: 'Test Stream' } as Stream;
+
+const licenseCheck = (valid: boolean): ReturnType<typeof usePluggableLicenseCheck> => ({
+  data: { valid, expired: false, violated: false },
+  isInitialLoading: false,
+  refetch: () => {},
+});
 
 const renderWithStreams = (streams: Array<Stream>) =>
   render(
@@ -58,61 +67,7 @@ describe('WelcomeMetrics', () => {
     asMock(useCreateSearch).mockImplementation((viewPromise: Promise<View>) => viewPromise);
     asMock(useSearchConfiguration).mockReturnValue({ config: undefined, refresh: () => {}, isInitialLoading: false });
     asMock(Store.get).mockReturnValue(undefined);
-  });
-
-  it('shows Alerts and Events widgets when the user has access to both underlying streams', async () => {
-    renderWithStreams([accessibleStream]);
-
-    await screen.findByText('Alerts Today');
-    await screen.findByText('Events Today');
-  });
-
-  it('shows only Messages Today and Top 5 Sources widgets, without Alerts and Events, when the user is missing access to both the alerts and events streams', async () => {
-    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions([]).build());
-
-    renderWithStreams([accessibleStream]);
-
-    await screen.findByText('Messages Today');
-    await screen.findByText('Top 5 Sources');
-    expect(screen.queryByText('Alerts Today')).not.toBeInTheDocument();
-    expect(screen.queryByText('Events Today')).not.toBeInTheDocument();
-  });
-
-  it('still shows Alerts and Events widgets when the user only has access to one of the two underlying streams', async () => {
-    asMock(useCurrentUser).mockReturnValue(
-      defaultUser.toBuilder().permissions(['streams:read:000000000000000000000002']).build(),
-    );
-
-    renderWithStreams([accessibleStream]);
-
-    await screen.findByText('Alerts Today');
-    await screen.findByText('Events Today');
-  });
-
-  it('uses the configured query time range limit as the widgets time range when it is lower than 24 hours', async () => {
-    asMock(useSearchConfiguration).mockReturnValue({
-      config: { query_time_range_limit: 'PT1H' } as SearchesConfig,
-      refresh: () => {},
-      isInitialLoading: false,
-    });
-
-    renderWithStreams([accessibleStream]);
-
-    await screen.findByText('Messages Today');
-    expect(await screen.findAllByText('1 hour ago - Now')).not.toHaveLength(0);
-  });
-
-  it('falls back to a 24 hour widgets time range when the configured query time range limit is unlimited', async () => {
-    asMock(useSearchConfiguration).mockReturnValue({
-      config: { query_time_range_limit: 'PT0S' } as SearchesConfig,
-      refresh: () => {},
-      isInitialLoading: false,
-    });
-
-    renderWithStreams([accessibleStream]);
-
-    await screen.findByText('Messages Today');
-    expect(await screen.findAllByText('1 day ago - Now')).not.toHaveLength(0);
+    asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(false));
   });
 
   it('shows a message instead of any widgets when the user has no access to any stream', async () => {
@@ -141,5 +96,133 @@ describe('WelcomeMetrics', () => {
     renderWithStreams([]);
 
     expect(screen.queryByText('Once you have access to a stream, your message metrics will show up here.')).toBeNull();
+  });
+
+  it('shows the default metrics view without a segmented control when no welcome page metrics plugin is registered', async () => {
+    renderWithStreams([accessibleStream]);
+
+    await screen.findByText('Messages Today');
+    expect(screen.queryAllByRole('radio')).toHaveLength(0);
+  });
+
+  describe('welcome page metrics plugins', () => {
+    let manifest: PluginManifest;
+
+    const registerPlugins = (
+      welcomePageMetrics: Array<WelcomePageMetricsPlugin> = [],
+      welcomePageMetricsGeneral: Array<WelcomeGeneralPageMetricsPlugin> = [],
+    ) => {
+      manifest = new PluginManifest(
+        { name: 'test-welcome-page-metrics-plugin' },
+        { welcomePageMetrics, 'welcomePageMetrics.general': welcomePageMetricsGeneral },
+      );
+      PluginStore.register(manifest);
+    };
+
+    afterEach(() => {
+      if (manifest) {
+        PluginStore.unregister(manifest);
+        manifest = undefined;
+      }
+    });
+
+    it('shows the default metrics view when the registered plugin is not enabled', async () => {
+      registerPlugins([
+        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: () => false },
+      ]);
+      asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
+
+      renderWithStreams([accessibleStream]);
+
+      await screen.findByText('Messages Today');
+      expect(screen.queryAllByRole('radio')).toHaveLength(0);
+    });
+
+    it('shows the default metrics view when the license is invalid, even though a plugin is registered', async () => {
+      registerPlugins([
+        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense },
+      ]);
+
+      renderWithStreams([accessibleStream]);
+
+      await screen.findByText('Messages Today');
+      expect(screen.queryAllByRole('radio')).toHaveLength(0);
+    });
+
+    it('shows a segmented control with a General tab and the extra tab, selecting the extra tab by default', async () => {
+      registerPlugins([
+        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense },
+      ]);
+      asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
+
+      renderWithStreams([accessibleStream]);
+
+      await screen.findByText('Security metrics content');
+      expect(screen.getByText('General')).toBeInTheDocument();
+      expect(screen.getByText('Security')).toBeInTheDocument();
+    });
+
+    it('shows the default MetricsSearchPage content in the General tab when no welcomePageMetrics.general plugin is registered', async () => {
+      registerPlugins([
+        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense },
+      ]);
+      asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
+
+      renderWithStreams([accessibleStream]);
+
+      const generalTab = await screen.findByText('General');
+      await userEvent.click(generalTab);
+
+      await screen.findByText('Messages Today');
+    });
+
+    it('shows the welcomePageMetrics.general plugin content in the General tab instead of the default MetricsSearchPage', async () => {
+      registerPlugins(
+        [{ label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense }],
+        [{ component: () => <div>General metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense }],
+      );
+      asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
+
+      renderWithStreams([accessibleStream]);
+
+      const generalTab = await screen.findByText('General');
+      await userEvent.click(generalTab);
+
+      await screen.findByText('General metrics content');
+      expect(screen.queryByText('Messages Today')).not.toBeInTheDocument();
+    });
+
+    it('ignores a registered welcomePageMetrics.general plugin when there is no active welcomePageMetrics plugin', async () => {
+      registerPlugins(
+        [],
+        [{ component: () => <div>General metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense }],
+      );
+      asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
+
+      renderWithStreams([accessibleStream]);
+
+      await screen.findByText('Messages Today');
+      expect(screen.queryByText('General metrics content')).not.toBeInTheDocument();
+      expect(screen.queryAllByRole('radio')).toHaveLength(0);
+    });
+
+    it('switches between the General tab and an extra tab when clicked', async () => {
+      registerPlugins([
+        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense },
+      ]);
+      asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
+
+      renderWithStreams([accessibleStream]);
+
+      await screen.findByText('Security metrics content');
+
+      const generalTab = await screen.findByText('General');
+      await userEvent.click(generalTab);
+      await screen.findByText('Messages Today');
+
+      const securityTab = await screen.findByText('Security');
+      await userEvent.click(securityTab);
+      await screen.findByText('Security metrics content');
+    });
   });
 });

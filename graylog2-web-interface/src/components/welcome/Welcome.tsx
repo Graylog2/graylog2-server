@@ -41,7 +41,7 @@ const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
-const SectionHeadline = styled.h2(
+export const SectionHeadline = styled.h2(
   ({ theme }) => `
     margin: ${theme.spacings.lg} 0 ${theme.spacings.xs};
   `,

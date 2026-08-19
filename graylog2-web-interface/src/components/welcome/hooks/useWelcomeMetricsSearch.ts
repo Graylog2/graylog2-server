@@ -44,11 +44,6 @@ import { TIMESTAMP_FIELD } from 'views/Constants';
 
 export const DEFAULT_TIME_RANGE_SECONDS = 86400;
 const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
-const MESSAGES_TODAY_LINK = '/search?q=&rangetype=relative&from=300';
-const ALERTS_LINK =
-  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dtrue';
-const EVENTS_LINK =
-  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dfalse';
 
 const messagesTodayLink = (timeRange: RelativeTimeRangeWithEnd) =>
   new URI(Routes.SEARCH).addQuery({ q: '', ...timeRangeToQueryParameter(timeRange) }).toString();
@@ -113,11 +108,15 @@ const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
     .build(),
 });
 
-const buildViewState = (permittedAlertsEventsStreams: Array<string>, timeRange: RelativeTimeRangeWithEnd) => {
+const buildViewState = (
+  permittedAlertsEventsStreams: Array<string>,
+  timeRange: RelativeTimeRangeWithEnd,
+  forceSimplifiedLayout: boolean,
+) => {
   const messages = numberWidget({ title: 'Messages Today', timeRange, link: messagesTodayLink(timeRange) });
   const sources = topSourcesWidget(timeRange);
 
-  if (permittedAlertsEventsStreams.length === 0) {
+  if (permittedAlertsEventsStreams.length === 0 || forceSimplifiedLayout) {
     const entries = [messages, sources];
 
     return ViewState.create()
@@ -163,21 +162,28 @@ const buildViewState = (permittedAlertsEventsStreams: Array<string>, timeRange: 
     .build();
 };
 
-const buildView = (permittedAlertsEventsStreams: Array<string>, timeRange: RelativeTimeRangeWithEnd) => {
+const buildView = (
+  permittedAlertsEventsStreams: Array<string>,
+  timeRange: RelativeTimeRangeWithEnd,
+  forceSimplifiedLayout: boolean,
+) => {
   const query = QueryGenerator(undefined, undefined, undefined, timeRange);
   const search = Search.create().toBuilder().queries([query]).build();
   const view = View.create()
     .toBuilder()
     .newId()
     .type(View.Type.Dashboard)
-    .state({ [query.id]: buildViewState(permittedAlertsEventsStreams, timeRange) })
+    .state({ [query.id]: buildViewState(permittedAlertsEventsStreams, timeRange, forceSimplifiedLayout) })
     .search(search)
     .build();
 
   return Promise.resolve(UpdateSearchForWidgets(view));
 };
 
-const useWelcomeMetricsSearch = (rangeSeconds: number = DEFAULT_TIME_RANGE_SECONDS) => {
+const useWelcomeMetricsSearch = (
+  rangeSeconds: number = DEFAULT_TIME_RANGE_SECONDS,
+  forceSimplifiedLayout: boolean = false,
+) => {
   const { isPermitted } = usePermissions();
   const permittedAlertsEventsStreams = useMemo(
     () => ALERTS_EVENTS_STREAMS.filter((streamId) => isPermitted(`streams:read:${streamId}`)),
@@ -185,8 +191,8 @@ const useWelcomeMetricsSearch = (rangeSeconds: number = DEFAULT_TIME_RANGE_SECON
   );
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
   const viewPromise = useMemo(
-    () => buildView(permittedAlertsEventsStreams, timeRange),
-    [permittedAlertsEventsStreams, timeRange],
+    () => buildView(permittedAlertsEventsStreams, timeRange, forceSimplifiedLayout),
+    [permittedAlertsEventsStreams, timeRange, forceSimplifiedLayout],
   );
 
   return useCreateSearch(viewPromise);
