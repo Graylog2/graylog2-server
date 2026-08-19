@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
@@ -203,13 +204,24 @@ public class MoreSearch {
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timeRange, Set<String> eventStreams,
                                        String filterString, SourceStreamFilter sourceStreamFilter,
                                        String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+        return aggregateSlicesForColumn(queryString, timeRange, eventStreams, filterString, sourceStreamFilter,
+                slicingColumn, null, meta, maxBuckets);
+    }
+
+    /**
+     * @param bucketPattern optional Lucene regular expression the returned slice values must match,
+     *                      see {@link MoreSearchAdapter#aggregateSlicesForColumn}
+     */
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timeRange, Set<String> eventStreams,
+                                       String filterString, SourceStreamFilter sourceStreamFilter,
+                                       String slicingColumn, @Nullable String bucketPattern, Map<String, Object> meta, int maxBuckets) {
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return List.of();
         }
         // TODO: add extra filters if necessary
         return moreSearchAdapter.aggregateSlicesForColumn(queryString, timeRange, affectedIndices, eventStreams,
-                filterString, sourceStreamFilter, Map.of(), slicingColumn, meta, maxBuckets);
+                filterString, sourceStreamFilter, Map.of(), slicingColumn, bucketPattern, meta, maxBuckets);
     }
 
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timeRange, Set<String> eventStreams,
