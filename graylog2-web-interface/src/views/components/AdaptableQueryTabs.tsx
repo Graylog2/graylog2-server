@@ -178,6 +178,12 @@ const QueryTabLink = styled.a`
   &:focus {
     text-decoration: none;
   }
+
+  /* Bootstrap rings a focused anchor whichever way it was focused, so clicking a tab leaves a ring
+     behind. Reaching it by keyboard still shows one. */
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
 `;
 
 type QueryTabProps = {
