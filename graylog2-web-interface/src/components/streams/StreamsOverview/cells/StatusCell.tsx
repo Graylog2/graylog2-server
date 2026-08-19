@@ -15,37 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 import { useCallback } from 'react';
 
 import { isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { Icon } from 'components/common';
 import { Label } from 'components/bootstrap';
 import useStreamMutations from 'hooks/useStreamMutations';
 import type { Stream } from 'logic/streams/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-
-const InnerContainer = styled.span`
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-`;
-
-const Spacer = styled.div`
-  border-left: 1px solid currentColor;
-  height: 0.8em;
-`;
-
-const _title = (disabled: boolean, disabledChange: boolean, description: string) => {
-  if (disabledChange) {
-    return description;
-  }
-
-  return disabled ? 'Start stream' : 'Pause stream';
-};
 
 type Props = {
   stream: Stream;
@@ -58,8 +36,13 @@ const StatusCell = ({ stream }: Props) => {
     `streams:edit:${stream.id}`,
   ]);
   const disableChange = stream.is_default || !stream.is_editable || !userHasPermissions;
-  const description = stream.disabled ? 'Paused' : 'Running';
-  const title = _title(stream.disabled, disableChange, description);
+  const title = disableChange
+    ? stream.disabled
+      ? 'Paused'
+      : 'Running'
+    : stream.disabled
+      ? 'Start stream'
+      : 'Pause stream';
   const sendTelemetry = useSendTelemetry();
   const { pauseStream, resumeStream } = useStreamMutations();
 
@@ -85,19 +68,12 @@ const StatusCell = ({ stream }: Props) => {
 
   return (
     <Label
-      bsStyle={stream.disabled ? 'warning' : 'success'}
+      status={{ color: stream.disabled ? 'warning' : 'success', variant: 'light', dot: true }}
       onClick={disableChange ? undefined : toggleStreamStatus}
       title={title}
-      aria-label={title}>
-      <InnerContainer>
-        {stream.disabled ? 'Paused' : 'Running'}
-        {!disableChange && (
-          <>
-            <Spacer />
-            <Icon name={stream.disabled ? 'play_arrow' : 'pause'} size="xs" />
-          </>
-        )}
-      </InnerContainer>
+      aria-label={title}
+      rightIcon={disableChange ? undefined : stream.disabled ? 'play_arrow' : 'pause'}>
+      {stream.disabled ? 'Paused' : 'Running'}
     </Label>
   );
 };
