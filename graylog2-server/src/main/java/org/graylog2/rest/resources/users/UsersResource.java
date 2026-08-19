@@ -573,7 +573,7 @@ public class UsersResource extends RestResource {
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
-            checkAdminRoleForServiceAccount(cr, user);
+            validateAdminRoleNotGrantedToServiceAccount(cr, user);
             privilegeEscalationGuard.validateRolePermissions(cr.roles(), userContext);
             setUserRoles(cr.roles(), user, userContext);
         }
@@ -632,7 +632,7 @@ public class UsersResource extends RestResource {
         return roles != null && roles.stream().anyMatch(RoleServiceImpl.ADMIN_ROLENAME::equalsIgnoreCase);
     }
 
-    private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
+    private void validateAdminRoleNotGrantedToServiceAccount(ChangeUserRequest cr, User user) {
         if (user.isServiceAccount() && rolesContainAdmin(cr.roles())) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
