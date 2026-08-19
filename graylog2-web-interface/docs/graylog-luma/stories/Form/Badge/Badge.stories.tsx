@@ -18,11 +18,11 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 import { Badge } from 'components/bootstrap';
-import type { StatusColor, StatusVariant } from 'components/bootstrap/types';
+import type { StatusColor, StatusVariant, BsSize } from 'components/bootstrap/types';
 
 const COLORS: StatusColor[] = ['primary', 'danger', 'success', 'warning', 'gray'];
 const VARIANTS: StatusVariant[] = ['light', 'filled'];
-const SIZES = ['sm', 'md', 'lg'] as const;
+const SIZES: BsSize[] = ['sm', 'md', 'lg'];
 
 const meta = {
   title: 'Components/Badges/Badge',
@@ -51,7 +51,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     status: { control: false },
-    bsSize: {
+    size: {
       control: { type: 'select' },
       options: ['xs', 'sm', 'md', 'lg'],
     },
@@ -60,6 +60,50 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+type PlaygroundArgs = {
+  text: string;
+  color: StatusColor;
+  variant: StatusVariant;
+  dot: boolean;
+  leftIcon: string;
+  rightIcon: string;
+  clickable: boolean;
+  size: BsSize;
+};
+
+export const Playground: StoryObj<Meta<PlaygroundArgs>> = {
+  argTypes: {
+    text: { control: 'text' },
+    color: { control: { type: 'select' }, options: COLORS },
+    variant: { control: { type: 'select' }, options: VARIANTS },
+    dot: { control: 'boolean', description: 'Shows a color dot as the left section (overrides leftIcon)' },
+    leftIcon: { control: 'text', description: 'Icon name shown before the label, e.g. "play_arrow" — ignored when dot is on' },
+    rightIcon: { control: 'text', description: 'Icon name shown after the label, e.g. "pause"' },
+    clickable: { control: 'boolean', description: 'Renders the badge as a real, keyboard-accessible button and fires onClick' },
+    size: { control: { type: 'select' }, options: ['xs', 'sm', 'md', 'lg'] },
+  },
+  args: {
+    text: 'Running',
+    color: 'success',
+    variant: 'light',
+    dot: true,
+    leftIcon: '',
+    rightIcon: 'pause',
+    clickable: true,
+    size: 'md',
+  },
+  render: ({ text, color, variant, dot, leftIcon, rightIcon, clickable, size }) => (
+    <Badge
+      status={{ color, variant, dot }}
+      leftIcon={leftIcon || undefined}
+      rightIcon={rightIcon || undefined}
+      size={size}
+      onClick={clickable ? () => {} : undefined}>
+      {text}
+    </Badge>
+  ),
+};
 
 export const Light: Story = {
   args: {
@@ -119,7 +163,7 @@ export const Sizes: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
       {SIZES.map((size) => (
-        <Badge key={size} bsSize={size} status={{ color: 'primary', variant: 'filled', dot: true }}>
+        <Badge key={size} size={size} status={{ color: 'primary', variant: 'filled', dot: true }}>
           {size}
         </Badge>
       ))}
