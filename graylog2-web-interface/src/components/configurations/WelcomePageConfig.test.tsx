@@ -24,7 +24,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import WelcomePageConfig from './WelcomePageConfig';
 
-const mockConfig = { disable_queries: false };
+const mockConfig = { disable_metrics: false };
 
 const mockList = jest.fn().mockResolvedValue(undefined);
 const mockUpdate = jest.fn().mockResolvedValue(undefined);
@@ -71,7 +71,7 @@ describe('WelcomePageConfig', () => {
 
     await waitFor(() => {
       expect(mockUpdate).toHaveBeenCalledWith('org.graylog2.configuration.WelcomePageConfiguration', {
-        disable_queries: true,
+        disable_metrics: true,
       });
     });
   });

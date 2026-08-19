@@ -36,9 +36,11 @@ const useWelcomePageConfig = (): WelcomePageConfig => {
     ConfigurationsActions.list(ConfigurationType.WELCOME_PAGE_CONFIG);
   }, []);
 
-  const disableQueries = configuration?.disable_queries;
+  const disableMetricsPreference = configuration?.disable_metrics;
 
-  return { widgetsEnabled: disableQueries === undefined ? ENABLE_QUERIES_BY_DEFAULT : !disableQueries };
+  return {
+    widgetsEnabled: disableMetricsPreference === undefined ? ENABLE_QUERIES_BY_DEFAULT : !disableMetricsPreference,
+  };
 };
 
 export default useWelcomePageConfig;

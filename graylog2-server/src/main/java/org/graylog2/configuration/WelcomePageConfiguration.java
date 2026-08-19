@@ -16,6 +16,6 @@
  */
 package org.graylog2.configuration;
 
-public record WelcomePageConfiguration(boolean disableQueries) {
+public record WelcomePageConfiguration(boolean disableMetrics) {
     public static final WelcomePageConfiguration DEFAULT = new WelcomePageConfiguration(false);
 }

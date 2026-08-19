@@ -53,7 +53,7 @@ const LabelSpan = styled.span(
 );
 
 const configType = ConfigurationType.WELCOME_PAGE_CONFIG;
-const DEFAULT_CONFIG: WelcomePageConfigType = { disable_queries: false };
+const DEFAULT_CONFIG: WelcomePageConfigType = { disable_metrics: false };
 
 type FormValues = { queries_enabled: boolean };
 
@@ -71,7 +71,7 @@ const WelcomePageConfig = () => {
       const config = getConfig(configType, configuration) ?? DEFAULT_CONFIG;
 
       setViewConfig(config);
-      setFormConfig({ queries_enabled: !config.disable_queries });
+      setFormConfig({ queries_enabled: !config.disable_metrics });
     });
   }, [configuration]);
 
@@ -82,14 +82,14 @@ const WelcomePageConfig = () => {
       app_action_value: 'configuration-save',
     });
 
-    ConfigurationsActions.update(configType, { disable_queries: !values.queries_enabled }).then(() => {
+    ConfigurationsActions.update(configType, { disable_metrics: !values.queries_enabled }).then(() => {
       setShowModal(false);
     });
   };
 
   const resetConfig = () => {
     setShowModal(false);
-    setFormConfig({ queries_enabled: !viewConfig.disable_queries });
+    setFormConfig({ queries_enabled: !viewConfig.disable_metrics });
   };
 
   return (
@@ -107,7 +107,7 @@ const WelcomePageConfig = () => {
         <>
           <StyledDefList>
             <dt>Welcome page metrics:</dt>
-            <dd>{viewConfig.disable_queries ? 'Disabled' : 'Enabled'}</dd>
+            <dd>{viewConfig.disable_metrics ? 'Disabled' : 'Enabled'}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">

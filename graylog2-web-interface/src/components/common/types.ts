@@ -23,5 +23,5 @@ export type MarkdownConfigType = {
 };
 
 export type WelcomePageConfigType = {
-  disable_queries: boolean;
+  disable_metrics: boolean;
 };
