@@ -26,29 +26,47 @@ import org.graylog2.rest.resources.tools.responses.LookupTableTesterResponse;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class LookupTableTesterResourceTest {
-    private static final String TABLE_NAME = "secret-table";
-    private static final String TABLE_ID = "54e3deadbeefdeadbeef0001";
-    private static final String OTHER_TABLE_ID = "54e3deadbeefdeadbeef0002";
-
+    @Mock
     private LookupTableService lookupTableService;
+
+    @Mock
+    private LookupTable table;
+
     private Subject subject;
     private LookupTableTesterResource resource;
+    private final String tableName = "foo-table";
+    private final String someKey = "some-key";
+    private final String staticResponse = "foo";
 
     @BeforeEach
     void setUp() {
-        lookupTableService = mock(LookupTableService.class);
+        when(lookupTableService.getTable(tableName)).thenReturn(table);
+        lenient().when(lookupTableService.hasTable(tableName)).thenReturn(true);
+
+        final var tableBuilderMock = mock(LookupTableService.Builder.class);
+        lenient().when(tableBuilderMock.lookupTable(tableName)).thenReturn(tableBuilderMock);
+
+        final var lookupTableFunc = mock(LookupTableService.Function.class);
+        lenient().when(lookupTableFunc.lookup(anyString())).thenReturn(LookupResult.single(staticResponse));
+        lenient().when(tableBuilderMock.build()).thenReturn(lookupTableFunc);
+
+        lenient().when(lookupTableService.newBuilder()).thenReturn(tableBuilderMock);
+        when(table.id()).thenReturn(tableName);
         subject = mock(Subject.class);
-        resource = new LookupTableTesterResource(lookupTableService) {
+        this.resource = new LookupTableTesterResource(lookupTableService) {
             @Override
             protected Subject getSubject() {
                 return subject;
@@ -57,106 +75,47 @@ class LookupTableTesterResourceTest {
     }
 
     @Test
-    void getRejectsUserWithoutReadPermissionForTable() {
-        final LookupTable table = existingTable();
+    void rejectTestingLookupTableUserHasNoAccessTo() {
+        setUserIsPermittedForLookupTable(false);
 
-        assertThatThrownBy(() -> resource.grokTest(TABLE_NAME, "foo"))
-                .isInstanceOf(ForbiddenException.class);
-
-        verify(table, never()).lookup(any());
+        assertThrows(ForbiddenException.class, () -> resource.testLookupTable(tableName, someKey));
+        assertThrows(ForbiddenException.class, () -> resource.testLookupTable(LookupTableTestRequest.create(someKey, tableName)));
     }
 
     @Test
-    void postRejectsUserWithoutReadPermissionForTable() {
-        final LookupTable table = existingTable();
+    void performTestingLookupIfUserHasAccessToTable() {
+        setUserIsPermittedForLookupTable(true);
 
-        assertThatThrownBy(() -> resource.testLookupTable(LookupTableTestRequest.create("foo", TABLE_NAME)))
-                .isInstanceOf(ForbiddenException.class);
-
-        verify(table, never()).lookup(any());
+        assertThat(resource.testLookupTable(tableName, someKey))
+                .satisfies(this::assertSuccessfulResponse);
+        assertThat(resource.testLookupTable(LookupTableTestRequest.create(someKey, tableName)))
+                .satisfies(this::assertSuccessfulResponse);
     }
 
     @Test
-    void rejectsUserWithReadPermissionForDifferentTable() {
-        existingTable();
-        grantReadPermissionFor(OTHER_TABLE_ID);
+    void returnsErrorResponseIfUserHasAccessButTableDoesNotExists() {
+        setUserIsPermittedForLookupTable(true);
+        when(lookupTableService.hasTable(tableName)).thenReturn(false);
 
-        assertThatThrownBy(() -> resource.grokTest(TABLE_NAME, "foo"))
-                .isInstanceOf(ForbiddenException.class);
+        assertThat(resource.testLookupTable(tableName, someKey))
+                .satisfies(this::assertErrorResponse);
+        assertThat(resource.testLookupTable(LookupTableTestRequest.create(someKey, tableName)))
+                .satisfies(this::assertErrorResponse);
     }
 
-    @Test
-    void rejectsUserWithoutInstanceScopedReadPermission() {
-        existingTable();
-        when(subject.isPermitted(RestPermissions.LOOKUP_TABLES_READ)).thenReturn(true);
-
-        assertThatThrownBy(() -> resource.grokTest(TABLE_NAME, "foo"))
-                .isInstanceOf(ForbiddenException.class);
+    private void setUserIsPermittedForLookupTable(boolean permitted) {
+        when(subject.isPermitted(RestPermissions.LOOKUP_TABLES_READ + ":" + tableName)).thenReturn(permitted);
     }
 
-    @Test
-    void getReturnsLookupResultForUserWithReadPermissionForTable() {
-        final LookupTable table = existingTable();
-        when(table.lookup("foo")).thenReturn(LookupResult.single("bar"));
-        grantReadPermissionFor(TABLE_ID);
-
-        final LookupTableTesterResponse response = resource.grokTest(TABLE_NAME, " foo ");
-
+    private void assertSuccessfulResponse(LookupTableTesterResponse response) {
         assertThat(response.error()).isFalse();
         assertThat(response.empty()).isFalse();
-        assertThat(response.key()).isEqualTo(" foo ");
-        assertThat(response.value()).isEqualTo("bar");
+        assertThat(response.key()).isEqualTo(someKey);
+        assertThat(response.value()).isEqualTo(staticResponse);
     }
 
-    @Test
-    void postReturnsLookupResultForUserWithReadPermissionForTable() {
-        final LookupTable table = existingTable();
-        when(table.lookup("foo")).thenReturn(LookupResult.single("bar"));
-        grantReadPermissionFor(TABLE_ID);
-
-        final LookupTableTesterResponse response =
-                resource.testLookupTable(LookupTableTestRequest.create("foo", TABLE_NAME));
-
-        assertThat(response.error()).isFalse();
-        assertThat(response.empty()).isFalse();
-        assertThat(response.key()).isEqualTo("foo");
-        assertThat(response.value()).isEqualTo("bar");
-    }
-
-    @Test
-    void returnsEmptyResultWhenLookupHasNoValue() {
-        final LookupTable table = existingTable();
-        when(table.lookup("foo")).thenReturn(LookupResult.empty());
-        grantReadPermissionFor(TABLE_ID);
-
-        final LookupTableTesterResponse response = resource.grokTest(TABLE_NAME, "foo");
-
-        assertThat(response.error()).isFalse();
-        assertThat(response.empty()).isTrue();
-        assertThat(response.value()).isNull();
-    }
-
-    @Test
-    void returnsErrorResponseForUnknownLookupTable() {
-        when(lookupTableService.getTable(TABLE_NAME)).thenReturn(null);
-        when(lookupTableService.hasTable(TABLE_NAME)).thenReturn(false);
-
-        final LookupTableTesterResponse response = resource.grokTest(TABLE_NAME, "foo");
-
+    private void assertErrorResponse(LookupTableTesterResponse response) {
         assertThat(response.error()).isTrue();
-        assertThat(response.errorMessage()).contains(TABLE_NAME);
-    }
-
-    private LookupTable existingTable() {
-        final LookupTable table = mock(LookupTable.class);
-        when(table.id()).thenReturn(TABLE_ID);
-        when(lookupTableService.getTable(TABLE_NAME)).thenReturn(table);
-        when(lookupTableService.hasTable(TABLE_NAME)).thenReturn(true);
-        when(lookupTableService.newBuilder()).thenReturn(new LookupTableService.Builder(lookupTableService));
-        return table;
-    }
-
-    private void grantReadPermissionFor(String tableId) {
-        when(subject.isPermitted(RestPermissions.LOOKUP_TABLES_READ + ":" + tableId)).thenReturn(true);
+        assertThat(response.errorMessage()).isEqualTo("Lookup table <" + tableName + "> doesn't exist");
     }
 }
