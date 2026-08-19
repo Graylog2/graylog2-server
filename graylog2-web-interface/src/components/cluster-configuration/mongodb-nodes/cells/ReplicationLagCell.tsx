@@ -92,7 +92,7 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
   return (
     <MetricsColumn>
       <MetricsRow>
-        <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs" title={exactValueTitle}>
+        <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} size="xs" title={exactValueTitle}>
           {formatted}
         </Label>
       </MetricsRow>

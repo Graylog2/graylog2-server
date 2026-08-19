@@ -35,7 +35,7 @@ const LoadBalancerStatusCell = ({ node }: Props) => {
   return (
     <MetricsColumn>
       <MetricsRow>
-        <Label bsStyle={status === 'ALIVE' ? 'success' : 'warning'} bsSize="xs" aria-label={`Load balancer ${status}`}>
+        <Label bsStyle={status === 'ALIVE' ? 'success' : 'warning'} size="xs" aria-label={`Load balancer ${status}`}>
           {status}
         </Label>
       </MetricsRow>

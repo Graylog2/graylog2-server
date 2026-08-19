@@ -32,12 +32,12 @@ const NodeIdentityCell = ({ node }: { node: DataNodeInformation }) => (
   <td>
     <div>
       {node?.hostname}&nbsp;
-      <Label bsStyle={isDataNodeAvailable(node) ? 'success' : 'warning'} bsSize="xs">
+      <Label bsStyle={isDataNodeAvailable(node) ? 'success' : 'warning'} size="xs">
         {node?.data_node_status}
       </Label>
       &nbsp;
       {node?.manager_node && (
-        <Label bsStyle="info" bsSize="xs">
+        <Label bsStyle="info" size="xs">
           manager
         </Label>
       )}
@@ -94,7 +94,7 @@ const DataNodeUpgradeNodes = ({ outdatedNodes, upToDateNodes, upgradedListRef, o
                   <i>{node?.datanode_version}</i>
                 </td>
                 <td align="right">
-                  <Label bsStyle="success" bsSize="xs">
+                  <Label bsStyle="success" size="xs">
                     Upgraded <Icon name="check" />
                   </Label>
                 </td>

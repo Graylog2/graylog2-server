@@ -82,7 +82,7 @@ const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick = undefined }
             <td>
               {d.deprecated && (
                 <span>
-                  <Label bsStyle="warning" bsSize="xs">
+                  <Label bsStyle="warning" size="xs">
                     Deprecated
                   </Label>
                   &nbsp;

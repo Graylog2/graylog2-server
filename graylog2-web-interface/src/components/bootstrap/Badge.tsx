@@ -94,7 +94,6 @@ const Dot = styled.span<{ $color: string; $size: SupportedMantineSize }>(
 
 type Props = React.PropsWithChildren<{
   'aria-label'?: string;
-  bsSize?: BsSize;
   bsStyle?: ColorVariant;
   className?: string;
   'data-testid'?: string;
@@ -104,6 +103,7 @@ type Props = React.PropsWithChildren<{
   onMouseLeave?: React.MouseEventHandler<HTMLElement>;
   rightIcon?: IconName;
   role?: string;
+  size?: BsSize;
   status?: { color: StatusColor; variant: StatusVariant; dot?: boolean };
   style?: React.CSSProperties;
   title?: string;
@@ -123,16 +123,16 @@ const Badge = (
     onMouseLeave = undefined,
     rightIcon = undefined,
     role = undefined,
+    size = 'md',
     status = undefined,
     style = undefined,
     title = undefined,
-    bsSize = 'md',
     uppercase = false,
   }: Props,
   ref: React.ForwardedRef<HTMLElement>,
 ) => {
   const theme = useTheme();
-  const size = sizeForMantine(bsSize);
+  const mantineSize = sizeForMantine(size);
 
   const background = status
     ? theme.colors.badges[status.color][status.variant].background
@@ -140,12 +140,14 @@ const Badge = (
   const color = status
     ? theme.colors.badges[status.color][status.variant].text
     : theme.utils.contrastingColor(background);
-  const iconSize = iconSizeForBadge[size];
+  const iconSize = iconSizeForBadge[mantineSize];
 
   let leftSection: React.ReactNode;
 
   if (status?.dot) {
-    leftSection = <Dot $color={theme.colors.badges[status.color].dot.color} $size={size} data-testid="badge-dot" />;
+    leftSection = (
+      <Dot $color={theme.colors.badges[status.color].dot.color} $size={mantineSize} data-testid="badge-dot" />
+    );
   } else if (leftIcon) {
     leftSection = <Icon name={leftIcon} size={iconSize} />;
   }
@@ -166,7 +168,7 @@ const Badge = (
     rightSection,
     onMouseEnter,
     onMouseLeave,
-    size,
+    size: mantineSize,
   };
 
   if (onClick) {

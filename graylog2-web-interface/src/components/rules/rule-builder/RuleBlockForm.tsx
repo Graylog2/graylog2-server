@@ -198,7 +198,7 @@ const RuleBlockForm = ({
         <OptionTitle>{option.label}</OptionTitle>
         <span>
           {option.deprecated && (
-            <Label bsStyle="warning" bsSize="xs">
+            <Label bsStyle="warning" size="xs">
               Deprecated
             </Label>
           )}
@@ -255,7 +255,7 @@ const RuleBlockForm = ({
                         {selectedBlockDict.deprecated && (
                           <DeprecatedLabel>
                             &nbsp;
-                            <Label bsStyle="warning" bsSize="xs">
+                            <Label bsStyle="warning" size="xs">
                               Deprecated
                             </Label>
                           </DeprecatedLabel>
