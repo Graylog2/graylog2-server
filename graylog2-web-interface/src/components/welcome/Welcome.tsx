@@ -83,10 +83,12 @@ const Welcome = () => {
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
       {onboardingEnabled && <OnboardingBanner />}
-      {metricsEnabled && <>
-        <SectionHeadline>Overview</SectionHeadline>
-        <WelcomeMetrics />
-      </>}
+      {metricsEnabled && (
+        <>
+          <SectionHeadline>Overview</SectionHeadline>
+          <WelcomeMetrics />
+        </>
+      )}
       <SectionHeadline>Search and Usage</SectionHeadline>
       <SectionGrid $columns="1fr 1fr 1fr">
         <StyledSectionComponent title="Favorite Items" titleAs="h3">

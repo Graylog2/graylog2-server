@@ -26,7 +26,7 @@ const ReplayLinkWidgetActionComponent = ({ widget }: WidgetMenuActionComponentPr
     return null;
   }
 
-  return <ReplaySearchButtonComponent searchLink={href} newTab />;
+  return <ReplaySearchButtonComponent searchLink={href} />;
 };
 
 const replayLinkWidgetAction: WidgetActionType = {
