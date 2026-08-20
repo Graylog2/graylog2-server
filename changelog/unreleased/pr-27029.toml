@@ -1,0 +1,4 @@
+type = "f"
+message = "Add Space char to Lucene query escaping. It probably was simply missing until now, adding it also prevents malicious injection."
+
+pulls = ["27029"]
