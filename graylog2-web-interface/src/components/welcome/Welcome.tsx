@@ -26,13 +26,13 @@ import ContentStreamContainer from 'components/content-stream/ContentStreamConta
 import useProductName from 'brand-customization/useProductName';
 import { hasAdminPermission } from 'util/PermissionsMixin';
 import useFeature from 'hooks/useFeature';
-import AppConfig from 'util/AppConfig';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 import OnboardingBanner from './OnboardingBanner';
 import WelcomeMetrics from './WelcomeMetrics';
+import useWelcomePageConfig from './hooks/useWelcomePageConfig';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -75,6 +75,7 @@ const Welcome = () => {
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
   const isAdmin = hasAdminPermission(permissions);
   const onboardingEnabled = useFeature('onboarding_experience');
+  const { metricsEnabled } = useWelcomePageConfig();
 
   return (
     <>
@@ -82,7 +83,7 @@ const Welcome = () => {
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
       {onboardingEnabled && <OnboardingBanner />}
-      {AppConfig.welcomePageMetricsEnabled() && <>
+      {metricsEnabled && <>
         <SectionHeadline>Overview</SectionHeadline>
         <WelcomeMetrics />
       </>}

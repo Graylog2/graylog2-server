@@ -14,14 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type ValidationState = 'error' | 'success' | 'warning';
-export type TimeUnit = 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
+package org.graylog2.configuration;
 
-export type MarkdownConfigType = {
-  allow_all_image_sources: boolean;
-  allowed_image_sources: string;
-};
-
-export type WelcomePageConfigType = {
-  disable_metrics: boolean;
-};
+public record WelcomePageConfiguration(boolean disableMetrics) {
+    public static final WelcomePageConfiguration DEFAULT = new WelcomePageConfiguration(false);
+}

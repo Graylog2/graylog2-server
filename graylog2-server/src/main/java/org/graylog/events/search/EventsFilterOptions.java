@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type ValidationState = 'error' | 'success' | 'warning';
-export type TimeUnit = 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
+package org.graylog.events.search;
 
-export type MarkdownConfigType = {
-  allow_all_image_sources: boolean;
-  allowed_image_sources: string;
-};
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.events.event.EventDto;
 
-export type WelcomePageConfigType = {
-  disable_metrics: boolean;
-};
+import java.util.List;
+
+/**
+ * Values available to filter the events table by. Fields that were not requested are omitted.
+ */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record EventsFilterOptions(@JsonProperty(EventDto.FIELD_TAGS) List<String> tags) {
+}
