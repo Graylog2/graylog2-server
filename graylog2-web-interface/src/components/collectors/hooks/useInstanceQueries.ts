@@ -53,6 +53,7 @@ const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
     os: (allAttributes?.['os.type'] as string) ?? null,
     version: (allAttributes?.['service.version'] as string) ?? null,
     has_pending_changes: dto.has_pending_changes,
+    health: dto.health ?? null,
   };
 };
 
@@ -118,16 +119,36 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
     refetchInterval: options.refetchInterval,
   });
 
-export const useInstance = (instanceUid: string | undefined) => {
+export const useInstance = (
+  instanceUid: string | undefined,
+  options: { refetchInterval?: number; silent?: boolean } = {},
+) => {
   const { data, isLoading, error, isError } = useQuery<CollectorInstanceView>({
+    // `silent` and the session-extension choice affect request behavior, not the cached data, so
+    // callers deliberately share one cache entry. If observers with different options coexist,
+    // whichever observer initiates a fetch determines both behaviors for that request.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- Options do not affect cached data.
     queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
-    queryFn: () =>
-      defaultOnError(
-        Collectors.getInstance(instanceUid).then((response) => toView(response)),
-        'Loading Collector instance failed with status',
-        'Could not load Collector instance',
-      ),
+    queryFn: () => {
+      // Polling callers are background refreshes and must not keep the session
+      // alive (module convention, see NO_SESSION_EXT above); one-shot callers
+      // are user-initiated and extend it as usual.
+      const request =
+        options.refetchInterval !== undefined
+          ? Collectors.getInstance(instanceUid, NO_SESSION_EXT)
+          : Collectors.getInstance(instanceUid);
+      const promise = request.then((response) => toView(response));
+
+      return options.silent
+        ? promise
+        : defaultOnError(
+            promise,
+            'Loading Collector instance failed with status',
+            'Could not load Collector instance',
+          );
+    },
     enabled: !!instanceUid,
+    refetchInterval: options.refetchInterval,
   });
 
   return { data, isLoading, error, isError };

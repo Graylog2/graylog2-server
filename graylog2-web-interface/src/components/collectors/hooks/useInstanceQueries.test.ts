@@ -91,6 +91,45 @@ describe('useInstance', () => {
 
     expect(Collectors.getInstance).not.toHaveBeenCalled();
   });
+
+  // Polling is a background refresh and must not keep the session alive; the
+  // one-shot form above deliberately has no request options (extends as usual).
+  it('does not extend the session when polling', async () => {
+    asMock(Collectors.getInstance).mockResolvedValue(asInstanceResponse('uid-42'));
+
+    const { result } = renderHook(() => useInstance('uid-42', { refetchInterval: 5000 }));
+
+    await waitFor(() => expect(result.current.data).toBeTruthy());
+
+    expect(Collectors.getInstance).toHaveBeenCalledWith('uid-42', { requestShouldExtendSession: false });
+  });
+
+  it('maps health to the view', async () => {
+    const health = {
+      healthy_changed_at: '2026-07-31T10:00:00.000+0000',
+      component_health: { healthy: false, last_error: 'connection refused' },
+    };
+    asMock(Collectors.getInstance).mockResolvedValue({
+      ...dto('uid-42'),
+      health,
+    } as unknown as Awaited<ReturnType<typeof Collectors.getInstance>>);
+
+    const { result } = renderHook(() => useInstance('uid-42'));
+
+    await waitFor(() => expect(result.current.data).toBeTruthy());
+
+    expect(result.current.data.health).toEqual(health);
+  });
+
+  it('normalizes absent health to null', async () => {
+    asMock(Collectors.getInstance).mockResolvedValue(asInstanceResponse('uid-42'));
+
+    const { result } = renderHook(() => useInstance('uid-42'));
+
+    await waitFor(() => expect(result.current.data).toBeTruthy());
+
+    expect(result.current.data.health).toBeNull();
+  });
 });
 
 describe('fetchPaginatedInstances session extension', () => {

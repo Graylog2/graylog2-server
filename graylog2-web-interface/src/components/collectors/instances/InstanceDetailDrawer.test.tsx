@@ -23,9 +23,16 @@ import asMock from 'helpers/mocking/AsMock';
 import InstanceDetailDrawer from './InstanceDetailDrawer';
 
 import useInstancePendingChanges from '../hooks/useInstancePendingChanges';
+import { useInstance } from '../hooks';
 import type { CollectorInstanceView, PendingChangesResponse, Source } from '../types';
 
 jest.mock('../hooks/useInstancePendingChanges');
+
+jest.mock('../hooks', () => ({
+  ...jest.requireActual('../hooks'),
+  useInstance: jest.fn(),
+  useCollectorRefetchInterval: jest.fn(() => 5000),
+}));
 
 const mockInstance: CollectorInstanceView = {
   id: 'inst-1',
@@ -45,6 +52,7 @@ const mockInstance: CollectorInstanceView = {
   version: '1.2.0',
   status: 'online',
   has_pending_changes: false,
+  health: null,
 };
 
 const mockSources: Source[] = [
@@ -83,6 +91,7 @@ const pendingChanges: PendingChangesResponse = {
 describe('InstanceDetailDrawer', () => {
   beforeEach(() => {
     asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    asMock(useInstance).mockReturnValue({ data: undefined, isLoading: true, error: null, isError: false });
   });
 
   it('renders instance hostname as title', async () => {
@@ -306,5 +315,60 @@ describe('InstanceDetailDrawer', () => {
     expect(await screen.findByRole('link', { name: 'prod-web-01' })).toBeInTheDocument();
     await screen.findByText(/and 1 other collector/i);
     expect(screen.queryByRole('link', { name: 'aaa-other-host' })).not.toBeInTheDocument();
+  });
+
+  it('renders the health section from the instance health', async () => {
+    const unhealthy: CollectorInstanceView = {
+      ...mockInstance,
+      health: {
+        healthy_changed_at: '2026-07-31T10:00:00.000+0000',
+        component_health: { healthy: false, last_error: 'connection refused' },
+      },
+    };
+
+    render(
+      <InstanceDetailDrawer instance={unhealthy} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Health');
+    await screen.findByText('Unhealthy');
+    await screen.findByText('connection refused');
+  });
+
+  it('renders fresh instance data over the stale row snapshot', async () => {
+    asMock(useInstance).mockReturnValue({
+      data: {
+        ...mockInstance,
+        status: 'offline',
+        health: {
+          healthy_changed_at: '2026-07-31T10:00:00.000+0000',
+          component_health: { healthy: false, last_error: 'connection refused' },
+        },
+      },
+      isLoading: false,
+      error: null,
+      isError: false,
+    });
+
+    // The stale snapshot says online/no health; the polled data must win.
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Offline');
+    await screen.findByText('Last known: Unhealthy');
+    await screen.findByText('connection refused');
+  });
+
+  it('falls back to the row snapshot while the instance query has no data', async () => {
+    asMock(useInstance).mockReturnValue({ data: undefined, isLoading: true, error: null, isError: false });
+
+    render(
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+    );
+
+    await screen.findByText('Online');
+    // Guards the polling wiring: silent (no toast spam) on the shared collector cadence.
+    expect(useInstance).toHaveBeenCalledWith('uid-1', { refetchInterval: 5000, silent: true });
   });
 });

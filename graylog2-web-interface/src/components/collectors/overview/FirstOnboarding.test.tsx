@@ -68,6 +68,7 @@ jest.mock('./onboarding/WaitingForConnection', () => {
     version: '1.2.3',
     status: 'online' as const,
     has_pending_changes: false,
+    health: null,
   };
 
   return function WaitingForConnectionStub({
