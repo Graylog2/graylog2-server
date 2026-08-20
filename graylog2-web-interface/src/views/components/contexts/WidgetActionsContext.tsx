@@ -15,30 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
-import styled from 'styled-components';
 
-import useElementDimensions from 'hooks/useElementDimensions';
+import type { WidgetActionType } from 'views/components/widgets/Types';
 
-const Wrapper = styled.div`
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  grid-row: 2;
-  grid-column: 1;
-`;
+const WidgetActionsContext = React.createContext<Array<WidgetActionType> | undefined>(undefined);
 
-type Dimensions = { height: number; width: number };
-
-type Props = {
-  children: (dimensions: Dimensions) => React.ReactElement;
-};
-
-const FullSizeContainer = ({ children }: Props) => {
-  const element = useRef<HTMLDivElement>(null);
-  const { width, height } = useElementDimensions(element, 50);
-
-  return <Wrapper ref={element}>{children({ height, width })}</Wrapper>;
-};
-
-export default FullSizeContainer;
+export default WidgetActionsContext;
