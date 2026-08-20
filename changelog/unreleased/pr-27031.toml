@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed bulk indexing requests being dropped instead of retried when OpenSearch returns an incomplete response during shard reallocation."
+
+issues = ["26853"]
+pulls = ["27031"]
