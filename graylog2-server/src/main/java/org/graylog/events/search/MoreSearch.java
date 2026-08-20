@@ -271,7 +271,7 @@ public class MoreSearch {
      * @return String where those characters that Lucene expects to be escaped are escaped by a
      * preceding <code>\</code>
      */
-    private static final String SPECIAL_CHARS = "\\+-!():^[]\"{}~|& ";
+    private static final String SPECIAL_CHARS = "\\+-!():^[]\"{}~|&/ ";
     private static final String SPECIAL_CHARS_WITH_WILDCARDS = SPECIAL_CHARS + "*?";
 
     public static String luceneEscape(String searchString) {
