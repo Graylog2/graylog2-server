@@ -78,6 +78,12 @@ const meta = {
       description: '"light" (tinted background) or "filled" (solid background)',
     },
   },
+  args: {
+    // Defined (rather than undefined) so the controls always render as editable text fields —
+    // an empty string is treated the same as "unset" by Badge, so this changes no story's rendering.
+    leftIcon: '',
+    rightIcon: '',
+  },
 } satisfies Meta<typeof Badge>;
 
 export default meta;
