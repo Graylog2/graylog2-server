@@ -95,7 +95,7 @@ jobs:
         service:
           # Latest OpenSearch and MongoDB
           - search-server-distribution: "OpenSearch"
-            search-server-version: "3.8.0"
+            search-server-version: "3.7.0"
             mongodb-version: "8.0"
 
           # Latest OpenSearch 2.19 version
