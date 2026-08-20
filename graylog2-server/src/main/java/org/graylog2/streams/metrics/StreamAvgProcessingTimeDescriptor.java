@@ -80,7 +80,7 @@ public class StreamAvgProcessingTimeDescriptor implements EntityCachedMetricDesc
                 entityIds.size(), entityIds);
 
         return entityIds.stream()
-                .map(id -> new EntityMetric<>(id, results.getOrDefault(id, 0.0)))
+                .map(id -> new EntityMetric<>(id, results.get(id)))
                 .toList();
     }
 

@@ -517,6 +517,13 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     private boolean globalInputsOnly = false;
 
     @Documentation("""
+            Show the metrics widgets (message, alert, and event counts) on the welcome page.
+            Default: true
+            """)
+    @Parameter(value = "welcome_page_metrics_enabled")
+    private boolean welcomePageMetricsEnabled = true;
+
+    @Documentation("""
             This parameter defines the maximum size in bytes of cluster events. When it is exceeded, oldest events will
             be overwritten. This should be as small as possible (for performance), but large enough to hold events long
             enough for all nodes to process them.
@@ -951,5 +958,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     public boolean isGlobalInputsOnly() {
         return globalInputsOnly;
+    }
+
+    public boolean isWelcomePageMetricsEnabled() {
+        return welcomePageMetricsEnabled;
     }
 }

@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 
-import { ShareButton, IfPermitted, HoverForHelp, LinkContainer } from 'components/common';
-import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
+import { ShareButton, IfPermitted, HoverForHelp, LinkContainer, IconButton } from 'components/common';
+import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type { Stream } from 'logic/streams/types';
 import useStreamMutations from 'hooks/useStreamMutations';
 import Routes from 'routing/Routes';
@@ -174,20 +174,20 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
     <ButtonToolbar>
       <IfPermitted permissions={`streams:read:${stream.id}`}>
         <LinkContainer to={Routes.stream_view(stream.id)}>
-          <Button
+          <IconButton
+            name="call_split"
+            title="Data routing"
+            bsStyle="default"
             disabled={isNotEditable}
-            bsStyle="primary"
-            bsSize="xsmall"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
                 app_pathname: 'stream',
               });
-            }}>
-            Data routing
-          </Button>
+            }}
+          />
         </LinkContainer>
       </IfPermitted>
-      <ShareButton entityId={stream.id} entityType="stream" onClick={toggleEntityShareModal} bsSize="xsmall" />
+      <ShareButton entityId={stream.id} entityType="stream" onClick={toggleEntityShareModal} bsSize="xs" />
       <MoreActions disabled={isNotEditable}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
           <MenuItem onSelect={onToggleStreamStatus} disabled={isDefaultStream || isNotEditable}>

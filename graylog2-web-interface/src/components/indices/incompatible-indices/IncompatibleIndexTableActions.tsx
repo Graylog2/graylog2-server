@@ -60,6 +60,7 @@ type Props = {
 const IncompatibleIndexTableActions = ({ index }: Props) => {
   const {
     archiveActionsAvailable,
+    reindexActionsAvailable,
     archivedIndexNames,
     pendingIndexStatuses,
     addArchiveDeleteAction,
@@ -73,7 +74,6 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
   const [confirmedAction, setConfirmedAction] = useState<IndexAction | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const canArchive = archiveActionsAvailable;
   const pendingStatus = pendingIndexStatuses.get(index.index_name);
   const isArchived = isIndexArchived(index.index_name, pendingStatus, archivedIndexNames);
 
@@ -107,10 +107,16 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
     );
   }
 
-  const actions = getAvailableActions(index, canArchive, isArchived);
+  const actions = getAvailableActions(index, {
+    canArchive: archiveActionsAvailable,
+    canReindex: reindexActionsAvailable,
+    alreadyArchived: isArchived,
+  });
 
   const handleConfirm = async () => {
-    if (!confirmedAction) {
+    if (!confirmedAction || (confirmedAction === 'reindex-system-index' && !reindexActionsAvailable)) {
+      setConfirmedAction(undefined);
+
       return;
     }
 

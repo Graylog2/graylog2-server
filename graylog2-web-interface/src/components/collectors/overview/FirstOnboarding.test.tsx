@@ -201,7 +201,7 @@ describe('FirstOnboarding', () => {
       );
     });
 
-    expect(createSource).toHaveBeenCalledTimes(3);
+    expect(createSource).toHaveBeenCalledTimes(4);
 
     await waitFor(() => {
       expect(createEnrollmentToken).toHaveBeenCalledWith({
@@ -250,7 +250,7 @@ describe('FirstOnboarding', () => {
       );
     });
 
-    expect(createSource).toHaveBeenCalledTimes(3);
+    expect(createSource).toHaveBeenCalledTimes(4);
 
     await waitFor(() => {
       expect(createEnrollmentToken).toHaveBeenCalledWith({
