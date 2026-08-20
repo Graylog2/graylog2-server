@@ -271,14 +271,23 @@ public class MoreSearch {
      * @return String where those characters that Lucene expects to be escaped are escaped by a
      * preceding <code>\</code>
      */
+    private static final String SPECIAL_CHARS = "\\+-!():^[]\"{}~|& ";
+    private static final String SPECIAL_CHARS_WITH_WILDCARDS = SPECIAL_CHARS + "*?";
+
     public static String luceneEscape(String searchString) {
+        return luceneEscape(SPECIAL_CHARS_WITH_WILDCARDS,  searchString);
+    }
+
+    public static String luceneEscapeButNotIncludingWildcards(String searchString) {
+        return luceneEscape(SPECIAL_CHARS, searchString);
+    }
+
+    private static String luceneEscape(final String charsToEscape, String searchString) {
         StringBuilder result = new StringBuilder();
         if (searchString != null) {
             for (char c : searchString.toCharArray()) {
                 // These characters are part of the query syntax and must be escaped
-                if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':'
-                        || c == '^' || c == '[' || c == ']' || c == '"' || c == '{' || c == '}' || c == '~'
-                        || c == '*' || c == '?' || c == '|' || c == '&' || c == '/' || c == ' ') {
+                if (charsToEscape.indexOf(c) >= 0) {
                     result.append('\\');
                 }
                 result.append(c);
