@@ -1,2 +1,4 @@
 type = "f"
 message = "Fix crash of the System Overview page when loading the notifications list fails."
+
+pulls = ["27045"]
