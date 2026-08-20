@@ -41,7 +41,6 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
 import org.graylog2.cluster.nodes.mongodb.MongodbNode;
-import org.graylog2.cluster.nodes.mongodb.MongodbNodeUtils;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
 import org.graylog2.cluster.nodes.mongodb.MongodbPermissionException;
 import org.graylog2.cluster.nodes.mongodb.ProfilingLevel;
