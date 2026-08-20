@@ -124,7 +124,7 @@ type Props = {
 const ClusterHealthInfo = ({ data, numberOfNodes, showShardReplication }: Props) => (
   <>
     <Title order={3}>
-      <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} size="large">
+      <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} size="lg">
         {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
       </Label>
       &nbsp;
