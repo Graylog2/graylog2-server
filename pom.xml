@@ -137,7 +137,7 @@
         <google-api-common.version>2.66.0</google-api-common.version>
         <google-auth-library.version>1.50.0</google-auth-library.version>
         <google-cloud-core.version>2.73.0</google-cloud-core.version>
-        <google-conscrypt.version>2.6.1</google-conscrypt.version>
+        <google-conscrypt.version>2.6.2</google-conscrypt.version>
         <google-gax.version>2.83.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
