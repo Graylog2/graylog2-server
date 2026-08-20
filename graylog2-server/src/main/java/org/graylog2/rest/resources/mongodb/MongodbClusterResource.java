@@ -174,8 +174,7 @@ public class MongodbClusterResource extends RestResource {
         }
 
         try {
-            Document command = new Document("profile", level.getNumericalValue())
-                    .append("slowms", MongodbNodeUtils.SLOW_QUERIES_THRESHOLD);
+            Document command = new Document("profile", level.getNumericalValue());
             clusterCommand.runOnEachNode(command);
             return profilingStatus();
         } catch (MongodbPermissionException e) {
