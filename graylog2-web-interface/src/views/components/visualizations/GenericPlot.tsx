@@ -322,7 +322,7 @@ const GenericPlot = ({
 
   return (
     <StyledPlot
-      $interactive={interactive}
+      $interactive={isInteractive}
       data={plotChartData}
       useResizeHandler
       layout={plotLayoutWithRevision}
