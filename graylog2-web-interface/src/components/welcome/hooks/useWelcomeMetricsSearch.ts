@@ -15,10 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
+import URI from 'urijs';
 
 import generateId from 'logic/generateId';
 import usePermissions from 'hooks/usePermissions';
 import useCreateSearch from 'views/hooks/useCreateSearch';
+import Routes from 'routing/Routes';
+import { nonInfoPriorities } from 'components/events/Constants';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
@@ -26,6 +29,8 @@ import Search from 'views/logic/search/Search';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
+import { timeRangeToQueryParameter } from 'views/logic/TimeRange';
+import { serializeTimeRange } from 'components/common/EntityFilters/helpers/timeRange';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -39,11 +44,19 @@ import { TIMESTAMP_FIELD } from 'views/Constants';
 
 export const DEFAULT_TIME_RANGE_SECONDS = 86400;
 const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
-const MESSAGES_TODAY_LINK = '/search?q=&rangetype=relative&from=300';
-const ALERTS_LINK =
-  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dtrue';
-const EVENTS_LINK =
-  '/alerts?page=1&filters=priority%3D4&filters=priority%3D3&filters=priority%3D2&filters=priority%3D1&filters=timestamp%3Drelative%4086400&filters=alert%3Dfalse';
+
+const messagesTodayLink = (timeRange: RelativeTimeRangeWithEnd) =>
+  new URI(Routes.SEARCH).addQuery({ q: '', ...timeRangeToQueryParameter(timeRange) }).toString();
+
+const alertsOrEventsLink = (timeRange: RelativeTimeRangeWithEnd, alert: boolean) =>
+  new URI(Routes.ALERTS.LIST)
+    .addQuery('page', 1)
+    .addQuery('filters', [
+      ...nonInfoPriorities.map((priority) => `priority=${priority}`),
+      `timestamp=${serializeTimeRange(timeRange)}`,
+      `alert=${alert}`,
+    ])
+    .toString();
 
 const numberWidget = ({
   title,
@@ -96,7 +109,7 @@ const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
 });
 
 const buildViewState = (permittedAlertsEventsStreams: Array<string>, timeRange: RelativeTimeRangeWithEnd) => {
-  const messages = numberWidget({ title: 'Messages Today', timeRange, link: MESSAGES_TODAY_LINK });
+  const messages = numberWidget({ title: 'Messages Today', timeRange, link: messagesTodayLink(timeRange) });
   const sources = topSourcesWidget(timeRange);
 
   if (permittedAlertsEventsStreams.length === 0) {
@@ -118,14 +131,14 @@ const buildViewState = (permittedAlertsEventsStreams: Array<string>, timeRange: 
     numberWidget({
       title: 'Alerts Today',
       timeRange,
-      link: ALERTS_LINK,
+      link: alertsOrEventsLink(timeRange, true),
       queryString: 'alert:true',
       streams: permittedAlertsEventsStreams,
     }),
     numberWidget({
       title: 'Events Today',
       timeRange,
-      link: EVENTS_LINK,
+      link: alertsOrEventsLink(timeRange, false),
       queryString: 'alert:false',
       streams: permittedAlertsEventsStreams,
     }),
