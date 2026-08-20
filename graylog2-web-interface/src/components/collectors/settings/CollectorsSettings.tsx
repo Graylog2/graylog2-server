@@ -50,7 +50,7 @@ const SectionTitle = styled.h3(
 const HelpText = styled.p(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     margin-bottom: ${theme.spacings.md};
   `,
 );

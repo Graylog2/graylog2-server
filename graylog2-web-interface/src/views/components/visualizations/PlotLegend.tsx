@@ -64,25 +64,33 @@ const VariableContainer = styled.div<{ $height: number; $width: number }>(
   `,
 );
 
-const LegendContainer = styled.div`
-  padding: 5px;
+const LegendContainerBase = styled.div(
+  ({ theme }) => css`
+    padding: ${theme.spacings.xxs};
+  `,
+);
+
+const LegendContainer = styled(LegendContainerBase)`
   max-height: 100px;
   overflow: auto;
 `;
 
-const Legend = styled.div`
-  display: table;
-  width: 100%;
-`;
+const Legend = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.xxs};
+    width: 100%;
+  `,
+);
 
-const LegendRow = styled.div`
-  display: table-row;
-`;
-
-const LegendCell = styled.div`
-  padding: 4px;
-  display: table-cell;
-`;
+const LegendRow = styled.div(
+  ({ theme }) => css`
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: ${theme.spacings.xs};
+  `,
+);
 
 const LegendEntryContainer = styled.div`
   display: flex;
@@ -179,9 +187,9 @@ const TableCell = ({ value, fieldTypes, labelFields }: TableCellProps) => {
   });
 
   return (
-    <LegendCell key={value}>
+    <div key={value}>
       <LegendEntry labelsWithField={labelsWithField} value={value} />
-    </LegendCell>
+    </div>
   );
 };
 
@@ -208,11 +216,14 @@ const InteractiveLegend = ({ config, fieldTypes, labelFields, labels }: LegendCo
   );
 };
 
-const FlexLegendContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-`;
+const FlexLegendContainer = styled(LegendContainerBase)(
+  ({ theme }) => css`
+    display: flex;
+    column-gap: ${theme.spacings.xs};
+    row-gap: ${theme.spacings.xxs};
+    flex-wrap: wrap;
+  `,
+);
 
 const NoninteractiveLegend = ({ config, fieldTypes, labels, labelFields }: LegendComponentProps) => {
   const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
