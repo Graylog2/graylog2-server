@@ -72,6 +72,7 @@ public class S3MinioContainer extends GenericContainer<S3MinioContainer> {
         withEnv("MINIO_ACCESS_KEY", accessKey);
         withEnv("MINIO_SECRET_KEY", secretKey);
         withEnv("MINIO_BROWSER", "off");
+        withEnv("MINIO_KMS_SECRET_KEY", "test-key:zK6Vv0G5x7Y0kP8lJ2mN4qR6sT9uW1xC3bE5dF7gH8i=");
 
         waitingFor(new HttpWaitStrategy().forPath("/minio/health/ready").forPort(PORT).withStartupTimeout(Duration.ofSeconds(10)));
     }
