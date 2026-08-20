@@ -34,8 +34,8 @@ import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 export type PlotLayout = Layout;
 
-const StyledPlot = styled(Plot)(
-  ({ theme }) => css`
+const StyledPlot = styled(Plot)<{ $interactive: boolean }>(
+  ({ theme, $interactive }) => css`
     .customPopover .popover-content {
       padding: 0;
     }
@@ -54,6 +54,13 @@ const StyledPlot = styled(Plot)(
         stroke: ${theme.colors.global.contentBackground} !important;
       }
     }
+
+    ${!$interactive &&
+    css`
+      .cursor-pointer {
+        cursor: default !important;
+      }
+    `}
   `,
 );
 
@@ -301,6 +308,7 @@ const GenericPlot = ({
 
   return (
     <StyledPlot
+      $interactive={interactive}
       data={plotChartData}
       useResizeHandler
       layout={plotLayoutWithRevision}
