@@ -26,6 +26,11 @@ const StyledNavbar = styled(Navbar)(
       cursor: default;
     }
 
+    a:focus:not(:focus-visible),
+    button:focus:not(:focus-visible) {
+      outline: none;
+    }
+
     &.navbar-default {
       .navbar-nav > li > a {
         padding: 0 15px;
