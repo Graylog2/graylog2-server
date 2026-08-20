@@ -146,7 +146,7 @@ const Badge = (
   let leftSection: React.ReactNode;
 
   if (color && dot) {
-    leftSection = <Dot $color={theme.colors.badges[color].dot.color} $size={size} data-testid="badge-dot" />;
+    leftSection = <Dot $color={textColor} $size={size} data-testid="badge-dot" />;
   } else if (leftIcon) {
     leftSection = <Icon name={leftIcon} size={iconSize} />;
   }
