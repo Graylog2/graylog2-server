@@ -87,8 +87,8 @@ describe('MainNavbar', () => {
     };
 
     beforeEach(() => {
-      AppConfig.gl2AppPathPrefix = jest.fn(() => '');
-      AppConfig.isFeatureEnabled = jest.fn(() => false);
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/');
+      asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
       PluginStore.register(plugin);
     });
 

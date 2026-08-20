@@ -22,11 +22,11 @@ import type { Permission } from 'graylog-web-plugin/plugin';
 import { Row, Col } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import Spinner from 'components/common/Spinner';
-import StreamsStore from 'stores/streams/StreamsStore';
+import useStreamOutputMutations from 'hooks/useStreamOutputMutations';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { isPermitted } from 'util/PermissionsMixin';
-import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
+import useAvailableOutputTypes, { getOutputTypeDefinition } from 'components/streams/useAvailableOutputTypes';
 import useOutputs from 'hooks/useOutputs';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import useOutputMutations from 'hooks/useOutputMutations';
@@ -48,6 +48,7 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
     enabled: !!streamId,
   });
   const { saveOutput, updateOutput, removeOutput } = useOutputMutations();
+  const { addStreamOutput, removeStreamOutput } = useStreamOutputMutations();
 
   const outputsData = streamId ? streamOutputsData : allOutputsData;
   const outputs = outputsData?.outputs;
@@ -72,8 +73,10 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
   const getTypeDefinition = useCallback(
     (typeName: string, callback: (def: any) => void) => {
-      if (types?.[typeName]) {
-        callback(types[typeName]);
+      const typeDefinition = getOutputTypeDefinition(types, typeName);
+
+      if (typeDefinition) {
+        callback(typeDefinition);
       }
     },
     [types],
@@ -87,17 +90,16 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
       saveOutput(data).then((result: any) => {
         if (streamId) {
-          StreamsStore.addOutput(streamId, result.id, (response) => {
-            refetchAll();
-
-            return response;
-          });
+          // The hook handles the success/error toast; swallow rejection to avoid an unhandled rejection.
+          addStreamOutput({ streamId, outputs: { outputs: [result.id] } })
+            .then(() => refetchAll())
+            .catch(() => {});
         } else {
           refetchAll();
         }
       });
     },
-    [saveOutput, sendTelemetry, streamId, refetchAll],
+    [saveOutput, sendTelemetry, streamId, refetchAll, addStreamOutput],
   );
 
   const _handleAssignOutput = useCallback(
@@ -106,13 +108,12 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
         app_action_value: 'assign-output',
       });
 
-      StreamsStore.addOutput(streamId, outputId, (response) => {
-        refetchAll();
-
-        return response;
-      });
+      // The hook handles the success/error toast; swallow rejection to avoid an unhandled rejection.
+      addStreamOutput({ streamId, outputs: { outputs: [outputId] } })
+        .then(() => refetchAll())
+        .catch(() => {});
     },
-    [sendTelemetry, streamId, refetchAll],
+    [sendTelemetry, streamId, refetchAll, addStreamOutput],
   );
 
   const _removeOutputGlobally = useCallback(
@@ -140,15 +141,13 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
       // eslint-disable-next-line no-alert
       if (window.confirm('Do you really want to remove this output from the stream?')) {
-        StreamsStore.removeOutput(_streamId, outputId, (response) => {
-          UserNotification.success('Output was removed from stream.', 'Success');
-          refetchAll();
-
-          return response;
-        });
+        // The hook handles the success/error toast; swallow rejection to avoid an unhandled rejection.
+        removeStreamOutput({ streamId: _streamId, outputId })
+          .then(() => refetchAll())
+          .catch(() => {});
       }
     },
-    [sendTelemetry, refetchAll],
+    [sendTelemetry, refetchAll, removeStreamOutput],
   );
 
   const _handleOutputUpdate = useCallback(

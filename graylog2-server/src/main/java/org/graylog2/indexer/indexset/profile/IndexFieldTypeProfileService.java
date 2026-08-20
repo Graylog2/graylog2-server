@@ -22,7 +22,6 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.BadRequestException;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
@@ -30,6 +29,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.indexer.fieldtypes.mapping.CustomMappingValidation;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -51,7 +51,6 @@ import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.CUSTOM
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.ID_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.NAME_FIELD_NAME;
-import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 
 
 public class IndexFieldTypeProfileService {
@@ -82,14 +81,17 @@ public class IndexFieldTypeProfileService {
     private final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService;
     private final IndexSetService indexSetService;
     private final MongoUtils<IndexFieldTypeProfile> mongoUtils;
+    private final CustomMappingValidation customMappingValidation;
 
     @Inject
     public IndexFieldTypeProfileService(final MongoCollections mongoCollections,
                                         final IndexFieldTypeProfileUsagesService indexFieldTypeProfileUsagesService,
-                                        final IndexSetService indexSetService) {
+                                        final IndexSetService indexSetService,
+                                        final CustomMappingValidation customMappingValidation) {
         this.indexSetService = indexSetService;
         this.dbQueryCreator = new DbQueryCreator(IndexFieldTypeProfile.NAME_FIELD_NAME, ATTRIBUTES);
         this.indexFieldTypeProfileUsagesService = indexFieldTypeProfileUsagesService;
+        this.customMappingValidation = customMappingValidation;
 
         collection = mongoCollections.collection(INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME, IndexFieldTypeProfile.class);
         mongoUtils = mongoCollections.utils(collection);
@@ -119,7 +121,7 @@ public class IndexFieldTypeProfileService {
     }
 
     public IndexFieldTypeProfile save(final IndexFieldTypeProfile profile) {
-        profile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
+        customMappingValidation.checkProfile(profile);
 
         final var id = profile.id();
         if (id == null) {
@@ -145,7 +147,7 @@ public class IndexFieldTypeProfileService {
         if (!ObjectId.isValid(profileId)) {
             return false;
         }
-        updatedProfile.customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
+        customMappingValidation.checkProfile(updatedProfile);
         return collection.replaceOne(idEq(profileId), updatedProfile).getMatchedCount() > 0;
     }
 
@@ -193,12 +195,6 @@ public class IndexFieldTypeProfileService {
                 .sort(Sorts.ascending(NAME_FIELD_NAME))
                 .map(profile -> new IndexFieldTypeProfileIdAndName(profile.id(), profile.name()))
                 .into(new LinkedList<>());
-    }
-
-    private void checkFieldTypeCanBeChanged(final String fieldName) {
-        if (FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldName)) {
-            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS);
-        }
     }
 
 }

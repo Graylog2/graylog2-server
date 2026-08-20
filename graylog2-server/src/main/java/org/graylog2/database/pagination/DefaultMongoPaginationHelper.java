@@ -22,6 +22,8 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Collation;
+import com.mongodb.client.model.CollationStrength;
+import com.mongodb.client.model.CountOptions;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoEntity;
@@ -32,8 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
@@ -46,6 +50,11 @@ import static org.graylog2.database.utils.MongoUtils.stream;
  */
 public class DefaultMongoPaginationHelper<T extends MongoEntity> implements MongoPaginationHelper<T> {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultMongoPaginationHelper.class);
+    public static final Collation DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING = Collation.builder()
+            .locale(Locale.ENGLISH.toLanguageTag())
+            .collationStrength(CollationStrength.SECONDARY)
+            .numericOrdering(true)
+            .build();
 
     private final MongoCollection<T> collection;
     private final Bson filter;
@@ -81,7 +90,7 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         this.perPage = perPage;
         this.includeGrandTotal = includeGrandTotal;
         this.grandTotalFilter = grandTotalFilter;
-        this.collation = collation;
+        this.collation = firstNonNull(collation, DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING);
         this.pipeline = pipeline;
         this.postSortPipeline = postSortPipeline;
         this.includeSourceMetadata = includeSourceMetadata;
@@ -155,10 +164,10 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         try (final var stream = stream(getFindIterableBase(pageNumber, perPage))) {
             documents = stream.toList();
         }
-        final int total = Ints.saturatedCast(collection.countDocuments(filter));
+        final int total = Ints.saturatedCast(countDocuments(filter));
 
         if (includeGrandTotal) {
-            final long grandTotal = collection.countDocuments(grandTotalFilter);
+            final long grandTotal = countDocuments(grandTotalFilter);
             return new PaginatedList<>(documents, total, pageNumber, perPage, grandTotal);
         } else {
             return new PaginatedList<>(documents, total, pageNumber, perPage);
@@ -182,11 +191,18 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         }
 
         if (includeGrandTotal) {
-            final long grandTotal = collection.countDocuments(grandTotalFilter);
+            final long grandTotal = countDocuments(grandTotalFilter);
             return new PaginatedList<>(documents, total, pageNumber, perPage, grandTotal);
         } else {
             return new PaginatedList<>(documents, total, pageNumber, perPage);
         }
+    }
+
+    private long countDocuments(@Nullable Bson countFilter) {
+        if (countFilter == null) {
+            return collection.countDocuments();
+        }
+        return collection.countDocuments(countFilter, new CountOptions().collation(collation));
     }
 
     private static String bsonToString(@Nullable Bson bson) {

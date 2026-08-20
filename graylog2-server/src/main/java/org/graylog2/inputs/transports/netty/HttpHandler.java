@@ -32,6 +32,8 @@ import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import jakarta.annotation.Nullable;
 
+import java.util.Set;
+
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -40,13 +42,13 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
     private final boolean enableCors;
     private final String authorizationHeader;
-    private final String authorizationHeaderValue;
+    private final Set<String> authorizationHeaderValues;
     private final String path;
 
-    public HttpHandler(boolean enableCors, String authorizationHeader, String authorizationHeaderValue, String path) {
+    public HttpHandler(boolean enableCors, String authorizationHeader, Set<String> authorizationHeaderValues, String path) {
         this.enableCors = enableCors;
         this.authorizationHeader = authorizationHeader;
-        this.authorizationHeaderValue = authorizationHeaderValue;
+        this.authorizationHeaderValues = authorizationHeaderValues;
         this.path = path;
     }
 
@@ -65,7 +67,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
         if (isNotBlank(authorizationHeader)) {
             final String suppliedAuthHeaderValue = request.headers().get(authorizationHeader);
-            if (isBlank(suppliedAuthHeaderValue) || !suppliedAuthHeaderValue.equals(authorizationHeaderValue)) {
+            if (isBlank(suppliedAuthHeaderValue) || !authorizationHeaderValues.contains(suppliedAuthHeaderValue)) {
                 writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.UNAUTHORIZED, origin);
                 return;
             }

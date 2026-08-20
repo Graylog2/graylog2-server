@@ -32,26 +32,24 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -61,6 +59,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -75,10 +74,13 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  *       for OpAMP enrollment. A unified certificate builder could serve both use cases.
  */
 public class CertificateBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(CertificateBuilder.class);
 
     static {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }
+
+    private static final SecureRandom SERIAL_RNG = new SecureRandom();
 
     private final EncryptedValueService encryptedValueService;
     private final String productName;
@@ -94,6 +96,35 @@ public class CertificateBuilder {
         this.encryptedValueService = encryptedValueService;
         this.productName = productName;
         this.clock = clock;
+    }
+
+    private static BigInteger generateSerialNumber() {
+        final byte[] bytes = new byte[16];
+        SERIAL_RNG.nextBytes(bytes);
+        bytes[0] |= 0x01; // Guarantee non-zero for RFC 5280 compliance
+        return new BigInteger(1, bytes);
+    }
+
+    /**
+     * Computes the effective notAfter for a certificate, capping to the issuer's remaining lifetime.
+     * <p>
+     * A signed certificate must never outlive its issuer. When the requested lifetime exceeds the
+     * issuer's remaining validity, we shorten it.
+     */
+    private Instant capNotAfter(Instant now, Duration validity, X509Certificate issuerCert) {
+        final var issuerNotAfter = issuerCert.getNotAfter().toInstant();
+        final var issuerRemaining = Duration.between(now, issuerNotAfter);
+
+        if (issuerRemaining.isNegative() || issuerRemaining.isZero()) {
+            throw new IllegalStateException("Issuer certificate has expired");
+        }
+
+        if (issuerRemaining.compareTo(validity) < 0) {
+            LOG.debug("Capping certificate lifetime from {} to {} days (issuer expires {})",
+                    validity.toDays(), issuerRemaining.toDays(), issuerNotAfter);
+            return now.plus(issuerRemaining);
+        }
+        return now.plus(validity);
     }
 
     /**
@@ -122,7 +153,7 @@ public class CertificateBuilder {
 
         final Instant now = Instant.now(clock);
         final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 subject,
@@ -195,8 +226,8 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
@@ -335,8 +366,8 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
@@ -442,11 +473,12 @@ public class CertificateBuilder {
                 null, // ID assigned on save
                 fingerprint,
                 PemUtils.extractSubjectKeyIdentifier(certificate).orElseThrow(() -> new IllegalArgumentException("Certificate has no SKI")),
+                PemUtils.extractAuthorityKeyIdentifier(certificate),
                 encryptedValueService.encrypt(privateKeyPem),
                 certificatePem,
                 issuerChain,
-                null, // subjectDn - extracted on save
-                null, // issuerDn - extracted on save
+                certificate.getSubjectX500Principal().getName(),
+                certificate.getIssuerX500Principal().getName(),
                 certificate.getNotBefore().toInstant(),
                 certificate.getNotAfter().toInstant(),
                 Instant.now(clock)
@@ -472,7 +504,7 @@ public class CertificateBuilder {
 
         // Detect algorithm from key pair
         final String keyAlgorithm = keyPair.getPublic().getAlgorithm();
-        final String signatureAlgorithm = "Ed25519".equals(keyAlgorithm) ? "Ed25519" : "SHA256withRSA";
+        final String signatureAlgorithm = Set.of("Ed25519", "EdDSA").contains(keyAlgorithm) ? "Ed25519" : "SHA256withRSA";
 
         final ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm)
                 .setProvider("BC")
@@ -492,16 +524,20 @@ public class CertificateBuilder {
     /**
      * Signs a Certificate Signing Request (CSR) and produces an X.509 certificate.
      * <p>
+     * Accepting only {@link VerifiedCsr} guarantees the CSR's self-signature has already been
+     * verified (see {@link PemUtils#parseCsr(String)}), so the requester has proven possession of
+     * the private key.
+     * <p>
      * This method:
      * <ul>
-     *   <li>Parses and verifies the CSR self-signature (proves agent has private key)</li>
-     *   <li>Validates that the public key is Ed25519</li>
-     *   <li>Ignores the CSR subject - uses the provided subjectCn instead</li>
-     *   <li>Sets extensions: BasicConstraints CA:FALSE (critical), KeyUsage digitalSignature (critical),
-     *       ExtendedKeyUsage clientAuth</li>
+     *   <li>Enforces that the CSR's public key is Ed25519 (or EdDSA)</li>
+     *   <li>Ignores the CSR subject — uses the provided {@code subjectCn} instead</li>
+     *   <li>Sets extensions: BasicConstraints CA:FALSE (critical), KeyUsage digitalSignature
+     *       (critical), ExtendedKeyUsage clientAuth</li>
+     *   <li>Caps the cert's {@code NotAfter} at the issuer's {@code NotAfter}</li>
      * </ul>
      *
-     * @param csrPem    the PEM-encoded CSR
+     * @param csr       the signature-verified CSR
      * @param issuer    the issuing CA's certificate entry (must contain the private key)
      * @param subjectCn the common name for the certificate subject (CSR subject is ignored)
      * @param validity  the validity period of the certificate
@@ -509,36 +545,12 @@ public class CertificateBuilder {
      * @throws Exception                if signing fails
      * @throws IllegalArgumentException if the CSR public key is not Ed25519
      */
-    public X509Certificate signCsr(byte[] csrPem, CertificateEntry issuer, String subjectCn, Duration validity)
+    public X509Certificate signCsr(VerifiedCsr csr, CertificateEntry issuer, String subjectCn, Duration validity)
             throws Exception {
-        // Parse the CSR
-        final PKCS10CertificationRequest csr;
-        try (PEMParser pemParser = new PEMParser(new StringReader(new String(csrPem, StandardCharsets.UTF_8)))) {
-            final Object object = pemParser.readObject();
-            if (!(object instanceof PKCS10CertificationRequest)) {
-                throw new IllegalArgumentException("PEM does not contain a valid CSR");
-            }
-            csr = (PKCS10CertificationRequest) object;
-        }
 
-        // Verify CSR self-signature (proves agent possesses private key)
-        try {
-            final ContentVerifierProvider verifier = new JcaContentVerifierProviderBuilder()
-                    .setProvider("BC")
-                    .build(csr.getSubjectPublicKeyInfo());
-            if (!csr.isSignatureValid(verifier)) {
-                throw new IllegalArgumentException("CSR signature verification failed");
-            }
-        } catch (PKCSException e) {
-            throw new IllegalArgumentException("CSR signature verification failed", e);
-        }
+        final PublicKey publicKey = csr.publicKey();
 
-        // Extract and validate public key - must be Ed25519
-        final PublicKey publicKey = new org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter()
-                .setProvider("BC")
-                .getPublicKey(csr.getSubjectPublicKeyInfo());
-
-        if (!"Ed25519".equals(publicKey.getAlgorithm())) {
+        if (!Set.of("Ed25519", "EdDSA").contains(publicKey.getAlgorithm())) {
             throw new IllegalArgumentException(
                     f("CSR public key must be Ed25519, but was %s", publicKey.getAlgorithm())
             );
@@ -562,8 +574,8 @@ public class CertificateBuilder {
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now(clock);
-        final Instant notAfter = now.plus(validity);
-        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        final Instant notAfter = capNotAfter(now, validity, issuerCert);
+        final BigInteger serialNumber = generateSerialNumber();
 
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn,
@@ -590,6 +602,9 @@ public class CertificateBuilder {
                 false,
                 new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth)
         );
+
+        addSubjectKeyIdentifier(certBuilder, publicKey);
+        addAuthorityKeyIdentifier(certBuilder, issuerCert);
 
         // Detect algorithm from issuer certificate
         final Algorithm algorithm = PemUtils.detectAlgorithm(issuerCert);

@@ -25,7 +25,7 @@ import UrlAllowListForm from './UrlAllowListForm';
 
 const mockTestRegexValidity = jest.fn(() => Promise.resolve({ is_valid: true }));
 
-jest.mock('stores/tools/ToolsStore', () => ({
+jest.mock('api/tools', () => ({
   testRegexValidity: () => mockTestRegexValidity(),
 }));
 

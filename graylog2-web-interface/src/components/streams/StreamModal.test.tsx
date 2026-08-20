@@ -18,12 +18,13 @@ import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import selectEvent from 'helpers/selectEvent';
 import { indexSets } from 'fixtures/indexSets';
 import { stream } from 'fixtures/streams';
-import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import StreamModal from './StreamModal';
 
@@ -34,17 +35,29 @@ const exampleStream = {
   index_set_id: indexSets[0].id,
 };
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
+jest.mock('domainActions/permissions/EntityShareDomain', () => ({
   __esModule: true,
-  EntityShareActions: {
+  default: {
     prepare: jest.fn(() => Promise.resolve()),
     update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
+    loadUserSharesPaginated: jest.fn(() =>
+      Promise.resolve({
+        list: require('immutable').List(),
+        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+      }),
+    ),
   },
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 const SUT = (props: Partial<React.ComponentProps<typeof StreamModal>>) => (
   <StreamModal
     onSubmit={() => Promise.resolve()}
@@ -60,7 +73,7 @@ jest.setTimeout(10000);
 
 describe('StreamModal', () => {
   beforeEach(() => {
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
   });
 
   it('should render without provided stream', async () => {
@@ -146,7 +159,7 @@ describe('StreamModal', () => {
     await userEvent.click(addCollaborator);
 
     await waitFor(() => {
-      const prepareCalls = asMock(EntityShareActions.prepare).mock.calls;
+      const prepareCalls = asMock(EntityShareDomain.prepare).mock.calls;
       expect(prepareCalls).toHaveLength(2);
 
       const lastCallPayload = prepareCalls[1][3];

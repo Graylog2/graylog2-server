@@ -19,29 +19,19 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
-import { MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 
 import StreamRuleModal from './StreamRuleModal';
 
 jest.mock('components/streams/hooks/useStreamRuleTypes');
+jest.mock('hooks/useStreamRulesInputs');
 jest.mock('@graylog/server-api', () => ({
   SystemFields: {
     fields: async () => ({ fields: [] }),
   },
-}));
-
-jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
-  StreamRulesInputsActions: {
-    list: jest.fn(),
-  },
-  StreamRulesInputsStore: MockStore([
-    'getInitialState',
-    () => ({
-      inputs: [{ id: 'my-id', title: 'input title', name: 'name' }],
-    }),
-  ]),
 }));
 
 describe('StreamRuleModal', () => {
@@ -67,6 +57,9 @@ describe('StreamRuleModal', () => {
 
   beforeEach(() => {
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
+    asMock(useStreamRulesInputs).mockReturnValue({
+      data: [{ id: 'my-id', title: 'input title', name: 'name' }],
+    } as any);
   });
 
   it('should render without provided stream rule', async () => {

@@ -65,6 +65,7 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.ArrayList;
@@ -79,6 +80,7 @@ import java.util.stream.Stream;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@PublicCloudAPI
 public class EnrollmentTokenResource extends RestResource {
 
     private static final String DEFAULT_SORT_FIELD = EnrollmentTokenDTO.FIELD_CREATED_AT;
@@ -147,10 +149,10 @@ public class EnrollmentTokenResource extends RestResource {
     public EnrollmentTokenResponse createToken(
             @RequestBody(description = "Enrollment token creation request")
             @Valid @NotNull CreateEnrollmentTokenRequest request) {
-        collectorsConfigService.get().orElseThrow(() ->
-                new BadRequestException("Collectors must be configured before creating enrollment tokens. " +
-                        "Configure collectors at /api/collectors/config first.")
-        );
+        if (collectorsConfigService.get().isEmpty()) {
+            throw new BadRequestException("Collectors must be configured before creating enrollment tokens. " +
+                    "Configure collectors at /api/collectors/config first.");
+        }
 
         checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, request.fleetId());
 
@@ -243,7 +245,7 @@ public class EnrollmentTokenResource extends RestResource {
                                     "name", dto.name(),
                                     "expiresAt", Objects.requireNonNullElse(dto.expiresAt(), "never"),
                                     "fleetId", dto.fleetId()
-                                    )))
+                            )))
                             .map(EnrollmentTokenDTO::id)
                             .toList();
             final long deleted = enrollmentTokenService.deleteMany(permittedIds);

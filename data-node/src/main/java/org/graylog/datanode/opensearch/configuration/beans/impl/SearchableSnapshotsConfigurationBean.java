@@ -22,7 +22,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
@@ -59,7 +59,6 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     private static final Logger LOG = LoggerFactory.getLogger(SearchableSnapshotsConfigurationBean.class);
 
     private final Configuration localConfiguration;
-    private final DatanodeDirectories datanodeDirectories;
 
     private final Set<RepositoryConfiguration> repositoryConfigurations;
 
@@ -69,17 +68,17 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     @Inject
     public SearchableSnapshotsConfigurationBean(
             Configuration localConfiguration,
-            DatanodeDirectories datanodeDirectories,
+            DatanodeConfiguration datanodeConfiguration,
             Set<RepositoryConfiguration> repositoryConfigurations,
             Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
-        this.datanodeDirectories = datanodeDirectories;
         this.repositoryConfigurations = repositoryConfigurations;
         this.usableSpaceProvider = usableSpaceProvider;
     }
 
     @Override
-    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
+        final String searchableSnapshotsRole = configurationParams.datanodeConfiguration().opensearchDistribution().distributionProperties().searchableSnapshotsRole();
 
         final Set<RepositoryConfiguration> enabledRepositories = repositoryConfigurations.stream()
                 .filter(RepositoryConfiguration::isRepositoryEnabled)
@@ -89,32 +88,32 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             LOG.info("Searchable snapshots are configured, adding opensearch configuration");
             final DatanodeConfigurationPart.Builder builder = DatanodeConfigurationPart.builder();
 
-            final boolean warmRoleEnabled = warmRoleEnabled();
-            if (warmRoleEnabled) {
-                LOG.info("Warm role enabled, validating usable space and adding warm role to opensearch configuration");
+            final boolean searchRoleEnabled = searchRoleEnabled(searchableSnapshotsRole);
+            if (searchRoleEnabled) {
+                LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
                 validateUsableSpace();
-                builder.addNodeRole(OpensearchNodeRole.WARM);
+                builder.addNodeRole(searchableSnapshotsRole);
             }
             return builder
-                    .properties(properties(warmRoleEnabled, enabledRepositories))
-                    .keystoreItems(keystoreItems(enabledRepositories))
+                    .properties(properties(searchRoleEnabled, enabledRepositories))
+                    .keystoreItems(keystoreItems(enabledRepositories, configurationParams))
                     .build();
-        } else if (warmRoleExplicitlyConfigured()) {
-            throw new OpensearchConfigurationException("Your configuration contains the warm node role in node_roles but there is no" +
+        } else if (searchRoleExplicitlyConfigured(searchableSnapshotsRole)) {
+            throw new OpensearchConfigurationException("Your configuration contains the search node role in node_roles but there is no" +
                     "snapshots repository configured. Please remove the role or provide path_repo or S3 repository credentials.");
         } else {
-            LOG.info("Opensearch snapshots not configured, skipping warm role and cache configuration.");
+            LOG.info("Opensearch snapshots not configured, skipping search role and cache configuration.");
             return DatanodeConfigurationPart.builder().build();
         }
     }
 
-    private boolean warmRoleExplicitlyConfigured() {
-        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(OpensearchNodeRole.WARM);
+    private boolean searchRoleExplicitlyConfigured(String searchableSnapshotsRole) {
+        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(searchableSnapshotsRole);
     }
 
-    private boolean warmRoleEnabled() {
+    private boolean searchRoleEnabled(String searchableSnapshotsRole) {
         final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
-        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(OpensearchNodeRole.WARM);
+        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(searchableSnapshotsRole);
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {
@@ -181,9 +180,9 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         return builder.build();
     }
 
-    private Collection<OpensearchKeystoreItem> keystoreItems(Set<RepositoryConfiguration> enabledRepositories) {
+    private Collection<OpensearchKeystoreItem> keystoreItems(Set<RepositoryConfiguration> enabledRepositories, OpensearchConfigurationParams configurationParams) {
         return enabledRepositories.stream()
-                .flatMap(repo -> repo.keystoreItems(datanodeDirectories).stream())
+                .flatMap(repo -> repo.keystoreItems(configurationParams.datanodeConfiguration().datanodeDirectories()).stream())
                 .collect(Collectors.toSet());
     }
 }

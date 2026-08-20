@@ -19,6 +19,7 @@ package org.graylog2.plugin.journal;
 import com.eaio.uuid.UUID;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterables;
+import com.google.common.primitives.Ints;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UninitializedMessageException;
@@ -197,6 +198,21 @@ public class RawMessage implements Serializable {
         return msgBuilder.getPayload().toByteArray(); // TODO PERFORMANCE array copy
     }
 
+    /**
+     * Returns the input message size if set, otherwise the payload size.
+     */
+    public int getInputMessageSize() {
+        return msgBuilder.hasInputMessageSize() ? msgBuilder.getInputMessageSize() : getPayloadSize();
+    }
+
+    public int getPayloadSize() {
+        return msgBuilder.getPayload().size();
+    }
+
+    public void setInputMessageSize(long inputMessageSize) {
+        msgBuilder.setInputMessageSize(Ints.saturatedCast(inputMessageSize));
+    }
+
     public UUID getId() {
         return id;
     }
@@ -298,7 +314,7 @@ public class RawMessage implements Serializable {
         helper.add("id", getId())
                 .add("messageQueueId", getMessageQueueId())
                 .add("codec", getCodecName())
-                .add("payloadSize", getPayload().length)
+                .add("payloadSize", getPayloadSize())
                 .add("timestamp", getTimestamp())
                 .add("seqenceNr", getSequenceNr());
         if (getRemoteAddress() != null) {

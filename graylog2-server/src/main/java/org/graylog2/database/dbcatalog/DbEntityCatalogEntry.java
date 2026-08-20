@@ -16,8 +16,11 @@
  */
 package org.graylog2.database.dbcatalog;
 
+import java.util.List;
+
 public record DbEntityCatalogEntry(String collection,
                                    String titleField,
                                    Class<?> modelClass,
-                                   String readPermission) {
+                                   String readPermission,
+                                   List<String> readableFields) {
 }

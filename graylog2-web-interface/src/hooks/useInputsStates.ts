@@ -34,6 +34,7 @@ export type InputStateByNode = {
     detailed_message: string | null;
     last_failed_at?: string | null;
     message_input: InputSummary;
+    only_one_per_cluster?: boolean;
   };
 };
 

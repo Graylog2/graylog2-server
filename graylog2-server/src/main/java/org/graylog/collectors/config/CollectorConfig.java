@@ -19,6 +19,7 @@ package org.graylog.collectors.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.collectors.config.exporter.OtlpExporterConfig;
+import org.graylog.collectors.config.extension.CollectorExtensionConfig;
 import org.graylog.collectors.config.processor.CollectorProcessorConfig;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 
@@ -33,8 +34,10 @@ import java.util.Map;
 @AutoValue
 public abstract class CollectorConfig {
 
-    // TODO: Add file_storage extension for persisting file offsets, and exporter sending queue
     // TODO: Add resourcedetection processor to add resource attributes like OS name, version, etc.
+
+    @JsonProperty("extensions")
+    public abstract Map<String, CollectorExtensionConfig> extensions();
 
     @JsonProperty("receivers")
     public abstract Map<String, CollectorReceiverConfig> receivers();
@@ -54,6 +57,8 @@ public abstract class CollectorConfig {
 
     @AutoValue.Builder
     public abstract static class Builder {
+
+        public abstract Builder extensions(Map<String, CollectorExtensionConfig> extensions);
 
         public abstract Builder receivers(Map<String, CollectorReceiverConfig> receivers);
 

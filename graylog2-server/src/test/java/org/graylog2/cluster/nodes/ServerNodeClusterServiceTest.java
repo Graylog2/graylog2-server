@@ -18,7 +18,6 @@ package org.graylog2.cluster.nodes;
 
 import com.mongodb.DBCollection;
 import org.assertj.core.api.Assertions;
-import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.Configuration;
@@ -26,7 +25,6 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -40,8 +38,9 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.net.URI;
-import java.util.Map;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,7 +67,7 @@ public class ServerNodeClusterServiceTest {
         this.mongoCollections = mongoCollections;
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
         this.nodeService =
-                new ServerNodeClusterService(mongoCollections.connection(), configuration);
+                new ServerNodeClusterService(mongoCollections, configuration);
     }
 
     @Test
@@ -144,7 +143,7 @@ public class ServerNodeClusterServiceTest {
     }
 
     @Test
-    public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
+    public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException {
         nodeService.registerServer(ServerNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
                 .setLeader(true)
@@ -154,28 +153,23 @@ public class ServerNodeClusterServiceTest {
                 .setLifecycle(LIFECYCLE)
                 .build());
 
-        final ServerNodeDto node = nodeService.byNodeId(nodeId);
+        // Older Graylog versions wrote last_seen as numeric epoch seconds rather than a BSON Date.
+        // Overwrite the field directly to simulate that on-disk shape.
+        final long staleEpochSeconds = (System.currentTimeMillis() - 2L * STALE_LEADER_TIMEOUT_MS) / 1000L;
+        mongoCollections.mongoConnection().getMongoDatabase()
+                .getCollection(ServerNodeDto.COLLECTION_NAME)
+                .updateOne(eq("node_id", nodeId.getNodeId()), set("last_seen", staleEpochSeconds));
 
-        final long lastSeenMs = System.currentTimeMillis() - 2 * STALE_LEADER_TIMEOUT_MS;
-
-        final Map<String, Object> fields = node.toEntityParameters();
-        fields.put("last_seen", (int) (lastSeenMs / 1000));
-        ServerNodeEntity nodeEntity = new ServerNodeEntity(new ObjectId(node.getObjectId()), fields);
-
-        nodeService.save(nodeEntity);
-
+        // byNodeId must deserialize the numeric value via LastSeenDeserializer.
         final Node nodeAfterUpdate = nodeService.byNodeId(nodeId);
-        final long lastSeenFromDb = nodeAfterUpdate.getLastSeen().toInstant().getMillis();
-        Assertions.assertThat(lastSeenMs - lastSeenFromDb).isLessThan(1000); // make sure that our lastSeen from int is the same valid date
+        Assertions.assertThat(nodeAfterUpdate.getLastSeen().getMillis())
+                .isEqualTo(staleEpochSeconds * 1000L);
 
-        final Map<String, ServerNodeDto> activeNodes = nodeService.allActive();
+        // The aggregation pipeline must coerce the numeric value to a Date and treat the node as stale.
+        Assertions.assertThat(nodeService.allActive()).isEmpty();
 
-        // the node is stale, should not be present here
-        Assertions.assertThat(activeNodes).isEmpty();
-
-        // this should drop the node with the int timestamp, as it's at least 2xstale_delay outdated.
+        // dropOutdated must remove the legacy-formatted node.
         nodeService.dropOutdated();
-
         Assertions.assertThatThrownBy(() -> nodeService.byNodeId(nodeId))
                 .isInstanceOf(NodeNotFoundException.class);
     }

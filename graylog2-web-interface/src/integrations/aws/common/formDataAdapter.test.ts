@@ -34,7 +34,9 @@ describe('formDataAdapter', () => {
     const mappings: Record<string, string> = {
       aws_access_key: awsAccessKey,
       aws_assume_role_arn: 'awsAssumeRoleARN',
+      aws_external_id: 'awsExternalId',
       aws_flow_log_prefix: 'awsCloudWatchAddFlowLogPrefix',
+      store_full_message: 'awsCloudWatchStoreFullMessage',
       aws_message_type: 'awsCloudWatchKinesisInputType',
       aws_region: 'awsCloudWatchAwsRegion',
       aws_secret_key: awsSecretKey,
@@ -82,6 +84,7 @@ describe('formDataAdapter', () => {
       aws_access_key_id: awsAccessKey,
       aws_secret_access_key: awsSecretKey,
       assume_role_arn: 'awsAssumeRoleARN',
+      aws_external_id: 'awsExternalId',
       cloudwatch_endpoint: 'awsEndpointCloudWatch',
       dynamodb_endpoint: 'awsEndpointDynamoDB',
       iam_endpoint: 'awsEndpointIAM',

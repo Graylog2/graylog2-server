@@ -20,9 +20,12 @@ import org.graylog.datanode.opensearch.cli.OpensearchCli;
 import org.graylog.datanode.process.Environment;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Utility for correct removal of opensearch plugins from a maven build. This makes sure that no dependencies are
@@ -33,24 +36,28 @@ public class RemoveOpensearchPlugins {
     public static void main(String[] args) throws IOException {
 
         if (args.length < 2) {
-            System.err.println("Syntax: " + RemoveOpensearchPlugins.class.getSimpleName() + " <opensearchDistDir> <pluginFile>");
+            System.err.println("Syntax: " + RemoveOpensearchPlugins.class.getSimpleName() + " <opensearchParentDir> <plugin1> ... <pluginN>");
             System.exit(1);
         }
 
-        final Path opensearchDist = Path.of(args[0]);
-        final Path binDir = opensearchDist.resolve("bin");
-        final Path configDir = opensearchDist.resolve("config");
+        final Path opensearchParentDir = Path.of(args[0]);
+        final List<String> pluginsToRemove = Arrays.stream(args).skip(1).toList();
 
-        Environment env = new Environment(Map.of())
+        try (Stream<Path> dirs = Files.list(opensearchParentDir)) {
+            dirs.filter(Files::isDirectory)
+                    .sorted()
+                    .forEach(distDir -> removePluginsFromDist(distDir, pluginsToRemove));
+        }
+    }
+
+    private static void removePluginsFromDist(Path distDir, List<String> pluginsToRemove) {
+        System.out.println("Removing unused plugins of  " + distDir.getFileName());
+        final Environment env = new Environment(Map.of())
                 .withOpensearchJavaHome(Path.of(System.getProperty("java.home")))
-                .withOpensearchPathConf(configDir);
-
-        final OpensearchCli cli = new OpensearchCli(env, binDir);
-
-        // TODO: implement batch removal of multiple plugins, if opensearch ever supports that (like ES does)
-        Arrays.stream(args)
-                .skip(1)
-                .forEach(pluginName -> removePlugin(pluginName, cli));
+                .withOpensearchPathConf(distDir.resolve("config"));
+        final OpensearchCli cli = new OpensearchCli(env, distDir.resolve("bin"));
+        // Caution: plugin order is relevant — plugins may depend on other plugins and must be removed in order.
+        pluginsToRemove.forEach(plugin -> removePlugin(plugin, cli));
     }
 
     private static void removePlugin(String plugin, OpensearchCli cli) {

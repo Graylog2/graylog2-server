@@ -132,16 +132,12 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
     [currentWidgetSearchType, result?.duration, result?.timestamp],
   );
 
-  const onClose = useCallback(() => {
-    setOpen(false);
-  }, []);
-
   const onToggle = useCallback(() => {
     setOpen((cur) => !cur);
   }, []);
 
   return interactive ? (
-    <Popover position="bottom" opened={open} onClose={onClose} closeOnClickOutside>
+    <Popover position="bottom" opened={open} onChange={setOpen} closeOnClickOutside>
       <Popover.Target>
         <TargetContainer role="presentation" onClick={onToggle}>
           <>

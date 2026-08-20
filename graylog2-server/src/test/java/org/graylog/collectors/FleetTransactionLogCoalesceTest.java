@@ -16,8 +16,8 @@
  */
 package org.graylog.collectors;
 
-import org.bson.Document;
 import org.graylog.collectors.db.CoalescedActions;
+import org.graylog.collectors.db.FleetReassignedPayload;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
 import org.junit.jupiter.api.Test;
@@ -147,7 +147,7 @@ class FleetTransactionLogCoalesceTest {
     @Test
     void unknownMarkerTypesAreSkipped() {
         var markers = List.of(
-                new TransactionMarker(10, TARGET_FLEET, Set.of("fleet-1"), MarkerType.UNKNOWN, "FUTURE_TYPE", null, Instant.now(), "system"),
+                new TransactionMarker(10, TARGET_FLEET, Set.of("fleet-1"), MarkerType.UNKNOWN, null, Instant.now(), "test-node", "system"),
                 marker(15, TARGET_FLEET, "fleet-1", MarkerType.CONFIG_CHANGED)
         );
         CoalescedActions actions = FleetTransactionLogService.doCoalesce(markers);
@@ -159,7 +159,7 @@ class FleetTransactionLogCoalesceTest {
     @Test
     void maxSeqIncludesUnknownMarkers() {
         var markers = List.of(
-                new TransactionMarker(20, TARGET_FLEET, Set.of("fleet-1"), MarkerType.UNKNOWN, "FUTURE_TYPE", null, Instant.now(), "system")
+                new TransactionMarker(20, TARGET_FLEET, Set.of("fleet-1"), MarkerType.UNKNOWN, null, Instant.now(), "test-node", "system")
         );
         CoalescedActions actions = FleetTransactionLogService.doCoalesce(markers);
         assertThat(actions.recomputeConfig()).isFalse();
@@ -184,12 +184,11 @@ class FleetTransactionLogCoalesceTest {
     // --- helpers ---
 
     private static TransactionMarker marker(long seq, String target, String targetId, MarkerType type) {
-        return new TransactionMarker(seq, target, Set.of(targetId), type, type.name(), null, Instant.now(), "system");
+        return new TransactionMarker(seq, target, Set.of(targetId), type, null, Instant.now(), "test-node", "system");
     }
 
     private static TransactionMarker reassignmentMarker(long seq, String instanceUid, String newFleetId) {
         return new TransactionMarker(seq, TransactionMarker.TARGET_COLLECTOR, Set.of(instanceUid),
-                MarkerType.FLEET_REASSIGNED, MarkerType.FLEET_REASSIGNED.name(),
-                new Document("new_fleet_id", newFleetId), Instant.now(), "system");
+                MarkerType.FLEET_REASSIGNED, new FleetReassignedPayload(newFleetId), Instant.now(), "test-node", "system");
     }
 }

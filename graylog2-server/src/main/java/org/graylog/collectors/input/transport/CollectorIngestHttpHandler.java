@@ -16,7 +16,8 @@
  */
 package org.graylog.collectors.input.transport;
 
-import com.google.protobuf.AbstractMessageLite;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,10 +31,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
+import org.graylog.collectors.CertBindingResolver;
 import org.graylog.collectors.input.CollectorJournalRecordFactory;
 import org.graylog.inputs.otel.transport.OtlpHttpUtils;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +58,16 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
     private static final String LOGS_PATH = OtlpHttpUtils.LOGS_PATH;
 
     private final MessageInput input;
+    private final CertBindingResolver certBindingResolver;
 
-    public CollectorIngestHttpHandler(MessageInput input) {
+    public interface Factory {
+        CollectorIngestHttpHandler create(MessageInput input);
+    }
+
+    @AssistedInject
+    public CollectorIngestHttpHandler(@Assisted MessageInput input, CertBindingResolver certBindingResolver) {
         this.input = input;
+        this.certBindingResolver = certBindingResolver;
     }
 
     @Override
@@ -74,10 +84,18 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
             return;
         }
 
-        final String instanceUid = ctx.channel().attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).get();
-        if (instanceUid == null) {
-            LOG.warn("Rejecting request without agent identity (no valid client certificate)");
-            sendError(ctx, HttpResponseStatus.UNAUTHORIZED, keepAlive);
+        final String certFingerprint = ctx.channel().attr(AgentCertChannelHandler.AGENT_CERT_FINGERPRINT).get();
+        if (certFingerprint == null) {
+            LOG.error("Missing client certificate fingerprint channel attribute.");
+            sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, false);
+            return;
+        }
+
+        final var instanceUid = certBindingResolver.resolve(certFingerprint);
+        if (instanceUid.isEmpty()) {
+            LOG.warn("Rejecting request from {}: certificate fingerprint {} does not resolve to a collector instance.",
+                    ctx.channel().remoteAddress(), certFingerprint);
+            sendError(ctx, HttpResponseStatus.UNAUTHORIZED, false);
             return;
         }
 
@@ -103,10 +121,13 @@ public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<Full
                 createRawMessage = RawMessage::new;
             }
 
-            CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid).stream()
-                    .map(AbstractMessageLite::toByteArray)
-                    .map(createRawMessage)
-                    .forEach(input::processRawMessage);
+            RecordSizeDistributingProcessor.processRecords(
+                    CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid.get()),
+                    exportRequest.getSerializedSize(),
+                    r -> r.getOtelRecord().getLog().getLogRecord().getSerializedSize(),
+                    createRawMessage,
+                    input,
+                    LOG);
         } catch (Exception e) {
             LOG.error("Failed to process OTLP request", e);
             sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive, isProtobuf);

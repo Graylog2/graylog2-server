@@ -1,0 +1,5 @@
+type = "f"
+message = "show Graylog Node Version in Cluster Configuration page"
+
+pulls = ["25500"]
+issues = ["25463"]

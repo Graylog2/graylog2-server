@@ -31,6 +31,7 @@ import {
   ContentPacksPage,
   CreateContentPackPage,
   CreateEventDefinitionPage,
+  SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DataNodePage,
@@ -104,6 +105,7 @@ import {
   CollectorsFleetsPage,
   CollectorsFleetDetailPage,
   CollectorsInstancesPage,
+  CollectorsOnboardingInstancePage,
   CollectorsDeploymentPage,
   CollectorsSettingsPage,
   SimulatorPage,
@@ -112,6 +114,7 @@ import {
   StreamOutputsPage,
   StreamsPage,
   StreamDetailsPage,
+  SystemNotificationsPage,
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
@@ -125,7 +128,7 @@ import {
   SidecarFailureTrackingPage,
   IndexSetFieldTypesPage,
   ClusterConfigurationPage,
-  ClusterCertificateManagementPage
+  ClusterCertificateManagementPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -215,6 +218,8 @@ const AppRouter = () => {
             { path: RoutePaths.ALERTS.LIST, element: <EventsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.LIST, element: <EventDefinitionsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.CREATE, element: <CreateEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.GIT_IMPORT, element: <SigmaEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.FILE_IMPORT, element: <SigmaEventDefinitionPage /> },
             {
               path: RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId'),
               element: <EditEventDefinitionPage />,
@@ -366,6 +371,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId'), element: <RoleEditPage /> },
 
             { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
+            { path: RoutePaths.SYSTEM.NOTIFICATIONS, element: <SystemNotificationsPage /> },
             { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },
@@ -391,6 +397,10 @@ const AppRouter = () => {
                   { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/new`, element: <CollectorsFleetsPage /> },
                   { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/:fleetId`, element: <CollectorsFleetDetailPage /> },
                   { path: RoutePaths.SYSTEM.COLLECTORS.INSTANCES, element: <CollectorsInstancesPage /> },
+                  {
+                    path: RoutePaths.SYSTEM.COLLECTORS.ONBOARDING_INSTANCE(':instanceUid'),
+                    element: <CollectorsOnboardingInstancePage />,
+                  },
                   { path: RoutePaths.SYSTEM.COLLECTORS.DEPLOYMENT, element: <CollectorsDeploymentPage /> },
                   { path: RoutePaths.SYSTEM.COLLECTORS.SETTINGS, element: <CollectorsSettingsPage /> },
                 ]
@@ -430,7 +440,7 @@ const AppRouter = () => {
 
   return (
     <RouterErrorBoundary>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </RouterErrorBoundary>
   );
 };

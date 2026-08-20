@@ -47,9 +47,9 @@ const replaySection: SidebarSection = {
 const defaultSearchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
+    initialSectionCollapsed: true,
     title: 'Replayed Search',
     sections: [...sidebarSections],
-    contentColumnWidth: 350,
   },
 };
 

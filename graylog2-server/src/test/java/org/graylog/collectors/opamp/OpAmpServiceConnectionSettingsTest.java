@@ -80,13 +80,4 @@ class OpAmpServiceConnectionSettingsTest {
                 .isEqualTo("https://otlp.example.com:14401/?tls_server_name=" + CLUSTER_ID + "&log_level=info");
     }
 
-    @Test
-    void returnsEmptyWhenExporterConfigIsNull() {
-        final var builder = Opamp.ServerToAgent.newBuilder();
-        OpAmpService.buildConnectionSettings(builder, null);
-
-        final var httpSettings = builder.getConnectionSettings().getOwnLogs();
-
-        assertThat(httpSettings.getDestinationEndpoint()).isEmpty();
-    }
 }

@@ -15,16 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { FormikTouched, FormikErrors } from 'formik';
 import { Formik, Form } from 'formik';
+import isEqual from 'lodash/isEqual';
+import moment from 'moment';
 
-import { Input } from 'components/bootstrap';
+import { HelpBlock, Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
-import { FormikInput } from 'components/common';
+import { FormikInput, InputDescription } from 'components/common';
+import TimeUnitInput, { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import ModalSubmit from 'components/common/ModalSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { SOURCE_TYPE_LABELS } from './Constants';
 
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type {
   Source,
   SourceType,
@@ -32,19 +38,42 @@ import type {
   JournaldSourceConfig,
   JournaldPriority,
   WindowsEventLogSourceConfig,
+  MacOSUnifiedLoggingSourceConfig,
 } from '../types';
 
 type Props = {
   fleetId: string;
   source?: Source;
   onClose: () => void;
-  onSave: (source: Omit<Source, 'id'>) => Promise<void>;
+  onSave: (source: Omit<Source, 'id'>) => Promise<{ id?: string } | void>;
 };
 
-const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
+const defaultConfigs: Record<
+  SourceType,
+  FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig
+> = {
   file: { paths: [''], read_mode: 'end' },
   journald: { read_mode: 'end', priority: 'info' },
   windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end' },
+  macos_unified_logging: {
+    predicate:
+      'subsystem IN {\n' +
+      "'com.apple.opendirectoryd',\n" +
+      "'com.apple.authorization',\n" +
+      "'com.apple.loginwindow',\n" +
+      "'com.apple.securityd',\n" +
+      "'com.apple.TCC',\n" +
+      "'com.apple.alf',\n" +
+      "'com.apple.networkextension',\n" +
+      "'com.apple.DiskManagement',\n" +
+      "'com.apple.CoreStorage',\n" +
+      "'com.apple.endpointsecurity',\n" +
+      "'com.apple.syspolicyd',\n" +
+      "'com.apple.launchd'\n" +
+      '} AND messageType >= error',
+    max_log_age: 'PT24H',
+    max_poll_interval: 'PT30S',
+  },
 };
 
 type FormValues = {
@@ -52,48 +81,103 @@ type FormValues = {
   name: string;
   description: string;
   enabled: boolean;
-  config: FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig;
+  config: FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig;
 };
 
-const validate = (values: FormValues) => {
-  const errors: Partial<Record<keyof FormValues, string>> = {};
+// TimeUnitInput is not a formik field, so we need to validate against the entire form
+const validateMacOSUnifiedLogging = (
+  config: MacOSUnifiedLoggingSourceConfig,
+): FormikErrors<MacOSUnifiedLoggingSourceConfig> => {
+  const errors: FormikErrors<MacOSUnifiedLoggingSourceConfig> = {};
 
-  if (!values.name) {
-    errors.name = 'Name is required';
+  if (moment.duration(config.max_poll_interval).asSeconds() <= 0) {
+    errors.max_poll_interval = 'Max poll interval must be at least 1 seconds.';
+  }
+
+  if (moment.duration(config.max_log_age).asSeconds() < 0) {
+    errors.max_log_age = 'Max log age must be 0 or a positive value.';
   }
 
   return errors;
 };
 
-const FileConfigFields = ({ config, setFieldValue }: { config: FileSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
-  <>
-    <Input
-      id="file-paths"
-      type="text"
-      label="File Path(s)"
-      help="Glob pattern supported (e.g., /var/log/*.log)"
-      value={config.paths[0] || ''}
-      onChange={(e) => setFieldValue('config', { ...config, paths: [e.target.value] })}
-      required
-    />
-    <Input
-      id="file-read-mode"
-      type="select"
-      label="Read Mode"
-      value={config.read_mode}
-      onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
-      <option value="end">From end (tail)</option>
-      <option value="beginning">From beginning</option>
-    </Input>
-  </>
-);
+const validate = (values: FormValues) => {
+  const errors: FormikErrors<FormValues> = {};
 
-const JournaldConfigFields = ({ config, setFieldValue }: { config: JournaldSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
+  if (!values.name) {
+    errors.name = 'Name is required';
+  }
+
+  if (values.source_type === 'macos_unified_logging') {
+    const configErrors = validateMacOSUnifiedLogging(values.config as MacOSUnifiedLoggingSourceConfig);
+
+    if (Object.keys(configErrors).length > 0) {
+      errors.config = configErrors;
+    }
+  }
+
+  return errors;
+};
+
+export const splitToList = (value: string | undefined): Array<string> =>
+  (value || '')
+    .split(',')
+    .map((c) => c.trim())
+    .filter(Boolean);
+
+const FileConfigFields = ({
+  config,
+  setFieldValue,
+}: {
+  config: FileSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+}) => {
+  // Keep a raw input buffer so the user can freely type commas and spaces.
+  // splitToList would strip a trailing comma on every keystroke otherwise,
+  // making it impossible to enter multiple comma-separated values.
+  const [pathsInput, setPathsInput] = useState(() => config.paths?.join(', ') ?? '');
+
+  return (
+    <>
+      <Input
+        id="file-paths"
+        type="text"
+        label="File Path(s)"
+        help="Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The Collector watches matched files for new lines."
+        value={pathsInput}
+        onChange={(e) => {
+          setPathsInput(e.target.value);
+          setFieldValue('config', { ...config, paths: splitToList(e.target.value) });
+        }}
+        required
+      />
+      <Input
+        id="file-read-mode"
+        type="select"
+        label="Read Mode"
+        help="From end: only collect new lines after the Collector starts. From beginning: collect all existing lines first, then continue tailing."
+        value={config.read_mode}
+        onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
+        <option value="end">From end (tail)</option>
+        <option value="beginning">From beginning</option>
+      </Input>
+    </>
+  );
+};
+
+const JournaldConfigFields = ({
+  config,
+  setFieldValue,
+}: {
+  config: JournaldSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+}) => (
   <>
     <Input
       id="journald-read-mode"
       type="select"
       label="Read Mode"
+      help="From end: only collect new entries after the Collector starts. From beginning: collect all existing entries first, then continue tailing."
       value={config.read_mode}
       onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
       <option value="end">From end (tail)</option>
@@ -103,6 +187,7 @@ const JournaldConfigFields = ({ config, setFieldValue }: { config: JournaldSourc
       id="journald-priority"
       type="select"
       label="Priority"
+      help="Minimum severity level to collect. For example, selecting Error also collects Critical, Alert, and Emergency entries."
       value={config.priority}
       onChange={(e) => setFieldValue('config', { ...config, priority: e.target.value as JournaldPriority })}>
       <option value="emerg">Emergency</option>
@@ -118,60 +203,184 @@ const JournaldConfigFields = ({ config, setFieldValue }: { config: JournaldSourc
       id="journald-match-pattern"
       type="text"
       label="Match Pattern"
-      help="Optional journald match expression to filter entries"
+      help="Optional journald match expression to filter entries by unit, process, etc. Example: _SYSTEMD_UNIT=nginx.service"
       value={config.match_pattern || ''}
       onChange={(e) => setFieldValue('config', { ...config, match_pattern: e.target.value || undefined })}
     />
   </>
 );
 
-const WindowsEventLogConfigFields = ({ config, setFieldValue }: { config: WindowsEventLogSourceConfig; setFieldValue: (field: string, value: unknown) => void }) => (
-  <>
-    <Input
-      id="win-channels"
-      type="text"
-      label="Channels"
-      help="Comma-separated channel names (e.g., Application, Security, System)"
-      value={config.channels.join(', ')}
-      onChange={(e) =>
-        setFieldValue('config', {
-          ...config,
-          channels: e.target.value.split(',').map((c) => c.trim()).filter(Boolean),
-        })
-      }
-      required
-    />
-    <Input
-      id="win-include-default-channels"
-      type="checkbox"
-      label="Include default channels"
-      checked={config.include_default_channels}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        setFieldValue('config', { ...config, include_default_channels: e.target.checked })
-      }
-    />
-    <Input
-      id="win-read-mode"
-      type="select"
-      label="Read Mode"
-      value={config.read_mode}
-      onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
-      <option value="end">From end (tail)</option>
-      <option value="beginning">From beginning</option>
-    </Input>
-  </>
-);
+const WindowsEventLogConfigFields = ({
+  config,
+  setFieldValue,
+}: {
+  config: WindowsEventLogSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+}) => {
+  const [channelsInput, setChannelsInput] = useState(() => config.channels.join(', '));
+
+  return (
+    <>
+      <Input
+        id="win-channels"
+        type="text"
+        label="Channels"
+        help="Comma-separated channel names (e.g., Application, Security, System)"
+        value={channelsInput}
+        onChange={(e) => {
+          setChannelsInput(e.target.value);
+          setFieldValue('config', {
+            ...config,
+            channels: splitToList(e.target.value),
+          });
+        }}
+        required={!config.include_default_channels}
+      />
+      <Input
+        id="win-include-default-channels"
+        type="checkbox"
+        label="Include default channels"
+        // if you update this, also update WindowsEventLogReceiverConfig.java
+        help="Defaults are: Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell"
+        checked={config.include_default_channels}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setFieldValue('config', { ...config, include_default_channels: e.target.checked })
+        }
+      />
+      <Input
+        id="win-read-mode"
+        type="select"
+        label="Read Mode"
+        value={config.read_mode}
+        onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
+        <option value="end">From end (tail)</option>
+        <option value="beginning">From beginning</option>
+      </Input>
+    </>
+  );
+};
+
+// Ordered largest-first so extractDurationAndUnit renders the most readable unit (e.g. PT24H -> "1 days").
+const POLL_INTERVAL_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
+const LOG_AGE_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
+
+const MacOSUnifiedLoggingConfigFields = ({
+  config,
+  setFieldValue,
+  errors = undefined,
+}: {
+  config: MacOSUnifiedLoggingSourceConfig;
+  setFieldValue: (field: string, value: unknown) => void;
+  errors?: FormikErrors<MacOSUnifiedLoggingSourceConfig>;
+}) => {
+  const pollInterval = extractDurationAndUnit(config.max_poll_interval, POLL_INTERVAL_UNITS);
+  const logAge = extractDurationAndUnit(config.max_log_age, LOG_AGE_UNITS);
+
+  // TimeUnitInput reports (value, unit, checked). Unchecked clears the field so the backend default applies.
+  const updateDuration = (field: 'max_poll_interval' | 'max_log_age') => (value: number, unit: string) => {
+    setFieldValue('config', {
+      ...config,
+      [field]: moment.duration(value, unit as moment.unitOfTime.DurationConstructor).toISOString(),
+    });
+  };
+
+  return (
+    <>
+      <Input
+        id="macos-predicate"
+        type="textarea"
+        label="Predicate"
+        help={
+          <span>
+            Optional macOS unified logging filter predicate passed to the <code>log</code> command. Leaving this empty
+            collects all logs from the system! <code>info</code> or <code>debug</code> levels are not currently
+            collected, as they are very noisy and carry very little valuable information. Example:{' '}
+            <code>subsystem == &#39;com.apple.securityd&#39;</code>
+          </span>
+        }
+        value={config.predicate || ''}
+        onChange={(e) => setFieldValue('config', { ...config, predicate: e.target.value || undefined })}
+      />
+      <TimeUnitInput
+        label="Max poll interval"
+        update={updateDuration('max_poll_interval')}
+        value={pollInterval.duration}
+        unit={pollInterval.unit}
+        units={POLL_INTERVAL_UNITS}
+        required
+      />
+      <InputDescription
+        error={errors?.max_poll_interval}
+        help="How often the Collector checks for new log entries. Must be at least 1 second."
+      />
+      <TimeUnitInput
+        label="Max log age"
+        update={updateDuration('max_log_age')}
+        value={logAge.duration}
+        unit={logAge.unit}
+        units={LOG_AGE_UNITS}
+        required
+      />
+      <InputDescription
+        error={errors?.max_log_age}
+        help="On first start, how far back to backfill logs. Set to 0 to disable backfilling."
+      />
+    </>
+  );
+};
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
   const isEdit = !!source;
+  const sendTelemetry = useSendCollectorsTelemetry();
 
-  const initialValues: FormValues = {
-    source_type: source?.type || 'file',
-    name: source?.name || '',
-    description: source?.description || '',
-    enabled: source?.enabled ?? true,
-    config: source?.config || defaultConfigs[source?.type || 'file'],
-  };
+  const initialValues: FormValues = useMemo(
+    () => ({
+      source_type: source?.type || 'file',
+      name: source?.name || '',
+      description: source?.description || '',
+      enabled: source?.enabled ?? true,
+      config: source?.config || defaultConfigs[source?.type || 'file'],
+    }),
+    [source],
+  );
+
+  useEffect(() => {
+    if (!isEdit) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_OPENED, {
+        app_action_value: 'source-create-open',
+        fleet_id: fleetId,
+      });
+    }
+    // fire only once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Ref kept up-to-date from the Formik render prop so handleClose (which lives
+  // outside Formik) can report abandonment context on cancel.
+  const formStateRef = useRef<{
+    dirty: boolean;
+    touched: FormikTouched<FormValues>;
+    values: FormValues;
+  }>({ dirty: false, touched: {}, values: initialValues });
+
+  const handleClose = useCallback(() => {
+    if (!isEdit) {
+      const { dirty, touched, values } = formStateRef.current;
+      const fields_touched = Object.keys(touched).filter((k) => Boolean((touched as Record<string, unknown>)[k]));
+
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_CANCELLED, {
+        app_action_value: 'source-create-cancel',
+        fleet_id: fleetId,
+        dirty,
+        fields_touched,
+        source_type: values.source_type,
+        source_type_changed_from_default: values.source_type !== 'file',
+        enabled: values.enabled,
+        enabled_toggled: values.enabled !== true,
+      });
+    }
+    onClose();
+  }, [fleetId, isEdit, onClose, sendTelemetry]);
 
   const handleSubmit = useCallback(
     (values: FormValues) =>
@@ -182,74 +391,124 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
         enabled: values.enabled,
         type: values.source_type,
         config: values.config,
-      } as Omit<Source, 'id'>).then(() => onClose()),
-    [fleetId, onSave, onClose],
+      } as Omit<Source, 'id'>).then((saved) => {
+        if (isEdit) {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.UPDATED, {
+            app_action_value: 'source-edit-submit',
+            fleet_id: fleetId,
+            source_id: source!.id,
+            source_type: values.source_type,
+            enabled: values.enabled,
+            enabled_changed: initialValues.enabled !== values.enabled,
+            config_changed: !isEqual(initialValues.config, values.config),
+          });
+        } else {
+          const savedId = (saved as { id?: string } | undefined)?.id ?? '';
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATED, {
+            app_action_value: 'source-create-submit',
+            fleet_id: fleetId,
+            source_id: savedId,
+            source_type: values.source_type,
+            enabled: values.enabled,
+          });
+        }
+
+        onClose();
+      }),
+    [fleetId, isEdit, onSave, onClose, sendTelemetry, source, initialValues],
   );
 
   return (
-    <Modal show onHide={onClose} bsSize="lg">
+    <Modal show onHide={handleClose} bsSize="lg">
       <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
-        {({ isSubmitting, isValidating, values, setFieldValue }) => (
-          <Form>
-            <Modal.Header>
-              <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Input
-                id="source-type"
-                type="select"
-                label="Source Type"
-                value={values.source_type}
-                onChange={(e) => {
-                  const newType = e.target.value as SourceType;
+        {({ isSubmitting, isValidating, isValid, values, setFieldValue, dirty, touched, errors }) => {
+          formStateRef.current = { dirty, touched, values };
 
-                  setFieldValue('source_type', newType);
-                  setFieldValue('config', defaultConfigs[newType]);
-                }}
-                disabled={isEdit}>
-                {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </Input>
-              <FormikInput
-                id="source-name"
-                label="Name"
-                name="name"
-                required
-              />
-              <FormikInput
-                id="source-description"
-                label="Description"
-                name="description"
-                type="textarea"
-              />
-              <FormikInput
-                id="source-enabled"
-                label="Enabled"
-                name="enabled"
-                type="checkbox"
-              />
-              {values.source_type === 'file' && (
-                <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />
-              )}
-              {values.source_type === 'journald' && (
-                <JournaldConfigFields config={values.config as JournaldSourceConfig} setFieldValue={setFieldValue} />
-              )}
-              {values.source_type === 'windows_event_log' && (
-                <WindowsEventLogConfigFields config={values.config as WindowsEventLogSourceConfig} setFieldValue={setFieldValue} />
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <ModalSubmit
-                submitButtonText={isEdit ? 'Update source' : 'Create source'}
-                submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
-                onCancel={onClose}
-                disabledSubmit={isValidating}
-                isSubmitting={isSubmitting}
-              />
-            </Modal.Footer>
-          </Form>
-        )}
+          return (
+            <Form>
+              <Modal.Header>
+                <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <p>
+                  A source defines what data Collectors in this fleet should collect. Each source type corresponds to a
+                  different collection method.
+                </p>
+                <Input
+                  id="source-type"
+                  type="select"
+                  label="Source Type"
+                  value={values.source_type}
+                  onChange={(e) => {
+                    const newType = e.target.value as SourceType;
+
+                    setFieldValue('source_type', newType);
+                    setFieldValue('config', defaultConfigs[newType]);
+                  }}
+                  disabled={isEdit}>
+                  {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </Input>
+                {values.source_type === 'file' && (
+                  <HelpBlock>
+                    Collect log lines from files on the host. Supports glob patterns for matching multiple files.
+                  </HelpBlock>
+                )}
+                {values.source_type === 'journald' && (
+                  <HelpBlock>Collect entries from the systemd journal (Linux only).</HelpBlock>
+                )}
+                {values.source_type === 'windows_event_log' && (
+                  <HelpBlock>Collect events from Windows Event Viewer channels.</HelpBlock>
+                )}
+                {values.source_type === 'macos_unified_logging' && (
+                  <HelpBlock>
+                    Collect from the macOS unified logging system via the <code>log</code> command (macOS only).
+                  </HelpBlock>
+                )}
+                <FormikInput id="source-name" label="Name" name="name" required />
+                <FormikInput id="source-description" label="Description" name="description" type="textarea" />
+                <FormikInput
+                  id="source-enabled"
+                  label="Enabled"
+                  name="enabled"
+                  type="checkbox"
+                  help="Disabled sources are not sent to Collectors. Use this to temporarily stop collection without removing the source."
+                />
+                {values.source_type === 'file' && (
+                  <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />
+                )}
+                {values.source_type === 'journald' && (
+                  <JournaldConfigFields config={values.config as JournaldSourceConfig} setFieldValue={setFieldValue} />
+                )}
+                {values.source_type === 'windows_event_log' && (
+                  <WindowsEventLogConfigFields
+                    config={values.config as WindowsEventLogSourceConfig}
+                    setFieldValue={setFieldValue}
+                  />
+                )}
+                {values.source_type === 'macos_unified_logging' && (
+                  <MacOSUnifiedLoggingConfigFields
+                    config={values.config as MacOSUnifiedLoggingSourceConfig}
+                    setFieldValue={setFieldValue}
+                    errors={errors.config as FormikErrors<MacOSUnifiedLoggingSourceConfig>}
+                  />
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <ModalSubmit
+                  submitButtonText={isEdit ? 'Update source' : 'Create source'}
+                  submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
+                  onCancel={handleClose}
+                  disabledSubmit={isValidating || !isValid}
+                  isSubmitting={isSubmitting}
+                />
+              </Modal.Footer>
+            </Form>
+          );
+        }}
       </Formik>
     </Modal>
   );

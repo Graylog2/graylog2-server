@@ -28,13 +28,12 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
-import org.graylog2.rest.RestTools;
+import org.graylog2.rest.URIHelper;
 
 import java.net.URI;
 
@@ -57,18 +56,16 @@ import java.net.URI;
 public class OpenApiResource {
 
     private final OpenApiContext context;
-    private final HttpConfiguration httpConfiguration;
 
     @Inject
-    public OpenApiResource(OpenAPIContextFactory contextFactory, HttpConfiguration httpConfiguration) {
+    public OpenApiResource(OpenAPIContextFactory contextFactory) {
         this.context = contextFactory.getOrCreate(OpenApiContext.OPENAPI_CONTEXT_ID_DEFAULT);
-        this.httpConfiguration = httpConfiguration;
     }
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.APPLICATION_YAML})
     @Operation(hidden = true)
-    public Response getOpenApi(@Context HttpHeaders headers,
+    public Response getOpenApi(@Context URIHelper uriHelper,
                                @PathParam("ext") String ext) throws Exception {
         final boolean yaml = ".yaml".equals(ext);
         final var mapper = yaml ? context.getOutputYamlMapper() : context.getOutputJsonMapper();
@@ -79,15 +76,9 @@ public class OpenApiResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        final String output = serializeWithServerUrl(openAPI, mapper, resolveServerUrl(headers));
+        final String output = serializeWithServerUrl(openAPI, mapper, uriHelper.resolve(HttpConfiguration.PATH_API));
 
         return Response.ok(output).type(mediaType).build();
-    }
-
-    private URI resolveServerUrl(HttpHeaders headers) {
-        final var baseUri = RestTools.buildExternalUri(
-                headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri());
-        return baseUri.resolve(HttpConfiguration.PATH_API);
     }
 
     private String serializeWithServerUrl(OpenAPI openAPI, ObjectMapper mapper, URI serverUrl)

@@ -37,7 +37,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 
 abstract class AbstractEventsSearchService {
     private final DBEventDefinitionService eventDefinitionService;
-    private final StreamService streamService;
+    protected final StreamService streamService;
     private final ObjectMapper objectMapper;
 
     protected AbstractEventsSearchService(DBEventDefinitionService eventDefinitionService,

@@ -23,7 +23,7 @@ import trim from 'lodash/trim';
 import { Col, FormControl, FormGroup, Panel, Row } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testNaturalDate } from 'api/tools';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { InputDescription, Timestamp } from 'components/common';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
@@ -49,7 +49,7 @@ const EffectiveTimeRangeTable = styled.table`
 `;
 
 const debouncedTestNaturalDate = debounceWithPromise(
-  (keyword: string, userTZ: string) => ToolsStore.testNaturalDate(keyword, userTZ),
+  (keyword: string, userTZ: string) => testNaturalDate(keyword, userTZ),
   350,
 );
 

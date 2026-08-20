@@ -35,7 +35,11 @@ public class CollectorCaRenewalPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        caService.renewCertificates();
+        try {
+            caService.renewCertificates();
+        } catch (Exception e) {
+            LOG.error("Certificate renewal failed", e);
+        }
     }
 
     @Override
@@ -54,6 +58,11 @@ public class CollectorCaRenewalPeriodical extends Periodical {
     }
 
     @Override
+    public boolean leaderOnly() {
+        return true;
+    }
+
+    @Override
     public boolean isDaemon() {
         return true;
     }
@@ -65,7 +74,7 @@ public class CollectorCaRenewalPeriodical extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 60 * 60;
+        return 15 * 60;
     }
 
     @Override

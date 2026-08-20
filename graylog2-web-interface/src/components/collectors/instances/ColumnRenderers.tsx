@@ -21,6 +21,7 @@ import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
+import SyncStateIndicator from '../common/SyncStateIndicator';
 import type { CollectorInstanceView } from '../types';
 
 const OsIcon = ({ os }: { os: string | null }) => {
@@ -28,7 +29,11 @@ const OsIcon = ({ os }: { os: string | null }) => {
   if (os === 'windows') return <span title="Windows">Windows</span>;
   if (os === 'darwin') return <span title="macOS">macOS</span>;
 
-  return <span title="Unknown"><i>Unknown</i></span>;
+  return (
+    <span title="Unknown">
+      <i>Unknown</i>
+    </span>
+  );
 };
 
 type Props = {
@@ -44,6 +49,12 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
         </Label>
       ),
       staticWidth: 100,
+    },
+    has_pending_changes: {
+      renderCell: (_hasPendingChanges: boolean, instance: CollectorInstanceView) => (
+        <SyncStateIndicator pending={instance.has_pending_changes} />
+      ),
+      staticWidth: 60,
     },
     hostname: {
       renderCell: (_hostname: string, instance: CollectorInstanceView) => (

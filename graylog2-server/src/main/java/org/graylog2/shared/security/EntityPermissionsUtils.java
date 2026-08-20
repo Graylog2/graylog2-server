@@ -24,6 +24,7 @@ import org.graylog2.database.DbEntity;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -59,5 +60,19 @@ public class EntityPermissionsUtils {
     public Optional<String> readPermissionForCollection(final String collection) {
         return catalog.getByCollectionName(collection)
                 .map(DbEntityCatalogEntry::readPermission);
+    }
+
+    /**
+     * Checks whether all the given field names are declared as readable for the specified collection.
+     * If the collection is not registered in the catalog, the request is denied.
+     * If the catalog entry has an empty {@code readableFields} list, no user-specified fields are allowed.
+     */
+    public boolean areAllFieldsReadable(final String collection, final Collection<String> fields) {
+        if (fields == null || fields.isEmpty()) {
+            return false;
+        }
+        final Optional<DbEntityCatalogEntry> entry = catalog.getByCollectionName(collection);
+        return entry.map(dbEntityCatalogEntry -> dbEntityCatalogEntry.readableFields().containsAll(fields))
+                .orElse(false);
     }
 }

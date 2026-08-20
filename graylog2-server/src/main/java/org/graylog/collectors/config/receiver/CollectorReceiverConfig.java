@@ -17,6 +17,9 @@
 package org.graylog.collectors.config.receiver;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.graylog.collectors.CollectorOSType;
+
+import java.util.EnumSet;
 
 public interface CollectorReceiverConfig {
     @JsonIgnore
@@ -24,4 +27,12 @@ public interface CollectorReceiverConfig {
 
     @JsonIgnore
     String type();
+
+    /**
+     * The operating systems the receiver supports.
+     *
+     * @return an enum set of supported operating system types
+     */
+    @JsonIgnore
+    EnumSet<CollectorOSType> osSupport();
 }

@@ -18,6 +18,7 @@ package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import org.graylog.collectors.CollectorReadMode;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,8 @@ class SourceDTOTest {
         objectMapper.registerSubtypes(
                 new NamedType(FileSourceConfig.class, FileSourceConfig.TYPE_NAME),
                 new NamedType(JournaldSourceConfig.class, JournaldSourceConfig.TYPE_NAME),
-                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME)
+                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME),
+                new NamedType(MacOSUnifiedLoggingSourceConfig.class, MacOSUnifiedLoggingSourceConfig.TYPE_NAME)
         );
     }
 
@@ -49,7 +51,7 @@ class SourceDTOTest {
                 .enabled(true)
                 .config(FileSourceConfig.builder()
                         .paths(List.of("/var/log/syslog"))
-                        .readMode("tail")
+                        .readMode(CollectorReadMode.END)
                         .multiline(new MultilineConfig("^\\d{4}-", true))
                         .build())
                 .build();
@@ -77,7 +79,7 @@ class SourceDTOTest {
                 .fleetId("fleet-1")
                 .name("File")
                 .description("File reader")
-                .config(FileSourceConfig.builder().paths(List.of("/var/log/messages")).readMode("tail").build())
+                .config(FileSourceConfig.builder().paths(List.of("/var/log/messages")).readMode(CollectorReadMode.END).build())
                 .build();
 
         assertThat(source.config().type()).isEqualTo("file");
@@ -89,7 +91,7 @@ class SourceDTOTest {
                 .fleetId("fleet-1")
                 .name("Test source")
                 .description("Testing defaults")
-                .config(FileSourceConfig.builder().paths(List.of("/var/log/test")).readMode("tail").build())
+                .config(FileSourceConfig.builder().paths(List.of("/var/log/test")).readMode(CollectorReadMode.END).build())
                 .build();
 
         assertThat(source.enabled()).isTrue();

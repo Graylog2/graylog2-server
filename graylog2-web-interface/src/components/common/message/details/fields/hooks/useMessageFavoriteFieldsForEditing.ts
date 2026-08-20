@@ -18,12 +18,10 @@ import { useState, useCallback, useContext } from 'react';
 import uniq from 'lodash/uniq';
 
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+import type { FormattedField } from 'components/common/message/details/fields/types';
+import { DEFAULT_FIELDS } from 'components/common/message/helpers';
 
 import useSendFavoriteFieldTelemetry from './useSendFavoriteFieldTelemetry';
-
-import type { FormattedField } from '../types';
-
-export const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
 
 const useMessageFavoriteFieldsForEditing = () => {
   const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();

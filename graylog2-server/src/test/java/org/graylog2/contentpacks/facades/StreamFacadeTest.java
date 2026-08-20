@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -55,6 +56,7 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamCache;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.streams.matchers.StreamRuleMock;
@@ -102,7 +104,8 @@ public class StreamFacadeTest {
         final Set<EntityScope> entityScopes = Set.of(new DefaultEntityScope(), new ImmutableSystemScope(), new NonDeletableSystemScope());
         streamService = new StreamServiceImpl(mongoCollections, streamRuleService,
                 mock(OutputService.class), indexSetService, mock(MongoIndexSet.Factory.class), mock(EntityRegistrar.class),
-                mock(ClusterEventBus.class), Set.of(), new EntityScopeService(entityScopes));
+                mock(ClusterEventBus.class), Set.of(), new EntityScopeService(entityScopes),
+                new StreamCache(mongoCollections, new EventBus()));
         this.facade = new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService);
     }
 

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
+import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'hooks/useIndices';
 
 type ClosingRetentionStrategySummaryProps = {
   config: any;

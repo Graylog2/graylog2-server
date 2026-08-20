@@ -75,10 +75,6 @@ const mockedConfigNotifications: Notifications = {
   },
 };
 
-jest.mock('util/AppConfig', () => ({
-  publicNotifications: jest.fn(() => mockedConfigNotifications),
-}));
-
 const onDismissPublicNotification = jest.fn();
 
 const testPlugin: PluginExports = {
@@ -96,6 +92,10 @@ const testPlugin: PluginExports = {
 };
 
 describe('PublicNotifications', () => {
+  beforeEach(() => {
+    asMock(AppConfig.publicNotifications).mockReturnValue(mockedConfigNotifications);
+  });
+
   describe('with loaded plugin', () => {
     usePluginExports(testPlugin);
 

@@ -17,15 +17,23 @@
 import * as React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsSettings from 'components/collectors/settings/CollectorsSettings';
 
 const CollectorsSettingsPage = () => (
   <DocumentTitle title="Collectors Settings">
     <CollectorsPageNavigation />
-    <PageHeader title={<>Collectors Settings <BetaBadge /></>}>
-      <span>Configure ingest endpoints for managed collectors.</span>
+    <PageHeader
+      title={
+        <>
+          Collectors Settings <PreviewBadge />
+        </>
+      }>
+      <span>
+        Configure the endpoints and lifecycle settings for managed collectors. Collectors connect to these endpoints to
+        receive configuration updates and send collected log data.
+      </span>
     </PageHeader>
     <CollectorsSettings />
   </DocumentTitle>

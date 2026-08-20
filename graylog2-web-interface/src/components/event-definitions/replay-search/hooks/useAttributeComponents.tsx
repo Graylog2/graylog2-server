@@ -27,6 +27,8 @@ import useReplaySearchContext from 'components/event-definitions/replay-search/h
 import useFeature from 'hooks/useFeature';
 import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
 import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
+import Routes from 'routing/Routes';
+import Link from 'components/common/Link';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
@@ -38,6 +40,19 @@ const AlertTimestamp = styled(Timestamp)(
     color: ${theme.colors.variant.darker.warning};
   `,
 );
+
+const EventDefinitionTitle = () => {
+  const { alertId, definitionId } = useReplaySearchContext();
+  const { eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+
+  return alertId ? (
+    <SidebarNavigationLink content={SidebarEventDefinitionDetails(definitionId)}>
+      {eventDefinition.title}
+    </SidebarNavigationLink>
+  ) : (
+    <Link to={Routes.ALERTS.DEFINITIONS.show(definitionId)}>{eventDefinition.title}</Link>
+  );
+};
 
 const useAttributeComponents = () => {
   const { alertId, definitionId, type } = useReplaySearchContext();
@@ -60,7 +75,6 @@ const useAttributeComponents = () => {
       title: string;
       content: React.ReactNode;
       show?: boolean;
-      inRows?: boolean;
     }> = [
       {
         title: 'Event definition updated at',
@@ -77,11 +91,7 @@ const useAttributeComponents = () => {
       },
       {
         title: 'Event definition',
-        content: (
-          <SidebarNavigationLink content={SidebarEventDefinitionDetails(eventDefinition.id)}>
-            {eventDefinition.title}
-          </SidebarNavigationLink>
-        ),
+        content: <EventDefinitionTitle />,
         show: !isEventDefinition,
       },
       {
@@ -102,13 +112,12 @@ const useAttributeComponents = () => {
         title: 'Notifications',
         content: <Notifications />,
       },
-      { title: 'Description', content: eventDefinition.description, inRows: true },
+      { title: 'Description', content: eventDefinition.description },
     ];
     if (!isRightSidebarEnabled) {
       components.push({
         title: 'Aggregation conditions',
         content: <AggregationConditions />,
-        inRows: true,
       });
     }
 

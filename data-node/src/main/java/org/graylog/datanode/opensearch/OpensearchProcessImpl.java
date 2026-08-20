@@ -53,6 +53,7 @@ import org.graylog2.security.TrustManagerAggregator;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.opensearch.client.opensearch.generic.Request;
 import org.opensearch.client.opensearch.generic.Requests;
+import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
@@ -60,7 +61,10 @@ import oshi.hardware.GlobalMemory;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.List;
 import java.util.Locale;
@@ -71,6 +75,7 @@ import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -79,6 +84,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
     private static final long MEMORY_RATIO_THRESHOLD = 2;
     private static final int CLUSTER_REQUEST_TIMEOUT = 30;
+    private static final long CGROUP_V1_UNLIMITED_THRESHOLD = 1L << 60;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
@@ -188,20 +194,12 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         return this.processState.getState().equals(expectedState);
     }
 
+    @Deprecated
     @Override
     public void configure(OpensearchConfiguration configuration) {
         this.opensearchConfiguration = Optional.of(configuration);
-        configure();
-    }
-
-    private void configure() {
-        opensearchConfiguration.ifPresentOrElse(
-                (config -> {
-                    // refresh TM if the SSL certs changed
-                    trustManager.refresh();
-                }),
-                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-        );
+        // refresh TM if the SSL certs changed
+        trustManager.refresh();
     }
 
     @Override
@@ -216,22 +214,108 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     void checkConfiguredHeap() {
         Size heap = Size.parse(configuration.getOpensearchHeap());
         long heapBytes = heap.toBytes();
-        final GlobalMemory memory = getGlobalMemory();
+        final MemoryValues memoryValues = getContainerMemory().orElseGet(() -> {
+            final GlobalMemory memory = getGlobalMemory();
+            return new MemoryValues(memory.getTotal(), memory.getAvailable());
+        });
         long buffer = 2 * 1024 * 1024 * 1024L;
-        long freeMemory = memory.getAvailable() - buffer;
+        long freeMemory = memoryValues.available() - buffer;
         float memoryRatio = (float) freeMemory / heapBytes;
         if (memoryRatio > MEMORY_RATIO_THRESHOLD) {
             LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
-            final String recommendedMemory = FileUtils.byteCountToDisplaySize(memory.getTotal() / 2);
+            final String recommendedMemory = FileUtils.byteCountToDisplaySize(memoryValues.total() / 2);
             clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
                     Map.of("hostname", configuration.getHostname(),
                             "memoryRatio", f("%.1f", memoryRatio),
-                            "totalMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()),
-                            "availableMemory", FileUtils.byteCountToDisplaySize(memory.getAvailable()),
+                            "totalMemory", FileUtils.byteCountToDisplaySize(memoryValues.total()),
+                            "availableMemory", FileUtils.byteCountToDisplaySize(memoryValues.available()),
                             "recommendedMemory", recommendedMemory,
                             "recommendedMemorySetting", recommendedMemorySetting(recommendedMemory),
                             "heapSize", FileUtils.byteCountToDisplaySize(heapBytes))));
         }
+    }
+
+    @VisibleForTesting
+    Optional<MemoryValues> getContainerMemory() {
+        return readCgroupV2Memory().or(this::readCgroupV1Memory);
+    }
+
+    private Optional<MemoryValues> readCgroupV2Memory() {
+        final Optional<String> rawLimit = readFirstLine(cgroupV2MemoryMaxPath());
+        final Optional<String> rawUsed = readFirstLine(cgroupV2MemoryCurrentPath());
+        if (rawLimit.isEmpty() || rawUsed.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if ("max".equalsIgnoreCase(rawLimit.get().trim())) {
+            return Optional.empty();
+        }
+
+        final Optional<Long> limit = parseLong(rawLimit.get());
+        final Optional<Long> used = parseLong(rawUsed.get());
+        if (limit.isEmpty() || used.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return memoryValues(limit.get(), used.get());
+    }
+
+    private Optional<MemoryValues> readCgroupV1Memory() {
+        final Optional<Long> limit = readFirstLine(cgroupV1MemoryLimitPath()).flatMap(this::parseLong);
+        final Optional<Long> used = readFirstLine(cgroupV1MemoryUsagePath()).flatMap(this::parseLong);
+        if (limit.isEmpty() || used.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (limit.get() >= CGROUP_V1_UNLIMITED_THRESHOLD) {
+            return Optional.empty();
+        }
+
+        return memoryValues(limit.get(), used.get());
+    }
+
+    private Optional<MemoryValues> memoryValues(long total, long used) {
+        if (total <= 0 || used < 0) {
+            return Optional.empty();
+        }
+        return Optional.of(new MemoryValues(total, Math.max(0, total - used)));
+    }
+
+    private Optional<Long> parseLong(String value) {
+        try {
+            return Optional.of(Long.parseLong(value.trim()));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    @VisibleForTesting
+    Optional<String> readFirstLine(Path path) {
+        try (Stream<String> lines = Files.lines(path)) {
+            return lines.findFirst();
+        } catch (IOException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    @VisibleForTesting
+    Path cgroupV2MemoryMaxPath() {
+        return Path.of("/sys/fs/cgroup/memory.max");
+    }
+
+    @VisibleForTesting
+    Path cgroupV2MemoryCurrentPath() {
+        return Path.of("/sys/fs/cgroup/memory.current");
+    }
+
+    @VisibleForTesting
+    Path cgroupV1MemoryLimitPath() {
+        return Path.of("/sys/fs/cgroup/memory/memory.limit_in_bytes");
+    }
+
+    @VisibleForTesting
+    Path cgroupV1MemoryUsagePath() {
+        return Path.of("/sys/fs/cgroup/memory/memory.usage_in_bytes");
     }
 
     protected static String recommendedMemorySetting(String recommendedMemory) {
@@ -244,6 +328,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         GlobalMemory memory = systemInfo.getHardware().getMemory();
         return memory;
     }
+
+    @VisibleForTesting
+    record MemoryValues(long total, long available) {}
 
     @Subscribe
     public void onNotificationEvent(DataNodeNotficationEvent event) {
@@ -368,7 +455,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Override
     public void reset() {
         stop();
-        configure();
+        opensearchConfiguration.ifPresentOrElse(
+                (config -> {
+                    // refresh TM if the SSL certs changed
+                    trustManager.refresh();
+                }),
+                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+        );
         start();
     }
 
@@ -434,9 +527,33 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 .method("GET")
                 .endpoint("/_cluster/state")
                 .build();
-        JsonNode jsonNode = client.performRequest(request, "Failed to obtain cluster state response");
-        ClusterStateResponse state = objectMapper.convertValue(jsonNode, ClusterStateResponse.class);
-        return Optional.of(state);
+        try {
+            JsonNode jsonNode = client.performRequest(request, "Failed to obtain cluster state response");
+            ClusterStateResponse state = objectMapper.convertValue(jsonNode, ClusterStateResponse.class);
+            return Optional.of(state);
+        } catch (RuntimeException e) {
+            if (isClusterStateTemporarilyUnavailable(e)) {
+                LOG.debug("Cluster state temporarily unavailable, cannot determine cluster manager node yet", e);
+                return Optional.empty();
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Right after a (re)start, OpenSearch can respond to /_cluster/state with a transient 503 for
+     * reasons unrelated to this node's own health — e.g. "security_exception" while the Security
+     * plugin is still loading its config, or "cluster_manager_not_discovered_exception" while the
+     * cluster is still (re-)electing a manager node. A 503 here just means "not answerable yet", not
+     * that this process is unhealthy, so it shouldn't be treated as a heartbeat/health-check failure.
+     */
+    private boolean isClusterStateTemporarilyUnavailable(Throwable t) {
+        for (Throwable cause = t; cause != null; cause = cause.getCause()) {
+            if (cause instanceof ResponseException responseException && responseException.status() == 503) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

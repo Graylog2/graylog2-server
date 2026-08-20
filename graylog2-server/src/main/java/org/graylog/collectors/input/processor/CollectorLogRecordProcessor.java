@@ -32,6 +32,11 @@ public class CollectorLogRecordProcessor implements LogRecordProcessor {
     public static final String RECEIVER_TYPE = "collector_log";
 
     @Override
+    public boolean producesUnaccountedMessages() {
+        return true;
+    }
+
+    @Override
     public Map<String, Object> process(OTelJournal.Log log) {
         final Map<String, Object> result = new HashMap<>();
 

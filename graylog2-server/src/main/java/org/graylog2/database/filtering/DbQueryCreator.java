@@ -22,11 +22,13 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class DbQueryCreator {
 
@@ -38,15 +40,32 @@ public class DbQueryCreator {
 
     public DbQueryCreator(final String defaultField,
                           final List<EntityAttribute> attributes) {
-        this(defaultField, attributes, null);
+        this(defaultField, attributes, (ComputedFieldRegistry) null);
     }
 
     public DbQueryCreator(final String defaultField,
                           final List<EntityAttribute> attributes,
                           final ComputedFieldRegistry computedFieldRegistry) {
+        this(defaultField, attributes, computedFieldRegistry, Map.of());
+    }
+
+    /**
+     * @param extraSearchFields additional fields that are searchable from the query bar
+     *                          but not part of the attributes list (e.g. to avoid duplicate columns)
+     */
+    public DbQueryCreator(final String defaultField,
+                          final List<EntityAttribute> attributes,
+                          final Map<String, SearchQueryField> extraSearchFields) {
+        this(defaultField, attributes, null, extraSearchFields);
+    }
+
+    public DbQueryCreator(final String defaultField,
+                          final List<EntityAttribute> attributes,
+                          final ComputedFieldRegistry computedFieldRegistry,
+                          final Map<String, SearchQueryField> extraSearchFields) {
         this.dbFilterParser = new DbFilterExpressionParser(computedFieldRegistry);
         this.attributes = attributes;
-        this.searchQueryParser = new SearchQueryParser(defaultField, attributes);
+        this.searchQueryParser = new SearchQueryParser(defaultField, attributes, extraSearchFields);
     }
 
     DbQueryCreator(final DbFilterExpressionParser dbFilterParser,

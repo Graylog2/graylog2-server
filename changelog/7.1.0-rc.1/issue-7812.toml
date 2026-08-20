@@ -1,0 +1,5 @@
+type = "c"
+message = "REST endpoint /system/inputstates/{inputId} now returns a more accurate InputStopped response instead of InputDeleted. This is only a name change - the JSON remains identical."
+
+issues = ["7812", "23406"]
+pulls = ["25296"]

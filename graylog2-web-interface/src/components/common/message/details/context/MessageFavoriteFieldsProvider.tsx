@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import zip from 'lodash/zip';
 import uniq from 'lodash/uniq';
 import flattenDeep from 'lodash/flattenDeep';
@@ -23,14 +23,12 @@ import flattenDeep from 'lodash/flattenDeep';
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import { useStore } from 'stores/connect';
-import { StreamsStore } from 'views/stores/StreamsStore';
+import StreamsContext from 'contexts/StreamsContext';
 import type { Stream } from 'logic/streams/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-
-import { DEFAULT_FIELDS } from '../fields/hooks/useMessageFavoriteFieldsForEditing';
-import useMessageFavoriteFieldsMutation from '../fields/hooks/useMessageFavoriteFieldsMutation';
+import { getStreamFavoriteFields } from 'components/common/message/helpers';
+import useMessageFavoriteFieldsMutation from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsMutation';
 
 type OriginalProps = React.PropsWithChildren<{
   message: Message;
@@ -38,7 +36,8 @@ type OriginalProps = React.PropsWithChildren<{
 }>;
 
 const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
-  const { streams: streamsList = [] } = useStore(StreamsStore);
+  const streamsContext = useContext(StreamsContext);
+  const streamsList = useMemo(() => streamsContext ?? [], [streamsContext]);
   const { permissions } = useCurrentUser();
   const streams = useMemo<Array<Stream>>(() => {
     const messageStreamIds: Array<string> = message?.fields?.streams ?? [];
@@ -51,18 +50,28 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     return messageStreamIds.map((id) => streamsById?.[id]).filter((s) => !!s);
   }, [message?.fields?.streams, permissions, streamsList]);
 
+  const initialFavoriteFieldsByStream = useMemo(
+    () => Object.fromEntries(streams.map((stream) => [stream.id, getStreamFavoriteFields(stream, message?.fields)])),
+    [message?.fields, streams],
+  );
+
   const initialFavoriteFields = useMemo(
-    () => uniq(flattenDeep(zip(streams.map((stream) => stream?.favorite_fields ?? DEFAULT_FIELDS)))),
-    [streams],
+    () => uniq(flattenDeep(zip(Object.values(initialFavoriteFieldsByStream)))),
+    [initialFavoriteFieldsByStream],
   );
 
   const editableStreams = useMemo(
-    () => streams.filter((stream: Stream) => isPermitted(permissions, `streams:edit:${stream.id}`)),
+    () => streams.filter((stream) => isPermitted(permissions, `streams:edit:${stream.id}`)),
     [permissions, streams],
   );
 
+  const editableStreamsInitialFavoriteFields = useMemo(
+    () => Object.fromEntries(editableStreams.map(({ id }) => [id, initialFavoriteFieldsByStream[id]])),
+    [editableStreams, initialFavoriteFieldsByStream],
+  );
+
   const { saveFavoriteField, toggleField, setFieldsIsPending } = useMessageFavoriteFieldsMutation(
-    editableStreams,
+    editableStreamsInitialFavoriteFields,
     initialFavoriteFields,
   );
 
@@ -75,6 +84,7 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
       toggleField,
       editableStreams,
       setFieldsIsPending,
+      initialFavoriteFieldsByStream,
     }),
     [
       initialFavoriteFields,
@@ -82,8 +92,9 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
       messageFields,
       message,
       toggleField,
-      editableStreams,
       setFieldsIsPending,
+      initialFavoriteFieldsByStream,
+      editableStreams,
     ],
   );
 

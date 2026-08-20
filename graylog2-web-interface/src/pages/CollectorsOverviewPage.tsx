@@ -15,35 +15,46 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import useProductName from 'brand-customization/useProductName';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useCollectorsConfig } from 'components/collectors/hooks';
-import Routes from 'routing/Routes';
+
+import CollectorsSettingsPage from './CollectorsSettingsPage';
 
 const CollectorsOverviewPage = () => {
+  const productName = useProductName();
   const { data: config, isLoading } = useCollectorsConfig();
 
   if (isLoading) {
-    return (<DocumentTitle title="Collectors Overview">
+    return (
+      <DocumentTitle title="Collectors Overview">
         <Spinner />
       </DocumentTitle>
     );
   }
 
   if (!config?.signing_cert_id) {
-    return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
+    return <CollectorsSettingsPage />;
   }
 
   return (
     <DocumentTitle title="Collectors Overview">
       <CollectorsPageNavigation />
-      <PageHeader title={<>Collectors Overview <BetaBadge /></>}>
-        <span>Overview of all collectors and sources across your infrastructure.</span>
+      <PageHeader
+        title={
+          <>
+            Collectors Overview <PreviewBadge />
+          </>
+        }>
+        <span>
+          Collectors are lightweight services deployed across your infrastructure to collect logs and forward them to{' '}
+          {productName}. They are organized into fleets and configured with sources that define what data to collect.
+        </span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

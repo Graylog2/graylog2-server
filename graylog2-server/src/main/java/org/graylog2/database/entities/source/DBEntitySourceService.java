@@ -56,12 +56,6 @@ public class DBEntitySourceService {
         collection.insertOne(entitySource);
     }
 
-    public void updateParentId(String oldParentId, String newParentId) {
-        final Bson filterByParentId = eq(EntitySource.FIELD_PARENT_ID, oldParentId);
-        final Bson updateParentId = set(EntitySource.FIELD_PARENT_ID, newParentId);
-        collection.updateMany(filterByParentId, updateParentId);
-    }
-
     public void deleteByEntityId(String entityId) {
         bulkDeleteByEntityId(Set.of(entityId));
     }

@@ -22,6 +22,7 @@ export type EventListItem = {
   created_at: string;
   event_definition_id: string;
   id: string;
+  key: string | null;
   name: string;
   priority: number;
   status: string | null;

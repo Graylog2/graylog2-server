@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
@@ -32,7 +33,6 @@ import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import okhttp3.HttpUrl;
@@ -46,23 +46,24 @@ import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
 import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
+import org.graylog.collectors.config.CollectorAttributes;
 import org.graylog.collectors.config.CollectorConfig;
 import org.graylog.collectors.config.CollectorPipelineConfig;
 import org.graylog.collectors.config.CollectorServiceConfig;
 import org.graylog.collectors.config.TLSConfigurationSettings;
 import org.graylog.collectors.config.exporter.OtlpExporterConfig;
 import org.graylog.collectors.config.exporter.OtlpHttpExporterConfig;
+import org.graylog.collectors.config.extension.FileStorageExtensionConfig;
 import org.graylog.collectors.config.processor.CollectorProcessorConfig;
 import org.graylog.collectors.config.processor.ResourceProcessorConfig;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.NoopReceiverConfig;
 import org.graylog.collectors.db.Attribute;
-import org.graylog.collectors.db.CoalescedActions;
-import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
@@ -80,7 +81,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
@@ -91,12 +91,11 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.graylog.collectors.config.processor.ResourceProcessorConfig.Attribute.upsert;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
@@ -213,85 +212,137 @@ public class OpAmpService {
         };
     }
 
+    /**
+     * Handles an OpAMP enrollment request.
+     * <p>
+     * If no record exists for the instance UID, signs the CSR and inserts a new record; the token
+     * usage counter is incremented.
+     * <p>
+     * If a record already exists, performs a proof-of-possession check: the CSR's public key must
+     * match the public key in the stored active certificate. On mismatch, the request is rejected
+     * without changing any state. On match, the CSR is signed and the existing record is re-issued
+     * via {@link CollectorInstanceService#reEnroll}. The token usage counter is incremented only
+     * when the incoming token id differs from the stored token id, suppressing double-counts on
+     * phantom-write retries by the same token; in that case only the token's {@code last_used_at}
+     * timestamp is updated.
+     * <p>
+     * Re-enrollment is the intended recovery path for a collector that lost its certificate but
+     * retained its private key — including the phantom-write scenario that motivated this design.
+     *
+     * @param message the enrollment AgentToServer message
+     * @param auth    the enrollment-token-authenticated context
+     * @return the ServerToAgent response carrying the issued certificate or an error
+     */
     @WithSpan
     private ServerToAgent handleEnrollment(AgentToServer message, OpAmpAuthContext.Enrollment auth) {
         final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
 
-        // 1. Reject if already enrolled
-        if (collectorInstanceService.existsByInstanceUid(instanceUid)) {
-            LOG.warn("Rejecting enrollment: collector {} already enrolled", instanceUid);
-            return ServerToAgent.newBuilder().setInstanceUid(message.getInstanceUid()).setErrorResponse(ServerErrorResponse.newBuilder().setErrorMessage("Collector already enrolled")).build();
-        }
-
-        // 2. Extract CSR
-        final var csrBytes = getCsr(message);
-        if (csrBytes.isEmpty()) {
-            return errorResponse(message, "Missing CSR in enrollment request");
-        }
-
         try {
             final var collectorConfig = collectorsConfigService.getOrDefault();
 
-            // 3. Sign CSR with OpAMP CA
+            final var csrPem = getCsr(message);
+            if (csrPem.isEmpty()) {
+                return errorResponse(message, "Missing CSR in enrollment request");
+            }
+
+            // CSR parsing also includes verification. If parsing succeeds, the collector has proven that it possesses
+            // the private key for the contained public key.
+            final var csr = PemUtils.parseCsr(csrPem.get());
+
+            // Check if we need to prohibit re-enrollment. We only allow re-enrollment for collectors when their
+            // keypair has not changed.
+            final var existingInstance = collectorInstanceService.findByInstanceUid(instanceUid);
+            if (existingInstance.isPresent()) {
+                final var publicKeyFromExistingCollector = PemUtils.parseCertificate(
+                        existingInstance.get().activeCertificatePem()).getPublicKey();
+                final var publicKeyFromCSR = csr.publicKey();
+                if (!Arrays.equals(publicKeyFromExistingCollector.getEncoded(), publicKeyFromCSR.getEncoded())) {
+                    LOG.warn("Rejecting re-enrollment for collector {}: CSR public key does not match public key in " +
+                            "stored certificate", instanceUid);
+                    return errorResponse(message, "Enrollment rejected.");
+                }
+            }
+
+            // Sign CSR with OpAMP CA
             final CertificateEntry issuerCert = collectorCaService.getSigningCert();
-            final X509Certificate agentCert = certificateService.builder().signCsr(csrBytes.get().toByteArray(), issuerCert, instanceUid, collectorConfig.collectorCertLifetime());
+            final X509Certificate agentCert = certificateService.builder().signCsr(csr, issuerCert, instanceUid,
+                    collectorConfig.collectorCertLifetime());
+            final var issuedCert = IssuedCertificate.of(agentCert, issuerCert);
 
-            // 4. Save agent record
-            final String fingerprint = PemUtils.computeFingerprint(agentCert);
-            final String certPem = PemUtils.toPem(agentCert);
+            // (Re-)enroll
+            existingInstance.ifPresentOrElse(instance -> {
+                if (!instance.fleetId().equals(auth.token().fleetId())) {
+                    LOG.warn("Ignoring fleet {} from enrollment token for re-enrollment of existing collector {}. " +
+                                    "Current assignment to fleet {} will be kept.", auth.token().fleetId(),
+                            instance.instanceUid(), instance.fleetId());
+                }
+                final var enrolled = collectorInstanceService.reEnroll(instance, issuedCert, auth.token().id());
+                LOG.info("Re-enrolled existing collector {}. Current fleet: {}", enrolled.instanceUid(),
+                        enrolled.fleetId());
+                // Don't count token usage for consecutive enrollments of the same collector, but
+                // still bump last_used_at so the token doesn't look dormant while a collector
+                // depends on it for recovery.
+                if (!Objects.equals(auth.token().id(), instance.enrollmentTokenId())) {
+                    enrollmentTokenService.incrementUsage(auth.token().id());
+                } else {
+                    enrollmentTokenService.markUsed(auth.token().id());
+                }
+            }, () -> {
+                final var enrolled = collectorInstanceService.enroll(instanceUid, auth.token().fleetId(), issuedCert,
+                        auth.token().id());
+                LOG.info("Enrolled collector {}. Assigned fleet: {}", enrolled.instanceUid(), enrolled.fleetId());
+                enrollmentTokenService.incrementUsage(auth.token().id());
+            });
 
-            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.token().fleetId(), fingerprint, certPem, agentCert.getNotAfter(), issuerCert.id(), Instant.now(), auth.token().id());
-            LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
-            enrollmentTokenService.incrementUsage(auth.token().id());
-
-            // 5. Return certificate and connection settings
+            // Return certificate and connection settings
             final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder();
-            setOpampConnectionSettings(connectionSettingsBuilder, certPem, collectorConfig.collectorHeartbeatInterval());
+            setOpampConnectionSettings(connectionSettingsBuilder, issuedCert.certPem(), collectorConfig.collectorHeartbeatInterval());
 
             return serverToAgentBuilder(message)
                     .setConnectionSettings(connectionSettingsBuilder)
                     .build();
         } catch (Exception e) {
             LOG.error("Enrollment failed for collector {}", instanceUid, e);
-            return errorResponse(message, "Enrollment failed: " + e.getMessage());
+            return errorResponse(message, "Enrollment failed");
         }
     }
 
-    private void setOpampConnectionSettings(Opamp.ConnectionSettingsOffers.Builder connectionSettingsBuilder, String certPem, Duration heartbeatInterval) {
+    private void setOpampConnectionSettings(ConnectionSettingsOffers.Builder connectionSettingsBuilder, String certPem, Duration heartbeatInterval) {
         connectionSettingsBuilder.setOpamp(OpAMPConnectionSettings.newBuilder()
-                .setHeartbeatIntervalSeconds(heartbeatInterval.getSeconds())
+                .setHeartbeatIntervalSeconds(heartbeatInterval.toSeconds())
                 .setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
     }
 
     /**
-     * Get the CSR byte value from the message. Returns an empty optional if the message doesn't contain a CSR,
-     * or the CSR is empty.
+     * Extracts the PEM-encoded CSR from the OpAMP message.
+     * <p>
+     * The OpAMP protobuf carries the CSR as opaque {@code bytes}; Graylog's collectors transmit it
+     * as PEM, and this method returns the UTF-8 decoded string for downstream parsing by
+     * {@link PemUtils#parseCsr(String)}.
      *
-     * @param message the message
-     * @return the CSR bytes or an empty optional
+     * @param message the OpAMP AgentToServer message
+     * @return the PEM-encoded CSR, or empty if the message does not carry a CSR
      */
-    private Optional<ByteString> getCsr(AgentToServer message) {
+    private Optional<String> getCsr(AgentToServer message) {
         if (!message.hasConnectionSettingsRequest()
                 || !message.getConnectionSettingsRequest().hasOpamp()
                 || !message.getConnectionSettingsRequest().getOpamp().hasCertificateRequest()) {
             return Optional.empty();
         }
 
-        final var csrBytes = message.getConnectionSettingsRequest().getOpamp().getCertificateRequest().getCsr();
-        if (csrBytes.isEmpty()) {
+        final var csrPem = message.getConnectionSettingsRequest()
+                .getOpamp()
+                .getCertificateRequest()
+                .getCsr()
+                .toStringUtf8();
+
+        if (csrPem.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(csrBytes);
+        return Optional.of(csrPem);
     }
 
-    static void buildConnectionSettings(ServerToAgent.Builder builder, @Nullable OtlpExporterConfig exporterConfig) {
-        if (exporterConfig == null) {
-            builder.setConnectionSettings(Opamp.ConnectionSettingsOffers.newBuilder()
-                    .setOwnLogs(Opamp.TelemetryConnectionSettings.newBuilder()
-                            .setDestinationEndpoint(""))); // Empty signals: don't send logs
-            return;
-        }
-
+    static void buildConnectionSettings(ServerToAgent.Builder builder, OtlpExporterConfig exporterConfig) {
         final var caCert = exporterConfig.tls().caPem().orElseThrow();
         final var minVersion = exporterConfig.tls().minVersion();
         final var maxVersion = exporterConfig.tls().maxVersion().orElse("");
@@ -305,13 +356,84 @@ public class OpAmpService {
                 .build()
                 .toString();
 
-        builder.setConnectionSettings(Opamp.ConnectionSettingsOffers.newBuilder()
+        builder.setConnectionSettings(ConnectionSettingsOffers.newBuilder()
                 .setOwnLogs(Opamp.TelemetryConnectionSettings.newBuilder()
                         .setDestinationEndpoint(endpoint)
                         .setTls(Opamp.TLSConnectionSettings.newBuilder()
                                 .setMinVersion(minVersion)
                                 .setMaxVersion(maxVersion)
                                 .setCaPemContents(caCert))));
+    }
+
+    /**
+     * Builds the OTel Collector config that we push down to an agent.
+     * <p>
+     * For each enabled source whose receiver supports the agent's OS, creates: a receiver (named
+     * {@code <receiverType>/<sourceId>}), a resource processor (named {@code resource/<sourceId>})
+     * that stamps {@code collector.fleet.id}, {@code collector.source.id}, and
+     * {@code collector.receiver.type}, and a pipeline (named {@code logs/<sourceId>}) wiring the
+     * receiver to the processor and the shared exporter.
+     * <p>
+     * If no sources survive filtering, falls back to a single no-op receiver with a minimal
+     * pipeline so the Collector passes startup validation.
+     */
+    @VisibleForTesting
+    static CollectorConfig buildCollectorConfig(String fleetId,
+                                                List<SourceDTO> sources,
+                                                CollectorOSType osType,
+                                                OtlpExporterConfig exporterConfig) {
+        final Map<String, CollectorReceiverConfig> receiverConfigs = Maps.newHashMap();
+        final Map<String, CollectorProcessorConfig> processorConfigs = Maps.newHashMap();
+        final Map<String, CollectorPipelineConfig> pipelines = Maps.newHashMap();
+
+        sources.stream().filter(SourceDTO::enabled).forEach(source -> {
+            final var receiverConfig = source.toReceiverConfig(osType)
+                    .filter(config -> config.osSupport().contains(osType))
+                    .orElse(null);
+
+            if (receiverConfig == null) {
+                return;
+            }
+
+            receiverConfigs.put(receiverConfig.name(), receiverConfig);
+
+            final var processorConfig = ResourceProcessorConfig.builder(source.id())
+                    .attributes(List.of(
+                            upsert(CollectorAttributes.COLLECTOR_RECEIVER_TYPE, receiverConfig.type()),
+                            upsert(CollectorAttributes.COLLECTOR_SOURCE_ID, source.id()),
+                            upsert(CollectorAttributes.COLLECTOR_FLEET_ID, fleetId)))
+                    .build();
+            processorConfigs.put(processorConfig.name(), processorConfig);
+
+            pipelines.put(f("logs/%s", source.id()), CollectorPipelineConfig.builder()
+                    .receivers(Set.of(receiverConfig.name()))
+                    .processors(Set.of(processorConfig.name()))
+                    .exporters(Set.of(exporterConfig.getName()))
+                    .build());
+        });
+
+        // The Collector must at least have one receiver wired into one pipeline to avoid a startup error.
+        if (pipelines.isEmpty()) {
+            final var noop = NoopReceiverConfig.instance();
+            receiverConfigs.put(noop.name(), noop);
+            pipelines.put(f("logs/%s", noop.name()), CollectorPipelineConfig.builder()
+                    .receivers(Set.of(noop.name()))
+                    .exporters(Set.of(exporterConfig.getName()))
+                    .build());
+        }
+
+        final var storageExtensionConfig = FileStorageExtensionConfig.defaultInstance();
+
+        return CollectorConfig.builder()
+                .extensions(Map.of(storageExtensionConfig.name(), storageExtensionConfig))
+                .receivers(receiverConfigs)
+                .exporters(Map.of(exporterConfig.getName(), exporterConfig))
+                .processors(processorConfigs)
+                .service(CollectorServiceConfig.builder()
+                        .extensions(Set.of(storageExtensionConfig.name()))
+                        .pipelines(pipelines)
+                        .build())
+                .build();
     }
 
     private ServerToAgent.Builder serverToAgentBuilder(AgentToServer message) {
@@ -336,6 +458,14 @@ public class OpAmpService {
     @WithSpan
     private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
         final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
+
+        if (LOG.isTraceEnabled()) {
+            try {
+                LOG.trace("Message from enrolled instance <{}>:\n{}", instanceUid, JsonFormat.printer().print(message));
+            } catch (Exception e) {
+                LOG.trace("Couldn't serialize message from instance <{}>", instanceUid, e);
+            }
+        }
 
         // payload and authentication context uids must match
         if (!Objects.equals(instanceUid, auth.instanceUid())) {
@@ -386,16 +516,22 @@ public class OpAmpService {
 
         // let's save the report and load the previously known values for the important properties
         // previousState is not the entire document, but the minimal version to avoid high deserialization cost
-        final Optional<CollectorInstanceService.MinimalCollectorInstanceDTO> previousState = collectorInstanceService.createOrUpdateFromReport(updateBuilder.build());
-        final boolean seqConsecutive = previousState
-                .filter(prevState -> (prevState.messageSeqNum() + 1) == sequenceNum)
-                .isPresent();
+        final var instanceReport = updateBuilder.build();
+        final var previousState = collectorInstanceService.updateFromReport(instanceReport);
+        final boolean seqConsecutive = (previousState.messageSeqNum() + 1) == sequenceNum;
+
+        final var osType = switch (previousState.osType()) {
+            // On the first report the "os.type" non-identifying attribute might not be present in the previous state.
+            // We will always run into this case when a Collector from an unsupported operating system connects.
+            case UNKNOWN -> CollectorInstanceService.extractOsTypeFromReport(instanceReport);
+            case LINUX, MACOS, WINDOWS -> previousState.osType();
+        };
 
         // determine our response
         final ServerToAgent.Builder responseBuilder = serverToAgentBuilder(message);
 
         // Don't fetch the config, we might not need it. If we need it, only get it once.
-        final var configSupplier = Suppliers.memoize(collectorsConfigService::get);
+        final Supplier<CollectorsConfig> configSupplier = Suppliers.memoize(collectorsConfigService::getOrDefault);
 
         LOG.debug("[{}/{}] Previously seen state {} - consecutive: {}", instanceUid, sequenceNum, previousState, seqConsecutive);
         if (!seqConsecutive) {
@@ -408,74 +544,40 @@ public class OpAmpService {
             // If we would only look at the applied transaction sequence from the previousState, we would reply
             // with a config update for a remote config status APPLIED request.
             final var lastProcessedTxnSeq = requireNonNull(appliedTxnSeq, "appliedTxnSeq is null")
-                    .orElse(previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::lastProcessTxnSeq).orElse(0L));
+                    .orElse(previousState.lastProcessTxnSeq());
 
-            final String fleetId = previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::fleetId).orElse(null);
+            final String fleetId = previousState.fleetId();
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
-            final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
+
+            final var coalesced = txnLogService.coalesce(unprocessedMarkers, lastProcessedTxnSeq);
+
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 
-            // do this first. in case there's no configured endpoint we don't have to perform the more expensive stuff
-            final Optional<OtlpExporterConfig> exporterConfig = getExporterConfig(configSupplier);
+            final OtlpExporterConfig exporterConfig = getExporterConfig(configSupplier);
 
             if (coalesced.recomputeIngestConfig()) {
                 // The connection settings should only be sent when they change. Not having a config is a change, too.
                 if (agentCapabilities.contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsOwnLogs)) {
                     // The "own_logs" are always transmitted via HTTP according to OpAMP.
-                    buildConnectionSettings(responseBuilder, exporterConfig.orElse(null));
+                    buildConnectionSettings(responseBuilder, exporterConfig);
                 }
             }
 
-            final var configBuilder = CollectorConfig.builder();
             if (coalesced.recomputeConfig() || coalesced.recomputeIngestConfig()) {
-                final var effectiveEndpoint = exporterConfig.orElseThrow();
                 final var effectiveFleetId = (coalesced.newFleetId() == null) ? fleetId : coalesced.newFleetId();
                 LOG.debug("[{}/{}] Computing new collector config for fleet id {}", instanceUid, sequenceNum, effectiveFleetId);
 
-                final Map<String, CollectorReceiverConfig> receiverConfigs = Maps.newHashMap();
-                try (final var sources = sourceService.streamAllByFleet(effectiveFleetId)) {
-                    sources.map(SourceDTO::toReceiverConfig)
-                            .flatMap(Optional::stream)
-                            .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
+                final List<SourceDTO> sources;
+                try (final var sourcesStream = sourceService.streamAllByFleet(effectiveFleetId)) {
+                    sources = sourcesStream.toList();
                 }
 
-                // The Collector must at least have one receiver to avoid a startup error.
-                if (receiverConfigs.isEmpty()) {
-                    final var noop = NoopReceiverConfig.instance();
-                    receiverConfigs.put(noop.name(), noop);
-                }
+                final var collectorConfig = buildCollectorConfig(effectiveFleetId, sources, osType, exporterConfig);
 
-                final var receiverGroups = receiverConfigs.values().stream()
-                        .collect(Collectors.groupingBy(CollectorReceiverConfig::type));
-
-                configBuilder.receivers(receiverConfigs);
-                configBuilder.exporters(Map.of(effectiveEndpoint.getName(), effectiveEndpoint));
-
-                final Map<String, CollectorProcessorConfig> receiverProcessors = receiverGroups.keySet().stream()
-                        .map(component -> ResourceProcessorConfig.builder(component)
-                                .attributes(List.of(ResourceProcessorConfig.collectorComponentAttribute(component)))
-                                .build())
-                        .collect(Collectors.toMap(CollectorProcessorConfig::name, Function.identity()));
-
-                configBuilder.processors(receiverProcessors);
-
-                final var pipelines = receiverGroups.entrySet().stream()
-                        .collect(Collectors.toMap(e -> f("logs/%s", e.getKey()), e -> CollectorPipelineConfig.builder()
-                                .receivers(e.getValue().stream().map(CollectorReceiverConfig::name).collect(Collectors.toSet()))
-                                .exporters(Set.of(effectiveEndpoint.getName()))
-                                .processors(receiverProcessors.values().stream()
-                                        .filter(config -> e.getKey().equals(config.id()))
-                                        .map(CollectorProcessorConfig::name)
-                                        .collect(Collectors.toSet()))
-                                .build()));
-
-                configBuilder.service(CollectorServiceConfig.builder()
-                        .pipelines(pipelines)
-                        .build());
                 try {
-                    final String configYaml = yamlObjectMapper.writeValueAsString(configBuilder.build());
+                    final String configYaml = yamlObjectMapper.writeValueAsString(collectorConfig);
 
                     responseBuilder.setRemoteConfig(Opamp.AgentRemoteConfig.newBuilder()
                             .setConfig(Opamp.AgentConfigMap.newBuilder()
@@ -511,15 +613,33 @@ public class OpAmpService {
         return responseBuilder.build();
     }
 
+    /**
+     * Handles a certificate renewal request sent by an already-authenticated collector inside the
+     * Identified channel.
+     * <p>
+     * Unlike enrollment, renewal arrives over a mutually-authenticated JWT session: the collector
+     * has already proven it holds its current active key. The new CSR is parsed and signed; the
+     * new cert is stored as the collector's {@code next_certificate_*} alongside the existing
+     * active cert. The collector activates it by authenticating with the new cert on a subsequent
+     * connection.
+     * <p>
+     * Failures are logged but do not tear down the OpAMP session — the collector's existing cert
+     * remains valid and it may retry renewal later.
+     *
+     * @param responseBuilder the outgoing ServerToAgent builder to add the new cert to on success
+     * @param instanceUid     the collector's OpAMP instance UID (for logging / inserting the cert)
+     * @param csrPem          the PEM-encoded renewal CSR
+     * @param configSupplier  memoized access to the collectors config (cert lifetime, heartbeat)
+     */
     private void handleRenewal(ServerToAgent.Builder responseBuilder,
                                String instanceUid,
-                               ByteString csr,
-                               Supplier<Optional<CollectorsConfig>> configSupplier) {
+                               String csrPem,
+                               Supplier<CollectorsConfig> configSupplier) {
         LOG.info("Received CSR for certificate renewal from instance: {}", instanceUid);
         try {
-            final var config = configSupplier.get().orElse(CollectorsConfig.createDefault("localhost"));
+            final var config = configSupplier.get();
             final var issuer = collectorCaService.getSigningCert();
-            final var cert = certificateService.builder().signCsr(csr.toByteArray(), issuer, instanceUid, config.collectorCertLifetime());
+            final var cert = certificateService.builder().signCsr(PemUtils.parseCsr(csrPem), issuer, instanceUid, config.collectorCertLifetime());
 
             final var fingerprint = PemUtils.computeFingerprint(cert);
             final var certPem = PemUtils.toPem(cert);
@@ -586,27 +706,18 @@ public class OpAmpService {
         return OptionalLong.empty();
     }
 
-    @Nonnull
-    private Optional<OtlpExporterConfig> getExporterConfig(Supplier<Optional<CollectorsConfig>> configSupplier) {
-        final CollectorsConfig collectorsConfig = configSupplier.get()
-                .orElseThrow(() -> new IllegalStateException("Unable to determine collector input config, cannot send remote config."));
+    private OtlpExporterConfig getExporterConfig(Supplier<CollectorsConfig> configSupplier) {
+        final CollectorsConfig collectorsConfig = configSupplier.get();
         final var httpEndpoint = collectorsConfig.http();
-        if (httpEndpoint == null) {
-            throw new IllegalStateException("No collector input configured, cannot send remote config.");
-        }
 
         // We use the long-lived CA cert so intermediate cert rotation is not an issue for Collector mTLS connections.
         final var caCert = collectorCaService.getCaCert().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterIdService.getString(), caCert);
 
-        if (httpEndpoint.enabled()) {
-            return Optional.of(OtlpHttpExporterConfig.builder()
-                    .endpoint(f("https://%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
-                    .tls(tlsSettings)
-                    .build());
-        }
-
-        return Optional.empty();
+        return OtlpHttpExporterConfig.builder()
+                .endpoint(f("https://%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
+                .tls(tlsSettings)
+                .build();
     }
 
     @Nonnull

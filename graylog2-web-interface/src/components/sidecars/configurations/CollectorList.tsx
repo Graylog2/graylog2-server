@@ -102,7 +102,6 @@ class CollectorList extends React.Component<CollectorListProps> {
               <div className={style.collectorTable}>
                 <DataTable
                   id="collector-list"
-                  className="table-hover"
                   headers={headers}
                   headerCellFormatter={headerCellFormatter}
                   rows={collectors}

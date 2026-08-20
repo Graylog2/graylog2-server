@@ -18,7 +18,6 @@ package org.graylog.security.entities;
 
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
-import org.graylog.security.DBGrantService;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,6 @@ class EntityRegistrarTest {
     private final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
 
     private EntityRegistrar entityRegistrar;
-    private DBGrantService dbGrantService;
 
     private EntityRegistrationHandler handler1;
     private EntityRegistrationHandler handler2;
@@ -45,8 +43,7 @@ class EntityRegistrarTest {
         this.handler2 = mock(EntityRegistrationHandler.class);
         this.registrationHandlers = Set.of(handler1, handler2);
 
-        this.dbGrantService = mock(DBGrantService.class);
-        this.entityRegistrar = new EntityRegistrar(dbGrantService, grnRegistry, () -> registrationHandlers);
+        this.entityRegistrar = new EntityRegistrar(grnRegistry, () -> registrationHandlers);
     }
 
     @Test

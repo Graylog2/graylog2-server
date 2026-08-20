@@ -23,21 +23,26 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.events.search.EventsSearchFilter.NULL_VALUE;
 
 public class EventsSearchService extends AbstractEventsSearchService {
+    // Upper bound on the values returned per filter option field. The dropdown shows the most-used
+    // values first and relies on the field query for anything beyond the cap.
+    private static final int MAX_FILTER_OPTIONS = 50;
+
     private final MoreSearch moreSearch;
     private final StreamService streamService;
 
@@ -60,7 +65,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         final var filter = buildFilter(parameters);
         final var cleanedParameters = hasAssociatedAssetsForNullFilter(parameters) ? removeAssociatedAssetsForNullFilter(parameters) : parameters;
 
-        final MoreSearch.Result result = moreSearch.eventSearch(cleanedParameters, filter, eventStreams, forbiddenSourceStreams(subject));
+        final MoreSearch.Result result = moreSearch.eventSearch(cleanedParameters, filter, eventStreams, allowedSourceStreams(subject));
 
         return buildResultForSubject(parameters, result, subject);
     }
@@ -88,13 +93,67 @@ public class EventsSearchService extends AbstractEventsSearchService {
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
         final var eventStreams = allowedEventStreams(subject);
         if (eventStreams.isEmpty()) {
-            return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty());
+            return EventsHistogramResult.fromResult(MoreSearch.Histogram.empty(effectiveTimeRange(parameters)));
         }
 
         final var filter = buildFilter(parameters);
-        final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
+        final var result = moreSearch.histogram(parameters, filter, eventStreams, allowedSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
+    }
+
+    /**
+     * Returns the values the events table can be filtered by, collected from the events the subject is
+     * permitted to see. Deliberately aggregates through {@link MoreSearch} rather than the views search
+     * engine so that the source stream permissions of the subject are the only thing scoping the result.
+     */
+    public EventsFilterOptions filterOptions(EventsFilterOptionsRequest request, Subject subject) {
+        final var tags = request.fields().contains(EventDto.FIELD_TAGS)
+                ? distinctValues(EventDto.FIELD_TAGS, request, subject)
+                : null;
+
+        return new EventsFilterOptions(tags);
+    }
+
+    /**
+     * Returns the distinct values of the given field, most used first, optionally narrowed to values
+     * containing the request's field query.
+     */
+    private List<String> distinctValues(String field, EventsFilterOptionsRequest request, Subject subject) {
+        final var eventStreams = allowedEventStreams(subject);
+        if (eventStreams.isEmpty()) {
+            return List.of();
+        }
+
+        final var bucketPattern = isNullOrEmpty(request.fieldQuery()) ? null : containsPattern(request.fieldQuery());
+        return moreSearch.aggregateSlicesForColumn(request.query(), request.timerange(), eventStreams, "",
+                        allowedSourceStreams(subject), field, bucketPattern, Map.of(), MAX_FILTER_OPTIONS)
+                .stream()
+                .map(Slice::value)
+                .filter(value -> !isNullOrEmpty(value))
+                .toList();
+    }
+
+    /**
+     * Builds a Lucene regular expression matching values that contain the given text. Lucene regexes
+     * have no case-insensitivity flag, but tags are lowercased at write time (see TagNormalizer), so
+     * lowercasing the input suffices. Revisit before reusing for fields that aren't normalized this
+     * way. Escaping every non-alphanumeric character keeps the input literal.
+     */
+    private static String containsPattern(String fieldQuery) {
+        final var escaped = new StringBuilder();
+        // Iterate code points so surrogate pairs aren't escaped as two broken halves.
+        fieldQuery.toLowerCase(Locale.ROOT).codePoints().forEach(codePoint -> {
+            if (!Character.isLetterOrDigit(codePoint)) {
+                escaped.append('\\');
+            }
+            escaped.appendCodePoint(codePoint);
+        });
+        return ".*" + escaped + ".*";
+    }
+
+    private AbsoluteRange effectiveTimeRange(EventsSearchParameters parameters) {
+        return AbsoluteRange.create(parameters.timerange().getFrom(), parameters.timerange().getTo());
     }
 
     public EventsSearchResult searchByIds(Collection<String> eventIds, Subject subject) {
@@ -117,19 +176,8 @@ public class EventsSearchService extends AbstractEventsSearchService {
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
     //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
     //       most probably not more efficient.
-    private Set<String> forbiddenSourceStreams(Subject subject) {
-        // Users with the generic streams:read permission can read all streams so we don't need to check every single
-        // stream here and can take a short cut.
-        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
-            return Collections.emptySet();
-        }
-
-        try (var stream = streamService.streamAllIds()) {
-            return stream
-                    // Select all streams the user is NOT permitted to access
-                    .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-                    .collect(Collectors.toSet());
-        }
+    private SourceStreamFilter allowedSourceStreams(Subject subject) {
+        return SourceStreamFilter.forSubject(subject, streamService);
     }
 
     private EventsSearchResult buildResultForSubject(EventsSearchParameters parameters,

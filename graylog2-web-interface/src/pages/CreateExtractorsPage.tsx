@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {useMemo} from 'react';
+import { useMemo } from 'react';
 
-import {DocumentTitle, PageHeader, Spinner} from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import Routes from 'routing/Routes';
-import {ExtractorsStore} from 'stores/extractors/ExtractorsStore';
+import { newExtractor } from 'hooks/useExtractors';
 import useMessage from 'views/hooks/useMessage';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
@@ -45,10 +45,10 @@ const CreateExtractorsPage = () => {
     extractor_type: extractorType,
     field,
   } = useQuery() as QueryParameters;
-  const {data: exampleMessage, isInitialLoading: messageIsLoading} = useMessage(exampleIndex, exampleId);
-  const {data: input, isInitialLoading: inputIsLoading} = useInput(params.inputId);
+  const { data: exampleMessage, isInitialLoading: messageIsLoading } = useMessage(exampleIndex, exampleId);
+  const { data: input, isInitialLoading: inputIsLoading } = useInput(params.inputId);
   const isLoading = messageIsLoading || inputIsLoading;
-  const extractor = useMemo(() => ExtractorsStore.new(extractorType, field), [extractorType, field]);
+  const extractor = useMemo(() => newExtractor(extractorType, field), [extractorType, field]);
 
   const _extractorSaved = () => {
     const url = input.global

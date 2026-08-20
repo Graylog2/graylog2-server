@@ -122,7 +122,6 @@ class ContentPackAuditLoggerTest {
                 .entityObjects(ImmutableMap.of())
                 .skippedEntities(ImmutableSet.of())
                 .failedEntities(ImmutableSet.of())
-                .entityGrants(ImmutableMap.of())
                 .build();
 
         auditLogger.logUninstallation(installation.contentPackId().id(), uninstallation, USER);

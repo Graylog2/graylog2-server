@@ -1,0 +1,95 @@
+import { Canvas, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Alert } from 'components/bootstrap';
+import { RequiredMarker } from 'components/common';
+
+import { FoundationTable } from '../Foundation/shared';
+import * as FormsStories from './Forms.stories';
+
+<Meta of={FormsStories} />
+
+# Forms
+
+Core rules for building forms in Graylog. This section covers container and field layout, error handling, and required field conventions.
+
+## Layout
+
+Forms live inside containers and are composed of fields. Both levels have rules.
+
+<Unstyled>
+  <Alert bsStyle="info">
+    {
+      <>
+        <strong>Column Layout Rule:</strong> Forms are always laid out in a single column.
+      </>
+    }
+  </Alert>
+</Unstyled>
+
+**Why**: CXL Institute research found single-column forms are completed 15.4 seconds faster on average. Baymard Institute usability testing found multi-column layouts cause users to skip required fields or fill unnecessary ones, drawn in the wrong direction by multiple columns of empty inputs.
+
+### Two Columns Valid Case
+
+A single row may use two columns when the fields are semantically one unit.
+
+- Examples: first / last name, key / value, start / end date
+- Both fields in the pair must be equal width
+
+{/* TODO: Add a Canvas example here showing a paired-field row (e.g. key / value inputs at equal width) once FormsStories.PairedFields is implemented. */}
+
+### Grouping and Structure
+
+- Group related fields with a section label and divider
+- Max 3 to 4 groups per form or step
+- Required fields before optional within each group
+- If a form has fields that most users will never need to fill out, those fields should be hidden by default behind a collapsible section labeled "Advanced options" rather than shown in the main form body
+
+## Required
+
+A single consistent convention across all Graylog forms.
+
+<Unstyled>
+  <Alert bsStyle="info">
+    {
+      <>
+        <strong>Rule:</strong> Mark required fields with
+        <RequiredMarker /> using the <code>RequiredMarker</code> component from <code>components/common</code>. Leave
+        optional fields unmarked. Never display the word "optional".
+      </>
+    }
+  </Alert>
+</Unstyled>
+
+{/* TODO: Add a Canvas example here showing a small form with required (*) and optional fields once FormsStories.RequiredFields is implemented. */}
+
+## Errors
+
+Errors must be specific, inline, and announced to assistive technology. **Never rely on color alone.**
+
+### Error Timing
+
+- Validate on blur, not on every keystroke
+- After a failed submit, switch to on-input for immediate recovery
+- Async checks (name taken): debounce 300ms after typing stops
+- Never show an error before the user has touched the field
+
+### Error Text
+
+- Be specific, say what is wrong and how to fix it
+- Plain language, no "invalid input" or error codes
+- Keep under 160 characters
+- Never clear the user's input on error
+
+{/* TODO: Add a Canvas example here demonstrating all three validation states — untouched, blur error, and on-input recovery — once FormsStories.FieldValidation is implemented. */}
+
+## Example
+
+A single form that exercises the rules above. Things to try:
+
+- **Blur validation** — focus Name and leave it empty, then tab away.
+- **On-input recovery** — click Create Input with empty fields, then start typing in any highlighted field; the error clears immediately.
+- **Paired fields** — Hostname and Port sit side by side at equal width.
+- **Advanced options** — click the toggle to reveal the optional configuration fields.
+
+<Unstyled>
+  <Canvas of={FormsStories.FormPatternExample} />
+</Unstyled>

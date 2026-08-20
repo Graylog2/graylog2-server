@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.processors.listeners;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.base.Preconditions;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
@@ -30,7 +31,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
+import java.util.function.IntPredicate;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -39,19 +42,34 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class RuleMetricsListener implements InterpreterListener {
     public enum Type {
-        EXECUTE, EVALUATE
+        EXECUTE, EVALUATE;
+
+        private final String lowerName = name().toLowerCase(Locale.US);
+
+        String lowerName() {
+            return lowerName;
+        }
     }
 
     private final MetricRegistry metricRegistry;
+    private final int sampleRate;
+    private final IntPredicate sampler;
     private final Map<TimerMapKey, Timer.Context> evaluateTimers = new HashMap<>();
     private final Map<TimerMapKey, Timer.Context> executeTimers = new HashMap<>();
 
-    public RuleMetricsListener(MetricRegistry metricRegistry) {
+    public RuleMetricsListener(MetricRegistry metricRegistry, int sampleRate) {
+        this(metricRegistry, sampleRate, n -> ThreadLocalRandom.current().nextInt(n) == 0);
+    }
+
+    RuleMetricsListener(MetricRegistry metricRegistry, int sampleRate, IntPredicate sampler) {
+        Preconditions.checkArgument(sampleRate >= 1, "sampleRate must be >= 1, was %s", sampleRate);
         this.metricRegistry = metricRegistry;
+        this.sampleRate = sampleRate;
+        this.sampler = sampler;
     }
 
     public static String getMetricName(String name, Type type) {
-        return name(Rule.class, name, "trace", type.toString().toLowerCase(Locale.US), "duration");
+        return name(Rule.class, name, "trace", type.lowerName(), "duration");
     }
 
     private void forEachStage(Rule rule, Pipeline pipeline, Consumer<Stage> consumer) {
@@ -68,17 +86,22 @@ public class RuleMetricsListener implements InterpreterListener {
     }
 
     private void startTimer(Rule rule, Pipeline pipeline, Type type, Map<TimerMapKey, Timer.Context> timers) {
-        if (rule.id() != null && pipeline.id() != null) {
-            forEachStage(rule, pipeline, stage -> {
-                final String name = name(rule.id(), pipeline.id(), String.valueOf(stage.stage()));
-                startTimerForKey(new TimerMapKey(rule, pipeline, stage), getMetricName(name, type), timers);
-            });
-            startTimerForKey(new TimerMapKey(rule), getMetricName(rule.id(), type), timers);
+        if (rule.id() == null || pipeline.id() == null) {
+            return;
         }
+        if (sampleRate > 1 && !sampler.test(sampleRate)) {
+            return;
+        }
+        forEachStage(rule, pipeline, stage -> {
+            final String name = name(rule.id(), pipeline.id(), String.valueOf(stage.stage()));
+            startTimerForKey(new TimerMapKey(rule, pipeline, stage), getMetricName(name, type), timers);
+        });
+        startTimerForKey(new TimerMapKey(rule), getMetricName(rule.id(), type), timers);
     }
 
     private void stopTimerForKey(TimerMapKey key, Map<TimerMapKey, Timer.Context> timers) {
-        final Timer.Context timer = timers.get(key);
+        @SuppressWarnings("resource")
+        final Timer.Context timer = timers.remove(key);
         if (timer != null) {
             timer.stop();
         }

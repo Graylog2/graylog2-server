@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix stale stream title in Data Lake preview after rename"
+
+issues = ["Graylog2/graylog-plugin-enterprise#11967"]
+pulls = ["25686"]

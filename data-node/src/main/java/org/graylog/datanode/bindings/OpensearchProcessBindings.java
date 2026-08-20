@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.datanode.configuration.ConfigurationWarningsLogger;
 import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.configuration.variants.DatanodeKeystoreOpensearchCertificatesProvider;
@@ -45,6 +46,7 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachineProvider;
 import org.graylog.datanode.opensearch.statemachine.tracer.ClusterNodeStateTracer;
 import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchStateMachineTransitionLogger;
+import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchVersionTracer;
 import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchWatchdog;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
@@ -83,6 +85,8 @@ public class OpensearchProcessBindings extends AbstractModule {
         serviceBinder.addBinding().to(OpensearchConfigurationService.class).asEagerSingleton();
         serviceBinder.addBinding().to(OpensearchProcessService.class).asEagerSingleton();
 
+        bind(ConfigurationWarningsLogger.class).asEagerSingleton();
+
         bind(DatanodeTrustManagerProvider.class);
 
         // tracer
@@ -93,6 +97,7 @@ public class OpensearchProcessBindings extends AbstractModule {
         tracerBinder.addBinding().to(OpensearchWatchdog.class).asEagerSingleton();
         tracerBinder.addBinding().to(OpensearchStateMachineTransitionLogger.class).asEagerSingleton();
         tracerBinder.addBinding().to(ConfigureMetricsIndexSettings.class).asEagerSingleton();
+        tracerBinder.addBinding().to(OpensearchVersionTracer.class).asEagerSingleton();
 
     }
 

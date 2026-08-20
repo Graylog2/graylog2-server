@@ -1,0 +1,5 @@
+type = "f"
+message = "fix: cluster configuration leader column empty"
+
+issues = ["Graylog2/graylog-plugin-enterprise#13633"]
+pulls = ["25575"]

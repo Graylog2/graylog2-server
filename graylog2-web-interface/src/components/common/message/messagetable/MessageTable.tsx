@@ -29,7 +29,6 @@ import Field from 'views/components/Field';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import FieldSortIcon from './FieldSortIcon';
 import MessageTableEntry from './MessageTableEntry';
@@ -99,6 +98,7 @@ type Props = {
   setLoadingState: (loading: boolean) => void;
   displayBulkSelectCol?: boolean;
   isEntitySelectable?: (entity: BackendMessage) => boolean;
+  rowOverride?: (message: Message) => React.ReactNode;
 };
 
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) =>
@@ -142,6 +142,7 @@ const MessageTable = ({
   scrollContainerRef,
   displayBulkSelectCol = false,
   isEntitySelectable = () => false,
+  rowOverride = undefined,
 }: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
@@ -163,9 +164,9 @@ const MessageTable = ({
           <TableHead>
             <tr>
               {displayBulkSelectCol && (
-                <BulkSelectCell>
+                <TableHeaderCell $noMinWidth>
                   <BulkSelectHead />
-                </BulkSelectCell>
+                </TableHeaderCell>
               )}
               {selectedFields
                 .toSeq()
@@ -195,6 +196,7 @@ const MessageTable = ({
           </TableHead>
           {formattedMessages.map((message) => {
             const messageKey = `${message.index}-${message.id}`;
+            const overrideContent = rowOverride?.(message);
 
             return (
               <MessageTableEntry
@@ -210,6 +212,7 @@ const MessageTable = ({
                 expandAllRenderAsync={false}
                 displayBulkSelectCol={displayBulkSelectCol}
                 isEntitySelectable={isEntitySelectable}
+                overrideContent={overrideContent}
               />
             );
           })}

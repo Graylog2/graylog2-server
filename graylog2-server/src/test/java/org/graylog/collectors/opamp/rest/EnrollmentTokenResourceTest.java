@@ -27,10 +27,10 @@ import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbSortResolver;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,6 +91,7 @@ class EnrollmentTokenResourceTest {
         final var expectedResponse = new EnrollmentTokenResponse(
                 "1",
                 "test-token",
+                "test-fleet",
                 Instant.now().plusSeconds(86400)
         );
 

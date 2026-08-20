@@ -17,7 +17,6 @@
 package org.graylog.inputs.otel.transport;
 
 import com.google.inject.assistedinject.Assisted;
-import com.google.protobuf.AbstractMessageLite;
 import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -26,10 +25,12 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
-
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.utilities.RecordSizeDistributingProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.function.Function;
@@ -38,6 +39,8 @@ import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeExce
 import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
 
 public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
+    private static final Logger LOG = LoggerFactory.getLogger(OTelLogsService.class);
+
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
 
@@ -72,10 +75,13 @@ public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
             createRawMessage = RawMessage::new;
         }
 
-        OTelJournalRecordFactory.createFromRequest(request).stream()
-                .map(AbstractMessageLite::toByteArray)
-                .map(createRawMessage)
-                .forEach(input::processRawMessage);
+        RecordSizeDistributingProcessor.processRecords(
+                OTelJournalRecordFactory.createFromRequest(request),
+                request.getSerializedSize(),
+                r -> r.getLog().getLogRecord().getSerializedSize(),
+                createRawMessage,
+                input,
+                LOG);
 
         responseObserver.onNext(ExportLogsServiceResponse.newBuilder().build());
         responseObserver.onCompleted();

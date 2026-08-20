@@ -52,7 +52,7 @@ import java.util.concurrent.ExecutionException;
 public class DatanodeSelfsignedStartupIT {
 
 
-    private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
+    private final Logger log = LoggerFactory.getLogger(DatanodeSelfsignedStartupIT.class);
 
     private static GraylogApis apis;
 
@@ -79,7 +79,7 @@ public class DatanodeSelfsignedStartupIT {
                     .relaxedHTTPSValidation(true)
                     .jwtAuthToken(createJwtAuthToken())
                     .build())
-                    .waitForNodesCount(1);
+                    .waitForGreenStatusAndNodesCount(1);
 
             response.assertThat().body("status", Matchers.equalTo("green"));
         } catch (Exception e) {

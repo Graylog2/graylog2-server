@@ -21,7 +21,6 @@ export type Fleet = {
   id: string;
   name: string;
   description?: string;
-  target_version: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -43,9 +42,10 @@ export type CollectorInstanceView = {
   os: string | null;
   version: string | null;
   status: 'online' | 'offline';
+  has_pending_changes: boolean;
 };
 
-export type SourceType = 'file' | 'journald' | 'windows_event_log';
+export type SourceType = 'file' | 'journald' | 'windows_event_log' | 'macos_unified_logging';
 
 export type SourceBase = {
   id: string;
@@ -76,10 +76,21 @@ export type WindowsEventLogSourceConfig = {
   read_mode: 'beginning' | 'end';
 };
 
+export type MacOSUnifiedLoggingSourceConfig = {
+  predicate?: string;
+  // ISO-8601 durations (e.g. 'PT30S', 'PT24H')
+  max_poll_interval: string;
+  max_log_age: string;
+};
+
 export type FileSource = SourceBase & { type: 'file'; config: FileSourceConfig };
 export type JournaldSource = SourceBase & { type: 'journald'; config: JournaldSourceConfig };
 export type WindowsEventLogSource = SourceBase & { type: 'windows_event_log'; config: WindowsEventLogSourceConfig };
-export type Source = FileSource | JournaldSource | WindowsEventLogSource;
+export type MacOSUnifiedLoggingSource = SourceBase & {
+  type: 'macos_unified_logging';
+  config: MacOSUnifiedLoggingSourceConfig;
+};
+export type Source = FileSource | JournaldSource | WindowsEventLogSource | MacOSUnifiedLoggingSource;
 
 export type EnrollmentTokenCreator = {
   user_id: string;
@@ -108,10 +119,8 @@ export type CollectorStats = {
 };
 
 export type IngestEndpointConfig = {
-  enabled: boolean;
   hostname: string;
   port: number;
-  input_id: string | null;
 };
 
 export type TokenSigningKey = {
@@ -127,20 +136,25 @@ export type CollectorsConfig = {
   token_signing_key: TokenSigningKey | null;
   otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
+  collector_heartbeat_interval: string;
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
 };
 
+export type CollectorInputIdsResponse = {
+  collector_input_ids: string[];
+};
+
 export type CollectorsConfigRequest = {
   http: {
-    enabled: boolean;
     hostname: string;
     port: number;
   };
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
+  create_input: boolean;
 };
 
 export type FleetStatsSummary = {
@@ -162,20 +176,47 @@ export type ActorInfo = {
 };
 
 export type TargetInfo = {
-  id: string;
+  id: string | null;
   name: string;
   type: 'fleet' | 'collector';
 };
 
-export type ActivityEntry = {
-  seq: number;
-  timestamp: string | null;
-  type: 'CONFIG_CHANGED' | 'INGEST_CONFIG_CHANGED' | 'RESTART' | 'DISCOVERY_RUN' | 'FLEET_REASSIGNED';
-  actor: ActorInfo | null;
-  targets: TargetInfo[];
-  details: Record<string, string>;
+export type FleetReassignedDetails = {
+  destination_fleet: TargetInfo;
 };
 
+export type ActivityEntryBase = {
+  seq: number;
+  timestamp: string | null;
+  actor: ActorInfo | null;
+  targets: TargetInfo[];
+};
+
+export type SimpleActivityEntry = ActivityEntryBase & {
+  type: 'CONFIG_CHANGED' | 'INGEST_CONFIG_CHANGED' | 'RESTART' | 'DISCOVERY_RUN';
+};
+
+export type FleetReassignedActivityEntry = ActivityEntryBase & {
+  type: 'FLEET_REASSIGNED';
+  details: FleetReassignedDetails | null;
+};
+
+export type ActivityEntry = SimpleActivityEntry | FleetReassignedActivityEntry;
+
 export type RecentActivityResponse = {
+  activities: ActivityEntry[];
+};
+
+export type CoalescedActions = {
+  recompute_config: boolean;
+  recompute_ingest_config: boolean;
+  reassign: boolean;
+  restart: boolean;
+  run_discovery: boolean;
+};
+
+export type PendingChangesResponse = {
+  has_pending_changes: boolean;
+  coalesced: CoalescedActions;
   activities: ActivityEntry[];
 };

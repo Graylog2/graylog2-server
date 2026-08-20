@@ -19,14 +19,15 @@ import { useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { SegmentedControl } from 'components/bootstrap';
-import { ClipboardButton, FormikInput, Select } from 'components/common';
-import SectionGrid from 'components/common/Section/SectionGrid';
+import { Alert, SegmentedControl, HelpBlock } from 'components/bootstrap';
 import FormSubmit from 'components/common/FormSubmit';
+import { ClipboardButton, FormikInput, Select, Timestamp } from 'components/common';
+import SectionGrid from 'components/common/Section/SectionGrid';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
-type Platform = 'linux' | 'windows' | 'macos' | 'container';
 type TokenExpiry = 'PT24H' | 'P7D' | 'P30D' | 'never';
 
 const Section = styled.div(
@@ -40,20 +41,6 @@ const Label = styled.label(
     display: block;
     font-weight: 500;
     margin-bottom: ${theme.spacings.xs};
-  `,
-);
-
-const ScriptBlock = styled.pre(
-  ({ theme }) => css`
-    display: block;
-    padding: ${theme.spacings.md};
-    background: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.gray[80]};
-    border-radius: 4px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    font-family: ${theme.fonts.family.monospace};
-    font-size: ${theme.fonts.size.small};
   `,
 );
 
@@ -73,15 +60,6 @@ const TokenRow = styled.div(
     display: flex;
     align-items: center;
     gap: ${theme.spacings.xs};
-  `,
-);
-
-const InfoText = styled.span(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
-    margin-top: ${theme.spacings.xs};
-    display: block;
   `,
 );
 
@@ -106,11 +84,11 @@ const ResultSection = styled.div(
 
 type TokenResponse = {
   token: string;
+  fleetId: string;
   expiresAt: string | null;
 };
 
 type FormValues = {
-  platform: Platform;
   fleetId: string;
   name: string;
   expiry: TokenExpiry;
@@ -130,15 +108,25 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
+const CollectorsDocsLink = () => (
+  <a
+    href="https://go2docs.graylog.org/current/getting_in_log_data/collectors.htm"
+    target="_blank"
+    rel="noopener noreferrer">
+    Collector installation instructions
+  </a>
+);
+
 const DeploymentForm = () => {
   const { data: fleets } = useFleets();
   const { createEnrollmentToken } = useCollectorsMutations();
+  const sendTelemetry = useSendCollectorsTelemetry();
   const [tokenResponse, setTokenResponse] = useState<TokenResponse | null>(null);
 
   const fleetOptions = (fleets || []).map((f) => ({ value: f.id, label: f.name }));
 
   const handleSubmit = useCallback(
-    async (values: FormValues) => {
+    async (values: FormValues, { resetForm }) => {
       try {
         const response = await createEnrollmentToken({
           name: values.name,
@@ -146,40 +134,27 @@ const DeploymentForm = () => {
           expiresIn: values.expiry === 'never' ? null : values.expiry,
         });
 
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
+          app_action_value: 'deployment-generate',
+          fleet_id: values.fleetId,
+          expires_in: values.expiry,
+        });
+
         setTokenResponse({
           token: response.token,
+          fleetId: response.fleet_id,
           expiresAt: response.expires_at,
         });
+
+        resetForm();
       } catch {
         // Error notification handled by useCollectorsMutations onError callback
       }
     },
-    [createEnrollmentToken],
+    [createEnrollmentToken, sendTelemetry],
   );
 
-  const getInstallScript = (platform: Platform) => {
-    if (!tokenResponse) return '';
-
-    const { token } = tokenResponse;
-    const scripts: Record<Platform, string> = {
-      linux: `curl -sL https://graylog.example.com/collector/install.sh \\
-  | sudo bash -s -- \\
-  --token "${token}"`,
-      windows: `Invoke-WebRequest -Uri https://graylog.example.com/collector/install.ps1 -OutFile install.ps1
-.\\install.ps1 -Token "${token}"`,
-      macos: `curl -sL https://graylog.example.com/collector/install.sh \\
-  | sudo bash -s -- \\
-  --token "${token}"`,
-      container: `docker run -d \\
-  -e GRAYLOG_TOKEN="${token}" \\
-  graylog/collector:latest`,
-    };
-
-    return scripts[platform];
-  };
-
   const initialValues: FormValues = {
-    platform: 'linux',
     fleetId: '',
     name: '',
     expiry: 'P7D',
@@ -189,29 +164,31 @@ const DeploymentForm = () => {
     <Formik<FormValues> initialValues={initialValues} onSubmit={handleSubmit} validate={validate}>
       {({ isSubmitting, values, setFieldValue }) => (
         <Form>
-          <Section>
-            <Label>Platform</Label>
-            <SegmentedControl
-              value={values.platform}
-              onChange={(v) => setFieldValue('platform', v)}
-              data={[
-                { value: 'linux', label: 'Linux' },
-                { value: 'windows', label: 'Windows' },
-                { value: 'macos', label: 'macOS' },
-                { value: 'container', label: 'Container' },
-              ]}
-            />
-          </Section>
+          <Alert bsStyle="info">
+            <strong>How deployment works:</strong> Select a fleet and generate an enrollment token. Then follow the{' '}
+            <CollectorsDocsLink /> to install the Collector on your target host &mdash; it will enroll, receive its
+            fleet&apos;s configuration, and start collecting data automatically.
+          </Alert>
 
           <Section>
-            <Label>Fleet *</Label>
+            <Label>
+              <strong>Fleet *</strong>
+            </Label>
             <Select
               placeholder="Select a fleet"
               options={fleetOptions}
               value={values.fleetId}
-              onChange={(selected) => setFieldValue('fleetId', selected as string)}
+              onChange={(selected) => {
+                const newFleetId = selected as string;
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
+                  app_action_value: 'deployment-fleet',
+                  fleet_id: newFleetId,
+                });
+                setFieldValue('fleetId', newFleetId);
+              }}
               clearable={false}
             />
+            <HelpBlock>Collectors enrolled with this token will be assigned to the selected fleet.</HelpBlock>
           </Section>
 
           <Section>
@@ -221,15 +198,24 @@ const DeploymentForm = () => {
               label="Name *"
               name="name"
               placeholder="e.g. Initial Fleet Enrollment"
+              help="A descriptive token name to simplify token management."
               required
             />
           </Section>
 
           <Section>
-            <Label>Token Expiry</Label>
+            <Label>
+              <strong>Token Expiry *</strong>
+            </Label>
             <SegmentedControl
               value={values.expiry}
-              onChange={(v) => setFieldValue('expiry', v)}
+              onChange={(v) => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.EXPIRY_SELECTED, {
+                  app_action_value: 'deployment-expiry',
+                  expires_in: v,
+                });
+                setFieldValue('expiry', v);
+              }}
               data={[
                 { value: 'PT24H', label: '24 hours' },
                 { value: 'P7D', label: '7 days' },
@@ -237,6 +223,10 @@ const DeploymentForm = () => {
                 { value: 'never', label: 'No expiry' },
               ]}
             />
+            <HelpBlock>
+              How long this token remains valid for new enrollments. Already-enrolled Collectors are not affected when a
+              token expires.
+            </HelpBlock>
           </Section>
 
           <FormSubmit
@@ -253,23 +243,39 @@ const DeploymentForm = () => {
                 <ResultSection>
                   <h4>
                     Enrollment Token
-                    <ClipboardButton text={tokenResponse.token} title="Copy Token" bsSize="xs" />
+                    <ClipboardButton
+                      text={tokenResponse.token}
+                      title="Copy Token"
+                      bsSize="xs"
+                      onSuccess={() =>
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+                          app_action_value: 'deployment-copy-token',
+                        })
+                      }
+                    />
                   </h4>
                   <TokenRow>
                     <CodeInline>{tokenResponse.token.slice(0, 50)}...</CodeInline>
                   </TokenRow>
-                  <InfoText>
-                    Fleet: {fleets?.find((f) => f.id === values.fleetId)?.name} | Expires:{' '}
-                    {tokenResponse.expiresAt ? new Date(tokenResponse.expiresAt).toLocaleString() : 'Never'}
-                  </InfoText>
+                  <HelpBlock>
+                    <ul style={{ paddingLeft: 0 }}>
+                      <li>
+                        <strong>Fleet:</strong> {fleets?.find((f) => f.id === tokenResponse.fleetId)?.name}
+                      </li>
+                      <li>
+                        <strong>Expires:</strong>{' '}
+                        {tokenResponse.expiresAt ? <Timestamp dateTime={tokenResponse.expiresAt} /> : 'Never'}
+                      </li>
+                    </ul>
+                  </HelpBlock>
                 </ResultSection>
 
                 <ResultSection>
-                  <h4>
-                    Installation Script
-                    <ClipboardButton text={getInstallScript(values.platform)} title="Copy Script" bsSize="xs" />
-                  </h4>
-                  <ScriptBlock>{getInstallScript(values.platform)}</ScriptBlock>
+                  <h4>Installation</h4>
+                  <p>
+                    Copy the enrollment token above, then follow the <CollectorsDocsLink /> to install and enroll the
+                    Collector on your target host(s).
+                  </p>
                 </ResultSection>
               </SectionGrid>
             </ResultsContainer>

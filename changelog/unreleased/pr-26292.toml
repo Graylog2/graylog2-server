@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Inputs page: Error occurs after creation External Data Lake Input."
+
+issues = ["13830"]
+pulls = ["26292"]

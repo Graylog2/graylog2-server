@@ -70,6 +70,17 @@ public class CollectorIngestHttpInput extends MessageInput {
         public Descriptor() {
             super(NAME, false, "");
         }
+
+        @Override
+        public String getDescription() {
+            return "This input receives data from managed collectors over mTLS-secured HTTP. "
+                    + "Managed collectors are configured to send their data to the external address "
+                    + "specified in the Collectors Settings page. The port configured on this input must "
+                    + "either match the external port from the Collectors Settings, or the external port "
+                    + "must be routed to this input's port (e.g. via a load balancer or port mapping). "
+                    + "Changing this input's port without updating the routing will prevent collectors "
+                    + "from delivering data.";
+        }
     }
 
     @ConfigClass

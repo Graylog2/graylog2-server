@@ -79,6 +79,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
+import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -346,6 +347,65 @@ public class UsersResourceTest {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
+    }
+
+    @Test
+    void usersCanRevokeTheirOwnToken() {
+        final AccessToken accessToken = prepareRevokeMocks(USERNAME, true, true);
+        try {
+            usersResource.revokeToken(USERNAME, TOKEN_NAME);
+        } finally {
+            verify(accessTokenService).loadById(TOKEN_NAME);
+            verify(accessTokenService).destroy(accessToken);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    void revokingWithoutPermissionThrowsForbidden() {
+        prepareRevokeMocks(USERNAME, false, true);
+        try {
+            assertThrows(ForbiddenException.class, () -> usersResource.revokeToken(USERNAME, TOKEN_NAME));
+        } finally {
+            verify(accessTokenService).loadById(TOKEN_NAME);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    void usersCanNotRevokeOtherUsersToken() {
+        final String accessingUser = "Dee-Dee";
+        prepareRevokeMocks(accessingUser, true, true);
+        try {
+            assertThrows(ForbiddenException.class, () -> usersResource.revokeToken(accessingUser, TOKEN_NAME));
+        } finally {
+            verify(accessTokenService).loadById(TOKEN_NAME);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    void revokingNonExistingTokenThrowsNotFound() {
+        prepareRevokeMocks(USERNAME, true, false);
+        try {
+            assertThrows(jakarta.ws.rs.NotFoundException.class, () -> usersResource.revokeToken(USERNAME, TOKEN_NAME));
+        } finally {
+            verify(accessTokenService).loadById(TOKEN_NAME);
+            verify(accessTokenService).load(TOKEN_NAME);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    private AccessToken prepareRevokeMocks(String urlUser, boolean hasPermission, boolean tokenExists) {
+        // Assuming that the token-owner is always USERNAME.
+        final AccessToken accessToken = tokenExists ? mock(AccessToken.class) : null;
+        if (tokenExists) {
+            when(accessToken.getUserName()).thenReturn(USERNAME);
+        }
+        when(userManagementService.loadById(urlUser)).thenReturn(userImplFactory.create(Map.of(UserImpl.USERNAME, urlUser)));
+        when(subject.isPermitted(USERS_TOKENREMOVE + ":" + urlUser)).thenReturn(hasPermission);
+        when(accessTokenService.loadById(TOKEN_NAME)).thenReturn(accessToken);
+        return accessToken;
     }
 
     @Test

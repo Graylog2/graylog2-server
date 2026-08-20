@@ -16,10 +16,9 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import selectEvent from 'helpers/selectEvent';
@@ -33,6 +32,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import { usePlugin } from 'views/test/testPlugins';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -91,9 +91,7 @@ describe('AggregationWizard', () => {
       </FieldTypesContext.Provider>,
     );
 
-  beforeAll(() => PluginStore.register(plugin));
-
-  afterAll(() => PluginStore.unregister(plugin));
+  usePlugin(plugin);
 
   beforeEach(() => {
     asMock(useActiveQueryId).mockReturnValue('queryId');
@@ -121,6 +119,24 @@ describe('AggregationWizard', () => {
       await selectEvent.chooseOption('Select a function', 'Minimum');
 
       await screen.findByText('Field is required for function min.');
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should allow entering an arbitrary field for a metric',
+    async () => {
+      renderSUT();
+
+      await addMetric();
+
+      const metricContainer = await screen.findByTestId('metric-0');
+      await selectEvent.chooseOption('Select a function', 'Minimum', { container: metricContainer });
+
+      const fieldInput = await selectEvent.findSelectInput('Select a field', { container: metricContainer });
+      await selectEvent.create(fieldInput, 'my_custom_field');
+
+      await within(metricContainer).findByText('my_custom_field');
     },
     extendedTimeout,
   );

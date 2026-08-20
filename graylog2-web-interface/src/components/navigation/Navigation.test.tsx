@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import type { Location } from 'history';
 import { defaultUser } from 'defaultMockValues';
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { asMock } from 'helpers/mocking';
@@ -25,7 +26,7 @@ import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useLocation from 'routing/useLocation';
 import HotkeysProvider from 'contexts/HotkeysProvider';
-import useNotifications from 'components/notifications/useNotifications';
+import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
 
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
@@ -33,9 +34,10 @@ jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 jest.mock('@graylog/server-api', () => ({
   SystemNotifications: {
     listNotifications: jest.fn(async () => ({ total: 0 })),
+    getPaginated: jest.fn(async () => ({ pagination: { total: 0 }, elements: [] })),
   },
 }));
-jest.mock('components/notifications/useNotifications');
+jest.mock('components/notifications/hooks/useNotificationBadgeCount');
 
 describe('Navigation', () => {
   const SUT = () => (
@@ -48,23 +50,8 @@ describe('Navigation', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
 
-    asMock(useNotifications).mockReturnValue({
-      data: {
-        total: 1,
-        notifications: [
-          {
-            id: 'deadbeef',
-            details: {},
-            validations: {},
-            fields: {},
-            severity: 'urgent',
-            type: 'no_input_running',
-            key: 'test',
-            timestamp: '2022-12-12T10:55:55.014Z',
-            node_id: '3fcc3889-18a3-4a0d-821c-0fd560d152e7',
-          },
-        ],
-      },
+    asMock(useNotificationBadgeCount).mockReturnValue({
+      data: 1,
       isLoading: false,
     });
   });
@@ -84,8 +71,8 @@ describe('Navigation', () => {
   });
 
   it('does not show notification badge when there are no notifications', async () => {
-    asMock(useNotifications).mockReturnValue({
-      data: { total: 0, notifications: [] },
+    asMock(useNotificationBadgeCount).mockReturnValue({
+      data: 0,
       isLoading: false,
     });
 
@@ -94,5 +81,49 @@ describe('Navigation', () => {
     await screen.findByRole('button', { name: /help/i });
 
     expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument();
+  });
+
+  describe('with a plugin navigation badge', () => {
+    const badgePlugin = (useCondition: () => boolean) =>
+      new PluginManifest(
+        {},
+        {
+          'navigation.badges': [
+            {
+              key: 'org.graylog.plugins.test.PluginBadge',
+              component: () => <span data-testid="plugin-badge" />,
+              useCondition,
+            },
+          ],
+        },
+      );
+
+    let plugin: PluginManifest;
+
+    afterEach(() => {
+      PluginStore.unregister(plugin);
+    });
+
+    it('replaces the notification badge when the plugin badge is active', async () => {
+      plugin = badgePlugin(() => true);
+      PluginStore.register(plugin);
+
+      render(<SUT />);
+
+      await screen.findByTestId('plugin-badge');
+
+      expect(screen.queryByTestId('notification-badge')).not.toBeInTheDocument();
+    });
+
+    it('falls back to the notification badge when the plugin badge is inactive', async () => {
+      plugin = badgePlugin(() => false);
+      PluginStore.register(plugin);
+
+      render(<SUT />);
+
+      await screen.findByTestId('notification-badge');
+
+      expect(screen.queryByTestId('plugin-badge')).not.toBeInTheDocument();
+    });
   });
 });

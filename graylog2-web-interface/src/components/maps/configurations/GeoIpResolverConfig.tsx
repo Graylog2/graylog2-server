@@ -63,10 +63,15 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       app_pathname: 'configurations',
       app_section: 'geolocation-processor',
     });
+
     const normalizedValues = {
       ...values,
       azure_endpoint:
         values.azure_endpoint && values.azure_endpoint.trim() !== '' ? values.azure_endpoint.trim() : null,
+      azure_account_key:
+        values.azure_account_key && 'is_set' in values.azure_account_key
+          ? { keep_value: true }
+          : values.azure_account_key,
     };
 
     return updateConfig(normalizedValues).then((value: GeoIpConfigType) => {
@@ -228,9 +233,11 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                         onChange={(option) => {
                           setFieldValue('pull_from_cloud', option);
 
-                          if (option !== CLOUD_STORAGE_OPTION.GCS) {
-                            setFieldValue('gcs_project_id', undefined);
-                          }
+                          setFieldValue('gcs_project_id', undefined);
+                          setFieldValue('azure_endpoint', undefined);
+                          setFieldValue('azure_account_key', undefined);
+                          setFieldValue('azure_account', undefined);
+                          setFieldValue('azure_container', undefined);
                         }}
                       />
                     </Input>

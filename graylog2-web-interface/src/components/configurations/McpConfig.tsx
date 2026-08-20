@@ -28,11 +28,11 @@ import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
-import BetaBadge from 'components/common/BetaBadge';
 
 type McpConfigState = {
   enable_remote_access: boolean;
   enable_output_schema: boolean;
+  enable_input_validation: boolean;
 };
 
 const McpConfig = () => {
@@ -61,6 +61,10 @@ const McpConfig = () => {
     setModalConfig({ ...modalConfig, enable_output_schema: !modalConfig.enable_output_schema });
   };
 
+  const onModalClickEnableInputValidation = () => {
+    setModalConfig({ ...modalConfig, enable_input_validation: !modalConfig.enable_input_validation });
+  };
+
   const onModalCancel = () => {
     setShowConfigModal(false);
     setModalConfig(viewConfig);
@@ -78,9 +82,7 @@ const McpConfig = () => {
 
   return (
     <div>
-      <h2>
-        MCP Server Configuration <BetaBadge />
-      </h2>
+      <h2>MCP Server Configuration</h2>
       <br />
       <p>Activate MCP (Model Context Protocol) to enable LLM-powered communication and automation with your cluster.</p>
       <p>
@@ -95,6 +97,9 @@ const McpConfig = () => {
         <br />
         <dt>Output schema</dt>
         <dd>{viewConfig.enable_output_schema ? 'Enabled' : 'Disabled'}</dd>
+        <br />
+        <dt>Input validation</dt>
+        <dd>{viewConfig.enable_input_validation ? 'Enabled' : 'Disabled'}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
@@ -128,6 +133,15 @@ const McpConfig = () => {
               name="output-schema-enabled"
               checked={modalConfig.enable_output_schema}
               onChange={onModalClickEnableOutputSchema}
+            />
+            <Input
+              id="enable-input-validation-checkbox"
+              disabled={!modalConfig.enable_remote_access}
+              type="checkbox"
+              label="Enable Tool Input Validation"
+              name="input-validation-enabled"
+              checked={modalConfig.enable_input_validation}
+              onChange={onModalClickEnableInputValidation}
             />
           </fieldset>
         </BootstrapModalForm>

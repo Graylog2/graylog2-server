@@ -32,12 +32,20 @@ import org.mongojack.ObjectId;
 
 import java.util.Optional;
 
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_DESCRIPTION;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_DESTINATION_TYPE;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_ID;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_STATUS;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_STREAM_ID;
+import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_TITLE;
 
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDestinationFilterRuleDTO.Builder.class)
-@DbEntity(collection = StreamDestinationFilterService.COLLECTION, readPermission = RestPermissions.STREAM_DESTINATION_FILTERS_READ)
+@DbEntity(collection = StreamDestinationFilterService.COLLECTION, readPermission = RestPermissions.STREAM_DESTINATION_FILTERS_READ,
+          readableFields = {ID_FIELD, FIELD_ID, FIELD_TITLE, FIELD_DESCRIPTION, FIELD_STREAM_ID, FIELD_DESTINATION_TYPE, FIELD_STATUS})
 public abstract class StreamDestinationFilterRuleDTO implements MongoEntity {
     public enum Status {
         @JsonProperty("enabled")
@@ -46,7 +54,7 @@ public abstract class StreamDestinationFilterRuleDTO implements MongoEntity {
         DISABLED;
     }
 
-    private static final String FIELD_ID = "id";
+    public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_STREAM_ID = "stream_id";

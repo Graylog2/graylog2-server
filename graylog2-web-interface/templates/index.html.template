@@ -2,6 +2,7 @@
 <html<% if(htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"<% } %> lang="en">
   <head>
     <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
     <title><%=htmlWebpackPlugin.options.title || 'Webpack App'%></title>
     <script defer src="/config.js"></script>
     <% for (var vendorChunk in vendorModule().files.js) { %>

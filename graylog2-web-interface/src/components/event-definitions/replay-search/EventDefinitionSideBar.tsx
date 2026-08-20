@@ -17,12 +17,12 @@
 import React from 'react';
 
 import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
+import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
 
 const EventDefinitionSideBar = () => (
   <div>
     <ExpandableSection title="Event Definition Details">
-      <EventDefinitionInfoTable />
+      <EventDefinitionInfoList />
     </ExpandableSection>
   </div>
 );

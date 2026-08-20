@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
 import { Modal, BootstrapModalWrapper, Button, SegmentedControl } from 'components/bootstrap';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import CreateOutputDropdown from 'components/outputs/CreateOutputDropdown';
 import AssignOutputDropdown from 'components/outputs/AssignOutputDropdown';
 import type { Output } from 'hooks/useOutputs';
@@ -30,13 +30,17 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
 import type {
   AvailableOutputRequestedConfiguration,
+  AvailableOutputSummary,
   AvailableOutputTypes,
 } from 'components/streams/useAvailableOutputTypes';
 import { Icon } from 'components/common';
 
 type Props = {
   stream: Stream;
-  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration;
+  getTypeDefinition: (
+    type: string,
+    callback?: (available: AvailableOutputSummary) => void,
+  ) => AvailableOutputRequestedConfiguration | undefined;
   availableOutputTypes: AvailableOutputTypes;
   assignableOutputs: Array<Output>;
 };

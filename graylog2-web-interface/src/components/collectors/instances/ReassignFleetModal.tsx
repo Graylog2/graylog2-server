@@ -21,8 +21,10 @@ import { Formik, Form } from 'formik';
 import { Modal } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
 type Props = {
@@ -46,9 +48,10 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
-const ReassignFleetModal = ({ instanceUids, currentFleetId, onClose, onSuccess }: Props) => {
+const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose, onSuccess = () => {} }: Props) => {
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
   const { reassignInstances } = useCollectorsMutations();
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const availableFleets = (fleets || []).filter((fleet: Fleet) => fleet.id !== currentFleetId);
 
@@ -60,10 +63,26 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId, onClose, onSuccess }
   const handleSubmit = useCallback(
     async (values: FormValues) => {
       await reassignInstances({ instanceUids, fleetId: values.fleetId });
-      onSuccess?.();
+
+      if (instanceUids.length === 1) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.REASSIGNED, {
+          app_action_value: 'instance-reassign',
+          instance_id: instanceUids[0],
+          from_fleet_id: currentFleetId ?? null,
+          to_fleet_id: values.fleetId,
+        });
+      } else {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.BULK_REASSIGNED, {
+          app_action_value: 'instance-bulk-reassign',
+          count: instanceUids.length,
+          to_fleet_id: values.fleetId,
+        });
+      }
+
+      onSuccess();
       onClose();
     },
-    [instanceUids, reassignInstances, onSuccess, onClose],
+    [instanceUids, reassignInstances, onSuccess, onClose, currentFleetId, sendTelemetry],
   );
 
   const instanceCount = instanceUids.length;

@@ -33,6 +33,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteDeflectorResource;
@@ -70,5 +72,14 @@ public class ClusterDeflectorResource extends ProxiedResource {
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public void cycle(@Parameter(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws IOException {
         requestOnLeader(c -> c.cycleIndexSet(indexSetId), RemoteDeflectorResource.class);
+    }
+
+    @POST
+    @Timed
+    @Operation(summary = "Finds leader node and triggers deflector cycle")
+    @Path("/bulk_cycle")
+    @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
+    public NodeResponse<BulkOperationResponse> bulkcycle(@Parameter(name = "Entities to cycle", required = true) final BulkOperationRequest bulkOperationRequest) throws IOException {
+        return requestOnLeader(c -> c.bulkCycle(bulkOperationRequest), RemoteDeflectorResource.class);
     }
 }

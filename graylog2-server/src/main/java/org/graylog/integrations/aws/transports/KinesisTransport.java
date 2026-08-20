@@ -46,7 +46,6 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
-import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.slf4j.Logger;
@@ -58,9 +57,9 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 import static org.graylog.integrations.aws.inputs.AWSInput.getKinesisStreamARNDefinition;
+import static org.graylog.integrations.aws.inputs.AWSInput.getSingleTableStateTrackingFieldDefinition;
 
 public class KinesisTransport extends ThrottleableTransport2 {
 
@@ -73,6 +72,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
     public static final String CK_KINESIS_STREAM_NAME = "kinesis_stream_name";
     public static final String CK_KINESIS_STREAM_ARN = "kinesis_stream_arn";
     public static final String CK_KINESIS_RECORD_BATCH_SIZE = "kinesis_record_batch_size";
+    public static final String CK_KINESIS_SINGLE_TABLE_STATE_TRACKING = "kinesis_single_table_state_tracking";
 
     public static final int DEFAULT_BATCH_SIZE = 10000;
 
@@ -123,6 +123,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
         final String key = configuration.getString(CK_ACCESS_KEY);
         final EncryptedValue secret = configuration.getEncryptedValue(CK_SECRET_KEY);
         final String assumeRoleArn = configuration.getString(AWSInput.CK_ASSUME_ROLE_ARN);
+        final String externalId = configuration.getString(AWSInput.CK_EXTERNAL_ID);
 
         final String dynamodbEndpoint = configuration.getString(AWSInput.CK_DYNAMODB_ENDPOINT);
         final String cloudwatchEndpoint = configuration.getString(AWSInput.CK_CLOUDWATCH_ENDPOINT);
@@ -140,6 +141,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
                 .awsAccessKeyId(key)
                 .awsSecretAccessKey(secret)
                 .assumeRoleArn(assumeRoleArn)
+                .externalId(externalId)
                 .cloudwatchEndpoint(cloudwatchEndpoint)
                 .dynamodbEndpoint(dynamodbEndpoint)
                 .iamEndpoint(iamEndpoint)
@@ -148,9 +150,11 @@ public class KinesisTransport extends ThrottleableTransport2 {
         final int batchSize = configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE);
         final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
+        final boolean migrateToSingleTable = configuration.getBoolean(CK_KINESIS_SINGLE_TABLE_STATE_TRACKING, false);
 
-        this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, kinesisCallback(input),
-                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder);
+        this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, input::processRawMessage,
+                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder,
+                migrateToSingleTable);
 
         LOG.debug("Starting Kinesis reader thread for input {}", input.toIdentifier());
         executor.submit(this.kinesisConsumer);
@@ -173,10 +177,6 @@ public class KinesisTransport extends ThrottleableTransport2 {
                         endpointName, endpoint), e);
             }
         }
-    }
-
-    private Consumer<byte[]> kinesisCallback(final MessageInput input) {
-        return (data) -> input.processRawMessage(new RawMessage(data));
     }
 
     @Override
@@ -235,6 +235,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
                     "",
                     "Secret key of an AWS user with sufficient permissions. (See documentation)",
                     ConfigurationField.Optional.OPTIONAL,
+                    true,
                     TextField.Attribute.IS_PASSWORD
             ));
 
@@ -254,6 +255,8 @@ public class KinesisTransport extends ThrottleableTransport2 {
                     "The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time.",
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
+
+            r.addField(getSingleTableStateTrackingFieldDefinition());
 
             return r;
         }

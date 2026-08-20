@@ -27,7 +27,7 @@ import EventNotificationActionLinks from 'components/event-notifications/event-n
 import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import { getEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import type { HistoryContext } from 'routing/withHistory';
 import withHistory from 'routing/withHistory';
@@ -44,7 +44,7 @@ class EditEventDefinitionPage extends React.Component<
     [key: string]: any;
   }
 > {
-  constructor(props) {
+  constructor(props: EditEventDefinitionPageProps) {
     super(props);
 
     this.state = {
@@ -56,7 +56,7 @@ class EditEventDefinitionPage extends React.Component<
     const { params, currentUser } = this.props;
 
     if (isPermitted(currentUser.permissions, `eventnotifications:edit:${params.notificationId}`)) {
-      EventNotificationsActions.get(params.notificationId).then(
+      getEventNotification(params.notificationId).then(
         (notification) => this.setState({ notification: notification }),
         (error) => {
           if (error.status === 404) {

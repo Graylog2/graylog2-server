@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed a bug where the Data Node version mismatch notification was never automatically cleared after all Data Nodes returned to a matching version"
+
+pulls = ["25879"]
+issues = ["24718"]

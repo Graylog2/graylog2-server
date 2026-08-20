@@ -18,6 +18,7 @@ package org.graylog.events.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog.events.event.EventDto.FIELD_ALERT;
 import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
+import static org.graylog.events.event.EventDto.FIELD_SOURCE_STREAMS;
 
 public class EventsSliceService extends AbstractEventsSearchService {
     public final static String TYPE = "type";
@@ -87,9 +89,13 @@ public class EventsSliceService extends AbstractEventsSearchService {
      * Used inside this service for the core Events/Alerts table but also is a provided method, re-used from the enterprise/security part of Graylog
      */
     protected List<Slice> slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final Map<String, Object> meta) {
+        final var filteredQuery = withSourceStreamFilter(query, SourceStreamFilter.forSubject(subject, streamService));
+        if (filteredQuery == null) {
+            return List.of();
+        }
         try {
             return scriptingApiService.executeAggregation(
-                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
+                            new AggregationRequestSpec(filteredQuery, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
                             searchUser
                     )
                     .datarows()
@@ -105,9 +111,13 @@ public class EventsSliceService extends AbstractEventsSearchService {
      * finding the overall count for one column for MongoDB based queries so we can calculate the "empty" case
      */
     public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final Map<String, Object> meta) {
+        final var filteredQuery = withSourceStreamFilter(query, SourceStreamFilter.forSubject(subject, streamService));
+        if (filteredQuery == null) {
+            return Optional.empty();
+        }
         try {
             return scriptingApiService.executeAggregation(
-                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(), List.of(new Metric("count", null))),
+                            new AggregationRequestSpec(filteredQuery, allowedEventStreams(subject), Set.of(), timeRange, List.of(), List.of(new Metric("count", null))),
                             searchUser
                     )
                     .datarows()
@@ -192,5 +202,22 @@ public class EventsSliceService extends AbstractEventsSearchService {
             case FIELD_PRIORITY -> handlePriorityColumn(slices);
             default -> slices;
         };
+    }
+
+    /**
+     * Augments a query string with a source stream filter clause. Returns {@code null} if the user has no
+     * source stream permissions (empty allow-list), signaling that the caller should return empty results.
+     */
+    @Nullable
+    private static String withSourceStreamFilter(String query, SourceStreamFilter sourceStreamFilter) {
+        if (sourceStreamFilter.isAllAllowed()) {
+            return query;
+        }
+        final var streamIds = sourceStreamFilter.streamIds();
+        if (streamIds.isEmpty()) {
+            return null;
+        }
+        final var clause = FIELD_SOURCE_STREAMS + ":(" + String.join(" OR ", streamIds) + ")";
+        return query.isEmpty() ? clause : query + " AND " + clause;
     }
 }

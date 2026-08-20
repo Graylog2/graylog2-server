@@ -17,9 +17,13 @@
 package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoBuilder;
 import jakarta.annotation.Nullable;
 import org.graylog2.database.MongoEntity;
+import org.graylog2.jackson.MongoInstantDeserializer;
+import org.graylog2.jackson.MongoInstantSerializer;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -32,10 +36,18 @@ public record EnrollmentTokenDTO(
         @JsonProperty(FIELD_KID) String kid,
         @JsonProperty(FIELD_FLEET_ID) String fleetId,
         @JsonProperty(FIELD_CREATED_BY) EnrollmentTokenCreator createdBy,
+        @JsonSerialize(using = MongoInstantSerializer.class)
+        @JsonDeserialize(using = MongoInstantDeserializer.class)
         @JsonProperty(FIELD_CREATED_AT) Instant createdAt,
-        @Nullable @JsonProperty(FIELD_EXPIRES_AT) Instant expiresAt,
+        @Nullable
+        @JsonSerialize(using = MongoInstantSerializer.class)
+        @JsonDeserialize(using = MongoInstantDeserializer.class)
+        @JsonProperty(FIELD_EXPIRES_AT) Instant expiresAt,
         @JsonProperty(FIELD_USAGE_COUNT) int usageCount,
-        @Nullable @JsonProperty(FIELD_LAST_USED_AT) Instant lastUsedAt
+        @Nullable
+        @JsonSerialize(using = MongoInstantSerializer.class)
+        @JsonDeserialize(using = MongoInstantDeserializer.class)
+        @JsonProperty(FIELD_LAST_USED_AT) Instant lastUsedAt
 ) implements MongoEntity {
     public static final String FIELD_NAME = "name";
     public static final String FIELD_JTI = "jti";

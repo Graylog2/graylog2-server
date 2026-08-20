@@ -25,6 +25,7 @@ const defaultResourcesUrls: Record<BrandingResourceKey, string> = {
   contact_support: 'https://support.graylog.org/portal',
   contact_us: 'https://www.graylog.org/community-support/',
   marketplace: 'https://marketplace.graylog.org/',
+  forwarder_download_url: 'https://www.graylog.org/downloads/',
 };
 
 const useResourceCustomization = (brandingKey: BrandingResourceKey): BrandingResource => {

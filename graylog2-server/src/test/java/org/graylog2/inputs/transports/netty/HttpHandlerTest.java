@@ -37,7 +37,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS;
 import static io.netty.handler.codec.http.HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS;
@@ -54,12 +57,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HttpHandlerTest {
     private static final byte[] GELF_MESSAGE = "{\"version\":\"1.1\",\"short_message\":\"Foo\",\"host\":\"localhost\"}".getBytes(StandardCharsets.UTF_8);
-    private static final String BEARER_EXPECTED_TOKEN = "Bearer: expected-token";
+    private static final String BEARER_PRIMARY_TOKEN = "Bearer: primary-token";
+    private static final String BEARER_SECONDARY_TOKEN = "Bearer: secondary-token";
     private EmbeddedChannel channel;
 
     @BeforeEach
     public void setUp() {
-        channel = new EmbeddedChannel(new HttpHandler(true, null, null, "/gelf"));
+        channel = new EmbeddedChannel(new HttpHandler(true, null, Set.of(), "/gelf"));
     }
 
     @Test
@@ -220,7 +224,7 @@ public class HttpHandlerTest {
     @Test
     void handleValidPostIsCalledForValidRequest() {
         final AtomicBoolean called = new AtomicBoolean(false);
-        final HttpHandler handler = new HttpHandler(false, null, null, "/test") {
+        final HttpHandler handler = new HttpHandler(false, null, Set.of(), "/test") {
             @Override
             protected void handleValidPost(ChannelHandlerContext ctx, FullHttpRequest request, boolean keepAlive, String origin) {
                 called.set(true);
@@ -245,16 +249,19 @@ public class HttpHandlerTest {
     @Test
     public void testAuthentication() {
         // No auth required - success.
-        testAuthentication(null, null, null, null, ACCEPTED);
-        // Auth required - success.
-        testAuthentication(AUTHORIZATION.toString(), BEARER_EXPECTED_TOKEN, AUTHORIZATION, BEARER_EXPECTED_TOKEN, ACCEPTED);
+        testAuthentication(null, null, null, null, null, ACCEPTED);
+        // Auth required - primary token succeeds.
+        testAuthentication(AUTHORIZATION.toString(), BEARER_PRIMARY_TOKEN, null, AUTHORIZATION, BEARER_PRIMARY_TOKEN, ACCEPTED);
+        // Auth required - secondary token succeeds.
+        testAuthentication(AUTHORIZATION.toString(), BEARER_PRIMARY_TOKEN, BEARER_SECONDARY_TOKEN, AUTHORIZATION, BEARER_SECONDARY_TOKEN, ACCEPTED);
         // Auth required - failures.
-        testAuthentication(AUTHORIZATION.toString(), BEARER_EXPECTED_TOKEN, AUTHORIZATION, "bad-token", UNAUTHORIZED);
-        testAuthentication(AUTHORIZATION.toString(), BEARER_EXPECTED_TOKEN, AUTHORIZATION, "", UNAUTHORIZED);
-        testAuthentication(AUTHORIZATION.toString(), BEARER_EXPECTED_TOKEN, null, "", UNAUTHORIZED);
+        testAuthentication(AUTHORIZATION.toString(), BEARER_PRIMARY_TOKEN, BEARER_SECONDARY_TOKEN, AUTHORIZATION, "bad-token", UNAUTHORIZED);
+        testAuthentication(AUTHORIZATION.toString(), BEARER_PRIMARY_TOKEN, BEARER_SECONDARY_TOKEN, AUTHORIZATION, "", UNAUTHORIZED);
+        testAuthentication(AUTHORIZATION.toString(), BEARER_PRIMARY_TOKEN, BEARER_SECONDARY_TOKEN, null, "", UNAUTHORIZED);
     }
 
-    private void testAuthentication(String expectedAuthHeader, String expectedAuthHeaderValue, AsciiString suppliedAuthHeader, String suppliedAuthHeaderValue,
+    private void testAuthentication(String expectedAuthHeader, String primaryToken, String secondaryToken,
+                                    AsciiString suppliedAuthHeader, String suppliedAuthHeaderValue,
                                     HttpResponseStatus expectedStatus) {
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/gelf");
         httpRequest.headers().add(HOST, "localhost");
@@ -266,13 +273,18 @@ public class HttpHandlerTest {
 
         httpRequest.content().writeBytes(GELF_MESSAGE);
 
+        final Set<String> authorizationHeaderValues = Stream.of(primaryToken, secondaryToken)
+                .filter(v -> v != null && !v.isBlank())
+                .collect(Collectors.toUnmodifiableSet());
+
         final DownstreamHandler downstreamHandler = new DownstreamHandler();
-        channel = new EmbeddedChannel(new HttpHandler(true, expectedAuthHeader, expectedAuthHeaderValue, "/gelf"), downstreamHandler);
+        channel = new EmbeddedChannel(
+                new HttpHandler(true, expectedAuthHeader, authorizationHeaderValues, "/gelf"),
+                downstreamHandler);
         channel.writeInbound(httpRequest);
         channel.finish();
 
         final HttpResponse httpResponse = channel.readOutbound();
-        // Request should be successful.
         assertThat(httpResponse.status()).isEqualTo(expectedStatus);
         final HttpHeaders headers = httpResponse.headers();
         assertThat(headers.get(CONTENT_LENGTH)).isEqualTo("0");
@@ -282,7 +294,7 @@ public class HttpHandlerTest {
         assertThat(headers.get(CONNECTION)).isEqualTo(HttpHeaderValues.CLOSE.toString());
         if (expectedStatus == HttpResponseStatus.ACCEPTED) {
             assertThat(downstreamHandler.received).isTrue();
-        }else if (expectedStatus == HttpResponseStatus.UNAUTHORIZED) {
+        } else if (expectedStatus == HttpResponseStatus.UNAUTHORIZED) {
             assertThat(downstreamHandler.received).isFalse();
         } else {
             throw new AssertionError("Unexpected status: " + expectedStatus);

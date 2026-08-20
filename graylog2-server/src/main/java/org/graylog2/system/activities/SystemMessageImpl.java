@@ -29,11 +29,13 @@ import org.joda.time.DateTimeZone;
 import java.util.Collections;
 import java.util.Map;
 
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.SYSTEMMESSAGES_READ;
 
 @DbEntity(collection = "system_messages",
           titleField = "content",
-          readPermission = SYSTEMMESSAGES_READ)
+          readPermission = SYSTEMMESSAGES_READ,
+          readableFields = {ID_FIELD, "caller", "content", "timestamp", "node_id"})
 public class SystemMessageImpl extends PersistedImpl implements SystemMessage {
 
     private final String caller;

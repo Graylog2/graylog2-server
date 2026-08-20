@@ -23,24 +23,18 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
-import org.graylog.security.DBGrantService;
-import org.graylog.security.GrantDTO;
 import org.graylog2.plugin.database.users.User;
 
-import java.util.List;
 import java.util.Set;
 
 @Singleton
 public class EntityRegistrar {
-    // TODO: get rid of this dependency
-    private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
     private final Provider<Set<EntityRegistrationHandler>> registrationHandlersProvider;
 
     @Inject
-    public EntityRegistrar(DBGrantService dbGrantService, GRNRegistry grnRegistry,
+    public EntityRegistrar(GRNRegistry grnRegistry,
                            Provider<Set<EntityRegistrationHandler>> registrationHandlersProvider) {
-        this.dbGrantService = dbGrantService;
         this.grnRegistry = grnRegistry;
         this.registrationHandlersProvider = registrationHandlersProvider;
     }
@@ -79,12 +73,6 @@ public class EntityRegistrar {
 
     public void unregisterEntity(final String id, final GRNType grnType) {
         unregisterEntity(grnRegistry.newGRN(grnType, id));
-    }
-
-    // TODO: move this method to a more appropriate place
-    public List<GrantDTO> getGrantsForTarget(final GRNType type, final String id) {
-        final GRN grn = grnRegistry.newGRN(type, id);
-        return dbGrantService.getForTarget(grn);
     }
 
     public void unregisterStream(String id) {

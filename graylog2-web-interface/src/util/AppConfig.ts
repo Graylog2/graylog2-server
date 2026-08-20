@@ -25,7 +25,12 @@ declare global {
 }
 
 export type BrandingResource = { enabled?: boolean; url?: string | undefined };
-export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us' | 'marketplace';
+export type BrandingResourceKey =
+  | 'stream_rule_matcher_code'
+  | 'contact_support'
+  | 'contact_us'
+  | 'marketplace'
+  | 'forwarder_download_url';
 
 export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
 type FeatureToggle = { enabled?: boolean };
@@ -73,6 +78,7 @@ export type AppConfigs = {
   contentStream: { refresh_interval: string; rss_url: string };
   branding: Branding | undefined;
   globalInputsOnly: boolean;
+  welcomePageMetricsEnabled: boolean;
 };
 
 declare global {
@@ -149,6 +155,10 @@ const AppConfig = {
 
   globalInputsOnly(): boolean {
     return appConfig().globalInputsOnly;
+  },
+
+  welcomePageMetricsEnabled(): boolean {
+    return appConfig().welcomePageMetricsEnabled ?? true;
   },
 };
 

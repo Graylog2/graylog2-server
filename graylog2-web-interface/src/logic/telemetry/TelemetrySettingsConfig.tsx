@@ -14,27 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Formik, Form } from 'formik';
 import { usePostHog } from 'posthog-js/react';
 
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { FormikFormGroup, Spinner } from 'components/common';
 import { Button, Row, Col, Input } from 'components/bootstrap';
-import type { UserTelemetrySettings } from 'stores/telemetry/TelemetrySettingsStore';
-import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
+import type { UserTelemetrySettings } from 'logic/telemetry/useTelemetrySettings';
+import useTelemetrySettings, { useUpdateTelemetrySettings } from 'logic/telemetry/useTelemetrySettings';
 import AppConfig from 'util/AppConfig';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
 
 const TelemetrySettingsConfigComponent = () => {
-  const [settings, setSettings] = useState<UserTelemetrySettings | undefined>(undefined);
+  const { data: settings } = useTelemetrySettings();
+  const { mutateAsync: updateSettings } = useUpdateTelemetrySettings();
   const posthog = usePostHog();
-
-  useEffect(() => {
-    TelemetrySettingsActions.get().then((result) => {
-      setSettings(result);
-    });
-  }, []);
 
   useEffect(() => {
     if (settings?.telemetry_enabled && posthog?.has_opted_out_capturing()) {
@@ -56,7 +51,7 @@ const TelemetrySettingsConfigComponent = () => {
   const onSubmit = (data: UserTelemetrySettings, { setSubmitting }) => {
     updateTelemetryOpt(data);
 
-    TelemetrySettingsActions.update(data).then(() => {
+    updateSettings(data).then(() => {
       setSubmitting(false);
       window.location.reload();
     });

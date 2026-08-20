@@ -162,9 +162,7 @@ const SUT = () => (
 
 describe('RightSidebarProvider', () => {
   it('should provide default context values', () => {
-    render(
-      <SUT />,
-    );
+    render(<SUT />);
 
     expect(screen.getByTestId('is-open')).toHaveTextContent('false');
     expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
@@ -175,9 +173,7 @@ describe('RightSidebarProvider', () => {
   });
 
   it('should open sidebar with content', async () => {
-    render(
-      <SUT />,
-    );
+    render(<SUT />);
 
     await userEvent.click(screen.getByText('Open Sidebar'));
 
@@ -186,9 +182,7 @@ describe('RightSidebarProvider', () => {
   });
 
   it('should close sidebar', async () => {
-    render(
-      <SUT />,
-    );
+    render(<SUT />);
 
     await userEvent.click(screen.getByText('Open Sidebar'));
     expect(screen.getByTestId('is-open')).toHaveTextContent('true');
@@ -198,9 +192,7 @@ describe('RightSidebarProvider', () => {
   });
 
   it('should update sidebar width', async () => {
-    render(
-      <SUT />,
-    );
+    render(<SUT />);
 
     expect(screen.getByTestId('width')).toHaveTextContent('400');
 

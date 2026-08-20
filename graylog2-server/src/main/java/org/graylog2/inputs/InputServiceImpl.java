@@ -19,13 +19,13 @@ package org.graylog2.inputs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
-import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -71,11 +71,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -178,15 +183,6 @@ public class InputServiceImpl implements InputService {
         return result;
     }
 
-    public String save(Input model) throws ValidationException {
-        return save(model, true);
-    }
-
-    @Override
-    public String saveWithoutEvents(Input model) throws ValidationException {
-        return save(model, false);
-    }
-
     private InputImpl toInputImpl(Input input) {
         if (input instanceof InputImpl inputImpl) {
             return inputImpl;
@@ -194,7 +190,7 @@ public class InputServiceImpl implements InputService {
         throw new IllegalArgumentException("Expected InputImpl, got " + input.getClass().getName());
     }
 
-    private String save(Input model, boolean fireEvents) throws ValidationException {
+    public String save(Input model) throws ValidationException {
         validateStaticFields(model);
         final InputImpl input = toInputImpl(model);
         String inputId = input.getId();
@@ -206,9 +202,7 @@ public class InputServiceImpl implements InputService {
             collection.replaceOne(MongoUtils.idEq(inputId), input);
         }
 
-        if (fireEvents) {
-            publishChange(InputCreated.create(inputId));
-        }
+        publishChange(InputCreated.create(inputId));
 
         return inputId;
     }
@@ -290,6 +284,11 @@ public class InputServiceImpl implements InputService {
             builder.setEmbeddedStaticFields(staticFields);
         }
 
+        final List<Map<String, Object>> extractors = (List<Map<String, Object>>) fields.get(InputImpl.EMBEDDED_EXTRACTORS);
+        if (extractors != null && !extractors.isEmpty()) {
+            builder.setEmbeddedExtractors(extractors);
+        }
+
         if (!isGlobal) {
             builder.setNodeId((String) fields.get(MessageInput.FIELD_NODE_ID));
         }
@@ -329,7 +328,7 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
-    public void addExtractor(Input input, Extractor extractor) throws ValidationException  {
+    public void addExtractor(Input input, Extractor extractor) throws ValidationException {
         validateExtractor(extractor);
         final Document embeddedDoc = new Document(extractor.getPersistedFields());
         final UpdateResult result = collection.updateOne(
@@ -393,6 +392,12 @@ public class InputServiceImpl implements InputService {
                 .append(InputImpl.FIELD_STATIC_FIELD_KEY, key)
                 .append(InputImpl.FIELD_STATIC_FIELD_VALUE, value);
 
+        // Remove any existing static field with the same key to prevent duplicates
+        collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                MongoUtils.removeEmbedded(InputImpl.EMBEDDED_STATIC_FIELDS, InputImpl.FIELD_STATIC_FIELD_KEY, key)
+        );
+
         final UpdateResult updateResult = collection.updateOne(
                 MongoUtils.idEq(input.getId()),
                 Updates.push(InputImpl.EMBEDDED_STATIC_FIELDS, staticFieldDoc)
@@ -445,9 +450,26 @@ public class InputServiceImpl implements InputService {
             list.stream()
                     .map(this::toDocument)
                     .map(this::getExtractorFromDoc)
+                    // getExtractorFromDoc() returns null for extractors that cannot be built from persisted data.
+                    // Skip those instead of adding null (which an ImmutableList rejects) so a single broken extractor
+                    // does not break listing of all extractors for the input (see issue #26122).
+                    .filter(Objects::nonNull)
                     .forEach(listBuilder::add);
         }
         return listBuilder.build();
+    }
+
+    @Override
+    public Map<String, Integer> extractorCountByInputId(Collection<String> inputIds) {
+        final List<Bson> pipeline = List.of(
+                Aggregates.match(MongoUtils.stringIdsIn(inputIds)),
+                Aggregates.project(Projections.computed("count",
+                        new Document("$size", new Document("$ifNull", List.of("$" + InputImpl.EMBEDDED_EXTRACTORS, List.of())))))
+        );
+        final Map<String, Integer> result = new HashMap<>();
+        documentCollection.aggregate(pipeline).forEach(doc ->
+                result.put(doc.getObjectId("_id").toHexString(), doc.getInteger("count", 0)));
+        return result;
     }
 
     @Override
@@ -613,23 +635,7 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public Map<String, Long> totalCountByType() {
-        final Map<String, Long> inputCountByType = new HashMap<>();
-
-        final List<Bson> pipeline = List.of(
-                Aggregates.group("$" + MessageInput.FIELD_TYPE, Accumulators.sum("count", 1)),
-                Aggregates.sort(Sorts.ascending(MessageInput.FIELD_TYPE))
-        );
-
-        collection.aggregate(pipeline, Document.class)
-                .forEach(doc -> {
-                    final String type = doc.getString(MessageInput.FIELD_TYPE);
-                    if (type != null) {
-                        final long count = doc.get("count", Long.class);
-                        inputCountByType.put(type, count);
-                    }
-                });
-
-        return inputCountByType;
+        return mongoUtils.countByField(MessageInput.FIELD_TYPE);
     }
 
     @Override
@@ -664,25 +670,35 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public Map<Extractor.Type, Long> totalExtractorCountByType() {
-        final Map<Extractor.Type, Long> extractorsCountByType = new HashMap<>();
-
-        documentCollection.find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
+        return stream(documentCollection
+                .find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
                 .projection(Projections.include(InputImpl.EMBEDDED_EXTRACTORS))
-                .forEach(doc -> {
-                    List<Document> extractors = doc.getList(InputImpl.EMBEDDED_EXTRACTORS, Document.class);
-                    if (extractors == null) return;
+        )
+                .flatMap(InputServiceImpl::embeddedExtractors)
+                .flatMap(InputServiceImpl::extractorType)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+    }
 
-                    for (Document extractorDoc : extractors) {
-                        final String typeStr = extractorDoc.getString(Extractor.FIELD_TYPE);
-                        final Extractor.Type type = Extractor.Type.fuzzyValueOf(typeStr);
+    @Nonnull
+    private static Stream<Document> stream(FindIterable<Document> projection) {
+        return StreamSupport.stream(projection.spliterator(), false);
+    }
 
-                        if (type != null) {
-                            extractorsCountByType.merge(type, 1L, Long::sum);
-                        }
-                    }
-                });
+    private static Stream<?> embeddedExtractors(Document doc) {
+        if (doc.get(InputImpl.EMBEDDED_EXTRACTORS) instanceof List<?> list) {
+            return list.stream();
+        }
+        return Stream.empty();
+    }
 
-        return extractorsCountByType;
+    private static Stream<Extractor.Type> extractorType(Object item) {
+        if (item instanceof Map<?, ?> extractorDoc) {
+            return Optional.ofNullable(extractorDoc.get(Extractor.FIELD_TYPE))
+                    .map(String::valueOf)
+                    .map(Extractor.Type::fuzzyValueOf)
+                    .stream();
+        }
+        return Stream.empty();
     }
 
     private void publishChange(Object event) {
@@ -727,8 +743,12 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public void persistDesiredState(Input input, IOState.Type desiredState) throws ValidationException {
-        final Input updatedInput = input.withDesiredState(desiredState);
-        saveWithoutEvents(updatedInput);
+        // Use a targeted update instead of saving the whole input to avoid overwriting concurrent changes
+        // to other parts of the input document.
+        collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                Updates.set(InputImpl.FIELD_DESIRED_STATE, desiredState.name())
+        );
     }
 
     @Override

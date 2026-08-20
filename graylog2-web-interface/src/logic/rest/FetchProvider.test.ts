@@ -18,8 +18,8 @@ import express from 'express';
 import nodeFetch from 'node-fetch';
 import formidableMiddleware from 'express-formidable';
 import FormData from 'form-data';
-import { JSONStringify } from 'json-with-bigint';
 
+import * as JSON from 'util/json';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { asMock } from 'helpers/mocking';
 
@@ -37,11 +37,9 @@ jest.mock('stores/sessions/SessionStore', () => ({
   },
 }));
 
-jest.mock('stores/sessions/ServerAvailabilityStore', () => ({
-  ServerAvailabilityActions: {
-    reportSuccess: jest.fn(),
-    reportError: jest.fn(),
-  },
+jest.mock('api/server-availability', () => ({
+  reportSuccess: jest.fn(),
+  reportError: jest.fn(),
 }));
 
 jest.mock('actions/errors/ErrorsActions', () => ({
@@ -78,7 +76,7 @@ const setUpServer = () => {
   });
 
   app.post('/test_bigint', (_req, res) => {
-    res.send(JSONStringify({ text: 'test', foo: BigInt('6674029904495870944') }));
+    res.send(JSON.stringify({ text: 'test', foo: BigInt('6674029904495870944') }));
   });
 
   app.post('/failIfWrongAcceptHeader', (req, res) => {

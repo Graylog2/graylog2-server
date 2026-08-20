@@ -51,6 +51,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stream;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class SourceService {
@@ -190,6 +191,20 @@ public class SourceService {
             final String fleetId = doc.getString("_id");
             if (fleetId != null) {
                 result.put(fleetId, ((Number) doc.get("count")).longValue());
+            }
+        });
+        return result;
+    }
+
+    public Map<String, Long> countByType() {
+        final var pipeline = List.of(
+                Aggregates.group(f("$%s.%s", SourceDTO.FIELD_CONFIG, SourceConfig.TYPE_FIELD), Accumulators.sum("count", 1L))
+        );
+        final Map<String, Long> result = new HashMap<>();
+        collection.aggregate(pipeline, Document.class).forEach(doc -> {
+            final String type = doc.getString("_id");
+            if (type != null) {
+                result.put(type, ((Number) doc.get("count")).longValue());
             }
         });
         return result;

@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
-import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
+import { fetchInput } from 'hooks/useInputs';
 import { useMetrics } from 'hooks/useMetrics';
 import useInputsStates from 'hooks/useInputsStates';
 import type { InputStateByNode, InputState } from 'hooks/useInputsStates';
@@ -98,11 +97,10 @@ const useInputDiagnosis = (
   inputNodeStates: InputNodeStates;
   inputMetrics: InputDiagnosisMetrics;
 } => {
-  const { input } = useStore(InputsStore);
-
-  useEffect(() => {
-    InputsActions.get(inputId);
-  }, [inputId]);
+  const { data: input } = useQuery({
+    queryKey: ['inputs', inputId],
+    queryFn: () => fetchInput(inputId),
+  });
 
   const { data: messageCountByStream } = useQuery({
     queryKey: ['input-diagnostics', inputId],

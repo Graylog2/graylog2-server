@@ -15,12 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { Pagination as BootstrapPagination } from 'react-bootstrap';
-import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
-import styled, { css } from 'styled-components';
-
-import { MoreActionsIcon } from 'components/common/MoreActions';
+import { Pagination as MantinePagination } from '@mantine/core';
+import styled from 'styled-components';
 
 import Icon from './Icon';
 
@@ -29,7 +25,6 @@ type Props = {
   totalPages: number;
   boundaryPagesRange?: number;
   siblingPagesRange?: number;
-  hideEllipsis?: boolean;
   hidePreviousAndNextPageLinks?: boolean;
   hideFirstAndLastPageLinks?: boolean;
   disabled?: boolean;
@@ -37,153 +32,46 @@ type Props = {
   warnIfPageOutOfBounds?: boolean;
 };
 
-const StyledBootstrapPagination = styled(BootstrapPagination)(
-  ({ theme }) => css`
-    &.pagination {
-      font-size: ${theme.fonts.size.small};
-      margin-top: 10px;
-      margin-bottom: 0;
+const controlAriaLabels = {
+  first: 'Open first page',
+  previous: 'Open previous page',
+  next: 'Open next page',
+  last: 'Open last page',
+};
 
-      > li {
-        > a,
-        > span {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
-          background-color: ${theme.colors.global.contentBackground};
-          border-color: ${theme.colors.variant.light.default};
-          border-radius: 0;
-          height: 32px;
+const PrevIcon = () => <Icon name="chevron_left" />;
+const NextIcon = () => <Icon name="chevron_right" />;
+const FirstIcon = () => <Icon name="keyboard_double_arrow_left" />;
+const LastIcon = () => <Icon name="keyboard_double_arrow_right" />;
 
-          &:hover,
-          &:focus {
-            color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
-            background-color: ${theme.colors.variant.lighter.default};
-            border-color: ${theme.colors.variant.light.default};
-          }
-        }
+const StyledPagination = styled(MantinePagination)`
+  margin-top: 10px;
+  overflow: hidden;
+  padding-bottom: 2px;
 
-        &.active > a,
-        &.active > span {
-          &,
-          &:hover,
-          &:focus {
-            color: ${theme.colors.pagination.active.color};
-            background-color: ${theme.colors.pagination.active.background};
-            border-color: ${theme.colors.pagination.active.border};
-            z-index: 1;
-          }
-        }
+  .mantine-Group-root {
+    gap: 0;
+    justify-content: center;
+  }
 
-        &.disabled {
-          > a,
-          > a:hover,
-          > a:focus,
-          > span,
-          > span:hover,
-          > span:focus {
-            color: ${theme.colors.variant.light.default};
-            background-color: ${theme.colors.global.contentBackground};
-            border-color: ${theme.colors.variant.lighter.default};
-          }
-        }
-      }
+  .mantine-Pagination-control {
+    border-color: ${({ theme }) => theme.colors.input.border};
+
+    &:not([data-active]) {
+      background-color: transparent;
     }
-  `,
-);
 
-const UltimatePagination = createUltimatePagination({
-  WrapperComponent: StyledBootstrapPagination,
-  itemTypeToComponent: {
-    [ITEM_TYPES.PAGE]: ({ value, isActive, onClick }) => {
-      const title = isActive ? 'Active page' : `Open page ${value}`;
-
-      return (
-        <BootstrapPagination.Item active={isActive} onClick={onClick} title={title} aria-label={title}>
-          {value}
-        </BootstrapPagination.Item>
-      );
-    },
-    [ITEM_TYPES.ELLIPSIS]: ({ isActive, onClick }) => {
-      const title = 'Open following page';
-
-      return (
-        <BootstrapPagination.Ellipsis
-          disabled={isActive}
-          onClick={onClick}
-          title={title}
-          aria-label={title}
-          className="pagination-control">
-          <MoreActionsIcon />
-        </BootstrapPagination.Ellipsis>
-      );
-    },
-    [ITEM_TYPES.FIRST_PAGE_LINK]: ({ isActive, onClick }) => {
-      const title = 'Open first page';
-
-      return (
-        <BootstrapPagination.First
-          disabled={isActive}
-          onClick={onClick}
-          title={title}
-          aria-label={title}
-          className="pagination-control">
-          <Icon name="keyboard_double_arrow_left" />
-        </BootstrapPagination.First>
-      );
-    },
-    [ITEM_TYPES.PREVIOUS_PAGE_LINK]: ({ isActive, onClick }) => {
-      const title = 'Open previous page';
-
-      return (
-        <BootstrapPagination.Prev
-          disabled={isActive}
-          onClick={onClick}
-          title={title}
-          aria-label={title}
-          className="pagination-control">
-          <Icon name="chevron_left" />
-        </BootstrapPagination.Prev>
-      );
-    },
-    [ITEM_TYPES.NEXT_PAGE_LINK]: ({ isActive, onClick }) => {
-      const title = 'Open next page';
-
-      return (
-        <BootstrapPagination.Next
-          disabled={isActive}
-          onClick={onClick}
-          title={title}
-          aria-label={title}
-          className="pagination-control">
-          <Icon name="chevron_right" />
-        </BootstrapPagination.Next>
-      );
-    },
-    [ITEM_TYPES.LAST_PAGE_LINK]: ({ isActive, onClick }) => {
-      const title = 'Open last page';
-
-      return (
-        <BootstrapPagination.Last
-          disabled={isActive}
-          onClick={onClick}
-          title={title}
-          aria-label={title}
-          className="pagination-control">
-          <Icon name="keyboard_double_arrow_right" />
-        </BootstrapPagination.Last>
-      );
-    },
-  },
-});
+    & + .mantine-Pagination-control {
+      border-left: none;
+    }
+  }
+`;
 
 const Pagination = ({
   currentPage,
   totalPages,
   boundaryPagesRange = 1,
   siblingPagesRange = 1,
-  hideEllipsis = false,
   hidePreviousAndNextPageLinks = false,
   hideFirstAndLastPageLinks = false,
   disabled = false,
@@ -204,16 +92,24 @@ const Pagination = ({
   }
 
   return (
-    <UltimatePagination
-      currentPage={currentPage}
-      totalPages={totalPages}
-      boundaryPagesRange={boundaryPagesRange}
-      siblingPagesRange={siblingPagesRange}
-      hideEllipsis={hideEllipsis}
-      hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
-      hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+    <StyledPagination
+      value={currentPage}
+      total={totalPages}
+      boundaries={boundaryPagesRange}
+      siblings={siblingPagesRange}
+      withControls={!hidePreviousAndNextPageLinks}
+      withEdges={!hideFirstAndLastPageLinks}
       disabled={disabled}
       onChange={onChange}
+      previousIcon={PrevIcon}
+      nextIcon={NextIcon}
+      firstIcon={FirstIcon}
+      lastIcon={LastIcon}
+      getControlProps={(control) => ({ 'aria-label': controlAriaLabels[control] })}
+      getItemProps={(page) => ({
+        'aria-label': `Open page ${page}`,
+        ...(page === currentPage ? { title: 'Active page' } : {}),
+      })}
       data-testid="graylog-pagination"
     />
   );

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import * as Immutable from 'immutable';
 import type { Subtract } from 'utility-types';
 
@@ -27,11 +27,10 @@ import { Select, FormSubmit } from 'components/common';
 import { Col, Row, Input } from 'components/bootstrap';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 import type { ConfigurationFieldValue } from 'components/configurationforms';
-import connect from 'stores/connect';
 import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
 import AppConfig from 'util/AppConfig';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import useInputsList, { inputsAsMap } from 'hooks/useInputs';
 import useHistory from 'routing/useHistory';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import UserNotification from 'util/UserNotification';
@@ -207,12 +206,6 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
   const [codecConfiguration, setCodecConfiguration] = useState({});
   const [inputId, setInputId] = useState<string | typeof undefined>();
   const history = useHistory();
-
-  useEffect(() => {
-    if (inputIdSelector) {
-      InputsActions.list();
-    }
-  }, [inputIdSelector]);
 
   const _loadMessage = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -411,12 +404,11 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
   );
 };
 
-export default connect(
-  // @ts-ignore
-  RawMessageLoader,
-  { inputs: InputsStore },
-  // @ts-ignore
-  ({ inputs: { inputs } }) => ({
-    inputs: inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined,
-  }),
-);
+const RawMessageLoaderWrapper = (props: Omit<Props, 'inputs'>) => {
+  const { data: inputsList } = useInputsList();
+  const inputs = inputsList ? Immutable.Map(inputsAsMap(inputsList)) : undefined;
+
+  return <RawMessageLoader {...props} inputs={inputs} />;
+};
+
+export default RawMessageLoaderWrapper;

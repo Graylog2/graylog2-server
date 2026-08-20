@@ -34,7 +34,7 @@ public class CollectorJournalRecordFactory {
                                                                   String instanceUid) {
         final List<CollectorJournal.Record> records = new ArrayList<>();
         for (final var resourceLogs : request.getResourceLogsList()) {
-            final var receiverType = extractReceiverType(resourceLogs);
+            final var attributes = extractResourceAttributes(resourceLogs);
             for (final var scopeLogs : resourceLogs.getScopeLogsList()) {
                 for (final var logRecord : scopeLogs.getLogRecordsList()) {
                     records.add(CollectorJournal.Record.newBuilder()
@@ -46,7 +46,9 @@ public class CollectorJournalRecordFactory {
                                             .setLogRecord(logRecord)
                                             .setLogRecordSchemaUrl(scopeLogs.getSchemaUrl())))
                             .setCollectorInstanceUid(instanceUid)
-                            .setCollectorReceiverType(receiverType)
+                            .setCollectorReceiverType(attributes.receiverType())
+                            .setCollectorSourceId(attributes.sourceId())
+                            .setCollectorFleetId(attributes.fleetId())
                             .build());
                 }
             }
@@ -54,12 +56,19 @@ public class CollectorJournalRecordFactory {
         return records;
     }
 
-    private static String extractReceiverType(ResourceLogs resourceLogs) {
+    private record ResourceAttributes(String receiverType, String sourceId, String fleetId) {}
+
+    private static ResourceAttributes extractResourceAttributes(ResourceLogs resourceLogs) {
+        String receiverType = "";
+        String sourceId = "";
+        String fleetId = "";
         for (final var attr : resourceLogs.getResource().getAttributesList()) {
-            if (CollectorAttributes.COLLECTOR_RECEIVER_TYPE.equals(attr.getKey())) {
-                return attr.getValue().getStringValue();
+            switch (attr.getKey()) {
+                case CollectorAttributes.COLLECTOR_RECEIVER_TYPE -> receiverType = attr.getValue().getStringValue();
+                case CollectorAttributes.COLLECTOR_SOURCE_ID -> sourceId = attr.getValue().getStringValue();
+                case CollectorAttributes.COLLECTOR_FLEET_ID -> fleetId = attr.getValue().getStringValue();
             }
         }
-        return "";
+        return new ResourceAttributes(receiverType, sourceId, fleetId);
     }
 }

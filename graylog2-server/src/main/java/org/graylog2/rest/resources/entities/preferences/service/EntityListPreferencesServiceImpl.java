@@ -22,9 +22,15 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.ENTITY_LIST_ID_SUB_FIELD;
+import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.LAYOUT_VARIANT_SUB_FIELD;
 import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.USER_ID_SUB_FIELD;
 
 public class EntityListPreferencesServiceImpl implements EntityListPreferencesService {
@@ -45,6 +51,18 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
     }
 
     @Override
+    public List<StoredEntityListPreferences> getPredefinedForEntityList(final String entityListId) {
+        return collection.find(
+                        Filters.and(
+                                Filters.eq("_id." + ENTITY_LIST_ID_SUB_FIELD, entityListId),
+                                Filters.exists("_id." + LAYOUT_VARIANT_SUB_FIELD),
+                                Filters.exists("_id." + USER_ID_SUB_FIELD, false)
+                        )
+                )
+                .into(new ArrayList<>());
+    }
+
+    @Override
     public boolean save(final StoredEntityListPreferences preferences) {
         if (preferences.preferencesId() == null) {
             collection.insertOne(preferences);
@@ -56,8 +74,22 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
     }
 
     @Override
-    public int deleteAllForUser(String userId) {
+    public int deleteAllForUser(final String userId) {
         return Ints.saturatedCast(collection.deleteMany(Filters.eq("_id." + USER_ID_SUB_FIELD, userId))
                 .getDeletedCount());
+    }
+
+    @Override
+    public boolean delete(final StoredEntityListPreferencesId preferencesId) throws ValidationException {
+        if (null == preferencesId) {
+            throw new ValidationException("Preferences ID cannot be null");
+        }
+
+        // So that predefined layout is never removed...
+        if (null == preferencesId.userId() || preferencesId.userId().isEmpty()) {
+            throw new ValidationException("User ID has to be specified for preferences removal");
+        }
+
+        return collection.deleteOne(Filters.eq("_id", preferencesId)).getDeletedCount() > 0;
     }
 }

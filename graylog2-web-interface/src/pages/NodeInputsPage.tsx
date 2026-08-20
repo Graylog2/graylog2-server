@@ -60,7 +60,25 @@ const NodeInputsPage = () => {
         </PageHeader>
         <Row className="content">
           <Col md={12}>
-            <InputsOverview node={node} inputTypes={inputTypes} inputTypeDescriptions={inputTypeDescriptions} />
+            <h2>Local Inputs</h2>
+            <InputsOverview
+              node={node}
+              inputTypes={inputTypes}
+              inputTypeDescriptions={inputTypeDescriptions}
+              entityTableId="node-inputs"
+            />
+          </Col>
+        </Row>
+        <Row className="content">
+          <Col md={12}>
+            <h2>Global Inputs</h2>
+            <InputsOverview
+              global={true}
+              inputTypes={inputTypes}
+              inputTypeDescriptions={inputTypeDescriptions}
+              entityTableId="global-inputs"
+              withoutURLParams
+            />
           </Col>
         </Row>
       </div>

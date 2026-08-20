@@ -18,6 +18,7 @@ import React from 'react';
 import * as mockImmutable from 'immutable';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -45,16 +46,26 @@ jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ state: undefined })),
-  },
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: Immutable.List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 describe('DashboardActionsMenu', () => {
   const mockView = View.create()
@@ -170,7 +181,7 @@ describe('DashboardActionsMenu', () => {
 
     await findByTitle(/Save dashboard/);
     await findByTitle(/Save as new dashboard/);
-    await findByTitle(/Share/);
+    await findByRole('button', { name: /Share/i });
     await findByRole('button', { name: /more actions/i });
   });
 
@@ -180,7 +191,7 @@ describe('DashboardActionsMenu', () => {
     );
 
     const saveButton = queryByTitle(/Save dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
@@ -197,7 +208,7 @@ describe('DashboardActionsMenu', () => {
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();

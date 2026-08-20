@@ -13,7 +13,7 @@
         <!-- Application Loggers -->
         <Logger name="org.graylog.datanode" level="info"/>
         <!-- Hide warnings for enterprise cluster events -->
-        <Logger name="org.graylog2.events.ClusterEventPeriodical" level="error"/>
+        <Logger name="org.graylog2.events.ClusterEventService" level="error"/>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="datanode-internal-logs"/>

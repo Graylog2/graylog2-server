@@ -41,6 +41,8 @@ type Props = {
   chevronPosition?: 'left' | 'right';
   variant?: 'default' | 'contained' | 'separated';
   noBackground?: boolean;
+  value?: string;
+  onChange?: (value: string) => void;
 };
 
 const MantineAccordion = ({
@@ -49,6 +51,7 @@ const MantineAccordion = ({
   chevronPosition = 'left',
   variant = 'default',
   noBackground = false,
+  ...mantineProps
 }: Props) => {
   const theme = useTheme();
   const styles = getStyles(theme, { noBackground });
@@ -60,7 +63,12 @@ const MantineAccordion = ({
   ));
 
   return (
-    <Accordion styles={styles} variant={variant} chevronPosition={chevronPosition} defaultValue={defaultValue}>
+    <Accordion
+      styles={styles}
+      variant={variant}
+      chevronPosition={chevronPosition}
+      defaultValue={defaultValue}
+      {...mantineProps}>
       {items}
     </Accordion>
   );

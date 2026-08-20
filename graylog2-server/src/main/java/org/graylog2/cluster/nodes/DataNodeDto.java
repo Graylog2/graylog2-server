@@ -26,6 +26,7 @@ import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.database.DbEntity;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
 import org.graylog2.plugin.Version;
 
@@ -42,7 +43,10 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(as = DataNodeDto.class)
 @JsonDeserialize(builder = DataNodeDto.Builder.class)
+@DbEntity(collection = DataNodeDto.COLLECTION_NAME, titleField = NodeDto.FIELD_NODE_ID)
 public abstract class DataNodeDto extends NodeDto {
+
+    public static final String COLLECTION_NAME = "datanodes";
 
     public static final String FIELD_ACTION_QUEUE = "action_queue";
     public static final String FIELD_CLUSTER_ADDRESS = "cluster_address";
@@ -167,7 +171,7 @@ public abstract class DataNodeDto extends NodeDto {
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_DataNodeDto.Builder()
-                    .setLeader(false); // TODO: completely remove the leader property from this DTO
+                    .setLeader(false);
         }
 
         @JsonProperty(FIELD_CLUSTER_ADDRESS)

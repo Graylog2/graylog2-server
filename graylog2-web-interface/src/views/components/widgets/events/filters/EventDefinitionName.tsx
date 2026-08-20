@@ -30,26 +30,22 @@ type Props = {
 const EventDefinitionName = ({ eventDefinitionId, displayAsLink = true }: Props) => {
   const currentUser = useCurrentUser();
   const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${eventDefinitionId}`);
-  const { data: eventDefinition, isFetching } = useEventDefinition(eventDefinitionId, canViewDefinition);
+  const { data: eventDefinition, isFetching, isError } = useEventDefinition(eventDefinitionId, canViewDefinition);
   const title = eventDefinition?.title ?? eventDefinitionId;
 
   if (isFetching) {
     return <Spinner />;
   }
 
-  if (!displayAsLink || !canViewDefinition) {
+  if (!displayAsLink || !canViewDefinition || !eventDefinition || isError) {
     return <>{title}</>;
   }
 
-  if (eventDefinition) {
-    return (
-      <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)} target="_blank">
-        {title}
-      </Link>
-    );
-  }
-
-  return null;
+  return (
+    <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)} target="_blank">
+      {title}
+    </Link>
+  );
 };
 
 export default EventDefinitionName;

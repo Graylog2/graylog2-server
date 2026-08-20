@@ -26,12 +26,10 @@ public record FleetResponse(
         @JsonProperty("id") String id,
         @JsonProperty("name") String name,
         @Nullable @JsonProperty("description") String description,
-        @Nullable @JsonProperty("target_version") String targetVersion,
         @JsonProperty("created_at") Instant createdAt,
         @JsonProperty("updated_at") Instant updatedAt) {
 
     public static FleetResponse fromDTO(FleetDTO dto) {
-        return new FleetResponse(dto.id(), dto.name(), dto.description(),
-                dto.targetVersion(), dto.createdAt(), dto.updatedAt());
+        return new FleetResponse(dto.id(), dto.name(), dto.description(), dto.createdAt(), dto.updatedAt());
     }
 }

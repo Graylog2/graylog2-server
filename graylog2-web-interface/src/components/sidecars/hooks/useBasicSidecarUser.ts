@@ -18,7 +18,9 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Sidecar } from '@graylog/server-api';
 
-import { defaultOnError } from 'util/conditional/onError';
+import { onError } from 'util/conditional/onError';
+import type FetchError from 'logic/errors/FetchError';
+import UserNotification from 'util/UserNotification';
 
 const BASIC_FORWARDER_USER_QUERY_KEY = 'basic_forwarder_user';
 
@@ -39,11 +41,7 @@ const getSidecarUser = async (): Promise<BasicSidecarUser> =>
     username: userResponse.username,
   }));
 
-type UseBasicSidecarUserOptions = {
-  enabled?: boolean;
-};
-
-const useBasicSidecarUser = ({ enabled = true }: UseBasicSidecarUserOptions = {}): {
+const useBasicSidecarUser = (): {
   data: BasicSidecarUser;
   isLoading: boolean;
   refetch: () => void;
@@ -51,8 +49,11 @@ const useBasicSidecarUser = ({ enabled = true }: UseBasicSidecarUserOptions = {}
   const { data, isLoading, refetch } = useQuery({
     queryKey: [BASIC_FORWARDER_USER_QUERY_KEY],
     queryFn: () =>
-      defaultOnError(getSidecarUser(), `Loading Sidecar User failed with status`, `Could not load Sidecar User`),
-    enabled,
+      onError(getSidecarUser(), (error: FetchError) => {
+        if (error.status !== 403) {
+          UserNotification.error(`Loading Sidecar User failed with status: ${error}`, 'Could not load Sidecar User');
+        }
+      }),
   });
 
   return {

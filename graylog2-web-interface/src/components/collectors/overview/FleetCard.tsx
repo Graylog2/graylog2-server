@@ -17,11 +17,13 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { HoverForHelp } from 'components/common';
+
 import type { FleetStatsSummary } from '../types';
 
-type HealthStatus = 'healthy' | 'degraded' | 'down' | 'empty';
+export type HealthStatus = 'healthy' | 'degraded' | 'down' | 'empty';
 
-const getHealthStatus = (stats: FleetStatsSummary): HealthStatus => {
+export const getHealthStatus = (stats: FleetStatsSummary): HealthStatus => {
   if (stats.total_instances === 0) return 'empty';
   if (stats.online_instances === stats.total_instances) return 'healthy';
   if (stats.online_instances === 0) return 'down';
@@ -29,25 +31,44 @@ const getHealthStatus = (stats: FleetStatsSummary): HealthStatus => {
   return 'degraded';
 };
 
-const Card = styled.div(
-  ({ theme }) => css`
+const HEALTH_VARIANT: Record<HealthStatus, string> = {
+  healthy: 'success',
+  degraded: 'warning',
+  down: 'danger',
+  empty: '',
+};
+
+const Card = styled.div<{ $status: HealthStatus }>(({ theme, $status }) => {
+  const bandColor = HEALTH_VARIANT[$status]
+    ? theme.colors.variant[HEALTH_VARIANT[$status] as keyof typeof theme.colors.variant]
+    : theme.colors.gray[60];
+
+  return css`
+    position: relative;
+    display: flex;
+    flex-direction: column;
     border: 1px solid ${theme.colors.gray[80]};
     border-radius: 8px;
     padding: ${theme.spacings.md};
     background: ${theme.colors.global.contentBackground};
     cursor: pointer;
+    border-left: 3px solid ${bandColor};
 
     &:hover {
       outline: 1px solid ${theme.colors.variant.info};
     }
+  `;
+});
+
+const HelpCorner = styled.div(
+  ({ theme }) => css`
+    position: absolute;
+    top: ${theme.spacings.xs};
+    right: ${theme.spacings.xs};
+    color: ${theme.colors.gray[70]};
+    font-size: 0.7em;
   `,
 );
-
-const CardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
 
 const FleetName = styled.span(
   ({ theme }) => css`
@@ -56,23 +77,6 @@ const FleetName = styled.span(
     font-size: ${theme.fonts.size.large};
   `,
 );
-
-const HealthDot = styled.span<{ $status: HealthStatus }>(({ theme, $status }) => {
-  const colorMap: Record<HealthStatus, string> = {
-    healthy: theme.colors.variant.success,
-    degraded: theme.colors.variant.warning,
-    down: theme.colors.variant.danger,
-    empty: theme.colors.gray[60],
-  };
-
-  return css`
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: ${colorMap[$status]};
-  `;
-});
 
 const HeroNumber = styled.div(
   ({ theme }) => css`
@@ -94,7 +98,9 @@ const Breakdown = styled.div(
     display: flex;
     gap: ${theme.spacings.sm};
     margin-top: ${theme.spacings.xs};
+    min-height: 1.4em;
     font-size: ${theme.fonts.size.small};
+    flex: 1;
   `,
 );
 
@@ -125,15 +131,24 @@ type Props = {
   onClick: () => void;
 };
 
+const healthTooltips: Record<HealthStatus, string> = {
+  healthy: 'All instances in this fleet are online',
+  degraded: 'Some instances in this fleet are offline',
+  down: 'All instances in this fleet are offline',
+  empty: 'No Collector instances have enrolled in this fleet yet',
+};
+
 const FleetCard = ({ stats, onClick }: Props) => {
   const health = getHealthStatus(stats);
 
   return (
-    <Card onClick={onClick} data-testid="fleet-card">
-      <CardHeader>
-        <FleetName>{stats.fleet_name}</FleetName>
-        <HealthDot $status={health} title={health} />
-      </CardHeader>
+    <Card onClick={onClick} data-testid="fleet-card" $status={health}>
+      <HelpCorner>
+        <HoverForHelp title={stats.fleet_name} placement="right" pullRight={false}>
+          {healthTooltips[health]}
+        </HoverForHelp>
+      </HelpCorner>
+      <FleetName>{stats.fleet_name}</FleetName>
       <HeroNumber>{stats.total_instances}</HeroNumber>
       <SubLabel>instances</SubLabel>
       <Breakdown>

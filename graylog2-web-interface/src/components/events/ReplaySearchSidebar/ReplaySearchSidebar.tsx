@@ -18,7 +18,7 @@ import React, { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import GeneralEventSideBar from 'components/events/ReplaySearchSidebar/GeneralEventSideBar';
-import type { EventReplaySideBarDetailsProps } from 'views/types';
+import type { EventDefinitionSideBarDetailsProps, EventReplaySideBarDetailsProps } from 'views/types';
 
 type Props = {
   alertId: string;
@@ -27,16 +27,29 @@ type Props = {
 
 const ReplaySearchSidebar = ({ alertId, definitionId = undefined }: Props) => {
   const sideBarDetailsPlugin = usePluginEntities('views.components.eventReplay.sideBarDetails');
+  const isEventDefinition = !alertId && !!definitionId;
+
+  const EventDefSideBar = useMemo<React.ComponentType<EventDefinitionSideBarDetailsProps> | null>(() => {
+    const sideBarDetails = sideBarDetailsPlugin[0];
+    const hasPlugin = typeof sideBarDetails?.useCondition === 'function' ? sideBarDetails.useCondition() : true;
+
+    if (hasPlugin && sideBarDetails?.eventDefinitionComponent) return sideBarDetails.eventDefinitionComponent;
+
+    return null;
+  }, [sideBarDetailsPlugin]);
 
   const EventSideBarDetails = useMemo<React.ComponentType<EventReplaySideBarDetailsProps>>(() => {
     const sideBarDetails = sideBarDetailsPlugin[0];
-
     const hasPlugin = typeof sideBarDetails?.useCondition === 'function' ? sideBarDetails.useCondition() : true;
 
     if (hasPlugin && !!sideBarDetails?.component) return sideBarDetails.component;
 
     return GeneralEventSideBar;
   }, [sideBarDetailsPlugin]);
+
+  if (isEventDefinition && EventDefSideBar) {
+    return <EventDefSideBar definitionId={definitionId} />;
+  }
 
   return <EventSideBarDetails alertId={alertId} definitionId={definitionId} />;
 };

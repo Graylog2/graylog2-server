@@ -29,6 +29,7 @@ export type AWSCloudTrailGenericInputCreateRequest = {
     aws_sqs_region: string;
     aws_s3_region: string;
     assume_role_arn: string;
+    aws_external_id?: string;
     override_source?: string;
     sqs_message_batch_size: number;
     include_full_message_json: boolean;
@@ -45,6 +46,7 @@ export type AWSCloudTrailInputCreateRequest = {
   aws_sqs_region: string;
   aws_s3_region: string;
   assume_role_arn: string;
+  aws_external_id?: string;
   override_source?: string;
   sqs_message_batch_size: number;
   include_full_message_json: boolean;

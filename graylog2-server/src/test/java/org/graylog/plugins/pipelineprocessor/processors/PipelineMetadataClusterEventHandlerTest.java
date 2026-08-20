@@ -23,6 +23,8 @@ import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
+import org.graylog2.streams.events.StreamDeletedEvent;
+import org.graylog2.streams.events.StreamRenamedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -113,6 +115,32 @@ class PipelineMetadataClusterEventHandlerTest {
         PipelineMetadataUpdateJob.Config config = captor.getValue();
         assertEquals(PipelineMetadataUpdateJob.EventType.INPUT_RENAMED, config.eventType());
         assertEquals(event, config.inputRenamedEvent());
+    }
+
+    @Test
+    void handleStreamRenamedSubmitsJob() {
+        StreamRenamedEvent event = new StreamRenamedEvent("stream1", "Old Title", "New Title");
+
+        handler.handleStreamRenamed(event);
+
+        ArgumentCaptor<PipelineMetadataUpdateJob.Config> captor = ArgumentCaptor.forClass(PipelineMetadataUpdateJob.Config.class);
+        verify(systemJobManager).submit(captor.capture());
+        PipelineMetadataUpdateJob.Config config = captor.getValue();
+        assertEquals(PipelineMetadataUpdateJob.EventType.STREAM_RENAMED, config.eventType());
+        assertEquals(event, config.streamRenamedEvent());
+    }
+
+    @Test
+    void handleStreamDeletedSubmitsJob() {
+        StreamDeletedEvent event = new StreamDeletedEvent("stream1", "Stream Title");
+
+        handler.handleStreamDeleted(event);
+
+        ArgumentCaptor<PipelineMetadataUpdateJob.Config> captor = ArgumentCaptor.forClass(PipelineMetadataUpdateJob.Config.class);
+        verify(systemJobManager).submit(captor.capture());
+        PipelineMetadataUpdateJob.Config config = captor.getValue();
+        assertEquals(PipelineMetadataUpdateJob.EventType.STREAM_DELETED, config.eventType());
+        assertEquals(event, config.streamDeletedEvent());
     }
 
     @Test

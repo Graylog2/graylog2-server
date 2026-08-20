@@ -73,7 +73,7 @@ class ViewOwnershipToGrantsMigrationTest {
         this.userService = userService;
         this.grantService = new DBGrantService(mongoCollections);
 
-        final EntityRegistrar entityRegistrar = new EntityRegistrar(grantService, grnRegistry,
+        final EntityRegistrar entityRegistrar = new EntityRegistrar(grnRegistry,
                 () -> Set.of(new EntityOwnershipRegistrationHandler(grantService, grnRegistry)));
         final TestViewService viewService = new TestViewService(clusterConfigService, entityRegistrar, viewSummaryService, entitySourceService, mongoCollections);
 

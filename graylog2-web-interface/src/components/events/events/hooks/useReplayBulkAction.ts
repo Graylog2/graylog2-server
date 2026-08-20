@@ -33,13 +33,20 @@ const useReplayBulkAction = (replayableEvents: Array<Event>) => {
   const history = useHistory();
 
   return useCallback(() => {
+    sendEventActionTelemetry('REPLAY_SEARCH', true, { events_length: eventIds.length });
+
+    if (eventIds.length === 1) {
+      history.push(Routes.ALERTS.replay_search(eventIds[0]));
+
+      return;
+    }
+
     const sessionId = generateId();
     const url = new URI(Routes.ALERTS.BULK_REPLAY_SEARCH)
       .search({
         [REPLAY_SESSION_ID_PARAM]: sessionId,
       })
       .toString();
-    sendEventActionTelemetry('REPLAY_SEARCH', true, { events_length: eventIds.length });
     Store.sessionSet(sessionId, { initialEventIds: eventIds, returnUrl: `${pathname}${search}` });
     history.push(url);
   }, [eventIds, history, pathname, search, sendEventActionTelemetry]);

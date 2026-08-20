@@ -20,9 +20,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import java.util.Map;
+import java.util.Set;
 
 @AutoValue
 public abstract class CollectorServiceConfig {
+
+    @JsonProperty("extensions")
+    public abstract Set<String> extensions();
 
     @JsonProperty("pipelines")
     public abstract Map<String, CollectorPipelineConfig> pipelines();
@@ -33,6 +37,8 @@ public abstract class CollectorServiceConfig {
 
     @AutoValue.Builder
     public abstract static class Builder {
+
+        public abstract Builder extensions(Set<String> extensions);
 
         public abstract Builder pipelines(Map<String, CollectorPipelineConfig> pipelines);
 

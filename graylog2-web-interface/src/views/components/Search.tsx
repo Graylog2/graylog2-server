@@ -17,11 +17,12 @@
 import * as React from 'react';
 import { useCallback, useEffect, useContext, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
-import { StreamsActions } from 'views/stores/StreamsStore';
+import { STREAMS_QUERY_KEY } from 'components/streams/hooks/useAllStreams';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -105,6 +106,7 @@ const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'res
       title={title}
       sections={searchPageLayout?.sidebar?.sections}
       contentColumnWidth={searchPageLayout?.sidebar?.contentColumnWidth}
+      initialSectionCollapsed={searchPageLayout?.sidebar?.initialSectionCollapsed}
       {...props}
     />
   );
@@ -151,6 +153,7 @@ type Props = {
 
 const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useViewsDispatch();
+  const queryClient = useQueryClient();
   const refreshSearch = useCallback(() => dispatch(executeActiveQuery()), [dispatch]);
   const {
     sidebar: { isShown: showSidebar },
@@ -168,8 +171,8 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
   }, [refreshSearch]);
 
   useEffect(() => {
-    StreamsActions.refresh();
-  }, []);
+    queryClient.invalidateQueries({ queryKey: STREAMS_QUERY_KEY });
+  }, [queryClient]);
 
   useOnWindowUnload();
 

@@ -22,7 +22,7 @@ import { DocumentationLink } from 'components/support';
 import NodeThroughput from 'components/throughput/NodeThroughput';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
-import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
+import { pauseProcessing, resumeProcessing } from 'api/system-processing';
 
 type SystemOverviewDetailsProps = {
   node: any;
@@ -42,9 +42,9 @@ class SystemOverviewDetails extends React.Component<
       )
     ) {
       if (this.props.information.is_processing) {
-        SystemProcessingStore.pause(this.props.node.node_id);
+        pauseProcessing(this.props.node.node_id);
       } else {
-        SystemProcessingStore.resume(this.props.node.node_id);
+        resumeProcessing(this.props.node.node_id);
       }
     }
   };

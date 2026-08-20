@@ -76,7 +76,7 @@ public class EncryptedValueDeserializer extends StdDeserializer<EncryptedValue> 
                     .build();
         }
 
-        throw new JsonMappingException(p, "Couldn't deserialize value: " + node + " (encrypted_value and salt must be a strings and cannot missing)");
+        throw new JsonMappingException(p, "Couldn't deserialize value (encrypted_value and salt must be strings and cannot be missing)");
     }
 
     private void validateValue(JsonParser p, JsonNode node) throws JsonMappingException {

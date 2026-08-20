@@ -40,7 +40,6 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   onActionsWidthChange,
   onChangeSlicing,
   onHeaderSectionResize,
-  parentBgColor,
   appSection,
 }: {
   actionsColMinWidth: number;
@@ -56,7 +55,6 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   onActionsWidthChange: (colId: string, width: number) => void;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
-  parentBgColor: string | undefined;
   appSection?: string;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
@@ -69,7 +67,6 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
     entityActions,
     hasRowActions,
     onWidthChange: onActionsWidthChange,
-    parentBgColor,
   });
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
     columnHelper,

@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
-import org.graylog.collectors.FleetService;
 import org.graylog.collectors.CollectorsPermissions;
+import org.graylog.collectors.FleetService;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.DbEntity;
 
@@ -30,11 +30,15 @@ import java.time.Instant;
 
 @AutoValue
 @JsonDeserialize(builder = FleetDTO.Builder.class)
-@DbEntity(collection = FleetService.COLLECTION_NAME, titleField = FleetDTO.FIELD_NAME, readPermission = CollectorsPermissions.FLEET_READ)
+@DbEntity(
+        collection = FleetService.COLLECTION_NAME,
+        titleField = FleetDTO.FIELD_NAME,
+        readPermission = CollectorsPermissions.FLEET_READ,
+        readableFields = {"_id", FleetDTO.FIELD_NAME}
+)
 public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDTO.Builder> {
     public static final String FIELD_NAME = "name";
     public static final String FIELD_DESCRIPTION = "description";
-    public static final String FIELD_TARGET_VERSION = "target_version";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_UPDATED_AT = "updated_at";
 
@@ -44,10 +48,6 @@ public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDT
     @Nullable
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
-
-    @Nullable
-    @JsonProperty(FIELD_TARGET_VERSION)
-    public abstract String targetVersion();
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract Instant createdAt();
@@ -72,9 +72,6 @@ public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDT
 
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(@Nullable String description);
-
-        @JsonProperty(FIELD_TARGET_VERSION)
-        public abstract Builder targetVersion(@Nullable String targetVersion);
 
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(Instant createdAt);

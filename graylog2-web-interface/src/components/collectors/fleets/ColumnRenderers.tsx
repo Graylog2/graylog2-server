@@ -34,10 +34,6 @@ const customColumnRenderers = (): ColumnRenderers<Fleet> => ({
       renderCell: (description: string) => <span>{description || '—'}</span>,
       width: 0.4,
     },
-    target_version: {
-      renderCell: (version: string | null) => <span>{version || '—'}</span>,
-      staticWidth: 120,
-    },
     created_at: {
       renderCell: (_createdAt: string, fleet: Fleet) => <RelativeTime dateTime={fleet.created_at} />,
       width: 0.15,

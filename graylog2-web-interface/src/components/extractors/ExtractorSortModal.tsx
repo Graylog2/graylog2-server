@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Row, Col, Modal, BootstrapModalWrapper } from 'components/bootstrap';
 import SortableList from 'components/common/SortableList';
-import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { orderExtractors } from 'hooks/useExtractors';
 import { ModalSubmit } from 'components/common/index';
 
 type ExtractorSortModalProps = {
@@ -66,7 +66,7 @@ class ExtractorSortModal extends React.Component<
       onClose();
     }
 
-    await ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
+    await orderExtractors(input.id, sortedExtractors);
 
     onSort();
     onClose();

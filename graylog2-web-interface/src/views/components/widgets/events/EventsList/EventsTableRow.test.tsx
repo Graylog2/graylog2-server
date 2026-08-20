@@ -30,6 +30,7 @@ jest.mock('hooks/useCurrentUser');
 const event = {
   id: 'event-id-1',
   event_definition_id: 'event-definition-id-1',
+  key: 'testkey_1',
   name: 'Event 1',
   status: null,
   assigned_to: null,

@@ -61,6 +61,9 @@ const BrandLink = styled(Link)(
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
+  const pluginBadges = usePluginEntities('navigation.badges');
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const activePluginBadges = pluginBadges.filter(({ useCondition }) => useCondition());
 
   return (
     <StyledNavbar fluid fixedTop collapseOnSelect>
@@ -79,7 +82,10 @@ const Navigation = React.memo(({ pathname }: Props) => {
       <Navbar.Collapse>
         <MainNavbar pathname={pathname} />
 
-        <NotificationBadge />
+        {activePluginBadges.map(({ key, component: PluginBadge }) => (
+          <PluginBadge key={key} />
+        ))}
+        {activePluginBadges.length === 0 && <NotificationBadge />}
 
         <Nav pullRight className="header-meta-nav">
           {AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}

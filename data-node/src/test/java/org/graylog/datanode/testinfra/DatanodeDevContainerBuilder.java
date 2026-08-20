@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 import static org.graylog.testing.completebackend.DefaultPluginJarsProvider.getProjectReposPath;
@@ -195,16 +196,10 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
             env.forEach(container::withEnv);
         }
 
-        final String opensearchDistributionName = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
-        final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchDistributionName));
-
-        if (!Files.exists(downloadedOpensearch)) {
-            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
-        }
-
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
-                .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/")
-                .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_ONLY);
+                .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/");
+
+        bindOpensearchDistributions(container);
 
         if (pluginJarsProvider != null) {
             pluginJarsProvider.getJars().forEach(hostPath -> {
@@ -219,11 +214,30 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         return container;
     }
 
-    private static String getOpensearchVersion() {
+    private void bindOpensearchDistributions(GenericContainer<?> container) {
+        // see opensearch.properties file, mapping the versions from pom.xml
+        Stream.of("opensearchCompatVersion", "opensearchLatestVersion")
+                .map(DatanodeDevContainerBuilder::getOpensearchVersion)
+                .map(DatanodeDevContainerBuilder::readOpensearchDistribution)
+                .forEach(d -> container.withFileSystemBind(d.distributionPath().toString(), IMAGE_WORKING_DIR + "/" + d.distributionName(), BindMode.READ_ONLY));
+    }
+
+    private static OpensearchDistribution readOpensearchDistribution(String version) {
+        final String distributionName = "opensearch-" + version + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
+        final Path distributionPath = getPath().resolve(Path.of("opensearch", distributionName));
+        if (!Files.exists(distributionPath)) {
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + distributionPath.toAbsolutePath() + " does not exist!");
+        }
+        return new OpensearchDistribution(distributionPath, distributionName);
+    }
+
+    private record OpensearchDistribution(Path distributionPath, String distributionName) {}
+
+    private static String getOpensearchVersion(String propertyName) {
         try {
             final Properties props = new Properties();
             props.load(DatanodeContainerizedBackend.class.getResourceAsStream("/opensearch.properties"));
-            return props.getProperty("opensearchVersion");
+            return props.getProperty(propertyName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

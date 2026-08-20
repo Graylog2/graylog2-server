@@ -31,6 +31,8 @@ import type { CollectorsConfigRequest, Fleet, Source } from '../types';
 type CreateSourceInput = {
   fleetId: string;
   source: Omit<Source, 'id' | 'fleet_id'>;
+  // When true, suppress the per-source success notification (e.g. bulk creation during onboarding).
+  silent?: boolean;
 };
 type UpdateSourceInput = {
   fleetId: string;
@@ -51,17 +53,19 @@ const onMutationSuccess = (message: string, invalidate: () => Promise<void>) => 
 const useCollectorsMutations = () => {
   const queryClient = useQueryClient();
 
+  // Contract: every query keyed under ['collectors'] is refetched after ANY collector mutation.
+  // Session-scoped state that must not be (e.g. the onboarding log preview's created search)
+  // lives under ONBOARDING_KEY_PREFIX instead — see useCollectorLogPreview.
   const invalidateCollectorsQueries = () => queryClient.invalidateQueries({ queryKey: ['collectors'] });
 
   const onSuccess = (message: string) => onMutationSuccess(message, invalidateCollectorsQueries);
 
   // Fleet mutations
   const createFleetMutation = useMutation({
-    mutationFn: (input: { name: string; description?: string; target_version?: string | null }) =>
+    mutationFn: (input: { name: string; description?: string }) =>
       CollectorsFleets.create({
         name: input.name,
         description: input.description,
-        target_version: input.target_version ?? null,
       }),
     onError: onMutationError('Creating fleet'),
     onSuccess: (fleet) => {
@@ -76,7 +80,6 @@ const useCollectorsMutations = () => {
       CollectorsFleets.update(fleetId, {
         name: updates.name,
         description: updates.description,
-        target_version: updates.target_version ?? null,
       }),
     onError: onMutationError('Updating fleet'),
     onSuccess: (fleet) => {
@@ -108,8 +111,10 @@ const useCollectorsMutations = () => {
         config: { type: source.type, ...source.config },
       }) as Promise<Source>,
     onError: onMutationError('Creating source'),
-    onSuccess: (source) => {
-      UserNotification.success(`Source "${source.name}" has been created.`, 'Success!');
+    onSuccess: (source, { silent }) => {
+      if (!silent) {
+        UserNotification.success(`Source "${source.name}" has been created.`, 'Success!');
+      }
 
       return invalidateCollectorsQueries();
     },
@@ -140,7 +145,7 @@ const useCollectorsMutations = () => {
 
   // Enrollment token mutations
   const createEnrollmentTokenMutation = useMutation({
-    mutationFn: (input: { name: string, fleetId: string; expiresIn: string | null }) =>
+    mutationFn: (input: { name: string; fleetId: string; expiresIn: string | null }) =>
       OpAMPEnrollment.createToken({
         name: input.name,
         fleet_id: input.fleetId,
@@ -157,8 +162,7 @@ const useCollectorsMutations = () => {
   });
 
   const bulkDeleteEnrollmentTokensMutation = useMutation({
-    mutationFn: (entityIds: string[]) =>
-      OpAMPEnrollment.bulkDelete({ entity_ids: entityIds }),
+    mutationFn: (entityIds: string[]) => OpAMPEnrollment.bulkDelete({ entity_ids: entityIds }),
     onError: onMutationError('Deleting enrollment tokens'),
     onSuccess: onSuccess('Enrollment tokens have been deleted.'),
   });

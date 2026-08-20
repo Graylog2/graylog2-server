@@ -19,5 +19,5 @@ package org.graylog.schema;
 public class SecurityFields {
     public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
     public static final String FIELD_ASSET_CATEGORIES = "associated_asset_categories";
-
+    public static final String FIELD_ASSET_PRIORITIES = "associated_asset_priorities";
 }

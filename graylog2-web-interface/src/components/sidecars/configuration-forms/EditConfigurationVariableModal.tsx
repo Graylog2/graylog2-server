@@ -19,7 +19,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import React from 'react';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
-import { ConfigurationVariableActions } from 'stores/sidecars/ConfigurationVariableStore';
+import { validateConfigurationVariable } from 'api/configuration-variables';
 
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
@@ -93,7 +93,7 @@ class EditConfigurationVariableModal extends React.Component<
   };
 
   _validateFormData = (nextFormData) => {
-    ConfigurationVariableActions.validate(nextFormData).then((validation: any) => {
+    validateConfigurationVariable(nextFormData).then((validation: any) => {
       this.setState({ validation_errors: validation.errors, error: validation.failed });
     });
   };

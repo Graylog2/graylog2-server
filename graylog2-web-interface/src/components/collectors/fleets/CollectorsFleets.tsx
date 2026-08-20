@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 
 import useLocation from 'routing/useLocation';
+import { ButtonToolbar } from 'components/bootstrap';
+import { LinkContainer, IconButton } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
@@ -27,25 +29,36 @@ import { FleetFormModal } from './index';
 import customColumnRenderers from './ColumnRenderers';
 import { DEFAULT_LAYOUT } from './Constants';
 
+import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
+import { COLLECTOR_FLEET_ID_FIELD } from '../common/fields';
 import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../hooks';
 import type { Fleet } from '../types';
 
 const CollectorsFleets = () => {
-  const [showFleetModal, setShowFleetModal] = useState(false);
   const { createFleet } = useCollectorsMutations();
   const { pathname } = useLocation();
   const history = useHistory();
 
-  useEffect(() => {
-    setShowFleetModal(pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW);
-  }, [pathname]);
+  // The modal is fully URL-driven: /fleets/new shows it, closing navigates back to /fleets.
+  const showFleetModal = pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW;
 
   const columnRenderers = useMemo(() => customColumnRenderers(), []);
 
   const fetchEntities = useCallback((searchParams: SearchParams) => fetchPaginatedFleets(searchParams), []);
 
+  const fleetActions = useCallback(
+    (fleet: Fleet) => (
+      <ButtonToolbar>
+        <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
+          <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
+        </LinkContainer>
+      </ButtonToolbar>
+    ),
+    [],
+  );
+
   const closeCreateModal = useCallback(() => {
-    history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
+    history.goBack();
   }, [history]);
 
   const handleSaveFleet = async (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
@@ -61,12 +74,10 @@ const CollectorsFleets = () => {
         keyFn={fleetsKeyFn}
         entityAttributesAreCamelCase={false}
         columnRenderers={columnRenderers}
-        entityActions={() => null}
+        entityActions={fleetActions}
       />
 
-      {showFleetModal && (
-        <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />
-      )}
+      {showFleetModal && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
     </>
   );
 };

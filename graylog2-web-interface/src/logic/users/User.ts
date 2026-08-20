@@ -17,7 +17,7 @@
 import * as Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
-import type { PreferencesMap } from 'stores/users/PreferencesStore';
+import type { PreferencesMap } from 'api/preferences';
 
 import type { AccountStatus } from './UserOverview';
 
@@ -199,7 +199,7 @@ export default class User {
     const MS_MINUTE = 60 * 1000;
     const MS_SECOND = 1000;
 
-    const _estimateUnit = (value): [number, string] => {
+    const _estimateUnit = (value: number): [number, string] => {
       if (value === 0) {
         return [MS_SECOND, 'Seconds'];
       }

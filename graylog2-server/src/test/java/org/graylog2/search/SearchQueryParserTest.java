@@ -19,15 +19,20 @@ package org.graylog2.search;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import com.mongodb.MongoClientSettings;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bson.BsonDocument;
 import org.bson.BsonValue;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -41,6 +46,12 @@ import static org.graylog2.search.SearchQueryParser.DEFAULT_OPERATOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SearchQueryParserTest {
+
+    private static final CodecRegistry CODEC_REGISTRY = MongoClientSettings.getDefaultCodecRegistry();
+
+    private String toJson(Bson bson) {
+        return bson.toBsonDocument(BsonDocument.class, CODEC_REGISTRY).toJson();
+    }
 
     @Test
     void explicitAllowedField() {
@@ -370,5 +381,49 @@ public class SearchQueryParserTest {
                         false)
                 );
 
+    }
+
+    @Test
+    void unqualifiedSearchUsesDefaultFieldBsonFilterCreator() {
+        final List<EntityAttribute> attributes = List.of(
+                EntityAttribute.builder().id("hostname").title("Hostname")
+                        .dbField("non_identifying_attributes")
+                        .bsonFilterCreator(AttributeFieldFilters.attributeArray("host.name"))
+                        .sortable(true).searchable(true).build(),
+                EntityAttribute.builder().id("instance_uid").title("Instance UID")
+                        .sortable(true).searchable(true).build()
+        );
+
+        final SearchQueryParser parser = new SearchQueryParser("hostname", attributes);
+
+        // Unqualified search: bare term without field prefix
+        final SearchQuery searchQuery = parser.parse("server01");
+        final List<Bson> filters = searchQuery.toBsonFilterList();
+
+        assertThat(filters).hasSize(1);
+        final String json = toJson(filters.getFirst());
+
+        // Must use $elemMatch on the attribute array, not a plain regex on "hostname"
+        assertThat(json).contains("$elemMatch");
+        assertThat(json).contains("non_identifying_attributes");
+        assertThat(json).contains("\"key\": \"host.name\"");
+        assertThat(json).contains("$regularExpression");
+    }
+
+    @Test
+    void qualifiedAndUnqualifiedSearchProduceSameFilterForDefaultField() {
+        final List<EntityAttribute> attributes = List.of(
+                EntityAttribute.builder().id("hostname").title("Hostname")
+                        .dbField("non_identifying_attributes")
+                        .bsonFilterCreator(AttributeFieldFilters.attributeArray("host.name"))
+                        .sortable(true).searchable(true).build()
+        );
+
+        final SearchQueryParser parser = new SearchQueryParser("hostname", attributes);
+
+        final String unqualifiedJson = toJson(parser.parse("server01").toBsonFilterList().getFirst());
+        final String qualifiedJson = toJson(parser.parse("hostname:server01").toBsonFilterList().getFirst());
+
+        assertThat(unqualifiedJson).isEqualTo(qualifiedJson);
     }
 }

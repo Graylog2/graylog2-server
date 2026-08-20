@@ -17,14 +17,14 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
-import EventDetailsTable from 'components/events/events/EventDetailsTable';
+import EventDetailsDefinitionList from 'components/events/events/EventDetailsDefinitionList';
 import { eventTypeAttribute } from 'components/events/events/ColumnRenderers';
 import type { EventReplaySideBarDetailsProps } from 'views/types';
 import useEventsAdditionalData from 'components/events/ReplaySearchSidebar/hooks/useEventsAdditionalData';
 import useEventById from 'hooks/useEventById';
 import { Spinner } from 'components/common';
 import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
+import EventDefinitionInfoList from 'components/event-definitions/replay-search/EventDefinitionInfoList';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 
@@ -79,7 +79,7 @@ const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetail
     <div>
       {alertId && (
         <ExpandableSection title="Event Details">
-          <EventDetailsTable
+          <EventDetailsDefinitionList
             event={eventData}
             meta={meta}
             attributesList={attributesList}
@@ -90,7 +90,7 @@ const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetail
       {resolvedDefinitionId && (
         <ReplaySearchContext.Provider value={replaySearchContext}>
           <ExpandableSection title="Event Definition Details">
-            <EventDefinitionInfoTable />
+            <EventDefinitionInfoList />
           </ExpandableSection>
         </ReplaySearchContext.Provider>
       )}

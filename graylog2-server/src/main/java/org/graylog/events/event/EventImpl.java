@@ -28,6 +28,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +65,9 @@ public class EventImpl implements Event {
     private Map<String, Double> aggregationConditions = new HashMap<>();
     private final Map<String, Double> scores = new HashMap<>();
     private final Set<String> associatedAssets = new HashSet<>();
+    private final Set<String> tags = new HashSet<>();
     private EventReplayInfo replayInfo;
+    private List<String> tacticsTechniques = ImmutableList.of();
 
     EventImpl(String eventId,
               DateTime eventTimestamp,
@@ -265,6 +268,19 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public Set<String> getTags() {
+        // unmodifiableSet wraps without copying; setTags is called at most once during
+        // construction so callers don't need a snapshot, just a mutation guard.
+        return Collections.unmodifiableSet(tags);
+    }
+
+    @Override
+    public void setTags(Set<String> tags) {
+        this.tags.clear();
+        this.tags.addAll(tags);
+    }
+
+    @Override
     public boolean getAlert() {
         return alert;
     }
@@ -325,6 +341,16 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public List<String> getTacticsTechniques() {
+        return tacticsTechniques;
+    }
+
+    @Override
+    public void setTacticsTechniques(List<String> tacticsTechniques) {
+        this.tacticsTechniques = tacticsTechniques == null ? ImmutableList.of() : ImmutableList.copyOf(tacticsTechniques);
+    }
+
+    @Override
     public EventDto toDto() {
         final Map<String, String> fields = this.fields.entrySet()
                 .stream()
@@ -354,11 +380,13 @@ public class EventImpl implements Event {
                 .priority(getPriority())
                 .scores(ImmutableMap.copyOf(scores))
                 .associatedAssets(ImmutableSet.copyOf(associatedAssets))
+                .tags(ImmutableSet.copyOf(tags))
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
                 .aggregationConditions(ImmutableMap.copyOf(aggregationConditions))
                 .replayInfo(getReplayInfo())
+                .tacticsTechniques(getTacticsTechniques())
                 .build();
     }
 
@@ -414,6 +442,8 @@ public class EventImpl implements Event {
                 Objects.equals(aggregationConditions, event.aggregationConditions) &&
                 Objects.equals(scores, event.scores) &&
                 Objects.equals(associatedAssets, event.associatedAssets) &&
+                Objects.equals(tags, event.tags) &&
+                Objects.equals(tacticsTechniques, event.tacticsTechniques) &&
                 Objects.equals(replayInfo, event.replayInfo);
     }
 
@@ -421,7 +451,8 @@ public class EventImpl implements Event {
     public int hashCode() {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
-                keyTuple, priority, alert, fields, groupByFields, aggregationConditions, scores, replayInfo);
+                keyTuple, priority, alert, fields, groupByFields, aggregationConditions, scores,
+                associatedAssets, tags, tacticsTechniques, replayInfo);
     }
 
     @Override
@@ -448,6 +479,8 @@ public class EventImpl implements Event {
                 .add("replayInfo", replayInfo)
                 .add("scores", scores)
                 .add("associatedAssets", associatedAssets)
+                .add("tags", tags)
+                .add("tacticsTechniques", tacticsTechniques)
                 .toString();
     }
 

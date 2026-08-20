@@ -62,7 +62,7 @@ describe('<EntityDataTable />', () => {
     status: { status: ATTRIBUTE_STATUS.show },
   } as const;
 
-  const defaultDisplayedColumns = ['title', 'description', 'summary', 'status'];
+  const defaultDisplayedColumns = ['title', 'description', 'status', 'summary'];
 
   const data = [
     {
@@ -123,7 +123,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    await screen.findByRole('columnheader', { name: /custom title header/i });
+    await screen.findByText(/custom title header/i);
     await screen.findByText('The title: Entity title');
   });
 
@@ -147,7 +147,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    await screen.findByRole('columnheader', { name: /custom header for type - title/i });
+    await screen.findByText(/custom header for type - title/i);
     await screen.findByText('Custom Cell For Attribute - Entity title');
 
     expect(screen.queryByText('Custom Cell For Type - Entity title')).not.toBeInTheDocument();
@@ -161,6 +161,19 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
+    await screen.findByText('Custom actions for Entity title');
+  });
+
+  it('should render row override content and keep row actions', async () => {
+    render(
+      <EntityDataTable<{ id: string; title: string }>
+        {...defaultProps}
+        entityActions={(entity) => `Custom actions for ${entity.title}`}
+        rowOverride={(entity) => `Override for ${entity.title}`}
+      />,
+    );
+
+    await screen.findByText('Override for Entity title');
     await screen.findByText('Custom actions for Entity title');
   });
 
@@ -202,7 +215,7 @@ describe('<EntityDataTable />', () => {
 
     render(<EntityDataTable {...defaultProps} onSortChange={onSortChange} />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /sort ascending/i }));
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
@@ -210,12 +223,25 @@ describe('<EntityDataTable />', () => {
     expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', direction: 'asc' });
   });
 
+  it('should open header actions menu with the Enter key, leaving Space free for column drag', async () => {
+    render(<EntityDataTable {...defaultProps} />);
+
+    const descriptionHeader = await screen.findByRole('button', {
+      name: /drag or press space to reorder description/i,
+    });
+    descriptionHeader.focus();
+
+    await userEvent.keyboard('{Enter}');
+
+    await screen.findByRole('menuitem', { name: /sort ascending/i });
+  });
+
   it('should slice by column using header action', async () => {
     const onChangeSlicing = jest.fn(() => {});
 
     render(<EntityDataTable {...defaultProps} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /slice by values/i }));
 
     expect(onChangeSlicing).toHaveBeenCalledWith('description');
@@ -233,7 +259,7 @@ describe('<EntityDataTable />', () => {
       />,
     );
 
-    await userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /drag or press space to reorder description/i }));
     await userEvent.click(await screen.findByRole('menuitem', { name: /no slicing/i }));
 
     expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
@@ -315,6 +341,83 @@ describe('<EntityDataTable />', () => {
         status: { status: ATTRIBUTE_STATUS.show },
         title: { status: 'hide' },
       },
+      order: ['description', 'status'],
+    });
+  });
+
+  it('should use current column order when showing a column without user order preferences', async () => {
+    const onLayoutPreferencesChange = jest.fn();
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        layoutPreferences={{
+          attributes: {
+            description: { status: ATTRIBUTE_STATUS.show },
+            status: { status: ATTRIBUTE_STATUS.show },
+            title: { status: ATTRIBUTE_STATUS.show },
+          },
+          order: [],
+        }}
+        defaultDisplayedColumns={['description', 'status', 'title']}
+        defaultColumnOrder={['description', 'status', 'stream', 'title']}
+        onLayoutPreferencesChange={onLayoutPreferencesChange}
+      />,
+    );
+
+    await screen.findByRole('columnheader', { name: /title/i });
+    await screen.findByRole('columnheader', { name: /status/i });
+    await screen.findByRole('columnheader', { name: /description/i });
+
+    await userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /show stream/i }));
+
+    expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
+      attributes: {
+        description: { status: ATTRIBUTE_STATUS.show },
+        status: { status: ATTRIBUTE_STATUS.show },
+        stream: { status: ATTRIBUTE_STATUS.show },
+        title: { status: ATTRIBUTE_STATUS.show },
+      },
+      order: ['description', 'status', 'stream', 'title'],
+    });
+  });
+
+  it('should preserve custom column widths when toggling column visibility', async () => {
+    const onLayoutPreferencesChange = jest.fn();
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        layoutPreferences={{
+          attributes: {
+            description: { status: ATTRIBUTE_STATUS.show, width: 350 },
+            status: { status: ATTRIBUTE_STATUS.show },
+            title: { status: ATTRIBUTE_STATUS.show },
+          },
+          order: [],
+        }}
+        defaultDisplayedColumns={['description', 'status', 'title']}
+        defaultColumnOrder={['description', 'status', 'stream', 'title']}
+        onLayoutPreferencesChange={onLayoutPreferencesChange}
+      />,
+    );
+
+    await screen.findByRole('columnheader', { name: /title/i });
+    await screen.findByRole('columnheader', { name: /status/i });
+    await screen.findByRole('columnheader', { name: /description/i });
+
+    await userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /show stream/i }));
+
+    expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
+      attributes: {
+        description: { status: ATTRIBUTE_STATUS.show, width: 350 },
+        status: { status: ATTRIBUTE_STATUS.show },
+        stream: { status: ATTRIBUTE_STATUS.show },
+        title: { status: ATTRIBUTE_STATUS.show },
+      },
+      order: ['description', 'status', 'stream', 'title'],
     });
   });
 

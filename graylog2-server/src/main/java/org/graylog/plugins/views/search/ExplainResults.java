@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -32,7 +33,15 @@ public record ExplainResults(String search_id, SearchResult search, Set<SearchEr
     public record QueryExplainResult(Map<String, ExplainResult> searchTypes) {
     }
 
-    public record ExplainResult(String queryString, Set<IndexRangeResult> searchedIndexRanges) {
+    public record ExplainResult(String queryString, Set<IndexRangeResult> searchedIndexRanges,
+                                @JsonInclude(JsonInclude.Include.NON_NULL) String effectiveQuery) {
+        public ExplainResult(String queryString, Set<IndexRangeResult> searchedIndexRanges) {
+            this(queryString, searchedIndexRanges, null);
+        }
+
+        public ExplainResult withEffectiveQuery(final String effectiveQuery) {
+            return new ExplainResult(queryString, searchedIndexRanges, effectiveQuery);
+        }
     }
 
     public record IndexRangeResult(String indexName, long begin, long end, boolean isWarmTiered,

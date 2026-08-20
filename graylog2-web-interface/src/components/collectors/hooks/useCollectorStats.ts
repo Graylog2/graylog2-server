@@ -30,7 +30,7 @@ export const useCollectorStats = () =>
     queryFn: () =>
       defaultOnError(
         Collectors.stats(),
-        'Loading collector stats failed with status',
-        'Could not load collector stats.',
+        'Loading Collector stats failed with status',
+        'Could not load Collector stats.',
       ),
   });

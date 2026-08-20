@@ -42,7 +42,7 @@ const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
           title: 'Create fleet',
           path: Routes.SYSTEM.COLLECTORS.FLEETS_NEW,
           telemetryEvent: {
-            type: TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET_NEW_OPENED,
+            type: TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_OPENED,
             section: 'collectors',
             actionValue: 'create-fleet-button',
           },

@@ -32,6 +32,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,6 +78,8 @@ class OTelHttpTransportIT {
     private HttpClient httpClient;
     private int port;
 
+    private static final EncryptedValueService ENCRYPTED_VALUE_SERVICE = new EncryptedValueService("test-encryption-key");
+
     private void launchTransport(Map<String, Object> extraConfig) throws Exception {
         eventLoopGroup = new NioEventLoopGroup(1);
         final var eventLoopGroupFactory = new EventLoopGroupFactory(
@@ -89,12 +92,19 @@ class OTelHttpTransportIT {
         configMap.put("bind_address", "127.0.0.1");
         configMap.put("port", 0);
         configMap.put("max_chunk_size", 4 * 1024 * 1024);
-        configMap.putAll(extraConfig);
+        extraConfig.forEach((k, v) -> {
+            if (k.startsWith("authorization_header_value") && v instanceof String s && !s.isEmpty()) {
+                configMap.put(k, ENCRYPTED_VALUE_SERVICE.encrypt(s));
+            } else {
+                configMap.put(k, v);
+            }
+        });
         final var configuration = new Configuration(configMap);
 
         transport = new OTelHttpTransport(configuration, eventLoopGroup, eventLoopGroupFactory,
                 new NettyTransportConfiguration("nio", "jdk", 2),
-                throughputCounter, localRegistry, tlsConfiguration, Collections.emptySet());
+                throughputCounter, localRegistry, tlsConfiguration,
+                ENCRYPTED_VALUE_SERVICE, Collections.emptySet());
         transport.launch(input);
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);

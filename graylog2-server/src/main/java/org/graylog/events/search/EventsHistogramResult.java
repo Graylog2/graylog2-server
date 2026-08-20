@@ -16,10 +16,14 @@
  */
 package org.graylog.events.search;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 
-public record EventsHistogramResult(EventsBuckets buckets) {
+public record EventsHistogramResult(EventsBuckets buckets,
+                                    @JsonProperty("effective_timerange") AbsoluteRange effectiveTimerange) {
     public static EventsHistogramResult fromResult(MoreSearch.Histogram result) {
         final var events = result.buckets().events().stream()
                 .map(event -> new Bucket(event.startDate(), event.count()))
@@ -28,7 +32,7 @@ public record EventsHistogramResult(EventsBuckets buckets) {
                 .map(alert -> new Bucket(alert.startDate(), alert.count()))
                 .toList();
 
-        return new EventsHistogramResult(new EventsBuckets(events, alerts));
+        return new EventsHistogramResult(new EventsBuckets(events, alerts), result.effectiveTimerange());
     }
 
     public record EventsBuckets(List<Bucket> events, List<Bucket> alerts) {}

@@ -27,7 +27,7 @@ import {
   classifyFromRange,
   RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
-import type { TimeRangePickerFormValues } from './TimeRangePicker';
+import type { TimeRangePickerFormValues } from './types';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
 type Props = {

@@ -19,7 +19,8 @@ import type React from 'react';
 
 import type { SearchBarControl } from 'views/types';
 import type User from 'logic/users/User';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
+import type { Attribute } from 'stores/PaginationTypes';
 
 export type AlertType = 'alert' | 'event' | 'event_definition';
 
@@ -58,11 +59,67 @@ export interface EventDefinitionType {
   }>;
   useCondition: () => boolean;
   hideFieldsStep?: boolean;
+  // Hides the type from the create wizard's dropdown while still listing it as a filter option.
+  hideFromCreation?: boolean;
 }
+export type TacticsTechniquesEditorPlugin = {
+  component: React.ComponentType<{
+    value: ReadonlyArray<string>;
+    onChange: (next: string[]) => void;
+    disabled?: boolean;
+    error?: React.ReactNode;
+  }>;
+};
+
+export type TacticsTechniquesColumnPlugin = {
+  attribute: Attribute;
+  component: React.ComponentType<{ entity: EventDefinition }>;
+  // Hook evaluated inside EventDefinitionsContainer to decide whether to render the column.
+  // Lets the plugin gate on license/feature state without OSS knowing about it.
+  useCondition?: () => boolean;
+};
+
+export type TacticsTechniquesDetailRowPlugin = {
+  // Renders a Tactics/Techniques row inside the event details expanded section.
+  // Plugin owns the dual-read between the new tactics_techniques field and legacy
+  // sigma_rule_tag_* shape so callers don't have to know about either.
+  component: React.ComponentType<{ entity: { tactics_techniques?: string[]; fields?: Record<string, unknown> } }>;
+  useCondition?: () => boolean;
+};
+
+export type TacticsTechniquesSummaryPlugin = {
+  // Renders a Tactics/Techniques row on the event definition summary view.
+  component: React.ComponentType<{ eventDefinition: EventDefinition }>;
+  useCondition?: () => boolean;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
-    'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
+    'eventDefinitions.components.searchForm'?: Array<
+      () => (SearchBarControl & { component: React.ComponentType<{ isParentMutable?: boolean }> }) | null
+    >;
     'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.overviewPageSections'?: Array<{
+      key: string;
+      component: React.ComponentType;
+      order?: number;
+    }>;
+    'eventDefinitions.components.detailPageSections'?: Array<{
+      key: string;
+      component: React.ComponentType<{ eventDefinition: EventDefinition }>;
+      order?: number;
+    }>;
+    'eventDefinitions.components.tacticsTechniquesEditor'?: Array<TacticsTechniquesEditorPlugin>;
+    'eventDefinitions.components.tacticsTechniquesColumn'?: Array<TacticsTechniquesColumnPlugin>;
+    'eventDefinitions.components.tacticsTechniquesSummary'?: Array<TacticsTechniquesSummaryPlugin>;
+    'events.components.tacticsTechniquesDetailRow'?: Array<TacticsTechniquesDetailRowPlugin>;
+    'eventDefinitions.components.sigmaGitImport'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaFileUpload'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaOptions'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.searchQueryPreview'?: Array<{
+      component: React.ComponentType<{ queryString: string; filters: SearchFilter[] }>;
+      key: string;
+    }>;
   }
 }

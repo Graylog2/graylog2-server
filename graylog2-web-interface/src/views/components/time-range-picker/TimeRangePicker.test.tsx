@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
-import ToolsStore from 'stores/tools/ToolsStore';
+import * as ToolsApi from 'api/tools';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
 
@@ -31,7 +31,7 @@ jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
-jest.mock('stores/tools/ToolsStore', () => ({
+jest.mock('api/tools', () => ({
   testNaturalDate: jest.fn(),
 }));
 
@@ -56,7 +56,7 @@ const TimeRangePicker = ({ ...props }: React.ComponentProps<typeof OriginalTimeR
 
 describe('TimeRangePicker', () => {
   beforeEach(() => {
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() =>
+    asMock(ToolsApi.testNaturalDate).mockImplementation(() =>
       Promise.resolve({
         from: '2018-11-14 13:52:38',
         to: '2018-11-14 13:57:38',

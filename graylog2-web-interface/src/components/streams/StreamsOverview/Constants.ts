@@ -14,56 +14,86 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type Immutable from 'immutable';
-import type { Permission } from 'graylog-web-plugin/plugin';
-
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
-const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
+import type { ExtensionColumnGroups } from './hooks/useStreamsOverviewExtensions';
+import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from './metricColumns';
+
+export const STREAM_VIEW_VARIANTS = {
+  default: '' as const,
+  routing: 'routing' as const,
+  performance: 'performance' as const,
+};
+
+const SHARED_LAYOUT = {
+  entityTableId: 'streams',
+  defaultPageSize: 20,
+  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+};
 
 const getStreamTableElements = (
-  permissions: Immutable.List<Permission>,
   isPipelineColumnPermitted: boolean,
-  pluggableAttributes?: {
+  extensionAttributes?: {
     attributeNames?: Array<string>;
+    defaultDisplayedAttributeNames?: Array<string>;
     attributes?: Array<Attribute>;
   },
+  extensionColumnGroups?: ExtensionColumnGroups,
 ) => {
-  const streamDataLakeTableElements = getStreamDataLakeTableElements?.(permissions);
+  const extRouting = extensionColumnGroups?.routing ?? [];
+  const extPerformance = extensionColumnGroups?.performance ?? [];
 
-  const defaultLayout = {
-    entityTableId: 'streams',
-    defaultPageSize: 20,
-    defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-    defaultDisplayedAttributes: [
-      'title',
-      'index_set_title',
-      'rules',
-      ...(isPipelineColumnPermitted ? ['pipelines'] : []),
-      'outputs',
-      'archiving',
-      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
-      'destination_filters',
-      ...(pluggableAttributes?.attributeNames || []),
-      'disabled',
-      'throughput',
-    ],
-    defaultColumnOrder: [
-      'title',
-      'index_set_title',
-      'rules',
-      ...(isPipelineColumnPermitted ? ['pipelines'] : []),
-      'outputs',
-      'archiving',
-      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
-      'destination_filters',
-      ...(pluggableAttributes?.attributeNames || []),
-      'disabled',
-      'throughput',
-      'created_at',
-    ],
+  const groupedIds = new Set([...extRouting, ...extPerformance]);
+  const ungroupedExtNames = (extensionAttributes?.defaultDisplayedAttributeNames ?? []).filter(
+    (id) => !groupedIds.has(id),
+  );
+
+  const defaultCols = [
+    'title',
+    'description',
+    'index_set_title',
+    'rules',
+    ...(isPipelineColumnPermitted ? ['pipelines'] : []),
+    'destination_filters',
+    'disabled',
+    'throughput',
+  ];
+
+  const routingCols = [
+    METRIC_COLUMN_IDS.associatedInputs,
+    ...(isPipelineColumnPermitted ? [METRIC_COLUMN_IDS.routingPipelines] : []),
+    'outputs',
+    ...extRouting,
+    'archiving',
+  ];
+
+  const performanceCols = [
+    METRIC_COLUMN_IDS.messageCount,
+    ...extPerformance,
+    METRIC_COLUMN_IDS.avgProcessingTime,
+    METRIC_COLUMN_IDS.maxProcessingTime,
+  ];
+
+  const defaultColumnOrder = [...defaultCols, ...routingCols, ...performanceCols, ...ungroupedExtNames, 'created_at'];
+
+  const defaultVariantLayout = {
+    ...SHARED_LAYOUT,
+    defaultColumnOrder,
+    defaultDisplayedAttributes: defaultCols,
+  };
+
+  const routingVariantLayout = {
+    ...SHARED_LAYOUT,
+    layoutVariant: STREAM_VIEW_VARIANTS.routing,
+    defaultColumnOrder,
+    defaultDisplayedAttributes: [...defaultCols, ...routingCols],
+  };
+
+  const performanceVariantLayout = {
+    ...SHARED_LAYOUT,
+    layoutVariant: STREAM_VIEW_VARIANTS.performance,
+    defaultColumnOrder,
+    defaultDisplayedAttributes: [...defaultCols, ...performanceCols],
   };
 
   const additionalAttributes: Array<Attribute> = [
@@ -71,15 +101,43 @@ const getStreamTableElements = (
     { id: 'throughput', title: 'Throughput' },
     { id: 'rules', title: 'Stream Rules' },
     ...(isPipelineColumnPermitted ? [{ id: 'pipelines', title: 'Pipelines' }] : []),
-    { id: 'outputs', title: 'Outputs' },
     { id: 'destination_filters', title: 'Filter Rules' },
+    {
+      id: METRIC_COLUMN_IDS.associatedInputs,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedInputs],
+    },
+    ...(isPipelineColumnPermitted
+      ? [
+          {
+            id: METRIC_COLUMN_IDS.routingPipelines,
+            title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.routingPipelines],
+          },
+        ]
+      : []),
+    { id: 'outputs', title: 'Outputs' },
+    ...(extensionAttributes?.attributes || []),
     { id: 'archiving', title: 'Archiving' },
-    ...(streamDataLakeTableElements?.attributes || []),
-    ...(pluggableAttributes?.attributes || []),
+    {
+      id: METRIC_COLUMN_IDS.messageCount,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.messageCount],
+      type: 'LONG' as const,
+    },
+    {
+      id: METRIC_COLUMN_IDS.avgProcessingTime,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.avgProcessingTime],
+      type: 'DOUBLE' as const,
+    },
+    {
+      id: METRIC_COLUMN_IDS.maxProcessingTime,
+      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.maxProcessingTime],
+      type: 'LONG' as const,
+    },
   ];
 
   return {
-    defaultLayout,
+    defaultVariantLayout,
+    routingVariantLayout,
+    performanceVariantLayout,
     additionalAttributes,
   };
 };

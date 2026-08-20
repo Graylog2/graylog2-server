@@ -113,8 +113,20 @@ public class CIDRPatriciaTrie {
         }
     }
 
+    /**
+     * Returns the rangeName of the range with the longest prefix that contains the IP address, ignoring any
+     * range whose TTL has elapsed, or null if no live range contains it.
+     *
+     * <p>An expired range is skipped rather than terminating the search, so a lookup falls through to a
+     * shorter enclosing range that is still live.
+     *
+     * @param ip IP address to check against the collection of ranges
+     * @return the name of the longest-prefix live range containing the IP if one exists, null otherwise
+     * @see #longestPrefixRangeLookupWithTtl(String, long) to supply an explicit lookup time, or 0 to ignore
+     * expiry entirely
+     */
     public String longestPrefixRangeLookup(String ip) {
-        return longestPrefixRangeLookupWithTtl(ip, 0L);
+        return longestPrefixRangeLookupWithTtl(ip, DateTime.now(DateTimeZone.UTC).getMillis());
     }
 
     /**
@@ -133,6 +145,10 @@ public class CIDRPatriciaTrie {
         final boolean lookupIsIPv6 = ip.contains(":");
 
         final int shortestPrefixForType = lookupIsIPv6 ? shortestV6Prefix : shortestV4Prefix;
+        if (shortestPrefixForType == -1) {
+            // No entry exists matching this IP type
+            return null;
+        }
         for (int i = binaryIP.length(); i >= shortestPrefixForType; i--) {
             final String lookupPrefix = binaryIP.substring(0, i);
             final Map<String, Node> prefixTrie = trie.prefixMap(lookupPrefix);

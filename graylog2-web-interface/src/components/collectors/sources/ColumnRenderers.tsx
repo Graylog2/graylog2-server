@@ -23,7 +23,6 @@ import { SOURCE_TYPE_LABELS } from './Constants';
 
 import type { Source } from '../types';
 
-
 const customColumnRenderers = (): ColumnRenderers<Source> => ({
   attributes: {
     name: {
@@ -32,7 +31,7 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
     },
     type: {
       renderCell: (type: string) => <Label bsStyle="info">{SOURCE_TYPE_LABELS[type] ?? type}</Label>,
-      staticWidth: 140,
+      staticWidth: 190,
     },
     enabled: {
       renderCell: (_enabled: boolean, source: Source) => (

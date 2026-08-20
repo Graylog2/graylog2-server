@@ -20,13 +20,12 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
 
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+import StreamsContext from 'contexts/StreamsContext';
 import { Button } from 'components/bootstrap';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
-import { StreamsActions } from 'views/stores/StreamsStore';
-import mockAction from 'helpers/mocking/MockAction';
 import type { Stream } from 'logic/streams/types';
 
 import MessageFavoriteFieldsProvider from './MessageFavoriteFieldsProvider';
@@ -36,22 +35,12 @@ import useMessageFavoriteFieldsMutation from '../fields/hooks/useMessageFavorite
 const mockSaveFields = jest.fn();
 const mockToggleField = jest.fn();
 
-jest.mock('views/stores/StreamsStore');
+const streams = [
+  { favorite_fields: ['field1'], id: 'stream1' },
+  { favorite_fields: ['field2'], id: 'stream2' },
+] as Array<Stream>;
 
 jest.mock('../fields/hooks/useMessageFavoriteFieldsMutation');
-
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsActions: { refresh: jest.fn() },
-  StreamsStore: MockStore([
-    'getInitialState',
-    () => ({
-      streams: [
-        { favorite_fields: ['field1'], id: 'stream1' },
-        { favorite_fields: ['field2'], id: 'stream2' },
-      ] as Array<Stream>,
-    }),
-  ]),
-}));
 
 const Consumer = () => {
   const contextValue = useContext(MessageFavoriteFieldsContext);
@@ -67,20 +56,21 @@ const Consumer = () => {
 
 const renderComponent = () =>
   render(
-    <MessageFavoriteFieldsProvider
-      isFeatureEnabled
-      message={{ id: 'id', index: 'index', fields: { streams: ['stream1', 'stream2'] } }}
-      messageFields={Immutable.List([
-        FieldTypeMapping.create('fav1', FieldTypes.STRING()),
-        FieldTypeMapping.create('rest1', FieldTypes.STRING()),
-      ])}>
-      <Consumer />
-    </MessageFavoriteFieldsProvider>,
+    <StreamsContext.Provider value={streams}>
+      <MessageFavoriteFieldsProvider
+        isFeatureEnabled
+        message={{ id: 'id', index: 'index', fields: { streams: ['stream1', 'stream2'] } }}
+        messageFields={Immutable.List([
+          FieldTypeMapping.create('fav1', FieldTypes.STRING()),
+          FieldTypeMapping.create('rest1', FieldTypes.STRING()),
+        ])}>
+        <Consumer />
+      </MessageFavoriteFieldsProvider>
+    </StreamsContext.Provider>,
   );
 
 describe('MessageFavoriteFieldsProvider', () => {
   beforeEach(() => {
-    StreamsActions.refresh = mockAction();
     asMock(useMessageFavoriteFieldsMutation).mockReturnValue({
       saveFavoriteField: mockSaveFields,
       toggleField: mockToggleField,

@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
-import { ConfirmDialog, IfPermitted, LinkContainer } from 'components/common';
+import { ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
+import { ConfirmDialog, IfPermitted, LinkContainer, IconButton } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
@@ -42,25 +42,13 @@ type Props = {
   input: Input;
   inputTypes: InputTypesSummary;
   inputTypeDescriptions: InputTypeDescriptionsResponse;
-  currentNode: {
-    node?: {
-      cluster_id: string;
-      hostname: string;
-      is_leader: boolean;
-      is_master: boolean;
-      last_seen: string;
-      node_id: string;
-      short_node_id: string;
-      transport_address: string;
-    };
-  };
 };
 
 const FORWARDER_SERVICE_INPUT = 'org.graylog.plugins.forwarder.input.ForwarderServiceInput';
 const GL2_FORWARDER_INPUT = 'gl2_forwarder_input';
 const GL2_SOURCE_INPUT = 'gl2_source_input';
 
-const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNode }: Props) => {
+const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) => {
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
@@ -142,16 +130,18 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
         <LinkContainer
           key={`received-messages-${input.id}`}
           to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
-          <Button
-            bsSize="xsmall"
+          <IconButton
+            name="search"
+            title="Received messages"
+            bsStyle="default"
+            size="xsmall"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
                 app_pathname: getPathnameWithoutId(pathname),
                 app_action_value: 'show-received-messages',
               });
-            }}>
-            Received messages
-          </Button>
+            }}
+          />
         </LinkContainer>
       </IfPermitted>
 
@@ -177,7 +167,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
                 to={
                   input.global
                     ? Routes.global_input_extractors(input.id)
-                    : Routes.local_input_extractors(currentNode?.node?.node_id, input.id)
+                    : Routes.local_input_extractors(input.node, input.id)
                 }>
                 <MenuItem
                   onClick={() => {

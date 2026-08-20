@@ -17,11 +17,8 @@
 package org.graylog.collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.annotation.Nullable;
 
 public record IngestEndpointConfig(
-        @JsonProperty("enabled") boolean enabled,
         @JsonProperty("hostname") String hostname,
-        @JsonProperty("port") int port,
-        @JsonProperty("input_id") @Nullable String inputId
+        @JsonProperty("port") int port
 ) {}

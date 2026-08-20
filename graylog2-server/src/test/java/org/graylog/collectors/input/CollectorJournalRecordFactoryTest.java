@@ -37,7 +37,7 @@ class CollectorJournalRecordFactoryTest {
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
                                         .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
-                                        .setValue(AnyValue.newBuilder().setStringValue("filelog"))))
+                                        .setValue(AnyValue.newBuilder().setStringValue("file_log"))))
                         .addScopeLogs(ScopeLogs.newBuilder()
                                 .addLogRecords(LogRecord.newBuilder()
                                         .setBody(AnyValue.newBuilder().setStringValue("hello")))))
@@ -48,7 +48,7 @@ class CollectorJournalRecordFactoryTest {
         assertThat(records).hasSize(1);
         final var record = records.get(0);
         assertThat(record.getCollectorInstanceUid()).isEqualTo("agent-42");
-        assertThat(record.getCollectorReceiverType()).isEqualTo("filelog");
+        assertThat(record.getCollectorReceiverType()).isEqualTo("file_log");
         assertThat(record.getOtelRecord().getLog().getLogRecord().getBody().getStringValue()).isEqualTo("hello");
     }
 
@@ -68,13 +68,117 @@ class CollectorJournalRecordFactoryTest {
     }
 
     @Test
+    void setsAllResourceAttributes() {
+        final var request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .setResource(Resource.newBuilder()
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
+                                        .setValue(AnyValue.newBuilder().setStringValue("filelog")))
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_SOURCE_ID)
+                                        .setValue(AnyValue.newBuilder().setStringValue("source-abc")))
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_FLEET_ID)
+                                        .setValue(AnyValue.newBuilder().setStringValue("fleet-xyz"))))
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("hello")))))
+                .build();
+
+        final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-42");
+
+        assertThat(records).hasSize(1);
+        final var record = records.get(0);
+        assertThat(record.getCollectorInstanceUid()).isEqualTo("agent-42");
+        assertThat(record.getCollectorReceiverType()).isEqualTo("filelog");
+        assertThat(record.getCollectorSourceId()).isEqualTo("source-abc");
+        assertThat(record.getCollectorFleetId()).isEqualTo("fleet-xyz");
+    }
+
+    @Test
+    void sourceIdDefaultsToEmptyWhenAttributeMissing() {
+        final var request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .setResource(Resource.newBuilder()
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
+                                        .setValue(AnyValue.newBuilder().setStringValue("filelog")))
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_FLEET_ID)
+                                        .setValue(AnyValue.newBuilder().setStringValue("fleet-xyz"))))
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("no source id")))))
+                .build();
+
+        final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-1");
+
+        assertThat(records).hasSize(1);
+        assertThat(records.get(0).getCollectorSourceId()).isEmpty();
+        assertThat(records.get(0).getCollectorFleetId()).isEqualTo("fleet-xyz");
+    }
+
+    @Test
+    void fleetIdDefaultsToEmptyWhenAttributeMissing() {
+        final var request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .setResource(Resource.newBuilder()
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
+                                        .setValue(AnyValue.newBuilder().setStringValue("filelog")))
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_SOURCE_ID)
+                                        .setValue(AnyValue.newBuilder().setStringValue("source-abc"))))
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("no fleet id")))))
+                .build();
+
+        final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-1");
+
+        assertThat(records).hasSize(1);
+        assertThat(records.get(0).getCollectorFleetId()).isEmpty();
+        assertThat(records.get(0).getCollectorSourceId()).isEqualTo("source-abc");
+    }
+
+    @Test
+    void extractsAllAttributesRegardlessOfOrder() {
+        // Source and fleet come first, receiver type last — single-pass extraction must not depend on order.
+        final var request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .setResource(Resource.newBuilder()
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_SOURCE_ID)
+                                        .setValue(AnyValue.newBuilder().setStringValue("source-abc")))
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_FLEET_ID)
+                                        .setValue(AnyValue.newBuilder().setStringValue("fleet-xyz")))
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
+                                        .setValue(AnyValue.newBuilder().setStringValue("filelog"))))
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("reordered")))))
+                .build();
+
+        final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-1");
+
+        assertThat(records).hasSize(1);
+        final var record = records.get(0);
+        assertThat(record.getCollectorReceiverType()).isEqualTo("filelog");
+        assertThat(record.getCollectorSourceId()).isEqualTo("source-abc");
+        assertThat(record.getCollectorFleetId()).isEqualTo("fleet-xyz");
+    }
+
+    @Test
     void multipleResourceLogsWithDifferentReceiverTypes() {
         final var request = ExportLogsServiceRequest.newBuilder()
                 .addResourceLogs(ResourceLogs.newBuilder()
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
                                         .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
-                                        .setValue(AnyValue.newBuilder().setStringValue("filelog"))))
+                                        .setValue(AnyValue.newBuilder().setStringValue("file_log"))))
                         .addScopeLogs(ScopeLogs.newBuilder()
                                 .addLogRecords(LogRecord.newBuilder()
                                         .setBody(AnyValue.newBuilder().setStringValue("file log")))))
@@ -91,7 +195,7 @@ class CollectorJournalRecordFactoryTest {
         final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-1");
 
         assertThat(records).hasSize(2);
-        assertThat(records.get(0).getCollectorReceiverType()).isEqualTo("filelog");
+        assertThat(records.get(0).getCollectorReceiverType()).isEqualTo("file_log");
         assertThat(records.get(1).getCollectorReceiverType()).isEqualTo("journald");
     }
 }

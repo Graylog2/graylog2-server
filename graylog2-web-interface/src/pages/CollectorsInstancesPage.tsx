@@ -19,7 +19,7 @@ import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsInstances from 'components/collectors/instances/CollectorsInstances';
 import { useCollectorsConfig } from 'components/collectors/hooks';
@@ -39,8 +39,16 @@ const CollectorsInstancesPage = () => {
   return (
     <DocumentTitle title="Collector Instances">
       <CollectorsPageNavigation />
-      <PageHeader title={<>Instances <BetaBadge /></>}>
-        <span>View all collector instances across fleets.</span>
+      <PageHeader
+        title={
+          <>
+            Instances <PreviewBadge />
+          </>
+        }>
+        <span>
+          A collector instance represents a running collector process on a remote host. Instances enroll into a fleet
+          using an enrollment token and automatically receive their fleet&apos;s source configuration.
+        </span>
       </PageHeader>
 
       <Row className="content">
