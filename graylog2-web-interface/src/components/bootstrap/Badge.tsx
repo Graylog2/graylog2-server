@@ -20,8 +20,10 @@ import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
+import type { BsSize } from 'components/bootstrap/types';
 import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';
+import sizeForMantine from 'theme/utils/sizeForMantine';
 import type { SupportedMantineSize } from 'theme/types';
 
 export type BadgeColor = Extract<ColorVariant, 'primary' | 'danger' | 'success' | 'warning' | 'gray'>;
@@ -94,6 +96,8 @@ const Dot = styled.span<{ $color: string; $size: SupportedMantineSize }>(
 
 type Props = React.PropsWithChildren<{
   'aria-label'?: string;
+  /** @deprecated Legacy size alias — prefer `size`. Only used as a fallback when `size` is not set. */
+  bsSize?: BsSize;
   /** @deprecated Legacy color variant — prefer `color`/`variant`. Only used as a fallback when `color` is not set. */
   bsStyle?: ColorVariant;
   className?: string;
@@ -116,6 +120,7 @@ type Props = React.PropsWithChildren<{
 const Badge = (
   {
     'aria-label': ariaLabel = undefined,
+    bsSize = undefined,
     bsStyle = 'default',
     className = undefined,
     children = undefined,
@@ -128,7 +133,7 @@ const Badge = (
     onMouseLeave = undefined,
     rightIcon = undefined,
     role = undefined,
-    size = 'md',
+    size = undefined,
     style = undefined,
     title = undefined,
     uppercase = false,
@@ -138,15 +143,16 @@ const Badge = (
 ) => {
   const theme = useTheme();
 
+  const resolvedSize = size ?? (bsSize ? sizeForMantine(bsSize) : 'md');
   const background = color ? theme.colors.badges[color][variant].background : mapStyle(bsStyle, theme);
   const textColor =
     color && variant === 'light' ? theme.colors.badges[color].light.text : theme.utils.contrastingColor(background);
-  const iconSize = iconSizeForBadge[size];
+  const iconSize = iconSizeForBadge[resolvedSize];
 
   let leftSection: React.ReactNode;
 
   if (color && dot) {
-    leftSection = <Dot $color={textColor} $size={size} data-testid="badge-dot" />;
+    leftSection = <Dot $color={textColor} $size={resolvedSize} data-testid="badge-dot" />;
   } else if (leftIcon) {
     leftSection = <Icon name={leftIcon} size={iconSize} />;
   }
@@ -167,7 +173,7 @@ const Badge = (
     rightSection,
     onMouseEnter,
     onMouseLeave,
-    size,
+    size: resolvedSize,
   };
 
   if (onClick) {

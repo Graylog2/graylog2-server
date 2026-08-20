@@ -52,6 +52,7 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     'aria-label': { table: { disable: true } },
+    bsSize: { table: { disable: true } },
     bsStyle: { table: { disable: true } },
     children: { control: 'text', description: 'The badge label text' },
     className: { table: { disable: true } },
