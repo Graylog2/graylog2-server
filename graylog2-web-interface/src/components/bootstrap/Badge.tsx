@@ -82,14 +82,13 @@ const StyledBadge = styled(MantineBadge)<{ $background: string; $color: string; 
 );
 
 const Dot = styled.span<{ $color: string; $size: SupportedMantineSize }>(
-  ({ theme, $color, $size }) => css`
+  ({ $color, $size }) => css`
     display: inline-block;
     flex-shrink: 0;
     width: ${dotSize[$size]};
     height: ${dotSize[$size]};
     border-radius: 50%;
     background-color: ${$color};
-    border: 1px solid ${theme.colors.badges.dotBorder};
   `,
 );
 
@@ -140,7 +139,8 @@ const Badge = (
   const theme = useTheme();
 
   const background = color ? theme.colors.badges[color][variant].background : mapStyle(bsStyle, theme);
-  const textColor = color ? theme.colors.badges[color][variant].text : theme.utils.contrastingColor(background);
+  const textColor =
+    color && variant === 'light' ? theme.colors.badges[color].light.text : theme.utils.contrastingColor(background);
   const iconSize = iconSizeForBadge[size];
 
   let leftSection: React.ReactNode;
