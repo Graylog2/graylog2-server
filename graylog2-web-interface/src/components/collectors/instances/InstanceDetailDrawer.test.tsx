@@ -31,7 +31,6 @@ jest.mock('../hooks/useInstancePendingChanges');
 jest.mock('../hooks', () => ({
   ...jest.requireActual('../hooks'),
   useInstance: jest.fn(),
-  useCollectorRefetchInterval: jest.fn(() => 5000),
 }));
 
 const mockInstance: CollectorInstanceView = {
@@ -368,7 +367,7 @@ describe('InstanceDetailDrawer', () => {
     );
 
     await screen.findByText('Online');
-    // Guards the polling wiring: silent (no toast spam) on the shared collector cadence.
-    expect(useInstance).toHaveBeenCalledWith('uid-1', { refetchInterval: 5000, silent: true });
+    // Guards the polling wiring: the hook itself handles cadence, session, and error reporting.
+    expect(useInstance).toHaveBeenCalledWith('uid-1');
   });
 });

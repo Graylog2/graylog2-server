@@ -14,5 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as DeployTab } from './DeployTab';
-export { default as EnrollmentTokenList } from './EnrollmentTokenList';
+import styled, { css } from 'styled-components';
+
+/**
+ * Muted small-print paragraph for contextual hints outside of forms (step-state notes, empty-state
+ * hints, inline error notices). The collectors-wide equivalent of the ad-hoc `Note`/`StepDetail`
+ * styles in the onboarding components. For help text under form controls, use `HelpBlock` instead.
+ */
+const MutedText = styled.p(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
+    font-size: ${theme.fonts.size.small};
+    margin: ${theme.spacings.md} 0 0 0;
+  `,
+);
+
+export default MutedText;

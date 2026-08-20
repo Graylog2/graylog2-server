@@ -32,7 +32,7 @@ const Description = styled.span`
 
 const MutedText = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     white-space: nowrap;
   `,
 );

@@ -24,11 +24,14 @@ import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import type { RequestOptions } from 'routing/request';
 
+import useCollectorRefetchInterval from './useCollectorRefetchInterval';
+
 import type { CollectorInstanceView } from '../types';
 
 const NO_SESSION_EXT: RequestOptions = { requestShouldExtendSession: false };
 export const INSTANCES_KEY_PREFIX = ['collectors', 'instances'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, 'paginated', searchParams];
+export const instanceKeyFn = (instanceUid: string | undefined) => [...INSTANCES_KEY_PREFIX, 'single', instanceUid];
 
 type ApiInstanceResponse = Awaited<ReturnType<typeof Collectors.findInstances>>['elements'][number];
 
@@ -119,36 +122,29 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
     refetchInterval: options.refetchInterval,
   });
 
-export const useInstance = (
-  instanceUid: string | undefined,
-  options: { refetchInterval?: number; silent?: boolean } = {},
-) => {
-  const { data, isLoading, error, isError } = useQuery<CollectorInstanceView>({
-    // `silent` and the session-extension choice affect request behavior, not the cached data, so
-    // callers deliberately share one cache entry. If observers with different options coexist,
-    // whichever observer initiates a fetch determines both behaviors for that request.
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- Options do not affect cached data.
-    queryKey: [...INSTANCES_KEY_PREFIX, 'single', instanceUid],
-    queryFn: () => {
-      // Polling callers are background refreshes and must not keep the session
-      // alive (module convention, see NO_SESSION_EXT above); one-shot callers
-      // are user-initiated and extend it as usual.
-      const request =
-        options.refetchInterval !== undefined
-          ? Collectors.getInstance(instanceUid, NO_SESSION_EXT)
-          : Collectors.getInstance(instanceUid);
-      const promise = request.then((response) => toView(response));
+/**
+ * A single instance, polled at the collector heartbeat cadence.
+ *
+ * The status and `last_seen` of a live collector change without any user interaction — a collector
+ * that stops reporting in is marked offline server-side — so a one-shot fetch would leave a page
+ * asserting "online" indefinitely. Polling is tied to the heartbeat interval because the data cannot
+ * become fresher than that: a shorter interval only adds requests.
+ *
+ * Two consequences of polling, both deliberate:
+ * - Requests do not extend the session, per the periodic-request rule. Arriving on a page still
+ *   extends it through the sibling queries (fleet, config), which do not opt out — the same reasoning
+ *   documented for `isBackgroundRefresh` above.
+ * - Errors are not reported through `defaultOnError`. A persistent failure would otherwise raise a
+ *   toast on every poll; callers get `error`/`isError` and render the failure themselves.
+ */
+export const useInstance = (instanceUid: string | undefined) => {
+  const refetchInterval = useCollectorRefetchInterval();
 
-      return options.silent
-        ? promise
-        : defaultOnError(
-            promise,
-            'Loading Collector instance failed with status',
-            'Could not load Collector instance',
-          );
-    },
+  const { data, isLoading, error, isError } = useQuery<CollectorInstanceView>({
+    queryKey: instanceKeyFn(instanceUid),
+    queryFn: () => Collectors.getInstance(instanceUid, NO_SESSION_EXT).then((response) => toView(response)),
     enabled: !!instanceUid,
-    refetchInterval: options.refetchInterval,
+    refetchInterval,
   });
 
   return { data, isLoading, error, isError };

@@ -24,7 +24,7 @@ import type { CollectorInstanceView } from 'components/collectors/types';
 
 import FirstOnboarding from './FirstOnboarding';
 
-import { useCollectorsConfig, useCollectorsMutations, useFleets } from '../hooks';
+import { useCollectorsMutations, useFleets } from '../hooks';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks');
@@ -87,18 +87,6 @@ jest.mock('./onboarding/WaitingForConnection', () => {
   };
 });
 
-const mockConfig = {
-  http: { hostname: 'graylog.example', port: 4317 },
-  ca_cert_id: null,
-  signing_cert_id: null,
-  token_signing_key: null,
-  otlp_server_cert_id: null,
-  collector_offline_threshold: 'PT5M',
-  collector_default_visibility_threshold: 'PT1H',
-  collector_expiration_threshold: 'P30D',
-  collector_heartbeat_interval: 'PT30S',
-};
-
 const mockFleets = [
   { id: 'fleet-1', name: 'Default Fleet', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
 ];
@@ -121,7 +109,6 @@ describe('FirstOnboarding', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    asMock(useCollectorsConfig).mockReturnValue({ data: mockConfig, isLoading: false });
     asMock(useFleets).mockReturnValue({ data: mockFleets, isLoading: false });
     asMock(useCollectorsMutations).mockReturnValue(
       mockCollectorsMutations({ createEnrollmentToken, createFleet, createSource }),
@@ -372,8 +359,8 @@ describe('FirstOnboarding', () => {
     });
   });
 
-  it('shows spinner while config or fleets are loading', async () => {
-    asMock(useCollectorsConfig).mockReturnValue({ data: undefined, isLoading: true });
+  it('shows spinner while fleets are loading', async () => {
+    asMock(useFleets).mockReturnValue({ data: undefined, isLoading: true });
 
     render(<FirstOnboarding />);
 

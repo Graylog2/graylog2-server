@@ -14,5 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as DeployTab } from './DeployTab';
-export { default as EnrollmentTokenList } from './EnrollmentTokenList';
+import { qualifyUrl } from 'util/URLUtils';
+
+/**
+ * The URL a collector enrolls against: the Graylog server URL without the API path. The
+ * qualified server URL always points at the API — the server generates it as the external
+ * base URI (including any app path prefix) plus the trailing `api/` segment (see
+ * `AppConfigResource`) — and the collector figures out the API path itself, so enrolling
+ * happens against everything before that segment.
+ */
+const enrollEndpointUrl = (): string =>
+  qualifyUrl('')
+    .replace(/\/api\/?$/, '')
+    .replace(/\/+$/, '');
+
+export default enrollEndpointUrl;
