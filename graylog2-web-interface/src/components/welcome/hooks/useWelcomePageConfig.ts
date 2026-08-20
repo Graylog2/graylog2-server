@@ -21,13 +21,12 @@ import { ConfigurationsStore, ConfigurationsActions } from 'stores/configuration
 import type { WelcomePageConfigType } from 'components/common/types';
 import { DEFAULT_WELCOME_PAGE_CONFIG } from 'logic/welcome/welcomePageConfig';
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 
 type WelcomePageConfig = { metricsEnabled: boolean };
 
 const useWelcomePageConfig = (): WelcomePageConfig => {
   const configuration = useStore(
-    ConfigurationsStore as Store<Record<string, any>>,
+    ConfigurationsStore,
     (state) => state?.configuration[ConfigurationType.WELCOME_PAGE_CONFIG] as WelcomePageConfigType,
   );
 
