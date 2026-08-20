@@ -50,7 +50,7 @@
         <opensearch.cache.url>
             https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/datanode-opensearch
         </opensearch.cache.url>
-        <opensearch.distribution.variant>datanode</opensearch.distribution.variant>
+        <opensearch.distribution.platform>linux</opensearch.distribution.platform>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -546,10 +546,10 @@
                             <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
                             <skip>${opensearch.unpack.compat.skip}</skip>
                             <url>
-                                ${opensearch.cache.url}/opensearch-${opensearch.compat.version}-linux-x64-${opensearch.distribution.variant}.tar.gz
+                                ${opensearch.cache.url}/opensearch-${opensearch.compat.version}-${opensearch.distribution.platform}-x64-datanode.tar.gz
                             </url>
                             <outputFileName>
-                                opensearch-${opensearch.compat.version}-linux-x64-${opensearch.distribution.variant}.tar.gz
+                                opensearch-${opensearch.compat.version}-${opensearch.distribution.platform}-x64-datanode.tar.gz
                             </outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -565,10 +565,10 @@
                             <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
                             <skip>${opensearch.unpack.compat.skip}</skip>
                             <url>
-                                ${opensearch.cache.url}/opensearch-${opensearch.compat.version}-linux-aarch64-${opensearch.distribution.variant}.tar.gz
+                                ${opensearch.cache.url}/opensearch-${opensearch.compat.version}-${opensearch.distribution.platform}-aarch64-datanode.tar.gz
                             </url>
                             <outputFileName>
-                                opensearch-${opensearch.compat.version}-linux-aarch64-${opensearch.distribution.variant}.tar.gz
+                                opensearch-${opensearch.compat.version}-${opensearch.distribution.platform}-aarch64-datanode.tar.gz
                             </outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -584,10 +584,10 @@
                             <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
                             <skip>${opensearch.unpack.latest.skip}</skip>
                             <url>
-                                ${opensearch.cache.url}/opensearch-${opensearch.latest.version}-linux-x64-${opensearch.distribution.variant}.tar.gz
+                                ${opensearch.cache.url}/opensearch-${opensearch.latest.version}-${opensearch.distribution.platform}-x64-datanode.tar.gz
                             </url>
                             <outputFileName>
-                                opensearch-${opensearch.latest.version}-linux-x64-${opensearch.distribution.variant}.tar.gz
+                                opensearch-${opensearch.latest.version}-${opensearch.distribution.platform}-x64-datanode.tar.gz
                             </outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -603,10 +603,10 @@
                             <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
                             <skip>${opensearch.unpack.latest.skip}</skip>
                             <url>
-                                ${opensearch.cache.url}/opensearch-${opensearch.latest.version}-linux-aarch64-${opensearch.distribution.variant}.tar.gz
+                                ${opensearch.cache.url}/opensearch-${opensearch.latest.version}-${opensearch.distribution.platform}-aarch64-datanode.tar.gz
                             </url>
                             <outputFileName>
-                                opensearch-${opensearch.latest.version}-linux-aarch64-${opensearch.distribution.variant}.tar.gz
+                                opensearch-${opensearch.latest.version}-${opensearch.distribution.platform}-aarch64-datanode.tar.gz
                             </outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -861,7 +861,7 @@
                 </os>
             </activation>
             <properties>
-                <opensearch.distribution.variant>datanode-mac</opensearch.distribution.variant>
+                <opensearch.distribution.platform>macos</opensearch.distribution.platform>
             </properties>
         </profile>
     </profiles>
