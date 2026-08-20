@@ -57,7 +57,7 @@ public class RulePermissionTestsIT {
 
     @FullBackendTest
     void testParseNotPermittedForReader() {
-        api.forUser(Users.JOHN_DOE).rules().parse(VALID_RULE_SOURCE, HttpStatus.SC_FORBIDDEN);
+        api.forUser(Users.JOHN_DOE).rules().parse(VALID_RULE_SOURCE, HttpStatus.SC_UNAUTHORIZED);
     }
 
     @FullBackendTest
@@ -72,7 +72,7 @@ public class RulePermissionTestsIT {
 
     @FullBackendTest
     void testSimulateNotPermittedForReader() {
-        api.forUser(Users.JOHN_DOE).rules().simulate(VALID_MESSAGE, VALID_RULE_SOURCE, HttpStatus.SC_FORBIDDEN);
+        api.forUser(Users.JOHN_DOE).rules().simulate(VALID_MESSAGE, VALID_RULE_SOURCE, HttpStatus.SC_UNAUTHORIZED);
     }
 
     @FullBackendTest

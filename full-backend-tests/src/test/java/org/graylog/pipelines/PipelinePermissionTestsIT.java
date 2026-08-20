@@ -55,7 +55,7 @@ public class PipelinePermissionTestsIT {
 
     @FullBackendTest
     void testParseNotPermittedForReader() {
-        api.forUser(Users.JOHN_DOE).pipelines().parse("Title", "Description", "Source", HttpStatus.SC_FORBIDDEN);
+        api.forUser(Users.JOHN_DOE).pipelines().parse("Title", "Description", "Source", HttpStatus.SC_UNAUTHORIZED);
     }
 
     @FullBackendTest

@@ -36,6 +36,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 @GraylogBackendConfiguration
 public class SimulatorPermissionTestsIT {
     private static final Map<String, Object> TEST_MESSAGE = Map.of(
+                "_id", "1",
             "message", "test message",
             "source", "test"
     );
@@ -64,7 +65,7 @@ public class SimulatorPermissionTestsIT {
 
     @FullBackendTest
     void testSimulateNotPermittedForReader() {
-        api.forUser(Users.JOHN_DOE).simulator().simulate(DEFAULT_STREAM_ID, TEST_MESSAGE, HttpStatus.SC_FORBIDDEN);
+        api.forUser(Users.JOHN_DOE).simulator().simulate(DEFAULT_STREAM_ID, TEST_MESSAGE, HttpStatus.SC_UNAUTHORIZED);
     }
 
     @FullBackendTest
