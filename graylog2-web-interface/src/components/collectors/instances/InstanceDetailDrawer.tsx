@@ -25,6 +25,8 @@ import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
+import InstanceHealthSection from './InstanceHealthSection';
+
 import ActivityEntryList from '../common/ActivityEntryList';
 import { DetailRow, DetailLabel } from '../common/DetailRow';
 import { IconRow, IconRowList } from '../common/IconRowList';
@@ -34,7 +36,7 @@ import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
-import { useInstancePendingChanges } from '../hooks';
+import { useInstance, useInstancePendingChanges } from '../hooks';
 import type { CoalescedActions, CollectorInstanceView, Source, TargetInfo } from '../types';
 
 type Props = {
@@ -119,7 +121,12 @@ const pendingActions = (coalesced: CoalescedActions): PendingAction[] => {
   return actions;
 };
 
-const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
+const InstanceDetailDrawer = ({ instance: instanceProp, sources, fleetName, onClose }: Props) => {
+  // The prop is a row snapshot frozen at drawer-open; poll the instance itself so
+  // Status, Last Seen, and Health stay live (same pattern as the sync section below).
+  // Errors here are non-fatal — we keep rendering the last known instance.
+  const { data: freshInstance } = useInstance(instanceProp.instance_uid);
+  const instance = freshInstance ?? instanceProp;
   const { data: pendingDetail, isError: pendingError } = useInstancePendingChanges(instance.instance_uid);
   // Use the backend's authoritative flag (consistent with the table); fall back to the table row's
   // value until the detail loads. Deriving from activities.length would wrongly show "In sync" for an
@@ -202,6 +209,8 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
           </Link>
         </DetailRow>
       </Section>
+
+      <InstanceHealthSection health={instance.health} online={instance.status === 'online'} />
 
       <Section>
         <SectionTitle>Attributes</SectionTitle>
