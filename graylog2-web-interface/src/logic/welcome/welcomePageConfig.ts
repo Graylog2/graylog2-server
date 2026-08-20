@@ -14,14 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type ValidationState = 'error' | 'success' | 'warning';
-export type TimeUnit = 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
+import type { WelcomePageConfigType } from 'components/common/types';
 
-export type MarkdownConfigType = {
-  allow_all_image_sources: boolean;
-  allowed_image_sources: string;
-};
-
-export type WelcomePageConfigType = {
-  disable_metrics: boolean;
-};
+export const DEFAULT_WELCOME_PAGE_CONFIG: WelcomePageConfigType = { disable_metrics: false };
