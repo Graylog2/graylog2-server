@@ -79,8 +79,6 @@ const meta = {
     },
   },
   args: {
-    // Defined (rather than undefined) so the controls always render as editable text fields —
-    // an empty string is treated the same as "unset" by Badge, so this changes no story's rendering.
     leftIcon: '',
     rightIcon: '',
   },
