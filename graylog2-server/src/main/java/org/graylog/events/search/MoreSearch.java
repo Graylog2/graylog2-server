@@ -272,10 +272,10 @@ public class MoreSearch {
      * preceding <code>\</code>
      */
     private static final String SPECIAL_CHARS = "\\+-!():^[]\"{}~|&/ ";
-    private static final String SPECIAL_CHARS_WITH_WILDCARDS = SPECIAL_CHARS + "*?";
+    private static final String SPECIAL_CHARS_INCLUDING_WILDCARDS = SPECIAL_CHARS + "*?";
 
     public static String luceneEscape(String searchString) {
-        return luceneEscape(SPECIAL_CHARS_WITH_WILDCARDS,  searchString);
+        return luceneEscape(SPECIAL_CHARS_INCLUDING_WILDCARDS,  searchString);
     }
 
     public static String luceneEscapeButNotIncludingWildcards(String searchString) {
