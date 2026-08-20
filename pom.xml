@@ -181,7 +181,7 @@
         <kotlinx-serialization.version>1.11.0</kotlinx-serialization.version>
         <kotlinx-coroutines.version>1.11.0</kotlinx-coroutines.version>
         <log4j.version>2.26.1</log4j.version>
-        <lucene.version>10.5.0</lucene.version>
+        <lucene.version>10.5.1</lucene.version>
         <lz4.version>1.11.2</lz4.version>
         <metrics.version>4.2.39</metrics.version>
         <mongodb-driver.version>5.9.1</mongodb-driver.version>
