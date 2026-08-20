@@ -26,7 +26,7 @@ import type { EventDefinition } from '../event-definitions-types';
 
 type Props = {
   onChange: (name: string, value: EntitySharePayload) => void;
-  eventDefinition: EventDefinition & { share_request?: EntitySharePayload };
+  eventDefinition: EventDefinition;
 };
 
 const ShareForm = ({ onChange, eventDefinition }: Props) => {
@@ -49,7 +49,7 @@ const ShareForm = ({ onChange, eventDefinition }: Props) => {
           entityType="event_definition"
           entityTitle=""
           dependenciesGRN={[...streamDependenciesGRN, ...notificationDependenciesGRN]}
-          defaultSharePayload={eventDefinition?.share_request}
+          defaultSharePayload={eventDefinition.share_request}
         />
       </Col>
     </Row>

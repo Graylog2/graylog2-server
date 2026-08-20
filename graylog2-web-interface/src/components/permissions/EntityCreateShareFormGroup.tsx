@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import isEmpty from 'lodash/isEmpty';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import useEntityShareState, { useSetEntityShareState } from 'hooks/useEntityShareState';
@@ -86,21 +85,17 @@ const EntityCreateShareFormGroup = ({
   );
   const PluggableEntityShareFormGroup = usePluggableEntityShareFormGroup();
 
-  // Serialized because callers build `dependenciesGRN` inline, so its identity changes every render.
-  const dependenciesKey = JSON.stringify(dependenciesGRN ?? []);
-
   useEffect(() => {
     const { selected_collections: _, ...rest } = defaultSharePayload ?? {};
-    const dependencies: Array<GRN> = JSON.parse(dependenciesKey);
     // Restoring a selection has to re-run the dependency check, or the missing dependency
     // warnings shown before would silently disappear.
-    const prepare_request =
-      (rest.selected_grantee_capabilities?.size ?? 0) > 0 && dependencies.length > 0 ? dependencies : null;
+    const hasSelection = (rest.selected_grantee_capabilities?.size ?? 0) > 0;
+    const prepare_request = hasSelection && dependenciesGRN?.length ? dependenciesGRN : null;
 
     EntityShareDomain.prepare(entityType, entityTitle, entityGRN, { ...rest, prepare_request }).then((state) => {
       setEntityShareState(entityGRN, state);
     });
-  }, [entityType, entityTitle, entityGRN, defaultSharePayload, dependenciesKey, setEntityShareState]);
+  }, [entityType, entityTitle, entityGRN, defaultSharePayload, dependenciesGRN, setEntityShareState]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
@@ -133,7 +128,7 @@ const EntityCreateShareFormGroup = ({
 
     setDisableSubmit(true);
 
-    const prepare_request = isEmpty(newSelectedCapabilities) ? null : dependenciesGRN;
+    const prepare_request = (newSelectedCapabilities?.size ?? 0) > 0 ? dependenciesGRN : null;
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
       prepare_request,
