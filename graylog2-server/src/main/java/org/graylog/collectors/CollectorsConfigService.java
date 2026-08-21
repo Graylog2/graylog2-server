@@ -36,8 +36,6 @@ import java.util.function.Supplier;
  */
 @Singleton
 public class CollectorsConfigService {
-    private static final CollectorsConfig DEFAULT_CONFIG = CollectorsConfig.createDefault("localhost");
-
     private final ClusterConfigService clusterConfigService;
     private final URI httpExternalUri;
     private final EventBus eventBus;
@@ -80,16 +78,6 @@ public class CollectorsConfigService {
      */
     public CollectorsConfig getOrDefault() {
         return get().orElse(CollectorsConfig.createDefault(httpExternalUri.getHost()));
-    }
-
-    /**
-     * Get the OpAMP max request body size in bytes.
-     *
-     * @return the max request body size
-     */
-    public int getOpampMaxRequestBodySizeBytes() {
-        // TODO: Switch to getting the actual database value once we have caching and cache invalidation in place.
-        return DEFAULT_CONFIG.opampMaxRequestBodySizeBytes();
     }
 
     /**
