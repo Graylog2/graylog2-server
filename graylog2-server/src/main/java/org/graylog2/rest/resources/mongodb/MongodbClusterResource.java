@@ -63,12 +63,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Tag(name = "System/Mongodb", description = "MongoDB Node discovery")
@@ -196,14 +198,32 @@ public class MongodbClusterResource extends RestResource {
     public Response profilingStatus() {
         try {
             Document command = new Document("profile", -1);
-            final Map<ProfilingLevel, Long> result = clusterCommand.runOnEachNode(command)
-                    .values().stream()
+            final Collection<Document> nodeResults = clusterCommand.runOnEachNode(command).values();
+
+            // "profile: -1" only queries the current settings without changing them, so this is readable with the
+            // same 'profiler' privilege as the level counts below - no need to set slowms (which requires elevated
+            // privileges as of MongoDB 8.0.29 / SERVER-130198) just to find out what it currently is.
+            final Map<String, Long> countsByLevel = nodeResults.stream()
                     .map(doc -> doc.getInteger("was"))
                     .map(ProfilingLevel::fromNumericalValue)
                     .collect(Collectors.groupingBy(
-                            Function.identity(),
+                            ProfilingLevel::name,
+                            LinkedHashMap::new,
                             Collectors.counting()
                     ));
+            final Map<String, Object> result = new LinkedHashMap<>(countsByLevel);
+
+            // slowms is per-node mongod state, not replicated cluster config - nodes can genuinely disagree
+            // (e.g. a manually tuned mongod.conf on one member). Only report it when every node that answered
+            // agrees; an arbitrary single node's value would misrepresent the others.
+            final Set<Integer> slowMsValues = nodeResults.stream()
+                    .map(doc -> doc.getInteger("slowms"))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            if (slowMsValues.size() == 1) {
+                result.put("slowMs", slowMsValues.iterator().next());
+            }
+
             return Response.ok().entity(result).build();
         } catch (MongodbPermissionException e) {
             LOG.error("Failed to retrieve profiling status due to insufficient MongoDB permissions", e);
