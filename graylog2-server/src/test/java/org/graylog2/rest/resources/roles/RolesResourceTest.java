@@ -29,7 +29,7 @@ import org.graylog2.security.SecurityTestUtils;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.users.Role;
-import org.graylog2.users.PermissionsValidator;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,11 +77,11 @@ class RolesResourceTest {
 
     @BeforeEach
     void setUp() {
-        // A real PermissionsValidator is used on purpose: these tests are about the permission semantics the
+        // A real PrivilegeEscalationGuard is used on purpose: these tests are about the permission semantics the
         // resource enforces, so they should exercise the actual Shiro wildcard resolution rather than assert
         // that a collaborator was called. `validatePermissions` never touches the RoleService.
         classUnderTest = new TestRolesResource(roleService, globalAuthServiceConfig,
-                new PermissionsValidator(roleService), new HttpConfiguration());
+                new PrivilegeEscalationGuard(roleService), new HttpConfiguration());
     }
 
     @Test
@@ -355,9 +355,9 @@ class RolesResourceTest {
     static class TestRolesResource extends RolesResource {
         TestRolesResource(RoleService roleService,
                           GlobalAuthServiceConfig globalAuthServiceConfig,
-                          PermissionsValidator permissionsValidator,
+                          PrivilegeEscalationGuard privilegeEscalationGuard,
                           HttpConfiguration configuration) {
-            super(roleService, globalAuthServiceConfig, permissionsValidator);
+            super(roleService, globalAuthServiceConfig, privilegeEscalationGuard);
             super.configuration = configuration;
         }
     }
