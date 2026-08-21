@@ -72,6 +72,13 @@ const MainNavAndNotificationBadge = styled.nav`
   align-items: center;
 `;
 
+// Measured as one region, whichever badge ends up in it.
+const Badges = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+`;
+
 const DevelopmentHeaderBadgeContainer = styled.div`
   padding-left: ${NAVBAR_GAP}px;
   padding-right: ${NAVBAR_GAP}px;
@@ -79,6 +86,11 @@ const DevelopmentHeaderBadgeContainer = styled.div`
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
+  const pluginBadges = usePluginEntities('navigation.badges');
+  // A badge decides for itself whether it applies, and does so with a hook. Plugins register their
+  // badges once for as long as the page lives, so the number of calls stays the same between renders.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const activePluginBadges = pluginBadges.filter(({ useCondition }) => useCondition());
   const { navbarRef, brandRef, badgesRef, iconsRef, menuRef, collapsed } = useNavigationCollapse();
 
   return (
@@ -91,7 +103,13 @@ const Navigation = React.memo(({ pathname }: Props) => {
       </Brand>
       <MainNavAndNotificationBadge aria-label="Main">
         {!collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
-        <NotificationBadge ref={badgesRef} />
+        <Badges ref={badgesRef}>
+          {activePluginBadges.length > 0 ? (
+            activePluginBadges.map(({ key, component: PluginBadge }) => <PluginBadge key={key} />)
+          ) : (
+            <NotificationBadge />
+          )}
+        </Badges>
       </MainNavAndNotificationBadge>
 
       <Icons ref={iconsRef} aria-label="Utility">
