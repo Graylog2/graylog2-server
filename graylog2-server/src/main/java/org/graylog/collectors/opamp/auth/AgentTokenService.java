@@ -21,6 +21,7 @@ import io.jsonwebtoken.Jwts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.security.pki.PemUtils;
@@ -40,11 +41,15 @@ public class AgentTokenService {
     private static final Logger LOG = LoggerFactory.getLogger(AgentTokenService.class);
 
     private final CollectorInstanceService collectorInstanceService;
+    private final CollectorsConfigService collectorsConfigService;
     private final Clock clock;
 
     @Inject
-    public AgentTokenService(CollectorInstanceService collectorInstanceService, Clock clock) {
+    public AgentTokenService(CollectorInstanceService collectorInstanceService,
+                             CollectorsConfigService collectorsConfigService,
+                             Clock clock) {
         this.collectorInstanceService = collectorInstanceService;
+        this.collectorsConfigService = collectorsConfigService;
         this.clock = clock;
     }
 
@@ -62,7 +67,11 @@ public class AgentTokenService {
      *   <li>Looking up agent by fingerprint</li>
      *   <li>Parsing agent's certificate and verifying validity</li>
      *   <li>Signature verification using the certificate's public key</li>
-     *   <li>Expiration check (handled automatically by JJWT)</li>
+     *   <li>Expiration check (handled automatically by JJWT if the claim is present)</li>
+     *   <li>Requiring an expiration claim (JJWT accepts tokens without one indefinitely)</li>
+     *   <li>Rejecting tokens that expire more than {@code agent_token_max_lifetime} in the future. This bounds the
+     *       remaining validity ({@code exp - now}), not the time since minting — {@code iat} is client-asserted and
+     *       carries no enforcement weight.</li>
      * </ul>
      *
      * @param token     the JWT token string
@@ -74,7 +83,7 @@ public class AgentTokenService {
             final AtomicReference<CollectorInstanceDTO> collectorRef = new AtomicReference<>();
             final var now = Date.from(clock.instant());
 
-            Jwts.parser()
+            final var claims = Jwts.parser()
                     .keyLocator(header -> {
                         final String x5t = (String) header.get("x5t#S256");
                         if (x5t == null) {
@@ -98,6 +107,18 @@ public class AgentTokenService {
                     .clock(() -> now)
                     .build()
                     .parseSignedClaims(token);
+
+            if (claims.getPayload().getExpiration() == null) {
+                throw new SecurityException("Missing required expiration claim");
+            }
+
+            // Sanity check for tokens: if the remaining lifetime of a token exceeds our configured maximum, reject
+            // it. This is meant to help prevent unsafe client configurations but doesn't add any security guarantees.
+            final var deadline = now.toInstant().plus(collectorsConfigService.getOrDefault().agentTokenMaxLifetime());
+
+            if (claims.getPayload().getExpiration().toInstant().isAfter(deadline)) {
+                throw new SecurityException("Token expiration exceeds maximum allowed lifetime");
+            }
 
             return Optional.of(new OpAmpAuthContext.Identified(collectorRef.get().instanceUid(), transport));
         } catch (Exception e) {
