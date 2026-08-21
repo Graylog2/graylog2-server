@@ -24,7 +24,6 @@ const CardContainer = styled.div<{ $clickable: boolean }>`
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.global.contentBackground};
   border-radius: ${({ theme }) => theme.spacings.xs};
-  /* Matches the real search widget's container padding (WidgetFrame). */
   padding: 7px 9px 6px;
 
   ${({ $clickable, theme }) =>
@@ -59,6 +58,10 @@ const Headline = styled.span(
   `,
 );
 
+const ActionsWrapper = styled.span`
+  display: inline-flex;
+`;
+
 /* Matches the bottom-right time range text real search widgets show (TimerangeInfo). */
 const TimeRangeInfo = styled.small`
   color: ${({ theme }) => theme.colors.text.secondary};
@@ -85,7 +88,7 @@ const WidgetCard = ({
   <CardContainer $clickable={!!onClick} onClick={onClick} className={className}>
     <HeaderRow>
       <Headline title={headline}>{headline}</Headline>
-      {actions}
+      {actions && <ActionsWrapper onClick={(e) => e.stopPropagation()}>{actions}</ActionsWrapper>}
     </HeaderRow>
     {children}
     {timeRangeInfo && <TimeRangeInfo>{timeRangeInfo}</TimeRangeInfo>}
