@@ -94,6 +94,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserConfiguration;
@@ -147,6 +148,7 @@ public class UsersResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
     private final UserSessionTerminationService sessionTerminationService;
     private final DefaultSecurityManager securityManager;
+    private final PrivilegeEscalationGuard privilegeEscalationGuard;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
     private final ClusterConfigService clusterConfigService;
 
@@ -164,7 +166,8 @@ public class UsersResource extends RestResource {
                          RoleService roleService,
                          MongoDBSessionService sessionService,
                          UserSessionTerminationService sessionTerminationService, DefaultSecurityManager securityManager,
-                         GlobalAuthServiceConfig globalAuthServiceConfig, ClusterConfigService clusterConfigService) {
+                         GlobalAuthServiceConfig globalAuthServiceConfig, ClusterConfigService clusterConfigService,
+                         PrivilegeEscalationGuard privilegeEscalationGuard) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -172,6 +175,7 @@ public class UsersResource extends RestResource {
         this.paginatedUserService = paginatedUserService;
         this.sessionTerminationService = sessionTerminationService;
         this.securityManager = securityManager;
+        this.privilegeEscalationGuard = privilegeEscalationGuard;
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
         this.globalAuthServiceConfig = globalAuthServiceConfig;
         this.clusterConfigService = clusterConfigService;
@@ -338,7 +342,8 @@ public class UsersResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true)
-                           @Valid @NotNull CreateUserRequest cr) throws ValidationException {
+                           @Valid @NotNull CreateUserRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
         if (userManagementService.load(cr.username()) != null) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
             LOG.error(msg);
@@ -347,6 +352,7 @@ public class UsersResource extends RestResource {
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
+        privilegeEscalationGuard.validatePermissionsAndRoles(cr, userContext);
 
         // Create user.
         User user = userManagementService.create();
@@ -417,15 +423,16 @@ public class UsersResource extends RestResource {
     public void changeUser(@ApiParam(name = "userId", value = "The ID of the user to modify.", required = true)
                            @PathParam("userId") String userId,
                            @ApiParam(name = "JSON body", value = "Updated user information.", required = true)
-                           @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
+                           @Valid @NotNull ChangeUserRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
 
         final User user = loadUserById(userId);
         final String username = user.getName();
         checkPermission(USERS_EDIT, username);
-
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot modify readonly user " + username);
         }
+
         // We only allow setting a subset of the fields in ChangeUserRequest
         if (!user.isExternalUser()) {
             if (cr.email() != null) {
@@ -437,11 +444,13 @@ public class UsersResource extends RestResource {
         }
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
         if (permitted && cr.permissions() != null) {
+            privilegeEscalationGuard.validatePermissions(cr.permissions(), userContext);
             user.setPermissions(getEffectiveUserPermissions(user, cr.permissions()));
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
-            checkAdminRoleForServiceAccount(cr, user);
+            validateAdminRoleNotGrantedToServiceAccount(cr, user);
+            privilegeEscalationGuard.validateRolePermissions(cr.roles(), userContext);
             setUserRoles(cr.roles(), user);
         }
 
@@ -503,7 +512,7 @@ public class UsersResource extends RestResource {
         return roles != null && roles.stream().anyMatch(RoleServiceImpl.ADMIN_ROLENAME::equalsIgnoreCase);
     }
 
-    private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
+    private void validateAdminRoleNotGrantedToServiceAccount(ChangeUserRequest cr, User user) {
         if (user.isServiceAccount() && rolesContainAdmin(cr.roles())) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
@@ -551,12 +560,14 @@ public class UsersResource extends RestResource {
     public void editPermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The list of permissions to assign to the user.", required = true)
-                                @Valid @NotNull PermissionEditRequest permissionRequest) throws ValidationException {
+                                @Valid @NotNull PermissionEditRequest permissionRequest,
+                                @Context UserContext userContext) throws ValidationException {
         final User user = userManagementService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
 
+        privilegeEscalationGuard.validatePermissions(permissionRequest.permissions(), userContext);
         user.setPermissions(getEffectiveUserPermissions(user, permissionRequest.permissions()));
         userManagementService.save(user);
     }
