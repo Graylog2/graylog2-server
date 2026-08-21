@@ -17,15 +17,14 @@
 import * as React from 'react';
 import { forwardRef, useMemo } from 'react';
 
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import { durationInSeconds } from 'util/DateTime';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
 import WidgetActionsContext from 'views/components/contexts/WidgetActionsContext';
 
-import useWelcomeMetricsSearch, { DEFAULT_TIME_RANGE_SECONDS } from './hooks/useWelcomeMetricsSearch';
+import useWelcomeMetricsSearch from './hooks/useWelcomeMetricsSearch';
+import useMetricsTimeRange from './hooks/useMetricsTimeRange';
 import replayLinkWidgetAction from './ReplayLinkWidgetAction';
 
 const WIDGET_ACTIONS = [replayLinkWidgetAction];
@@ -39,13 +38,7 @@ type Props = {
 };
 
 const MetricsSearchPage = ({ topSourcesOnly = false }: Props) => {
-  const { config } = useSearchConfiguration();
-  const queryTimeRangeLimitSeconds = durationInSeconds(config?.query_time_range_limit ?? '');
-  const rangeSeconds =
-    queryTimeRangeLimitSeconds > 0 && queryTimeRangeLimitSeconds < DEFAULT_TIME_RANGE_SECONDS
-      ? queryTimeRangeLimitSeconds
-      : DEFAULT_TIME_RANGE_SECONDS;
-
+  const rangeSeconds = useMetricsTimeRange();
   const view = useWelcomeMetricsSearch(rangeSeconds, topSourcesOnly);
 
   const searchPageLayoutContextValue = useMemo(
