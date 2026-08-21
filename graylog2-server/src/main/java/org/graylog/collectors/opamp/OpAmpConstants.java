@@ -19,6 +19,19 @@ package org.graylog.collectors.opamp;
 public final class OpAmpConstants {
     public static final String PATH = "/v1/opamp";
 
+    /**
+     * Identifies the enrollment auth-check message exchange. Collectors announce this custom
+     * capability and send a matching custom message as a pre-flight check to detect invalid
+     * tokens before starting the OpAMP client. Must match the collector-side constant.
+     */
+    public static final String AUTH_CHECK_CUSTOM_CAPABILITY = "org.graylog.collector.enrollment.auth-check";
+
+    /**
+     * The custom message type marking an auth-check request. Must match the collector-side
+     * constant.
+     */
+    public static final String AUTH_CHECK_MESSAGE_TYPE = "request";
+
     private OpAmpConstants() {
     }
 }
