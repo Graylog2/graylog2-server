@@ -256,7 +256,7 @@ declare module 'graylog-web-plugin/plugin' {
     collectors_config: 'read';
     contentpack: 'read';
     dashboards: 'create' | 'edit' | 'read';
-    datanode: 'start';
+    datanode: 'read' | 'start';
     decorators: 'create' | 'edit' | 'read';
     eventdefinitions: 'create' | 'delete' | 'edit' | 'read';
     eventnotifications: 'create' | 'delete' | 'edit' | 'read';

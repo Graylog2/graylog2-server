@@ -75,11 +75,18 @@ const debouncedValidateUrlEntry = debounce(validateUrlEntry, 200);
 type Props = {
   urls?: Array<Url>;
   disabled?: boolean;
+  enforceForNotifications?: boolean;
   onUpdate?: (config: AllowListConfig, valid: boolean) => void;
   newEntryId?: string;
 };
 
-const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId = undefined }: Props) => {
+const UrlAllowListForm = ({
+  urls = [],
+  onUpdate = () => {},
+  disabled = false,
+  enforceForNotifications = false,
+  newEntryId = undefined,
+}: Props) => {
   const productName = useProductName();
   const literal = 'literal';
   const regex = 'regex';
@@ -89,7 +96,11 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
   ];
   // eslint-disable-next-line prefer-const
   let inputs = {};
-  const [config, setConfig] = useState<AllowListConfig>({ entries: urls, disabled });
+  const [config, setConfig] = useState<AllowListConfig>({
+    entries: urls,
+    disabled,
+    enforce_for_notifications: enforceForNotifications,
+  });
   const [validationState, setValidationState] = useState({ errors: [] });
   const isInitialRender = useRef<boolean>(false);
 
@@ -272,6 +283,14 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
         checked={config.disabled}
         onChange={() => setConfig({ ...config, disabled: !config.disabled })}
         help={`Disable the allowlist functionality. Warning: Disabling this option will allow users to enter any URL in ${productName} entities, which may pose a security risk.`}
+      />
+      <Input
+        type="checkbox"
+        id="enforce-for-notifications"
+        label="Enforce for Slack & Teams notifications"
+        checked={config.enforce_for_notifications}
+        onChange={() => setConfig({ ...config, enforce_for_notifications: !config.enforce_for_notifications })}
+        help="When enabled, Slack and Microsoft Teams notifications will fail if their webhook URL is not in the URL allowlist. When disabled, a warning is logged instead."
       />
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
         Add Url
