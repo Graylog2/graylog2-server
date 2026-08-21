@@ -35,6 +35,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { toUTCFromTz } from 'util/DateTime';
 import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
+import merge from 'lodash/merge';
 
 const config = AggregationWidgetConfig.builder()
   .visualization('line')
@@ -44,12 +45,11 @@ const config = AggregationWidgetConfig.builder()
   .rollup(false)
   .build();
 
-const height = 180;
+const DEFAULT_HEIGHT = '180px';
 
-const GraphContainer = styled.div`
-  height: ${height}px;
+const GraphContainer = styled.div<{ $height: string }>`
+  height: ${({ $height }) => $height};
   width: 100%;
-  margin: 20px 0;
 `;
 
 type ResultPromise = ReturnType<typeof fetchEventsHistogram>;
@@ -106,7 +106,6 @@ const layout: Partial<PlotLayout> = {
     domain: [0, 1],
     type: 'date',
   },
-  legend: { y: yLegendPosition(height) },
 };
 
 const prepareTimeRangeForGraph = (
@@ -123,11 +122,13 @@ const EventsGraph = ({
   alerts,
   onZoom,
   formatTime,
+  height,
 }: {
   data: Awaited<ResultPromise>;
   alerts: 'include' | 'exclude' | 'only';
   onZoom: (from: string, to: string) => void;
   formatTime: FormatTime;
+  height: string;
 }) => {
   const chartData = useMemo(
     () => [
@@ -137,7 +138,7 @@ const EventsGraph = ({
     [alerts, results.buckets.alerts, results.buckets.events, formatTime],
   );
 
-  const _layout = useMemo(
+  const baseLayout = useMemo(
     () => ({
       ...layout,
       xaxis: {
@@ -149,13 +150,18 @@ const EventsGraph = ({
   );
 
   return (
-    <GraphContainer>
+    <GraphContainer $height={height}>
       <InteractiveContext.Provider value={false}>
         <FullSizeContainer>
           {(dimensions) => (
-            <PlotLegend config={config} chartData={chartData} height={height} width={dimensions.width}>
+            <PlotLegend config={config} chartData={chartData} height={dimensions.height} width={dimensions.width}>
               <InteractiveContext.Provider value>
-                <GenericPlot chartData={chartData} layout={_layout} onZoom={onZoom} setChartColor={defaultSetColor} />
+                <GenericPlot
+                  chartData={chartData}
+                  layout={merge({}, baseLayout, { legend: { y: yLegendPosition(dimensions.height) } })}
+                  onZoom={onZoom}
+                  setChartColor={defaultSetColor}
+                />
               </InteractiveContext.Provider>
             </PlotLegend>
           )}
@@ -169,8 +175,14 @@ type EventsHistogramFetcher = typeof fetchEventsHistogram;
 
 type Props = MiddleSectionProps & {
   eventsHistogramFetcher?: EventsHistogramFetcher;
+  height?: string;
 };
-const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
+const EventsHistogram = ({
+  searchParams,
+  setFilters,
+  eventsHistogramFetcher = fetchEventsHistogram,
+  height = DEFAULT_HEIGHT,
+}: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const { data, isLoading, refetch, isError, error } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
@@ -198,7 +210,7 @@ const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fe
     return <Alert bsStyle="danger">Loading events histogram failed: {error?.message ?? 'Unknown error'}</Alert>;
   }
 
-  return <EventsGraph data={data} alerts={alerts} onZoom={onZoom} formatTime={formatTime} />;
+  return <EventsGraph data={data} alerts={alerts} onZoom={onZoom} formatTime={formatTime} height={height} />;
 };
 
 export default EventsHistogram;
