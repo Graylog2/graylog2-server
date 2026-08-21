@@ -23,14 +23,12 @@ import './types';
 import useHasAccessToAnyStream from 'hooks/useHasAccessToAnyStream';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { Alert, Row, Col, SegmentedControl } from 'components/bootstrap';
-import Store from 'logic/local-storage/Store';
+import { SegmentedControl } from 'components/bootstrap';
 import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
 import SectionHeader from 'components/welcome/SectionHeader';
+import NoStreamAccessAlert from 'components/welcome/NoStreamAccessAlert';
 
 import MetricsSearchPage from './MetricsSearchPage';
-
-const NO_STREAM_ACCESS_DISMISSED_KEY = 'welcome-metrics-no-stream-access-dismissed';
 
 const Container = styled.div`
   margin-bottom: 6.4px;
@@ -40,15 +38,10 @@ const Container = styled.div`
   }
 `;
 
-const StyledAlert = styled(Alert)`
-  margin: 0;
-`;
-
 const GENERAL_TAB_VALUE = 'general';
 
 const WelcomeMetrics = () => {
   const hasAccessToAnyStream = useHasAccessToAnyStream();
-  const [noStreamAccessDismissed, setNoStreamAccessDismissed] = useState(!!Store.get(NO_STREAM_ACCESS_DISMISSED_KEY));
   const [selectedTabValue, setSelectedTabValue] = useState<string>();
 
   const {
@@ -66,25 +59,8 @@ const WelcomeMetrics = () => {
     typeof plugin.isEnabled === 'function' ? plugin.isEnabled(pluginContext) : true,
   );
 
-  const onDismissNoStreamAccess = () => {
-    Store.set(NO_STREAM_ACCESS_DISMISSED_KEY, true);
-    setNoStreamAccessDismissed(true);
-  };
-
   if (!hasAccessToAnyStream) {
-    if (noStreamAccessDismissed) {
-      return null;
-    }
-
-    return (
-      <Row className="content">
-        <Col xs={12}>
-          <StyledAlert onDismiss={onDismissNoStreamAccess}>
-            Once you have access to a stream, your message metrics will show up here.
-          </StyledAlert>
-        </Col>
-      </Row>
-    );
+    return <NoStreamAccessAlert />;
   }
 
   if (activeExtraTabs.length === 0) {
