@@ -57,7 +57,7 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
-import org.graylog2.users.PermissionsValidator;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleImpl;
 import org.graylog2.users.RoleService;
 import org.joda.time.DateTimeZone;
@@ -86,13 +86,13 @@ public class RolesResource extends RestResource {
 
     private final RoleService roleService;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
-    private final PermissionsValidator permissionsValidator;
+    private final PrivilegeEscalationGuard privilegeEscalationGuard;
 
     @Inject
-    public RolesResource(RoleService roleService, GlobalAuthServiceConfig globalAuthServiceConfig, PermissionsValidator permissionsValidator) {
+    public RolesResource(RoleService roleService, GlobalAuthServiceConfig globalAuthServiceConfig, PrivilegeEscalationGuard privilegeEscalationGuard) {
         this.roleService = roleService;
         this.globalAuthServiceConfig = globalAuthServiceConfig;
-        this.permissionsValidator = permissionsValidator;
+        this.privilegeEscalationGuard = privilegeEscalationGuard;
     }
 
     @GET
@@ -129,7 +129,7 @@ public class RolesResource extends RestResource {
             throw new BadRequestException("Role " + roleResponse.name() + " already exists.");
         }
 
-        permissionsValidator.validatePermissions(roleResponse.permissions(), userContext);
+        privilegeEscalationGuard.validatePermissions(roleResponse.permissions(), userContext);
 
         Role role = new RoleImpl();
         role.setName(roleResponse.name());
@@ -163,7 +163,7 @@ public class RolesResource extends RestResource {
             @Context UserContext userContext) throws NotFoundException {
         checkPermission(RestPermissions.ROLES_EDIT, name);
 
-        permissionsValidator.validatePermissions(roleRepresentation.permissions(), userContext);
+        privilegeEscalationGuard.validatePermissions(roleRepresentation.permissions(), userContext);
 
         final Role role = roleService.load(name);
         if (role.isReadOnly()) {
@@ -277,7 +277,7 @@ public class RolesResource extends RestResource {
         // verify that the role exists
         final Role role = roleService.load(rolename);
 
-        permissionsValidator.validatePermissions(role.getPermissions(), userContext);
+        privilegeEscalationGuard.validatePermissions(role.getPermissions(), userContext);
 
         final HashSet<String> roles = Sets.newHashSet(user.getRoleIds());
         roles.add(role.getId());
