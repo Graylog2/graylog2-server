@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,23 +52,39 @@ public class SystemJobManager {
         this.clock = clock;
     }
 
-    public void submit(SystemJobConfig config) {
-        submitWithDelay(config, Duration.ZERO);
+    public JobTriggerDto submit(SystemJobConfig config) {
+        return submit(config, Set.of());
     }
 
-    public void submitWithDelay(SystemJobConfig config, Duration delay) {
+    /**
+     * Submits a system job that only nodes providing all given scheduler capabilities may execute.
+     *
+     * @param config      the job configuration
+     * @param constraints the scheduler capabilities a node must provide to execute the job
+     * @return the created job trigger
+     */
+    public JobTriggerDto submit(SystemJobConfig config, Set<String> constraints) {
+        return submit(config, Duration.ZERO, constraints);
+    }
+
+    public JobTriggerDto submitWithDelay(SystemJobConfig config, Duration delay) {
+        return submit(config, delay, Set.of());
+    }
+
+    public JobTriggerDto submit(SystemJobConfig config, Duration delay, Set<String> constraints) {
         final var now = clock.nowUTC();
         final var startTime = now.plusMillis(Ints.saturatedCast(delay.toMillis()));
         final var trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionType(SystemJobDefinitionConfig.TYPE_NAME)
                 .jobDefinitionId(config.type())
+                .constraints(constraints)
                 .data(config)
                 .startTime(startTime)
                 .nextTime(startTime)
                 .schedule(OnceJobSchedule.create())
                 .build();
 
-        triggerService.create(trigger);
+        return triggerService.create(trigger);
     }
 
     public List<SystemJobConfig> getRunningJobConfigs(String type) {
@@ -80,7 +97,7 @@ public class SystemJobManager {
         try (var stream = triggerService.streamByQuery(query)) {
             return stream.map(JobTriggerDto::data)
                     .flatMap(Optional::stream)
-                    .map(config -> (SystemJobConfig) config)
+                    .map(SystemJobConfig.class::cast)
                     .toList();
         }
     }
