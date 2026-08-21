@@ -17,8 +17,6 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
-
 const CardContainer = styled.div<{ $clickable: boolean }>`
   height: 100%;
   display: flex;
@@ -61,10 +59,6 @@ const Headline = styled.span(
   `,
 );
 
-const ReplayLinkWrapper = styled.span`
-  display: inline-flex;
-`;
-
 /* Matches the bottom-right time range text real search widgets show (TimerangeInfo). */
 const TimeRangeInfo = styled.small`
   color: ${({ theme }) => theme.colors.text.secondary};
@@ -75,7 +69,7 @@ const TimeRangeInfo = styled.small`
 type Props = React.PropsWithChildren<{
   headline: string;
   timeRangeInfo?: React.ReactNode;
-  replayLink?: string;
+  actions?: React.ReactNode;
   onClick?: () => void;
   className?: string;
 }>;
@@ -83,7 +77,7 @@ type Props = React.PropsWithChildren<{
 const WidgetCard = ({
   headline,
   timeRangeInfo = undefined,
-  replayLink = undefined,
+  actions = undefined,
   onClick = undefined,
   className = undefined,
   children = undefined,
@@ -91,11 +85,7 @@ const WidgetCard = ({
   <CardContainer $clickable={!!onClick} onClick={onClick} className={className}>
     <HeaderRow>
       <Headline title={headline}>{headline}</Headline>
-      {replayLink && (
-        <ReplayLinkWrapper onClick={(e) => e.stopPropagation()}>
-          <ReplaySearchButtonComponent searchLink={replayLink} newTab />
-        </ReplayLinkWrapper>
-      )}
+      {actions}
     </HeaderRow>
     {children}
     {timeRangeInfo && <TimeRangeInfo>{timeRangeInfo}</TimeRangeInfo>}
