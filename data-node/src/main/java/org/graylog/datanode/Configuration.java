@@ -160,8 +160,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             Warn if the configured opensearch heap size appears too small compared to the memory available
             to this data node. Set to false to suppress the warning.
             """)
-    @Parameter(value = "data_node_heap_size_warning_enabled")
-    private boolean dataNodeHeapSizeWarningEnabled = true;
+    @Parameter(value = "opensearch_heap_size_warning_enabled")
+    private boolean opensearchHeapSizeWarningEnabled = true;
 
     @Documentation("HTTP port on which the embedded opensearch listens")
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
@@ -751,8 +751,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return opensearchHeap;
     }
 
-    public boolean isDataNodeHeapSizeWarningEnabled() {
-        return dataNodeHeapSizeWarningEnabled;
+    public boolean isOpensearchHeapSizeWarningEnabled() {
+        return opensearchHeapSizeWarningEnabled;
     }
 
     @Override

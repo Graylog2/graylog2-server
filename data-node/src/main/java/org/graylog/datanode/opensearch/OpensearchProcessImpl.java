@@ -207,7 +207,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @VisibleForTesting
     void checkConfiguredHeap() {
-        if (!configuration.isDataNodeHeapSizeWarningEnabled()) {
+        if (!configuration.isOpensearchHeapSizeWarningEnabled()) {
             return;
         }
         Size heap = Size.parse(configuration.getOpensearchHeap());
