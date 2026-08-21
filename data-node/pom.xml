@@ -46,7 +46,7 @@
         <opensearch.compat.version>2.19.6</opensearch.compat.version>
         <lucene.compat.version>9.12.3-1</lucene.compat.version>
         <!-- 3.x versions -->
-        <opensearch.latest.version>3.5.0</opensearch.latest.version>
+        <opensearch.latest.version>3.7.0</opensearch.latest.version>
         <opensearch.cache.url>
             https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/datanode-opensearch
         </opensearch.cache.url>
