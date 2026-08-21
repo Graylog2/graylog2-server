@@ -17,102 +17,122 @@
 package org.graylog.collectors;
 
 import com.google.common.eventbus.EventBus;
-import org.graylog.collectors.events.CollectorCaConfigUpdated;
+import com.google.common.eventbus.Subscribe;
+import org.graylog.collectors.events.CollectorsConfigUpdatedEvent;
+import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CollectorsConfigServiceTest {
 
     private ClusterConfigService clusterConfigService;
-    private ClusterEventBus clusterEventBus;
+    private EventBus eventBus;
     private CollectorsConfigService service;
+    private UpdatedEventCollector updatedEvents;
+
+    private static final class UpdatedEventCollector {
+        private final List<CollectorsConfigUpdatedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void handleUpdated(CollectorsConfigUpdatedEvent event) {
+            events.add(event);
+        }
+    }
 
     @BeforeEach
     void setUp() {
         clusterConfigService = mock(ClusterConfigService.class);
-        clusterEventBus = mock(ClusterEventBus.class);
+        eventBus = new EventBus();
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
-        service = new CollectorsConfigService(clusterConfigService, clusterEventBus, httpConfiguration, new EventBus());
+        service = new CollectorsConfigService(clusterConfigService, httpConfiguration, eventBus);
+        updatedEvents = new UpdatedEventCollector();
+        eventBus.register(updatedEvents);
     }
 
-    private CollectorsConfig configWithCerts(String caCertId, String signingCertId, String serverCertId) {
+    private CollectorsConfig configWithPort(int port) {
         return CollectorsConfig.createDefaultBuilder("localhost")
-                .caCertId(caCertId)
-                .signingCertId(signingCertId)
-                .otlpServerCertId(serverCertId)
+                .http(new IngestEndpointConfig("localhost", port))
                 .build();
     }
 
-    @Test
-    void save_firesEventWhenCaCertIdChanges() {
-        final var existing = configWithCerts("ca-1", "signing-1", "server-1");
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(existing);
-
-        service.save(configWithCerts("ca-2", "signing-1", "server-1"));
-
-        verify(clusterEventBus).post(any(CollectorCaConfigUpdated.class));
+    private void postClusterConfigChangedEvent(String type) {
+        eventBus.post(ClusterConfigChangedEvent.create(DateTime.now(DateTimeZone.UTC), "node-id", type));
     }
 
     @Test
-    void save_firesEventWhenSigningCertIdChanges() {
-        final var existing = configWithCerts("ca-1", "signing-1", "server-1");
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(existing);
+    void get_cachesLoadedConfig() {
+        final var config = configWithPort(1111);
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(config);
 
-        service.save(configWithCerts("ca-1", "signing-2", "server-1"));
+        assertThat(service.get()).contains(config);
+        assertThat(service.get()).contains(config);
 
-        verify(clusterEventBus).post(any(CollectorCaConfigUpdated.class));
+        verify(clusterConfigService, times(1)).get(CollectorsConfig.class);
     }
 
     @Test
-    void save_firesEventWhenServerCertIdChanges() {
-        final var existing = configWithCerts("ca-1", "signing-1", "server-1");
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(existing);
-
-        service.save(configWithCerts("ca-1", "signing-1", "server-2"));
-
-        verify(clusterEventBus).post(any(CollectorCaConfigUpdated.class));
-    }
-
-    @Test
-    void save_doesNotFireEventWhenCertIdsUnchanged() {
-        final var existing = configWithCerts("ca-1", "signing-1", "server-1");
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(existing);
-
-        service.save(configWithCerts("ca-1", "signing-1", "server-1"));
-
-        verify(clusterEventBus, never()).post(any());
-    }
-
-    @Test
-    void save_doesNotFireEventWhenNonCertFieldChanges() {
-        final var existing = configWithCerts("ca-1", "signing-1", "server-1");
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(existing);
-
-        // Change only the HTTP port, not cert IDs
-        final var updated = existing.toBuilder()
-                .http(new IngestEndpointConfig("localhost", 9999))
-                .build();
-        service.save(updated);
-
-        verify(clusterEventBus, never()).post(any());
-    }
-
-    @Test
-    void save_doesNotFireEventOnFirstSave() {
+    void get_cachesEmptyResult() {
         when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
-        service.save(configWithCerts("ca-1", "signing-1", "server-1"));
+        assertThat(service.get()).isEmpty();
+        assertThat(service.get()).isEmpty();
 
-        verify(clusterEventBus, never()).post(any());
+        verify(clusterConfigService, times(1)).get(CollectorsConfig.class);
+    }
+
+    @Test
+    void save_writesConfigAndInvalidatesCache() {
+        final var initial = configWithPort(1111);
+        final var updated = configWithPort(2222);
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(initial, updated);
+
+        assertThat(service.get()).contains(initial);
+
+        service.save(updated);
+
+        verify(clusterConfigService).write(updated);
+        assertThat(service.get()).contains(updated);
+    }
+
+    @Test
+    void clusterConfigChangedEvent_invalidatesCacheAndPostsUpdatedEvent() {
+        final var initial = configWithPort(1111);
+        final var updated = configWithPort(2222);
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(initial, updated);
+
+        assertThat(service.get()).contains(initial);
+
+        postClusterConfigChangedEvent(CollectorsConfig.class.getCanonicalName());
+
+        assertThat(service.get()).contains(updated);
+        assertThat(updatedEvents.events).hasSize(1);
+    }
+
+    @Test
+    void clusterConfigChangedEventForOtherType_isIgnored() {
+        final var initial = configWithPort(1111);
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(initial, configWithPort(2222));
+
+        assertThat(service.get()).contains(initial);
+
+        postClusterConfigChangedEvent("org.graylog2.some.OtherConfig");
+
+        assertThat(service.get()).contains(initial);
+        verify(clusterConfigService, times(1)).get(CollectorsConfig.class);
+        assertThat(updatedEvents.events).isEmpty();
     }
 }

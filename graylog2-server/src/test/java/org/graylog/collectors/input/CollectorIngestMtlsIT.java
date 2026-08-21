@@ -164,7 +164,7 @@ class CollectorIngestMtlsIT {
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://localhost:443/"));
 
-        final var collectorsConfigService = new CollectorsConfigService(clusterConfigService, new ClusterEventBus(), httpConfiguration, new EventBus());
+        final var collectorsConfigService = new CollectorsConfigService(clusterConfigService, httpConfiguration, new EventBus());
         final var caService = new CollectorCaService(certService, clusterIdService, collectorsConfigService, Clock.systemUTC());
 
         final var hierarchy = caService.initializeCa();

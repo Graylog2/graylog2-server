@@ -37,7 +37,6 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdService;
@@ -95,7 +94,7 @@ class CollectorCaServiceTest {
         when(clusterIdService.getString()).thenReturn("cluster-id");
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration, new EventBus());
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, httpConfiguration, new EventBus());
         collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
     }
 

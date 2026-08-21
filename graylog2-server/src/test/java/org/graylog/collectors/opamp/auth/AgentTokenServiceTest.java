@@ -105,7 +105,7 @@ class AgentTokenServiceTest {
         collectorInstanceService = new CollectorInstanceService(mongoCollections, new ClusterEventBus(), clock);
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration, new EventBus());
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, httpConfiguration, new EventBus());
         collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
         agentTokenService = new AgentTokenService(collectorInstanceService, clock);
     }
