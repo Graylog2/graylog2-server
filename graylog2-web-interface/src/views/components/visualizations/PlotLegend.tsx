@@ -219,8 +219,7 @@ const InteractiveLegend = ({ config, fieldTypes, labelFields, labels }: LegendCo
 const FlexLegendContainer = styled(LegendContainerBase)(
   ({ theme }) => css`
     display: flex;
-    column-gap: ${theme.spacings.xs};
-    row-gap: ${theme.spacings.xxs};
+    gap: ${theme.spacings.xxs} ${theme.spacings.xs};
     flex-wrap: wrap;
   `,
 );
