@@ -37,11 +37,11 @@ import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.graylog.collectors.CertBindingResolver;
 import org.graylog.collectors.CollectorCaCache;
 import org.graylog.collectors.CollectorCaKeyManager;
 import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorCaTrustManager;
-import org.graylog.collectors.CertBindingResolver;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog.collectors.CollectorTLSUtils;
@@ -164,7 +164,7 @@ class CollectorIngestMtlsIT {
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://localhost:443/"));
 
-        final var collectorsConfigService = new CollectorsConfigService(clusterConfigService, new ClusterEventBus(), httpConfiguration);
+        final var collectorsConfigService = new CollectorsConfigService(clusterConfigService, new ClusterEventBus(), httpConfiguration, new EventBus());
         final var caService = new CollectorCaService(certService, clusterIdService, collectorsConfigService, Clock.systemUTC());
 
         final var hierarchy = caService.initializeCa();

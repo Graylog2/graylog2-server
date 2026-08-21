@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import com.google.common.eventbus.EventBus;
 import org.graylog.collectors.events.CollectorCaConfigUpdated;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
@@ -41,7 +42,7 @@ class CollectorsConfigServiceTest {
         clusterEventBus = mock(ClusterEventBus.class);
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
-        service = new CollectorsConfigService(clusterConfigService, clusterEventBus, httpConfiguration);
+        service = new CollectorsConfigService(clusterConfigService, clusterEventBus, httpConfiguration, new EventBus());
     }
 
     private CollectorsConfig configWithCerts(String caCertId, String signingCertId, String serverCertId) {

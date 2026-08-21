@@ -16,9 +16,13 @@
  */
 package org.graylog.collectors;
 
+import com.google.common.base.Suppliers;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.collectors.events.CollectorCaConfigUpdated;
+import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -26,6 +30,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 /**
  * Provides access to the collector configuration.
@@ -38,13 +44,26 @@ public class CollectorsConfigService {
     private final ClusterEventBus clusterEventBus;
     private final URI httpExternalUri;
 
+    private final AtomicReference<Supplier<Optional<CollectorsConfig>>> config;
+
     @Inject
     public CollectorsConfigService(ClusterConfigService clusterConfigService,
                                    ClusterEventBus clusterEventBus,
-                                   HttpConfiguration httpConfiguration) {
+                                   HttpConfiguration httpConfiguration,
+                                   EventBus eventBus) {
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = clusterEventBus;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
+        this.config = new AtomicReference<>(Suppliers.memoize(this::loadConfig));
+
+        eventBus.register(this);
+    }
+
+    @Subscribe
+    public void handleClusterConfigChangedEvent(ClusterConfigChangedEvent event) {
+        if (CollectorsConfig.class.getCanonicalName().equals(event.type())) {
+            invalidate();
+        }
     }
 
     /**
@@ -53,7 +72,7 @@ public class CollectorsConfigService {
      * @return the current config or an empty optional
      */
     public Optional<CollectorsConfig> get() {
-        return Optional.ofNullable(clusterConfigService.get(CollectorsConfig.class));
+        return config.get().get();
     }
 
     /**
@@ -84,6 +103,7 @@ public class CollectorsConfigService {
         final var existing = get();
 
         clusterConfigService.write(config);
+        invalidate();
 
         // On first-time save (no existing config), there's nothing cached to invalidate, so we skip the event.
         existing.ifPresent(c -> {
@@ -93,5 +113,13 @@ public class CollectorsConfigService {
                 clusterEventBus.post(new CollectorCaConfigUpdated());
             }
         });
+    }
+
+    private Optional<CollectorsConfig> loadConfig() {
+        return Optional.ofNullable(clusterConfigService.get(CollectorsConfig.class));
+    }
+
+    private void invalidate() {
+        config.set(Suppliers.memoize(this::loadConfig));
     }
 }

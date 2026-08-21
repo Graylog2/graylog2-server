@@ -95,7 +95,7 @@ class CollectorCaServiceTest {
         when(clusterIdService.getString()).thenReturn("cluster-id");
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration);
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration, new EventBus());
         collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
     }
 
