@@ -25,6 +25,26 @@ export type Fleet = {
   updated_at: string;
 };
 
+// Mirrors the OpAMP ComponentHealth message as stored/served by the backend.
+// Recursive; today's agent only ever fills the root node (healthy + last_error).
+export type ComponentHealth = {
+  healthy: boolean;
+  status?: string;
+  last_error?: string;
+  start_time?: string;
+  status_time?: string;
+  components?: Record<string, ComponentHealth>;
+};
+
+export type CollectorHealth = {
+  // Server-clocked timestamp of the last root-`healthy` transition. All health timestamps
+  // (`healthy_changed_at`, `start_time`, `status_time`) are backend-rendered with a
+  // `+0000`-style offset, unlike the instance-level timestamps' `Z` — fine for RelativeTime,
+  // never string-compare timestamps.
+  healthy_changed_at: string;
+  component_health: ComponentHealth;
+};
+
 export type CollectorInstanceView = {
   id: string;
   instance_uid: string;
@@ -43,6 +63,7 @@ export type CollectorInstanceView = {
   version: string | null;
   status: 'online' | 'offline';
   has_pending_changes: boolean;
+  health: CollectorHealth | null;
 };
 
 export type SourceType = 'file' | 'journald' | 'windows_event_log' | 'macos_unified_logging';

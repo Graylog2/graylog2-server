@@ -260,6 +260,7 @@ export const TELEMETRY_EVENT_TYPE = {
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
     MARKDOWN_UPDATED: 'Configurations Markdown Updated',
     PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
+    WELCOME_PAGE_UPDATED: 'Configurations Welcome Page Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',

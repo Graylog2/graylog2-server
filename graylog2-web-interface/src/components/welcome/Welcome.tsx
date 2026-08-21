@@ -26,13 +26,13 @@ import ContentStreamContainer from 'components/content-stream/ContentStreamConta
 import useProductName from 'brand-customization/useProductName';
 import { hasAdminPermission } from 'util/PermissionsMixin';
 import useFeature from 'hooks/useFeature';
-import AppConfig from 'util/AppConfig';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 import OnboardingBanner from './OnboardingBanner';
 import WelcomeMetrics from './WelcomeMetrics';
+import useWelcomePageConfig from './hooks/useWelcomePageConfig';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -40,6 +40,12 @@ import useCurrentUser from '../../hooks/useCurrentUser';
 const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
+
+const SectionHeadline = styled.h2(
+  ({ theme }) => `
+    margin: ${theme.spacings.lg} 0 ${theme.spacings.xs};
+  `,
+);
 
 type HelperProps = { readOnly: boolean; userId: string; startpage: StartPage };
 
@@ -69,20 +75,27 @@ const Welcome = () => {
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
   const isAdmin = hasAdminPermission(permissions);
   const onboardingEnabled = useFeature('onboarding_experience');
+  const { metricsEnabled } = useWelcomePageConfig();
 
   return (
     <>
       <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
-      {AppConfig.welcomePageMetricsEnabled() && <WelcomeMetrics />}
       {onboardingEnabled && <OnboardingBanner />}
+      {metricsEnabled && (
+        <>
+          <SectionHeadline>Overview</SectionHeadline>
+          <WelcomeMetrics />
+        </>
+      )}
+      <SectionHeadline>Search and Usage</SectionHeadline>
       <SectionGrid $columns="1fr 1fr 1fr">
-        <StyledSectionComponent title="Favorite Items">
+        <StyledSectionComponent title="Favorite Items" titleAs="h3">
           <p className="description">Overview of your favorite saved searches and dashboards.</p>
           <FavoriteItemsList />
         </StyledSectionComponent>
-        <StyledSectionComponent title="Recent Activity">
+        <StyledSectionComponent title="Recent Activity" titleAs="h3">
           <p className="description">
             {isAdmin
               ? 'This list includes all actions users performed, like creating or sharing an entity.'
@@ -90,7 +103,7 @@ const Welcome = () => {
           </p>
           <RecentActivityList />
         </StyledSectionComponent>
-        <StyledSectionComponent title="Last Opened">
+        <StyledSectionComponent title="Last Opened" titleAs="h3">
           <p className="description">Overview of recently visited saved searches and dashboards.</p>
           <LastOpenList />
         </StyledSectionComponent>

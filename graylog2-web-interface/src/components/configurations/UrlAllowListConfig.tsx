@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
+import type { AllowListConfig } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -27,7 +27,6 @@ import { IfPermitted } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlAllowListForm from 'components/configurations/UrlAllowListForm';
-import type { AllowListConfig } from 'stores/configurations/ConfigurationsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -37,7 +36,7 @@ import useProductName from 'brand-customization/useProductName';
 const UrlAllowListConfig = () => {
   const productName = useProductName();
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
   const [viewConfig, setViewConfig] = useState<AllowListConfig | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<AllowListConfig | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);

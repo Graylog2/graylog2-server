@@ -28,7 +28,8 @@ type Platform = {
   id: PlatformId;
   label: string;
   icon: PlatformIcon;
-  commandTemplate: (host: string, port: number, token: string) => string;
+  /** `endpoint` is the full enroll URL — see `enrollEndpointUrl` in `collectors/common`. */
+  commandTemplate: (endpoint: string, token: string) => string;
 };
 
 const PLATFORMS: Platform[] = [
@@ -36,22 +37,22 @@ const PLATFORMS: Platform[] = [
     id: 'linux',
     label: 'Linux',
     icon: { type: 'brand', name: 'linux' },
-    commandTemplate: (host, port, token) =>
-      `curl -fsSL https://${host}:${port}/collectors/install | ENROLLMENT_TOKEN=${token} bash`,
+    commandTemplate: (endpoint, token) =>
+      `graylog-collector supervisor --enroll-endpoint ${endpoint} --enroll-token ${token}`,
   },
   {
     id: 'windows',
     label: 'Windows',
     icon: { type: 'brand', name: 'windows' },
-    commandTemplate: (host, port, token) =>
-      `Invoke-WebRequest -Uri https://${host}:${port}/collectors/install/windows -OutFile install.ps1; .\\install.ps1 -Token ${token}`,
+    commandTemplate: (endpoint, token) =>
+      `graylog-collector.exe supervisor --enroll-endpoint ${endpoint} --enroll-token ${token}`,
   },
   {
     id: 'macos',
     label: 'macOS',
     icon: { type: 'brand', name: 'apple' },
-    commandTemplate: (host, port, token) =>
-      `curl -fsSL https://${host}:${port}/collectors/install | ENROLLMENT_TOKEN=${token} bash`,
+    commandTemplate: (endpoint, token) =>
+      `graylog-collector supervisor --enroll-endpoint ${endpoint} --enroll-token ${token}`,
   },
 ];
 
