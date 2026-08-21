@@ -24,6 +24,7 @@ import AppConfig from 'util/AppConfig';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
 import BrandNavLogo from 'components/navigation/NavigationBrand';
+import { hoverIndicatorStyles } from 'components/common/NavItemStateIndicator';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
 import useNavigationCollapse from 'components/navigation/useNavigationCollapse';
@@ -62,10 +63,20 @@ const Brand = styled.div`
   flex: 0 0 auto;
 `;
 
-const Icons = styled.nav`
-  margin-left: auto;
-  flex: 0 0 auto;
-`;
+const Icons = styled.nav(
+  ({ theme }) => css`
+    margin-left: auto;
+    flex: 0 0 auto;
+
+    /* Navigation items render the state indicator but leave it to the item to say when it applies,
+       and the icons in here are links without an item of their own to do so. Buttons among them,
+       such as the menus, bring their own. */
+    a:hover,
+    a:focus-visible {
+      ${hoverIndicatorStyles(theme)}
+    }
+  `,
+);
 
 const MainNavAndNotificationBadge = styled.nav`
   display: flex;
