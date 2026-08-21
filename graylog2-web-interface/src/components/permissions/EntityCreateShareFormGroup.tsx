@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import isEmpty from 'lodash/isEmpty';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { useStore } from 'stores/connect';
@@ -88,9 +87,13 @@ const EntityCreateShareFormGroup = ({
 
   useEffect(() => {
     const { selected_collections: _, ...rest } = defaultSharePayload ?? {};
+    // Restoring a selection has to re-run the dependency check, or the missing dependency
+    // warnings shown before would silently disappear.
+    const hasSelection = (rest.selected_grantee_capabilities?.size ?? 0) > 0;
+    const prepare_request = hasSelection && dependenciesGRN?.length ? dependenciesGRN : null;
 
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, rest);
-  }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, { ...rest, prepare_request });
+  }, [entityType, entityTitle, entityGRN, defaultSharePayload, dependenciesGRN]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
@@ -122,7 +125,7 @@ const EntityCreateShareFormGroup = ({
 
     setDisableSubmit(true);
 
-    const prepare_request = isEmpty(newSelectedCapabilities) ? null : dependenciesGRN;
+    const prepare_request = (newSelectedCapabilities?.size ?? 0) > 0 ? dependenciesGRN : null;
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
       prepare_request,
@@ -198,6 +201,8 @@ const EntityCreateShareFormGroup = ({
             availableGrantees={entityShareState.availableGrantees}
           />
           {PluggableEntityShareFormGroup && (
+            /* Resolved from the plugin store at render time and cannot be hoisted. */
+            /* eslint-disable-next-line react-hooks/static-components */
             <PluggableEntityShareFormGroup
               entityType={entityType}
               onChange={handleAdditionalFormChange}
