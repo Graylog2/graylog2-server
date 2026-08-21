@@ -19,6 +19,7 @@ package org.graylog.pipelines;
 import net.bytebuddy.utility.RandomString;
 import org.apache.http.HttpStatus;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
@@ -27,6 +28,7 @@ import org.graylog.testing.completebackend.apis.Users;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -40,11 +42,20 @@ public class PipelinePermissionTestsIT {
     @BeforeAll
     static void setUp(GraylogApis graylogApis) {
         api = graylogApis;
-        ruleCreatorRole = api.roles().create("custom_rule_creator", "test role for allowing rule creation", Set.of(
-                PipelineRestPermissions.PIPELINE_RULE_CREATE
+        ruleCreatorRole = api.roles().create("custom_pipeline_creator", "test role for allowing pipeline creation", Set.of(
+                PipelineRestPermissions.PIPELINE_CREATE
         ), false);
-        ruleCreator = api.users().generateUserWithDefaults("inputs.reader", RandomString.make(), ruleCreatorRole);
+        ruleCreator = api.users().generateUserWithDefaults("pipeline.creator", RandomString.make(), ruleCreatorRole);
         api.users().createUser(ruleCreator);
+    }
+
+    private String createPipelineSource(String ruleName) {
+        return """
+                pipeline "MyPipe"
+                stage 0 match either
+                rule "%s"
+                end
+                """.formatted(ruleName);
     }
 
     @AfterAll
@@ -55,15 +66,15 @@ public class PipelinePermissionTestsIT {
 
     @FullBackendTest
     void testParseNotPermittedForReader() {
-        api.forUser(Users.JOHN_DOE).pipelines().parse("Title", "Description", "Source", HttpStatus.SC_UNAUTHORIZED);
+        api.forUser(Users.JOHN_DOE).pipelines().parse("Title", "Description", "pipeline \"test1\"\nstage 0 match either\nend", HttpStatus.SC_UNAUTHORIZED);
     }
 
     @FullBackendTest
     void testParsePermittedForAdmin() {
-        api.forUser(Users.LOCAL_ADMIN).pipelines().parse("Title", "Description", "Source", HttpStatus.SC_OK);
+        api.forUser(Users.LOCAL_ADMIN).pipelines().parse("Title", "Description", "pipeline \"test2\"\nstage 0 match either\nend", HttpStatus.SC_OK);
     }
     @FullBackendTest
     void testParsePermittedForUser() {
-        api.forUser(ruleCreator).pipelines().parse("Title", "Description", "Source", HttpStatus.SC_OK);
+        api.forUser(ruleCreator).pipelines().parse("Title", "Description", "pipeline \"test3\"\nstage 0 match either\nend", HttpStatus.SC_OK);
     }
 }
