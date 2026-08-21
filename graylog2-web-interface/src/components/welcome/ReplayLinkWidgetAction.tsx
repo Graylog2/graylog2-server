@@ -1,0 +1,39 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+
+import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
+import type { WidgetActionType, WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
+
+const ReplayLinkWidgetActionComponent = ({ widget }: WidgetMenuActionComponentProps) => {
+  const href = widget.context;
+
+  if (!href) {
+    return null;
+  }
+
+  return <ReplaySearchButtonComponent searchLink={href} />;
+};
+
+const replayLinkWidgetAction: WidgetActionType = {
+  type: 'welcome-replay-link',
+  position: 'menu',
+  showInNonInteractiveMode: true,
+  component: ReplayLinkWidgetActionComponent,
+};
+
+export default replayLinkWidgetAction;
