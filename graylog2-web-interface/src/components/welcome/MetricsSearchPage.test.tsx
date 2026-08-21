@@ -97,11 +97,11 @@ describe('MetricsSearchPage', () => {
     expect(await screen.findAllByText('1 day ago - Now')).not.toHaveLength(0);
   });
 
-  it('shows the combined Messages Today / Top 5 Sources layout when forceSimplifiedLayout is set, even with full stream access', async () => {
-    render(<MetricsSearchPage forceSimplifiedLayout />);
+  it('shows only the Top 5 Sources widget when topSourcesOnly is set, even with full stream access', async () => {
+    render(<MetricsSearchPage topSourcesOnly />);
 
-    await screen.findByText('Messages Today');
     await screen.findByText('Top 5 Sources');
+    expect(screen.queryByText('Messages Today')).not.toBeInTheDocument();
     expect(screen.queryByText('Alerts Today')).not.toBeInTheDocument();
     expect(screen.queryByText('Events Today')).not.toBeInTheDocument();
   });

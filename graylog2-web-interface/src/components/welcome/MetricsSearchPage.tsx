@@ -35,10 +35,10 @@ const SearchAreaContainer = forwardRef<HTMLDivElement, React.PropsWithChildren>(
 ));
 
 type Props = {
-  forceSimplifiedLayout?: boolean;
+  topSourcesOnly?: boolean;
 };
 
-const MetricsSearchPage = ({ forceSimplifiedLayout = false }: Props) => {
+const MetricsSearchPage = ({ topSourcesOnly = false }: Props) => {
   const { config } = useSearchConfiguration();
   const queryTimeRangeLimitSeconds = durationInSeconds(config?.query_time_range_limit ?? '');
   const rangeSeconds =
@@ -46,7 +46,7 @@ const MetricsSearchPage = ({ forceSimplifiedLayout = false }: Props) => {
       ? queryTimeRangeLimitSeconds
       : DEFAULT_TIME_RANGE_SECONDS;
 
-  const view = useWelcomeMetricsSearch(rangeSeconds, forceSimplifiedLayout);
+  const view = useWelcomeMetricsSearch(rangeSeconds, topSourcesOnly);
 
   const searchPageLayoutContextValue = useMemo(
     () => ({

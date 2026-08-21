@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import './types';
 
@@ -26,9 +26,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { Alert, Row, Col, SegmentedControl } from 'components/bootstrap';
 import Store from 'logic/local-storage/Store';
 import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
+import SectionHeader from 'components/welcome/SectionHeader';
 
 import MetricsSearchPage from './MetricsSearchPage';
-import SectionHeader from 'components/welcome/SectionHeader';
 
 const NO_STREAM_ACCESS_DISMISSED_KEY = 'welcome-metrics-no-stream-access-dismissed';
 

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -26,6 +26,7 @@ import ContentStreamContainer from 'components/content-stream/ContentStreamConta
 import useProductName from 'brand-customization/useProductName';
 import { hasAdminPermission } from 'util/PermissionsMixin';
 import useFeature from 'hooks/useFeature';
+import SectionHeader from 'components/welcome/SectionHeader';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -36,7 +37,6 @@ import useWelcomePageConfig from './hooks/useWelcomePageConfig';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
-import SectionHeader from 'components/welcome/SectionHeader';
 
 const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;

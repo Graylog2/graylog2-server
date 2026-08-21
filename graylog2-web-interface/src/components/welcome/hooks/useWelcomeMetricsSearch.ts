@@ -15,79 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
-import URI from 'urijs';
 
 import generateId from 'logic/generateId';
 import usePermissions from 'hooks/usePermissions';
-import useCreateSearch from 'views/hooks/useCreateSearch';
-import Routes from 'routing/Routes';
-import { nonInfoPriorities } from 'components/events/Constants';
-import View from 'views/logic/views/View';
-import ViewState from 'views/logic/views/ViewState';
-import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import Search from 'views/logic/search/Search';
-import QueryGenerator from 'views/logic/queries/QueryGenerator';
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
-import { timeRangeToQueryParameter } from 'views/logic/TimeRange';
-import { serializeTimeRange } from 'components/common/EntityFilters/helpers/timeRange';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
-export const DEFAULT_TIME_RANGE_SECONDS = 86400;
+import useWelcomeSearch, {
+  DEFAULT_TIME_RANGE_SECONDS,
+  numberWidget,
+  messagesTodayLink,
+  alertsOrEventsLink,
+  type WelcomeSearchWidgetEntry,
+} from './useWelcomeSearch';
+
+export { DEFAULT_TIME_RANGE_SECONDS };
+
 const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
-
-const messagesTodayLink = (timeRange: RelativeTimeRangeWithEnd) =>
-  new URI(Routes.SEARCH).addQuery({ q: '', ...timeRangeToQueryParameter(timeRange) }).toString();
-
-const alertsOrEventsLink = (timeRange: RelativeTimeRangeWithEnd, alert: boolean) =>
-  new URI(Routes.ALERTS.LIST)
-    .addQuery('page', 1)
-    .addQuery('filters', [
-      ...nonInfoPriorities.map((priority) => `priority=${priority}`),
-      `timestamp=${serializeTimeRange(timeRange)}`,
-      `alert=${alert}`,
-    ])
-    .toString();
-
-const numberWidget = ({
-  title,
-  timeRange,
-  queryString = '',
-  streams = [],
-  link,
-}: {
-  title: string;
-  timeRange: RelativeTimeRangeWithEnd;
-  queryString?: string;
-  streams?: Array<string>;
-  link?: string;
-}) => ({
-  title,
-  widget: AggregationWidget.builder()
-    .id(generateId())
-    .timerange(timeRange)
-    .context(link)
-    .query(createElasticsearchQueryString(queryString))
-    .streams(streams)
-    .config(
-      AggregationWidgetConfig.builder()
-        .series([Series.forFunction('count()')])
-        .visualization('numeric')
-        .visualizationConfig(NumberVisualizationConfig.create(true, 'NEUTRAL', 'bottom-left'))
-        .rollup(false)
-        .build(),
-    )
-    .build(),
-});
 
 const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
   title: 'Top 5 Sources',
@@ -108,26 +61,24 @@ const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
     .build(),
 });
 
-const buildViewState = (
+const buildEntries = (
   permittedAlertsEventsStreams: Array<string>,
   timeRange: RelativeTimeRangeWithEnd,
-  forceSimplifiedLayout: boolean,
-) => {
-  const messages = numberWidget({ title: 'Messages Today', timeRange, link: messagesTodayLink(timeRange) });
+  topSourcesOnly: boolean,
+): Array<WelcomeSearchWidgetEntry> => {
   const sources = topSourcesWidget(timeRange);
 
-  if (permittedAlertsEventsStreams.length === 0 || forceSimplifiedLayout) {
-    const entries = [messages, sources];
+  if (topSourcesOnly) {
+    return [{ ...sources, position: new WidgetPosition(1, 1, 3, 12) }];
+  }
 
-    return ViewState.create()
-      .toBuilder()
-      .titles({ widget: Object.fromEntries(entries.map(({ widget, title }) => [widget.id, title])) })
-      .widgets(entries.map(({ widget }) => widget))
-      .widgetPositions({
-        [messages.widget.id]: new WidgetPosition(1, 1, 3, 4),
-        [sources.widget.id]: new WidgetPosition(5, 1, 3, 8),
-      })
-      .build();
+  const messages = numberWidget({ title: 'Messages Today', timeRange, link: messagesTodayLink(timeRange) });
+
+  if (permittedAlertsEventsStreams.length === 0) {
+    return [
+      { ...messages, position: new WidgetPosition(1, 1, 3, 4) },
+      { ...sources, position: new WidgetPosition(5, 1, 3, 8) },
+    ];
   }
 
   const numberWidgets = [
@@ -147,42 +98,20 @@ const buildViewState = (
       streams: permittedAlertsEventsStreams,
     }),
   ];
-  const entries = [...numberWidgets, sources];
 
-  return ViewState.create()
-    .toBuilder()
-    .titles({ widget: Object.fromEntries(entries.map(({ widget, title }) => [widget.id, title])) })
-    .widgets(entries.map(({ widget }) => widget))
-    .widgetPositions({
-      ...Object.fromEntries(
-        numberWidgets.map(({ widget }, index) => [widget.id, new WidgetPosition(1 + index * 4, 1, 1.6, 4)]),
-      ),
-      [sources.widget.id]: new WidgetPosition(1, 2.75, 3, 12),
-    })
-    .build();
-};
-
-const buildView = (
-  permittedAlertsEventsStreams: Array<string>,
-  timeRange: RelativeTimeRangeWithEnd,
-  forceSimplifiedLayout: boolean,
-) => {
-  const query = QueryGenerator(undefined, undefined, undefined, timeRange);
-  const search = Search.create().toBuilder().queries([query]).build();
-  const view = View.create()
-    .toBuilder()
-    .newId()
-    .type(View.Type.Dashboard)
-    .state({ [query.id]: buildViewState(permittedAlertsEventsStreams, timeRange, forceSimplifiedLayout) })
-    .search(search)
-    .build();
-
-  return Promise.resolve(UpdateSearchForWidgets(view));
+  return [
+    ...numberWidgets.map(({ title, widget }, index) => ({
+      title,
+      widget,
+      position: new WidgetPosition(1 + index * 4, 1, 1.6, 4),
+    })),
+    { ...sources, position: new WidgetPosition(1, 2.75, 3, 12) },
+  ];
 };
 
 const useWelcomeMetricsSearch = (
   rangeSeconds: number = DEFAULT_TIME_RANGE_SECONDS,
-  forceSimplifiedLayout: boolean = false,
+  topSourcesOnly: boolean = false,
 ) => {
   const { isPermitted } = usePermissions();
   const permittedAlertsEventsStreams = useMemo(
@@ -190,12 +119,12 @@ const useWelcomeMetricsSearch = (
     [isPermitted],
   );
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
-  const viewPromise = useMemo(
-    () => buildView(permittedAlertsEventsStreams, timeRange, forceSimplifiedLayout),
-    [permittedAlertsEventsStreams, timeRange, forceSimplifiedLayout],
+  const entries = useMemo(
+    () => buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly),
+    [permittedAlertsEventsStreams, timeRange, topSourcesOnly],
   );
 
-  return useCreateSearch(viewPromise);
+  return useWelcomeSearch(entries, timeRange);
 };
 
 export default useWelcomeMetricsSearch;
