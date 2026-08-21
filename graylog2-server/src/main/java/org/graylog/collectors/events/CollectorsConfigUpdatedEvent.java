@@ -16,5 +16,5 @@
  */
 package org.graylog.collectors.events;
 
-public record CollectorCaConfigUpdated() {
+public record CollectorsConfigUpdatedEvent() {
 }
