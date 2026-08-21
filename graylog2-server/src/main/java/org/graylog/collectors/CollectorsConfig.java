@@ -98,6 +98,10 @@ public abstract class CollectorsConfig {
     @JsonProperty(FIELD_COLLECTOR_CERT_ROTATION_GRACE_PERIOD)
     public abstract Duration collectorCertRotationGracePeriod();
 
+    /**
+     * Maximum remaining validity ({@code exp - now}) the server accepts for agent tokens. Must exceed the
+     * {@code jwt_lifetime} configured on the agents (default there: 5 minutes), or they will fail to authenticate.
+     */
     @JsonProperty(FIELD_AGENT_TOKEN_MAX_LIFETIME)
     public abstract Duration agentTokenMaxLifetime();
 

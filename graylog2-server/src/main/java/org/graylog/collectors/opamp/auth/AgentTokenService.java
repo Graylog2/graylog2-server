@@ -67,11 +67,11 @@ public class AgentTokenService {
      *   <li>Looking up agent by fingerprint</li>
      *   <li>Parsing agent's certificate and verifying validity</li>
      *   <li>Signature verification using the certificate's public key</li>
-     *   <li>Expiration check (handled automatically by JJWT if the claim is present)</li>
-     *   <li>Requiring an expiration claim (JJWT accepts tokens without one indefinitely)</li>
-     *   <li>Rejecting tokens that expire more than {@code agent_token_max_lifetime} in the future. This bounds the
-     *       remaining validity ({@code exp - now}), not the time since minting — {@code iat} is client-asserted and
-     *       carries no enforcement weight.</li>
+     *   <li>Expiration check: the {@code exp} claim is required (JJWT alone accepts tokens without one
+     *       indefinitely) and validated by JJWT when present</li>
+     *   <li>Rejecting tokens that expire more than {@code agent_token_max_lifetime} in the future. This bounds
+     *       the remaining validity ({@code exp - now}), not the time since minting — {@code iat} is
+     *       client-asserted and carries no enforcement weight.</li>
      * </ul>
      *
      * @param token     the JWT token string
@@ -112,8 +112,9 @@ public class AgentTokenService {
                 throw new SecurityException("Missing required expiration claim");
             }
 
-            // Sanity check for tokens: if the remaining lifetime of a token exceeds our configured maximum, reject
-            // it. This is meant to help prevent unsafe client configurations but doesn't add any security guarantees.
+            // Reject tokens whose remaining validity exceeds the configured maximum. This mainly guards against
+            // unsafe client configurations; it bounds how long any single token stays acceptable, but not the time
+            // since minting (iat is client-asserted and can't be trusted).
             final var deadline = now.toInstant().plus(collectorsConfigService.getOrDefault().agentTokenMaxLifetime());
 
             if (claims.getPayload().getExpiration().toInstant().isAfter(deadline)) {
