@@ -42,7 +42,7 @@ type OverviewSectionProps = React.PropsWithChildren<{
   headerActions?: React.ReactNode;
 }>;
 
-const OverviewSection = ({ headerActions = undefined, children }: OverviewSectionProps) => (
+const OverviewSection = ({ headerActions = undefined, children = undefined }: OverviewSectionProps) => (
   <>
     <SectionHeader>
       <h2>Overview</h2>

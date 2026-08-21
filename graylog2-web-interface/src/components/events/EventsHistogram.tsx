@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
+import merge from 'lodash/merge';
 
 import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -35,7 +36,6 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { toUTCFromTz } from 'util/DateTime';
 import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
-import merge from 'lodash/merge';
 
 const config = AggregationWidgetConfig.builder()
   .visualization('line')
@@ -123,12 +123,14 @@ const EventsGraph = ({
   onZoom,
   formatTime,
   height,
+  readOnly,
 }: {
   data: Awaited<ResultPromise>;
   alerts: 'include' | 'exclude' | 'only';
   onZoom: (from: string, to: string) => void;
   formatTime: FormatTime;
   height: string;
+  readOnly: boolean;
 }) => {
   const chartData = useMemo(
     () => [
@@ -155,7 +157,7 @@ const EventsGraph = ({
         <FullSizeContainer>
           {(dimensions) => (
             <PlotLegend config={config} chartData={chartData} height={dimensions.height} width={dimensions.width}>
-              <InteractiveContext.Provider value>
+              <InteractiveContext.Provider value={!readOnly}>
                 <GenericPlot
                   chartData={chartData}
                   layout={merge({}, baseLayout, { legend: { y: yLegendPosition(dimensions.height) } })}
@@ -176,12 +178,14 @@ type EventsHistogramFetcher = typeof fetchEventsHistogram;
 type Props = MiddleSectionProps & {
   eventsHistogramFetcher?: EventsHistogramFetcher;
   height?: string;
+  readOnly?: boolean;
 };
 const EventsHistogram = ({
   searchParams,
   setFilters,
   eventsHistogramFetcher = fetchEventsHistogram,
   height = DEFAULT_HEIGHT,
+  readOnly = false,
 }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const { data, isLoading, refetch, isError, error } = useQuery({
@@ -210,7 +214,16 @@ const EventsHistogram = ({
     return <Alert bsStyle="danger">Loading events histogram failed: {error?.message ?? 'Unknown error'}</Alert>;
   }
 
-  return <EventsGraph data={data} alerts={alerts} onZoom={onZoom} formatTime={formatTime} height={height} />;
+  return (
+    <EventsGraph
+      data={data}
+      alerts={alerts}
+      onZoom={onZoom}
+      formatTime={formatTime}
+      height={height}
+      readOnly={readOnly}
+    />
+  );
 };
 
 export default EventsHistogram;
