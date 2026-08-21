@@ -305,13 +305,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-bom</artifactId>
-                <version>${aws-java-sdk-1.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>google-cloud-storage</artifactId>
                 <version>${gcs.version}</version>
@@ -886,6 +879,11 @@
                                              megabytes to our production artifacts and must be avoided. -->
                                         <exclude>com.amazonaws:aws-java-sdk-bundle</exclude>
                                         <exclude>software.amazon.awssdk:bundle</exclude>
+                                        <!-- The AWS plugin has been fully migrated to AWS SDK v2 (software.amazon.awssdk).
+                                             Ban the v1 SDK to prevent it from creeping back in. Note: this only bans the
+                                             "aws-java-sdk-*" artifacts; it does not affect com.amazonaws:dynamodb-lock-client,
+                                             an unrelated utility used by the Kinesis Client Library that is itself built on SDK v2. -->
+                                        <exclude>com.amazonaws:aws-java-sdk-*</exclude>
                                         <!-- Ban some javax dependencies after the move to jakarta -->
                                         <exclude>javax.inject:*</exclude>
                                         <exclude>javax.ws.rs:javax.*</exclude>
