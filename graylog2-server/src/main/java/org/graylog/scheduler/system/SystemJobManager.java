@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @Singleton
@@ -52,7 +53,7 @@ public class SystemJobManager {
         this.clock = clock;
     }
 
-    public JobTriggerDto submit(SystemJobConfig config) {
+    public SystemJobSubmitResult submit(SystemJobConfig config) {
         return submit(config, Set.of());
     }
 
@@ -61,17 +62,17 @@ public class SystemJobManager {
      *
      * @param config      the job configuration
      * @param constraints the scheduler capabilities a node must provide to execute the job
-     * @return the created job trigger
+     * @return the result of the submission
      */
-    public JobTriggerDto submit(SystemJobConfig config, Set<String> constraints) {
+    public SystemJobSubmitResult submit(SystemJobConfig config, Set<String> constraints) {
         return submit(config, Duration.ZERO, constraints);
     }
 
-    public JobTriggerDto submitWithDelay(SystemJobConfig config, Duration delay) {
+    public SystemJobSubmitResult submitWithDelay(SystemJobConfig config, Duration delay) {
         return submit(config, delay, Set.of());
     }
 
-    public JobTriggerDto submit(SystemJobConfig config, Duration delay, Set<String> constraints) {
+    public SystemJobSubmitResult submit(SystemJobConfig config, Duration delay, Set<String> constraints) {
         final var now = clock.nowUTC();
         final var startTime = now.plusMillis(Ints.saturatedCast(delay.toMillis()));
         final var trigger = JobTriggerDto.builderWithClock(clock)
@@ -84,7 +85,9 @@ public class SystemJobManager {
                 .schedule(OnceJobSchedule.create())
                 .build();
 
-        return triggerService.create(trigger);
+        final var created = triggerService.create(trigger);
+
+        return new SystemJobSubmitResult(requireNonNull(created.id(), "Created job trigger must have an ID"));
     }
 
     public List<SystemJobConfig> getRunningJobConfigs(String type) {
