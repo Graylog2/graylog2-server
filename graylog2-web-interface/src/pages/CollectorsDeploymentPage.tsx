@@ -16,17 +16,34 @@
  */
 import * as React from 'react';
 import { Navigate } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, Tabs, Badge } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
-import { DeploymentForm, EnrollmentTokenList } from 'components/collectors/deployment';
+import { DeployTab, EnrollmentTokenList } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import { useCollectorsConfig } from 'components/collectors/hooks';
+import { useCollectorsConfig, useEnrollmentTokenCount } from 'components/collectors/hooks';
+import { COLOR_SCHEME_LIGHT } from 'theme/constants';
 import Routes from 'routing/Routes';
+
+// Mantine's default --tab-border-color (gray-3 / dark-4) is too high-contrast against the content
+// background. The palette vars don't flip with the color scheme, so pick per theme mode. Mantine
+// defines the var via `[data-mantine-color-scheme] .class` (0-2-0), so the override needs higher
+// specificity than a single class.
+const SoftBorderTabs = styled(Tabs)(
+  ({ theme }) => css`
+    &&& {
+      --tab-border-color: var(
+        ${theme.mode === COLOR_SCHEME_LIGHT ? '--mantine-color-gray-1' : '--mantine-color-dark-5'}
+      );
+    }
+  `,
+);
 
 const CollectorsDeploymentPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
+  const tokenCount = useEnrollmentTokenCount();
 
   if (isLoading) {
     return <Spinner />;
@@ -46,23 +63,36 @@ const CollectorsDeploymentPage = () => {
           </>
         }>
         <span>
-          Deploy Collectors to your infrastructure using enrollment tokens. An enrollment token authorizes a Collector
-          to join a specific fleet and establishes a secure connection using mutual TLS.
+          Run the command on any number of hosts &mdash; they enroll into the fleet you pick and appear as they check
+          in.
         </span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          <DeploymentForm />
-        </Col>
-      </Row>
-      <Row className="content">
-        <Col md={12}>
-          <h2>Enrollment Tokens</h2>
-          <p className="description">
-            Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect already-enrolled
-            Collectors.
-          </p>
-          <EnrollmentTokenList />
+          <SoftBorderTabs defaultValue="deploy">
+            <Tabs.List>
+              <Tabs.Tab value="deploy">Deploy</Tabs.Tab>
+              <Tabs.Tab value="tokens">
+                Enrollment tokens
+                {tokenCount !== undefined && (
+                  <>
+                    {' '}
+                    <Badge>{tokenCount}</Badge>
+                  </>
+                )}
+              </Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value="deploy">
+              <DeployTab />
+            </Tabs.Panel>
+            <Tabs.Panel value="tokens">
+              <p className="description">
+                Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect
+                already-enrolled Collectors.
+              </p>
+              <EnrollmentTokenList />
+            </Tabs.Panel>
+          </SoftBorderTabs>
         </Col>
       </Row>
     </DocumentTitle>

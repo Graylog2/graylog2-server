@@ -20,9 +20,8 @@ import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
 
 import type { UserConfigType } from 'stores/configurations/ConfigurationsStore';
-import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { useStore } from 'stores/connect';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Button, Col, Modal, Row } from 'components/bootstrap';
@@ -56,7 +55,7 @@ const UserConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<UserConfigType | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<UserConfigType | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();

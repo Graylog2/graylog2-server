@@ -16,6 +16,7 @@
  */
 package org.graylog.events.search;
 
+import jakarta.annotation.Nullable;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
@@ -55,9 +56,15 @@ public interface MoreSearchAdapter {
     void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
                       List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 
+    /**
+     * @param bucketPattern optional Lucene regular expression applied to the bucket keys of the terms
+     *                      aggregation, so only matching values are returned. Pass {@code null} to
+     *                      return all values.
+     */
     List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                 Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets);
+                                Map<String, Set<String>> extraFilters, String slicingColumn, @Nullable String bucketPattern,
+                                Map<String, Object> meta, int maxBuckets);
 
     List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                            Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,

@@ -23,8 +23,6 @@ import { Events } from '@graylog/server-api';
 import type { FilterComponentProps } from 'stores/PaginationTypes';
 import SuggestionsList from 'components/common/EntityFilters/FilterConfiguration/SuggestionsList';
 import useQuery_ from 'routing/useQuery';
-import useDebouncedValue from 'hooks/useDebouncedValue';
-import { MISSING_BUCKET_NAME } from 'views/Constants';
 
 const DEFAULT_SEARCH_PARAMS = {
   query: '',
@@ -39,39 +37,15 @@ const TIMERANGE_30D = { type: 'relative', range: 30 * 24 * 60 * 60 };
 // Hard cap on rendered suggestions; relies on the search box to narrow further.
 const MAX_RENDERED_SUGGESTIONS = 100;
 
-// Debounce window for forwarding the typed prefix to a server-side fetcher.
-const PREFIX_DEBOUNCE_MS = 300;
-
 type Suggestion = { id: string; value: string };
 
-const emptyFilter = {
-  alerts: 'include' as const,
-  extra_filters: {},
-  aggregation_timerange: { type: 'relative', range: 0 },
-  id: [] as string[],
-  priority: [] as string[],
-  event_definitions: [] as string[],
-  key: [] as string[],
-};
-
-const fetchTagSuggestions = (streamId: string | undefined, _prefix?: string): Promise<Suggestion[]> =>
-  Events.slices({
-    include_all: true,
-    slice_column: 'tags',
+const fetchTagSuggestions = (streamId: string | undefined, prefix?: string): Promise<Suggestion[]> =>
+  Events.filterOptions({
+    fields: ['tags'],
     query: streamId ? `source_streams:${streamId}` : '',
-    filter: emptyFilter,
+    field_query: prefix ?? '',
     timerange: TIMERANGE_30D,
-  }).then((response) =>
-    (response?.slices ?? [])
-      .map((slice) => slice?.value)
-      // Drop the scripting-API missing-bucket placeholder — events without tags would otherwise
-      // surface as a literal "(Empty Value)" suggestion, which isn't a real tag to filter by.
-      .filter(
-        (value): value is string => typeof value === 'string' && value.length > 0 && value !== MISSING_BUCKET_NAME,
-      )
-      .sort()
-      .map((value) => ({ id: value, value })),
-  );
+  }).then((response) => (response?.tags ?? []).map((value) => ({ id: value, value })));
 
 type FetchSuggestions = (streamId: string | undefined, prefix?: string) => Promise<Suggestion[]>;
 
@@ -80,9 +54,10 @@ type FetchSuggestions = (streamId: string | undefined, prefix?: string) => Promi
  * truth (indexed events vs. defined event definitions) so the fetcher is injected.
  *
  * Set `serverSidePrefix` when the backend caps results (e.g. the event-definitions
- * suggest endpoint, which is hard-capped at 100). In that mode the debounced search-box
- * query is forwarded to the fetcher as a prefix and included in the React Query key so
- * later keystrokes can reach entries past the server cap.
+ * suggest endpoint, which is hard-capped at 100). In that mode the search-box query
+ * (already debounced by the suggestions list) is forwarded to the fetcher as a prefix
+ * and included in the React Query key so later keystrokes can reach entries past the
+ * server cap.
  */
 export const createTagsFilter = ({
   queryKeyPrefix,
@@ -97,10 +72,9 @@ export const createTagsFilter = ({
 }) => {
   const Filter = ({ attribute, allActiveFilters, filter, filterValueRenderer, onSubmit }: FilterComponentProps) => {
     const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
-    const [debouncedQuery] = useDebouncedValue(searchParams.query, PREFIX_DEBOUNCE_MS);
     const { stream_id: streamId } = useQuery_();
     const streamIdParam = streamScoped && typeof streamId === 'string' ? streamId : undefined;
-    const prefixParam = serverSidePrefix ? debouncedQuery : undefined;
+    const prefixParam = serverSidePrefix ? searchParams.query : undefined;
     const {
       data: allSuggestions,
       isInitialLoading,
@@ -149,6 +123,7 @@ const TagsFilter = createTagsFilter({
   queryKeyPrefix: ['events', 'tag-suggestions', `t${TIMERANGE_30D.range}`],
   fetchSuggestions: fetchTagSuggestions,
   streamScoped: true,
+  serverSidePrefix: true,
 });
 
 export default TagsFilter;
