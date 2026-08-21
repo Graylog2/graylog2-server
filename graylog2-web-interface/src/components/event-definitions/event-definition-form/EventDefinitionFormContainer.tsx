@@ -32,7 +32,6 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 
 import useEventDefinitionSteps, { INITIAL_EVENT_DEFINITION } from './useEventDefinitionCommonSteps';
@@ -56,9 +55,7 @@ const STEP_KEYS = {
 
 type Props = {
   action?: 'edit' | 'create';
-  eventDefinition?: EventDefinition & {
-    share_request?: EntitySharePayload;
-  };
+  eventDefinition?: EventDefinition;
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
   initialStep?: string;
   onCancel?: () => void;
