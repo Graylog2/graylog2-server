@@ -22,6 +22,10 @@ import TagsFilter from 'components/events/TagsFilter';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
+export const nonInfoPriorities = Object.keys(EventDefinitionPriorityEnum.properties)
+  .reverse()
+  .filter((key) => key !== String(EventDefinitionPriorityEnum.INFO));
+
 export const commonEventAttributes: Array<Attribute> = [
   {
     filter_options: [

@@ -20,7 +20,6 @@ import moment from 'moment';
 import Immutable from 'immutable';
 
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -89,7 +88,7 @@ const SearchesConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<SearchConfig | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<SearchConfig | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
   const [relativeTimeRangeOptionsUpdate, setRelativeTimeRangeOptionsUpdate] = useState<Array<Option> | undefined>(
     undefined,
   );
