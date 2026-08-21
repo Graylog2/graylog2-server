@@ -24,11 +24,10 @@ import {
 } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { DEFAULT_PASSWORD_COMPLEXITY_CONFIG } from 'logic/users/passwordComplexity';
 
 const usePasswordComplexityConfig = (): PasswordComplexityConfigType => {
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   useEffect(() => {
     ConfigurationsActions.listPasswordComplexityConfig(ConfigurationType.PASSWORD_COMPLEXITY_CONFIG);

@@ -27,7 +27,6 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { getConfig } from 'components/configurations/helpers';
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useLocation from 'routing/useLocation';
@@ -61,7 +60,7 @@ const WelcomePageConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<WelcomePageConfigType | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<FormValues | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();

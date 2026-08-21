@@ -51,16 +51,18 @@ const ActionBlock = styled.div`
 
 const MongodbProfilingAction = () => {
   const [showProfilingDialog, setShowProfilingDialog] = useState(false);
-  const { action, state, profilingStatusByLevel, isStatusReady, isTogglingProfiling, runToggleAction } =
+  const { action, state, profilingStatusByLevel, slowMs, isStatusReady, isTogglingProfiling, runToggleAction } =
     useMongodbProfilingToggle();
 
-  const { actionLabel, actionTitle, buttonLabel, enablingProfiling, statusSummary } = buildMongodbProfilingActionView({
-    action,
-    state,
-    profilingStatusByLevel,
-    isStatusReady,
-    isTogglingProfiling,
-  });
+  const { actionLabel, actionTitle, buttonLabel, enablingProfiling, statusSummary, enableThresholdLabel } =
+    buildMongodbProfilingActionView({
+      action,
+      state,
+      profilingStatusByLevel,
+      slowMs,
+      isStatusReady,
+      isTogglingProfiling,
+    });
 
   const onConfirmProfilingAction = async () => {
     const actionWasSuccessful = await runToggleAction();
@@ -117,7 +119,7 @@ const MongodbProfilingAction = () => {
           isSubmitting={isTogglingProfiling}
           onConfirm={onConfirmProfilingAction}
           onCancel={() => setShowProfilingDialog(false)}>
-          Enable <b>Slow Ops</b> profiling (level 1, 100ms threshold) on all MongoDB nodes? It applies immediately
+          Enable <b>Slow Ops</b> profiling ({enableThresholdLabel}) on all MongoDB nodes? It applies immediately
           without restart, but resets after restart unless configured at startup.
         </ConfirmDialog>
       )}
