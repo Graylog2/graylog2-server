@@ -20,7 +20,6 @@ import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
 
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import type { PermissionsConfigType } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -55,7 +54,7 @@ const LabelSpan = styled.span(
 const PermissionsConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [config, setConfig] = useState<PermissionsConfigType | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();

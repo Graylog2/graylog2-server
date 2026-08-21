@@ -293,8 +293,9 @@ const MacOSUnifiedLoggingConfigFields = ({
         help={
           <span>
             Optional macOS unified logging filter predicate passed to the <code>log</code> command. Leaving this empty
-            collects all logs from the system! <code>info</code> or <code>debug</code> levels are not currently collected,
-            as they are very noisy and carry very little valuable information. Example: <code>subsystem == &#39;com.apple.securityd&#39;</code>
+            collects all logs from the system! <code>info</code> or <code>debug</code> levels are not currently
+            collected, as they are very noisy and carry very little valuable information. Example:{' '}
+            <code>subsystem == &#39;com.apple.securityd&#39;</code>
           </span>
         }
         value={config.predicate || ''}
