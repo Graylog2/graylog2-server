@@ -50,7 +50,13 @@ jest.mock('react-router-dom', () => ({
   createBrowserRouter: jest.fn(),
 }));
 
-jest.mock('components/navigation/NotificationBadge', () => () => null);
+// The navigation bar measures the badge and therefore hands it a ref, which a plain function
+// component cannot be given.
+jest.mock('components/navigation/NotificationBadge', () => {
+  const { forwardRef } = jest.requireActual('react');
+
+  return forwardRef(() => null);
+});
 
 const AppRouterWithContext = () => (
   <HotkeysProvider>
