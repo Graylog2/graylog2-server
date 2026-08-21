@@ -34,6 +34,7 @@ type WidgetBaseActionType = {
   type: string;
   isHidden?: (w: Widget) => boolean;
   disabled?: () => boolean;
+  showInNonInteractiveMode?: boolean;
 };
 
 type WidgetDropdownActionType = {
