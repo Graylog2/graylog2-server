@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import './types';
 
@@ -26,14 +26,15 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { Alert, Row, Col, SegmentedControl } from 'components/bootstrap';
 import Store from 'logic/local-storage/Store';
 import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
-import { SectionHeadline } from 'components/welcome/Welcome';
 
 import MetricsSearchPage from './MetricsSearchPage';
+import SectionHeader from 'components/welcome/SectionHeader';
 
 const NO_STREAM_ACCESS_DISMISSED_KEY = 'welcome-metrics-no-stream-access-dismissed';
 
 const Container = styled.div`
   margin-bottom: 6.4px;
+
   .${widgetActionsMenuClass} {
     opacity: 1;
   }
@@ -41,12 +42,6 @@ const Container = styled.div`
 
 const StyledAlert = styled(Alert)`
   margin: 0;
-`;
-
-const SectionHeadlineRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 `;
 
 const GENERAL_TAB_VALUE = 'general';
@@ -95,7 +90,9 @@ const WelcomeMetrics = () => {
   if (activeExtraTabs.length === 0) {
     return (
       <>
-        <SectionHeadline>Overview</SectionHeadline>
+        <SectionHeader>
+          <h2>Overview</h2>
+        </SectionHeader>
         <Container>
           <MetricsSearchPage />
         </Container>
@@ -113,14 +110,14 @@ const WelcomeMetrics = () => {
 
   return (
     <>
-      <SectionHeadlineRow>
-        <SectionHeadline>Overview</SectionHeadline>
+      <SectionHeader>
+        <h2>Overview</h2>
         <SegmentedControl
           data={tabs.map(({ label, value }) => ({ label, value }))}
           value={activeTabValue}
           onChange={setSelectedTabValue}
         />
-      </SectionHeadlineRow>
+      </SectionHeader>
       <Container>
         <ActiveTabComponent />
       </Container>

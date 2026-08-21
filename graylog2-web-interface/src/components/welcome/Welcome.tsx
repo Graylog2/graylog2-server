@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -36,16 +36,11 @@ import useWelcomePageConfig from './hooks/useWelcomePageConfig';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
+import SectionHeader from 'components/welcome/SectionHeader';
 
 const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
-
-export const SectionHeadline = styled.h2(
-  ({ theme }) => `
-    margin: ${theme.spacings.lg} 0 ${theme.spacings.xs};
-  `,
-);
 
 type HelperProps = { readOnly: boolean; userId: string; startpage: StartPage };
 
@@ -83,13 +78,10 @@ const Welcome = () => {
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
       {onboardingEnabled && <OnboardingBanner />}
-      {metricsEnabled && (
-        <>
-          <SectionHeadline>Overview</SectionHeadline>
-          <WelcomeMetrics />
-        </>
-      )}
-      <SectionHeadline>Search and Usage</SectionHeadline>
+      {metricsEnabled && <WelcomeMetrics />}
+      <SectionHeader>
+        <h2>Search and Usage</h2>
+      </SectionHeader>
       <SectionGrid $columns="1fr 1fr 1fr">
         <StyledSectionComponent title="Favorite Items" titleAs="h3">
           <p className="description">Overview of your favorite saved searches and dashboards.</p>
