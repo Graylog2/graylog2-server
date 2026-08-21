@@ -36,7 +36,7 @@ public class MavenPackager {
     private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip -Dskip.artifact.assembly ";
     private static final String SKIP_FLAG = "GRAYLOG_IT_SKIP_PACKAGING";
 
-    private static boolean jarHasBeenPackagedInThisRun = false;
+    private static boolean jarHasBeenPackagedInThisRun = true;
 
     private static String getMavenCommand() {
         return MVN_COMMAND;
