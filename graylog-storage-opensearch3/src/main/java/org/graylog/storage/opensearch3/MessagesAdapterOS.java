@@ -19,7 +19,9 @@ package org.graylog.storage.opensearch3;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Throwables;
 import jakarta.inject.Inject;
+import org.graylog2.indexer.IncompleteBulkResponseException;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Indexable;
@@ -36,6 +38,7 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.ShardSearchFailure;
 import org.opensearch.client.opensearch.core.BulkRequest;
 import org.opensearch.client.opensearch.core.BulkResponse;
 import org.opensearch.client.opensearch.core.GetRequest;
@@ -46,6 +49,7 @@ import org.opensearch.client.opensearch.indices.AnalyzeRequest;
 import org.opensearch.client.opensearch.indices.AnalyzeResponse;
 import org.opensearch.client.opensearch.indices.analyze.AnalyzeToken;
 import org.opensearch.client.transport.httpclient5.ResponseException;
+import org.opensearch.client.util.MissingRequiredPropertyException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -144,8 +148,33 @@ public class MessagesAdapterOS implements MessagesAdapter {
             throw new org.graylog2.indexer.ElasticsearchException(e);
         } catch (IOException e) {
             throw new org.graylog2.indexer.ElasticsearchException(e);
+        } catch (RuntimeException e) {
+            if (isIncompleteShardFailureResponse(e)) {
+                // Can happen while shards are being reallocated during a rolling restart: OpenSearch omits the
+                // "shard" field on a shard failure entry, which the opensearch-java 3.x client fails to parse.
+                // Messages#createBulkRequestRetryerBuilder() retries this exception type explicitly.
+                throw new IncompleteBulkResponseException(
+                        "Received an incomplete bulk response from OpenSearch, this can happen while shards are being reallocated",
+                        e);
+            }
+            throw e;
         }
         return new ChunkedBulkIndexer.BulkIndexResult(indexingResultsFrom(result, chunk), () -> buildFailureMessage(result), result.items().size());
+    }
+
+    // The opensearch-java client throws this whenever ANY response it deserializes is missing a field it
+    // considers required, so we only treat it as our known, retryable rolling-restart scenario when the
+    // missing property is specifically ShardSearchFailure#shard. Anything else (a different missing field,
+    // or a genuinely incompatible/broken response) should keep propagating instead of being retried forever.
+    // Note: this is the same "_shards.failures[]" schema field that was named ShardFailure#shard in
+    // opensearch-java <= 3.3.0; the client renamed the generated class to ShardSearchFailure afterwards. If
+    // opensearch.client.version is bumped and this stops matching, MessagesAdapterOSTest will fail loudly.
+    private boolean isIncompleteShardFailureResponse(RuntimeException e) {
+        return Throwables.getCausalChain(e).stream()
+                .filter(MissingRequiredPropertyException.class::isInstance)
+                .map(MissingRequiredPropertyException.class::cast)
+                .anyMatch(missingProperty -> ShardSearchFailure.class.equals(missingProperty.getObjectClass())
+                        && "shard".equals(missingProperty.getPropertyName()));
     }
 
     private OpenSearchException toOpenSearchException(ResponseException re) {

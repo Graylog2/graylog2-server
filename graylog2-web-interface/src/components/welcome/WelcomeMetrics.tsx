@@ -27,13 +27,19 @@ import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayout
 import SearchPage from 'views/pages/SearchPage';
 import Store from 'logic/local-storage/Store';
 import { durationInSeconds } from 'util/DateTime';
+import WidgetActionsContext from 'views/components/contexts/WidgetActionsContext';
+import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
 
 import useWelcomeMetricsSearch, { DEFAULT_TIME_RANGE_SECONDS } from './hooks/useWelcomeMetricsSearch';
-
+import replayLinkWidgetAction from './ReplayLinkWidgetAction';
 const NO_STREAM_ACCESS_DISMISSED_KEY = 'welcome-metrics-no-stream-access-dismissed';
+const WIDGET_ACTIONS = [replayLinkWidgetAction];
 
 const Container = styled.div`
   margin-bottom: 6.4px;
+  .${widgetActionsMenuClass} {
+    opacity: 1;
+  }
 `;
 
 const StyledAlert = styled(Alert)`
@@ -58,9 +64,11 @@ const MetricsSearchPage = ({ rangeSeconds }: { rangeSeconds: number }) => {
 
   return (
     <InteractiveContext.Provider value={false}>
-      <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
-        <SearchPage view={view} isNew={false} skipNoStreamsCheck />
-      </SearchPageLayoutProvider>
+      <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
+        <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
+          <SearchPage view={view} isNew={false} skipNoStreamsCheck />
+        </SearchPageLayoutProvider>
+      </WidgetActionsContext.Provider>
     </InteractiveContext.Provider>
   );
 };

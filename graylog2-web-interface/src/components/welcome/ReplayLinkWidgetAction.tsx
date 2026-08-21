@@ -15,30 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
-import styled from 'styled-components';
 
-import useElementDimensions from 'hooks/useElementDimensions';
+import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
+import type { WidgetActionType, WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
 
-const Wrapper = styled.div`
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  grid-row: 2;
-  grid-column: 1;
-`;
+const ReplayLinkWidgetActionComponent = ({ widget }: WidgetMenuActionComponentProps) => {
+  const href = widget.context;
 
-type Dimensions = { height: number; width: number };
+  if (!href) {
+    return null;
+  }
 
-type Props = {
-  children: (dimensions: Dimensions) => React.ReactElement;
+  return <ReplaySearchButtonComponent searchLink={href} />;
 };
 
-const FullSizeContainer = ({ children }: Props) => {
-  const element = useRef<HTMLDivElement>(null);
-  const { width, height } = useElementDimensions(element, 50);
-
-  return <Wrapper ref={element}>{children({ height, width })}</Wrapper>;
+const replayLinkWidgetAction: WidgetActionType = {
+  type: 'welcome-replay-link',
+  position: 'menu',
+  showInNonInteractiveMode: true,
+  component: ReplayLinkWidgetActionComponent,
 };
 
-export default FullSizeContainer;
+export default replayLinkWidgetAction;
