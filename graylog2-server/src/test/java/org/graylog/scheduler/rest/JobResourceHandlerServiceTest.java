@@ -31,6 +31,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,6 +59,15 @@ class JobResourceHandlerServiceTest {
         final var summary = service().jobSummaryFromTrigger(trigger(SystemJobDefinitionConfig.TYPE_NAME));
 
         assertThat(summary.info()).isEqualTo("job info");
+    }
+
+    @Test
+    void ignoresTheTriggerDataTypeForOtherJobs() {
+        // Only system jobs are looked up by their data type, so this trigger gets no details
+        final var summary = service().jobSummaryFromTrigger(trigger("another-job-v1"));
+
+        assertThat(summary.info()).isEqualTo(JobTriggerDetails.EMPTY_DETAILS.info());
+        verify(handler, never()).getTriggerDetails(any());
     }
 
     @Test

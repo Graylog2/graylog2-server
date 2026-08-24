@@ -17,6 +17,7 @@
 package org.graylog.scheduler.rest;
 
 import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.system.SystemJobDefinitionConfig;
 import org.graylog.security.UserContext;
 import org.graylog2.rest.models.system.SystemJobSummary;
 
@@ -118,6 +119,11 @@ public class JobResourceHandlerService {
         if (handler != null) {
             return handler;
         }
-        return trigger.data().map(data -> resourceHandlers.get(data.type())).orElse(null);
+
+        if (SystemJobDefinitionConfig.TYPE_NAME.equals(trigger.jobDefinitionType())) {
+            return trigger.data().map(data -> resourceHandlers.get(data.type())).orElse(null);
+        }
+
+        return null;
     }
 }

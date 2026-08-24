@@ -18,9 +18,6 @@ package org.graylog.scheduler.system;
 
 /**
  * The result of submitting a system job to the scheduler.
- * <p>
- * The ID is wrapped in a record so that later additions to the result don't change the signature of
- * {@link SystemJobManager#submit(SystemJobConfig)} and its siblings.
  *
  * @param id the ID of the submitted job. Pass it to {@link SystemJobManager#getRunningJob(String)} to read the
  *           state of the job while it runs.

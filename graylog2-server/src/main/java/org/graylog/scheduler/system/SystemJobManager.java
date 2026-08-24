@@ -16,7 +16,6 @@
  */
 package org.graylog.scheduler.system;
 
-import com.google.common.primitives.Ints;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -54,7 +53,7 @@ public class SystemJobManager {
     }
 
     public SystemJobSubmitResult submit(SystemJobConfig config) {
-        return submit(config, Set.of());
+        return submitWithConstraints(config, Set.of());
     }
 
     /**
@@ -64,17 +63,17 @@ public class SystemJobManager {
      * @param constraints the scheduler capabilities a node must provide to execute the job
      * @return the result of the submission
      */
-    public SystemJobSubmitResult submit(SystemJobConfig config, Set<String> constraints) {
-        return submit(config, Duration.ZERO, constraints);
+    public SystemJobSubmitResult submitWithConstraints(SystemJobConfig config, Set<String> constraints) {
+        return submitWithDelayAndConstraints(config, Duration.ZERO, constraints);
     }
 
     public SystemJobSubmitResult submitWithDelay(SystemJobConfig config, Duration delay) {
-        return submit(config, delay, Set.of());
+        return submitWithDelayAndConstraints(config, delay, Set.of());
     }
 
-    public SystemJobSubmitResult submit(SystemJobConfig config, Duration delay, Set<String> constraints) {
+    public SystemJobSubmitResult submitWithDelayAndConstraints(SystemJobConfig config, Duration delay, Set<String> constraints) {
         final var now = clock.nowUTC();
-        final var startTime = now.plusMillis(Ints.saturatedCast(delay.toMillis()));
+        final var startTime = now.plus(delay.toMillis());
         final var trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionType(SystemJobDefinitionConfig.TYPE_NAME)
                 .jobDefinitionId(config.type())
