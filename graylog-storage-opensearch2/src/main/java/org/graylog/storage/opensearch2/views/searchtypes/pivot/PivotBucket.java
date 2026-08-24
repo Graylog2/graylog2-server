@@ -24,25 +24,24 @@ import java.util.Map;
 /**
  * A bucket extracted from a search response, together with the grouping keys leading to it.
  *
+ * @param isOtherBucket whether this is the synthetic {@code (Other)} bucket. This is the bucket's identity;
+ *                      {@code derivedValues} is only its payload and must never be re-derived from it.
  * @param derivedValues for the synthetic {@code (Other)} bucket, the series values computed by
  *                      {@code OtherBucketDerivation}, keyed the way {@code PivotResultProcessor} assembles its
  *                      column keys. Empty for every ordinary bucket, whose values come from the series handlers.
  */
 public record PivotBucket(ImmutableList<String> keys,
                           MultiBucketsAggregation.Bucket bucket,
+                          boolean isOtherBucket,
                           Map<String, Object> derivedValues) {
 
     public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket) {
-        return new PivotBucket(keys, bucket, Map.of());
+        return new PivotBucket(keys, bucket, false, Map.of());
     }
 
     public static PivotBucket createOther(ImmutableList<String> keys,
                                           MultiBucketsAggregation.Bucket bucket,
                                           Map<String, Object> derivedValues) {
-        return new PivotBucket(keys, bucket, derivedValues);
-    }
-
-    public boolean isOtherBucket() {
-        return !derivedValues.isEmpty();
+        return new PivotBucket(keys, bucket, true, Map.copyOf(derivedValues));
     }
 }
