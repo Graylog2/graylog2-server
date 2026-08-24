@@ -125,6 +125,35 @@ describe('LogPreviewSection', () => {
     expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
 
+  it('renders a caption below the preview when one is given', () => {
+    render(
+      <LogPreviewSection
+        title="Log preview"
+        searchUrl="/search?q=x"
+        preview={preview}
+        isLoading={false}
+        error={null}
+        caption="Showing the newest messages from this collector"
+      />,
+    );
+
+    expect(screen.getByText('Showing the newest messages from this collector')).toBeInTheDocument();
+  });
+
+  it('renders no caption when none is given', () => {
+    render(
+      <LogPreviewSection
+        title="Log preview"
+        searchUrl="/search?q=x"
+        preview={preview}
+        isLoading={false}
+        error={null}
+      />,
+    );
+
+    expect(screen.queryByText(/showing the newest messages/i)).not.toBeInTheDocument();
+  });
+
   it('renders a message count in the header when collapsible', () => {
     render(
       <LogPreviewSection
