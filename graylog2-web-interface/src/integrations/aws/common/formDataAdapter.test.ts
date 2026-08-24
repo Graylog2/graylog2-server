@@ -36,6 +36,7 @@ describe('formDataAdapter', () => {
       aws_assume_role_arn: 'awsAssumeRoleARN',
       aws_external_id: 'awsExternalId',
       aws_flow_log_prefix: 'awsCloudWatchAddFlowLogPrefix',
+      store_full_message: 'awsCloudWatchStoreFullMessage',
       aws_message_type: 'awsCloudWatchKinesisInputType',
       aws_region: 'awsCloudWatchAwsRegion',
       aws_secret_key: awsSecretKey,

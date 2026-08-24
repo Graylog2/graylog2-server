@@ -46,6 +46,7 @@
         <opensearch.compat.version>2.19.5</opensearch.compat.version>
         <opensearch.compat.mac.jdk.version>21.0.7</opensearch.compat.mac.jdk.version>
         <opensearch.compat.mac.jdk.build>6</opensearch.compat.mac.jdk.build>
+        <lucene.compat.version>9.12.3-1</lucene.compat.version>
 
         <!-- SHA512 checksums for OpenSearch 2.x downloads -->
         <opensearch.compat.sha512.linux.x64>5594746235bc1321e8bfdccb23375c6b7f10b4cd5145bca6ff275abef4cc2a954b4381955f8dca66c0804446bbf58eaf812b2ac16e123d79f0bd6f4a976edfa6</opensearch.compat.sha512.linux.x64>
@@ -79,17 +80,6 @@
         -->
         <opensearch.log4j.bundled.version>2.25.3</opensearch.log4j.bundled.version>
         <opensearch.log4j.replacement.version>2.25.4</opensearch.log4j.replacement.version>
-
-        <!--
-            Skip flags for the OpenSearch bundle/plugin downloads (see the download-maven-plugin
-            executions and the opensearch-*-already-downloaded profiles below). They default to
-            "true" (skip); the profiles flip them to "false" (download) whenever a version-specific
-            artifact for the currently configured version is missing. Declaring them here (rather
-            than computing them in a plugin) keeps the download setup free of any early-phase goal
-            that would force test-scope dependency resolution, and lets IDEs resolve the properties.
-        -->
-        <opensearch.download.skip>true</opensearch.download.skip>
-        <opensearch.plugins.download.skip>true</opensearch.plugins.download.skip>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -284,6 +274,11 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-backward-codecs</artifactId>
             <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>lucene9</artifactId>
+            <version>${lucene.compat.version}</version>
         </dependency>
 
         <dependency>
@@ -577,7 +572,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.download.skip}</skip>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.compat.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.compat.version}/opensearch-${opensearch.compat.version}-linux-x64.tar.gz
                             </url>
@@ -600,7 +596,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.download.skip}</skip>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.compat.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.compat.version}/opensearch-${opensearch.compat.version}-linux-arm64.tar.gz
                             </url>
@@ -623,7 +620,6 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.compat.version}/repository-s3-${opensearch.compat.version}.zip
                             </url>
@@ -639,7 +635,6 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-gcs/${opensearch.compat.version}/repository-gcs-${opensearch.compat.version}.zip
                             </url>
@@ -655,7 +650,6 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-hdfs/${opensearch.compat.version}/repository-hdfs-${opensearch.compat.version}.zip
                             </url>
@@ -671,7 +665,6 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-azure/${opensearch.compat.version}/repository-azure-${opensearch.compat.version}.zip
                             </url>
@@ -688,7 +681,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.download.skip}</skip>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.latest.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.latest.version}/opensearch-${opensearch.latest.version}-linux-x64.tar.gz
                             </url>
@@ -711,7 +705,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.download.skip}</skip>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.latest.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.latest.version}/opensearch-${opensearch.latest.version}-linux-arm64.tar.gz
                             </url>
@@ -734,7 +729,6 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.latest.version}/repository-s3-${opensearch.latest.version}.zip
                             </url>
@@ -750,7 +744,6 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-gcs/${opensearch.latest.version}/repository-gcs-${opensearch.latest.version}.zip
                             </url>
@@ -766,7 +759,6 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-hdfs/${opensearch.latest.version}/repository-hdfs-${opensearch.latest.version}.zip
                             </url>
@@ -782,7 +774,6 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <skip>${opensearch.plugins.download.skip}</skip>
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-azure/${opensearch.latest.version}/repository-azure-${opensearch.latest.version}.zip
                             </url>
@@ -1058,6 +1049,27 @@
                             <propertyPrefix>maven</propertyPrefix>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>check-opensearch-unpack-state</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>bsh-property</goal>
+                        </goals>
+                        <configuration>
+                            <source><![CDATA[
+                                String dir = project.getBuild().getDirectory();
+                                String cv = project.getProperties().getProperty("opensearch.compat.version");
+                                String lv = project.getProperties().getProperty("opensearch.latest.version");
+                                boolean compat = new java.io.File(dir, "opensearch/opensearch-" + cv + "-linux-x64").isDirectory()
+                                              && new java.io.File(dir, "opensearch/opensearch-" + cv + "-linux-aarch64").isDirectory();
+                                boolean latest = new java.io.File(dir, "opensearch/opensearch-" + lv + "-linux-x64").isDirectory()
+                                              && new java.io.File(dir, "opensearch/opensearch-" + lv + "-linux-aarch64").isDirectory();
+                                project.getProperties().setProperty("opensearch.unpack.compat.skip", compat ? "true" : "false");
+                                project.getProperties().setProperty("opensearch.unpack.latest.skip", latest ? "true" : "false");
+                                log.info("OpenSearch unpack skip flags: compat=" + compat + " latest=" + latest);
+                            ]]></source>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -1099,165 +1111,6 @@
     </build>
 
     <profiles>
-        <!--
-            Conditional OpenSearch download.
-
-            opensearch(.plugins)?.download.skip default to "true" (see <properties>). Each profile
-            below activates when one version-specific artifact is MISSING and flips its group's flag
-            back to "false" so the whole group is (re-)downloaded. If every artifact for the
-            configured versions is already present, no profile activates and the group is skipped.
-
-            Because the artifact paths/filenames contain the version, bumping opensearch.*.version
-            leaves the new artifacts missing and re-triggers the download. Profile <file> activation
-            only interpolates ${basedir} (not ${project.build.directory}), and the build directory is
-            the default ${basedir}/target, so the paths below use ${basedir}/target/... to match the
-            download-maven-plugin output directories.
-        -->
-        <!-- OpenSearch bundles (unpacked into ${basedir}/target/opensearch/opensearch-<version>-<arch>) -->
-        <profile>
-            <id>download-opensearch-bundle-compat-x64</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch/opensearch-${opensearch.compat.version}-linux-x64</missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.download.skip>false</opensearch.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-bundle-compat-aarch64</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch/opensearch-${opensearch.compat.version}-linux-aarch64
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.download.skip>false</opensearch.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-bundle-latest-x64</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch/opensearch-${opensearch.latest.version}-linux-x64</missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.download.skip>false</opensearch.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-bundle-latest-aarch64</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch/opensearch-${opensearch.latest.version}-linux-aarch64
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.download.skip>false</opensearch.download.skip>
-            </properties>
-        </profile>
-        <!-- Repository plugin zips (${basedir}/target/opensearch-plugins/repository-<name>-<version>.zip) -->
-        <profile>
-            <id>download-opensearch-plugin-compat-s3</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch-plugins/repository-s3-${opensearch.compat.version}.zip
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.plugins.download.skip>false</opensearch.plugins.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-plugin-compat-gcs</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch-plugins/repository-gcs-${opensearch.compat.version}.zip
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.plugins.download.skip>false</opensearch.plugins.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-plugin-compat-hdfs</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch-plugins/repository-hdfs-${opensearch.compat.version}.zip
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.plugins.download.skip>false</opensearch.plugins.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-plugin-compat-azure</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch-plugins/repository-azure-${opensearch.compat.version}.zip
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.plugins.download.skip>false</opensearch.plugins.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-plugin-latest-s3</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch-plugins/repository-s3-${opensearch.latest.version}.zip
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.plugins.download.skip>false</opensearch.plugins.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-plugin-latest-gcs</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch-plugins/repository-gcs-${opensearch.latest.version}.zip
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.plugins.download.skip>false</opensearch.plugins.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-plugin-latest-hdfs</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch-plugins/repository-hdfs-${opensearch.latest.version}.zip
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.plugins.download.skip>false</opensearch.plugins.download.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>download-opensearch-plugin-latest-azure</id>
-            <activation>
-                <file>
-                    <missing>${basedir}/target/opensearch-plugins/repository-azure-${opensearch.latest.version}.zip
-                    </missing>
-                </file>
-            </activation>
-            <properties>
-                <opensearch.plugins.download.skip>false</opensearch.plugins.download.skip>
-            </properties>
-        </profile>
-
         <profile>
             <id>release</id>
             <build>

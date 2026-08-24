@@ -17,9 +17,12 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.Document;
+import org.bson.codecs.Codec;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
@@ -29,17 +32,23 @@ import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
+import org.mongojack.JacksonCodecRegistry;
 
 @Singleton
 public class MongoCollections {
 
     private final ObjectMapper objectMapper;
     private final MongoConnection mongoConnection;
+    private final Supplier<JacksonCodecRegistry> codecRegistrySupplier;
 
     @Inject
     public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
+        this.codecRegistrySupplier = Suppliers.memoize(() -> new CustomJacksonCodecRegistry(
+                objectMapper,
+                mongoConnection.getMongoDatabase().getCodecRegistry()
+        ));
     }
 
     /**
@@ -65,6 +74,17 @@ public class MongoCollections {
      */
     public <T extends MongoEntity> MongoCollection<T> collection(String collectionName, Class<T> valueType) {
         return getCollection(collectionName, valueType);
+    }
+
+    /**
+     * Returns a Jackson-backed MongoDB codec without binding the value type to a collection.
+     *
+     * @param valueType Java type to encode and decode
+     * @return a codec using the same MongoJack object mapper as managed collections
+     */
+    public <T> Codec<T> getCodecFor(Class<T> valueType) {
+        // Use the codec registry supplier to avoid creating a new registry per call.
+        return codecRegistrySupplier.get().addCodecForClass(valueType);
     }
 
     /**
@@ -120,6 +140,7 @@ public class MongoCollections {
 
     /**
      * Provides access to the underlying MongoConnection for custom aggregation code or tests.
+     *
      * @return the underlying MongoConnection
      */
     public MongoConnection connection() {

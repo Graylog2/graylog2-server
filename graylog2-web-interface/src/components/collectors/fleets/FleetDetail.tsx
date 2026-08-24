@@ -21,8 +21,8 @@ import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
-import { ConfirmDialog, Link, LinkContainer, Spinner } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import { ConfirmDialog, IconButton, Link, LinkContainer, Spinner } from 'components/common';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
@@ -30,6 +30,7 @@ import useQuery from 'routing/useQuery';
 import Routes from 'routing/Routes';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import StatCard from 'components/common/StatCard/StatCard';
 
 import FleetSettings from './FleetSettings';
 
@@ -47,7 +48,6 @@ import {
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_FLEET_ID_FIELD, COLLECTOR_SOURCE_ID_FIELD } from '../common/fields';
-import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
 import InstanceActions from '../instances/InstanceActions';
@@ -70,6 +70,10 @@ const Header = styled.div(
     align-items: center;
   `,
 );
+
+const HeaderActions = styled.div`
+  margin-left: auto;
+`;
 
 const ActionsRow = styled.div(
   ({ theme }) => css`
@@ -107,7 +111,7 @@ export const sourceActionsFactory =
   (source: Source) => (
     <ButtonToolbar>
       <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_SOURCE_ID_FIELD, source.id)}>
-        <Button bsSize="xsmall">Received messages</Button>
+        <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
       </LinkContainer>
       <Button bsSize="xsmall" onClick={() => onEdit(source)}>
         Edit
@@ -227,6 +231,9 @@ const FleetDetail = ({ fleetId }: Props) => {
     return <div>Fleet not found</div>;
   }
 
+  // Deep link into the deployment wizard with this fleet preselected.
+  const deployCollectorUrl = new URI(Routes.SYSTEM.COLLECTORS.DEPLOYMENT).addSearch('fleet', fleet.id).resource();
+
   const handleSaveSource = async (source: Omit<Source, 'id'>) => {
     if (editingSource) {
       await updateSource({ fleetId, sourceId: editingSource.id, updates: source as Omit<Source, 'id' | 'fleet_id'> });
@@ -239,8 +246,13 @@ const FleetDetail = ({ fleetId }: Props) => {
     <div>
       <Header>
         <h2>
-          {fleet.name} <BetaBadge />
+          {fleet.name} <PreviewBadge />
         </h2>
+        <HeaderActions>
+          <LinkContainer to={deployCollectorUrl}>
+            <Button bsStyle="primary">Deploy a new Collector</Button>
+          </LinkContainer>
+        </HeaderActions>
       </Header>
 
       <StatsRow>

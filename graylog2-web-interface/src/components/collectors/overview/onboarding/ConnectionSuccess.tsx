@@ -15,201 +15,154 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
+import { Grid } from '@mantine/core';
+import moment from 'moment/moment';
 
-import { Alert, Label } from 'components/bootstrap';
-import { AccessibleCard } from 'components/common';
-import useHistory from 'routing/useHistory';
+import { Button } from 'components/bootstrap';
+import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
+import { useCollectorLogPreview, PREVIEW_RANGE_SECONDS } from 'components/collectors/hooks/useCollectorLogPreview';
+import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
 
-import type { PlatformId } from './platforms';
-import PLATFORMS from './platforms';
-import useCollectorLogPreview from './useCollectorLogPreview';
 import LogPreviewSection from './LogPreviewSection';
+import OnboardingTimeline from './OnboardingTimeline';
+import NextSteps from './NextSteps';
+import CollectorFactsSection from './CollectorFactsSection';
+import SourceStatusSection from './SourceStatusSection';
 
-import StatCard from '../../common/StatCard';
+import InstanceStatusLabel from '../../common/InstanceStatusLabel';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
 
 type Props = {
-  platformId?: PlatformId;
   instance: CollectorInstanceView;
   fleetName: string | undefined;
 };
 
-// Asset auto-detection has no backend yet — intentionally stays mocked until that feature ships.
-const MOCK_ASSETS = [
-  { type: 'host', name: 'example-host' },
-  { type: 'user', name: 'root' },
-];
-
-const SummaryRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.sm};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const StatsRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const SectionTitle = styled.h3(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.h3};
-    margin: 0 0 ${theme.spacings.sm} 0;
-  `,
-);
-
-const AssetsGrid = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const AssetCard = styled(AccessibleCard)(
-  ({ theme }) => css`
-    min-width: 150px;
-    padding: ${theme.spacings.md};
-  `,
-);
-
-const AssetType = styled.div(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
-    text-transform: uppercase;
-    margin-bottom: ${theme.spacings.xxs};
-  `,
-);
-
-const AssetName = styled.div`
-  font-weight: 500;
+const Title = styled.h2`
+  margin: 0;
 `;
 
-const NextGrid = styled.div(
+const Subtitle = styled.div(
   ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
+    margin-top: ${theme.spacings.xxs};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
-const NextCard = styled(AccessibleCard)(
-  ({ theme }) => css`
-    flex: 1;
-    min-width: 180px;
-    padding: ${theme.spacings.md};
+// The timeline and next-steps rails keep a readable width; the detail column takes what is left.
+const ColContainer = styled.div`
+  min-width: 350px;
+`;
 
-    h4 {
-      margin: 0 0 ${theme.spacings.xxs} 0;
-      font-size: ${theme.fonts.size.large};
-    }
-
-    p {
-      margin: 0;
-      font-size: ${theme.fonts.size.small};
-      color: ${theme.colors.gray[60]};
-    }
-  `,
-);
-
-const LogPreviewsWrapper = styled.div(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const ConnectionSuccess = ({ platformId = undefined, instance, fleetName }: Props) => {
-  const history = useHistory();
-  const platform = PLATFORMS.find((p) => p.id === platformId);
-  const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
+const ConnectionSuccess = ({ instance, fleetName }: Props) => {
+  const { selfLogs, sourceLogs, sourceCounts, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
     instance.instance_uid,
   );
   const { data: sources } = useSources(instance.fleet_id);
+  const queryClient = useQueryClient();
+
+  const online = instance.status === 'online';
+  const receiving = (sourceLogs?.total ?? 0) > 0;
+  const sourceLogsUrl = collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid);
+
+  const subtitle = () => {
+    if (!online)
+      return (
+        <>
+          The collector connected once but hasn&apos;t reported in since <RelativeTime dateTime={instance.last_seen} />.
+        </>
+      );
+    if (receiving) return <>The collector is connected and delivering messages.</>;
+
+    return <>Almost there &mdash; the collector is connected and we&apos;re listening for its first messages.</>;
+  };
 
   return (
-    <div>
-      <Alert bsStyle="success">
-        Collector connected &mdash; <strong>{instance.hostname ?? instance.instance_uid}</strong>
-        {instance.version && (
-          <>
-            {' '}
-            running <strong>v{instance.version}</strong>
-          </>
+    <Stack gap="lg">
+      <Group justify="space-between" align="flex-start">
+        <div>
+          <Group gap="sm">
+            <Title>Setting Up {instance.hostname ?? instance.instance_uid}</Title>
+            {!online && <InstanceStatusLabel status={instance.status} />}
+          </Group>
+          <Subtitle>{subtitle()}</Subtitle>
+        </div>
+        {online ? (
+          <LinkContainer to={sourceLogsUrl}>
+            <Button bsStyle="success">Open in search</Button>
+          </LinkContainer>
+        ) : (
+          <Group gap="xs">
+            <LinkContainer to={Routes.SYSTEM.COLLECTORS.INSTANCES}>
+              <Button>View instances</Button>
+            </LinkContainer>
+            <Button
+              bsStyle="info"
+              onClick={() => queryClient.invalidateQueries({ queryKey: instanceKeyFn(instance.instance_uid) })}>
+              Check again
+            </Button>
+          </Group>
         )}
-      </Alert>
+      </Group>
 
-      <SummaryRow>
-        {fleetName && <Label>{fleetName}</Label>}
-        {platform && <Label>{platform.label}</Label>}
-        <Label>{sources?.length ?? 0} sources</Label>
-      </SummaryRow>
+      <Grid gutter="xl">
+        <Grid.Col span="content">
+          <ColContainer>
+            <OnboardingTimeline
+              instance={instance}
+              fleetName={fleetName}
+              sourceCount={sources?.length ?? 0}
+              receivedTotal={sourceLogs?.total}
+            />
+          </ColContainer>
+        </Grid.Col>
 
-      <StatsRow>
-        <StatCard value={instance.status === 'online' ? 1 : 0} label="Online" variant="success" />
-        <StatCard value={sourceLogs?.total ?? 0} label="Messages (15 min)" />
-        <StatCard value={sources?.length ?? 0} label="Sources" />
-      </StatsRow>
+        <Grid.Col span="auto">
+          <Stack gap="md">
+            <CollectorFactsSection instance={instance} fleetName={fleetName} />
+            <SourceStatusSection
+              instance={instance}
+              sources={sources}
+              receiving={receiving}
+              sourceCounts={sourceCounts}
+            />
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span="content">
+          <ColContainer>
+            <NextSteps instance={instance} />
+          </ColContainer>
+        </Grid.Col>
+      </Grid>
 
-      <LogPreviewsWrapper>
+      {/* While healthy the preview tails what the collector delivers; once it drops offline the
+          collector's own logs usually hold the reason, so they take over. */}
+      {online ? (
         <LogPreviewSection
-          title="Your log sources"
-          searchUrl={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}
+          title="Log Preview"
+          searchUrl={sourceLogsUrl}
           preview={sourceLogs}
           isLoading={isLoading}
           error={sourceLogsError}
+          caption={`Showing messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
         />
-
+      ) : (
         <LogPreviewSection
-          title="Collector logs"
+          title="Log Preview"
           searchUrl={collectorSystemLogsUrl(instance.instance_uid)}
           preview={selfLogs}
           isLoading={isLoading}
           error={selfLogsError}
-          collapsible
+          caption={`Showing Collector system messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
         />
-      </LogPreviewsWrapper>
-
-      <SectionTitle>Auto-detected assets</SectionTitle>
-      <AssetsGrid>
-        {MOCK_ASSETS.map((asset) => (
-          <AssetCard key={`${asset.type}-${asset.name}`}>
-            <AssetType>{asset.type}</AssetType>
-            <AssetName>{asset.name}</AssetName>
-          </AssetCard>
-        ))}
-      </AssetsGrid>
-
-      <SectionTitle>What&apos;s next?</SectionTitle>
-      <NextGrid>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
-          <h4>Manage Fleets</h4>
-          <p>Group collectors by environment or team.</p>
-        </NextCard>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id))}>
-          <h4>Configure Sources</h4>
-          <p>Add file paths, journald, or Windows Event Log sources.</p>
-        </NextCard>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}>
-          <h4>View Instances</h4>
-          <p>Monitor all connected collector instances.</p>
-        </NextCard>
-      </NextGrid>
-    </div>
+      )}
+    </Stack>
   );
 };
 

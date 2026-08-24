@@ -20,9 +20,9 @@ import styled, { css } from 'styled-components';
 import { Alert, Label } from 'components/bootstrap';
 import { Link, Section, Spinner, Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
+import type { LogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
 
 import PulsingDot from './PulsingDot';
-import type { LogPreview } from './useCollectorLogPreview';
 
 type Props = {
   title: string;
@@ -31,6 +31,8 @@ type Props = {
   isLoading: boolean;
   error: Error | null;
   collapsible?: boolean;
+  /** Explains what the preview is showing (and when it refreshes), rendered below the messages. */
+  caption?: React.ReactNode;
 };
 
 const MessageRow = styled.div(
@@ -46,7 +48,7 @@ const MessageRow = styled.div(
 
 const RowTimestamp = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     margin-right: ${theme.spacings.sm};
   `,
 );
@@ -56,8 +58,16 @@ const EmptyState = styled.div(
     display: flex;
     align-items: center;
     gap: ${theme.spacings.sm};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     padding: ${theme.spacings.sm} 0;
+  `,
+);
+
+const Caption = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.sm};
+    font-size: ${theme.fonts.size.small};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -100,7 +110,15 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
   );
 };
 
-const LogPreviewSection = ({ title, searchUrl, preview, isLoading, error, collapsible = false }: Props) => (
+const LogPreviewSection = ({
+  title,
+  searchUrl,
+  preview,
+  isLoading,
+  error,
+  collapsible = false,
+  caption = undefined,
+}: Props) => (
   <Section
     title={title}
     collapsible={collapsible}
@@ -108,6 +126,7 @@ const LogPreviewSection = ({ title, searchUrl, preview, isLoading, error, collap
     headerLeftSection={collapsible ? <Label bsStyle="default">{preview ? preview.total : '—'}</Label> : undefined}
     actions={<Link to={searchUrl}>Open in search</Link>}>
     <PreviewBody preview={preview} isLoading={isLoading} error={error} />
+    {caption && <Caption>{caption}</Caption>}
   </Section>
 );
 

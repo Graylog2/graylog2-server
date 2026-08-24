@@ -32,8 +32,10 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.security.UserContext;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -152,6 +155,33 @@ public class EventDefinitionsResourceTest {
         resource.suggestTags("", 99999);
 
         verify(dbService).suggestTags(eq(""), eq(100));
+    }
+
+    @Test
+    public void duplicateWithoutReadPermissionOnDefinitionIsForbidden() {
+        final String definitionId = "54e3deadbeefdeadbeefaffe";
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ + ":" + definitionId)).thenReturn(false);
+
+        assertThrows(ForbiddenException.class, () -> resource.duplicate(definitionId, mock(UserContext.class)));
+
+        // The definition must not even be loaded when the caller lacks read access to it.
+        verify(dbService, never()).get(any());
+        verify(eventDefinitionHandler, never()).duplicate(any(), any());
+    }
+
+    @Test
+    public void duplicateWithReadPermissionOnDefinitionSucceeds() {
+        final String definitionId = "54e3deadbeefdeadbeefaffe";
+        final EventDefinitionDto dto = eventDefinitionDto(config1);
+        final User user = mock(User.class);
+        final UserContext userContext = mock(UserContext.class);
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ + ":" + definitionId)).thenReturn(true);
+        when(dbService.get(definitionId)).thenReturn(Optional.of(dto));
+        when(userContext.getUser()).thenReturn(user);
+
+        resource.duplicate(definitionId, userContext);
+
+        verify(eventDefinitionHandler).duplicate(dto, user);
     }
 
     @Test

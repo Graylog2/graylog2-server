@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {render, screen} from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
 import type {

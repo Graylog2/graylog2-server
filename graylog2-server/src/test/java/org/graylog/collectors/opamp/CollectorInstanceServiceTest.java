@@ -16,7 +16,9 @@
  */
 package org.graylog.collectors.opamp;
 
+import com.google.common.eventbus.Subscribe;
 import com.mongodb.client.model.Filters;
+import jakarta.annotation.Nullable;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -26,12 +28,15 @@ import org.graylog.collectors.PendingChangesLookup;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.collectors.db.ComponentHealthDTO;
+import org.graylog.collectors.events.CollectorInstanceCertsChangedEvent;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +48,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,6 +71,7 @@ class CollectorInstanceServiceTest {
     private CollectorInstanceService collectorInstanceService;
     private MongoCollections mongoCollections;
     private MutableClock clock;
+    private List<CollectorInstanceCertsChangedEvent> capturedEvents;
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -77,7 +84,23 @@ class CollectorInstanceServiceTest {
     void setUp(MongoCollections coll) {
         mongoCollections = coll;
         clock = TestClocks.mutableFixedEpoch();
-        collectorInstanceService = new CollectorInstanceService(coll, clock);
+        capturedEvents = new ArrayList<>();
+
+        // directExecutor() makes posts synchronous, so events are captured inline.
+        final var clusterEventBus = new ClusterEventBus();
+        clusterEventBus.registerClusterEventSubscriber(new Object() {
+            @Subscribe
+            public void on(CollectorInstanceCertsChangedEvent event) {
+                capturedEvents.add(event);
+            }
+        });
+
+        collectorInstanceService = new CollectorInstanceService(coll, clusterEventBus, clock);
+    }
+
+    private CollectorInstanceCertsChangedEvent lastEvent() {
+        assertThat(capturedEvents).isNotEmpty();
+        return capturedEvents.get(capturedEvents.size() - 1);
     }
 
     @Test
@@ -305,7 +328,7 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert("uid-re", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), original.activeCertificateFingerprint(), newIssued, "new-token-id");
+        final var updated = collectorInstanceService.reEnroll(original, newIssued, "new-token-id");
 
         assertThat(updated.activeCertificateFingerprint()).isEqualTo(newIssued.fingerprint());
         assertThat(updated.activeCertificatePem()).isEqualTo(newIssued.certPem());
@@ -324,7 +347,7 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert("uid-preserve", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), original.activeCertificateFingerprint(), newIssued, "new-token-id");
+        final var updated = collectorInstanceService.reEnroll(original, newIssued, "new-token-id");
 
         assertThat(updated.instanceUid()).isEqualTo(original.instanceUid());
         assertThat(updated.enrolledAt()).isEqualTo(enrollTime);
@@ -342,7 +365,8 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert("uid-pending-renewal", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        final var updated = collectorInstanceService.reEnroll(original.id(), original.activeCertificateFingerprint(), newIssued, "token-x");
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-pending-renewal").orElseThrow();
+        final var updated = collectorInstanceService.reEnroll(withNext, newIssued, "token-x");
 
         assertThat(updated.nextCertificateFingerprint()).isEmpty();
         assertThat(updated.nextCertificatePem()).isEmpty();
@@ -366,7 +390,7 @@ class CollectorInstanceServiceTest {
         clock.setInstant(reEnrollTime);
         final var newCert = certBuilder.createEndEntityCert("uid-roundtrip", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
-        collectorInstanceService.reEnroll(enrolled.id(), enrolled.activeCertificateFingerprint(), newIssued, "token-2");
+        collectorInstanceService.reEnroll(enrolled, newIssued, "token-2");
 
         // Fresh read after re-enroll — exercises the post-update deserialize path.
         final var afterReEnroll = collectorInstanceService.findByInstanceUid("uid-roundtrip").orElseThrow();
@@ -387,10 +411,108 @@ class CollectorInstanceServiceTest {
         final var newCert = certBuilder.createEndEntityCert(uid, issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
 
-        collectorInstanceService.reEnroll(original.id(), original.activeCertificateFingerprint(), newIssued, "token-x");
+        collectorInstanceService.reEnroll(original, newIssued, "token-x");
 
         assertFieldIsDate(uid, CollectorInstanceDTO.FIELD_LAST_SEEN);
         assertFieldIsDate(uid, CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_EXPIRES_AT);
+    }
+
+    @Test
+    void enrollDoesNotPersistNextCertificateFingerprintAsNull() throws Exception {
+        // The partial index on next_certificate_fingerprint filters on {$exists: true}, which in MongoDB
+        // also matches a field present with an explicit null. Persisting the field as null (instead of
+        // omitting it) would pull every non-renewing instance into the index, defeating its purpose. A
+        // freshly enrolled instance has no next certificate, so the field must be absent from the document.
+        enroll("uid-no-next-field");
+
+        final var doc = findRawDocument("uid-no-next-field").orElseThrow();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT)).isFalse();
+    }
+
+    @Test
+    void enrollDoesNotPersistPreviousCertificateFieldsAsNull() throws Exception {
+        // A freshly enrolled instance has never rotated, so none of the previous-certificate fields nor
+        // certificates_rotated_at exist yet. They must be ABSENT, not present-with-null: the partial index
+        // on previous_certificate_fingerprint is UNIQUE, and {$exists: true} matches an explicit null, so a
+        // second instance persisting a null previous fingerprint would collide and fail the write.
+        enroll("uid-no-previous-fields");
+
+        final var doc = findRawDocument("uid-no-previous-fields").orElseThrow();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT)).isFalse();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_PEM)).isFalse();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT)).isFalse();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT)).isFalse();
+    }
+
+    @Test
+    void enrollingMultipleInstancesWithoutPreviousDoesNotCollideOnUniqueIndex() throws Exception {
+        // Guards the unique partial index on previous_certificate_fingerprint: instances that have never
+        // rotated omit the field entirely, so the partial {$exists: true} filter excludes them and many
+        // such instances can coexist. If any write path ever wrote an explicit null instead, the second
+        // enroll here would fail with a duplicate-key error.
+        final var first = enroll("uid-no-previous-1");
+        final var second = enroll("uid-no-previous-2");
+
+        assertThat(first.id()).isNotNull();
+        assertThat(second.id()).isNotNull();
+        assertThat(collectorInstanceService.findByInstanceUid("uid-no-previous-1")).isPresent();
+        assertThat(collectorInstanceService.findByInstanceUid("uid-no-previous-2")).isPresent();
+    }
+
+    @Test
+    void constructionClearsLegacyNullNextCertificateValuesSoTheUniqueIndexCanBuild() throws Exception {
+        // Released versions persisted next_certificate_fingerprint as an explicit null (the field predates
+        // @JsonInclude(NON_ABSENT)). Reproduce that pre-migration state: drop the unique next index so
+        // multiple null documents can be seeded (the live unique index would reject the second null), then
+        // seed several. On construction the service must clear the nulls and successfully (re)build the index.
+        final var raw = mongoCollections.nonEntityCollection(CollectorInstanceService.COLLECTION_NAME, Document.class);
+        raw.dropIndex("next_certificate_fingerprint_1");
+        for (int i = 0; i < 3; i++) {
+            enroll("uid-legacy-null-" + i);
+            raw.updateOne(Filters.eq(CollectorInstanceDTO.FIELD_INSTANCE_UID, "uid-legacy-null-" + i),
+                    new Document("$set", new Document()
+                            .append(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT, null)
+                            .append(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_PEM, null)
+                            .append(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT, null)));
+        }
+
+        // Constructing the service runs the cleanup, then rebuilds the indexes over the now-clean data.
+        new CollectorInstanceService(mongoCollections, new ClusterEventBus(), clock);
+
+        for (int i = 0; i < 3; i++) {
+            final var doc = findRawDocument("uid-legacy-null-" + i).orElseThrow();
+            assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT)).isFalse();
+            assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_PEM)).isFalse();
+            assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_EXPIRES_AT)).isFalse();
+        }
+
+        // The unique next index must exist again — if the cleanup had failed, createIndexes would have
+        // collided on the nulls (swallowed by its catch) and the index would be missing.
+        boolean uniqueNextIndexPresent = false;
+        for (Document index : raw.listIndexes()) {
+            final Document key = index.get("key", Document.class);
+            if (key != null && key.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT)
+                    && index.getBoolean("unique", false)) {
+                uniqueNextIndexPresent = true;
+                break;
+            }
+        }
+        assertThat(uniqueNextIndexPresent).isTrue();
+    }
+
+    @Test
+    void activateNextCertificateRemovesNextCertificateFingerprintField() throws Exception {
+        // Activation promotes next -> active and must remove the next fingerprint field entirely (not set
+        // it to null), so the instance drops back out of the partial index once it is no longer mid-renewal.
+        enroll("uid-activate-clears-next");
+        collectorInstanceService.insertNextCertificate("uid-activate-clears-next", "sha256:next-fp", "next-pem",
+                Instant.ofEpochMilli(0).plus(Duration.ofDays(2)));
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-activate-clears-next").orElseThrow();
+
+        collectorInstanceService.activateNextCertificate(withNext);
+
+        final var doc = findRawDocument("uid-activate-clears-next").orElseThrow();
+        assertThat(doc.containsKey(CollectorInstanceDTO.FIELD_NEXT_CERTIFICATE_FINGERPRINT)).isFalse();
     }
 
     @Test
@@ -398,7 +520,10 @@ class CollectorInstanceServiceTest {
         final var cert = certBuilder.createEndEntityCert("ghost", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
         final var issued = new IssuedCertificate(cert.fingerprint(), cert.certificate(), cert.notAfter(), issuerCert.id());
 
-        assertThatThrownBy(() -> collectorInstanceService.reEnroll("507f1f77bcf86cd799439999", "sha256:whatever", issued, "token"))
+        // An instance whose id matches no stored record.
+        final var ghost = enroll("ghost").toBuilder().id("507f1f77bcf86cd799439999").build();
+
+        assertThatThrownBy(() -> collectorInstanceService.reEnroll(ghost, issued, "token"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("doesn't exist");
     }
@@ -412,7 +537,8 @@ class CollectorInstanceServiceTest {
 
         // Stale fingerprint: simulates the active cert being swapped (e.g. by a concurrent renewal
         // activation) between the caller's read and the update.
-        assertThatThrownBy(() -> collectorInstanceService.reEnroll(original.id(), "sha256:stale-fingerprint", newIssued, "token"))
+        final var stale = original.toBuilder().activeCertificateFingerprint("sha256:stale-fingerprint").build();
+        assertThatThrownBy(() -> collectorInstanceService.reEnroll(stale, newIssued, "token"))
                 .isInstanceOf(IllegalStateException.class);
 
         // The record must be untouched — same cert, token, and next_* state as before.
@@ -488,6 +614,46 @@ class CollectorInstanceServiceTest {
     }
 
     @Test
+    void activateNextCertificateIsNoOpWhenSlotsChangedConcurrently() throws Exception {
+        final var enrolled = enroll("uid-cas");
+        setNextCertificateFields("uid-cas", "sha256:cas-next", "next-pem", clock.instant().plus(Duration.ofDays(30)));
+        final var stale = collectorInstanceService.findByInstanceUid("uid-cas").orElseThrow();
+        // A concurrent renewal stages a different next certificate after our read: the activation must
+        // not promote the outdated one it read.
+        setNextCertificateFields("uid-cas", "sha256:cas-next-2", "next-pem-2", clock.instant().plus(Duration.ofDays(60)));
+        capturedEvents.clear();
+
+        assertThat(collectorInstanceService.activateNextCertificate(stale)).isFalse();
+
+        // The concurrently written state stays intact: no promotion, no rotation stamp, no event.
+        final var current = collectorInstanceService.findByInstanceUid("uid-cas").orElseThrow();
+        assertThat(current.activeCertificateFingerprint()).isEqualTo(enrolled.activeCertificateFingerprint());
+        assertThat(current.nextCertificateFingerprint()).contains("sha256:cas-next-2");
+        assertThat(current.previousCertificateFingerprint()).isEmpty();
+        assertThat(current.certificatesRotatedAt()).isEmpty();
+        assertThat(capturedEvents).isEmpty();
+    }
+
+    @Test
+    void activateNextCertificateRepeatedActivationWithStaleStateIsNoOp() throws Exception {
+        enroll("uid-cas-double");
+        setNextCertificateFields("uid-cas-double", "sha256:cas-d-next", "next-pem", clock.instant().plus(Duration.ofDays(30)));
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-cas-double").orElseThrow();
+        assertThat(collectorInstanceService.activateNextCertificate(withNext)).isTrue();
+        final var rotatedAt = collectorInstanceService.findByInstanceUid("uid-cas-double").orElseThrow()
+                .certificatesRotatedAt().orElseThrow();
+
+        // A second activation with the same stale DTO (e.g. two concurrent requests both presenting the
+        // next thumbprint) must be a no-op — re-stamping certificates_rotated_at would silently extend
+        // the rotation grace window.
+        clock.add(Duration.ofMinutes(1));
+        assertThat(collectorInstanceService.activateNextCertificate(withNext)).isFalse();
+
+        assertThat(collectorInstanceService.findByInstanceUid("uid-cas-double").orElseThrow()
+                .certificatesRotatedAt()).contains(rotatedAt);
+    }
+
+    @Test
     void insertNextCertificateSetsNextFields() throws Exception {
         final var instance = enroll("uid-insert-next");
         final var nextDuration = Duration.ofDays(30);
@@ -537,6 +703,150 @@ class CollectorInstanceServiceTest {
         assertThat(updated.nextCertificateFingerprint()).hasValue("sha256:second-next-fp");
         assertThat(updated.nextCertificatePem()).hasValue("second-pem");
         assertThat(updated.nextCertificateExpiresAt()).hasValue(Date.from(secondExpiresAt).toInstant());
+    }
+
+    // ----- CollectorInstanceCertsChangedEvent publishing -----
+
+    @Test
+    void enrollPublishesActiveFingerprint() throws Exception {
+        final var instance = enroll("uid-evt-enroll");
+
+        assertThat(lastEvent().fingerprints()).containsExactly(instance.activeCertificateFingerprint());
+    }
+
+    @Test
+    void insertNextCertificatePublishesActiveAndNextFingerprints() throws Exception {
+        final var enrolled = enroll("uid-evt-next");
+        capturedEvents.clear();
+
+        collectorInstanceService.insertNextCertificate("uid-evt-next", "sha256:next-fp", "pem",
+                Instant.now().plus(Duration.ofDays(30)));
+
+        assertThat(lastEvent().fingerprints())
+                .containsExactlyInAnyOrder(enrolled.activeCertificateFingerprint(), "sha256:next-fp");
+    }
+
+    @Test
+    void insertNextCertificatePublishesReplacedAndNewNextFingerprints() throws Exception {
+        final var enrolled = enroll("uid-evt-next-replace");
+        collectorInstanceService.insertNextCertificate("uid-evt-next-replace", "sha256:first-next", "pem1",
+                Instant.now().plus(Duration.ofDays(10)));
+        capturedEvents.clear();
+
+        collectorInstanceService.insertNextCertificate("uid-evt-next-replace", "sha256:second-next", "pem2",
+                Instant.now().plus(Duration.ofDays(20)));
+
+        assertThat(lastEvent().fingerprints()).containsExactlyInAnyOrder(
+                enrolled.activeCertificateFingerprint(), "sha256:first-next", "sha256:second-next");
+    }
+
+    @Test
+    void activateNextCertificatePublishesRotatedFingerprints() throws Exception {
+        final var enrolled = enroll("uid-evt-activate");
+        setNextCertificateFields("uid-evt-activate", "sha256:new-active", "new-pem",
+                Instant.now().plus(Duration.ofDays(30)));
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-evt-activate").orElseThrow();
+        capturedEvents.clear();
+
+        collectorInstanceService.activateNextCertificate(withNext);
+
+        // Both rotated fingerprints (demoted old active + promoted next) are touched and re-resolved.
+        assertThat(lastEvent().fingerprints())
+                .containsExactlyInAnyOrder(enrolled.activeCertificateFingerprint(), "sha256:new-active");
+    }
+
+    @Test
+    void activateNextCertificateDemotesActiveToPreviousAndStampsRotationTimestamp() throws Exception {
+        final var enrolled = enroll("uid-rotate-fields");
+        setNextCertificateFields("uid-rotate-fields", "sha256:new-active", "new-pem",
+                Instant.now().plus(Duration.ofDays(30)));
+        final var withNext = collectorInstanceService.findByInstanceUid("uid-rotate-fields").orElseThrow();
+
+        collectorInstanceService.activateNextCertificate(withNext);
+
+        // The old active cert is demoted into the previous slot, and the rotation is timestamped so the
+        // ingest grace window can be measured from it. Temporal fields must be stored as BSON dates.
+        final var doc = findRawDocument("uid-rotate-fields").orElseThrow();
+        assertThat(doc.getString(CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_FINGERPRINT))
+                .isEqualTo(enrolled.activeCertificateFingerprint());
+        assertFieldIsDate("uid-rotate-fields", CollectorInstanceDTO.FIELD_PREVIOUS_CERTIFICATE_EXPIRES_AT);
+        assertFieldIsDate("uid-rotate-fields", CollectorInstanceDTO.FIELD_CERTIFICATES_ROTATED_AT);
+    }
+
+    @Test
+    void reEnrollPublishesOldAndNewActiveFingerprints() throws Exception {
+        final var original = enroll("uid-evt-reenroll");
+        final var newCert = certBuilder.createEndEntityCert("uid-evt-reenroll", issuerCert, KeyUsage.digitalSignature, Duration.ofDays(1));
+        final var newIssued = new IssuedCertificate(newCert.fingerprint(), newCert.certificate(), newCert.notAfter(), issuerCert.id());
+        capturedEvents.clear();
+
+        collectorInstanceService.reEnroll(original, newIssued, "token-evt");
+
+        assertThat(lastEvent().fingerprints())
+                .containsExactlyInAnyOrder(original.activeCertificateFingerprint(), newIssued.fingerprint());
+    }
+
+    @Test
+    void deleteByInstanceUidPublishesAllCertFingerprints() throws Exception {
+        final var instance = enroll("uid-evt-delete");
+        setNextCertificateFields("uid-evt-delete", "sha256:pending", "pending-pem",
+                Instant.now().plus(Duration.ofDays(30)));
+        capturedEvents.clear();
+
+        collectorInstanceService.deleteByInstanceUid("uid-evt-delete");
+
+        assertThat(lastEvent().fingerprints())
+                .containsExactlyInAnyOrder(instance.activeCertificateFingerprint(), "sha256:pending");
+    }
+
+    @Test
+    void deleteExpiredPublishesFingerprintsForPurgedInstances() throws Exception {
+        final Instant reference = Instant.parse("2025-01-01T00:00:00Z");
+        final var expiredA = enrollWithFleetAndLastSeen("uid-exp-a", "507f1f77bcf86cd799439012", reference.minus(Duration.ofDays(8)));
+        final var expiredB = enrollWithFleetAndLastSeen("uid-exp-b", "507f1f77bcf86cd799439012", reference.minus(Duration.ofDays(8)));
+        enrollWithFleetAndLastSeen("uid-exp-fresh", "507f1f77bcf86cd799439012", reference);
+        capturedEvents.clear();
+
+        clock.setInstant(reference);
+        collectorInstanceService.deleteExpired(Duration.ofDays(7));
+
+        final var fingerprints = new ArrayList<String>();
+        capturedEvents.forEach(event -> fingerprints.addAll(event.fingerprints()));
+        assertThat(fingerprints).containsExactlyInAnyOrder(
+                expiredA.activeCertificateFingerprint(), expiredB.activeCertificateFingerprint());
+    }
+
+    @Test
+    void deleteExpiredBatchesRevocationEvents() {
+        // Enough expired instances that the purge spans multiple revocation-event batches
+        // (REVOCATION_EVENT_BATCH_SIZE is 1000). Inserted as raw documents — deleteExpired only reads
+        // last_seen and the fingerprint fields through its projection, so full enrollment is unnecessary.
+        final int instanceCount = 1100;
+        final Instant reference = Instant.parse("2025-01-01T00:00:00Z");
+        final var expectedFingerprints = new HashSet<String>();
+        final var documents = new ArrayList<Document>(instanceCount);
+        for (int i = 0; i < instanceCount; i++) {
+            final var fingerprint = "sha256:batch-" + i;
+            expectedFingerprints.add(fingerprint);
+            documents.add(new Document(CollectorInstanceDTO.FIELD_INSTANCE_UID, "uid-batch-" + i)
+                    .append(CollectorInstanceDTO.FIELD_LAST_SEEN, Date.from(reference.minus(Duration.ofDays(8))))
+                    .append(CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, fingerprint));
+        }
+        mongoCollections.nonEntityCollection(CollectorInstanceService.COLLECTION_NAME, Document.class)
+                .insertMany(documents);
+        capturedEvents.clear();
+
+        clock.setInstant(reference);
+        assertThat(collectorInstanceService.deleteExpired(Duration.ofDays(7))).isEqualTo(instanceCount);
+
+        // Each event must respect the batch limit, and together the events must cover every revoked
+        // fingerprint exactly once.
+        assertThat(capturedEvents).allSatisfy(event ->
+                assertThat(event.fingerprints()).hasSizeLessThanOrEqualTo(1000));
+        final var posted = new ArrayList<String>();
+        capturedEvents.forEach(event -> posted.addAll(event.fingerprints()));
+        assertThat(posted).hasSize(instanceCount); // no fingerprint posted twice
+        assertThat(Set.copyOf(posted)).isEqualTo(expectedFingerprints);
     }
 
     @Test
@@ -696,6 +1006,205 @@ class CollectorInstanceServiceTest {
         assertFieldIsDate("date-uid", CollectorInstanceDTO.FIELD_LAST_SEEN);
     }
 
+    // ----- health snapshot + healthy_changed_at handling in updateFromReport -----
+
+    @Test
+    void updateFromReportFirstHealthReportCreatesEnvelopeWithTimestamp() throws Exception {
+        final var uid = "health-first";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(true, null)));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t0);
+                    assertThat(stored.componentHealth()).isEqualTo(health(true, null));
+                }));
+
+        // The timestamp must be stored as a BSON Date, not a String.
+        final var healthDoc = findRawDocument(uid).orElseThrow()
+                .get(CollectorInstanceDTO.FIELD_HEALTH, Document.class);
+        assertThat(healthDoc.get("healthy_changed_at")).isInstanceOf(Date.class);
+    }
+
+    @Test
+    void updateFromReportIdenticalHealthResendKeepsTimestamp() throws Exception {
+        // Reconnects and ReportFullState re-deliver unchanged health; the transition timestamp
+        // must not move ("unhealthy since X" would otherwise reset on every reconnect).
+        final var uid = "health-resend";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "connection refused")));
+
+        clock.setInstant(t0.plus(Duration.ofHours(1)));
+        collectorInstanceService.updateFromReport(healthReport(uid, 2L, health(false, "connection refused")));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t0);
+                    assertThat(stored.componentHealth()).isEqualTo(health(false, "connection refused"));
+                }));
+    }
+
+    @Test
+    void updateFromReportHealthyFlipUpdatesTreeAndTimestamp() throws Exception {
+        final var uid = "health-flip";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        final var t1 = t0.plus(Duration.ofHours(1));
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(true, null)));
+
+        clock.setInstant(t1);
+        collectorInstanceService.updateFromReport(healthReport(uid, 2L, health(false, "connection refused")));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t1);
+                    assertThat(stored.componentHealth()).isEqualTo(health(false, "connection refused"));
+                }));
+    }
+
+    @Test
+    void updateFromReportTreeChangeWithoutFlipUpdatesTreeButKeepsTimestamp() throws Exception {
+        // An unhealthy collector whose error text changes is still "unhealthy since t0" — the
+        // snapshot must refresh, the transition timestamp must not.
+        final var uid = "health-no-flip";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "error A")));
+
+        clock.setInstant(t0.plus(Duration.ofHours(1)));
+        collectorInstanceService.updateFromReport(healthReport(uid, 2L, health(false, "error B")));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t0);
+                    assertThat(stored.componentHealth()).isEqualTo(health(false, "error B"));
+                }));
+    }
+
+    @Test
+    void updateFromReportWithoutHealthLeavesStoredHealthUntouched() throws Exception {
+        // Health is compression-eligible in OpAMP: a message without the field means "unchanged",
+        // never "no health".
+        final var uid = "health-absent";
+        enroll(uid);
+
+        final var t0 = Instant.parse("2025-06-01T10:00:00Z");
+        clock.setInstant(t0);
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "connection refused")));
+
+        clock.setInstant(t0.plus(Duration.ofHours(1)));
+        collectorInstanceService.updateFromReport(healthReport(uid, 2L, null));
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored -> {
+                    assertThat(stored.healthyChangedAt()).isEqualTo(t0);
+                    assertThat(stored.componentHealth()).isEqualTo(health(false, "connection refused"));
+                }));
+    }
+
+    @Test
+    void updateFromReportWithoutReportsHealthCapabilityRemovesStoredHealth() throws Exception {
+        final var uid = "health-capability-removed";
+        enroll(uid);
+
+        clock.setInstant(Instant.parse("2025-06-01T10:00:00Z"));
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "connection refused")));
+
+        collectorInstanceService.updateFromReport(CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .messageSeqNum(2L)
+                .capabilities(0L)
+                .build());
+
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).isEmpty());
+        assertThat(findRawDocument(uid).orElseThrow().containsKey(CollectorInstanceDTO.FIELD_HEALTH)).isFalse();
+    }
+
+    @Test
+    void updateFromReportRoundTripsRecursiveHealthTree() throws Exception {
+        final var uid = "health-tree";
+        enroll(uid);
+
+        final var pipeline = ComponentHealthDTO.builder()
+                .healthy(false)
+                .status("StatusPermanentError")
+                .lastError("exporter failed")
+                .statusTime(Instant.parse("2025-06-01T09:59:00Z"))
+                .build();
+        final var collector = ComponentHealthDTO.builder()
+                .healthy(false)
+                .status("StatusRecoverableError")
+                .startTime(Instant.parse("2025-06-01T08:00:00Z"))
+                .components(Map.of("pipeline:logs/abc", pipeline))
+                .build();
+        final var root = ComponentHealthDTO.builder()
+                .healthy(true)
+                .status("StatusOK")
+                .components(Map.of("collector", collector))
+                .build();
+
+        clock.setInstant(Instant.parse("2025-06-01T10:00:00Z"));
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, root));
+
+        // Fresh read exercises the full serialize/deserialize path including the recursion.
+        assertThat(collectorInstanceService.findByInstanceUid(uid)).hasValueSatisfying(instance ->
+                assertThat(instance.health()).hasValueSatisfying(stored ->
+                        assertThat(stored.componentHealth()).isEqualTo(root)));
+    }
+
+    @Test
+    void healthDocumentOmitsAbsentFieldsAndEmptyComponents() throws Exception {
+        // Guards the @JsonInclude(NON_EMPTY) convention on ComponentHealthDTO: absent optionals
+        // and empty components maps are omitted from the stored document — while healthy=false,
+        // being a boolean, must NOT be treated as "empty" (NON_DEFAULT would break this).
+        final var uid = "health-shape";
+        enroll(uid);
+
+        clock.setInstant(Instant.parse("2025-06-01T10:00:00Z"));
+        collectorInstanceService.updateFromReport(healthReport(uid, 1L, health(false, "connection refused")));
+
+        final var componentHealthDoc = findRawDocument(uid).orElseThrow()
+                .get(CollectorInstanceDTO.FIELD_HEALTH, Document.class)
+                .get("component_health", Document.class);
+
+        assertThat(componentHealthDoc.getBoolean("healthy")).isFalse();
+        assertThat(componentHealthDoc.getString("last_error")).isEqualTo("connection refused");
+        assertThat(componentHealthDoc.containsKey("status")).isFalse();
+        assertThat(componentHealthDoc.containsKey("start_time")).isFalse();
+        assertThat(componentHealthDoc.containsKey("status_time")).isFalse();
+        assertThat(componentHealthDoc.containsKey("components")).isFalse();
+    }
+
+    private static CollectorInstanceReport healthReport(String uid, long seqNum, @Nullable ComponentHealthDTO health) {
+        final var builder = CollectorInstanceReport.builder()
+                .instanceUid(uid)
+                .messageSeqNum(seqNum)
+                .capabilities(0L)
+                .reportsHealth(true);
+        if (health != null) {
+            builder.health(health);
+        }
+        return builder.build();
+    }
+
+    private static ComponentHealthDTO health(boolean healthy, @Nullable String lastError) {
+        return ComponentHealthDTO.builder()
+                .healthy(healthy)
+                .lastError(lastError)
+                .build();
+    }
+
     @Test
     void extractOsTypeFromReportReturnsCorrectOs() {
         final var report = reportWithAttributes(List.of(
@@ -816,7 +1325,7 @@ class CollectorInstanceServiceTest {
 
         final var lookup = new PendingChangesLookup(
                 Map.of("fleet-1", 5L),
-                Map.of("uid-pending-self", 4L));
+                Map.of("uid-pending-self", 4L), 0L);
 
         assertThat(collectorUids(CollectorInstanceService.hasPendingChangesFilter(lookup)))
                 .containsExactlyInAnyOrder("uid-pending-fleet", "uid-pending-self");
@@ -828,10 +1337,24 @@ class CollectorInstanceServiceTest {
         insertInstance("uid-insync", "fleet-1", 5L);
         insertInstance("uid-untouched", "fleet-3", 0L);
 
-        final var lookup = new PendingChangesLookup(Map.of("fleet-1", 5L), Map.of());
+        final var lookup = new PendingChangesLookup(Map.of("fleet-1", 5L), Map.of(), 0L);
 
         assertThat(collectorUids(Filters.nor(CollectorInstanceService.hasPendingChangesFilter(lookup))))
                 .containsExactlyInAnyOrder("uid-insync", "uid-untouched");
+    }
+
+    @Test
+    void hasPendingChangesFilterSelectsInstancesBelowHighestPurgedSeq() {
+        insertInstance("uid-below", "fleet-1", 3L);   // below highestPurgedSeq (4): may have missed purged markers
+        insertInstance("uid-at", "fleet-1", 4L);      // saw everything that was purged
+        insertInstance("uid-above", "fleet-1", 9L);
+
+        final var lookup = new PendingChangesLookup(Map.of(), Map.of(), 4L);
+
+        assertThat(collectorUids(CollectorInstanceService.hasPendingChangesFilter(lookup)))
+                .containsExactly("uid-below");
+        assertThat(collectorUids(Filters.nor(CollectorInstanceService.hasPendingChangesFilter(lookup))))
+                .containsExactlyInAnyOrder("uid-at", "uid-above");
     }
 
     @Test
@@ -839,7 +1362,7 @@ class CollectorInstanceServiceTest {
         insertInstance("uid-1", "fleet-1", 0L);
         insertInstance("uid-2", "fleet-2", 7L);
 
-        final var filter = CollectorInstanceService.hasPendingChangesFilter(new PendingChangesLookup(Map.of(), Map.of()));
+        final var filter = CollectorInstanceService.hasPendingChangesFilter(new PendingChangesLookup(Map.of(), Map.of(), 0L));
 
         assertThat(collectorUids(filter)).isEmpty();
         assertThat(collectorUids(Filters.nor(filter))).containsExactlyInAnyOrder("uid-1", "uid-2");

@@ -64,7 +64,6 @@ import org.graylog.collectors.config.processor.ResourceProcessorConfig;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.NoopReceiverConfig;
 import org.graylog.collectors.db.Attribute;
-import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
@@ -104,6 +103,7 @@ public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
     public static final String REMOTE_CONFIG_KEY = "collector.yaml";
 
+    private static final ComponentHealthExtractor COMPONENT_HEALTH_EXTRACTOR = new ComponentHealthExtractor();
     private static final JsonFormat.Printer PROTO_PRINTER = JsonFormat.printer().omittingInsignificantWhitespace();
 
     private final EnrollmentTokenService enrollmentTokenService;
@@ -277,8 +277,7 @@ public class OpAmpService {
                                     "Current assignment to fleet {} will be kept.", auth.token().fleetId(),
                             instance.instanceUid(), instance.fleetId());
                 }
-                final var enrolled = collectorInstanceService.reEnroll(instance.id(),
-                        instance.activeCertificateFingerprint(), issuedCert, auth.token().id());
+                final var enrolled = collectorInstanceService.reEnroll(instance, issuedCert, auth.token().id());
                 LOG.info("Re-enrolled existing collector {}. Current fleet: {}", enrolled.instanceUid(),
                         enrolled.fleetId());
                 // Don't count token usage for consecutive enrollments of the same collector, but
@@ -389,7 +388,7 @@ public class OpAmpService {
         final Map<String, CollectorPipelineConfig> pipelines = Maps.newHashMap();
 
         sources.stream().filter(SourceDTO::enabled).forEach(source -> {
-            final var receiverConfig = source.toReceiverConfig()
+            final var receiverConfig = source.toReceiverConfig(osType)
                     .filter(config -> config.osSupport().contains(osType))
                     .orElse(null);
 
@@ -477,9 +476,13 @@ public class OpAmpService {
         LOG.debug("[{}/{}] Handling OpAMP message from collector: {}", instanceUid, sequenceNum, message);
 
         var appliedTxnSeq = OptionalLong.empty();
-        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder().instanceUid(instanceUid).messageSeqNum(sequenceNum).capabilities(message.getCapabilities());
-
         final EnumSet<Opamp.AgentCapabilities> agentCapabilities = fromBitmask(message.getCapabilities());
+        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder()
+                .instanceUid(instanceUid)
+                .messageSeqNum(sequenceNum)
+                .capabilities(message.getCapabilities())
+                .reportsHealth(agentCapabilities.contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsHealth));
+
         for (Opamp.AgentCapabilities cap : agentCapabilities) {
             switch (cap) {
                 case AgentCapabilities_ReportsStatus -> {
@@ -501,6 +504,8 @@ public class OpAmpService {
                                 .addArgument(instanceUid).addArgument(sequenceNum)
                                 .addArgument(() -> toProtoString(message.getHealth()))
                                 .log();
+
+                        updateBuilder.health(COMPONENT_HEALTH_EXTRACTOR.extract(message.getHealth()));
                     }
                 }
                 case AgentCapabilities_ReportsHeartbeat -> {
@@ -551,7 +556,9 @@ public class OpAmpService {
             final String fleetId = previousState.fleetId();
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
-            final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
+
+            final var coalesced = txnLogService.coalesce(unprocessedMarkers, lastProcessedTxnSeq);
+
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 

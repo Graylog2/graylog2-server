@@ -63,7 +63,10 @@ const InputList = ({
   const [inputValue, setInputValue] = useState<string>('');
   const [value, setValue] = useState<readonly Option[]>(values.map((val: string | number) => createOption(val)));
 
-  useLayoutEffect(() => setValue(values.map((val: string | number) => createOption(val))), [values]);
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setValue(values.map((val: string | number) => createOption(val)));
+  }, [values]);
 
   const dispatchOnChange = (newValue: Option[]) => {
     const newList = newValue.map((item: Option) => item.value);

@@ -260,6 +260,7 @@ export const TELEMETRY_EVENT_TYPE = {
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
     MARKDOWN_UPDATED: 'Configurations Markdown Updated',
     PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
+    WELCOME_PAGE_UPDATED: 'Configurations Welcome Page Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
@@ -492,7 +493,7 @@ export const TELEMETRY_EVENT_TYPE = {
     NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
   },
   WELCOME: {
-    SETUP_COLLECTOR_CLICKED: 'Welcome Setup Collector Clicked',
+    SETUP_COLLECTOR_CLICKED: 'Welcome Enroll Collector Clicked',
     CONFIGURE_INPUT_CLICKED: 'Welcome Configure Input Clicked',
     RESOURCE_CONTINUE_CLICKED: 'Welcome Resource Continue Clicked',
     DISMISS_CLICKED: 'Welcome Dismiss Clicked',

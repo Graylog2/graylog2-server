@@ -20,10 +20,7 @@ import { validateExternalIdRequiresArn } from './awsValidation';
 describe('awsValidation', () => {
   describe('validateExternalIdRequiresArn', () => {
     it('returns undefined when both ARN and External ID are provided', () => {
-      const result = validateExternalIdRequiresArn(
-        'arn:aws:iam::123456789012:role/test-role',
-        'test-external-id',
-      );
+      const result = validateExternalIdRequiresArn('arn:aws:iam::123456789012:role/test-role', 'test-external-id');
       expect(result).toBeUndefined();
     });
 

@@ -46,7 +46,7 @@ public class SlackClient {
 
     @Inject
     public SlackClient(OkHttpClient httpClient, ObjectMapper objectMapper) {
-        this.httpClient = httpClient.newBuilder().followRedirects(false).build();
+        this.httpClient = httpClient;
         this.objectMapper = objectMapper;
     }
 

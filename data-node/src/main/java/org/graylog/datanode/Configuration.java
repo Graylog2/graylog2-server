@@ -369,8 +369,23 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_bootstrap_memory_lock")
     private boolean opensearchBootstrapMemoryLock = false;
 
+    /**
+     * Testing aid, deliberately undocumented and unsupported. Normally a datanode keeps running the opensearch version
+     * it has already recorded, and moving to a newer one is an explicit administrator action on the upgrade page.
+     * With this enabled the node instead takes the newest distribution its data allows on every start, which makes it
+     * possible to exercise a generation change without driving the upgrade UI. It never relaxes the compatibility
+     * bound — data that only the compatibility distribution can read still gets the compatibility distribution.
+     */
+    @Documentation(visible = false)
+    @Parameter(value = "auto_update_opensearch")
+    private boolean autoUpdateOpensearch = false;
+
     public String getOpensearchAuditLog() {
         return opensearchAuditLog;
+    }
+
+    public boolean isAutoUpdateOpensearch() {
+        return autoUpdateOpensearch;
     }
 
     @Documentation("""

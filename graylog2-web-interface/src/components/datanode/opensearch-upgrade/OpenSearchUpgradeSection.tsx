@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { Alert, Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { Title } from 'components/common';
 import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
+import IncompatibleIndicesTable from 'components/indices/incompatible-indices/IncompatibleIndicesTable';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -28,7 +29,6 @@ import StartUpgradeConfirmDialog from './StartUpgradeConfirmDialog';
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/useOpenSearchRollingRestart';
 import useOpenSearchUpgradeStatus from './hooks/useOpenSearchUpgradeStatus';
-import IncompatibleIndicesTable from './IncompatibleIndicesTable';
 import OpenSearchUpgradeInfo from './OpenSearchUpgradeInfo';
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
 import { isRollingRestartPaused, isRollingRestartTerminalState } from './rollingRestartTypes';
@@ -46,6 +46,19 @@ const DisabledHint = styled.p(
     margin-bottom: 0;
     color: ${theme.colors.gray[60]};
     font-size: ${theme.fonts.size.small};
+  `,
+);
+
+const ActionsRow = styled(Row)(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.md};
+  `,
+);
+
+const Heading = styled.h4(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.md};
+    margin-bottom: ${theme.spacings.sm};
   `,
 );
 
@@ -143,8 +156,8 @@ const OpenSearchUpgradeSection = () => {
         />
         <Alert bsStyle="warning">
           Incompatible indices and upgrade status cannot be checked while {unavailableDataNodeCount} Data{' '}
-          {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all
-          Data Nodes are available.
+          {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all Data
+          Nodes are available.
         </Alert>
       </Section>
     );
@@ -164,12 +177,13 @@ const OpenSearchUpgradeSection = () => {
       {showIncompatibleIndices && (
         <Row>
           <Col xs={12}>
+            <Heading>Incompatible indices</Heading>
             <IncompatibleIndicesTable />
           </Col>
         </Row>
       )}
 
-      <Row>
+      <ActionsRow>
         <Col xs={12}>
           <ButtonToolbar>
             {showStartAction && (
@@ -197,7 +211,7 @@ const OpenSearchUpgradeSection = () => {
             <DisabledHint>Data Nodes&apos; embedded OpenSearch is already up to date.</DisabledHint>
           )}
         </Col>
-      </Row>
+      </ActionsRow>
 
       {showRollingUpgradeStatus && (
         <Row>
