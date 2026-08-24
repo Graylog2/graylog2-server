@@ -70,7 +70,7 @@ const submitWidgetConfigForm = async () => {
   await userEvent.click(applyButton);
 };
 
-const expectedPivotConfig = { skip_empty_values: undefined, limit: 15 };
+const expectedPivotConfig = { skip_empty_values: undefined, other_bucket: undefined, limit: 15 };
 
 describe('AggregationWizard', () => {
   type Props = Partial<React.ComponentProps<typeof AggregationWizard>> & {
@@ -373,6 +373,28 @@ describe('AggregationWizard', () => {
       const configureElementsSection = await screen.findByTestId('configure-elements-section');
 
       expect(within(configureElementsSection).getByText('Group By')).toBeInTheDocument();
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'allows enabling the Other bucket for a values grouping',
+    async () => {
+      const onChange = jest.fn();
+      renderSUT({ onChange });
+
+      await addGrouping();
+      await selectField('http_method');
+      await userEvent.click(await screen.findByRole('checkbox', { name: /include other bucket/i }));
+      await submitWidgetConfigForm();
+
+      await waitFor(() =>
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            rowPivots: [expect.objectContaining({ config: expect.objectContaining({ other_bucket: true }) })],
+          }),
+        ),
+      );
     },
     extendedTimeout,
   );

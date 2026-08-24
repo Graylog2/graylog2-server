@@ -36,7 +36,7 @@ const bar = (name: string, x: string[]) => ({
 describe('defineSingleDateBarWidth', () => {
   it('returns chart data unchanged when there is no time row pivot', () => {
     const config = AggregationWidgetConfig.builder()
-      .rowPivots([Pivot.create(['action'], ValuesType, { limit: 15, skip_empty_values: false })])
+      .rowPivots([Pivot.create(['action'], ValuesType, { limit: 15, skip_empty_values: false, other_bucket: false })])
       .build();
     const chartDataResult = [bar('a', ['2026-05-12T14:30:00.000Z'])];
 

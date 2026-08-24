@@ -76,6 +76,7 @@ export const RESERVED_FIELDS = [
 ];
 
 export const MISSING_BUCKET_NAME = '(Empty Value)';
+export const OTHER_BUCKET_NAME = '(Other)';
 export const DEFAULT_PIVOT_LIMIT = 15;
 
 export const DEFAULT_PIVOT_INTERVAL: AutoTimeConfig = {
