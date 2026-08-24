@@ -35,21 +35,34 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.Filters;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.ParsedFilters;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.NumericMetricsAggregation;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OtherBucket;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.graylog.plugins.views.search.aggregations.OtherBucketConstants.OTHER_BUCKET_NAME;
 
 public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
@@ -142,7 +155,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket, OSGeneratedQueryContext queryContext) {
         var values = (Values) bucketSpecs;
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
@@ -153,25 +166,121 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
             // This happens when the other bucket is passed for column value extraction
             return Stream.of(initialBucket);
         }
-        final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
-        if (values.skipEmptyValues()) {
-            return extractTermsBuckets(previousKeys, reorderKeys, termsAggregation, values.skipEmptyValues());
-        } else {
-            final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+        final Filters.Bucket presentValuesBucket = filterAggregation.getBuckets().get(0);
+        final MultiBucketsAggregation termsAggregation = presentValuesBucket.getAggregations().get(AGG_NAME);
 
-            final Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation, values.skipEmptyValues());
+        final List<MultiBucketsAggregation> termsAggregations = new ArrayList<>();
+        termsAggregations.add(termsAggregation);
 
-            if (otherBucket.getDocCount() > 0) {
-                final MultiBucketsAggregation otherTermsAggregations = otherBucket.getAggregations().get(AGG_NAME);
-                final var otherStream = extractTermsBuckets(previousKeys, reorderKeys, otherTermsAggregations, values.skipEmptyValues());
-                return Stream.concat(bucketStream, otherStream);
-            } else {
-                return bucketStream;
+        Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
+
+        if (!values.skipEmptyValues()) {
+            final Filters.Bucket emptyValuesBucket = filterAggregation.getBuckets().get(1);
+            if (emptyValuesBucket.getDocCount() > 0) {
+                final MultiBucketsAggregation emptyValuesTerms = emptyValuesBucket.getAggregations().get(AGG_NAME);
+                termsAggregations.add(emptyValuesTerms);
+                bucketStream = Stream.concat(bucketStream, extractTermsBuckets(previousKeys, reorderKeys, emptyValuesTerms));
             }
         }
+
+        if (values.otherBucket()) {
+            final Optional<PivotBucket> otherBucket =
+                    createOtherBucket(pivot, values, previousKeys, presentValuesBucket, termsAggregations, queryContext);
+            if (otherBucket.isPresent()) {
+                bucketStream = Stream.concat(bucketStream, Stream.of(otherBucket.get()));
+            }
+        }
+
+        return bucketStream;
     }
 
-    private Stream<PivotBucket> extractTermsBuckets(ImmutableList<String> previousKeys, Function<List<String>, List<String>> reorderKeys, MultiBucketsAggregation termsAggregation, boolean skipEmptyValues) {
+    private Optional<PivotBucket> createOtherBucket(Pivot pivot,
+                                                     Values values,
+                                                     ImmutableList<String> previousKeys,
+                                                     HasAggregations parent,
+                                                     List<MultiBucketsAggregation> termsAggregations,
+                                                     OSGeneratedQueryContext queryContext) {
+        final long otherDocCount = termsAggregations.stream()
+                .filter(Terms.class::isInstance)
+                .mapToLong(terms -> ((Terms) terms).getSumOfOtherDocCounts())
+                .sum();
+
+        if (otherDocCount <= 0) {
+            return Optional.empty();
+        }
+
+        final List<MultiBucketsAggregation.Bucket> shownBuckets = termsAggregations.stream()
+                .flatMap(terms -> terms.getBuckets().stream())
+                .map(MultiBucketsAggregation.Bucket.class::cast)
+                .toList();
+
+        final Map<String, Object> derivedValues = new LinkedHashMap<>();
+        pivot.series().stream()
+                .filter(OtherBucketDerivation::isDerivable)
+                .forEach(seriesSpec -> {
+                    final var input = tailInput(pivot, seriesSpec, otherDocCount, parent, shownBuckets, queryContext);
+                    OtherBucketDerivation.derive(seriesSpec, input)
+                            .ifPresent(value -> derivedValues.put(seriesSpec.id(), value));
+                });
+
+        if (derivedValues.isEmpty()) {
+            return Optional.empty();
+        }
+
+        final ImmutableList<String> keys = ImmutableList.<String>builder()
+                .addAll(previousKeys)
+                .addAll(Collections.nCopies(values.fields().size(), OTHER_BUCKET_NAME))
+                .build();
+
+        return Optional.of(PivotBucket.createOther(keys, OtherBucket.create(otherDocCount), derivedValues));
+    }
+
+    private OtherBucketDerivation.TailInput tailInput(Pivot pivot,
+                                                       SeriesSpec seriesSpec,
+                                                       long otherDocCount,
+                                                       HasAggregations parent,
+                                                       List<MultiBucketsAggregation.Bucket> shownBuckets,
+                                                       OSGeneratedQueryContext queryContext) {
+        if (OtherBucketDerivation.requiresStats(seriesSpec)) {
+            final String statsName = statsAggregationName(statsFieldOf(seriesSpec));
+            return new OtherBucketDerivation.TailInput(
+                    otherDocCount,
+                    null,
+                    List.of(),
+                    readStats(parent, statsName),
+                    shownBuckets.stream().map(bucket -> readStats(bucket, statsName))
+                            .filter(Objects::nonNull)
+                            .toList());
+        }
+
+        final String seriesName = queryContext.seriesName(seriesSpec, pivot);
+        return new OtherBucketDerivation.TailInput(
+                otherDocCount,
+                readNumeric(parent, seriesName),
+                shownBuckets.stream().map(bucket -> readNumeric(bucket, seriesName))
+                        .filter(Objects::nonNull)
+                        .toList(),
+                null,
+                List.of());
+    }
+
+    private static OtherBucketDerivation.Stats readStats(HasAggregations source, String name) {
+        final Aggregation aggregation = source.getAggregations().get(name);
+        if (!(aggregation instanceof final ExtendedStats stats)) {
+            return null;
+        }
+        return new OtherBucketDerivation.Stats(stats.getCount(), stats.getSum(), stats.getSumOfSquares());
+    }
+
+    private static Double readNumeric(HasAggregations source, String name) {
+        final Aggregation aggregation = source.getAggregations().get(name);
+        if (aggregation instanceof final NumericMetricsAggregation.SingleValue singleValue) {
+            return singleValue.value();
+        }
+        return null;
+    }
+
+    private Stream<PivotBucket> extractTermsBuckets(ImmutableList<String> previousKeys, Function<List<String>, List<String>> reorderKeys, MultiBucketsAggregation termsAggregation) {
         return termsAggregation.getBuckets().stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()

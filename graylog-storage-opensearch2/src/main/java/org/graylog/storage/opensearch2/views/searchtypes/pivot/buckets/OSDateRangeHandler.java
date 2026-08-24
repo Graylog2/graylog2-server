@@ -72,7 +72,7 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket, OSGeneratedQueryContext queryContext) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final ParsedDateRange aggregation = previousBucket.getAggregations().get(AGG_NAME);

@@ -70,7 +70,7 @@ public class OSRangeHandler extends OSPivotBucketSpecHandler<RangeBucket> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket, OSGeneratedQueryContext queryContext) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final ParsedRange aggregation = previousBucket.getAggregations().get(AGG_NAME);
