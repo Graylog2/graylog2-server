@@ -121,6 +121,10 @@ public class SystemJobResource extends RestResource {
         }
 
         for (final var summary : systemJobManager.getRunningJobs(nodeId).values()) {
+            // Jobs with their own JobResourceHandler are listed through that handler instead
+            if (jobResourceHandlerService.handlesJobType(summary.jobType())) {
+                continue;
+            }
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, summary.jobType())) {
                 jobs.add(summary);
             }

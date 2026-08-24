@@ -126,4 +126,11 @@ public class JobResourceHandlerService {
 
         return null;
     }
+
+    /**
+     * @return true if a plugin lists jobs of this type through its own handler
+     */
+    public boolean handlesJobType(String jobType) {
+        return resourceHandlers.containsKey(jobType);
+    }
 }
