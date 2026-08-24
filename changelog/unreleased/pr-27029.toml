@@ -1,4 +1,4 @@
 type = "f"
-message = "Add Space char to Lucene query escaping."
+message = "Properly escaping space in lucene queries on search page/event definitions/internal functionality."
 
 pulls = ["27029"]
