@@ -32,9 +32,12 @@ import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import static org.graylog.plugins.views.search.aggregations.OtherBucketConstants.OTHER_BUCKET_NAME;
 
 /**
  * Turns an OpenSearch {@link MultiSearchItem} response into a {@link PivotResult} by walking the row and column bucket
@@ -70,7 +73,7 @@ class PivotResultProcessor {
 
         final InitialBucket initialBucket = InitialBucket.create(queryResult);
 
-        retrieveBuckets(pivot, pivot.rowGroups(), initialBucket)
+        retrieveBuckets(pivot, pivot.rowGroups(), initialBucket, queryContext)
                 .forEach(tuple -> resultBuilder.addRow(buildRow(pivot, queryResult, queryContext, seriesNames, colGroupNames, tuple)));
 
         if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
@@ -91,22 +94,51 @@ class PivotResultProcessor {
         final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
                 .key(rowKeys)
                 .source("leaf");
+
+        if (tuple.isOtherBucket()) {
+            // The (Other) bucket is synthetic: it has no aggregations to read, only values derived from its siblings.
+            addDerivedValues(rowBuilder, pivot, tuple.derivedValues(), new ArrayDeque<>(), true, "row-leaf");
+            return rowBuilder.build();
+        }
+
         if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
             processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
         }
         if (!pivot.columnGroups().isEmpty()) {
             final var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
-            retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
+            retrieveBuckets(pivot, pivot.columnGroups(), rowBucket, queryContext)
                     .forEach(columnBucketTuple -> {
                         final ImmutableList<String> columnKeys = columnBucketTuple.keys();
                         colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
 
                         final MultiBucketBase columnBucket = columnBucketTuple.bucket();
 
-                        processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                        if (columnBucketTuple.isOtherBucket()) {
+                            addDerivedValues(rowBuilder, pivot, columnBucketTuple.derivedValues(), new ArrayDeque<>(columnKeys), false, "col-leaf");
+                        } else {
+                            processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                        }
                     });
         }
         return rowBuilder.build();
+    }
+
+    private void addDerivedValues(PivotResult.Row.Builder rowBuilder,
+                                  Pivot pivot,
+                                  Map<String, Object> derivedValues,
+                                  ArrayDeque<String> columnKeys,
+                                  boolean rollup,
+                                  String source) {
+        pivot.series().forEach(seriesSpec -> {
+            final Object value = derivedValues.get(seriesSpec.id());
+            if (value == null) {
+                // Not derivable for the (Other) bucket - omitted rather than reported as zero.
+                return;
+            }
+            columnKeys.addLast(seriesSpec.id());
+            rowBuilder.addValue(PivotResult.Value.create(columnKeys, value, rollup, source));
+            columnKeys.removeLast();
+        });
     }
 
     private PivotResult.Row buildRollupRow(Pivot pivot,
@@ -118,13 +150,22 @@ class PivotResultProcessor {
         return rowBuilder.source("non-leaf").build();
     }
 
-    private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketBase aggregations) {
+    private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketBase aggregations, OSGeneratedQueryContext queryContext) {
         Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), aggregations));
 
         for (BucketSpec bucketSpec : pivots) {
             result = result.flatMap((tuple) -> {
+                if (tuple.isOtherBucket()) {
+                    // The tail cannot be broken down by deeper groupings, so pad the key instead of descending.
+                    // "(Other)" in the inner position reads accurately: all remaining values, within all remaining.
+                    final ImmutableList<String> paddedKeys = ImmutableList.<String>builder()
+                            .addAll(tuple.keys())
+                            .addAll(Collections.nCopies(bucketSpec.fields().size(), OTHER_BUCKET_NAME))
+                            .build();
+                    return Stream.of(PivotBucket.createOther(paddedKeys, tuple.bucket(), tuple.derivedValues()));
+                }
                 final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
-                return bucketHandler.extractBuckets(pivot, bucketSpec, tuple);
+                return bucketHandler.extractBuckets(pivot, bucketSpec, tuple, queryContext);
             });
         }
 

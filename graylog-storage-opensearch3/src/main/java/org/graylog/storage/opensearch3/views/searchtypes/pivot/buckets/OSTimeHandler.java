@@ -176,7 +176,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket, OSGeneratedQueryContext queryContext) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketBase previousBucket = initialBucket.bucket();
         final Aggregate aggregation = previousBucket.aggregations().get(AGG_NAME);

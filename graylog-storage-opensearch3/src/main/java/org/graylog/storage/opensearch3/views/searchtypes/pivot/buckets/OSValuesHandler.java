@@ -21,14 +21,18 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
+import org.graylog.plugins.views.search.aggregations.OtherBucketDerivation;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.OtherBucket;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
 import org.opensearch.client.opensearch._types.Script;
 import org.opensearch.client.opensearch._types.SortOrder;
@@ -38,6 +42,7 @@ import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.FiltersAggregation;
 import org.opensearch.client.opensearch._types.aggregations.FiltersBucket;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.SingleMetricAggregateBase;
 import org.opensearch.client.opensearch._types.aggregations.TermsAggregateBase;
 import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -45,11 +50,17 @@ import org.opensearch.client.opensearch._types.query_dsl.ExistsQuery;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.graylog.plugins.views.search.aggregations.OtherBucketConstants.OTHER_BUCKET_NAME;
 
 public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
@@ -66,7 +77,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final TermsAggregation.Builder termsAggregationBuilder = createTerms(orderedBuckets, limit);
 
         termsAggregationBuilder.order(mapOrders(ordering.orders()));
-        MutableNamedAggregationBuilder termsAggregation = new MutableNamedAggregationBuilder(
+        final MutableNamedAggregationBuilder termsAggregation = new MutableNamedAggregationBuilder(
                 AGG_NAME,
                 Aggregation.builder()
                         .terms(termsAggregationBuilder.build())
@@ -80,7 +91,45 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                         .filters(filterAggregationBuilder.build())
         );
         filterAggregation.subAggregation(termsAggregation);
-        return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+
+        final List<MutableNamedAggregationBuilder> metrics = List.of(termsAggregation, filterAggregation);
+        if (bucketSpec.otherBucket()) {
+            addStatsCompanions(pivot, metrics);
+        }
+
+        return CreatedAggregations.create(filterAggregation, termsAggregation, metrics);
+    }
+
+    /**
+     * Mean-based series cannot be reconstructed for the {@code (Other)} bucket from their own value alone: the tail's
+     * mean needs its value count and sum of squares. One {@code extended_stats} aggregation per field supplies all of
+     * them, at both the terms level (the shown buckets) and the enclosing filter level (the total to subtract from).
+     */
+    private void addStatsCompanions(Pivot pivot, List<MutableNamedAggregationBuilder> metrics) {
+        statsFields(pivot).forEach(field -> metrics.forEach(metric ->
+                metric.subAggregation(new MutableNamedAggregationBuilder(
+                        statsAggregationName(field),
+                        Aggregation.builder().extendedStats(e -> e.field(field))))));
+    }
+
+    /** The distinct fields whose {@code extended_stats} the derivation will need. */
+    static List<String> statsFields(Pivot pivot) {
+        return pivot.series().stream()
+                .filter(OtherBucketDerivation::requiresStats)
+                .map(HasField.class::cast)
+                .map(HasField::field)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+    /** The {@code extended_stats} field for one series. Only call for specs where {@code requiresStats} is true. */
+    static String statsFieldOf(SeriesSpec seriesSpec) {
+        return ((HasField) seriesSpec).field();
+    }
+
+    public static String statsAggregationName(String field) {
+        return "other-stats(" + field + ")";
     }
 
     private FiltersAggregation.Builder createFilter(List<String> bucketSpecs, boolean skipEmptyValues) {
@@ -133,44 +182,157 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket, OSGeneratedQueryContext queryContext) {
         var values = (Values) bucketSpecs;
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketBase previousBucket = initialBucket.bucket();
         final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpecs.fields(), pivot.sort());
 
         final Aggregate aggregation = previousBucket.aggregations().get(AGG_NAME);
-        if (!(aggregation.isFilters())) {
+        if (!aggregation.isFilters()) {
             // This happens when the other bucket is passed for column value extraction
             return Stream.of(initialBucket);
         }
-        Aggregate termsAggregation = aggregation.filters().buckets().array().getFirst().aggregations().get(AGG_NAME);
+        final FiltersBucket presentValuesBucket = aggregation.filters().buckets().array().getFirst();
+        final Aggregate termsAggregation = presentValuesBucket.aggregations().get(AGG_NAME);
 
-        if (values.skipEmptyValues()) {
-            return extractTermsBuckets(previousKeys, reorderKeys, termsAggregation, values.skipEmptyValues());
-        } else {
-            FiltersBucket otherBucket = aggregation.filters().buckets().array().get(1);
+        Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
 
-            final Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation, values.skipEmptyValues());
-
-            if (otherBucket.docCount() > 0) {
-                final Aggregate otherTermsAggregations = otherBucket.aggregations().get(AGG_NAME);
-                final var otherStream = extractTermsBuckets(previousKeys, reorderKeys, otherTermsAggregations, values.skipEmptyValues());
-                return Stream.concat(bucketStream, otherStream);
-            } else {
-                return bucketStream;
+        if (!values.skipEmptyValues()) {
+            final FiltersBucket emptyValuesBucket = aggregation.filters().buckets().array().get(1);
+            if (emptyValuesBucket.docCount() > 0) {
+                // filters[1] holds only documents where none of the grouped fields exist, so its scripted key is
+                // always the single all-(Empty Value) tuple: no tail to contribute, and its documents are absent
+                // from filters[0], so its buckets must never be subtracted from filters[0]'s totals.
+                final Aggregate emptyValuesTerms = emptyValuesBucket.aggregations().get(AGG_NAME);
+                bucketStream = Stream.concat(bucketStream, extractTermsBuckets(previousKeys, reorderKeys, emptyValuesTerms));
             }
+        }
+
+        if (values.otherBucket()) {
+            final Optional<PivotBucket> otherBucket =
+                    createOtherBucket(pivot, values, previousKeys, presentValuesBucket, termsAggregation, queryContext);
+            if (otherBucket.isPresent()) {
+                bucketStream = Stream.concat(bucketStream, Stream.of(otherBucket.get()));
             }
+        }
+
+        return bucketStream;
     }
 
-    private Stream<PivotBucket> extractTermsBuckets(ImmutableList<String> previousKeys, Function<List<String>, List<String>> reorderKeys, Aggregate termsAggregation, boolean skipEmptyValues) {
-        AggregateVariant rawAggregation = termsAggregation._get();
-        if (!(rawAggregation instanceof TermsAggregateBase<?> terms)) {
+    private Optional<PivotBucket> createOtherBucket(Pivot pivot,
+                                                     Values values,
+                                                     ImmutableList<String> previousKeys,
+                                                     MultiBucketBase parent,
+                                                     Aggregate termsAggregation,
+                                                     OSGeneratedQueryContext queryContext) {
+        final AggregateVariant rawAggregation = termsAggregation._get();
+        if (!(rawAggregation instanceof final TermsAggregateBase<?> terms)) {
+            return Optional.empty();
+        }
+        final long otherDocCount = Optional.ofNullable(terms.sumOtherDocCount()).orElse(0L);
+
+        if (otherDocCount <= 0) {
+            return Optional.empty();
+        }
+
+        final List<MultiBucketBase> shownBuckets = terms.buckets().array().stream()
+                .map(bucket -> {
+                    if (!(bucket instanceof final MultiBucketBase multiBucketBase)) {
+                        throw new IllegalArgumentException("Aggregate must implement MultiBucketBase");
+                    }
+                    return multiBucketBase;
+                })
+                .toList();
+
+        final Map<String, Object> derivedValues = new LinkedHashMap<>();
+        pivot.series().stream()
+                .filter(OtherBucketDerivation::isDerivable)
+                .forEach(seriesSpec ->
+                        tailInput(pivot, seriesSpec, otherDocCount, parent, shownBuckets, queryContext)
+                                .flatMap(input -> OtherBucketDerivation.derive(seriesSpec, input))
+                                .ifPresent(value -> derivedValues.put(seriesSpec.id(), value)));
+
+        if (derivedValues.isEmpty()) {
+            return Optional.empty();
+        }
+
+        final ImmutableList<String> keys = ImmutableList.<String>builder()
+                .addAll(previousKeys)
+                .addAll(Collections.nCopies(values.fields().size(), OTHER_BUCKET_NAME))
+                .build();
+
+        return Optional.of(PivotBucket.createOther(keys, OtherBucket.create(otherDocCount), derivedValues));
+    }
+
+    /**
+     * Fails closed: if any shown bucket is missing the value or stats needed for this series, the whole series is
+     * omitted from the {@code (Other)} bucket rather than derived from a partial, too-large tail.
+     */
+    private Optional<OtherBucketDerivation.TailInput> tailInput(Pivot pivot,
+                                                                 SeriesSpec seriesSpec,
+                                                                 long otherDocCount,
+                                                                 MultiBucketBase parent,
+                                                                 List<MultiBucketBase> shownBuckets,
+                                                                 OSGeneratedQueryContext queryContext) {
+        if (OtherBucketDerivation.requiresStats(seriesSpec)) {
+            final String statsName = statsAggregationName(statsFieldOf(seriesSpec));
+            final List<OtherBucketDerivation.Stats> shownStats = shownBuckets.stream()
+                    .map(bucket -> readStats(bucket.aggregations(), statsName))
+                    .toList();
+            if (shownStats.stream().anyMatch(Objects::isNull)) {
+                return Optional.empty();
+            }
+            return Optional.of(new OtherBucketDerivation.TailInput(
+                    otherDocCount,
+                    null,
+                    List.of(),
+                    readStats(parent.aggregations(), statsName),
+                    shownStats));
+        }
+
+        final String seriesName = queryContext.seriesName(seriesSpec, pivot);
+        final List<Double> shownValues = shownBuckets.stream()
+                .map(bucket -> readNumeric(bucket.aggregations(), seriesName))
+                .toList();
+        if (shownValues.stream().anyMatch(Objects::isNull)) {
+            return Optional.empty();
+        }
+        return Optional.of(new OtherBucketDerivation.TailInput(
+                otherDocCount,
+                readNumeric(parent.aggregations(), seriesName),
+                shownValues,
+                null,
+                List.of()));
+    }
+
+    private static OtherBucketDerivation.Stats readStats(Map<String, Aggregate> aggregations, String name) {
+        return Optional.ofNullable(aggregations.get(name))
+                .filter(Aggregate::isExtendedStats)
+                .map(Aggregate::extendedStats)
+                .map(stats -> new OtherBucketDerivation.Stats(stats.count(), stats.sum(), stats.sumOfSquares()))
+                .orElse(null);
+    }
+
+    private static Double readNumeric(Map<String, Aggregate> aggregations, String name) {
+        final Aggregate aggregation = aggregations.get(name);
+        if (aggregation == null) {
+            return null;
+        }
+        if (aggregation._get() instanceof final SingleMetricAggregateBase singleValue) {
+            return singleValue.value();
+        }
+        return null;
+    }
+
+    private Stream<PivotBucket> extractTermsBuckets(ImmutableList<String> previousKeys, Function<List<String>, List<String>> reorderKeys, Aggregate termsAggregation) {
+        final AggregateVariant rawAggregation = termsAggregation._get();
+        if (!(rawAggregation instanceof final TermsAggregateBase<?> terms)) {
             throw new IllegalArgumentException("Aggregate must implement TermsAggregateBase");
         }
         return terms.buckets().array().stream()
                 .map(b -> {
-                    if (!(b instanceof MultiBucketBase bucket)) {
+                    if (!(b instanceof final MultiBucketBase bucket)) {
                         throw new IllegalArgumentException("Aggregate must implement MultiBucketBase");
                     }
                     final ImmutableList<String> keys = ImmutableList.<String>builder()

@@ -19,8 +19,29 @@ package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 import com.google.common.collect.ImmutableList;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 
-public record PivotBucket(ImmutableList<String> keys, MultiBucketBase bucket) {
+import java.util.Map;
+
+/**
+ * A bucket extracted from a search response, together with the grouping keys leading to it.
+ *
+ * @param isOtherBucket whether this is the synthetic {@code (Other)} bucket. This is the bucket's identity;
+ *                      {@code derivedValues} is only its payload and must never be re-derived from it.
+ * @param derivedValues for the synthetic {@code (Other)} bucket, the series values computed by
+ *                      {@code OtherBucketDerivation}, keyed the way {@code PivotResultProcessor} assembles its
+ *                      column keys. Empty for every ordinary bucket, whose values come from the series handlers.
+ */
+public record PivotBucket(ImmutableList<String> keys,
+                          MultiBucketBase bucket,
+                          boolean isOtherBucket,
+                          Map<String, Object> derivedValues) {
+
     public static PivotBucket create(ImmutableList<String> keys, MultiBucketBase bucket) {
-        return new PivotBucket(keys, bucket);
+        return new PivotBucket(keys, bucket, false, Map.of());
+    }
+
+    public static PivotBucket createOther(ImmutableList<String> keys,
+                                          MultiBucketBase bucket,
+                                          Map<String, Object> derivedValues) {
+        return new PivotBucket(keys, bucket, true, Map.copyOf(derivedValues));
     }
 }
