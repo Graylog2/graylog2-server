@@ -50,7 +50,6 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.OtherBucket;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -169,23 +168,22 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final Filters.Bucket presentValuesBucket = filterAggregation.getBuckets().get(0);
         final MultiBucketsAggregation termsAggregation = presentValuesBucket.getAggregations().get(AGG_NAME);
 
-        final List<MultiBucketsAggregation> termsAggregations = new ArrayList<>();
-        termsAggregations.add(termsAggregation);
-
         Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
 
         if (!values.skipEmptyValues()) {
             final Filters.Bucket emptyValuesBucket = filterAggregation.getBuckets().get(1);
             if (emptyValuesBucket.getDocCount() > 0) {
+                // filters[1] holds only documents where none of the grouped fields exist, so its scripted key is
+                // always the single all-(Empty Value) tuple: no tail to contribute, and its documents are absent
+                // from filters[0], so its buckets must never be subtracted from filters[0]'s totals.
                 final MultiBucketsAggregation emptyValuesTerms = emptyValuesBucket.getAggregations().get(AGG_NAME);
-                termsAggregations.add(emptyValuesTerms);
                 bucketStream = Stream.concat(bucketStream, extractTermsBuckets(previousKeys, reorderKeys, emptyValuesTerms));
             }
         }
 
         if (values.otherBucket()) {
             final Optional<PivotBucket> otherBucket =
-                    createOtherBucket(pivot, values, previousKeys, presentValuesBucket, termsAggregations, queryContext);
+                    createOtherBucket(pivot, values, previousKeys, presentValuesBucket, termsAggregation, queryContext);
             if (otherBucket.isPresent()) {
                 bucketStream = Stream.concat(bucketStream, Stream.of(otherBucket.get()));
             }
@@ -198,30 +196,28 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                                                      Values values,
                                                      ImmutableList<String> previousKeys,
                                                      HasAggregations parent,
-                                                     List<MultiBucketsAggregation> termsAggregations,
+                                                     MultiBucketsAggregation termsAggregation,
                                                      OSGeneratedQueryContext queryContext) {
-        final long otherDocCount = termsAggregations.stream()
-                .filter(Terms.class::isInstance)
-                .mapToLong(terms -> ((Terms) terms).getSumOfOtherDocCounts())
-                .sum();
+        if (!(termsAggregation instanceof final Terms terms)) {
+            return Optional.empty();
+        }
+        final long otherDocCount = terms.getSumOfOtherDocCounts();
 
         if (otherDocCount <= 0) {
             return Optional.empty();
         }
 
-        final List<MultiBucketsAggregation.Bucket> shownBuckets = termsAggregations.stream()
-                .flatMap(terms -> terms.getBuckets().stream())
+        final List<MultiBucketsAggregation.Bucket> shownBuckets = termsAggregation.getBuckets().stream()
                 .map(MultiBucketsAggregation.Bucket.class::cast)
                 .toList();
 
         final Map<String, Object> derivedValues = new LinkedHashMap<>();
         pivot.series().stream()
                 .filter(OtherBucketDerivation::isDerivable)
-                .forEach(seriesSpec -> {
-                    final var input = tailInput(pivot, seriesSpec, otherDocCount, parent, shownBuckets, queryContext);
-                    OtherBucketDerivation.derive(seriesSpec, input)
-                            .ifPresent(value -> derivedValues.put(seriesSpec.id(), value));
-                });
+                .forEach(seriesSpec ->
+                        tailInput(pivot, seriesSpec, otherDocCount, parent, shownBuckets, queryContext)
+                                .flatMap(input -> OtherBucketDerivation.derive(seriesSpec, input))
+                                .ifPresent(value -> derivedValues.put(seriesSpec.id(), value)));
 
         if (derivedValues.isEmpty()) {
             return Optional.empty();
@@ -235,33 +231,45 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         return Optional.of(PivotBucket.createOther(keys, OtherBucket.create(otherDocCount), derivedValues));
     }
 
-    private OtherBucketDerivation.TailInput tailInput(Pivot pivot,
-                                                       SeriesSpec seriesSpec,
-                                                       long otherDocCount,
-                                                       HasAggregations parent,
-                                                       List<MultiBucketsAggregation.Bucket> shownBuckets,
-                                                       OSGeneratedQueryContext queryContext) {
+    /**
+     * Fails closed: if any shown bucket is missing the value or stats needed for this series, the whole series is
+     * omitted from the {@code (Other)} bucket rather than derived from a partial, too-large tail.
+     */
+    private Optional<OtherBucketDerivation.TailInput> tailInput(Pivot pivot,
+                                                                 SeriesSpec seriesSpec,
+                                                                 long otherDocCount,
+                                                                 HasAggregations parent,
+                                                                 List<MultiBucketsAggregation.Bucket> shownBuckets,
+                                                                 OSGeneratedQueryContext queryContext) {
         if (OtherBucketDerivation.requiresStats(seriesSpec)) {
             final String statsName = statsAggregationName(statsFieldOf(seriesSpec));
-            return new OtherBucketDerivation.TailInput(
+            final List<OtherBucketDerivation.Stats> shownStats = shownBuckets.stream()
+                    .map(bucket -> readStats(bucket, statsName))
+                    .toList();
+            if (shownStats.stream().anyMatch(Objects::isNull)) {
+                return Optional.empty();
+            }
+            return Optional.of(new OtherBucketDerivation.TailInput(
                     otherDocCount,
                     null,
                     List.of(),
                     readStats(parent, statsName),
-                    shownBuckets.stream().map(bucket -> readStats(bucket, statsName))
-                            .filter(Objects::nonNull)
-                            .toList());
+                    shownStats));
         }
 
         final String seriesName = queryContext.seriesName(seriesSpec, pivot);
-        return new OtherBucketDerivation.TailInput(
+        final List<Double> shownValues = shownBuckets.stream()
+                .map(bucket -> readNumeric(bucket, seriesName))
+                .toList();
+        if (shownValues.stream().anyMatch(Objects::isNull)) {
+            return Optional.empty();
+        }
+        return Optional.of(new OtherBucketDerivation.TailInput(
                 otherDocCount,
                 readNumeric(parent, seriesName),
-                shownBuckets.stream().map(bucket -> readNumeric(bucket, seriesName))
-                        .filter(Objects::nonNull)
-                        .toList(),
+                shownValues,
                 null,
-                List.of());
+                List.of()));
     }
 
     private static OtherBucketDerivation.Stats readStats(HasAggregations source, String name) {

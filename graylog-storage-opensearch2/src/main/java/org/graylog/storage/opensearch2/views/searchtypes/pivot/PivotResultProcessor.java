@@ -97,7 +97,7 @@ class PivotResultProcessor {
 
         if (tuple.isOtherBucket()) {
             // The (Other) bucket is synthetic: it has no aggregations to read, only values derived from its siblings.
-            addDerivedValues(rowBuilder, pivot, tuple.derivedValues(), new ArrayDeque<>());
+            addDerivedValues(rowBuilder, pivot, tuple.derivedValues(), new ArrayDeque<>(), true, "row-leaf");
             return rowBuilder.build();
         }
 
@@ -114,7 +114,7 @@ class PivotResultProcessor {
                         final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
                         if (columnBucketTuple.isOtherBucket()) {
-                            addDerivedValues(rowBuilder, pivot, columnBucketTuple.derivedValues(), new ArrayDeque<>(columnKeys));
+                            addDerivedValues(rowBuilder, pivot, columnBucketTuple.derivedValues(), new ArrayDeque<>(columnKeys), false, "col-leaf");
                         } else {
                             processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                         }
@@ -126,7 +126,9 @@ class PivotResultProcessor {
     private void addDerivedValues(PivotResult.Row.Builder rowBuilder,
                                   Pivot pivot,
                                   Map<String, Object> derivedValues,
-                                  ArrayDeque<String> columnKeys) {
+                                  ArrayDeque<String> columnKeys,
+                                  boolean rollup,
+                                  String source) {
         pivot.series().forEach(seriesSpec -> {
             final Object value = derivedValues.get(seriesSpec.id());
             if (value == null) {
@@ -134,7 +136,7 @@ class PivotResultProcessor {
                 return;
             }
             columnKeys.addLast(seriesSpec.id());
-            rowBuilder.addValue(PivotResult.Value.create(columnKeys, value, true, "row-leaf"));
+            rowBuilder.addValue(PivotResult.Value.create(columnKeys, value, rollup, source));
             columnKeys.removeLast();
         });
     }
