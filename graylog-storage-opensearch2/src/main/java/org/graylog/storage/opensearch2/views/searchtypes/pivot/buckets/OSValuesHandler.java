@@ -257,6 +257,10 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                     shownStats));
         }
 
+        if (!OtherBucketDerivation.requiresSeriesValue(seriesSpec)) {
+            return Optional.of(new OtherBucketDerivation.TailInput(otherDocCount, null, List.of(), null, List.of()));
+        }
+
         final String seriesName = queryContext.seriesName(seriesSpec, pivot);
         final List<Double> shownValues = shownBuckets.stream()
                 .map(bucket -> readNumeric(bucket, seriesName))

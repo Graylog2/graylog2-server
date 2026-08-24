@@ -80,14 +80,6 @@ class OtherBucketDerivationTest {
     }
 
     @Test
-    void sumOfSquaresClampsNegativeDriftToZero() {
-        final var result = OtherBucketDerivation.derive(SumOfSquares.builder().field("age").build(),
-                plain(0L, 100.0d, 100.0000000001d));
-
-        assertThat(result).contains(0.0d);
-    }
-
-    @Test
     void averageIsDerivedFromStats() {
         // parent: 5 values summing to 100. shown: 3 values summing to 40. tail: 2 values summing to 60 -> avg 30.
         final var result = OtherBucketDerivation.derive(Average.builder().field("age").build(),
@@ -122,6 +114,27 @@ class OtherBucketDerivationTest {
 
         assertThat(result).get().asInstanceOf(InstanceOfAssertFactories.DOUBLE)
                 .isCloseTo(2.0d, within(1e-9));
+    }
+
+    @Test
+    void sumOfSquaresIsDerivedFromStats() {
+        // tail: sumOfSquares = 158.0 - 100.0 = 58.0.
+        final var result = OtherBucketDerivation.derive(SumOfSquares.builder().field("age").build(),
+                withStats(new Stats(3L, 20.0d, 158.0d), new Stats(1L, 10.0d, 100.0d)));
+
+        assertThat(result).contains(58.0d);
+    }
+
+    @Test
+    void sumOfSquaresClampsNegativeDriftToZero() {
+        // parent's sumOfSquares is one ulp below 9.0, shown's is exactly 9.0: the subtraction lands just
+        // under zero from floating-point drift, not from a real negative sum of squares. Only the clamp
+        // keeps this at 0.
+        final var result = OtherBucketDerivation.derive(SumOfSquares.builder().field("age").build(),
+                withStats(new Stats(2L, 6.0d, 8.999999999999998d), new Stats(1L, 3.0d, 9.0d)));
+
+        assertThat(result).get().asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isEqualTo(0.0d);
     }
 
     @Test
@@ -164,10 +177,20 @@ class OtherBucketDerivationTest {
         assertThat(OtherBucketDerivation.requiresStats(Average.builder().field("age").build())).isTrue();
         assertThat(OtherBucketDerivation.requiresStats(Variance.builder().field("age").build())).isTrue();
         assertThat(OtherBucketDerivation.requiresStats(StdDev.builder().field("age").build())).isTrue();
+        assertThat(OtherBucketDerivation.requiresStats(SumOfSquares.builder().field("age").build())).isTrue();
 
         assertThat(OtherBucketDerivation.requiresStats(Count.builder().build())).isFalse();
         assertThat(OtherBucketDerivation.requiresStats(Sum.builder().field("age").build())).isFalse();
         assertThat(OtherBucketDerivation.requiresStats(Min.builder().field("age").build())).isFalse();
+    }
+
+    @Test
+    void requiresSeriesValueIsFalseOnlyForFieldLessCount() {
+        assertThat(OtherBucketDerivation.requiresSeriesValue(Count.builder().build())).isFalse();
+
+        assertThat(OtherBucketDerivation.requiresSeriesValue(Count.builder().field("age").build())).isTrue();
+        assertThat(OtherBucketDerivation.requiresSeriesValue(Sum.builder().field("age").build())).isTrue();
+        assertThat(OtherBucketDerivation.requiresSeriesValue(Average.builder().field("age").build())).isTrue();
     }
 
     @Test

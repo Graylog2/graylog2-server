@@ -89,7 +89,17 @@ public final class OtherBucketDerivation {
      * generation time so companions are only added when something actually consumes them.
      */
     public static boolean requiresStats(SeriesSpec spec) {
-        return spec instanceof Average || spec instanceof Variance || spec instanceof StdDev;
+        return spec instanceof Average || spec instanceof Variance || spec instanceof StdDev || spec instanceof SumOfSquares;
+    }
+
+    /**
+     * Whether this series has a per-bucket aggregation to read at all. Field-less {@code count()} does not:
+     * the backends rely on each bucket's own {@code doc_count}, so no aggregation is emitted for it and the
+     * tail comes straight from {@code sum_other_doc_count}. Adapters must consult this before treating a
+     * missing value as a reason to bail.
+     */
+    public static boolean requiresSeriesValue(SeriesSpec spec) {
+        return !(spec instanceof Count count && count.field().isEmpty());
     }
 
     public static Optional<Object> derive(SeriesSpec spec, TailInput input) {
@@ -102,7 +112,7 @@ public final class OtherBucketDerivation {
             return subtract(input).map(Object.class::cast);
         }
         if (spec instanceof SumOfSquares) {
-            return subtract(input).map(value -> Math.max(0.0d, value)).map(Object.class::cast);
+            return tailStats(input).map(Stats::sumOfSquares).map(value -> Math.max(0.0d, value)).map(Object.class::cast);
         }
         if (spec instanceof Average) {
             return tailStats(input).flatMap(OtherBucketDerivation::mean).map(Object.class::cast);

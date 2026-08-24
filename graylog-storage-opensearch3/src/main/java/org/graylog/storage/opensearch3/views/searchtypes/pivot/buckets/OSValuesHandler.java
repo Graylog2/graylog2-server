@@ -291,6 +291,10 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                     shownStats));
         }
 
+        if (!OtherBucketDerivation.requiresSeriesValue(seriesSpec)) {
+            return Optional.of(new OtherBucketDerivation.TailInput(otherDocCount, null, List.of(), null, List.of()));
+        }
+
         final String seriesName = queryContext.seriesName(seriesSpec, pivot);
         final List<Double> shownValues = shownBuckets.stream()
                 .map(bucket -> readNumeric(bucket.aggregations(), seriesName))
@@ -310,7 +314,10 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         return Optional.ofNullable(aggregations.get(name))
                 .filter(Aggregate::isExtendedStats)
                 .map(Aggregate::extendedStats)
-                .map(stats -> new OtherBucketDerivation.Stats(stats.count(), stats.sum(), stats.sumOfSquares()))
+                .map(stats -> new OtherBucketDerivation.Stats(
+                        stats.count(),
+                        stats.sum(),
+                        stats.sumOfSquares() == null ? 0.0d : stats.sumOfSquares()))
                 .orElse(null);
     }
 
