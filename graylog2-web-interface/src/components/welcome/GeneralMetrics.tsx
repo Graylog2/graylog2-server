@@ -19,7 +19,7 @@ import * as React from 'react';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-import MetricsSearchPage from './MetricsSearchPage';
+import GeneralWelcomeMetrics from './GeneralWelcomeMetrics';
 
 const GeneralMetrics = () => {
   const {
@@ -32,7 +32,7 @@ const GeneralMetrics = () => {
     typeof plugin.isEnabled === 'function' ? plugin.isEnabled(pluginContext) : true,
   );
 
-  const GeneralComponent = activeGeneralPlugins[0]?.component ?? MetricsSearchPage;
+  const GeneralComponent = activeGeneralPlugins[0]?.component ?? GeneralWelcomeMetrics;
 
   return <GeneralComponent />;
 };

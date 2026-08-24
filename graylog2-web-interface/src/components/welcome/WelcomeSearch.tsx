@@ -47,7 +47,7 @@ type Props = {
  * page's metrics tiles and charts. Shared by any welcome-page area that builds its own view/search with
  * `useWelcomeSearch` (see components/welcome/hooks/useWelcomeSearch.ts) and just needs it rendered.
  */
-const WelcomeSearchPage = ({ view }: Props) => (
+const WelcomeSearch = ({ view }: Props) => (
   <InteractiveContext.Provider value={false}>
     <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
       <SearchPageLayoutProvider value={SEARCH_PAGE_LAYOUT_CONTEXT_VALUE}>
@@ -57,4 +57,4 @@ const WelcomeSearchPage = ({ view }: Props) => (
   </InteractiveContext.Provider>
 );
 
-export default WelcomeSearchPage;
+export default WelcomeSearch;

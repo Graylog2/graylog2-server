@@ -26,7 +26,7 @@ import type View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
-import MetricsSearchPage from './MetricsSearchPage';
+import GeneralWelcomeMetrics from './GeneralWelcomeMetrics';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useSearchConfiguration');
@@ -43,7 +43,7 @@ describe('MetricsSearchPage', () => {
   });
 
   it('shows Alerts and Events widgets when the user has access to both underlying streams', async () => {
-    render(<MetricsSearchPage />);
+    render(<GeneralWelcomeMetrics />);
 
     await screen.findByText('Alerts Today');
     await screen.findByText('Events Today');
@@ -52,7 +52,7 @@ describe('MetricsSearchPage', () => {
   it('shows only Messages Today and Top 5 Sources widgets, without Alerts and Events, when the user is missing access to both the alerts and events streams', async () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions([]).build());
 
-    render(<MetricsSearchPage />);
+    render(<GeneralWelcomeMetrics />);
 
     await screen.findByText('Messages Today');
     await screen.findByText('Top 5 Sources');
@@ -65,7 +65,7 @@ describe('MetricsSearchPage', () => {
       defaultUser.toBuilder().permissions(['streams:read:000000000000000000000002']).build(),
     );
 
-    render(<MetricsSearchPage />);
+    render(<GeneralWelcomeMetrics />);
 
     await screen.findByText('Alerts Today');
     await screen.findByText('Events Today');
@@ -78,7 +78,7 @@ describe('MetricsSearchPage', () => {
       isInitialLoading: false,
     });
 
-    render(<MetricsSearchPage />);
+    render(<GeneralWelcomeMetrics />);
 
     await screen.findByText('Messages Today');
     expect(await screen.findAllByText('1 hour ago - Now')).not.toHaveLength(0);
@@ -91,14 +91,14 @@ describe('MetricsSearchPage', () => {
       isInitialLoading: false,
     });
 
-    render(<MetricsSearchPage />);
+    render(<GeneralWelcomeMetrics />);
 
     await screen.findByText('Messages Today');
     expect(await screen.findAllByText('1 day ago - Now')).not.toHaveLength(0);
   });
 
   it('shows only the Top 5 Sources widget when topSourcesOnly is set, even with full stream access', async () => {
-    render(<MetricsSearchPage topSourcesOnly />);
+    render(<GeneralWelcomeMetrics topSourcesOnly />);
 
     await screen.findByText('Top 5 Sources');
     expect(screen.queryByText('Messages Today')).not.toBeInTheDocument();

@@ -32,7 +32,7 @@ import type { Stream } from 'logic/streams/types';
 import Store from 'logic/local-storage/Store';
 import type { WelcomePageMetricsPlugin, WelcomeGeneralPageMetricsPlugin } from 'components/welcome/types';
 
-import WelcomeMetrics from './WelcomeMetrics';
+import WelcomeMetricsSection from './WelcomeMetricsSection';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useSearchConfiguration');
@@ -54,7 +54,7 @@ const licenseCheck = (valid: boolean): ReturnType<typeof usePluggableLicenseChec
 const renderWithStreams = (streams: Array<Stream>) =>
   render(
     <StreamsContext.Provider value={streams}>
-      <WelcomeMetrics />
+      <WelcomeMetricsSection />
     </StreamsContext.Provider>,
   );
 
@@ -140,7 +140,11 @@ describe('WelcomeMetrics', () => {
 
     it('shows the default metrics view when the license is invalid, even though a plugin is registered', async () => {
       registerPlugins([
-        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense },
+        {
+          label: 'Security',
+          component: () => <div>Security metrics content</div>,
+          isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
+        },
       ]);
 
       renderWithStreams([accessibleStream]);
@@ -151,7 +155,11 @@ describe('WelcomeMetrics', () => {
 
     it('shows a segmented control with a General tab and the extra tab, selecting the extra tab by default', async () => {
       registerPlugins([
-        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense },
+        {
+          label: 'Security',
+          component: () => <div>Security metrics content</div>,
+          isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
+        },
       ]);
       asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
 
@@ -164,7 +172,11 @@ describe('WelcomeMetrics', () => {
 
     it('shows the default MetricsSearchPage content in the General tab when no welcomePageMetrics.general plugin is registered', async () => {
       registerPlugins([
-        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense },
+        {
+          label: 'Security',
+          component: () => <div>Security metrics content</div>,
+          isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
+        },
       ]);
       asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
 
@@ -178,8 +190,19 @@ describe('WelcomeMetrics', () => {
 
     it('shows the welcomePageMetrics.general plugin content in the General tab instead of the default MetricsSearchPage', async () => {
       registerPlugins(
-        [{ label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense }],
-        [{ component: () => <div>General metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense }],
+        [
+          {
+            label: 'Security',
+            component: () => <div>Security metrics content</div>,
+            isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
+          },
+        ],
+        [
+          {
+            component: () => <div>General metrics content</div>,
+            isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
+          },
+        ],
       );
       asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
 
@@ -195,7 +218,12 @@ describe('WelcomeMetrics', () => {
     it('ignores a registered welcomePageMetrics.general plugin when there is no active welcomePageMetrics plugin', async () => {
       registerPlugins(
         [],
-        [{ component: () => <div>General metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense }],
+        [
+          {
+            component: () => <div>General metrics content</div>,
+            isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
+          },
+        ],
       );
       asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
 
@@ -208,7 +236,11 @@ describe('WelcomeMetrics', () => {
 
     it('switches between the General tab and an extra tab when clicked', async () => {
       registerPlugins([
-        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense },
+        {
+          label: 'Security',
+          component: () => <div>Security metrics content</div>,
+          isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
+        },
       ]);
       asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
 

@@ -26,7 +26,9 @@ import SectionHeader from 'components/welcome/SectionHeader';
 import GeneralMetrics from 'components/welcome/GeneralMetrics';
 import type { WelcomePageMetricsPlugin } from 'components/welcome/types';
 
-import MetricsSearchPage from './MetricsSearchPage';
+import GeneralWelcomeMetrics from './GeneralWelcomeMetrics';
+import useHasAccessToAnyStream from 'hooks/useHasAccessToAnyStream';
+import NoStreamAccessAlert from 'components/welcome/NoStreamAccessAlert';
 
 const Container = styled.div`
   margin-bottom: 6.4px;
@@ -52,7 +54,7 @@ const OverviewSection = ({ headerActions = undefined, children = undefined }: Ov
   </>
 );
 
-const MetricsOverviewTabs = ({ metricsPlugins }: { metricsPlugins: Array<WelcomePageMetricsPlugin> }) => {
+const MetricsTabs = ({ metricsPlugins }: { metricsPlugins: Array<WelcomePageMetricsPlugin> }) => {
   const [selectedTabValue, setSelectedTabValue] = useState<string>();
 
   const tabs = [
@@ -76,7 +78,7 @@ const MetricsOverviewTabs = ({ metricsPlugins }: { metricsPlugins: Array<Welcome
   );
 };
 
-const MetricsOverview = () => {
+const WelcomeMetricsContent = () => {
   const {
     data: { valid: isValidSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
@@ -88,14 +90,24 @@ const MetricsOverview = () => {
   );
 
   if (enabledWelcomePageMetricsPlugins.length > 0) {
-    return <MetricsOverviewTabs metricsPlugins={enabledWelcomePageMetricsPlugins} />;
+    return <MetricsTabs metricsPlugins={enabledWelcomePageMetricsPlugins} />;
   }
 
   return (
     <OverviewSection>
-      <MetricsSearchPage />
+      <GeneralWelcomeMetrics />
     </OverviewSection>
   );
 };
 
-export default MetricsOverview;
+const WelcomeMetricsSection = () => {
+  const hasAccessToAnyStream = useHasAccessToAnyStream();
+
+  if (!hasAccessToAnyStream) {
+    return <NoStreamAccessAlert />;
+  }
+
+  return <WelcomeMetricsContent />;
+};
+
+export default WelcomeMetricsSection;

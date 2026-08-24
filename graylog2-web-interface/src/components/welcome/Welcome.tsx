@@ -32,7 +32,7 @@ import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 import OnboardingBanner from './OnboardingBanner';
-import WelcomeMetrics from './WelcomeMetrics';
+import WelcomeMetricsSection from './WelcomeMetricsSection';
 import useWelcomePageConfig from './hooks/useWelcomePageConfig';
 
 import SectionGrid from '../common/Section/SectionGrid';
@@ -78,7 +78,7 @@ const Welcome = () => {
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
       {onboardingEnabled && <OnboardingBanner />}
-      {metricsEnabled && <WelcomeMetrics />}
+      {metricsEnabled && <WelcomeMetricsSection />}
       <SectionHeader>
         <h2>Search and Usage</h2>
       </SectionHeader>
