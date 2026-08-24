@@ -1,0 +1,2 @@
+type = "a"
+message = "Values groupings can now collect all results beyond their configured limit into a single `(Other)` bucket, instead of dropping them silently."
