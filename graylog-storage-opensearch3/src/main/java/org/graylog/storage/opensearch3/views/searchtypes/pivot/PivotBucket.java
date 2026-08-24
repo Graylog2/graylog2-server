@@ -29,8 +29,9 @@ import java.util.Map;
  * @param isOtherBucket whether this is the synthetic {@code (Other)} bucket. This is the bucket's identity;
  *                      {@code derivedValues} is only its payload and must never be re-derived from it.
  * @param derivedValues for the synthetic {@code (Other)} bucket, the series values computed by
- *                      {@code OtherBucketDerivation}, keyed the way {@code PivotResultProcessor} assembles its
- *                      column keys. Empty for every ordinary bucket, whose values come from the series handlers.
+ *                      {@code OtherBucketDerivation}, keyed by the bare {@code seriesSpec.id()}. The column key
+ *                      path is prepended separately by {@code PivotResultProcessor} when it emits each value.
+ *                      Empty for every ordinary bucket, whose values come from the series handlers.
  * @param otherParent   for the synthetic {@code (Other)} bucket, the enclosing {@code filters} bucket that the
  *                      tail was subtracted from. {@code null} for every ordinary bucket.
  * @param otherSiblings for the synthetic {@code (Other)} bucket, the shown buckets that made the limit at that
