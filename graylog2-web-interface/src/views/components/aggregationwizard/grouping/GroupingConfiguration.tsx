@@ -62,8 +62,8 @@ const GroupingConfiguration = React.memo(({ index }: Props) => {
             Groups all values beyond the configured limit into a single &quot;(Other)&quot; bucket.
             <p />
             Count, sum, sum of squares, average, standard deviation and variance are calculated exactly.
-            Minimum, maximum, cardinality, percentile and latest cannot be derived for this bucket and are
-            left empty.
+            Minimum, maximum, cardinality, percentile, percentage and latest cannot be derived for this bucket
+            and are left empty.
           </GroupingCheckbox>
         </>
       )}

@@ -37,6 +37,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import { createViewWithWidgets } from 'fixtures/searches';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import { OTHER_BUCKET_NAME } from 'views/Constants';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
@@ -278,7 +279,7 @@ describe('DataTable', () => {
         {
           key: [],
           values: [
-            { key: ['(Other)', 'count()'], value: 3, rollup: false, source: 'col-leaf' },
+            { key: [OTHER_BUCKET_NAME, 'count()'], value: 3, rollup: false, source: 'col-leaf' },
             { key: ['zzz', 'count()'], value: 1, rollup: false, source: 'col-leaf' },
             { key: ['aaa', 'count()'], value: 2, rollup: false, source: 'col-leaf' },
           ],
@@ -306,7 +307,7 @@ describe('DataTable', () => {
     const headers = await screen.findAllByRole('columnheader');
     const labels = headers.map((header) => header.textContent);
 
-    expect(labels.indexOf('(Other)')).toBeGreaterThan(labels.indexOf('zzz'));
+    expect(labels.indexOf(OTHER_BUCKET_NAME)).toBeGreaterThan(labels.indexOf('zzz'));
   });
 
   it('passes inferred types to fields', async () => {
