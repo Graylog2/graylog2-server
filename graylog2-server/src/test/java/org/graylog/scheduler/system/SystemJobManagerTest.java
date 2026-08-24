@@ -197,6 +197,12 @@ class SystemJobManagerTest {
     }
 
     @Test
+    void getRunningJobReturnsEmptyForNonObjectIdId() {
+        // A legacy job UUID (or any non-ObjectId string) must not throw; it simply has no running scheduler job.
+        assertThat(systemJobManager.getRunningJob("11111111-2222-3333-4444-555555555555")).isEmpty();
+    }
+
+    @Test
     void cancelSetsCancelFlagOnTrigger() {
         systemJobManager.submit(TestSystemJobConfig.create("cancel-me"));
         final var locked = triggerService.nextRunnableTrigger();
@@ -213,6 +219,12 @@ class SystemJobManagerTest {
     @Test
     void cancelIsNoOpForNonExistentId() {
         assertThatCode(() -> systemJobManager.cancel("000000000000000000000000")).doesNotThrowAnyException();
+    }
+
+    @Test
+    void cancelIsNoOpForNonObjectIdId() {
+        // A legacy job UUID (or any non-ObjectId string) must not throw; there is no scheduler job to cancel.
+        assertThatCode(() -> systemJobManager.cancel("11111111-2222-3333-4444-555555555555")).doesNotThrowAnyException();
     }
 
     /**
