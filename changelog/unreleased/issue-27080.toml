@@ -2,3 +2,4 @@ type = "f"
 message = "Fixed cancellation of jobs running on the system job scheduler. Clicking Cancel on a cancelable system job (e.g. \"Recalculate index ranges\") failed with a 404 and the job kept running; it now stops at its next cancellation check."
 
 issues = ["27080"]
+pulls = ["27087"]
