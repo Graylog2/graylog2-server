@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed a crash when displaying values which contain integers exceeding the safe integer range, e.g. in the pipeline rule simulator output."
+
+pulls = ["27058"]
