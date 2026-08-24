@@ -28,7 +28,7 @@ import { diff } from './trendDirection';
 
 const TextContainer = styled.div(
   ({ theme }) => css`
-    margin: 5px;
+    margin-bottom: ${theme.spacings.xxs};
     text-align: right;
     font-family: ${theme.fonts.family.body};
   `,
