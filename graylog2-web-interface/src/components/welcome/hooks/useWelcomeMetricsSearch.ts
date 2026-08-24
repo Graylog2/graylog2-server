@@ -115,12 +115,8 @@ const useWelcomeMetricsSearch = (topSourcesOnly: boolean = false) => {
     [isPermitted],
   );
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
-  const entries = useMemo(
-    () => buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly),
-    [permittedAlertsEventsStreams, timeRange, topSourcesOnly],
-  );
 
-  return useWelcomeSearch(entries, timeRange);
+  return useWelcomeSearch(buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly), timeRange);
 };
 
 export default useWelcomeMetricsSearch;

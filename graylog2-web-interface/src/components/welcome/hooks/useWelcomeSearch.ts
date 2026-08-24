@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import URI from 'urijs';
 
 import generateId from 'logic/generateId';
@@ -116,10 +115,7 @@ const buildView = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: Relative
  * Shared by the general tab (`useWelcomeMetricsSearch`) and any other welcome-page widget area (e.g. the
  * Security tab's search-backed widgets) that needs its own view/search built from a small widget set.
  */
-const useWelcomeSearch = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: RelativeTimeRangeWithEnd) => {
-  const viewPromise = useMemo(() => buildView(entries, timeRange), [entries, timeRange]);
-
-  return useCreateSearch(viewPromise);
-};
+const useWelcomeSearch = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: RelativeTimeRangeWithEnd) =>
+  useCreateSearch(buildView(entries, timeRange));
 
 export default useWelcomeSearch;
