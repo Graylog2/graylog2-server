@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3.testing;
 
-import org.graylog.storage.opensearch3.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.completebackend.SearchServerBuilder;
 import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
 import org.graylog2.storage.SearchVersion;
@@ -26,7 +25,7 @@ import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
 public class OpenSearchInstanceProvider implements SearchServerInterfaceProvider {
     @Override
     public SearchServerBuilder getBuilderFor(final SearchVersion version) {
-        if(version.satisfies(OPENSEARCH, "^2.0.0")) {
+        if (version.satisfies(OPENSEARCH, ">=2.0.0")) {
             return new OpenSearchInstanceBuilder(version);
         }
         return null;

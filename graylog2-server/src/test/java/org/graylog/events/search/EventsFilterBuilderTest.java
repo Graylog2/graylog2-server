@@ -76,7 +76,7 @@ class EventsFilterBuilderTest {
                 .extraFilters(Map.of(EventDto.FIELD_TAGS, Set.of("phish\"ing OR alert:true")))
                 .build();
 
-        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phish\\\"ing OR alert\\:true\")");
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phish\\\"ing\\ OR\\ alert\\:true\")");
     }
 
 }

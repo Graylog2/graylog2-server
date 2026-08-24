@@ -63,6 +63,7 @@ type WidgetExecutionData = {
 const StyledIcon = styled(Icon)(
   ({ theme }) => css`
     color: ${theme.colors.gray[60]};
+    margin-left: 5px;
   `,
 );
 
