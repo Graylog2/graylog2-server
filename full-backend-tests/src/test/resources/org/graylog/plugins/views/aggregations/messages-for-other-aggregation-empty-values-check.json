@@ -1,0 +1,20 @@
+{
+  "documents": [
+    { "document": [ { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "e0" } },
+      { "data": { "source": "fbi.org", "message": "m", "timestamp": "2022-01-01 01:00:00.000", "fixtureType": "551200", "name": "p", "age": 10, "streams": ["000000000000000000000001"] } } ] },
+    { "document": [ { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "e1" } },
+      { "data": { "source": "fbi.org", "message": "m", "timestamp": "2022-01-01 01:00:00.000", "fixtureType": "551200", "name": "p", "age": 10, "streams": ["000000000000000000000001"] } } ] },
+    { "document": [ { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "e2" } },
+      { "data": { "source": "fbi.org", "message": "m", "timestamp": "2022-01-01 01:00:00.000", "fixtureType": "551200", "name": "p", "age": 10, "streams": ["000000000000000000000001"] } } ] },
+    { "document": [ { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "e3" } },
+      { "data": { "source": "fbi.org", "message": "m", "timestamp": "2022-01-01 01:00:00.000", "fixtureType": "551200", "name": "q", "age": 20, "streams": ["000000000000000000000001"] } } ] },
+    { "document": [ { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "e4" } },
+      { "data": { "source": "fbi.org", "message": "m", "timestamp": "2022-01-01 01:00:00.000", "fixtureType": "551200", "name": "q", "age": 20, "streams": ["000000000000000000000001"] } } ] },
+    { "document": [ { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "e5" } },
+      { "data": { "source": "fbi.org", "message": "m", "timestamp": "2022-01-01 01:00:00.000", "fixtureType": "551200", "name": "r", "age": 5, "streams": ["000000000000000000000001"] } } ] },
+    { "document": [ { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "e6" } },
+      { "data": { "source": "fbi.org", "message": "m", "timestamp": "2022-01-01 01:00:00.000", "fixtureType": "551200", "age": 1000, "streams": ["000000000000000000000001"] } } ] },
+    { "document": [ { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "e7" } },
+      { "data": { "source": "fbi.org", "message": "m", "timestamp": "2022-01-01 01:00:00.000", "fixtureType": "551200", "age": 1000, "streams": ["000000000000000000000001"] } } ] }
+  ]
+}
