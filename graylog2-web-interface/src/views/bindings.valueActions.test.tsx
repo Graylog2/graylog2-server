@@ -19,6 +19,9 @@ import MockAction from 'helpers/mocking/MockAction';
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 import { createSearch } from 'fixtures/searches';
 import type { RootState } from 'views/types';
+import { OTHER_BUCKET_NAME } from 'views/Constants';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import bindings from './bindings';
 
@@ -49,6 +52,10 @@ describe('Views bindings value actions', () => {
   const findAction = (type: string) => valueActions.find((binding) => binding.type === type);
   const view = createSearch({ queryId: 'query1' });
   const rootState = { view: { view } } as RootState;
+  const widget = AggregationWidget.builder()
+    .id('widget1')
+    .config(AggregationWidgetConfig.builder().visualization('table').build())
+    .build();
   const getState = jest.fn(() => rootState);
 
   describe('CreateExtractor', () => {
@@ -142,6 +149,125 @@ describe('Views bindings value actions', () => {
       expect(
         action.isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState),
       ).toEqual(true);
+    });
+
+    it('should be disabled for the Other bucket value', () => {
+      expect(
+        action.isEnabled(
+          { ...defaultArguments, field: 'something', value: OTHER_BUCKET_NAME, type: FieldTypes.STRING() },
+          getState,
+        ),
+      ).toEqual(false);
+    });
+  });
+
+  describe('Exclude from results', () => {
+    const action = findAction('exclude');
+
+    it('is present', () => {
+      expect(action).toBeDefined();
+    });
+
+    it('has `isEnabled` condition', () => {
+      expect(action.isEnabled).toBeDefined();
+    });
+
+    it('should be disabled for decorated fields', () => {
+      expect(
+        action.isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Decorated]),
+          },
+          getState,
+        ),
+      ).toEqual(false);
+    });
+
+    it('should be disabled for functions', () => {
+      expect(
+        action.isEnabled({ ...defaultArguments, field: 'count(something)', type: FieldTypes.STRING() }, getState),
+      ).toEqual(false);
+    });
+
+    it('should be enabled for fields with type string', () => {
+      expect(
+        action.isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState),
+      ).toEqual(true);
+    });
+
+    it('should be disabled for the Other bucket value', () => {
+      expect(
+        action.isEnabled(
+          { ...defaultArguments, field: 'something', value: OTHER_BUCKET_NAME, type: FieldTypes.STRING() },
+          getState,
+        ),
+      ).toEqual(false);
+    });
+  });
+
+  describe('Show documents for value', () => {
+    const action = findAction('show-bucket');
+
+    it('is present', () => {
+      expect(action).toBeDefined();
+    });
+
+    it('has `isEnabled` condition', () => {
+      expect(action.isEnabled).toBeDefined();
+    });
+
+    it('should be enabled for a regular value path', () => {
+      expect(
+        action.isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldTypes.STRING(),
+            contexts: { valuePath: [{ something: 'a-value' }], widget },
+          },
+          getState,
+        ),
+      ).toEqual(true);
+    });
+
+    it('should be disabled when the value path contains the Other bucket', () => {
+      expect(
+        action.isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldTypes.STRING(),
+            contexts: { valuePath: [{ something: OTHER_BUCKET_NAME }], widget },
+          },
+          getState,
+        ),
+      ).toEqual(false);
+    });
+  });
+
+  describe('Create event definition', () => {
+    const action = findAction('create-event-definition-from-value');
+
+    it('is present', () => {
+      expect(action).toBeDefined();
+    });
+
+    it('has `isEnabled` condition', () => {
+      expect(action.isEnabled).toBeDefined();
+    });
+
+    it('should be enabled for a regular value', () => {
+      expect(
+        action.isEnabled({ ...defaultArguments, field: 'something', value: 'a-value' }, getState),
+      ).toEqual(true);
+    });
+
+    it('should be disabled for the Other bucket value', () => {
+      expect(
+        action.isEnabled({ ...defaultArguments, field: 'something', value: OTHER_BUCKET_NAME }, getState),
+      ).toEqual(false);
     });
   });
 });

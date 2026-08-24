@@ -16,9 +16,11 @@
  */
 import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import { escape, addToQuery, predicate } from 'views/logic/queries/QueryHelper';
+import containsOtherBucketValue from 'views/components/visualizations/utils/containsOtherBucketValue';
 import TitleTypes from 'views/stores/TitleTypes';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
+import type { FieldValue } from 'views/logic/fieldtypes/FieldType';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
@@ -76,7 +78,16 @@ const ShowDocumentsHandler =
     );
   };
 
-ShowDocumentsHandler.isEnabled = ({ contexts: { valuePath, widget } }) =>
-  valuePath !== undefined && valuePath.length > 0 && widget !== undefined;
+ShowDocumentsHandler.isEnabled = ({
+  value,
+  contexts: { valuePath, widget },
+}: {
+  value?: FieldValue;
+  contexts: Contexts;
+}) =>
+  valuePath !== undefined &&
+  valuePath.length > 0 &&
+  widget !== undefined &&
+  !containsOtherBucketValue(value, { valuePath });
 
 export default ShowDocumentsHandler;
