@@ -26,6 +26,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -38,8 +39,12 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.lock.AlreadyLockedException;
+import org.graylog2.cluster.lock.RefreshingLockService;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
@@ -56,6 +61,8 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_DELETE;
@@ -74,18 +81,21 @@ public class IndexSetTemplateResource extends RestResource {
     private final IndexSetTemplateService templateService;
     private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
     private final IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker;
+    private final RefreshingLockService.Factory lockServiceFactory;
 
     @Inject
     public IndexSetTemplateResource(IndexSetValidator indexSetValidator,
                                     Validator validator,
                                     IndexSetTemplateService templateService,
                                     IndexSetDefaultTemplateService indexSetDefaultTemplateService,
-                                    IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker) {
+                                    IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker,
+                                    RefreshingLockService.Factory lockServiceFactory) {
         this.indexSetValidator = indexSetValidator;
         this.validator = validator;
         this.templateService = templateService;
         this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
         this.indexSetTemplateRequirementsChecker = indexSetTemplateRequirementsChecker;
+        this.lockServiceFactory = lockServiceFactory;
     }
 
     @GET
@@ -141,9 +151,9 @@ public class IndexSetTemplateResource extends RestResource {
     @Operation(summary = "Creates a new editable template")
     public IndexSetTemplateResponse create(@Parameter(name = "request") IndexSetTemplateRequest templateData) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_CREATE);
-        validateConfig(templateData.indexSetConfig());
 
-        return toResponse(templateService.save(new IndexSetTemplate(templateData)));
+        return toResponse(validateAndPersistWithRepositoryLock(templateData.indexSetConfig(),
+                () -> templateService.save(new IndexSetTemplate(templateData))));
     }
 
     @PUT
@@ -157,11 +167,28 @@ public class IndexSetTemplateResource extends RestResource {
                        @NotNull IndexSetTemplateRequest template) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, id);
         checkReadOnly(getIndexSetTemplate(id));
-        validateConfig(template.indexSetConfig());
 
-        final boolean updated = templateService.update(id, new IndexSetTemplate(template));
+        final boolean updated = validateAndPersistWithRepositoryLock(template.indexSetConfig(),
+                () -> templateService.update(id, new IndexSetTemplate(template)));
         if (!updated) {
             throw new NotFoundException(f("Template %s <%s> does not exist", id, template.title()));
+        }
+    }
+
+    // Keeps a concurrent repository delete from missing the reference this save adds.
+    private <T> T validateAndPersistWithRepositoryLock(IndexSetTemplateConfig config, Supplier<T> persist) {
+        final Optional<String> repositoryLockId = Optional.ofNullable(config.dataTieringConfig())
+                .flatMap(DataTieringConfig::repositoryLockId);
+        if (repositoryLockId.isEmpty()) {
+            validateConfig(config);
+            return persist.get();
+        }
+        try (RefreshingLockService lockService = lockServiceFactory.create()) {
+            lockService.acquireAndKeepLock(repositoryLockId.get(), 1);
+            validateConfig(config);
+            return persist.get();
+        } catch (AlreadyLockedException e) {
+            throw new ClientErrorException(e.getMessage(), Response.Status.CONFLICT);
         }
     }
 
