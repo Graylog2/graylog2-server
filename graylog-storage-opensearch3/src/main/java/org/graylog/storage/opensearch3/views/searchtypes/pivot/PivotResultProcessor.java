@@ -107,7 +107,9 @@ class PivotResultProcessor {
 
         if (tuple.isOtherBucket()) {
             // The (Other) bucket is synthetic: it has no aggregations to read, only values derived from its siblings.
-            addDerivedValues(rowBuilder, pivot, tuple.derivedValues(), new ArrayDeque<>(), true, "row-leaf");
+            if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
+                addDerivedValues(rowBuilder, pivot, tuple.derivedValues(), new ArrayDeque<>(), true, "row-leaf");
+            }
             if (!pivot.columnGroups().isEmpty()) {
                 addOtherColumnValues(rowBuilder, pivot, queryContext, colGroupNames, seriesNames, tuple);
             }
