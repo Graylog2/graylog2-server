@@ -72,7 +72,7 @@ class MoreSearchTest {
 
     @Test
     void doubleQuoteIsEscaped() {
-        // '"' and '\"' are identical Java char literals — the recent cleanup did not change behavior.
+        // '"' and '\"' are identical Java char literals.
         assertThat(MoreSearch.luceneEscape("\"")).isEqualTo("\\\"");
     }
 
