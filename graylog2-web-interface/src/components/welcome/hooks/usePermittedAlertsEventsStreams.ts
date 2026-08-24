@@ -14,19 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import usePermissions from 'hooks/usePermissions';
 
-import useGeneralMetricsSearch from './hooks/useGeneralMetricsSearch';
-import WelcomeSearch from './WelcomeSearch';
+export const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
 
-type Props = {
-  topSourcesOnly?: boolean;
+const usePermittedAlertsEventsStreams = () => {
+  const { isPermitted } = usePermissions();
+
+  return ALERTS_EVENTS_STREAMS.filter((streamId) => isPermitted(`streams:read:${streamId}`));
 };
 
-const GeneralWelcomeMetrics = ({ topSourcesOnly = false }: Props) => {
-  const view = useGeneralMetricsSearch(topSourcesOnly);
-
-  return <WelcomeSearch view={view} />;
-};
-
-export default GeneralWelcomeMetrics;
+export default usePermittedAlertsEventsStreams;

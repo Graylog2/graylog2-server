@@ -17,7 +17,6 @@
 import { useMemo } from 'react';
 
 import generateId from 'logic/generateId';
-import usePermissions from 'hooks/usePermissions';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
@@ -37,8 +36,7 @@ import useWelcomeSearch, {
   type WelcomeSearchWidgetEntry,
 } from './useWelcomeSearch';
 import useMetricsTimeRange from './useMetricsTimeRange';
-
-const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
+import usePermittedAlertsEventsStreams from './usePermittedAlertsEventsStreams';
 
 const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
   title: 'Top 5 Sources',
@@ -107,16 +105,12 @@ const buildEntries = (
   ];
 };
 
-const useWelcomeMetricsSearch = (topSourcesOnly: boolean = false) => {
+const useGeneralMetricsSearch = (topSourcesOnly: boolean = false) => {
   const rangeSeconds = useMetricsTimeRange();
-  const { isPermitted } = usePermissions();
-  const permittedAlertsEventsStreams = useMemo(
-    () => ALERTS_EVENTS_STREAMS.filter((streamId) => isPermitted(`streams:read:${streamId}`)),
-    [isPermitted],
-  );
+  const permittedAlertsEventsStreams = usePermittedAlertsEventsStreams();
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
 
   return useWelcomeSearch(buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly), timeRange);
 };
 
-export default useWelcomeMetricsSearch;
+export default useGeneralMetricsSearch;
