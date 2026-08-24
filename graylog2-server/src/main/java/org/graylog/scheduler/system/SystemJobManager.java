@@ -90,10 +90,21 @@ public class SystemJobManager {
     }
 
     public List<SystemJobConfig> getRunningJobConfigs(String type) {
+        return getJobConfigs(type, JobTriggerStatus.RUNNING);
+    }
+
+    /**
+     * Returns the configurations of all queued, running and paused jobs of the given type.
+     */
+    public List<SystemJobConfig> getActiveJobConfigs(String type) {
+        return getJobConfigs(type, JobTriggerStatus.RUNNABLE, JobTriggerStatus.RUNNING, JobTriggerStatus.PAUSED);
+    }
+
+    private List<SystemJobConfig> getJobConfigs(String type, JobTriggerStatus... statuses) {
         final var query = Filters.and(
                 // The trigger's job definition ID is the type name for system jobs
                 Filters.eq(JobTriggerDto.FIELD_JOB_DEFINITION_ID, type),
-                Filters.eq(JobTriggerDto.FIELD_STATUS, JobTriggerStatus.RUNNING)
+                Filters.in(JobTriggerDto.FIELD_STATUS, statuses)
         );
 
         try (var stream = triggerService.streamByQuery(query)) {
