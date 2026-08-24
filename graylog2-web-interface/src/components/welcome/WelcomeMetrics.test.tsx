@@ -128,7 +128,7 @@ describe('WelcomeMetrics', () => {
 
     it('shows the default metrics view when the registered plugin is not enabled', async () => {
       registerPlugins([
-        { label: 'Security', component: () => <div>Security metrics content</div>, isEnabled: () => false },
+        { label: 'Extra', component: () => <div>Extra tab content</div>, isEnabled: () => false },
       ]);
       asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
 
@@ -141,8 +141,8 @@ describe('WelcomeMetrics', () => {
     it('shows the default metrics view when the license is invalid, even though a plugin is registered', async () => {
       registerPlugins([
         {
-          label: 'Security',
-          component: () => <div>Security metrics content</div>,
+          label: 'Extra',
+          component: () => <div>Extra tab content</div>,
           isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
         },
       ]);
@@ -156,8 +156,8 @@ describe('WelcomeMetrics', () => {
     it('shows a segmented control with a General tab and the extra tab, selecting the extra tab by default', async () => {
       registerPlugins([
         {
-          label: 'Security',
-          component: () => <div>Security metrics content</div>,
+          label: 'Extra',
+          component: () => <div>Extra tab content</div>,
           isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
         },
       ]);
@@ -165,16 +165,16 @@ describe('WelcomeMetrics', () => {
 
       renderWithStreams([accessibleStream]);
 
-      await screen.findByText('Security metrics content');
+      await screen.findByText('Extra tab content');
       expect(screen.getByText('General')).toBeInTheDocument();
-      expect(screen.getByText('Security')).toBeInTheDocument();
+      expect(screen.getByText('Extra')).toBeInTheDocument();
     });
 
     it('shows the default MetricsSearchPage content in the General tab when no welcomePageMetrics.general plugin is registered', async () => {
       registerPlugins([
         {
-          label: 'Security',
-          component: () => <div>Security metrics content</div>,
+          label: 'Extra',
+          component: () => <div>Extra tab content</div>,
           isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
         },
       ]);
@@ -192,8 +192,8 @@ describe('WelcomeMetrics', () => {
       registerPlugins(
         [
           {
-            label: 'Security',
-            component: () => <div>Security metrics content</div>,
+            label: 'Extra',
+            component: () => <div>Extra tab content</div>,
             isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
           },
         ],
@@ -237,8 +237,8 @@ describe('WelcomeMetrics', () => {
     it('switches between the General tab and an extra tab when clicked', async () => {
       registerPlugins([
         {
-          label: 'Security',
-          component: () => <div>Security metrics content</div>,
+          label: 'Extra',
+          component: () => <div>Extra tab content</div>,
           isEnabled: ({ isValidSecurityLicense }) => isValidSecurityLicense,
         },
       ]);
@@ -246,15 +246,15 @@ describe('WelcomeMetrics', () => {
 
       renderWithStreams([accessibleStream]);
 
-      await screen.findByText('Security metrics content');
+      await screen.findByText('Extra tab content');
 
       const generalTab = await screen.findByText('General');
       await userEvent.click(generalTab);
       await screen.findByText('Messages Today');
 
-      const securityTab = await screen.findByText('Security');
-      await userEvent.click(securityTab);
-      await screen.findByText('Security metrics content');
+      const extraTab = await screen.findByText('Extra');
+      await userEvent.click(extraTab);
+      await screen.findByText('Extra tab content');
     });
   });
 });
