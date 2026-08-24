@@ -14,20 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.testing;
+import usePermissions from 'hooks/usePermissions';
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
-import org.graylog2.storage.SearchVersion;
+export const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
 
-import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
+const usePermittedAlertsEventsStreams = () => {
+  const { isPermitted } = usePermissions();
 
-public class OpenSearchInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder getBuilderFor(final SearchVersion version) {
-        if (version.satisfies(OPENSEARCH, ">=2.0.0")) {
-            return new OpenSearchInstanceBuilder(version);
-        }
-        return null;
-    }
-}
+  return ALERTS_EVENTS_STREAMS.filter((streamId) => isPermitted(`streams:read:${streamId}`));
+};
+
+export default usePermittedAlertsEventsStreams;
