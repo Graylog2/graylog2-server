@@ -15,50 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { forwardRef, useMemo } from 'react';
-
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import { BLANK } from 'views/components/contexts/SearchPageLayoutContext';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
-import SearchPage from 'views/pages/SearchPage';
-import WidgetActionsContext from 'views/components/contexts/WidgetActionsContext';
 
 import useWelcomeMetricsSearch from './hooks/useWelcomeMetricsSearch';
-import useMetricsTimeRange from './hooks/useMetricsTimeRange';
-import replayLinkWidgetAction from './ReplayLinkWidgetAction';
-
-const WIDGET_ACTIONS = [replayLinkWidgetAction];
-
-const SearchAreaContainer = forwardRef<HTMLDivElement, React.PropsWithChildren>(({ children }, ref) => (
-  <div ref={ref}>{children}</div>
-));
+import WelcomeSearchPage from './WelcomeSearchPage';
 
 type Props = {
   topSourcesOnly?: boolean;
 };
 
 const MetricsSearchPage = ({ topSourcesOnly = false }: Props) => {
-  const rangeSeconds = useMetricsTimeRange();
-  const view = useWelcomeMetricsSearch(rangeSeconds, topSourcesOnly);
+  const view = useWelcomeMetricsSearch(topSourcesOnly);
 
-  const searchPageLayoutContextValue = useMemo(
-    () => ({
-      sidebar: { isShown: false },
-      viewActions: BLANK,
-      searchAreaContainer: { component: SearchAreaContainer },
-    }),
-    [],
-  );
-
-  return (
-    <InteractiveContext.Provider value={false}>
-      <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
-        <SearchPageLayoutProvider value={searchPageLayoutContextValue}>
-          <SearchPage view={view} isNew={false} skipNoStreamsCheck />
-        </SearchPageLayoutProvider>
-      </WidgetActionsContext.Provider>
-    </InteractiveContext.Provider>
-  );
+  return <WelcomeSearchPage view={view} />;
 };
 
 export default MetricsSearchPage;

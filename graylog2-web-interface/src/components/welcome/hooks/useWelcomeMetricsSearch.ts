@@ -31,14 +31,12 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
 import useWelcomeSearch, {
-  DEFAULT_TIME_RANGE_SECONDS,
   numberWidget,
   messagesTodayLink,
   alertsOrEventsLink,
   type WelcomeSearchWidgetEntry,
 } from './useWelcomeSearch';
-
-export { DEFAULT_TIME_RANGE_SECONDS };
+import useMetricsTimeRange from './useMetricsTimeRange';
 
 const ALERTS_EVENTS_STREAMS = ['000000000000000000000003', '000000000000000000000002'];
 
@@ -109,10 +107,8 @@ const buildEntries = (
   ];
 };
 
-const useWelcomeMetricsSearch = (
-  rangeSeconds: number = DEFAULT_TIME_RANGE_SECONDS,
-  topSourcesOnly: boolean = false,
-) => {
+const useWelcomeMetricsSearch = (topSourcesOnly: boolean = false) => {
+  const rangeSeconds = useMetricsTimeRange();
   const { isPermitted } = usePermissions();
   const permittedAlertsEventsStreams = useMemo(
     () => ALERTS_EVENTS_STREAMS.filter((streamId) => isPermitted(`streams:read:${streamId}`)),
