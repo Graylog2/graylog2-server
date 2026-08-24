@@ -44,6 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @ExtendWith(MongoDBExtension.class)
 class SystemJobManagerTest {
@@ -193,6 +194,25 @@ class SystemJobManagerTest {
     void getRunningJobReturnsEmptyForNonExistentId() {
         // Use a valid ObjectId format that doesn't exist in the database
         assertThat(systemJobManager.getRunningJob("000000000000000000000000")).isEmpty();
+    }
+
+    @Test
+    void cancelSetsCancelFlagOnTrigger() {
+        systemJobManager.submit(TestSystemJobConfig.create("cancel-me"));
+        final var locked = triggerService.nextRunnableTrigger();
+        assertThat(locked).isPresent();
+        assertThat(locked.get().isCancelled()).isFalse();
+        final var triggerId = locked.get().id();
+
+        systemJobManager.cancel(triggerId);
+
+        assertThat(triggerService.get(triggerId))
+                .hasValueSatisfying(trigger -> assertThat(trigger.isCancelled()).isTrue());
+    }
+
+    @Test
+    void cancelIsNoOpForNonExistentId() {
+        assertThatCode(() -> systemJobManager.cancel("000000000000000000000000")).doesNotThrowAnyException();
     }
 
     /**

@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @Singleton
@@ -102,6 +103,15 @@ public class SystemJobManager {
         return triggerService.get(requireNonBlank(id, "id can't be blank"))
                 .filter(trigger -> trigger.status() == JobTriggerStatus.RUNNING)
                 .map(this::toSystemJobInfo);
+    }
+
+    /**
+     * Requests cancellation of the system job with the given trigger ID by setting the trigger's cancel flag. The
+     * running job stops at its next check of {@link SystemJobContext#isCancelled()}. Callers are responsible for
+     * permission checks and for verifying that the job is cancelable (see {@link SystemJobSummary#isCancelable()}).
+     */
+    public void cancel(String id) {
+        triggerService.cancelTriggerByQuery(idEq(requireNonBlank(id, "id can't be blank")));
     }
 
     private Map<String, SystemJobSummary> getJobsByQuery(Bson query) {
