@@ -35,7 +35,7 @@ export type TimeConfigType = {
 export type ValuesConfigType = {
   limit: number;
   skip_empty_values: boolean;
-  other_bucket: boolean;
+  other_bucket?: boolean;
 };
 
 export type PivotConfigType = TimeConfigType | ValuesConfigType;

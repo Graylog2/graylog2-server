@@ -47,7 +47,7 @@ const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
     .config(
       AggregationWidgetConfig.builder()
         .rowPivots([pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], []))])
-        .columnPivots([Pivot.createValues(['source'], { limit: 5, skip_empty_values: false, other_bucket: false })])
+        .columnPivots([Pivot.createValues(['source'], { limit: 5, skip_empty_values: false })])
         .series([Series.forFunction('count()')])
         .visualization('area')
         .visualizationConfig(AreaVisualizationConfig.create('spline'))
