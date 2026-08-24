@@ -1,0 +1,4 @@
+type = "f"
+message = "Add Space char to Lucene query escaping."
+
+pulls = ["27029"]
