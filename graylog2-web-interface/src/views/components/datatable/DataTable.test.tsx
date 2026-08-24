@@ -272,6 +272,43 @@ describe('DataTable', () => {
     await screen.findByRole('columnheader', { name: 'TCP' });
   });
 
+  it('renders the (Other) column last regardless of key ordering', async () => {
+    const otherBucketData = {
+      chart: [
+        {
+          key: [],
+          values: [
+            { key: ['(Other)', 'count()'], value: 3, rollup: false, source: 'col-leaf' },
+            { key: ['zzz', 'count()'], value: 1, rollup: false, source: 'col-leaf' },
+            { key: ['aaa', 'count()'], value: 2, rollup: false, source: 'col-leaf' },
+          ],
+          source: 'leaf',
+        },
+      ],
+    };
+
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([])
+      .columnPivots([columnPivot])
+      .series([series])
+      .sort([])
+      .visualization('table')
+      .rollup(false)
+      .build();
+    render(
+      <SimplifiedDataTable
+        config={config}
+        // @ts-expect-error
+        data={otherBucketData}
+      />,
+    );
+
+    const headers = await screen.findAllByRole('columnheader');
+    const labels = headers.map((header) => header.textContent);
+
+    expect(labels.indexOf('(Other)')).toBeGreaterThan(labels.indexOf('zzz'));
+  });
+
   it('passes inferred types to fields', async () => {
     const avgSeries = new Series('avg(bytes)');
     const maxTimestampSeries = new Series('max(timestamp)');
