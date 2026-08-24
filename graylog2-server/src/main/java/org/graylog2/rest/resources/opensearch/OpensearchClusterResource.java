@@ -17,8 +17,6 @@
 package org.graylog2.rest.resources.opensearch;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -52,7 +50,6 @@ import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 @Tag(name = "System/Opensearch", description = "OpenSearch Node discovery")
 @RequiresAuthentication
@@ -84,12 +81,7 @@ public class OpensearchClusterResource extends RestResource {
 
     @Inject
     public OpensearchClusterResource(OpensearchNodesProvider provider) {
-        final Supplier<List<OpensearchNode>> cachingSupplier = Suppliers.memoizeWithExpiration(
-                provider::get,
-                10,
-                TimeUnit.SECONDS
-        );
-        this.opensearchNodesSearchService = new LuceneInMemorySearchEngine<>(attributes, cachingSupplier);
+        this.opensearchNodesSearchService = new LuceneInMemorySearchEngine<>(attributes, provider::get);
         this.searchQueryParser = new SearchQueryParser(DEFAULT_SORT_FIELD, attributes);
     }
 

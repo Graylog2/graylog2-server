@@ -16,8 +16,11 @@
  */
 package org.graylog2.cluster.nodes.opensearch;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
@@ -27,22 +30,30 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Singleton
 public class OpensearchNodesProvider implements Provider<List<OpensearchNode>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchNodesProvider.class);
 
     private final Cluster cluster;
+    private final Supplier<List<OpensearchNode>> cachingSupplier;
 
     @Inject
     public OpensearchNodesProvider(Cluster cluster) {
         this.cluster = cluster;
+        this.cachingSupplier = Suppliers.memoizeWithExpiration(this::fetchNodes, 10, TimeUnit.SECONDS);
     }
 
     @Override
     public List<OpensearchNode> get() {
+        return cachingSupplier.get();
+    }
+
+    private List<OpensearchNode> fetchNodes() {
         try {
             final Map<String, NodeInfo> nodesInfo = cluster.getNodesInfo();
             final Map<String, NodeUtilization> utilizationByName = cluster.getNodesUtilization().values().stream()
