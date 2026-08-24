@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeAll;
 import static org.graylog.plugins.views.search.aggregations.MissingBucketConstants.MISSING_BUCKET_NAME;
 import static org.graylog.plugins.views.search.aggregations.OtherBucketConstants.OTHER_BUCKET_NAME;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -77,7 +78,7 @@ public class SearchWithAggregationsSupportingOtherBucketsIT {
         response.body(".rows[0].key", contains("aaa"));
         response.body(".rows[1].key", contains("bbb"));
         response.body(".rows[2].key", contains(OTHER_BUCKET_NAME));
-        response.body(".rows[3].key", contains());
+        response.body(".rows[3].key", empty());
 
         // ccc: 2 docs, ages 10+20=30. ddd: 1 doc, age 10. Tail: 3 docs, sum 40.
         response.body(".rows[2].values.find{ it.key == ['count()'] }.value", equalTo(3));
