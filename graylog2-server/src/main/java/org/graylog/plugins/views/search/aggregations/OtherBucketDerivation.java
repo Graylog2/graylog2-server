@@ -114,8 +114,10 @@ public final class OtherBucketDerivation {
         if (spec instanceof SumOfSquares) {
             return tailStats(input).map(Stats::sumOfSquares).map(value -> Math.max(0.0d, value)).map(Object.class::cast);
         }
-        if (spec instanceof Average) {
-            return tailStats(input).flatMap(OtherBucketDerivation::mean).map(Object.class::cast);
+        if (spec instanceof Average average) {
+            return tailStats(input).flatMap(OtherBucketDerivation::mean)
+                    .map(value -> applyWholeNumber(value, average.wholeNumber()))
+                    .map(Object.class::cast);
         }
         if (spec instanceof Variance) {
             return tailStats(input).flatMap(OtherBucketDerivation::variance).map(Object.class::cast);
@@ -161,6 +163,20 @@ public final class OtherBucketDerivation {
 
     private static Optional<Double> mean(Stats stats) {
         return stats.count() > 0 ? Optional.of(stats.sum() / stats.count()) : Optional.empty();
+    }
+
+    /**
+     * Mirrors {@code OSAverageHandler.getValueFromAggregationResult}'s {@code wholeNumber} rounding, so the
+     * {@code (Other)} row's average matches the rounding ordinary rows apply.
+     */
+    private static double applyWholeNumber(double value, boolean wholeNumber) {
+        if (!wholeNumber) {
+            return value;
+        }
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            return 0;
+        }
+        return Math.round(value);
     }
 
     private static Optional<Double> variance(Stats stats) {

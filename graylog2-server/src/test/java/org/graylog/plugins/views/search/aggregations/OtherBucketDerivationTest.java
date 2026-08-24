@@ -90,6 +90,25 @@ class OtherBucketDerivationTest {
     }
 
     @Test
+    void averageWithWholeNumberRoundsTheResult() {
+        // tail: 2 values summing to 61 -> avg 30.5, which whole_number rounds to 31.
+        final var result = OtherBucketDerivation.derive(Average.builder().field("age").wholeNumber(true).build(),
+                withStats(new Stats(5L, 101.0d, 0.0d), new Stats(3L, 40.0d, 0.0d)));
+
+        assertThat(result).get().asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isCloseTo(31.0d, within(1e-9));
+    }
+
+    @Test
+    void averageWithoutWholeNumberKeepsTheFraction() {
+        final var result = OtherBucketDerivation.derive(Average.builder().field("age").wholeNumber(false).build(),
+                withStats(new Stats(5L, 101.0d, 0.0d), new Stats(3L, 40.0d, 0.0d)));
+
+        assertThat(result).get().asInstanceOf(InstanceOfAssertFactories.DOUBLE)
+                .isCloseTo(30.5d, within(1e-9));
+    }
+
+    @Test
     void averageIsOmittedWhenTailIsEmpty() {
         final var result = OtherBucketDerivation.derive(Average.builder().field("age").build(),
                 withStats(new Stats(3L, 40.0d, 0.0d), new Stats(3L, 40.0d, 0.0d)));
