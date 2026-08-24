@@ -21,6 +21,7 @@ import 'moment-precise-range-plugin';
 
 import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import { EffectiveTimeRange } from 'components/events/EventsHistogram';
 
 export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
   const rangeAsSeconds = timerange?.[fieldName];
@@ -59,7 +60,10 @@ const absoluteTimeRangeToString = (
 
 const keywordTimeRangeToString = (timerange: KeywordTimeRange): string => timerange.keyword;
 
-const TimeRangeToString = (timerange?: TimeRange, localizer?: (dateTime: string) => string): string => {
+const TimeRangeToString = (
+  timerange?: TimeRange | EffectiveTimeRange,
+  localizer?: (dateTime: string) => string,
+): string => {
   const { type } = timerange || {};
 
   switch (type) {

@@ -25,10 +25,10 @@ import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
 import SectionHeader from 'components/welcome/SectionHeader';
 import GeneralMetrics from 'components/welcome/GeneralMetrics';
 import type { WelcomePageMetricsPlugin } from 'components/welcome/types';
-
-import GeneralWelcomeMetrics from './GeneralWelcomeMetrics';
 import useHasAccessToAnyStream from 'hooks/useHasAccessToAnyStream';
 import NoStreamAccessAlert from 'components/welcome/NoStreamAccessAlert';
+
+import GeneralWelcomeMetrics from './GeneralWelcomeMetrics';
 
 const Container = styled.div`
   margin-bottom: 6.4px;
