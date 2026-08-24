@@ -38,6 +38,7 @@ public abstract class Values implements BucketSpec {
     public static final String NAME = "values";
     public static final int DEFAULT_LIMIT = 15;
     private static final String FIELD_SKIP_EMPTY_VALUES = "skip_empty_values";
+    private static final String FIELD_OTHER_BUCKET = "other_bucket";
 
     @Override
     public abstract String type();
@@ -52,11 +53,15 @@ public abstract class Values implements BucketSpec {
     @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
     public abstract boolean skipEmptyValues();
 
+    @JsonProperty(FIELD_OTHER_BUCKET)
+    public abstract boolean otherBucket();
+
     public static Values.Builder builder() {
         return new AutoValue_Values.Builder()
                 .type(NAME)
                 .limit(DEFAULT_LIMIT)
-                .skipEmptyValues(false);
+                .skipEmptyValues(false)
+                .otherBucket(false);
     }
 
     public Values withLimit(int limit) {
@@ -94,6 +99,13 @@ public abstract class Values implements BucketSpec {
         @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
         public Builder setSkipEmptyValues(@Nullable Boolean skipEmptyValues) {
             return skipEmptyValues(firstNonNull(skipEmptyValues, false));
+        }
+
+        public abstract Builder otherBucket(Boolean otherBucket);
+
+        @JsonProperty(FIELD_OTHER_BUCKET)
+        public Builder setOtherBucket(@Nullable Boolean otherBucket) {
+            return otherBucket(firstNonNull(otherBucket, false));
         }
     }
 }
