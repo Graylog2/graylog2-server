@@ -23,6 +23,7 @@ import type { RuleType } from 'components/rules/hooks/useRules';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import * as JSON from 'util/json';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { PipelineRulesContext, SimulationFieldType } from './RuleContext';
