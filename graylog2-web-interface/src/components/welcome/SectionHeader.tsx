@@ -14,20 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.testing;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
-import org.graylog2.storage.SearchVersion;
+import styled, { css } from 'styled-components';
 
-import static org.graylog2.storage.SearchVersion.Distribution.OPENSEARCH;
+const SectionHeader = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: ${theme.spacings.lg} 0 ${theme.spacings.xs};
+  `,
+);
 
-public class OpenSearchInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder getBuilderFor(final SearchVersion version) {
-        if (version.satisfies(OPENSEARCH, ">=2.0.0")) {
-            return new OpenSearchInstanceBuilder(version);
-        }
-        return null;
-    }
-}
+export default SectionHeader;
