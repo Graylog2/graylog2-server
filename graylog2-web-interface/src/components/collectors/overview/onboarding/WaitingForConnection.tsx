@@ -50,7 +50,7 @@ const StatusRow = styled.div(
 
 const StatusText = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.body};
   `,
 );

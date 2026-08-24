@@ -25,7 +25,6 @@ import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
 import ConnectionSuccess from 'components/collectors/overview/onboarding/ConnectionSuccess';
-import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
 import Routes from 'routing/Routes';
 import useLocation from 'routing/useLocation';
 import { extractErrorMessage } from 'util/extractErrorMessage';
@@ -35,9 +34,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
-  const location = useLocation<{ platformId?: PlatformId; fleetName?: string } | null>();
+  const location = useLocation<{ fleetName?: string } | null>();
   // Set by the onboarding wizard's history push; absent on direct visits.
-  const platformId = location.state?.platformId;
   const stateFleetName = location.state?.fleetName;
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
@@ -74,7 +72,7 @@ const CollectorsOnboardingInstancePage = () => {
       );
     }
 
-    return <ConnectionSuccess platformId={platformId} instance={instance} fleetName={fleet?.name ?? stateFleetName} />;
+    return <ConnectionSuccess instance={instance} fleetName={fleet?.name ?? stateFleetName} />;
   };
 
   return (

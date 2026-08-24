@@ -21,7 +21,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import type { StepType } from 'components/common/Wizard';
 
@@ -75,9 +74,7 @@ type CommonStepProps = {
   key: string;
   action?: 'edit' | 'create';
   entityTypes?: {};
-  eventDefinition: EventDefinition & {
-    share_request?: EntitySharePayload;
-  };
+  eventDefinition: EventDefinition;
   onChange: (key: string, value: unknown) => void;
   validation?: {
     errors: {

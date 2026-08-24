@@ -395,7 +395,8 @@ public class CollectorInstancesResource extends RestResource {
                 dto.nextCertificateExpiresAt().orElse(null),
                 attributesToMap(dto.identifyingAttributes()),
                 attributesToMap(dto.nonIdentifyingAttributes()),
-                hasPendingChanges
+                hasPendingChanges,
+                dto.health().orElse(null)
         );
     }
 
