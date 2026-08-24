@@ -126,6 +126,20 @@ public final class OtherBucketDerivation {
         return Optional.empty();
     }
 
+    /**
+     * Derives a field-less {@code count()} within a single column of the {@code (Other)} row.
+     * {@code sum_other_doc_count} describes the row grouping's own tail, not the tail within one column, so it
+     * cannot be used here; the doc count of the tail is reconstructed as {@code parentDocCount - Σ(shownDocCounts)}
+     * instead.
+     */
+    public static Optional<Object> deriveFromDocCounts(SeriesSpec spec, long parentDocCount, List<Long> shownDocCounts) {
+        if (spec instanceof Count count && count.field().isEmpty()) {
+            final long tail = parentDocCount - shownDocCounts.stream().mapToLong(Long::longValue).sum();
+            return tail > 0 ? Optional.of(tail) : Optional.empty();
+        }
+        return Optional.empty();
+    }
+
     private static Optional<Double> subtract(TailInput input) {
         if (input.parentValue() == null) {
             return Optional.empty();

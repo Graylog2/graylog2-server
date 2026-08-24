@@ -207,4 +207,24 @@ class OtherBucketDerivationTest {
 
         assertThat(result).isEmpty();
     }
+
+    @Test
+    void deriveFromDocCountsSubtractsShownFromParent() {
+        assertThat(OtherBucketDerivation.deriveFromDocCounts(Count.builder().build(), 10L, List.of(4L, 3L)))
+                .contains(3L);
+    }
+
+    @Test
+    void deriveFromDocCountsOmitsEmptyTail() {
+        assertThat(OtherBucketDerivation.deriveFromDocCounts(Count.builder().build(), 7L, List.of(4L, 3L)))
+                .isEmpty();
+    }
+
+    @Test
+    void deriveFromDocCountsIsOnlyForFieldLessCount() {
+        assertThat(OtherBucketDerivation.deriveFromDocCounts(Count.builder().field("age").build(), 10L, List.of(4L)))
+                .isEmpty();
+        assertThat(OtherBucketDerivation.deriveFromDocCounts(Sum.builder().field("age").build(), 10L, List.of(4L)))
+                .isEmpty();
+    }
 }

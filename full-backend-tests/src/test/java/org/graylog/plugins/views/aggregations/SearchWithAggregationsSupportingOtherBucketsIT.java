@@ -206,4 +206,24 @@ public class SearchWithAggregationsSupportingOtherBucketsIT {
         response.body(".rows.find{ it.key == [] }.values.find{ it.key == ['count()'] }.value", equalTo(8));
         response.body(".rows.find{ it.key == [] }.values.find{ it.key == ['sum(age)'] }.value", equalTo(2075.0f));
     }
+
+    @FullBackendTest
+    void otherRowCarriesPerColumnValues() {
+        // Rows: name (limit 1 -> aaa shown, rest in Other). Columns: age.
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build())
+                .rowGroups(Values.builder().field("name").limit(1).otherBucket(true).build())
+                .columnGroups(Values.builder().field("age").limit(10).build())
+                .build();
+        final ValidatableResponse response = execute(pivot);
+
+        response.body(".rows[1].key", contains(OTHER_BUCKET_NAME));
+        // Tail is bbb (10,20,30), ccc (10,20), ddd (10). By age: 10 -> 3 docs, 20 -> 2 docs, 30 -> 1 doc.
+        response.body(".rows[1].values.find{ it.key == ['10', 'count()'] }.value", equalTo(3));
+        response.body(".rows[1].values.find{ it.key == ['20', 'count()'] }.value", equalTo(2));
+        response.body(".rows[1].values.find{ it.key == ['30', 'count()'] }.value", equalTo(1));
+        // age 40 belongs entirely to aaa, so the tail has no cell for it.
+        response.body(".rows[1].values.find{ it.key == ['40', 'count()'] }", nullValue());
+    }
 }

@@ -262,7 +262,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 .addAll(Collections.nCopies(values.fields().size(), OTHER_BUCKET_NAME))
                 .build();
 
-        return Optional.of(PivotBucket.createOther(keys, OtherBucket.create(otherDocCount), derivedValues));
+        return Optional.of(PivotBucket.createOther(keys, OtherBucket.create(otherDocCount), derivedValues, parent, shownBuckets));
     }
 
     /**
