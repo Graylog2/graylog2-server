@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import merge from 'lodash/merge';
@@ -108,14 +108,16 @@ const layout: Partial<PlotLayout> = {
   },
 };
 
-const prepareTimeRangeForGraph = (
-  timerange: {
-    from: string;
-    to: string;
-    type: string;
-  },
-  formatTime: FormatTime,
-) => [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
+export type EffectiveTimeRange = {
+  from: string;
+  to: string;
+  type: string;
+};
+
+const prepareTimeRangeForGraph = (timerange: EffectiveTimeRange, formatTime: FormatTime) => [
+  formatTime(timerange.from, 'internal'),
+  formatTime(timerange.to, 'internal'),
+];
 
 const EventsGraph = ({
   data: { results, timerange },
@@ -179,6 +181,7 @@ type Props = MiddleSectionProps & {
   eventsHistogramFetcher?: EventsHistogramFetcher;
   height?: string;
   readOnly?: boolean;
+  onEffectiveTimeRangeChange?: (timerange: EffectiveTimeRange) => void;
 };
 const EventsHistogram = ({
   searchParams,
@@ -186,6 +189,7 @@ const EventsHistogram = ({
   eventsHistogramFetcher = fetchEventsHistogram,
   height = DEFAULT_HEIGHT,
   readOnly = false,
+  onEffectiveTimeRangeChange = undefined,
 }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const { data, isLoading, refetch, isError, error } = useQuery({
@@ -195,6 +199,12 @@ const EventsHistogram = ({
   });
 
   useOnRefresh(refetch);
+
+  useEffect(() => {
+    if (data) {
+      onEffectiveTimeRangeChange?.(data.timerange);
+    }
+  }, [data, onEffectiveTimeRangeChange]);
 
   const alerts = parseTypeFilter(searchParams?.filters?.get('alert')?.[0]);
   const onZoom = useCallback(

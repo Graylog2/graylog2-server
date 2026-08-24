@@ -17,6 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { TextOverflowEllipsis } from 'components/common';
+
 const CardContainer = styled.div<{ $clickable: boolean }>`
   height: 100%;
   display: flex;
@@ -46,7 +48,6 @@ const HeaderRow = styled.div`
   min-height: 25px;
 `;
 
-/* Matches the real search widget's title styling (WidgetHeader's Title). */
 const Headline = styled.span(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.large};
@@ -62,16 +63,24 @@ const ActionsWrapper = styled.span`
   display: inline-flex;
 `;
 
-/* Matches the bottom-right time range text real search widgets show (TimerangeInfo). */
-const TimeRangeInfo = styled.small`
-  color: ${({ theme }) => theme.colors.text.secondary};
-  white-space: nowrap;
-  align-self: flex-end;
+const WidgetMeta = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
+
+const TimeRangeInfo = styled(TextOverflowEllipsis)(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
+    align-self: flex-end;
+    font-size: ${theme.fonts.size.small};
+  `,
+);
 
 type Props = React.PropsWithChildren<{
   headline: string;
-  timeRangeInfo?: React.ReactNode;
+  timeRangeInfo?: string;
+  timeRangeTooltip?: string;
   actions?: React.ReactNode;
   onClick?: () => void;
   className?: string;
@@ -80,6 +89,7 @@ type Props = React.PropsWithChildren<{
 const WidgetCard = ({
   headline,
   timeRangeInfo = undefined,
+  timeRangeTooltip = undefined,
   actions = undefined,
   onClick = undefined,
   className = undefined,
@@ -91,7 +101,11 @@ const WidgetCard = ({
       {actions && <ActionsWrapper onClick={(e) => e.stopPropagation()}>{actions}</ActionsWrapper>}
     </HeaderRow>
     {children}
-    {timeRangeInfo && <TimeRangeInfo>{timeRangeInfo}</TimeRangeInfo>}
+    {timeRangeInfo && (
+      <WidgetMeta>
+        <TimeRangeInfo titleOverride={timeRangeTooltip}>{timeRangeInfo}</TimeRangeInfo>
+      </WidgetMeta>
+    )}
   </CardContainer>
 );
 
