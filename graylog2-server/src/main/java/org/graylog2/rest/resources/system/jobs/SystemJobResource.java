@@ -161,7 +161,8 @@ public class SystemJobResource extends RestResource {
             );
         }
 
-        final Optional<SystemJobSummary> systemJobSummary = systemJobManager.getRunningJob(jobId);
+        final Optional<SystemJobSummary> systemJobSummary = systemJobManager.getRunningJob(jobId)
+                .filter(summary -> !jobResourceHandlerService.handlesJobType(summary.jobType()));
         if (systemJobSummary.isPresent()) {
             checkPermission(RestPermissions.SYSTEMJOBS_READ, systemJobSummary.get().jobType());
             return systemJobSummary.get();
