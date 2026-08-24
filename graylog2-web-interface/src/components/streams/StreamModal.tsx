@@ -69,7 +69,7 @@ const StreamModal = ({
   initialValues = {
     title: '',
     description: '',
-    remove_matches_from_default_stream: false,
+    remove_matches_from_default_stream: true,
     share_request: null,
   },
   title: modalTitle,

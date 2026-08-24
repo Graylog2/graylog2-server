@@ -88,6 +88,8 @@ describe('StreamModal', () => {
     await screen.findByRole('textbox', {
       name: /description/i,
     });
+
+    expect(await screen.findByRole('checkbox', { name: /remove matches from/i })).toBeChecked();
   });
 
   it('should update stream', async () => {
@@ -186,7 +188,7 @@ describe('StreamModal', () => {
       expect(onSubmit).toHaveBeenCalledWith({
         description: 'New description',
         index_set_id: 'index-set-id-2',
-        remove_matches_from_default_stream: false,
+        remove_matches_from_default_stream: true,
         title: 'New title',
         share_request: {
           selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
