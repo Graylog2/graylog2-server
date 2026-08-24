@@ -21,8 +21,11 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
+import org.graylog.plugins.views.search.aggregations.OtherBucketDerivation;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
@@ -67,7 +70,43 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
-        return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+
+        final List<AggregationBuilder> metrics = List.of(termsAggregation, filterAggregation);
+        if (bucketSpec.otherBucket()) {
+            addStatsCompanions(pivot, metrics);
+        }
+
+        return CreatedAggregations.create(filterAggregation, termsAggregation, metrics);
+    }
+
+    /**
+     * Mean-based series cannot be reconstructed for the {@code (Other)} bucket from their own value alone: the tail's
+     * mean needs its value count and sum of squares. One {@code extended_stats} aggregation per field supplies all of
+     * them, at both the terms level (the shown buckets) and the enclosing filter level (the total to subtract from).
+     */
+    private void addStatsCompanions(Pivot pivot, List<AggregationBuilder> metrics) {
+        statsFields(pivot).forEach(field -> metrics.forEach(metric ->
+                metric.subAggregation(AggregationBuilders.extendedStats(statsAggregationName(field)).field(field))));
+    }
+
+    /** The distinct fields whose {@code extended_stats} the derivation will need. */
+    static List<String> statsFields(Pivot pivot) {
+        return pivot.series().stream()
+                .filter(OtherBucketDerivation::requiresStats)
+                .map(HasField.class::cast)
+                .map(HasField::field)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+    /** The {@code extended_stats} field for one series. Only call for specs where {@code requiresStats} is true. */
+    static String statsFieldOf(SeriesSpec seriesSpec) {
+        return ((HasField) seriesSpec).field();
+    }
+
+    public static String statsAggregationName(String field) {
+        return "other-stats(" + field + ")";
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<String> bucketSpecs, boolean skipEmptyValues) {
