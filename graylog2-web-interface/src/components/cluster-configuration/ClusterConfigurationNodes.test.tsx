@@ -17,10 +17,12 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import { Datanode } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import ClusterConfigurationNodes from './ClusterConfigurationNodes';
 
@@ -35,6 +37,8 @@ jest.mock('@graylog/server-api', () => ({
     runsWithDataNode: jest.fn(),
   },
 }));
+
+jest.mock('hooks/useCurrentUser');
 
 jest.mock('components/common/PaginatedEntityTable', () => ({
   __esModule: true,
@@ -56,6 +60,7 @@ jest.mock('./mongodb-nodes/useMongodbProfilingToggle', () => ({
 
 describe('<ClusterConfigurationNodes />', () => {
   beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(Datanode.runsWithDataNode).mockResolvedValue(true);
   });
 
@@ -64,13 +69,9 @@ describe('<ClusterConfigurationNodes />', () => {
   });
 
   it('renders Data Nodes instead of OpenSearch Nodes when using Data Node', async () => {
-    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
-    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
-
     render(<ClusterConfigurationNodes />);
 
-    expect(await screen.findAllByRole('table')).toHaveLength(3);
-    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(3);
+    await waitFor(() => expect(screen.getAllByRole('table')).toHaveLength(3));
     expect(screen.getByRole('radio', { name: 'Data Nodes' })).toBeInTheDocument();
     expect(screen.queryByRole('radio', { name: 'OpenSearch Nodes' })).not.toBeInTheDocument();
     expect(Datanode.runsWithDataNode).toHaveBeenCalledWith({ requestShouldExtendSession: false });
@@ -82,7 +83,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     render(<ClusterConfigurationNodes />);
 
-    await screen.findAllByRole('table');
+    await screen.findByRole('radio', { name: 'Data Nodes' });
     mockPaginatedEntityTable.mockClear();
 
     await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
@@ -96,7 +97,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     render(<ClusterConfigurationNodes />);
 
-    await screen.findAllByRole('table');
+    await screen.findByRole('radio', { name: 'Data Nodes' });
     mockPaginatedEntityTable.mockClear();
 
     await userEvent.click(screen.getByRole('radio', { name: 'MongoDB Nodes' }));
@@ -111,7 +112,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     render(<ClusterConfigurationNodes />);
 
-    expect(await screen.findAllByRole('table')).toHaveLength(3);
+    await waitFor(() => expect(screen.getAllByRole('table')).toHaveLength(3));
     expect(screen.queryByRole('radio', { name: 'Data Nodes' })).not.toBeInTheDocument();
     mockPaginatedEntityTable.mockClear();
 
@@ -123,13 +124,34 @@ describe('<ClusterConfigurationNodes />', () => {
     );
   });
 
+  it('keeps unrelated node tables visible when search backend detection fails', async () => {
+    asMock(Datanode.runsWithDataNode).mockRejectedValue(new Error('Request failed'));
+
+    render(<ClusterConfigurationNodes />);
+
+    await screen.findByText('Could not determine the configured search backend.');
+    expect(screen.getAllByRole('table')).toHaveLength(2);
+    expect(screen.getByRole('radio', { name: 'Graylog Nodes' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'MongoDB Nodes' })).toBeInTheDocument();
+  });
+
+  it('does not request search backend configuration without permission', async () => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions([]).build());
+
+    render(<ClusterConfigurationNodes />);
+
+    await screen.findByText('Could not determine the configured search backend.');
+    expect(screen.getAllByRole('table')).toHaveLength(2);
+    expect(Datanode.runsWithDataNode).not.toHaveBeenCalled();
+  });
+
   it('uses child "select node type" handler to switch view', async () => {
     const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
     const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
 
     render(<ClusterConfigurationNodes />);
 
-    await screen.findAllByRole('table');
+    await screen.findByRole('radio', { name: 'Data Nodes' });
     const calls = mockPaginatedEntityTable.mock.calls as Array<[MockPaginatedEntityTableProps]>;
     const dataNodesTableProps = calls.map(([props]) => props).find((props) => props?.humanName === 'Data Nodes');
 
@@ -153,7 +175,7 @@ describe('<ClusterConfigurationNodes />', () => {
     const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
 
     render(<ClusterConfigurationNodes />);
-    await screen.findAllByRole('table');
+    await screen.findByRole('radio', { name: 'Data Nodes' });
     mockPaginatedEntityTable.mockClear();
 
     const searchInput = screen.getByPlaceholderText('Search nodes…');

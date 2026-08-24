@@ -18,12 +18,31 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Datanode } from '@graylog/server-api';
 
-const DATANODE_CONFIGURED_QUERY_KEY = ['datanode', 'configured'] as const;
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
-const useRunsWithDataNode = () =>
-  useQuery({
+const DATANODE_CONFIGURED_QUERY_KEY = ['datanode', 'configured'] as const;
+const STALE_TIME_MS = 300000;
+
+type Options = {
+  enabled?: boolean;
+};
+
+type Result = {
+  data: boolean | undefined;
+  isLoading: boolean;
+};
+
+const useRunsWithDataNode = ({ enabled = true }: Options = {}): Result => {
+  const { permissions } = useCurrentUser();
+  const { data, isLoading } = useQuery({
     queryKey: DATANODE_CONFIGURED_QUERY_KEY,
     queryFn: () => Datanode.runsWithDataNode({ requestShouldExtendSession: false }),
+    enabled: enabled && isPermitted(permissions, 'datanode:read'),
+    staleTime: STALE_TIME_MS,
   });
+
+  return { data, isLoading };
+};
 
 export default useRunsWithDataNode;
