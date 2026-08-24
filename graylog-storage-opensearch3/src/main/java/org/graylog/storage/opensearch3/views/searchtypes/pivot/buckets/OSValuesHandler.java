@@ -112,8 +112,12 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                         Aggregation.builder().extendedStats(e -> e.field(field))))));
     }
 
-    /** The distinct fields whose {@code extended_stats} the derivation will need. */
-    static List<String> statsFields(Pivot pivot) {
+    /**
+     * The distinct fields whose {@code extended_stats} the derivation will need. Public because
+     * {@code PivotQueryGenerator}, in the parent package, also attaches these companions to the second column tree
+     * it builds for the {@code (Other)} row's per-column cells.
+     */
+    public static List<String> statsFields(Pivot pivot) {
         return pivot.series().stream()
                 .filter(OtherBucketDerivation::requiresStats)
                 .map(HasField.class::cast)
@@ -123,8 +127,12 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 .toList();
     }
 
-    /** The {@code extended_stats} field for one series. Only call for specs where {@code requiresStats} is true. */
-    static String statsFieldOf(SeriesSpec seriesSpec) {
+    /**
+     * The {@code extended_stats} field for one series. Only call for specs where {@code requiresStats} is true.
+     * Public for the same reason as {@link #statsFields}: {@code PivotResultProcessor} needs it to read the
+     * companion back when deriving the {@code (Other)} row's per-column cells.
+     */
+    public static String statsFieldOf(SeriesSpec seriesSpec) {
         return ((HasField) seriesSpec).field();
     }
 

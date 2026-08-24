@@ -51,6 +51,7 @@ public class SearchWithAggregationsSupportingOtherBucketsIT {
         api = graylogApis;
         api.backend().importElasticsearchFixture("messages-for-other-aggregation-check.json", SearchWithAggregationsSupportingOtherBucketsIT.class);
         api.backend().importElasticsearchFixture("messages-for-other-aggregation-empty-values-check.json", SearchWithAggregationsSupportingOtherBucketsIT.class);
+        api.backend().importElasticsearchFixture("messages-for-other-aggregation-column-truncation-check.json", SearchWithAggregationsSupportingOtherBucketsIT.class);
     }
 
     private ValidatableResponse execute(Pivot pivot) {
@@ -61,6 +62,11 @@ public class SearchWithAggregationsSupportingOtherBucketsIT {
     private ValidatableResponse executeEmptyValues(Pivot pivot) {
         return api.search().executePivot(pivot, "fixtureType:551200")
                 .body(".total", equalTo(8));
+    }
+
+    private ValidatableResponse executeColumnTruncation(Pivot pivot) {
+        return api.search().executePivot(pivot, "fixtureType:551201")
+                .body(".total", equalTo(17));
     }
 
     @FullBackendTest
@@ -212,7 +218,7 @@ public class SearchWithAggregationsSupportingOtherBucketsIT {
         // Rows: name (limit 1 -> aaa shown, rest in Other). Columns: age.
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
-                .series(Count.builder().build())
+                .series(Count.builder().build(), Average.builder().field("age").build())
                 .rowGroups(Values.builder().field("name").limit(1).otherBucket(true).build())
                 .columnGroups(Values.builder().field("age").limit(10).build())
                 .build();
@@ -225,5 +231,63 @@ public class SearchWithAggregationsSupportingOtherBucketsIT {
         response.body(".rows[1].values.find{ it.key == ['30', 'count()'] }.value", equalTo(1));
         // age 40 belongs entirely to aaa, so the tail has no cell for it.
         response.body(".rows[1].values.find{ it.key == ['40', 'count()'] }", nullValue());
+
+        // Every doc within a given age column has exactly that age, so avg(age) per column is trivially the
+        // column's own value - but only if the extended_stats companion needed to derive it is actually there.
+        response.body(".rows[1].values.find{ it.key == ['10', 'avg(age)'] }.value", equalTo(10.0f));
+        response.body(".rows[1].values.find{ it.key == ['20', 'avg(age)'] }.value", equalTo(20.0f));
+        response.body(".rows[1].values.find{ it.key == ['30', 'avg(age)'] }.value", equalTo(30.0f));
+    }
+
+    @FullBackendTest
+    void otherRowCarriesPerColumnValuesWithNonInnermostRowGrouping() {
+        // Rows: name (limit 1, Other on) then source. "source" is "fbi.org" for every document, so it exists
+        // purely to push the opted-in grouping away from the innermost row level. Columns: age.
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build())
+                .rowGroups(Values.builder().field("name").limit(1).otherBucket(true).build(),
+                        Values.builder().field("source").limit(10).build())
+                .columnGroups(Values.builder().field("age").limit(10).build())
+                .build();
+        final ValidatableResponse response = execute(pivot);
+
+        final String otherKey = ".rows.find{ it.key == ['" + OTHER_BUCKET_NAME + "', '" + OTHER_BUCKET_NAME + "'] }";
+        response.body(otherKey, notNullValue());
+        // Tail is bbb (10,20,30), ccc (10,20), ddd (10) - same tail as otherRowCarriesPerColumnValues. Reading the
+        // second column tree off the wrong node (a deeper row grouping's own tree, misread as columns) would
+        // report the full column total instead: 4, 3 and 2 respectively.
+        response.body(otherKey + ".values.find{ it.key == ['10', 'count()'] }.value", equalTo(3));
+        response.body(otherKey + ".values.find{ it.key == ['20', 'count()'] }.value", equalTo(2));
+        response.body(otherKey + ".values.find{ it.key == ['30', 'count()'] }.value", equalTo(1));
+        response.body(otherKey + ".values.find{ it.key == ['40', 'count()'] }", nullValue());
+    }
+
+    @FullBackendTest
+    void otherRowColumnCellOmittedWhenSiblingColumnTermsAreTruncated() {
+        // Rows: name (limit 1 -> aaa shown, 8 docs). Columns: age (limit 2).
+        // Global age totals: 10->6, 20->5, 30->3, 40->3, so the parent's top-2 columns are 10 and 20.
+        // aaa's OWN age totals: 30->3, 40->3, 10->1, 20->1, so aaa's own top-2 (limit 2) are 30 and 40 - its
+        // report has no bucket for 10 or 20 at all, and its sum_other_doc_count for that sub-aggregation is
+        // exactly the 2 documents (age 10 and 20) hidden by its own truncation.
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build(), Sum.builder().field("age").build())
+                .rowGroups(Values.builder().field("name").limit(1).otherBucket(true).build())
+                .columnGroups(Values.builder().field("age").limit(2).build())
+                .build();
+        final ValidatableResponse response = executeColumnTruncation(pivot);
+
+        response.body(".rows[1].key", contains(OTHER_BUCKET_NAME));
+        // Tail (bbb + ccc) doc count is 9, unaffected by the column-level fix.
+        response.body(".rows[1].values.find{ it.key == ['count()'] }.value", equalTo(9));
+
+        // Column 10 and column 20 both fall in aaa's own column-level tail: aaa's true contribution to them (1
+        // document each) cannot be read from the response, so both cells must be omitted rather than computed as
+        // parentTotal - 0, which would silently report 6 and 5 (and 60.0/100.0 for sum(age)) instead.
+        response.body(".rows[1].values.find{ it.key == ['10', 'count()'] }", nullValue());
+        response.body(".rows[1].values.find{ it.key == ['10', 'sum(age)'] }", nullValue());
+        response.body(".rows[1].values.find{ it.key == ['20', 'count()'] }", nullValue());
+        response.body(".rows[1].values.find{ it.key == ['20', 'sum(age)'] }", nullValue());
     }
 }

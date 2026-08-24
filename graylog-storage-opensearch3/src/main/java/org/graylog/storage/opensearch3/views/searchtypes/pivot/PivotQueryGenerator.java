@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.storage.opensearch3.views.MutableSearchRequestBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSValuesHandler;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +70,13 @@ class PivotQueryGenerator {
             addGlobalRollupSeries(pivot, queryContext, searchSourceBuilder);
         }
 
-        final List<MutableNamedAggregationBuilder> otherBucketRowRoots = new ArrayList<>();
+        final List<List<MutableNamedAggregationBuilder>> otherBucketRowTargets = new ArrayList<>();
         final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> rowAggregations =
-                createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext, AGG_NAME, otherBucketRowRoots);
+                createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext, AGG_NAME, otherBucketRowTargets);
         addRowSeries(pivot, queryContext, searchSourceBuilder, rowAggregations, generateRollups);
 
         if (!pivot.columnGroups().isEmpty()) {
-            addColumnGroups(query, pivot, queryContext, searchSourceBuilder, rowAggregations.leaf(), otherBucketRowRoots);
+            addColumnGroups(query, pivot, queryContext, searchSourceBuilder, rowAggregations.leaf(), otherBucketRowTargets);
         }
 
         if (rowAggregations.root() != null) {
@@ -118,27 +119,43 @@ class PivotQueryGenerator {
                                  OSGeneratedQueryContext queryContext,
                                  MutableSearchRequestBuilder searchSourceBuilder,
                                  MutableNamedAggregationBuilder rowLeafAggregation,
-                                 List<MutableNamedAggregationBuilder> otherBucketRowRoots) {
+                                 List<List<MutableNamedAggregationBuilder>> otherBucketRowTargets) {
         final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> columnsAggregation =
-                createColumnTree(query, pivot, queryContext, AGG_NAME);
+                createColumnTree(query, pivot, queryContext, AGG_NAME, false);
         if (rowLeafAggregation != null) {
             rowLeafAggregation.subAggregation(columnsAggregation.root());
         } else {
             searchSourceBuilder.aggregation(columnsAggregation.root());
         }
 
-        // The (Other) row's per-column cells are derived as parentColumn - sum(shownRowsColumn), which needs the
-        // same column tree on the enclosing filters bucket of every opted-in row grouping. Because these are
-        // mutable builder trees, a second independent tree is built for each rather than re-parenting the one
-        // attached above.
-        otherBucketRowRoots.forEach(rowRoot ->
-                rowRoot.subAggregation(createColumnTree(query, pivot, queryContext, OTHER_BUCKET_COLUMNS_AGG_NAME).root()));
+        // The (Other) row's per-column cells are derived as parentColumn - sum(shownRowsColumn). Both the parent
+        // (the enclosing filters bucket) and every shown sibling (a terms bucket) must be able to read this tree,
+        // so it is attached to BOTH targets of every opted-in row grouping - exactly where
+        // OSValuesHandler.addStatsCompanions already places its per-field extended_stats companions. Attaching it
+        // only to the filters bucket (the parent) would silently mis-read as some deeper row grouping's own tree
+        // whenever the opted-in grouping isn't the innermost row level. Because these are mutable builder trees, a
+        // second independent tree is built per grouping rather than re-parenting the one attached above; that one
+        // instance is then shared by both targets at that grouping's level, since it is the same declarative
+        // aggregation definition at both places.
+        otherBucketRowTargets.forEach(targets -> {
+            final MutableNamedAggregationBuilder columnTreeRoot =
+                    createColumnTree(query, pivot, queryContext, OTHER_BUCKET_COLUMNS_AGG_NAME, true).root();
+            targets.forEach(target -> target.subAggregation(columnTreeRoot));
+        });
     }
 
+    /**
+     * @param withStatsCompanions whether to also attach one {@code extended_stats} companion per
+     *                            {@link OSValuesHandler#statsFields}, needed to reconstruct mean-based series
+     *                            (avg/variance/stddev/sumOfSquares) within a single column of the {@code (Other)}
+     *                            row. Only the second, {@code (Other)}-row-dedicated tree needs these; the ordinary
+     *                            per-row column tree does not, since ordinary rows read series values directly.
+     */
     private BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createColumnTree(Query query,
                                                                                                     Pivot pivot,
                                                                                                     OSGeneratedQueryContext queryContext,
-                                                                                                    String rootName) {
+                                                                                                    String rootName,
+                                                                                                    boolean withStatsCompanions) {
         final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> columnsAggregation =
                 createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext, rootName, new ArrayList<>());
         final List<MutableNamedAggregationBuilder> columnMetrics = columnsAggregation.metrics();
@@ -150,6 +167,12 @@ class PivotQueryGenerator {
                         case METRIC -> columnMetrics.forEach(metric -> metric.subAggregation(aggregationBuilder));
                     }
                 });
+        if (withStatsCompanions) {
+            OSValuesHandler.statsFields(pivot).forEach(field -> columnMetrics.forEach(metric ->
+                    metric.subAggregation(new MutableNamedAggregationBuilder(
+                            OSValuesHandler.statsAggregationName(field),
+                            Aggregation.builder().extendedStats(e -> e.field(field))))));
+        }
         return columnsAggregation;
     }
 
@@ -165,12 +188,13 @@ class PivotQueryGenerator {
     }
 
     /**
-     * @param rootName            the name given to the outermost bucket aggregation of {@code pivots}. Every deeper
-     *                            level keeps using {@link #AGG_NAME}, since each is nested inside its own private
-     *                            leaf and never a sibling of anything already using that name.
-     * @param otherBucketRowRoots for {@code direction == Row}, collects the root aggregation of every {@link Values}
-     *                            grouping with {@code otherBucket() == true}, so a second column tree can later be
-     *                            attached to it. Ignored for {@code direction == Column}.
+     * @param rootName             the name given to the outermost bucket aggregation of {@code pivots}. Every
+     *                             deeper level keeps using {@link #AGG_NAME}, since each is nested inside its own
+     *                             private leaf and never a sibling of anything already using that name.
+     * @param otherBucketRowTargets for {@code direction == Row}, collects the OWN {@code metrics()} - the terms
+     *                             aggregation and the enclosing filters aggregation - of every {@link Values}
+     *                             grouping with {@code otherBucket() == true}, so a second column tree can later be
+     *                             attached to both. Ignored for {@code direction == Column}.
      */
     private BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createPivots(BucketSpecHandler.Direction direction,
                                                                                                 Query query,
@@ -178,7 +202,7 @@ class PivotQueryGenerator {
                                                                                                 List<BucketSpec> pivots,
                                                                                                 OSGeneratedQueryContext queryContext,
                                                                                                 String rootName,
-                                                                                                List<MutableNamedAggregationBuilder> otherBucketRowRoots) {
+                                                                                                List<List<MutableNamedAggregationBuilder>> otherBucketRowTargets) {
         MutableNamedAggregationBuilder leaf = null;
         MutableNamedAggregationBuilder root = null;
         final List<MutableNamedAggregationBuilder> metrics = new ArrayList<>();
@@ -192,7 +216,7 @@ class PivotQueryGenerator {
 
             metrics.addAll(aggregationMetrics);
             if (direction == BucketSpecHandler.Direction.Row && bucketSpec instanceof Values values && values.otherBucket()) {
-                otherBucketRowRoots.add(aggregationRoot);
+                otherBucketRowTargets.add(aggregationMetrics);
             }
             if (root == null && leaf == null) {
                 root = aggregationRoot;
