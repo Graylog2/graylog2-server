@@ -69,7 +69,7 @@ const SingleItemGrid = styled(Container)`
 const NumberBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
-  padding-bottom: 10px;
+  padding-bottom: ${({ theme }) => theme.spacings.xxs};
   min-height: 0;
   min-width: 0;
   overflow: hidden;
