@@ -25,13 +25,13 @@ import java.nio.file.Path;
 class OpensearchDistributionTest {
     @Test
     void testOpensearchCompatProperties(@TempDir Path tempDir) {
-        final OpensearchDistribution dist = new OpensearchDistribution(tempDir, "2.19.5");
+        final OpensearchDistribution dist = new OpensearchDistribution(tempDir, "2.19.6");
         Assertions.assertThat(dist.distributionProperties().searchableSnapshotsRole()).isEqualTo("search");
     }
 
     @Test
     void testOpensearchLatestProperties(@TempDir Path tempDir) {
-        final OpensearchDistribution dist = new OpensearchDistribution(tempDir, "3.5.0");
+        final OpensearchDistribution dist = new OpensearchDistribution(tempDir, "3.7.0");
         Assertions.assertThat(dist.distributionProperties().searchableSnapshotsRole()).isEqualTo("warm");
     }
 }

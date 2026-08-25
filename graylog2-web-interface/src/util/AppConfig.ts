@@ -78,7 +78,6 @@ export type AppConfigs = {
   contentStream: { refresh_interval: string; rss_url: string };
   branding: Branding | undefined;
   globalInputsOnly: boolean;
-  welcomePageMetricsEnabled: boolean;
 };
 
 declare global {
@@ -155,10 +154,6 @@ const AppConfig = {
 
   globalInputsOnly(): boolean {
     return appConfig().globalInputsOnly;
-  },
-
-  welcomePageMetricsEnabled(): boolean {
-    return appConfig().welcomePageMetricsEnabled ?? true;
   },
 };
 

@@ -45,6 +45,8 @@ export {
   ENROLLMENT_TOKENS_KEY_PREFIX,
 } from './useEnrollmentTokenQueries';
 
+export { default as useEnrollmentTokenCount } from './useEnrollmentTokenCount';
+
 export { default as useCollectorsMutations } from './useCollectorsMutations';
 export { default as useCollectorInputMutations } from './useCollectorInputMutations';
 export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilters';
