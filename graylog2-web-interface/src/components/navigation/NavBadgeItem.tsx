@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { LinkContainer } from 'components/common';
 import { Nav } from 'components/bootstrap';
@@ -23,16 +23,19 @@ import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import InactiveNavItem from './InactiveNavItem';
 
-const StyledNav = styled(Nav)`
-  > li > a {
-    min-height: ${NAV_ITEM_HEIGHT};
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    cursor: pointer;
-  }
-`;
+const StyledNav = styled(Nav)(
+  ({ theme }) => css`
+    --nav-item-horizontal-padding: ${theme.spacings.sm};
+
+    > li > a {
+      min-height: ${NAV_ITEM_HEIGHT};
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  `,
+);
 
 const StyledInactiveNavItem = styled(InactiveNavItem)`
   a:hover {
