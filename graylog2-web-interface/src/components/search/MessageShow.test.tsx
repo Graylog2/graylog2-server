@@ -14,16 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useRunsWithDataNode from 'components/datanode/hooks/useRunsWithDataNode';
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-/**
- * Reindexing a system index needs the admin certificate that only a Data Node search backend accepts.
- * Unless we know for sure that this Graylog does not run against Data Nodes, we keep the action available.
- */
-const useCanReindex = (): boolean => {
-  const { data: runsWithDataNode } = useRunsWithDataNode();
+import MessageShow from 'components/search/MessageShow';
 
-  return runsWithDataNode !== false;
+const message = {
+  id: 'deadbeef',
+  index: 'graylog_0',
+  fields: {
+    message: 'Some message',
+    // Integers outside of the safe range are parsed as BigInt from API responses.
+    event: { record_id: BigInt('12345678901234567890') },
+  },
 };
 
-export default useCanReindex;
+describe('MessageShow', () => {
+  it('renders field values containing integers which exceed the safe integer range', async () => {
+    render(<MessageShow message={message} />);
+
+    await screen.findByText('{"record_id":12345678901234567890}');
+  });
+});
