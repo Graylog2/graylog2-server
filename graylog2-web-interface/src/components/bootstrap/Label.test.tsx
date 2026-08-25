@@ -32,18 +32,22 @@ describe('Label', () => {
   });
 
   it('keeps the legacy small border-radius for bsStyle-driven usage', () => {
-    render(<Label bsStyle="success">Legacy</Label>);
+    render(
+      <Label bsStyle="success" data-testid="label">
+        Legacy
+      </Label>,
+    );
 
-    expect(screen.getByText('Legacy')).toHaveStyleRule('border-radius', '3px');
+    expect(screen.getByTestId('label')).toHaveStyleRule('border-radius', '3px');
   });
 
   it('does not force the legacy border-radius when color is set', () => {
     render(
-      <Label color="success" variant="light">
+      <Label color="success" variant="light" data-testid="label">
         Running
       </Label>,
     );
 
-    expect(screen.getByText('Running')).not.toHaveStyleRule('border-radius', '3px');
+    expect(screen.getByTestId('label')).not.toHaveStyleRule('border-radius', '3px');
   });
 });
