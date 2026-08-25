@@ -56,6 +56,7 @@ const iconSizeForBadge: Record<SupportedMantineSize, 'xs' | 'sm'> = {
 const StyledBadge = styled(MantineBadge)<{ $background: string; $color: string; size: SupportedMantineSize }>(
   ({ theme, $background, $color, size }) => css`
     text-transform: none;
+    font-weight: 600;
     background-color: ${$background};
     color: ${$color};
 
