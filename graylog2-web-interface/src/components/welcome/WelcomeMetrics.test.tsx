@@ -127,9 +127,7 @@ describe('WelcomeMetrics', () => {
     });
 
     it('shows the default metrics view when the registered plugin is not enabled', async () => {
-      registerPlugins([
-        { label: 'Extra', component: () => <div>Extra tab content</div>, isEnabled: () => false },
-      ]);
+      registerPlugins([{ label: 'Extra', component: () => <div>Extra tab content</div>, isEnabled: () => false }]);
       asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(true));
 
       renderWithStreams([accessibleStream]);

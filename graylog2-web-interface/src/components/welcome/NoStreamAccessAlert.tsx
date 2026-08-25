@@ -42,7 +42,9 @@ const NoStreamAccessAlert = () => {
   return (
     <Row className="content">
       <Col xs={12}>
-        <StyledAlert onDismiss={onDismiss}>Once you have access to a stream, your message metrics will show up here.</StyledAlert>
+        <StyledAlert onDismiss={onDismiss}>
+          Once you have access to a stream, your message metrics will show up here.
+        </StyledAlert>
       </Col>
     </Row>
   );
