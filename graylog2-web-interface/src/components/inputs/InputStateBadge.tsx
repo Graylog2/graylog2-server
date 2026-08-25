@@ -17,7 +17,8 @@
 import React from 'react';
 
 import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
-import { Label } from 'components/bootstrap';
+import { Badge } from 'components/bootstrap';
+import type { BadgeColor } from 'components/bootstrap/Badge';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
 import { type NodeInfo, NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
@@ -31,12 +32,14 @@ type Props = {
 
 const comparator = new InputStateComparator();
 
-const getLabelClassForState = (
+const toTitleCase = (text: string) => text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+
+const getBadgeColorForState = (
   sortedStates,
   input: InputSummary,
   nodes: { [nodeId: string]: NodeInfo },
   isOnlyOnePerCluster: boolean,
-) => {
+): BadgeColor => {
   const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => numberOfNodes + state.count, 0);
 
   if (input.global && !isOnlyOnePerCluster && nodesWithKnownState !== Object.keys(nodes).length) {
@@ -51,14 +54,16 @@ const getLabelClassForState = (
     case 'STOPPED':
       return 'danger';
     case 'STARTING':
-      return 'info';
+      return 'primary';
     default:
       return 'warning';
   }
 };
 
 const getTextForState = (sortedStates, input: InputSummary) =>
-  input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state;
+  toTitleCase(
+    input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state,
+  );
 
 const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
   const { nodes } = useStore(NodesStore);
@@ -99,7 +104,7 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
     const popOverText = sorted.map((state) =>
       sortedInputStates[state.state].map((node) => (
         <small key={`${input.id}-state-${state.state}-node-${node}`}>
-          <LinkToNode nodeId={node} />: {state.state}
+          <LinkToNode nodeId={node} />: {toTitleCase(state.state)}
           <br />
         </small>
       )),
@@ -112,22 +117,23 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
         overlay={popOverText}
         rootClose
         title={`Input States for ${input.title}`}>
-        <Label
-          bsStyle={getLabelClassForState(sorted, input, nodes, isOnlyOnePerCluster)}
-          bsSize="xsmall"
+        <Badge
+          color={getBadgeColorForState(sorted, input, nodes, isOnlyOnePerCluster)}
+          variant="light"
+          dot
           style={{ cursor: 'pointer' }}>
           {getTextForState(sorted, input)}
-        </Label>
+        </Badge>
       </OverlayTrigger>
     );
   }
 
-  const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
+  const text = toTitleCase(input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING');
 
   return (
-    <Label bsStyle="warning" bsSize="xsmall">
+    <Badge color="warning" variant="light" dot>
       {text}
-    </Label>
+    </Badge>
   );
 };
 
