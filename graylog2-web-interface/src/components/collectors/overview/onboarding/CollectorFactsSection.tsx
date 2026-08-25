@@ -81,7 +81,6 @@ const Fact = ({ label, children = undefined }: React.PropsWithChildren<{ label: 
  * stay scannable while everything the agent reported remains one click away.
  */
 const CollectorFactsSection = ({ instance, fleetName, onFleetLinkClick = undefined }: Props) => {
-
   const attributes = [
     ...Object.entries(instance.identifying_attributes ?? {}),
     ...Object.entries(instance.non_identifying_attributes ?? {}),
@@ -107,7 +106,10 @@ const CollectorFactsSection = ({ instance, fleetName, onFleetLinkClick = undefin
         </Fact>
       </SimpleGrid>
       {attributes.length > 0 && (
-        <AttributesSpoiler maxHeight={0} showLabel={`Show all ${attributes.length} attributes`} hideLabel='Hide attributes'>
+        <AttributesSpoiler
+          maxHeight={0}
+          showLabel={`Show all ${attributes.length} attributes`}
+          hideLabel="Hide attributes">
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md" verticalSpacing="sm">
             {attributes.map(([key, value]) => (
               <Fact key={key} label={key}>
