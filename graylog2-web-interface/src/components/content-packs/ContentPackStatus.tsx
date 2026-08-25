@@ -23,7 +23,7 @@ import Routes from 'routing/Routes';
 
 const BADGE_COLOR_BY_STATUS: Record<string, BadgeColor> = {
   installed: 'success',
-  updatable: 'gray',
+  updatable: 'primary',
   edited: 'warning',
   error: 'danger',
 };
