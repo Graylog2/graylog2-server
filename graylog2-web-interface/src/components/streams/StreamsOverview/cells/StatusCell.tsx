@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 
 import { isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { Label } from 'components/bootstrap';
+import { Badge } from 'components/bootstrap';
 import useStreamMutations from 'hooks/useStreamMutations';
 import type { Stream } from 'logic/streams/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -64,7 +64,7 @@ const StatusCell = ({ stream }: Props) => {
   }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream]);
 
   return (
-    <Label
+    <Badge
       color={stream.disabled ? 'warning' : 'success'}
       variant="light"
       dot
@@ -73,7 +73,7 @@ const StatusCell = ({ stream }: Props) => {
       aria-label={title}
       rightIcon={disableChange ? undefined : toggleIcon}>
       {statusLabel}
-    </Label>
+    </Badge>
   );
 };
 
