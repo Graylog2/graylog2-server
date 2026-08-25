@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import styled, { css } from 'styled-components';
+import type { ColorVariant } from '@graylog/sawmill';
+
+import type { BsSize } from 'components/bootstrap/types';
 
 import Badge from './Badge';
-import type { BadgeColor } from './Badge';
 
-type LabelProps = {
-  color?: BadgeColor;
-};
-
-const Label = styled(Badge)<LabelProps>(
-  ({ theme, color }) => css`
-    ${!color &&
-    css`
-      border-radius: 3px;
-    `}
+const StyledBadge = styled(Badge)(
+  ({ theme }) => css`
+    border-radius: 3px;
     font-weight: normal;
     padding-left: ${theme.spacings.xs};
     padding-right: ${theme.spacings.xs};
@@ -51,6 +47,55 @@ const Label = styled(Badge)<LabelProps>(
       white-space: nowrap;
     }
   `,
+);
+
+type Props = React.PropsWithChildren<{
+  'aria-label'?: string;
+  /** @deprecated Legacy size alias — prefer bsSize on new call sites too, this component only supports the legacy shape. */
+  bsSize?: BsSize;
+  bsStyle?: ColorVariant;
+  className?: string;
+  'data-testid'?: string;
+  onClick?: (e: React.MouseEvent) => void;
+  onMouseEnter?: React.MouseEventHandler<HTMLElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLElement>;
+  role?: string;
+  style?: React.CSSProperties;
+  title?: string;
+  uppercase?: boolean;
+}>;
+
+/** Plain legacy status label — small pill shape, bsStyle-only. Use Badge for the color/variant/dot API. */
+const Label = ({
+  'aria-label': ariaLabel = undefined,
+  bsSize = undefined,
+  bsStyle = undefined,
+  className = undefined,
+  children = undefined,
+  'data-testid': dataTestid = undefined,
+  onClick = undefined,
+  onMouseEnter = undefined,
+  onMouseLeave = undefined,
+  role = undefined,
+  style = undefined,
+  title = undefined,
+  uppercase = false,
+}: Props) => (
+  <StyledBadge
+    aria-label={ariaLabel}
+    bsSize={bsSize}
+    bsStyle={bsStyle}
+    className={className}
+    data-testid={dataTestid}
+    onClick={onClick}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+    role={role}
+    style={style}
+    title={title}
+    uppercase={uppercase}>
+    {children}
+  </StyledBadge>
 );
 
 export default Label;

@@ -62,7 +62,7 @@ const RatioIndicator = ({ ratio, warningThreshold = Number.NaN, dangerThreshold 
 
   return (
     <SecondaryText>
-      <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} size="xs">
+      <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs">
         {formattedRatio}
       </Label>
     </SecondaryText>

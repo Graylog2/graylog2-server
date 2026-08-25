@@ -37,7 +37,7 @@ const LifecycleCell = ({ node }: Props) => {
       <MetricsRow>
         <Label
           bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
-          size="xs"
+          bsSize="xs"
           title={lifecycleStatus}
           aria-label={lifecycleStatus}>
           {lifecycleStatus}

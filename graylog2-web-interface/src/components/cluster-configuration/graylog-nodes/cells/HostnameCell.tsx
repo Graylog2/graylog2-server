@@ -46,7 +46,7 @@ const HostnameCell = ({ node }: Props) => {
       {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
       {node.is_leader && (
         <SecondaryText>
-          <Label size="xs">Leader</Label>
+          <Label bsSize="xs">Leader</Label>
         </SecondaryText>
       )}
     </NodePrimary>

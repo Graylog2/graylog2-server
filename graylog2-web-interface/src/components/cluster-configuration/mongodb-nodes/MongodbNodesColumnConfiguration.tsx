@@ -63,7 +63,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
           );
         }
 
-        return <Label size="xs">{role}</Label>;
+        return <Label bsSize="xs">{role}</Label>;
       },
       minWidth: 130,
     },

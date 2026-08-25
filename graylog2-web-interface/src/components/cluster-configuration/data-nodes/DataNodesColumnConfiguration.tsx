@@ -66,7 +66,7 @@ export const createColumnDefinitions = (): Array<ColumnSchema> => [
 const getRoleLabels = (roles: Array<string>) =>
   roles.map((role) => (
     <span key={role}>
-      <Label size="xs">{role}</Label>&nbsp;
+      <Label bsSize="xs">{role}</Label>&nbsp;
     </span>
   ));
 

@@ -46,7 +46,7 @@ const ProfilingLevelCell = ({ profilingLevel }: Props) => {
   return (
     <MetricsColumn>
       <MetricsRow>
-        <Label bsStyle={resolvedLevelInfo.style} size="xs">
+        <Label bsStyle={resolvedLevelInfo.style} bsSize="xs">
           {resolvedLevelInfo.label}
         </Label>
       </MetricsRow>

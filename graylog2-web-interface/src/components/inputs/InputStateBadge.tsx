@@ -114,7 +114,7 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
         title={`Input States for ${input.title}`}>
         <Label
           bsStyle={getLabelClassForState(sorted, input, nodes, isOnlyOnePerCluster)}
-          size="xs"
+          bsSize="xsmall"
           style={{ cursor: 'pointer' }}>
           {getTextForState(sorted, input)}
         </Label>
@@ -125,7 +125,7 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
   const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
 
   return (
-    <Label bsStyle="warning" size="xs">
+    <Label bsStyle="warning" bsSize="xsmall">
       {text}
     </Label>
   );

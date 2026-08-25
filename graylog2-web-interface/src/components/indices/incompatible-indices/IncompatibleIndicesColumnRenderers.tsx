@@ -51,7 +51,7 @@ const statusBadges = (index: IncompatibleIndex, isArchived: boolean): Array<Badg
 const renderBadges = (badges: Array<Badge>) =>
   badges.map(({ text, style }) => (
     <React.Fragment key={text}>
-      <Label bsStyle={style} size="xs">
+      <Label bsStyle={style} bsSize="xs">
         {text}
       </Label>
       &nbsp;

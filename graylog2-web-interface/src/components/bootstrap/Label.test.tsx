@@ -20,18 +20,13 @@ import { render, screen } from 'wrappedTestingLibrary';
 import Label from './Label';
 
 describe('Label', () => {
-  it('renders color/variant content', () => {
-    render(
-      <Label color="warning" variant="light" dot>
-        Paused
-      </Label>,
-    );
+  it('renders bsStyle-driven content', () => {
+    render(<Label bsStyle="success">Running</Label>);
 
-    expect(screen.getByText('Paused')).toBeInTheDocument();
-    expect(screen.getByTestId('badge-dot')).toBeInTheDocument();
+    expect(screen.getByText('Running')).toBeInTheDocument();
   });
 
-  it('keeps the legacy small border-radius for bsStyle-driven usage', () => {
+  it('keeps the legacy small border-radius', () => {
     render(
       <Label bsStyle="success" data-testid="label">
         Legacy
@@ -39,15 +34,5 @@ describe('Label', () => {
     );
 
     expect(screen.getByTestId('label')).toHaveStyleRule('border-radius', '3px');
-  });
-
-  it('does not force the legacy border-radius when color is set', () => {
-    render(
-      <Label color="success" variant="light" data-testid="label">
-        Running
-      </Label>,
-    );
-
-    expect(screen.getByTestId('label')).not.toHaveStyleRule('border-radius', '3px');
   });
 });

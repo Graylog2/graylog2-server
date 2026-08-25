@@ -37,7 +37,7 @@ const ProcessingStateCell = ({ node }: Props) => {
       <MetricsRow>
         <Label
           bsStyle={node.is_processing ? 'success' : 'warning'}
-          size="xs"
+          bsSize="xs"
           aria-label={`Message processing ${status}`}>
           {status}
         </Label>
