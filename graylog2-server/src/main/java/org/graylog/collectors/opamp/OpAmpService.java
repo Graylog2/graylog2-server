@@ -103,6 +103,7 @@ public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
     public static final String REMOTE_CONFIG_KEY = "collector.yaml";
 
+    private static final ComponentHealthExtractor COMPONENT_HEALTH_EXTRACTOR = new ComponentHealthExtractor();
     private static final JsonFormat.Printer PROTO_PRINTER = JsonFormat.printer().omittingInsignificantWhitespace();
 
     private final EnrollmentTokenService enrollmentTokenService;
@@ -475,9 +476,13 @@ public class OpAmpService {
         LOG.debug("[{}/{}] Handling OpAMP message from collector: {}", instanceUid, sequenceNum, message);
 
         var appliedTxnSeq = OptionalLong.empty();
-        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder().instanceUid(instanceUid).messageSeqNum(sequenceNum).capabilities(message.getCapabilities());
-
         final EnumSet<Opamp.AgentCapabilities> agentCapabilities = fromBitmask(message.getCapabilities());
+        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder()
+                .instanceUid(instanceUid)
+                .messageSeqNum(sequenceNum)
+                .capabilities(message.getCapabilities())
+                .reportsHealth(agentCapabilities.contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsHealth));
+
         for (Opamp.AgentCapabilities cap : agentCapabilities) {
             switch (cap) {
                 case AgentCapabilities_ReportsStatus -> {
@@ -499,6 +504,8 @@ public class OpAmpService {
                                 .addArgument(instanceUid).addArgument(sequenceNum)
                                 .addArgument(() -> toProtoString(message.getHealth()))
                                 .log();
+
+                        updateBuilder.health(COMPONENT_HEALTH_EXTRACTOR.extract(message.getHealth()));
                     }
                 }
                 case AgentCapabilities_ReportsHeartbeat -> {

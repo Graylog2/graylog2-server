@@ -28,7 +28,6 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import ConfigurationType from 'components/configurations/ConfigurationTypes';
 import getConfig from 'components/configurations/helpers';
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import reloadPage from 'preflight/components/reloadPage';
@@ -61,7 +60,7 @@ const MarkdownConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<MarkdownConfigType | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<MarkdownConfigType | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();

@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import { Button, ButtonToolbar, DeleteMenuItem, SegmentedControl } from 'components/bootstrap';
-import { ConfirmDialog, Link, LinkContainer, Spinner } from 'components/common';
+import { ConfirmDialog, IconButton, Link, LinkContainer, Spinner } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -71,6 +71,10 @@ const Header = styled.div(
   `,
 );
 
+const HeaderActions = styled.div`
+  margin-left: auto;
+`;
+
 const ActionsRow = styled.div(
   ({ theme }) => css`
     display: flex;
@@ -107,7 +111,7 @@ export const sourceActionsFactory =
   (source: Source) => (
     <ButtonToolbar>
       <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_SOURCE_ID_FIELD, source.id)}>
-        <Button bsSize="xsmall">Received messages</Button>
+        <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
       </LinkContainer>
       <Button bsSize="xsmall" onClick={() => onEdit(source)}>
         Edit
@@ -227,6 +231,9 @@ const FleetDetail = ({ fleetId }: Props) => {
     return <div>Fleet not found</div>;
   }
 
+  // Deep link into the deployment wizard with this fleet preselected.
+  const deployCollectorUrl = new URI(Routes.SYSTEM.COLLECTORS.DEPLOYMENT).addSearch('fleet', fleet.id).resource();
+
   const handleSaveSource = async (source: Omit<Source, 'id'>) => {
     if (editingSource) {
       await updateSource({ fleetId, sourceId: editingSource.id, updates: source as Omit<Source, 'id' | 'fleet_id'> });
@@ -241,6 +248,11 @@ const FleetDetail = ({ fleetId }: Props) => {
         <h2>
           {fleet.name} <PreviewBadge />
         </h2>
+        <HeaderActions>
+          <LinkContainer to={deployCollectorUrl}>
+            <Button bsStyle="primary">Deploy a new Collector</Button>
+          </LinkContainer>
+        </HeaderActions>
       </Header>
 
       <StatsRow>

@@ -42,18 +42,15 @@ jest.mock(
     function ConnectionSuccessStub({
       instance,
       fleetName = undefined,
-      platformId = undefined,
     }: {
       instance: { hostname: string | null };
       fleetName?: string;
-      platformId?: string;
     }) {
       return (
         <div>
           <span>Collector connected</span>
           <span>{instance.hostname}</span>
           <span>{fleetName}</span>
-          <span data-testid="platform-id">{platformId ?? 'none'}</span>
         </div>
       );
     },
@@ -107,14 +104,6 @@ describe('CollectorsOnboardingInstancePage', () => {
     expect(screen.getByText('Collector connected')).toBeInTheDocument();
     expect(screen.getByText('web-prod-01')).toBeInTheDocument();
     expect(screen.getByText('Default Fleet')).toBeInTheDocument();
-  });
-
-  it('passes the platform from router location state', () => {
-    mockUseLocation.mockReturnValue({ state: { platformId: 'linux' } });
-
-    render(<CollectorsOnboardingInstancePage />);
-
-    expect(screen.getByTestId('platform-id')).toHaveTextContent('linux');
   });
 
   it('falls back to the fleet name from location state while the fleet loads', () => {
