@@ -24,6 +24,7 @@ import { type NodeInfo, NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import type { InputStates } from 'hooks/useInputsStates';
+import StringUtils from 'util/StringUtils';
 
 type Props = {
   input: InputSummary;
@@ -31,8 +32,6 @@ type Props = {
 };
 
 const comparator = new InputStateComparator();
-
-const toTitleCase = (text: string) => text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 
 const getBadgeColorForState = (
   sortedStates,
@@ -61,7 +60,7 @@ const getBadgeColorForState = (
 };
 
 const getTextForState = (sortedStates, input: InputSummary) =>
-  toTitleCase(
+  StringUtils.toTitleCase(
     input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state,
   );
 
@@ -104,7 +103,7 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
     const popOverText = sorted.map((state) =>
       sortedInputStates[state.state].map((node) => (
         <small key={`${input.id}-state-${state.state}-node-${node}`}>
-          <LinkToNode nodeId={node} />: {toTitleCase(state.state)}
+          <LinkToNode nodeId={node} />: {StringUtils.toTitleCase(state.state)}
           <br />
         </small>
       )),
@@ -128,7 +127,7 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
     );
   }
 
-  const text = toTitleCase(input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING');
+  const text = StringUtils.toTitleCase(input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING');
 
   return (
     <Badge color="warning" variant="light" dot>
