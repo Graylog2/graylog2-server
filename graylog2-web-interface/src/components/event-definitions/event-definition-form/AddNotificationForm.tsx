@@ -133,7 +133,7 @@ class AddNotificationForm extends React.Component<
         Add notification
       </Button>
     ) : (
-      <Button bsStyle="primary" onClick={this.handleSubmit}>
+      <Button bsStyle="primary" onClick={this.handleSubmit} disabled={!selectedNotification}>
         Add notification
       </Button>
     );
