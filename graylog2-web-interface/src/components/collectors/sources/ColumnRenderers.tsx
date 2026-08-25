@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Label } from 'components/bootstrap';
+import { Badge, Label } from 'components/bootstrap';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 import { SOURCE_TYPE_LABELS } from './Constants';
@@ -35,7 +35,9 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
     },
     enabled: {
       renderCell: (_enabled: boolean, source: Source) => (
-        <Label bsStyle={source.enabled ? 'success' : 'default'}>{source.enabled ? 'Enabled' : 'Disabled'}</Label>
+        <Badge color={source.enabled ? 'success' : 'warning'} variant="light">
+          {source.enabled ? 'Enabled' : 'Disabled'}
+        </Badge>
       ),
       staticWidth: 100,
     },
