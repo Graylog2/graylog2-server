@@ -50,7 +50,7 @@ const StatusCell = ({ eventDefinition }: Props) => {
   const disableChange =
     isSystemEventDefinition(eventDefinition) ||
     !isPermitted(currentUser.permissions, `eventdefinitions:edit:${eventDefinition.id}`);
-  const description = isEnabled ? 'enabled' : 'disabled';
+  const description = isEnabled ? 'Enabled' : 'Disabled';
   const title = _title(!isEnabled, disableChange, description);
   const toggleIcon = isEnabled ? 'pause' : 'play_arrow';
 
@@ -74,7 +74,6 @@ const StatusCell = ({ eventDefinition }: Props) => {
       <Badge
         color={isEnabled ? 'success' : 'warning'}
         variant="light"
-        dot
         onClick={disableChange ? undefined : toggleEventDefinitionStatus}
         title={title}
         aria-label={title}
