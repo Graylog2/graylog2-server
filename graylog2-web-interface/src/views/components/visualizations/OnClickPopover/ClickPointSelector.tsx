@@ -27,6 +27,7 @@ import PopoverTitle from 'views/components/visualizations/OnClickPopover/Popover
 const StyledListGroup = styled(ListGroup)`
   max-height: 300px;
   overflow-y: auto;
+  max-width: 400px;
 `;
 
 type Props = {
