@@ -27,7 +27,7 @@ import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLa
 
 const Container = styled.div(
   ({ theme }) => css`
-    margin: ${theme.spacings.xs} 0;
+    margin: ${theme.spacings.xs} 0 ${theme.spacings.sm} 0;
   `,
 );
 const HeadlineContainer = styled.div`

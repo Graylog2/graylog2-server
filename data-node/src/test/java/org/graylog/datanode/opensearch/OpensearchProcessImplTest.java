@@ -140,6 +140,7 @@ public class OpensearchProcessImplTest {
 
     @Test
     public void testHeapThresholdWarning() {
+        when(configuration.isOpensearchHeapSizeWarningEnabled()).thenReturn(true);
         when(configuration.getHostname()).thenReturn("datanode");
         when(configuration.getOpensearchHeap()).thenReturn("1g");
         when(opensearchProcess.getContainerMemory()).thenReturn(Optional.empty());
@@ -149,7 +150,15 @@ public class OpensearchProcessImplTest {
     }
 
     @Test
+    public void testHeapThresholdWarningDisabled() {
+        when(configuration.isOpensearchHeapSizeWarningEnabled()).thenReturn(false);
+        opensearchProcess.checkConfiguredHeap();
+        verifyNoInteractions(clusterEventBus);
+    }
+
+    @Test
     public void testNoHeapThresholdWarning() {
+        when(configuration.isOpensearchHeapSizeWarningEnabled()).thenReturn(true);
         when(configuration.getOpensearchHeap()).thenReturn("1g");
         when(opensearchProcess.getContainerMemory()).thenReturn(Optional.empty());
         when(opensearchProcess.getGlobalMemory()).thenReturn(mockMemory(gigabytes(2), gigabytes(3)));
