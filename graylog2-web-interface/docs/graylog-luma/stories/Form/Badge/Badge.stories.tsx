@@ -86,10 +86,6 @@ const meta = {
       description: '"light" (tinted background) or "filled" (solid background)',
     },
   },
-  args: {
-    leftIcon: '',
-    rightIcon: '',
-  },
 } satisfies Meta<typeof Badge>;
 
 export default meta;
