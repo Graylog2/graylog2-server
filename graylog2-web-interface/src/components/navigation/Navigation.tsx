@@ -105,7 +105,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
   const { navbarRef, brandRef, badgesRef, iconsRef, menuRef, collapsed } = useNavigationCollapse();
 
   return (
-    <Navbar ref={navbarRef}>
+    <Navbar ref={navbarRef} role="navigation">
       {collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
       <Brand ref={brandRef}>
         <BrandLink to={Routes.WELCOME} aria-label="Welcome">
