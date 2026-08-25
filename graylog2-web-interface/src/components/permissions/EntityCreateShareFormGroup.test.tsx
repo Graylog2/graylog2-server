@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as mockImmutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
@@ -34,7 +35,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
     update: jest.fn(() => Promise.resolve()),
     loadUserSharesPaginated: jest.fn(() =>
       Promise.resolve({
-        list: require('immutable').List(),
+        list: mockImmutable.List(),
         pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
       }),
     ),
@@ -90,7 +91,40 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {});
+      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+        prepare_request: null,
+      });
+    });
+  });
+
+  it('restores a previously made selection from the default share payload', async () => {
+    const selected_grantee_capabilities = createEntityShareState.selectedGranteeCapabilities.merge({
+      [everyone.id]: viewer.id,
+    });
+
+    render(<SUT defaultSharePayload={{ selected_grantee_capabilities }} />);
+
+    await waitFor(() => {
+      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+        selected_grantee_capabilities,
+        prepare_request: null,
+      });
+    });
+  });
+
+  it('re-runs the dependency check when restoring a selection', async () => {
+    const selected_grantee_capabilities = createEntityShareState.selectedGranteeCapabilities.merge({
+      [everyone.id]: viewer.id,
+    });
+    const dependenciesGRN = ['grn::::stream:stream-id'];
+
+    render(<SUT defaultSharePayload={{ selected_grantee_capabilities }} dependenciesGRN={dependenciesGRN} />);
+
+    await waitFor(() => {
+      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+        selected_grantee_capabilities,
+        prepare_request: dependenciesGRN,
+      });
     });
   });
 

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components'
+import styled, { css } from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
 
@@ -61,27 +61,26 @@ const LegendValue = styled.span`
 
 type Props = {
   legends: Array<{
-    color: string,
-    label: string,
-    value: string | number,
-    numberValue: number,
-    percentageValue: number,
-  }>
-}
+    color: string;
+    label: string;
+    value: string | number;
+    numberValue: number;
+    percentageValue: number;
+  }>;
+};
 
 const LegendsWithPercent = ({ legends }: Props) => (
-    <LegendList>
-      {legends.map(({ value, label, numberValue, percentageValue, color }) => (
-        <LegendItem key={value}>
-          <LegendSwatch $color={color} />
-          <LegendLabel title={label}>{label}</LegendLabel>
-          <LegendValue>
-            {NumberUtils.formatNumber(numberValue)} (
-            {NumberUtils.formatPercentage(percentageValue)})
-          </LegendValue>
-        </LegendItem>
-      ))}
-    </LegendList>
-  );
+  <LegendList>
+    {legends.map(({ value, label, numberValue, percentageValue, color }) => (
+      <LegendItem key={value}>
+        <LegendSwatch $color={color} />
+        <LegendLabel title={label}>{label}</LegendLabel>
+        <LegendValue>
+          {NumberUtils.formatNumber(numberValue)} ({NumberUtils.formatPercentage(percentageValue)})
+        </LegendValue>
+      </LegendItem>
+    ))}
+  </LegendList>
+);
 
 export default LegendsWithPercent;

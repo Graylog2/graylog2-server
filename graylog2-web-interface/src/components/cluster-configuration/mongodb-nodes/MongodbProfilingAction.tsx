@@ -119,8 +119,8 @@ const MongodbProfilingAction = () => {
           isSubmitting={isTogglingProfiling}
           onConfirm={onConfirmProfilingAction}
           onCancel={() => setShowProfilingDialog(false)}>
-          Enable <b>Slow Ops</b> profiling ({enableThresholdLabel}) on all MongoDB nodes? It applies immediately
-          without restart, but resets after restart unless configured at startup.
+          Enable <b>Slow Ops</b> profiling ({enableThresholdLabel}) on all MongoDB nodes? It applies immediately without
+          restart, but resets after restart unless configured at startup.
         </ConfirmDialog>
       )}
     </>
