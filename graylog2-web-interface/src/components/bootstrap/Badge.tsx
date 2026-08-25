@@ -42,6 +42,7 @@ const StyledBadge = styled(MantineBadge)<{
 }>(
   ({ theme, color, size, variant }) => css`
     text-transform: none;
+    cursor: inherit;
     ${variant === 'filled'
       ? css`
           background-color: ${color};
