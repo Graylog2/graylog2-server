@@ -42,7 +42,7 @@ const NotificationBadge = () => {
 
   return (
     <NavBadgeItem to={Routes.SYSTEM.NOTIFICATIONS}>
-      <Badge aria-label={accessibleLabel} data-testid="notification-badge" title={accessibleLabel} variant="default">
+      <Badge aria-label={accessibleLabel} data-testid="notification-badge" title={accessibleLabel}>
         <Group component="span" gap={4} wrap="nowrap">
           <Icon name="notifications" size="sm" />
           {count > 0 ? displayedCount : null}
