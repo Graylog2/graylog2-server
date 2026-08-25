@@ -95,7 +95,7 @@ const Dot = styled.span<{ $color: string; $size: SupportedMantineSize }>(
   `,
 );
 
-type Props = React.PropsWithChildren<{
+export type BadgeProps = React.PropsWithChildren<{
   'aria-label'?: string;
   /** @deprecated Legacy size alias — prefer `size`. Only used as a fallback when `size` is not set. */
   bsSize?: BsSize;
@@ -104,6 +104,7 @@ type Props = React.PropsWithChildren<{
   className?: string;
   color?: BadgeColor;
   'data-testid'?: string;
+  /** Only takes effect when `color` is set — a no-op on the legacy `bsStyle` path. */
   dot?: boolean;
   leftIcon?: IconName;
   onClick?: (e: React.MouseEvent) => void;
@@ -139,15 +140,14 @@ const Badge = (
     title = undefined,
     uppercase = false,
     variant = 'light',
-  }: Props,
+  }: BadgeProps,
   ref: React.ForwardedRef<HTMLElement>,
 ) => {
   const theme = useTheme();
 
   const resolvedSize = size ?? (bsSize ? sizeForMantine(bsSize) : 'md');
   const background = color ? theme.colors.badges[color][variant].background : mapStyle(bsStyle, theme);
-  const textColor =
-    color && variant === 'light' ? theme.colors.badges[color].light.text : theme.utils.contrastingColor(background);
+  const textColor = color ? theme.colors.badges[color][variant].text : theme.utils.contrastingColor(background);
   const iconSize = iconSizeForBadge[resolvedSize];
 
   let leftSection: React.ReactNode;

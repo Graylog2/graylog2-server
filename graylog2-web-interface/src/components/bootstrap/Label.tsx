@@ -16,11 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
-
-import type { BsSize } from 'components/bootstrap/types';
 
 import Badge from './Badge';
+import type { BadgeProps } from './Badge';
 
 const StyledBadge = styled(Badge)(
   ({ theme }) => css`
@@ -49,21 +47,22 @@ const StyledBadge = styled(Badge)(
   `,
 );
 
-type Props = React.PropsWithChildren<{
-  'aria-label'?: string;
-  /** @deprecated Legacy size alias — prefer bsSize on new call sites too, this component only supports the legacy shape. */
-  bsSize?: BsSize;
-  bsStyle?: ColorVariant;
-  className?: string;
-  'data-testid'?: string;
-  onClick?: (e: React.MouseEvent) => void;
-  onMouseEnter?: React.MouseEventHandler<HTMLElement>;
-  onMouseLeave?: React.MouseEventHandler<HTMLElement>;
-  role?: string;
-  style?: React.CSSProperties;
-  title?: string;
-  uppercase?: boolean;
-}>;
+type Props = Pick<
+  BadgeProps,
+  | 'aria-label'
+  | 'bsSize'
+  | 'bsStyle'
+  | 'children'
+  | 'className'
+  | 'data-testid'
+  | 'onClick'
+  | 'onMouseEnter'
+  | 'onMouseLeave'
+  | 'role'
+  | 'style'
+  | 'title'
+  | 'uppercase'
+>;
 
 /** Plain legacy status label — small pill shape, bsStyle-only. Use Badge for the color/variant/dot API. */
 const Label = ({
