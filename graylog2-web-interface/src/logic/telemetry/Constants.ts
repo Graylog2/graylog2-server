@@ -462,6 +462,7 @@ export const TELEMETRY_EVENT_TYPE = {
       UPDATED: 'Collector Source Updated',
       DELETED: 'Collector Source Deleted',
       EDIT_OPENED: 'Collector Source Edit Opened',
+      EDIT_CANCELLED: 'Collector Source Edit Cancelled',
       RECEIVED_MESSAGES_CLICKED: 'Collector Source Received Messages Clicked',
     },
     INSTANCE: {
