@@ -30,7 +30,7 @@ import {
   InputGroup,
   Row,
 } from 'components/bootstrap';
-import { ColorPickerPopover, TimezoneSelect, URLAllowListInput } from 'components/common';
+import { ColorPickerPopover, TimezoneSelect } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import DocumentationLink from 'components/support/DocumentationLink';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -154,10 +154,6 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
     propagateChange(name, getValueFromInput(event.target));
   };
 
-  const handleWebhookUrlChange = (event) => {
-    propagateChange('webhook_url', getValueFromInput(event.target));
-  };
-
   const handleTimeZoneChange = (nextValue) => {
     propagateChange('time_zone', nextValue);
   };
@@ -187,13 +183,16 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
         </div>
         <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
       </FormGroup>
-      <URLAllowListInput
+      <Input
+        id="notification-webhookUrl"
+        name="webhook_url"
         label="Webhook URL"
-        onChange={handleWebhookUrlChange}
-        validationState={validation.errors.webhook_url ? 'error' : null}
-        validationMessage={validation?.errors?.webhook_url?.[0] || 'Slack "Incoming Webhook" URL'}
-        url={config.webhook_url || ''}
-        autofocus={false}
+        type="text"
+        bsStyle={validation.errors.webhook_url ? 'error' : null}
+        help={validation?.errors?.webhook_url?.[0] || 'Slack "Incoming Webhook" URL'}
+        value={config.webhook_url || ''}
+        onChange={handleChange}
+        required
       />
       <Input
         id="notification-channel"
@@ -240,7 +239,6 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
             <input
               id="toggle_backlog_size"
               type="checkbox"
-              aria-label="Enable message backlog limit"
               checked={isBacklogSizeEnabled}
               onChange={toggleBacklogSize}
             />
