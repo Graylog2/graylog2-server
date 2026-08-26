@@ -94,15 +94,17 @@ public class OutputServiceImpl implements OutputService {
 
     @Override
     public Set<Output> loadAll() {
+        final Map<String, AvailableOutputSummary> availableOutputs = messageOutputFactory.getAvailableOutputs();
         try (final var stream = MongoUtils.stream(collection.find())) {
-            return stream.map(this::withEncryptedFields).collect(ImmutableSet.toImmutableSet());
+            return stream.map(output -> withEncryptedFields(output, availableOutputs)).collect(ImmutableSet.toImmutableSet());
         }
     }
 
     @Override
     public Set<Output> loadByIds(Collection<String> ids) {
+        final Map<String, AvailableOutputSummary> availableOutputs = messageOutputFactory.getAvailableOutputs();
         try (final var stream = MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))) {
-            return stream.map(this::withEncryptedFields).collect(ImmutableSet.toImmutableSet());
+            return stream.map(output -> withEncryptedFields(output, availableOutputs)).collect(ImmutableSet.toImmutableSet());
         }
     }
 
@@ -176,12 +178,16 @@ public class OutputServiceImpl implements OutputService {
         }
     }
 
-    private Set<String> getEncryptedFields(String type) {
-        final AvailableOutputSummary summary = messageOutputFactory.getAvailableOutputs().get(type);
+    private Set<String> getEncryptedFields(String type, Map<String, AvailableOutputSummary> availableOutputs) {
+        final AvailableOutputSummary summary = availableOutputs.get(type);
         if (summary == null) {
             return Set.of();
         }
         return EncryptedInputConfigs.getEncryptedFields(summary.requestedConfiguration());
+    }
+
+    private Output withEncryptedFields(OutputImpl output) {
+        return withEncryptedFields(output, messageOutputFactory.getAvailableOutputs());
     }
 
     /**
@@ -189,8 +195,8 @@ public class OutputServiceImpl implements OutputService {
      * objects for those configuration fields declared as encrypted. This ensures secrets are masked in API responses
      * and exposed as {@link EncryptedValue} to running outputs.
      */
-    private Output withEncryptedFields(OutputImpl output) {
-        final Set<String> encryptedFields = getEncryptedFields(output.getType());
+    private Output withEncryptedFields(OutputImpl output, Map<String, AvailableOutputSummary> availableOutputs) {
+        final Set<String> encryptedFields = getEncryptedFields(output.getType(), availableOutputs);
         if (encryptedFields.isEmpty()) {
             return output;
         }
