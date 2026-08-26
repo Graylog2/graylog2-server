@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix MCP `ping` request returning an internal error (-32603) instead of an empty result."
+
+issues = ["27066"]
+pulls = [""]
