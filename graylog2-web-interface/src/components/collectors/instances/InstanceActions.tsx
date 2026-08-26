@@ -65,6 +65,8 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.RECEIVED_MESSAGES_CLICKED, {
                 app_action_value: 'instance-received-messages',
                 ...instanceTelemetryProps(instance),
+                // Both this and the detail drawer can reach these; keep them comparable.
+                origin: 'row',
               })
             }
           />
@@ -76,6 +78,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
                 app_action_value: 'instance-view-logs',
                 ...instanceTelemetryProps(instance),
+                origin: 'row',
               })
             }>
             View System Logs

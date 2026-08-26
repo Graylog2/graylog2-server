@@ -467,6 +467,8 @@ export const TELEMETRY_EVENT_TYPE = {
     INSTANCE: {
       VIEW_LOGS_CLICKED: 'Collector Instance View Logs Clicked',
       RECEIVED_MESSAGES_CLICKED: 'Collector Instance Received Messages Clicked',
+      FLEET_OPENED: 'Collector Instance Fleet Opened',
+      TRANSACTIONS_TOGGLED: 'Collector Instance Queued Transactions Toggled',
       DETAILS_OPENED: 'Collector Instance Details Opened',
       REASSIGNED: 'Collector Instance Reassigned',
       DELETED: 'Collector Instance Deleted',

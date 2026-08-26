@@ -24,9 +24,11 @@ import InstanceDetailDrawer from './InstanceDetailDrawer';
 
 import useInstancePendingChanges from '../hooks/useInstancePendingChanges';
 import { useInstance } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { CollectorInstanceView, PendingChangesResponse, Source } from '../types';
 
 jest.mock('../hooks/useInstancePendingChanges');
+jest.mock('../hooks/useSendCollectorsTelemetry');
 
 jest.mock('../hooks', () => ({
   ...jest.requireActual('../hooks'),
@@ -89,6 +91,7 @@ const pendingChanges: PendingChangesResponse = {
 
 describe('InstanceDetailDrawer', () => {
   beforeEach(() => {
+    asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
     asMock(useInstancePendingChanges).mockReturnValue({ data: undefined, isLoading: true, isError: false });
     asMock(useInstance).mockReturnValue({ data: undefined, isLoading: true, error: null, isError: false });
   });
@@ -369,5 +372,78 @@ describe('InstanceDetailDrawer', () => {
     await screen.findByText('Online');
     // Guards the polling wiring: the hook itself handles cadence, session, and error reporting.
     expect(useInstance).toHaveBeenCalledWith('uid-1');
+  });
+
+  describe('telemetry', () => {
+    const sendTelemetry = jest.fn();
+
+    beforeEach(() => {
+      sendTelemetry.mockClear();
+      asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
+    });
+
+    it('reports opening the fleet from the drawer', async () => {
+      render(
+        <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      );
+
+      await userEvent.click(await screen.findByRole('link', { name: 'production' }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        'Collector Instance Fleet Opened',
+        expect.objectContaining({
+          app_action_value: 'instance-drawer-open-fleet',
+          instance_id: 'uid-1',
+          fleet_id: 'fleet-1',
+        }),
+      );
+    });
+
+    // The same two actions exist as row buttons, so `origin` keeps the surfaces comparable.
+    it.each([
+      [/view system logs/i, 'Collector Instance View Logs Clicked', 'instance-drawer-view-logs'],
+      [/^received messages$/i, 'Collector Instance Received Messages Clicked', 'instance-drawer-received-messages'],
+    ])('reports %s from the drawer surface', async (name, eventType, appActionValue) => {
+      render(
+        <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      );
+
+      await userEvent.click(await screen.findByRole('link', { name }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        eventType,
+        expect.objectContaining({
+          app_action_value: appActionValue,
+          instance_id: 'uid-1',
+          origin: 'detail-drawer',
+        }),
+      );
+    });
+
+    it('reports expanding and collapsing the queued transactions', async () => {
+      asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: false });
+
+      render(
+        <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      );
+
+      await userEvent.click(await screen.findByRole('button', { name: /show queued transactions \(1\)/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        'Collector Instance Queued Transactions Toggled',
+        expect.objectContaining({
+          app_action_value: 'instance-drawer-toggle-transactions',
+          shown: true,
+          queued_count: 1,
+        }),
+      );
+
+      await userEvent.click(await screen.findByRole('button', { name: /hide queued transactions/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        'Collector Instance Queued Transactions Toggled',
+        expect.objectContaining({ shown: false, queued_count: 1 }),
+      );
+    });
   });
 });
