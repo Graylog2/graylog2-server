@@ -1,0 +1,4 @@
+type = "s"
+message = "Fix NetFlow V9 loop with unreachable exit condition."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15330"]
