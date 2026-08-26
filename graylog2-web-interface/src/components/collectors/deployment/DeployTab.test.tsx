@@ -212,6 +212,35 @@ describe('DeployTab', () => {
       });
     });
 
+    // The wizard writes the selected fleet into ?fleet, so the deep-link effect used to fire a
+    // second FLEET_SELECTED for the component's own push. Simulate the URL actually changing --
+    // a static useQuery mock cannot reproduce this.
+    it('reports a clicked fleet selection once, not again when it lands in the URL', async () => {
+      const user = userEvent.setup();
+      asMock(useHistory).mockReturnValue({
+        push: (url: string) => {
+          historyPush(url);
+          asMock(useQuery).mockReturnValue({ fleet: 'fleet-1' });
+        },
+      } as unknown as ReturnType<typeof useHistory>);
+
+      const { rerender } = render(<DeployTab />);
+
+      await pickFleet(user);
+      rerender(<DeployTab />);
+
+      const calls = sendTelemetry.mock.calls.filter(
+        ([event]) => event === TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED,
+      );
+
+      expect(calls).toEqual([
+        [
+          TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED,
+          { app_action_value: 'deployment-fleet', fleet_id: 'fleet-1', via: 'click' },
+        ],
+      ]);
+    });
+
     it('reports a fleet preselected via the ?fleet URL parameter exactly once', () => {
       asMock(useQuery).mockReturnValue({ fleet: 'fleet-2' });
 

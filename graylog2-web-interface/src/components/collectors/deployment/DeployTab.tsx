@@ -61,18 +61,24 @@ const DeployTab = () => {
 
   // A fleet arriving via deep link is a selection the user never clicks, so report it here —
   // once — or the funnel undercounts against manual selections.
+  //
+  // Only the value the page *loaded* with counts as a deep link. A fleet appearing in the URL
+  // later is this component's own pushFleetUrl echoing a click that handleFleetSelect already
+  // reported, so watching `fleetParam` would report every manual selection twice. useRef's
+  // initial value is evaluated on the first render only, which is exactly the snapshot needed.
+  const deepLinkedFleetId = useRef(typeof fleetParam === 'string' ? fleetParam : null);
   const reportedUrlFleet = useRef(false);
   useEffect(() => {
-    if (!reportedUrlFleet.current && typeof fleetParam === 'string') {
-      reportedUrlFleet.current = true;
+    if (reportedUrlFleet.current || !deepLinkedFleetId.current) return;
 
-      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
-        app_action_value: 'deployment-fleet',
-        fleet_id: fleetParam,
-        via: 'url',
-      });
-    }
-  }, [fleetParam, sendTelemetry]);
+    reportedUrlFleet.current = true;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
+      app_action_value: 'deployment-fleet',
+      fleet_id: deepLinkedFleetId.current,
+      via: 'url',
+    });
+  }, [sendTelemetry]);
 
   if (isFleetsLoading) return <Spinner />;
 
