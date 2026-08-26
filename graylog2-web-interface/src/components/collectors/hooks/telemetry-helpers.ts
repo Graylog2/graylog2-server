@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { CollectorInstanceView } from '../types';
+
 export type HostnameKind = 'ip' | 'hostname';
 export type InputBindType = 'wildcard' | 'specific' | 'unknown';
 
@@ -39,3 +41,26 @@ export const classifyInputBind = (bindAddress: string | undefined | null): Input
 
   return 'specific';
 };
+
+// Strips build metadata from a collector version, keeping the release identity.
+// `0.3.1-SNAPSHOT+1caa145` -> `0.3.1-SNAPSHOT`. The build hash is debug detail and
+// would give every build its own bucket in analytics breakdowns.
+export const classifyVersion = (version: string | undefined | null): string | null => {
+  if (!version) return null;
+
+  return version.split('+')[0];
+};
+
+// Shared payload for telemetry events about a single collector instance, so the
+// per-instance actions stay comparable to each other in analytics. Only carries what
+// every caller holding a `CollectorInstanceView` already has -- callers that only know
+// an instance UID intentionally send less rather than fetching extra data.
+export const instanceTelemetryProps = (instance: CollectorInstanceView) => ({
+  instance_id: instance.instance_uid,
+  fleet_id: instance.fleet_id,
+  status: instance.status,
+  // Liveness (`status`) and config convergence are orthogonal: an instance can be
+  // offline with changes still pending. Both are needed to reconstruct what the user saw.
+  has_pending_changes: instance.has_pending_changes,
+  version: classifyVersion(instance.version),
+});

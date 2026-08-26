@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { classifyHostname, classifyInputBind } from './telemetry-helpers';
+import { classifyHostname, classifyInputBind, classifyVersion, instanceTelemetryProps } from './telemetry-helpers';
+
+import type { CollectorInstanceView } from '../types';
 
 describe('classifyHostname', () => {
   it.each([
@@ -44,5 +46,45 @@ describe('classifyInputBind', () => {
     [null, 'unknown'],
   ])('classifies %p as %s', (input, expected) => {
     expect(classifyInputBind(input as string | undefined)).toBe(expected);
+  });
+});
+
+describe('classifyVersion', () => {
+  it('strips build metadata', () => {
+    expect(classifyVersion('0.3.1-SNAPSHOT+1caa145')).toBe('0.3.1-SNAPSHOT');
+  });
+
+  it('leaves a plain version untouched', () => {
+    expect(classifyVersion('1.2.0')).toBe('1.2.0');
+  });
+
+  it('returns null for missing versions', () => {
+    expect(classifyVersion(null)).toBeNull();
+    expect(classifyVersion(undefined)).toBeNull();
+    expect(classifyVersion('')).toBeNull();
+  });
+});
+
+describe('instanceTelemetryProps', () => {
+  const instance = {
+    instance_uid: 'uid-1',
+    fleet_id: 'fleet-1',
+    status: 'offline',
+    has_pending_changes: true,
+    version: '0.3.1-SNAPSHOT+1caa145',
+  } as CollectorInstanceView;
+
+  it('carries status and pending changes as independent dimensions', () => {
+    expect(instanceTelemetryProps(instance)).toEqual({
+      instance_id: 'uid-1',
+      fleet_id: 'fleet-1',
+      status: 'offline',
+      has_pending_changes: true,
+      version: '0.3.1-SNAPSHOT',
+    });
+  });
+
+  it('tolerates an instance with no reported version', () => {
+    expect(instanceTelemetryProps({ ...instance, version: null }).version).toBeNull();
   });
 });
