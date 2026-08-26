@@ -191,6 +191,26 @@ describe('InstanceActions', () => {
     });
   });
 
+  describe('Received messages telemetry', () => {
+    it('emits RECEIVED_MESSAGES_CLICKED with the shared instance payload', async () => {
+      render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
+
+      await userEvent.click(await screen.findByRole('link', { name: /received messages/i }));
+
+      expect(sendTelemetryMock).toHaveBeenCalledWith(
+        'Collector Instance Received Messages Clicked',
+        expect.objectContaining({
+          app_action_value: 'instance-received-messages',
+          instance_id: 'uid-1',
+          fleet_id: 'fleet-1',
+          status: 'online',
+          has_pending_changes: false,
+          version: '1.2.0',
+        }),
+      );
+    });
+  });
+
   describe('View Logs button telemetry', () => {
     it('emits VIEW_LOGS_CLICKED with the shared instance payload when View Logs is clicked', async () => {
       render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);

@@ -453,6 +453,7 @@ export const TELEMETRY_EVENT_TYPE = {
       UPDATED: 'Fleet Updated',
       DELETED: 'Fleet Deleted',
       TAB_SELECTED: 'Fleet Tab Selected',
+      RECEIVED_MESSAGES_CLICKED: 'Fleet Received Messages Clicked',
     },
     SOURCE: {
       CREATE_OPENED: 'Collector Source Create Opened',
@@ -460,9 +461,12 @@ export const TELEMETRY_EVENT_TYPE = {
       CREATED: 'Collector Source Created',
       UPDATED: 'Collector Source Updated',
       DELETED: 'Collector Source Deleted',
+      EDIT_OPENED: 'Collector Source Edit Opened',
+      RECEIVED_MESSAGES_CLICKED: 'Collector Source Received Messages Clicked',
     },
     INSTANCE: {
       VIEW_LOGS_CLICKED: 'Collector Instance View Logs Clicked',
+      RECEIVED_MESSAGES_CLICKED: 'Collector Instance Received Messages Clicked',
       DETAILS_OPENED: 'Collector Instance Details Opened',
       REASSIGNED: 'Collector Instance Reassigned',
       DELETED: 'Collector Instance Deleted',

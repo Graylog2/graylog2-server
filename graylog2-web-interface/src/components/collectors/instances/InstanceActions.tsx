@@ -56,7 +56,18 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
     <>
       <ButtonToolbar>
         <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
-          <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
+          <IconButton
+            name="search"
+            title="Received messages"
+            bsStyle="default"
+            size="xsmall"
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.RECEIVED_MESSAGES_CLICKED, {
+                app_action_value: 'instance-received-messages',
+                ...instanceTelemetryProps(instance),
+              })
+            }
+          />
         </LinkContainer>
         <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
           <Button

@@ -14,9 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { classifyHostname, classifyInputBind, classifyVersion, instanceTelemetryProps } from './telemetry-helpers';
+import {
+  classifyHostname,
+  classifyInputBind,
+  classifyVersion,
+  instanceTelemetryProps,
+  sourceTelemetryProps,
+} from './telemetry-helpers';
 
-import type { CollectorInstanceView } from '../types';
+import type { CollectorInstanceView, Source } from '../types';
 
 describe('classifyHostname', () => {
   it.each([
@@ -86,5 +92,17 @@ describe('instanceTelemetryProps', () => {
 
   it('tolerates an instance with no reported version', () => {
     expect(instanceTelemetryProps({ ...instance, version: null }).version).toBeNull();
+  });
+});
+
+describe('sourceTelemetryProps', () => {
+  it('matches the trio the create/update/delete source events already send', () => {
+    const source = { id: 'src-1', type: 'journald', name: 'journal' } as Source;
+
+    expect(sourceTelemetryProps(source, 'fleet-9')).toEqual({
+      fleet_id: 'fleet-9',
+      source_id: 'src-1',
+      source_type: 'journald',
+    });
   });
 });

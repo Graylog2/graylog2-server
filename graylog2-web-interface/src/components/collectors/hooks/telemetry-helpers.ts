@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { CollectorInstanceView } from '../types';
+import type { CollectorInstanceView, Source } from '../types';
 
 export type HostnameKind = 'ip' | 'hostname';
 export type InputBindType = 'wildcard' | 'specific' | 'unknown';
@@ -63,4 +63,12 @@ export const instanceTelemetryProps = (instance: CollectorInstanceView) => ({
   // offline with changes still pending. Both are needed to reconstruct what the user saw.
   has_pending_changes: instance.has_pending_changes,
   version: classifyVersion(instance.version),
+});
+
+// Shared payload for telemetry events about a single source, matching the trio the
+// create/update/delete events already send so all of them stay comparable.
+export const sourceTelemetryProps = (source: Source, fleetId: string) => ({
+  fleet_id: fleetId,
+  source_id: source.id,
+  source_type: source.type,
 });
