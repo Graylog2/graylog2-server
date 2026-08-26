@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as JSON from 'util/json';
+
 const StringUtils = {
   tempDocument: document.createElement('textarea'),
   capitalizeFirstLetter(text: string) {
