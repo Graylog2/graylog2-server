@@ -19,7 +19,7 @@ import { useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { Spinner } from 'components/common';
+import { ClipboardButton, Spinner } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getMajorAndMinorVersion } from 'util/Version';
 import useHistory from 'routing/useHistory';
@@ -71,6 +71,10 @@ const FirstOnboarding = () => {
 
   // The enrollment token is minted once and reused while switching platforms.
   const tokenRef = useRef<string | null>(null);
+  // Mirrors `tokenRef` for rendering only. The ref stays the source of truth for the async
+  // flow -- its `if (!tokenRef.current)` guard must not read a stale closure -- but a ref
+  // cannot be read during render, so the "Copy token only" button needs this.
+  const [enrollmentToken, setEnrollmentToken] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
   const history = useHistory();
@@ -133,10 +137,14 @@ const FirstOnboarding = () => {
 
           const { token } = await createEnrollmentToken({ name: 'onboarding', fleetId: fleet.id, expiresIn: 'P1D' });
           tokenRef.current = token;
+          setEnrollmentToken(token);
 
           sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
             app_action_value: 'onboarding-generate',
             fleet_id: fleet.id,
+            // Carried on every onboarding step so a funnel can break down by platform
+            // without losing this one.
+            platform: platformId,
             mode: 'onboarding',
             expires_in: 'P1D',
           });
@@ -185,6 +193,7 @@ const FirstOnboarding = () => {
 
       setFleetChoice(choice);
       tokenRef.current = null; // fleet changed -> a new token is needed
+      setEnrollmentToken(null);
 
       if (selectedPlatform) showCommand(selectedPlatform, choice);
     },
@@ -200,6 +209,7 @@ const FirstOnboarding = () => {
     setFleetChoice(null);
     setResolvedFleet(null);
     tokenRef.current = null;
+    setEnrollmentToken(null);
     setPhase('setup');
   }, [sendTelemetry]);
 
@@ -259,7 +269,22 @@ const FirstOnboarding = () => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.COMMAND_COPIED, {
                 app_action_value: 'onboarding-copy-command',
                 platform: selectedPlatform,
+                fleet_id: resolvedFleet?.id,
               })
+            }
+            actions={
+              <ClipboardButton
+                text={enrollmentToken ?? ''}
+                title="Copy token only"
+                bsSize="sm"
+                onSuccess={() =>
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+                    app_action_value: 'onboarding-copy-token',
+                    platform: selectedPlatform,
+                    fleet_id: resolvedFleet?.id,
+                  })
+                }
+              />
             }
           />
           <WaitingForConnection key={resolvedFleet?.id} fleetId={resolvedFleet?.id} onConnected={handleConnected} />

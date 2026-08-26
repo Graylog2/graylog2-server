@@ -385,6 +385,7 @@ describe('FirstOnboarding', () => {
         expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
           app_action_value: 'onboarding-generate',
           fleet_id: 'fleet-1',
+          platform: 'linux',
           mode: 'onboarding',
           expires_in: 'P1D',
         });
@@ -478,6 +479,22 @@ describe('FirstOnboarding', () => {
       });
     });
 
+    it('offers a copy-token-only button next to the command, and reports it', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: /copy token only/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+          app_action_value: 'onboarding-copy-token',
+          platform: 'linux',
+          fleet_id: 'fleet-1',
+        });
+      });
+    });
+
     it('reports copying the install command', async () => {
       render(<FirstOnboarding />);
 
@@ -489,6 +506,7 @@ describe('FirstOnboarding', () => {
         expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.COMMAND_COPIED, {
           app_action_value: 'onboarding-copy-command',
           platform: 'linux',
+          fleet_id: 'fleet-1',
         });
       });
     });
