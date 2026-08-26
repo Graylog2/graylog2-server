@@ -31,15 +31,13 @@ type Props = {
 const ArchivingsCell = ({ stream, indexSets }: Props) => {
   const excludedStreams = useExcludedArchiveStreams();
 
-  // No is_default/is_editable guard here (unlike the sibling action cells): archiving is a
-  // read-only status that applies to every stream, including the default and non-editable ones.
+  // No is_default/is_editable guard: archiving status applies to every stream, unlike the sibling action cells.
   const indexSet = indexSets.find((is) => is.id === stream.index_set_id);
 
   const indexSetArchivingEnabled = Boolean(
     (indexSet?.use_legacy_rotation && indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY) ||
     indexSet?.data_tiering?.archive_before_deletion,
   );
-  // A stream is only archived when its index set archives AND the stream is not excluded from archiving.
   const archivingEnabled = indexSetArchivingEnabled && !excludedStreams.includes(stream.id);
 
   if (!archivingEnabled) {

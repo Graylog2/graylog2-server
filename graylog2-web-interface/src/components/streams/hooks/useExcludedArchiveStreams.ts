@@ -19,8 +19,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 const EMPTY_STREAMS: Array<string> = [];
 const fallbackUseExcludedArchiveStreams = (): Array<string> => EMPTY_STREAMS;
 
-// Streams excluded from archiving under Enterprise > Archive > Configuration.
-// The archive plugin provides the actual list; without it (open source) nothing is archived anyway.
 const useExcludedArchiveStreams = (): Array<string> => {
   const useExcludedStreams = usePluginEntities('archive')?.[0]?.hooks?.useExcludedStreams ?? fallbackUseExcludedArchiveStreams;
 
