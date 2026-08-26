@@ -16,12 +16,7 @@
  */
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
-import {
-  LookupTableDataAdaptersActions,
-  LookupTableDataAdaptersStore,
-} from 'stores/lookup-tables/LookupTableDataAdaptersStore';
-import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
+import PaginationURL from 'util/PaginationURL';
 import deserializeLookupTables from 'components/lookup-tables/lookup-table-list/utils';
 import deserializeCaches from 'components/lookup-tables/cache-list/utils';
 import deserializeDataAdapters from 'components/lookup-tables/adapter-list/utils';
@@ -29,7 +24,18 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { LookupPreviewType } from 'components/lookup-tables/types';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
 
-export const deleteLookupTable = async (tableId: string) => LookupTablesActions.delete(tableId);
+const _url = (path: string) => qualifyUrl(`/system/lookup/${path}`);
+const _urlClusterWise = (path: string) => qualifyUrl(`/cluster/system/lookup/${path}`);
+
+// Lookup Tables
+
+export const fetchAllLookupTables = async (resolve: boolean = false): Promise<Array<LookupTable>> => {
+  const url = _url(PaginationURL('tables', 1, 0, undefined, { resolve }));
+
+  return fetch('GET', url).then((response: any) => response.lookup_tables);
+};
+
+export const deleteLookupTable = async (tableId: string) => fetch('DELETE', _url(`tables/${tableId}`));
 
 export const fetchErrors = async ({
   lutNames = undefined,
@@ -39,97 +45,100 @@ export const fetchErrors = async ({
   lutNames?: Array<string>;
   cacheNames?: Array<string>;
   adapterNames?: Array<string>;
-}) => LookupTablesActions.getErrors(lutNames, cacheNames, adapterNames);
+}) => {
+  const request: { tables?: Array<string>; caches?: Array<string>; data_adapters?: Array<string> } = {};
+
+  if (lutNames) request.tables = lutNames;
+  if (cacheNames) request.caches = cacheNames;
+  if (adapterNames) request.data_adapters = adapterNames;
+
+  return fetch('POST', _url('errorstates'), request);
+};
 
 export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => {
   const { page, pageSize, query, sort } = searchParams;
-
   const sortField = sort?.attributeId;
   const sortOrder = sort?.direction;
 
-  const promise = LookupTablesStore.searchPaginated(page, pageSize, query, true, sortField, sortOrder);
+  const url = _url(
+    PaginationURL('tables', page, pageSize, query, { resolve: true, sort: sortField, order: sortOrder }),
+  );
 
-  LookupTablesActions.searchPaginated.promise(promise);
-
-  return promise.then(deserializeLookupTables);
+  return fetch('GET', url).then(deserializeLookupTables);
 };
 
 export const fetchLookupTable = async (idOrName: string): Promise<{ lookup_tables: Array<LookupTable> }> =>
-  LookupTablesActions.get(idOrName);
+  fetch('GET', _url(`tables/${idOrName}?resolve=true`));
 
-export const createLookupTable = async (payload: LookupTableCache) => LookupTablesActions.create(payload);
+export const createLookupTable = async (payload: LookupTableCache) => fetch('POST', _url('tables'), payload);
 
-export const updateLookupTable = async (payload: LookupTableCache) => LookupTablesActions.update(payload);
+export const updateLookupTable = async (payload: LookupTableCache) =>
+  fetch('PUT', _url(`tables/${(payload as any).id}`), payload);
 
 export const purgeLookupTableKey = async ({ table, key }: { table: LookupTable; key: string }) =>
-  LookupTablesActions.purgeKey(table, key);
+  fetch('POST', _urlClusterWise(`tables/${table.id}/purge?key=${encodeURIComponent(key)}`));
 
-export const purgeAllLookupTableKey = async (table: LookupTable) => LookupTablesActions.purgeAll(table);
+export const purgeAllLookupTableKey = async (table: LookupTable) =>
+  fetch('POST', _urlClusterWise(`tables/${table.id}/purge`));
 
 export const testLookupTableKey = async ({ tableName, key }: { tableName: string; key: string }) =>
-  LookupTablesActions.lookup(tableName, key);
+  fetch('GET', _url(`tables/${tableName}/query?key=${encodeURIComponent(key)}`));
 
 export const fetchLookupPreview = async (idOrName: string, size: number): Promise<LookupPreviewType> =>
   fetch('GET', qualifyUrl(`/system/lookup/tables/preview/${idOrName}?size=${size}`));
 
+// Caches
+
 export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
   const { page, pageSize, query, sort } = searchParams;
-
   const sortField = sort?.attributeId;
   const sortOrder = sort?.direction;
 
-  const promise = LookupTableCachesStore.searchPaginated(page, pageSize, query, sortField, sortOrder);
+  const url = _url(PaginationURL('caches', page, pageSize, query, { sort: sortField, order: sortOrder }));
 
-  LookupTableCachesActions.searchPaginated.promise(promise);
-
-  return promise.then(deserializeCaches);
+  return fetch('GET', url).then(deserializeCaches);
 };
 
-export const fetchCache = async (idOrName: string): Promise<LookupTableCache> => LookupTableCachesActions.get(idOrName);
+export const fetchCache = async (idOrName: string): Promise<LookupTableCache> =>
+  fetch('GET', _url(`caches/${idOrName}`));
 
-export const fetchCacheTypes = async () => {
-  await LookupTableCachesActions.getTypes();
-  const state = LookupTableCachesStore.getInitialState();
+export const fetchCacheTypes = async () => fetch('GET', _url('types/caches'));
 
-  return state.types;
-};
+export const validateCache = async (cache: LookupTableCache) => fetch('POST', _url('caches/validate'), cache);
 
-export const validateCache = async (cache: LookupTableCache) => LookupTableCachesActions.validate(cache);
+export const createCache = async (payload: LookupTableCache) => fetch('POST', _url('caches'), payload);
 
-export const createCache = async (payload: LookupTableCache) => LookupTableCachesActions.create(payload);
+export const updateCache = async (payload: LookupTableCache) =>
+  fetch('PUT', _url(`caches/${(payload as any).id}`), payload);
 
-export const updateCache = async (payload: LookupTableCache) => LookupTableCachesActions.update(payload);
+export const deleteCache = async (cacheId: string) => fetch('DELETE', _url(`caches/${cacheId}`));
 
-export const deleteCache = async (cacheId: string) => LookupTableCachesActions.delete(cacheId);
+// Data Adapters
 
 export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => {
   const { page, pageSize, query, sort } = searchParams;
-
   const sortField = sort?.attributeId;
   const sortOrder = sort?.direction;
 
-  const promise = LookupTableDataAdaptersStore.searchPaginated(page, pageSize, query, sortField, sortOrder);
+  const url = _url(PaginationURL('adapters', page, pageSize, query, { sort: sortField, order: sortOrder }));
 
-  LookupTableDataAdaptersActions.searchPaginated.promise(promise);
-
-  return promise.then(deserializeDataAdapters);
+  return fetch('GET', url).then(deserializeDataAdapters);
 };
 
 export const fetchDataAdapter = async (idOrName: string): Promise<LookupTableAdapter> =>
-  LookupTableDataAdaptersActions.get(idOrName);
+  fetch('GET', _url(`adapters/${idOrName}`));
 
-export const fetchDataAdapterTypes = async () => {
-  await LookupTableDataAdaptersActions.getTypes();
-  const state = LookupTableDataAdaptersStore.getInitialState();
+export const fetchDataAdapterTypes = async () => fetch('GET', _url('types/adapters'));
 
-  return state.types;
-};
+export const createDataAdapter = async (payload: LookupTableCache) => fetch('POST', _url('adapters'), payload);
 
-export const createDataAdapter = async (payload: LookupTableCache) => LookupTableDataAdaptersActions.create(payload);
-
-export const updateDataAdapter = async (payload: LookupTableCache) => LookupTableDataAdaptersActions.update(payload);
+export const updateDataAdapter = async (payload: LookupTableCache) =>
+  fetch('PUT', _url(`adapters/${(payload as any).id}`), payload);
 
 export const validateDataAdapter = async (adapter: LookupTableAdapter) =>
-  LookupTableDataAdaptersActions.validate(adapter);
+  fetch('POST', _url('adapters/validate'), adapter);
 
-export const deleteDataAdapter = async (adapterId: string) => LookupTableDataAdaptersActions.delete(adapterId);
+export const deleteDataAdapter = async (adapterId: string) => fetch('DELETE', _url(`adapters/${adapterId}`));
+
+export const lookupDataAdapter = async (adapterName: string, key: string) =>
+  fetch('GET', _url(`adapters/${adapterName}/query?key=${encodeURIComponent(key)}`));

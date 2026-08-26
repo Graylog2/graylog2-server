@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import type { Attributes } from 'stores/PaginationTypes';
@@ -23,20 +23,27 @@ import ActiveFilter from 'components/common/EntityFilters/ActiveFilter';
 import HoverForHelp from 'components/common/HoverForHelp';
 import { ROW_MIN_HEIGHT } from 'components/common/EntityFilters/Constants';
 
-const FilterGroup = styled.div`
-  display: inline-flex;
-  align-items: center;
-  min-height: ${ROW_MIN_HEIGHT}px;
-  gap: 3px;
-  flex-wrap: wrap;
-`;
+const FilterGroup = styled.div(
+  ({ theme }) => css`
+    display: inline-flex;
+    align-items: center;
+    min-height: ${ROW_MIN_HEIGHT}px;
+    gap: ${theme.spacings.xxs};
+    flex-wrap: wrap;
 
-const FilterGroupTitle = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  margin-right: 3px;
-`;
+    &:not(:last-child) {
+      margin-right: ${theme.spacings.xs};
+    }
+  `,
+);
+
+const FilterGroupTitle = styled.div(
+  ({ theme }) => css`
+    display: inline-flex;
+    align-items: center;
+    gap: ${theme.spacings.xxs};
+  `,
+);
 
 const SLICE_FILTER_CONFLICT_HELP =
   'This filter is ignored because a slice is active for this attribute. Clear the slice to apply the filter.';

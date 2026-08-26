@@ -24,7 +24,7 @@ import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
-import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import { deleteContentPack, installContentPack } from 'hooks/useContentPackMutations';
 import useContentPacks from 'components/content-packs/hooks/useContentPacks';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
@@ -45,7 +45,7 @@ const ContentPacksPage = () => {
     (contentPackId: string) => {
       // eslint-disable-next-line no-alert
       if (window.confirm('You are about to delete this Content Pack, are you sure?')) {
-        ContentPacksActions.delete(contentPackId).then(
+        deleteContentPack(contentPackId).then(
           () => {
             UserNotification.success('Content Pack deleted successfully.', 'Success');
             refetch();
@@ -68,7 +68,7 @@ const ContentPacksPage = () => {
 
   const _installContentPack = useCallback(
     (contentPackId: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => {
-      ContentPacksActions.install(contentPackId, contentPackRev, parameters, shareRequest).then(
+      installContentPack(contentPackId, contentPackRev, parameters, shareRequest).then(
         () => {
           UserNotification.success('Content Pack installed successfully.', 'Success');
           refetch();

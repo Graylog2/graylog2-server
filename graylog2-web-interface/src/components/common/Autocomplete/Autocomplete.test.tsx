@@ -17,7 +17,7 @@
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { Formik } from 'formik';
-import { render, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import Autocomplete from './Autocomplete';
 
@@ -36,39 +36,30 @@ const renderAutocomplete = () =>
 
 describe('Autocomplete component', () => {
   it('should render the field with a label', async () => {
-    const { getByText, baseElement } = renderAutocomplete();
-    let label = null;
-    let pseudoInput = null;
+    renderAutocomplete();
 
-    await waitFor(() => {
-      label = getByText('Color translator');
-      pseudoInput = baseElement.querySelector('[id="spaColor"]');
-    });
+    const label = await screen.findByText('Color translator');
+    const pseudoInput = screen.getByRole('combobox');
 
     expect(label).toBeVisible();
     expect(pseudoInput).toBeVisible();
   });
 
   it('should let the user type', async () => {
-    const { baseElement } = renderAutocomplete();
-    const input = baseElement.querySelector('input');
+    renderAutocomplete();
+    const input = screen.getByRole('combobox');
 
     await userEvent.type(input, 'Naranja');
 
-    expect(baseElement).toHaveTextContent('Naranja');
+    expect(input).toHaveValue('Naranja');
   });
 
   it('should show a list with options', async () => {
-    const { baseElement } = renderAutocomplete();
-    const input = baseElement.querySelector('input');
+    renderAutocomplete();
+    const input = screen.getByRole('combobox');
 
     await userEvent.type(input, 'ver');
-    let list = null;
 
-    await waitFor(() => {
-      list = baseElement.querySelector('[class$="menu"]');
-    });
-
-    expect(list).toBeVisible();
+    expect(await screen.findByRole('listbox')).toBeVisible();
   });
 });

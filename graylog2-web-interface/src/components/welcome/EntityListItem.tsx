@@ -17,31 +17,30 @@
 
 import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
-import { Link } from 'components/common/router';
-import { ListGroupItem, Label } from 'components/bootstrap';
+import { Link, RelativeTime } from 'components/common';
+import { ListGroupItem } from 'components/bootstrap';
 import getTitleForEntityType from 'util/getTitleForEntityType';
-import { RelativeTime } from 'components/common';
 import { getValuesFromGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
-const StyledListGroupItem = styled(ListGroupItem)`
+export const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
   gap: 16px;
   align-items: flex-start;
+  justify-content: space-between;
 `;
 
-export const StyledLabel = styled(Label)`
-  cursor: default;
-  width: 110px;
-  display: block;
+const Title = styled.span`
+  text-transform: capitalize;
 `;
 
-const LastOpenedTime = styled.i(
-  ({ theme }: { theme: DefaultTheme }) => css`
-    color: ${theme.colors.gray[60]};
+export const TimeInfo = styled.span(
+  ({ theme }) => css`
+    flex-shrink: 0;
+    white-space: nowrap;
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -61,12 +60,14 @@ const EntityItem = ({ title, grn, timestamp = undefined }: Props) => {
 
   return (
     <StyledListGroupItem>
-      <StyledLabel bsStyle="info">{entityTypeTitle}</StyledLabel>
-      {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
+      <Title>
+        {`${entityTypeTitle} `}
+        {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
+      </Title>
       {timestamp ? (
-        <LastOpenedTime>
+        <TimeInfo>
           <RelativeTime dateTime={timestamp} />
-        </LastOpenedTime>
+        </TimeInfo>
       ) : null}
     </StyledListGroupItem>
   );

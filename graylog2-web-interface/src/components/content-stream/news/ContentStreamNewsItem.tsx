@@ -17,9 +17,8 @@
 import React from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-import DOMPurify from 'dompurify';
 
-import { Carousel, Timestamp } from 'components/common';
+import { Carousel, Sanitize, Timestamp } from 'components/common';
 import { Panel } from 'components/bootstrap';
 import type { FeedItem, FeedMediaContent } from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -62,7 +61,6 @@ const StyledPanel = styled(Panel)(
     border-radius: ${theme.spacings.xxs};
   `,
 );
-const _sanitizeText = (text) => DOMPurify.sanitize(text);
 
 const getImage = (media: FeedMediaContent | Array<FeedMediaContent>) =>
   Array.isArray(media) ? media?.[0]?.attr_url : media?.attr_url;
@@ -90,12 +88,11 @@ const ContentStreamNewsItem = ({ feed }: Props) => {
 
         <StyledPanelBody>
           <a href={feed?.link} target="_blank" onClick={() => handleSendTelemetry()} rel="noreferrer">
-            {/* eslint-disable-next-line react/no-danger */}
-            <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
+            <Sanitize html={feed?.title} />
           </a>
         </StyledPanelBody>
         <StyledPanelFooter>
-          <Timestamp dateTime={_sanitizeText(feed?.pubDate)} format="shortReadable" />
+          <Timestamp dateTime={feed?.pubDate} format="shortReadable" />
         </StyledPanelFooter>
       </StyledPanel>
     </Carousel.Slide>

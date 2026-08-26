@@ -81,18 +81,21 @@ public class PipelineInterpreter implements MessageProcessor {
     private final Meter filteredOutMessages;
     private final Timer executionTime;
     private final MetricRegistry metricRegistry;
-    private final ConfigurationStateUpdater stateUpdater;
+    private final PipelineInterpreterStateUpdater stateUpdater;
+    private final int ruleMetricsSampleRate;
 
     @Inject
     public PipelineInterpreter(MessageQueueAcknowledger messageQueueAcknowledger,
                                MetricRegistry metricRegistry,
-                               ConfigurationStateUpdater stateUpdater) {
+                               PipelineInterpreterStateUpdater stateUpdater,
+                               @Named("rule_metrics_sample_rate") int ruleMetricsSampleRate) {
 
         this.messageQueueAcknowledger = messageQueueAcknowledger;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
+        this.ruleMetricsSampleRate = ruleMetricsSampleRate;
     }
 
     /**
@@ -103,8 +106,12 @@ public class PipelineInterpreter implements MessageProcessor {
     public Messages process(Messages messages) {
         try (Timer.Context ignored = executionTime.time()) {
             final State latestState = stateUpdater.getLatestState();
+            if (latestState == null) {
+                log.warn("Pipeline interpreter state is not yet available, passing messages through unchanged");
+                return messages;
+            }
             if (latestState.enableRuleMetrics()) {
-                return process(messages, new RuleMetricsListener(metricRegistry), latestState);
+                return process(messages, new RuleMetricsListener(metricRegistry, ruleMetricsSampleRate), latestState);
             }
             return process(messages, new NoopInterpreterListener(), latestState);
         }
@@ -472,6 +479,7 @@ public class PipelineInterpreter implements MessageProcessor {
     public static class State {
         private final Logger LOG = LoggerFactory.getLogger(getClass());
         protected static final String STAGE_CACHE_METRIC_SUFFIX = "stage-cache";
+        private static final Object METRIC_REGISTRATION_LOCK = new Object();
 
         private final ImmutableMap<String, Pipeline> currentPipelines;
         private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
@@ -501,9 +509,13 @@ public class PipelineInterpreter implements MessageProcessor {
                         }
                     });
 
-            // we have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(getStageCacheMetricName()));
-            MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(getStageCacheMetricName(), cache));
+            // Synchronized to prevent concurrent State constructions from racing on remove+register,
+            // which would cause duplicate metric registration errors. (See #26080)
+            // We have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
+            synchronized (METRIC_REGISTRATION_LOCK) {
+                metricRegistry.removeMatching((name, metric) -> name.startsWith(getStageCacheMetricName()));
+                MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(getStageCacheMetricName(), cache));
+            }
         }
 
         protected String getStageCacheMetricName() {

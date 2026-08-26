@@ -23,10 +23,14 @@ import useStream from 'components/streams/hooks/useStream';
 
 const StreamDetailsPage = () => {
   const { streamId } = useParams<{ streamId: string }>();
-  const { data: stream, isFetching } = useStream(streamId);
+  const { data: stream, isFetching, isError } = useStream(streamId);
 
-  if (isFetching) {
+  if (!stream && isFetching) {
     return <Spinner />;
+  }
+
+  if (!stream || isError) {
+    return null;
   }
 
   return <StreamDetails stream={stream} />;

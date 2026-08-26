@@ -20,7 +20,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { ReadOnlyFormGroup } from 'components/common';
 import { Alert } from 'components/bootstrap';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 const _getNotificationPlugin = (type: string) => {
   if (type === undefined) {

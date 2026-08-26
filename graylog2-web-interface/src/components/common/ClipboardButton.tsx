@@ -23,7 +23,7 @@ import ClipboardContainer from 'components/common/ClipboardContainer';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
- * The text to be copied can be given in the `text` prop, or in an external element through a CSS selector in the `target` prop.
+ * The text to be copied can be given in the `text` prop.
  */
 
 type Props = {

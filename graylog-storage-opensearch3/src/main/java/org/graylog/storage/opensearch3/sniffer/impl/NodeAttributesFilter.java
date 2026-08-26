@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch3.sniffer.impl;
 
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.storage.opensearch3.sniffer.DiscoveredNode;
 import org.graylog.storage.opensearch3.sniffer.SnifferFilter;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class NodeAttributesFilter implements SnifferFilter {
 
     private final boolean enabled;
-    private final Predicate<Node> filter;
+    private final Predicate<DiscoveredNode> filter;
 
     @Inject
     public NodeAttributesFilter(ElasticsearchClientConfiguration configuration) {
@@ -48,13 +48,13 @@ public class NodeAttributesFilter implements SnifferFilter {
     }
 
     @Override
-    public List<Node> filterNodes(List<Node> nodes) {
+    public List<DiscoveredNode> filterNodes(List<DiscoveredNode> nodes) {
         return nodes.stream()
                 .filter(filter)
                 .collect(Collectors.toList());
     }
 
-    static Predicate<Node> create(String filter) {
+    static Predicate<DiscoveredNode> create(String filter) {
         final String attribute;
         final String value;
         if (!Strings.isNullOrEmpty(filter)) {
@@ -71,13 +71,11 @@ public class NodeAttributesFilter implements SnifferFilter {
         return node -> nodeMatchesFilter(node, attribute, value);
     }
 
-    private static boolean nodeMatchesFilter(Node node, String attribute, String value) {
-
+    private static boolean nodeMatchesFilter(DiscoveredNode node, String attribute, String value) {
         if (attribute == null || value == null) {
             return true;
         }
-
-        return node.getAttributes()
+        return node.attributes()
                 .getOrDefault(attribute, Collections.emptyList())
                 .contains(value);
     }

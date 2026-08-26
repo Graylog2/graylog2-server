@@ -18,6 +18,7 @@ import React from 'react';
 import * as mockImmutable from 'immutable';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -45,16 +46,26 @@ jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ state: undefined })),
-  },
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: Immutable.List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 describe('DashboardActionsMenu', () => {
   const mockView = View.create()
@@ -91,13 +102,13 @@ describe('DashboardActionsMenu', () => {
       name: /create dashboard/i,
     });
 
-    userEvent.click(saveButton);
+    await userEvent.click(saveButton);
   };
 
   const openDashboardSaveForm = async () => {
     const saveAsMenuItem = await screen.findByRole('button', { name: /save as new dashboard/i });
 
-    userEvent.click(saveAsMenuItem);
+    await userEvent.click(saveAsMenuItem);
   };
 
   beforeEach(() => {
@@ -149,10 +160,10 @@ describe('DashboardActionsMenu', () => {
 
   it('should open edit dashboard meta information modal', async () => {
     const { findByText } = render(<SUT />);
-    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     const editMenuItem = await screen.findByText(/Edit metadata/i);
 
-    userEvent.click(editMenuItem);
+    await userEvent.click(editMenuItem);
 
     await findByText(/Editing dashboard/);
   });
@@ -160,7 +171,7 @@ describe('DashboardActionsMenu', () => {
   it('should open dashboard share modal', async () => {
     render(<SUT />);
     const openShareButton = await screen.findByRole('button', { name: /Share/i });
-    userEvent.click(openShareButton);
+    await userEvent.click(openShareButton);
 
     await screen.findByRole('button', { name: /update sharing/i });
   });
@@ -170,7 +181,7 @@ describe('DashboardActionsMenu', () => {
 
     await findByTitle(/Save dashboard/);
     await findByTitle(/Save as new dashboard/);
-    await findByTitle(/Share/);
+    await findByRole('button', { name: /Share/i });
     await findByRole('button', { name: /more actions/i });
   });
 
@@ -180,7 +191,7 @@ describe('DashboardActionsMenu', () => {
     );
 
     const saveButton = queryByTitle(/Save dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
@@ -197,7 +208,7 @@ describe('DashboardActionsMenu', () => {
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
@@ -208,7 +219,7 @@ describe('DashboardActionsMenu', () => {
 
   it('should save view when pressing related keyboard shortcut', async () => {
     render(<SUT />);
-    userEvent.keyboard('{Meta>}s{/Meta}');
+    await userEvent.keyboard('{Meta>}s{/Meta}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
   });
 });

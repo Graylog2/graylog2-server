@@ -151,16 +151,18 @@ export const getRestParameterValues = ({
   parameters: Immutable.Set<ValueParameter | LookupTableParameter>;
   parameterBindings?: Immutable.Map<string, ParameterBinding>;
 }) =>
-  parameters.reduce((res, cur) => {
-    if (cur.type !== 'lut-parameter-v1') {
-      const paramJSON = cur.toJSON();
-      const { name } = paramJSON;
-      const bindingValue = parameterBindings?.get(name)?.value;
-      res[name] = bindingValue ?? paramJSON?.default_value;
-    }
+  Object.fromEntries(
+    parameters
+      .filter((cur) => cur.type !== 'lut-parameter-v1')
+      .map((cur) => {
+        const paramJSON = cur.toJSON();
+        const { name } = paramJSON;
+        const bindingValue = parameterBindings?.get(name)?.value;
 
-    return res;
-  }, {});
+        return [name, bindingValue ?? paramJSON?.default_value];
+      })
+      .toArray(),
+  );
 
 export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) =>
   concatQueryStrings(

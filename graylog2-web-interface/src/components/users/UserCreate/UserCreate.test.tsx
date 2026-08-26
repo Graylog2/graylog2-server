@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
@@ -24,7 +24,7 @@ import { Users } from '@graylog/server-api';
 import selectEvent from 'helpers/selectEvent';
 import { alice as existingUser } from 'fixtures/users';
 import { rolesList } from 'fixtures/roles';
-import { UsersActions } from 'stores/users/UsersStore';
+import { createUser } from 'hooks/useUsers';
 import { asMock } from 'helpers/mocking';
 
 import UserCreate from './UserCreate';
@@ -40,10 +40,9 @@ const mockLoadRolesPromise = Promise.resolve({
   total: 0,
 });
 
-jest.mock('stores/users/UsersStore', () => ({
-  UsersActions: {
-    create: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('hooks/useUsers', () => ({
+  USERS_QUERY_KEY: ['users'],
+  createUser: jest.fn(() => Promise.resolve()),
 }));
 
 jest.mock('@graylog/server-api', () => ({
@@ -52,10 +51,9 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesActions: {
-    loadRolesPaginated: jest.fn(() => Promise.resolve(mockLoadRolesPromise)),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  loadRolesPaginated: jest.fn(() => Promise.resolve(mockLoadRolesPromise)),
 }));
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
@@ -84,10 +82,7 @@ describe('<UserCreate />', () => {
       const submitButton = await findSubmitButton();
       await userEvent.type(usernameInput, 'The username');
 
-      // eslint-disable-next-line testing-library/no-unnecessary-act
-      await act(async () => {
-        await userEvent.type(firstNameInput, 'The first name');
-      });
+      await userEvent.type(firstNameInput, 'The first name');
 
       await userEvent.type(lastNameInput, 'The last name');
       await userEvent.type(emailInput, 'username@example.org');
@@ -105,7 +100,7 @@ describe('<UserCreate />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() =>
-        expect(UsersActions.create).toHaveBeenCalledWith({
+        expect(createUser).toHaveBeenCalledWith({
           username: 'The username',
           first_name: 'The first name',
           last_name: 'The last name',
@@ -137,10 +132,7 @@ describe('<UserCreate />', () => {
       await userEvent.type(usernameInput, '   username   ');
       await userEvent.type(firstNameInput, 'The first name');
 
-      // eslint-disable-next-line testing-library/no-unnecessary-act
-      await act(async () => {
-        await userEvent.type(lastNameInput, 'The last name');
-      });
+      await userEvent.type(lastNameInput, 'The last name');
 
       await userEvent.type(emailInput, 'username@example.org');
       await userEvent.type(passwordInput, 'thepassword');
@@ -150,7 +142,7 @@ describe('<UserCreate />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() =>
-        expect(UsersActions.create).toHaveBeenCalledWith({
+        expect(createUser).toHaveBeenCalledWith({
           username: 'username',
           first_name: 'The first name',
           last_name: 'The last name',

@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link, Icon, StatusIcon } from 'components/common';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
-import { Icon, StatusIcon } from 'components/common';
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import useFetch from 'integrations/hooks/useFetch';
@@ -28,6 +27,7 @@ import FormWrap from 'integrations/aws/common/FormWrap';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
+import Store from 'logic/local-storage/Store';
 
 const Container = styled.div`
   border: 1px solid #a6afbd;
@@ -99,13 +99,14 @@ type StepReviewProps = {
 };
 
 const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: StepReviewProps) => {
-  const [formError, setFormError] = useState(null);
   const { formData } = useContext(FormDataContext);
   const { logData } = useContext(ApiContext);
   const {
     awsAuthenticationType,
     awsCloudWatchAddFlowLogPrefix = { value: undefined },
+    awsCloudWatchStoreFullMessage = { value: undefined },
     awsAssumeRoleARN = { value: undefined },
+    awsExternalId = { value: undefined },
     awsAccessKey = { value: undefined },
     awsCloudWatchAwsRegion,
     awsCloudWatchBatchSize,
@@ -122,11 +123,16 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
+  const storeFullMessage = !!awsCloudWatchStoreFullMessage.value;
   const awsCloudwatchKinesisStreamArn = formData.awsCloudwatchKinesisStreamArn?.value ?? '';
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
-    () => {
+    (result) => {
+      if (result?.id) {
+        Store.sessionSet('setup_wizard_input_id', result.id);
+      }
+
       onSubmit();
     },
     'POST',
@@ -138,19 +144,19 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
+      store_full_message: storeFullMessage,
       kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
+      aws_external_id: awsExternalId.value ?? '',
       override_source: overrideSource?.value ?? '',
     }),
   );
 
-  useEffect(() => {
-    if (fetchSubmitStatus.error) {
-      setFormError({
+  const formError = fetchSubmitStatus.error
+    ? {
         full_message: fetchSubmitStatus.error,
         nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
-      });
-    }
-  }, [fetchSubmitStatus.error]);
+      }
+    : null;
 
   const handleSubmit = () => {
     if (externalInputSubmit) {
@@ -199,6 +205,13 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <li>
               <strong>AWS Assumed ARN Role</strong>
               <span>{awsAssumeRoleARN.value}</span>
+            </li>
+          )}
+
+          {awsExternalId.value && (
+            <li>
+              <strong>AWS External ID</strong>
+              <span>{awsExternalId.value}</span>
             </li>
           )}
 
@@ -287,6 +300,12 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <strong>Add Flow Log prefix to field names</strong>
             <span>
               <StatusIcon active={addPrefix} />
+            </span>
+          </li>
+          <li>
+            <strong>Store full message</strong>
+            <span>
+              <StatusIcon active={storeFullMessage} />
             </span>
           </li>
           {overrideSource.value && (

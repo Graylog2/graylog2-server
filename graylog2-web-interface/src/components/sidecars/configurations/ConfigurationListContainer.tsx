@@ -14,113 +14,85 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Spinner } from 'components/common';
-import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
+import { useCollectorsAll } from 'hooks/useCollectors';
 import {
-  CollectorConfigurationsActions,
-  CollectorConfigurationsStore,
-} from 'stores/sidecars/CollectorConfigurationsStore';
-import withTelemetry from 'logic/telemetry/withTelemetry';
+  COLLECTOR_CONFIGURATIONS_QUERY_KEY,
+  useCollectorConfigurationsPaginated,
+  copyConfiguration,
+  deleteConfiguration,
+  validateConfiguration,
+} from 'hooks/useCollectorConfigurations';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import connect from 'stores/connect';
+import type { Configuration } from 'components/sidecars/types';
 
 import ConfigurationList from './ConfigurationList';
 
-const handleDelete = (configuration) => CollectorConfigurationsActions.delete(configuration);
+const ConfigurationListContainer = () => {
+  const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-const reloadConfiguration = () => {
-  CollectorConfigurationsActions.list({});
-  CollectorsActions.all();
-};
+  const { data: collectors } = useCollectorsAll();
+  const { data: configurations } = useCollectorConfigurationsPaginated({ query, page, pageSize });
 
-const validateConfiguration = (configuration) => CollectorConfigurationsActions.validate(configuration);
+  const invalidateConfigurations = () =>
+    queryClient.invalidateQueries({ queryKey: COLLECTOR_CONFIGURATIONS_QUERY_KEY });
 
-type ConfigurationListContainerProps = {
-  configurations?: any;
-  collectors?: any[];
-  sendTelemetry?: (...args: any[]) => void;
-};
+  const handleDelete = (configuration: Configuration) =>
+    deleteConfiguration(configuration).then(invalidateConfigurations);
 
-class ConfigurationListContainer extends React.Component<
-  ConfigurationListContainerProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    configurations: undefined,
-    collectors: undefined,
-    sendTelemetry: () => {},
+  const handlePageChange = (newPage: number, newPageSize: number) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
   };
 
-  componentDidMount() {
-    reloadConfiguration();
-  }
-
-  handlePageChange = (page, pageSize) => {
-    const { query } = this.props.configurations;
-
-    CollectorConfigurationsActions.list({ query: query, page: page, pageSize: pageSize });
+  const handleQueryChange = (newQuery: string = '', callback: () => void = () => {}) => {
+    setQuery(newQuery);
+    setPage(1);
+    callback();
   };
 
-  handleQueryChange = (query = '', callback = () => {}) => {
-    const { pageSize } = this.props.configurations.pagination;
-
-    CollectorConfigurationsActions.list({ query: query, pageSize: pageSize }).finally(callback);
-  };
-
-  handleClone = (configuration, name, callback) => {
-    const { sendTelemetry } = this.props;
-
+  const handleClone = (configurationId: string, name: string, callback: () => void) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_CLONED, {
       app_pathname: 'sidecars',
       app_section: 'configuration',
     });
 
-    CollectorConfigurationsActions.copyConfiguration(configuration, name).then((response) => {
+    copyConfiguration(configurationId, name).then((response) => {
+      invalidateConfigurations();
       callback();
 
       return response;
     });
   };
 
-  render() {
-    const { collectors, configurations } = this.props;
-    const isLoading = !collectors || !configurations || !configurations.paginatedConfigurations;
+  const isLoading = !collectors || !configurations || !configurations.paginatedConfigurations;
 
-    if (isLoading) {
-      return <Spinner />;
-    }
-
-    return (
-      <ConfigurationList
-        collectors={collectors}
-        query={configurations.query}
-        pagination={configurations.pagination}
-        total={configurations.total}
-        configurations={configurations.paginatedConfigurations}
-        onPageChange={this.handlePageChange}
-        onQueryChange={this.handleQueryChange}
-        onClone={this.handleClone}
-        onDelete={handleDelete}
-        validateConfiguration={validateConfiguration}
-      />
-    );
+  if (isLoading) {
+    return <Spinner />;
   }
-}
 
-export default withTelemetry(
-  connect(
-    ConfigurationListContainer,
-    {
-      configurations: CollectorConfigurationsStore,
-      collectorsState: CollectorsStore,
-    },
-    ({ configurations, collectorsState }) => ({
-      collectors: collectorsState.collectors,
-      configurations,
-    }),
-  ),
-);
+  return (
+    <ConfigurationList
+      collectors={collectors}
+      query={configurations.query}
+      pagination={configurations.pagination}
+      total={configurations.total}
+      configurations={configurations.paginatedConfigurations}
+      onPageChange={handlePageChange}
+      onQueryChange={handleQueryChange}
+      onClone={handleClone}
+      onDelete={handleDelete}
+      validateConfiguration={validateConfiguration}
+    />
+  );
+};
+
+export default ConfigurationListContainer;

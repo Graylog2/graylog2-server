@@ -18,8 +18,10 @@ package org.graylog.inputs.otel.bindings;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.inputs.otel.OTelGrpcInput;
+import org.graylog.inputs.otel.OTelHttpInput;
 import org.graylog.inputs.otel.codec.OTelCodec;
 import org.graylog.inputs.otel.transport.OTelGrpcTransport;
+import org.graylog.inputs.otel.transport.OTelHttpTransport;
 import org.graylog.inputs.otel.transport.OTelLogsService;
 import org.graylog2.plugin.PluginModule;
 
@@ -27,7 +29,9 @@ public class OTelModule extends PluginModule {
     @Override
     protected void configure() {
         addMessageInput(OTelGrpcInput.class);
+        addMessageInput(OTelHttpInput.class);
         addTransport(OTelGrpcTransport.NAME, OTelGrpcTransport.class);
+        addTransport(OTelHttpTransport.NAME, OTelHttpTransport.class);
         addCodec(OTelCodec.NAME, OTelCodec.class);
 
         install(new FactoryModuleBuilder().build(OTelLogsService.Factory.class));

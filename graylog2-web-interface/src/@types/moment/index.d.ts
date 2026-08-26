@@ -22,6 +22,7 @@
 // Definitions by: Mitchell Grice <https://github.com/gricey432>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import moment = require('moment');
 
 export = moment;

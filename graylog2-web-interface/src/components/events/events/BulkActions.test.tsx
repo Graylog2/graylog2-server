@@ -70,7 +70,7 @@ const mockedEventActions: Array<EventAction> = [
 const renderBulkAction = () => render(<BulkActions selectedEntitiesData={mockedSelectedEntitiesData} />);
 
 const openActionsDropdown = async () =>
-  userEvent.click(
+  await userEvent.click(
     await screen.findByRole('button', {
       name: /bulk actions/i,
     }),

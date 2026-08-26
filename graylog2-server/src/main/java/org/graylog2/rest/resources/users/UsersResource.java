@@ -101,6 +101,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserConfiguration;
@@ -159,6 +160,7 @@ public class UsersResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
     private final UserSessionTerminationService sessionTerminationService;
     private final DefaultSecurityManager securityManager;
+    private final PrivilegeEscalationGuard privilegeEscalationGuard;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
     private final ClusterConfigService clusterConfigService;
     private final AuditEventSender auditEventSender;
@@ -180,7 +182,8 @@ public class UsersResource extends RestResource {
                          DefaultSecurityManager securityManager,
                          GlobalAuthServiceConfig globalAuthServiceConfig,
                          ClusterConfigService clusterConfigService,
-                         AuditEventSender auditEventSender) {
+                         AuditEventSender auditEventSender,
+                         PrivilegeEscalationGuard privilegeEscalationGuard) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -188,6 +191,7 @@ public class UsersResource extends RestResource {
         this.paginatedUserService = paginatedUserService;
         this.sessionTerminationService = sessionTerminationService;
         this.securityManager = securityManager;
+        this.privilegeEscalationGuard = privilegeEscalationGuard;
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
         this.globalAuthServiceConfig = globalAuthServiceConfig;
         this.clusterConfigService = clusterConfigService;
@@ -388,7 +392,7 @@ public class UsersResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@RequestBody(description = "Must contain username, full_name, email, password and a list of permissions.", required = true)
-                               @Valid @NotNull CreateUserRequest cr,
+                           @Valid @NotNull CreateUserRequest cr,
                            @Context UserContext userContext) throws ValidationException {
         if (isUserNameInUse(cr.username())) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
@@ -398,6 +402,7 @@ public class UsersResource extends RestResource {
         if (rolesContainAdmin(cr.roles()) && cr.isServiceAccount()) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
+        privilegeEscalationGuard.validatePermissionsAndRoles(cr, userContext);
         validatePasswordComplexity(cr.password());
 
         // Create user.
@@ -433,6 +438,8 @@ public class UsersResource extends RestResource {
 
         return Response.created(userUri).build();
     }
+
+
 
     @GET
     @RequiresPermissions(RestPermissions.USERS_CREATE)
@@ -546,10 +553,10 @@ public class UsersResource extends RestResource {
         final User user = loadUserById(userId);
         final String username = user.getName();
         checkPermission(USERS_EDIT, username);
-
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot modify readonly user " + username);
         }
+
         // We only allow setting a subset of the fields in ChangeUserRequest
         if (!user.isExternalUser()) {
             if (cr.email() != null) {
@@ -561,11 +568,13 @@ public class UsersResource extends RestResource {
         }
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
         if (permitted && cr.permissions() != null) {
+            privilegeEscalationGuard.validatePermissions(cr.permissions(), userContext);
             user.setPermissions(getEffectiveUserPermissions(user, cr.permissions()));
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
-            checkAdminRoleForServiceAccount(cr, user);
+            validateAdminRoleNotGrantedToServiceAccount(cr, user);
+            privilegeEscalationGuard.validateRolePermissions(cr.roles(), userContext);
             setUserRoles(cr.roles(), user, userContext);
         }
 
@@ -623,7 +632,7 @@ public class UsersResource extends RestResource {
         return roles != null && roles.stream().anyMatch(RoleServiceImpl.ADMIN_ROLENAME::equalsIgnoreCase);
     }
 
-    private void checkAdminRoleForServiceAccount(ChangeUserRequest cr, User user) {
+    private void validateAdminRoleNotGrantedToServiceAccount(ChangeUserRequest cr, User user) {
         if (user.isServiceAccount() && rolesContainAdmin(cr.roles())) {
             throw new BadRequestException("Cannot assign Admin role to service account");
         }
@@ -681,12 +690,14 @@ public class UsersResource extends RestResource {
     public void editPermissions(@Parameter(name = "username", description = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
                                 @RequestBody(description = "The list of permissions to assign to the user.", required = true)
-                                @Valid @NotNull PermissionEditRequest permissionRequest) throws ValidationException {
+                                @Valid @NotNull PermissionEditRequest permissionRequest,
+                                @Context UserContext userContext) throws ValidationException {
         final User user = userManagementService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
 
+        privilegeEscalationGuard.validatePermissions(permissionRequest.permissions(), userContext);
         user.setPermissions(getEffectiveUserPermissions(user, permissionRequest.permissions()));
         userManagementService.save(user);
     }
@@ -874,24 +885,25 @@ public class UsersResource extends RestResource {
     public void revokeToken(
             @Parameter(name = "userId", required = true) @PathParam("userId") String userId,
             @Parameter(name = "idOrToken", required = true) @PathParam("idOrToken") String idOrToken) {
-        final User user = loadUserById(userId);
-        final String username = user.getName();
-        if (!isPermitted(USERS_TOKENREMOVE, username)) {
-            throw new ForbiddenException("Not allowed to remove tokens for user " + username);
-        }
+        // The user must be logged in already, so we check the permission based on that info and the username of the
+        // token to be deleted. That way, the `userId`-parameter is indeed unused. Removing it would be a breaking change.
 
         // The endpoint supports both, deletion by token ID and deletion by using the token value itself.
         // The latter should not be used anymore because the plain text token will be part of the URL and URLs
         // will most probably be logged. We keep the old behavior for backwards compatibility.
         // TODO: Remove support for old behavior in 4.0
         final AccessToken accessToken = Optional.ofNullable(accessTokenService.loadById(idOrToken))
-                .orElse(accessTokenService.load(idOrToken));
+                .orElseGet(() -> accessTokenService.load(idOrToken));
 
-        if (accessToken != null) {
-            accessTokenService.destroy(accessToken);
-        } else {
-            throw new NotFoundException("Couldn't find access token for user " + username);
+        if (accessToken == null) {
+            throw new NotFoundException("Couldn't find access token for user.");
         }
+
+        if (!isPermitted(USERS_TOKENREMOVE, accessToken.getUserName())) {
+            throw new ForbiddenException("Not allowed to remove token for user " + accessToken.getUserName());
+        }
+
+        accessTokenService.destroy(accessToken);
     }
 
     private User loadUserById(String userId) {

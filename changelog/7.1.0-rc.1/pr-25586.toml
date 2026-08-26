@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix Event Key column showing blank values in Events Overview Widget."
+
+issues = ["13374"]
+pulls = ["25586"]

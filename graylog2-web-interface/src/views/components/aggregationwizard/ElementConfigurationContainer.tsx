@@ -30,6 +30,16 @@ const Container = styled.div(
     background-color: ${theme.colors.variant.lightest.default};
     flex-direction: column;
     position: relative;
+
+    input {
+      font-size: ${theme.fonts.size.body};
+    }
+
+    .control-label {
+      padding-left: 0;
+      padding-right: 5px;
+      font-weight: normal;
+    }
   `,
 );
 
@@ -44,8 +54,7 @@ const ElementActions = styled.div`
 `;
 
 const StyledIconButton = styled(IconButton)`
-  width: fit-content;
-  height: fit-content;
+  line-height: normal;
 `;
 
 const ElementConfiguration = styled.div`
@@ -69,7 +78,7 @@ const ElementConfigurationContainer = (
   <Container className={className} ref={ref}>
     <ElementActions>
       {dragHandle}
-      {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
+      {onRemove && <StyledIconButton size="xs" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
     </ElementActions>
     <ElementConfiguration>{children}</ElementConfiguration>
   </Container>

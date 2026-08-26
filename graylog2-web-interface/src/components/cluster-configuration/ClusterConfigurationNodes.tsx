@@ -18,11 +18,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
-import { SearchForm } from 'components/common';
+import { SearchForm, Spinner } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
+import useRunsWithDataNode from 'components/datanode/hooks/useRunsWithDataNode';
 
 import GraylogNodesExpandable from './graylog-nodes/GraylogNodesExpandable';
 import DataNodesExpandable from './data-nodes/DataNodesExpandable';
+import MongodbNodesExpandable from './mongodb-nodes/MongodbNodesExpandable';
+import OpensearchNodesExpandable from './opensearch-nodes/OpensearchNodesExpandable';
 
 const SectionCol = styled(Col)`
   margin-top: 12px;
@@ -41,34 +44,70 @@ const ControlsWrapper = styled.div`
   gap: 12px;
 `;
 
-type NodeType = 'all' | 'graylog' | 'data';
+type NodeType = 'all' | 'graylog' | 'data' | 'mongodb' | 'opensearch';
+type SearchNodesConfig =
+  | { nodeType: 'data'; label: 'Data Nodes'; component: typeof DataNodesExpandable }
+  | { nodeType: 'opensearch'; label: 'OpenSearch Nodes'; component: typeof OpensearchNodesExpandable };
 
 const ALL_NODES_PAGE_SIZE = 10;
 const SINGLE_NODE_TYPE_PAGE_SIZE = 100;
 const ALL_NODES_REFETCH_INTERVAL = 10000;
 const SINGLE_NODE_TYPE_REFETCH_INTERVAL = 20000;
 
+const getSearchNodesConfig = (runsWithDataNode: boolean | undefined): SearchNodesConfig | undefined => {
+  if (runsWithDataNode === undefined) {
+    return undefined;
+  }
+
+  return runsWithDataNode
+    ? { nodeType: 'data', label: 'Data Nodes', component: DataNodesExpandable }
+    : { nodeType: 'opensearch', label: 'OpenSearch Nodes', component: OpensearchNodesExpandable };
+};
+
 const ClusterConfigurationNodes = () => {
   const productName = useProductName();
   const [activeNodeType, setActiveNodeType] = useState<NodeType>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const nodeTypeOptions = useMemo<Array<{ label: string; value: NodeType }>>(
-    () => [
-      { label: 'All Nodes', value: 'all' },
-      { label: `${productName} Nodes`, value: 'graylog' },
-      { label: 'Data Nodes', value: 'data' },
-    ],
-    [productName],
-  );
+  const { data: runsWithDataNode, isLoading: isLoadingSearchBackend } = useRunsWithDataNode();
+  const searchNodesConfig = getSearchNodesConfig(runsWithDataNode);
+  const searchNodeType = searchNodesConfig?.nodeType;
+  const SearchNodesExpandable = searchNodesConfig?.component;
+  const nodeTypeOptions: Array<{ label: string; value: NodeType }> = [
+    { label: 'All Nodes', value: 'all' },
+    { label: `${productName} Nodes`, value: 'graylog' },
+    ...(searchNodesConfig ? [{ label: searchNodesConfig.label, value: searchNodesConfig.nodeType }] : []),
+    { label: 'MongoDB Nodes', value: 'mongodb' },
+  ];
   const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);
   const handleSearch = useCallback((query: string) => setSearchQuery(query), []);
   const handleResetSearch = useCallback(() => setSearchQuery(''), []);
 
   const showGraylogNodes = activeNodeType === 'all' || activeNodeType === 'graylog';
-  const showDataNodes = activeNodeType === 'all' || activeNodeType === 'data';
+  const showSearchNodes = activeNodeType === 'all' || activeNodeType === searchNodeType;
+  const showMongodbNodes = activeNodeType === 'all' || activeNodeType === 'mongodb';
   const isAllNodesView = activeNodeType === 'all';
   const pageSizeLimit = isAllNodesView ? ALL_NODES_PAGE_SIZE : SINGLE_NODE_TYPE_PAGE_SIZE;
   const refetchInterval = isAllNodesView ? ALL_NODES_REFETCH_INTERVAL : SINGLE_NODE_TYPE_REFETCH_INTERVAL;
+
+  const renderSearchNodes = () => {
+    if (isLoadingSearchBackend) {
+      return <Spinner text="Loading search backend nodes..." />;
+    }
+
+    if (!SearchNodesExpandable || !searchNodeType) {
+      return <p>Could not determine the configured search backend.</p>;
+    }
+
+    return (
+      <SearchNodesExpandable
+        collapsible={activeNodeType === 'all'}
+        searchQuery={normalizedSearch}
+        pageSizeLimit={pageSizeLimit}
+        refetchInterval={refetchInterval}
+        onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType(searchNodeType) : undefined}
+      />
+    );
+  };
 
   return (
     <Row>
@@ -101,14 +140,15 @@ const ClusterConfigurationNodes = () => {
           />
         </SectionCol>
       )}
-      {showDataNodes && (
+      {showSearchNodes && <SectionCol md={12}>{renderSearchNodes()}</SectionCol>}
+      {showMongodbNodes && (
         <SectionCol md={12}>
-          <DataNodesExpandable
+          <MongodbNodesExpandable
             collapsible={activeNodeType === 'all'}
             searchQuery={normalizedSearch}
             pageSizeLimit={pageSizeLimit}
             refetchInterval={refetchInterval}
-            onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('data') : undefined}
+            onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('mongodb') : undefined}
           />
         </SectionCol>
       )}

@@ -167,7 +167,7 @@ const DashboardActionsMenu = () => {
           entityType="dashboard"
           entityId={view.id}
           onClick={() => setShareViewOpen(true)}
-          bsStyle="default"
+          bsSize="md"
           disabledInfo={isNewView && 'Only saved dashboards can be shared.'}
         />
       )}

@@ -28,7 +28,6 @@ import org.graylog.security.DBGrantService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.contentpacks.ContentPackEntityResolver;
 import org.graylog2.contentpacks.model.ModelId;
@@ -74,7 +73,7 @@ class DefaultEntityDependencyResolverTest {
     }
 
     @Test
-    @DisplayName("Try a regular depency resolve")
+    @DisplayName("Try a regular dependency resolve")
     void resolve() {
         final String TEST_TITLE = "Test Stream Title";
         final EntityExcerpt streamExcerpt = EntityExcerpt.builder()
@@ -179,6 +178,31 @@ class DefaultEntityDependencyResolverTest {
         grnRegistry.registerType(GRNType.create("event_procedure"));
         final ImmutableSet<org.graylog.security.entities.EntityDescriptor> missingDependencies = entityDependencyResolver.resolve(definitionGrn);
         assertThat(missingDependencies).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Lookup table dependencies are ignored during resolve")
+    void resolveWithLookupTableDependency() {
+        final EntityDescriptor eventDefDescriptor = EntityDescriptor.builder()
+                .type(ModelTypes.EVENT_DEFINITION_V1).id(ModelId.of("54e3deadbeefdeadbeefafff")).build();
+        final EntityDescriptor lookupTableDescriptor = EntityDescriptor.builder()
+                .type(ModelTypes.LOOKUP_TABLE_V1).id(ModelId.of("54e3deadbeefdeadbeefaffe")).build();
+        final EntityDescriptor streamDescriptor = EntityDescriptor.builder()
+                .type(ModelTypes.STREAM_V1).id(ModelId.of("54e3deadbeefdeadbeefaffd")).build();
+
+        final var dependencyGraph = GraphBuilder.directed().<EntityDescriptor>build();
+        dependencyGraph.addNode(eventDefDescriptor);
+        dependencyGraph.putEdge(eventDefDescriptor, lookupTableDescriptor);
+        dependencyGraph.putEdge(eventDefDescriptor, streamDescriptor);
+        when(contentPackEntityResolver.resolveEntityDependencyGraph(any())).thenReturn(dependencyGraph);
+        when(contentPackEntityResolver.listAllEntityExcerpts()).thenReturn(ImmutableSet.of());
+
+        final GRN eventDefGrn = grnRegistry.newGRN("event_definition", "54e3deadbeefdeadbeefafff");
+        final ImmutableSet<org.graylog.security.entities.EntityDescriptor> dependencies = entityDependencyResolver.resolve(eventDefGrn);
+
+        // The lookup_table dependency should be skipped, only the stream should remain
+        assertThat(dependencies).hasSize(1);
+        assertThat(dependencies.asList().get(0).id().toString()).isEqualTo("grn::::stream:54e3deadbeefdeadbeefaffd");
     }
 
     @Test

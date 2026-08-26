@@ -90,7 +90,7 @@ describe('AggregationWizard', () => {
   it('should call onCancel', async () => {
     const onCancel = jest.fn();
     renderSUT({ onCancel });
-    userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
 
     await waitFor(() => expect(onCancel).toHaveBeenCalledTimes(1));
   });

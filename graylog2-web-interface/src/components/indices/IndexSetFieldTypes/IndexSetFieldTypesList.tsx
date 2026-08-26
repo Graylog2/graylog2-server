@@ -30,8 +30,7 @@ import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/Ori
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 import IndexSetProfile from 'components/indices/IndexSetFieldTypes/IndexSetProfile';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { useStore } from 'stores/connect';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 import BulkActions from './BulkActions';
@@ -60,7 +59,7 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
-  const { indexSet } = useStore(IndexSetsStore);
+  const { data: indexSet } = useSingleIndexSet(indexSetId);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
   const customColumnRenderers = useCustomColumnRenderers();
 

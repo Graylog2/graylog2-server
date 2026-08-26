@@ -14,12 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { UsersActions } from 'stores/users/UsersStore';
+import type { UserUpdate } from 'hooks/useUsers';
+import {
+  createUser,
+  loadUser,
+  loadUserByUsername,
+  updateUser,
+  deleteUser,
+  changeUserPassword,
+  createUserToken,
+  loadUserTokens,
+  deleteUserToken,
+  loadUsers,
+  loadUsersPaginated,
+  setUserStatus,
+} from 'hooks/useUsers';
 
 import notifyingAction from '../notifyingAction';
 
 const create = notifyingAction({
-  action: UsersActions.create,
+  action: createUser,
   success: (user) => ({
     message: `User "${user?.first_name} ${user?.last_name}" was created successfully`,
   }),
@@ -29,7 +43,7 @@ const create = notifyingAction({
 });
 
 const load = notifyingAction({
-  action: UsersActions.load,
+  action: loadUser,
   error: (error, userId) => ({
     message: `Loading user with id "${userId}" failed with status: ${error}`,
   }),
@@ -37,7 +51,7 @@ const load = notifyingAction({
 });
 
 const loadByUsername = notifyingAction({
-  action: UsersActions.loadByUsername,
+  action: loadUserByUsername,
   error: (error, username) => ({
     message: `Loading user with username "${username}" failed with status: ${error}`,
   }),
@@ -45,7 +59,7 @@ const loadByUsername = notifyingAction({
 });
 
 const update = notifyingAction({
-  action: UsersActions.update,
+  action: (userId: string, request: UserUpdate, _fullName: string) => updateUser(userId, request),
   success: (_userId, _payload, fullName) => ({
     message: `User "${fullName}" was updated successfully`,
   }),
@@ -55,7 +69,7 @@ const update = notifyingAction({
 });
 
 const deleteAction = notifyingAction({
-  action: UsersActions.delete,
+  action: (userId: string, _fullName: string) => deleteUser(userId),
   success: (_userId, fullName) => ({
     message: `User "${fullName}" was deleted successfully`,
   }),
@@ -65,7 +79,7 @@ const deleteAction = notifyingAction({
 });
 
 const changePassword = notifyingAction({
-  action: UsersActions.changePassword,
+  action: changeUserPassword,
   success: () => ({
     message: 'Password was changed successfully ',
   }),
@@ -75,7 +89,7 @@ const changePassword = notifyingAction({
 });
 
 const createToken = notifyingAction({
-  action: UsersActions.createToken,
+  action: createUserToken,
   success: (_userId, tokenName) => ({
     message: `Token "${tokenName}" created successfully`,
   }),
@@ -85,14 +99,14 @@ const createToken = notifyingAction({
 });
 
 const loadTokens = notifyingAction({
-  action: UsersActions.loadTokens,
+  action: loadUserTokens,
   error: (error, userId) => ({
     message: `Loading tokens for user with id "${userId}" failed with status: ${error}`,
   }),
 });
 
 const deleteToken = notifyingAction({
-  action: UsersActions.deleteToken,
+  action: (userId: string, tokenId: string, _tokenName: string) => deleteUserToken(userId, tokenId),
   success: (_userId, _tokenId, tokenName) => ({
     message: `Token "${tokenName}" deleted successfully`,
   }),
@@ -101,22 +115,22 @@ const deleteToken = notifyingAction({
   }),
 });
 
-const loadUsers = notifyingAction({
-  action: UsersActions.loadUsers,
+const loadUsersAction = notifyingAction({
+  action: loadUsers,
   error: (error) => ({
     message: `Loading users failed with status: ${error}`,
   }),
 });
 
-const loadUsersPaginated = notifyingAction({
-  action: UsersActions.loadUsersPaginated,
+const loadUsersPaginatedAction = notifyingAction({
+  action: loadUsersPaginated,
   error: (error) => ({
     message: `Loading users failed with status: ${error}`,
   }),
 });
 
 const setStatus = notifyingAction({
-  action: UsersActions.setStatus,
+  action: setUserStatus,
   success: (userId, accountStatus) => ({
     message: `User "${userId}" was set to ${accountStatus}`,
   }),
@@ -135,7 +149,7 @@ export default {
   createToken,
   loadTokens,
   deleteToken,
-  loadUsers,
-  loadUsersPaginated,
+  loadUsers: loadUsersAction,
+  loadUsersPaginated: loadUsersPaginatedAction,
   setStatus,
 };

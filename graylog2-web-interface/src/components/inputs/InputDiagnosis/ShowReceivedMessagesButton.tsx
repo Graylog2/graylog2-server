@@ -19,7 +19,7 @@ import React from 'react';
 import { Button } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import type { Input } from 'components/messageloaders/Types';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import recentMessagesTimeRange from 'util/TimeRangeHelper';
 import { getPathnameWithoutId } from 'util/URLUtils';

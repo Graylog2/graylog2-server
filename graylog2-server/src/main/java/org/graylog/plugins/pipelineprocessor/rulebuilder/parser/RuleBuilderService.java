@@ -60,6 +60,7 @@ public class RuleBuilderService {
         this.conditionParser = conditionParser;
         this.actionParser = actionParser;
         this.freemarkerConfiguration = secureFreemarkerConfigProvider.get();
+        this.freemarkerConfiguration.setNumberFormat("computer");
         StringTemplateLoader templateLoader = new StringTemplateLoader();
         conditionParser.getConditions().forEach((key, value) -> templateLoader.putTemplate(key, value.descriptor().ruleBuilderTitle()));
         actionParser.getActions().forEach((key, value) -> templateLoader.putTemplate(key, value.descriptor().ruleBuilderTitle()));

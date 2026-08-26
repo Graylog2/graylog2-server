@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { useStore } from 'stores/connect';
+import { useNodeMetrics } from 'hooks/useMetrics';
 import LoggingSubsystem from 'components/loggers/LoggingSubsystem';
 import LogLevelMetricsOverview from 'components/loggers/LogLevelMetricsOverview';
 import { Col, Row, Button } from 'components/bootstrap';
@@ -31,30 +30,23 @@ type Props = {
   subsystems: {};
 };
 const metric_name = 'org.apache.logging.log4j.core.Appender.all';
+const METRIC_NAMES = [metric_name];
 
 const NodeLoggers = ({ nodeId, subsystems }: Props) => {
   const sendTelemetry = useSendTelemetry();
 
-  const { metrics } = useStore(MetricsStore);
+  const { data: nodeMetrics } = useNodeMetrics(nodeId, METRIC_NAMES);
   const [showDetails, setShowDetails] = useState(false);
 
-  useEffect(() => {
-    MetricsActions.add(nodeId, metric_name);
-
-    return () => {
-      MetricsActions.remove(nodeId, metric_name);
-    };
-  }, [nodeId]);
-
   const _formattedThroughput = useMemo(() => {
-    if (metrics?.[nodeId]?.[metric_name]) {
-      const { metric } = metrics[nodeId][metric_name];
+    if (nodeMetrics?.[metric_name]) {
+      const { metric } = nodeMetrics[metric_name];
 
       return 'rate' in metric ? metric.rate.total : 'n/a';
     }
 
     return 'n/a';
-  }, [metrics, nodeId]);
+  }, [nodeMetrics]);
 
   const subsystemKeys = Object.keys(subsystems).map((subsystem) => (
     <LoggingSubsystem

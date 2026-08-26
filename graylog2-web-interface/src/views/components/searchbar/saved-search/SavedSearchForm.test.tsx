@@ -17,27 +17,44 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { useFormikContext } from 'formik';
 
 import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import OriginalSavedSearchForm from './SavedSearchForm';
 
-jest.mock('views/hooks/useSaveViewFormControls');
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  __esModule: true,
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
-  },
+jest.mock('formik', () => ({
+  ...jest.requireActual('formik'),
+  useFormikContext: jest.fn(),
 }));
+jest.mock('views/hooks/useSaveViewFormControls');
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
+}));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
+
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 const shareWithCollaborator = async () => {
   await selectEvent.chooseOption('Search for users and teams', everyone.title);
   await selectEvent.chooseOption('Select a capability', viewer.title);
@@ -46,7 +63,7 @@ const shareWithCollaborator = async () => {
     name: /add collaborator/i,
   });
 
-  userEvent.click(addCollaborator);
+  await setupUser().click(addCollaborator);
 
   await screen.findByText(/everyone/i);
 };
@@ -58,9 +75,14 @@ const SavedSearchForm = ({ ...props }: React.ComponentProps<typeof OriginalSaved
 );
 jest.setTimeout(10000);
 
+const mockFormDirtyState = (dirty: boolean) =>
+  asMock(useFormikContext)
+    // @ts-expect-error context return type is not complete
+    .mockReturnValue({ dirty });
+
 describe('SavedSearchForm', () => {
   beforeEach(() => {
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
   });
 
   beforeAll(() => {
@@ -85,6 +107,7 @@ describe('SavedSearchForm', () => {
 
   beforeEach(() => {
     asMock(useSaveViewFormControls).mockReturnValue([]);
+    mockFormDirtyState(false);
   });
 
   describe('render the SavedSearchForm', () => {
@@ -116,7 +139,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} toggleModal={onToggleModal} />);
 
       const cancelButton = await screen.findByRole('button', { name: /cancel/i });
-      userEvent.click(cancelButton);
+      await setupUser().click(cancelButton);
 
       expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
@@ -127,7 +150,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} saveSearch={onSave} />);
 
       const saveButton = await screen.findByRole('button', { name: /Save search/i });
-      userEvent.click(saveButton);
+      await setupUser().click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
     });
@@ -137,9 +160,9 @@ describe('SavedSearchForm', () => {
 
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
-      userEvent.type(await findTitleInput(), ' and further title');
+      await setupUser().type(await findTitleInput(), ' and further title');
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
-      userEvent.click(saveAsButton);
+      await setupUser().click(saveAsButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
@@ -150,7 +173,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
-      userEvent.click(saveAsButton);
+      await setupUser().click(saveAsButton);
 
       expect(onSaveAs).not.toHaveBeenCalled();
     });
@@ -160,9 +183,9 @@ describe('SavedSearchForm', () => {
 
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
 
-      userEvent.type(await findTitleInput(), ' and further title');
+      await setupUser().type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
-      userEvent.click(createNewButton);
+      await setupUser().click(createNewButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
@@ -170,14 +193,34 @@ describe('SavedSearchForm', () => {
     it('should handle saveSearch with share settings', async () => {
       const onSaveAs = jest.fn();
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
-      userEvent.type(await findTitleInput(), ' and further title');
+      await setupUser().type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
 
       await shareWithCollaborator();
 
-      userEvent.click(createNewButton);
+      await setupUser().click(createNewButton);
 
       expect(onSaveAs).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('unconfirmed changes warning', () => {
+    it('should show warning when form has unconfirmed changes', async () => {
+      mockFormDirtyState(true);
+
+      render(<SavedSearchForm {...props} />);
+
+      await screen.findByText(/unconfirmed changes to the search parameters/i);
+    });
+
+    it('should not show warning when form has no unconfirmed changes', async () => {
+      mockFormDirtyState(false);
+
+      render(<SavedSearchForm {...props} />);
+
+      await findByHeadline();
+
+      expect(screen.queryByText(/unconfirmed changes to the search parameters/i)).not.toBeInTheDocument();
     });
   });
 

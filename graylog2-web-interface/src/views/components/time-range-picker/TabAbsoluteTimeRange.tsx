@@ -25,7 +25,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 
 import AbsoluteCalendar from './AbsoluteCalendar';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
-import type { TimeRangePickerFormValues } from './TimeRangePicker';
+import type { TimeRangePickerFormValues } from './types';
 
 type Props = {
   disabled?: boolean;

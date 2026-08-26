@@ -29,10 +29,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.events.search.EventsFilterOptions;
+import org.graylog.events.search.EventsFilterOptionsRequest;
 import org.graylog.events.search.EventsHistogramResult;
 import org.graylog.events.search.EventsSearchParameters;
 import org.graylog.events.search.EventsSearchResult;
 import org.graylog.events.search.EventsSearchService;
+import org.graylog.events.search.EventsSliceService;
 import org.graylog.events.search.EventsSlicesRequest;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -60,10 +63,13 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @RequiresAuthentication
 public class EventsResource extends RestResource implements PluginRestResource {
     private final EventsSearchService searchService;
+    private final EventsSliceService sliceService;
 
     @Inject
-    public EventsResource(EventsSearchService searchService) {
+    public EventsResource(final EventsSearchService searchService,
+                          final EventsSliceService sliceService) {
         this.searchService = searchService;
+        this.sliceService = sliceService;
     }
 
     @POST
@@ -81,7 +87,15 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Slices slices(@Context SearchUser searchUser, @Parameter(name = "JSON body") final EventsSlicesRequest request) {
-        return searchService.slices(firstNonNull(request, EventsSlicesRequest.empty()), getSubject(), searchUser);
+        return sliceService.slices(firstNonNull(request, EventsSlicesRequest.empty()), getSubject(), searchUser);
+    }
+
+    @POST
+    @Path("/filter_options")
+    @Operation(summary = "Get the available values for the given event fields")
+    @NoAuditEvent("Doesn't change any data, only collects filter values")
+    public EventsFilterOptions filterOptions(@Parameter(name = "JSON body") final EventsFilterOptionsRequest request) {
+        return searchService.filterOptions(firstNonNull(request, EventsFilterOptionsRequest.empty()), getSubject());
     }
 
     @POST

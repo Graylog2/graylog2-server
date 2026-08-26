@@ -17,7 +17,7 @@
 import UserNotification from 'util/UserNotification';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
-import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
+import { updateAuthBackend } from 'hooks/useAuthentication';
 
 import type { WizardFormValues } from './BackendWizard/BackendWizardContext';
 
@@ -34,7 +34,7 @@ export default (
   const notifyOnError = (error) =>
     UserNotification.error(`Updating authentication service failed with status: ${error}`, 'Error');
 
-  return AuthenticationActions.update(backendId, {
+  return updateAuthBackend(backendId, {
     ...payload,
     id: backendId,
   })

@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { useRef, useCallback } from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { CountBadge } from 'components/common';
 
@@ -36,14 +36,21 @@ const StreamRulesCell = ({ stream }: Props) => {
     return null;
   }
 
+  const streamRulesCount = stream.rules.length;
+  if (streamRulesCount === 0) {
+    return null;
+  }
+
   const streamRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('rules');
+  const streamRulesSectionTitle = `${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`;
 
   return (
     <CountBadge
-      count={stream.rules.length}
+      count={streamRulesCount}
+      iconName={streamRulesSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
       onClick={toggleRulesSection}
       ref={buttonRef}
-      title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}
+      title={streamRulesSectionTitle}
     />
   );
 };

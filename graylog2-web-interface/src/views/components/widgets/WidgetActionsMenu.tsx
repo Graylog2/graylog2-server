@@ -239,10 +239,14 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
             streamCategories={streamCategories}
             parameterBindings={parameterBindings}
             parameters={parameters}
+            filters={widget.filters}
+            newTab
           />
         </IfDashboard>
-        <ExtraMenuWidgetActions widget={widget} />
         {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
+      </IfInteractive>
+      <ExtraMenuWidgetActions widget={widget} />
+      <IfInteractive>
         {!isFocused && (
           <>
             <WidgetHorizontalStretch

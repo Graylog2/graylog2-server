@@ -18,7 +18,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Metric } from 'components/metrics';
-import type { Metric as MetricType } from 'stores/metrics/MetricsStore';
+import type { Metric as MetricType } from 'types/metrics';
 
 const MetricListWrap = styled.ul(
   ({ theme }) => css`

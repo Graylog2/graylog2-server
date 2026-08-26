@@ -16,9 +16,6 @@
  */
 package org.graylog.storage.opensearch3.sniffer;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
 import org.graylog.storage.opensearch3.sniffer.impl.NodeAttributesFilter;
 import org.junit.jupiter.api.Test;
 
@@ -27,86 +24,63 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class NodeAttributesFilterTest {
-    private final Node nodeOnRack23 = nodeOnRack(23);
-    private final Node nodeOnRack42 = nodeOnRack(42);
-    private final Node nodeWithNoAttributes = mockNode(Collections.emptyMap());
+    private final DiscoveredNode nodeOnRack23 = nodeOnRack(23);
+    private final DiscoveredNode nodeOnRack42 = nodeOnRack(42);
+    private final DiscoveredNode nodeWithNoExtraAttributes = new DiscoveredNode(
+            "http", "no-attrs", 9200, Map.of("always", List.of("true")));
 
     @Test
-    void doesNotFilterNodesIfNoFilterIsSet() throws Exception {
-        final List<Node> nodes = mockNodes();
-
-        final SnifferFilter nodesSniffer = new NodeAttributesFilter(false, null);
-
-        assertThat(nodesSniffer.filterNodes(nodes)).isEqualTo(nodes);
-    }
-
-    @Test
-    void worksWithEmptyNodesListIfFilterIsSet() throws Exception {
-        final List<Node> nodes = Collections.emptyList();
-
-        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "rack:42");
-
-        assertThat(nodesSniffer.filterNodes(nodes)).isEqualTo(nodes);
+    void doesNotFilterNodesIfNoFilterIsSet() {
+        final List<DiscoveredNode> nodes = mockNodes();
+        final var filter = new NodeAttributesFilter(false, null);
+        assertThat(filter.filterNodes(nodes)).isEqualTo(nodes);
     }
 
     @Test
-    void returnsNodesMatchingGivenFilter() throws Exception {
-        final List<Node> nodes = mockNodes();
-
-        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "rack:42");
-
-        assertThat(nodesSniffer.filterNodes(nodes)).containsExactly(nodeOnRack42);
+    void worksWithEmptyNodesListIfFilterIsSet() {
+        final List<DiscoveredNode> nodes = Collections.emptyList();
+        final var filter = new NodeAttributesFilter(true, "rack:42");
+        assertThat(filter.filterNodes(nodes)).isEqualTo(nodes);
     }
 
     @Test
-    void returnsNoNodesIfFilterDoesNotMatch() throws Exception {
-        final List<Node> nodes = mockNodes();
-        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "location:alaska");
-        assertThat(nodesSniffer.filterNodes(nodes)).isEmpty();
+    void returnsNodesMatchingGivenFilter() {
+        final List<DiscoveredNode> nodes = mockNodes();
+        final var filter = new NodeAttributesFilter(true, "rack:42");
+        assertThat(filter.filterNodes(nodes)).containsExactly(nodeOnRack42);
     }
 
     @Test
-    void returnsAllNodesIfFilterMatchesAll() throws Exception {
-        final List<Node> nodes = mockNodes();
-
-        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "always:true");
-
-        assertThat(nodesSniffer.filterNodes(nodes)).isEqualTo(nodes);
+    void returnsNoNodesIfFilterDoesNotMatch() {
+        final List<DiscoveredNode> nodes = mockNodes();
+        final var filter = new NodeAttributesFilter(true, "location:alaska");
+        assertThat(filter.filterNodes(nodes)).isEmpty();
     }
 
     @Test
-    void returnsMatchingNodesIfGivenAttributeIsInList() throws Exception {
-        final Node matchingNode = mockNode(ImmutableMap.of(
-                "something", ImmutableList.of("somevalue", "42", "pi")
-        ));
-        final List<Node> nodes = Collections.singletonList(matchingNode);
-
-        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "something:42");
-
-        assertThat(nodesSniffer.filterNodes(nodes)).isEqualTo(nodes);
+    void returnsAllNodesIfFilterMatchesAll() {
+        final List<DiscoveredNode> nodes = mockNodes();
+        final var filter = new NodeAttributesFilter(true, "always:true");
+        assertThat(filter.filterNodes(nodes)).isEqualTo(nodes);
     }
 
-    private Node nodeOnRack(int rackNo) {
-        return mockNode(ImmutableMap.of(
-                "rack", ImmutableList.of(Integer.toString(rackNo))
-        ));
+    @Test
+    void returnsMatchingNodesIfGivenAttributeIsInList() {
+        final var matchingNode = new DiscoveredNode("http", "multi-attr", 9200,
+                Map.of("something", List.of("somevalue", "42", "pi")));
+        final List<DiscoveredNode> nodes = List.of(matchingNode);
+        final var filter = new NodeAttributesFilter(true, "something:42");
+        assertThat(filter.filterNodes(nodes)).isEqualTo(nodes);
     }
 
-    private Node mockNode(Map<String, List<String>> attributes) {
-        final Node node = mock(Node.class);
-        final Map<String, List<String>> nodeAttributes = new ImmutableMap.Builder<String, List<String>>()
-                .put("always", Collections.singletonList("true"))
-                .putAll(attributes)
-                .build();
-        when(node.getAttributes()).thenReturn(nodeAttributes);
-        return node;
+    private DiscoveredNode nodeOnRack(int rackNo) {
+        return new DiscoveredNode("http", "rack-" + rackNo, 9200,
+                Map.of("rack", List.of(Integer.toString(rackNo)), "always", List.of("true")));
     }
 
-    private List<Node> mockNodes() {
-        return ImmutableList.of(nodeOnRack42, nodeOnRack23, nodeWithNoAttributes);
+    private List<DiscoveredNode> mockNodes() {
+        return List.of(nodeOnRack42, nodeOnRack23, nodeWithNoExtraAttributes);
     }
 }

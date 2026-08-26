@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from 'components/bootstrap';
 import { ConfirmDialog, Icon } from 'components/common';
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
 import { keyFn } from 'hooks/useStreamOutputs';
 

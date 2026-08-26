@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix issue when entidy data table filter suggestions list take more place than screen height."
+
+issues = ["graylog-plugin-enterprise#13131"]
+pulls = ["25286"]

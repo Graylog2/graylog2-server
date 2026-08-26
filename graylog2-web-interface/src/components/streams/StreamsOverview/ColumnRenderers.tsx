@@ -15,12 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import type Immutable from 'immutable';
 
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
-import type { Output } from 'stores/outputs/OutputsStore';
-import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
+import type { Output } from 'hooks/useOutputs';
+import type { Stream, StreamRule } from 'logic/streams/types';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
 import TitleCell from 'components/streams/StreamsOverview/cells/TitleCell';
@@ -32,19 +30,25 @@ import StreamRulesCell from './cells/StreamRulesCell';
 import PipelinesCell from './cells/PipelinesCell';
 import OutputsCell from './cells/OutputsCell';
 import ArchivingsCell from './cells/ArchivingsCell';
+import DestinationFilterRulesCell from './cells/DestinationFilterRulesCell';
+import MessageCountCell from './cells/MessageCountCell';
+import AvgProcessingTimeCell from './cells/AvgProcessingTimeCell';
+import MaxProcessingTimeCell from './cells/MaxProcessingTimeCell';
+import AssociatedInputsCell from './cells/AssociatedInputsCell';
+import RoutingPipelinesCell from './cells/RoutingPipelinesCell';
+import { METRIC_COLUMN_IDS } from './metricColumns';
 
-const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 const pipelineRenderer = {
   pipelines: {
     renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
     staticWidth: 'matchHeader' as const,
+    textAlign: 'right',
   },
 };
 const customColumnRenderers = (
   indexSets: Array<IndexSet>,
   isPipelineColumnPermitted: boolean,
-  permissions: Immutable.List<string>,
-  pluggableColumnRenderers?: ColumnRenderersByAttribute<Stream>,
+  extensionColumnRenderers?: ColumnRenderersByAttribute<Stream>,
 ): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
@@ -58,26 +62,53 @@ const customColumnRenderers = (
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
       staticWidth: 'matchHeader' as const,
+      textAlign: 'right',
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
-      staticWidth: 'matchHeader' as const,
+      staticWidth: 100,
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
       staticWidth: 'matchHeader' as const,
+      textAlign: 'right',
     },
     ...(isPipelineColumnPermitted ? pipelineRenderer : {}),
     outputs: {
       renderCell: (_outputs: Output[], stream) => <OutputsCell stream={stream} />,
       staticWidth: 'matchHeader' as const,
     },
+    destination_filters: {
+      renderCell: (_destinationFilters: string, stream) => <DestinationFilterRulesCell stream={stream} />,
+      staticWidth: 'matchHeader' as const,
+    },
     archiving: {
       renderCell: (_archiving: boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
       staticWidth: 'matchHeader' as const,
     },
-    ...(getStreamDataLakeTableElements?.(permissions)?.columnRenderer || {}),
-    ...(pluggableColumnRenderers || {}),
+    [METRIC_COLUMN_IDS.messageCount]: {
+      renderCell: (_value: unknown, stream) => <MessageCountCell stream={stream} />,
+      staticWidth: 180,
+    },
+    [METRIC_COLUMN_IDS.avgProcessingTime]: {
+      renderCell: (_value: unknown, stream) => <AvgProcessingTimeCell stream={stream} />,
+      staticWidth: 200,
+    },
+    [METRIC_COLUMN_IDS.maxProcessingTime]: {
+      renderCell: (_value: unknown, stream) => <MaxProcessingTimeCell stream={stream} />,
+      staticWidth: 200,
+    },
+    [METRIC_COLUMN_IDS.associatedInputs]: {
+      renderCell: (_value: unknown, stream) => <AssociatedInputsCell stream={stream} />,
+      staticWidth: 180,
+      textAlign: 'right',
+    },
+    [METRIC_COLUMN_IDS.routingPipelines]: {
+      renderCell: (_value: unknown, stream) => <RoutingPipelinesCell stream={stream} />,
+      staticWidth: 160,
+      textAlign: 'right',
+    },
+    ...(extensionColumnRenderers || {}),
   },
 });
 

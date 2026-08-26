@@ -44,6 +44,7 @@ jest.mock('domainActions/users/UsersDomain');
 jest.mock('stores/users/CurrentUserStore');
 
 jest.useFakeTimers();
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 describe('<UserEdit />', () => {
   afterEach(() => {
@@ -82,7 +83,7 @@ describe('<UserEdit />', () => {
     render(<UserEdit user={user} />);
 
     const tab = await screen.findByLabelText(/Preferences/i);
-    userEvent.click(tab);
+    await setupUser().click(tab);
 
     expect(screen.getByText('PreferencesSection')).toBeInTheDocument();
     expect(screen.getByText('SettingsSection')).toBeInTheDocument();
@@ -92,7 +93,7 @@ describe('<UserEdit />', () => {
     render(<UserEdit user={user} />);
 
     const tab = await screen.findByLabelText(/Teams & Roles/i);
-    userEvent.click(tab);
+    await setupUser().click(tab);
 
     expect(screen.getByText('RolesSection')).toBeInTheDocument();
     expect(screen.getByText('TeamsSection')).toBeInTheDocument();
@@ -114,7 +115,7 @@ describe('<UserEdit />', () => {
     render(<UserEdit user={user} />);
 
     const updateButton = await screen.findByText('Update Profile');
-    await userEvent.click(updateButton);
+    await setupUser().click(updateButton);
 
     await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(1));
 
@@ -135,10 +136,10 @@ describe('<UserEdit />', () => {
     render(<UserEdit user={user} />);
 
     const tab = await screen.findByLabelText(/Teams & Roles/i);
-    await userEvent.click(tab);
+    await setupUser().click(tab);
 
     const updateButton = await screen.findByText('Update Roles');
-    await userEvent.click(updateButton);
+    await setupUser().click(updateButton);
 
     await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(1));
 
@@ -161,7 +162,7 @@ describe('<UserEdit />', () => {
     render(<UserEdit user={user} />);
 
     const updateButton = await screen.findByText('Update Profile');
-    await userEvent.click(updateButton);
+    await setupUser().click(updateButton);
 
     await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(reloadSpy).toHaveBeenCalledTimes(1));
@@ -177,7 +178,7 @@ describe('<UserEdit />', () => {
     render(<UserEdit user={differentUser} />);
 
     const updateButton = await screen.findByText('Update Profile');
-    await userEvent.click(updateButton);
+    await setupUser().click(updateButton);
 
     await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(1));
     expect(reloadSpy).not.toHaveBeenCalled();

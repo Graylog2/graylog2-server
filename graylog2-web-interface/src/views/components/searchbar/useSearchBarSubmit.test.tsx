@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { SearchQueryStrings } from '@graylog/server-api';
@@ -40,8 +40,7 @@ type Props = {
 const initialValues: SearchBarFormValues = {
   queryString: 'action:login',
   timerange: { type: 'relative', range: 300 },
-  streams: [],
-  streamCategories: [],
+  streamsAndCategories: { streams: [], categories: [] },
 };
 
 const Wrapper = ({ onSubmit, values }: Props) => {
@@ -65,9 +64,8 @@ describe('useSearchBarSubmit', () => {
     const onSubmit = jest.fn(async () => {});
     const values: SearchBarFormValues = {
       queryString: ' http_method:POST ',
-      streams: [],
+      streamsAndCategories: { streams: [], categories: [] },
       timerange: { type: 'relative', range: 60 },
-      streamCategories: [],
     };
     render(<Wrapper onSubmit={onSubmit} values={values} />);
 
@@ -86,15 +84,12 @@ describe('useSearchBarSubmit', () => {
     const onSubmit = jest.fn(async () => {});
     const values: SearchBarFormValues = {
       queryString: '  ',
-      streams: [],
+      streamsAndCategories: { streams: [], categories: [] },
       timerange: { type: 'relative', range: 60 },
-      streamCategories: [],
     };
     render(<Wrapper onSubmit={onSubmit} values={values} />);
 
-    await act(async () => {
-      await clickSubmit();
-    });
+    await clickSubmit();
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(values);
@@ -107,15 +102,12 @@ describe('useSearchBarSubmit', () => {
     const onSubmit = jest.fn(async () => {});
     const values: SearchBarFormValues = {
       queryString: ' action:login ',
-      streams: [],
+      streamsAndCategories: { streams: [], categories: [] },
       timerange: { type: 'relative', range: 60 },
-      streamCategories: [],
     };
     render(<Wrapper onSubmit={onSubmit} values={values} />);
 
-    await act(async () => {
-      await clickSubmit();
-    });
+    await clickSubmit();
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(values);
@@ -128,9 +120,8 @@ describe('useSearchBarSubmit', () => {
     const onSubmit = jest.fn(async () => {});
     const values: SearchBarFormValues = {
       queryString: ' http_method:POST ',
-      streams: [],
+      streamsAndCategories: { streams: [], categories: [] },
       timerange: { type: 'relative', range: 60 },
-      streamCategories: [],
     };
     asMock(SearchQueryStrings.queryStringUsed).mockRejectedValue(new Error('Boom!'));
     render(<Wrapper onSubmit={onSubmit} values={values} />);

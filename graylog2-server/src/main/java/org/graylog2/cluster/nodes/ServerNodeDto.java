@@ -23,21 +23,31 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 
 import java.util.Map;
 import java.util.Optional;
 
+import static org.graylog2.cluster.nodes.ServerNodeDto.FIELD_IS_PROCESSING;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(as = ServerNodeDto.class)
 @JsonDeserialize(builder = ServerNodeDto.Builder.class)
+@DbEntity(collection = ServerNodeDto.COLLECTION_NAME, titleField = NodeDto.FIELD_NODE_ID,
+          readableFields = {ID_FIELD, "node_id", "hostname", "transport_address", "is_leader", "last_seen",
+                  FIELD_IS_PROCESSING})
 public abstract class ServerNodeDto extends NodeDto {
+
+    public static final String COLLECTION_NAME = "nodes";
 
     public static final String FIELD_IS_PROCESSING = "is_processing";
     public static final String FIELD_LOAD_BALANCER_STATUS = "lb_status";
     public static final String FIELD_LIFECYCLE = "lifecycle";
+    public static final String FIELD_VERSION = "version";
 
     @JsonProperty(FIELD_IS_PROCESSING)
     public abstract boolean isProcessing();
@@ -54,6 +64,10 @@ public abstract class ServerNodeDto extends NodeDto {
     @JsonProperty(FIELD_LIFECYCLE)
     public abstract Lifecycle getLifecycle();
 
+    @Nullable
+    @JsonProperty(FIELD_VERSION)
+    public abstract String getVersion();
+
     public abstract Builder toBuilder();
 
     @Override
@@ -62,6 +76,9 @@ public abstract class ServerNodeDto extends NodeDto {
         entityParameters.put(FIELD_IS_PROCESSING, isProcessing());
         if(getLifecycle() != null) {
             entityParameters.put(FIELD_LIFECYCLE, getLifecycle().name());
+        }
+        if(getVersion() != null) {
+            entityParameters.put(FIELD_VERSION, getVersion());
         }
         return entityParameters;
     }
@@ -76,9 +93,13 @@ public abstract class ServerNodeDto extends NodeDto {
         @JsonProperty(FIELD_LIFECYCLE)
         public abstract Builder setLifecycle(@Nullable Lifecycle lifecycle);
 
+        @JsonProperty(FIELD_VERSION)
+        public abstract Builder setVersion(@Nullable String version);
+
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_ServerNodeDto.Builder();
+            return new AutoValue_ServerNodeDto.Builder()
+                    .setProcessing(false);
         }
 
         public abstract ServerNodeDto build();

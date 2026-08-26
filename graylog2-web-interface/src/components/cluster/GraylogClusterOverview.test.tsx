@@ -20,11 +20,11 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
+import { SystemClusterTraffic } from '@graylog/server-api';
+
 import { adminUser } from 'fixtures/users';
-import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
 
 import GraylogClusterOverview from './GraylogClusterOverview';
 
@@ -32,6 +32,22 @@ const trafficResponse = {
   from: '2022-03-31T00:00:00.000Z',
   to: '2022-09-27T09:41:10.926Z',
   input: {
+    '2022-09-16T13:00:00.000Z': 0,
+    '2022-09-20T18:00:00.000Z': 0,
+    '2022-09-20T19:00:00.000Z': 0,
+    '2022-09-21T08:00:00.000Z': 20218553,
+    '2022-09-21T09:00:00.000Z': 7867447,
+    '2022-09-26T10:00:00.000Z': 7942929,
+    '2022-09-26T11:00:00.000Z': 27529017,
+    '2022-09-26T12:00:00.000Z': 29165527,
+    '2022-09-26T13:00:00.000Z': 29188019,
+    '2022-09-26T14:00:00.000Z': 29161963,
+    '2022-09-26T15:00:00.000Z': 29262878,
+    '2022-09-26T16:00:00.000Z': 9254935,
+    '2022-09-27T08:00:00.000Z': 2145529,
+    '2022-09-27T09:00:00.000Z': 1053461,
+  },
+  input_indexed: {
     '2022-09-16T13:00:00.000Z': 0,
     '2022-09-20T18:00:00.000Z': 0,
     '2022-09-20T19:00:00.000Z': 0,
@@ -83,15 +99,9 @@ const trafficResponse = {
 
 jest.mock('hooks/useCurrentUser');
 
-jest.mock('stores/cluster/ClusterTrafficStore', () => ({
-  ClusterTrafficStore: MockStore([
-    'getInitialState',
-    jest.fn(() => ({
-      traffic: undefined,
-    })),
-  ]),
-  ClusterTrafficActions: {
-    getTraffic: jest.fn((_days: number) => ({ traffic: undefined })),
+jest.mock('@graylog/server-api', () => ({
+  SystemClusterTraffic: {
+    get: jest.fn(() => Promise.resolve(trafficResponse)),
   },
 }));
 
@@ -103,10 +113,6 @@ describe('GraylogClusterOverview', () => {
       .build();
 
     asMock(useCurrentUser).mockReturnValue(currentUserWithPermissions);
-
-    asMock(ClusterTrafficStore.getInitialState).mockReturnValue({
-      traffic: trafficResponse,
-    });
   });
 
   afterEach(() => {
@@ -117,11 +123,11 @@ describe('GraylogClusterOverview', () => {
   it('renders GraylogClusterOverview', async () => {
     render(<GraylogClusterOverview />);
 
-    expect(screen.getByText(/Outgoing traffic/)).toBeInTheDocument();
+    expect(screen.getByText(/Incoming traffic/)).toBeInTheDocument();
 
-    await waitFor(() => expect(ClusterTrafficActions.getTraffic).toHaveBeenCalledWith(30));
+    await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(30, false));
 
-    expect(screen.getByText(/Last 30 days/)).toBeInTheDocument();
+    await screen.findByText(/Last 30 days/);
   });
 
   it('renders GraylogClusterOverview and change the days for the traffic graph', async () => {
@@ -130,8 +136,8 @@ describe('GraylogClusterOverview', () => {
 
     await userEvent.selectOptions(graphDaysSelect, '365');
 
-    await waitFor(() => expect(ClusterTrafficActions.getTraffic).toHaveBeenCalledWith(365));
+    await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(365, false));
 
-    expect(screen.getByText(/Last 365 days/)).toBeInTheDocument();
+    await screen.findByText(/Last 365 days/);
   });
 });

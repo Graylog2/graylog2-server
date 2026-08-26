@@ -21,6 +21,7 @@ import type { Event } from 'components/events/events/types';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import EventReplaySearch from 'components/events/EventReplaySearch';
 import { events } from 'fixtures/events';
+import RightSidebarProvider from 'contexts/RightSidebarProvider';
 
 import { eventDefinition, systemEventDefinition } from './fixtures';
 
@@ -33,22 +34,24 @@ describe('EventDefinitionReplaySearch', () => {
 
   it('can replay event', async () => {
     render(
-      <div>
+      <RightSidebarProvider>
         <EventReplaySearch
           eventDefinitionMappedData={{ eventDefinition, aggregations: [] }}
           eventData={events[0] as Event}
         />
-      </div>,
+      </RightSidebarProvider>,
     );
     await screen.findByText('Embedded Search');
   });
 
   it('refuses to replay system events', async () => {
     render(
-      <EventReplaySearch
-        eventData={events[0] as Event}
-        eventDefinitionMappedData={{ eventDefinition: systemEventDefinition, aggregations: [] }}
-      />,
+      <RightSidebarProvider>
+        <EventReplaySearch
+          eventData={events[0] as Event}
+          eventDefinitionMappedData={{ eventDefinition: systemEventDefinition, aggregations: [] }}
+        />
+      </RightSidebarProvider>,
     );
     await screen.findByText(/Event is a system event/);
 

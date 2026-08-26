@@ -24,7 +24,7 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
 import org.graylog2.decorators.Decorator;
@@ -46,7 +46,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
     private static final String CONFIG_FIELD_PIPELINE = "pipeline";
 
     private final PipelineInterpreter pipelineInterpreter;
-    private final ConfigurationStateUpdater pipelineStateUpdater;
+    private final PipelineInterpreterStateUpdater pipelineStateUpdater;
     private final MessageFactory messageFactory;
     private final ImmutableSet<String> pipelines;
 
@@ -93,7 +93,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
 
     @Inject
     public PipelineProcessorMessageDecorator(PipelineInterpreter pipelineInterpreter,
-                                             ConfigurationStateUpdater pipelineStateUpdater,
+                                             PipelineInterpreterStateUpdater pipelineStateUpdater,
                                              MessageFactory messageFactory,
                                              @Assisted Decorator decorator) {
         this.pipelineInterpreter = pipelineInterpreter;

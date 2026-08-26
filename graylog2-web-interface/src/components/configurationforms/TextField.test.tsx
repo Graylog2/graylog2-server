@@ -76,7 +76,8 @@ describe('<TextField>', () => {
 
     const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
-    await userEvent.paste(formField, 'new value');
+    await userEvent.click(formField);
+    await userEvent.paste('new value');
 
     expect(updateFunction).toHaveBeenLastCalledWith('example_text_field', 'new value');
   });

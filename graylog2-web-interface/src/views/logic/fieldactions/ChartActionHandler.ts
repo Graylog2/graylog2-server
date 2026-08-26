@@ -23,12 +23,13 @@ import { TIMESTAMP_FIELD } from 'views/Constants';
 import type { ThunkActionHandler } from 'views/components/actions/ActionHandler';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
+import type { AdditionalViewsActionHandlerArguments } from 'views/types';
 
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
 import { FieldTypes } from '../fieldtypes/FieldType';
 
-const ChartActionHandler: ThunkActionHandler<{ widget?: Widget }> =
+const ChartActionHandler: ThunkActionHandler<AdditionalViewsActionHandlerArguments> =
   ({ field, contexts: { widget: origWidget = Widget.empty() } }) =>
   (dispatch: ViewsDispatch) => {
     const series = isFunction(field) ? Series.forFunction(field) : Series.forFunction(`avg(${field})`);

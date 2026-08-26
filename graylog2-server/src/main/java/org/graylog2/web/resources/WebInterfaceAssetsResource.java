@@ -37,6 +37,8 @@ import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.customization.CustomizationConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
@@ -55,6 +57,8 @@ import static java.util.Objects.requireNonNull;
 @CSP(group = CSP.DEFAULT)
 @NonApiResource
 public class WebInterfaceAssetsResource {
+    private static final Logger LOG = LoggerFactory.getLogger(WebInterfaceAssetsResource.class);
+
     private static final String ASSETS_PREFIX = "assets";
     private static final String FAVICON = "favicon.png";
     private final MimetypesFileTypeMap mimeTypes;
@@ -122,7 +126,9 @@ public class WebInterfaceAssetsResource {
             final var resource = resourceFileReader.readFileFromPlugin(filenameWithoutSuffix, plugin.metadata().getClass());
             return getResponse(request, filenameWithoutSuffix, resource);
         } catch (URISyntaxException | IOException e) {
-            throw new NotFoundException("Couldn't find " + filenameWithoutSuffix + " in plugin " + pluginName, e);
+            LOG.debug("Couldn't serve asset <{}> of plugin <{}>.", filenameWithoutSuffix, pluginName, e);
+            // Don't reflect the requested file name back to the client.
+            throw new NotFoundException("Couldn't find the requested resource in plugin " + pluginName, e);
         }
     }
 
@@ -163,7 +169,9 @@ public class WebInterfaceAssetsResource {
     public Response getIndex(@Context ContainerRequest request,
                              @Context HttpHeaders headers) {
         // If we end up here, the request should go to the API, but no resource class matched it, so we return a 404.
-        if (request.getAbsolutePath().getPath().startsWith("/" + HttpConfiguration.API_PREFIX)) {
+        final var path = request.getAbsolutePath().getPath();
+        final var apiPrefix = "/" + HttpConfiguration.API_PREFIX;
+        if (path.equals(apiPrefix) || path.startsWith(apiPrefix + "/")) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         final URI originalLocation = request.getRequestUri();

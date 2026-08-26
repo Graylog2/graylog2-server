@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import { DecoratorsActions, DecoratorsStore } from 'stores/decorators/DecoratorsStore';
-import connect from 'stores/connect';
+import { SearchDecorators } from '@graylog/server-api';
+
 import { Spinner } from 'components/common';
 import type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
-import type { Store } from 'stores/StoreTypes';
+import type { DecoratorType } from 'views/components/messagelist/decorators/Types';
 
 import AddDecoratorButton from './AddDecoratorButton';
 import DecoratorSummary from './DecoratorSummary';
@@ -29,84 +30,79 @@ import DecoratorStyles from './decoratorStyles.css';
 
 type Props = {
   decorators: Array<Decorator>;
-  decoratorTypes: {};
   onChange: (decorators: Array<Decorator>) => void;
 };
 
-class DecoratorSidebar extends React.Component<Props> {
-  componentDidMount() {
-    DecoratorsActions.available();
+const DecoratorSidebar = ({ decorators, onChange }: Props) => {
+  const { data: decoratorTypes } = useQuery({
+    queryKey: ['decorators', 'types'],
+    queryFn: () => SearchDecorators.getAvailable(),
+  });
+
+  const formatDecorator = useCallback(
+    (decorator: Decorator) => {
+      const typeDefinition =
+        decoratorTypes[decorator.type] ||
+        ({
+          requested_configuration: {},
+          name: `Unknown type: ${decorator.type}`,
+          type: decorator.type,
+          human_name: decorator.type,
+          link_to_docs: '',
+        } as DecoratorType);
+      const deleteDecorator = (decoratorId: string) =>
+        onChange(decorators.filter((_decorator) => _decorator.id !== decoratorId));
+      const updateDecorator = (id: string, updatedDecorator: Decorator) =>
+        onChange(decorators.map((_decorator) => (_decorator.id === id ? updatedDecorator : _decorator)));
+
+      return {
+        id: decorator.id,
+        title: (
+          <DecoratorSummary
+            key={`decorator-${decorator.id}`}
+            decorator={decorator}
+            decoratorTypes={decoratorTypes}
+            onDelete={deleteDecorator}
+            onUpdate={updateDecorator}
+            typeDefinition={typeDefinition}
+          />
+        ),
+      };
+    },
+    [decoratorTypes, decorators, onChange],
+  );
+
+  const updateOrder = useCallback(
+    (orderedDecorators: Array<Decorator>) => {
+      orderedDecorators.forEach((item, idx) => {
+        const decorator = decorators.find((i) => i.id === item.id);
+
+        decorator.order = idx;
+      });
+
+      onChange(decorators);
+    },
+    [decorators, onChange],
+  );
+
+  if (!decoratorTypes) {
+    return <Spinner />;
   }
 
-  _formatDecorator = (decorator: Decorator) => {
-    const { decorators, decoratorTypes, onChange } = this.props;
-    const typeDefinition = decoratorTypes[decorator.type] || {
-      requested_configuration: {},
-      name: `Unknown type: ${decorator.type}`,
-    };
-    const deleteDecorator = (decoratorId) => onChange(decorators.filter((_decorator) => _decorator.id !== decoratorId));
-    const updateDecorator = (id, updatedDecorator) =>
-      onChange(decorators.map((_decorator) => (_decorator.id === id ? updatedDecorator : _decorator)));
+  const sortedDecorators = decorators.sort((d1, d2) => d1.order - d2.order);
+  const nextDecoratorOrder = sortedDecorators.length > 0 ? sortedDecorators[sortedDecorators.length - 1].order + 1 : 0;
+  const decoratorItems = sortedDecorators.map(formatDecorator);
 
-    return {
-      id: decorator.id,
-      title: (
-        <DecoratorSummary
-          key={`decorator-${decorator.id}`}
-          decorator={decorator}
-          decoratorTypes={decoratorTypes}
-          onDelete={deleteDecorator}
-          onUpdate={updateDecorator}
-          typeDefinition={typeDefinition}
-        />
-      ),
-    };
-  };
+  const addDecorator = (decorator: Decorator) => onChange([...decorators, decorator]);
 
-  _updateOrder = (orderedDecorators: Array<Decorator>) => {
-    const { decorators, onChange } = this.props;
-
-    orderedDecorators.forEach((item, idx) => {
-      const decorator = decorators.find((i) => i.id === item.id);
-
-      decorator.order = idx;
-    });
-
-    onChange(decorators);
-  };
-
-  render() {
-    const { decoratorTypes, onChange, decorators } = this.props;
-
-    if (!decoratorTypes) {
-      return <Spinner />;
-    }
-
-    const sortedDecorators = decorators.sort((d1, d2) => d1.order - d2.order);
-    const nextDecoratorOrder =
-      sortedDecorators.length > 0 ? sortedDecorators[sortedDecorators.length - 1].order + 1 : 0;
-    const decoratorItems = sortedDecorators.map(this._formatDecorator);
-
-    const addDecorator = (decorator: Decorator) => onChange([...decorators, decorator]);
-
-    return (
-      <div>
-        <AddDecoratorButton decoratorTypes={decoratorTypes} nextOrder={nextDecoratorOrder} onCreate={addDecorator} />
-        <div className={DecoratorStyles.decoratorListContainer}>
-          <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} />
-        </div>
+  return (
+    <div>
+      <AddDecoratorButton decoratorTypes={decoratorTypes} nextOrder={nextDecoratorOrder} onCreate={addDecorator} />
+      <div className={DecoratorStyles.decoratorListContainer}>
+        <DecoratorList decorators={decoratorItems} onReorder={updateOrder} />
       </div>
-    );
-  }
-}
-
-type DecoratorsStoreState = {
-  decorators: Array<Decorator>;
-  types: {};
+    </div>
+  );
 };
 
-export default connect(
-  DecoratorSidebar,
-  { decoratorStore: DecoratorsStore as Store<DecoratorsStoreState> },
-  ({ decoratorStore: { types = {} } = {} }) => ({ decoratorTypes: types }),
-);
+export default DecoratorSidebar;

@@ -21,7 +21,7 @@ import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
-import { useFetchLookupTables } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { fetchPaginatedLookupTables, lookupTablesKeyFn } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import type { LookupTableEntity } from 'components/lookup-tables/types';
@@ -54,59 +54,55 @@ function LookupTableList() {
     cacheNames?: Array<string>;
     adapterNames?: Array<string>;
   }>({ lutNames: undefined, cacheNames: undefined, adapterNames: undefined });
-  const { fetchPaginatedLookupTables, lookupTablesKeyFn } = useFetchLookupTables();
   const { renderActions } = useActions();
 
-  const handleFetchTables = useCallback(
-    async (searchParams: SearchParams) => {
-      const resp = await fetchPaginatedLookupTables(searchParams);
+  const handleFetchTables = useCallback(async (searchParams: SearchParams) => {
+    const resp = await fetchPaginatedLookupTables(searchParams);
 
-      const overrides: Record<string, Partial<Attribute>> = {
-        title: { sortable: true },
-        name: { sortable: true },
-        description: { sortable: false },
-        cache_id: { sortable: false },
-        data_adapter_id: { sortable: false },
-      };
+    const overrides: Record<string, Partial<Attribute>> = {
+      title: { sortable: true },
+      name: { sortable: true },
+      description: { sortable: false },
+      cache_id: { sortable: false },
+      data_adapter_id: { sortable: false },
+    };
 
-      const expectedIds = lutListElements.defaultLayout.defaultDisplayedAttributes;
+    const expectedIds = lutListElements.defaultLayout.defaultDisplayedAttributes;
 
-      const attrMap = new Map<string, Attribute>();
+    const attrMap = new Map<string, Attribute>();
 
-      (resp.attributes ?? []).forEach((attr) => {
-        const override = overrides[attr.id] ?? {};
-        attrMap.set(attr.id, { ...attr, ...override });
-      });
+    (resp.attributes ?? []).forEach((attr) => {
+      const override = overrides[attr.id] ?? {};
+      attrMap.set(attr.id, { ...attr, ...override });
+    });
 
-      expectedIds.forEach((id) => {
-        if (!attrMap.has(id)) {
-          const override = overrides[id] ?? {};
-          attrMap.set(id, {
-            id,
-            title: id.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-            type: 'STRING',
-            ...override,
-          });
-        }
-      });
+    expectedIds.forEach((id) => {
+      if (!attrMap.has(id)) {
+        const override = overrides[id] ?? {};
+        attrMap.set(id, {
+          id,
+          title: id.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+          type: 'STRING',
+          ...override,
+        });
+      }
+    });
 
-      const mergedAttributes = Array.from(attrMap.values());
+    const mergedAttributes = Array.from(attrMap.values());
 
-      const patchedResponse = {
-        ...resp,
-        attributes: mergedAttributes,
-      };
+    const patchedResponse = {
+      ...resp,
+      attributes: mergedAttributes,
+    };
 
-      setNames({
-        lutNames: patchedResponse.list.map((lut: LookupTableEntity) => lut.name),
-        cacheNames: Object.values(patchedResponse.meta.caches).map((cache: LookupTableCache) => cache.name),
-        adapterNames: Object.values(patchedResponse.meta.adapters).map((adapter: LookupTableAdapter) => adapter.name),
-      });
+    setNames({
+      lutNames: patchedResponse.list.map((lut: LookupTableEntity) => lut.name),
+      cacheNames: Object.values(patchedResponse.meta.caches).map((cache: LookupTableCache) => cache.name),
+      adapterNames: Object.values(patchedResponse.meta.adapters).map((adapter: LookupTableAdapter) => adapter.name),
+    });
 
-      return Promise.resolve(patchedResponse);
-    },
-    [fetchPaginatedLookupTables],
-  );
+    return Promise.resolve(patchedResponse);
+  }, []);
 
   return (
     <ErrorsProvider>

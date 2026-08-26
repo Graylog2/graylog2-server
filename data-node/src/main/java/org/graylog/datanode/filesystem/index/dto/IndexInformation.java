@@ -19,8 +19,8 @@ package org.graylog.datanode.filesystem.index.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
+import org.graylog.datanode.filesystem.index.OpensearchUtils;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
-import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import java.nio.file.Path;
 import java.time.Instant;
@@ -48,8 +48,7 @@ public record IndexInformation(@JsonIgnore Path path, String indexID, @Nullable 
     public String indexVersionCreated() {
         return indexSetting("index.version.created")
                 .map(Integer::parseInt)
-                .map(Version::fromId)
-                .map(Version::toString)
+                .map(OpensearchUtils::versionStringFromId)
                 .orElse(null);
     }
 

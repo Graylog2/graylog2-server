@@ -34,7 +34,7 @@ describe('NewWidgetPlaceholder', () => {
     const component = () => <>Hey there!</>;
     render(<NewWidgetPlaceholder position={widgetPosition} component={component} />);
     const text = await screen.findByText('Create a new widget here');
-    userEvent.click(text);
+    await userEvent.click(text);
 
     await screen.findByText('Hey there!');
   });
@@ -43,7 +43,7 @@ describe('NewWidgetPlaceholder', () => {
     const component = jest.fn(() => <>Hey there!</>);
     render(<NewWidgetPlaceholder position={widgetPosition} component={component} />);
     const text = await screen.findByText('Create a new widget here');
-    userEvent.click(text);
+    await userEvent.click(text);
 
     await screen.findByText('Hey there!');
 
@@ -58,10 +58,10 @@ describe('NewWidgetPlaceholder', () => {
     );
     render(<NewWidgetPlaceholder position={widgetPosition} component={component} />);
     const text = await screen.findByText('Create a new widget here');
-    userEvent.click(text);
+    await userEvent.click(text);
 
     const close = await screen.findByRole('button', { name: 'Close' });
-    userEvent.click(close);
+    await userEvent.click(close);
 
     expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
   });

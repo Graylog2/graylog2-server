@@ -15,26 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 
-import type { ExtractStoreState } from 'stores/connect';
-import { useStore } from 'stores/connect';
 import InputsContext from 'contexts/InputsContext';
-import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
-
-const mapInputs = (state: ExtractStoreState<typeof InputsStore>) =>
-  Object.fromEntries(state?.inputs?.map((input) => [input.id, input]) ?? []);
-
-const useInputs = () => {
-  useEffect(() => {
-    InputsActions.list();
-  }, []);
-
-  return useStore(InputsStore, mapInputs);
-};
+import useInputsList from 'hooks/useInputs';
 
 const InputsProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => {
-  const value = useInputs();
+  const { data: inputs } = useInputsList();
+  const value = Object.fromEntries(inputs?.map((input) => [input.id, input]) ?? []);
 
   return <InputsContext.Provider value={value}>{children}</InputsContext.Provider>;
 };

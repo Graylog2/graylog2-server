@@ -29,12 +29,20 @@ import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Map;
 
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.OUTPUTS_READ;
+import static org.graylog2.streams.OutputImpl.FIELD_CONTENT_PACK;
+import static org.graylog2.streams.OutputImpl.FIELD_CREATED_AT;
+import static org.graylog2.streams.OutputImpl.FIELD_CREATOR_USER_ID;
+import static org.graylog2.streams.OutputImpl.FIELD_ID;
+import static org.graylog2.streams.OutputImpl.FIELD_TITLE;
+import static org.graylog2.streams.OutputImpl.FIELD_TYPE;
 
 @AutoValue
 @JsonAutoDetect
 @DbEntity(collection = "outputs",
-          readPermission = OUTPUTS_READ)
+          readPermission = OUTPUTS_READ,
+          readableFields = {ID_FIELD, FIELD_ID, FIELD_TITLE, FIELD_TYPE, FIELD_CREATOR_USER_ID, FIELD_CREATED_AT, FIELD_CONTENT_PACK})
 public abstract class OutputImpl implements Output {
     static final String FIELD_ID = "id";
     static final String FIELD_TITLE = "title";

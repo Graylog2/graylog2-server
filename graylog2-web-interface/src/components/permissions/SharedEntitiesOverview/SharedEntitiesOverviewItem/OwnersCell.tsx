@@ -19,8 +19,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import type Grantee from 'logic/permissions/Grantee';
-import { Link } from 'components/common/router';
-import { RestrictedAccessTooltip } from 'components/common';
+import { Link, RestrictedAccessTooltip } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';

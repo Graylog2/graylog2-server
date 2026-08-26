@@ -16,28 +16,19 @@
  */
 package org.graylog2.security.sessions;
 
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.mongodb.MongoException;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
-import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.security.SessionDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A Shiro SessionDAO that persists sessions to MongoDB. Although its methods accept and return sessions that
@@ -49,11 +40,6 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class SessionDAO extends CachingSessionDAO {
     private static final Logger LOG = LoggerFactory.getLogger(SessionDAO.class);
-    private static final Retryer<Void> UPSERT_RETRYER = RetryerBuilder.<Void>newBuilder()
-            .retryIfException(e -> e instanceof MongoException me && MongoUtils.isDuplicateKeyError(me))
-            .withWaitStrategy(WaitStrategies.randomWait(5, TimeUnit.MILLISECONDS))
-            .withStopStrategy(StopStrategies.stopAfterAttempt(10))
-            .build();
 
     private final SessionService sessionService;
 
@@ -86,7 +72,7 @@ public class SessionDAO extends CachingSessionDAO {
 
         assignSessionId(session, sessionId);
 
-        final var primaryKey = sessionService.create(SessionDTO.fromSimpleSession(session));
+        final var primaryKey = sessionService.create(SessionDTO.builderFromSimpleSession(session).build());
         LOG.debug("Created session {}", primaryKey);
 
         return sessionId;
@@ -107,27 +93,8 @@ public class SessionDAO extends CachingSessionDAO {
 
     private void doUpdate(SimpleSession session) {
         LOG.debug("Updating session");
-
-        final var sessionDTO = sessionService.getBySessionId(session.getId().toString())
-                .map(SessionDTO::id)
-                .map(id -> SessionDTO.fromSimpleSession(session).toBuilder().id(id).build())
-                .orElseThrow(() -> new RuntimeException("Couldn't load session"));
-
-        // Due to https://jira.mongodb.org/browse/SERVER-14322 upserts can fail under concurrency.
-        // We need to retry the update, and stagger them a bit, so not all the retries attempt it at the same time again.
-        // Usually this should succeed the first time, though
-        try {
-            UPSERT_RETRYER.call(() -> {
-                sessionService.update(sessionDTO);
-                return null;
-            });
-        } catch (ExecutionException e) {
-            LOG.warn("Unexpected exception when saving session to MongoDB. Failed to update session.", e);
-            throw new RuntimeException(e.getCause());
-        } catch (RetryException e) {
-            LOG.warn("Tried to update session 10 times, but still failed. This is likely because of https://jira.mongodb.org/browse/SERVER-14322", e);
-            throw new RuntimeException(e.getCause());
-        }
+        final var sessionDTO = SessionDTO.builderFromSimpleSession(session).build();
+        sessionService.updateBySessionId(sessionDTO);
     }
 
     @Override

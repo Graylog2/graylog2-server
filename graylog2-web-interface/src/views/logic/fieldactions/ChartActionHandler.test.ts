@@ -39,7 +39,14 @@ describe('ChartActionHandler', () => {
   const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
 
   it('uses average function if triggered on field', async () => {
-    await dispatch(ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} }));
+    await dispatch(
+      ChartActionHandler({
+        queryId: 'queryId',
+        field: 'somefield',
+        type: emptyFieldType,
+        contexts: {},
+      }),
+    );
 
     expect(addWidget).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -52,7 +59,12 @@ describe('ChartActionHandler', () => {
 
   it('uses the function itself if it was triggered on one', async () => {
     await dispatch(
-      ChartActionHandler({ queryId: 'queryId', field: 'max(somefield)', type: emptyFieldType, contexts: {} }),
+      ChartActionHandler({
+        queryId: 'queryId',
+        field: 'max(somefield)',
+        type: emptyFieldType,
+        contexts: {},
+      }),
     );
 
     expect(addWidget).toHaveBeenCalledWith(

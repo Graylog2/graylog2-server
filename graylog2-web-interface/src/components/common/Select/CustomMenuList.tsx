@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useCallback, useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import { components as Components } from 'react-select';
 import type { MenuListProps } from 'react-select';
 import { List, type RowComponentProps } from 'react-window';
@@ -113,12 +113,34 @@ export const WindowList = ({ children, listRef = undefined, onRowsRendered = und
 const CustomMenuList = ({
   children,
   innerProps,
+  innerRef = undefined,
   ...rest
-}: Partial<MenuListProps> & { children: Array<React.ReactNode> }) => {
+}: Partial<MenuListProps> & { children: Array<React.ReactNode>; innerRef?: React.Ref<HTMLDivElement> }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const inputValue = rest.selectProps?.inputValue;
+
+  const setRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      containerRef.current = el;
+      // react-select always passes innerRef as a callback ref
+      if (typeof innerRef === 'function') {
+        innerRef(el);
+      }
+    },
+    [innerRef],
+  );
+
+  useLayoutEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  }, [inputValue]);
+
   if (!children?.length || children.length < REACT_SELECT_MAX_OPTIONS_LENGTH) {
     return (
       <Components.MenuList
         {...rest}
+        innerRef={setRef}
         innerProps={{
           ...innerProps,
           // @ts-ignore

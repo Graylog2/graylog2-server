@@ -51,7 +51,7 @@ describe('<ExpandableList />', () => {
 
     const parentItem = await screen.findByRole('button', { name: /wheel of time/i });
 
-    userEvent.click(parentItem);
+    await userEvent.click(parentItem);
 
     await screen.findByRole('button', { name: /edmonds field/i });
   });

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { act, render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import React from 'react';
 import Immutable, { OrderedSet } from 'immutable';
 import userEvent from '@testing-library/user-event';
@@ -68,7 +68,7 @@ describe('AdaptableQueryTabsConfiguration', () => {
   it('should run setOrder and patchQueriesTitle with correct tab order and titles on submit', async () => {
     renderConfiguration();
     const submitButton = await screen.findByTitle('Update configuration');
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await expect(setQueriesOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1', 'queryId-2']));
 
@@ -84,10 +84,11 @@ describe('AdaptableQueryTabsConfiguration', () => {
       name: /remove page query title 2/i,
     });
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.click(deleteButton);
-    });
+    await userEvent.click(deleteButton);
+
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: /remove page query title 2/i })).not.toBeInTheDocument(),
+    );
 
     const submitButton = await screen.findByTitle('Update configuration');
 

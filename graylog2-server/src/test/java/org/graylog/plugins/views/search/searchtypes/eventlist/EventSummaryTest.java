@@ -16,10 +16,12 @@
  */
 package org.graylog.plugins.views.search.searchtypes.eventlist;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
@@ -58,5 +60,78 @@ public class EventSummaryTest {
         assertThat(eventSummary.timestamp().toString(Tools.ES_DATE_FORMAT_FORMATTER))
                 .isEqualTo(now.toString(Tools.ES_DATE_FORMAT_FORMATTER));
         assertThat(eventSummary.alert()).isEqualTo(false);
+    }
+
+    @Test
+    public void parseShouldPreserveEventKey() {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final var rawEvent = EventDto.builder()
+                .id("dead-beef")
+                .message("message")
+                .sourceStreams(Set.of("stream-id-1"))
+                .eventTimestamp(now)
+                .alert(false)
+                .eventDefinitionId("deadbeef")
+                .priority(2)
+                .key("testkey_1")
+                .keyTuple(List.of("testkey_1"))
+                .eventDefinitionType("aggregation-v1")
+                .processingTimestamp(now)
+                .streams(Set.of())
+                .source("localhost")
+                .fields(Map.of())
+                .build();
+
+        EventSummary eventSummary = EventSummary.parse(rawEvent);
+        assertThat(eventSummary.key()).isEqualTo("testkey_1");
+    }
+
+    @Test
+    public void parseShouldHandleNullEventKey() {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final var rawEvent = EventDto.builder()
+                .id("dead-beef")
+                .message("message")
+                .sourceStreams(Set.of("stream-id-1"))
+                .eventTimestamp(now)
+                .alert(false)
+                .eventDefinitionId("deadbeef")
+                .priority(2)
+                .keyTuple(List.of())
+                .eventDefinitionType("aggregation-v1")
+                .processingTimestamp(now)
+                .streams(Set.of())
+                .source("localhost")
+                .fields(Map.of())
+                .build();
+
+        EventSummary eventSummary = EventSummary.parse(rawEvent);
+        assertThat(eventSummary.key()).isNull();
+    }
+
+    @Test
+    public void serializedJsonShouldContainKeyField() throws Exception {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final var rawEvent = EventDto.builder()
+                .id("dead-beef")
+                .message("message")
+                .sourceStreams(Set.of("stream-id-1"))
+                .eventTimestamp(now)
+                .alert(false)
+                .eventDefinitionId("deadbeef")
+                .priority(2)
+                .key("testkey_1")
+                .keyTuple(List.of("testkey_1"))
+                .eventDefinitionType("aggregation-v1")
+                .processingTimestamp(now)
+                .streams(Set.of())
+                .source("localhost")
+                .fields(Map.of())
+                .build();
+
+        EventSummary eventSummary = EventSummary.parse(rawEvent);
+        final String json = objectMapper.writeValueAsString(eventSummary);
+        assertThat(json).contains("\"key\":\"testkey_1\"");
     }
 }

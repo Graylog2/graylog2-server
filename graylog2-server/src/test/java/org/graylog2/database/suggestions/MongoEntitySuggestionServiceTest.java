@@ -30,10 +30,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +53,7 @@ class MongoEntitySuggestionServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
+        lenient().doReturn(true).when(entityPermissionsUtils).areAllFieldsReadable(anyString(), any());
         this.toTest = new MongoEntitySuggestionService(mongodb.mongoConnection(), entityPermissionsUtils);
     }
 
@@ -61,7 +67,7 @@ class MongoEntitySuggestionServiceTest {
                 .when(entityPermissionsUtils)
                 .createPermissionCheck(subject, "dashboards");
 
-        final var result = toTest.suggest("dashboards", "_id", "title", "", 1, 10, subject);
+        final var result = toTest.suggest("dashboards", "_id", "title", null, null, "", 1, 10, subject);
 
         assertThat(result.pagination().count()).isEqualTo(2);
 
@@ -244,5 +250,49 @@ class MongoEntitySuggestionServiceTest {
         assertThat(suggestions).allMatch(s -> s.targetId() != null && !s.targetId().isEmpty());
         assertThat(suggestions.stream().map(EntitySuggestion::targetId).toList())
                 .containsExactlyInAnyOrder("node-uuid-123", "node-uuid-456", "node-uuid-789", "node-uuid-abc");
+    }
+
+    @Test
+    void throwsExceptionWhenValueColumnIsNotReadable() {
+        doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("field_1", "field_2"));
+
+        assertThatThrownBy(() -> toTest.suggest("dashboards", "field_1", "field_2", null, null, "", 1, 10, subject))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void throwsExceptionWhenTargetColumnIsNotReadable() {
+        doReturn(false).when(entityPermissionsUtils).areAllFieldsReadable("dashboards", Set.of("secret_target", "title"));
+
+        assertThatThrownBy(() -> toTest.suggest("dashboards", "secret_target", "title", null, null, "", 1, 10, subject))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @MongoDBFixtures("composite-display-fixtures.json")
+    void throwsExceptionWhenDisplayFieldIsNotReadable() {
+        doReturn(false).when(entityPermissionsUtils)
+                .areAllFieldsReadable("nodes", Set.of("node_id", "hostname", "secret_field"));
+
+        assertThatThrownBy(() -> toTest.suggest(
+                "nodes",
+                "node_id",
+                "hostname",
+                List.of("node_id", "secret_field"),
+                "{node_id} ({secret_field})",
+                "",
+                1,
+                10,
+                subject
+        )).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void returnsResultsWhenAllFieldsAreReadable() {
+        doReturn(true).when(entityPermissionsUtils).hasAllPermission(subject);
+
+        final var result = toTest.suggest("dashboards", "_id", "title", null, null, "", 1, 10, subject);
+
+        assertThat(result.suggestions()).isNotEmpty();
     }
 }

@@ -218,6 +218,15 @@ public class FailureSubmissionService {
         }
     }
 
+    public void submitInputFailure(InputFailure inputFailure) {
+        try {
+            failureSubmissionQueue.submitBlocking(FailureBatch.inputFailureBatch(List.of(inputFailure)));
+        } catch (InterruptedException ignored) {
+            logger.warn("Failed to submit an input failure for failure handling. The thread has been interrupted!");
+            Thread.currentThread().interrupt();
+        }
+    }
+
     private IndexingFailure fromIndexingError(IndexingError indexingError) {
         return new IndexingFailure(
                 indexingError.error().type() == MappingError ?

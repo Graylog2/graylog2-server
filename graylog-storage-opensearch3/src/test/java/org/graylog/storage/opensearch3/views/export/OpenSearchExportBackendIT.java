@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3.views.export;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
 import jakarta.annotation.Nonnull;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -23,8 +24,7 @@ import org.graylog.plugins.views.search.export.ExportException;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchInstance;
@@ -36,11 +36,14 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch.indices.PutMappingResponse;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -280,53 +283,58 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     }
 
     @Nonnull
-    private static Map<String, Object> mappingWithOutAlias() {
-        return Map.of("properties",
-                Map.of(
-                        Message.FIELD_TIMESTAMP,
-                        Map.of("type", "date",
-                                "format", "uuuu-MM-dd HH:mm:ss.SSS"
-                        )
-                        ,
-                        Message.FIELD_GL2_MESSAGE_ID,
-                        Map.of("type", "keyword"),
-                        Message.FIELD_STREAMS,
-                        Map.of("type", "keyword")
+    private static Map<String, Map<String, Object>> mappingWithOutAlias() {
+        return Map.of(
+                Message.FIELD_TIMESTAMP,
+                Map.of("type", "date",
+                        "format", "uuuu-MM-dd HH:mm:ss.SSS"
                 )
+                ,
+                Message.FIELD_GL2_MESSAGE_ID,
+                Map.of("type", "keyword"),
+                Message.FIELD_STREAMS,
+                Map.of("type", "keyword")
         );
     }
 
     @Nonnull
-    private static Map<String, Object> mappingWithAlias() {
-        return Map.of("properties",
-                Map.of(
-                        Message.FIELD_TIMESTAMP,
-                        Map.of("type", "date",
-                                "format", "uuuu-MM-dd HH:mm:ss.SSS"
-                        )
-                        ,
-                        Message.FIELD_GL2_MESSAGE_ID,
-                        Map.of("type", "keyword")
-                        ,
-                        Message.FIELD_STREAMS,
-                        Map.of("type", "keyword"),
-                        Message.GL2_SECOND_SORT_FIELD,
-                        Map.of("type", "alias",
-                                "path", Message.FIELD_GL2_MESSAGE_ID)
+    private static Map<String, Map<String, Object>> mappingWithAlias() {
+        return Map.of(
+                Message.FIELD_TIMESTAMP,
+                Map.of("type", "date",
+                        "format", "uuuu-MM-dd HH:mm:ss.SSS"
                 )
+                ,
+                Message.FIELD_GL2_MESSAGE_ID,
+                Map.of("type", "keyword")
+                ,
+                Message.FIELD_STREAMS,
+                Map.of("type", "keyword"),
+                Message.GL2_SECOND_SORT_FIELD,
+                Map.of("type", "alias",
+                        "path", Message.FIELD_GL2_MESSAGE_ID)
         );
     }
 
-    private void createIndicesWithMapping(Map<String, Object> mapping, String... indices) {
+    private void createIndicesWithMapping(Map<String, Map<String, Object>> mapping, String... indices) {
         for (String index : indices) {
             client().createIndex(index);
         }
 
-        final PutMappingRequest putMappingRequest = new PutMappingRequest(indices).source(mapping);
-        final AcknowledgedResponse acknowledgedResponse = openSearchInstance.openSearchClient()
-                .execute((c, opt) -> c.indices().putMapping(putMappingRequest, opt));
+        Map<String, Property> propertyMappings = mapping.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                    try {
+                        return OSSerializationUtils.fromMap(entry.getValue(), Property._DESERIALIZER);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("Could not create mapping.", e);
+                    }
+                }));
 
-        if (!acknowledgedResponse.isAcknowledged()) {
+        final PutMappingResponse acknowledgedResponse = openSearchInstance.getOfficialOpensearchClient()
+                .sync(c -> c.indices().putMapping(r -> r.index(Arrays.asList(indices)).properties(propertyMappings)),
+                        "Failed to add mapping for indices " + Arrays.toString(indices));
+
+        if (!acknowledgedResponse.acknowledged()) {
             throw new RuntimeException("Failed to add mapping for indices " + Arrays.toString(indices));
         }
     }

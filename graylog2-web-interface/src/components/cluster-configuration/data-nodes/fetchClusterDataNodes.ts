@@ -18,7 +18,7 @@ import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
-import type { Metric, NodeMetric } from 'stores/metrics/MetricsStore';
+import type { Metric, NodeMetric } from 'types/metrics';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { DataNode } from 'components/datanode/Types';
 import { fetchDataNodes, keyFn as dataNodesKeyFn, type DataNodeResponse } from 'components/datanode/hooks/useDataNodes';

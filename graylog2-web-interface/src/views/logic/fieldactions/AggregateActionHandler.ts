@@ -23,10 +23,11 @@ import DataTable from 'views/components/datatable';
 import type { ThunkActionHandler } from 'views/components/actions/ActionHandler';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
+import type { AdditionalViewsActionHandlerArguments } from 'views/types';
 
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
-const AggregateActionHandler: ThunkActionHandler<{ widget?: Widget }> =
+const AggregateActionHandler: ThunkActionHandler<AdditionalViewsActionHandlerArguments> =
   ({ field, type, contexts: { widget = Widget.empty() } }) =>
   (dispatch: ViewsDispatch) => {
     const newWidgetBuilder = AggregationWidget.builder()

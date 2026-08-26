@@ -35,7 +35,14 @@ const renderCreateDefinitionAction = ({
 }) =>
   render(
     <AdditionalContext.Provider value={contexts}>
-      <CreateEventDefinition onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
+      <CreateEventDefinition
+        onClose={onClose}
+        queryId={queryId}
+        field={field}
+        type={type}
+        value={value}
+        contexts={contexts}
+      />
     </AdditionalContext.Provider>,
   );
 

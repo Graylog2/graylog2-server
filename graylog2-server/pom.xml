@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>7.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -302,6 +302,10 @@
             <artifactId>jersey-container-grizzly2-http</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-websockets</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.hk2</groupId>
             <artifactId>guice-bridge</artifactId>
         </dependency>
@@ -316,13 +320,6 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-        </dependency>
-        <!-- We need the servlet API dependency for the Swagger resources to be able to initialize properly. We don't
-             run a servlet container though, therefore the Grizzly HTTP server won't provide it at runtime. That's why
-             we need to include it as a compile dependency. -->
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
@@ -396,7 +393,7 @@
         </dependency>
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
-            <artifactId>swagger-parser</artifactId>
+            <artifactId>swagger-parser-v3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -414,6 +411,11 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analysis-common</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-backward-codecs</artifactId>
             <version>${lucene.version}</version>
         </dependency>
         <dependency>
@@ -661,6 +663,11 @@
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
         </dependency>
+        <!-- Explicitly declare lz4 since kafka-clients depends on it and we exclude it from the declaration. -->
+        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
@@ -732,6 +739,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Netty async HTTP client, used by the AWS async clients (DynamoDB, CloudWatch, Kinesis) for the Kinesis
+             input. Required for HTTP/2 (Kinesis Client Library) and proxy support on the async clients. -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>netty-nio-client</artifactId>
+        </dependency>
         <!-- additional integrations dependencies -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -764,6 +777,13 @@
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- Glue schema support pulls in outdated Kotlin dependencies. ATM we don't support integrating
+                 Amazon Kinesis Data Streams with the AWS Glue Schema Registry, so we can skip the dependency.
+                 Once we add support, this exclusion has to be revisited. -->
+                <exclusion>
+                    <groupId>software.amazon.glue</groupId>
+                    <artifactId>schema-registry-serde</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -892,6 +912,14 @@
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
             <version>1.5.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.testcontainers/testcontainers-mongodb -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-mongodb</artifactId>
+            <version>2.0.5</version>
             <scope>test</scope>
         </dependency>
 
@@ -1218,15 +1246,32 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <configuration>
                     <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
-                    <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
                 </configuration>
                 <executions>
                     <execution>
+                        <id>compile</id>
                         <goals>
                             <goal>compile</goal>
                             <goal>compile-custom</goal>
                         </goals>
+                        <configuration>
+                            <pluginId>grpc-java</pluginId>
+                            <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                            <excludes>
+                                <exclude>opamp/proto/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <!-- We need a separate run for the OpAMP proto files because otherwise they fail to resolve imports -->
+                    <execution>
+                        <id>compile-opamp</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <clearOutputDirectory>false</clearOutputDirectory>
+                            <protoSourceRoot>${project.basedir}/src/main/proto/opamp/proto</protoSourceRoot>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -1352,6 +1397,7 @@
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
                             <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
+                            <installDirectory>${webInterface.path}</installDirectory>
                         </configuration>
 
                         <executions>
@@ -1386,13 +1432,13 @@
                             </execution>
 
                             <execution>
-                                <id>yarn tsc</id>
+                                <id>yarn tsgo</id>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
                                 <phase>compile</phase>
                                 <configuration>
-                                    <arguments>tsc</arguments>
+                                    <arguments>tsgo</arguments>
                                 </configuration>
                             </execution>
 
@@ -1415,6 +1461,30 @@
                                 </goals>
                                 <configuration>
                                     <arguments>run build:preflight</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>luma: yarn install</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>luma: yarn tsc</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>tsc</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
                                 </configuration>
                             </execution>
 

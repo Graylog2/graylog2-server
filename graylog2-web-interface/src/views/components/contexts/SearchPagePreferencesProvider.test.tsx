@@ -21,12 +21,10 @@ import userEvent from '@testing-library/user-event';
 
 import { adminUser, alice } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
-import MockAction from 'helpers/mocking/MockAction';
-import { MockStore } from 'helpers/mocking';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
-import type { PreferencesMap } from 'stores/users/PreferencesStore';
-import { PreferencesActions } from 'stores/users/PreferencesStore';
+import type { PreferencesMap } from 'api/preferences';
+import { saveUserPreferences } from 'api/preferences';
 import type User from 'logic/users/User';
 import useCurrentUser from 'hooks/useCurrentUser';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -40,12 +38,8 @@ import SearchPagePreferencesProvider from './SearchPagePreferencesProvider';
 
 jest.mock('hooks/useCurrentUser');
 
-jest.mock('stores/users/PreferencesStore', () => ({
-  PreferencesActions: {
-    list: jest.fn(),
-    saveUserPreferences: MockAction(jest.fn()),
-  },
-  PreferencesStore: MockStore(),
+jest.mock('api/preferences', () => ({
+  saveUserPreferences: jest.fn(),
 }));
 
 jest.mock('logic/local-storage/Store', () => ({
@@ -178,9 +172,9 @@ describe('SearchPagePreferencesProvider', () => {
 
     await userEvent.click(getByText('Toggle sidebar pinning'));
 
-    expect(PreferencesActions.saveUserPreferences).toHaveBeenCalledTimes(1);
+    expect(saveUserPreferences).toHaveBeenCalledTimes(1);
 
-    expect(PreferencesActions.saveUserPreferences).toHaveBeenCalledWith(
+    expect(saveUserPreferences).toHaveBeenCalledWith(
       'alice',
       {
         ...alice.preferences,

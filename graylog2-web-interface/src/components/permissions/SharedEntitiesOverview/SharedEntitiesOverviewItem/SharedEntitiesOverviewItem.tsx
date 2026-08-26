@@ -18,8 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
-import { RestrictedAccessTooltip } from 'components/common';
-import { Link } from 'components/common/router';
+import { RestrictedAccessTooltip, Link } from 'components/common';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 import usePluggableSharedEntityTableElements from 'hooks/usePluggableSharedEntityTableElements';

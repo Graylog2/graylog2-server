@@ -22,8 +22,6 @@ import { asMock } from 'helpers/mocking';
 import { qualifyUrl, currentPathnameWithoutPrefix } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
-jest.mock('util/AppConfig');
-
 describe('qualifyUrl', () => {
   const setLocation = (pathname: string) => {
     window.history.pushState({}, '', pathname);

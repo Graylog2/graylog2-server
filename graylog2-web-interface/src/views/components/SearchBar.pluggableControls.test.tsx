@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest } from 'graylog-web-plugin/plugin';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import FormikInput from 'components/common/FormikInput';
@@ -41,10 +40,6 @@ const testTimeout = applyTimeoutMultiplier(30000);
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useAutoRefresh');
-
-jest.mock('stores/streams/StreamsStore', () =>
-  MockStore(['listStreams', () => ({ then: jest.fn() })], 'availableStreams'),
-);
 
 jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () =>
   jest.fn(() => <div>Saved Search Controls</div>),
@@ -124,7 +119,11 @@ describe('SearchBar pluggable controls', () => {
   usePlugin(testPlugin);
 
   beforeEach(() => {
-    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchesClusterConfig,
+      refresh: () => {},
+      isInitialLoading: false,
+    });
   });
 
   it('should render and have initial values', async () => {
@@ -141,21 +140,23 @@ describe('SearchBar pluggable controls', () => {
       render(<SearchBar />);
 
       const pluggableFormField = await screen.findByLabelText('Pluggable Control');
-      userEvent.type(pluggableFormField, '2');
+      await userEvent.type(pluggableFormField, '2');
 
       const searchButton = screen.getByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,
       });
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
-      userEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() =>
         expect(mockOnSubmitFromPlugin).toHaveBeenCalledWith(
           {
             pluggableControl: 'Initial Value2',
             queryString: '*',
-            streams: [],
-            streamCategories: [],
+            'streamsAndCategories': {
+              'categories': [],
+              'streams': [],
+            },
             timerange: { from: 300, type: 'relative' },
           },
           expect.any(Function),
@@ -174,8 +175,10 @@ describe('SearchBar pluggable controls', () => {
         {
           pluggableControl: 'Initial Value',
           queryString: '*',
-          streams: [],
-          streamCategories: [],
+          'streamsAndCategories': {
+            'categories': [],
+            'streams': [],
+          },
           timerange: { from: 300, type: 'relative' },
         },
         {

@@ -19,10 +19,6 @@ import AppConfig from 'util/AppConfig';
 
 import filterMenuItems, { filterCloudMenuItems } from './filterMenuItems';
 
-jest.mock('util/AppConfig', () => ({
-  isCloud: jest.fn(() => false),
-}));
-
 describe('filterMenuItems', () => {
   it('should filter items by path', () => {
     const items = [

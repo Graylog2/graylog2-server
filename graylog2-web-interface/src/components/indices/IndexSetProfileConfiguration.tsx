@@ -18,9 +18,8 @@ import React from 'react';
 import { styled } from 'styled-components';
 
 import { Alert, Col, Input, Row } from 'components/bootstrap';
-import { Select } from 'components/common';
+import { Select, Link } from 'components/common';
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 
 const StyledAlert = styled(Alert)`

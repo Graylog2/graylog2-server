@@ -81,6 +81,8 @@ jest.mock('stores/configurations/ConfigurationsStore', () => {
   };
 });
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('MessageProcessorsConfig', () => {
   beforeAll(() => jest.useFakeTimers());
 
@@ -97,7 +99,7 @@ describe('MessageProcessorsConfig', () => {
 
     const editButton = await screen.findByRole('button', { name: /edit configuration/i });
 
-    userEvent.click(editButton);
+    await setupUser().click(editButton);
 
     await screen.findByRole('heading', {
       name: /update message processors configuration/i,

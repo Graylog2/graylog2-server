@@ -17,7 +17,7 @@
 import type { ActionHandlerCondition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { createHighlightingRule } from 'views/logic/slices/highlightActions';
-import type { GetState, ActionContexts } from 'views/types';
+import type { GetState, AdditionalViewsActionHandlerArguments } from 'views/types';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 
@@ -31,7 +31,10 @@ const HighlightValueHandler =
     return dispatch(createHighlightingRule(field, value));
   };
 
-const isEnabled: ActionHandlerCondition<Partial<ActionContexts>> = ({ field, value, contexts }, getState: GetState) => {
+const isEnabled: ActionHandlerCondition<AdditionalViewsActionHandlerArguments> = (
+  { field, value, contexts },
+  getState: GetState,
+) => {
   const highlightingRules = selectHighlightingRules(getState());
 
   return (

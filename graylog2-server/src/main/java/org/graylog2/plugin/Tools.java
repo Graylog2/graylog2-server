@@ -75,10 +75,12 @@ public final class Tools {
 
     private static final String ES_DATE_FORMAT_JODA = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
+    private static final String ISO_DATE_FORMAT_NO_MS = "yyyy-MM-dd'T'HH:mm:ssZZ";
 
     public static final DateTimeFormatter ES_DATE_FORMAT_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_JODA).withZoneUTC();
     public static final DateTimeFormatter ES_DATE_FORMAT_NO_MS_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZoneUTC();
     public static final DateTimeFormatter ISO_DATE_FORMAT_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
+    public static final DateTimeFormatter ISO_DATE_FORMAT_NO_MS_FORMATTER = DateTimeFormat.forPattern(ISO_DATE_FORMAT_NO_MS).withZoneUTC();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
@@ -382,6 +384,9 @@ public final class Tools {
         return ISODateTimeFormat.dateTime().print(time);
     }
 
+    public static String getISO8601StringWithoutMillis(DateTime time) {
+        return ISO_DATE_FORMAT_NO_MS_FORMATTER.print(time);
+    }
 
     public static ZonedDateTime jodaToJavaUTC(DateTime dateTime) {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(dateTime.getMillis()), ZoneId.of("UTC"));

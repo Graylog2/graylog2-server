@@ -26,6 +26,7 @@ import com.google.common.collect.Sets;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog2.indexer.IncompleteBulkResponseException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.results.ResultMessage;
@@ -67,7 +68,8 @@ public class Messages {
         return RetryerBuilder.<IndexingResults>newBuilder()
                 .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class)
                         || t instanceof InvalidWriteTargetException
-                        || t instanceof MasterNotDiscoveredException)
+                        || t instanceof MasterNotDiscoveredException
+                        || t instanceof IncompleteBulkResponseException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override
@@ -234,13 +236,21 @@ public class Messages {
     private void accountTotalMessageSizes(List<IndexingSuccess> requests, boolean isSystemTraffic) {
         final long totalSizeOfIndexedMessages = requests.stream()
                 .map(IndexingSuccess::message)
+                .filter(Indexable::isAccounted)
                 .mapToLong(Indexable::getSize)
+                .sum();
+
+        final long totalInputSizeOfIndexedMessages = requests.stream()
+                .map(IndexingSuccess::message)
+                .filter(Indexable::isAccounted)
+                .mapToLong(Indexable::getInputMessageSize)
                 .sum();
 
         if (isSystemTraffic) {
             trafficAccounting.addSystemTraffic(totalSizeOfIndexedMessages);
         } else {
             trafficAccounting.addOutputTraffic(totalSizeOfIndexedMessages);
+            trafficAccounting.addIndexedInputTraffic(totalInputSizeOfIndexedMessages);
         }
     }
 

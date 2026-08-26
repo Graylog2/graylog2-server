@@ -17,27 +17,46 @@
 import * as React from 'react';
 import { screen, render, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { defaultUser } from 'defaultMockValues';
 
+import { asMock } from 'helpers/mocking';
 import type { SearchParams } from 'stores/PaginationTypes';
-import TableFetchContext, { type ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import TableFilterContext, {
+  type TableFilterContextValue,
+} from 'components/common/PaginatedEntityTable/TableFilterContext';
+import type { ColumnSchema } from 'components/common/EntityDataTable/types';
+import useCurrentUser from 'hooks/useCurrentUser';
 
+import { ALPHABETICAL_SORT } from './SliceFilters';
 import Slicing from './index';
 
 jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
+jest.mock('hooks/useCurrentUser');
 
 describe('Slicing', () => {
-  const columnSchemas = [
+  const columnSchemas: Array<ColumnSchema> = [
     { id: 'title', title: 'Title', type: 'STRING' as const, sliceable: true },
-    { id: 'status', title: 'Status', type: 'STRING' as const, sliceable: true },
+    {
+      id: 'status',
+      title: 'Status',
+      type: 'STRING' as const,
+      sliceable: true,
+      permissions: ['streams:read'],
+      slice_sort_options: [{ value: 'risk_score', title: 'Risk Score' }],
+    },
+    { id: 'owner', title: 'Owner', type: 'STRING' as const, sliceable: true, permissions: ['roles:read'] },
     { id: 'description', title: 'Description', type: 'STRING' as const, sliceable: false },
   ];
 
-  const renderSUT = (
-    props: Partial<React.ComponentProps<typeof Slicing>> = {},
-    contextOverrides: Partial<ContextValue> & { searchParams?: Partial<SearchParams> } = {},
-  ) => {
-    const searchParams = {
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
+
+  type SUTProps = Partial<React.ComponentProps<typeof Slicing>>;
+  type ContextOverrides = { searchParams?: Partial<SearchParams> };
+
+  const createSUT = (props: SUTProps = {}, contextOverrides: ContextOverrides = {}) => {
+    const searchParams: SearchParams = {
       page: 1,
       pageSize: 10,
       query: '',
@@ -47,27 +66,41 @@ describe('Slicing', () => {
       filters: undefined,
       ...contextOverrides.searchParams,
     };
-    const contextValue: ContextValue = {
+    const contextValue: TableFilterContextValue = {
       searchParams,
-      refetch: jest.fn(),
-      attributes: [],
-      entityTableId: 'test-entity-table',
-      ...contextOverrides,
+      setQuery: jest.fn(),
+      onChangeFilters: jest.fn(),
+      onChangeSlicingFilter: jest.fn(),
+      paginationState: {
+        page: searchParams.page,
+        pageSize: searchParams.pageSize,
+        resetPage: jest.fn(),
+        setPagination: jest.fn(),
+      },
+      resetFilters: jest.fn(),
     };
 
-    return render(
-      <DefaultQueryParamProvider>
-        <TableFetchContext.Provider value={contextValue}>
-          <Slicing
-            appSection="test-app-section"
-            columnSchemas={columnSchemas}
-            onChangeSlicing={() => {}}
-            fetchSlices={() => Promise.resolve({ slices: [] })}
-            {...props}
-          />
-        </TableFetchContext.Provider>
-      </DefaultQueryParamProvider>,
+    return (
+      <TableFilterContext.Provider value={contextValue}>
+        <Slicing
+          appSection="test-app-section"
+          columnSchemas={columnSchemas}
+          onChangeSlicing={() => {}}
+          fetchSlices={() => Promise.resolve({ slices: [] })}
+          {...props}
+        />
+      </TableFilterContext.Provider>
     );
+  };
+
+  const renderSUT = (props: SUTProps = {}, contextOverrides: ContextOverrides = {}) => {
+    const renderResult = render(createSUT(props, contextOverrides));
+
+    return {
+      ...renderResult,
+      rerenderSUT: (newProps: SUTProps = props, newContextOverrides: ContextOverrides = contextOverrides) =>
+        renderResult.rerender(createSUT(newProps, newContextOverrides)),
+    };
   };
 
   it('displays slice options', async () => {
@@ -77,8 +110,22 @@ describe('Slicing', () => {
     await userEvent.click(button);
 
     await screen.findByRole('menuitem', { name: /title/i });
+    await screen.findByRole('menuitem', { name: /owner/i });
     await screen.findByRole('menuitem', { name: /status/i });
     expect(screen.queryByRole('menuitem', { name: /description/i })).not.toBeInTheDocument();
+  });
+
+  it('hides slice options for columns without the required permissions', async () => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(['streams:read']).build());
+
+    renderSUT();
+
+    const button = await screen.findByRole('button', { name: /status/i });
+    await userEvent.click(button);
+
+    await screen.findByRole('menuitem', { name: /title/i });
+    await screen.findByRole('menuitem', { name: /status/i });
+    expect(screen.queryByRole('menuitem', { name: /owner/i })).not.toBeInTheDocument();
   });
 
   it('selects a slice', async () => {
@@ -101,7 +148,7 @@ describe('Slicing', () => {
     const noSlicingButton = await screen.findByRole('button', { name: /no slicing/i });
     await userEvent.click(noSlicingButton);
 
-    expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
+    expect(onChangeSlicing).toHaveBeenCalledWith(null, null);
   });
 
   it('filters slices based on search query', async () => {
@@ -117,21 +164,172 @@ describe('Slicing', () => {
 
     await screen.findByText('Alpha');
 
-    await userEvent.type(screen.getByPlaceholderText(/filter status/i), 'alp');
+    await userEvent.type(screen.getByPlaceholderText(/filter/i), 'alp');
 
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.queryByText('Beta')).not.toBeInTheDocument();
   });
 
-  it('sorts slices by count', async () => {
+  it('does not display count as a slice sort option', async () => {
+    renderSUT();
+
+    await userEvent.click(await screen.findByRole('button', { name: /alphabetical/i }));
+
+    expect(screen.queryByRole('menuitem', { name: /count/i })).not.toBeInTheDocument();
+  });
+
+  it('displays additional slice sort options from the active column schema', async () => {
+    renderSUT();
+
+    await userEvent.click(await screen.findByRole('button', { name: /alphabetical/i }));
+
+    await screen.findByRole('menuitem', { name: /risk score/i });
+  });
+
+  it('applies slicing preferences for initial slice sort', async () => {
     renderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' },
       fetchSlices: () =>
         Promise.resolve({
           slices: [
-            { value: 'Alpha', count: 1 },
-            { value: 'Beta', count: 3 },
+            { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+            { value: 'Beta', count: 1, meta: { risk_score: 10 } },
           ],
         }),
+    });
+
+    await screen.findByText('Alpha');
+
+    expect(screen.getByRole('button', { name: /risk score/i })).toBeInTheDocument();
+
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+    expect(getItems()[0]).toHaveTextContent('Beta');
+    expect(getItems()[1]).toHaveTextContent('Alpha');
+  });
+
+  it('applies updated slicing preferences without remounting', async () => {
+    const fetchSlices = () =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+          { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+        ],
+      });
+
+    const { rerenderSUT } = renderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' },
+      fetchSlices,
+    });
+
+    await screen.findByText('Alpha');
+
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+    expect(screen.getByRole('button', { name: /risk score/i })).toBeInTheDocument();
+    expect(getItems()[0]).toHaveTextContent('Beta');
+    expect(getItems()[1]).toHaveTextContent('Alpha');
+
+    rerenderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: ALPHABETICAL_SORT, order: 'asc' },
+      fetchSlices,
+    });
+
+    await screen.findByRole('button', { name: /alphabetical/i });
+    expect(getItems()[0]).toHaveTextContent('Alpha');
+    expect(getItems()[1]).toHaveTextContent('Beta');
+  });
+
+  it('updates slicing preferences when slice sort changes', async () => {
+    const onSlicingPreferencesChange = jest.fn();
+    const fetchSlices = () =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+          { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+        ],
+      });
+    const { rerenderSUT } = renderSUT({
+      onSlicingPreferencesChange,
+      fetchSlices,
+    });
+
+    await screen.findByText('Alpha');
+
+    await userEvent.click(screen.getByRole('button', { name: /alphabetical/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
+
+    expect(onSlicingPreferencesChange).toHaveBeenCalledWith({
+      sliceColumn: 'status',
+      sortBy: 'risk_score',
+      order: 'asc',
+    });
+
+    rerenderSUT({
+      onSlicingPreferencesChange,
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'asc' },
+      fetchSlices,
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    expect(onSlicingPreferencesChange).toHaveBeenCalledWith({
+      sliceColumn: 'status',
+      sortBy: 'risk_score',
+      order: 'desc',
+    });
+  });
+
+  it('sorts slices by additional slice sort metadata', async () => {
+    const fetchSlices = () =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+          { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+        ],
+      });
+    const { rerenderSUT } = renderSUT({
+      fetchSlices,
+    });
+
+    await screen.findByText('Alpha');
+
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+
+    await userEvent.click(screen.getByRole('button', { name: /alphabetical/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
+
+    rerenderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'asc' },
+      fetchSlices,
+    });
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('Alpha');
+      expect(getItems()[1]).toHaveTextContent('Beta');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    rerenderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' },
+      fetchSlices,
+    });
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('Beta');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+    });
+  });
+
+  it('toggles the slice sort direction', async () => {
+    const fetchSlices = () =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 1 },
+          { value: 'Beta', count: 1 },
+        ],
+      });
+    const { rerenderSUT } = renderSUT({
+      fetchSlices,
     });
 
     await screen.findByText('Alpha');
@@ -141,8 +339,12 @@ describe('Slicing', () => {
     expect(getItems()[0]).toHaveTextContent('Alpha');
     expect(getItems()[1]).toHaveTextContent('Beta');
 
-    await userEvent.click(screen.getByRole('button', { name: /a-z/i }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: /count/i }));
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    rerenderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: ALPHABETICAL_SORT, order: 'desc' },
+      fetchSlices,
+    });
 
     await waitFor(() => {
       expect(getItems()[0]).toHaveTextContent('Beta');
@@ -150,23 +352,192 @@ describe('Slicing', () => {
     });
   });
 
-  it('shows empty slices when toggled', async () => {
+  it('keeps null-value slices at the top regardless of slice sort', async () => {
+    const fetchSlices = () =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 2, meta: { risk_score: 1 } },
+          { value: null, title: '(Empty Value)', count: 1, meta: { risk_score: 100 } },
+          { value: 'Beta', count: 3, meta: { risk_score: 10 } },
+        ],
+      });
+    const { rerenderSUT } = renderSUT({
+      fetchSlices,
+    });
+
+    await screen.findByText('(Empty Value)');
+
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+
+    expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+
+    await userEvent.click(screen.getByRole('button', { name: /alphabetical/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
+
+    rerenderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'asc' },
+      fetchSlices,
+    });
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+      expect(getItems()[2]).toHaveTextContent('Beta');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    rerenderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' },
+      fetchSlices,
+    });
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Beta');
+      expect(getItems()[2]).toHaveTextContent('Alpha');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort ascending/i }));
+
+    rerenderSUT({
+      slicingPreferences: { sliceColumn: 'status', sortBy: 'risk_score', order: 'asc' },
+      fetchSlices,
+    });
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+      expect(getItems()[2]).toHaveTextContent('Beta');
+    });
+  });
+
+  it('paginates non-empty slices', async () => {
     renderSUT({
       fetchSlices: () =>
         Promise.resolve({
-          slices: [
-            { value: 'Alpha', count: 1 },
-            { value: 'Gamma', count: 0 },
-          ],
+          slices: Array.from({ length: 11 }, (_, index) => ({
+            value: `Slice-${String(index + 1).padStart(2, '0')}`,
+            count: 1,
+          })),
         }),
     });
 
+    await screen.findByText('Slice-01');
+
+    expect(within(screen.getByTestId('slices-list')).getByText('Slice-01')).toBeInTheDocument();
+    expect(within(screen.getByTestId('slices-list')).queryByText('Slice-11')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /open page 2/i }));
+
+    await waitFor(() => expect(within(screen.getByTestId('slices-list')).getByText('Slice-11')).toBeInTheDocument());
+    expect(within(screen.getByTestId('slices-list')).queryByText('Slice-01')).not.toBeInTheDocument();
+  });
+
+  it('hides the empty slices section for now', async () => {
+    renderSUT(
+      {
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1 },
+              { value: 'Gamma', count: 0 },
+            ],
+          }),
+      },
+      { searchParams: { slice: 'Gamma' } },
+    );
+
     await screen.findByText('Alpha');
 
+    expect(screen.queryByRole('button', { name: /show empty slices/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /hide empty slices/i })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('empty-slices-list')).not.toBeInTheDocument();
     expect(screen.queryByText('Gamma')).not.toBeInTheDocument();
+  });
 
-    await userEvent.click(screen.getByRole('button', { name: /show empty slices/i }));
+  describe('slice_sort_default', () => {
+    it('applies the configured sort mode and direction on initial render', async () => {
+      const columnSchemasWithDefault: Array<ColumnSchema> = [
+        {
+          id: 'status',
+          title: 'Status',
+          type: 'STRING' as const,
+          sliceable: true,
+          slice_sort_options: [{ value: 'risk_score', title: 'Risk Score' }],
+          slice_sort_default: { mode: 'risk_score', direction: 'desc' },
+        },
+      ];
 
-    expect(await screen.findByText('Gamma')).toBeInTheDocument();
+      renderSUT({
+        columnSchemas: columnSchemasWithDefault,
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1, meta: { risk_score: 2 } },
+              { value: 'Beta', count: 1, meta: { risk_score: 10 } },
+            ],
+          }),
+      });
+
+      await screen.findByText('Alpha');
+
+      // sort dropdown should display the default sort mode without user interaction
+      expect(screen.getByRole('button', { name: /risk score/i })).toBeInTheDocument();
+
+      // slices should be ordered by risk_score descending: Beta (10) before Alpha (2)
+      const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+      expect(getItems()[0]).toHaveTextContent('Beta');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+    });
+
+    it('applies the configured direction for alphabetical sort on initial render', async () => {
+      const columnSchemasWithDefault: Array<ColumnSchema> = [
+        {
+          id: 'status',
+          title: 'Status',
+          type: 'STRING' as const,
+          sliceable: true,
+          slice_sort_default: { mode: ALPHABETICAL_SORT, direction: 'desc' },
+        },
+      ];
+
+      renderSUT({
+        columnSchemas: columnSchemasWithDefault,
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1 },
+              { value: 'Beta', count: 1 },
+            ],
+          }),
+      });
+
+      await screen.findByText('Alpha');
+
+      // slices should be sorted alphabetically descending: Beta before Alpha
+      const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+      expect(getItems()[0]).toHaveTextContent('Beta');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+    });
+  });
+
+  it('refetches slices when selecting a slice', async () => {
+    const fetchSlices = jest.fn(() =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 2 },
+          { value: 'Beta', count: 1 },
+        ],
+      }),
+    );
+    renderSUT({ fetchSlices });
+
+    await screen.findByText('Alpha');
+    expect(fetchSlices).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(within(screen.getByTestId('slices-list')).getByRole('button', { name: /beta/i }));
+
+    await waitFor(() => expect(fetchSlices.mock.calls.length).toBeGreaterThanOrEqual(2));
   });
 });

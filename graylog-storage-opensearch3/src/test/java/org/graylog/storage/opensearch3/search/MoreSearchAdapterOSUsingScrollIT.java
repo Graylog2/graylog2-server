@@ -48,7 +48,7 @@ public class MoreSearchAdapterOSUsingScrollIT extends MoreSearchAdapterIT {
                         (initialResult, query, scroll, fields, limit) -> new ScrollResultOS(
                                 resultMessageFactory, openSearchInstance.getOfficialOpensearchClient(), initialResult, query, scroll, fields, limit
                         ),
-                        new SearchRequestFactoryOS(false, new IgnoreSearchFilters())
+                        new SearchRequestFactoryOS(true, false, new IgnoreSearchFilters())
                 ),
                 resultMessageFactory
         );

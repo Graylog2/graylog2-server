@@ -31,6 +31,8 @@ import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.users.responses.BasicUserResponse;
 import org.graylog2.shared.users.UserManagementService;
 import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
@@ -240,5 +242,29 @@ public class SidecarResourceTest extends RestResourceBaseTest {
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
+    }
+
+    @Test
+    public void testGetBasicSidecarUser() throws Exception {
+        final User sidecarUser = mock(User.class);
+        when(sidecarUser.getId()).thenReturn("sidecar-user-id");
+        when(sidecarUser.getName()).thenReturn("graylog-sidecar");
+        when(sidecarUser.getFullName()).thenReturn("Sidecar System User");
+        when(sidecarUser.isReadOnly()).thenReturn(true);
+        when(sidecarUser.isServiceAccount()).thenReturn(true);
+        when(userManagementService.load("graylog-sidecar")).thenReturn(sidecarUser);
+
+        final BasicUserResponse response = this.resource.getBasicSidecarUser();
+
+        assertNotNull(response);
+        assertEquals("sidecar-user-id", response.id());
+        assertEquals("graylog-sidecar", response.username());
+    }
+
+    @Test
+    public void testGetBasicSidecarUserNotFound() throws Exception {
+        when(userManagementService.load("graylog-sidecar")).thenReturn(null);
+
+        assertThrows(NotFoundException.class, () -> this.resource.getBasicSidecarUser());
     }
 }

@@ -116,6 +116,7 @@ public abstract class IndexMapping extends AbstractMapping {
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
                 .put(Message.FIELD_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
+                .put(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_ORIGINAL_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())

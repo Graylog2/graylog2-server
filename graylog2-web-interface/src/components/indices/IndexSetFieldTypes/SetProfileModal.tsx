@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -26,7 +27,6 @@ import { Button, Input, Modal } from 'components/bootstrap';
 import useParams from 'routing/useParams';
 import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
-import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
 import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
 
 const StyledLabel = styled.h5`
@@ -47,6 +47,7 @@ const StyledSelect = styled(Select)`
 
 const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
   const { indexSetId } = useParams();
+  const queryClient = useQueryClient();
   const [rotated, setRotated] = useState(true);
   const [profile, setProfile] = useState(null);
   const { setIndexSetFieldTypeProfile, isLoading } = useSetIndexSetProfileMutation();
@@ -70,10 +71,10 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
             },
           });
         })
-        .then(() => IndexSetsActions.get(indexSetId))
+        .then(() => queryClient.invalidateQueries({ queryKey: ['indexSet', indexSetId] }))
         .then(() => onClose());
     },
-    [setIndexSetFieldTypeProfile, indexSetId, rotated, profile, sendTelemetry, telemetryPathName, onClose],
+    [setIndexSetFieldTypeProfile, indexSetId, rotated, profile, sendTelemetry, telemetryPathName, onClose, queryClient],
   );
 
   const onRemoveProfileFromIndex = useCallback(() => {
@@ -90,9 +91,9 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
       .then(() => {
         onClose();
 
-        return IndexSetsActions.get(indexSetId);
+        return queryClient.invalidateQueries({ queryKey: ['indexSet', indexSetId] });
       });
-  }, [indexSetId, onClose, removeProfileFromIndex, rotated, sendTelemetry, telemetryPathName]);
+  }, [indexSetId, onClose, removeProfileFromIndex, rotated, sendTelemetry, telemetryPathName, queryClient]);
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_CANCELED, {
       app_pathname: telemetryPathName,

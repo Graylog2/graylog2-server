@@ -50,7 +50,7 @@ describe('ConfigurationForm', () => {
 
     render(<SUT submitAction={submitAction} />);
 
-    userEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /open modal/i,
       }),
@@ -60,7 +60,7 @@ describe('ConfigurationForm', () => {
       name: /edit entity/i,
     });
 
-    userEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /update entity/i,
       }),

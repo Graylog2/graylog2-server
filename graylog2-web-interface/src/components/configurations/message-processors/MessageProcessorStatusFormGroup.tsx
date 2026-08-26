@@ -39,7 +39,7 @@ const MessageProcessorStatusFormGroup = () => {
     return (
       <tr key={processor.name}>
         <td>{processor.name}</td>
-        {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+        {}
         <td>
           <input
             type="checkbox"

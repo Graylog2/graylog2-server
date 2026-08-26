@@ -17,8 +17,12 @@
 import { useState } from 'react';
 
 import useProductName from 'brand-customization/useProductName';
-import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import type {
+  EventNotification,
+  TestResult,
+  TestResults,
+} from 'components/event-notifications/hooks/useEventNotifications';
+import { testPersistedEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 type UseNotificationTestType = {
   isLoadingTest: boolean;
@@ -32,9 +36,9 @@ const useNotificationTest = (): UseNotificationTestType => {
 
   const getNotificationTest = (notification: EventNotification) => {
     setTestResults({ [notification.id]: { isLoading: true, id: notification.id } });
-    let result = { isLoading: false, id: null, error: null, message: null };
+    let result: TestResult = { isLoading: false, id: undefined, error: undefined, message: undefined };
 
-    EventNotificationsActions.testPersisted(notification).then(
+    testPersistedEventNotification(notification).then(
       (response) => {
         result = {
           ...result,
@@ -48,7 +52,7 @@ const useNotificationTest = (): UseNotificationTestType => {
         return response;
       },
       (errorResponse) => {
-        result = { isLoading: false, id: notification.id, error: true, message: null };
+        result = { isLoading: false, id: notification.id, error: true, message: undefined };
 
         if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
           result.message =

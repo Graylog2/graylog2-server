@@ -24,11 +24,17 @@ export function sortByDate(d1: string, d2: string, sortOrder: SortOrder = 'asc')
   const d1Time = moment(d1);
   const d2Time = moment(d2);
 
-  if (sortOrder === 'asc') {
-    return d1Time.isBefore(d2Time) ? -1 : d2Time.isBefore(d1Time) ? 1 : 0;
+  const [earlier, later] = sortOrder === 'asc' ? [d1Time, d2Time] : [d2Time, d1Time];
+
+  if (earlier.isBefore(later)) {
+    return -1;
   }
 
-  return d2Time.isBefore(d1Time) ? -1 : d1Time.isBefore(d2Time) ? 1 : 0;
+  if (later.isBefore(earlier)) {
+    return 1;
+  }
+
+  return 0;
 }
 
 export function naturalSortIgnoreCase(s1: string, s2: string, sortOrder: SortOrder = 'asc') {

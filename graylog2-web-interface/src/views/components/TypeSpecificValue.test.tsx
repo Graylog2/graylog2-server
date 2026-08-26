@@ -23,7 +23,7 @@ import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import useFeature from 'hooks/useFeature';
 import usePluginEntities from 'hooks/usePluginEntities';
 import FieldTypeValueRenderer from 'views/components/fieldtypes/FieldTypeValueRenderer';
-import useInputs from 'hooks/useInputs';
+import { useInputs } from 'hooks/useInputs';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 jest.mock('hooks/useFeature');
@@ -74,5 +74,18 @@ describe('TypeSpecificValue', () => {
     render(<TypeSpecificValue field="gl2_source_input" value="input-id-1" type={new FieldType('input', [], [])} />);
 
     await screen.findByText('Input 1');
+  });
+
+  // Regression: error processing stream's message body details may contain BigInt values
+  // (deserialized by json-with-bigint), which native JSON.stringify cannot serialize.
+  it('should render object values containing BigInts without crashing', async () => {
+    const value = {
+      message: 'failed to process',
+      size: BigInt('9223372036854775807'),
+    };
+
+    render(<TypeSpecificValue field="gl2_processing_error" value={value} />);
+
+    await screen.findByText(/9223372036854775807/);
   });
 });

@@ -20,12 +20,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import { useTableFilterContext } from 'components/common/PaginatedEntityTable';
 
 const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, loadFunc: (searchId: string) => void) => {
   if (!selectedSavedSearchId || !loadFunc) {
@@ -41,7 +41,7 @@ const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, lo
 
 const SavedSearchFavIcon = ({ isFavorite, search }: { isFavorite: boolean; search: View }) => {
   const queryClient = useQueryClient();
-  const { searchParams } = useTableFetchContext();
+  const { searchParams } = useTableFilterContext();
 
   return (
     <FavoriteIcon

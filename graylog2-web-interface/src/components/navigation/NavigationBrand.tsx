@@ -17,6 +17,7 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 
+import Sanitize from 'components/common/Sanitize';
 import { NAV_LOGO_HEIGHT, MAX_NAV_LOGO_WIDTH } from 'theme/constants';
 import useCustomLogo from 'brand-customization/useCustomLogo';
 
@@ -78,7 +79,13 @@ const NavigationBrand = () => {
   const theme = useTheme();
   const customLogo = useCustomLogo(theme.mode);
 
-  if (customLogo) return <StyledSvgContainer dangerouslySetInnerHTML={{ __html: customLogo }} />;
+  if (customLogo) {
+    return (
+      <StyledSvgContainer>
+        <Sanitize html={customLogo} />
+      </StyledSvgContainer>
+    );
+  }
 
   return <Logo color={theme.colors.brand.logo} />;
 };

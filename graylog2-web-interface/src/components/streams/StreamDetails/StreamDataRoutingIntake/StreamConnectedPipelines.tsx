@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/bootstrap';
 import type { Sort } from 'stores/PaginationTypes';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Section, PaginatedEntityTable } from 'components/common';
 import {
   fetchStreamConnectedPipelines,
@@ -32,6 +32,8 @@ import customColumnRenderers from './customColumnRenderers';
 type Props = {
   stream: Stream;
 };
+
+const EXTERNAL_SEARCH = { query: '' };
 
 export const DEFAULT_LAYOUT = {
   entityTableId: 'pipelines',
@@ -48,7 +50,7 @@ const ListCol = styled(Col)(
 );
 
 const StreamConnectedPipelines = ({ stream }: Props) => (
-  <Section title="Pipelines" collapsible>
+  <Section title="Routing from other Streams" collapsible>
     <Row>
       <ListCol md={12}>
         <PaginatedEntityTable<StreamConnectedPipeline>
@@ -57,7 +59,7 @@ const StreamConnectedPipelines = ({ stream }: Props) => (
           fetchEntities={(searchParams) => fetchStreamConnectedPipelines(stream.id, searchParams)}
           keyFn={(searchParams) => keyFn(stream.id, searchParams)}
           entityAttributesAreCamelCase={false}
-          searchPlaceholder="Search for pipeline"
+          externalSearch={EXTERNAL_SEARCH}
           columnRenderers={customColumnRenderers}
         />
       </ListCol>

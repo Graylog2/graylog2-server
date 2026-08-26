@@ -20,13 +20,15 @@ import styled from 'styled-components';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
 import { Alert, Button } from 'components/bootstrap';
-import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
-import sidebarSections from 'views/components/sidebar/sidebarSections';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
-import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
 import EventReplaySearch from 'components/events/EventReplaySearch';
 import useEventDefinition from 'hooks/useEventDefinition';
 import type { SelectedEventsData } from 'contexts/EventReplaySelectedContext';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
+import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
+import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
+import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import useFeature from 'hooks/useFeature';
 
 const Container = styled.div`
   display: flex;
@@ -51,21 +53,38 @@ const AlertWrapper = styled(Alert)(
 `,
 );
 
+const ReplaySearchSidebarSection = () => {
+  const { alertId, definitionId } = useReplaySearchContext();
+  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
+
+  if (!isRightSidebarEnabled) {
+    return (
+      <div>
+        <SidebarBulkEventReplay />
+        <hr />
+        <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />
+      </div>
+    );
+  }
+
+  return <SidebarBulkEventReplay />;
+};
+
 const replaySection: SidebarSection = {
   key: 'eventDescription',
   title: null,
   hoverTitle: 'Replayed Search',
   icon: 'play_arrow',
-  content: ReplaySearchSidebar,
+  content: ReplaySearchSidebarSection,
 };
 
-const searchPageLayout = {
+const searchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
-    title: SidebarBulkEventReplay,
+    title: 'Replay Search',
     sections: [replaySection, ...sidebarSections],
-    contentColumnWidth: 350,
   },
+  synchronizeUrl: false,
 };
 
 const ReplayedSearch = ({

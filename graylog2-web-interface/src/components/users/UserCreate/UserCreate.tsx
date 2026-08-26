@@ -28,12 +28,11 @@ import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem
 import RolesSelector from 'components/permissions/RolesSelector';
 import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
+import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup, Link } from 'components/common';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
-import { Link } from 'components/common/router';
 import { Headline } from 'components/common/Section/SectionComponent';
 import useProductName from 'brand-customization/useProductName';
 import usePasswordComplexityConfig from 'components/users/usePasswordComplexityConfig';

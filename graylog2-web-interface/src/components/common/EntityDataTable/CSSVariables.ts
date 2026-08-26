@@ -15,9 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export const columnTransformVar = (colId: string) => `--col-${colId}-transform`;
-export const columnWidthVar = (colId: string) => `--col-${colId.replace(/\./g, '_')}-width`;
-export const columnOpacityVar = (colId: string) => `--col-${colId}-opacity`;
+const sanitizeColId = (colId: string) => colId.replace(/\./g, '_');
+
+export const columnTransformVar = (colId: string) => `--col-${sanitizeColId(colId)}-transform`;
+export const columnWidthVar = (colId: string) => `--col-${sanitizeColId(colId)}-width`;
+export const columnOpacityVar = (colId: string) => `--col-${sanitizeColId(colId)}-opacity`;
 export const columnTransition = () => `--col-transition`;
 export const actionsHeaderWidthVar = `--actions-header-width`;
 export const displayScrollRightIndicatorVar = `--display-scroll-right-indicator`;
+export const scrollContainerWidthVar = `--scroll-container-width`;

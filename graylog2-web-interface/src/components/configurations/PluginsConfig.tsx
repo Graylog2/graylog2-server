@@ -21,13 +21,12 @@ import URI from 'urijs';
 
 import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { getConfig } from 'components/configurations/helpers';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import useLocation from 'routing/useLocation';
 import type { SelectCallback } from 'components/bootstrap/types';
 import usePermissions from 'hooks/usePermissions';
@@ -65,7 +64,7 @@ const PluginsConfig = () => {
         .filter((config) => (config.readPermission ? isPermitted(config.readPermission) : true)), // defaults to true for backwards compatibility. should be removed once all plugins have a permission added
     [originalPluginSystemConfigs, isPermitted],
   );
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   useEffect(() => {
     const pluginPromises = pluginSystemConfigs

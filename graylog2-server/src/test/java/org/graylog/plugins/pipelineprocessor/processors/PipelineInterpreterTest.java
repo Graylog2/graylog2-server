@@ -50,7 +50,6 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheServi
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
-import org.graylog2.Configuration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
@@ -72,6 +71,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -506,26 +506,28 @@ public class PipelineInterpreterTest {
         final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
         when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
 
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
-                mock(Configuration.class),
+        final PipelineInterpreterStateBuilder stateBuilder = new PipelineInterpreterStateBuilder(
                 ruleService,
                 pipelineService,
                 connectionsService,
                 parser,
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
-                metricRegistry,
-                mock(PipelineMetadataUpdater.class),
-                Executors.newScheduledThreadPool(1),
-                eventBus,
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
                         new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true)
+        );
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
+                stateBuilder,
+                metricRegistry,
+                mock(ScheduledExecutorService.class),
+                eventBus
         );
 
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 messageQueueAcknowledger,
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
 
         // Create message on default stream only
         final Message msg = messageFactory.createMessage("test message", "test", Tools.nowUTC());
@@ -563,25 +565,27 @@ public class PipelineInterpreterTest {
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
 
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
-                mock(Configuration.class),
+        final PipelineInterpreterStateBuilder stateBuilder = new PipelineInterpreterStateBuilder(
                 ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
-                metricRegistry,
-                mock(PipelineMetadataUpdater.class),
-                Executors.newScheduledThreadPool(1),
-                mock(EventBus.class),
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
                         new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true)
+        );
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
+                stateBuilder,
+                metricRegistry,
+                mock(ScheduledExecutorService.class),
+                mock(EventBus.class)
         );
         return new PipelineInterpreter(
                 messageQueueAcknowledger,
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
     }
 
     @Test
@@ -623,24 +627,26 @@ public class PipelineInterpreterTest {
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
 
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
-                mock(Configuration.class),
+        final PipelineInterpreterStateBuilder stateBuilder = new PipelineInterpreterStateBuilder(
                 ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
-                metricRegistry,
-                mock(PipelineMetadataUpdater.class),
-                Executors.newScheduledThreadPool(1),
-                mock(EventBus.class),
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+        );
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
+                stateBuilder,
+                metricRegistry,
+                mock(ScheduledExecutorService.class),
+                mock(EventBus.class)
         );
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
 
         interpreter.process(messageInDefaultStream("", ""));
 

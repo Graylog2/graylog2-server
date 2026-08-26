@@ -16,12 +16,10 @@
  */
 
 import * as React from 'react';
-import DOMPurify from 'dompurify';
 import styled from 'styled-components';
-import { useMemo } from 'react';
 
 import useNavigationCustomization from 'brand-customization/useNavigationCustomization';
-import { Icon } from 'components/common';
+import { Icon, Sanitize } from 'components/common';
 import type { IconName } from 'components/common/Icon';
 import type { Branding } from 'util/AppConfig';
 import { MAX_NAV_ICON_WIDTH } from 'theme/constants';
@@ -48,15 +46,8 @@ const SvgContainer = styled.div`
 
 const useCustomIcon = (type: NavIconType) => {
   const navigationCustomization = useNavigationCustomization();
-  const customIcon = navigationCustomization?.[type]?.icon;
 
-  return useMemo(() => {
-    if (customIcon) {
-      return DOMPurify.sanitize(customIcon);
-    }
-
-    return null;
-  }, [customIcon]);
+  return navigationCustomization?.[type]?.icon ?? null;
 };
 
 type Props = {
@@ -68,7 +59,11 @@ const NavIcon = ({ type, title = undefined }: Props) => {
   const customSvgIcon = useCustomIcon(type);
 
   if (customSvgIcon) {
-    return <SvgContainer dangerouslySetInnerHTML={{ __html: customSvgIcon }} title={title} />;
+    return (
+      <SvgContainer title={title}>
+        <Sanitize html={customSvgIcon} />
+      </SvgContainer>
+    );
   }
 
   return <Icon name={DEFAULT_ICONS[type]} size="lg" title={title} />;

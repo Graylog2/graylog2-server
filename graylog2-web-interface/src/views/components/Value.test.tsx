@@ -36,7 +36,7 @@ const Value = ({ ...props }: React.ComponentProps<typeof OriginalValue>) => (
 
 describe('Value', () => {
   const openActionsMenu = async (value: string | RegExp) => {
-    userEvent.click(screen.getByText(value));
+    await userEvent.click(screen.getByText(value));
     await screen.findByRole('menu');
   };
 
@@ -158,7 +158,7 @@ describe('Value', () => {
         </InteractiveContext.Provider>
       );
 
-      render(<Component field="foo" queryId="someQueryId" value={value} type={type} />);
+      render(<Component field="foo" value={value} type={type} />);
 
       await screen.findByText(result);
     },
@@ -178,7 +178,7 @@ describe('Value', () => {
 
       render(<NoninteractiveComponent field="foo" value={{ foo: 23 }} type={FieldType.Unknown} />);
 
-      userEvent.click(screen.getByText('{"foo":23}'));
+      await userEvent.click(screen.getByText('{"foo":23}'));
 
       expect(screen.queryByText('foo = {"foo":23}')).not.toBeInTheDocument();
     });

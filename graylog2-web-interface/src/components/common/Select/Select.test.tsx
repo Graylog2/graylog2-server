@@ -84,9 +84,9 @@ describe('Select', () => {
 
       await waitFor(() => expect(onChange).toHaveBeenCalledWith('value1', expect.any(Object)));
 
-      selectEvent.clearAll(container, 'simple-select');
+      await selectEvent.clearAll(container, 'simple-select');
 
-      expect(onChange).toHaveBeenCalledWith('', expect.any(Object));
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith('', expect.any(Object)));
     });
 
     it('should use displayKey to select the option label', async () => {

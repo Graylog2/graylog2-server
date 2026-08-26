@@ -75,6 +75,7 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/messages")
 public class MessageResource extends RestResource {
+
     private final Messages messages;
     private final CodecFactory codecFactory;
     private final IndexSetRegistry indexSetRegistry;
@@ -95,8 +96,7 @@ public class MessageResource extends RestResource {
     @Operation(summary = "Get a single message.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns the message", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "404", description = "Specified index does not exist."),
-            @ApiResponse(responseCode = "404", description = "Message does not exist.")
+            @ApiResponse(responseCode = "404", description = "Specified message does not exist or the user does not have the required permissions.")
     })
     public ResultMessage search(@Parameter(name = "index", description = "The index this message is stored in.", required = true)
                                 @PathParam("index") String index,
@@ -109,10 +109,8 @@ public class MessageResource extends RestResource {
             checkMessageReadPermission(message);
 
             return resultMessage;
-        } catch (DocumentNotFoundException e) {
-            throw new NotFoundException("Message " + messageId + " does not exist in index " + index, e);
-        } catch (IndexNotFoundException e) {
-            throw new NotFoundException("Index " + index + " does not exist.", e);
+        } catch (DocumentNotFoundException | IndexNotFoundException | ForbiddenException e) {
+            throw new NotFoundException("Specified message does not exist or the user does not have the required permissions");
         }
     }
 
@@ -191,7 +189,7 @@ public class MessageResource extends RestResource {
     @Path("/{index}/analyze")
     @Timed
     @Operation(summary = "Analyze a message string",
-                  description = "Returns what tokens/terms a message string (message or full_message) is split to.")
+               description = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns tokens", useReturnTypeSchema = true),

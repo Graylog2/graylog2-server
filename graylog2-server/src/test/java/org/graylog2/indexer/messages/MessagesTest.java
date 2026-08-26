@@ -18,7 +18,11 @@ package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IncompleteBulkResponseException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
@@ -33,6 +37,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +45,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.messages.ImmutableMessage.wrap;
 import static org.graylog2.indexer.messages.IndexingError.Type.IndexBlocked;
 import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
 import static org.mockito.ArgumentMatchers.any;
@@ -70,6 +74,8 @@ public class MessagesTest {
 
     private Messages messages;
 
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     @BeforeEach
     public void setUp() throws Exception {
         this.messages = new Messages(trafficAccounting, messagesAdapter, mock(ProcessingStatusRecorder.class), failureSubmissionService);
@@ -87,33 +93,89 @@ public class MessagesTest {
 
     @Test
     public void bulkIndexingShouldAccountMessageSizes() throws IOException {
-        when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.empty());
-        final List<MessageWithIndex> messageList = List.of(
-                new MessageWithIndex(wrap(messageWithSize(17)), ""),
-                new MessageWithIndex(wrap(messageWithSize(23)), ""),
-                new MessageWithIndex(wrap(messageWithSize(42)), "")
-        );
-        when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
 
-        messages.bulkIndex(messageList);
+        final var listOfMessages = List.of(
+                accountedMessage(100),
+                accountedMessage(200),
+                accountedMessage(300));
 
-        verify(trafficAccounting, times(1)).addOutputTraffic(82);
+        // getSize() is derived from the message content, so we pin it here as a fixture for the
+        // output-traffic assertions below.
+        assertThat(listOfMessages).allMatch(m -> m.getSize() == 48);
+
+        final var listOfImmutableMessages = listOfMessages.stream()
+                .map(ImmutableMessage::wrap).toList();
+
+        final var listOfMessagesWithIndex = listOfImmutableMessages.stream()
+                .map(m -> new MessageWithIndex(m, ""))
+                .toList();
+
+        when(messagesAdapter.bulkIndex(any()))
+                .thenReturn(IndexingResults.create(createSuccessFromMessages(listOfMessagesWithIndex), List.of()));
+
+        messages.bulkIndex(listOfMessagesWithIndex);
+
+        verify(trafficAccounting, times(1)).addOutputTraffic(48 * 3);
+        verify(trafficAccounting, times(1)).addIndexedInputTraffic(600); // 100 + 200 + 300
         verify(trafficAccounting, never()).addSystemTraffic(anyLong());
     }
 
     @Test
     public void bulkIndexingShouldAccountMessageSizesForSystemTrafficSeparately() throws IOException {
-        final List<MessageWithIndex> messageList = List.of(
-                new MessageWithIndex(wrap(messageWithSize(17)), ""),
-                new MessageWithIndex(wrap(messageWithSize(23)), ""),
-                new MessageWithIndex(wrap(messageWithSize(42)), "")
-        );
-        when(messagesAdapter.bulkIndex(any())).thenReturn(IndexingResults.create(createSuccessFromMessages(messageList), List.of()));
+        final var listOfMessages = List.of(
+                accountedMessage(100),
+                accountedMessage(200));
 
-        messages.bulkIndex(messageList, true);
+        // getSize() is derived from the message content, so we pin it here as a fixture for the
+        // output-traffic assertions below.
+        assertThat(listOfMessages).allMatch(m -> m.getSize() == 48);
+
+        final var listOfImmutableMessages = listOfMessages.stream()
+                .map(ImmutableMessage::wrap).toList();
+
+        final var listOfMessagesWithIndex = listOfImmutableMessages.stream()
+                .map(m -> new MessageWithIndex(m, ""))
+                .toList();
+
+        when(messagesAdapter.bulkIndex(any()))
+                .thenReturn(IndexingResults.create(createSuccessFromMessages(listOfMessagesWithIndex), List.of()));
+
+        messages.bulkIndex(listOfMessagesWithIndex, true);
 
         verify(trafficAccounting, never()).addOutputTraffic(anyLong());
-        verify(trafficAccounting, times(1)).addSystemTraffic(82);
+        verify(trafficAccounting, never()).addIndexedInputTraffic(anyLong());
+        verify(trafficAccounting, times(1)).addSystemTraffic(48 * 2);
+    }
+
+    @Test
+    public void bulkIndexingShouldNotAccountMessagesExcludedFromTrafficAccounting() throws IOException {
+        final var accounted1 = accountedMessage(100);
+        final var unaccounted = unaccountedMessage(200);
+        final var accounted2 = accountedMessage(300);
+        final var listOfMessages = List.of(accounted1, unaccounted, accounted2);
+
+        // getSize() is derived from the message content: accounted messages report their real size,
+        // while an unaccounted message reports 0. We pin these as a fixture for the assertions below.
+        assertThat(accounted1.getSize()).isEqualTo(48);
+        assertThat(accounted2.getSize()).isEqualTo(48);
+        assertThat(unaccounted.getSize()).isZero();
+
+        final var listOfImmutableMessages = listOfMessages.stream()
+                .map(ImmutableMessage::wrap).toList();
+
+        final var listOfMessagesWithIndex = listOfImmutableMessages.stream()
+                .map(m -> new MessageWithIndex(m, ""))
+                .toList();
+
+        when(messagesAdapter.bulkIndex(any()))
+                .thenReturn(IndexingResults.create(createSuccessFromMessages(listOfMessagesWithIndex), List.of()));
+
+        messages.bulkIndex(listOfMessagesWithIndex);
+
+        // The excluded message must contribute to neither the output nor the input-indexed counter.
+        verify(trafficAccounting, times(1)).addOutputTraffic(48 * 2);
+        verify(trafficAccounting, times(1)).addIndexedInputTraffic(400); // 100 + 300, the excluded 200 is omitted
+        verify(trafficAccounting, never()).addSystemTraffic(anyLong());
     }
 
     @Test
@@ -191,6 +253,58 @@ public class MessagesTest {
         verifyNoInteractions(failureSubmissionService);
     }
 
+    @Test
+    public void bulkIndexRequests_retriesWhenAdapterThrowsExceptionWithIOExceptionCause() throws Exception {
+        // given
+        final DateTime ts = Tools.nowUTC();
+        final Message message1 = message("msg-1", ts);
+
+        final List<IndexingRequest> indexingRequest = ImmutableList.of(IndexingRequest.create("", message1));
+
+        // A generic transient transport failure (e.g. a real connection problem), as any MessagesAdapter might
+        // throw it, unrelated to the more specific IncompleteBulkResponseException case tested below.
+        final ElasticsearchException transientFailure = new ElasticsearchException(
+                "Could not reach the indexer", new SocketTimeoutException("connect timed out"));
+
+        when(messagesAdapter.bulkIndex(indexingRequest))
+                .thenThrow(transientFailure)
+                .thenReturn(IndexingResults.create(List.of(new IndexingSuccess(message1, "index_1")), List.of()));
+
+        // when
+        final IndexingResults indexingResults = messages.bulkIndexRequests(indexingRequest, false);
+
+        // then
+        verify(messagesAdapter, times(2)).bulkIndex(indexingRequest);
+        assertThat(indexingResults.errors()).isEmpty();
+        assertThat(indexingResults.successes()).hasSize(1);
+    }
+
+    @Test
+    public void bulkIndexRequests_retriesWhenAdapterThrowsIncompleteBulkResponseException() throws Exception {
+        // given
+        final DateTime ts = Tools.nowUTC();
+        final Message message1 = message("msg-1", ts);
+
+        final List<IndexingRequest> indexingRequest = ImmutableList.of(IndexingRequest.create("", message1));
+
+        // What MessagesAdapterOS throws when OpenSearch returns an incomplete bulk response (e.g. a
+        // "_shards.failures[]" entry missing its "shard" field) while shards are being reallocated.
+        final IncompleteBulkResponseException transientFailure = new IncompleteBulkResponseException(
+                "Received an incomplete bulk response from OpenSearch", new RuntimeException("missing property"));
+
+        when(messagesAdapter.bulkIndex(indexingRequest))
+                .thenThrow(transientFailure)
+                .thenReturn(IndexingResults.create(List.of(new IndexingSuccess(message1, "index_1")), List.of()));
+
+        // when
+        final IndexingResults indexingResults = messages.bulkIndexRequests(indexingRequest, false);
+
+        // then
+        verify(messagesAdapter, times(2)).bulkIndex(indexingRequest);
+        assertThat(indexingResults.errors()).isEmpty();
+        assertThat(indexingResults.successes()).hasSize(1);
+    }
+
     private List<IndexingSuccess> createSuccessFromMessages(List<MessageWithIndex> messageList) {
         return messageList.stream().map(m -> new IndexingSuccess(m.message(), "index_2")).collect(Collectors.toList());
     }
@@ -203,10 +317,15 @@ public class MessagesTest {
         return mock;
     }
 
-    private Message messageWithSize(long size) {
-        final Message message = mock(Message.class);
-        when(message.getSize()).thenReturn(size);
+    private Message accountedMessage(long inputSize) {
+        final Message message = messageFactory.createMessage("message body", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
+        return message;
+    }
 
+    private Message unaccountedMessage(long inputSize) {
+        final Message message = messageFactory.createUnaccountedMessage("message body", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
         return message;
     }
 }

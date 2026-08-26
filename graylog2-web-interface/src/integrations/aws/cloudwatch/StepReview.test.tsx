@@ -28,7 +28,6 @@ import StepReview from './StepReview';
 import FormDataProvider from '../../contexts/FormDataProvider';
 
 jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
-jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
 

@@ -22,7 +22,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import { getValueFromInput } from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testRegexReplace } from 'api/tools';
 
 type Props = {
   configuration: any;
@@ -55,7 +55,7 @@ class RegexReplaceExtractorConfiguration extends React.Component<Props, { trying
     this.setState({ trying: true });
 
     const { configuration } = this.props;
-    const promise = ToolsStore.testRegexReplace(
+    const promise = testRegexReplace(
       configuration.regex,
       configuration.replacement,
       configuration.replace_all,

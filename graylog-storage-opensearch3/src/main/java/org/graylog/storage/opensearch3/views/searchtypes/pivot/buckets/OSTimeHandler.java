@@ -29,10 +29,12 @@ import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpec
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.opensearch.client.opensearch._types.SortOptions;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.AutoDateHistogramAggregation;
+import org.opensearch.client.opensearch._types.aggregations.BucketSortAggregation;
 import org.opensearch.client.opensearch._types.aggregations.CalendarInterval;
 import org.opensearch.client.opensearch._types.aggregations.DateHistogramAggregation;
 import org.opensearch.client.opensearch._types.aggregations.DateHistogramBucket;
@@ -42,7 +44,10 @@ import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
@@ -90,16 +95,29 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
                 DateHistogramAggregation.Builder aggBuilder = DateHistogramAggregation.builder()
                         .field(timeField)
-                        .order(mapOrders(ordering.orders()))
                         .format(DATE_TIME_FORMAT)
                         .timeZone(timeZone);
+                final HistogramOrder histogramOrder = mapOrders(ordering.orders());
+                if (histogramOrder != null) {
+                    aggBuilder.order(histogramOrder);
+                }
                 setInterval(aggBuilder, dateHistogramInterval);
 
                 DateHistogramAggregation aggregation = aggBuilder.build();
+
+                // HistogramOrder only supports _key and _count ordering. For metric-based
+                // (AGGREGATION type) ordering, we use a bucket_sort pipeline aggregation.
+                final Map<String, Aggregation> allSortingAggs = new LinkedHashMap<>(ordering.sortingAggregations());
+                final List<SortOptions> bucketSortOptions = buildBucketSortOptions(ordering.orders());
+                if (!bucketSortOptions.isEmpty()) {
+                    allSortingAggs.put("bucket_sort_order", Aggregation.of(a ->
+                            a.bucketSort(BucketSortAggregation.of(bs -> bs.sort(bucketSortOptions)))));
+                }
+
                 MutableNamedAggregationBuilder builder = new MutableNamedAggregationBuilder(
                         name,
                         Aggregation.builder().dateHistogram(aggregation)
-                                .aggregations(ordering.sortingAggregations())
+                                .aggregations(allSortingAggs)
                 );
                 if (root == null && leaf == null) {
                     root = builder;
@@ -116,14 +134,28 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
     private HistogramOrder mapOrders(List<BucketOrder> orders) {
         HistogramOrder.Builder builder = HistogramOrder.builder();
-        orders.forEach(order -> {
+        boolean hasOrders = false;
+        for (BucketOrder order : orders) {
             if (order.type() == BucketOrder.Type.KEY) {
                 builder.key(order.order());
+                hasOrders = true;
             } else if (order.type() == BucketOrder.Type.COUNT) {
                 builder.count(order.order());
+                hasOrders = true;
             }
-        });
-        return builder.build();
+            // AGGREGATION type ordering is handled separately via bucket_sort pipeline aggregation,
+            // because HistogramOrder only supports _key and _count.
+        }
+        // Return null when no KEY/COUNT orders to avoid an empty "order": {} which
+        // OpenSearch 3.x rejects with: [date_histogram] failed to parse field [order]
+        return hasOrders ? builder.build() : null;
+    }
+
+    private List<SortOptions> buildBucketSortOptions(List<BucketOrder> orders) {
+        return orders.stream()
+                .filter(order -> order.type() == BucketOrder.Type.AGGREGATION)
+                .map(order -> SortOptions.of(s -> s.field(f -> f.field(order.name()).order(order.order()))))
+                .collect(Collectors.toList());
     }
 
     private boolean isAllMessages(final TimeRange timerange) {

@@ -106,7 +106,7 @@ describe('AggregationWizard/Core Visualizations', () => {
       await selectEvent.chooseOption('Select Interpolation', 'step-after');
       await expectSubmitButtonNotToBeDisabled();
 
-      userEvent.click(await submitButton());
+      await userEvent.click(await submitButton());
 
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith(
@@ -138,7 +138,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await expectSubmitButtonNotToBeDisabled();
 
-      userEvent.click(await submitButton());
+      await userEvent.click(await submitButton());
 
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith(
@@ -170,7 +170,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await expectSubmitButtonNotToBeDisabled();
 
-      userEvent.click(await submitButton());
+      await userEvent.click(await submitButton());
 
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith(
@@ -200,9 +200,9 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await selectEvent.chooseOption('Select visualization type', 'Line Chart');
 
-      userEvent.click(await screen.findByRole('checkbox', { name: /show event annotations/i }));
+      await userEvent.click(await screen.findByRole('checkbox', { name: /show event annotations/i }));
 
-      userEvent.click(await submitButton());
+      await userEvent.click(await submitButton());
 
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith(
@@ -232,11 +232,11 @@ describe('AggregationWizard/Core Visualizations', () => {
       await selectEvent.chooseOption('Select visualization type', 'Heatmap');
 
       const useSmallestAsDefault = await screen.findByRole('checkbox', { name: 'Use smallest as default' });
-      userEvent.click(useSmallestAsDefault);
+      await userEvent.click(useSmallestAsDefault);
 
       await expectSubmitButtonNotToBeDisabled();
 
-      userEvent.click(await submitButton());
+      await userEvent.click(await submitButton());
 
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith(
@@ -266,7 +266,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await expectSubmitButtonNotToBeDisabled();
 
-      userEvent.click(await screen.findByRole('checkbox', { name: 'Trend' }));
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Trend' }));
 
       await expectSubmitButtonToBeDisabled();
 
@@ -274,7 +274,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await expectSubmitButtonNotToBeDisabled();
 
-      userEvent.click(await submitButton());
+      await userEvent.click(await submitButton());
 
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith(
@@ -307,7 +307,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await expectSubmitButtonNotToBeDisabled();
 
-      userEvent.click(await submitButton());
+      await userEvent.click(await submitButton());
 
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith(

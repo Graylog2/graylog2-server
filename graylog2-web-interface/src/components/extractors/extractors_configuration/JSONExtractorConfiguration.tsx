@@ -20,7 +20,7 @@ import { Icon } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 import { getValueFromInput } from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testJSON } from 'api/tools';
 
 type Configuration = {
   flatten: boolean;
@@ -78,7 +78,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
     this.setState({ trying: true });
 
     const { configuration } = this.state;
-    const promise = ToolsStore.testJSON(
+    const promise = testJSON(
       configuration.flatten,
       configuration.list_separator,
       configuration.key_separator,

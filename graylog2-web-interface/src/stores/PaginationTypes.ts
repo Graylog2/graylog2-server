@@ -98,6 +98,8 @@ export type Attribute = {
   related_display_fields?: Array<string>;
   related_display_template?: string;
   sliceable?: boolean;
+  slice_sort_options?: Array<{ value: string; title: string }>;
+  slice_sort_default?: { mode: string; direction: 'asc' | 'desc' };
   permissions?: Array<Permission>;
 };
 

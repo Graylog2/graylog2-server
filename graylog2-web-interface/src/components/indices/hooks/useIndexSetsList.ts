@@ -49,7 +49,7 @@ const useIndexSetsList = (
   isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading, isSuccess } = useQuery({
-    queryKey: ['IndexSetsList', stats],
+    queryKey: ['IndexSetsList', stats, only_open],
 
     queryFn: () =>
       defaultOnError(

@@ -21,7 +21,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ImportExtractors from 'components/extractors/ImportExtractors';
 import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
-import { InputsActions } from 'stores/inputs/InputsStore';
+import { fetchInput } from 'hooks/useInputs';
 import type { Input } from 'components/messageloaders/Types';
 import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
@@ -33,7 +33,7 @@ const ImportExtractorsPage = ({ params }: Props) => {
   const [input, setInput] = useState<Input>();
 
   useEffect(() => {
-    InputsActions.get(params.inputId).then((_input) => setInput(_input));
+    fetchInput(params.inputId).then((_input) => setInput(_input));
   }, [params.inputId]);
 
   const _isLoading = !input;

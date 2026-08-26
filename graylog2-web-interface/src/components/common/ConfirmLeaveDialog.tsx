@@ -47,6 +47,7 @@ const ConfirmLeaveDialog = ({ question = 'Are you sure?', ignoredRoutes = [] }: 
         return null;
       }
 
+      // eslint-disable-next-line no-param-reassign
       e.returnValue = question;
 
       return question;

@@ -37,7 +37,7 @@ import static org.graylog2.indexer.Constants.USE_OPENSEARCH3_CLIENT_FEATURE;
 public class OpenSearch3Plugin implements Plugin {
     public static final Set<SearchVersion> SUPPORTED_OS_VERSIONS = ImmutableSet.of(
 
-            //TODO:opensearch1 is currently served by elasticsearch7 storage module.
+            //opensearch1 is currently served by elasticsearch7 storage module.
             //SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.of(1, 0, 0)),
             SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.of(2, 0, 0)),
             SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.of(3, 0, 0)),

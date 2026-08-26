@@ -142,6 +142,58 @@ class DateTimeConverterTest {
     }
 
     @Test
+    void convertFromESDateStringWithoutMillis() {
+        //ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
+        final String input = "2026-05-18 08:57:55";
+
+        final DateTime output = DateTimeConverter.convertToDateTime(input);
+        final DateTime expectedOutput = new DateTime(2026, 5, 18, 8, 57, 55, DateTimeZone.UTC);
+        assertThat(output).isEqualTo(expectedOutput);
+    }
+
+    @Test
+    void convertFromIsoStringWithOffset() {
+        // yyyy-MM-dd'T'HH:mm:ssZZ - +0200 means the instant is 06:57:55 UTC
+        final String input = "2026-05-18T08:57:55+0200";
+
+        final DateTime output = DateTimeConverter.convertToDateTime(input);
+        final DateTime expectedOutput = new DateTime(2026, 5, 18, 6, 57, 55, DateTimeZone.UTC);
+        assertThat(output).isEqualTo(expectedOutput);
+    }
+
+    @Test
+    void convertFromIsoStringInUtcWithMillis() {
+        // yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+        final String input = "2026-05-18T08:57:55.123Z";
+
+        final DateTime output = DateTimeConverter.convertToDateTime(input);
+        final DateTime expectedOutput = new DateTime(2026, 5, 18, 8, 57, 55, 123, DateTimeZone.UTC);
+        assertThat(output).isEqualTo(expectedOutput);
+    }
+
+    @Test
+    void convertFromIsoStringWithoutOffsetIsRejected() {
+        // A value without zone/offset is ambiguous and must be rejected.
+        assertThatThrownBy(() -> DateTimeConverter.convertToDateTime("2026-05-18T08:57:55"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void convertFromIsoStringWithMillisWithoutOffsetIsRejected() {
+        // The millis variant routes through a different formatter than the no-ms case above, but a value
+        // without zone/offset is equally ambiguous and must be rejected.
+        assertThatThrownBy(() -> DateTimeConverter.convertToDateTime("2026-05-18T08:57:55.123"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void convertFromUnsupportedStringFormat() {
+        assertThatThrownBy(() -> DateTimeConverter.convertToDateTime("not-a-timestamp"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Unsupported timestamp string format");
+    }
+
+    @Test
     void convertFromInvalidType() {
         assertThatThrownBy(() -> DateTimeConverter.convertToDateTime(1234))
                 .isInstanceOf(IllegalArgumentException.class)

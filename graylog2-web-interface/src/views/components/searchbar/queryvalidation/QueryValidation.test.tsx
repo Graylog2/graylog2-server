@@ -38,7 +38,7 @@ describe('QueryValidation', () => {
 
   const openExplanation = async () => {
     const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
-    userEvent.click(validationExplanationTrigger);
+    await userEvent.click(validationExplanationTrigger);
   };
 
   const SUT = ({ error = undefined, warning = undefined, validationExplanations = undefined }: SUTProps) => (

@@ -16,24 +16,17 @@
  */
 
 import * as React from 'react';
-import { useEffect } from 'react';
 
-import { useStore } from 'stores/connect';
-import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
 import { TrafficGraphWithDaySelect } from 'components/common/Graph';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
 
+import useClusterTraffic from './hooks/useClusterTraffic';
+
 const ClusterTrafficGraph = () => {
-  const { traffic } = useStore(ClusterTrafficStore);
   const { graphDays } = useGraphDays();
+  const { traffic } = useClusterTraffic(graphDays);
 
-  useEffect(() => {
-    if (graphDays) {
-      ClusterTrafficActions.getTraffic(graphDays);
-    }
-  }, [graphDays]);
-
-  return <TrafficGraphWithDaySelect traffic={traffic?.output} />;
+  return <TrafficGraphWithDaySelect traffic={traffic?.input_indexed} trafficType="input-indexed" />;
 };
 
 export default ClusterTrafficGraph;

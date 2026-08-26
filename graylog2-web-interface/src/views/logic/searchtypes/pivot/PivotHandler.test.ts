@@ -119,6 +119,8 @@ const pivotResult: Result = {
 
 describe('PivotHandler', () => {
   it('has type information matching actual result', () => {
-    PivotHandler.convert(pivotResult);
+    const result = PivotHandler.convert(pivotResult);
+
+    expect(result).toBeDefined();
   });
 });

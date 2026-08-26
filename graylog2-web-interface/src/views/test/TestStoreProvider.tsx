@@ -19,6 +19,7 @@ import * as React from 'react';
 import { createSearch } from 'fixtures/searches';
 import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import ViewsFieldActionsProvider from 'views/components/ViewsFieldActionsProvider';
 
 const TestStoreProvider = ({
   children = undefined,
@@ -37,7 +38,7 @@ const TestStoreProvider = ({
       initialQuery={initialQuery}
       isNew={isNew}
       executionState={executionState}>
-      {children}
+      <ViewsFieldActionsProvider>{children}</ViewsFieldActionsProvider>
     </ViewsStoreProvider>
   );
 };

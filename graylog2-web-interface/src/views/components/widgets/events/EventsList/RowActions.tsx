@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import { IconButton, ModalSubmit } from 'components/common';
+import { IconButton, LinkContainer, ModalSubmit } from 'components/common';
 import { ButtonToolbar, Modal, Menu, MenuItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import Routes from 'routing/Routes';
@@ -63,9 +63,9 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
 
   const moreActions = [
     hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`) ? (
-      <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank" key="replay-search">
-        Replay search
-      </MenuItem>
+      <LinkContainer to={Routes.ALERTS.replay_search(eventId)} key="replay-search">
+        <MenuItem>Replay search</MenuItem>
+      </LinkContainer>
     ) : null,
     pluggableActions.length ? pluggableActions : null,
   ].filter(Boolean);
@@ -77,7 +77,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
         {!!moreActions.length && (
           <Menu position="bottom-end">
             <Menu.Target>
-              <IconButton name="more_vert" title="Toggle event actions" />
+              <IconButton name="more_vert" title="Toggle event actions" showTooltip={false} />
             </Menu.Target>
             <Menu.Dropdown>{moreActions}</Menu.Dropdown>
           </Menu>

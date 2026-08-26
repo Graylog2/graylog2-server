@@ -52,7 +52,7 @@ describe('<ContentPackVersions />', () => {
     render(<ContentPackVersions onChange={changeFn} contentPackRevisions={contentPackRevision} />);
 
     const inputs = await screen.findAllByRole('radio');
-    userEvent.click(inputs[0]);
+    await userEvent.click(inputs[0]);
 
     await waitFor(() => {
       expect(changeFn).toHaveBeenCalledWith('1');
@@ -64,10 +64,10 @@ describe('<ContentPackVersions />', () => {
     render(<ContentPackVersions onDeletePack={deleteFn} contentPackRevisions={contentPackRevision} />);
 
     const menuButton = await screen.findAllByRole('button', { name: /actions/i });
-    userEvent.click(menuButton[0]);
+    await userEvent.click(menuButton[0]);
 
     const deleteButton = await screen.findByRole('menuitem', { name: /delete/i });
-    userEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     await waitFor(() => {
       expect(deleteFn).toHaveBeenCalledWith('1', 1);

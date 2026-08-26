@@ -26,11 +26,9 @@ import type ViewState from './ViewState';
 import ViewStateGenerator from './ViewStateGenerator';
 import viewTransformer from './ViewTransformer';
 
-const mockList = jest.fn(() => Promise.resolve([]));
-
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsActions: {
-    list: () => mockList(),
+jest.mock('@graylog/server-api', () => ({
+  SearchDecorators: {
+    get: jest.fn(() => Promise.resolve([])),
   },
 }));
 

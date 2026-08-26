@@ -17,7 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Title, Space, Tabs } from 'preflight/components/common';
+import Tabs from 'components/bootstrap/Tabs';
+import { Title, Space } from 'preflight/components/common';
 
 import CACreateForm from './CACreateForm';
 import CAUpload from './CAUpload';

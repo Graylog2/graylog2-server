@@ -16,19 +16,16 @@
  */
 import memoize from 'lodash/memoize';
 
+import * as JSON from 'util/json';
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
-import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+import { reportError as reportServerError, reportSuccess as reportServerSuccess } from 'api/server-availability';
 import type { Method } from 'routing/types';
 
 // eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
 const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
-
-const reportServerSuccess = () => {
-  ServerAvailabilityActions.reportSuccess();
-};
 
 const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(createFromFetchError(error));
 
@@ -52,7 +49,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   }
 
   if (error && !error.status) {
-    ServerAvailabilityActions.reportError(fetchError);
+    reportServerError(fetchError);
   }
 
   throw fetchError;
@@ -73,7 +70,7 @@ const defaultResponseHandler = (resp: Response) => {
 
     reportServerSuccess();
 
-    return noContent ? null : resp.json();
+    return noContent ? null : resp.text().then(JSON.parse);
   }
 
   throw resp;
@@ -117,10 +114,19 @@ export class Builder {
     this.errorHandler = undefined;
   }
 
-  setHeader(header, value) {
+  setHeader(header: string, value: string | number | boolean | string[]) {
     this.options = {
       ...this.options,
       [header]: value,
+    };
+
+    return this;
+  }
+
+  setHeaders(headers: { [key: string]: string | number | boolean | string[] }) {
+    this.options = {
+      ...this.options,
+      ...headers,
     };
 
     return this;
@@ -137,7 +143,7 @@ export class Builder {
     return this;
   }
 
-  formData(body, acceptedMimeType = 'application/json') {
+  formData(body: any, acceptedMimeType = 'application/json') {
     this.body = { body };
 
     this.accept = acceptedMimeType;
@@ -148,7 +154,7 @@ export class Builder {
     return this;
   }
 
-  file(body, mimeType) {
+  file(body: any, mimeType: string) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
@@ -167,7 +173,7 @@ export class Builder {
     return this;
   }
 
-  blobFile(body, mimeType) {
+  blobFile(body: any, mimeType: string) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
@@ -186,7 +192,7 @@ export class Builder {
     return this;
   }
 
-  plaintext(body) {
+  plaintext(body: any) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
 
@@ -197,7 +203,7 @@ export class Builder {
     return this;
   }
 
-  streamingplaintext(body) {
+  streamingplaintext(body: any) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'text/plain';
 
@@ -302,13 +308,13 @@ export function fetchPeriodically<T = unknown>(method: Method, url: string, body
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchFile(method, url, body, mimeType = 'text/csv') {
+export function fetchFile(method: Method, url: string, body?: any, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url).file(body, mimeType).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchBlobFile(method, url, body, mimeType = 'text/csv') {
+export function fetchBlobFile(method: Method, url: string, body?: any, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url).blobFile(body, mimeType).build();
 
   return queuePromiseIfNotLoggedin(promise)();

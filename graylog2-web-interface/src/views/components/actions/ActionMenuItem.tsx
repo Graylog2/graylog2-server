@@ -19,23 +19,22 @@ import { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 import upperCase from 'lodash/upperCase';
 
-import type { ActionContexts } from 'views/types';
 import Icon from 'components/common/Icon';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type {
-  ActionDefinition,
   ActionHandlerArguments,
   ExternalLinkAction,
   HandlerAction,
   SetActionComponents,
   ActionComponents,
+  ActionDefinition,
 } from 'views/components/actions/ActionHandler';
 import { createHandlerFor, isExternalLinkAction } from 'views/components/actions/ActionHandler';
 import HoverForHelp from 'components/common/HoverForHelp';
-import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 const StyledMenuItem: typeof MenuItem = styled(MenuItem)`
   && > a {
@@ -86,7 +85,7 @@ const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition; handle
 };
 
 type ExternalLinkItemProps = Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'type'> & {
-  action: ExternalLinkAction<ActionContexts>;
+  action: ExternalLinkAction;
   disabled: boolean;
   field: string;
 };
@@ -122,7 +121,7 @@ type ActionHandlerItemProps = Pick<
   Props,
   'handlerArgs' | 'onMenuToggle' | 'overflowingComponents' | 'setOverflowingComponents' | 'type'
 > & {
-  action: HandlerAction<ActionContexts>;
+  action: HandlerAction;
   disabled: boolean;
   field: string;
 };
@@ -137,7 +136,7 @@ const ActionHandlerItem = ({
   onMenuToggle,
 }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
-  const dispatch = useViewsDispatch();
+  const { executeThunkAction } = useFieldActions();
   const sendTelemetry = useSendTelemetry();
 
   const setActionComponents: SetActionComponents = useCallback(
@@ -148,8 +147,8 @@ const ActionHandlerItem = ({
   );
 
   const handler = useMemo(
-    () => createHandlerFor(dispatch, action, setActionComponents),
-    [action, dispatch, setActionComponents],
+    () => createHandlerFor(executeThunkAction, action, setActionComponents),
+    [action, executeThunkAction, setActionComponents],
   );
 
   const onSelect = useCallback(() => {
@@ -187,8 +186,9 @@ const ActionMenuItem = ({
   onMenuToggle,
 }: Props) => {
   const { isEnabled = () => true } = action;
-  const dispatch = useViewsDispatch();
-  const actionDisabled = dispatch((_dispatch, getState) => !isEnabled(handlerArgs, getState));
+  const { evaluateCondition } = useFieldActions();
+  const actionEnabled = evaluateCondition(isEnabled, handlerArgs, true);
+  const actionDisabled = !actionEnabled;
   const { field } = handlerArgs;
 
   if (isExternalLinkAction(action)) {

@@ -29,7 +29,6 @@ import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.metrics.SlidingWindowCounter;
-import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,12 +83,11 @@ public class InputLauncher {
 
         final IOState<MessageInput> inputState;
         if (inputRegistry.getInputState(input.getId()) == null) {
-            if (featureFlags.isOn("SETUP_MODE") && input.getDesiredState() == IOState.Type.SETUP) {
-                inputState = inputStateFactory.create(input, IOState.Type.SETUP);
-            } else {
-                inputState = inputStateFactory.create(input);
-            }
+            inputState = inputStateFactory.create(input);
             inputRegistry.add(inputState);
+            if (featureFlags.isOn("SETUP_MODE") && input.getDesiredState() == IOState.Type.SETUP) {
+                inputState.setState(IOState.Type.SETUP);
+            }
         } else {
             inputState = inputRegistry.getInputState(input.getId());
             switch (inputState.getState()) {
@@ -128,11 +126,10 @@ public class InputLauncher {
     protected void handleLaunchException(Throwable e, IOState<MessageInput> inputState) {
         final MessageInput input = inputState.getStoppable();
         failedStartsCounter(input).inc();
-        StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier() + " misfired. Reason: ");
 
-        String causeMsg = ExceptionUtils.getRootCauseMessage(e);
-        msg.append(causeMsg);
-        LOG.error(msg.toString(), e);
+        final String causeMsg = InputStartupErrors.describeFailure(input, e);
+        LOG.error("The [{}] input {} misfired. Reason: {}", input.getClass().getCanonicalName(),
+                input.toIdentifier(), causeMsg, e);
         inputState.setState(IOState.Type.FAILED, causeMsg);
     }
 

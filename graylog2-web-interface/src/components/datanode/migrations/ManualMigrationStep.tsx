@@ -34,10 +34,10 @@ const ManualMigrationStep = () => {
   const sendTelemetry = useSendTelemetry();
   const inPlaceMigrationAction: MigrationActions = 'SELECT_ROLLING_UPGRADE_MIGRATION';
 
-  const onMigrationStepChange = async (step: MigrationActions, args?: StepArgs = {}) =>
+  const onMigrationStepChange = async (step: MigrationActions, args: StepArgs = {}) =>
     onTriggerNextState({ step, args });
 
-  const handleSelectMigrationType = async (step: MigrationActions, args?: StepArgs = {}) => {
+  const handleSelectMigrationType = async (step: MigrationActions, args: StepArgs = {}) => {
     if (step === inPlaceMigrationAction) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.MIGRATION_TYPE_SELECTED, {
         app_pathname: 'datanode',

@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { AbsoluteTimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
+
 export type RangeClassified = {
   value: number;
   unit: 'minutes' | 'seconds' | 'hours' | 'days';
@@ -26,3 +28,17 @@ export type RelativeTimeRangeClassified = {
   from: RangeClassified;
   to: RangeClassified;
 };
+
+export type SupportedTimeRangeType = 'relative' | 'absolute' | 'keyword';
+
+export type TimeRangePickerFormValues = {
+  timeRangeTabs: {
+    relative?: RelativeTimeRangeClassified | undefined;
+    absolute?: AbsoluteTimeRange | undefined;
+    keyword?: KeywordTimeRange | undefined;
+  };
+  activeTab: SupportedTimeRangeType | undefined;
+};
+
+export type TimeRangePickerTimeRange =
+  TimeRangePickerFormValues['timeRangeTabs'][keyof TimeRangePickerFormValues['timeRangeTabs']];

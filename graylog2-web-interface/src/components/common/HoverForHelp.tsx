@@ -71,7 +71,8 @@ type Props = {
   placement?: 'top' | 'right' | 'bottom' | 'left';
   iconSize?: SizeProp;
   pullRight?: boolean;
-  title?: string;
+  triggerTitle?: string;
+  title?: React.ComponentProps<typeof OverlayTrigger>['title'];
   testId?: string;
   trigger?: React.ComponentProps<typeof OverlayTrigger>['trigger'];
   type?: 'info' | 'error';
@@ -85,6 +86,7 @@ const HoverForHelp = ({
   id = 'help-popover',
   pullRight = true,
   placement = 'bottom',
+  triggerTitle = undefined,
   testId = undefined,
   type = 'info',
   iconSize = undefined,
@@ -94,6 +96,7 @@ const HoverForHelp = ({
     trigger={trigger}
     placement={placement}
     overlay={<StyledPopover id={id}>{children}</StyledPopover>}
+    triggerTitle={triggerTitle}
     title={title}
     testId={testId}>
     <StyledIcon

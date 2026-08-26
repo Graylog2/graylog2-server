@@ -20,10 +20,9 @@ import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Table, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
-import { SearchForm, Icon, ModalSubmit } from 'components/common';
+import { SearchForm, Icon, ModalSubmit, Link } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
-import { Link } from 'components/common/router';
 import Alert from 'components/bootstrap/Alert';
 
 import type { Collector, Configuration, SidecarSummary } from '../types';
@@ -260,7 +259,7 @@ const CollectorConfigurationModal = ({
           </InfoContainer>
         )}
         <ConfigurationContainer>
-          <ConfigurationTable className="table-condensed table-hover">
+          <ConfigurationTable condensed>
             <tbody>
               {rows.length === 0 ? (
                 <TableRow>

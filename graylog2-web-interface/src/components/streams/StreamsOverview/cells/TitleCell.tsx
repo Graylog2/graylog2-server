@@ -15,28 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
-import type { Stream } from 'stores/streams/StreamsStore';
+import { Link } from 'components/common';
+import type { Stream } from 'logic/streams/types';
 import { Label } from 'components/bootstrap';
-import { Text } from 'components/common';
 
 type Props = {
   stream: Stream;
 };
 const DefaultLabel = styled(Label)`
-  display: inline-flex;
   margin-left: 5px;
   vertical-align: inherit;
 `;
-
-const StyledText = styled(Text)(
-  ({ theme }) => css`
-    color: ${theme.colors.text.secondary};
-  `,
-);
 
 const TitleCell = ({ stream }: Props) => (
   <>
@@ -46,7 +38,6 @@ const TitleCell = ({ stream }: Props) => (
         Default
       </DefaultLabel>
     )}
-    <StyledText>{stream.description}</StyledText>
   </>
 );
 

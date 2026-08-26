@@ -78,10 +78,10 @@ describe('<ContentPackApplyParameter />', () => {
     );
 
     const selectConfigKey = await screen.findByLabelText('Config Key');
-    userEvent.selectOptions(selectConfigKey, 'configuration.port');
+    await userEvent.selectOptions(selectConfigKey, 'configuration.port');
 
     const selectParameter = await screen.findByLabelText('Parameter');
-    userEvent.selectOptions(selectParameter, 'Port (PORT)');
+    await userEvent.selectOptions(selectParameter, 'Port (PORT)');
 
     const submitButton = await screen.findByRole('button', { name: 'Apply' });
 
@@ -89,7 +89,7 @@ describe('<ContentPackApplyParameter />', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(applyFn).toHaveBeenCalledWith('configuration.port', 'PORT');

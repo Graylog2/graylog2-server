@@ -1,0 +1,5 @@
+type = "f"
+message = "Correcting permission to replay search for alerts."
+
+issues = ["25369"]
+pulls = ["25406"]

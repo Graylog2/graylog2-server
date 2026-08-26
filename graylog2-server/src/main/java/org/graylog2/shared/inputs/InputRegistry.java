@@ -18,68 +18,40 @@ package org.graylog2.shared.inputs;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.IOState;
-import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 @Singleton
 public class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
 
-    private final InputStateCache cache = new InputStateCache();
+    private final ConcurrentMap<String, IOState<MessageInput>> inputStates = new ConcurrentHashMap<>();
 
     @Inject
-    public InputRegistry(EventBus eventBus) {
-        eventBus.register(this);
-    }
-
-    @Subscribe
-    public void onIOStateChanged(IOStateChangedEvent<MessageInput> event) {
-        final IOState<MessageInput> changedState = event.changedState();
-        final String inputId = changedState.getStoppable().getId();
-
-        if (!cache.contains(inputId)) {
-            return;
-        }
-
-        cache.updateState(inputId, event.oldState(), event.newState());
-    }
-
-    public Map<String, String> getStatusesByInputId() {
-        return cache.getStatusesByInputId();
-    }
-
-    public Set<String> getInputIdsByState(IOState.Type state) {
-        return cache.getIdsByState(state);
+    public InputRegistry() {
     }
 
     public Set<IOState<MessageInput>> getInputStates() {
-        return ImmutableSet.copyOf(cache.getAll());
+        return ImmutableSet.copyOf(inputStates.values());
     }
 
     public IOState<MessageInput> getInputState(String inputId) {
-        return cache.get(inputId);
+        return inputStates.get(inputId);
     }
 
     public Set<IOState<MessageInput>> getRunningInputs() {
-        Set<String> runningIds = cache.getIdsByState(IOState.Type.RUNNING);
         ImmutableSet.Builder<IOState<MessageInput>> builder = ImmutableSet.builder();
-        for (String id : runningIds) {
-            IOState<MessageInput> state = cache.get(id);
-            if (state != null) {
+        for (IOState<MessageInput> state : inputStates.values()) {
+            if (state.getState() == IOState.Type.RUNNING) {
                 builder.add(state);
             }
         }
@@ -87,7 +59,7 @@ public class InputRegistry {
     }
 
     public boolean hasTypeRunning(Class klazz) {
-        for (IOState<MessageInput> inputState : cache.getAll()) {
+        for (IOState<MessageInput> inputState : inputStates.values()) {
             if (inputState.getStoppable().getClass().equals(klazz)) {
                 return true;
             }
@@ -96,7 +68,13 @@ public class InputRegistry {
     }
 
     public int runningCount() {
-        return cache.getIdsByState(IOState.Type.RUNNING).size();
+        int count = 0;
+        for (IOState<MessageInput> state : inputStates.values()) {
+            if (state.getState() == IOState.Type.RUNNING) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public boolean remove(MessageInput input) {
@@ -104,7 +82,7 @@ public class InputRegistry {
         input.terminate();
         if (inputState != null) {
             inputState.setState(IOState.Type.TERMINATED);
-            cache.remove(input.getId());
+            inputStates.remove(input.getId());
         }
         return inputState != null;
     }
@@ -115,7 +93,7 @@ public class InputRegistry {
     }
 
     public IOState<MessageInput> stop(MessageInput input) {
-        IOState<MessageInput> inputState = cache.get(input.getId());
+        IOState<MessageInput> inputState = inputStates.get(input.getId());
 
         if (inputState != null) {
             inputState.setState(IOState.Type.STOPPING);
@@ -137,73 +115,12 @@ public class InputRegistry {
     }
 
     public boolean add(IOState<MessageInput> messageInputIOState) {
-        return cache.add(messageInputIOState);
+        final String inputId = messageInputIOState.getStoppable().getId();
+        return inputStates.putIfAbsent(inputId, messageInputIOState) == null;
     }
 
     public Stream<IOState<MessageInput>> stream() {
-        return cache.getAll().stream();
+        return inputStates.values().stream();
     }
 
-    class InputStateCache {
-        private final ConcurrentHashMap<String, IOState<MessageInput>> byId = new ConcurrentHashMap<>();
-        private final ConcurrentHashMap<IOState.Type, Set<String>> byState = new ConcurrentHashMap<>();
-
-        private IOState<MessageInput> get(String inputId) {
-            return byId.get(inputId);
-        }
-
-        boolean contains(String inputId) {
-            return byId.containsKey(inputId);
-        }
-
-        private Set<String> getIdsByState(IOState.Type state) {
-            final Set<String> ids = byState.get(state);
-            return ids != null ? Set.copyOf(ids) : Set.of();
-        }
-
-        private Collection<IOState<MessageInput>> getAll() {
-            return byId.values();
-        }
-
-        private boolean add(IOState<MessageInput> ioState) {
-            final String inputId = ioState.getStoppable().getId();
-            final IOState<MessageInput> previous = byId.putIfAbsent(inputId, ioState);
-            if (previous != null) {
-                return false;
-            }
-            byState.computeIfAbsent(ioState.getState(), k -> ConcurrentHashMap.newKeySet())
-                    .add(inputId);
-            return true;
-        }
-
-        private IOState<MessageInput> remove(String inputId) {
-            final IOState<MessageInput> removed = byId.remove(inputId);
-            if (removed != null) {
-                for (Set<String> ids : byState.values()) {
-                    ids.remove(inputId);
-                }
-            }
-            return removed;
-        }
-
-        private void updateState(String inputId, IOState.Type oldState, IOState.Type newState) {
-            final Set<String> oldSet = byState.get(oldState);
-            if (oldSet != null) {
-                oldSet.remove(inputId);
-            }
-            byState.computeIfAbsent(newState, k -> ConcurrentHashMap.newKeySet())
-                    .add(inputId);
-        }
-
-        private Map<String, String> getStatusesByInputId() {
-            final Map<String, String> result = new HashMap<>();
-            for (Map.Entry<IOState.Type, Set<String>> entry : byState.entrySet()) {
-                final String stateStr = entry.getKey().toString();
-                for (String inputId : entry.getValue()) {
-                    result.put(inputId, stateStr);
-                }
-            }
-            return result;
-        }
-    }
 }

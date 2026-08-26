@@ -17,6 +17,7 @@
 package org.graylog.plugins.beats;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.Resources;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -100,6 +101,95 @@ public class Beats2CodecTest {
         assertThat(message.getField("filebeat_" + Message.FIELD_GL2_SOURCE_COLLECTOR)).isNull();
         @SuppressWarnings("unchecked") final List<String> tags = (List<String>) message.getField("filebeat_tags");
         assertThat(tags).containsOnly("foobar", "test");
+    }
+
+    @Test
+    public void decodeMessagesFallsBackToAgentTypeWhenMetadataMissing() throws Exception {
+        // Simulates Beat -> Logstash -> Kafka scenario where @metadata is stripped
+        final ObjectNode event = objectMapper.createObjectNode();
+        event.put("@timestamp", "2025-04-01T19:04:19.678Z");
+        event.put("message", "Tue Apr  1 03:04:18 PM EDT 2025");
+        event.put("source", "tst-logstash");
+        event.put("input_type", "filestream");
+        event.put("gl2_source_collector", "4aebb921-aa6f-4352-bfe5-0cdb78a428e6");
+
+        final ObjectNode agent = event.putObject("agent");
+        agent.put("type", "filebeat");
+        agent.put("name", "tst-logstash");
+        agent.put("id", "fb05301d-99f8-45f8-9019-994dbfa6f8a7");
+
+        final ObjectNode host = event.putObject("host");
+        host.put("name", "tst-logstash");
+
+        final ObjectNode log = event.putObject("log");
+        log.put("offset", 475);
+        final ObjectNode logFile = log.putObject("file");
+        logFile.put("path", "/home/drew/tmp.txt");
+
+        event.putArray("tags").add("beats_input_codec_plain_applied");
+
+        final Message message = codec.decodeSafe(new RawMessage(objectMapper.writeValueAsBytes(event))).get();
+        assertThat(message).isNotNull();
+        assertThat(message.getMessage()).isEqualTo("Tue Apr  1 03:04:18 PM EDT 2025");
+        assertThat(message.getSource()).isEqualTo("tst-logstash");
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2025, 4, 1, 19, 4, 19, 678, DateTimeZone.UTC));
+        assertThat(message.getField("beats_type")).isEqualTo("filebeat");
+        assertThat(message.getField("filebeat_source")).isEqualTo("tst-logstash");
+        assertThat(message.getField("filebeat_agent_type")).isEqualTo("filebeat");
+        assertThat(message.getField("filebeat_agent_name")).isEqualTo("tst-logstash");
+        assertThat(message.getField("filebeat_agent_id")).isEqualTo("fb05301d-99f8-45f8-9019-994dbfa6f8a7");
+        assertThat(message.getField("filebeat_host_name")).isEqualTo("tst-logstash");
+        assertThat(message.getField("filebeat_input_type")).isEqualTo("filestream");
+        assertThat(message.getField("filebeat_log_offset")).isEqualTo(475);
+        assertThat(message.getField("filebeat_log_file_path")).isEqualTo("/home/drew/tmp.txt");
+        @SuppressWarnings("unchecked") final List<String> tags = (List<String>) message.getField("filebeat_tags");
+        assertThat(tags).containsExactly("beats_input_codec_plain_applied");
+        assertThat(message.getField(Message.FIELD_GL2_SOURCE_COLLECTOR)).isEqualTo("4aebb921-aa6f-4352-bfe5-0cdb78a428e6");
+        // Verify that beat_ prefix is NOT used
+        assertThat(message.getField("beat_agent_type")).isNull();
+        assertThat(message.getField("beat_log_file_path")).isNull();
+        assertThat(message.getField("beat_tags")).isNull();
+    }
+
+    @Test
+    public void decodeMessagesFallsBackToBeatTypeForOlderBeats() throws Exception {
+        // Simulates older Beats < 7.0 without agent field
+        final ObjectNode event = objectMapper.createObjectNode();
+        event.put("@timestamp", "2016-04-01T00:00:00.000Z");
+        event.put("message", "Test message");
+
+        final ObjectNode beat = event.putObject("beat");
+        beat.put("type", "topbeat");
+        beat.put("hostname", "example.local");
+
+        event.put("foo", "bar");
+
+        final Message message = codec.decodeSafe(new RawMessage(objectMapper.writeValueAsBytes(event))).get();
+        assertThat(message).isNotNull();
+        assertThat(message.getMessage()).isEqualTo("Test message");
+        assertThat(message.getSource()).isEqualTo("example.local");
+        assertThat(message.getField("beats_type")).isEqualTo("topbeat");
+        assertThat(message.getField("topbeat_beat_type")).isEqualTo("topbeat");
+        assertThat(message.getField("topbeat_foo")).isEqualTo("bar");
+    }
+
+    @Test
+    public void decodeMessagesDefaultsToBeatWhenNoTypeInformation() throws Exception {
+        // Edge case: no metadata, no agent.type, no beat.type
+        final ObjectNode event = objectMapper.createObjectNode();
+        event.put("@timestamp", "2016-04-01T00:00:00.000Z");
+        event.put("message", "Test message");
+        event.put("foo", "bar");
+
+        final ObjectNode agent = event.putObject("agent");
+        agent.put("hostname", "example.local");
+        // No type field
+
+        final Message message = codec.decodeSafe(new RawMessage(objectMapper.writeValueAsBytes(event))).get();
+        assertThat(message).isNotNull();
+        assertThat(message.getMessage()).isEqualTo("Test message");
+        assertThat(message.getField("beats_type")).isEqualTo("beat");
+        assertThat(message.getField("beat_foo")).isEqualTo("bar");
     }
 
     @Test

@@ -14,25 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import max from 'lodash/max';
-
 import ContentPack from 'logic/content-packs/ContentPack';
 
 export default class ContentPackRevisions {
-  private _value = {};
+  private _value: { [revision: number]: ContentPack } = {};
 
-  constructor(contentPackRevision) {
-    this._value = Object.keys(contentPackRevision).reduce((acc, rev) => {
-      const contentPack = contentPackRevision[rev];
-
-      acc[parseInt(rev, 10)] = ContentPack.fromJSON(contentPack);
-
-      return acc;
-    }, {});
+  constructor(contentPackRevision: { [revision: string]: any }) {
+    this._value = Object.fromEntries(
+      Object.keys(contentPackRevision).map((rev) => [
+        parseInt(rev, 10),
+        ContentPack.fromJSON(contentPackRevision[rev]),
+      ]),
+    );
   }
 
   get latestRevision() {
-    return max(this.revisions);
+    return this.revisions.length > 0 ? Math.max(...this.revisions) : undefined;
   }
 
   get revisions() {
@@ -47,14 +44,14 @@ export default class ContentPackRevisions {
     return Object.values(this._value);
   }
 
-  createNewVersionFromRev(rev) {
+  createNewVersionFromRev(rev: string) {
     return this.contentPack(parseInt(rev, 10))
       .toBuilder()
       .rev(this.latestRevision + 1)
       .build();
   }
 
-  contentPack(revision) {
+  contentPack(revision: number) {
     return this._value[revision];
   }
 }

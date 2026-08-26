@@ -15,23 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useRef } from 'react';
+import { useCallback, useContext, useMemo, useRef } from 'react';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
 
 import useView from 'views/hooks/useView';
-import { useStore } from 'stores/connect';
+import StreamsContext from 'contexts/StreamsContext';
 import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
-import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import ViewsRefreshControls from 'views/components/searchbar/ViewsRefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
-import { StreamsStore } from 'views/stores/StreamsStore';
 import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
@@ -42,6 +40,7 @@ import {
   newFiltersForQuery,
 } from 'views/logic/queries/Query';
 import type { SearchBarFormValues } from 'views/Constants';
+import { QUERY_TIME_RANGE_LIMIT_ERROR_TYPE } from 'views/Constants';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
@@ -73,10 +72,12 @@ import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
-import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
+import StreamsFilter from 'views/components/searchbar/StreamsFilter';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -99,7 +100,7 @@ const defaultOnSubmit = async (
   currentQuery: Query,
   restartAutoRefresh: () => void,
 ) => {
-  const { timerange, streams, streamCategories, queryString } = values;
+  const { timerange, streamsAndCategories, queryString } = values;
   restartAutoRefresh();
   const queryWithPluginData = await executePluggableSubmitHandler(
     dispatch,
@@ -111,7 +112,7 @@ const defaultOnSubmit = async (
   const newQuery = queryWithPluginData
     .toBuilder()
     .timerange(timerange)
-    .filter(newFiltersForQuery(streams, streamCategories))
+    .filter(newFiltersForQuery(streamsAndCategories?.streams, streamsAndCategories?.categories))
     .query(createElasticsearchQueryString(queryString))
     .build();
 
@@ -140,8 +141,12 @@ const useInitialFormValues = ({
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
   const streamCategories = filtersToStreamCategorySet(queryFilters.get(id, Immutable.Map())).toJS();
+  const streamsAndCategories: StreamsAndCategoriesSelection = {
+    streams: streams,
+    categories: streamCategories,
+  };
 
-  return { timerange, streams, queryString, streamCategories, ...initialValuesFromPlugins };
+  return { timerange, streamsAndCategories, queryString, ...initialValuesFromPlugins };
 };
 
 const _validateQueryString = (
@@ -152,8 +157,8 @@ const _validateQueryString = (
 ) => {
   const request = {
     timeRange: values?.timerange,
-    streams: values?.streams,
-    streamCategories: values?.streamCategories,
+    streams: values?.streamsAndCategories?.streams,
+    streamCategories: values?.streamsAndCategories?.categories,
     queryString: values?.queryString,
     ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
@@ -175,23 +180,28 @@ type Props = {
 const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props) => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
-  const availableStreams = useStore(StreamsStore, ({ streams }) =>
-    streams.map((stream) => ({
-      key: stream.title,
-      value: stream.id,
-    })),
+  const streams = useContext(StreamsContext);
+  const availableStreams = useMemo(
+    () =>
+      (streams ?? []).map((stream) => ({
+        key: stream.title,
+        value: stream.id,
+      })),
+    [streams],
   );
-  const availableStreamCategories = useStore(StreamsStore, ({ streams }) =>
-    streams
-      .flatMap((stream) => {
-        if (stream.categories) {
-          return stream.categories.map((s) => ({ key: s, value: s }));
-        }
+  const availableStreamCategories = useMemo(
+    () =>
+      (streams ?? [])
+        .flatMap((stream) => {
+          if (stream.categories) {
+            return stream.categories.map((s) => ({ key: s, value: s }));
+          }
 
-        return [];
-      })
-      .filter((element, index, self) => index === self.findIndex((e) => e.value === element.value))
-      .sort((a, b) => defaultCompare(a.value, b.value)),
+          return [];
+        })
+        .filter((element, index, self) => index === self.findIndex((e) => e.value === element.value))
+        .sort((a, b) => defaultCompare(a.value, b.value)),
+    [streams],
   );
   const { config } = useSearchConfiguration();
   const { userTimezone } = useUserDateTime();
@@ -211,6 +221,8 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
   const handlerContext = useHandlerContext();
   const isLoadingExecution = useIsLoading();
 
+  const searchResultTimeRangeErrorCheck = useSearchResultTimeRangeErrorCheck(QUERY_TIME_RANGE_LIMIT_ERROR_TYPE);
+
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -222,11 +234,6 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <FormWarningsProvider>
-          <ScrollToHint
-            scrollContainer={scrollContainer}
-            ifValueChanges={query.query_string}
-            title="Scroll to search bar"
-          />
           <SearchBarForm
             initialValues={initialValues}
             limitDuration={limitDuration}
@@ -245,18 +252,25 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
               setFieldValue,
               validateForm,
             }) => {
-              const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
+              const showTimeRangeErrorFromResults = searchResultTimeRangeErrorCheck(values?.timerange);
+              const disableSearchSubmit =
+                isSubmitting || isValidating || !isValid || isLoadingExecution || showTimeRangeErrorFromResults;
 
               return (
                 <>
                   <ValidateOnParameterChange parameters={parameters} />
+                  <ScrollToHint
+                    scrollContainer={scrollContainer}
+                    ifValueChanges={query.query_string}
+                    title="Scroll to search bar"
+                  />
                   <SearchBarContainer>
                     <TimeRangeRow>
                       <TimeRangeFilter
                         limitDuration={limitDuration}
                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                         value={values?.timerange}
-                        hasErrorOnMount={!!errors.timerange}
+                        hasErrorOnMount={!!errors.timerange || showTimeRangeErrorFromResults}
                         moveRangeProps={{
                           effectiveTimerange: results?.effectiveTimerange,
                           initialTimerange: currentQuery.timerange,
@@ -264,39 +278,23 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                         }}
                       />
                       <StreamsAndRefresh>
-                        <Field name="streams">
+                        <Field name="streamsAndCategories">
                           {({ field: { name, value, onChange } }) => (
                             <StreamsFilter
-                              value={value}
+                              value={{ streams: value?.streams, categories: value?.categories }}
                               streams={availableStreams}
-                              onChange={(newStreams) =>
-                                onChange({
-                                  target: {
-                                    value: newStreams,
-                                    name,
-                                  },
-                                })
-                              }
-                            />
-                          )}
-                        </Field>
-                        <Field name="streamCategories">
-                          {({ field: { name, value, onChange } }) => (
-                            <StreamCategoryFilter
-                              value={value}
                               streamCategories={availableStreamCategories}
-                              onChange={(newCategories) =>
+                              onChange={(selected: StreamsAndCategoriesSelection) => {
                                 onChange({
                                   target: {
-                                    value: newCategories,
+                                    value: selected,
                                     name,
                                   },
-                                })
-                              }
+                                });
+                              }}
                             />
                           )}
                         </Field>
-
                         <ViewsRefreshControls disable={!isValid} />
                       </StreamsAndRefresh>
                     </TimeRangeRow>
@@ -319,7 +317,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                                         ref={editorRef}
                                         view={view}
                                         timeRange={values.timerange}
-                                        streams={values.streams}
+                                        streams={values.streamsAndCategories?.streams}
                                         name={name}
                                         onChange={onChange}
                                         placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'

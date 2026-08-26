@@ -25,7 +25,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import type { TimeRange } from 'views/logic/queries/Query';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testNaturalDate } from 'api/tools';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -59,9 +59,7 @@ const relativeStartTimeForTimeRange = (timeRange: TimeRange) => {
     case 'absolute':
       return moment().diff(timeRange.from, 'seconds');
     case 'keyword':
-      return ToolsStore.testNaturalDate(timeRange.keyword, timeRange.timezone).then(({ from }) =>
-        moment().diff(from, 'seconds'),
-      );
+      return testNaturalDate(timeRange.keyword, timeRange.timezone).then(({ from }) => moment().diff(from, 'seconds'));
     default:
       throw Error("Time range type doesn't not exist");
   }

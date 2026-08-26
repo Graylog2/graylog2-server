@@ -16,12 +16,12 @@
  */
 
 import React, { useCallback, useMemo, useState } from 'react';
+import upperFirst from 'lodash/upperFirst';
 
-import { Table } from 'components/bootstrap';
+import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
-import { NoSearchResult, PaginatedList, RelativeTime, Spinner } from 'components/common';
-import { Link } from 'components/common/router';
-import { StyledLabel } from 'components/welcome/EntityListItem';
+import { NoSearchResult, PaginatedList, RelativeTime, Spinner, Link } from 'components/common';
+import { StyledListGroupItem, TimeInfo } from 'components/welcome/EntityListItem';
 import type { RecentActivityType } from 'components/welcome/types';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 import getTitleForEntityType from 'util/getTitleForEntityType';
@@ -44,7 +44,7 @@ const ActionItem = ({ itemGrn, activityType, itemTitle, userName = null }: Props
 
   return (
     <div>
-      {`The ${entityTypeTitle} `}
+      {`${upperFirst(entityTypeTitle)} `}
       {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
       {' was '}
       {`${activityType}d`}
@@ -89,22 +89,16 @@ const RecentActivityList = () => {
       pageSize={pagination.per_page}
       showPageSizeSelect={false}
       hideFirstAndLastPageLinks>
-      <Table striped>
-        <tbody>
-          {recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => (
-            <tr key={id}>
-              <td style={{ width: 110 }}>
-                <StyledLabel bsStyle="primary">
-                  <RelativeTime dateTime={timestamp} />
-                </StyledLabel>
-              </td>
-              <td>
-                <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <ListGroup>
+        {recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => (
+          <StyledListGroupItem key={id}>
+            <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
+            <TimeInfo>
+              <RelativeTime dateTime={timestamp} />
+            </TimeInfo>
+          </StyledListGroupItem>
+        ))}
+      </ListGroup>
     </PaginatedList>
   );
 };

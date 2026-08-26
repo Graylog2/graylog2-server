@@ -21,6 +21,6 @@ import StreamsContext from 'contexts/StreamsContext';
 const useEditableStreams = () => {
   const _streams = useContext(StreamsContext);
 
-  return useMemo(() => _streams.filter((s) => s.is_editable), [_streams]);
+  return useMemo(() => _streams?.filter((s) => s.is_editable), [_streams]);
 };
 export default useEditableStreams;

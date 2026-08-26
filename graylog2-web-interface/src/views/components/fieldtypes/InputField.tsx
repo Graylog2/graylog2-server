@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import useInputs from 'hooks/useInputs';
+import { useInputs } from 'hooks/useInputs';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {

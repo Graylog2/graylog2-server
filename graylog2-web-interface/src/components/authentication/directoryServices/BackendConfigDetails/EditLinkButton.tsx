@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 

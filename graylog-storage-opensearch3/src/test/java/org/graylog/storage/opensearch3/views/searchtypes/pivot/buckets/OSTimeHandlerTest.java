@@ -20,10 +20,13 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.PivotAggsContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
@@ -34,9 +37,11 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -113,6 +118,58 @@ class OSTimeHandlerTest {
         assertEquals("foobar", builtAggregation.autoDateHistogram().field());
         assertEquals(DATE_TIME_FORMAT, builtAggregation.autoDateHistogram().format());
 
+    }
+
+    @Test
+    public void metricSortOnDateHistogramUsesBucketSort() throws InvalidRangeParametersException {
+        when(interval.toDateInterval(any())).thenReturn(DateInterval.days(1));
+        when(pivot.timerange()).thenReturn(Optional.empty());
+        when(query.timerange()).thenReturn(RelativeRange.create(300));
+
+        final Average avgSeries = Average.builder().field("some_field").build();
+        when(pivot.series()).thenReturn(List.of(avgSeries));
+        when(pivot.sort()).thenReturn(List.of(
+                SeriesSort.create("avg(some_field)", SortSpec.Direction.Descending)
+        ));
+        when(queryContext.seriesName(any(), any())).thenReturn("avg-some_field");
+
+        final var result = osTimeHandler.doCreateAggregation(
+                BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
+
+        Aggregation agg = result.root().build();
+
+        // date_histogram should have no order (null) to avoid empty "order": {}
+        assertThat(agg.dateHistogram().order()).isNull();
+
+        // should contain a bucket_sort pipeline aggregation for the metric ordering
+        assertThat(agg.aggregations()).containsKey("bucket_sort_order");
+        assertThat(agg.aggregations().get("bucket_sort_order").isBucketSort()).isTrue();
+
+        var bucketSort = agg.aggregations().get("bucket_sort_order").bucketSort();
+        assertThat(bucketSort.sort()).hasSize(1);
+        assertThat(bucketSort.sort().getFirst().field().field()).isEqualTo("avg-some_field");
+        assertThat(bucketSort.sort().getFirst().field().order()).isEqualTo(SortOrder.Desc);
+    }
+
+    @Test
+    public void defaultSortUsesHistogramOrderWithNoExtraBucketSort() throws InvalidRangeParametersException {
+        when(interval.toDateInterval(any())).thenReturn(DateInterval.days(1));
+        when(pivot.timerange()).thenReturn(Optional.empty());
+        when(query.timerange()).thenReturn(RelativeRange.create(300));
+        when(pivot.sort()).thenReturn(List.of());
+        when(pivot.series()).thenReturn(List.of());
+
+        final var result = osTimeHandler.doCreateAggregation(
+                BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
+
+        Aggregation agg = result.root().build();
+
+        // default sort: _key ascending via HistogramOrder
+        assertThat(agg.dateHistogram().order()).isNotNull();
+        assertThat(agg.dateHistogram().order().key()).isEqualTo(SortOrder.Asc);
+
+        // no bucket_sort needed for default ordering
+        assertThat(agg.aggregations()).doesNotContainKey("bucket_sort_order");
     }
 
 }

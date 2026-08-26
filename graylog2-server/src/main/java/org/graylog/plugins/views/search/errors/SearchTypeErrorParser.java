@@ -76,7 +76,7 @@ public class SearchTypeErrorParser {
         return parseResultLimit(throwable.getMessage());
     }
 
-    private static Integer parseResultLimit(String description) {
+    public static Integer parseResultLimit(String description) {
         if (description.toLowerCase(Locale.US).contains("result window is too large")) {
             final Matcher matcher = Pattern.compile("[0-9]+").matcher(description);
             if (matcher.find()) {

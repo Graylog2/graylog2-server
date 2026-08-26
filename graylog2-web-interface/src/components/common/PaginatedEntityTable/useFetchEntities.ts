@@ -34,7 +34,7 @@ export type FetchOptions = {
   refetchInterval?: number;
 };
 
-const slicesToFilters = (searchParams: SearchParams) => {
+export const slicesToFilters = (searchParams: SearchParams) => {
   const newSearchParams = { ...searchParams };
 
   delete newSearchParams.slice;
@@ -66,8 +66,10 @@ const useFetchEntities = <T, M = unknown>({
   isInitialLoading: boolean;
   data: PaginatedResponse<T, M>;
   refetch: () => void;
+  isError?: boolean;
+  error?: Error | null;
 } => {
-  const { data, isInitialLoading, refetch } = useQuery({
+  const { data, isInitialLoading, refetch, isError, error } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: fetchKey,
 
@@ -86,6 +88,8 @@ const useFetchEntities = <T, M = unknown>({
     data,
     isInitialLoading,
     refetch,
+    isError,
+    error,
   };
 };
 

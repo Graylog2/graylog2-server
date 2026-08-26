@@ -112,14 +112,7 @@ describe('FieldStatisticsHandler', () => {
       .timerange({ type: 'relative', range: 3600 })
       .build();
 
-    await dispatch(
-      handler({
-        queryId,
-        field: fieldName,
-        type: nonNumericFieldType,
-        contexts: { widget: origWidget },
-      }),
-    );
+    await dispatch(handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: { widget: origWidget } }));
 
     expect(addWidget).toHaveBeenCalledWith(
       expect.objectContaining({

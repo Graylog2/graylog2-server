@@ -29,6 +29,8 @@ message JournalMessage {
     optional bytes payload = 8;
 
     optional uint32 sequence_nr = 9;
+
+    optional uint32 input_message_size = 10;
 }
 
 message RemoteAddress {

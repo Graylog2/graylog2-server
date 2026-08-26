@@ -17,11 +17,15 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import {
+  enableEventDefinition,
+  disableEventDefinition,
+  EVENT_DEFINITIONS_QUERY_KEY,
+} from 'components/event-definitions/hooks/useEventDefinitions';
 import { Label, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 
@@ -31,9 +35,6 @@ import { isSystemEventDefinition } from '../event-definitions-types';
 const StatusLabel = styled(Label)<{ $clickable: boolean }>(
   ({ $clickable }) => css`
     cursor: ${$clickable ? 'pointer' : 'default'};
-    display: inline-flex;
-    justify-content: center;
-    gap: 4px;
   `,
 );
 
@@ -56,7 +57,7 @@ type Props = {
 
 const StatusCell = ({ eventDefinition }: Props) => {
   const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
-  const { refetch: refetchEventDefinitions } = useTableFetchContext();
+  const queryClient = useQueryClient();
   const isEnabled = eventDefinition?.state === 'ENABLED';
   const currentUser = useCurrentUser();
   const disableChange =
@@ -69,16 +70,16 @@ const StatusCell = ({ eventDefinition }: Props) => {
     if (isEnabled) {
       setShowConfirmDisableModal(true);
     } else {
-      await EventDefinitionsActions.enable(eventDefinition);
-      await refetchEventDefinitions();
+      await enableEventDefinition(eventDefinition);
+      await queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
     }
-  }, [isEnabled, eventDefinition, refetchEventDefinitions]);
+  }, [isEnabled, eventDefinition, queryClient]);
 
   const handleConfirmDisable = useCallback(async () => {
-    await EventDefinitionsActions.disable(eventDefinition);
-    await refetchEventDefinitions();
+    await disableEventDefinition(eventDefinition);
+    await queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
     setShowConfirmDisableModal(false);
-  }, [eventDefinition, refetchEventDefinitions]);
+  }, [eventDefinition, queryClient]);
 
   return (
     <>

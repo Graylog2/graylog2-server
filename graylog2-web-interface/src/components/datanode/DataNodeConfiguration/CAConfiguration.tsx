@@ -17,7 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Tabs, Tab, Alert } from 'components/bootstrap';
+import { Tabs, Alert } from 'components/bootstrap';
 import CACreateForm from 'components/datanode/DataNodeConfiguration/CACreateForm';
 import CAUpload from 'components/datanode/DataNodeConfiguration/CAUpload';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -38,9 +38,9 @@ const CAConfiguration = () => {
   const sendTelemetry = useSendTelemetry();
   const productName = useProductName();
 
-  const handleTabSwitch = (e) => {
+  const handleTabSwitch = (value: string | null) => {
     sendTelemetry(
-      e?.target?.innerText === UploadCA
+      value === TAB_KEYS[1]
         ? TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_UPLOAD_TAB_CLICKED
         : TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_CREATE_TAB_CLICKED,
       {
@@ -65,13 +65,17 @@ const CAConfiguration = () => {
         <DocumentationLink page="graylog-data-node" text={`${productName} Data Node - Getting Started`} /> for more
         information.
       </StyledAlert>
-      <Tabs defaultActiveKey={TAB_KEYS[0]} id="ca-configurations" onClick={handleTabSwitch}>
-        <Tab eventKey={TAB_KEYS[0]} title="Create new CA">
+      <Tabs defaultValue={TAB_KEYS[0]} onChange={handleTabSwitch}>
+        <Tabs.List>
+          <Tabs.Tab value={TAB_KEYS[0]}>Create new CA</Tabs.Tab>
+          <Tabs.Tab value={TAB_KEYS[1]}>{UploadCA}</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value={TAB_KEYS[0]}>
           <CACreateForm />
-        </Tab>
-        <Tab eventKey={TAB_KEYS[1]} title={UploadCA}>
+        </Tabs.Panel>
+        <Tabs.Panel value={TAB_KEYS[1]}>
           <CAUpload />
-        </Tab>
+        </Tabs.Panel>
       </Tabs>
     </>
   );

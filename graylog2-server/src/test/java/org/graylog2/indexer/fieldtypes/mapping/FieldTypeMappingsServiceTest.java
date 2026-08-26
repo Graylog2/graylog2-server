@@ -77,7 +77,7 @@ class FieldTypeMappingsServiceTest {
 
     @BeforeEach
     void setUp() {
-        toTest = new FieldTypeMappingsService(indexSetService, mongoIndexSetFactory, profileService);
+        toTest = new FieldTypeMappingsService(indexSetService, mongoIndexSetFactory, profileService, new CustomMappingValidation());
         existingIndexSet = buildSampleIndexSetConfig("existing_index_set");
 
         //simple storage mocking

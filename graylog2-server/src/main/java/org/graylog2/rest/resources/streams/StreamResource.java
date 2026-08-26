@@ -112,6 +112,7 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.filters.StreamDestinationFilterService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
@@ -122,6 +123,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -133,6 +135,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -163,6 +166,7 @@ public class StreamResource extends RestResource {
     private final MessageFactory messageFactory;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
+    private final StreamDestinationFilterService streamDestinationFilterService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final RecentActivityService recentActivityService;
@@ -179,6 +183,7 @@ public class StreamResource extends RestResource {
     public StreamResource(StreamService streamService,
                           PaginatedStreamService paginatedStreamService,
                           StreamRuleService streamRuleService,
+                          StreamDestinationFilterService streamDestinationFilterService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
                           IndexSetRegistry indexSetRegistry,
                           RecentActivityService recentActivityService,
@@ -189,6 +194,7 @@ public class StreamResource extends RestResource {
                           EntitySharesService entitySharesService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
+        this.streamDestinationFilterService = streamDestinationFilterService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
@@ -661,6 +667,8 @@ public class StreamResource extends RestResource {
 
     public record GetConnectedPipelinesRequest(List<String> streamIds) {}
 
+    public record GetDestinationFilterRuleCountsRequest(List<String> streamIds) {}
+
     @POST
     @Path("/pipelines")
     @Operation(summary = "Get pipelines associated with specified streams")
@@ -692,6 +700,30 @@ public class StreamResource extends RestResource {
                             .map(pipeline -> PipelineCompactSource.create(pipeline.id(), pipeline.title()))
                             .toList();
                 }));
+    }
+
+    @POST
+    @Path("/destinations/filters/count")
+    @Operation(summary = "Get destination filter rule counts associated with specified streams")
+    @NoAuditEvent("No data is changed.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, Long> getDestinationFilterRuleCountsForStreams(@Parameter(name = "streamIds", required = true) GetDestinationFilterRuleCountsRequest request) {
+        request.streamIds().forEach(streamId -> {
+            if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+                throw new ForbiddenException(f("Not allowed to read configuration for stream with id: %s", streamId));
+            }
+        });
+
+        final var streamIds = Set.copyOf(request.streamIds());
+        final var countsByStreamId = streamDestinationFilterService.countByStreamIds(
+                streamIds,
+                dtoId -> isPermitted(RestPermissions.STREAM_DESTINATION_FILTERS_READ, dtoId)
+        );
+
+        final var response = new LinkedHashMap<String, Long>();
+        request.streamIds().forEach(streamId -> response.put(streamId, countsByStreamId.getOrDefault(streamId, 0L)));
+
+        return response;
     }
 
     @PUT

@@ -28,10 +28,14 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
+
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 
 @AutoValue
 @JsonTypeName(UsedSearchFilter.REFERENCED_SEARCH_FILTER)
@@ -53,6 +57,11 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @JsonProperty(QUERY_STRING_FIELD)
     @Nullable
     public abstract String queryString();
+
+    // Nullable for backward compat with old JSON that lacks the scope field
+    @JsonProperty(FIELD_SCOPE)
+    @Nullable
+    public abstract String scope();
 
     @Override
     @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
@@ -92,6 +101,9 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
         @JsonProperty(QUERY_STRING_FIELD)
         public abstract Builder queryString(String queryString);
 
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
+
         @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
         public abstract Builder negation(boolean negation);
 
@@ -102,7 +114,8 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
         public static Builder create() {
             return new AutoValue_ReferencedQueryStringSearchFilter.Builder()
                     .disabled(false)
-                    .negation(false);
+                    .negation(false)
+                    .scope(DefaultEntityScope.NAME);
         }
 
         public abstract ReferencedQueryStringSearchFilter build();
@@ -111,7 +124,7 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Override
     public InlineQueryStringSearchFilter toInlineRepresentation() {
         return InlineQueryStringSearchFilter.builder()
-                // create a new ID for the inlined filter on purpose, so it's not the same as the global one. if you later inline the same global filter a 2nd time, it would crash/overwrite your first 
+                // create a new ID for the inlined filter on purpose, so it's not the same as the global one. if you later inline the same global filter a 2nd time, it would crash/overwrite your first
                 .id(new org.bson.types.ObjectId().toHexString())
                 .queryString(this.queryString())
                 .description(this.description())
@@ -130,8 +143,12 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                                            Map<EntityDescriptor, Object> nativeEntities) {
         final DBSearchFilter dbFilter = (DBSearchFilter) nativeEntities.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
         if (dbFilter != null) {
-            // If this filter references a newly imported filter, update this filter with the ID of the new filter created in MongoDB.
-            return this.withId(dbFilter.id());
+            // If this filter references a newly imported filter, update this filter with the ID and scope of the new filter created in MongoDB.
+            final Builder builder = toBuilder().id(dbFilter.id());
+            if (dbFilter instanceof ScopedEntity<?> scopedFilter) {
+                builder.scope(scopedFilter.scope());
+            }
+            return builder.build();
         } else {
             // Otherwise return this filter as it is in the parent entity, but convert to inline.
             return this.toInlineRepresentation();

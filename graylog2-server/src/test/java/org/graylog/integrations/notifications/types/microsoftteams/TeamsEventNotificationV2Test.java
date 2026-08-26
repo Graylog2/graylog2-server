@@ -34,6 +34,7 @@ import org.graylog2.bindings.providers.JsonSafeEngineProvider;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistValidator;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.TestMessageFactory;
@@ -110,7 +111,7 @@ public class TeamsEventNotificationV2Test {
                           },
                           {
                             "title": "Timestamp",
-                            "value": "${event.timestamp_processing}"
+                            "value": "{{DATE(${event.timestamp_processing},SHORT)}} at {{TIME(${event.timestamp_processing})}}"
                           },
                           {
                             "title": "Message",
@@ -183,6 +184,9 @@ public class TeamsEventNotificationV2Test {
     @Mock
     EventNotificationService notificationCallbackService;
 
+    @Mock
+    UrlAllowlistValidator mockUrlAllowlistValidator;
+
     private TeamsEventNotificationConfigV2 notificationConfig;
     private EventNotificationContext eventNotificationContext;
 
@@ -198,7 +202,8 @@ public class TeamsEventNotificationV2Test {
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()));
+                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()),
+                mockUrlAllowlistValidator);
     }
 
     @Test
@@ -212,7 +217,6 @@ public class TeamsEventNotificationV2Test {
         TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
                 .adaptiveCard(defaultTemplate)
                 .backlogSize(5)
-                .timeZone(DateTimeZone.UTC)
                 .webhookUrl("http://localhost:12345")
                 .build();
         String body = teamsEventNotification.generateBody(eventNotificationContext, config);
@@ -223,7 +227,7 @@ public class TeamsEventNotificationV2Test {
     @Test
     public void getCustomMessageModel() {
         List<MessageSummary> messageSummaries = generateMessageSummaries(50);
-        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, notificationConfig.type(), messageSummaries, DateTimeZone.UTC);
+        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, notificationConfig.type(), messageSummaries);
 
         assertThat(customMessageModel).isNotNull();
         assertThat(customMessageModel.get("event_definition_description")).isEqualTo("Event Definition Test Description");
@@ -283,6 +287,34 @@ public class TeamsEventNotificationV2Test {
         // Global setting is at 50 and the message override is 0 then the backlog size = 50
         List<MessageSummary> messageSummaries = teamsEventNotification.getMessageBacklog(eventNotificationContext, config);
         assertThat(messageSummaries.size()).isEqualTo(50);
+    }
+
+    @Test
+    public void testDefaultAdaptiveCardTemplate() throws PermanentEventNotificationException {
+        TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
+                .adaptiveCard(TeamsEventNotificationConfigV2.DEFAULT_ADAPTIVE_CARD)
+                .backlogSize(0)
+                .webhookUrl("http://localhost:12345")
+                .build();
+        String body = teamsEventNotification.generateBody(eventNotificationContext, config);
+        assertThat(body).contains("\"contentType\": \"application/vnd.microsoft.card.adaptive\"");
+        assertThat(body).contains("\"type\": \"AdaptiveCard\"");
+        assertThat(body).contains("\"version\": \"1.6\"");
+        assertThat(body).doesNotContain("${event_definition_title} triggered");
+        assertThat(body).doesNotContain("${event_definition_description}");
+    }
+
+    @Test
+    public void testTimestampFunctionsInPayload() throws PermanentEventNotificationException {
+        TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
+                .adaptiveCard(defaultTemplate)
+                .backlogSize(0)
+                .webhookUrl("http://localhost:12345")
+                .build();
+        String body = teamsEventNotification.generateBody(eventNotificationContext, config);
+        assertThat(body).contains("{{DATE(");
+        assertThat(body).contains("{{TIME(");
+        assertThat(body).doesNotContain("${event.timestamp_processing}");
     }
 
     @Test

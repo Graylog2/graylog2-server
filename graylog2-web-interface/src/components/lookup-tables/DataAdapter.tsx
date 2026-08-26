@@ -16,13 +16,14 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
+import * as JSON from 'util/json';
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Button, Input, Label } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import { lookupDataAdapter } from 'components/lookup-tables/hooks/api/lookupTablesAPI';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
 
@@ -38,7 +39,7 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
   const [lookupKey, setLookupKey] = useState('');
   const [lookupResult, setLookupResult] = useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
@@ -49,13 +50,13 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
   const _lookupKey = (event: React.SyntheticEvent) => {
     event.preventDefault();
 
-    LookupTableDataAdaptersActions.lookup(dataAdapter.name, lookupKey).then((result: LookupTableAdapter[]) => {
+    lookupDataAdapter(dataAdapter.name, lookupKey).then((result) => {
       setLookupResult(result);
     });
   };
 
   const handleEdit = () => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(dataAdapter.name));
+    push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(dataAdapter.name));
   };
 
   const plugin = usePluginEntities('lookupTableAdapters').find(

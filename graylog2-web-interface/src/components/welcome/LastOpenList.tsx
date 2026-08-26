@@ -20,8 +20,7 @@ import React from 'react';
 import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import EntityItem from 'components/welcome/EntityListItem';
-import { NoSearchResult, Spinner } from 'components/common';
-import { Link } from 'components/common/router';
+import { NoSearchResult, Spinner, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import useLastOpened from 'components/welcome/hooks/useLastOpened';
 

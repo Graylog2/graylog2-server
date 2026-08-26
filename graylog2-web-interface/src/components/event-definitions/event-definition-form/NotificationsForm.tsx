@@ -18,9 +18,8 @@ import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import without from 'lodash/without';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, Icon } from 'components/common';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
-import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import withTelemetry from 'logic/telemetry/withTelemetry';

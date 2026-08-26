@@ -18,6 +18,7 @@ package org.graylog2.telemetry.suppliers;
 
 import com.mongodb.MongoClient;
 import jakarta.inject.Inject;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoDBVersionCheck;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
@@ -29,8 +30,8 @@ public class MongoDBMetricsSupplier implements TelemetryMetricSupplier {
     private final MongoClient mongoClient;
 
     @Inject
-    public MongoDBMetricsSupplier(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
+    public MongoDBMetricsSupplier(MongoConnection mongoConnection) {
+        this.mongoClient = mongoConnection.connect();
     }
 
     @Override

@@ -98,9 +98,9 @@ describe('DashboardSearchBar', () => {
 
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
-    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
+    await waitFor(() => expect(searchButton).not.toHaveAttribute('data-disabled'));
 
-    userEvent.click(searchButton);
+    await userEvent.click(searchButton);
 
     await waitFor(() => expect(executeActiveQuery).toHaveBeenCalledTimes(1));
   });
@@ -115,18 +115,18 @@ describe('DashboardSearchBar', () => {
       // TODO: Fix nested `form`-elements and remove `suppressConsole` here.
       await suppressConsole(() => userEvent.click(timeRangeFilter));
 
-      userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
+      await userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
       const timeRangePickerSubmitButton = await screen.findByRole('button', { name: 'Update time range' });
       await waitFor(() => expect(timeRangePickerSubmitButton).toBeEnabled());
-      userEvent.click(timeRangePickerSubmitButton);
+      await userEvent.click(timeRangePickerSubmitButton);
 
       const searchButton = await screen.findByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,
       });
 
-      await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
+      await waitFor(() => expect(searchButton).not.toHaveAttribute('data-disabled'));
 
-      userEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() => expect(setGlobalOverride).toHaveBeenCalledWith('', { type: 'relative', from: 300 }));
       await waitFor(() => expect(executeActiveQuery).toHaveBeenCalledTimes(1));

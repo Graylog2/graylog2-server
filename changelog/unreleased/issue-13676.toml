@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Apply static fields configured on a Forwarder input to forwarded messages."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13676"]

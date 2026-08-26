@@ -23,7 +23,6 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchRequest;
 
 import java.util.List;
@@ -43,6 +42,7 @@ class ScrollTest {
     @BeforeEach
     void setUp() {
         searchRequestFactory = new SearchRequestFactoryOS(
+                true,
                 true,  // allowLeadingWildcardSearches
                 new IgnoreSearchFilters()
         );
@@ -64,7 +64,7 @@ class ScrollTest {
                 .fields(List.of("message", "timestamp"))
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -82,7 +82,7 @@ class ScrollTest {
                 .fields(List.of("message"))
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -101,7 +101,7 @@ class ScrollTest {
                 .fields(List.of("message"))
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -123,7 +123,7 @@ class ScrollTest {
                 .batchSize(batchSize)
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -142,7 +142,7 @@ class ScrollTest {
                 .fields(fields)
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -163,7 +163,7 @@ class ScrollTest {
                 .fields(List.of("message"))
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -184,7 +184,7 @@ class ScrollTest {
                 .offset(offset)
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -204,7 +204,7 @@ class ScrollTest {
                 .limit(limit)
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -226,7 +226,7 @@ class ScrollTest {
                 .limit(limit)
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -248,7 +248,7 @@ class ScrollTest {
                 .limit(limit)
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -269,7 +269,7 @@ class ScrollTest {
                 .sliceParams(sliceParams)
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
@@ -293,7 +293,7 @@ class ScrollTest {
                 .sliceParams(sliceParams)
                 .build();
 
-        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+        final SearchRequest.Builder query = searchRequestFactory.create(chunkCommand);
 
         // When
         final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);

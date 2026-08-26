@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import numeral from 'numeral';
 
 import { Spinner } from 'components/common';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import { useStore } from 'stores/connect';
+import { useNodeMetrics } from 'hooks/useMetrics';
 
 type Props = {
   nodeId: string;
@@ -32,27 +30,15 @@ const metricNames = {
   totalOut: 'org.graylog2.throughput.output.1-sec-rate',
 };
 
-// TODO this is a copy of GlobalThroughput, it just renders differently and only targets a single node.
+const metricValues = Object.values(metricNames);
+
 const NodeThroughput = ({ nodeId, longFormat = false }: Props) => {
-  const { metrics: _metrics } = useStore(MetricsStore);
+  const { data: nodeMetrics, isLoading } = useNodeMetrics(nodeId, metricValues);
 
-  useEffect(() => {
-    Object.keys(metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, metricNames[metricShortName]));
-
-    return () => {
-      Object.keys(metricNames).forEach((metricShortName) =>
-        MetricsActions.remove(nodeId, metricNames[metricShortName]),
-      );
-    };
-  }, [nodeId]);
-
-  const _isLoading = !_metrics;
-
-  if (_isLoading) {
+  if (isLoading || !nodeMetrics) {
     return <Spinner text="Loading throughput..." />;
   }
 
-  const nodeMetrics = _metrics[nodeId];
   const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, metricNames);
 
   if (Object.keys(metrics).length === 0) {

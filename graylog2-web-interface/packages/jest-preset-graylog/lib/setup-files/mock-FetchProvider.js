@@ -23,6 +23,8 @@ class MockBuilder {
 
   setHeader = () => this;
 
+  setHeaders = () => this;
+
   json = () => this;
 
   plaintext = () => this;
@@ -32,19 +34,15 @@ class MockBuilder {
   build = () => Promise.resolve({});
 }
 
-class MockFetchError {
-}
+class MockFetchError {}
 
-const MockFetchProvider = Object.assign(
-  () => Promise.resolve(mockResponse),
-  {
-    FetchError: MockFetchError,
-    Builder: MockBuilder,
-    default: jest.fn(() => Promise.resolve(mockResponse)),
-    fetchPlainText: jest.fn(() => Promise.resolve(mockResponse)),
-    fetchPeriodically: jest.fn(() => Promise.resolve(mockResponse)),
-    fetchFile: jest.fn(() => Promise.resolve(mockResponse)),
-  },
-);
+const MockFetchProvider = Object.assign(() => Promise.resolve(mockResponse), {
+  FetchError: MockFetchError,
+  Builder: MockBuilder,
+  default: jest.fn(() => Promise.resolve(mockResponse)),
+  fetchPlainText: jest.fn(() => Promise.resolve(mockResponse)),
+  fetchPeriodically: jest.fn(() => Promise.resolve(mockResponse)),
+  fetchFile: jest.fn(() => Promise.resolve(mockResponse)),
+});
 
 jest.mock('logic/rest/FetchProvider', () => MockFetchProvider);

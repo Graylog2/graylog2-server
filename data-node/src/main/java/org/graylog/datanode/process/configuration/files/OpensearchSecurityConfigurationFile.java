@@ -48,7 +48,7 @@ public class OpensearchSecurityConfigurationFile implements DatanodeConfigFile {
 
     @Override
     public void write(OutputStream stream) throws IOException {
-        final InputStream configSource = getClass().getResourceAsStream("/opensearch/config/opensearch-security/config.yml");
+        final InputStream configSource = getClass().getResourceAsStream("/opensearch/config/common/opensearch-security/config.yml");
         Map<String, Object> contents = OBJECT_MAPPER.readValue(configSource, new TypeReference<>() {});
         Map<String, Object> config = filterConfigurationMap(contents, "config", "dynamic", "authc", "jwt_auth_domain", "http_authenticator", "config");
         config.put("signing_key", signingKey.getBase64Encoded());

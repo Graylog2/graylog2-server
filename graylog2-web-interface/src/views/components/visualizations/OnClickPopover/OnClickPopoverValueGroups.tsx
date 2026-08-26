@@ -76,26 +76,32 @@ type GroupingActionsProps = {
   columnPivotValues: Array<ValueGroupItem>;
   rowPivotValues: Array<ValueGroupItem>;
   setFieldData: Props['setFieldData'];
-  metricValue: ValueGroupItem;
+  metricValue?: ValueGroupItem;
+  combineOperator?: 'AND' | 'OR' | 'EDGE';
 };
 
-const GroupingActions = ({ columnPivotValues, rowPivotValues, setFieldData, metricValue }: GroupingActionsProps) => {
-  const valuePath = [...columnPivotValues, ...rowPivotValues].map(({ value, field }) => ({ [field]: value }));
+const GroupingActions = ({
+  columnPivotValues,
+  rowPivotValues,
+  setFieldData,
+  metricValue = undefined,
+  combineOperator = undefined,
+}: GroupingActionsProps) => {
+  const groupings = [...columnPivotValues, ...rowPivotValues];
+  const valuePath = groupings.map(({ value, field }) => ({ [field]: value }));
+  // Display the resolved labels (`text`) rather than the raw values, which may be ids.
+  const displayValue = groupings.map(({ text }) => text).join(humanSeparator);
 
   return (
     <ListGroupItem
       onClick={() =>
         setFieldData({
-          value: metricValue.value,
-          field: metricValue.field,
-          contexts: { valuePath },
+          value: metricValue?.value ?? '',
+          field: metricValue?.field ?? '',
+          contexts: { valuePath, valuePathOperator: combineOperator },
         })
       }>
-      <ValueRenderer
-        field=""
-        value={valuePath.map((o) => Object.values(o)[0]).join(humanSeparator)}
-        traceColor={metricValue.traceColor}
-      />
+      <ValueRenderer field="" value={displayValue} traceColor={metricValue?.traceColor ?? null} />
     </ListGroupItem>
   );
 };
@@ -120,6 +126,7 @@ const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotVal
           rowPivotValues={rowPivotValues}
           setFieldData={setFieldData}
           metricValue={metricValue}
+          combineOperator={config.visualization === 'network' ? 'EDGE' : undefined}
         />
       )}
       <GroupingsContainer $withMargin={showMultipleAction}>

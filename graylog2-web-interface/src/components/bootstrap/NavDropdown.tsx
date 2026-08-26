@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import { NAV_ITEM_HEIGHT, NAV_ITEM_LINE_HEIGHT } from 'theme/constants';
 import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
@@ -35,6 +35,7 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
     padding: 0 15px;
     min-height: ${NAV_ITEM_HEIGHT};
     display: inline-flex;
+    line-height: ${NAV_ITEM_LINE_HEIGHT};
     align-items: center;
     gap: ${theme.spacings.xs};
 

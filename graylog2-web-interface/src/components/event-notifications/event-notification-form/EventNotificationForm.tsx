@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { FormSubmit, Select, Spinner } from 'components/common';
@@ -28,7 +27,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import withLocation from 'routing/withLocation';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 const getNotificationPlugin = (type: string) => {
   if (type === undefined) {
@@ -76,7 +75,7 @@ const EventNotificationForm = ({
 }: EventNotificationFormProps) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     sendTelemetry(
       action === 'create'
         ? TELEMETRY_EVENT_TYPE.NOTIFICATIONS.CREATE_CLICKED
@@ -93,13 +92,13 @@ const EventNotificationForm = ({
     onSubmit(notification);
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
 
     onChange(name, getValueFromInput(event.target));
   };
 
-  const handleConfigChange = (nextConfig) => {
+  const handleConfigChange = (nextConfig: EventNotification['config']) => {
     onChange('config', nextConfig);
   };
 
@@ -107,7 +106,7 @@ const EventNotificationForm = ({
     onChange('share_request', entityShare);
   };
 
-  const handleTypeChange = (nextType) => {
+  const handleTypeChange = (nextType: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_TYPE_SELECTED, {
       app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'event-definition-notifications',
@@ -154,7 +153,7 @@ const EventNotificationForm = ({
             label="Title"
             type="text"
             bsStyle={validation.errors.title ? 'error' : null}
-            help={get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
+            help={validation?.errors?.title?.[0] ?? 'Title to identify this Notification.'}
             value={notification.title}
             onChange={handleChange}
             required
@@ -186,7 +185,7 @@ const EventNotificationForm = ({
               clearable={false}
               required
             />
-            <HelpBlock>{get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}</HelpBlock>
+            <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Notification to create.'}</HelpBlock>
           </FormGroup>
 
           {notificationFormComponent}

@@ -15,22 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
-
-import { ClusterNodeMetrics } from '@graylog/server-api';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
-import type { Metric } from 'stores/metrics/MetricsStore';
-import { MetricsStore } from 'stores/metrics/MetricsStore';
 import type { NodesStoreState } from 'stores/nodes/NodesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
+import { useMetricsNames } from 'hooks/useMetrics';
 import useQueryParameters from 'routing/useQuery';
 import useParams from 'routing/useParams';
 import useProductName from 'brand-customization/useProductName';
 
-const metricsNamespace = MetricsStore.namespace;
+const metricsNamespace = 'org';
 
 const useNodeId = (nodes: NodesStoreState['nodes']) => {
   const { nodeId } = useParams();
@@ -55,11 +51,7 @@ const ShowMetricsPage = () => {
   const productName = useProductName();
   const nodes = useStore(NodesStore, (state) => state.nodes);
   const nodeId = useNodeId(nodes);
-  const { data: names, isLoading } = useQuery({
-    queryKey: ['metrics', 'names', nodeId],
-    queryFn: () => ClusterNodeMetrics.byNamespace(nodeId, metricsNamespace).then(({ metrics }) => metrics as Metric[]),
-    enabled: nodeId !== undefined,
-  });
+  const { data: names, isLoading } = useMetricsNames(nodeId, metricsNamespace);
 
   const { filter } = useQueryParameters() as { filter: string };
 

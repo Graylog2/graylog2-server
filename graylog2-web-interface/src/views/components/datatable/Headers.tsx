@@ -22,6 +22,7 @@ import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';
 
+import { getPinnedCellClassName } from 'components/bootstrap/Table';
 import Field from 'views/components/Field';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import Value from 'views/components/Value';
@@ -32,7 +33,6 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Icon } from 'components/common';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import FieldSortIcon from './FieldSortIcon';
@@ -60,7 +60,6 @@ const PinIcon = styled.button(
 );
 
 type HeaderFilterProps = {
-  activeQuery: string;
   borderedHeader: boolean;
   fields: FieldTypeMappingsList | Array<FieldTypeMapping>;
   field: string;
@@ -76,10 +75,10 @@ type HeaderFilterProps = {
   showPinIcon?: boolean;
   setLoadingState: (loading: boolean) => void;
   togglePin: (field: string) => void;
+  className?: string;
 };
 
 const HeaderField = ({
-  activeQuery,
   borderedHeader,
   fields,
   field,
@@ -95,6 +94,7 @@ const HeaderField = ({
   showPinIcon = false,
   togglePin,
   setLoadingState,
+  className = undefined,
 }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
   const thRef = useRef(null);
@@ -103,7 +103,7 @@ const HeaderField = ({
     if (onSetColumnsWidth && thRef?.current?.offsetWidth) {
       onSetColumnsWidth({ field: `${prefix}${field}`, offsetWidth: thRef.current.offsetWidth });
     }
-  }, [onSetColumnsWidth, field, prefix, thRef?.current?.offsetWidth]);
+  }, [onSetColumnsWidth, field, prefix]);
 
   const _togglePin = useCallback(() => {
     togglePin(`${prefix}${field}`);
@@ -113,10 +113,11 @@ const HeaderField = ({
     <TableHeaderCell
       ref={thRef}
       key={`${prefix}${field}`}
+      className={className}
       colSpan={span}
       $isNumeric={type.isNumeric()}
       $borderedHeader={borderedHeader}>
-      <Field name={field} queryId={activeQuery} type={type}>
+      <Field name={field} type={type}>
         {title}
       </Field>
       {showPinIcon && (
@@ -245,6 +246,7 @@ type Props = {
   sortConfigMap: OrderedMap<string, SortConfig>;
   onSetColumnsWidth?: (props: { field: string; offsetWidth: number }) => void;
   pinnedColumns?: Immutable.Set<string>;
+  pinnedColumnIndexes?: Set<number>;
   togglePin: (field: string) => void;
   setLoadingState: (loading: boolean) => void;
   showRowNumbers?: boolean;
@@ -262,11 +264,11 @@ const Headers = ({
   sortConfigMap,
   onSetColumnsWidth = undefined,
   pinnedColumns = Immutable.Set(),
+  pinnedColumnIndexes = new Set(),
   togglePin,
   setLoadingState,
   showRowNumbers = true,
 }: Props) => {
-  const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
   const interactive = useContext(InteractiveContext);
@@ -279,9 +281,9 @@ const Headers = ({
     sortable = false,
     sortType = undefined,
     showPinIcon = false,
+    className = undefined,
   }) => (
     <HeaderField
-      activeQuery={activeQuery}
       borderedHeader={borderedHeader}
       key={`${prefix}${field}`}
       fields={fields}
@@ -298,13 +300,21 @@ const Headers = ({
       showPinIcon={showPinIcon}
       togglePin={togglePin}
       setLoadingState={setLoadingState}
+      className={className}
     />
   );
 
-  const rowPivotFields = rowFieldNames.map((fieldName) =>
-    headerField({ field: fieldName, sortable: interactive, sortType: SortConfig.PIVOT_TYPE, showPinIcon: interactive }),
+  const lineNumberOffset = showRowNumbers ? 1 : 0;
+  const rowPivotFields = rowFieldNames.map((fieldName, index) =>
+    headerField({
+      field: fieldName,
+      sortable: interactive,
+      sortType: SortConfig.PIVOT_TYPE,
+      showPinIcon: interactive,
+      className: getPinnedCellClassName(pinnedColumnIndexes.has(index + lineNumberOffset), false),
+    }),
   );
-  const seriesFields = series.map((s) =>
+  const seriesFields = series.map((s, index) =>
     headerField({
       field: s.function,
       prefix: '',
@@ -313,6 +323,10 @@ const Headers = ({
       sortable: interactive,
       sortType: SortConfig.SERIES_TYPE,
       showPinIcon: false,
+      className: getPinnedCellClassName(
+        pinnedColumnIndexes.has(index + rowFieldNames.length + lineNumberOffset),
+        false,
+      ),
     }),
   );
   const columnPivotFields = flatten(

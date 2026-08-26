@@ -16,9 +16,8 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, IfPermitted } from 'components/common';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 

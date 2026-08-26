@@ -17,7 +17,7 @@
 import React from 'react';
 import numeral from 'numeral';
 
-import type { HistogramMetric } from 'stores/metrics/MetricsStore';
+import type { HistogramMetric } from 'types/metrics';
 
 type Props = {
   metric: HistogramMetric;

@@ -19,25 +19,10 @@ import type { ColorVariant } from '@graylog/sawmill';
 import { Button as MantineButton } from '@mantine/core';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
-import { Link } from 'react-router-dom';
 
+import Link from 'components/common/Link';
 import type { BsSize } from 'components/bootstrap/types';
-
-const sizeForMantine = (size: BsSize) => {
-  switch (size) {
-    case 'xs':
-    case 'xsmall':
-      return 'xs';
-    case 'sm':
-    case 'small':
-      return 'sm';
-    case 'lg':
-    case 'large':
-      return 'lg';
-    default:
-      return 'md';
-  }
-};
+import sizeForMantine from 'theme/utils/sizeForMantine';
 
 export type StyleProps = ColorVariant | 'link' | 'transparent';
 
@@ -140,10 +125,17 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
 // Other link styles are defined in e.g. the size specific function
 const linkStyles = css`
   vertical-align: baseline;
+  user-select: text;
 
   &:hover {
     background: transparent;
     text-decoration: underline;
+  }
+
+  .mantine-Button-label {
+    word-break: break-word;
+    white-space: normal;
+    text-align: left;
   }
 `;
 
@@ -169,7 +161,8 @@ const StyledButton = styled(MantineButton)<{
   $bsStyle: StyleProps;
   $bsSize: BsSize;
   $active: boolean;
-}>(({ theme, $bsStyle, $bsSize, $active }) => {
+  $showOverflow: boolean;
+}>(({ theme, $bsStyle, $bsSize, $active, $showOverflow = false }) => {
   const isLink = isLinkStyle($bsStyle);
   const isTransparent = isTransparentStyle($bsStyle);
   const color = textColor($bsStyle, theme.colors);
@@ -177,7 +170,7 @@ const StyledButton = styled(MantineButton)<{
   return css`
     color: ${color};
     font-weight: 400;
-    overflow: visible;
+    ${$showOverflow ? 'overflow: visible;' : null}
 
     ${disabledStyles(theme.colors, $bsStyle)}
     ${stylesForSize($bsSize, $bsStyle)}
@@ -190,6 +183,10 @@ const StyledButton = styled(MantineButton)<{
     &:focus {
       color: ${color};
       text-decoration: none;
+
+      &:not(:focus-visible) {
+        outline: none;
+      }
     }
 
     ${$active && activeStyles(theme.colors, $bsStyle)}
@@ -198,7 +195,7 @@ const StyledButton = styled(MantineButton)<{
 
     .mantine-Button-label {
       gap: 0.25em;
-      overflow: visible;
+      ${$showOverflow ? 'overflow: visible;' : null}
     }
 
     .mantine-Button-loader {
@@ -209,7 +206,9 @@ const StyledButton = styled(MantineButton)<{
 
 type Props = React.PropsWithChildren<{
   active?: boolean;
+  allowClickWhenDisabled?: boolean;
   'aria-label'?: string;
+  'aria-disabled'?: boolean;
   bsStyle?: StyleProps;
   bsSize?: BsSize;
   className?: string;
@@ -220,8 +219,16 @@ type Props = React.PropsWithChildren<{
   id?: string;
   name?: string;
   onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void);
+  onFocus?: (e: React.FocusEvent) => void;
+  onBlur?: (e: React.FocusEvent) => void;
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: (e: React.MouseEvent) => void;
+  onMouseMove?: (e: React.MouseEvent) => void;
+  onPointerDown?: (e: React.PointerEvent) => void;
+  onPointerEnter?: (e: React.PointerEvent) => void;
   rel?: 'noopener noreferrer';
   role?: string;
+  showOverflow?: boolean;
   style?: React.ComponentProps<typeof StyledButton>['style'];
   tabIndex?: number;
   target?: '_blank';
@@ -232,12 +239,21 @@ type Props = React.PropsWithChildren<{
 const Button = (
   {
     'aria-label': ariaLabel,
+    'aria-disabled': ariaDisabled = undefined,
+    allowClickWhenDisabled = false,
     bsStyle = 'default',
     bsSize = undefined,
     className = undefined,
     'data-testid': dataTestId,
     id = undefined,
     onClick = undefined,
+    onFocus = undefined,
+    onBlur = undefined,
+    onMouseEnter = undefined,
+    onMouseLeave = undefined,
+    onMouseMove = undefined,
+    onPointerDown = undefined,
+    onPointerEnter = undefined,
     disabled = false,
     href = undefined,
     title = undefined,
@@ -250,6 +266,7 @@ const Button = (
     tabIndex = undefined,
     children = undefined,
     active = undefined,
+    showOverflow = false,
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
 ) => {
@@ -260,6 +277,14 @@ const Button = (
   const sharedProps = {
     id,
     'aria-label': ariaLabel,
+    'aria-disabled': ariaDisabled,
+    onFocus,
+    onBlur,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseMove,
+    onPointerDown,
+    onPointerEnter,
     className,
     ...stylesProps(style),
     $active: active,
@@ -268,17 +293,20 @@ const Button = (
     variant: active ? 'outline' : 'filled',
     color,
     'data-testid': dataTestId,
-    disabled,
+    disabled: allowClickWhenDisabled ? false : disabled,
+    'data-disabled': (allowClickWhenDisabled && disabled) || undefined,
     role,
     size: sizeForMantine(bsSize),
     tabIndex,
     title,
     type,
+    '$showOverflow': showOverflow,
   } as const;
 
   if (href) {
     return (
       <StyledButton
+        ref={ref as unknown as React.Ref<HTMLAnchorElement>}
         component={Link}
         to={href}
         target={target}

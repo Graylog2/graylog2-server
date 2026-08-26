@@ -193,4 +193,12 @@ public class DataNodeCommandServiceImplTest {
 
     }
 
+    @Test
+    public void revokeCertificatePublishesClusterEvent() throws NodeNotFoundException {
+        final String testNodeId = "node";
+        nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
+        classUnderTest.revokeCertificate(testNodeId);
+        verify(clusterEventBus).post(DataNodeLifecycleEvent.create(testNodeId, DataNodeLifecycleTrigger.REVOKE_CERTIFICATE));
+    }
+
 }

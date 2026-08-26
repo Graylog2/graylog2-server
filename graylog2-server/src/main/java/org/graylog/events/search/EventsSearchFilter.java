@@ -30,6 +30,8 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = EventsSearchFilter.Builder.class)
 public abstract class EventsSearchFilter {
+    public static final String NULL_VALUE = "null";
+
     private static final String FIELD_ALERTS = "alerts";
     private static final String FIELD_EVENT_DEFINITIONS = "event_definitions";
     private static final String FIELD_PRIORITY = "priority";

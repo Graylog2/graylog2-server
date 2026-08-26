@@ -27,6 +27,7 @@ import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
 import org.bson.BsonValue;
@@ -38,9 +39,11 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoEntity;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -59,7 +62,7 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
-     * Extract the inserted id of type {@link ObjectId} from the insert result.
+     * Extract the inserted ID of type {@link ObjectId} from the insert result.
      *
      * @param result Result object for inserting a document of type MongoEntity.
      * @return the inserted object ID. Fails if the id was not stored as an {@link ObjectId}.
@@ -75,13 +78,43 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
-     * Extract the inserted id as a String from the insert result.
+     * Extract the inserted ID as a String from the insert result.
      *
      * @param result Result object for inserting a document of type MongoEntity.
      * @return the inserted object ID as string. Fails if the id was not stored as an {@link ObjectId}.
      */
     public static String insertedIdAsString(@Nonnull InsertOneResult result) {
         return insertedId(result).toHexString();
+    }
+
+    /**
+     * Extract the inserted IDs of type {@link ObjectId} from the insert result.
+     *
+     * @param result Result object for inserting many documents of type MongoEntity.
+     * @return a list of the inserted object IDs. Fails if the IDs are not stored as {@link ObjectId}.
+     */
+    public static List<ObjectId> insertedIds(@Nonnull InsertManyResult result) {
+        final var entries = result.getInsertedIds().entrySet();
+        if (entries.stream().map(Map.Entry::getValue).anyMatch(Objects::isNull)) {
+            // This should only happen when inserting RawBsonDocuments
+            throw new IllegalArgumentException("One of the inserted IDs is null. Make sure that you are inserting documents of " +
+                    "type <? extends MongoEntity>.");
+        }
+        return entries.stream()
+                .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                .map(Map.Entry::getValue)
+                .map(value -> value.asObjectId().getValue())
+                .toList();
+    }
+
+    /**
+     * Extract the inserted IDs of type {@link ObjectId} from the insert result as strings.
+     *
+     * @param result Result object for inserting many documents of type MongoEntity.
+     * @return a list of the inserted object IDs as strings. Fails if the IDs are not stored as {@link ObjectId}.
+     */
+    public static List<String> insertedIdsAsString(@Nonnull InsertManyResult result) {
+        return insertedIds(result).stream().map(ObjectId::toHexString).toList();
     }
 
     /**

@@ -59,5 +59,14 @@ public abstract class WebInterfaceAssetsResourceBase {
                     .statusCode(HttpStatus.SC_OK)
                     .contentType(ContentType.JSON);
         });
+
+        // Testing that the special `/api-browser` route is not returning a 404
+        backend()
+                .get(prefix + "api-browser")
+                .then()
+                .log().ifError()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .contentType(ContentType.HTML);
     }
 }

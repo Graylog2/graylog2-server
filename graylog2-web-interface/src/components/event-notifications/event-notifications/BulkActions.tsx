@@ -32,6 +32,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import { EVENT_NOTIFICATIONS_QUERY_KEY } from 'components/event-notifications/hooks/useEventNotifications';
 
 const BulkActions = () => {
   const queryClient = useQueryClient();
@@ -76,8 +77,9 @@ const BulkActions = () => {
 
           if (notDeletedNotificationIds.length !== selectedEntities.length) {
             queryClient.invalidateQueries({
-              queryKey: ['eventNotifications', 'overview'],
+              queryKey: EVENT_NOTIFICATIONS_QUERY_KEY,
             });
+            refetchEventNotifications();
           }
 
           UserNotification.error(
@@ -88,7 +90,7 @@ const BulkActions = () => {
         }
 
         queryClient.invalidateQueries({
-          queryKey: ['eventNotifications', 'overview'],
+          queryKey: EVENT_NOTIFICATIONS_QUERY_KEY,
         });
         setSelectedEntities(notDeletedNotificationIds);
         refetchEventNotifications();

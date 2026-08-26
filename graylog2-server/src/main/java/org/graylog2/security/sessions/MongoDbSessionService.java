@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -93,8 +92,13 @@ public class MongoDbSessionService implements SessionService {
     }
 
     @Override
-    public void update(SessionDTO session) {
-        collection.replaceOne(MongoUtils.idEq(Objects.requireNonNull(session.id())), session);
+    public void updateBySessionId(SessionDTO session) {
+        final var sessionId = session.sessionId();
+        final var result = collection.replaceOne(eq(FIELD_SESSION_ID, sessionId), session);
+        if (result.getMatchedCount() == 0) {
+            LOG.warn("Session <{}> was not found in MongoDB. " +
+                    "This may indicate a cache/database desync.", sessionId);
+        }
     }
 
     @Override

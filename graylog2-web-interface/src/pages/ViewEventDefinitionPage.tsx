@@ -15,105 +15,80 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
 import { ButtonToolbar, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner, ConfirmDialog } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import usePluginEntities from 'hooks/usePluginEntities';
+import {
+  useEventDefinitionWithContext,
+  copyEventDefinition,
+  EVENT_DEFINITIONS_QUERY_KEY,
+} from 'components/event-definitions/hooks/useEventDefinitions';
 
-type SigmaEventDefinitionConfig = EventDefinition['config'] & {
-  sigma_rule_id: string;
-};
+import useEventDefinitionDetailSections from './useEventDefinitionDetailSections';
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
   const currentUser = useCurrentUser();
-  const [eventDefinition, setEventDefinition] = useState<EventDefinition | undefined>();
   const [showDialog, setShowDialog] = useState(false);
-  const { all: notifications } = useStore(EventNotificationsStore);
+  const { data: notificationsData } = useEventNotifications();
+  const notifications = notificationsData?.notifications;
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
-  const navigate = useNavigate();
-  const [showSigmaModal, setShowSigmaModal] = useState(false);
-  const [refetch, setRefetch] = useState(true);
+  const detailSections = useEventDefinitionDetailSections();
 
-  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
-    (entity: { key: string }) => entity.key === 'coreSigmaModal',
-  );
+  const queryClient = useQueryClient();
+  const { data, isFetching } = useEventDefinitionWithContext(params.definitionId);
 
-  const CoreSigmaModal = pluggableSigmaModal
-    ? (pluggableSigmaModal.component as React.FC<{ ruleId: string; onCancel: () => void; onConfirm: () => void }>)
-    : null;
+  const eventDefinition = useMemo(() => {
+    if (!data?.eventDefinition) return null;
+
+    return {
+      ...data.eventDefinition,
+      config: {
+        ...data.eventDefinition.config,
+        _is_scheduled: data.context?.scheduler?.is_scheduled,
+      },
+    };
+  }, [data]);
 
   useEffect(() => {
-    if (
-      currentUser &&
-      isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`) &&
-      refetch
-    ) {
-      EventDefinitionsActions.get(params.definitionId).then(
-        (response: any) => {
-          const eventDefinitionResp = response.event_definition;
-
-          // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
-          // backend. This field will be removed in the event definitions store before sending an event definition
-          // back to the server.
-          eventDefinitionResp.config._is_scheduled = response.context.scheduler.is_scheduled;
-          setEventDefinition(eventDefinitionResp);
-        },
-        (error) => {
-          if (error.status === 404) {
-            history.push(Routes.ALERTS.DEFINITIONS.LIST);
-          }
-        },
-      );
-
-      EventNotificationsActions.listAll();
-
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setRefetch(false);
+    if (!isFetching && !eventDefinition) {
+      history.push(Routes.ALERTS.DEFINITIONS.LIST);
     }
-  }, [currentUser, history, params, refetch]);
+  }, [eventDefinition, history, isFetching]);
 
   const handleDuplicateEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, {
       app_pathname: 'event-definition',
     });
 
-    EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent: any) => {
-      navigate(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
-    });
+    copyEventDefinition(eventDefinition).then(
+      (duplicatedEvent) => {
+        queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
+        history.push(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
+      },
+      () => {
+        // Error feedback is handled by `copyEventDefinition` itself.
+      },
+    );
   };
 
-  const onEditEventDefinition = () => {
-    if (eventDefinition.config.type === 'sigma-v1') {
-      setShowSigmaModal(true);
-    } else {
-      navigate(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
-    }
-  };
+  const onEditEventDefinition = () => history.push(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
 
-  const onSigmaModalClose = () => {
-    setRefetch(true);
-    setShowSigmaModal(false);
-  };
-
-  if (!eventDefinition || !notifications) {
+  if (isFetching || !eventDefinition || !notifications) {
     return (
       <DocumentTitle title="View Event Definition">
         <span>
@@ -154,6 +129,9 @@ const ViewEventDefinitionPage = () => {
 
         <Row className="content">
           <Col md={12}>
+            {detailSections.map(({ key, component: Component }) => (
+              <Component key={key} eventDefinition={eventDefinition} />
+            ))}
             <EventDefinitionSummary
               eventDefinition={eventDefinition}
               currentUser={currentUser}
@@ -170,13 +148,6 @@ const ViewEventDefinitionPage = () => {
           onCancel={() => setShowDialog(false)}>
           {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
         </ConfirmDialog>
-      )}
-      {showSigmaModal && CoreSigmaModal && (
-        <CoreSigmaModal
-          ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
-          onCancel={onSigmaModalClose}
-          onConfirm={onSigmaModalClose}
-        />
       )}
     </>
   );

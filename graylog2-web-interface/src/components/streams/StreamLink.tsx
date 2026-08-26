@@ -16,9 +16,9 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
-import type { Stream } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 
 type Props = {
   stream: Stream;

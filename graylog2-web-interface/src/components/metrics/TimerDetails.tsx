@@ -17,7 +17,7 @@
 import React from 'react';
 import numeral from 'numeral';
 
-import type { TimerMetric } from 'stores/metrics/MetricsStore';
+import type { TimerMetric } from 'types/metrics';
 
 type Props = {
   metric: TimerMetric;

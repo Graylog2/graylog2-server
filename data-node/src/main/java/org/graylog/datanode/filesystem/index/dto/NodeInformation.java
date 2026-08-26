@@ -18,13 +18,14 @@ package org.graylog.datanode.filesystem.index.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.datanode.filesystem.index.OpensearchUtils;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
-import org.graylog.shaded.opensearch2.org.opensearch.Version;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public record NodeInformation(@JsonIgnore java.nio.file.Path nodePath, List<IndexInformation> indices,
@@ -40,12 +41,16 @@ public record NodeInformation(@JsonIgnore java.nio.file.Path nodePath, List<Inde
     @JsonProperty
     public String nodeVersion() {
         return Optional.ofNullable(stateFile).map(sf -> (Integer) sf.document().get("node_version"))
-                .map(Version::fromId)
-                .map(Version::toString)
+                .map(OpensearchUtils::versionStringFromId)
                 .orElseGet(this::parseFromIndices);
     }
 
     private String parseFromIndices() {
-        return indices.stream().map(IndexInformation::indexVersionCreated).distinct().findFirst().orElse(null);
+        // Indices without a state file have no version, Stream#findFirst would throw on those
+        return indices.stream()
+                .map(IndexInformation::indexVersionCreated)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 }

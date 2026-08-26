@@ -51,7 +51,7 @@ describe('TabAbsoluteTimeRange', () => {
     expect(accordionItemCal.getAttribute('aria-expanded')).toEqual('true');
     expect(accordionItemTime.getAttribute('aria-expanded')).toEqual('false');
 
-    userEvent.click(accordionItemTime);
+    await userEvent.click(accordionItemTime);
 
     await screen.findByText(/Date should be formatted as/i);
   });

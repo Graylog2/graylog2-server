@@ -50,11 +50,11 @@ const extendTypeSlices = (slices: Array<Slice>) => {
 const sliceRenderers: SliceRenderers = {
   priority: {
     extendSlices: extendPrioritySlices,
-    render: (value) => <PriorityName priority={value} />,
+    render: ({ value }) => <PriorityName priority={value} />,
   },
   alert: {
     extendSlices: extendTypeSlices,
-    render: (value) => <EventTypeLabel isAlert={String(value) === 'true'} />,
+    render: ({ value }) => <EventTypeLabel isAlert={String(value) === 'true'} />,
   },
 };
 

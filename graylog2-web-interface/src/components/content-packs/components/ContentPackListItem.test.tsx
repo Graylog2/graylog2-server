@@ -54,8 +54,8 @@ describe('<ContentPackListItem />', () => {
       <ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={deleteFn} onInstall={() => {}} />,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
-    userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+    await userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
 
     await waitFor(() => {
       expect(screen.queryByRole('menuitem', { name: /delete all versions/i })).not.toBeInTheDocument();
@@ -71,8 +71,8 @@ describe('<ContentPackListItem />', () => {
       <ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={deleteFn} onInstall={() => {}} />,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
-    userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+    await userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
 
     await waitFor(() => {
       expect(screen.queryByRole('menuitem', { name: /delete all versions/i })).not.toBeInTheDocument();

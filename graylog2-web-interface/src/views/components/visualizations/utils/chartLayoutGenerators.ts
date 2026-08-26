@@ -75,8 +75,9 @@ const defaultSettings = {
 };
 
 const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: FieldUnitType) => {
-  const min = Math.min(0, ...values);
-  const max = Math.max(...values);
+  const _values = values.map(Number);
+  const min = Math.min(0, ..._values);
+  const max = Math.max(..._values);
   const step = (max - min) / TIME_AXIS_LABELS_QUANTITY;
 
   const valueBaseUnit = getBaseUnit(fieldType);
@@ -117,6 +118,8 @@ export const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxis
       };
     case 'size':
       return getFormatSettingsWithCustomTickVals(values, 'size');
+    case 'binary_size':
+      return getFormatSettingsWithCustomTickVals(values, 'binary_size');
     case 'time':
       return getFormatSettingsWithCustomTickVals(values, 'time');
     default:
@@ -311,7 +314,7 @@ export const getHoverTemplateSettings = ({
   unit: FieldUnit;
   name?: string;
 }): { text: Array<string>; hovertemplate: string; meta: string } | {} => {
-  if (unit?.unitType === 'time' || unit?.unitType === 'size') {
+  if (unit?.unitType === 'time' || unit?.unitType === 'size' || unit?.unitType === 'binary_size') {
     return {
       text: getHoverTexts({ convertedValues, unit }),
       hovertemplate: `%{text}<br>${name ? '<extra>%{meta}</extra>' : '<extra></extra>'}`,

@@ -48,6 +48,7 @@ public class RestApiBindings extends PluginModule {
         // we don't actually have global REST API bindings for these
         jerseyExceptionMapperBinder();
         jerseyAdditionalComponentsBinder();
+        httpServerExtensionBinder();
 
         // Ensure that we create the binder. We might not have any plugin that registers a JobResourceHandler.
         jobResourceHandlerBinder();

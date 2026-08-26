@@ -17,12 +17,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link, RestrictedAccessTooltip } from 'components/common';
 import Routes from 'routing/Routes';
 import { createGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import type UserOverview from 'logic/users/UserOverview';
-import { RestrictedAccessTooltip } from 'components/common';
 import RolesCell from 'components/permissions/RolesCell';
 
 import ActionsCell from './ActionsCell';
@@ -32,6 +31,8 @@ import StatusCell from './StatusCell';
 type Props = {
   user: UserOverview;
   isActive: boolean;
+  onDeleted?: () => void;
+  onStatusChange?: () => void;
 };
 
 const NameColumnWrapper = styled.div`
@@ -54,6 +55,8 @@ const UsersOverviewItem = ({
     authServiceEnabled,
   },
   isActive,
+  onDeleted = undefined,
+  onStatusChange = undefined,
 }: Props) => {
   const grn = createGRN('user', username);
   const hasEditPermissions = useHasEntityPermissionByGRN(grn, 'edit');
@@ -78,7 +81,7 @@ const UsersOverviewItem = ({
       <td className="limited">{clientAddress}</td>
       <StatusCell accountStatus={accountStatus} authServiceEnabled={authServiceEnabled} />
       <RolesCell roles={roles} />
-      <ActionsCell user={user} />
+      <ActionsCell user={user} onDeleted={onDeleted} onStatusChange={onStatusChange} />
     </tr>
   );
 };

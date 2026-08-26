@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { ActionContexts } from 'views/types';
 import { multipleValuesActionsSupportedVisualizations } from 'views/Constants';
+import type { ActionContexts } from 'views/types';
 
 const hasMultipleValueForActions = (actionContexts: Partial<ActionContexts>): boolean =>
   !!(

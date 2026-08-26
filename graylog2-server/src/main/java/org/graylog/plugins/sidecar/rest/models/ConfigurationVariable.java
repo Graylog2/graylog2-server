@@ -62,6 +62,11 @@ public abstract class ConfigurationVariable implements MongoEntity {
 
     @JsonIgnore
     public String fullName() {
-        return String.format(Locale.ENGLISH, "${%s.%s}", VARIABLE_PREFIX, name());
+        return reference(name());
+    }
+
+    /** Template reference for a variable {@code name}, e.g. {@code ${user.graylog_host}}. */
+    public static String reference(String name) {
+        return String.format(Locale.ENGLISH, "${%s.%s}", VARIABLE_PREFIX, name);
     }
 }

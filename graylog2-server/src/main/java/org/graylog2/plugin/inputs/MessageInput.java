@@ -380,7 +380,7 @@ public abstract class MessageInput implements Stoppable {
     }
 
     public void processRawMessage(RawMessage rawMessage) {
-        final int payloadLength = rawMessage.getPayload().length;
+        final int payloadLength = rawMessage.getPayloadSize();
         if (payloadLength == 0) {
             LOG.debug("Discarding empty message {} from input {} (remote address {}). Turn logger org.graylog2.plugin.journal.RawMessage to TRACE to see originating stack trace.",
                     rawMessage.getId(),

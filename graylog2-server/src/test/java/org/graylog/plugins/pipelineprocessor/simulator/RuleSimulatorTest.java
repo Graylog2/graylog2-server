@@ -17,7 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.simulator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -38,7 +38,7 @@ class RuleSimulatorTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private ConfigurationStateUpdater configurationStateUpdater;
+    private PipelineInterpreterStateUpdater configurationStateUpdater;
 
     @BeforeAll
     public void setUp(MessageFactory messageFactory) {

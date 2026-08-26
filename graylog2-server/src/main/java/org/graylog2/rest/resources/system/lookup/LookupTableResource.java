@@ -71,6 +71,7 @@ import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -634,7 +635,15 @@ public class LookupTableResource extends RestResource {
                                         @Valid @RequestBody(required = true) DataAdapterApi toUpdate) {
         checkLookupAdapterId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
-        DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(toUpdate.toDto());
+
+        final DataAdapterDto existingDto = dbDataAdapterService.get(idOrName)
+                .orElseThrow(() -> new NotFoundException("Data adapter <" + idOrName + "> not found."));
+
+        final LookupDataAdapterConfiguration mergedConfig =
+                existingDto.config().prepareConfigUpdate(toUpdate.config());
+        final DataAdapterDto dtoToSave = toUpdate.toDto().toBuilder().config(mergedConfig).build();
+
+        DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(dtoToSave);
 
         return DataAdapterApi.fromDto(saved);
     }

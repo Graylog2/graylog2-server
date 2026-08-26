@@ -16,8 +16,7 @@
  */
 import * as React from 'react';
 
-import { useStore } from 'stores/connect';
-import { StreamsStore } from 'views/stores/StreamsStore';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 
 import StreamsContext from './StreamsContext';
 
@@ -26,9 +25,9 @@ type Props = {
 };
 
 const StreamsProvider = ({ children }: Props) => {
-  const _streams = useStore(StreamsStore, ({ streams }) => streams);
+  const { data: streams } = useAllStreams();
 
-  return <StreamsContext.Provider value={_streams}>{children}</StreamsContext.Provider>;
+  return <StreamsContext.Provider value={streams}>{children}</StreamsContext.Provider>;
 };
 
 export default StreamsProvider;

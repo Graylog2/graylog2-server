@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import type Role from 'logic/roles/Role';
 import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';

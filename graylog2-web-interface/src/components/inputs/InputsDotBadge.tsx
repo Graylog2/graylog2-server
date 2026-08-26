@@ -16,27 +16,26 @@
  */
 import * as React from 'react';
 
-import useInputsStates from 'hooks/useInputsStates';
+import useInputStateSummary from 'hooks/useInputStateSummary';
 import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
 
-const InputsDotBadge = ({ text }: { text: string }) => {
-  const { data, isLoading } = useInputsStates();
+type Props = {
+  text: string;
+  hasExternalIssues?: boolean;
+  externalIssuesTitle?: string;
+};
+
+const InputsDotBadge = ({ text, hasExternalIssues = false, externalIssuesTitle = '' }: Props) => {
+  const { hasProblematicInputs, isLoading } = useInputStateSummary();
 
   if (isLoading) {
-    return null;
+    return <>{text}</>;
   }
 
-  const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
-    Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
-  );
+  const showDot = hasProblematicInputs || hasExternalIssues;
+  const title = hasProblematicInputs ? 'Some inputs are in failed state or in setup mode.' : externalIssuesTitle;
 
-  return (
-    <MenuItemDotBadge
-      text={text}
-      title="Some inputs are in failed state or in setup mode."
-      showDot={hasFailedOrSetupInputs}
-    />
-  );
+  return <MenuItemDotBadge text={text} title={title} showDot={showDot} />;
 };
 
 export default InputsDotBadge;

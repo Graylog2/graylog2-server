@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { OrderedMap } from 'immutable';
 
 import { Events } from '@graylog/server-api';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
-import { eventsTableElements } from 'components/events/Constants';
+import { eventsTableElements, nonInfoPriorities } from 'components/events/Constants';
 import eventsSliceRenderers from 'components/events/SliceRenderers';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
@@ -38,6 +39,8 @@ const additionalSearchFields = {
   key: 'The key of the event',
 };
 
+const defaultFilters = OrderedMap({ priority: nonInfoPriorities });
+
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
   const _fetchEvents = (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string);
@@ -49,7 +52,7 @@ const EventsEntityTable = () => {
     const { filter, timerange } = parseFilters(filters);
 
     return Events.slices({
-      include_all: false,
+      include_all: true,
       slice_column: column,
       query: getConcatenatedQuery(query, streamId as string),
       filter,
@@ -64,6 +67,7 @@ const EventsEntityTable = () => {
         queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
         entityActions={entityActions}
         tableLayout={eventsTableElements.defaultLayout}
+        defaultFilters={defaultFilters}
         fetchEntities={_fetchEvents}
         fetchSlices={_fetchSlices}
         sliceRenderers={eventsSliceRenderers}

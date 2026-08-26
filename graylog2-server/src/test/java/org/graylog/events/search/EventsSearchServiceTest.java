@@ -21,7 +21,6 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
@@ -67,14 +66,12 @@ class EventsSearchServiceTest {
     private ObjectMapper objectMapper;
     @Mock
     private Subject subject;
-    @Mock
-    private ScriptingApiService scriptingApiService;
 
     private EventsSearchService service;
 
     @BeforeEach
     void setUp() {
-        service = new EventsSearchService(moreSearch, streamService, eventDefinitionService, scriptingApiService, objectMapper);
+        service = new EventsSearchService(moreSearch, streamService, eventDefinitionService, objectMapper);
 
         when(objectMapper.convertValue(any(Map.class), eq(EventDto.class))).thenAnswer(invocation -> {
             final Map<String, Object> fields = invocation.getArgument(0);
@@ -97,7 +94,7 @@ class EventsSearchServiceTest {
                 .executedQuery("message:*")
                 .build();
 
-        when(moreSearch.eventSearch(any(), any(), anySet(), anySet())).thenReturn(searchResult);
+        when(moreSearch.eventSearch(any(), any(), anySet(), any(SourceStreamFilter.class))).thenReturn(searchResult);
         when(streamService.streamAllIds()).thenAnswer(invocation -> java.util.stream.Stream.of("stream-allowed", "stream-denied"));
 
         mockSubjectPermissions();
@@ -110,11 +107,12 @@ class EventsSearchServiceTest {
         assertThat(result.context().streams()).containsOnlyKeys("stream-allowed");
         assertThat(result.context().eventDefinitions()).containsOnlyKeys("event-def-allowed");
 
-        final ArgumentCaptor<Set<String>> forbiddenCaptor = ArgumentCaptor.forClass(Set.class);
+        final ArgumentCaptor<SourceStreamFilter> filterCaptor = ArgumentCaptor.forClass(SourceStreamFilter.class);
         final ArgumentCaptor<Set<String>> eventStreamsCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(moreSearch).eventSearch(eq(parameters), any(), eventStreamsCaptor.capture(), forbiddenCaptor.capture());
+        verify(moreSearch).eventSearch(eq(parameters), any(), eventStreamsCaptor.capture(), filterCaptor.capture());
         assertThat(eventStreamsCaptor.getValue()).containsExactly(DEFAULT_EVENTS_STREAM_ID);
-        assertThat(forbiddenCaptor.getValue()).contains("stream-denied");
+        assertThat(filterCaptor.getValue().isAllAllowed()).isFalse();
+        assertThat(filterCaptor.getValue().streamIds()).containsExactly("stream-allowed");
     }
 
     private void mockSubjectPermissions() {

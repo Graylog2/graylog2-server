@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix grouping direction radio button losing visual state during reorder."
+
+pulls = ["25169"]
+issues = ["20261"]

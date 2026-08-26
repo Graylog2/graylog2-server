@@ -17,7 +17,8 @@
 import type { SyntheticEvent } from 'react';
 
 import type { StepsType } from 'components/common/Wizard';
-import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 
 type Provider = {
@@ -64,14 +65,15 @@ export type SearchFilter = {
   frontendId?: string;
   description?: string;
 };
+
 export type EventProcessorConfig = {
   type: string;
   query?: string;
-  query_parameters?: LookupTableParameterJson[];
+  query_parameters?: ParameterJson[];
   filters?: SearchFilter[];
   streams?: string[];
   stream_categories?: string[];
-  group_by: string[];
+  group_by?: string[];
   _is_scheduled?: boolean;
   series?: Array<{ field: string; id: string; type: string }>;
   conditions?: {
@@ -84,6 +86,7 @@ export type EventProcessorConfig = {
   cron_timezone?: string;
   event_limit?: number;
 };
+
 export type EventDefinition = {
   _scope: string;
   _entity_source: any;
@@ -107,10 +110,13 @@ export type EventDefinition = {
     type: string;
     streams: number[] | string[];
   }>;
+  tags: string[];
   updated_at: string | null;
   matched_at: string;
   scheduler: Scheduler;
   event_summary_template: string;
+  tactics_techniques?: string[];
+  share_request?: EntitySharePayload;
 };
 
 export type EventDefinitionFormControlsProps = {
@@ -121,6 +127,8 @@ export type EventDefinitionFormControlsProps = {
   onOpenPrevPage: () => void;
   onSubmit: (event: SyntheticEvent) => void;
   steps: StepsType<string>;
+  isSubmitting?: boolean;
+  disabledSubmit?: boolean;
 };
 
 export const isSystemEventDefinition = (eventDefinition: EventDefinition) =>

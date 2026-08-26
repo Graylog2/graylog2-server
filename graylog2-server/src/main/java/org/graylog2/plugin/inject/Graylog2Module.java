@@ -41,6 +41,7 @@ import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.jersey.HttpServerExtension;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
@@ -351,6 +352,10 @@ public abstract class Graylog2Module extends AbstractModule {
     @Nonnull
     protected Multibinder<Class<? extends ExceptionMapper>> jerseyExceptionMapperBinder() {
         return Multibinder.newSetBinder(binder(), new ExceptionMapperType());
+    }
+
+    protected MapBinder<String, HttpServerExtension> httpServerExtensionBinder() {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>() {});
     }
 
     @Nonnull

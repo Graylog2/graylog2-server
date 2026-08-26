@@ -66,7 +66,8 @@ describe('RuleForm', () => {
 
     expect(descriptionInput).toHaveValue('');
 
-    await userEvent.paste(descriptionInput, ruleToUpdate.description);
+    await userEvent.click(descriptionInput);
+    await userEvent.paste(ruleToUpdate.description);
     const createRuleButton = getByRole('button', { name: 'Update rule & close' });
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
@@ -131,7 +132,8 @@ describe('RuleForm', () => {
 
       expect(rawMessageInput).toHaveValue('');
 
-      await userEvent.paste(rawMessageInput, ruleInput);
+      await userEvent.click(rawMessageInput);
+      await userEvent.paste(ruleInput);
       const runSimulationButton = await screen.findByRole('button', { name: 'Run rule simulation' });
 
       await waitFor(() => {

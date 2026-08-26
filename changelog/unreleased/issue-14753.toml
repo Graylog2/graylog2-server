@@ -1,0 +1,5 @@
+type = "f"
+message = "Add entity-level permission check to event notification test endpoint."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14753"]
+pulls = ["26614"]

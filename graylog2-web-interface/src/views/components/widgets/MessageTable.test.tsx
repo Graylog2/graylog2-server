@@ -24,8 +24,9 @@ import MockAction from 'helpers/mocking/MockAction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-
-import MessageTable from './MessageTable';
+import MessageTable from 'components/common/message/messagetable/MessageTable';
+import SelectableMessageTableMessagesProvider from 'views/components/widgets/SelectableMessageTableMessagesProvider';
+import MessageTableSelectedEntitiesProvider from 'views/components/widgets/MessageTableSelectedEntitiesProvider';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
@@ -52,19 +53,25 @@ const messages = [
 ];
 const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
-const activeQueryId = 'some-query-id';
 
-const SimpleMessageTable = (props: Partial<Pick<React.ComponentProps<typeof MessageTable>, 'config' | 'fields'>>) => (
-  <MessageTable
-    activeQueryId={activeQueryId}
-    config={config}
-    fields={Immutable.List(fields)}
-    messages={messages}
-    onSortChange={() => Promise.resolve()}
-    setLoadingState={() => {}}
-    scrollContainerRef={undefined}
-    {...props}
-  />
+const SimpleMessageTable = (
+  props: Partial<
+    Pick<React.ComponentProps<typeof MessageTable>, 'config' | 'fields' | 'rowOverride' | 'renderRowActions'>
+  >,
+) => (
+  <SelectableMessageTableMessagesProvider displayBulkSelectCol={false} messages={messages}>
+    <MessageTableSelectedEntitiesProvider bulkSelection={null}>
+      <MessageTable
+        config={config}
+        fields={Immutable.List(fields)}
+        messages={messages}
+        onSortChange={() => Promise.resolve()}
+        setLoadingState={() => {}}
+        scrollContainerRef={undefined}
+        {...props}
+      />
+    </MessageTableSelectedEntitiesProvider>
+  </SelectableMessageTableMessagesProvider>
 );
 
 const highlightedStyle = 'border-left: 7px solid #45E5A8';
@@ -80,6 +87,18 @@ describe('MessageTable', () => {
     render(<SimpleMessageTable />);
 
     await screen.findByText(/frank.txt/i);
+  });
+
+  it('renders row override content and keeps row actions', async () => {
+    render(
+      <SimpleMessageTable
+        rowOverride={(message) => `Override for ${message.id}`}
+        renderRowActions={(message) => `Actions for ${message.id}`}
+      />,
+    );
+
+    await screen.findByText('Override for message-id-1');
+    await screen.findByText('Actions for message-id-1');
   });
 
   it('renders a table entry for messages, even if fields are `undefined`', async () => {

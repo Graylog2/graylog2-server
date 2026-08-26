@@ -18,9 +18,8 @@ import React, { useState } from 'react';
 import { styled } from 'styled-components';
 
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
-import { IconButton } from 'components/common';
+import { IconButton, Link } from 'components/common';
 import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileModal';
-import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
 const Container = styled.div`

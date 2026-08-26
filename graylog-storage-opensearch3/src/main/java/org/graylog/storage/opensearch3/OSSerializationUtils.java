@@ -26,6 +26,10 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
 import org.opensearch.client.json.PlainJsonSerializable;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch._types.aggregations.DoubleTermsBucket;
+import org.opensearch.client.opensearch._types.aggregations.LongTermsBucket;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
@@ -168,4 +172,17 @@ public class OSSerializationUtils {
                 )
         );
     }
+
+    public static String getBucketKeyAsString(MultiBucketBase bucket) {
+        return switch (bucket) {
+            case StringTermsBucket sterms -> sterms.key();
+            case DoubleTermsBucket dterms -> (dterms.keyAsString() != null) ?
+                    dterms.keyAsString() : Double.toString(dterms.key());
+            case LongTermsBucket lterms -> (lterms.keyAsString() != null) ?
+                    lterms.keyAsString() : lterms.key()._get().toString();
+            default -> "";
+        };
+    }
+
+
 }

@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -154,6 +155,13 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             """)
     @Parameter(value = "opensearch_heap", validators = {JavaHeapSizeValidator.class})
     private String opensearchHeap = "1g";
+
+    @Documentation("""
+            Warn if the configured opensearch heap size appears too small compared to the memory available
+            to this data node. Set to false to suppress the warning.
+            """)
+    @Parameter(value = "opensearch_heap_size_warning_enabled")
+    private boolean opensearchHeapSizeWarningEnabled = true;
 
     @Documentation("HTTP port on which the embedded opensearch listens")
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
@@ -364,11 +372,38 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_plugins_security_audit_type")
     private String opensearchAuditLog;
 
+    @Documentation("Opensearch memory lock ensures the process locks its memory into RAM so it cannot be swapped to disk.")
+    @Parameter(value = "opensearch_bootstrap_memory_lock")
+    private boolean opensearchBootstrapMemoryLock = false;
+
+    /**
+     * Testing aid, deliberately undocumented and unsupported. Normally a datanode keeps running the opensearch version
+     * it has already recorded, and moving to a newer one is an explicit administrator action on the upgrade page.
+     * With this enabled the node instead takes the newest distribution its data allows on every start, which makes it
+     * possible to exercise a generation change without driving the upgrade UI. It never relaxes the compatibility
+     * bound — data that only the compatibility distribution can read still gets the compatibility distribution.
+     */
+    @Documentation(visible = false)
+    @Parameter(value = "auto_update_opensearch")
+    private boolean autoUpdateOpensearch = false;
+
     public String getOpensearchAuditLog() {
         return opensearchAuditLog;
     }
 
-     /**
+    public boolean isAutoUpdateOpensearch() {
+        return autoUpdateOpensearch;
+    }
+
+    @Documentation("""
+            This parameter defines the maximum size in bytes of cluster events. When it is exceeded, oldest events will
+            be overwritten. This should be as small as possible (for performance), but large enough to hold events long
+            enough for all nodes to process them.
+            """)
+    @Parameter(value = "max_events_collection_size")
+    private Size maxEventsCollectionSize = Size.megabytes(100);
+
+    /**
      * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
      * configure all the CA and certs automatically.
      */
@@ -716,6 +751,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return opensearchHeap;
     }
 
+    public boolean isOpensearchHeapSizeWarningEnabled() {
+        return opensearchHeapSizeWarningEnabled;
+    }
+
     @Override
     public String getEnvironmentVariablePrefix() {
         return "GRAYLOG_DATANODE_";
@@ -752,5 +791,9 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public Duration getIndexerJwtAuthTokenClockSkewTolerance() {
         return indexerJwtAuthTokeClockSkewTolerance;
+    }
+
+    public boolean getOpensearchBootstrapMemoryLock() {
+        return opensearchBootstrapMemoryLock;
     }
 }

@@ -24,6 +24,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useEventById from 'hooks/useEventById';
 import { mockEventData, mockEventDefinitionTwoAggregations } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
+import RightSidebarProvider from 'contexts/RightSidebarProvider';
 
 import EventDetails from './EventDetails';
 
@@ -32,8 +33,12 @@ jest.mock('hooks/useEventById');
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/events/events/hooks/useEventDefinition');
 
-const renderEventDetails = () => render(<EventDetails eventId="event-id" />);
-
+const renderEventDetails = () =>
+  render(
+    <RightSidebarProvider>
+      <EventDetails eventId="event-id" />
+    </RightSidebarProvider>,
+  );
 describe('EventDetails', () => {
   beforeEach(() => {
     asMock(usePluginEntities).mockImplementation(
@@ -47,7 +52,12 @@ describe('EventDetails', () => {
     );
 
     asMock(useCurrentUser).mockReturnValue(adminUser);
-    asMock(useEventDefinition).mockReturnValue({ data: undefined, isFetching: false, isInitialLoading: false });
+    asMock(useEventDefinition).mockReturnValue({
+      data: undefined,
+      isFetching: false,
+      isInitialLoading: false,
+      isError: false,
+    });
 
     asMock(useEventById).mockImplementation(() => ({
       data: mockEventData.event,
@@ -81,6 +91,7 @@ describe('EventDetails', () => {
       data: mockEventDefinitionTwoAggregations,
       isFetching: false,
       isInitialLoading: false,
+      isError: false,
     });
 
     renderEventDetails();
