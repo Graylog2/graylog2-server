@@ -15,16 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 
 import { isPermitted } from 'util/PermissionsMixin';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import useMigrationState from './useMigrationState';
-
-const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl('/datanode/configured'));
+import useRunsWithDataNode from './useRunsWithDataNode';
 
 const useShowDatanodeMigration = (): {
   isDatanodeConfiguredAndUsed: boolean;
@@ -33,11 +29,7 @@ const useShowDatanodeMigration = (): {
   const { permissions } = useCurrentUser();
   const canStartDataNode = useMemo(() => isPermitted(permissions, 'datanode:start'), [permissions]);
 
-  const { data: isDatanodeConfiguredAndUsed } = useQuery({
-    queryKey: ['show_datanode_migration'],
-    queryFn: fetchShowDatanodeMigration,
-    enabled: canStartDataNode,
-  });
+  const { data: isDatanodeConfiguredAndUsed } = useRunsWithDataNode({ enabled: canStartDataNode });
 
   const { currentStep } = useMigrationState({ enabled: canStartDataNode });
   const noMigrationInProgress = !currentStep || currentStep?.state === 'NEW' || currentStep?.state === 'FINISHED';
