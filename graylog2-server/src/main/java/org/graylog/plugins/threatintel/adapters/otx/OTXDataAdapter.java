@@ -50,6 +50,9 @@ import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
+import org.graylog2.system.urlallowlist.UrlNotAllowlistedException;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -98,6 +101,8 @@ public class OTXDataAdapter extends LookupDataAdapter {
 
     private final Config config;
     private final OkHttpClient httpClient;
+    private final UrlAllowlistService urlAllowlistService;
+    private final UrlAllowlistNotificationService urlAllowlistNotificationService;
     private final Timer httpRequestTimer;
     private final Meter httpRequestErrors;
     private Headers httpHeaders;
@@ -108,6 +113,8 @@ public class OTXDataAdapter extends LookupDataAdapter {
                              @Assisted("name") String name,
                              @Assisted LookupDataAdapterConfiguration config,
                              OkHttpClient httpClient,
+                             UrlAllowlistService urlAllowlistService,
+                             UrlAllowlistNotificationService urlAllowlistNotificationService,
                              MetricRegistry metricRegistry) {
         super(id, name, config, metricRegistry);
 
@@ -118,6 +125,8 @@ public class OTXDataAdapter extends LookupDataAdapter {
                 .readTimeout(this.config.httpReadTimeout(), TimeUnit.MILLISECONDS)
                 .build();
 
+        this.urlAllowlistService = urlAllowlistService;
+        this.urlAllowlistNotificationService = urlAllowlistNotificationService;
         this.httpRequestTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "httpRequestTime"));
         this.httpRequestErrors = metricRegistry.meter(MetricRegistry.name(getClass(), "httpRequestErrors"));
     }
@@ -152,6 +161,11 @@ public class OTXDataAdapter extends LookupDataAdapter {
             throw new IllegalArgumentException("OTX API URL is not valid");
         }
 
+        if (!urlAllowlistService.isAllowlisted(config.apiUrl())) {
+            publishSystemNotificationForAllowlistFailure();
+            throw UrlNotAllowlistedException.forUrl(config.apiUrl());
+        }
+
         this.httpHeaders = builder
                 .add(HttpHeaders.USER_AGENT, config.httpUserAgent())
                 .add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
@@ -161,6 +175,12 @@ public class OTXDataAdapter extends LookupDataAdapter {
     @Override
     protected void doStop() throws Exception {
         // Not needed
+    }
+
+    private void publishSystemNotificationForAllowlistFailure() {
+        final String description = "An \"OTX\" lookup adapter is trying to access a URL which is not allowlisted. " +
+                "Please check your configuration. [adapter name: \"" + name() + "\", url: \"" + config.apiUrl() + "\"]";
+        urlAllowlistNotificationService.publishAllowlistFailure(description);
     }
 
     @Override

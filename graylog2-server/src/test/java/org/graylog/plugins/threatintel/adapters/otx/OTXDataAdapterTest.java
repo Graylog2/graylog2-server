@@ -21,10 +21,14 @@ import com.google.common.io.Resources;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
+import org.graylog2.system.urlallowlist.UrlNotAllowlistedException;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -33,10 +37,21 @@ import java.net.URL;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class OTXDataAdapterTest {
+
+    @Mock
+    private UrlAllowlistService urlAllowlistService;
+
+    @Mock
+    private UrlAllowlistNotificationService urlAllowlistNotificationService;
 
     private OTXDataAdapter otxDataAdapter;
 
@@ -45,7 +60,8 @@ public class OTXDataAdapterTest {
         final OTXDataAdapter.Config defaultConfiguration = new OTXDataAdapter.Descriptor(CustomizationConfig.empty()).defaultConfiguration();
         final MetricRegistry metricRegistry = new MetricRegistry();
 
-        this.otxDataAdapter = new OTXDataAdapter("1", "otx-test", defaultConfiguration, new OkHttpClient(), metricRegistry);
+        this.otxDataAdapter = new OTXDataAdapter("1", "otx-test", defaultConfiguration, new OkHttpClient(),
+                urlAllowlistService, urlAllowlistNotificationService, metricRegistry);
     }
 
     @Test
@@ -67,5 +83,24 @@ public class OTXDataAdapterTest {
         assertThat(otxDataAdapter.isPrivateIPAddress("192.168.178.56")).isTrue();
         assertThat(otxDataAdapter.isPrivateIPAddress("8.8.8.8")).isFalse();
         assertThat(otxDataAdapter.isPrivateIPAddress("137.254.56.25")).isFalse();
+    }
+
+    @Test
+    public void doStart_allowsWhenUrlIsAllowlisted() throws Exception {
+        when(urlAllowlistService.isAllowlisted("https://otx.alienvault.com")).thenReturn(true);
+
+        assertThatCode(() -> otxDataAdapter.doStart())
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    public void doStart_throwsWhenUrlNotAllowlisted() throws Exception {
+        when(urlAllowlistService.isAllowlisted("https://otx.alienvault.com")).thenReturn(false);
+
+        assertThatThrownBy(() -> otxDataAdapter.doStart())
+                .isInstanceOf(UrlNotAllowlistedException.class)
+                .hasMessageContaining("https://otx.alienvault.com");
+
+        verify(urlAllowlistNotificationService).publishAllowlistFailure(anyString());
     }
 }
