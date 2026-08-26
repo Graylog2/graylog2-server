@@ -21,7 +21,7 @@ import { fetchStreams } from 'api/streams';
 
 export const STREAMS_QUERY_KEY = ['streams', 'all'];
 
-const STREAMS_STALE_TIME = 30 * 1000;
+const STREAMS_STALE_TIME = 5 * 1000;
 
 const useAllStreams = (): {
   data: Array<Stream> | undefined;

@@ -18,9 +18,12 @@
 import useAllStreams from 'components/streams/hooks/useAllStreams';
 
 const useHasAccessToAnyStream = () => {
-  const { data: streams } = useAllStreams();
+  const { data: streams, isLoading } = useAllStreams();
 
-  return !!streams && streams.length > 0;
+  return {
+    isLoading,
+    hasAccessToAnyStream: !!streams && streams.length > 0,
+  };
 };
 
 export default useHasAccessToAnyStream;
