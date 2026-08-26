@@ -44,11 +44,14 @@ const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) =>
     }
   }, [dispatch, jobIds]);
 
+  // `AutoRefreshProvider` only seeds its state from `defaultRefreshConfig` when it mounts, so it needs to be
+  // remounted once the minimum refresh interval has been loaded. That is only relevant when auto refresh is
+  // requested through the URL, otherwise `refreshConfig` stays `null` either way and remounting would throw
+  // away and rebuild the complete search page, causing a second search execution and duplicate requests.
+  const providerKey = autoRefresh && isLoadingMinimumRefresh ? 'loading' : 'ready';
+
   return (
-    <AutoRefreshProvider
-      key={isLoadingMinimumRefresh ? 'loading' : 'ready'}
-      defaultRefreshConfig={refreshConfig}
-      onRefresh={onRefresh}>
+    <AutoRefreshProvider key={providerKey} defaultRefreshConfig={refreshConfig} onRefresh={onRefresh}>
       {children}
     </AutoRefreshProvider>
   );

@@ -121,6 +121,10 @@ public class SystemJobResource extends RestResource {
         }
 
         for (final var summary : systemJobManager.getRunningJobs(nodeId).values()) {
+            // Jobs with their own JobResourceHandler are listed through that handler instead
+            if (jobResourceHandlerService.handlesJobType(summary.jobType())) {
+                continue;
+            }
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, summary.jobType())) {
                 jobs.add(summary);
             }
@@ -157,7 +161,8 @@ public class SystemJobResource extends RestResource {
             );
         }
 
-        final Optional<SystemJobSummary> systemJobSummary = systemJobManager.getRunningJob(jobId);
+        final Optional<SystemJobSummary> systemJobSummary = systemJobManager.getRunningJob(jobId)
+                .filter(summary -> !jobResourceHandlerService.handlesJobType(summary.jobType()));
         if (systemJobSummary.isPresent()) {
             checkPermission(RestPermissions.SYSTEMJOBS_READ, systemJobSummary.get().jobType());
             return systemJobSummary.get();
