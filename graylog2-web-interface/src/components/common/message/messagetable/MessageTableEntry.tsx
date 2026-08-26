@@ -21,7 +21,7 @@ import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import type { Stream } from 'logic/streams/types';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Input } from 'components/messageloaders/Types';
@@ -173,7 +173,7 @@ const MessageTableEntry = ({
   overrideContent = undefined,
 }: Props) => {
   const { data: inputsList = [] } = useInputsList();
-  const streamsList = useContext(StreamsContext);
+  const { data: streamsList } = useAllStreams();
   const highlightMessageId = useContext(HighlightMessageContext);
 
   const sendTelemetry = useSendTelemetry();

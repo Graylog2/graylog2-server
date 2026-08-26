@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
 
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 
 const useHasAccessToAnyStream = () => {
-  const streams = useContext(StreamsContext);
+  const { data: streams } = useAllStreams();
 
   return !!streams && streams.length > 0;
 };

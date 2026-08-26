@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import type { Stream } from 'logic/streams/types';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -45,6 +45,7 @@ const streams = [{ id: 'streamId', title: 'Stream' }] as Array<Stream>;
 
 jest.mock('./hooks/useFormattedFields');
 jest.mock('./hooks/useMessageFavoriteFieldsForEditing');
+jest.mock('components/streams/hooks/useAllStreams');
 jest.mock('./hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
 
 const formattedFavorites = [
@@ -80,18 +81,16 @@ const renderComponent = () =>
     render(
       <TestStoreProvider view={view}>
         <GraylogThemeProvider userIsLoggedIn>
-          <StreamsContext.Provider value={streams}>
-            <MessageFavoriteFieldsContext.Provider
-              value={
-                {
-                  saveFavoriteField: saveFavoriteFields,
-                  editableStreams: [],
-                  message,
-                } as any
-              }>
-              <MessageFieldsEditModal toggleEditMode={mockedToggleEditMode} />
-            </MessageFavoriteFieldsContext.Provider>
-          </StreamsContext.Provider>
+          <MessageFavoriteFieldsContext.Provider
+            value={
+              {
+                saveFavoriteField: saveFavoriteFields,
+                editableStreams: [],
+                message,
+              } as any
+            }>
+            <MessageFieldsEditModal toggleEditMode={mockedToggleEditMode} />
+          </MessageFavoriteFieldsContext.Provider>
         </GraylogThemeProvider>
       </TestStoreProvider>,
     ),
@@ -101,6 +100,7 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    mockUseAllStreams(streams);
     asMock(useFormattedFields).mockReturnValue({ formattedRest, formattedFavorites });
     asMock(useMessageFavoriteFieldsForEditing).mockReturnValue({
       resetFavoriteFields,

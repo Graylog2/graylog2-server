@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import upperFirst from 'lodash/upperFirst';
 import styled from 'styled-components';
@@ -34,7 +33,7 @@ import type { Stream } from 'logic/streams/types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 
 import AggregationConditionSummary from './AggregationConditionSummary';
 import { TIME_UNITS } from './FilterForm';
@@ -149,7 +148,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
 };
 
 const FilterAggregationSummary = ({ config, currentUser, definitionId = undefined }: Props) => {
-  const streams = useContext(StreamsContext);
+  const { data: streams } = useAllStreams();
   const {
     query,
     query_parameters: queryParameters,
@@ -212,7 +211,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       <dt>Streams</dt>
       <dd className={styles.streamList}>
         <Streams
-          streams={streams}
+          streams={streams ?? []}
           streamIds={effectiveStreamIds}
           streamIdsWithMissingPermission={streamIdsWithMissingPermission}
         />

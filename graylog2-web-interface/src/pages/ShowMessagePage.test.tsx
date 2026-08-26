@@ -25,7 +25,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { Stream } from 'logic/streams/types';
 import { fetchInput } from 'hooks/useInputs';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import FetchError from 'logic/errors/FetchError';
 import suppressConsole from 'helpers/suppressConsole';
 import { usePlugin } from 'views/test/testPlugins';
@@ -56,24 +56,23 @@ jest.mock('hooks/useInputs', () => ({
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 jest.mock('routing/withParams', () => (x) => x);
+jest.mock('components/streams/hooks/useAllStreams');
 
 type SimpleShowMessagePageProps = {
   index: string;
   messageId: string;
-  streams?: Array<{ id: string }>;
 };
 
-const SimpleShowMessagePage = ({ index, messageId, streams = [] }: SimpleShowMessagePageProps) => (
-  <StreamsContext.Provider value={streams as Array<Stream>}>
-    {/* @ts-expect-error */}
-    <ShowMessagePage params={{ index, messageId }} />
-  </StreamsContext.Provider>
+const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps) => (
+  // @ts-expect-error
+  <ShowMessagePage params={{ index, messageId }} />
 );
 
 describe('ShowMessagePage', () => {
   const isLocalNode = jest.fn();
 
   beforeEach(() => {
+    mockUseAllStreams([]);
     jest.clearAllMocks();
     asMock(useFieldTypes).mockReturnValue({ data: [], refetch: () => {} });
     asMock(isLocalNode).mockResolvedValue(true);
@@ -113,7 +112,9 @@ describe('ShowMessagePage', () => {
   it('renders for generic message if streams are (yet) missing', async () => {
     asMock(fetchInput).mockResolvedValue(input);
 
-    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" streams={null} />);
+    mockUseAllStreams(undefined);
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
 
     await screen.findByText(/Deprecated field/);
     await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
@@ -145,13 +146,9 @@ describe('ShowMessagePage', () => {
     asMock(Messages.search).mockResolvedValue(messageWithMultipleStreams);
     mockGetInput.mockImplementation(() => Promise.resolve(input));
 
-    render(
-      <SimpleShowMessagePage
-        index="graylog_5"
-        messageId="20f683d2-a874-11e9-8a11-0242ac130004"
-        streams={[{ id: 'deadbeef' }]}
-      />,
-    );
+    mockUseAllStreams([{ id: 'deadbeef' } as Stream]);
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
 
     await screen.findByText(/Deprecated field/);
 

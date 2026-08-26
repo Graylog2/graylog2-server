@@ -19,7 +19,7 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import SearchComponent from 'views/components/Search';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import UseCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
@@ -53,6 +53,7 @@ jest.mock('views/hooks/useCreateSearch');
 jest.mock('hooks/useEventById');
 jest.mock('hooks/useEventDefinition');
 jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
+jest.mock('components/streams/hooks/useAllStreams');
 
 jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
   ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
@@ -74,15 +75,14 @@ jest.mock('views/logic/Widgets', () => ({
 describe('EventReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
     <RightSidebarProvider>
-      <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
-        <EventReplaySearchPage />
-      </StreamsContext.Provider>
+      <EventReplaySearchPage />
     </RightSidebarProvider>
   );
 
   useViewsPlugin();
 
   beforeEach(() => {
+    mockUseAllStreams([{ id: 'deadbeef', title: 'Teststream' } as Stream]);
     asMock(useParams).mockReturnValue({ alertId: mockEventData.event.id });
     asMock(UseCreateViewForEvent).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue({
