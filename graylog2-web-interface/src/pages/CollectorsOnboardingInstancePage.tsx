@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
@@ -29,8 +29,6 @@ import Routes from 'routing/Routes';
 import useLocation from 'routing/useLocation';
 import { extractErrorMessage } from 'util/extractErrorMessage';
 import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
@@ -42,21 +40,20 @@ const CollectorsOnboardingInstancePage = () => {
   const { data: fleet } = useFleet(instance?.fleet_id ?? '');
 
   const { mutate: finish } = useFinishOnboarding();
-  const sendTelemetry = useSendCollectorsTelemetry();
 
-  // using useEffect to guard that the instance is actually there before we finish the onboarding
+  // Guards that the instance is actually there before we finish the onboarding. `useInstance`
+  // polls on the heartbeat interval and returns a new object each time, so this must be latched
+  // rather than keyed on the instance reference -- otherwise it re-POSTs every poll.
+  // The COMPLETED telemetry event lives in `ConnectionSuccess`, which knows whether messages
+  // are actually arriving.
+  const finishedFor = useRef<string | null>(null);
+
   useEffect(() => {
-    if (instance) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
-        app_action_value: 'collector-onboarding-completed',
-        instance_id: instance.instance_uid,
-        fleet_id: instance.fleet_id,
-        status: instance.status,
-      });
+    if (!instance || finishedFor.current === instance.instance_uid) return;
 
-      finish();
-    }
-  }, [instance, finish, sendTelemetry]);
+    finishedFor.current = instance.instance_uid;
+    finish();
+  }, [instance, finish]);
 
   const content = () => {
     if (isLoading) return <Spinner />;

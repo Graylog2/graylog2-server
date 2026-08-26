@@ -498,6 +498,8 @@ export const TELEMETRY_EVENT_TYPE = {
       FLEET_CLEARED: 'Collector Onboarding Fleet Cleared',
       CONNECTED: 'Collector Onboarding Collector Connected',
       COMPLETED: 'Collector Onboarding Completed',
+      CONNECTION_LOST: 'Collector Onboarding Connection Lost',
+      AWAITING_DATA: 'Collector Onboarding Awaiting Data',
       NEXT_STEP_CLICKED: 'Collector Onboarding Next Step Clicked',
       CHECK_AGAIN_CLICKED: 'Collector Onboarding Check Again Clicked',
     },

@@ -375,4 +375,116 @@ describe('ConnectionSuccess', () => {
       });
     });
   });
+
+  describe('onboarding state telemetry', () => {
+    const offline = { ...instance, status: 'offline' } as typeof instance;
+    const notReceiving = { ...logPreview, sourceLogs: { messages: [], total: 0 } };
+
+    const EVENTS = TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING;
+
+    const callsFor = (eventType: string) => sendTelemetry.mock.calls.filter(([type]) => type === eventType);
+
+    it('reports COMPLETED on entering the receiving state', () => {
+      render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        EVENTS.COMPLETED,
+        expect.objectContaining({
+          app_action_value: 'collector-onboarding-completed',
+          instance_id: 'uid-42',
+          outcome: 'online-receiving',
+          from_outcome: null,
+        }),
+      );
+    });
+
+    it('reports AWAITING_DATA for a collector that is up but has sent nothing', () => {
+      asMock(useCollectorLogPreview).mockReturnValue(notReceiving);
+
+      render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        EVENTS.AWAITING_DATA,
+        expect.objectContaining({
+          app_action_value: 'onboarding-awaiting-data',
+          outcome: 'online-silent',
+          had_messages: false,
+        }),
+      );
+      expect(callsFor(EVENTS.COMPLETED)).toHaveLength(0);
+    });
+
+    it('reports CONNECTION_LOST on entering the offline state', () => {
+      render(<ConnectionSuccess instance={offline} fleetName="Default Fleet" />);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        EVENTS.CONNECTION_LOST,
+        expect.objectContaining({
+          app_action_value: 'onboarding-connection-lost',
+          outcome: 'offline',
+          had_messages: true,
+          seconds_since_last_seen: expect.any(Number),
+        }),
+      );
+    });
+
+    // The instance query polls on the heartbeat interval and returns a fresh object each time;
+    // a state that has not changed must not produce an event per poll.
+    it.each([
+      ['receiving', instance, EVENTS.COMPLETED],
+      ['offline', offline, EVENTS.CONNECTION_LOST],
+    ])('reports only once while the %s state is unchanged', (_name, subject, eventType) => {
+      const { rerender } = render(<ConnectionSuccess instance={subject} fleetName="Default Fleet" />);
+
+      rerender(<ConnectionSuccess instance={{ ...subject }} fleetName="Default Fleet" />);
+      rerender(<ConnectionSuccess instance={{ ...subject }} fleetName="Default Fleet" />);
+
+      expect(callsFor(eventType)).toHaveLength(1);
+    });
+
+    it('reports the silent state again when a collector reconnects without sending data', () => {
+      asMock(useCollectorLogPreview).mockReturnValue(notReceiving);
+
+      const { rerender } = render(<ConnectionSuccess instance={offline} fleetName="Default Fleet" />);
+
+      expect(callsFor(EVENTS.CONNECTION_LOST)).toHaveLength(1);
+
+      rerender(<ConnectionSuccess instance={{ ...instance }} fleetName="Default Fleet" />);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        EVENTS.AWAITING_DATA,
+        expect.objectContaining({ outcome: 'online-silent', from_outcome: 'offline' }),
+      );
+    });
+
+    it('walks the full silent -> receiving -> offline -> silent path, one event per entry', () => {
+      asMock(useCollectorLogPreview).mockReturnValue(notReceiving);
+      const { rerender } = render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      asMock(useCollectorLogPreview).mockReturnValue(logPreview);
+      rerender(<ConnectionSuccess instance={{ ...instance }} fleetName="Default Fleet" />);
+
+      rerender(<ConnectionSuccess instance={{ ...offline }} fleetName="Default Fleet" />);
+
+      asMock(useCollectorLogPreview).mockReturnValue(notReceiving);
+      rerender(<ConnectionSuccess instance={{ ...instance }} fleetName="Default Fleet" />);
+
+      expect(sendTelemetry.mock.calls.map(([type]) => type)).toEqual([
+        EVENTS.AWAITING_DATA,
+        EVENTS.COMPLETED,
+        EVENTS.CONNECTION_LOST,
+        EVENTS.AWAITING_DATA,
+      ]);
+    });
+
+    // COMPLETED is a funnel milestone, not a state: recovering does not mean onboarding twice.
+    it('does not report COMPLETED a second time after a drop and recovery', () => {
+      const { rerender } = render(<ConnectionSuccess instance={instance} fleetName="Default Fleet" />);
+
+      rerender(<ConnectionSuccess instance={{ ...offline }} fleetName="Default Fleet" />);
+      rerender(<ConnectionSuccess instance={{ ...instance }} fleetName="Default Fleet" />);
+
+      expect(callsFor(EVENTS.COMPLETED)).toHaveLength(1);
+    });
+  });
 });

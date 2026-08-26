@@ -22,11 +22,13 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
+import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
+jest.mock('components/welcome/hooks/useFinishOnboarding');
 
 jest.mock('components/collectors/hooks/useInstanceQueries', () => ({
   useInstance: jest.fn(),
@@ -90,11 +92,15 @@ describe('CollectorsOnboardingInstancePage', () => {
     } as ReturnType<typeof useInstance>);
 
   const sendTelemetry = jest.fn();
+  const finish = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
+    asMock(useFinishOnboarding).mockReturnValue({ mutate: finish } as unknown as ReturnType<
+      typeof useFinishOnboarding
+    >);
     mockUseLocation.mockReturnValue({ state: null });
     mockInstanceLookup();
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);
@@ -138,23 +144,42 @@ describe('CollectorsOnboardingInstancePage', () => {
     );
   });
 
-  it('reports onboarding completion once the instance is loaded', () => {
+  it('finishes the onboarding once the instance is loaded', () => {
     render(<CollectorsOnboardingInstancePage />);
 
-    expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
-      app_action_value: 'collector-onboarding-completed',
-      instance_id: 'uid-42',
-      fleet_id: 'fleet-1',
-      status: 'online',
-    });
+    expect(finish).toHaveBeenCalledTimes(1);
   });
 
-  it('does not report onboarding completion while the instance is still loading', () => {
+  it('does not finish the onboarding while the instance is still loading', () => {
     mockInstanceLookup({ data: undefined, isLoading: true });
 
     render(<CollectorsOnboardingInstancePage />);
 
-    expect(sendTelemetry).not.toHaveBeenCalled();
+    expect(finish).not.toHaveBeenCalled();
+  });
+
+  // `useInstance` polls on the heartbeat interval and returns a fresh object each time, so a
+  // re-render with an equal-but-not-identical instance must not re-POST the completion.
+  it('does not finish the onboarding again when the polled instance object changes identity', () => {
+    const { rerender } = render(<CollectorsOnboardingInstancePage />);
+
+    expect(finish).toHaveBeenCalledTimes(1);
+
+    mockInstanceLookup({ data: { ...instance } });
+    rerender(<CollectorsOnboardingInstancePage />);
+    mockInstanceLookup({ data: { ...instance } });
+    rerender(<CollectorsOnboardingInstancePage />);
+
+    expect(finish).toHaveBeenCalledTimes(1);
+  });
+
+  it('no longer emits onboarding telemetry from the page itself', () => {
+    render(<CollectorsOnboardingInstancePage />);
+
+    expect(sendTelemetry).not.toHaveBeenCalledWith(
+      TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED,
+      expect.anything(),
+    );
   });
 
   it('surfaces a fetch error', () => {
