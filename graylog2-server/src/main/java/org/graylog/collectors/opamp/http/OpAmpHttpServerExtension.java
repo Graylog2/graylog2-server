@@ -19,6 +19,7 @@ package org.graylog.collectors.opamp.http;
 import jakarta.inject.Inject;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.graylog.collectors.opamp.OpAmpConstants;
+import org.graylog.collectors.opamp.transport.OpAmpAuthCheckHttpHandler;
 import org.graylog.collectors.opamp.transport.OpAmpHttpHandler;
 import org.graylog2.jersey.HttpServerExtension;
 import org.slf4j.Logger;
@@ -32,17 +33,21 @@ public class OpAmpHttpServerExtension implements HttpServerExtension {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpHttpServerExtension.class);
 
     private final OpAmpHttpHandler opAmpHttpHandler;
+    private final OpAmpAuthCheckHttpHandler opAmpAuthCheckHttpHandler;
 
     @Inject
-    public OpAmpHttpServerExtension(OpAmpHttpHandler opAmpHttpHandler) {
+    public OpAmpHttpServerExtension(OpAmpHttpHandler opAmpHttpHandler,
+                                    OpAmpAuthCheckHttpHandler opAmpAuthCheckHttpHandler) {
         this.opAmpHttpHandler = requireNonNull(opAmpHttpHandler, "opAmpHttpHandler");
+        this.opAmpAuthCheckHttpHandler = requireNonNull(opAmpAuthCheckHttpHandler, "opAmpAuthCheckHttpHandler");
     }
 
     /**
-     * Configure OpAMP endpoint at /v1/opamp for HTTP transport.
+     * Configure OpAMP endpoint at /v1/opamp and /v1/opamp-auth-check for HTTP transport.
      */
     public void configure(HttpServer httpServer) {
         httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, OpAmpConstants.PATH);
+        httpServer.getServerConfiguration().addHttpHandler(opAmpAuthCheckHttpHandler, OpAmpConstants.AUTH_CHECK_PATH);
 
         LOG.info("OpAMP endpoint enabled at {}", OpAmpConstants.PATH);
     }

@@ -207,32 +207,10 @@ public class OpAmpService {
 
     @WithSpan
     public ServerToAgent handleMessage(AgentToServer message, OpAmpAuthContext authContext) {
-        if (isAuthCheck(message)) {
-            return handleAuthCheck(message);
-        }
         return switch (authContext) {
             case OpAmpAuthContext.Enrollment e -> handleEnrollment(message, e);
             case OpAmpAuthContext.Identified i -> handleIdentifiedMessage(message, i);
         };
-    }
-
-    private static boolean isAuthCheck(AgentToServer message) {
-        return message.hasCustomMessage()
-                && OpAmpConstants.AUTH_CHECK_CUSTOM_CAPABILITY.equals(message.getCustomMessage().getCapability())
-                && OpAmpConstants.AUTH_CHECK_MESSAGE_TYPE.equals(message.getCustomMessage().getType());
-    }
-
-    /**
-     * Answers a collector's pre-flight auth-check. Reaching this point means the token was
-     * already validated by the transport layer, so an empty response is all the collector needs;
-     * it must not cause any state changes. The auth-check message always carries sequence
-     * number 0, so {@link #serverToAgentBuilder} announces the custom capability in the reply.
-     */
-    private ServerToAgent handleAuthCheck(AgentToServer message) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Handle auth-check for {}", bytesToUuidString(message.getInstanceUid().toByteArray()));
-        }
-        return serverToAgentBuilder(message).build();
     }
 
     /**
@@ -471,10 +449,6 @@ public class OpAmpService {
                             | Opamp.ServerCapabilities.ServerCapabilities_AcceptsEffectiveConfig_VALUE
                             | Opamp.ServerCapabilities.ServerCapabilities_OffersConnectionSettings_VALUE
             );
-            // Custom capabilities are announced once per session and only re-sent when the list
-            // changes, per the OpAMP spec.
-            builder.setCustomCapabilities(Opamp.CustomCapabilities.newBuilder()
-                    .addCapabilities(OpAmpConstants.AUTH_CHECK_CUSTOM_CAPABILITY));
         } else {
             builder.setCapabilities(Opamp.ServerCapabilities.ServerCapabilities_Unspecified_VALUE);
         }

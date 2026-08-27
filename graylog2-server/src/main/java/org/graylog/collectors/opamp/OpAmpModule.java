@@ -21,6 +21,7 @@ import org.graylog.collectors.opamp.auth.AgentTokenService;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.collectors.opamp.http.OpAmpHttpServerExtension;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResource;
+import org.graylog.collectors.opamp.transport.OpAmpAuthCheckHttpHandler;
 import org.graylog.collectors.opamp.transport.OpAmpHttpHandler;
 import org.graylog2.plugin.PluginModule;
 
@@ -32,6 +33,7 @@ public class OpAmpModule extends PluginModule {
     protected void configure() {
         bind(OpAmpService.class).in(Scopes.SINGLETON);
         bind(OpAmpHttpHandler.class).in(Scopes.SINGLETON);
+        bind(OpAmpAuthCheckHttpHandler.class).in(Scopes.SINGLETON);
         bind(ExecutorService.class).annotatedWith(OpAmpExecutor.class)
                 .toInstance(Executors.newVirtualThreadPerTaskExecutor());
 
