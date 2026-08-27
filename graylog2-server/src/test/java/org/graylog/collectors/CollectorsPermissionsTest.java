@@ -45,4 +45,50 @@ class CollectorsPermissionsTest {
                 CollectorsPermissions.TOKEN_READ,
                 CollectorsPermissions.TOKEN_DELETE);
     }
+
+    @Test
+    void shipsCollectorsManagerRole() {
+        final var role = permissions.builtinRoles().stream()
+                .filter(r -> "Collectors Manager".equals(r.name()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(role.permissions()).containsExactlyInAnyOrder(
+                CollectorsPermissions.FLEET_CREATE,
+                CollectorsPermissions.FLEET_READ,
+                CollectorsPermissions.FLEET_EDIT,
+                CollectorsPermissions.FLEET_DELETE,
+                CollectorsPermissions.FLEET_INSTANCE_ASSIGN,
+                CollectorsPermissions.FLEET_INSTANCE_DELETE,
+                CollectorsPermissions.SOURCE_CREATE,
+                CollectorsPermissions.SOURCE_EDIT,
+                CollectorsPermissions.SOURCE_DELETE,
+                CollectorsPermissions.TOKEN_CREATE,
+                CollectorsPermissions.TOKEN_READ,
+                CollectorsPermissions.TOKEN_DELETE,
+                CollectorsPermissions.CONFIGURATION_READ,
+                CollectorsPermissions.CONFIGURATION_EDIT,
+                CollectorsPermissions.ACTIVITIES_READ);
+    }
+
+    @Test
+    void shipsCollectorsReaderRole() {
+        final var role = permissions.builtinRoles().stream()
+                .filter(r -> "Collectors Reader".equals(r.name()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(role.permissions()).containsExactlyInAnyOrder(
+                CollectorsPermissions.FLEET_READ,
+                CollectorsPermissions.CONFIGURATION_READ,
+                CollectorsPermissions.ACTIVITIES_READ);
+    }
+
+    @Test
+    void everyBuiltinRolePermissionIsDeclared() {
+        final Set<String> declared = permissionStrings();
+
+        permissions.builtinRoles().forEach(role ->
+                assertThat(declared).as("role <%s>", role.name()).containsAll(role.permissions()));
+    }
 }

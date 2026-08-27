@@ -17,6 +17,7 @@
 package org.graylog.collectors;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.authzroles.BuiltinRole;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 
@@ -72,5 +73,21 @@ public class CollectorsPermissions implements PluginPermissions {
     @Override
     public Set<Permission> readerBasePermissions() {
         return Set.of();
+    }
+
+    @Override
+    public Set<BuiltinRole> builtinRoles() {
+        return Set.of(
+                BuiltinRole.create("Collectors Manager",
+                        "Grants full control of collectors and fleets (built-in)",
+                        Set.of(FLEET_CREATE, FLEET_READ, FLEET_EDIT, FLEET_DELETE,
+                                FLEET_INSTANCE_ASSIGN, FLEET_INSTANCE_DELETE,
+                                SOURCE_CREATE, SOURCE_EDIT, SOURCE_DELETE,
+                                TOKEN_CREATE, TOKEN_READ, TOKEN_DELETE,
+                                CONFIGURATION_READ, CONFIGURATION_EDIT,
+                                ACTIVITIES_READ)),
+                BuiltinRole.create("Collectors Reader",
+                        "Grants read-only access to collectors and fleets (built-in)",
+                        Set.of(FLEET_READ, CONFIGURATION_READ, ACTIVITIES_READ)));
     }
 }
