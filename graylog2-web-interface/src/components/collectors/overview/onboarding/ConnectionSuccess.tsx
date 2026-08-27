@@ -68,10 +68,7 @@ const ColContainer = styled.div`
 type OnboardingOutcome = 'offline' | 'online-silent' | 'online-receiving';
 
 // One event per onboarding state, so entering a state always reports the same way.
-const ONBOARDING_STATE_EVENTS: Record<
-  OnboardingOutcome,
-  { eventType: TelemetryEventType; appActionValue: string }
-> = {
+const ONBOARDING_STATE_EVENTS: Record<OnboardingOutcome, { eventType: TelemetryEventType; appActionValue: string }> = {
   offline: {
     eventType: TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.CONNECTION_LOST,
     appActionValue: 'onboarding-connection-lost',
