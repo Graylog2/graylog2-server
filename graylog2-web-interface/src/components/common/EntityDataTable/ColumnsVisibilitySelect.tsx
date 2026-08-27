@@ -97,7 +97,7 @@ const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayo
         <ColumnListItem<Entity> column={column} key={column.id} />
       ))}
     <MenuItem divider />
-    <DeleteMenuItem onSelect={onResetLayoutPreferences}>
+    <DeleteMenuItem onSelect={onResetLayoutPreferences} closeMenuOnClick>
       <Icon name="reopen_window" /> Reset all columns
     </DeleteMenuItem>
   </StyledDropdownButton>
