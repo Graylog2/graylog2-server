@@ -15,12 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
 import AppConfig from 'util/AppConfig';
 import useInputsStates from 'hooks/useInputsStates';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 
 import CollectorsSettings from './CollectorsSettings';
@@ -31,12 +35,14 @@ import {
   useCollectorsMutations,
   useCollectorInputDetails,
   useCollectorInputMutations,
+  useCollectorPermissions,
 } from '../hooks';
 import type { CollectorsConfig } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks');
 jest.mock('hooks/useInputsStates');
+jest.mock('hooks/useCurrentUser');
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 
 const mockInput = (port: number) => ({
@@ -115,6 +121,8 @@ describe('CollectorsSettings', () => {
       createCollectorInput: jest.fn(),
       isCreatingCollectorInput: false,
     });
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<typeof useCollectorPermissions>);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
     updateConfig.mockResolvedValue(undefined);
   });
 
@@ -249,6 +257,17 @@ describe('CollectorsSettings', () => {
       expect(screen.getByText(/managed ingest endpoint/i)).toBeInTheDocument();
     });
   });
+
+  it('hides the settings submit without collectors_config:edit', () => {
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser.toBuilder().permissions(Immutable.List(['collectors_config:read'] as Array<Permission>)).build(),
+    );
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: false } as ReturnType<typeof useCollectorPermissions>);
+
+    render(<CollectorsSettings />);
+
+    expect(screen.queryByRole('button', { name: /confirm settings/i })).not.toBeInTheDocument();
+  });
 });
 
 describe('CollectorsSettings telemetry', () => {
@@ -292,6 +311,8 @@ describe('CollectorsSettings telemetry', () => {
       unreadableCount: 0,
       isLoading: false,
     });
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<typeof useCollectorPermissions>);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   it('emits SETTINGS.UPDATED on submit with resulting state and diff flags', async () => {
