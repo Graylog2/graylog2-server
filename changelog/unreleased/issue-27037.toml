@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix crash when configuring an extractor converter (CSV, Split & Count, Lookup Table, Date). The checkbox `Input` did not capture its DOM node, so reading its checked state during render threw."
+
+issues = ["27037"]
