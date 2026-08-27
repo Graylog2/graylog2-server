@@ -23,9 +23,14 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 
 import ReassignFleetModal from './ReassignFleetModal';
 
+import { useFleets, useCollectorPermissions } from '../hooks';
+
 const BulkActions = () => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const [showReassignModal, setShowReassignModal] = useState(false);
+  const { data: fleets } = useFleets();
+  const { canAssignToFleet } = useCollectorPermissions();
+  const canReassignAnywhere = (fleets ?? []).some((fleet) => canAssignToFleet(fleet.id));
 
   const toggleReassignModal = useCallback(() => {
     setShowReassignModal((cur) => !cur);
@@ -37,9 +42,11 @@ const BulkActions = () => {
 
   return (
     <>
-      <BulkActionsDropdown>
-        <MenuItem onSelect={toggleReassignModal}>Reassign to fleet</MenuItem>
-      </BulkActionsDropdown>
+      {canReassignAnywhere && (
+        <BulkActionsDropdown>
+          <MenuItem onSelect={toggleReassignModal}>Reassign to fleet</MenuItem>
+        </BulkActionsDropdown>
+      )}
       {showReassignModal && (
         <ReassignFleetModal
           instanceUids={selectedEntities}

@@ -27,7 +27,7 @@ import ReassignFleetModal from './ReassignFleetModal';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
-import { useCollectorsMutations } from '../hooks';
+import { useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { CollectorInstanceView } from '../types';
 
@@ -40,6 +40,9 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
   const [showReassignModal, setShowReassignModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { deleteInstance } = useCollectorsMutations();
+  const { canDeleteInstance, canAssignToFleet } = useCollectorPermissions();
+  const canReassign = canAssignToFleet(instance.fleet_id);
+  const canDelete = canDeleteInstance(instance.fleet_id);
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const handleConfirmDelete = useCallback(async () => {
@@ -85,11 +88,13 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
           }}>
           Details
         </Button>
-        <MoreActions>
-          <MenuItem onSelect={() => setShowReassignModal(true)}>Reassign to fleet</MenuItem>
-          <MenuItem divider />
-          <DeleteMenuItem onSelect={() => setShowDeleteConfirm(true)} />
-        </MoreActions>
+        {(canReassign || canDelete) && (
+          <MoreActions>
+            {canReassign && <MenuItem onSelect={() => setShowReassignModal(true)}>Reassign to fleet</MenuItem>}
+            {canReassign && canDelete && <MenuItem divider />}
+            {canDelete && <DeleteMenuItem onSelect={() => setShowDeleteConfirm(true)} />}
+          </MoreActions>
+        )}
       </ButtonToolbar>
       {showReassignModal && (
         <ReassignFleetModal

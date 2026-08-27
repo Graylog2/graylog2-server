@@ -23,7 +23,7 @@ import { Select, Spinner } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import { useFleets, useCollectorsMutations } from '../hooks';
+import { useFleets, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
@@ -51,9 +51,12 @@ const validate = (values: FormValues) => {
 const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose, onSuccess = () => {} }: Props) => {
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
   const { reassignInstances } = useCollectorsMutations();
+  const { canAssignToFleet } = useCollectorPermissions();
   const sendTelemetry = useSendCollectorsTelemetry();
 
-  const availableFleets = (fleets || []).filter((fleet: Fleet) => fleet.id !== currentFleetId);
+  const availableFleets = (fleets || []).filter(
+    (fleet: Fleet) => fleet.id !== currentFleetId && canAssignToFleet(fleet.id),
+  );
 
   const fleetOptions = availableFleets.map((fleet: Fleet) => ({
     label: fleet.name,
@@ -102,13 +105,19 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose,
               {fleetsLoading ? (
                 <Spinner />
               ) : (
-                <Select
-                  placeholder="Select a fleet..."
-                  options={fleetOptions}
-                  value={values.fleetId}
-                  onChange={(value: string) => setFieldValue('fleetId', value)}
-                  clearable={false}
-                />
+                <>
+                  {fleetOptions.length === 0 ? (
+                    <p>You do not have permission to assign Collectors to any other fleet.</p>
+                  ) : (
+                    <Select
+                      placeholder="Select a fleet..."
+                      options={fleetOptions}
+                      value={values.fleetId}
+                      onChange={(value: string) => setFieldValue('fleetId', value)}
+                      clearable={false}
+                    />
+                  )}
+                </>
               )}
             </Modal.Body>
             <Modal.Footer>
