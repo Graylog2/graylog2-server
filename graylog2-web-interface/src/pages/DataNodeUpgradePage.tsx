@@ -68,7 +68,7 @@ const DataNodeUpgradePage = () => {
   };
 
   const confirmNodeUpgrade = async () => {
-    startShardReplication();
+    await startShardReplication();
     setOpenUpgradeConfirmDialog(false);
   };
 
@@ -92,9 +92,11 @@ const DataNodeUpgradePage = () => {
 
   const isRollingUpgradePossible = numberOfNodes >= 3;
   const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && (!!nodeInProgress || isRollingUpgradePossible);
-  const areAllDataNodesUpToDate = !data?.outdated_nodes?.length && (data?.up_to_date_nodes?.length ?? 0) > 0;
+  const areAllDataNodeVersionsUpToDate = !data?.outdated_nodes?.length && (data?.up_to_date_nodes?.length ?? 0) > 0;
+  const isOpenSearchPhase =
+    openSearchStatus === 'upgrading' || (areAllDataNodeVersionsUpToDate && data?.shard_replication_enabled === true);
   const showOpenSearchUpgradeSection =
-    areAllDataNodesUpToDate && ['outdated', 'upgrading', 'unconfirmed'].includes(openSearchStatus);
+    isOpenSearchPhase && ['outdated', 'upgrading', 'unconfirmed'].includes(openSearchStatus);
 
   return (
     <DocumentTitle title="Data Node Upgrade">
@@ -115,7 +117,7 @@ const DataNodeUpgradePage = () => {
       ) : (
         <Row className="content">
           <Col xs={12}>
-            {!areAllDataNodesUpToDate && (
+            {!isOpenSearchPhase && (
               <>
                 <Title order={1}>Select Upgrade Strategy</Title>
                 <br />
@@ -141,7 +143,7 @@ const DataNodeUpgradePage = () => {
               numberOfNodes={numberOfNodes}
               showShardReplication={upgradeMethod === 'rolling-upgrade'}
             />
-            {!areAllDataNodesUpToDate && showRollingUpgrade && (
+            {!isOpenSearchPhase && showRollingUpgrade && (
               <DataNodeUpgradeNodes
                 outdatedNodes={data?.outdated_nodes ?? []}
                 upToDateNodes={data?.up_to_date_nodes ?? []}
@@ -149,7 +151,7 @@ const DataNodeUpgradePage = () => {
                 onStartNodeUpgrade={startNodeUpgrade}
               />
             )}
-            {areAllDataNodesUpToDate && (
+            {isOpenSearchPhase && (
               <UpgradeStatusAlert
                 currentOpenSearchVersion={currentOpenSearchVersion}
                 status={openSearchStatus}
@@ -157,7 +159,7 @@ const DataNodeUpgradePage = () => {
               />
             )}
             {showOpenSearchUpgradeSection && <OpenSearchUpgradeSection />}
-            {openUpgradeConfirmDialog && nodeInProgress && (
+            {!isOpenSearchPhase && openUpgradeConfirmDialog && nodeInProgress && (
               <Modal
                 show
                 backdrop={false}
