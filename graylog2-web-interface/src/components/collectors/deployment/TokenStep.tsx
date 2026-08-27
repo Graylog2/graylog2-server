@@ -169,6 +169,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
   };
 
   const canGenerate = Boolean(fleet) && (mode === 'short-lived' || effectiveName.trim().length > 0);
+  const isTokenCreationPermitted = Boolean(fleet) && canCreateToken(fleet.id);
 
   return (
     <div>
@@ -227,9 +228,9 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
       <Button
         bsStyle="primary"
         onClick={handleGenerate}
-        disabled={!canGenerate || isCreatingEnrollmentToken || !canCreateToken(fleet.id)}
+        disabled={!canGenerate || isCreatingEnrollmentToken || !isTokenCreationPermitted}
         title={
-          fleet && !canCreateToken(fleet.id)
+          fleet && !isTokenCreationPermitted
             ? 'You do not have permission to create enrollment tokens for this fleet'
             : undefined
         }>
