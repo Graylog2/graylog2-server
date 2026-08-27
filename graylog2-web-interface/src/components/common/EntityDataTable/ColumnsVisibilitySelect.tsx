@@ -80,7 +80,11 @@ type Props<Entity> = {
   hasColumnLayoutPreferences: boolean;
 };
 
-const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayoutPreferences, hasColumnLayoutPreferences }: Props<Entity>) => (
+const ColumnsVisibilitySelect = <Entity extends EntityBase>({
+  table,
+  onResetLayoutPreferences,
+  hasColumnLayoutPreferences,
+}: Props<Entity>) => (
   <StyledDropdownButton
     title="Columns"
     withinPortal
