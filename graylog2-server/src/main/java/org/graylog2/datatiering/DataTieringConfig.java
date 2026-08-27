@@ -51,7 +51,9 @@ public interface DataTieringConfig {
     Period indexLifetimeMax();
 
     /**
-     * The lock id for the repository this config selects, or empty when it selects none.
+     * The lock id for the repository this config selects, or empty when it selects none. Selecting
+     * means the tier is enabled and names a repository, a leftover name on a disabled tier neither
+     * locks nor counts as a repository reference.
      * Returning the finished id keeps the id format in the plugin that owns the repositories.
      */
     @JsonIgnore
