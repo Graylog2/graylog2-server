@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Permission } from 'graylog-web-plugin/plugin';
-
 import usePermissions from 'hooks/usePermissions';
 
 import { COLLECTOR_PERMISSIONS, scoped } from '../Permissions';
@@ -31,7 +29,7 @@ const useCollectorPermissions = () => {
   const { isPermitted } = usePermissions();
 
   return {
-    canCreateFleet: isPermitted(COLLECTOR_PERMISSIONS.FLEET_CREATE as Permission),
+    canCreateFleet: isPermitted(COLLECTOR_PERMISSIONS.FLEET_CREATE),
     canEditFleet: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.FLEET_EDIT, fleetId)),
     canDeleteFleet: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.FLEET_DELETE, fleetId)),
     canCreateSource: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.SOURCE_CREATE, fleetId)),
@@ -46,8 +44,8 @@ const useCollectorPermissions = () => {
       ]),
     canCreateToken: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.TOKEN_CREATE, fleetId)),
     canDeleteToken: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.TOKEN_DELETE, fleetId)),
-    canReadActivities: isPermitted(COLLECTOR_PERMISSIONS.ACTIVITIES_READ as Permission),
-    canEditConfig: isPermitted(COLLECTOR_PERMISSIONS.CONFIGURATION_EDIT as Permission),
+    canReadActivities: isPermitted(COLLECTOR_PERMISSIONS.ACTIVITIES_READ),
+    canEditConfig: isPermitted(COLLECTOR_PERMISSIONS.CONFIGURATION_EDIT),
   };
 };
 

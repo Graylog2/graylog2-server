@@ -64,6 +64,22 @@ describe('useCollectorPermissions', () => {
     expect(second.current.canAssignToFleet('fleet-1')).toBe(true);
   });
 
+  it('grants canEditConfig to a holder of collectors_config:edit', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collectors_config:edit']));
+
+    const { result } = renderHook(() => useCollectorPermissions());
+
+    expect(result.current.canEditConfig).toBe(true);
+  });
+
+  it('grants canReadActivities to a holder of collector_activities:read', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_activities:read']));
+
+    const { result } = renderHook(() => useCollectorPermissions());
+
+    expect(result.current.canReadActivities).toBe(true);
+  });
+
   it('denies everything for a user with no collector permissions', () => {
     asMock(useCurrentUser).mockReturnValue(userWith([]));
 

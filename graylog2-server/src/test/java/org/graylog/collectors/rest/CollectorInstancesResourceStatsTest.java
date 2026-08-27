@@ -92,7 +92,7 @@ class CollectorInstancesResourceStatsTest {
                 fleet("fleet-hidden", "Hidden")));
         when(collectorInstanceService.countByFleetGrouped(any())).thenReturn(Map.of(
                 "fleet-visible", new InstanceCount(3L, 2L),
-                "fleet-hidden", new InstanceCount(7L, 7L)));
+                "fleet-hidden", new InstanceCount(7L, 5L)));
         when(sourceService.countByFleetGrouped()).thenReturn(Map.of(
                 "fleet-visible", 4L,
                 "fleet-hidden", 9L));

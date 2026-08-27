@@ -54,7 +54,7 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose,
   const { canAssignToFleet } = useCollectorPermissions();
   const sendTelemetry = useSendCollectorsTelemetry();
 
-  const availableFleets = (fleets || []).filter(
+  const availableFleets = (fleets ?? []).filter(
     (fleet: Fleet) => fleet.id !== currentFleetId && canAssignToFleet(fleet.id),
   );
 

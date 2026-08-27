@@ -25,21 +25,21 @@ import type { Permission } from 'graylog-web-plugin/plugin';
  * their parent fleet does. Use `scoped()` to build the check.
  */
 export const COLLECTOR_PERMISSIONS = {
-  FLEET_CREATE: 'collector_fleets:create',
-  FLEET_READ: 'collector_fleets:read',
-  FLEET_EDIT: 'collector_fleets:edit',
-  FLEET_DELETE: 'collector_fleets:delete',
-  FLEET_INSTANCE_ASSIGN: 'collector_fleets:assign_instance',
-  FLEET_INSTANCE_DELETE: 'collector_fleets:delete_instance',
-  SOURCE_CREATE: 'collector_fleets:source_create',
-  SOURCE_EDIT: 'collector_fleets:source_edit',
-  SOURCE_DELETE: 'collector_fleets:source_delete',
-  TOKEN_CREATE: 'collector_enrollment_tokens:create',
-  TOKEN_READ: 'collector_enrollment_tokens:read',
-  TOKEN_DELETE: 'collector_enrollment_tokens:delete',
-  CONFIGURATION_READ: 'collectors_config:read',
-  CONFIGURATION_EDIT: 'collectors_config:edit',
-  ACTIVITIES_READ: 'collector_activities:read',
+  FLEET_CREATE: 'collector_fleets:create' as Permission,
+  FLEET_READ: 'collector_fleets:read' as Permission,
+  FLEET_EDIT: 'collector_fleets:edit' as Permission,
+  FLEET_DELETE: 'collector_fleets:delete' as Permission,
+  FLEET_INSTANCE_ASSIGN: 'collector_fleets:assign_instance' as Permission,
+  FLEET_INSTANCE_DELETE: 'collector_fleets:delete_instance' as Permission,
+  SOURCE_CREATE: 'collector_fleets:source_create' as Permission,
+  SOURCE_EDIT: 'collector_fleets:source_edit' as Permission,
+  SOURCE_DELETE: 'collector_fleets:source_delete' as Permission,
+  TOKEN_CREATE: 'collector_enrollment_tokens:create' as Permission,
+  TOKEN_READ: 'collector_enrollment_tokens:read' as Permission,
+  TOKEN_DELETE: 'collector_enrollment_tokens:delete' as Permission,
+  CONFIGURATION_READ: 'collectors_config:read' as Permission,
+  CONFIGURATION_EDIT: 'collectors_config:edit' as Permission,
+  ACTIVITIES_READ: 'collector_activities:read' as Permission,
 } as const;
 
 export const scoped = (permission: string, entityId: string) => `${permission}:${entityId}` as Permission;

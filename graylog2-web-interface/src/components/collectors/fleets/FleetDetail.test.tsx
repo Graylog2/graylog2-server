@@ -198,4 +198,21 @@ describe('FleetDetail permissions', () => {
 
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
+
+  it('shows Delete but not Edit when only canDelete is granted', async () => {
+    const withDeleteOnly = sourceActionsFactory({
+      onEdit: jest.fn(),
+      onDelete: jest.fn(),
+      canEdit: false,
+      canDelete: true,
+    })(source);
+
+    render(withDeleteOnly);
+
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+
+    await screen.findByRole('menuitem', { name: /delete/i });
+  });
 });
