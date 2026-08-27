@@ -25,6 +25,8 @@ import OnboardingTimeline from 'components/collectors/overview/onboarding/Onboar
 import SourceStatusSection from 'components/collectors/overview/onboarding/SourceStatusSection';
 import { useCollectorLogPreview } from 'components/collectors/hooks/useCollectorLogPreview';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import collectorReceivedMessagesUrl from 'components/collectors/common/collectorReceivedMessagesUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
 import type { CollectorInstanceView } from 'components/collectors/types';
@@ -53,6 +55,7 @@ const TimelineContainer = styled.div`
 const EnrollingHostSetup = ({ instance, fleetName }: Props) => {
   const { sourceLogs, sourceCounts } = useCollectorLogPreview(instance.instance_uid);
   const { data: sources } = useSources(instance.fleet_id);
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   const online = instance.status === 'online';
   const receiving = (sourceLogs?.total ?? 0) > 0;
@@ -82,7 +85,16 @@ const EnrollingHostSetup = ({ instance, fleetName }: Props) => {
             {online && (
               <div>
                 <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
-                  <Button bsStyle="success" bsSize="small">
+                  <Button
+                    bsStyle="success"
+                    bsSize="small"
+                    onClick={() =>
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.LINK_CLICKED, {
+                        app_action_value: 'deployment-open-in-search',
+                        link: 'search',
+                        instance_id: instance.instance_uid,
+                      })
+                    }>
                     Open in search
                   </Button>
                 </LinkContainer>
