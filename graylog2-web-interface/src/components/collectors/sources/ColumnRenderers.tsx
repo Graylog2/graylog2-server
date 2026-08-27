@@ -39,7 +39,7 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
           {source.enabled ? 'Enabled' : 'Disabled'}
         </Badge>
       ),
-      staticWidth: 100,
+      staticWidth: 110,
     },
     description: {
       renderCell: (description: string) => <span>{description || '—'}</span>,
