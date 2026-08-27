@@ -23,7 +23,7 @@ import { RelativeTime } from 'components/common';
 import MutedText from 'components/collectors/common/MutedText';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import { useCollectorsMutations } from '../hooks';
+import { useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
@@ -116,6 +116,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
   const [customName, setCustomName] = useState<string | null>(null);
   const [expiry, setExpiry] = useState<TokenExpiry>('P7D');
   const { createEnrollmentToken, isCreatingEnrollmentToken } = useCollectorsMutations();
+  const { canCreateToken } = useCollectorPermissions();
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const effectiveName = customName ?? (fleet ? `${fleet.name} rollout` : '');
@@ -223,7 +224,15 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
         )}
         <MutedText>Custom tokens appear on the Enrollment tokens tab and can be revoked any time.</MutedText>
       </OptionsBox>
-      <Button bsStyle="primary" onClick={handleGenerate} disabled={!canGenerate || isCreatingEnrollmentToken}>
+      <Button
+        bsStyle="primary"
+        onClick={handleGenerate}
+        disabled={!canGenerate || isCreatingEnrollmentToken || !canCreateToken(fleet.id)}
+        title={
+          fleet && !canCreateToken(fleet.id)
+            ? 'You do not have permission to create enrollment tokens for this fleet'
+            : undefined
+        }>
         {isCreatingEnrollmentToken ? 'Generating...' : 'Generate token'}
       </Button>
       {!fleet && <MutedText>Select a fleet above first.</MutedText>}

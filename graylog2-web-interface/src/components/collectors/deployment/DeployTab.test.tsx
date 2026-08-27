@@ -27,7 +27,7 @@ import useHistory from 'routing/useHistory';
 
 import DeployTab from './DeployTab';
 
-import { useFleets, useCollectorsConfig, useCollectorsMutations } from '../hooks';
+import { useFleets, useCollectorsConfig, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 import type { Fleet } from '../types';
 
@@ -62,6 +62,20 @@ describe('DeployTab', () => {
     asMock(useInstances).mockReturnValue({ data: [], error: null } as ReturnType<typeof useInstances>);
     asMock(useFleetReceivingCounts).mockReturnValue({ counts: undefined, error: null });
     asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({ createEnrollmentToken }));
+    asMock(useCollectorPermissions).mockReturnValue({
+      canCreateFleet: true,
+      canEditFleet: () => true,
+      canDeleteFleet: () => true,
+      canCreateSource: () => true,
+      canEditSource: () => true,
+      canDeleteSource: () => true,
+      canDeleteInstance: () => true,
+      canAssignToFleet: () => true,
+      canCreateToken: () => true,
+      canDeleteToken: () => true,
+      canReadActivities: true,
+      canEditConfig: true,
+    } as ReturnType<typeof useCollectorPermissions>);
 
     createEnrollmentToken.mockResolvedValue({
       token: 'the-token-value',

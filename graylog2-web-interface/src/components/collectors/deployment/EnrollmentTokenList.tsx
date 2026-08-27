@@ -30,7 +30,13 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import BulkActions from './BulkActions';
 
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
-import { fetchPaginatedEnrollmentTokens, enrollmentTokensKeyFn, useCollectorsMutations, useFleets } from '../hooks';
+import {
+  fetchPaginatedEnrollmentTokens,
+  enrollmentTokensKeyFn,
+  useCollectorsMutations,
+  useFleets,
+  useCollectorPermissions,
+} from '../hooks';
 import type { EnrollmentTokenMetadata } from '../types';
 
 const DEFAULT_LAYOUT = {
@@ -115,6 +121,7 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
 const EnrollmentTokenList = () => {
   const { deleteEnrollmentToken } = useCollectorsMutations();
   const { data: fleets } = useFleets();
+  const { canDeleteToken } = useCollectorPermissions();
   const sendTelemetry = useSendCollectorsTelemetry();
   const [deletingToken, setDeletingToken] = useState<EnrollmentTokenMetadata | null>(null);
 
@@ -139,12 +146,13 @@ const EnrollmentTokenList = () => {
   }, [deletingToken, deleteEnrollmentToken, sendTelemetry]);
 
   const entityActions = useCallback(
-    (token: EnrollmentTokenMetadata) => (
-      <MoreActions>
-        <DeleteMenuItem onSelect={() => setDeletingToken(token)} />
-      </MoreActions>
-    ),
-    [],
+    (token: EnrollmentTokenMetadata) =>
+      canDeleteToken(token.fleet_id) ? (
+        <MoreActions>
+          <DeleteMenuItem onSelect={() => setDeletingToken(token)} />
+        </MoreActions>
+      ) : null,
+    [canDeleteToken],
   );
 
   const renderers = useMemo(() => customColumnRenderers(fleetNames), [fleetNames]);

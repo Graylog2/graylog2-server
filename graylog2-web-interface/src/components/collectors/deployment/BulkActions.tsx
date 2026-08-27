@@ -23,14 +23,20 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import { ConfirmDialog } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import { useCollectorsMutations } from '../hooks';
+import { useCollectorsMutations, useFleets, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
 const BulkActions = () => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { bulkDeleteEnrollmentTokens } = useCollectorsMutations();
+  const { data: fleets } = useFleets();
+  const { canDeleteToken } = useCollectorPermissions();
   const sendTelemetry = useSendCollectorsTelemetry();
   const [showConfirm, setShowConfirm] = useState(false);
+
+  // Selection can span fleets and this component only holds token ids, so show bulk delete if
+  // the user can delete tokens in any fleet and let the backend filter the actual selection.
+  const canDeleteAnyToken = (fleets ?? []).some((fleet) => canDeleteToken(fleet.id));
 
   const handleConfirm = useCallback(async () => {
     await bulkDeleteEnrollmentTokens(selectedEntities);
@@ -44,9 +50,11 @@ const BulkActions = () => {
 
   return (
     <>
-      <BulkActionsDropdown>
-        <DeleteMenuItem onSelect={() => setShowConfirm(true)} />
-      </BulkActionsDropdown>
+      {canDeleteAnyToken && (
+        <BulkActionsDropdown>
+          <DeleteMenuItem onSelect={() => setShowConfirm(true)} />
+        </BulkActionsDropdown>
+      )}
       {showConfirm && (
         <ConfirmDialog
           title="Delete enrollment tokens"
