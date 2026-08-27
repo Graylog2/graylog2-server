@@ -34,7 +34,7 @@ import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
 
 import enrollEndpointUrl from '../common/enrollEndpointUrl';
-import { useCollectorsMutations, useFleets } from '../hooks';
+import { useCollectorsMutations, useCollectorPermissions, useFleets } from '../hooks';
 // Imported from the concrete module (not the hooks index) so tests that automock the index
 // still see the real cache key.
 import { INSTANCES_KEY_PREFIX } from '../hooks/useInstanceQueries';
@@ -76,6 +76,7 @@ const FirstOnboarding = () => {
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
   const { createFleet, isCreatingFleet, createSource, createEnrollmentToken, isCreatingEnrollmentToken } =
     useCollectorsMutations();
+  const { canCreateFleet } = useCollectorPermissions();
 
   const buildCommand = useCallback((platformId: PlatformId, token: string) => {
     const platform = PLATFORMS.find((p) => p.id === platformId);
@@ -97,14 +98,16 @@ const FirstOnboarding = () => {
     return fleet;
   }, [createFleet, createSource]);
 
-  // The fleet to use without asking the user: none -> create one, exactly one -> use it,
-  // more than one -> null (the user must decide via the fleet-choice UI).
+  // The fleet to use without asking the user: none -> create one (only when permitted), exactly
+  // one -> use it, more than one -> null (the user must decide via the fleet-choice UI). A user
+  // who cannot create a fleet never gets auto-dropped into that write; CollectorsOverview also
+  // keeps such a user out of this wizard entirely, but this stays defensive on its own.
   const autoChoice = useCallback((): FleetChoiceValue | null => {
-    if (!fleets || fleets.length === 0) return { kind: 'create-new' };
+    if (!fleets || fleets.length === 0) return canCreateFleet ? { kind: 'create-new' } : null;
     if (fleets.length === 1) return { kind: 'existing', fleetId: fleets[0].id };
 
     return null;
-  }, [fleets]);
+  }, [fleets, canCreateFleet]);
 
   // Both gates (platform, fleet) converge here once both are known. Builds the command box.
   const showCommand = useCallback(

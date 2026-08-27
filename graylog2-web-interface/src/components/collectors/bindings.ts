@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Permission, PluginExports } from 'graylog-web-plugin/plugin';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -51,7 +51,7 @@ const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
             section: 'collectors',
             actionValue: 'create-fleet-button',
           },
-          permissions: COLLECTOR_PERMISSIONS.FLEET_CREATE as Permission,
+          permissions: COLLECTOR_PERMISSIONS.FLEET_CREATE,
         },
       ],
     }
