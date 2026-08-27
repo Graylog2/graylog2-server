@@ -76,7 +76,7 @@ public class OTXDataAdapterTest {
     }
 
     @Test
-    public void isPrivateIPAddress() throws Exception {
+    public void isPrivateIPAddress() {
         assertThat(otxDataAdapter.isPrivateIPAddress("0.0.0.0")).isTrue();
         assertThat(otxDataAdapter.isPrivateIPAddress("127.0.0.1")).isTrue();
         assertThat(otxDataAdapter.isPrivateIPAddress("192.168.1.1")).isTrue();
@@ -86,7 +86,7 @@ public class OTXDataAdapterTest {
     }
 
     @Test
-    public void doStart_allowsWhenUrlIsAllowlisted() throws Exception {
+    public void doStart_allowsWhenUrlIsAllowlisted() {
         when(urlAllowlistService.isAllowlisted("https://otx.alienvault.com")).thenReturn(true);
 
         assertThatCode(() -> otxDataAdapter.doStart())
@@ -94,7 +94,7 @@ public class OTXDataAdapterTest {
     }
 
     @Test
-    public void doStart_throwsWhenUrlNotAllowlisted() throws Exception {
+    public void doStart_throwsWhenUrlNotAllowlisted() {
         when(urlAllowlistService.isAllowlisted("https://otx.alienvault.com")).thenReturn(false);
 
         assertThatThrownBy(() -> otxDataAdapter.doStart())
