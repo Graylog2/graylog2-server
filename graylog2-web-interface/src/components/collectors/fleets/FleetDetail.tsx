@@ -44,6 +44,7 @@ import {
   instancesKeyFn,
   useCollectorsMutations,
   useDefaultInstanceFilters,
+  useCollectorPermissions,
 } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
@@ -104,21 +105,27 @@ const SEGMENTS = [
 type SourceActionsHandlers = {
   onEdit: (source: Source) => void;
   onDelete: (source: Source) => void;
+  canEdit: boolean;
+  canDelete: boolean;
 };
 
 export const sourceActionsFactory =
-  ({ onEdit, onDelete }: SourceActionsHandlers) =>
+  ({ onEdit, onDelete, canEdit, canDelete }: SourceActionsHandlers) =>
   (source: Source) => (
     <ButtonToolbar>
       <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_SOURCE_ID_FIELD, source.id)}>
         <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
       </LinkContainer>
-      <Button bsSize="xsmall" onClick={() => onEdit(source)}>
-        Edit
-      </Button>
-      <MoreActions>
-        <DeleteMenuItem onSelect={() => onDelete(source)} />
-      </MoreActions>
+      {canEdit && (
+        <Button bsSize="xsmall" onClick={() => onEdit(source)}>
+          Edit
+        </Button>
+      )}
+      {canDelete && (
+        <MoreActions>
+          <DeleteMenuItem onSelect={() => onDelete(source)} />
+        </MoreActions>
+      )}
     </ButtonToolbar>
   );
 
@@ -129,6 +136,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const defaultInstanceFilters = useDefaultInstanceFilters();
   const { data: sources } = useSources(fleetId);
   const { createSource, updateSource, deleteSource, updateFleet, deleteFleet } = useCollectorsMutations();
+  const { canCreateSource, canEditSource, canDeleteSource } = useCollectorPermissions();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [deletingSource, setDeletingSource] = useState<Source | null>(null);
@@ -215,10 +223,12 @@ const FleetDetail = ({ fleetId }: Props) => {
     setDeletingSource(null);
   }, [deletingSource, deleteSource, fleetId, sendTelemetry]);
 
-  const sourceActions = useMemo(
-    () => sourceActionsFactory({ onEdit: setEditingSource, onDelete: setDeletingSource }),
-    [],
-  );
+  const sourceActions = sourceActionsFactory({
+    onEdit: setEditingSource,
+    onDelete: setDeletingSource,
+    canEdit: canEditSource(fleetId),
+    canDelete: canDeleteSource(fleetId),
+  });
 
   const getSourcesForInstance = (instance: CollectorInstanceView) =>
     (sources || []).filter((s) => s.fleet_id === instance.fleet_id);
@@ -349,9 +359,11 @@ const FleetDetail = ({ fleetId }: Props) => {
             <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
               <Button>Received messages</Button>
             </LinkContainer>
-            <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
-              Add Source
-            </Button>
+            {canCreateSource(fleetId) && (
+              <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
+                Add Source
+              </Button>
+            )}
           </ActionsRow>
           <PaginatedEntityTable<Source>
             humanName="sources"
