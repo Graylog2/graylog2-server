@@ -77,9 +77,10 @@ const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<
 type Props<Entity> = {
   onResetLayoutPreferences: () => void;
   table: Table<Entity>;
+  hasColumnLayoutPreferences: boolean;
 };
 
-const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayoutPreferences }: Props<Entity>) => (
+const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayoutPreferences, hasColumnLayoutPreferences }: Props<Entity>) => (
   <StyledDropdownButton
     title="Columns"
     withinPortal
@@ -97,7 +98,7 @@ const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayo
         <ColumnListItem<Entity> column={column} key={column.id} />
       ))}
     <MenuItem divider />
-    <DeleteMenuItem onSelect={onResetLayoutPreferences}>
+    <DeleteMenuItem disabled={!hasColumnLayoutPreferences} onSelect={onResetLayoutPreferences} closeMenuOnClick>
       <Icon name="reopen_window" /> Reset all columns
     </DeleteMenuItem>
   </StyledDropdownButton>
