@@ -50,6 +50,7 @@ describe('useSendCollectorsTelemetry', () => {
     ['/system/collectors/instances', 'collectors-instances'],
     ['/system/collectors/deployment', 'collectors-deployment'],
     ['/system/collectors/settings', 'collectors-settings'],
+    ['/system/collectors/onboarding/0198c7c2-2c3e-7b90-8f6e-1a2b3c4d5e6f', 'collectors-onboarding'],
   ])('derives app_section %s for pathname %s', (pathname, expected) => {
     const { result } = renderHook(() => useSendCollectorsTelemetry(), { wrapper: wrapper(pathname) });
 

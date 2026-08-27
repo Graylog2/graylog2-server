@@ -64,7 +64,7 @@ const ShowDashboardInBigDisplayMode = () => {
   const configuration = castQueryWithDefaults(query);
 
   return (
-    <InteractiveContext.Provider value={false}>
+    <InteractiveContext.Provider value="disabled">
       <BodyPositioningWrapper>
         <ShowViewPage>
           <AutoRefreshSearch refreshInterval={configuration.refresh} />
