@@ -40,43 +40,47 @@ public record IndicesDirectoryParseResult(IndexerDirectoryInformation info,
     /**
      * Whether the given opensearch version is able to open everything in this directory.
      * <p>
-     * An index can be opened by the opensearch release that created it and by the following one, and by no other:
+     * An index can be opened by the opensearch generation that created it and by the following one, and by no other:
      * a newer release reads it and migrates it forward, an older one cannot read it at all. That makes the answer
      * asymmetric, which is why {@code OpensearchUtils#isCompatible} is not enough here — it treats a candidate one
      * generation <em>behind</em> the data as acceptable, and picking such a candidate leaves opensearch unable to
      * open its own indices.
      * <p>
+     * The comparison runs on {@link OpensearchUtils#generation(Version) generations} rather than on major versions,
+     * so data written by elasticsearch 7.x counts as the opensearch 1.x generation it shares its index format with.
+     * <p>
      * A directory we can't extract any version from imposes no constraint. That means a corrupt or partial directory
      * is not silently narrowed down here; the preflight check reports it with a message naming the actual indices.
      */
     public boolean canBeOpenedBy(String opensearchVersion) {
-        final Long parsed = majorVersionOrNull(opensearchVersion);
+        final Long parsed = generationOrNull(opensearchVersion);
         if (parsed == null) {
             return true;
         }
-        final long candidateMajor = parsed;
-        return dataMajorVersions()
-                .allMatch(dataMajor -> candidateMajor == dataMajor || candidateMajor == dataMajor + 1);
+        final long candidateGeneration = parsed;
+        return dataGenerations()
+                .allMatch(dataGeneration -> candidateGeneration == dataGeneration
+                        || candidateGeneration == dataGeneration + 1);
     }
 
     /**
-     * The distinct opensearch major versions that wrote this directory, taken from the node and index state files.
+     * The distinct index generations that wrote this directory, taken from the node and index state files.
      */
-    private Stream<Long> dataMajorVersions() {
+    private Stream<Long> dataGenerations() {
         return info.nodes().stream()
                 .flatMap(node -> Stream.concat(
                         Stream.ofNullable(node.nodeVersion()),
                         node.indices().stream().map(IndexInformation::indexVersionCreated)))
                 .filter(Objects::nonNull)
-                .map(IndicesDirectoryParseResult::majorVersionOrNull)
+                .map(IndicesDirectoryParseResult::generationOrNull)
                 .filter(Objects::nonNull)
                 .distinct();
     }
 
     @Nullable
-    private static Long majorVersionOrNull(String version) {
+    private static Long generationOrNull(String version) {
         try {
-            return Version.parse(version).majorVersion();
+            return OpensearchUtils.generation(Version.parse(version));
         } catch (Exception e) {
             LOG.warn("Failed to parse opensearch version {}, ignoring it when deciding which distribution can open "
                     + "the data directory", version, e);
