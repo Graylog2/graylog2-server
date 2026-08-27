@@ -274,6 +274,7 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns created index set", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
+            @ApiResponse(responseCode = "409", description = "A concurrent operation holds the selected repository's lock"),
     })
     public IndexSetResponse save(@Parameter(name = "Index set configuration", required = true)
                                  @Valid @NotNull IndexSetCreationRequest indexSet) {
@@ -300,7 +301,7 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns updated index set", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
-            @ApiResponse(responseCode = "409", description = "Mismatch of IDs in URI path and payload"),
+            @ApiResponse(responseCode = "409", description = "The default index set would become non-writable, or a concurrent operation holds the selected repository's lock"),
     })
     public IndexSetResponse update(@Parameter(name = "id", required = true)
                                    @PathParam("id") String id,
@@ -328,7 +329,9 @@ public class IndexSetsResource extends RestResource {
         return IndexSetResponse.fromIndexSetConfig(savedObject, isDefaultSet, null);
     }
 
-    // Keeps a concurrent repository delete from missing the reference this save adds.
+    // Keeps a concurrent repository delete from missing the reference this save adds. Covers operator
+    // edits only, internally created index sets inherit their repository from the default template,
+    // which is itself a reference that blocks the delete.
     private IndexSetConfig validateAndSaveWithRepositoryLock(IndexSetConfig indexSetConfig) {
         final Optional<String> repositoryLockId = Optional.ofNullable(indexSetConfig.dataTieringConfig())
                 .flatMap(DataTieringConfig::repositoryLockId);

@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -149,6 +150,7 @@ public class IndexSetTemplateResource extends RestResource {
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_CREATE)
     @Operation(summary = "Creates a new editable template")
+    @ApiResponse(responseCode = "409", description = "A concurrent operation holds the selected repository's lock")
     public IndexSetTemplateResponse create(@Parameter(name = "request") IndexSetTemplateRequest templateData) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_CREATE);
 
@@ -161,6 +163,7 @@ public class IndexSetTemplateResource extends RestResource {
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_UPDATE)
     @Operation(summary = "Updates existing template")
+    @ApiResponse(responseCode = "409", description = "A concurrent operation holds the selected repository's lock")
     public void update(@Parameter(name = "id", required = true)
                        @PathParam("id") String id,
                        @Parameter(name = "request")
