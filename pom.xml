@@ -228,7 +228,7 @@
         <poi.version>5.5.1</poi.version>
         <!-- mcp-core 2.0.0 pulls in an older reactor-core than azure-core requires. When bumping, check if the
              explicit reactor-core dependency management can be removed. -->
-        <mcp-bom.version>2.0.0</mcp-bom.version>
+        <mcp-bom.version>2.0.1</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
