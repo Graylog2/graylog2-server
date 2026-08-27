@@ -28,7 +28,7 @@ type Props = {
 const ExpandedOutputsActions = ({ stream }: Props) => (
   <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
     <LinkContainer to={`${Routes.stream_view(stream.id)}?segment=destinations`}>
-      <Button bsStyle="link" bsSize="xsmall" disabled={stream.is_default || !stream.is_editable}>
+      <Button bsStyle="link" bsSize="xsmall" disabled={!stream.is_editable}>
         Manage Outputs
       </Button>
     </LinkContainer>

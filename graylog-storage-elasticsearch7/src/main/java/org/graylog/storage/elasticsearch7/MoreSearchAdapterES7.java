@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Streams;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
@@ -330,10 +331,14 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     @Override
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                 Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                                Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+                                                Map<String, Set<String>> extraFilters, String slicingColumn, @Nullable String bucketPattern,
+                                                Map<String, Object> meta, int maxBuckets) {
         final var builder = AggregationBuilders.terms(slicesAggregationName)
                 .field(slicingColumn)
                 .size(maxBuckets);
+        if (bucketPattern != null) {
+            builder.includeExclude(new IncludeExclude(bucketPattern, null));
+        }
 
         return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, sourceStreamFilter, extraFilters, meta, builder);
     }

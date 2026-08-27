@@ -310,10 +310,7 @@ describe('StreamsOverview', () => {
 
     renderSut();
 
-    expect(useStreamMetrics).toHaveBeenCalledWith(
-      expect.any(Array),
-      expect.arrayContaining(['message_count']),
-    );
+    expect(useStreamMetrics).toHaveBeenCalledWith(expect.any(Array), expect.arrayContaining(['message_count']));
   });
 
   it('should only show grouped plugin table elements in their matching view', async () => {

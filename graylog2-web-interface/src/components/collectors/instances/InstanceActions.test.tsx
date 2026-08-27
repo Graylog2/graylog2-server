@@ -55,6 +55,7 @@ const mockInstance: CollectorInstanceView = {
   version: '1.2.0',
   status: 'online',
   has_pending_changes: false,
+  health: null,
 };
 
 const deleteInstanceMock = jest.fn(() => Promise.resolve());
@@ -182,14 +183,36 @@ describe('InstanceActions', () => {
             instance_id: 'uid-1',
             fleet_id: 'fleet-1',
             status: 'online',
+            has_pending_changes: false,
+            version: '1.2.0',
           }),
         );
       });
     });
   });
 
+  describe('Received messages telemetry', () => {
+    it('emits RECEIVED_MESSAGES_CLICKED with the shared instance payload', async () => {
+      render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
+
+      await userEvent.click(await screen.findByRole('link', { name: /received messages/i }));
+
+      expect(sendTelemetryMock).toHaveBeenCalledWith(
+        'Collector Instance Received Messages Clicked',
+        expect.objectContaining({
+          app_action_value: 'instance-received-messages',
+          instance_id: 'uid-1',
+          fleet_id: 'fleet-1',
+          status: 'online',
+          has_pending_changes: false,
+          version: '1.2.0',
+        }),
+      );
+    });
+  });
+
   describe('View Logs button telemetry', () => {
-    it('emits VIEW_LOGS_CLICKED when View Logs is clicked', async () => {
+    it('emits VIEW_LOGS_CLICKED with the shared instance payload when View Logs is clicked', async () => {
       render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
       await userEvent.click(await screen.findByText(/view system logs/i));
@@ -199,13 +222,16 @@ describe('InstanceActions', () => {
         expect.objectContaining({
           instance_id: 'uid-1',
           fleet_id: 'fleet-1',
+          status: 'online',
+          has_pending_changes: false,
+          version: '1.2.0',
         }),
       );
     });
   });
 
   describe('Details button telemetry', () => {
-    it('emits DETAILS_OPENED with status when Details is clicked', async () => {
+    it('emits DETAILS_OPENED with the shared instance payload when Details is clicked', async () => {
       const onDetailsClick = jest.fn();
       render(<InstanceActions instance={mockInstance} onDetailsClick={onDetailsClick} />);
 
@@ -217,6 +243,8 @@ describe('InstanceActions', () => {
           instance_id: 'uid-1',
           fleet_id: 'fleet-1',
           status: 'online',
+          has_pending_changes: false,
+          version: '1.2.0',
         }),
       );
       expect(onDetailsClick).toHaveBeenCalledWith(mockInstance);

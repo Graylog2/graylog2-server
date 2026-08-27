@@ -51,6 +51,7 @@ import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
@@ -292,6 +293,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     private NodeInfo createNodeInfo(JsonNode nodesJson) {
         return NodeInfo.builder()
+                .name(nodesJson.at("/name").asText())
                 .version(nodesJson.at("/version").asText())
                 .os(nodesJson.at("/os"))
                 .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
@@ -313,6 +315,24 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         return new NodeOSInfo(
                 nodesOsJson.at("/os/mem/total_in_bytes").asLong(),
                 toStream(nodesOsJson.at("/roles").elements()).map(JsonNode::asText).toList()
+        );
+    }
+
+    @Override
+    public Map<String, NodeUtilization> nodesUtilization() {
+        final Request request = new Request("GET", "/_nodes/stats/os,jvm");
+        final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Elasticsearch nodes stats data!");
+
+        final JsonNode nodes = nodesJson.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeUtilization(nodes.get(name))));
+    }
+
+    private NodeUtilization createNodeUtilization(JsonNode nodeJson) {
+        return new NodeUtilization(
+                nodeJson.at("/name").asText(),
+                nodeJson.at("/os/cpu/percent").asDouble(-1),
+                nodeJson.at("/jvm/mem/heap_used_percent").asDouble(-1)
         );
     }
 

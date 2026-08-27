@@ -73,10 +73,10 @@ describe('FleetDetail telemetry', () => {
     ['Sources', { card: 'sources', value: 2, variant: 'default', navigates_to: 'sources' }],
   ])('emits STAT_CARD_CLICKED on %s card click', async (label, expected) => {
     render(<FleetDetail fleetId="f-1" />);
-    // StatCards render as <button>; multiple elements may match by label so narrow by role+regex.
+    // StatCards render as <button>; multiple elements may match by label so narrow by value.
     const card = screen
       .getAllByRole('button', { name: new RegExp(label) })
-      .find((el) => el.textContent?.match(new RegExp(`${expected.value}\\s*${label}`)));
+      .find((el) => el.textContent?.includes(String(expected.value)));
     if (!card) throw new Error(`Card matching ${label} with value ${expected.value} not found`);
     await userEvent.click(card);
 
@@ -114,11 +114,34 @@ describe('sourceActionsFactory', () => {
       config: { paths: ['/var/log/app.log'], read_mode: 'end' as const },
     };
 
-    const actions = sourceActionsFactory({ onEdit: jest.fn(), onDelete: jest.fn() });
+    const actions = sourceActionsFactory({ onEdit: jest.fn(), onDelete: jest.fn(), onViewMessages: jest.fn() });
     render(<>{actions(source)}</>);
 
     const link = await screen.findByRole('link', { name: /received messages/i });
     expect(link).toHaveAttribute('href', expect.stringContaining('collector_source_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('src-1'));
+  });
+
+  it('reports the row actions it is given', async () => {
+    const source = {
+      id: 'src-1',
+      fleet_id: 'f-1',
+      name: 'app-logs',
+      description: '',
+      enabled: true,
+      type: 'file' as const,
+      config: { paths: ['/var/log/app.log'], read_mode: 'end' as const },
+    };
+
+    const onEdit = jest.fn();
+    const onViewMessages = jest.fn();
+    const actions = sourceActionsFactory({ onEdit, onDelete: jest.fn(), onViewMessages });
+    render(<>{actions(source)}</>);
+
+    await userEvent.click(await screen.findByRole('button', { name: /edit/i }));
+    expect(onEdit).toHaveBeenCalledWith(source);
+
+    await userEvent.click(await screen.findByRole('link', { name: /received messages/i }));
+    expect(onViewMessages).toHaveBeenCalledWith(source);
   });
 });

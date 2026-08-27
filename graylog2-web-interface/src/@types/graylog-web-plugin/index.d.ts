@@ -256,7 +256,7 @@ declare module 'graylog-web-plugin/plugin' {
     collectors_config: 'read';
     contentpack: 'read';
     dashboards: 'create' | 'edit' | 'read';
-    datanode: 'start';
+    datanode: 'read' | 'start';
     decorators: 'create' | 'edit' | 'read';
     eventdefinitions: 'create' | 'delete' | 'edit' | 'read';
     eventnotifications: 'create' | 'delete' | 'edit' | 'read';
@@ -265,7 +265,7 @@ declare module 'graylog-web-plugin/plugin' {
     indexercluster: 'read';
     indexranges: 'rebuild';
     indexset_templates: 'create' | 'edit' | 'read';
-    indexsets: 'create' | 'edit' | 'read';
+    indexsets: 'create' | 'delete' | 'edit' | 'read';
     indexsets_field_restrictions: 'edit';
     indices: 'read' | 'changestate' | 'failures';
     input_types: 'create';
@@ -354,6 +354,12 @@ declare module 'graylog-web-plugin/plugin' {
     DataLakeStreamDeleteWarning: React.ComponentType;
   }
 
+  interface PluginArchive {
+    hooks: {
+      useExcludedStreams: () => Array<string>;
+    };
+  }
+
   type HelpMenuItem = {
     description: string;
     permissions?: Permission | Array<Permission>;
@@ -421,6 +427,7 @@ declare module 'graylog-web-plugin/plugin' {
      */
     pageNavigation?: Array<PageNavigation>;
     dataLake?: Array<PluginDataLake>;
+    archive?: Array<PluginArchive>;
     // Use this for stream-overview-only columns. Use `components.shared.entityTableElements`
     // when the extension should participate in the generic entity-table mechanism.
     'components.streams.overview.tableElements'?: Array<StreamsOverviewTableElement>;

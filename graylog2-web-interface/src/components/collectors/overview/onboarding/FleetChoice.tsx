@@ -31,14 +31,17 @@ type Props = {
   selectedFleet: Fleet | null;
   onSelect: (choice: FleetChoiceValue) => void;
   onChange: () => void;
-  disabled: boolean;
+  disabled?: boolean;
+  // Embedded in a surrounding flow (e.g. the deploy wizard steps): left-aligned, no own heading.
+  inline?: boolean;
 };
 
-const Container = styled.div(
-  ({ theme }) => css`
-    max-width: 700px;
-    margin: 0 auto ${theme.spacings.md};
-    text-align: center;
+const Container = styled.div<{ $inline: boolean }>(
+  ({ theme, $inline }) => css`
+    /* Inline (deploy wizard): half the step width, matching the token step's boxes. */
+    max-width: ${$inline ? '50%' : '700px'};
+    margin: ${$inline ? '0' : `0 auto ${theme.spacings.md}`};
+    text-align: ${$inline ? 'left' : 'center'};
   `,
 );
 
@@ -50,18 +53,18 @@ const Heading = styled.h3(
 );
 
 // Button and dropdown sit side by side, separated by an "or".
-const Row = styled.div(
-  ({ theme }) => css`
+const Row = styled.div<{ $inline: boolean }>(
+  ({ theme, $inline }) => css`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: ${$inline ? 'flex-start' : 'center'};
     gap: ${theme.spacings.md};
   `,
 );
 
 const Separator = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-style: italic;
   `,
 );
@@ -103,18 +106,18 @@ const FleetName = styled.div(
 
 const FleetDescription = styled.div(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.small};
   `,
 );
 
 const FLEET_SELECT_ID = 'onboarding-fleet-select';
 
-const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled }: Props) => {
+const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled = false, inline = false }: Props) => {
   if (selectedFleet) {
     return (
-      <Container>
-        <Heading>Fleet for this collector</Heading>
+      <Container $inline={inline}>
+        {!inline && <Heading>Fleet for This Collector</Heading>}
         <SelectedBox>
           <div>
             <FleetName>{selectedFleet.name}</FleetName>
@@ -131,9 +134,9 @@ const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled }: Pr
   const options = fleets.map((fleet) => ({ label: fleet.name, value: fleet.id }));
 
   return (
-    <Container>
-      <Heading>Choose a fleet for this collector</Heading>
-      <Row>
+    <Container $inline={inline}>
+      {!inline && <Heading>Choose a Fleet for This Collector</Heading>}
+      <Row $inline={inline}>
         <Button bsStyle="primary" onClick={() => onSelect({ kind: 'create-new' })} disabled={disabled}>
           Create new fleet
         </Button>

@@ -301,6 +301,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
 
+  const hasColumnLayoutPreferences =
+    Object.keys(layoutPreferences?.attributes ?? {}).length > 0 || (layoutPreferences?.order?.length ?? 0) > 0;
+
   const resetLayoutPreferences = useCallback(() => {
     onResetLayoutPreferences().then(() => {
       setInternalAttributeColumnOrder(defaultColumnOrder);
@@ -335,6 +338,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                       <ColumnsVisibilitySelect<Entity>
                         table={table}
                         onResetLayoutPreferences={resetLayoutPreferences}
+                        hasColumnLayoutPreferences={hasColumnLayoutPreferences}
                       />
                     )}
                   </ButtonGroup>
@@ -355,6 +359,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $scrollContainerWidth={scrollContainerWidth}>
                     <InnerContainer>
                       <Table<Entity>
+                        columnWidths={columnWidths}
                         expandedSectionRenderers={expandedSectionRenderers}
                         headerGroups={headerGroups}
                         rowOverride={rowOverride}

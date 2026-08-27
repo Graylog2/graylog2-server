@@ -26,6 +26,7 @@ import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
 import java.time.Duration;
@@ -76,6 +77,12 @@ public interface ClusterAdapter {
     Map<String, NodeInfo> nodesInfo();
 
     Map<String, NodeOSInfo> nodesHostInfo();
+
+    /**
+     * Live per-node runtime utilization ({@code _nodes/stats/os,jvm}): CPU percent and JVM heap-used percent, keyed
+     * by node id. A single bounded round-trip; the search-cluster health reporters sample and window this on the leader.
+     */
+    Map<String, NodeUtilization> nodesUtilization();
 
     ShardStats shardStats();
 

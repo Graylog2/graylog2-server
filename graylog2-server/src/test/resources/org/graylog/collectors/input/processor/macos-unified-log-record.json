@@ -1,0 +1,34 @@
+{
+  "otelRecord": {
+    "log": {
+      "resource": {
+        "attributes": [
+          { "key": "collector.receiver.type", "value": { "stringValue": "macos_unified_logging" } }
+        ]
+      },
+      "scope": {},
+      "logRecord": {
+        "timeUnixNano": "1709000000000000000",
+        "observedTimeUnixNano": "1709000001000000000",
+        "severityText": "Default",
+        "body": { "stringValue": "Connection established to endpoint 10.0.1.50:443" },
+        "attributes": [
+          { "key": "macos.subsystem", "value": { "stringValue": "com.example.network" } },
+          { "key": "macos.category", "value": { "stringValue": "connection" } },
+          { "key": "macos.eventType", "value": { "stringValue": "logEvent" } },
+          { "key": "macos.formatString", "value": { "stringValue": "%{public}s connection to %{public}s:%{public}d" } },
+          { "key": "macos.processImagePath", "value": { "stringValue": "/usr/libexec/example-daemon" } },
+          { "key": "macos.processID", "value": { "intValue": "1234" } },
+          { "key": "macos.userID", "value": { "intValue": "501" } },
+          { "key": "macos.threadID", "value": { "intValue": "7890" } },
+          { "key": "macos.bootUUID", "value": { "stringValue": "FFEEDDCC-BBAA-9988-7766-554433221100" } },
+          { "key": "macos.machTimestamp", "value": { "intValue": "1234567890" } },
+          { "key": "macos.traceID", "value": { "intValue": "45473881108119556" } },
+          { "key": "macos.senderImagePath", "value": { "stringValue": "/usr/lib/libexample.dylib" } }
+        ]
+      }
+    }
+  },
+  "collectorInstanceUid": "test-agent-001",
+  "collectorReceiverType": "macos_unified_logging"
+}
