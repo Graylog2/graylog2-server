@@ -14,16 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import usePluginEntities from 'hooks/usePluginEntities';
+package org.graylog.scheduler.system;
 
-const EMPTY_STREAMS: Array<string> = [];
-const fallbackUseExcludedArchiveStreams = (): Array<string> => EMPTY_STREAMS;
-
-const useExcludedArchiveStreams = (): Array<string> => {
-  const useExcludedStreams =
-    usePluginEntities('archive')?.[0]?.hooks?.useExcludedStreams ?? fallbackUseExcludedArchiveStreams;
-
-  return useExcludedStreams();
-};
-
-export default useExcludedArchiveStreams;
+/**
+ * The result of submitting a system job to the scheduler.
+ *
+ * @param id the ID of the submitted job. Pass it to {@link SystemJobManager#getRunningJob(String)} to read the
+ *           state of the job while it runs.
+ */
+public record SystemJobSubmitResult(String id) {
+}
