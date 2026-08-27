@@ -154,7 +154,7 @@ public class EnrollmentTokenResource extends RestResource {
                     "Configure collectors at /api/collectors/config first.");
         }
 
-        checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, request.fleetId());
+        checkPermission(CollectorsPermissions.TOKEN_CREATE, request.fleetId());
 
         if (fleetService.get(request.fleetId()).isEmpty()) {
             throw new BadRequestException("Fleet not found: " + request.fleetId());
@@ -191,7 +191,7 @@ public class EnrollmentTokenResource extends RestResource {
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
         final var list = enrollmentTokenService.findPaginated(dbQuery, resolvedSort,
-                page, perPage, dto -> isPermitted(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, dto.fleetId()));
+                page, perPage, dto -> isPermitted(CollectorsPermissions.TOKEN_READ, dto.fleetId()));
 
         return PageListResponse.create(query, list.pagination(), list.pagination().total(),
                 sort, order, list.stream().toList(), ATTRIBUTES, DEFAULTS);
@@ -211,7 +211,7 @@ public class EnrollmentTokenResource extends RestResource {
             throw new NotFoundException("Enrollment token not found");
         }
         final EnrollmentTokenDTO dto = token.get();
-        checkPermission(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, dto.fleetId());
+        checkPermission(CollectorsPermissions.TOKEN_DELETE, dto.fleetId());
 
         if (!enrollmentTokenService.delete(tokenId)) {
             throw new NotFoundException("Enrollment token not found");
@@ -239,7 +239,7 @@ public class EnrollmentTokenResource extends RestResource {
             // we need to create the proper audit contexts for each delete event
             final List<Map<String, Object>> auditContexts = new ArrayList<>();
             final List<String> permittedIds =
-                    stream.filter(dto -> isPermitted(CollectorsPermissions.FLEET_INSTANCE_ASSIGN, dto.fleetId()))
+                    stream.filter(dto -> isPermitted(CollectorsPermissions.TOKEN_DELETE, dto.fleetId()))
                             .peek(dto -> auditContexts.add(Map.of(
                                     "tokenId", Objects.requireNonNull(dto.id()),
                                     "name", dto.name(),

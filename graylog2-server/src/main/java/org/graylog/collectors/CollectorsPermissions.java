@@ -42,6 +42,10 @@ public class CollectorsPermissions implements PluginPermissions {
 
     public static final String ACTIVITIES_READ = "collector_activities:read";
 
+    public static final String TOKEN_CREATE = "collector_enrollment_tokens:create";
+    public static final String TOKEN_READ = "collector_enrollment_tokens:read";
+    public static final String TOKEN_DELETE = "collector_enrollment_tokens:delete";
+
     private static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.of(
             create(FLEET_CREATE, "Create a new fleet"),
             create(FLEET_READ, "Read fleet details"),
@@ -54,7 +58,10 @@ public class CollectorsPermissions implements PluginPermissions {
             create(SOURCE_DELETE, "Delete a source in a fleet"),
             create(CONFIGURATION_READ, "Read the configuration for collectors"),
             create(CONFIGURATION_EDIT, "Edit the configuration for collectors"),
-            create(ACTIVITIES_READ, "Read the recent activity feed")
+            create(ACTIVITIES_READ, "Read the recent activity feed"),
+            create(TOKEN_CREATE, "Create an enrollment token for a fleet"),
+            create(TOKEN_READ, "Read enrollment tokens for a fleet"),
+            create(TOKEN_DELETE, "Delete an enrollment token for a fleet")
     );
 
     @Override
