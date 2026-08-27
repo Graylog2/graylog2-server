@@ -26,8 +26,20 @@ import type { IconName } from 'components/common/Icon';
 import sizeForMantine from 'theme/utils/sizeForMantine';
 import type { SupportedMantineSize } from 'theme/types';
 
-export type BadgeColor = Extract<ColorVariant, 'primary' | 'danger' | 'success' | 'warning' | 'gray'>;
-export type BadgeVariant = 'light' | 'filled';
+export const BADGE_COLORS = [
+  'primary',
+  'danger',
+  'success',
+  'warning',
+  'gray',
+] as const satisfies readonly ColorVariant[];
+export type BadgeColor = (typeof BADGE_COLORS)[number];
+
+export const BADGE_VARIANTS = ['light', 'filled'] as const;
+export type BadgeVariant = (typeof BADGE_VARIANTS)[number];
+
+export const BADGE_SIZES = ['sm', 'md', 'lg'] as const;
+export type BadgeSize = (typeof BADGE_SIZES)[number];
 
 const mapStyle = (style: ColorVariant, theme: DefaultTheme) =>
   style === 'default' ? theme.colors.button.gray.background : theme.colors.variant[style];
@@ -112,7 +124,7 @@ export type BadgeProps = React.PropsWithChildren<{
   onMouseLeave?: React.MouseEventHandler<HTMLElement>;
   rightIcon?: IconName;
   role?: string;
-  size?: SupportedMantineSize;
+  size?: BadgeSize;
   style?: React.CSSProperties;
   title?: string;
   uppercase?: boolean;
@@ -145,7 +157,7 @@ const Badge = (
 ) => {
   const theme = useTheme();
 
-  const resolvedSize = size ?? (bsSize ? sizeForMantine(bsSize) : 'md');
+  const resolvedSize: SupportedMantineSize = size ?? (bsSize ? sizeForMantine(bsSize) : 'md');
   const background = color ? theme.colors.badges[color][variant].background : mapStyle(bsStyle, theme);
   const textColor = color ? theme.colors.badges[color][variant].text : theme.utils.contrastingColor(background);
   const iconSize = iconSizeForBadge[resolvedSize];

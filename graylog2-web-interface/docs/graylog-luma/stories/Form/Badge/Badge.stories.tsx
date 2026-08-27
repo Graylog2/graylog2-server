@@ -19,11 +19,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { fn } from 'storybook/test';
 
 import { Badge } from 'components/bootstrap';
-import type { BadgeColor, BadgeVariant } from 'components/bootstrap/Badge';
-
-const COLORS: BadgeColor[] = ['primary', 'danger', 'success', 'warning', 'gray'];
-const VARIANTS: BadgeVariant[] = ['light', 'filled'];
-const SIZES = ['sm', 'md', 'lg'] as const;
+import { BADGE_COLORS, BADGE_VARIANTS, BADGE_SIZES } from 'components/bootstrap/Badge';
 
 const meta = {
   title: 'Components/Badges/Badge',
@@ -61,7 +57,7 @@ const meta = {
     className: { table: { disable: true } },
     color: {
       control: { type: 'select' },
-      options: COLORS,
+      options: BADGE_COLORS,
       description: 'Semantic color — picks the background/text pair from the theme',
     },
     'data-testid': { table: { disable: true } },
@@ -76,13 +72,13 @@ const meta = {
     onMouseLeave: { table: { disable: true } },
     rightIcon: { control: 'text', description: 'Icon name shown after the label, e.g. "pause"' },
     role: { table: { disable: true } },
-    size: { control: { type: 'select' }, options: ['xs', 'sm', 'md', 'lg'], description: 'Badge size' },
+    size: { control: { type: 'select' }, options: BADGE_SIZES, description: 'Badge size' },
     style: { table: { disable: true } },
     title: { table: { disable: true } },
     uppercase: { table: { disable: true } },
     variant: {
       control: { type: 'select' },
-      options: VARIANTS,
+      options: BADGE_VARIANTS,
       description: '"light" (tinted background) or "filled" (solid background)',
     },
   },
@@ -140,8 +136,8 @@ export const AllColors: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, max-content)', gap: '8px 24px', alignItems: 'center' }}>
-      {COLORS.flatMap((color) =>
-        VARIANTS.map((variant) => (
+      {BADGE_COLORS.flatMap((color) =>
+        BADGE_VARIANTS.map((variant) => (
           <Badge key={`${color}-${variant}`} color={color} variant={variant}>
             {color} / {variant}
           </Badge>
@@ -155,7 +151,7 @@ export const Sizes: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-      {SIZES.map((size) => (
+      {BADGE_SIZES.map((size) => (
         <Badge key={size} size={size} color="primary" variant="filled" dot>
           {size}
         </Badge>
