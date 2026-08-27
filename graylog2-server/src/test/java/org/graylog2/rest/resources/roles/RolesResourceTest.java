@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.roles;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
+import org.graylog.security.UserContext;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
@@ -29,6 +30,7 @@ import org.graylog2.security.SecurityTestUtils;
 import org.graylog2.security.WithAuthorization;
 import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.users.Role;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleService;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,8 +74,11 @@ class RolesResourceTest {
     private RoleService roleService;
     @Mock
     private GlobalAuthServiceConfig globalAuthServiceConfig;
+    @Mock
+    private UserService userService;
 
     private TestRolesResource classUnderTest;
+    private UserContext userContext;
 
     @BeforeEach
     void setUp() {
@@ -82,6 +87,7 @@ class RolesResourceTest {
         // that a collaborator was called. `validatePermissions` never touches the RoleService.
         classUnderTest = new TestRolesResource(roleService, globalAuthServiceConfig,
                 new PrivilegeEscalationGuard(roleService), new HttpConfiguration());
+        this.userContext = SecurityTestUtils.getUserContext(userService);
     }
 
     @Test
@@ -113,7 +119,7 @@ class RolesResourceTest {
         givenSaveReturnsRole(STREAM_READER_ROLE, Set.of(STREAMS_READ));
 
         final Response response = classUnderTest.create(
-                roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ)), SecurityTestUtils.getUserContext());
+                roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ)), userContext);
 
         assertThat(response.getStatus()).isEqualTo(201);
         verify(roleService).save(any(Role.class));
@@ -125,7 +131,7 @@ class RolesResourceTest {
         givenSaveReturnsRole(STREAM_READER_ROLE, Set.of());
 
         final Response response = classUnderTest.create(
-                roleRequest(STREAM_READER_ROLE, Set.of()), SecurityTestUtils.getUserContext());
+                roleRequest(STREAM_READER_ROLE, Set.of()), SecurityTestUtils.getUserContext(userService));
 
         assertThat(response.getStatus()).isEqualTo(201);
     }
@@ -134,7 +140,6 @@ class RolesResourceTest {
     @WithAuthorization(permissions = {"roles:create"})
     void createRoleFailsWhenCurrentUserLacksARequestedPermission() throws ValidationException {
         final var request = roleRequest(STREAM_READER_ROLE, Set.of(INPUTS_CREATE));
-        final var userContext = SecurityTestUtils.getUserContext();
 
         assertThatThrownBy(() -> classUnderTest.create(request, userContext))
                 .isInstanceOf(BadRequestException.class)
@@ -147,7 +152,6 @@ class RolesResourceTest {
     @WithAuthorization(permissions = {"roles:create"})
     void createRoleFailsWhenGrantingTheWildcardPermission() throws ValidationException {
         final var request = roleRequest(ADMIN_ROLE, Set.of("*"));
-        final var userContext = SecurityTestUtils.getUserContext();
 
         assertThatThrownBy(() -> classUnderTest.create(request, userContext))
                 .isInstanceOf(BadRequestException.class)
@@ -162,7 +166,7 @@ class RolesResourceTest {
         givenSaveReturnsRole(STREAM_READER_ROLE, Set.of(STREAMS_READ));
 
         final Response response = classUnderTest.create(
-                roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ)), SecurityTestUtils.getUserContext());
+                roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ)), userContext);
 
         assertThat(response.getStatus()).isEqualTo(201);
     }
@@ -172,7 +176,6 @@ class RolesResourceTest {
     void createRoleRejectsPermissionBroaderThanTheOneCurrentUserHolds() throws ValidationException {
         // Holding `streams:read:12345` must not allow granting `streams:read` for *all* streams.
         final var request = roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ));
-        final var userContext = SecurityTestUtils.getUserContext();
 
         assertThatThrownBy(() -> classUnderTest.create(request, userContext))
                 .isInstanceOf(BadRequestException.class)
@@ -185,7 +188,6 @@ class RolesResourceTest {
     @WithAuthorization(permissions = {STREAMS_READ})
     void createRoleStillRequiresTheRolesCreatePermission() {
         final var request = roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ));
-        final var userContext = SecurityTestUtils.getUserContext();
 
         assertThatThrownBy(() -> classUnderTest.create(request, userContext))
                 .isInstanceOf(ForbiddenException.class);
@@ -205,7 +207,7 @@ class RolesResourceTest {
         when(roleService.load(STREAM_READER_ROLE)).thenReturn(existingRole);
 
         final RoleResponse result = classUnderTest.update(STREAM_READER_ROLE,
-                roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ)), SecurityTestUtils.getUserContext());
+                roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ)), userContext);
 
         assertThat(result.permissions()).containsExactly(STREAMS_READ);
         verify(existingRole).setPermissions(Set.of(STREAMS_READ));
@@ -217,7 +219,6 @@ class RolesResourceTest {
     void updateRoleFailsWhenAddingAPermissionCurrentUserLacks() throws ValidationException {
         // A member of a role with `roles:edit` on it must not be able to escalate by widening that role.
         final var request = roleRequest(ADMIN_ROLE, Set.of("*"));
-        final var userContext = SecurityTestUtils.getUserContext();
 
         assertThatThrownBy(() -> classUnderTest.update(ADMIN_ROLE, request, userContext))
                 .isInstanceOf(BadRequestException.class)
@@ -230,7 +231,6 @@ class RolesResourceTest {
     @WithAuthorization(permissions = {"roles:edit:" + ADMIN_ROLE})
     void updateRoleValidatesBeforeLoadingTheRole() throws NotFoundException, ValidationException {
         final var request = roleRequest(ADMIN_ROLE, Set.of(INPUTS_CREATE));
-        final var userContext = SecurityTestUtils.getUserContext();
 
         assertThatThrownBy(() -> classUnderTest.update(ADMIN_ROLE, request, userContext))
                 .isInstanceOf(BadRequestException.class);
@@ -244,7 +244,6 @@ class RolesResourceTest {
     @WithAuthorization(permissions = {STREAMS_READ})
     void updateRoleStillRequiresTheRolesEditPermission() {
         final var request = roleRequest(STREAM_READER_ROLE, Set.of(STREAMS_READ));
-        final var userContext = SecurityTestUtils.getUserContext();
 
         assertThatThrownBy(() -> classUnderTest.update(STREAM_READER_ROLE, request, userContext))
                 .isInstanceOf(ForbiddenException.class);
@@ -264,7 +263,7 @@ class RolesResourceTest {
         when(roleService.load(STREAM_READER_ROLE)).thenReturn(role);
 
         final Response response = classUnderTest.addMember(
-                STREAM_READER_ROLE, CURRENT_USER, "{}", SecurityTestUtils.getUserContext());
+                STREAM_READER_ROLE, CURRENT_USER, "{}", userContext);
 
         assertThat(response.getStatus()).isEqualTo(204);
     }
@@ -276,8 +275,6 @@ class RolesResourceTest {
         final Role adminRole = mock(Role.class);
         when(adminRole.getPermissions()).thenReturn(Set.of("*"));
         when(roleService.load(ADMIN_ROLE)).thenReturn(adminRole);
-
-        final var userContext = SecurityTestUtils.getUserContext();
 
         assertThatThrownBy(() -> classUnderTest.addMember(ADMIN_ROLE, CURRENT_USER, "{}", userContext))
                 .isInstanceOf(BadRequestException.class)
@@ -292,8 +289,6 @@ class RolesResourceTest {
         when(adminRole.getPermissions()).thenReturn(Set.of(STREAMS_READ, INPUTS_CREATE));
         when(roleService.load(ADMIN_ROLE)).thenReturn(adminRole);
 
-        final var userContext = SecurityTestUtils.getUserContext();
-
         assertThatThrownBy(() -> classUnderTest.addMember(ADMIN_ROLE, CURRENT_USER, "{}", userContext))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining(INPUTS_CREATE)
@@ -303,8 +298,6 @@ class RolesResourceTest {
     @Test
     @WithAuthorization(permissions = {"roles:assign:" + STREAM_READER_ROLE, STREAMS_READ})
     void addMemberStillRequiresTheUsersEditPermission() {
-        final var userContext = SecurityTestUtils.getUserContext();
-
         assertThatThrownBy(() -> classUnderTest.addMember(
                 STREAM_READER_ROLE, CURRENT_USER, "{}", userContext))
                 .isInstanceOf(ForbiddenException.class);
@@ -313,8 +306,6 @@ class RolesResourceTest {
     @Test
     @WithAuthorization(permissions = {"users:edit:" + CURRENT_USER, STREAMS_READ})
     void addMemberStillRequiresTheRolesAssignPermission() {
-        final var userContext = SecurityTestUtils.getUserContext();
-
         assertThatThrownBy(() -> classUnderTest.addMember(
                 STREAM_READER_ROLE, CURRENT_USER, "{}", userContext))
                 .isInstanceOf(ForbiddenException.class);
