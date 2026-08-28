@@ -198,7 +198,7 @@
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
-        <protobuf.version>4.35.1</protobuf.version>
+        <protobuf.version>4.36.0</protobuf.version>
         <proto-google-common-protos.version>2.74.0</proto-google-common-protos.version>
         <proto-google-iam-v1.version>1.69.0</proto-google-iam-v1.version>
         <reactor.version>3.7.19</reactor.version>
