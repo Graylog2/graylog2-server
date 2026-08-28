@@ -51,7 +51,7 @@ const Notifications = ({ count, notifications }: { count: number; notifications:
 const NotificationsList = () => {
   const { data, isLoading } = useNotifications();
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return <Spinner />;
   }
 
