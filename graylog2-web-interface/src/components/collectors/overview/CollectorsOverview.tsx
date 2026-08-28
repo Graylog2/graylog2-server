@@ -25,7 +25,6 @@ import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { CollectorStats } from 'components/collectors/types';
-import useFeature from 'hooks/useFeature';
 import StatCard from 'components/common/StatCard/StatCard';
 
 import FleetCardsGrid from './FleetCardsGrid';
@@ -150,13 +149,12 @@ const FleetsSection = ({ filter }: { filter: string }) => {
 const CollectorsOverview = () => {
   const [filter, setFilter] = useState('');
   const { data: stats, isLoading, isError } = useCollectorStats();
-  const showOnboarding = useFeature('collectors_onboarding');
 
   if (isLoading) return <Spinner />;
 
   if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
 
-  if (showOnboarding && stats.total_instances === 0) return <FirstOnboarding />;
+  if (stats.total_instances === 0) return <FirstOnboarding />;
 
   return (
     <div>
