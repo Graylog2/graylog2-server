@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import type { BadgeVariant } from '@mantine/core';
 import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';

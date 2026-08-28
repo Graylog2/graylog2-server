@@ -33,6 +33,10 @@ const StyledNav = styled(Nav)(
       align-items: center;
       justify-content: center;
       cursor: pointer;
+
+      * {
+        cursor: inherit;
+      }
     }
   `,
 );

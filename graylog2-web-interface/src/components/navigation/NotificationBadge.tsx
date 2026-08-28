@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 
-import { Group, Icon } from 'components/common';
 import { Badge } from 'components/bootstrap';
 import usePermissions from 'hooks/usePermissions';
 import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
@@ -42,11 +41,13 @@ const NotificationBadge = () => {
 
   return (
     <NavBadgeItem to={Routes.SYSTEM.NOTIFICATIONS}>
-      <Badge aria-label={accessibleLabel} data-testid="notification-badge" title={accessibleLabel}>
-        <Group component="span" gap={4} wrap="nowrap">
-          <Icon name="notifications" size="sm" />
-          {count > 0 ? displayedCount : null}
-        </Group>
+      <Badge
+        aria-label={accessibleLabel}
+        color="gray"
+        data-testid="notification-badge"
+        leftIcon="notifications"
+        title={accessibleLabel}>
+        {count > 0 ? displayedCount : null}
       </Badge>
     </NavBadgeItem>
   );
