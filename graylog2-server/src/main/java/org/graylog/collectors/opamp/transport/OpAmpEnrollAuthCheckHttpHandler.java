@@ -25,17 +25,21 @@ import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.graylog.collectors.opamp.OpAmpExecutor;
 import org.graylog.collectors.opamp.OpAmpService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 
 @Singleton
-public class OpAmpAuthCheckHttpHandler extends HttpHandler {
+public class OpAmpEnrollAuthCheckHttpHandler extends HttpHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(OpAmpEnrollAuthCheckHttpHandler.class);
+
     private final OpAmpService opAmpService;
     private final ExecutorService executor;
 
     @Inject
-    public OpAmpAuthCheckHttpHandler(OpAmpService opAmpService,
-                                     @OpAmpExecutor ExecutorService executor) {
+    public OpAmpEnrollAuthCheckHttpHandler(OpAmpService opAmpService,
+                                           @OpAmpExecutor ExecutorService executor) {
         this.opAmpService = opAmpService;
         this.executor = executor;
     }
@@ -53,16 +57,22 @@ public class OpAmpAuthCheckHttpHandler extends HttpHandler {
     }
 
     private void processRequest(Request request, Response response) {
-        if (request.getMethod() != Method.GET) {
-            response.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
-            response.finish();
-            return;
-        }
+        try {
+            if (request.getMethod() != Method.GET) {
+                response.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
+                response.finish();
+                return;
+            }
 
-        final var authContext = opAmpService.authenticate(request.getHeader("Authorization"), OpAmpAuthContext.Transport.HTTP);
-        if (authContext.isEmpty()) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            if (!opAmpService.enrollmentAuthCheck(request.getHeader("Authorization"), OpAmpAuthContext.Transport.HTTP)) {
+                response.setStatus(HttpStatus.UNAUTHORIZED_401);
+                response.finish();
+                return;
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
             response.finish();
+            LOG.error("OpAMP auth-check failed", e);
             return;
         }
 

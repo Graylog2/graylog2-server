@@ -46,6 +46,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -196,6 +197,42 @@ class OpAmpServiceTest {
         assertThat(result).isEmpty();
         verify(enrollmentTokenService, never()).validateToken(any());
         verify(agentTokenService, never()).validateAgentToken(any(), any());
+    }
+
+    @Test
+    void enrollmentAuthCheckAcceptsValidEnrollmentToken() {
+        final String token = createTokenWithCtt("enrollment");
+        final EnrollmentTokenDTO tokenDto = new EnrollmentTokenDTO("token-id", "test-token", "jti-1", "kid-1", "test-fleet",
+                new EnrollmentTokenCreator("user-id", "admin"), Instant.now(), null, 0, null);
+
+        when(enrollmentTokenService.validateToken(eq(token)))
+                .thenReturn(Optional.of(tokenDto));
+
+        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token, TRANSPORT)).isTrue();
+    }
+
+    @Test
+    void enrollmentAuthCheckRejectsInvalidEnrollmentToken() {
+        final String token = createTokenWithCtt("enrollment");
+
+        when(enrollmentTokenService.validateToken(eq(token)))
+                .thenReturn(Optional.empty());
+
+        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token, TRANSPORT)).isFalse();
+    }
+
+    /**
+     * The auth-check must be side-effect free. Agent token validation activates a pending "next"
+     * certificate as a side effect, so the auth-check must reject agent tokens without ever
+     * invoking the agent token validation.
+     */
+    @Test
+    void enrollmentAuthCheckRejectsAgentTokenWithoutValidatingIt() {
+        final String token = createTokenWithCtt("agent");
+
+        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token, TRANSPORT)).isFalse();
+        verify(agentTokenService, never()).validateAgentToken(any(), any());
+        verifyNoInteractions(collectorInstanceService);
     }
 
     /**

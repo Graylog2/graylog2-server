@@ -22,8 +22,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.graylog.collectors.CollectorsConfigService;
-import org.graylog.collectors.db.EnrollmentTokenCreator;
-import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.opamp.OpAmpConstants;
 import org.graylog.collectors.opamp.OpAmpService;
 import org.junit.jupiter.api.AfterEach;
@@ -33,9 +31,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,20 +41,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class OpAmpAuthCheckHttpHandlerIT {
-
-    private static final EnrollmentTokenDTO TEST_TOKEN_DTO = new EnrollmentTokenDTO(
-            "token-id",
-            "test-token",
-            "jti-1",
-            "kid-1",
-            "test-fleet",
-            new EnrollmentTokenCreator("user-id", "admin"),
-            Instant.now(),
-            null,
-            0,
-            null
-    );
+class OpAmpEnrollAuthCheckHttpHandlerIT {
 
     private HttpServer httpServer;
     private OpAmpService opAmpService;
@@ -78,9 +60,9 @@ class OpAmpAuthCheckHttpHandlerIT {
         // Register both handlers like OpAmpHttpServerExtension does, to verify that the
         // auth-check mapping routes to its own handler next to the regular OpAMP endpoint.
         final var opAmpHandler = new OpAmpHttpHandler(opAmpService, collectorsConfigService, executor);
-        final var authCheckHandler = new OpAmpAuthCheckHttpHandler(opAmpService, executor);
+        final var authCheckHandler = new OpAmpEnrollAuthCheckHttpHandler(opAmpService, executor);
         httpServer.getServerConfiguration().addHttpHandler(opAmpHandler, OpAmpConstants.PATH);
-        httpServer.getServerConfiguration().addHttpHandler(authCheckHandler, OpAmpConstants.AUTH_CHECK_PATH);
+        httpServer.getServerConfiguration().addHttpHandler(authCheckHandler, OpAmpConstants.ENROLL_AUTH_CHECK_PATH);
 
         httpServer.start();
 
@@ -97,9 +79,9 @@ class OpAmpAuthCheckHttpHandlerIT {
     }
 
     @Test
-    void returnsOkForValidEnrollmentToken() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), eq(OpAmpAuthContext.Transport.HTTP)))
-                .thenReturn(Optional.of(new OpAmpAuthContext.Enrollment(TEST_TOKEN_DTO, OpAmpAuthContext.Transport.HTTP)));
+    void returnsOkForValidToken() throws Exception {
+        when(opAmpService.enrollmentAuthCheck(eq("Bearer valid"), eq(OpAmpAuthContext.Transport.HTTP)))
+                .thenReturn(true);
 
         try (var response = client.newCall(authCheckRequest("Bearer valid")).execute()) {
             assertThat(response.code()).isEqualTo(200);
@@ -107,23 +89,12 @@ class OpAmpAuthCheckHttpHandlerIT {
 
         // The auth-check must not cause any state changes.
         verify(opAmpService, never()).handleMessage(any(), any());
-    }
-
-    @Test
-    void returnsOkForValidAgentToken() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), eq(OpAmpAuthContext.Transport.HTTP)))
-                .thenReturn(Optional.of(new OpAmpAuthContext.Identified(UUID.randomUUID().toString(), OpAmpAuthContext.Transport.HTTP)));
-
-        try (var response = client.newCall(authCheckRequest("Bearer valid")).execute()) {
-            assertThat(response.code()).isEqualTo(200);
-        }
-
-        verify(opAmpService, never()).handleMessage(any(), any());
+        verify(opAmpService, never()).authenticate(any(), any());
     }
 
     @Test
     void rejectsMissingAuth() throws Exception {
-        when(opAmpService.authenticate(any(), any())).thenReturn(Optional.empty());
+        when(opAmpService.enrollmentAuthCheck(any(), any())).thenReturn(false);
 
         final var request = new Request.Builder()
                 .url(authCheckUrl())
@@ -137,7 +108,7 @@ class OpAmpAuthCheckHttpHandlerIT {
 
     @Test
     void rejectsInvalidAuth() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer invalid"), any())).thenReturn(Optional.empty());
+        when(opAmpService.enrollmentAuthCheck(eq("Bearer invalid"), any())).thenReturn(false);
 
         try (var response = client.newCall(authCheckRequest("Bearer invalid")).execute()) {
             assertThat(response.code()).isEqualTo(401);
@@ -156,7 +127,16 @@ class OpAmpAuthCheckHttpHandlerIT {
             assertThat(response.code()).isEqualTo(405);
         }
 
-        verify(opAmpService, never()).authenticate(any(), any());
+        verify(opAmpService, never()).enrollmentAuthCheck(any(), any());
+    }
+
+    @Test
+    void returnsServerErrorWhenAuthCheckThrows() throws Exception {
+        when(opAmpService.enrollmentAuthCheck(any(), any())).thenThrow(new RuntimeException("boom"));
+
+        try (var response = client.newCall(authCheckRequest("Bearer valid")).execute()) {
+            assertThat(response.code()).isEqualTo(500);
+        }
     }
 
     private Request authCheckRequest(String authorization) {
@@ -168,7 +148,7 @@ class OpAmpAuthCheckHttpHandlerIT {
     }
 
     private String authCheckUrl() {
-        return "http://localhost:" + port + OpAmpConstants.AUTH_CHECK_PATH;
+        return "http://localhost:" + port + OpAmpConstants.ENROLL_AUTH_CHECK_PATH;
     }
 
     private static int findFreePort() throws IOException {

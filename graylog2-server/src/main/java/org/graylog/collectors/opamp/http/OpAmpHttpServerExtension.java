@@ -19,7 +19,7 @@ package org.graylog.collectors.opamp.http;
 import jakarta.inject.Inject;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.graylog.collectors.opamp.OpAmpConstants;
-import org.graylog.collectors.opamp.transport.OpAmpAuthCheckHttpHandler;
+import org.graylog.collectors.opamp.transport.OpAmpEnrollAuthCheckHttpHandler;
 import org.graylog.collectors.opamp.transport.OpAmpHttpHandler;
 import org.graylog2.jersey.HttpServerExtension;
 import org.slf4j.Logger;
@@ -33,13 +33,13 @@ public class OpAmpHttpServerExtension implements HttpServerExtension {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpHttpServerExtension.class);
 
     private final OpAmpHttpHandler opAmpHttpHandler;
-    private final OpAmpAuthCheckHttpHandler opAmpAuthCheckHttpHandler;
+    private final OpAmpEnrollAuthCheckHttpHandler opAmpEnrollAuthCheckHttpHandler;
 
     @Inject
     public OpAmpHttpServerExtension(OpAmpHttpHandler opAmpHttpHandler,
-                                    OpAmpAuthCheckHttpHandler opAmpAuthCheckHttpHandler) {
+                                    OpAmpEnrollAuthCheckHttpHandler opAmpEnrollAuthCheckHttpHandler) {
         this.opAmpHttpHandler = requireNonNull(opAmpHttpHandler, "opAmpHttpHandler");
-        this.opAmpAuthCheckHttpHandler = requireNonNull(opAmpAuthCheckHttpHandler, "opAmpAuthCheckHttpHandler");
+        this.opAmpEnrollAuthCheckHttpHandler = requireNonNull(opAmpEnrollAuthCheckHttpHandler, "opAmpAuthCheckHttpHandler");
     }
 
     /**
@@ -47,7 +47,7 @@ public class OpAmpHttpServerExtension implements HttpServerExtension {
      */
     public void configure(HttpServer httpServer) {
         httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, OpAmpConstants.PATH);
-        httpServer.getServerConfiguration().addHttpHandler(opAmpAuthCheckHttpHandler, OpAmpConstants.AUTH_CHECK_PATH);
+        httpServer.getServerConfiguration().addHttpHandler(opAmpEnrollAuthCheckHttpHandler, OpAmpConstants.ENROLL_AUTH_CHECK_PATH);
 
         LOG.info("OpAMP endpoint enabled at {}", OpAmpConstants.PATH);
     }

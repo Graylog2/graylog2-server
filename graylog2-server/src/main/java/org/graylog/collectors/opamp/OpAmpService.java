@@ -91,6 +91,7 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
@@ -156,7 +157,32 @@ public class OpAmpService {
         }
     }
 
+    public boolean enrollmentAuthCheck(String authHeader, OpAmpAuthContext.Transport transport) {
+        return handleAuthHeader(authHeader, (token, typ) -> {
+            if (!"enrollment".equals(typ)) {
+                LOG.debug("Invalid token type received: {}", typ);
+                return Optional.empty();
+            }
+            return enrollmentTokenService.validateToken(token)
+                    .map(dto -> new OpAmpAuthContext.Enrollment(dto, transport));
+        }).isPresent();
+    }
+
     public Optional<OpAmpAuthContext> authenticate(String authHeader, OpAmpAuthContext.Transport transport) {
+        return handleAuthHeader(authHeader, (token, typ) -> switch (typ) {
+            case "enrollment" -> enrollmentTokenService.validateToken(token)
+                    .map(dto -> new OpAmpAuthContext.Enrollment(dto, transport));
+            case "agent" -> agentTokenService.validateAgentToken(token, transport).map(i -> i);
+            default -> {
+                LOG.warn("Unknown token type: {}", typ);
+                yield Optional.empty();
+            }
+        });
+    }
+
+    private Optional<OpAmpAuthContext> handleAuthHeader(
+            String authHeader,
+            BiFunction<String, String, Optional<OpAmpAuthContext>> callback) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Optional.empty();
         }
@@ -168,15 +194,7 @@ public class OpAmpService {
             return Optional.empty();
         }
 
-        return switch (typ) {
-            case "enrollment" -> enrollmentTokenService.validateToken(token)
-                    .map(dto -> new OpAmpAuthContext.Enrollment(dto, transport));
-            case "agent" -> agentTokenService.validateAgentToken(token, transport).map(i -> i);
-            default -> {
-                LOG.warn("Unknown token type: {}", typ);
-                yield Optional.empty();
-            }
-        };
+        return callback.apply(token, typ);
     }
 
     // TODO: Replace with proper JWT library parsing or pull into key locator
