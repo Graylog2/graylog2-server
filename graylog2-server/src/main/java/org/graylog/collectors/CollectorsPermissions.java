@@ -43,9 +43,9 @@ public class CollectorsPermissions implements PluginPermissions {
 
     public static final String ACTIVITIES_READ = "collector_activities:read";
 
-    public static final String TOKEN_CREATE = "collector_enrollment_tokens:create";
-    public static final String TOKEN_READ = "collector_enrollment_tokens:read";
-    public static final String TOKEN_DELETE = "collector_enrollment_tokens:delete";
+    public static final String ENROLL_TOKEN_CREATE = "collector_enrollment_tokens:create";
+    public static final String ENROLL_TOKEN_READ = "collector_enrollment_tokens:read";
+    public static final String ENROLL_TOKEN_DELETE = "collector_enrollment_tokens:delete";
 
     private static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.of(
             create(FLEET_CREATE, "Create a new fleet"),
@@ -60,9 +60,9 @@ public class CollectorsPermissions implements PluginPermissions {
             create(CONFIGURATION_READ, "Read the configuration for collectors"),
             create(CONFIGURATION_EDIT, "Edit the configuration for collectors"),
             create(ACTIVITIES_READ, "Read the recent activity feed"),
-            create(TOKEN_CREATE, "Create an enrollment token for a fleet"),
-            create(TOKEN_READ, "Read enrollment tokens for a fleet"),
-            create(TOKEN_DELETE, "Delete an enrollment token for a fleet")
+            create(ENROLL_TOKEN_CREATE, "Create an enrollment token for a fleet"),
+            create(ENROLL_TOKEN_READ, "Read enrollment tokens for a fleet"),
+            create(ENROLL_TOKEN_DELETE, "Delete an enrollment token for a fleet")
     );
 
     @Override
@@ -83,7 +83,7 @@ public class CollectorsPermissions implements PluginPermissions {
                         Set.of(FLEET_CREATE, FLEET_READ, FLEET_EDIT, FLEET_DELETE,
                                 FLEET_INSTANCE_ASSIGN, FLEET_INSTANCE_DELETE,
                                 SOURCE_CREATE, SOURCE_EDIT, SOURCE_DELETE,
-                                TOKEN_CREATE, TOKEN_READ, TOKEN_DELETE,
+                                ENROLL_TOKEN_CREATE, ENROLL_TOKEN_READ, ENROLL_TOKEN_DELETE,
                                 CONFIGURATION_READ, CONFIGURATION_EDIT,
                                 ACTIVITIES_READ)),
                 BuiltinRole.create("Collectors Reader",

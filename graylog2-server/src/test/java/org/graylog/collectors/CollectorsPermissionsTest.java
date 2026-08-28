@@ -36,14 +36,14 @@ class CollectorsPermissionsTest {
 
     @Test
     void declaresEnrollmentTokenPermissions() {
-        assertThat(CollectorsPermissions.TOKEN_CREATE).isEqualTo("collector_enrollment_tokens:create");
-        assertThat(CollectorsPermissions.TOKEN_READ).isEqualTo("collector_enrollment_tokens:read");
-        assertThat(CollectorsPermissions.TOKEN_DELETE).isEqualTo("collector_enrollment_tokens:delete");
+        assertThat(CollectorsPermissions.ENROLL_TOKEN_CREATE).isEqualTo("collector_enrollment_tokens:create");
+        assertThat(CollectorsPermissions.ENROLL_TOKEN_READ).isEqualTo("collector_enrollment_tokens:read");
+        assertThat(CollectorsPermissions.ENROLL_TOKEN_DELETE).isEqualTo("collector_enrollment_tokens:delete");
 
         assertThat(permissionStrings()).contains(
-                CollectorsPermissions.TOKEN_CREATE,
-                CollectorsPermissions.TOKEN_READ,
-                CollectorsPermissions.TOKEN_DELETE);
+                CollectorsPermissions.ENROLL_TOKEN_CREATE,
+                CollectorsPermissions.ENROLL_TOKEN_READ,
+                CollectorsPermissions.ENROLL_TOKEN_DELETE);
     }
 
     @Test
@@ -63,9 +63,9 @@ class CollectorsPermissionsTest {
                 CollectorsPermissions.SOURCE_CREATE,
                 CollectorsPermissions.SOURCE_EDIT,
                 CollectorsPermissions.SOURCE_DELETE,
-                CollectorsPermissions.TOKEN_CREATE,
-                CollectorsPermissions.TOKEN_READ,
-                CollectorsPermissions.TOKEN_DELETE,
+                CollectorsPermissions.ENROLL_TOKEN_CREATE,
+                CollectorsPermissions.ENROLL_TOKEN_READ,
+                CollectorsPermissions.ENROLL_TOKEN_DELETE,
                 CollectorsPermissions.CONFIGURATION_READ,
                 CollectorsPermissions.CONFIGURATION_EDIT,
                 CollectorsPermissions.ACTIVITIES_READ);

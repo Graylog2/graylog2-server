@@ -42,8 +42,8 @@ const useCollectorPermissions = () => {
         scoped(COLLECTOR_PERMISSIONS.FLEET_READ, fleetId),
         scoped(COLLECTOR_PERMISSIONS.FLEET_INSTANCE_ASSIGN, fleetId),
       ]),
-    canCreateToken: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.TOKEN_CREATE, fleetId)),
-    canDeleteToken: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.TOKEN_DELETE, fleetId)),
+    canCreateToken: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.ENROLL_TOKEN_CREATE, fleetId)),
+    canDeleteToken: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.ENROLL_TOKEN_DELETE, fleetId)),
     canReadActivities: isPermitted(COLLECTOR_PERMISSIONS.ACTIVITIES_READ),
     canEditConfig: isPermitted(COLLECTOR_PERMISSIONS.CONFIGURATION_EDIT),
   };
