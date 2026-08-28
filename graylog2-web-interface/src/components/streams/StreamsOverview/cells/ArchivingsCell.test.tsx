@@ -24,7 +24,13 @@ import ArchivingsCell from './ArchivingsCell';
 
 jest.mock('components/streams/hooks/useExcludedArchiveStreams');
 
-const stream = { id: 'stream-1', title: 'Test Stream', is_default: false, is_editable: true, index_set_id: 'is-1' } as any;
+const stream = {
+  id: 'stream-1',
+  title: 'Test Stream',
+  is_default: false,
+  is_editable: true,
+  index_set_id: 'is-1',
+} as any;
 const archivingIndexSet = { id: 'is-1', data_tiering: { archive_before_deletion: true } } as any;
 const nonArchivingIndexSet = { id: 'is-1', data_tiering: { archive_before_deletion: false } } as any;
 

@@ -26,7 +26,8 @@ export type CollectorsSection =
   | 'collectors-fleet-detail'
   | 'collectors-instances'
   | 'collectors-deployment'
-  | 'collectors-settings';
+  | 'collectors-settings'
+  | 'collectors-onboarding';
 
 const sectionForPathname = (pathname: string): CollectorsSection => {
   if (pathname.includes('/system/collectors/fleets/')) return 'collectors-fleet-detail';
@@ -34,6 +35,7 @@ const sectionForPathname = (pathname: string): CollectorsSection => {
   if (pathname.includes('/system/collectors/instances')) return 'collectors-instances';
   if (pathname.includes('/system/collectors/deployment')) return 'collectors-deployment';
   if (pathname.includes('/system/collectors/settings')) return 'collectors-settings';
+  if (pathname.includes('/system/collectors/onboarding')) return 'collectors-onboarding';
 
   return 'collectors-overview';
 };

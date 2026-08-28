@@ -20,7 +20,8 @@ const EMPTY_STREAMS: Array<string> = [];
 const fallbackUseExcludedArchiveStreams = (): Array<string> => EMPTY_STREAMS;
 
 const useExcludedArchiveStreams = (): Array<string> => {
-  const useExcludedStreams = usePluginEntities('archive')?.[0]?.hooks?.useExcludedStreams ?? fallbackUseExcludedArchiveStreams;
+  const useExcludedStreams =
+    usePluginEntities('archive')?.[0]?.hooks?.useExcludedStreams ?? fallbackUseExcludedArchiveStreams;
 
   return useExcludedStreams();
 };

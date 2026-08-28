@@ -25,10 +25,11 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ReassignFleetModal from './ReassignFleetModal';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
+import { AGENT_ID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import { useCollectorsMutations } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import { instanceTelemetryProps } from '../hooks/telemetry-helpers';
 import type { CollectorInstanceView } from '../types';
 
 type Props = {
@@ -46,9 +47,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
     await deleteInstance(instance.instance_uid);
     sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.DELETED, {
       app_action_value: 'instance-delete',
-      instance_id: instance.instance_uid,
-      fleet_id: instance.fleet_id,
-      status: instance.status,
+      ...instanceTelemetryProps(instance),
     });
     setShowDeleteConfirm(false);
   }, [instance, deleteInstance, sendTelemetry]);
@@ -56,8 +55,21 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
   return (
     <>
       <ButtonToolbar>
-        <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
-          <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
+        <LinkContainer to={collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid)}>
+          <IconButton
+            name="search"
+            title="Received messages"
+            bsStyle="default"
+            size="xsmall"
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.RECEIVED_MESSAGES_CLICKED, {
+                app_action_value: 'instance-received-messages',
+                ...instanceTelemetryProps(instance),
+                // Both this and the detail drawer can reach these; keep them comparable.
+                origin: 'row',
+              })
+            }
+          />
         </LinkContainer>
         <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
           <Button
@@ -65,8 +77,8 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
             onClick={() =>
               sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
                 app_action_value: 'instance-view-logs',
-                instance_id: instance.instance_uid,
-                fleet_id: instance.fleet_id,
+                ...instanceTelemetryProps(instance),
+                origin: 'row',
               })
             }>
             View System Logs
@@ -77,9 +89,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.DETAILS_OPENED, {
               app_action_value: 'instance-details',
-              instance_id: instance.instance_uid,
-              fleet_id: instance.fleet_id,
-              status: instance.status,
+              ...instanceTelemetryProps(instance),
             });
             onDetailsClick(instance);
           }}>
@@ -93,6 +103,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
       </ButtonToolbar>
       {showReassignModal && (
         <ReassignFleetModal
+          origin="row"
           instanceUids={[instance.instance_uid]}
           currentFleetId={instance.fleet_id}
           onClose={() => setShowReassignModal(false)}

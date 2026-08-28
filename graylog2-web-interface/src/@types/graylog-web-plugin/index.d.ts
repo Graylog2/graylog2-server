@@ -47,7 +47,6 @@ interface GlobalNotification {
 interface NavigationBadge {
   key: string;
   component: React.ComponentType;
-  // Active badges replace the built-in notification badge, so they must render the notification count themselves.
   useCondition: () => boolean;
 }
 
@@ -265,7 +264,7 @@ declare module 'graylog-web-plugin/plugin' {
     indexercluster: 'read';
     indexranges: 'rebuild';
     indexset_templates: 'create' | 'edit' | 'read';
-    indexsets: 'create' | 'edit' | 'read';
+    indexsets: 'create' | 'delete' | 'edit' | 'read';
     indexsets_field_restrictions: 'edit';
     indices: 'read' | 'changestate' | 'failures';
     input_types: 'create';
