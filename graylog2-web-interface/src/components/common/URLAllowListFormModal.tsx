@@ -53,7 +53,7 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
   const urlAllowListConfig = configuration[URL_ALLOWLIST_CONFIG];
 
   const currentUser = useCurrentUser();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('urlallowlist');
 
   useEffect(() => {
     if (isPermitted(currentUser.permissions, ['urlallowlist:read'])) {
@@ -116,7 +116,6 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
     }
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.URLALLOWLIST_CONFIGURATION_UPDATED, {
-      app_section: 'urlallowlist',
       app_action_value: 'configuration-update',
     });
 

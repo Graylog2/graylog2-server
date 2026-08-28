@@ -18,7 +18,6 @@ import React, { useMemo, useCallback, useEffect } from 'react';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
 import type { IndexSetFieldTypeProfileForm } from 'components/indices/IndexSetFieldTypeProfiles/types';
@@ -28,9 +27,7 @@ import useHistory from 'routing/useHistory';
 
 const CreateProfile = () => {
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const { createProfile } = useProfileMutations();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const location = useLocation<{ customFieldMappings: any }>();
   const history = useHistory();
   const initialValues = useMemo<IndexSetFieldTypeProfileForm>(() => {
@@ -51,30 +48,27 @@ const CreateProfile = () => {
     (profile: IndexSetFieldTypeProfileForm) => {
       createProfile(profile).then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CREATED, {
-          app_pathname: telemetryPathName,
           app_action_value: { mappingsQuantity: profile?.customFieldMappings?.length },
         });
 
         history.push(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
       });
     },
-    [createProfile, history, sendTelemetry, telemetryPathName],
+    [createProfile, history, sendTelemetry],
   );
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_OPENED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'create-new-index-set-field-type-profile-opened',
     });
-  }, [sendTelemetry, telemetryPathName]);
+  }, [sendTelemetry]);
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_CANCELED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'create-new-index-set-field-type-profile-canceled',
     });
     history.goBack();
-  }, [history, sendTelemetry, telemetryPathName]);
+  }, [history, sendTelemetry]);
 
   return (
     <ProfileForm

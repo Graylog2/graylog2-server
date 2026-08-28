@@ -28,7 +28,6 @@ import type { Permission } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -46,7 +45,6 @@ import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type User from 'logic/users/User';
@@ -191,9 +189,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const validationState = warnings?.queryString as QueryValidationState;
   const warmTierRanges = indicesInWarmTier(validationState);
 
-  const { pathname } = useLocation();
-
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('event-definition-condition');
 
   const queryId = generateId();
   const searchTypeId = generateId();
@@ -375,8 +371,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     (name: string, config: EventDefinitionConfig) => {
       if (name === '_is_scheduled') {
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'event-definition-condition',
           app_action_value: 'enable-checkbox',
           is_scheduled: config._is_scheduled,
         });
@@ -384,7 +378,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
       propagateChange(config);
     },
-    [pathname, propagateChange, sendTelemetry],
+    [propagateChange, sendTelemetry],
   );
 
   const handleQueryChange = useCallback(
@@ -464,8 +458,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const handleStreamsAndCategoriesChange = useCallback(
     (selected: StreamsAndCategoriesSelection) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-definition-condition',
         app_action_value: 'stream-select',
       });
 
@@ -476,22 +468,18 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         ]),
       );
     },
-    [getUpdatedConfigMulti, pathname, propagateChange, sendTelemetry],
+    [getUpdatedConfigMulti, propagateChange, sendTelemetry],
   );
 
   const handleTimeRangeChange = useCallback(
     (fieldName: EventDefinitionConfigKeys) => (nextValue: number, nextUnit: 'hours' | 'minutes' | 'seconds') => {
       if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'event-definition-condition',
           app_action_value: 'searchWithinMsUnit-select',
           new_unit: nextUnit,
         });
       } else if (fieldName === 'execute_every_ms' && nextUnit !== executeEveryMsUnit) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'event-definition-condition',
           app_action_value: 'executeEveryMsUnit-select',
           new_unit: nextUnit,
         });
@@ -513,7 +501,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       setExecuteEveryMsDuration(nextValue);
       setExecuteEveryMsUnit(nextUnit);
     },
-    [executeEveryMsUnit, getUpdatedConfig, pathname, propagateChange, searchWithinMsUnit, sendTelemetry],
+    [executeEveryMsUnit, getUpdatedConfig, propagateChange, searchWithinMsUnit, sendTelemetry],
   );
 
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';

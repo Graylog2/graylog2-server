@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import TemplateForm from 'components/indices/IndexSetTemplates/TemplateForm';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import useTemplateMutation from 'components/indices/IndexSetTemplates/hooks/useTemplateMutation';
@@ -33,38 +31,33 @@ type Props = {
 const EditTemplate = ({ template }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
-  const { pathname } = useLocation();
   const { updateTemplate } = useTemplateMutation();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
   const onSubmit = useCallback(
     (newTemplate: IndexSetTemplate) => {
       updateTemplate({ template: newTemplate, id: template.id }).then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT, {
-          app_pathname: telemetryPathName,
           app_action_value: 'edit-index-set-template-edited',
         });
 
         push(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
       });
     },
-    [updateTemplate, push, template.id, sendTelemetry, telemetryPathName],
+    [updateTemplate, push, template.id, sendTelemetry],
   );
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_OPENED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'edit-index-set-template-opened',
     });
-  }, [sendTelemetry, telemetryPathName]);
+  }, [sendTelemetry]);
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_CANCELLED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'edit-index-set-template-cancelled',
     });
     push(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
-  }, [push, sendTelemetry, telemetryPathName]);
+  }, [push, sendTelemetry]);
 
   return (
     <TemplateForm

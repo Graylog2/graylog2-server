@@ -20,8 +20,6 @@ import omit from 'lodash/omit';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
 import type {
   IndexSetFieldTypeProfile,
@@ -37,38 +35,33 @@ type Props = {
 const EditProfile = ({ profile }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
-  const { pathname } = useLocation();
   const { editProfile } = useProfileMutations();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
   const onSubmit = useCallback(
     (newProfile: IndexSetFieldTypeProfileForm) => {
       editProfile({ profile: newProfile, id: profile.id }).then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT, {
-          app_pathname: telemetryPathName,
           app_action_value: { mappingsQuantity: newProfile?.customFieldMappings?.length },
         });
 
         push(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
       });
     },
-    [editProfile, push, profile.id, sendTelemetry, telemetryPathName],
+    [editProfile, push, profile.id, sendTelemetry],
   );
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_OPENED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'create-new-index-set-field-type-profile-opened',
     });
-  }, [sendTelemetry, telemetryPathName]);
+  }, [sendTelemetry]);
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_CANCELED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'create-new-index-set-field-type-profile-canceled',
     });
     push(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
-  }, [push, sendTelemetry, telemetryPathName]);
+  }, [push, sendTelemetry]);
 
   const initialValues = useMemo(() => omit(profile, ['id', 'indexSetIds']), [profile]);
 

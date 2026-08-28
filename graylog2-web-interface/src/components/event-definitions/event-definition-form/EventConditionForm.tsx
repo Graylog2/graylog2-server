@@ -23,9 +23,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstr
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
 import type User from 'logic/users/User';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventDefinitionType } from 'components/event-definitions/types';
 
@@ -70,8 +68,7 @@ const EventConditionForm = ({
   onChange,
   canEdit,
 }: Props) => {
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('event-definition-condition');
 
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
   const filteredDefinitionTypes = eventDefinitionTypes.filter((type) => type.useCondition() && !type.hideFromCreation);
@@ -126,8 +123,6 @@ const EventConditionForm = ({
 
   const handleEventDefinitionTypeChange = (nextType: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.TYPE_SELECTED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-condition',
       app_action_value: 'type-select',
       condition_type: nextType,
     });

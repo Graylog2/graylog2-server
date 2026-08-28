@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { ModalSubmit, Select } from 'components/common';
 import { Button, Input, Modal } from 'components/bootstrap';
@@ -55,8 +53,6 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
   const { options, isLoading: profileOptionsIsLoading } = useProfileOptions();
 
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -64,7 +60,6 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
       setIndexSetFieldTypeProfile({ indexSetId, rotated, profileId: profile })
         .then(() => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_CHANGED, {
-            app_pathname: telemetryPathName,
             app_action_value: {
               value: 'index-field-type-profile-changed',
               rotated,
@@ -74,14 +69,13 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
         .then(() => queryClient.invalidateQueries({ queryKey: ['indexSet', indexSetId] }))
         .then(() => onClose());
     },
-    [setIndexSetFieldTypeProfile, indexSetId, rotated, profile, sendTelemetry, telemetryPathName, onClose, queryClient],
+    [setIndexSetFieldTypeProfile, indexSetId, rotated, profile, sendTelemetry, onClose, queryClient],
   );
 
   const onRemoveProfileFromIndex = useCallback(() => {
     removeProfileFromIndex({ indexSetId, rotated })
       .then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_CHANGED, {
-          app_pathname: telemetryPathName,
           app_action_value: {
             value: 'index-field-type-profile-removed',
             rotated,
@@ -93,21 +87,19 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
 
         return queryClient.invalidateQueries({ queryKey: ['indexSet', indexSetId] });
       });
-  }, [indexSetId, onClose, removeProfileFromIndex, rotated, sendTelemetry, telemetryPathName, queryClient]);
+  }, [indexSetId, onClose, removeProfileFromIndex, rotated, sendTelemetry, queryClient]);
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_CANCELED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'removed-custom-field-type-closed',
     });
     onClose();
-  }, [onClose, sendTelemetry, telemetryPathName]);
+  }, [onClose, sendTelemetry]);
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_OPENED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'removed-custom-field-type-opened',
     });
-  }, [sendTelemetry, telemetryPathName, currentProfile]);
+  }, [sendTelemetry, currentProfile]);
 
   useEffect(() => {
     setProfile(currentProfile);

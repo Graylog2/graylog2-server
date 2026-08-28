@@ -20,8 +20,6 @@ import styled from 'styled-components';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Spinner, Link } from 'components/common';
 import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -170,8 +168,6 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   );
   const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation({ onErrorHandler, onSuccessHandler });
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -179,7 +175,6 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
 
       removeCustomFieldTypeMutation({ fields, indexSets: indexSetIds, rotated }).then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_REMOVED, {
-          app_pathname: telemetryPathName,
           app_action_value: {
             value: 'removed-custom-field-type',
             rotated,
@@ -187,23 +182,21 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
         });
       });
     },
-    [fields, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName],
+    [fields, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry],
   );
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_CLOSED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'removed-custom-field-type-closed',
     });
     onClose();
-  }, [onClose, sendTelemetry, telemetryPathName]);
+  }, [onClose, sendTelemetry]);
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_OPENED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'removed-custom-field-type-opened',
     });
-  }, [sendTelemetry, telemetryPathName]);
+  }, [sendTelemetry]);
 
   return (
     <BootstrapModalForm
