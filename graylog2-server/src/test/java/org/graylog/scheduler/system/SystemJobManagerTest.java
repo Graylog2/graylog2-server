@@ -130,6 +130,22 @@ class SystemJobManagerTest {
     }
 
     @Test
+    void getActiveJobConfigsReturnsQueuedAndRunningJobsOfSpecifiedType() {
+        // Create and lock a job (simulating a running job)
+        systemJobManager.submit(TestSystemJobConfig.create("running-job"));
+        assertThat(triggerService.nextRunnableTrigger()).isPresent();
+
+        systemJobManager.submit(TestSystemJobConfig.create("pending-job"));
+
+        final var activeConfigs = systemJobManager.getActiveJobConfigs(TestSystemJobConfig.TYPE_NAME);
+
+        assertThat(activeConfigs)
+                .extracting(config -> ((TestSystemJobConfig) config).testValue())
+                .containsExactlyInAnyOrder("running-job", "pending-job");
+        assertThat(systemJobManager.getActiveJobConfigs("other-type")).isEmpty();
+    }
+
+    @Test
     void getRunningJobsReturnsAllRunningJobs() {
         // Submit and lock first job
         systemJobManager.submit(TestSystemJobConfig.create("job-1"));

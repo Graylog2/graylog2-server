@@ -29,6 +29,7 @@ import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
 
 type Props = {
   instance: CollectorInstanceView;
+  onLinkClick?: (link: string) => void;
 };
 
 const PanelTitle = styled.h4(
@@ -57,28 +58,32 @@ const TroubleshootingList = styled.ol(
   `,
 );
 
-type NextLink = { icon: IconName; title: string; description: string; to: string };
+type NextLink = { key: string; icon: IconName; title: string; description: string; to: string };
 
 const nextLinks = (instance: CollectorInstanceView): Array<NextLink> => [
   {
+    key: 'search',
     icon: 'search',
     title: 'Explore your data',
     description: 'Open search filtered to this collector',
     to: collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid),
   },
   {
+    key: 'configure-sources',
     icon: 'settings',
     title: 'Configure sources',
     description: 'Add or tune what this fleet collects',
     to: Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id),
   },
   {
+    key: 'fleets',
     icon: 'hub',
     title: 'Manage fleets',
     description: 'Move this collector to a permanent fleet',
     to: Routes.SYSTEM.COLLECTORS.FLEETS,
   },
   {
+    key: 'install-another',
     icon: 'add_circle',
     title: 'Install another collector',
     description: 'Repeat this setup on another host',
@@ -90,7 +95,7 @@ const nextLinks = (instance: CollectorInstanceView): Array<NextLink> => [
  * The panel below the onboarding timeline: pointers to what to do next while everything is
  * healthy, or recovery steps when the collector has gone offline.
  */
-const NextSteps = ({ instance }: Props) => {
+const NextSteps = ({ instance, onLinkClick = undefined }: Props) => {
   const productName = useProductName();
   if (instance.status !== 'online') {
     return (
@@ -109,11 +114,13 @@ const NextSteps = ({ instance }: Props) => {
     <div>
       <PanelTitle>What&apos;s Next</PanelTitle>
       <IconRowList>
-        {nextLinks(instance).map(({ icon, title, description, to }) => (
-          <IconRow key={icon}>
+        {nextLinks(instance).map(({ key, icon, title, description, to }) => (
+          <IconRow key={key}>
             <Icon name={icon} />
             <div>
-              <Link to={to}>{title}</Link>
+              <Link to={to} onClick={() => onLinkClick?.(key)}>
+                {title}
+              </Link>
               <LinkDescription>{description}</LinkDescription>
             </div>
           </IconRow>
