@@ -104,20 +104,20 @@
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.8</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
-        <apache-httpclient5.version>5.6.3</apache-httpclient5.version>
+        <apache-httpclient5.version>5.6.4</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <apache-httpcore5.version>5.4.3</apache-httpcore5.version>
         <asm.version>9.10.1</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.50.3</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.53.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.7</aws-msk-iam-auth.version>
         <bouncycastle.version>1.85</bouncycastle.version>
         <caffeine.version>3.2.4</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.186</classgraph.version>
+        <classgraph.version>4.8.192</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -145,13 +145,13 @@
         <grpc.version>1.83.1</grpc.version>
         <gson.version>2.14.0</gson.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>33.6.0-jre</guava.version>
+        <guava.version>33.7.1-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
         <hibernate-validator.version>9.1.3.Final</hibernate-validator.version>
         <hk2.version>4.0.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <jadconfig.version>1.1.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -170,9 +170,10 @@
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.14.3</joda-time.version>
         <jool.version>0.9.15</jool.version>
-        <json-org.version>20260719</json-org.version>
+        <json-org.version>20260814</json-org.version>
         <json-path.version>3.0.0</json-path.version>
         <jsoup.version>1.23.1</jsoup.version>
+        <jspecify.version>1.0.1</jspecify.version>
         <jsr305.version>3.0.2</jsr305.version>
         <kafka.version>4.3.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
@@ -181,17 +182,17 @@
         <kotlinx-serialization.version>1.11.0</kotlinx-serialization.version>
         <kotlinx-coroutines.version>1.11.0</kotlinx-coroutines.version>
         <log4j.version>2.26.1</log4j.version>
-        <lucene.version>10.5.0</lucene.version>
+        <lucene.version>10.5.1</lucene.version>
         <lz4.version>1.11.2</lz4.version>
         <metrics.version>4.2.39</metrics.version>
-        <mongodb-driver.version>5.9.1</mongodb-driver.version>
+        <mongodb-driver.version>5.10.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.16.Final</netty.version>
+        <netty.version>4.2.17.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.81.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>5.4.0</okhttp.version>
+        <okhttp.version>5.5.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.64.0</opentelemetry.version>
+        <opentelemetry.version>1.65.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.30.0</opentelemetry-instrumentation.version>
         <opentelemetry-semconv.version>1.43.0</opentelemetry-semconv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
@@ -207,7 +208,7 @@
         <shiro.version>2.2.1</shiro.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>7.4.3</oshi.version>
+        <oshi.version>7.5.0</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
@@ -219,7 +220,7 @@
         <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-12</zstd.version>
+        <zstd.version>1.5.7-15</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -227,7 +228,7 @@
         <poi.version>5.5.1</poi.version>
         <!-- mcp-core 2.0.0 pulls in an older reactor-core than azure-core requires. When bumping, check if the
              explicit reactor-core dependency management can be removed. -->
-        <mcp-bom.version>2.0.0</mcp-bom.version>
+        <mcp-bom.version>2.0.1</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -237,7 +238,7 @@
         <awaitility.version>4.3.0</awaitility.version>
         <equalsverifier.version>4.5</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
-        <junit-jupiter.version>6.1.2</junit-jupiter.version>
+        <junit-jupiter.version>6.1.3</junit-jupiter.version>
         <mockito.version>5.23.0</mockito.version>
         <restassured.version>6.0.1</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
@@ -665,13 +666,18 @@
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>${jspecify.version}</version>
+            </dependency>
 
             <!-- Explicitly manage avro to fix CVE-2023-39410. We are using this only as a transitive dependency in
                  plugins. Remove once its usages are updated and the fixed version is pulled in automatically. -->
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>1.12.1</version>
+                <version>1.12.2</version>
             </dependency>
             <!-- Explicitly manage commons-compress to fix CVE-2023-42503. We are using this only as a transitive
                  dependency in plugins. Remove once its usages are updated and the fixed version is pulled in
@@ -981,7 +987,7 @@
                 <plugin>
                     <groupId>org.openrewrite.maven</groupId>
                     <artifactId>rewrite-maven-plugin</artifactId>
-                    <version>6.45.0</version>
+                    <version>6.46.1</version>
                     <configuration>
                         <!-- do not set <configLocation> here, otherwise it cannot be overridden by a system property later -->
                         <exclusions>
@@ -998,27 +1004,27 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.88.0</version>
+                            <version>8.90.2</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.43.0</version>
+                            <version>3.44.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-migrate-java</artifactId>
-                            <version>3.41.0</version>
+                            <version>3.42.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.40.0</version>
+                            <version>2.41.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-joda</artifactId>
-                            <version>0.10.0</version>
+                            <version>0.10.1</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -1162,7 +1168,7 @@
                     <dependency>
                         <groupId>de.skuzzle.enforcer</groupId>
                         <artifactId>restrict-imports-enforcer-rule</artifactId>
-                        <version>3.0.0</version>
+                        <version>3.0.1</version>
                         <scope>compile</scope>
                     </dependency>
                 </dependencies>

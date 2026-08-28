@@ -70,7 +70,7 @@ describe('ThresholdFormItem', () => {
   it('calls remove callback when delete button is clicked', async () => {
     const removeMock = jest.fn();
     renderComponent({ metricIndex: 0, thresholdIndex: 0, onRemove: removeMock });
-    const deleteButton = await screen.findByTitle(/Remove threshold/i);
+    const deleteButton = await screen.findByRole('button', { name: /Remove threshold/i });
     await userEvent.click(deleteButton);
 
     expect(removeMock).toHaveBeenCalled();

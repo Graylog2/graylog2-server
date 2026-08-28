@@ -18,16 +18,23 @@ import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import minBy from 'lodash/minBy';
 import uniqBy from 'lodash/uniqBy';
 
-import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { RelativeCoordinates, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type {
   Px,
   Anchor,
   PlotlyHTMLElementWithInternals,
 } from 'views/components/visualizations/OnClickPopover/anchors';
-import { clamp01, distToRect, pickNearestElementAnchor } from 'views/components/visualizations/OnClickPopover/anchors';
+import { clamp01, distToRect } from 'views/components/visualizations/OnClickPopover/anchors';
 import dropdownPopover from 'views/components/visualizations/OnClickPopover/dropdownPopover';
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
+
+type PointCandidate = { pt: ClickPoint; d: number };
+type MarkerCandidate = PointCandidate & { type: 'marker'; el: Element; rect: DOMRect };
+type LineCandidate = PointCandidate & { type: 'line'; el: Element; valuePx: number; valuePy: number };
+type ScatterAnchorCandidate = MarkerCandidate | LineCandidate;
+
+const isDefined = <T,>(value: T | null | undefined): value is T => !!value;
 
 const getScatterMarkerElement = (graphDiv: HTMLElement, pt: ClickPoint): Element | null => {
   const {
@@ -123,7 +130,11 @@ function pickNearestLinesElementForTrace(gd: PlotlyHTMLElement, pt: ClickPoint, 
  *  - px, py: projected point coordinates in page pixels
  *  - valuePx, valuePy: value point coordinates in page pixels
  */
-const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint) => {
+const getScatterLineElements = (
+  gd: PlotlyHTMLElement,
+  click: Px,
+  pt: ClickPoint,
+): Array<Omit<LineCandidate, 'type'> | null> => {
   // Get the full data for this trace (array of x/y values)
   const fd: PlotData = pt.data ?? (gd as PlotlyHTMLElementWithInternals)._fullData?.[pt.curveNumber];
   const xs = fd?.x ?? [];
@@ -152,48 +163,68 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
     const d = Math.hypot(click.x - px, click.y - py);
     // Find the actual <path> element for the line
     const el = pickNearestLinesElementForTrace(gd, pt, click);
+    if (!el) return null;
     // The actual data point's pixel coordinates
-    const { x: valuePx, y: valuePy } = dataToPagePx(gd, pt, xs[i], ys[i]);
+    const valuePoint = dataToPagePx(gd, pt, xs[i], ys[i]);
+    if (!valuePoint) return null;
+    const { x: valuePx, y: valuePy } = valuePoint;
 
     return { el, pt, d, px, py, valuePx, valuePy };
   });
 };
 
-const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
-  const graphDiv = gd;
-  const markerCandidates = e.points
-    .map((pt: ClickPoint) => {
-      const el = getScatterMarkerElement(graphDiv, pt);
+const pointIdentity = (pt: ClickPoint) =>
+  `${pt.fullData?.uid ?? pt.curveNumber}:${pt.pointIndex ?? pt.pointNumber ?? pt.x}`;
 
-      return el ? { pt, el, rect: el.getBoundingClientRect() } : null;
-    })
-    .filter((candidate) => !!candidate);
-
-  const bestMarker = pickNearestElementAnchor(e, markerCandidates);
-  if (bestMarker) return bestMarker;
-  const { clientX, clientY } = e.event;
-  const click: Px = { x: clientX, y: clientY };
-  const lineCandidates = e.points
-    .flatMap((pt: ClickPoint) => getScatterLineElements(graphDiv, click, pt))
-    .filter((candidate) => !!candidate);
-  const best = minBy(lineCandidates, 'd');
-  // we need unique pt because in this case one pt can have several related lines
-  const pointsInRadius = uniqBy(
-    lineCandidates
+const getPointsInRadius = (candidates: Array<PointCandidate>) =>
+  uniqBy(
+    candidates
       .filter(({ d }) => d < CANDIDATE_PICK_RADIUS)
       .sort((a, b) => a.d - b.d)
       .map(({ pt }) => pt),
-    'pointIndex',
+    pointIdentity,
   );
 
+const getScatterRelativeCoordinates = (x: number, y: number, rect: DOMRect) => (
+  {
+    x: clamp01((x - rect.left) / Math.max(rect.width, 1)),
+    y: clamp01((y - rect.top) / Math.max(rect.height, 1)),
+  }
+)
+
+const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
+  const graphDiv = gd;
+  const { clientX, clientY } = e.event;
+  const click: Px = { x: clientX, y: clientY };
+  const markerCandidates: Array<MarkerCandidate> = e.points
+    .map((pt: ClickPoint) => {
+      const el = getScatterMarkerElement(graphDiv, pt);
+      if (!el) return null;
+      const rect = el.getBoundingClientRect();
+
+      return { type: 'marker' as const, pt, el, rect, d: distToRect(rect, click) };
+    })
+    .filter(isDefined);
+  const lineCandidates: Array<LineCandidate> = e.points
+    .flatMap((pt: ClickPoint) => getScatterLineElements(graphDiv, click, pt))
+    .filter(isDefined)
+    .map((candidate) => ({ ...candidate, type: 'line' as const }));
+  const candidates: Array<ScatterAnchorCandidate> = [...markerCandidates, ...lineCandidates];
+  const pointsInRadius = getPointsInRadius(candidates);
+  const best = minBy(candidates, 'd');
+
   if (!best) return null;
+
+  if (best.type === 'marker') {
+    const { el, rect, pt } = best;
+    const rel: RelativeCoordinates = getScatterRelativeCoordinates(clientX, clientY, rect);
+
+    return { rel, el, pt, pointsInRadius };
+  }
+
   const { el, pt, valuePx, valuePy } = best;
-  if (!el) return null;
   const rect = el.getBoundingClientRect();
-  const rel: Rel = {
-    x: clamp01((valuePx - rect.left) / Math.max(rect.width, 1)),
-    y: clamp01((valuePy - rect.top) / Math.max(rect.height, 1)),
-  };
+  const rel: RelativeCoordinates = getScatterRelativeCoordinates(valuePx, valuePy, rect);
 
   return { rel, el, pt, pointsInRadius };
 };

@@ -59,7 +59,7 @@ import WidgetErrorBoundary from './WidgetErrorBoundary';
 import WidgetActionsMenu from './WidgetActionsMenu';
 import WidgetWarmTierAlert from './WidgetWarmTierAlert';
 
-import InteractiveContext from '../contexts/InteractiveContext';
+import { useIsInteractiveMode } from '../contexts/InteractiveContext';
 
 export type Props = {
   id: string;
@@ -287,7 +287,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   const { focusedWidget } = useContext(WidgetFocusContext);
   const dispatch = useViewsDispatch();
   const sendWidgetConfigUpdateTelemetry = useSendWidgetConfigUpdateTelemetry();
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
 
   const isDashboard = viewType === View.Type.Dashboard;
 

@@ -19,7 +19,8 @@ import { useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { Spinner } from 'components/common';
+import { ClipboardButton, Spinner } from 'components/common';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getMajorAndMinorVersion } from 'util/Version';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -33,10 +34,12 @@ import PLATFORMS from './onboarding/platforms';
 import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
 
-import { useCollectorsConfig, useCollectorsMutations, useFleets } from '../hooks';
+import enrollEndpointUrl from '../common/enrollEndpointUrl';
+import { useCollectorsMutations, useFleets } from '../hooks';
 // Imported from the concrete module (not the hooks index) so tests that automock the index
 // still see the real cache key.
 import { INSTANCES_KEY_PREFIX } from '../hooks/useInstanceQueries';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet, CollectorInstanceView } from '../types';
 
 // 'setup' = still collecting platform/fleet; 'waiting' = command box is live.
@@ -68,27 +71,26 @@ const FirstOnboarding = () => {
 
   // The enrollment token is minted once and reused while switching platforms.
   const tokenRef = useRef<string | null>(null);
+  // Mirrors `tokenRef` for rendering only. The ref stays the source of truth for the async
+  // flow -- its `if (!tokenRef.current)` guard must not read a stale closure -- but a ref
+  // cannot be read during render, so the "Copy token only" button needs this.
+  const [enrollmentToken, setEnrollmentToken] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
   const history = useHistory();
+  const sendTelemetry = useSendCollectorsTelemetry();
 
-  const { data: config, isLoading: isConfigLoading } = useCollectorsConfig();
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
   const { createFleet, isCreatingFleet, createSource, createEnrollmentToken, isCreatingEnrollmentToken } =
     useCollectorsMutations();
 
-  const buildCommand = useCallback(
-    (platformId: PlatformId, token: string) => {
-      if (!config) return '';
+  const buildCommand = useCallback((platformId: PlatformId, token: string) => {
+    const platform = PLATFORMS.find((p) => p.id === platformId);
 
-      const platform = PLATFORMS.find((p) => p.id === platformId);
+    if (!platform) return '';
 
-      if (!platform) return '';
-
-      return platform.commandTemplate(config.http.hostname, config.http.port, token);
-    },
-    [config],
-  );
+    return platform.commandTemplate(enrollEndpointUrl(), token);
+  }, []);
 
   const createOnboardingFleet = useCallback(async () => {
     const version = getMajorAndMinorVersion();
@@ -114,60 +116,112 @@ const FirstOnboarding = () => {
   // Both gates (platform, fleet) converge here once both are known. Builds the command box.
   const showCommand = useCallback(
     async (platformId: PlatformId, choice: FleetChoiceValue) => {
+      let fleet: Fleet | undefined;
+
       try {
         if (!tokenRef.current) {
-          const fleet =
+          fleet =
             choice.kind === 'create-new' ? await createOnboardingFleet() : fleets?.find((f) => f.id === choice.fleetId);
 
           if (!fleet) return;
+
+          if (choice.kind === 'create-new') {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATED, {
+              app_action_value: 'onboarding-fleet-create',
+              fleet_id: fleet.id,
+            });
+          }
 
           // Reflect the fleet right away so the box lands on its details view without a flash of the prompt.
           setResolvedFleet(fleet);
 
           const { token } = await createEnrollmentToken({ name: 'onboarding', fleetId: fleet.id, expiresIn: 'P1D' });
           tokenRef.current = token;
+          setEnrollmentToken(token);
+
+          sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
+            app_action_value: 'onboarding-generate',
+            fleet_id: fleet.id,
+            // Carried on every onboarding step so a funnel can break down by platform
+            // without losing this one.
+            platform: platformId,
+            mode: 'onboarding',
+            expires_in: 'P1D',
+          });
         }
 
         setInstallCommand(buildCommand(platformId, tokenRef.current));
         setPhase('waiting');
       } catch {
         // Error notification handled by useCollectorsMutations onError callback
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
+          app_action_value: 'onboarding-generate-failed',
+          fleet_id: fleet?.id,
+          mode: 'onboarding',
+        });
       }
     },
-    [fleets, createOnboardingFleet, createEnrollmentToken, buildCommand],
+    [fleets, createOnboardingFleet, createEnrollmentToken, buildCommand, sendTelemetry],
   );
 
   const handlePlatformSelect = useCallback(
     (platformId: PlatformId) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.PLATFORM_SELECTED, {
+        app_action_value: 'onboarding-platform',
+        platform: platformId,
+      });
+
       setSelectedPlatform(platformId);
 
       // 0/1-fleet falls straight through; >1 fleets waits for the user's choice.
       const choice = fleetChoice ?? autoChoice();
       if (choice) showCommand(platformId, choice);
     },
-    [fleetChoice, autoChoice, showCommand],
+    [fleetChoice, autoChoice, showCommand, sendTelemetry],
   );
 
   const handleFleetChoice = useCallback(
     (choice: FleetChoiceValue) => {
+      // A created fleet is reported from showCommand once it exists and has an id.
+      if (choice.kind === 'existing') {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
+          app_action_value: 'onboarding-fleet',
+          fleet_id: choice.fleetId,
+          via: 'click',
+        });
+      }
+
       setFleetChoice(choice);
       tokenRef.current = null; // fleet changed -> a new token is needed
+      setEnrollmentToken(null);
 
       if (selectedPlatform) showCommand(selectedPlatform, choice);
     },
-    [selectedPlatform, showCommand],
+    [selectedPlatform, showCommand, sendTelemetry],
   );
 
   // "Change fleet": drop the resolved fleet and token, and fall back to the choice UI.
   const handleChangeFleet = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.FLEET_CLEARED, {
+      app_action_value: 'onboarding-change-fleet',
+    });
+
     setFleetChoice(null);
     setResolvedFleet(null);
     tokenRef.current = null;
+    setEnrollmentToken(null);
     setPhase('setup');
-  }, []);
+  }, [sendTelemetry]);
 
   const handleConnected = useCallback(
     (instance: CollectorInstanceView) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.CONNECTED, {
+        app_action_value: 'onboarding-connected',
+        instance_id: instance.instance_uid,
+        fleet_id: instance.fleet_id,
+        platform: selectedPlatform,
+      });
+
       // Seed the destination page's lookup so it renders without a refetch round trip.
       queryClient.setQueryData([...INSTANCES_KEY_PREFIX, 'single', instance.instance_uid], instance);
       // The overview's cached stats still say zero instances; refresh so Back shows the real overview.
@@ -177,10 +231,10 @@ const FirstOnboarding = () => {
         fleetName: resolvedFleet?.name,
       });
     },
-    [queryClient, history, selectedPlatform, resolvedFleet?.name],
+    [queryClient, history, selectedPlatform, resolvedFleet?.name, sendTelemetry],
   );
 
-  if (isConfigLoading || isFleetsLoading) return <Spinner />;
+  if (isFleetsLoading) return <Spinner />;
 
   const isBusy = isCreatingFleet || isCreatingEnrollmentToken;
   // Show the fleet box whenever an existing fleet could be chosen. With exactly one fleet it
@@ -211,6 +265,27 @@ const FirstOnboarding = () => {
             command={installCommand}
             platformLabel={PLATFORMS.find((p) => p.id === selectedPlatform)?.label ?? ''}
             tokenDuration="P1D"
+            onCopySuccess={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.COMMAND_COPIED, {
+                app_action_value: 'onboarding-copy-command',
+                platform: selectedPlatform,
+                fleet_id: resolvedFleet?.id,
+              })
+            }
+            actions={
+              <ClipboardButton
+                text={enrollmentToken ?? ''}
+                title="Copy token only"
+                bsSize="sm"
+                onSuccess={() =>
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+                    app_action_value: 'onboarding-copy-token',
+                    platform: selectedPlatform,
+                    fleet_id: resolvedFleet?.id,
+                  })
+                }
+              />
+            }
           />
           <WaitingForConnection key={resolvedFleet?.id} fleetId={resolvedFleet?.id} onConnected={handleConnected} />
         </BodyContainer>

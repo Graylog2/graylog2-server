@@ -42,6 +42,7 @@ const BulkActions = () => {
       </BulkActionsDropdown>
       {showReassignModal && (
         <ReassignFleetModal
+          origin="bulk-selection"
           instanceUids={selectedEntities}
           onClose={toggleReassignModal}
           onSuccess={handleReassignSuccess}

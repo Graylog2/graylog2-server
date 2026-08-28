@@ -50,7 +50,7 @@ const SectionTitle = styled.h3(
 const HelpText = styled.p(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     margin-bottom: ${theme.spacings.md};
   `,
 );
@@ -298,7 +298,14 @@ const CollectorsSettings = () => {
                 )}
               </Col>
 
-              <Collapsible label="Advanced options">
+              <Collapsible
+                label="Advanced options"
+                onToggle={(opened) =>
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.ADVANCED_TOGGLED, {
+                    app_action_value: 'settings-advanced-toggle',
+                    opened,
+                  })
+                }>
                 <Col md={6}>
                   <SectionTitle>Collector Lifecycle</SectionTitle>
 

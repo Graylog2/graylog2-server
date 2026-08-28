@@ -15,9 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 
 import { singleton } from '../../../logic/singleton';
 
-const InteractiveContext = React.createContext<boolean>(true);
+export type InteractionMode = 'interactive' | 'read-only' | 'disabled';
 
-export default singleton('views.components.contexts.InteractiveContext', () => InteractiveContext);
+const InteractiveContext = singleton('views.components.contexts.InteractiveContext', () =>
+  React.createContext<InteractionMode>('interactive'),
+);
+
+export const useIsInteractiveMode = () => useContext(InteractiveContext) === 'interactive';
+export const useIsReadOnlyMode = () => useContext(InteractiveContext) === 'read-only';
+
+export default InteractiveContext;

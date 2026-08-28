@@ -62,6 +62,24 @@ describe('SourceFormModal', () => {
 
     await screen.findByLabelText(/file path/i);
   });
+
+  it('renders macOS predicate field when macos source type selected', async () => {
+    render(<SourceFormModal fleetId="fleet-1" onClose={jest.fn()} onSave={jest.fn()} />);
+
+    await screen.findByText('macOS Unified Logging');
+    await userEvent.selectOptions(screen.getByLabelText(/Source Type/i), 'macos_unified_logging');
+
+    await screen.findByLabelText(/Predicate/i);
+  });
+
+  it('renders macOS poll interval and log age fields when macos source type selected', async () => {
+    render(<SourceFormModal fleetId="fleet-1" onClose={jest.fn()} onSave={jest.fn()} />);
+
+    await userEvent.selectOptions(screen.getByLabelText(/Source Type/i), 'macos_unified_logging');
+
+    await screen.findByLabelText(/Max poll interval/i);
+    await screen.findByLabelText(/Max log age/i);
+  });
 });
 
 describe('splitToList', () => {
@@ -178,6 +196,59 @@ describe('SourceFormModal telemetry', () => {
     render(<SourceFormModal fleetId="f-1" source={source} onClose={jest.fn()} onSave={jest.fn()} />);
 
     expect(sendTelemetryInstance).not.toHaveBeenCalledWith('Collector Source Create Opened', expect.anything());
+  });
+
+  describe('abandoning an edit', () => {
+    const editSource = {
+      id: 's-1',
+      fleet_id: 'f-1',
+      name: 's',
+      description: '',
+      enabled: true,
+      type: 'file' as const,
+      config: { paths: ['/var/log/x'], read_mode: 'end' as const },
+    };
+
+    it('emits EDIT_CANCELLED with nothing changed when the user cancels straight away', async () => {
+      render(<SourceFormModal fleetId="f-1" source={editSource} onClose={jest.fn()} onSave={jest.fn()} />);
+
+      await userEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+
+      expect(sendTelemetryInstance).toHaveBeenCalledWith(
+        'Collector Source Edit Cancelled',
+        expect.objectContaining({
+          app_action_value: 'source-edit-cancel',
+          fleet_id: 'f-1',
+          source_id: 's-1',
+          dirty: false,
+          fields_touched: [],
+          source_type: 'file',
+          source_type_changed: false,
+          enabled_changed: false,
+          config_changed: false,
+        }),
+      );
+    });
+
+    it('reports what the user had changed before abandoning the edit', async () => {
+      render(<SourceFormModal fleetId="f-1" source={editSource} onClose={jest.fn()} onSave={jest.fn()} />);
+
+      await userEvent.type(await screen.findByLabelText(/name/i), '-edited');
+      await userEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+
+      expect(sendTelemetryInstance).toHaveBeenCalledWith(
+        'Collector Source Edit Cancelled',
+        expect.objectContaining({ source_id: 's-1', dirty: true }),
+      );
+    });
+
+    it('does not emit the create-path cancel event in edit mode', async () => {
+      render(<SourceFormModal fleetId="f-1" source={editSource} onClose={jest.fn()} onSave={jest.fn()} />);
+
+      await userEvent.click(screen.getByRole('button', { name: /Cancel/i }));
+
+      expect(sendTelemetryInstance).not.toHaveBeenCalledWith('Collector Source Create Cancelled', expect.anything());
+    });
   });
 
   it('emits CREATE_CANCELLED with dirty=false when user cancels without touching anything', async () => {
