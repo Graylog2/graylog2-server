@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.migrations;
+package org.graylog.collectors.migrations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
@@ -29,6 +29,7 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;

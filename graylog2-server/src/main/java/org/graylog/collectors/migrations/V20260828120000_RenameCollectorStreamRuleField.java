@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.migrations;
+package org.graylog.collectors.migrations;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -25,6 +25,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamRuleImpl;
