@@ -449,14 +449,11 @@ describe('FirstOnboarding', () => {
       await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
       await waitFor(() => {
-        expect(sendTelemetry).toHaveBeenCalledWith(
-          TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED,
-          {
-            app_action_value: 'onboarding-generate-failed',
-            fleet_id: 'fleet-1',
-            mode: 'onboarding',
-          },
-        );
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
+          app_action_value: 'onboarding-generate-failed',
+          fleet_id: 'fleet-1',
+          mode: 'onboarding',
+        });
       });
     });
 
