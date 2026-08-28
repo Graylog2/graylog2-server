@@ -24,6 +24,7 @@ import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.roles.responses.RoleResponse;
 import org.graylog2.rest.models.roles.responses.RolesResponse;
 import org.graylog2.security.SecurityTestUtils;
@@ -48,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -62,9 +64,9 @@ class RolesResourceTest {
     private static final String ADMIN_ROLE = "admin";
     private static final String ADMIN_ROLE_ID = "admin-id";
 
-    // The username the @WithAuthorization security context is built for. The UserService mocked by
-    // SecurityTestUtils only resolves this user, so membership tests operate on the calling user - which is
-    // also the interesting case, since assigning yourself a privileged role is the escalation we block.
+    // The username the @WithAuthorization security context is built for. The mocked UserService only
+    // resolves this user, so membership tests operate on the calling user - which is also the interesting
+    // case, since assigning yourself a privileged role is the escalation we block.
     private static final String CURRENT_USER = "test_user";
 
     private static final String STREAMS_READ = "streams:read";
@@ -86,12 +88,18 @@ class RolesResourceTest {
         // resource enforces, so they should exercise the actual Shiro wildcard resolution rather than assert
         // that a collaborator was called. `validatePermissions` never touches the RoleService.
         classUnderTest = new TestRolesResource(roleService, globalAuthServiceConfig,
-                new PrivilegeEscalationGuard(roleService), new HttpConfiguration());
+                new PrivilegeEscalationGuard(roleService), new HttpConfiguration(), userService);
         this.userContext = SecurityTestUtils.getUserContext(userService);
+
+        // The membership endpoints load the target user via the RestResource superclass field. Only the
+        // calling user is resolvable; tests that never get past the permission checks do not need it.
+        lenient().when(userService.load(CURRENT_USER)).thenReturn(mock(User.class));
     }
 
+    // On this branch `listAll` is gated on the unscoped `roles:read` permission and returns every role.
+    // Filtering the listing per role is a later change that is not part of this security fix.
     @Test
-    @WithAuthorization(permissions = {"roles:read:reader"})
+    @WithAuthorization(permissions = {"roles:read"})
     void testListAll() {
         Role readerRole = mock(Role.class);
         Role adminRole = mock(Role.class);
@@ -106,7 +114,14 @@ class RolesResourceTest {
                 .map(r -> r.name())
                 .collect(Collectors.toSet());
 
-        assertEquals(Set.of("reader"), roleNames);
+        assertEquals(Set.of("reader", "admin"), roleNames);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"roles:read:reader"})
+    void testListAllRequiresTheUnscopedRolesReadPermission() {
+        assertThatThrownBy(() -> classUnderTest.listAll())
+                .isInstanceOf(ForbiddenException.class);
     }
 
     // ----------------------------------------------------------------------------------------------------
@@ -255,7 +270,7 @@ class RolesResourceTest {
 
     @Test
     @WithAuthorization(permissions = {
-            "users:edit:" + CURRENT_USER, "roles:assign:" + STREAM_READER_ROLE, STREAMS_READ})
+            "users:edit:" + CURRENT_USER, "roles:edit:" + STREAM_READER_ROLE, STREAMS_READ})
     void addMemberSucceedsWhenCurrentUserHoldsAllPermissionsGrantedByTheRole() throws NotFoundException {
         final Role role = mock(Role.class);
         when(role.getId()).thenReturn(STREAM_READER_ROLE_ID);
@@ -269,9 +284,9 @@ class RolesResourceTest {
     }
 
     @Test
-    @WithAuthorization(permissions = {"users:edit:" + CURRENT_USER, "roles:assign:" + ADMIN_ROLE})
+    @WithAuthorization(permissions = {"users:edit:" + CURRENT_USER, "roles:edit:" + ADMIN_ROLE})
     void addMemberFailsWhenRoleGrantsAPermissionCurrentUserLacks() throws NotFoundException {
-        // Holding `roles:assign` on the admin role is no longer enough to make yourself an admin.
+        // Holding `roles:edit` on the admin role is no longer enough to make yourself an admin.
         final Role adminRole = mock(Role.class);
         when(adminRole.getPermissions()).thenReturn(Set.of("*"));
         when(roleService.load(ADMIN_ROLE)).thenReturn(adminRole);
@@ -283,7 +298,7 @@ class RolesResourceTest {
 
     @Test
     @WithAuthorization(permissions = {
-            "users:edit:" + CURRENT_USER, "roles:assign:" + ADMIN_ROLE, "streams:*"})
+            "users:edit:" + CURRENT_USER, "roles:edit:" + ADMIN_ROLE, "streams:*"})
     void addMemberFailsOnASinglePermissionTheCurrentUserLacks() throws NotFoundException {
         final Role adminRole = mock(Role.class);
         when(adminRole.getPermissions()).thenReturn(Set.of(STREAMS_READ, INPUTS_CREATE));
@@ -296,7 +311,7 @@ class RolesResourceTest {
     }
 
     @Test
-    @WithAuthorization(permissions = {"roles:assign:" + STREAM_READER_ROLE, STREAMS_READ})
+    @WithAuthorization(permissions = {"roles:edit:" + STREAM_READER_ROLE, STREAMS_READ})
     void addMemberStillRequiresTheUsersEditPermission() {
         assertThatThrownBy(() -> classUnderTest.addMember(
                 STREAM_READER_ROLE, CURRENT_USER, "{}", userContext))
@@ -305,14 +320,14 @@ class RolesResourceTest {
 
     @Test
     @WithAuthorization(permissions = {"users:edit:" + CURRENT_USER, STREAMS_READ})
-    void addMemberStillRequiresTheRolesAssignPermission() {
+    void addMemberStillRequiresTheRolesEditPermission() {
         assertThatThrownBy(() -> classUnderTest.addMember(
                 STREAM_READER_ROLE, CURRENT_USER, "{}", userContext))
                 .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
-    @WithAuthorization(permissions = {"users:edit:" + CURRENT_USER, "roles:assign:" + ADMIN_ROLE})
+    @WithAuthorization(permissions = {"users:edit:" + CURRENT_USER, "roles:edit:" + ADMIN_ROLE})
     void removeMemberDoesNotRequireThePermissionsGrantedByTheRole() throws NotFoundException {
         // Un-assigning a role reduces privileges, so it must not be gated on holding the role's permissions -
         // otherwise an over-privileged user could never be demoted by a less privileged administrator.
@@ -340,16 +355,19 @@ class RolesResourceTest {
     }
 
     /**
-     * Test implementation of RolesResource is needed to set the superclass configuration property
-     * (which is directly injected without a constructor) required for building the "created" location URI.
+     * Test implementation of RolesResource is needed to set the superclass properties (which are directly
+     * injected without a constructor): the configuration required for building the "created" location URI,
+     * and the user service the membership endpoints load the target user from.
      */
     static class TestRolesResource extends RolesResource {
         TestRolesResource(RoleService roleService,
                           GlobalAuthServiceConfig globalAuthServiceConfig,
                           PrivilegeEscalationGuard privilegeEscalationGuard,
-                          HttpConfiguration configuration) {
+                          HttpConfiguration configuration,
+                          UserService userService) {
             super(roleService, globalAuthServiceConfig, privilegeEscalationGuard);
             super.configuration = configuration;
+            super.userService = userService;
         }
     }
 }
