@@ -39,11 +39,11 @@ public class OpAmpHttpServerExtension implements HttpServerExtension {
     public OpAmpHttpServerExtension(OpAmpHttpHandler opAmpHttpHandler,
                                     OpAmpEnrollAuthCheckHttpHandler opAmpEnrollAuthCheckHttpHandler) {
         this.opAmpHttpHandler = requireNonNull(opAmpHttpHandler, "opAmpHttpHandler");
-        this.opAmpEnrollAuthCheckHttpHandler = requireNonNull(opAmpEnrollAuthCheckHttpHandler, "opAmpAuthCheckHttpHandler");
+        this.opAmpEnrollAuthCheckHttpHandler = requireNonNull(opAmpEnrollAuthCheckHttpHandler, "opAmpEnrollAuthCheckHttpHandler");
     }
 
     /**
-     * Configure OpAMP endpoint at /v1/opamp and /v1/opamp-auth-check for HTTP transport.
+     * Configure OpAMP endpoint at /v1/opamp and /v1/opamp-enroll-auth-check for HTTP transport.
      */
     public void configure(HttpServer httpServer) {
         httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, OpAmpConstants.PATH);

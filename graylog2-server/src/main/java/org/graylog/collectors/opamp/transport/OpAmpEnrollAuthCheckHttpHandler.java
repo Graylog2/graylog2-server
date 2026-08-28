@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 @Singleton
 public class OpAmpEnrollAuthCheckHttpHandler extends HttpHandler {
@@ -47,24 +48,31 @@ public class OpAmpEnrollAuthCheckHttpHandler extends HttpHandler {
     @Override
     public void service(Request request, Response response) throws Exception {
         response.suspend();
-        executor.submit(() -> {
-            try {
-                processRequest(request, response);
-            } finally {
-                response.resume();
-            }
-        });
+        try {
+            executor.submit(() -> {
+                try {
+                    processRequest(request, response);
+                } finally {
+                    response.resume();
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            response.setStatus(HttpStatus.SERVICE_UNAVAILABLE_503);
+            response.resume();
+        }
     }
 
     private void processRequest(Request request, Response response) {
         try {
             if (request.getMethod() != Method.GET) {
                 response.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
+                response.setHeader("Allow", "GET");
                 response.finish();
                 return;
             }
 
-            if (!opAmpService.enrollmentAuthCheck(request.getHeader("Authorization"), OpAmpAuthContext.Transport.HTTP)) {
+            if (!opAmpService.enrollmentAuthCheck(request.getHeader("Authorization"))) {
+                LOG.debug("OpAMP enrollment auth check failed");
                 response.setStatus(HttpStatus.UNAUTHORIZED_401);
                 response.finish();
                 return;

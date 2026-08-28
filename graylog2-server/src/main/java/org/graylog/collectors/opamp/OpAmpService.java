@@ -157,14 +157,13 @@ public class OpAmpService {
         }
     }
 
-    public boolean enrollmentAuthCheck(String authHeader, OpAmpAuthContext.Transport transport) {
+    public boolean enrollmentAuthCheck(String authHeader) {
         return handleAuthHeader(authHeader, (token, typ) -> {
             if (!"enrollment".equals(typ)) {
-                LOG.debug("Invalid token type received: {}", typ);
+                LOG.debug("Enrollment auth check requires an enrollment token but received: {}", typ);
                 return Optional.empty();
             }
-            return enrollmentTokenService.validateToken(token)
-                    .map(dto -> new OpAmpAuthContext.Enrollment(dto, transport));
+            return enrollmentTokenService.validateToken(token);
         }).isPresent();
     }
 
@@ -180,9 +179,9 @@ public class OpAmpService {
         });
     }
 
-    private Optional<OpAmpAuthContext> handleAuthHeader(
+    private <T> Optional<T> handleAuthHeader(
             String authHeader,
-            BiFunction<String, String, Optional<OpAmpAuthContext>> callback) {
+            BiFunction<String, String, Optional<T>> callback) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Optional.empty();
         }

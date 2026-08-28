@@ -24,6 +24,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.opamp.OpAmpConstants;
 import org.graylog.collectors.opamp.OpAmpService;
+import org.graylog.collectors.opamp.http.OpAmpHttpServerExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,12 +58,12 @@ class OpAmpEnrollAuthCheckHttpHandlerIT {
         final var collectorsConfigService = mock(CollectorsConfigService.class);
         final var executor = Executors.newVirtualThreadPerTaskExecutor();
 
-        // Register both handlers like OpAmpHttpServerExtension does, to verify that the
-        // auth-check mapping routes to its own handler next to the regular OpAMP endpoint.
+        // Register the full extension, to verify that the auth-check mapping routes to its own handler next to the
+        // regular OpAMP endpoint.
         final var opAmpHandler = new OpAmpHttpHandler(opAmpService, collectorsConfigService, executor);
         final var authCheckHandler = new OpAmpEnrollAuthCheckHttpHandler(opAmpService, executor);
-        httpServer.getServerConfiguration().addHttpHandler(opAmpHandler, OpAmpConstants.PATH);
-        httpServer.getServerConfiguration().addHttpHandler(authCheckHandler, OpAmpConstants.ENROLL_AUTH_CHECK_PATH);
+        final var extension = new OpAmpHttpServerExtension(opAmpHandler, authCheckHandler);
+        extension.configure(httpServer);
 
         httpServer.start();
 
@@ -80,7 +81,7 @@ class OpAmpEnrollAuthCheckHttpHandlerIT {
 
     @Test
     void returnsOkForValidToken() throws Exception {
-        when(opAmpService.enrollmentAuthCheck(eq("Bearer valid"), eq(OpAmpAuthContext.Transport.HTTP)))
+        when(opAmpService.enrollmentAuthCheck(eq("Bearer valid")))
                 .thenReturn(true);
 
         try (var response = client.newCall(authCheckRequest("Bearer valid")).execute()) {
@@ -94,7 +95,7 @@ class OpAmpEnrollAuthCheckHttpHandlerIT {
 
     @Test
     void rejectsMissingAuth() throws Exception {
-        when(opAmpService.enrollmentAuthCheck(any(), any())).thenReturn(false);
+        when(opAmpService.enrollmentAuthCheck(any())).thenReturn(false);
 
         final var request = new Request.Builder()
                 .url(authCheckUrl())
@@ -108,7 +109,7 @@ class OpAmpEnrollAuthCheckHttpHandlerIT {
 
     @Test
     void rejectsInvalidAuth() throws Exception {
-        when(opAmpService.enrollmentAuthCheck(eq("Bearer invalid"), any())).thenReturn(false);
+        when(opAmpService.enrollmentAuthCheck(eq("Bearer invalid"))).thenReturn(false);
 
         try (var response = client.newCall(authCheckRequest("Bearer invalid")).execute()) {
             assertThat(response.code()).isEqualTo(401);
@@ -127,12 +128,12 @@ class OpAmpEnrollAuthCheckHttpHandlerIT {
             assertThat(response.code()).isEqualTo(405);
         }
 
-        verify(opAmpService, never()).enrollmentAuthCheck(any(), any());
+        verify(opAmpService, never()).enrollmentAuthCheck(any());
     }
 
     @Test
     void returnsServerErrorWhenAuthCheckThrows() throws Exception {
-        when(opAmpService.enrollmentAuthCheck(any(), any())).thenThrow(new RuntimeException("boom"));
+        when(opAmpService.enrollmentAuthCheck(any())).thenThrow(new RuntimeException("boom"));
 
         try (var response = client.newCall(authCheckRequest("Bearer valid")).execute()) {
             assertThat(response.code()).isEqualTo(500);

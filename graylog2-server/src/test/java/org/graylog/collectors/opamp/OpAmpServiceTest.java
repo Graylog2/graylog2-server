@@ -208,7 +208,7 @@ class OpAmpServiceTest {
         when(enrollmentTokenService.validateToken(eq(token)))
                 .thenReturn(Optional.of(tokenDto));
 
-        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token, TRANSPORT)).isTrue();
+        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token)).isTrue();
     }
 
     @Test
@@ -218,7 +218,7 @@ class OpAmpServiceTest {
         when(enrollmentTokenService.validateToken(eq(token)))
                 .thenReturn(Optional.empty());
 
-        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token, TRANSPORT)).isFalse();
+        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token)).isFalse();
     }
 
     /**
@@ -230,7 +230,7 @@ class OpAmpServiceTest {
     void enrollmentAuthCheckRejectsAgentTokenWithoutValidatingIt() {
         final String token = createTokenWithCtt("agent");
 
-        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token, TRANSPORT)).isFalse();
+        assertThat(opAmpService.enrollmentAuthCheck("Bearer " + token)).isFalse();
         verify(agentTokenService, never()).validateAgentToken(any(), any());
         verifyNoInteractions(collectorInstanceService);
     }
