@@ -40,7 +40,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
   const [showReassignModal, setShowReassignModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { deleteInstance } = useCollectorsMutations();
-  const { canDeleteInstance, canAssignToFleet } = useCollectorPermissions();
+  const { canDeleteInstance, canAssignToFleet, canReadSystemLogs } = useCollectorPermissions();
   const canReassign = canAssignToFleet(instance.fleet_id);
   const canDelete = canDeleteInstance(instance.fleet_id);
   const sendTelemetry = useSendCollectorsTelemetry();
@@ -62,19 +62,21 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
         <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
           <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
         </LinkContainer>
-        <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
-          <Button
-            bsSize="xsmall"
-            onClick={() =>
-              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
-                app_action_value: 'instance-view-logs',
-                instance_id: instance.instance_uid,
-                fleet_id: instance.fleet_id,
-              })
-            }>
-            View System Logs
-          </Button>
-        </LinkContainer>
+        {canReadSystemLogs && (
+          <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
+            <Button
+              bsSize="xsmall"
+              onClick={() =>
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
+                  app_action_value: 'instance-view-logs',
+                  instance_id: instance.instance_uid,
+                  fleet_id: instance.fleet_id,
+                })
+              }>
+              View System Logs
+            </Button>
+          </LinkContainer>
+        )}
         <Button
           bsSize="xsmall"
           onClick={() => {

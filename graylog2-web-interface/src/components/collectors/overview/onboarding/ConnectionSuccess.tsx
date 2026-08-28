@@ -38,6 +38,7 @@ import InstanceStatusLabel from '../../common/InstanceStatusLabel';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
 import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
+import { useCollectorPermissions } from '../../hooks';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -65,6 +66,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
     instance.instance_uid,
   );
   const { data: sources } = useSources(instance.fleet_id);
+  const { canReadSystemLogs } = useCollectorPermissions();
   const queryClient = useQueryClient();
 
   const online = instance.status === 'online';
@@ -155,7 +157,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
       ) : (
         <LogPreviewSection
           title="Log Preview"
-          searchUrl={collectorSystemLogsUrl(instance.instance_uid)}
+          searchUrl={canReadSystemLogs ? collectorSystemLogsUrl(instance.instance_uid) : undefined}
           preview={selfLogs}
           isLoading={isLoading}
           error={selfLogsError}

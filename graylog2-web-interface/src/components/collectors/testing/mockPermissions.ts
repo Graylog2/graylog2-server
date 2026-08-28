@@ -35,5 +35,6 @@ export const mockCollectorPermissions = (
   canEditConfig: true,
   canDeployCollectors: true,
   canViewEnrollmentTokens: true,
+  canReadSystemLogs: true,
   ...overrides,
 });

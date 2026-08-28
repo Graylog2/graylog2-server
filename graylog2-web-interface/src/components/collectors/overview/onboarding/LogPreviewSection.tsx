@@ -26,7 +26,8 @@ import PulsingDot from './PulsingDot';
 
 type Props = {
   title: string;
-  searchUrl: string;
+  /** Omitted when the viewer lacks read permission on the underlying stream. */
+  searchUrl?: string;
   preview: LogPreview | undefined;
   isLoading: boolean;
   error: Error | null;
@@ -112,7 +113,7 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
 
 const LogPreviewSection = ({
   title,
-  searchUrl,
+  searchUrl = undefined,
   preview,
   isLoading,
   error,
@@ -124,7 +125,7 @@ const LogPreviewSection = ({
     collapsible={collapsible}
     defaultClosed={collapsible}
     headerLeftSection={collapsible ? <Label bsStyle="default">{preview ? preview.total : '—'}</Label> : undefined}
-    actions={<Link to={searchUrl}>Open in search</Link>}>
+    actions={searchUrl ? <Link to={searchUrl}>Open in search</Link> : undefined}>
     <PreviewBody preview={preview} isLoading={isLoading} error={error} />
     {caption && <Caption>{caption}</Caption>}
   </Section>

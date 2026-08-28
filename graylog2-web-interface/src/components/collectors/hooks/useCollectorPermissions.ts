@@ -17,6 +17,7 @@
 import usePermissions from 'hooks/usePermissions';
 
 import { COLLECTOR_PERMISSIONS, scoped } from '../Permissions';
+import { COLLECTOR_SYSTEM_LOGS_STREAM_ID } from '../common/fields';
 
 /**
  * Permission checks for the Collectors feature.
@@ -50,6 +51,10 @@ const useCollectorPermissions = () => {
     // existing top-level Collectors nav gate, and is unreachable today (fleets are not shareable).
     canDeployCollectors: isPermitted(COLLECTOR_PERMISSIONS.ENROLL_TOKEN_CREATE),
     canViewEnrollmentTokens: isPermitted(COLLECTOR_PERMISSIONS.ENROLL_TOKEN_READ),
+    // Collector self-logs are routed to a built-in stream, so the links into search are gated by a
+    // STREAM permission rather than a collector one. Without it the link lands on the "Missing
+    // Stream Permissions" page, so we know enough not to offer it.
+    canReadSystemLogs: isPermitted(scoped('streams:read', COLLECTOR_SYSTEM_LOGS_STREAM_ID)),
     canReadActivities: isPermitted(COLLECTOR_PERMISSIONS.ACTIVITIES_READ),
     canEditConfig: isPermitted(COLLECTOR_PERMISSIONS.CONFIGURATION_EDIT),
   };

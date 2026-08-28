@@ -282,4 +282,27 @@ describe('InstanceActions permissions', () => {
     expect(screen.queryByText(/reassign to fleet/i)).not.toBeInTheDocument();
     expect(await screen.findByRole('menuitem', { name: /delete/i })).toBeInTheDocument();
   });
+
+  it('hides View System Logs without read permission on the collector system logs stream', async () => {
+    // The link targets a search scoped to the built-in collector system logs stream. Without
+    // streams:read on it the link lands on the "Missing Stream Permissions" page.
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read:f-1']));
+
+    render(<InstanceActions instance={instance} onDetailsClick={jest.fn()} />);
+
+    await screen.findByRole('button', { name: /details/i });
+
+    expect(screen.queryByRole('link', { name: /view system logs/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/view system logs/i)).not.toBeInTheDocument();
+  });
+
+  it('shows View System Logs with read permission on that stream', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read:f-1', 'streams:read:000000000000000000000005']),
+    );
+
+    render(<InstanceActions instance={instance} onDetailsClick={jest.fn()} />);
+
+    expect(await screen.findByRole('link', { name: /view system logs/i })).toBeInTheDocument();
+  });
 });
