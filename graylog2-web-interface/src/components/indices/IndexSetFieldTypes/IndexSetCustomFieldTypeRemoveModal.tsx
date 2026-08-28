@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Spinner, Link } from 'components/common';
 import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -192,11 +193,13 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
     onClose();
   }, [onClose, sendTelemetry]);
 
-  useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_OPENED, {
+  useSendTelemetryOnMount(
+    sendTelemetry,
+    TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_OPENED,
+    {
       app_action_value: 'removed-custom-field-type-opened',
-    });
-  }, [sendTelemetry]);
+    },
+  );
 
   return (
     <BootstrapModalForm

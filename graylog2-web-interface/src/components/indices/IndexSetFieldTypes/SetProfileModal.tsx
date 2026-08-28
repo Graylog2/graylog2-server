@@ -19,6 +19,7 @@ import styled from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { ModalSubmit, Select } from 'components/common';
 import { Button, Input, Modal } from 'components/bootstrap';
@@ -95,11 +96,12 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
     onClose();
   }, [onClose, sendTelemetry]);
 
-  useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_OPENED, {
-      app_action_value: 'removed-custom-field-type-opened',
-    });
-  }, [sendTelemetry, currentProfile]);
+  useSendTelemetryOnMount(
+    sendTelemetry,
+    TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CHANGE_FOR_INDEX_OPENED,
+    { app_action_value: 'removed-custom-field-type-opened' },
+    [currentProfile],
+  );
 
   useEffect(() => {
     setProfile(currentProfile);

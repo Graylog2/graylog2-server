@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import TemplateForm from 'components/indices/IndexSetTemplates/TemplateForm';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
@@ -42,11 +43,9 @@ const CreateTemplate = () => {
     [createTemplate, history, sendTelemetry],
   );
 
-  useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_OPENED, {
-      app_action_value: 'create-new-index-set-template-opened',
-    });
-  }, [sendTelemetry]);
+  useSendTelemetryOnMount(sendTelemetry, TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_OPENED, {
+    app_action_value: 'create-new-index-set-template-opened',
+  });
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_CANCELLED, {

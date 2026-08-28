@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import omit from 'lodash/omit';
 
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
 import type {
@@ -50,11 +51,9 @@ const EditProfile = ({ profile }: Props) => {
     [editProfile, push, profile.id, sendTelemetry],
   );
 
-  useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_OPENED, {
-      app_action_value: 'create-new-index-set-field-type-profile-opened',
-    });
-  }, [sendTelemetry]);
+  useSendTelemetryOnMount(sendTelemetry, TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_OPENED, {
+    app_action_value: 'create-new-index-set-field-type-profile-opened',
+  });
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_CANCELED, {
