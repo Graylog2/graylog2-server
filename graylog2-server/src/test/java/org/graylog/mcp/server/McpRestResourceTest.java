@@ -73,9 +73,6 @@ public class McpRestResourceTest {
         clusterConfigService.write(McpConfiguration.create(true, false));
 
         final McpService mcpService = mock(McpService.class);
-        final McpSchema.JSONRPCRequest pingRequest =
-                new McpSchema.JSONRPCRequest("2.0", McpSchema.METHOD_PING, 2, null);
-        when(mcpService.parseMessage(any())).thenReturn(pingRequest);
         when(mcpService.handle(any(), any(), any(), any())).thenReturn(Optional.empty());
 
         final McpRestResource pingResource = new McpRestResource(clusterConfigService, mcpService, new ObjectMapper(), mock(SecurityContext.class)) {
