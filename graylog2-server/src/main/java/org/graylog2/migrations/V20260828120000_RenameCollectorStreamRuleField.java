@@ -77,8 +77,10 @@ public class V20260828120000_RenameCollectorStreamRuleField extends Migration {
                 Updates.set(StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE)
         );
 
-        LOG.info("Renamed field <{}> to <{}> on {} collector system logs stream rule(s).",
-                OLD_FIELD_NAME, CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE, result.getModifiedCount());
+        if (result.getModifiedCount() > 0) {
+            LOG.info("Renamed field <{}> to <{}> on {} collector system logs stream rule(s).",
+                    OLD_FIELD_NAME, CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE, result.getModifiedCount());
+        }
 
         clusterConfigService.write(new MigrationCompleted(result.getModifiedCount()));
     }
