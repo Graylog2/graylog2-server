@@ -74,19 +74,19 @@ describe('ReassignFleetModal', () => {
   });
 
   it('renders modal title with instance count', async () => {
-    render(<ReassignFleetModal instanceUids={['uid-1', 'uid-2']} onClose={jest.fn()} />);
+    render(<ReassignFleetModal origin="row" instanceUids={['uid-1', 'uid-2']} onClose={jest.fn()} />);
 
     await screen.findByText(/reassign 2 instances to fleet/i);
   });
 
   it('renders singular title for single instance', async () => {
-    render(<ReassignFleetModal instanceUids={['uid-1']} onClose={jest.fn()} />);
+    render(<ReassignFleetModal origin="row" instanceUids={['uid-1']} onClose={jest.fn()} />);
 
     await screen.findByText(/reassign 1 instance to fleet/i);
   });
 
   it('excludes current fleet from options', async () => {
-    render(<ReassignFleetModal instanceUids={['uid-1']} currentFleetId="fleet-1" onClose={jest.fn()} />);
+    render(<ReassignFleetModal origin="row" instanceUids={['uid-1']} currentFleetId="fleet-1" onClose={jest.fn()} />);
 
     const select = await screen.findByText(/select a fleet/i);
     await userEvent.click(select);
@@ -97,7 +97,7 @@ describe('ReassignFleetModal', () => {
   });
 
   it('disables submit button when no fleet is selected', async () => {
-    render(<ReassignFleetModal instanceUids={['uid-1']} onClose={jest.fn()} />);
+    render(<ReassignFleetModal origin="row" instanceUids={['uid-1']} onClose={jest.fn()} />);
 
     const submitButton = await screen.findByRole('button', { name: /reassign instance/i });
 
@@ -106,7 +106,7 @@ describe('ReassignFleetModal', () => {
 
   it('calls onClose when cancel is clicked', async () => {
     const onClose = jest.fn();
-    render(<ReassignFleetModal instanceUids={['uid-1']} onClose={onClose} />);
+    render(<ReassignFleetModal origin="row" instanceUids={['uid-1']} onClose={onClose} />);
 
     await userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
 
@@ -114,7 +114,7 @@ describe('ReassignFleetModal', () => {
   });
 
   it('calls reassignInstances with correct args on submit', async () => {
-    render(<ReassignFleetModal instanceUids={['uid-1', 'uid-2']} onClose={jest.fn()} />);
+    render(<ReassignFleetModal origin="row" instanceUids={['uid-1', 'uid-2']} onClose={jest.fn()} />);
 
     // Select a fleet
     await userEvent.click(await screen.findByText(/select a fleet/i));
@@ -135,7 +135,7 @@ describe('ReassignFleetModal', () => {
     const onClose = jest.fn();
     const onSuccess = jest.fn();
 
-    render(<ReassignFleetModal instanceUids={['uid-1']} onClose={onClose} onSuccess={onSuccess} />);
+    render(<ReassignFleetModal origin="row" instanceUids={['uid-1']} onClose={onClose} onSuccess={onSuccess} />);
 
     await userEvent.click(await screen.findByText(/select a fleet/i));
     await userEvent.click(await screen.findByText('Staging'));
@@ -153,14 +153,14 @@ describe('ReassignFleetModal', () => {
       isLoading: true,
     });
 
-    render(<ReassignFleetModal instanceUids={['uid-1']} onClose={jest.fn()} />);
+    render(<ReassignFleetModal origin="row" instanceUids={['uid-1']} onClose={jest.fn()} />);
 
     await screen.findByText(/loading/i);
   });
 
   describe('telemetry', () => {
     it('emits REASSIGNED telemetry on single-instance reassignment success', async () => {
-      render(<ReassignFleetModal instanceUids={['uid-1']} currentFleetId="fleet-1" onClose={jest.fn()} />);
+      render(<ReassignFleetModal origin="row" instanceUids={['uid-1']} currentFleetId="fleet-1" onClose={jest.fn()} />);
 
       // Select a fleet
       await userEvent.click(await screen.findByText(/select a fleet/i));
@@ -174,6 +174,7 @@ describe('ReassignFleetModal', () => {
           'Collector Instance Reassigned',
           expect.objectContaining({
             instance_id: 'uid-1',
+            count: 1,
             from_fleet_id: 'fleet-1',
             to_fleet_id: 'fleet-2',
           }),
@@ -182,7 +183,9 @@ describe('ReassignFleetModal', () => {
     });
 
     it('emits BULK_REASSIGNED telemetry on multi-instance reassignment success', async () => {
-      render(<ReassignFleetModal instanceUids={['uid-1', 'uid-2', 'uid-3']} onClose={jest.fn()} />);
+      render(
+        <ReassignFleetModal origin="bulk-selection" instanceUids={['uid-1', 'uid-2', 'uid-3']} onClose={jest.fn()} />,
+      );
 
       // Select a fleet
       await userEvent.click(await screen.findByText(/select a fleet/i));
@@ -198,6 +201,41 @@ describe('ReassignFleetModal', () => {
             count: 3,
             to_fleet_id: 'fleet-2',
           }),
+        );
+      });
+    });
+
+    it('emits BULK_REASSIGNED, not REASSIGNED, when the bulk selection holds a single instance', async () => {
+      render(<ReassignFleetModal origin="bulk-selection" instanceUids={['uid-1']} onClose={jest.fn()} />);
+
+      await userEvent.click(await screen.findByText(/select a fleet/i));
+      await userEvent.click(await screen.findByText('Staging'));
+      await userEvent.click(await screen.findByRole('button', { name: /reassign instance/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetryMock).toHaveBeenCalledWith(
+          'Collector Instances Bulk Reassigned',
+          expect.objectContaining({
+            count: 1,
+            to_fleet_id: 'fleet-2',
+          }),
+        );
+      });
+
+      expect(sendTelemetryMock).not.toHaveBeenCalledWith('Collector Instance Reassigned', expect.anything());
+    });
+
+    it('omits from_fleet_id on the bulk path, where the source fleet is unknown', async () => {
+      render(<ReassignFleetModal origin="bulk-selection" instanceUids={['uid-1', 'uid-2']} onClose={jest.fn()} />);
+
+      await userEvent.click(await screen.findByText(/select a fleet/i));
+      await userEvent.click(await screen.findByText('Staging'));
+      await userEvent.click(await screen.findByRole('button', { name: /reassign instances/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetryMock).toHaveBeenCalledWith(
+          'Collector Instances Bulk Reassigned',
+          expect.not.objectContaining({ from_fleet_id: expect.anything() }),
         );
       });
     });
