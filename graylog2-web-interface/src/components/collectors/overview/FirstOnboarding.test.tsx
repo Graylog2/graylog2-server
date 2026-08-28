@@ -20,15 +20,18 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import selectEvent from 'helpers/selectEvent';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import FirstOnboarding from './FirstOnboarding';
 
 import { useCollectorsMutations, useCollectorPermissions, useFleets } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 import { mockCollectorPermissions } from '../testing/mockPermissions';
 
 jest.mock('../hooks');
+jest.mock('../hooks/useSendCollectorsTelemetry');
 jest.mock('util/Version', () => ({
   getMajorAndMinorVersion: () => '7.1',
 }));
@@ -107,9 +110,11 @@ describe('FirstOnboarding', () => {
   const createEnrollmentToken = jest.fn();
   const createFleet = jest.fn();
   const createSource = jest.fn();
+  const sendTelemetry = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
     asMock(useFleets).mockReturnValue({ data: mockFleets, isLoading: false });
     asMock(useCollectorsMutations).mockReturnValue(
       mockCollectorsMutations({ createEnrollmentToken, createFleet, createSource }),
@@ -371,6 +376,151 @@ describe('FirstOnboarding', () => {
     expect(mockPushWithState).toHaveBeenCalledWith('/system/collectors/onboarding/uid-web-prod-01', {
       platformId: 'linux',
       fleetName: 'Default Fleet',
+    });
+  });
+
+  describe('telemetry', () => {
+    it('reports the platform selection', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.PLATFORM_SELECTED, {
+        app_action_value: 'onboarding-platform',
+        platform: 'linux',
+      });
+    });
+
+    it('reports the generated onboarding token but no fleet selection for the auto-selected lone fleet', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
+          app_action_value: 'onboarding-generate',
+          fleet_id: 'fleet-1',
+          platform: 'linux',
+          mode: 'onboarding',
+          expires_in: 'P1D',
+        });
+      });
+
+      expect(sendTelemetry).not.toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED,
+        expect.anything(),
+      );
+    });
+
+    it('reports the implicitly created onboarding fleet', async () => {
+      asMock(useFleets).mockReturnValue({ data: [], isLoading: false });
+
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATED, {
+          app_action_value: 'onboarding-fleet-create',
+          fleet_id: 'new-fleet-id',
+        });
+      });
+    });
+
+    it('reports an explicitly selected existing fleet', async () => {
+      asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+      await screen.findByRole('button', { name: /create new fleet/i });
+      await selectEvent.chooseOption('Select existing fleet', 'Staging');
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
+          app_action_value: 'onboarding-fleet',
+          fleet_id: 'fleet-2',
+          via: 'click',
+        });
+      });
+    });
+
+    it('reports clearing the fleet choice', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /change fleet/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.FLEET_CLEARED, {
+        app_action_value: 'onboarding-change-fleet',
+      });
+    });
+
+    it('reports a failed token generation', async () => {
+      createEnrollmentToken.mockRejectedValue(new Error('boom'));
+
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
+          app_action_value: 'onboarding-generate-failed',
+          fleet_id: 'fleet-1',
+          mode: 'onboarding',
+        });
+      });
+    });
+
+    it('reports the collector connecting', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.CONNECTED, {
+        app_action_value: 'onboarding-connected',
+        instance_id: 'uid-web-prod-01',
+        fleet_id: 'fleet-1',
+        platform: 'linux',
+      });
+    });
+
+    it('offers a copy-token-only button next to the command, and reports it', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: /copy token only/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+          app_action_value: 'onboarding-copy-token',
+          platform: 'linux',
+          fleet_id: 'fleet-1',
+        });
+      });
+    });
+
+    it('reports copying the install command', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await userEvent.click(await screen.findByRole('button', { name: /copy command/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.COMMAND_COPIED, {
+          app_action_value: 'onboarding-copy-command',
+          platform: 'linux',
+          fleet_id: 'fleet-1',
+        });
+      });
     });
   });
 

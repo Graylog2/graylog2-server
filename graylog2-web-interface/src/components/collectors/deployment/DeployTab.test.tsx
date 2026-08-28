@@ -19,7 +19,9 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
+import Routes from 'routing/Routes';
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
 import useFleetReceivingCounts from 'components/collectors/hooks/useFleetReceivingCounts';
 import useQuery from 'routing/useQuery';
@@ -49,12 +51,13 @@ const fleets: Fleet[] = [
 describe('DeployTab', () => {
   const createEnrollmentToken = jest.fn();
   const historyPush = jest.fn();
+  const sendTelemetry = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useQuery).mockReturnValue({});
     asMock(useHistory).mockReturnValue({ push: historyPush } as unknown as ReturnType<typeof useHistory>);
-    asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
     asMock(useFleets).mockReturnValue({ data: fleets, isLoading: false } as ReturnType<typeof useFleets>);
     asMock(useCollectorsConfig).mockReturnValue({
       data: { signing_cert_id: 'cert', http: { hostname: '127.0.0.1', port: 14401 } },
@@ -190,6 +193,234 @@ describe('DeployTab', () => {
     await user.click(screen.getByRole('option', { name: /web-servers/i }));
 
     expect(historyPush).toHaveBeenCalledWith(expect.stringContaining('fleet=fleet-1'));
+  });
+
+  describe('telemetry', () => {
+    const pickFleet = async (user: ReturnType<typeof userEvent.setup>) => {
+      await user.click(screen.getByRole('combobox', { name: /select existing fleet/i }));
+      await user.click(screen.getByRole('option', { name: /web-servers/i }));
+    };
+
+    it('reports a clicked fleet selection', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
+        app_action_value: 'deployment-fleet',
+        fleet_id: 'fleet-1',
+        via: 'click',
+      });
+    });
+
+    // The wizard writes the selected fleet into ?fleet, so the deep-link effect used to fire a
+    // second FLEET_SELECTED for the component's own push. Simulate the URL actually changing --
+    // a static useQuery mock cannot reproduce this.
+    it('reports a clicked fleet selection once, not again when it lands in the URL', async () => {
+      const user = userEvent.setup();
+      asMock(useHistory).mockReturnValue({
+        push: (url: string) => {
+          historyPush(url);
+          asMock(useQuery).mockReturnValue({ fleet: 'fleet-1' });
+        },
+      } as unknown as ReturnType<typeof useHistory>);
+
+      const { rerender } = render(<DeployTab />);
+
+      await pickFleet(user);
+      rerender(<DeployTab />);
+
+      const calls = sendTelemetry.mock.calls.filter(
+        ([event]) => event === TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED,
+      );
+
+      expect(calls).toEqual([
+        [
+          TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED,
+          { app_action_value: 'deployment-fleet', fleet_id: 'fleet-1', via: 'click' },
+        ],
+      ]);
+    });
+
+    it('reports a fleet preselected via the ?fleet URL parameter exactly once', () => {
+      asMock(useQuery).mockReturnValue({ fleet: 'fleet-2' });
+
+      render(<DeployTab />);
+
+      const calls = sendTelemetry.mock.calls.filter(
+        ([event]) => event === TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED,
+      );
+
+      expect(calls).toEqual([
+        [
+          TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED,
+          { app_action_value: 'deployment-fleet', fleet_id: 'fleet-2', via: 'url' },
+        ],
+      ]);
+    });
+
+    it('reports jumping to fleet creation', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await user.click(screen.getByRole('button', { name: /create new fleet/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_OPENED, {
+        app_action_value: 'deployment-create-fleet',
+      });
+      expect(historyPush).toHaveBeenCalledWith(Routes.SYSTEM.COLLECTORS.FLEETS_NEW);
+    });
+
+    it('reports clearing the selected fleet', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('button', { name: /change fleet/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.FLEET_CLEARED, {
+        app_action_value: 'deployment-change-fleet',
+      });
+    });
+
+    it('reports the token mode toggle', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('radio', { name: /custom token/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.MODE_SELECTED, {
+        app_action_value: 'deployment-token-mode',
+        mode: 'custom',
+      });
+    });
+
+    it('reports a generated short-lived token with its mode and effective expiry', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('button', { name: /generate token/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
+          app_action_value: 'deployment-generate',
+          fleet_id: 'fleet-1',
+          mode: 'short-lived',
+          expires_in: 'P1D',
+        });
+      });
+    });
+
+    it('reports a generated custom token with the chosen expiry', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('radio', { name: /custom token/i }));
+      await user.click(screen.getByRole('radio', { name: /30 days/i }));
+      await user.click(screen.getByRole('button', { name: /generate token/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
+          app_action_value: 'deployment-generate',
+          fleet_id: 'fleet-1',
+          mode: 'custom',
+          expires_in: 'P30D',
+        });
+      });
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.EXPIRY_SELECTED, {
+        app_action_value: 'deployment-expiry',
+        expires_in: 'P30D',
+      });
+    });
+
+    it('reports a failed token generation without leaking the error', async () => {
+      const user = userEvent.setup();
+      createEnrollmentToken.mockRejectedValue(new Error('boom'));
+
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('button', { name: /generate token/i }));
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
+          app_action_value: 'deployment-generate-failed',
+          fleet_id: 'fleet-1',
+          mode: 'short-lived',
+        });
+      });
+
+      expect(sendTelemetry).not.toHaveBeenCalledWith(
+        TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED,
+        expect.anything(),
+      );
+    });
+
+    it('reports discarding a generated token via "Change token"', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('button', { name: /generate token/i }));
+      await user.click(await screen.findByRole('button', { name: /change token/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.CHANGE_CLICKED, {
+        app_action_value: 'deployment-change-token',
+      });
+    });
+
+    it('reports switching the install platform', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('button', { name: /generate token/i }));
+
+      await user.click(await screen.findByRole('tab', { name: /windows/i }));
+
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.PLATFORM_SELECTED, {
+        app_action_value: 'deployment-platform',
+        platform: 'windows',
+      });
+    });
+
+    it('reports copying the install command with the active platform', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('button', { name: /generate token/i }));
+
+      await user.click((await screen.findAllByRole('button', { name: /copy command/i }))[0]);
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.COMMAND_COPIED, {
+          app_action_value: 'deployment-copy-command',
+          platform: 'linux',
+        });
+      });
+    });
+
+    it('reports copying the raw token', async () => {
+      const user = userEvent.setup();
+      render(<DeployTab />);
+
+      await pickFleet(user);
+      await user.click(screen.getByRole('button', { name: /generate token/i }));
+
+      await user.click((await screen.findAllByRole('button', { name: /copy token only/i }))[0]);
+
+      await waitFor(() => {
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {
+          app_action_value: 'deployment-copy-token',
+        });
+      });
+    });
   });
 
   it('clears the generated token when the fleet changes', async () => {

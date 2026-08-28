@@ -24,6 +24,8 @@ import PreviewBadge from 'components/common/PreviewBadge';
 import { DeployTab, EnrollmentTokenList } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useCollectorsConfig, useEnrollmentTokenCount, useCollectorPermissions } from 'components/collectors/hooks';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { COLOR_SCHEME_LIGHT } from 'theme/constants';
 import Routes from 'routing/Routes';
 
@@ -45,6 +47,16 @@ const CollectorsDeploymentPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
   const tokenCount = useEnrollmentTokenCount();
   const { canDeployCollectors, canViewEnrollmentTokens } = useCollectorPermissions();
+  const sendTelemetry = useSendCollectorsTelemetry();
+
+  const handleTabChange = (tab: string | null) => {
+    if (!tab) return;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.TAB_SELECTED, {
+      app_action_value: `tab-${tab}`,
+      tab,
+    });
+  };
 
   if (isLoading) {
     return <Spinner />;
@@ -77,7 +89,7 @@ const CollectorsDeploymentPage = () => {
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          <SoftBorderTabs defaultValue={canDeployCollectors ? 'deploy' : 'tokens'}>
+          <SoftBorderTabs defaultValue={canDeployCollectors ? 'deploy' : 'tokens'} onChange={handleTabChange}>
             <Tabs.List>
               {canDeployCollectors && <Tabs.Tab value="deploy">Deploy</Tabs.Tab>}
               {canViewEnrollmentTokens && (

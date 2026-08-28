@@ -34,6 +34,7 @@ type Props = {
   collapsible?: boolean;
   /** Explains what the preview is showing (and when it refreshes), rendered below the messages. */
   caption?: React.ReactNode;
+  onOpenSearch?: () => void;
 };
 
 const MessageRow = styled.div(
@@ -119,13 +120,20 @@ const LogPreviewSection = ({
   error,
   collapsible = false,
   caption = undefined,
+  onOpenSearch = undefined,
 }: Props) => (
   <Section
     title={title}
     collapsible={collapsible}
     defaultClosed={collapsible}
     headerLeftSection={collapsible ? <Label bsStyle="default">{preview ? preview.total : '—'}</Label> : undefined}
-    actions={searchUrl ? <Link to={searchUrl}>Open in search</Link> : undefined}>
+    actions={
+      searchUrl ? (
+        <Link to={searchUrl} onClick={onOpenSearch}>
+          Open in search
+        </Link>
+      ) : undefined
+    }>
     <PreviewBody preview={preview} isLoading={isLoading} error={error} />
     {caption && <Caption>{caption}</Caption>}
   </Section>

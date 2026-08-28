@@ -25,6 +25,7 @@ type Props = {
   platformLabel: string;
   tokenDuration: string | null;
   actions?: React.ReactNode;
+  onCopySuccess?: () => void;
 };
 
 const Container = styled.div(
@@ -79,13 +80,19 @@ const HeaderActions = styled.div(
   `,
 );
 
-const InstallCommand = ({ command, platformLabel, tokenDuration, actions = undefined }: Props) => (
+const InstallCommand = ({
+  command,
+  platformLabel,
+  tokenDuration,
+  actions = undefined,
+  onCopySuccess = undefined,
+}: Props) => (
   <Container>
     <Header>
       <Title>Run This on {platformLabel}</Title>
       <HeaderActions>
         {actions}
-        <ClipboardButton text={command} title="Copy command" bsSize="sm" />
+        <ClipboardButton text={command} title="Copy command" bsSize="sm" onSuccess={onCopySuccess} />
       </HeaderActions>
     </Header>
     <CommandBlock>{command}</CommandBlock>

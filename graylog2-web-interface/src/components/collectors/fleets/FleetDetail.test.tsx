@@ -123,6 +123,7 @@ describe('sourceActionsFactory', () => {
     const actions = sourceActionsFactory({
       onEdit: jest.fn(),
       onDelete: jest.fn(),
+      onViewMessages: jest.fn(),
       canEdit: true,
       canDelete: true,
     });
@@ -131,6 +132,29 @@ describe('sourceActionsFactory', () => {
     const link = await screen.findByRole('link', { name: /received messages/i });
     expect(link).toHaveAttribute('href', expect.stringContaining('collector_source_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('src-1'));
+  });
+
+  it('reports the row actions it is given', async () => {
+    const source = {
+      id: 'src-1',
+      fleet_id: 'f-1',
+      name: 'app-logs',
+      description: '',
+      enabled: true,
+      type: 'file' as const,
+      config: { paths: ['/var/log/app.log'], read_mode: 'end' as const },
+    };
+
+    const onEdit = jest.fn();
+    const onViewMessages = jest.fn();
+    const actions = sourceActionsFactory({ onEdit, onDelete: jest.fn(), onViewMessages, canEdit: true, canDelete: true });
+    render(<>{actions(source)}</>);
+
+    await userEvent.click(await screen.findByRole('button', { name: /edit/i }));
+    expect(onEdit).toHaveBeenCalledWith(source);
+
+    await userEvent.click(await screen.findByRole('link', { name: /received messages/i }));
+    expect(onViewMessages).toHaveBeenCalledWith(source);
   });
 });
 
@@ -179,12 +203,14 @@ describe('FleetDetail permissions', () => {
     const withNone = sourceActionsFactory({
       onEdit: jest.fn(),
       onDelete: jest.fn(),
+      onViewMessages: jest.fn(),
       canEdit: false,
       canDelete: false,
     })(source);
     const withBoth = sourceActionsFactory({
       onEdit: jest.fn(),
       onDelete: jest.fn(),
+      onViewMessages: jest.fn(),
       canEdit: true,
       canDelete: true,
     })(source);
@@ -203,6 +229,7 @@ describe('FleetDetail permissions', () => {
     const withDeleteOnly = sourceActionsFactory({
       onEdit: jest.fn(),
       onDelete: jest.fn(),
+      onViewMessages: jest.fn(),
       canEdit: false,
       canDelete: true,
     })(source);

@@ -349,4 +349,26 @@ describe('CollectorsSettings telemetry', () => {
       );
     });
   });
+
+  it('emits ADVANCED_TOGGLED when the advanced options section is opened and closed', async () => {
+    const user = userEvent.setup();
+
+    render(<CollectorsSettings />);
+
+    const toggle = await screen.findByRole('button', { name: /advanced options/i });
+
+    await user.click(toggle);
+
+    expect(sendTelemetry).toHaveBeenCalledWith('Collector Settings Advanced Options Toggled', {
+      app_action_value: 'settings-advanced-toggle',
+      opened: true,
+    });
+
+    await user.click(toggle);
+
+    expect(sendTelemetry).toHaveBeenCalledWith('Collector Settings Advanced Options Toggled', {
+      app_action_value: 'settings-advanced-toggle',
+      opened: false,
+    });
+  });
 });

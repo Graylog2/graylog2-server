@@ -305,7 +305,14 @@ const CollectorsSettings = () => {
                 )}
               </Col>
 
-              <Collapsible label="Advanced options">
+              <Collapsible
+                label="Advanced options"
+                onToggle={(opened) =>
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.ADVANCED_TOGGLED, {
+                    app_action_value: 'settings-advanced-toggle',
+                    opened,
+                  })
+                }>
                 <Col md={6}>
                   <SectionTitle>Collector Lifecycle</SectionTitle>
 

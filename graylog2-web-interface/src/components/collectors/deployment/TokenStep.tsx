@@ -141,7 +141,16 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
             </>
           )}
         </span>
-        <Button onClick={onChangeToken}>Change token</Button>
+        <Button
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.CHANGE_CLICKED, {
+              app_action_value: 'deployment-change-token',
+            });
+
+            onChangeToken();
+          }}>
+          Change token
+        </Button>
       </SummaryBox>
     );
   }
@@ -159,17 +168,32 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
       sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATED, {
         app_action_value: 'deployment-generate',
         fleet_id: fleet.id,
+        mode,
         expires_in: expiresIn ?? 'never',
       });
 
       onGenerated({ token: response.token, name, expiresIn, expiresAt: response.expires_at });
     } catch {
       // Error notification handled by useCollectorsMutations onError callback
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
+        app_action_value: 'deployment-generate-failed',
+        fleet_id: fleet.id,
+        mode,
+      });
     }
   };
 
   const canGenerate = Boolean(fleet) && (mode === 'short-lived' || effectiveName.trim().length > 0);
   const isTokenCreationPermitted = Boolean(fleet) && canCreateToken(fleet.id);
+
+  const handleModeChange = (newMode: 'short-lived' | 'custom') => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.MODE_SELECTED, {
+      app_action_value: 'deployment-token-mode',
+      mode: newMode,
+    });
+
+    setMode(newMode);
+  };
 
   return (
     <div>
@@ -181,7 +205,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
             name="token-mode"
             label="Short-lived token (expires in 1 day)"
             checked={mode === 'short-lived'}
-            onChange={() => setMode('short-lived')}
+            onChange={() => handleModeChange('short-lived')}
           />
           <Input
             type="radio"
@@ -189,7 +213,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
             name="token-mode"
             label="Custom token"
             checked={mode === 'custom'}
-            onChange={() => setMode('custom')}
+            onChange={() => handleModeChange('custom')}
           />
         </ModeRow>
         {mode === 'custom' && (

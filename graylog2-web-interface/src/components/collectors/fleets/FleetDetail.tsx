@@ -47,6 +47,7 @@ import {
   useCollectorPermissions,
 } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import { sourceTelemetryProps } from '../hooks/telemetry-helpers';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_FLEET_ID_FIELD, COLLECTOR_SOURCE_ID_FIELD } from '../common/fields';
 import { InstanceDetailDrawer } from '../instances';
@@ -105,16 +106,23 @@ const SEGMENTS = [
 type SourceActionsHandlers = {
   onEdit: (source: Source) => void;
   onDelete: (source: Source) => void;
+  onViewMessages: (source: Source) => void;
   canEdit: boolean;
   canDelete: boolean;
 };
 
 export const sourceActionsFactory =
-  ({ onEdit, onDelete, canEdit, canDelete }: SourceActionsHandlers) =>
+  ({ onEdit, onDelete, onViewMessages, canEdit, canDelete }: SourceActionsHandlers) =>
   (source: Source) => (
     <ButtonToolbar>
       <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_SOURCE_ID_FIELD, source.id)}>
-        <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
+        <IconButton
+          name="search"
+          title="Received messages"
+          bsStyle="default"
+          size="xsmall"
+          onClick={() => onViewMessages(source)}
+        />
       </LinkContainer>
       {canEdit && (
         <Button bsSize="xsmall" onClick={() => onEdit(source)}>
@@ -216,19 +224,49 @@ const FleetDetail = ({ fleetId }: Props) => {
     await deleteSource({ fleetId, sourceId: deletingSource.id });
     sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.DELETED, {
       app_action_value: 'source-delete',
-      fleet_id: fleetId,
-      source_id: deletingSource.id,
-      source_type: deletingSource.type,
+      ...sourceTelemetryProps(deletingSource, fleetId),
     });
     setDeletingSource(null);
   }, [deletingSource, deleteSource, fleetId, sendTelemetry]);
 
-  const sourceActions = sourceActionsFactory({
-    onEdit: setEditingSource,
-    onDelete: setDeletingSource,
-    canEdit: canEditSource(fleetId),
-    canDelete: canDeleteSource(fleetId),
-  });
+  const handleEditSource = useCallback(
+    (source: Source) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.EDIT_OPENED, {
+        app_action_value: 'source-edit-open',
+        ...sourceTelemetryProps(source, fleetId),
+      });
+
+      setEditingSource(source);
+    },
+    [fleetId, sendTelemetry],
+  );
+
+  const handleViewSourceMessages = useCallback(
+    (source: Source) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.RECEIVED_MESSAGES_CLICKED, {
+        app_action_value: 'source-received-messages',
+        ...sourceTelemetryProps(source, fleetId),
+      });
+    },
+    [fleetId, sendTelemetry],
+  );
+
+  // Hoisted out of the factory call so they can be tracked as memo dependencies: the permissions
+  // are fleet-scoped, so a memo keyed only on the callbacks would go stale across fleets.
+  const canEditSources = canEditSource(fleetId);
+  const canDeleteSources = canDeleteSource(fleetId);
+
+  const sourceActions = useMemo(
+    () =>
+      sourceActionsFactory({
+        onEdit: handleEditSource,
+        onDelete: setDeletingSource,
+        onViewMessages: handleViewSourceMessages,
+        canEdit: canEditSources,
+        canDelete: canDeleteSources,
+      }),
+    [handleEditSource, handleViewSourceMessages, canEditSources, canDeleteSources],
+  );
 
   const getSourcesForInstance = (instance: CollectorInstanceView) =>
     (sources || []).filter((s) => s.fleet_id === instance.fleet_id);
