@@ -346,14 +346,11 @@ describe('DeployTab', () => {
       await user.click(screen.getByRole('button', { name: /generate token/i }));
 
       await waitFor(() => {
-        expect(sendTelemetry).toHaveBeenCalledWith(
-          TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED,
-          {
-            app_action_value: 'deployment-generate-failed',
-            fleet_id: 'fleet-1',
-            mode: 'short-lived',
-          },
-        );
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
+          app_action_value: 'deployment-generate-failed',
+          fleet_id: 'fleet-1',
+          mode: 'short-lived',
+        });
       });
 
       expect(sendTelemetry).not.toHaveBeenCalledWith(
