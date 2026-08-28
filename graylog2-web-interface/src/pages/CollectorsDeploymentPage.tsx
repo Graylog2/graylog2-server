@@ -23,7 +23,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
 import { DeployTab, EnrollmentTokenList } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import { useCollectorsConfig, useEnrollmentTokenCount } from 'components/collectors/hooks';
+import { useCollectorsConfig, useEnrollmentTokenCount, useCollectorPermissions } from 'components/collectors/hooks';
 import { COLOR_SCHEME_LIGHT } from 'theme/constants';
 import Routes from 'routing/Routes';
 
@@ -44,9 +44,17 @@ const SoftBorderTabs = styled(Tabs)(
 const CollectorsDeploymentPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
   const tokenCount = useEnrollmentTokenCount();
+  const { canDeployCollectors, canViewEnrollmentTokens } = useCollectorPermissions();
 
   if (isLoading) {
     return <Spinner />;
+  }
+
+  // Guards a deep link: the nav entry is already hidden for these users, but the route is reachable
+  // by typing the URL. Deliberately the union of the two tab conditions below, so the page can never
+  // render with zero tabs. useCanAccessDeployment mirrors this for the nav entry — keep them in step.
+  if (!canDeployCollectors && !canViewEnrollmentTokens) {
+    return <Navigate to={Routes.SYSTEM.COLLECTORS.OVERVIEW} />;
   }
 
   if (!config?.signing_cert_id) {
@@ -69,29 +77,35 @@ const CollectorsDeploymentPage = () => {
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          <SoftBorderTabs defaultValue="deploy">
+          <SoftBorderTabs defaultValue={canDeployCollectors ? 'deploy' : 'tokens'}>
             <Tabs.List>
-              <Tabs.Tab value="deploy">Deploy</Tabs.Tab>
-              <Tabs.Tab value="tokens">
-                Enrollment tokens
-                {tokenCount !== undefined && (
-                  <>
-                    {' '}
-                    <Badge>{tokenCount}</Badge>
-                  </>
-                )}
-              </Tabs.Tab>
+              {canDeployCollectors && <Tabs.Tab value="deploy">Deploy</Tabs.Tab>}
+              {canViewEnrollmentTokens && (
+                <Tabs.Tab value="tokens">
+                  Enrollment tokens
+                  {tokenCount !== undefined && (
+                    <>
+                      {' '}
+                      <Badge>{tokenCount}</Badge>
+                    </>
+                  )}
+                </Tabs.Tab>
+              )}
             </Tabs.List>
-            <Tabs.Panel value="deploy">
-              <DeployTab />
-            </Tabs.Panel>
-            <Tabs.Panel value="tokens">
+            {canDeployCollectors && (
+              <Tabs.Panel value="deploy">
+                <DeployTab />
+              </Tabs.Panel>
+            )}
+            {canViewEnrollmentTokens && (
+              <Tabs.Panel value="tokens">
               <p className="description">
                 Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect
                 already-enrolled Collectors.
               </p>
-              <EnrollmentTokenList />
-            </Tabs.Panel>
+                <EnrollmentTokenList />
+              </Tabs.Panel>
+            )}
           </SoftBorderTabs>
         </Col>
       </Row>

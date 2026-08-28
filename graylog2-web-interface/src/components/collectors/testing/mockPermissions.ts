@@ -33,5 +33,7 @@ export const mockCollectorPermissions = (
   canDeleteToken: () => true,
   canReadActivities: true,
   canEditConfig: true,
+  canDeployCollectors: true,
+  canViewEnrollmentTokens: true,
   ...overrides,
 });

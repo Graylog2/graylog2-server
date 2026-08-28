@@ -44,6 +44,12 @@ const useCollectorPermissions = () => {
       ]),
     canCreateToken: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.ENROLL_TOKEN_CREATE, fleetId)),
     canDeleteToken: (fleetId: string) => isPermitted(scoped(COLLECTOR_PERMISSIONS.ENROLL_TOKEN_DELETE, fleetId)),
+    // Page- and tab-level gates. Unlike the checks above these are unscoped, because a page has no
+    // single fleet in context — the scoped variants still gate the individual controls inside it.
+    // Consequence: a user holding only a fleet-scoped grant would not match here. That mirrors the
+    // existing top-level Collectors nav gate, and is unreachable today (fleets are not shareable).
+    canDeployCollectors: isPermitted(COLLECTOR_PERMISSIONS.ENROLL_TOKEN_CREATE),
+    canViewEnrollmentTokens: isPermitted(COLLECTOR_PERMISSIONS.ENROLL_TOKEN_READ),
     canReadActivities: isPermitted(COLLECTOR_PERMISSIONS.ACTIVITIES_READ),
     canEditConfig: isPermitted(COLLECTOR_PERMISSIONS.CONFIGURATION_EDIT),
   };

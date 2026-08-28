@@ -29,6 +29,7 @@ import DeployTab from './DeployTab';
 
 import { useFleets, useCollectorsConfig, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import { mockCollectorsMutations } from '../testing/mockMutations';
+import { mockCollectorPermissions } from '../testing/mockPermissions';
 import type { Fleet } from '../types';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
@@ -62,20 +63,7 @@ describe('DeployTab', () => {
     asMock(useInstances).mockReturnValue({ data: [], error: null } as ReturnType<typeof useInstances>);
     asMock(useFleetReceivingCounts).mockReturnValue({ counts: undefined, error: null });
     asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({ createEnrollmentToken }));
-    asMock(useCollectorPermissions).mockReturnValue({
-      canCreateFleet: true,
-      canEditFleet: () => true,
-      canDeleteFleet: () => true,
-      canCreateSource: () => true,
-      canEditSource: () => true,
-      canDeleteSource: () => true,
-      canDeleteInstance: () => true,
-      canAssignToFleet: () => true,
-      canCreateToken: () => true,
-      canDeleteToken: () => true,
-      canReadActivities: true,
-      canEditConfig: true,
-    } as ReturnType<typeof useCollectorPermissions>);
+    asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions());
 
     createEnrollmentToken.mockResolvedValue({
       token: 'the-token-value',
