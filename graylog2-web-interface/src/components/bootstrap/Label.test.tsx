@@ -14,15 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-export const DECIMAL_PLACES = 1;
-export const DEFAULT_AXIS_KEY = 'number';
-export const TIME_AXIS_LABELS_QUANTITY = 4;
-export const NO_FIELD_NAME_SERIES = 'no_field_name_series';
+import Label from './Label';
 
-export const UNIT_FEATURE_FLAG = 'configurable_value_units';
-export const CANDIDATE_PICK_RADIUS = Infinity;
+describe('Label', () => {
+  it('renders bsStyle-driven content', () => {
+    render(<Label bsStyle="success">Running</Label>);
 
-export const TICK_VALS_SECOND_MARGIN = 80;
-export const TICK_VALS_FIRST_MARGIN = 10;
-export const AXIS_LABEL_MARGIN = 10;
+    expect(screen.getByText('Running')).toBeInTheDocument();
+  });
+
+  it('keeps the legacy small border-radius', () => {
+    render(
+      <Label bsStyle="success" data-testid="label">
+        Legacy
+      </Label>,
+    );
+
+    expect(screen.getByTestId('label')).toHaveStyleRule('border-radius', '3px');
+  });
+});

@@ -21,9 +21,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ClusterJobs, SystemJobs } from '@graylog/server-api';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
-import { Button } from 'components/bootstrap';
+import { Button, Badge } from 'components/bootstrap';
+import type { BadgeColor } from 'components/bootstrap/Badge';
 import UserNotification from 'util/UserNotification';
-import Badge from 'components/bootstrap/Badge';
 import { SYSTEM_JOBS_QUERY_KEY } from 'components/systemjobs/useSystemJobs';
 
 enum JobStatus {
@@ -35,23 +35,13 @@ enum JobStatus {
   Running = 'running',
 }
 
-const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
-  const { primary, success, info, warning, danger } = theme.colors.variant.dark;
-  const statuses = {
-    cancelled: warning,
-    complete: success,
-    error: danger,
-    queued: info,
-    running: primary,
-  };
-  const color = statuses[status] ?? info;
-
-  return css`
-    margin-left: 4px;
-    background-color: ${color};
-    color: ${theme.utils.readableColor(color)};
-  `;
-});
+const BADGE_COLOR_BY_STATUS: Record<string, BadgeColor> = {
+  cancelled: 'warning',
+  complete: 'success',
+  error: 'danger',
+  queued: 'gray',
+  running: 'primary',
+};
 
 const StyledProgressBar = styled(ProgressBar)`
   margin-top: 2px;
@@ -134,7 +124,13 @@ const SystemJob = ({ job }: SystemJobProps) => {
         </span>{' '}
         - on <LinkToNode nodeId={job.node_id} /> <RelativeTime dateTime={job.started_at} />{' '}
         <span data-toggle="tooltip" title={`runtime: ${job.execution_duration}`}>
-          <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
+          <Badge
+            color={BADGE_COLOR_BY_STATUS[mappedJobStatus] ?? 'gray'}
+            variant="light"
+            dot
+            style={{ marginLeft: 4 }}>
+            {mappedJobStatus}
+          </Badge>
         </span>
         {!jobIsOver && job.is_cancelable ? (
           <Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>
