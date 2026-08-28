@@ -1,0 +1,8 @@
+type = "f"
+message = "Fixed Data Node metrics backing indices created by a rollover not being managed by the metrics ISM policy."
+
+details.user = """
+The `gl-datanode-metrics-ism` policy was created without an `ism_template`, so it was only attached to the backing indices of the `gl-datanode-metrics` data stream that existed at the time the policy was applied. Every backing index created by a later rollover stayed unmanaged, meaning the configured rollup and deletion never ran on it and indices and shards accumulated until they could trip `cluster.max_shards_per_node`. The policy now carries an `ism_template` for the metrics data stream, so OpenSearch attaches it to new backing indices automatically. Existing installations pick this up on the next Data Node restart, which rewrites the policy.
+"""
+
+issues = ["27040"]
