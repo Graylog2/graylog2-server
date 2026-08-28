@@ -15,24 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import { Badge } from 'components/bootstrap';
+import Label from './Label';
 
-import type { StreamOutputFilterRule } from './Types';
+describe('Label', () => {
+  it('renders bsStyle-driven content', () => {
+    render(<Label bsStyle="success">Running</Label>);
 
-type Props = {
-  filterOutputRule: StreamOutputFilterRule;
-};
+    expect(screen.getByText('Running')).toBeInTheDocument();
+  });
 
-const FilterStatusCell = ({ filterOutputRule }: Props) => {
-  const isEnabled = filterOutputRule.status === 'enabled';
-  const title = isEnabled ? 'Enabled' : 'Disabled';
+  it('keeps the legacy small border-radius', () => {
+    render(
+      <Label bsStyle="success" data-testid="label">
+        Legacy
+      </Label>,
+    );
 
-  return (
-    <Badge color={isEnabled ? 'success' : 'warning'} variant="light" title={title} aria-label={title}>
-      {title}
-    </Badge>
-  );
-};
-
-export default FilterStatusCell;
+    expect(screen.getByTestId('label')).toHaveStyleRule('border-radius', '3px');
+  });
+});

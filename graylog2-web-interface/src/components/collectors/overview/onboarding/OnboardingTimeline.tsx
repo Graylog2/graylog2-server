@@ -47,7 +47,13 @@ const CheckBullet = () => <Icon name="check" size="sm" />;
  * preview sees source messages, completes once messages arrive, and turns into a warning when the
  * collector drops offline before delivering any.
  */
-const OnboardingTimeline = ({ instance, fleetName, sourceCount, receivedTotal, onFleetLinkClick = undefined }: Props) => {
+const OnboardingTimeline = ({
+  instance,
+  fleetName,
+  sourceCount,
+  receivedTotal,
+  onFleetLinkClick = undefined,
+}: Props) => {
   const offline = instance.status !== 'online';
   const receiving = (receivedTotal ?? 0) > 0;
   // Steps 0-2 are always in the past for an enrolled collector; step 3 joins them once messages
