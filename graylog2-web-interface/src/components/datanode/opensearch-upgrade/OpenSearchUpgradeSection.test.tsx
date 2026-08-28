@@ -169,11 +169,23 @@ describe('OpenSearchUpgradeSection', () => {
     expect(sendTelemetry).not.toHaveBeenCalledWith(EVENTS.ROLLING_UPGRADE_STARTED, expect.anything());
   });
 
-  it('offers an enabled Restart action below the rolling-upgrade node threshold', () => {
+  it('describes the rolling upgrade before the start action', () => {
+    render(<OpenSearchUpgradeSection />);
+
+    expect(screen.getByRole('heading', { name: /upgrade process/i })).toBeInTheDocument();
+    expect(screen.getByText(/automatically upgrades its embedded opensearch/i)).toBeInTheDocument();
+    expect(screen.getByText(/restart one at a time to minimize the impact/i)).toBeInTheDocument();
+    expect(screen.getByText(/search functionality may be impaired/i)).toBeInTheDocument();
+    expect(screen.getByText(/ensure a smooth rollback path/i)).toBeInTheDocument();
+  });
+
+  it('describes the restart and offers an enabled action below the rolling-upgrade node threshold', () => {
     mockClusterStats({ numberOfDataNodes: 2 });
     render(<OpenSearchUpgradeSection />);
 
-    expect(screen.getByRole('button', { name: /^restart$/i })).toBeEnabled();
+    expect(screen.getByText(/all data nodes must restart/i)).toBeInTheDocument();
+    expect(screen.getByText(/search and indexing are unavailable/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start opensearch upgrade and restart/i })).toBeEnabled();
     expect(screen.queryByRole('button', { name: /start opensearch rolling upgrade/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/requires at least 3 data nodes/i)).not.toBeInTheDocument();
   });
@@ -182,7 +194,7 @@ describe('OpenSearchUpgradeSection', () => {
     mockClusterStats({ numberOfDataNodes: 2 });
     render(<OpenSearchUpgradeSection />);
 
-    await userEvent.click(screen.getByRole('button', { name: /^restart$/i }));
+    await userEvent.click(screen.getByRole('button', { name: /start opensearch upgrade and restart/i }));
 
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByText(/full restart, not a rolling one/i)).toBeInTheDocument();

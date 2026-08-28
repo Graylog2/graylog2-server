@@ -62,8 +62,65 @@ const Heading = styled.h4(
   `,
 );
 
+const UpgradeProcess = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.md};
+    color: ${theme.colors.gray[60]};
+    font-size: ${theme.fonts.size.small};
+  `,
+);
+
+const UpgradeProcessHeading = styled.h4`
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
+`;
+
+const UpgradeProcessList = styled.ul(
+  ({ theme }) => css`
+    margin: ${theme.spacings.xs} 0 0;
+    padding-left: ${theme.spacings.lg};
+    list-style-position: outside;
+    list-style-type: disc;
+
+    > li {
+      display: list-item;
+      margin-bottom: ${theme.spacings.xxs};
+    }
+
+    > li:last-child {
+      margin-bottom: 0;
+    }
+  `,
+);
+
 const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
 const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
+
+const UpgradeProcessInfo = ({ isRollingUpgrade }: { isRollingUpgrade: boolean }) => (
+  <Row>
+    <Col xs={12}>
+      <UpgradeProcess>
+        <UpgradeProcessHeading>Upgrade process</UpgradeProcessHeading>
+        <UpgradeProcessList>
+          <li>Each Data Node automatically upgrades its embedded OpenSearch to the target version.</li>
+          {isRollingUpgrade ? (
+            <>
+              <li>Data Nodes restart one at a time to minimize the impact.</li>
+              <li>Search functionality may be impaired while Data Nodes restart.</li>
+            </>
+          ) : (
+            <>
+              <li>All Data Nodes must restart for the upgrade to take effect.</li>
+              <li>Search and indexing are unavailable while Data Nodes restart.</li>
+            </>
+          )}
+          <li>Back up MongoDB, Data Node, and Data Lake storage before upgrading to ensure a smooth rollback path.</li>
+        </UpgradeProcessList>
+      </UpgradeProcess>
+    </Col>
+  </Row>
+);
 
 const OpenSearchUpgradeSection = () => {
   const {
@@ -99,7 +156,9 @@ const OpenSearchUpgradeSection = () => {
   const showStartAction = openSearchStatus === 'outdated';
   const isStartActionDisabled =
     isStartingRollingRestart || isLoadingIncompatibleIndices || isIncompatibleIndicesError || hasIncompatibleIndices;
-  const startActionLabel = isRollingUpgradePossible ? 'Start OpenSearch Rolling Upgrade' : 'Restart';
+  const startActionLabel = isRollingUpgradePossible
+    ? 'Start OpenSearch Rolling Upgrade'
+    : 'Start OpenSearch Upgrade and Restart';
   const startActionLoadingLabel = isRollingUpgradePossible ? 'Starting OpenSearch Rolling Upgrade...' : 'Restarting...';
   const canResumeRollingRestart =
     isRollingRestartPaused(rollingRestart?.data?.sm_state) && !rollingRestart?.data?.abort_requested;
@@ -182,6 +241,8 @@ const OpenSearchUpgradeSection = () => {
           </Col>
         </Row>
       )}
+
+      {showStartAction && <UpgradeProcessInfo isRollingUpgrade={isRollingUpgradePossible} />}
 
       <ActionsRow>
         <Col xs={12}>
