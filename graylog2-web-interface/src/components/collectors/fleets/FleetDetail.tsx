@@ -48,7 +48,7 @@ import {
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { sourceTelemetryProps } from '../hooks/telemetry-helpers';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_FLEET_ID_FIELD, COLLECTOR_SOURCE_ID_FIELD } from '../common/fields';
+import { AGENT_FLEET_ID_FIELD, AGENT_SOURCE_ID_FIELD } from '../common/fields';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
 import InstanceActions from '../instances/InstanceActions';
@@ -112,7 +112,7 @@ export const sourceActionsFactory =
   ({ onEdit, onDelete, onViewMessages }: SourceActionsHandlers) =>
   (source: Source) => (
     <ButtonToolbar>
-      <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_SOURCE_ID_FIELD, source.id)}>
+      <LinkContainer to={collectorReceivedMessagesUrl(AGENT_SOURCE_ID_FIELD, source.id)}>
         <IconButton
           name="search"
           title="Received messages"
@@ -379,7 +379,7 @@ const FleetDetail = ({ fleetId }: Props) => {
         <>
           <p>Sources are automatically pushed to all Collectors in this fleet. Changes take effect within seconds.</p>
           <ActionsRow>
-            <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
+            <LinkContainer to={collectorReceivedMessagesUrl(AGENT_FLEET_ID_FIELD, fleet.id)}>
               <Button>Received messages</Button>
             </LinkContainer>
             <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>

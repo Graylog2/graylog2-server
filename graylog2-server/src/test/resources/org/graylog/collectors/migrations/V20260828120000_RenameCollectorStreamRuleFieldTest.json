@@ -1,0 +1,43 @@
+{
+  "streamrules": [
+    {
+      "_id": {
+        "$oid": "aaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "stream_id": {
+        "$oid": "000000000000000000000005"
+      },
+      "field": "collector_receiver_type",
+      "type": 1,
+      "value": "collector_log",
+      "inverted": false,
+      "description": "Route collector system logs to dedicated stream"
+    },
+    {
+      "_id": {
+        "$oid": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "stream_id": {
+        "$oid": "000000000000000000000005"
+      },
+      "field": "source",
+      "type": 1,
+      "value": "some-host",
+      "inverted": false,
+      "description": "Unrelated rule on the same stream"
+    },
+    {
+      "_id": {
+        "$oid": "cccccccccccccccccccccccc"
+      },
+      "stream_id": {
+        "$oid": "5f3c5a1b2c3d4e5f60718293"
+      },
+      "field": "collector_receiver_type",
+      "type": 1,
+      "value": "file_log",
+      "inverted": false,
+      "description": "User-created rule on another stream"
+    }
+  ]
+}

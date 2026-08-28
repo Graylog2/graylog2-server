@@ -25,7 +25,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ReassignFleetModal from './ReassignFleetModal';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
+import { AGENT_ID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import { useCollectorsMutations } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
@@ -55,7 +55,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
   return (
     <>
       <ButtonToolbar>
-        <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
+        <LinkContainer to={collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid)}>
           <IconButton
             name="search"
             title="Received messages"
