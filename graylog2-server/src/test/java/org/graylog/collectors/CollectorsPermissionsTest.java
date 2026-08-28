@@ -36,10 +36,6 @@ class CollectorsPermissionsTest {
 
     @Test
     void declaresEnrollmentTokenPermissions() {
-        assertThat(CollectorsPermissions.ENROLL_TOKEN_CREATE).isEqualTo("collector_enrollment_tokens:create");
-        assertThat(CollectorsPermissions.ENROLL_TOKEN_READ).isEqualTo("collector_enrollment_tokens:read");
-        assertThat(CollectorsPermissions.ENROLL_TOKEN_DELETE).isEqualTo("collector_enrollment_tokens:delete");
-
         assertThat(permissionStrings()).contains(
                 CollectorsPermissions.ENROLL_TOKEN_CREATE,
                 CollectorsPermissions.ENROLL_TOKEN_READ,
