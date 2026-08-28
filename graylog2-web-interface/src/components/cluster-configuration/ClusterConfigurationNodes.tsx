@@ -68,19 +68,14 @@ const ClusterConfigurationNodes = () => {
   const productName = useProductName();
   const [activeNodeType, setActiveNodeType] = useState<NodeType>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const {
-    data: runsWithDataNode,
-    isLoading: isLoadingSearchBackend,
-  } = useRunsWithDataNode();
+  const { data: runsWithDataNode, isLoading: isLoadingSearchBackend } = useRunsWithDataNode();
   const searchNodesConfig = getSearchNodesConfig(runsWithDataNode);
   const searchNodeType = searchNodesConfig?.nodeType;
   const SearchNodesExpandable = searchNodesConfig?.component;
   const nodeTypeOptions: Array<{ label: string; value: NodeType }> = [
     { label: 'All Nodes', value: 'all' },
     { label: `${productName} Nodes`, value: 'graylog' },
-    ...(searchNodesConfig
-      ? [{ label: searchNodesConfig.label, value: searchNodesConfig.nodeType }]
-      : []),
+    ...(searchNodesConfig ? [{ label: searchNodesConfig.label, value: searchNodesConfig.nodeType }] : []),
     { label: 'MongoDB Nodes', value: 'mongodb' },
   ];
   const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);
@@ -145,9 +140,7 @@ const ClusterConfigurationNodes = () => {
           />
         </SectionCol>
       )}
-      {showSearchNodes && (
-        <SectionCol md={12}>{renderSearchNodes()}</SectionCol>
-      )}
+      {showSearchNodes && <SectionCol md={12}>{renderSearchNodes()}</SectionCol>}
       {showMongodbNodes && (
         <SectionCol md={12}>
           <MongodbNodesExpandable
