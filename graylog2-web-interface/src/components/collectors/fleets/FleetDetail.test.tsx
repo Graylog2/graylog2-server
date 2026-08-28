@@ -103,7 +103,7 @@ describe('FleetDetail telemetry', () => {
 });
 
 describe('sourceActionsFactory', () => {
-  it('renders a Received messages link per source pointing to collector_source_id filter', async () => {
+  it('renders a Received messages link per source pointing to agent_source_id filter', async () => {
     const source = {
       id: 'src-1',
       fleet_id: 'f-1',
@@ -118,7 +118,7 @@ describe('sourceActionsFactory', () => {
     render(<>{actions(source)}</>);
 
     const link = await screen.findByRole('link', { name: /received messages/i });
-    expect(link).toHaveAttribute('href', expect.stringContaining('collector_source_id'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('agent_source_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('src-1'));
   });
 
