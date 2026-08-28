@@ -61,6 +61,12 @@
         <skip.web.build>false</skip.web.build>
         <skip.web.tests>false</skip.web.tests>
 
+        <!-- Upload of web interface source maps to PostHog. Only runs in the "release" profile, and only when
+             POSTHOG_CLI_API_KEY is present in the environment and the web interface is being built. See the
+             "posthog-sourcemaps-disabled" and "posthog-sourcemaps-disabled-without-web-build" profiles. -->
+        <posthog.sourcemaps.skip>false</posthog.sourcemaps.skip>
+        <posthog.release.name>graylog-server</posthog.release.name>
+
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
@@ -1349,8 +1355,87 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!-- Make it obvious in the release build log when source maps are not being uploaded. -->
+                                <id>warn-about-skipped-posthog-sourcemap-upload</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target xmlns:if="ant:if">
+                                        <condition property="posthog.sourcemaps.skipped">
+                                            <istrue value="${posthog.sourcemaps.skip}"/>
+                                        </condition>
+                                        <echo if:set="posthog.sourcemaps.skipped" level="warning"
+                                              message="POSTHOG_CLI_API_KEY is not set - skipping upload of web interface source maps to PostHog."/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <configuration>
+                            <workingDirectory>${webInterface.path}</workingDirectory>
+                            <installDirectory>${webInterface.path}</installDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <!-- Stamp the bundled chunks with PostHog chunk IDs and upload their source maps, so
+                                     stack traces from released builds resolve to the original sources.
+
+                                     This runs against ${project.build.outputDirectory} instead of the webpack output
+                                     directory on purpose: the inject step rewrites the bundles, and PostHog can only
+                                     resolve a stack trace if the JavaScript we actually ship carries the chunk IDs.
+                                     Injecting the directory that maven-jar-plugin packages in the "package" phase
+                                     guarantees that, without depending on plugin ordering within "compile". -->
+                                <id>upload-web-sourcemaps-to-posthog</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${posthog.sourcemaps.skip}</skip>
+                                    <arguments>run posthog-cli sourcemap process --directory ${project.build.outputDirectory}/web-interface/assets --release-name ${posthog.release.name} --release-version ${project.version}</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <!-- Disables the PostHog source map upload in the "release" profile when no API key is available.
+                 Maven cannot AND two profiles together, so the "release" profile gates its executions on the
+                 property this profile flips. -->
+            <id>posthog-sourcemaps-disabled</id>
+            <activation>
+                <property>
+                    <name>!env.POSTHOG_CLI_API_KEY</name>
+                </property>
+            </activation>
+            <properties>
+                <posthog.sourcemaps.skip>true</posthog.sourcemaps.skip>
+            </properties>
+        </profile>
+        <profile>
+            <!-- Without the web interface build there are no bundles to process, and no node/yarn installation to
+                 run the PostHog CLI with. Mirrors the activation of the "web-interface-build" profile. -->
+            <id>posthog-sourcemaps-disabled-without-web-build</id>
+            <activation>
+                <property>
+                    <name>skip.web.build</name>
+                </property>
+            </activation>
+            <properties>
+                <posthog.sourcemaps.skip>true</posthog.sourcemaps.skip>
+            </properties>
         </profile>
         <profile>
             <id>skip-web-interface-tests</id>

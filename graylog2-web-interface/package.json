@@ -113,6 +113,7 @@
   "devDependencies": {
     "@cyclonedx/webpack-plugin": "^5.1.1",
     "@graylog/oxfmt-config": "^1.0.1",
+    "@posthog/cli": "^0.14.1",
     "@types/chroma-js": "^3.1.2",
     "@types/crossfilter": "0.0.38",
     "@types/express": "^5.0.6",
