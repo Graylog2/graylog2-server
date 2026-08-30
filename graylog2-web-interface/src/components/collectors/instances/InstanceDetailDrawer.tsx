@@ -35,7 +35,7 @@ import InstanceStatusLabel from '../common/InstanceStatusLabel';
 import collectorOsName from '../common/collectorOsName';
 import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
+import { AGENT_ID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
 import { useInstance, useInstancePendingChanges, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
@@ -231,7 +231,7 @@ const InstanceDetailDrawer = ({ instance: instanceProp, sources, fleetName, onCl
         <DetailRow>
           <DetailLabel>Messages:</DetailLabel>
           <Link
-            to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}
+            to={collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid)}
             onClick={() =>
               sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.RECEIVED_MESSAGES_CLICKED, {
                 app_action_value: 'instance-drawer-received-messages',

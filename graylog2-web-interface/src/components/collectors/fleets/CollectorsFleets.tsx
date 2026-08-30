@@ -31,7 +31,7 @@ import customColumnRenderers from './ColumnRenderers';
 import { DEFAULT_LAYOUT } from './Constants';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_FLEET_ID_FIELD } from '../common/fields';
+import { AGENT_FLEET_ID_FIELD } from '../common/fields';
 import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
@@ -53,7 +53,7 @@ const CollectorsFleets = () => {
   const fleetActions = useCallback(
     (fleet: Fleet) => (
       <ButtonToolbar>
-        <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
+        <LinkContainer to={collectorReceivedMessagesUrl(AGENT_FLEET_ID_FIELD, fleet.id)}>
           <IconButton
             name="search"
             title="Received messages"

@@ -42,7 +42,7 @@ import SourceStatusSection from './SourceStatusSection';
 import InstanceStatusLabel from '../../common/InstanceStatusLabel';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
+import { AGENT_ID_FIELD } from '../../common/fields';
 import { useCollectorPermissions } from '../../hooks';
 
 type Props = {
@@ -96,7 +96,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
 
   const online = instance.status === 'online';
   const receiving = (sourceLogs?.total ?? 0) > 0;
-  const sourceLogsUrl = collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid);
+  const sourceLogsUrl = collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid);
 
   // Which of the page's three states the user is looking at; attached to every click event so
   // interactions can be segmented by how the onboarding actually went.
