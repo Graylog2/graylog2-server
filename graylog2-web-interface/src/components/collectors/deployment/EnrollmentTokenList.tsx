@@ -155,6 +155,14 @@ const EnrollmentTokenList = () => {
     [canDeleteToken],
   );
 
+  // Mirrors the server-side filter in EnrollmentTokenResource#bulkDelete, which silently drops
+  // tokens the user may not delete. Marking those rows unselectable stops us offering a bulk
+  // delete that would partially no-op.
+  const isTokenSelectable = useCallback(
+    (token: EnrollmentTokenMetadata) => canDeleteToken(token.fleet_id),
+    [canDeleteToken],
+  );
+
   const renderers = useMemo(() => customColumnRenderers(fleetNames), [fleetNames]);
 
   return (
@@ -167,7 +175,7 @@ const EnrollmentTokenList = () => {
         entityAttributesAreCamelCase={false}
         columnRenderers={renderers}
         entityActions={entityActions}
-        bulkSelection={{ actions: <BulkActions /> }}
+        bulkSelection={{ actions: <BulkActions />, isEntitySelectable: isTokenSelectable }}
       />
       {deletingToken && (
         <ConfirmDialog

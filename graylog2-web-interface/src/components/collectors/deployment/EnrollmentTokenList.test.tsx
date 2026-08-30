@@ -308,4 +308,49 @@ describe('EnrollmentTokenList permissions', () => {
 
     await screen.findByRole('menuitem', { name: /delete/i });
   });
+
+  it('disables bulk selection for a token the user may not delete', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_enrollment_tokens:read:fleet-1']));
+
+    render(<EnrollmentTokenList />);
+
+    await screen.findByText('Test token');
+
+    expect(await screen.findByRole('checkbox', { name: /select entity/i })).toBeDisabled();
+  });
+
+  it('enables bulk selection for a token the user may delete', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_enrollment_tokens:read:fleet-1', 'collector_enrollment_tokens:delete:fleet-1']),
+    );
+
+    render(<EnrollmentTokenList />);
+
+    await screen.findByText('Test token');
+
+    expect(await screen.findByRole('checkbox', { name: /select entity/i })).toBeEnabled();
+  });
+
+  // The selection spans fleets, so the gate has to be per row rather than per table: the backend
+  // filters a bulk delete down to the permitted tokens, and the checkboxes must say the same.
+  it('gates bulk selection per row when delete is granted on only one fleet', async () => {
+    asMock(fetchPaginatedEnrollmentTokens).mockResolvedValue(
+      mockPaginatedResponse([
+        mockToken({ id: 'token-1', name: 'Token 1', fleet_id: 'fleet-1' }),
+        mockToken({ id: 'token-2', name: 'Token 2', fleet_id: 'fleet-2' }),
+      ]),
+    );
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_enrollment_tokens:read', 'collector_enrollment_tokens:delete:fleet-1']),
+    );
+
+    render(<EnrollmentTokenList />);
+
+    await screen.findByText('Token 1');
+
+    const [fleetOneCheckbox, fleetTwoCheckbox] = await screen.findAllByRole('checkbox', { name: /select entity/i });
+
+    expect(fleetOneCheckbox).toBeEnabled();
+    expect(fleetTwoCheckbox).toBeDisabled();
+  });
 });

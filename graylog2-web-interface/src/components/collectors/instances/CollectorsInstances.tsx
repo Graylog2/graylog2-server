@@ -33,6 +33,7 @@ import {
   useSources,
   useDefaultInstanceFilters,
   useCollectorRefetchInterval,
+  useCollectorPermissions,
 } from '../hooks';
 
 const CollectorsInstances = () => {
@@ -41,6 +42,7 @@ const CollectorsInstances = () => {
   const { data: sources } = useSources(selectedInstance?.fleet_id);
   const defaultFilters = useDefaultInstanceFilters();
   const refetchInterval = useCollectorRefetchInterval();
+  const { canAssignToFleet } = useCollectorPermissions();
 
   const fleetNames = useMemo(() => Object.fromEntries((fleets ?? []).map((fleet) => [fleet.id, fleet.name])), [fleets]);
 
@@ -49,6 +51,13 @@ const CollectorsInstances = () => {
   const entityActions = useCallback(
     (instance: CollectorInstanceView) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />,
     [],
+  );
+
+  // Mirrors the server-side filter in CollectorInstancesResource#reassignInstances, which keeps
+  // only the instances whose *current* fleet the user may read and assign from.
+  const isInstanceSelectable = useCallback(
+    (instance: CollectorInstanceView) => canAssignToFleet(instance.fleet_id),
+    [canAssignToFleet],
   );
 
   return (
@@ -63,7 +72,7 @@ const CollectorsInstances = () => {
         entityAttributesAreCamelCase={false}
         columnRenderers={columnRenderers}
         defaultFilters={defaultFilters}
-        bulkSelection={{ actions: <BulkActions /> }}
+        bulkSelection={{ actions: <BulkActions />, isEntitySelectable: isInstanceSelectable }}
       />
 
       {selectedInstance && (

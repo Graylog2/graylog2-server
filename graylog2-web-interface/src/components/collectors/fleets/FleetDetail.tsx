@@ -144,7 +144,8 @@ const FleetDetail = ({ fleetId }: Props) => {
   const defaultInstanceFilters = useDefaultInstanceFilters();
   const { data: sources } = useSources(fleetId);
   const { createSource, updateSource, deleteSource, updateFleet, deleteFleet } = useCollectorsMutations();
-  const { canCreateSource, canCreateToken, canEditSource, canDeleteSource } = useCollectorPermissions();
+  const { canCreateSource, canCreateToken, canEditSource, canDeleteSource, canAssignToFleet } =
+    useCollectorPermissions();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [deletingSource, setDeletingSource] = useState<Source | null>(null);
@@ -216,6 +217,13 @@ const FleetDetail = ({ fleetId }: Props) => {
   const instanceActions = useCallback(
     (instance: CollectorInstanceView) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />,
     [],
+  );
+
+  // Mirrors the server-side filter in CollectorInstancesResource#reassignInstances, which keeps
+  // only the instances whose *current* fleet the user may read and assign from.
+  const isInstanceSelectable = useCallback(
+    (instance: CollectorInstanceView) => canAssignToFleet(instance.fleet_id),
+    [canAssignToFleet],
   );
 
   const handleConfirmDeleteSource = useCallback(async () => {
@@ -433,7 +441,7 @@ const FleetDetail = ({ fleetId }: Props) => {
             entityAttributesAreCamelCase={false}
             columnRenderers={instanceRenderers}
             defaultFilters={defaultInstanceFilters}
-            bulkSelection={{ actions: <BulkActions /> }}
+            bulkSelection={{ actions: <BulkActions />, isEntitySelectable: isInstanceSelectable }}
           />
         </>
       )}

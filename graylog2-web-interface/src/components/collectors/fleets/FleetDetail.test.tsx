@@ -31,6 +31,7 @@ import {
 } from 'components/collectors/hooks';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
 import FleetDetail, { sourceActionsFactory } from './FleetDetail';
 
@@ -46,7 +47,7 @@ jest.mock('components/collectors/hooks', () => ({
 }));
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn(), replace: jest.fn() }));
 jest.mock('routing/useQuery', () => () => ({}));
-jest.mock('components/common/PaginatedEntityTable', () => () => null);
+jest.mock('components/common/PaginatedEntityTable', () => jest.fn(() => null));
 jest.mock('components/collectors/instances', () => ({ InstanceDetailDrawer: () => null }));
 jest.mock('hooks/useCurrentUser');
 
@@ -215,6 +216,44 @@ describe('FleetDetail permissions', () => {
     render(<FleetDetail fleetId="f-1" />);
 
     expect(await screen.findByRole('link', { name: /deploy a new collector/i })).toBeInTheDocument();
+  });
+
+  // The instances table lets the user bulk-reassign, which the backend filters by read+assign on
+  // each instance's *current* fleet. The row checkboxes have to say the same thing.
+  const instancesTableProps = async () => {
+    const instancesTab = await screen.findByRole('radio', { name: 'Instances' });
+    await userEvent.click(instancesTab);
+
+    // Only the instances table declares bulk selection, so that is enough to pick it out of the
+    // tables this page renders.
+    const call = asMock(PaginatedEntityTable)
+      .mock.calls.map(([props]) => props)
+      .findLast((props) => 'bulkSelection' in props);
+
+    return (call as { bulkSelection: { isEntitySelectable?: (entity: { id: string; fleet_id: string }) => boolean } })
+      .bulkSelection;
+  };
+
+  it('marks instances unselectable without assign permission on their fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    const { isEntitySelectable } = await instancesTableProps();
+
+    expect(isEntitySelectable({ id: 'i-1', fleet_id: 'f-1' })).toBe(false);
+  });
+
+  it('marks instances selectable with assign permission on their fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read:f-1', 'collector_fleets:assign_instance:f-1']),
+    );
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    const { isEntitySelectable } = await instancesTableProps();
+
+    expect(isEntitySelectable({ id: 'i-1', fleet_id: 'f-1' })).toBe(true);
   });
 
   it('renders source row actions according to the permissions passed in', () => {
