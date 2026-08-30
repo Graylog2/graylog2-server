@@ -199,6 +199,24 @@ describe('FleetDetail permissions', () => {
     expect(await screen.findByRole('button', { name: /add source/i })).toBeInTheDocument();
   });
 
+  it('hides Deploy a new Collector without enrollment token create on this fleet', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    expect(screen.queryByRole('link', { name: /deploy a new collector/i })).not.toBeInTheDocument();
+  });
+
+  it('shows Deploy a new Collector with enrollment token create scoped to this fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read', 'collector_enrollment_tokens:create:f-1']),
+    );
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    expect(await screen.findByRole('link', { name: /deploy a new collector/i })).toBeInTheDocument();
+  });
+
   it('renders source row actions according to the permissions passed in', () => {
     const withNone = sourceActionsFactory({
       onEdit: jest.fn(),

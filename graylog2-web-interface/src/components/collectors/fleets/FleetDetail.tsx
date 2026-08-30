@@ -144,7 +144,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const defaultInstanceFilters = useDefaultInstanceFilters();
   const { data: sources } = useSources(fleetId);
   const { createSource, updateSource, deleteSource, updateFleet, deleteFleet } = useCollectorsMutations();
-  const { canCreateSource, canEditSource, canDeleteSource } = useCollectorPermissions();
+  const { canCreateSource, canCreateToken, canEditSource, canDeleteSource } = useCollectorPermissions();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [deletingSource, setDeletingSource] = useState<Source | null>(null);
@@ -297,9 +297,11 @@ const FleetDetail = ({ fleetId }: Props) => {
           {fleet.name} <PreviewBadge />
         </h2>
         <HeaderActions>
-          <LinkContainer to={deployCollectorUrl}>
-            <Button bsStyle="primary">Deploy a new Collector</Button>
-          </LinkContainer>
+          {canCreateToken(fleet.id) && (
+            <LinkContainer to={deployCollectorUrl}>
+              <Button bsStyle="primary">Deploy a new Collector</Button>
+            </LinkContainer>
+          )}
         </HeaderActions>
       </Header>
 
