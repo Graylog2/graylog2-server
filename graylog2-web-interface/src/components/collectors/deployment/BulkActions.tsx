@@ -26,17 +26,32 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useCollectorsMutations, useFleets, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
+/**
+ * Whether this component has any action to offer the current user.
+ *
+ * Exported so a table can decide whether to render the bulk-select column at all -- an
+ * `EntityDataTable` shows that column whenever `bulkSelection.actions` is set, and cannot tell
+ * that the element it was handed renders nothing. Callers get a boolean and stay unaware of which
+ * actions exist or which permissions they need.
+ *
+ * Selection can span fleets and this component only holds token ids, so the answer is "can the
+ * user delete tokens in *any* fleet"; the backend filters the actual selection, and
+ * `isEntitySelectable` gates the individual rows. While the fleet list is still loading we assume
+ * yes, so the column does not pop in for the common, permitted case.
+ */
+export const useHasBulkActions = () => {
+  const { data: fleets } = useFleets();
+  const { canDeleteToken } = useCollectorPermissions();
+
+  return fleets === undefined || fleets.some((fleet) => canDeleteToken(fleet.id));
+};
+
 const BulkActions = () => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { bulkDeleteEnrollmentTokens } = useCollectorsMutations();
-  const { data: fleets } = useFleets();
-  const { canDeleteToken } = useCollectorPermissions();
   const sendTelemetry = useSendCollectorsTelemetry();
   const [showConfirm, setShowConfirm] = useState(false);
-
-  // Selection can span fleets and this component only holds token ids, so show bulk delete if
-  // the user can delete tokens in any fleet and let the backend filter the actual selection.
-  const canDeleteAnyToken = (fleets ?? []).some((fleet) => canDeleteToken(fleet.id));
+  const canDeleteAnyToken = useHasBulkActions();
 
   const handleConfirm = useCallback(async () => {
     await bulkDeleteEnrollmentTokens(selectedEntities);

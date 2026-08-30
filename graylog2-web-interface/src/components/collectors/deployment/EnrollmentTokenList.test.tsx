@@ -309,14 +309,15 @@ describe('EnrollmentTokenList permissions', () => {
     await screen.findByRole('menuitem', { name: /delete/i });
   });
 
-  it('disables bulk selection for a token the user may not delete', async () => {
+  // No fleet grants a bulk action, so the whole column goes rather than rendering dead checkboxes.
+  it('hides bulk selection when the user may not delete tokens in any fleet', async () => {
     asMock(useCurrentUser).mockReturnValue(userWith(['collector_enrollment_tokens:read:fleet-1']));
 
     render(<EnrollmentTokenList />);
 
     await screen.findByText('Test token');
 
-    expect(await screen.findByRole('checkbox', { name: /select entity/i })).toBeDisabled();
+    expect(screen.queryByRole('checkbox', { name: /select entity/i })).not.toBeInTheDocument();
   });
 
   it('enables bulk selection for a token the user may delete', async () => {

@@ -51,7 +51,7 @@ import { sourceTelemetryProps } from '../hooks/telemetry-helpers';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { COLLECTOR_FLEET_ID_FIELD, COLLECTOR_SOURCE_ID_FIELD } from '../common/fields';
 import { InstanceDetailDrawer } from '../instances';
-import BulkActions from '../instances/BulkActions';
+import BulkActions, { useHasBulkActions } from '../instances/BulkActions';
 import InstanceActions from '../instances/InstanceActions';
 import instanceColumnRenderers from '../instances/ColumnRenderers';
 import { DEFAULT_LAYOUT as INSTANCES_LAYOUT } from '../instances/Constants';
@@ -146,6 +146,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { createSource, updateSource, deleteSource, updateFleet, deleteFleet } = useCollectorsMutations();
   const { canCreateSource, canCreateToken, canEditSource, canDeleteSource, canAssignToFleet } =
     useCollectorPermissions();
+  const hasBulkActions = useHasBulkActions();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [deletingSource, setDeletingSource] = useState<Source | null>(null);
@@ -441,7 +442,9 @@ const FleetDetail = ({ fleetId }: Props) => {
             entityAttributesAreCamelCase={false}
             columnRenderers={instanceRenderers}
             defaultFilters={defaultInstanceFilters}
-            bulkSelection={{ actions: <BulkActions />, isEntitySelectable: isInstanceSelectable }}
+            bulkSelection={
+              hasBulkActions ? { actions: <BulkActions />, isEntitySelectable: isInstanceSelectable } : undefined
+            }
           />
         </>
       )}

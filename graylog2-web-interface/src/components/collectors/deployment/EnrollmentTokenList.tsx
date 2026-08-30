@@ -27,7 +27,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Sort } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import BulkActions from './BulkActions';
+import BulkActions, { useHasBulkActions } from './BulkActions';
 
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import {
@@ -122,6 +122,7 @@ const EnrollmentTokenList = () => {
   const { deleteEnrollmentToken } = useCollectorsMutations();
   const { data: fleets } = useFleets();
   const { canDeleteToken } = useCollectorPermissions();
+  const hasBulkActions = useHasBulkActions();
   const sendTelemetry = useSendCollectorsTelemetry();
   const [deletingToken, setDeletingToken] = useState<EnrollmentTokenMetadata | null>(null);
 
@@ -175,7 +176,9 @@ const EnrollmentTokenList = () => {
         entityAttributesAreCamelCase={false}
         columnRenderers={renderers}
         entityActions={entityActions}
-        bulkSelection={{ actions: <BulkActions />, isEntitySelectable: isTokenSelectable }}
+        bulkSelection={
+          hasBulkActions ? { actions: <BulkActions />, isEntitySelectable: isTokenSelectable } : undefined
+        }
       />
       {deletingToken && (
         <ConfirmDialog

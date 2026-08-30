@@ -50,28 +50,39 @@ describe('CollectorsInstances', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    asMock(useFleets).mockReturnValue({ data: [], isLoading: false });
+    asMock(useFleets).mockReturnValue({
+      data: [
+        { id: 'fleet-1', name: 'Production', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
+        { id: 'fleet-2', name: 'Staging', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
+      ],
+      isLoading: false,
+    });
     asMock(useSources).mockReturnValue({ data: [] } as never);
     asMock(useDefaultInstanceFilters).mockReturnValue([] as never);
     asMock(useCollectorRefetchInterval).mockReturnValue(false as never);
   });
 
+  const bulkSelection = () => {
+    const [props] = asMock(PaginatedEntityTable).mock.calls[0];
+
+    return (
+      props as {
+        bulkSelection?: { isEntitySelectable: (entity: { id: string; fleet_id: string }) => boolean };
+      }
+    ).bulkSelection;
+  };
+
   // Bulk reassign is filtered server-side by read+assign on each instance's *current* fleet
   // (CollectorInstancesResource#reassignInstances). The row checkboxes have to say the same, since
   // a selection here can span fleets.
-  const isEntitySelectable = () => {
-    const [props] = asMock(PaginatedEntityTable).mock.calls[0];
+  const isEntitySelectable = () => bulkSelection().isEntitySelectable;
 
-    return (props as { bulkSelection: { isEntitySelectable: (entity: { id: string; fleet_id: string }) => boolean } })
-      .bulkSelection.isEntitySelectable;
-  };
-
-  it('marks instances unselectable without assign permission on their fleet', () => {
+  it('hides bulk selection when no fleet accepts reassigned instances', () => {
     asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
 
     render(<CollectorsInstances />);
 
-    expect(isEntitySelectable()({ id: 'i-1', fleet_id: 'fleet-1' })).toBe(false);
+    expect(bulkSelection()).toBeUndefined();
   });
 
   it('marks instances selectable with assign permission on their fleet', () => {

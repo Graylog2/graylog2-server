@@ -21,7 +21,7 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
 import customColumnRenderers from './ColumnRenderers';
 import InstanceActions from './InstanceActions';
-import BulkActions from './BulkActions';
+import BulkActions, { useHasBulkActions } from './BulkActions';
 import { DEFAULT_LAYOUT } from './Constants';
 import { InstanceDetailDrawer } from './index';
 
@@ -43,6 +43,7 @@ const CollectorsInstances = () => {
   const defaultFilters = useDefaultInstanceFilters();
   const refetchInterval = useCollectorRefetchInterval();
   const { canAssignToFleet } = useCollectorPermissions();
+  const hasBulkActions = useHasBulkActions();
 
   const fleetNames = useMemo(() => Object.fromEntries((fleets ?? []).map((fleet) => [fleet.id, fleet.name])), [fleets]);
 
@@ -72,7 +73,9 @@ const CollectorsInstances = () => {
         entityAttributesAreCamelCase={false}
         columnRenderers={columnRenderers}
         defaultFilters={defaultFilters}
-        bulkSelection={{ actions: <BulkActions />, isEntitySelectable: isInstanceSelectable }}
+        bulkSelection={
+          hasBulkActions ? { actions: <BulkActions />, isEntitySelectable: isInstanceSelectable } : undefined
+        }
       />
 
       {selectedInstance && (
