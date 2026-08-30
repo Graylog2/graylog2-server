@@ -37,7 +37,7 @@ import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { AGENT_ID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
-import { useInstance, useInstancePendingChanges } from '../hooks';
+import { useInstance, useInstancePendingChanges, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { instanceTelemetryProps } from '../hooks/telemetry-helpers';
 import type { CoalescedActions, CollectorInstanceView, Source, TargetInfo } from '../types';
@@ -128,6 +128,7 @@ const InstanceDetailDrawer = ({ instance: instanceProp, sources, fleetName, onCl
   // The prop is a row snapshot frozen at drawer-open; poll the instance itself so
   // Status, Last Seen, and Health stay live (same pattern as the sync section below).
   // Errors here are non-fatal — we keep rendering the last known instance.
+  const { canReadSystemLogs } = useCollectorPermissions();
   const { data: freshInstance } = useInstance(instanceProp.instance_uid);
   const instance = freshInstance ?? instanceProp;
   const { data: pendingDetail, isError: pendingError } = useInstancePendingChanges(instance.instance_uid);
@@ -210,20 +211,22 @@ const InstanceDetailDrawer = ({ instance: instanceProp, sources, fleetName, onCl
           <span>{instance.version || 'Unknown'}</span>
         </DetailRow>
 
-        <DetailRow>
-          <DetailLabel>Logs:</DetailLabel>
-          <Link
-            to={collectorSystemLogsUrl(instance.instance_uid)}
-            onClick={() =>
-              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
-                app_action_value: 'instance-drawer-view-logs',
-                ...instanceTelemetryProps(instance),
-                origin: 'detail-drawer',
-              })
-            }>
-            View System Logs
-          </Link>
-        </DetailRow>
+        {canReadSystemLogs && (
+          <DetailRow>
+            <DetailLabel>Logs:</DetailLabel>
+            <Link
+              to={collectorSystemLogsUrl(instance.instance_uid)}
+              onClick={() =>
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
+                  app_action_value: 'instance-drawer-view-logs',
+                  ...instanceTelemetryProps(instance),
+                  origin: 'detail-drawer',
+                })
+              }>
+              View System Logs
+            </Link>
+          </DetailRow>
+        )}
 
         <DetailRow>
           <DetailLabel>Messages:</DetailLabel>

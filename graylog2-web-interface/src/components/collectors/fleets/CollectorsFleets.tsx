@@ -32,12 +32,13 @@ import { DEFAULT_LAYOUT } from './Constants';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
 import { AGENT_FLEET_ID_FIELD } from '../common/fields';
-import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../hooks';
+import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
 const CollectorsFleets = () => {
   const { createFleet } = useCollectorsMutations();
+  const { canCreateFleet } = useCollectorPermissions();
   const { pathname } = useLocation();
   const history = useHistory();
   const sendTelemetry = useSendCollectorsTelemetry();
@@ -91,7 +92,7 @@ const CollectorsFleets = () => {
         entityActions={fleetActions}
       />
 
-      {showFleetModal && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
+      {showFleetModal && canCreateFleet && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
     </>
   );
 };

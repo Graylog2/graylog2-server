@@ -32,7 +32,7 @@ import FleetCardsGrid from './FleetCardsGrid';
 import RecentActivity from './RecentActivity';
 import FirstOnboarding from './FirstOnboarding';
 
-import { useCollectorStats, useFleetsBulkStats } from '../hooks';
+import { useCollectorStats, useFleetsBulkStats, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 
 const StatsRow = styled.div(
@@ -151,12 +151,16 @@ const CollectorsOverview = () => {
   const [filter, setFilter] = useState('');
   const { data: stats, isLoading, isError } = useCollectorStats();
   const showOnboarding = useFeature('collectors_onboarding');
+  const { canCreateFleet } = useCollectorPermissions();
 
   if (isLoading) return <Spinner />;
 
   if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
 
-  if (showOnboarding && stats.total_instances === 0) return <FirstOnboarding />;
+  // A user who can't create a fleet has no path forward in the wizard (its every write —
+  // create fleet, create source, mint an enrollment token — requires it). Falling through to the
+  // normal overview instead of a wizard whose first action 403s. See FirstOnboarding.tsx.
+  if (showOnboarding && canCreateFleet && stats.total_instances === 0) return <FirstOnboarding />;
 
   return (
     <div>
