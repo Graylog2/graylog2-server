@@ -15,11 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import EnrollmentTokenList from './EnrollmentTokenList';
 
@@ -28,6 +32,7 @@ import type { EnrollmentTokenMetadata, Fleet } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('logic/telemetry/useSendTelemetry');
+jest.mock('hooks/useCurrentUser');
 jest.mock('../hooks/useFleetQueries');
 jest.mock('../hooks/useCollectorsMutations');
 jest.mock('../hooks/useEnrollmentTokenQueries', () => ({
@@ -35,6 +40,9 @@ jest.mock('../hooks/useEnrollmentTokenQueries', () => ({
   fetchPaginatedEnrollmentTokens: jest.fn(),
   enrollmentTokensKeyFn: jest.fn((params) => ['collectors', 'enrollment-tokens', 'paginated', params]),
 }));
+
+const userWith = (permissions: Array<string>) =>
+  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
 
 const mockFleets: Fleet[] = [
   {
@@ -91,6 +99,7 @@ describe('EnrollmentTokenList', () => {
     jest.clearAllMocks();
 
     asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
     asMock(useFleets).mockReturnValue({
       data: mockFleets,
       isLoading: false,
@@ -254,5 +263,95 @@ describe('EnrollmentTokenList', () => {
         );
       });
     });
+  });
+});
+
+describe('EnrollmentTokenList permissions', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    asMock(useFleets).mockReturnValue({
+      data: mockFleets,
+      isLoading: false,
+    });
+
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        deleteEnrollmentToken: deleteEnrollmentTokenMock,
+      }),
+    );
+
+    asMock(fetchPaginatedEnrollmentTokens).mockResolvedValue(
+      mockPaginatedResponse([mockToken({ id: 'token-1', fleet_id: 'fleet-1' })]),
+    );
+  });
+
+  it('hides the delete action without token delete on the token fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_enrollment_tokens:read:fleet-1']));
+
+    render(<EnrollmentTokenList />);
+
+    await screen.findByText('Test token');
+
+    expect(screen.queryByRole('button', { name: /more actions/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /delete/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the delete action when token delete is permitted on the token fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_enrollment_tokens:read:fleet-1', 'collector_enrollment_tokens:delete:fleet-1']),
+    );
+
+    render(<EnrollmentTokenList />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+
+    await screen.findByRole('menuitem', { name: /delete/i });
+  });
+
+  // No fleet grants a bulk action, so the whole column goes rather than rendering dead checkboxes.
+  it('hides bulk selection when the user may not delete tokens in any fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_enrollment_tokens:read:fleet-1']));
+
+    render(<EnrollmentTokenList />);
+
+    await screen.findByText('Test token');
+
+    expect(screen.queryByRole('checkbox', { name: /select entity/i })).not.toBeInTheDocument();
+  });
+
+  it('enables bulk selection for a token the user may delete', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_enrollment_tokens:read:fleet-1', 'collector_enrollment_tokens:delete:fleet-1']),
+    );
+
+    render(<EnrollmentTokenList />);
+
+    await screen.findByText('Test token');
+
+    expect(await screen.findByRole('checkbox', { name: /select entity/i })).toBeEnabled();
+  });
+
+  // The selection spans fleets, so the gate has to be per row rather than per table: the backend
+  // filters a bulk delete down to the permitted tokens, and the checkboxes must say the same.
+  it('gates bulk selection per row when delete is granted on only one fleet', async () => {
+    asMock(fetchPaginatedEnrollmentTokens).mockResolvedValue(
+      mockPaginatedResponse([
+        mockToken({ id: 'token-1', name: 'Token 1', fleet_id: 'fleet-1' }),
+        mockToken({ id: 'token-2', name: 'Token 2', fleet_id: 'fleet-2' }),
+      ]),
+    );
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_enrollment_tokens:read', 'collector_enrollment_tokens:delete:fleet-1']),
+    );
+
+    render(<EnrollmentTokenList />);
+
+    await screen.findByText('Token 1');
+
+    const [fleetOneCheckbox, fleetTwoCheckbox] = await screen.findAllByRole('checkbox', { name: /select entity/i });
+
+    expect(fleetOneCheckbox).toBeEnabled();
+    expect(fleetTwoCheckbox).toBeDisabled();
   });
 });

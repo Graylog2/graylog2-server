@@ -15,12 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import { useCollectorStats, useFleetsBulkStats } from 'components/collectors/hooks';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import CollectorsOverview from './CollectorsOverview';
 
@@ -34,6 +38,12 @@ jest.mock('components/collectors/hooks', () => ({
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn() }));
 jest.mock('./RecentActivity', () => () => null);
 jest.mock('./FirstOnboarding', () => () => <div data-testid="first-onboarding">Onboarding wizard</div>);
+// useCollectorPermissions is left un-mocked above (real implementation via jest.requireActual),
+// so it runs the real isPermitted logic against whatever user useCurrentUser returns here.
+jest.mock('hooks/useCurrentUser');
+
+const userWith = (permissions: Array<string>) =>
+  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
 
 describe('CollectorsOverview telemetry', () => {
   const sendTelemetry = jest.fn();
@@ -49,6 +59,7 @@ describe('CollectorsOverview telemetry', () => {
     asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
     asMock(useCollectorStats).mockReturnValue({ data: stats, isLoading: false, isError: false } as never);
     asMock(useFleetsBulkStats).mockReturnValue({ data: { fleets: [] }, isLoading: false, isError: false } as never);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
     sendTelemetry.mockClear();
   });
 
@@ -90,6 +101,7 @@ describe('CollectorsOverview onboarding', () => {
   beforeEach(() => {
     asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
     asMock(useFleetsBulkStats).mockReturnValue({ data: { fleets: [] }, isLoading: false, isError: false } as never);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   it('renders the onboarding wizard when there are no instances', () => {
@@ -98,6 +110,20 @@ describe('CollectorsOverview onboarding', () => {
     render(<CollectorsOverview />);
 
     expect(screen.getByTestId('first-onboarding')).toBeInTheDocument();
+  });
+
+  it('falls through to the normal overview for a user without collector_fleets:create, even with no instances', () => {
+    // A "Collectors Reader" with no fleet grants: total_instances is scoped to readable fleets
+    // and comes back 0, but the wizard's first write (create fleet) would 403. Regression test
+    // for the crux of this branch's final fix wave: losing the whole page to that 403 defeats
+    // the entity-scoped-permissions design this branch exists to deliver.
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collectors_config:read']));
+    mockStats(emptyStats);
+
+    render(<CollectorsOverview />);
+
+    expect(screen.queryByTestId('first-onboarding')).not.toBeInTheDocument();
+    expect(screen.getByText('Sources')).toBeInTheDocument();
   });
 
   it('renders the normal overview when instances exist', () => {

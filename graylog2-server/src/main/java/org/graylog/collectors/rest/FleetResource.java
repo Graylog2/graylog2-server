@@ -160,6 +160,7 @@ public class FleetResource extends RestResource {
         final var sourceCountByFleet = sourceService.countByFleetGrouped();
 
         final List<BulkFleetStatsResponse.FleetStatsSummary> summaries = fleets.stream()
+                .filter(fleet -> isPermitted(CollectorsPermissions.FLEET_READ, fleet.id()))
                 .sorted(Comparator.comparing(FleetDTO::name))
                 .map(fleet -> {
                     final var count = instanceCounts.getOrDefault(fleet.id(), new InstanceCount(0L, 0L));
