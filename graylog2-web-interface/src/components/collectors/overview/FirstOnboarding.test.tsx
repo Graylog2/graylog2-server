@@ -25,9 +25,10 @@ import type { CollectorInstanceView } from 'components/collectors/types';
 
 import FirstOnboarding from './FirstOnboarding';
 
-import { useCollectorsMutations, useFleets } from '../hooks';
+import { useCollectorsMutations, useCollectorPermissions, useFleets } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { mockCollectorsMutations } from '../testing/mockMutations';
+import { mockCollectorPermissions } from '../testing/mockPermissions';
 
 jest.mock('../hooks');
 jest.mock('../hooks/useSendCollectorsTelemetry');
@@ -118,6 +119,7 @@ describe('FirstOnboarding', () => {
     asMock(useCollectorsMutations).mockReturnValue(
       mockCollectorsMutations({ createEnrollmentToken, createFleet, createSource }),
     );
+    asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions());
     createEnrollmentToken.mockResolvedValue({
       token: 'test-token-abc',
       fleet_id: 'fleet-1',
@@ -210,6 +212,19 @@ describe('FirstOnboarding', () => {
     render(<FirstOnboarding />);
 
     expect(screen.getByRole('button', { name: /linux/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /create new fleet/i })).not.toBeInTheDocument();
+  });
+
+  it('hides the create-new-fleet affordance for a user without collector_fleets:create', async () => {
+    asMock(useFleets).mockReturnValue({ data: multipleFleets, isLoading: false });
+    asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions({ canCreateFleet: false }));
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+    // Only the existing-fleet dropdown remains reachable — no ungated create-fleet write.
+    expect(await screen.findByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create new fleet/i })).not.toBeInTheDocument();
   });
 
