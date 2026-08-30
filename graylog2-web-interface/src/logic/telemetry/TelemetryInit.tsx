@@ -45,6 +45,7 @@ const init = (key: string, host: string) => {
     capture_pageleave: false,
     cross_subdomain_cookie: false,
     persistence: 'cookie',
+    strict_script_versioning: true,
   });
 
   return posthog;

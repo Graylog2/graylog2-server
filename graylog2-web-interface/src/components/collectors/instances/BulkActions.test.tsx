@@ -14,16 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
+import { useFleets } from 'components/collectors/hooks';
 
 import BulkActions from './BulkActions';
 
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
+jest.mock('hooks/useCurrentUser');
+jest.mock('components/collectors/hooks', () => ({
+  __esModule: true,
+  ...jest.requireActual('components/collectors/hooks'),
+  useFleets: jest.fn(),
+}));
 jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void; onSuccess: () => void }) => (
   <div data-testid="reassign-modal">
     <button type="button" onClick={props.onClose}>
@@ -34,6 +45,9 @@ jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void; onSuccess
     </button>
   </div>
 ));
+
+const userWith = (permissions: Array<string>) =>
+  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
 
 const setSelectedEntitiesMock = jest.fn();
 
@@ -55,6 +69,10 @@ describe('BulkActions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
+    asMock(useFleets).mockReturnValue({ data: [{ id: 'f-1', name: 'Fleet 1' }], isLoading: false } as never);
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read:f-1', 'collector_fleets:assign_instance:f-1']),
+    );
   });
 
   it('renders bulk actions dropdown', async () => {
@@ -124,5 +142,13 @@ describe('BulkActions', () => {
     await userEvent.click(await screen.findByRole('button', { name: /succeed/i }));
 
     expect(setSelectedEntitiesMock).toHaveBeenCalledWith([]);
+  });
+
+  it('hides the dropdown when the user cannot assign into any fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read:f-1']));
+
+    render(<BulkActions />);
+
+    expect(screen.queryByRole('button', { name: /bulk actions/i })).not.toBeInTheDocument();
   });
 });
