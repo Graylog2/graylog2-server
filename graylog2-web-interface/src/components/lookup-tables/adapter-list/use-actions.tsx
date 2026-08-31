@@ -34,7 +34,7 @@ type ActionsProps = {
 
 function Actions({ adapter }: ActionsProps) {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('lut_data_adapter');
   const { deleteDataAdapter, deletingDataAdapter } = useDeleteDataAdapter();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const { push } = useHistory();
@@ -46,7 +46,6 @@ function Actions({ adapter }: ActionsProps) {
   const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DATA_ADAPTER_DELETED, {
       app_pathname: 'lut',
-      app_section: 'lut_data_adapter',
     });
 
     deleteDataAdapter(adapter.id).then(() => setShowDeleteModal(false));

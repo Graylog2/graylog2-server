@@ -29,15 +29,19 @@ import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils
 
 import ChartColorContext from './ChartColorContext';
 
-import InteractiveContext from '../contexts/InteractiveContext';
+import { useIsInteractiveMode, useIsReadOnlyMode } from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 export type PlotLayout = Layout;
 
-const StyledPlot = styled(Plot)(
-  ({ theme }) => css`
+const StyledPlot = styled(Plot)<{ $interactive: boolean }>(
+  ({ theme, $interactive }) => css`
     .customPopover .popover-content {
       padding: 0;
+    }
+
+    path.js-fill {
+      fill-opacity: 0.25 !important;
     }
 
     .hoverlayer .hovertext {
@@ -54,6 +58,13 @@ const StyledPlot = styled(Plot)(
         stroke: ${theme.colors.global.contentBackground} !important;
       }
     }
+
+    ${!$interactive &&
+    css`
+      .cursor-pointer {
+        cursor: default !important;
+      }
+    `}
   `,
 );
 
@@ -112,6 +123,9 @@ type Axis = {
 const nonInteractiveLayout = {
   yaxis: { fixedrange: true },
   xaxis: { fixedrange: true },
+};
+
+const disabledLayout = {
   hovermode: false,
 };
 
@@ -126,7 +140,8 @@ const defaultPlotConfig: Partial<Plotly.Config> = {
 
 const usePlotLayout = (layout: Partial<Layout>) => {
   const theme = useTheme();
-  const interactive = useContext(InteractiveContext);
+  const isInteractive = useIsInteractiveMode();
+  const isReadOnly = useIsReadOnlyMode();
   const { colors } = useContext(ChartColorContext);
 
   return useMemo(() => {
@@ -176,8 +191,14 @@ const usePlotLayout = (layout: Partial<Layout>) => {
       line: { ...(shape?.line ?? {}), color: shape?.line?.color || colors.get(eventsDisplayName, EVENT_COLOR) },
     }));
 
-    return interactive ? plotLayout : merge({}, plotLayout, nonInteractiveLayout);
-  }, [colors, interactive, layout, theme]);
+    if (isInteractive) {
+      return plotLayout;
+    }
+
+    const lockedLayout = merge({}, plotLayout, nonInteractiveLayout);
+
+    return isReadOnly ? lockedLayout : merge({}, lockedLayout, disabledLayout);
+  }, [colors, isInteractive, isReadOnly, layout, theme]);
 };
 
 const usePlotChartData = (
@@ -226,7 +247,7 @@ const GenericPlot = ({
   onAfterPlot = () => {},
   onInitialized = () => {},
 }: Props) => {
-  const interactive = useContext(InteractiveContext);
+  const isInteractive = useIsInteractiveMode();
   const plotLayout = usePlotLayout(layout);
   const plotChartData = usePlotChartData(chartData, setChartColor);
 
@@ -301,15 +322,16 @@ const GenericPlot = ({
 
   return (
     <StyledPlot
+      $interactive={isInteractive}
       data={plotChartData}
       useResizeHandler
       layout={plotLayoutWithRevision}
       style={style}
       onAfterPlot={_onAfterPlot}
-      onClick={interactive ? _onMarkerClick : () => false}
+      onClick={isInteractive ? _onMarkerClick : () => false}
       onHover={_onHoverMarker}
       onUnhover={onUnhoverMarker}
-      onRelayout={interactive ? _onRelayout : () => {}}
+      onRelayout={isInteractive ? _onRelayout : () => {}}
       config={plotConfig}
       onInitialized={onInitialized}
     />

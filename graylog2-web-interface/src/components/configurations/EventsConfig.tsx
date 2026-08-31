@@ -20,7 +20,6 @@ import capitalize from 'lodash/capitalize';
 import moment from 'moment';
 
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -56,7 +55,7 @@ const EventsConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [viewConfig, setViewConfig] = useState<Config>(DEFAULT_CONFIG);
   const [formConfig, setFormConfig] = useState<Config>(DEFAULT_CONFIG);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {

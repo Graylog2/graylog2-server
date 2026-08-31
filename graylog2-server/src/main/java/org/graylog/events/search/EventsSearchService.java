@@ -25,17 +25,24 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.events.search.EventsSearchFilter.NULL_VALUE;
 
 public class EventsSearchService extends AbstractEventsSearchService {
+    // Upper bound on the values returned per filter option field. The dropdown shows the most-used
+    // values first and relies on the field query for anything beyond the cap.
+    private static final int MAX_FILTER_OPTIONS = 50;
+
     private final MoreSearch moreSearch;
     private final StreamService streamService;
     private final EventDefinitionFilterFactory eventDefinitionFilterFactory;
@@ -96,6 +103,57 @@ public class EventsSearchService extends AbstractEventsSearchService {
         final var result = moreSearch.histogram(parameters, filter, eventStreams, allowedSourceStreams(subject), allowedEventDefinitions(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
+    }
+
+    /**
+     * Returns the values the events table can be filtered by, collected from the events the subject is
+     * permitted to see. Deliberately aggregates through {@link MoreSearch} rather than the views search
+     * engine so that the source stream permissions of the subject are the only thing scoping the result.
+     */
+    public EventsFilterOptions filterOptions(EventsFilterOptionsRequest request, Subject subject) {
+        final var tags = request.fields().contains(EventDto.FIELD_TAGS)
+                ? distinctValues(EventDto.FIELD_TAGS, request, subject)
+                : null;
+
+        return new EventsFilterOptions(tags);
+    }
+
+    /**
+     * Returns the distinct values of the given field, most used first, optionally narrowed to values
+     * containing the request's field query.
+     */
+    private List<String> distinctValues(String field, EventsFilterOptionsRequest request, Subject subject) {
+        final var eventStreams = allowedEventStreams(subject);
+        if (eventStreams.isEmpty()) {
+            return List.of();
+        }
+
+        final var bucketPattern = isNullOrEmpty(request.fieldQuery()) ? null : containsPattern(request.fieldQuery());
+        return moreSearch.aggregateSlicesForColumn(request.query(), request.timerange(), eventStreams, "",
+                        allowedSourceStreams(subject), allowedEventDefinitions(subject), field, bucketPattern,
+                        Map.of(), MAX_FILTER_OPTIONS)
+                .stream()
+                .map(Slice::value)
+                .filter(value -> !isNullOrEmpty(value))
+                .toList();
+    }
+
+    /**
+     * Builds a Lucene regular expression matching values that contain the given text. Lucene regexes
+     * have no case-insensitivity flag, but tags are lowercased at write time (see TagNormalizer), so
+     * lowercasing the input suffices. Revisit before reusing for fields that aren't normalized this
+     * way. Escaping every non-alphanumeric character keeps the input literal.
+     */
+    private static String containsPattern(String fieldQuery) {
+        final var escaped = new StringBuilder();
+        // Iterate code points so surrogate pairs aren't escaped as two broken halves.
+        fieldQuery.toLowerCase(Locale.ROOT).codePoints().forEach(codePoint -> {
+            if (!Character.isLetterOrDigit(codePoint)) {
+                escaped.append('\\');
+            }
+            escaped.appendCodePoint(codePoint);
+        });
+        return ".*" + escaped + ".*";
     }
 
     private AbsoluteRange effectiveTimeRange(EventsSearchParameters parameters) {

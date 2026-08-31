@@ -34,7 +34,13 @@ import Collapsible from 'components/common/Collapsible';
 import IngestEndpointStatus from './IngestEndpointStatus';
 import PortMismatchAlert from './PortMismatchAlert';
 
-import { useCollectorsConfig, useCollectorInputIds, useCollectorsMutations, useCollectorInputDetails } from '../hooks';
+import {
+  useCollectorsConfig,
+  useCollectorInputIds,
+  useCollectorsMutations,
+  useCollectorInputDetails,
+  useCollectorPermissions,
+} from '../hooks';
 import type { CollectorsConfigRequest } from '../types';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { classifyHostname, classifyInputBind } from '../hooks/telemetry-helpers';
@@ -50,7 +56,7 @@ const SectionTitle = styled.h3(
 const HelpText = styled.p(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     margin-bottom: ${theme.spacings.md};
   `,
 );
@@ -77,6 +83,7 @@ const CollectorsSettings = () => {
   const { data: collectorInputIds = [], isLoading: isLoadingInputIds } = useCollectorInputIds();
   const { loadedInputs: collectorInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
   const { data: inputStates } = useInputsStates({ enabled: collectorInputIds.length > 0 });
+  const { canEditConfig } = useCollectorPermissions();
 
   const isCloud = AppConfig.isCloud();
 
@@ -298,7 +305,14 @@ const CollectorsSettings = () => {
                 )}
               </Col>
 
-              <Collapsible label="Advanced options">
+              <Collapsible
+                label="Advanced options"
+                onToggle={(opened) =>
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SETTINGS.ADVANCED_TOGGLED, {
+                    app_action_value: 'settings-advanced-toggle',
+                    opened,
+                  })
+                }>
                 <Col md={6}>
                   <SectionTitle>Collector Lifecycle</SectionTitle>
 
@@ -365,13 +379,15 @@ const CollectorsSettings = () => {
               </Collapsible>
 
               <Col md={12}>
-                <FormSubmit
-                  isAsyncSubmit
-                  submitButtonText="Confirm settings"
-                  submitLoadingText="Saving..."
-                  isSubmitting={isSubmitting}
-                  displayCancel={false}
-                />
+                {canEditConfig && (
+                  <FormSubmit
+                    isAsyncSubmit
+                    submitButtonText="Confirm settings"
+                    submitLoadingText="Saving..."
+                    isSubmitting={isSubmitting}
+                    displayCancel={false}
+                  />
+                )}
               </Col>
             </Form>
           )}

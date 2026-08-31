@@ -15,201 +15,249 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
+import { Grid } from '@mantine/core';
+import moment from 'moment/moment';
 
-import { Alert, Label } from 'components/bootstrap';
-import { AccessibleCard } from 'components/common';
-import useHistory from 'routing/useHistory';
+import { Button } from 'components/bootstrap';
+import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 import Routes from 'routing/Routes';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import { useSources } from 'components/collectors/hooks/useSourceQueries';
-import StatCard from 'components/common/StatCard/StatCard';
+import { useCollectorLogPreview, PREVIEW_RANGE_SECONDS } from 'components/collectors/hooks/useCollectorLogPreview';
+import { instanceKeyFn } from 'components/collectors/hooks/useInstanceQueries';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
+import { instanceTelemetryProps } from 'components/collectors/hooks/telemetry-helpers';
 
-import type { PlatformId } from './platforms';
-import PLATFORMS from './platforms';
-import useCollectorLogPreview from './useCollectorLogPreview';
 import LogPreviewSection from './LogPreviewSection';
+import OnboardingTimeline from './OnboardingTimeline';
+import NextSteps from './NextSteps';
+import CollectorFactsSection from './CollectorFactsSection';
+import SourceStatusSection from './SourceStatusSection';
 
+import InstanceStatusLabel from '../../common/InstanceStatusLabel';
 import collectorReceivedMessagesUrl from '../../common/collectorReceivedMessagesUrl';
 import collectorSystemLogsUrl from '../../common/collectorSystemLogsUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../../common/fields';
+import { AGENT_ID_FIELD } from '../../common/fields';
+import { useCollectorPermissions } from '../../hooks';
 
 type Props = {
-  platformId?: PlatformId;
   instance: CollectorInstanceView;
   fleetName: string | undefined;
 };
 
-// Asset auto-detection has no backend yet — intentionally stays mocked until that feature ships.
-const MOCK_ASSETS = [
-  { type: 'host', name: 'example-host' },
-  { type: 'user', name: 'root' },
-];
-
-const SummaryRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.sm};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const StatsRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const SectionTitle = styled.h3(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.h3};
-    margin: 0 0 ${theme.spacings.sm} 0;
-  `,
-);
-
-const AssetsGrid = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const AssetCard = styled(AccessibleCard)(
-  ({ theme }) => css`
-    min-width: 150px;
-    padding: ${theme.spacings.md};
-  `,
-);
-
-const AssetType = styled.div(
-  ({ theme }) => css`
-    font-size: ${theme.fonts.size.small};
-    color: ${theme.colors.gray[60]};
-    text-transform: uppercase;
-    margin-bottom: ${theme.spacings.xxs};
-  `,
-);
-
-const AssetName = styled.div`
-  font-weight: 500;
+const Title = styled.h2`
+  margin: 0;
 `;
 
-const NextGrid = styled.div(
+const Subtitle = styled.div(
   ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.md};
-    flex-wrap: wrap;
+    margin-top: ${theme.spacings.xxs};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
-const NextCard = styled(AccessibleCard)(
-  ({ theme }) => css`
-    flex: 1;
-    min-width: 180px;
-    padding: ${theme.spacings.md};
+// The timeline and next-steps rails keep a readable width; the detail column takes what is left.
+const ColContainer = styled.div`
+  min-width: 350px;
+`;
 
-    h4 {
-      margin: 0 0 ${theme.spacings.xxs} 0;
-      font-size: ${theme.fonts.size.large};
-    }
+type OnboardingOutcome = 'offline' | 'online-silent' | 'online-receiving';
 
-    p {
-      margin: 0;
-      font-size: ${theme.fonts.size.small};
-      color: ${theme.colors.gray[60]};
-    }
-  `,
-);
+// One event per onboarding state, so entering a state always reports the same way.
+const ONBOARDING_STATE_EVENTS: Record<OnboardingOutcome, { eventType: TelemetryEventType; appActionValue: string }> = {
+  offline: {
+    eventType: TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.CONNECTION_LOST,
+    appActionValue: 'onboarding-connection-lost',
+  },
+  'online-silent': {
+    eventType: TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.AWAITING_DATA,
+    appActionValue: 'onboarding-awaiting-data',
+  },
+  'online-receiving': {
+    eventType: TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED,
+    // Unchanged from before the state machine, so existing dashboards keep working.
+    appActionValue: 'collector-onboarding-completed',
+  },
+};
 
-const LogPreviewsWrapper = styled.div(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.lg};
-  `,
-);
-
-const ConnectionSuccess = ({ platformId = undefined, instance, fleetName }: Props) => {
-  const history = useHistory();
-  const platform = PLATFORMS.find((p) => p.id === platformId);
-  const { selfLogs, sourceLogs, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
+const ConnectionSuccess = ({ instance, fleetName }: Props) => {
+  const { selfLogs, sourceLogs, sourceCounts, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
     instance.instance_uid,
   );
   const { data: sources } = useSources(instance.fleet_id);
+  const { canReadSystemLogs } = useCollectorPermissions();
+  const queryClient = useQueryClient();
+  const sendTelemetry = useSendCollectorsTelemetry();
+
+  const online = instance.status === 'online';
+  const receiving = (sourceLogs?.total ?? 0) > 0;
+  const sourceLogsUrl = collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid);
+
+  // Which of the page's three states the user is looking at; attached to every click event so
+  // interactions can be segmented by how the onboarding actually went.
+  let outcome: OnboardingOutcome = 'online-silent';
+  if (!online) outcome = 'offline';
+  else if (receiving) outcome = 'online-receiving';
+
+  // Onboarding is a three-state machine, and every entry into a state is worth an event.
+  // Emitting on *state entry* rather than on a condition being true is what stops the
+  // heartbeat-interval polling from re-firing events, and it is what makes a reconnect
+  // visible: offline -> online-silent is a real transition even though no data has arrived.
+  // `from_outcome` carries where we came from, so a funnel can be reconstructed from the
+  // events alone.
+  const previousOutcome = useRef<OnboardingOutcome | null>(null);
+  const completedReportedFor = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (previousOutcome.current === outcome) return;
+
+    const fromOutcome = previousOutcome.current;
+    previousOutcome.current = outcome;
+
+    const { eventType, appActionValue } = ONBOARDING_STATE_EVENTS[outcome];
+
+    // `Completed` is a funnel milestone rather than a state: a collector that drops and
+    // recovers re-enters the receiving state, but it has not onboarded a second time.
+    if (eventType === TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED) {
+      if (completedReportedFor.current === instance.instance_uid) return;
+
+      completedReportedFor.current = instance.instance_uid;
+    }
+
+    sendTelemetry(eventType, {
+      app_action_value: appActionValue,
+      ...instanceTelemetryProps(instance),
+      outcome,
+      from_outcome: fromOutcome,
+      // `outcome` alone cannot say whether messages ever arrived -- it collapses to 'offline'
+      // either way. This separates "worked, then died" from "never delivered anything".
+      // Scoped to the log-preview window, so it goes false once the last messages age out.
+      had_messages: receiving,
+      seconds_since_last_seen: moment().diff(moment(instance.last_seen), 'seconds'),
+    });
+  }, [outcome, receiving, instance, sendTelemetry]);
+
+  const reportNextStep = (appActionValue: string, link: string) =>
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.NEXT_STEP_CLICKED, {
+      app_action_value: appActionValue,
+      link,
+      outcome,
+    });
+
+  const subtitle = () => {
+    if (!online)
+      return (
+        <>
+          The collector connected once but hasn&apos;t reported in since <RelativeTime dateTime={instance.last_seen} />.
+        </>
+      );
+    if (receiving) return <>The collector is connected and delivering messages.</>;
+
+    return <>Almost there &mdash; the collector is connected and we&apos;re listening for its first messages.</>;
+  };
 
   return (
-    <div>
-      <Alert bsStyle="success">
-        Collector connected &mdash; <strong>{instance.hostname ?? instance.instance_uid}</strong>
-        {instance.version && (
-          <>
-            {' '}
-            running <strong>v{instance.version}</strong>
-          </>
+    <Stack gap="lg">
+      <Group justify="space-between" align="flex-start">
+        <div>
+          <Group gap="sm">
+            <Title>Setting Up {instance.hostname ?? instance.instance_uid}</Title>
+            {!online && <InstanceStatusLabel status={instance.status} />}
+          </Group>
+          <Subtitle>{subtitle()}</Subtitle>
+        </div>
+        {online ? (
+          <LinkContainer to={sourceLogsUrl}>
+            <Button bsStyle="success" onClick={() => reportNextStep('onboarding-open-in-search', 'search')}>
+              Open in search
+            </Button>
+          </LinkContainer>
+        ) : (
+          <Group gap="xs">
+            <LinkContainer to={Routes.SYSTEM.COLLECTORS.INSTANCES}>
+              <Button onClick={() => reportNextStep('onboarding-view-instances', 'instances')}>View instances</Button>
+            </LinkContainer>
+            <Button
+              bsStyle="info"
+              onClick={() => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.CHECK_AGAIN_CLICKED, {
+                  app_action_value: 'onboarding-check-again',
+                  status: instance.status,
+                });
+
+                queryClient.invalidateQueries({ queryKey: instanceKeyFn(instance.instance_uid) });
+              }}>
+              Check again
+            </Button>
+          </Group>
         )}
-      </Alert>
+      </Group>
 
-      <SummaryRow>
-        {fleetName && <Label>{fleetName}</Label>}
-        {platform && <Label>{platform.label}</Label>}
-        <Label>{sources?.length ?? 0} sources</Label>
-      </SummaryRow>
+      <Grid gutter="xl">
+        <Grid.Col span="content">
+          <ColContainer>
+            <OnboardingTimeline
+              instance={instance}
+              fleetName={fleetName}
+              sourceCount={sources?.length ?? 0}
+              receivedTotal={sourceLogs?.total}
+              onFleetLinkClick={() => reportNextStep('onboarding-fleet-link', 'fleet')}
+            />
+          </ColContainer>
+        </Grid.Col>
 
-      <StatsRow>
-        <StatCard value={instance.status === 'online' ? 1 : 0} label="Online" variant="success" />
-        <StatCard value={sourceLogs?.total ?? 0} label="Messages (15 min)" />
-        <StatCard value={sources?.length ?? 0} label="Sources" />
-      </StatsRow>
+        <Grid.Col span="auto">
+          <Stack gap="md">
+            <CollectorFactsSection
+              instance={instance}
+              fleetName={fleetName}
+              onFleetLinkClick={() => reportNextStep('onboarding-fleet-link', 'fleet')}
+            />
+            <SourceStatusSection
+              instance={instance}
+              sources={sources}
+              receiving={receiving}
+              sourceCounts={sourceCounts}
+              onConfigureSources={() => reportNextStep('onboarding-configure-sources', 'configure-sources')}
+            />
+          </Stack>
+        </Grid.Col>
+        <Grid.Col span="content">
+          <ColContainer>
+            <NextSteps instance={instance} onLinkClick={(link) => reportNextStep('onboarding-next-step', link)} />
+          </ColContainer>
+        </Grid.Col>
+      </Grid>
 
-      <LogPreviewsWrapper>
+      {/* While healthy the preview tails what the collector delivers; once it drops offline the
+          collector's own logs usually hold the reason, so they take over. */}
+      {online ? (
         <LogPreviewSection
-          title="Your log sources"
-          searchUrl={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}
+          title="Log Preview"
+          searchUrl={sourceLogsUrl}
           preview={sourceLogs}
           isLoading={isLoading}
           error={sourceLogsError}
+          caption={`Showing messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
+          onOpenSearch={() => reportNextStep('onboarding-log-preview-search', 'log-preview')}
         />
-
+      ) : (
         <LogPreviewSection
-          title="Collector logs"
-          searchUrl={collectorSystemLogsUrl(instance.instance_uid)}
+          title="Log Preview"
+          searchUrl={canReadSystemLogs ? collectorSystemLogsUrl(instance.instance_uid) : undefined}
           preview={selfLogs}
           isLoading={isLoading}
           error={selfLogsError}
-          collapsible
+          caption={`Showing Collector system messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
+          onOpenSearch={() => reportNextStep('onboarding-log-preview-search', 'log-preview')}
         />
-      </LogPreviewsWrapper>
-
-      <SectionTitle>Auto-detected assets</SectionTitle>
-      <AssetsGrid>
-        {MOCK_ASSETS.map((asset) => (
-          <AssetCard key={`${asset.type}-${asset.name}`}>
-            <AssetType>{asset.type}</AssetType>
-            <AssetName>{asset.name}</AssetName>
-          </AssetCard>
-        ))}
-      </AssetsGrid>
-
-      <SectionTitle>What&apos;s next?</SectionTitle>
-      <NextGrid>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}>
-          <h4>Manage Fleets</h4>
-          <p>Group collectors by environment or team.</p>
-        </NextCard>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id))}>
-          <h4>Configure Sources</h4>
-          <p>Add file paths, journald, or Windows Event Log sources.</p>
-        </NextCard>
-        <NextCard onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}>
-          <h4>View Instances</h4>
-          <p>Monitor all connected collector instances.</p>
-        </NextCard>
-      </NextGrid>
-    </div>
+      )}
+    </Stack>
   );
 };
 

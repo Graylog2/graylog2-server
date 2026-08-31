@@ -19,7 +19,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import type {
@@ -29,10 +28,8 @@ import type {
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 
 import useEventDefinitionSteps, { INITIAL_EVENT_DEFINITION } from './useEventDefinitionCommonSteps';
@@ -56,9 +53,7 @@ const STEP_KEYS = {
 
 type Props = {
   action?: 'edit' | 'create';
-  eventDefinition?: EventDefinition & {
-    share_request?: EntitySharePayload;
-  };
+  eventDefinition?: EventDefinition;
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
   initialStep?: string;
   onCancel?: () => void;
@@ -117,8 +112,7 @@ const EventDefinitionFormContainer = ({
   const { data: eventNotificationsData, isLoading: loadingEventNotifications } = useEventNotifications();
   const notifications = eventNotificationsData?.notifications ?? [];
   const currentUser = useCurrentUser();
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(action === 'create' ? 'new-event-definition' : 'edit-event-definition');
   const isNew = action === 'create';
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const hideFieldsStep = eventDefinitionType?.hideFieldsStep ?? false;
@@ -241,8 +235,6 @@ const EventDefinitionFormContainer = ({
 
     if (action === 'create') {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CREATE_CLICKED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'new-event-definition',
         app_action_value: 'create-event-definition-button',
         ...tacticsTechniquesTelemetry,
       });
@@ -250,8 +242,6 @@ const EventDefinitionFormContainer = ({
       createEventDefinition(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     } else {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'edit-event-definition',
         app_action_value: 'update-event-definition-button',
         ...tacticsTechniquesTelemetry,
       });
@@ -265,8 +255,6 @@ const EventDefinitionFormContainer = ({
 
   const handleCancel = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CANCEL_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'cancel-button',
     });
 

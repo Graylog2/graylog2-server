@@ -165,14 +165,13 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
   const dispatch = useViewsDispatch();
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-widget');
   const { parameters, parameterBindings } = useParameters();
   const [overflowingComponents, setOverflowingComponents] = useState<ActionComponents>({});
   const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
 
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
-      app_section: 'search-widget',
       app_action_value: 'widget-duplicate-button',
     });
 
@@ -182,7 +181,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const onCopyToDashboard = useCallback(
     (widgetId: string, dashboardId: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
-        app_section: 'search-widget',
         app_action_value: 'widget-copy-to-dashboard-button',
       });
 
@@ -193,7 +191,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
   const onCreateNewDashboard = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CREATE_NEW_DASHBOARD, {
-      app_section: 'search-widget',
       app_action_value: 'widget-create-new-dashboard-button',
     });
 
@@ -203,7 +200,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const onMoveWidgetToTab = useCallback(
     (widgetId: string, queryId: string, keepCopy: boolean) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.MOVE, {
-        app_section: 'search-widget',
         app_action_value: 'widget-move-button',
       });
 
@@ -213,7 +209,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   );
   const onDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DELETED, {
-      app_section: 'search-widget',
       app_action_value: 'widget-delete-button',
     });
 
@@ -221,7 +216,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [dispatch, sendTelemetry, title, view, widget]);
   const focusWidget = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.FOCUSED, {
-      app_section: 'search-widget',
       app_action_value: 'widget-focus-button',
     });
 
@@ -243,8 +237,10 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
             newTab
           />
         </IfDashboard>
-        <ExtraMenuWidgetActions widget={widget} />
         {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
+      </IfInteractive>
+      <ExtraMenuWidgetActions widget={widget} />
+      <IfInteractive>
         {!isFocused && (
           <>
             <WidgetHorizontalStretch

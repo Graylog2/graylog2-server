@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
@@ -25,38 +25,39 @@ import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
 import ConnectionSuccess from 'components/collectors/overview/onboarding/ConnectionSuccess';
-import type { PlatformId } from 'components/collectors/overview/onboarding/platforms';
 import Routes from 'routing/Routes';
 import useLocation from 'routing/useLocation';
 import { extractErrorMessage } from 'util/extractErrorMessage';
 import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
-  const location = useLocation<{ platformId?: PlatformId; fleetName?: string } | null>();
+  const location = useLocation<{ fleetName?: string } | null>();
   // Set by the onboarding wizard's history push; absent on direct visits.
-  const platformId = location.state?.platformId;
   const stateFleetName = location.state?.fleetName;
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
   const { data: fleet } = useFleet(instance?.fleet_id ?? '');
 
   const { mutate: finish } = useFinishOnboarding();
-  const sendTelemetry = useSendTelemetry();
 
-  // using useEffect to guard that the instance is actually there before we finish the onboarding
+  // Guards that the instance is actually there before we finish the onboarding. `useInstance`
+  // polls on the heartbeat interval and returns a new object each time, so this must be latched
+  // rather than keyed on the instance reference -- otherwise it re-POSTs every poll.
+  // The COMPLETED telemetry event lives in `ConnectionSuccess`, which knows whether messages
+  // are actually arriving.
+  const finishedFor = useRef<string | null>(null);
+
+  const { data: onboarding } = useOnboardingEligibility();
+  const onboardingInProgress = onboarding?.status === 'setup';
+
   useEffect(() => {
-    if (instance) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
-        app_section: 'collectors-onboarding',
-        app_action_value: 'collector-onboarding-completed',
-      });
+    if (!onboardingInProgress || !instance || finishedFor.current === instance.instance_uid) return;
 
-      finish();
-    }
-  }, [instance, finish, sendTelemetry]);
+    finishedFor.current = instance.instance_uid;
+    finish();
+  }, [onboardingInProgress, instance, finish]);
 
   const content = () => {
     if (isLoading) return <Spinner />;
@@ -74,7 +75,7 @@ const CollectorsOnboardingInstancePage = () => {
       );
     }
 
-    return <ConnectionSuccess platformId={platformId} instance={instance} fleetName={fleet?.name ?? stateFleetName} />;
+    return <ConnectionSuccess instance={instance} fleetName={fleet?.name ?? stateFleetName} />;
   };
 
   return (

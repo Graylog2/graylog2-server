@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Streams;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
@@ -48,6 +49,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.IncludeExclude;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.NumericMetricsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
@@ -342,10 +344,14 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                              Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                              EventDefinitionFilter eventDefinitionFilter,
-                                             Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
-        AggregationBuilder builder = AggregationBuilders.terms(slicesAggregationName)
+                                             Map<String, Set<String>> extraFilters, String slicingColumn, @Nullable String bucketPattern,
+                                             Map<String, Object> meta, int maxBuckets) {
+        TermsAggregationBuilder builder = AggregationBuilders.terms(slicesAggregationName)
                         .field(slicingColumn)
                         .size(maxBuckets);
+        if (bucketPattern != null) {
+            builder.includeExclude(new IncludeExclude(bucketPattern, null));
+        }
 
         return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, sourceStreamFilter, eventDefinitionFilter, extraFilters, meta, builder);
     }

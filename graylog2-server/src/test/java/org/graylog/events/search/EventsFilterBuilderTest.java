@@ -44,14 +44,26 @@ class EventsFilterBuilderTest {
     }
 
     @Test
-    void buildWithMultipleTagFiltersJoinsWithAND() {
+    void buildWithMultipleTagFiltersJoinsWithOR() {
         // LinkedHashSet keeps insertion order so the assertion against the full query string is
         // deterministic — EventsFilterBuilder iterates the tag set as-is.
         final var filter = EventsSearchFilter.builder()
                 .extraFilters(Map.of(EventDto.FIELD_TAGS, new LinkedHashSet<>(List.of("phishing", "exfil"))))
                 .build();
 
-        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phishing\" AND tags:\"exfil\")");
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phishing\" OR tags:\"exfil\")");
+    }
+
+    @Test
+    void buildAndsTagsClauseWithOtherAttributeFilters() {
+        // Tags OR internally, but the tags clause as a whole still ANDs with other attributes.
+        final var filter = EventsSearchFilter.builder()
+                .priority(Set.of("high"))
+                .extraFilters(Map.of(EventDto.FIELD_TAGS, new LinkedHashSet<>(List.of("phishing", "exfil"))))
+                .build();
+
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE
+                + " AND (priority:3) AND (tags:\"phishing\" OR tags:\"exfil\")");
     }
 
     @Test
@@ -76,7 +88,7 @@ class EventsFilterBuilderTest {
                 .extraFilters(Map.of(EventDto.FIELD_TAGS, Set.of("phish\"ing OR alert:true")))
                 .build();
 
-        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phish\\\"ing OR alert\\:true\")");
+        assertThat(build(filter)).isEqualTo(EVENT_DEFINITION_ID_CLAUSE + " AND (tags:\"phish\\\"ing\\ OR\\ alert\\:true\")");
     }
 
 }

@@ -23,7 +23,9 @@ import { formatDuration } from 'util/ISODurationUtils';
 type Props = {
   command: string;
   platformLabel: string;
-  tokenDuration: string;
+  tokenDuration: string | null;
+  actions?: React.ReactNode;
+  onCopySuccess?: () => void;
 };
 
 const Container = styled.div(
@@ -64,22 +66,39 @@ const CommandBlock = styled.pre(
 
 const Note = styled.p(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.small};
     margin: 0;
   `,
 );
 
-const InstallCommand = ({ command, platformLabel, tokenDuration }: Props) => (
+const HeaderActions = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+  `,
+);
+
+const InstallCommand = ({
+  command,
+  platformLabel,
+  tokenDuration,
+  actions = undefined,
+  onCopySuccess = undefined,
+}: Props) => (
   <Container>
     <Header>
-      <Title>Run this on {platformLabel}</Title>
-      <ClipboardButton text={command} title="Copy command" bsSize="sm" />
+      <Title>Run This on {platformLabel}</Title>
+      <HeaderActions>
+        {actions}
+        <ClipboardButton text={command} title="Copy command" bsSize="sm" onSuccess={onCopySuccess} />
+      </HeaderActions>
     </Header>
     <CommandBlock>{command}</CommandBlock>
     <Note>
-      Downloads the collector, enrolls it in the selected fleet, and starts collecting immediately. Token expires in{' '}
-      {formatDuration(tokenDuration, () => true)}.
+      Runs the collector, enrolls it in the selected fleet, and starts collecting immediately.{' '}
+      {tokenDuration ? <>Token expires in {formatDuration(tokenDuration, () => true)}.</> : 'This token never expires.'}
     </Note>
   </Container>
 );

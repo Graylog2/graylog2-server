@@ -19,12 +19,10 @@ import { useCallback } from 'react';
 import capitalize from 'lodash/capitalize';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { availableLoglevels } from 'components/loggers/Constants';
 import useSetSubsystemLoggerLevel from 'components/loggers/useSetSubsystemLoggerLevel';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 
 type Props = {
   name: string;
@@ -34,7 +32,6 @@ type Props = {
 
 const LogLevelDropdown = ({ nodeId, name, subsystem }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
   const { setSubsystemLoggerLevel } = useSetSubsystemLoggerLevel();
 
   const _changeLoglevel = useCallback(
@@ -46,7 +43,6 @@ const LogLevelDropdown = ({ nodeId, name, subsystem }: Props) => {
     _changeLoglevel(loglevel);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.LOG_LEVEL_EDITED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'log-level-change',
       event_details: { value: loglevel },
     });

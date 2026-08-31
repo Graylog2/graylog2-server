@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
@@ -28,7 +28,7 @@ import type { BackendMessage, Message } from 'views/components/messagelist/Types
 import Field from 'views/components/Field';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 import FieldSortIcon from './FieldSortIcon';
 import MessageTableEntry from './MessageTableEntry';
@@ -148,7 +148,7 @@ const MessageTable = ({
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
   const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
   const toggleDetail = useMemo(
     () =>
       interactive
