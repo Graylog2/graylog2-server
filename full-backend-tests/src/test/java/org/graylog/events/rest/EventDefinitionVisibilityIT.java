@@ -217,6 +217,29 @@ public class EventDefinitionVisibilityIT {
     }
 
     private static void setEnforcement(boolean enabled) {
+        writeEnforcement(enabled);
+        waitForConfigurationChangeToPropagate();
+    }
+
+    /**
+     * {@code EventDefinitionFilterFactory} holds the events configuration and refreshes it when the
+     * {@code ClusterConfigChangedEvent} reaches it. Locally produced cluster events are handed straight to
+     * the server event bus rather than waiting for a periodical, but that bus is asynchronous, so the
+     * refresh can still land just after the write request returns.
+     *
+     * @see org.graylog.events.search.EventDefinitionFilterFactory
+     * @see org.graylog2.events.ClusterEventService#publishClusterEvent
+     */
+    private static void waitForConfigurationChangeToPropagate() {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void writeEnforcement(boolean enabled) {
         api.put(EVENTS_CONFIG_URL, """
                 {
                   "events_search_timeout": 60000,
