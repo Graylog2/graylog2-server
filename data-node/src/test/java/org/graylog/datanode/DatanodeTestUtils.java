@@ -75,7 +75,7 @@ public class DatanodeTestUtils {
 
     public static DatanodeConfiguration mockDatanodeConfiguration(Path tempDir) {
         return new DatanodeConfiguration(
-                new OpensearchDistribution(tempDir, "2.19.5"),
+                new OpensearchDistribution(tempDir, "2.19.6"),
                 DatanodeTestUtils.tempDirectories(tempDir),
                 100,
                 IndexerJwtAuthToken.disabled()
