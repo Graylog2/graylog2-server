@@ -25,7 +25,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
@@ -94,6 +93,7 @@ import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.graylog.collectors.config.processor.ResourceProcessorConfig.Attribute.upsert;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -105,6 +105,16 @@ public class OpAmpService {
 
     private static final ComponentHealthExtractor COMPONENT_HEALTH_EXTRACTOR = new ComponentHealthExtractor();
     private static final JsonFormat.Printer PROTO_PRINTER = JsonFormat.printer().omittingInsignificantWhitespace();
+
+    // Limits for Collector-submitted identifying/non-identifying attributes. These bound both the
+    // persisted document size and the cost of the extractor itself, since the attribute list comes
+    // from an untrusted agent. See https://github.com/Graylog2/graylog2-server/issues/26901.
+    @VisibleForTesting
+    static final int MAX_ATTRIBUTES = 128;
+    @VisibleForTesting
+    static final int MAX_ATTRIBUTE_KEY_LENGTH = 256;
+    @VisibleForTesting
+    static final int MAX_ATTRIBUTE_VALUE_LENGTH = 1024;
 
     private final EnrollmentTokenService enrollmentTokenService;
     private final AgentTokenService agentTokenService;
@@ -142,18 +152,33 @@ public class OpAmpService {
                 .registerModule(new Jdk8Module());
     }
 
+    // Cap on how much of an untrusted, agent-submitted proto message we'll ever put in a log line.
+    // The attributes persisted to the instance document are bounded (see extractAttributes), but log
+    // output isn't, so without this an oversized/malicious OpAMP message or health tree can still
+    // blow up log volume even after persistence is bounded. See issue #26901.
+    private static final int MAX_LOGGED_PROTO_LENGTH = 2048;
+
     /**
-     * Converts the given protobuf message to a JSON string.
+     * Converts the given protobuf message to a JSON string, truncated to {@link #MAX_LOGGED_PROTO_LENGTH}.
      *
      * @param message the message to convert
-     * @return the JSON string or the #toString() result if the JSON converter fails
+     * @return the JSON string (possibly truncated) or the #toString() result if the JSON converter fails
      */
     private static String toProtoString(MessageOrBuilder message) {
+        return boundedProtoString(message, MAX_LOGGED_PROTO_LENGTH);
+    }
+
+    private static String boundedProtoString(MessageOrBuilder message, int maxLength) {
+        final String printed;
         try {
-            return PROTO_PRINTER.print(message);
+            printed = PROTO_PRINTER.print(message);
         } catch (Exception e) {
             return message.toString();
         }
+        if (printed.length() <= maxLength) {
+            return printed;
+        }
+        return printed.substring(0, maxLength) + f("... (truncated, %d bytes total)", printed.length());
     }
 
     public Optional<OpAmpAuthContext> authenticate(String authHeader, OpAmpAuthContext.Transport transport) {
@@ -460,20 +485,23 @@ public class OpAmpService {
     private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
         final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
 
-        if (LOG.isTraceEnabled()) {
-            try {
-                LOG.trace("Message from enrolled instance <{}>:\n{}", instanceUid, JsonFormat.printer().print(message));
-            } catch (Exception e) {
-                LOG.trace("Couldn't serialize message from instance <{}>", instanceUid, e);
-            }
-        }
+        // The full message is untrusted, agent-controlled input and can be large (e.g. a bulky
+        // AgentDescription or health tree); log a bounded excerpt rather than the complete payload so
+        // log volume stays bounded independent of what the agent sends. See issue #26901.
+        LOG.atTrace()
+                .setMessage("Message from enrolled instance <{}>:\n{}")
+                .addArgument(instanceUid)
+                .addArgument(() -> toProtoString(message))
+                .log();
 
         // payload and authentication context uids must match
         if (!Objects.equals(instanceUid, auth.instanceUid())) {
             return errorResponse(message, "Invalid instanceUid");
         }
         final long sequenceNum = message.getSequenceNum();
-        LOG.debug("[{}/{}] Handling OpAMP message from collector: {}", instanceUid, sequenceNum, message);
+        LOG.debug("[{}/{}] Handling OpAMP message from collector. capabilities={} hasAgentDescription={} hasHealth={} hasRemoteConfigStatus={}",
+                instanceUid, sequenceNum, message.getCapabilities(), message.hasAgentDescription(),
+                message.hasHealth(), message.hasRemoteConfigStatus());
 
         var appliedTxnSeq = OptionalLong.empty();
         final EnumSet<Opamp.AgentCapabilities> agentCapabilities = fromBitmask(message.getCapabilities());
@@ -492,7 +520,11 @@ public class OpAmpService {
                     // Otherwise it's "compressed", which means identical values aren't sent again
                     if (message.hasAgentDescription()) {
                         final Opamp.AgentDescription agentDescription = message.getAgentDescription();
-                        LOG.debug("[{}/{}] {}", instanceUid, sequenceNum, agentDescription);
+                        // Don't log the raw, untrusted AgentDescription here - extractAttributes()
+                        // below already emits a summary warning for anything it had to sanitize.
+                        LOG.debug("[{}/{}] AgentDescription: {} identifying, {} non-identifying attribute(s) submitted",
+                                instanceUid, sequenceNum, agentDescription.getIdentifyingAttributesCount(),
+                                agentDescription.getNonIdentifyingAttributesCount());
 
                         updateBuilder.identifyingAttributes(extractAttributes(instanceUid, sequenceNum, agentDescription.getIdentifyingAttributesList()));
                         updateBuilder.nonIdentifyingAttributes(extractAttributes(instanceUid, sequenceNum, agentDescription.getNonIdentifyingAttributesList()));
@@ -727,27 +759,94 @@ public class OpAmpService {
                 .build();
     }
 
+    /**
+     * Extracts, sanitizes, and de-duplicates Collector-submitted attributes.
+     * <p>
+     * The input comes from an untrusted agent, so this method bounds it before it's persisted:
+     * blank keys are skipped, keys and string/byte values are truncated to a fixed maximum length,
+     * duplicate keys (including ones that only collide after truncation) are collapsed to the last
+     * value seen, and at most {@link #MAX_ATTRIBUTES} entries are kept. Rather than logging each
+     * skipped/truncated/dropped attribute individually - which would let a malicious or malfunctioning
+     * agent flood the logs - a single summary warning is emitted for the whole batch.
+     */
+    @VisibleForTesting
     @Nonnull
-    private static List<Attribute> extractAttributes(String instanceUid, long sequenceNum, List<Anyvalue.KeyValue> attributesList) {
-        final List<Attribute> attributes = Lists.newArrayListWithExpectedSize(attributesList.size());
-        for (final Anyvalue.KeyValue keyValue : attributesList) {
-            final Anyvalue.AnyValue value = keyValue.getValue();
-            LOG.debug("[{}/{}] {} = {}", instanceUid, sequenceNum, keyValue.getKey(), value);
+    static List<Attribute> extractAttributes(String instanceUid, long sequenceNum, List<Anyvalue.KeyValue> attributesList) {
+        final Map<String, Attribute> byKey = Maps.newLinkedHashMapWithExpectedSize(
+                Math.min(attributesList.size(), MAX_ATTRIBUTES));
 
+        int blankKeys = 0;
+        int unsupportedType = 0;
+        int truncatedKeys = 0;
+        int truncatedValues = 0;
+        int duplicateKeys = 0;
+        int droppedOverLimit = 0;
+
+        for (final Anyvalue.KeyValue keyValue : attributesList) {
+            String key = keyValue.getKey();
+            if (isBlank(key)) {
+                blankKeys++;
+                continue;
+            }
+            if (key.length() > MAX_ATTRIBUTE_KEY_LENGTH) {
+                key = key.substring(0, MAX_ATTRIBUTE_KEY_LENGTH);
+                truncatedKeys++;
+            }
+
+            final Anyvalue.AnyValue value = keyValue.getValue();
+            final Object attributeValue;
             switch (value.getValueCase()) {
-                case STRING_VALUE -> attributes.add(Attribute.of(keyValue.getKey(), value.getStringValue()));
-                case BOOL_VALUE -> attributes.add(Attribute.of(keyValue.getKey(), value.getBoolValue()));
-                case INT_VALUE -> attributes.add(Attribute.of(keyValue.getKey(), value.getIntValue()));
-                case DOUBLE_VALUE -> attributes.add(Attribute.of(keyValue.getKey(), value.getDoubleValue()));
-                case BYTES_VALUE -> // TODO does this make sense for us?
-                        attributes.add(Attribute.of(keyValue.getKey(), value.getBytesValue()));
-                case ARRAY_VALUE, KVLIST_VALUE ->
-                        LOG.error("[{}/{}] Unsupported value type for identifying attributes, must be a scalar type but is {}", instanceUid, sequenceNum, value.getValueCase());
-                case VALUE_NOT_SET ->
-                        LOG.error("[{}/{}] Unsupported value type for identifying attributes, the value is undefined", instanceUid, sequenceNum);
+                case STRING_VALUE -> {
+                    final String raw = value.getStringValue();
+                    if (raw.length() > MAX_ATTRIBUTE_VALUE_LENGTH) {
+                        attributeValue = raw.substring(0, MAX_ATTRIBUTE_VALUE_LENGTH);
+                        truncatedValues++;
+                    } else {
+                        attributeValue = raw;
+                    }
+                }
+                case BOOL_VALUE -> attributeValue = value.getBoolValue();
+                case INT_VALUE -> attributeValue = value.getIntValue();
+                case DOUBLE_VALUE -> attributeValue = value.getDoubleValue();
+                case BYTES_VALUE -> {
+                    final ByteString raw = value.getBytesValue();
+                    if (raw.size() > MAX_ATTRIBUTE_VALUE_LENGTH) {
+                        attributeValue = raw.substring(0, MAX_ATTRIBUTE_VALUE_LENGTH);
+                        truncatedValues++;
+                    } else {
+                        attributeValue = raw;
+                    }
+                }
+                case ARRAY_VALUE, KVLIST_VALUE, VALUE_NOT_SET -> {
+                    unsupportedType++;
+                    continue;
+                }
+            }
+
+            // Only count real dedup (i.e. don't count the limit-check below against it), so if we're
+            // already at the cap, further duplicate keys just overwrite in place without eating into
+            // the attribute budget.
+            if (!byKey.containsKey(key) && byKey.size() >= MAX_ATTRIBUTES) {
+                droppedOverLimit++;
+                continue;
+            }
+            if (byKey.put(key, Attribute.of(key, attributeValue)) != null) {
+                duplicateKeys++;
             }
         }
-        return attributes;
+
+        if (blankKeys > 0 || unsupportedType > 0 || truncatedKeys > 0 || truncatedValues > 0
+                || duplicateKeys > 0 || droppedOverLimit > 0) {
+            LOG.warn("[{}/{}] Sanitized Collector-submitted attributes: {} blank key(s) skipped, " +
+                            "{} unsupported value type(s) skipped, {} key(s) truncated to {} chars, " +
+                            "{} value(s) truncated to {} chars/bytes, {} duplicate key(s) collapsed, " +
+                            "{} attribute(s) dropped over the {}-attribute limit",
+                    instanceUid, sequenceNum, blankKeys, unsupportedType, truncatedKeys,
+                    MAX_ATTRIBUTE_KEY_LENGTH, truncatedValues, MAX_ATTRIBUTE_VALUE_LENGTH, duplicateKeys,
+                    droppedOverLimit, MAX_ATTRIBUTES);
+        }
+
+        return List.copyOf(byKey.values());
     }
 
     private static EnumSet<Opamp.AgentCapabilities> fromBitmask(long capabilities) {
