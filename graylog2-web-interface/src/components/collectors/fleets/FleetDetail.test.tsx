@@ -148,7 +148,13 @@ describe('sourceActionsFactory', () => {
 
     const onEdit = jest.fn();
     const onViewMessages = jest.fn();
-    const actions = sourceActionsFactory({ onEdit, onDelete: jest.fn(), onViewMessages, canEdit: true, canDelete: true });
+    const actions = sourceActionsFactory({
+      onEdit,
+      onDelete: jest.fn(),
+      onViewMessages,
+      canEdit: true,
+      canDelete: true,
+    });
     render(<>{actions(source)}</>);
 
     await userEvent.click(await screen.findByRole('button', { name: /edit/i }));
@@ -165,7 +171,10 @@ describe('FleetDetail permissions', () => {
   const source = { id: 's-1', fleet_id: 'f-1', name: 'syslog', type: 'filelog', enabled: true } as never;
 
   const userWith = (permissions: Array<string>) =>
-    adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+    adminUser
+      .toBuilder()
+      .permissions(Immutable.List(permissions as Array<Permission>))
+      .build();
 
   beforeEach(() => {
     asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
@@ -191,9 +200,7 @@ describe('FleetDetail permissions', () => {
   });
 
   it('shows Add Source with source_create scoped to this fleet', async () => {
-    asMock(useCurrentUser).mockReturnValue(
-      userWith(['collector_fleets:read', 'collector_fleets:source_create:f-1']),
-    );
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:source_create:f-1']));
 
     render(<FleetDetail fleetId="f-1" />);
 

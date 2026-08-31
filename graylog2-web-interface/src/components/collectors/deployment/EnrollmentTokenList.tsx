@@ -176,9 +176,7 @@ const EnrollmentTokenList = () => {
         entityAttributesAreCamelCase={false}
         columnRenderers={renderers}
         entityActions={entityActions}
-        bulkSelection={
-          hasBulkActions ? { actions: <BulkActions />, isEntitySelectable: isTokenSelectable } : undefined
-        }
+        bulkSelection={hasBulkActions ? { actions: <BulkActions />, isEntitySelectable: isTokenSelectable } : undefined}
       />
       {deletingToken && (
         <ConfirmDialog

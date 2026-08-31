@@ -185,12 +185,10 @@ const getPointsInRadius = (candidates: Array<PointCandidate>) =>
     pointIdentity,
   );
 
-const getScatterRelativeCoordinates = (x: number, y: number, rect: DOMRect) => (
-  {
-    x: clamp01((x - rect.left) / Math.max(rect.width, 1)),
-    y: clamp01((y - rect.top) / Math.max(rect.height, 1)),
-  }
-)
+const getScatterRelativeCoordinates = (x: number, y: number, rect: DOMRect) => ({
+  x: clamp01((x - rect.left) / Math.max(rect.width, 1)),
+  y: clamp01((y - rect.top) / Math.max(rect.height, 1)),
+});
 
 const makeScatterAnchor = (e: PlotMouseEvent, gd: PlotlyHTMLElement): Anchor | null => {
   const graphDiv = gd;

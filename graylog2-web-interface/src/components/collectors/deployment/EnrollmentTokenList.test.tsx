@@ -42,7 +42,10 @@ jest.mock('../hooks/useEnrollmentTokenQueries', () => ({
 }));
 
 const userWith = (permissions: Array<string>) =>
-  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 const mockFleets: Fleet[] = [
   {

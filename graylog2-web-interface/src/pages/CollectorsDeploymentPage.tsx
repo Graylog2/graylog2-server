@@ -111,10 +111,10 @@ const CollectorsDeploymentPage = () => {
             )}
             {canViewEnrollmentTokens && (
               <Tabs.Panel value="tokens">
-              <p className="description">
-                Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect
-                already-enrolled Collectors.
-              </p>
+                <p className="description">
+                  Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect
+                  already-enrolled Collectors.
+                </p>
                 <EnrollmentTokenList />
               </Tabs.Panel>
             )}
