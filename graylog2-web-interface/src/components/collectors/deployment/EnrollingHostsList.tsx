@@ -25,7 +25,9 @@ import MutedText from 'components/collectors/common/MutedText';
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
 import useFleetReceivingCounts from 'components/collectors/hooks/useFleetReceivingCounts';
 import PulsingDot from 'components/collectors/overview/onboarding/PulsingDot';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import type { CollectorInstanceView } from 'components/collectors/types';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import Routes from 'routing/Routes';
 
 import EnrollingHostSetup from './EnrollingHostSetup';
@@ -107,6 +109,10 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
   // Expanding shows the concise connection-success view inline instead of navigating to the
   // detail page — leaving the wizard would lose the generated token and install command.
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const sendTelemetry = useSendCollectorsTelemetry();
+  // The first host checking in is the success moment of the deploy flow — report it once per
+  // mount (i.e. once per generated token, since the parent remounts this list per token).
+  const reportedFirstHost = useRef(false);
 
   useEffect(() => {
     if (!instances) return;
@@ -122,8 +128,27 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
       .filter((i) => !known.has(i.id))
       .sort((a, b) => (b.enrolled_at ?? '').localeCompare(a.enrolled_at ?? ''));
 
+    if (fresh.length > 0 && !reportedFirstHost.current) {
+      reportedFirstHost.current = true;
+
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.FIRST_HOST_ENROLLED, {
+        app_action_value: 'deployment-first-host-enrolled',
+        fleet_id: fleetId,
+      });
+    }
+
     setEnrolling(fresh);
-  }, [instances]);
+  }, [instances, fleetId, sendTelemetry]);
+
+  const handleToggleSetup = (i: CollectorInstanceView, expanded: boolean) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.HOST_SETUP_TOGGLED, {
+      app_action_value: 'deployment-host-setup',
+      expanded: !expanded,
+      instance_id: i.instance_uid,
+    });
+
+    setExpandedId(expanded ? null : i.id);
+  };
 
   const connectedCount = enrolling.filter((i) => i.status === 'online').length;
 
@@ -137,7 +162,16 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
             {enrolling.length > 0 ? `${connectedCount} connected · listening for more…` : 'listening…'}
           </Subtitle>
         </TitleGroup>
-        <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>View all in Instances</Link>
+        <Link
+          to={Routes.SYSTEM.COLLECTORS.INSTANCES}
+          onClick={() =>
+            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.LINK_CLICKED, {
+              app_action_value: 'deployment-view-all-instances',
+              link: 'instances',
+            })
+          }>
+          View all in Instances
+        </Link>
       </Header>
       {enrolling.length > 0 ? (
         <Table condensed>
@@ -168,7 +202,7 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
                       <RelativeTime dateTime={i.enrolled_at} />
                     </td>
                     <td>
-                      <Button bsStyle="link" bsSize="xsmall" onClick={() => setExpandedId(expanded ? null : i.id)}>
+                      <Button bsStyle="link" bsSize="xsmall" onClick={() => handleToggleSetup(i, expanded)}>
                         {expanded ? 'Hide setup' : 'View setup'}
                       </Button>
                     </td>

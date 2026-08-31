@@ -133,7 +133,7 @@ describe('MessageTable', () => {
     const configFields = ['gl2_receive_timestamp', 'user_id', 'gl2_source_input'];
     const configWithFields = MessagesWidgetConfig.builder().fields(configFields).build();
     render(
-      <InteractiveContext.Provider value={false}>
+      <InteractiveContext.Provider value="disabled">
         <SimpleMessageTable config={configWithFields} />
       </InteractiveContext.Provider>,
     );
@@ -179,7 +179,7 @@ describe('MessageTable', () => {
 
   it('does not show sort icons in non-interactive context', async () => {
     render(
-      <InteractiveContext.Provider value={false}>
+      <InteractiveContext.Provider value="disabled">
         <SimpleMessageTable />
       </InteractiveContext.Provider>,
     );
