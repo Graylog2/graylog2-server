@@ -1,0 +1,199 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "edv-a1"
+          }
+        },
+        {
+          "data": {
+            "event_key": "edv-a1",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-aaa",
+            "timestamp": "2025-01-15 10:00:00.000",
+            "timestamp_processing": "2025-01-15 10:00:05.000",
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-a"
+            ],
+            "message": "event edv-a1 from def-aaa",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 1,
+            "risk_score": 10.0,
+            "associated_assets": [],
+            "tags": [
+              "windows"
+            ],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "edv-a2"
+          }
+        },
+        {
+          "data": {
+            "event_key": "edv-a2",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-aaa",
+            "timestamp": "2025-01-15 11:00:00.000",
+            "timestamp_processing": "2025-01-15 11:00:05.000",
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-b"
+            ],
+            "message": "event edv-a2 from def-aaa",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 1,
+            "risk_score": 20.0,
+            "associated_assets": [],
+            "tags": [
+              "windows"
+            ],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "edv-b1"
+          }
+        },
+        {
+          "data": {
+            "event_key": "edv-b1",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-bbb",
+            "timestamp": "2025-01-15 12:00:00.000",
+            "timestamp_processing": "2025-01-15 12:00:05.000",
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-a"
+            ],
+            "message": "event edv-b1 from def-bbb",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 1,
+            "risk_score": 30.0,
+            "associated_assets": [],
+            "tags": [
+              "linux"
+            ],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "edv-b2"
+          }
+        },
+        {
+          "data": {
+            "event_key": "edv-b2",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-bbb",
+            "timestamp": "2025-01-15 13:00:00.000",
+            "timestamp_processing": "2025-01-15 13:00:05.000",
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-b"
+            ],
+            "message": "event edv-b2 from def-bbb",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 1,
+            "risk_score": 40.0,
+            "associated_assets": [],
+            "tags": [
+              "linux"
+            ],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "edv-c1"
+          }
+        },
+        {
+          "data": {
+            "event_key": "edv-c1",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-ccc",
+            "timestamp": "2025-01-15 14:00:00.000",
+            "timestamp_processing": "2025-01-15 14:00:05.000",
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-a"
+            ],
+            "message": "event edv-c1 from def-ccc",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 1,
+            "risk_score": 50.0,
+            "associated_assets": [],
+            "tags": [
+              "credential-access"
+            ],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    }
+  ]
+}
