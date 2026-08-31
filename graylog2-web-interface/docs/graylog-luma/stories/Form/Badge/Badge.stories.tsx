@@ -37,11 +37,11 @@ const meta = {
           '- Use `variant="light"` for most contexts (table cells, status columns) and `"filled"` for',
           '  emphasis (e.g. a "default" marker that should stand out from a plain informational one).',
           '- Set `dot` for a small color dot instead of an icon — use it for a *live, actively-changing*',
-          '  process state (e.g. Streams\' Running/Paused toggle, a system job\'s running/queued/complete',
+          "  process state (e.g. Streams' Running/Paused toggle, a system job's running/queued/complete",
           '  status). Leave it off for a *static, stored* attribute (Enabled/Disabled config flags,',
           '  install/edit state, severity) — there nothing is "happening" right now, so the dot reads as',
           '  noise rather than a live signal.',
-          '- `leftIcon`/`rightIcon` accept any `Icon` name and render into Mantine\'s native icon slots.',
+          "- `leftIcon`/`rightIcon` accept any `Icon` name and render into Mantine's native icon slots.",
           '- Pass `onClick` to make the whole badge a real, keyboard-accessible `<button>` instead of a',
           '  decorative `<span>` — this works identically regardless of color system.',
         ].join('\n'),
@@ -66,7 +66,10 @@ const meta = {
       description:
         'Shows a small color dot as the left section (overrides leftIcon). Use for live/actively-changing process state only — not static attributes.',
     },
-    leftIcon: { control: 'text', description: 'Icon name shown before the label, e.g. "play_arrow" — ignored when dot is set' },
+    leftIcon: {
+      control: 'text',
+      description: 'Icon name shown before the label, e.g. "play_arrow" — ignored when dot is set',
+    },
     onClick: { description: 'Renders the badge as a real, keyboard-accessible button and fires on click' },
     onMouseEnter: { table: { disable: true } },
     onMouseLeave: { table: { disable: true } },
@@ -135,7 +138,8 @@ export const Clickable: Story = {
 export const AllColors: Story = {
   parameters: { controls: { disable: true } },
   render: () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, max-content)', gap: '8px 24px', alignItems: 'center' }}>
+    <div
+      style={{ display: 'grid', gridTemplateColumns: 'repeat(2, max-content)', gap: '8px 24px', alignItems: 'center' }}>
       {BADGE_COLORS.flatMap((color) =>
         BADGE_VARIANTS.map((variant) => (
           <Badge key={`${color}-${variant}`} color={color} variant={variant}>

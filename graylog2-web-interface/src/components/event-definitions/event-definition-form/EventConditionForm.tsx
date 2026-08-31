@@ -141,9 +141,10 @@ const EventConditionForm = ({
     () => eventDefinition._scope === 'ILLUMINATE' && action === 'edit',
     [action, eventDefinition._scope],
   );
-  const isSigma = useMemo(
-    () => eventDefinition.config.type === 'sigma-v1' && action === 'edit',
-    [action, eventDefinition.config.type],
+  // Types hidden from the creation wizard cannot have their condition type changed when being edited.
+  const isNonCreatableType = useMemo(
+    () => action === 'edit' && !!currentConditionPlugin?.hideFromCreation,
+    [action, currentConditionPlugin],
   );
 
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
@@ -183,7 +184,7 @@ const EventConditionForm = ({
                 value={eventDefinition.config.type}
                 onChange={handleEventDefinitionTypeChange}
                 clearable={false}
-                disabled={disabledSelect || onlyFilters || isSigma}
+                disabled={disabledSelect || onlyFilters || isNonCreatableType}
                 required
               />
               <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Condition for this Event.'}</HelpBlock>
