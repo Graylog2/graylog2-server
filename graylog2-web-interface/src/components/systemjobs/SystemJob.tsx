@@ -124,11 +124,7 @@ const SystemJob = ({ job }: SystemJobProps) => {
         </span>{' '}
         - on <LinkToNode nodeId={job.node_id} /> <RelativeTime dateTime={job.started_at} />{' '}
         <span data-toggle="tooltip" title={`runtime: ${job.execution_duration}`}>
-          <Badge
-            color={BADGE_COLOR_BY_STATUS[mappedJobStatus] ?? 'gray'}
-            variant="light"
-            dot
-            style={{ marginLeft: 4 }}>
+          <Badge color={BADGE_COLOR_BY_STATUS[mappedJobStatus] ?? 'gray'} variant="light" dot style={{ marginLeft: 4 }}>
             {mappedJobStatus}
           </Badge>
         </span>
