@@ -71,6 +71,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class OTXDataAdapter extends LookupDataAdapter {
     public static final String NAME = "otx-api";
+    public static final String DEFAULT_API_URL = "https://otx.alienvault.com";
 
     private static final Logger LOG = LoggerFactory.getLogger(OTXDataAdapter.class);
     private static final InetAddressValidator INET_ADDRESS_VALIDATOR = InetAddressValidator.getInstance();
@@ -319,7 +320,7 @@ public class OTXDataAdapter extends LookupDataAdapter {
             return Config.builder()
                     .type(NAME)
                     .indicator(OTX_INDICATOR_IP_AUTO_DETECT)
-                    .apiUrl("https://otx.alienvault.com")
+                    .apiUrl(DEFAULT_API_URL)
                     .httpUserAgent("%1$s Threat Intelligence".formatted(customizationConfig.productName()))
                     .httpConnectTimeout(10000)
                     .httpWriteTimeout(10000)
