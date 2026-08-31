@@ -1,0 +1,5 @@
+type = "s"
+message = "Enforce URL allowlist for AlienVault OTX lookup data adapter."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15084"]
+pulls = [""]
