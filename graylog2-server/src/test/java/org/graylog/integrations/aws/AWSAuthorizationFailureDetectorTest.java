@@ -73,12 +73,12 @@ class AWSAuthorizationFailureDetectorTest {
 
         // 13 denials at the real cadence span 119.7s - just inside the floor.
         for (int i = 0; i < 13; i++) {
-            detector.recordFailure(QUERY, denial);
+            recordFailure(QUERY, denial);
             assertThat(reportedFailures).isEmpty();
             advance(LEASE_DISCOVERY_INTERVAL);
         }
 
-        detector.recordFailure(QUERY, denial);
+        recordFailure(QUERY, denial);
 
         assertThat(reportedFailures).containsExactly(denial);
     }
@@ -92,11 +92,11 @@ class AWSAuthorizationFailureDetectorTest {
         final DynamoDbException denial = accessDenied("denied");
 
         for (int i = 0; i < 14; i++) {
-            detector.recordFailure(QUERY, denial);
+            recordFailure(QUERY, denial);
             // A permitted lease renewal succeeds roughly three times per denied discovery attempt.
-            detector.recordSuccess(UPDATE_ITEM);
-            detector.recordSuccess(UPDATE_ITEM);
-            detector.recordSuccess(UPDATE_ITEM);
+            recordSuccess(UPDATE_ITEM);
+            recordSuccess(UPDATE_ITEM);
+            recordSuccess(UPDATE_ITEM);
             advance(LEASE_DISCOVERY_INTERVAL);
         }
 
@@ -107,7 +107,7 @@ class AWSAuthorizationFailureDetectorTest {
     void successOnTheSameOperationClearsTheStreak() {
         denyRepeatedly(QUERY, 13, LEASE_DISCOVERY_INTERVAL);
 
-        detector.recordSuccess(QUERY);
+        recordSuccess(QUERY);
         denyRepeatedly(QUERY, 13, LEASE_DISCOVERY_INTERVAL);
 
         assertThat(reportedFailures).isEmpty();
@@ -153,7 +153,7 @@ class AWSAuthorizationFailureDetectorTest {
 
     @Test
     void doesNotReportASingleDenial() {
-        detector.recordFailure(QUERY, accessDenied("denied"));
+        recordFailure(QUERY, accessDenied("denied"));
 
         assertThat(reportedFailures).isEmpty();
     }
@@ -162,9 +162,9 @@ class AWSAuthorizationFailureDetectorTest {
     void doesNotReportJustShortOfTheThreshold() {
         final DynamoDbException denial = accessDenied("denied");
 
-        detector.recordFailure(QUERY, denial);
+        recordFailure(QUERY, denial);
         advance(Duration.ofMinutes(2).minusNanos(1));
-        detector.recordFailure(QUERY, denial);
+        recordFailure(QUERY, denial);
 
         assertThat(reportedFailures).isEmpty();
     }
@@ -173,9 +173,9 @@ class AWSAuthorizationFailureDetectorTest {
     void reportsExactlyAtTheThreshold() {
         final DynamoDbException denial = accessDenied("denied");
 
-        detector.recordFailure(QUERY, denial);
+        recordFailure(QUERY, denial);
         advance(Duration.ofMinutes(2));
-        detector.recordFailure(QUERY, denial);
+        recordFailure(QUERY, denial);
 
         assertThat(reportedFailures).containsExactly(denial);
     }
@@ -188,9 +188,9 @@ class AWSAuthorizationFailureDetectorTest {
     void reportsAnOperationRetriedMoreSlowlyThanTheThreshold() {
         final DynamoDbException denial = accessDenied("denied");
 
-        detector.recordFailure(QUERY, denial);
+        recordFailure(QUERY, denial);
         advance(Duration.ofMinutes(3));
-        detector.recordFailure(QUERY, denial);
+        recordFailure(QUERY, denial);
 
         assertThat(reportedFailures).containsExactly(denial);
     }
@@ -222,7 +222,7 @@ class AWSAuthorizationFailureDetectorTest {
             "KMSDisabledException"})
     void treatsDeniedActionsUnusableCredentialsAndUnusableKeysAsTerminal(String errorCode) {
         for (int i = 0; i < 10; i++) {
-            detector.recordFailure(QUERY, withErrorCode(errorCode, "denied"));
+            recordFailure(QUERY, withErrorCode(errorCode, "denied"));
             advance(WIDE_SPACING);
         }
 
@@ -245,7 +245,7 @@ class AWSAuthorizationFailureDetectorTest {
             "KMSInvalidStateException"})
     void neverReportsSelfHealingErrors(String errorCode) {
         for (int i = 0; i < 10; i++) {
-            detector.recordFailure(QUERY, withErrorCode(errorCode, "retry later"));
+            recordFailure(QUERY, withErrorCode(errorCode, "retry later"));
             advance(WIDE_SPACING);
         }
 
@@ -259,8 +259,8 @@ class AWSAuthorizationFailureDetectorTest {
     @Test
     void matchesErrorCodesExactly() {
         for (int i = 0; i < 10; i++) {
-            detector.recordFailure(QUERY, withErrorCode("AccessDeniedExceptionFoo", "denied"));
-            detector.recordFailure(QUERY, withErrorCode("PreAccessDenied", "denied"));
+            recordFailure(QUERY, withErrorCode("AccessDeniedExceptionFoo", "denied"));
+            recordFailure(QUERY, withErrorCode("PreAccessDenied", "denied"));
             advance(WIDE_SPACING);
         }
 
@@ -272,7 +272,7 @@ class AWSAuthorizationFailureDetectorTest {
         final DynamoDbException denial = accessDenied("denied");
 
         for (int i = 0; i < 10; i++) {
-            detector.recordFailure(QUERY, new CompletionException(denial));
+            recordFailure(QUERY, new CompletionException(denial));
             advance(WIDE_SPACING);
         }
 
@@ -282,7 +282,7 @@ class AWSAuthorizationFailureDetectorTest {
     @Test
     void ignoresFailuresThatAreNotAwsServiceExceptions() {
         for (int i = 0; i < 10; i++) {
-            detector.recordFailure(QUERY, new IOException("connection reset"));
+            recordFailure(QUERY, new IOException("connection reset"));
             advance(WIDE_SPACING);
         }
 
@@ -292,37 +292,11 @@ class AWSAuthorizationFailureDetectorTest {
     @Test
     void ignoresAwsExceptionsWithoutErrorDetails() {
         for (int i = 0; i < 10; i++) {
-            detector.recordFailure(QUERY, AwsServiceException.builder().message("no details").build());
+            recordFailure(QUERY, AwsServiceException.builder().message("no details").build());
             advance(WIDE_SPACING);
         }
 
         assertThat(reportedFailures).isEmpty();
-    }
-
-    /**
-     * The interceptor hooks are what production calls, so at least one case has to drive them rather than the
-     * package-private counters they delegate to.
-     */
-    @Test
-    void countsDenialsAndSuccessesDeliveredThroughTheInterceptorHooks() {
-        final DynamoDbException denial = accessDenied("denied");
-        final Context.FailedExecution failedExecution = mock(Context.FailedExecution.class);
-        when(failedExecution.exception()).thenReturn(denial);
-
-        // A success on the denied operation itself has to clear the streak, or the hooks are wired the wrong way round.
-        for (int i = 0; i < 8; i++) {
-            detector.onExecutionFailure(failedExecution, attributesFor(QUERY));
-            detector.afterExecution(mock(Context.AfterExecution.class), attributesFor(QUERY));
-            advance(WIDE_SPACING);
-        }
-        assertThat(reportedFailures).isEmpty();
-
-        for (int i = 0; i < 8; i++) {
-            detector.onExecutionFailure(failedExecution, attributesFor(QUERY));
-            advance(WIDE_SPACING);
-        }
-
-        assertThat(reportedFailures).contains(denial);
     }
 
     /**
@@ -357,9 +331,23 @@ class AWSAuthorizationFailureDetectorTest {
 
     private void denyRepeatedly(String operation, int times, Duration spacing) {
         for (int i = 0; i < times; i++) {
-            detector.recordFailure(operation, accessDenied("denied"));
+            recordFailure(operation, accessDenied("denied"));
             advance(spacing);
         }
+    }
+
+    /**
+     * Drives the detector through the same {@link ExecutionInterceptor} hooks the SDK calls in production, so the tests
+     * exercise the wiring rather than any test-only entry point.
+     */
+    private void recordFailure(String operation, Throwable throwable) {
+        final Context.FailedExecution failedExecution = mock(Context.FailedExecution.class);
+        when(failedExecution.exception()).thenReturn(throwable);
+        detector.onExecutionFailure(failedExecution, attributesFor(operation));
+    }
+
+    private void recordSuccess(String operation) {
+        detector.afterExecution(mock(Context.AfterExecution.class), attributesFor(operation));
     }
 
     private void advance(Duration duration) {

@@ -218,7 +218,8 @@ class KinesisConsumerIT {
                 request,
                 clientBuilderUtil,
                 failureRecorder,
-                false) {
+                false,
+                System::nanoTime) {
             @Override
             void customizeSchedulerConfigs(CoordinatorConfig coordinatorConfig,
                                            LeaseManagementConfig leaseManagementConfig,

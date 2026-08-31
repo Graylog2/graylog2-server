@@ -16,7 +16,6 @@
  */
 package org.graylog.integrations.aws;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.interceptor.Context;
@@ -154,12 +153,13 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
     public void afterExecution(Context.AfterExecution context, ExecutionAttributes executionAttributes) {
         final String operation = executionAttributes.getAttribute(SdkExecutionAttribute.OPERATION_NAME);
         if (operation != null) {
-            recordSuccess(operation);
+            // A success on an operation clears its streak. Kept per-operation so healthy traffic on one operation
+            // cannot clear a denied one sharing the same client.
+            denialsByOperation.remove(operation);
         }
     }
 
-    @VisibleForTesting
-    void recordFailure(String operation, Throwable throwable) {
+    private void recordFailure(String operation, Throwable throwable) {
         if (!ESSENTIAL_OPERATIONS.contains(operation)) {
             return;
         }
@@ -173,11 +173,6 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
         if (streak.isTerminal()) {
             onTerminalFailure.accept(denial);
         }
-    }
-
-    @VisibleForTesting
-    void recordSuccess(String operation) {
-        denialsByOperation.remove(operation);
     }
 
     /**

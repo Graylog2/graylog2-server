@@ -90,29 +90,14 @@ public class KinesisConsumer implements Runnable {
     private final boolean migrateToSingleTable;
 
     /**
-     * Monotonic clock handed to the authorization-failure detectors, so a test can drive their threshold.
+     * Monotonic clock handed to the authorization-failure detectors. {@code System::nanoTime} in production; a test
+     * passes a controllable clock to drive the denial threshold.
      */
     private final LongSupplier nanoClock;
     private final AtomicBoolean authorizationFailureHandled = new AtomicBoolean();
     // volatile: written on the KCL runner thread but read by the async stop() handoff, which needs to see it.
     private volatile Scheduler kinesisScheduler;
 
-    KinesisConsumer(NodeId nodeId,
-                    KinesisTransport transport,
-                    ObjectMapper objectMapper,
-                    Consumer<RawMessage> handleMessageCallback,
-                    String kinesisStreamName,
-                    AWSMessageType awsMessageType,
-                    int recordBatchSize, AWSRequest request,
-                    AWSClientBuilderUtil awsClientBuilderUtil,
-                    InputFailureRecorder inputFailureRecorder,
-                    boolean migrateToSingleTable) {
-        this(nodeId, transport, objectMapper, handleMessageCallback, kinesisStreamName, awsMessageType,
-                recordBatchSize, request, awsClientBuilderUtil, inputFailureRecorder, migrateToSingleTable,
-                System::nanoTime);
-    }
-
-    @VisibleForTesting
     KinesisConsumer(NodeId nodeId,
                     KinesisTransport transport,
                     ObjectMapper objectMapper,
@@ -296,8 +281,7 @@ public class KinesisConsumer implements Runnable {
      * {@link InputFailureRecorder}, so a task completing concurrently with a terminal failure cannot report the input
      * healthy again.
      */
-    @VisibleForTesting
-    void recordTaskSuccess() {
+    private void recordTaskSuccess() {
         inputFailureRecorder.setRunning();
     }
 
