@@ -43,7 +43,10 @@ jest.mock('./FirstOnboarding', () => () => <div data-testid="first-onboarding">O
 jest.mock('hooks/useCurrentUser');
 
 const userWith = (permissions: Array<string>) =>
-  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 describe('CollectorsOverview telemetry', () => {
   const sendTelemetry = jest.fn();

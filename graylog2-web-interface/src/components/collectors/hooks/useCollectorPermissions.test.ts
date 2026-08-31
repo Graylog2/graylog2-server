@@ -27,7 +27,10 @@ import useCollectorPermissions from './useCollectorPermissions';
 jest.mock('hooks/useCurrentUser');
 
 const userWith = (permissions: Array<string>) =>
-  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 describe('useCollectorPermissions', () => {
   it('grants fleet edit to a holder of the unscoped permission', () => {

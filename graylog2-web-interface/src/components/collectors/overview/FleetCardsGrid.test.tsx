@@ -32,7 +32,10 @@ jest.mock('hooks/useCurrentUser');
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn() }));
 
 const userWith = (permissions: Array<string>) =>
-  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 describe('FleetCardsGrid telemetry', () => {
   const sendTelemetry = jest.fn();

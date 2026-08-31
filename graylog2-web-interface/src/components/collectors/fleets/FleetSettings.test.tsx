@@ -101,7 +101,10 @@ describe('FleetSettings permissions', () => {
   } as never;
 
   const userWith = (permissions: Array<string>) =>
-    adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+    adminUser
+      .toBuilder()
+      .permissions(Immutable.List(permissions as Array<Permission>))
+      .build();
 
   it('hides the Danger Zone without delete permission', () => {
     asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:edit:f-1']));

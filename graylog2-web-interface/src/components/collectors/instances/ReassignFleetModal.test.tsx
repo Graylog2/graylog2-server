@@ -38,7 +38,10 @@ jest.mock('../hooks/useSendCollectorsTelemetry');
 jest.mock('hooks/useCurrentUser');
 
 const userWith = (permissions: Array<string>) =>
-  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 const mockFleets: Fleet[] = [
   {

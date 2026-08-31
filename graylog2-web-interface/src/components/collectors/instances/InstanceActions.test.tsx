@@ -43,7 +43,10 @@ jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void }) => (
 ));
 
 const userWith = (permissions: Array<string>) =>
-  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 const mockInstance: CollectorInstanceView = {
   id: 'inst-1',

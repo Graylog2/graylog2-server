@@ -121,7 +121,9 @@ describe('CollectorsSettings', () => {
       createCollectorInput: jest.fn(),
       isCreatingCollectorInput: false,
     });
-    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<typeof useCollectorPermissions>);
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<
+      typeof useCollectorPermissions
+    >);
     asMock(useCurrentUser).mockReturnValue(adminUser);
     updateConfig.mockResolvedValue(undefined);
   });
@@ -260,9 +262,14 @@ describe('CollectorsSettings', () => {
 
   it('hides the settings submit without collectors_config:edit', () => {
     asMock(useCurrentUser).mockReturnValue(
-      adminUser.toBuilder().permissions(Immutable.List(['collectors_config:read'] as Array<Permission>)).build(),
+      adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['collectors_config:read'] as Array<Permission>))
+        .build(),
     );
-    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: false } as ReturnType<typeof useCollectorPermissions>);
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: false } as ReturnType<
+      typeof useCollectorPermissions
+    >);
 
     render(<CollectorsSettings />);
 
@@ -311,7 +318,9 @@ describe('CollectorsSettings telemetry', () => {
       unreadableCount: 0,
       isLoading: false,
     });
-    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<typeof useCollectorPermissions>);
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<
+      typeof useCollectorPermissions
+    >);
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
