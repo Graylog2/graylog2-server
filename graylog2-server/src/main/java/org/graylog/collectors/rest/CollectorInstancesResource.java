@@ -42,6 +42,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorInstanceService.InstanceCount;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
@@ -210,17 +211,26 @@ public class CollectorInstancesResource extends RestResource {
     @Timed
     @Operation(summary = "Get global collector statistics")
     public CollectorStatsResponse stats() {
-        // TODO for a permission check we would need to know which fleets are granted to the user
-        // since we haven't implemented that yet, we can't add them as filters to the count queries, as a consequence
-        // the counts would be wrong in case someone had explicit grants
-        final var instanceCount = collectorInstanceService.countAcrossAllFleets(
-                Instant.now().minus(getOfflineThreshold()));
-        return new CollectorStatsResponse(
-                instanceCount.total(),
-                instanceCount.online(),
-                instanceCount.offline(),
-                fleetService.count(),
-                sourceService.count());
+        final var threshold = Instant.now().minus(getOfflineThreshold());
+        final List<String> grantedFleetIds = fleetService.getAllFleets().stream()
+                .map(FleetDTO::id)
+                .filter(id -> isPermitted(CollectorsPermissions.FLEET_READ, id))
+                .toList();
+
+        final var instanceCounts = collectorInstanceService.countByFleetGrouped(threshold);
+        final var sourceCounts = sourceService.countByFleetGrouped();
+
+        long total = 0L;
+        long online = 0L;
+        long sources = 0L;
+        for (final String fleetId : grantedFleetIds) {
+            final var counts = instanceCounts.getOrDefault(fleetId, new InstanceCount(0L, 0L));
+            total += counts.total();
+            online += counts.online();
+            sources += sourceCounts.getOrDefault(fleetId, 0L);
+        }
+
+        return new CollectorStatsResponse(total, online, total - online, grantedFleetIds.size(), sources);
     }
 
     @GET
