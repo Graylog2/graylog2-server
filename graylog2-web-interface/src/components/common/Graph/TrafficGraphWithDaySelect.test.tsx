@@ -78,10 +78,10 @@ describe('TrafficGraphWithDaySelect', () => {
       expect(mockSetGraphDays).toHaveBeenCalledWith(365);
     });
 
+    expect(useSendTelemetry).toHaveBeenCalledWith('outgoing-traffic');
     expect(mockSendTelemetry).toHaveBeenCalledWith(
       TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED,
       expect.objectContaining({
-        app_section: 'outgoing-traffic',
         event_details: { value: 365 },
       }),
     );
@@ -97,9 +97,10 @@ describe('TrafficGraphWithDaySelect', () => {
     const daysSelect = getByLabelText('Days');
     await userEvent.selectOptions(daysSelect, '90');
 
+    expect(useSendTelemetry).toHaveBeenCalledWith('incoming-traffic');
     expect(mockSendTelemetry).toHaveBeenCalledWith(
       TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED,
-      expect.objectContaining({ app_section: 'incoming-traffic' }),
+      expect.objectContaining({ event_details: { value: 90 } }),
     );
 
     jest.clearAllMocks();

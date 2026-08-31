@@ -133,7 +133,7 @@ const newTabTimeRange = ({
 };
 
 const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
   const { formatTime, userTimezone } = useUserDateTime();
   const {
     setValues,
@@ -161,7 +161,6 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
       });
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TAB_SELECTED, {
-        app_section: 'search-bar',
         app_action_value: 'search-time-range',
         event_details: {
           tab: nextTab,

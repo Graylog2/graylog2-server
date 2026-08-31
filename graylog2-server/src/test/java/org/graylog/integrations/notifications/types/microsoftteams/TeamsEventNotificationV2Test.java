@@ -34,7 +34,6 @@ import org.graylog2.bindings.providers.JsonSafeEngineProvider;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.system.urlallowlist.UrlAllowlistValidator;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.TestMessageFactory;
@@ -184,9 +183,6 @@ public class TeamsEventNotificationV2Test {
     @Mock
     EventNotificationService notificationCallbackService;
 
-    @Mock
-    UrlAllowlistValidator mockUrlAllowlistValidator;
-
     private TeamsEventNotificationConfigV2 notificationConfig;
     private EventNotificationContext eventNotificationContext;
 
@@ -202,8 +198,7 @@ public class TeamsEventNotificationV2Test {
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()),
-                mockUrlAllowlistValidator);
+                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()));
     }
 
     @Test

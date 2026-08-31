@@ -120,13 +120,13 @@ describe('InstanceDetailDrawer', () => {
     await screen.findByText(/Active Sources.*1/i);
   });
 
-  it('renders Messages link pointing to collector_instance_uid filter', async () => {
+  it('renders Messages link pointing to agent_id filter', async () => {
     render(
       <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
     );
 
     const link = await screen.findByRole('link', { name: /^received messages$/i });
-    expect(link).toHaveAttribute('href', expect.stringContaining('collector_instance_uid'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('agent_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
   });
 

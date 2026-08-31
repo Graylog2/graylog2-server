@@ -24,11 +24,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { createInput as createInputRequest } from 'hooks/useInputs';
 import type { InputDescription } from 'hooks/useInputType';
 import { fetchInputType } from 'hooks/useInputType';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import Store from 'logic/local-storage/Store';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { Col, Row, Button } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { InputForm } from 'components/inputs';
@@ -65,7 +63,6 @@ const CreateInputControl = () => {
     () => Store.sessionGet<string>(SETUP_WIZARD_INPUT_ID_KEY) ?? null,
   );
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const inputTypes = useInputTypes();
   const queryClient = useQueryClient();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
@@ -139,7 +136,6 @@ const CreateInputControl = () => {
     setSelectedInput(selected);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SELECTED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-select',
       event_details: { value: selected },
     });
@@ -169,7 +165,6 @@ const CreateInputControl = () => {
 
   const createInput = (data: ConfiguredInput) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_CREATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-create',
     });
 

@@ -74,7 +74,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
   const dispatch = useViewsDispatch();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-widget');
   const { setWidgetEditing } = useContext(WidgetFocusContext);
 
   const widgetButtons = useMemo(
@@ -84,7 +84,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
           sendTelemetry(
             TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')] ??
               `Search Widget ${title} Created`,
-            { app_section: 'search-widget' },
+            {},
           );
 
           const newId = generateId();
