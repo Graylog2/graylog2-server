@@ -47,7 +47,7 @@ public class EventDefinitionFilterFactory {
     }
 
     public EventDefinitionFilter forSubject(Subject subject) {
-        if (!eventsConfiguration.get().enforceEventDefinitionPermissions() || subject.isPermitted(EVENT_DEFINITIONS_READ)) {
+        if (subject.isPermitted(EVENT_DEFINITIONS_READ) || !eventsConfiguration.get().enforceEventDefinitionPermissions()) {
             return EventDefinitionFilter.allAllowed();
         }
         final Set<String> ids = eventDefinitionService.findPermittedIds(
