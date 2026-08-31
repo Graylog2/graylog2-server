@@ -152,8 +152,7 @@ public class AWSService {
             final MessageInput messageInput = messageInputFactory.create(inputCreateRequest, user.getName(), nodeId.getNodeId(), isSetupWizard);
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());
-            final String newInputId = inputService.save(input);
-            LOG.debug("New AWS input created. id [{}] request [{}]", newInputId, request);
+            inputService.save(input);
             return input;
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
