@@ -94,7 +94,8 @@ public class KinesisConsumer implements Runnable {
      */
     private final LongSupplier nanoClock;
     private final AtomicBoolean authorizationFailureHandled = new AtomicBoolean();
-    private Scheduler kinesisScheduler;
+    // volatile: written on the KCL runner thread but read by the async stop() handoff, which needs to see it.
+    private volatile Scheduler kinesisScheduler;
 
     KinesisConsumer(NodeId nodeId,
                     KinesisTransport transport,

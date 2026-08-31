@@ -166,7 +166,7 @@ percentage than it did in 7.1, without any change to the actual installed Event 
 ## AWS Kinesis/CloudWatch Input: Required DynamoDB Permissions
 
 In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5, which calls
-DynamoDB actions KCL 2.x did not. **This applies to every Kinesis/CloudWatch input, whether it is new or existed
+DynamoDB actions that KCL 2.x did not. **This applies to every Kinesis/CloudWatch input, whether it is new or existed
 before 7.2**, so a policy written for an earlier Graylog release can look correct and still deny the input. A policy
 that grants only the actions KCL 2.x needed leaves the input logging an authorization error on a fixed schedule while
 consuming no records.
@@ -178,7 +178,9 @@ In addition to the actions the lease table already needed (`CreateTable`, `Descr
   leases through a global secondary index on the lease table. An index is a separate IAM resource from its table, so
   granting `Query` on the table alone still denies this call.
 - **`dynamodb:UpdateTable` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*`.** KCL creates that
-  index on first start. If this is denied the index is never created, and the input starts but consumes nothing.
+  index on first start. If this is denied the index is never created, and the input starts but consumes nothing. The
+  failure detection described above does not cover this case, because `UpdateTable` is not one of the watched
+  operations and the missing index surfaces as a not-found error rather than a denial.
 
 The two legacy tables, `<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats`, also need
 access, and how much depends on the input:
