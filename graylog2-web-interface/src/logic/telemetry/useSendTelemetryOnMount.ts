@@ -15,22 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect } from 'react';
+import type { Optional } from 'utility-types';
 
-import useLocation from 'routing/useLocation';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
+import type useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const NavigationTelemetry = () => {
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
-
+const useSendTelemetryOnMount = (
+  sendTelemetry: ReturnType<typeof useSendTelemetry>,
+  eventType: TelemetryEventType,
+  event: Optional<TelemetryEvent, 'app_path_pattern'>,
+  deps: Array<unknown> = [],
+) => {
   useEffect(() => {
-    if (location.pathname) {
-      sendTelemetry('$pageview', {
-      });
-    }
-  }, [location.pathname, sendTelemetry]);
-
-  return null;
+    sendTelemetry(eventType, event);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sendTelemetry, ...deps]);
 };
 
-export default NavigationTelemetry;
+export default useSendTelemetryOnMount;

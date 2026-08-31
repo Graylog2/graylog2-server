@@ -19,25 +19,20 @@ import { useCallback } from 'react';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 
 const useSendEventActionTelemetry = () => {
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('alerts-and-events');
 
   return useCallback(
     (actionName: string, fromBulk: boolean, eventDetails: { [key: string]: unknown } = {}) =>
       sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_AND_EVENTS.ACTION_RAN, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'alerts-and-events',
         event_details: {
           actionName,
           fromBulk: !!fromBulk,
           ...eventDetails,
         },
       }),
-    [pathname, sendTelemetry],
+    [sendTelemetry],
   );
 };
 
