@@ -92,6 +92,16 @@ describe('stringify', () => {
 
     expect(result).toBe('undefined');
   });
+
+  it('stringifies integers which exceed the safe integer range', () => {
+    // API responses are parsed with BigInt support, so any integer outside of the safe range
+    // ends up as a BigInt in the values we are rendering.
+    const bigInteger = BigInt('12345678901234567890');
+
+    expect(StringUtils.stringify({ id: bigInteger })).toBe('{"id":12345678901234567890}');
+    expect(StringUtils.stringify([bigInteger])).toBe('[12345678901234567890]');
+    expect(StringUtils.stringify(bigInteger)).toBe('12345678901234567890');
+  });
 });
 
 describe('replaceSpaces', () => {
