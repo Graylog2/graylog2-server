@@ -115,6 +115,7 @@
         <aws-kinesis-client.version>3.5.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.7</aws-msk-iam-auth.version>
         <bouncycastle.version>1.85</bouncycastle.version>
+        <bouncycastle.provider.version>1.85.2</bouncycastle.provider.version>
         <caffeine.version>3.2.4</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.192</classgraph.version>
@@ -733,7 +734,7 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
+                <version>${bouncycastle.provider.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>

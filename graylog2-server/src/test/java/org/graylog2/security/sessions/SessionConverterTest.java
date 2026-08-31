@@ -76,11 +76,10 @@ class SessionConverterTest {
     void simpleSessionToSessionDTO() {
         final var now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-        final var simpleSession = new SimpleSession();
+        final var simpleSession = new SimpleSession(
+                "localhost", java.util.Date.from(now.minusSeconds(10)));
         simpleSession.setId("session-id");
-        simpleSession.setHost("localhost");
         simpleSession.setTimeout(10_000);
-        simpleSession.setStartTimestamp(java.util.Date.from(now.minusSeconds(10)));
         simpleSession.setLastAccessTime(java.util.Date.from(now));
         simpleSession.setExpired(false);
         simpleSession.setAttribute(SessionUtils.USERNAME_SESSION_KEY, "user-name");
@@ -106,9 +105,8 @@ class SessionConverterTest {
 
     @Test
     void failsForUnknownAttributes() {
-        final var simpleSession = new SimpleSession();
+        final var simpleSession = new SimpleSession("localhost");
         simpleSession.setId("session-id");
-        simpleSession.setHost("localhost");
         simpleSession.setAttribute("unknown-key", "some-value");
 
         assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build())
@@ -118,9 +116,8 @@ class SessionConverterTest {
 
     @Test
     void hasStrictPrincipalsHandlingg() {
-        final var simpleSession = new SimpleSession();
+        final var simpleSession = new SimpleSession("localhost");
         simpleSession.setId("session-id");
-        simpleSession.setHost("localhost");
 
         assertThat(SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build().userId()).isEmpty();
 
