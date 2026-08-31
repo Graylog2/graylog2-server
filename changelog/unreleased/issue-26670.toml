@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix PostHog session recording not starting after telemetry opt-in."
+
+issues = ["26670"]
+pulls = ["26671"]

@@ -15,10 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
+import selectEvent from 'helpers/selectEvent';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import ReassignFleetModal from './ReassignFleetModal';
 
@@ -30,6 +35,13 @@ import { mockCollectorsMutations } from '../testing/mockMutations';
 jest.mock('../hooks/useFleetQueries');
 jest.mock('../hooks/useCollectorsMutations');
 jest.mock('../hooks/useSendCollectorsTelemetry');
+jest.mock('hooks/useCurrentUser');
+
+const userWith = (permissions: Array<string>) =>
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 const mockFleets: Fleet[] = [
   {
@@ -71,6 +83,7 @@ describe('ReassignFleetModal', () => {
         isReassigningInstances: false,
       }),
     );
+    asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   it('renders modal title with instance count', async () => {
@@ -239,5 +252,81 @@ describe('ReassignFleetModal', () => {
         );
       });
     });
+  });
+});
+
+describe('ReassignFleetModal permissions', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({ reassignInstances: jest.fn(), isReassigningInstances: false }),
+    );
+    asMock(useFleets).mockReturnValue({
+      data: [
+        { id: 'f-1', name: 'Allowed' },
+        { id: 'f-2', name: 'Forbidden' },
+      ],
+      isLoading: false,
+    } as never);
+  });
+
+  it('offers only fleets the user may read and assign into', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read:f-1', 'collector_fleets:assign_instance:f-1']),
+    );
+
+    render(<ReassignFleetModal origin="row" instanceUids={['i-1']} onClose={jest.fn()} />);
+
+    const input = await selectEvent.findSelectInput('Select a fleet');
+    selectEvent.openMenu(input);
+
+    expect(await screen.findByText('Allowed')).toBeInTheDocument();
+    expect(screen.queryByText('Forbidden')).not.toBeInTheDocument();
+  });
+
+  it('blames permissions only when other fleets exist but none are assignable', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith([]));
+
+    render(<ReassignFleetModal origin="row" instanceUids={['i-1']} onClose={jest.fn()} />);
+
+    expect(
+      await screen.findByText(/you do not have permission to assign collectors to any other fleet/i),
+    ).toBeInTheDocument();
+  });
+
+  it('says there is nowhere else to move to when the only fleet is the current one', async () => {
+    // A fully-permitted user with a single fleet in the system: the instance already lives in it,
+    // so there is no target left. This is not a permission problem and must not be reported as one.
+    asMock(useFleets).mockReturnValue({
+      data: [{ id: 'f-1', name: 'Onboarding' }],
+      isLoading: false,
+    } as never);
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:assign_instance']));
+
+    render(<ReassignFleetModal origin="row" instanceUids={['i-1']} currentFleetId="f-1" onClose={jest.fn()} />);
+
+    expect(await screen.findByText(/there is no other fleet to assign this collector to/i)).toBeInTheDocument();
+    expect(screen.queryByText(/do not have permission/i)).not.toBeInTheDocument();
+  });
+
+  it('pluralises the no-other-fleet message for a bulk selection', async () => {
+    asMock(useFleets).mockReturnValue({
+      data: [{ id: 'f-1', name: 'Onboarding' }],
+      isLoading: false,
+    } as never);
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:assign_instance']));
+
+    render(
+      <ReassignFleetModal
+        origin="bulk-selection"
+        instanceUids={['i-1', 'i-2']}
+        currentFleetId="f-1"
+        onClose={jest.fn()}
+      />,
+    );
+
+    expect(await screen.findByText(/there is no other fleet to assign these collectors to/i)).toBeInTheDocument();
   });
 });
