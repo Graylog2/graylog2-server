@@ -35,7 +35,7 @@ const TAB_KEYS = ['create', 'upload'];
 const UploadCA = 'Upload CA';
 
 const CAConfiguration = () => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
   const productName = useProductName();
 
   const handleTabSwitch = (value: string | null) => {
@@ -45,7 +45,6 @@ const CAConfiguration = () => {
         : TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_CREATE_TAB_CLICKED,
       {
         app_pathname: 'datanode',
-        app_section: 'migration',
       },
     );
   };

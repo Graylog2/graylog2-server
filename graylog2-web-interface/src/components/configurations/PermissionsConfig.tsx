@@ -29,8 +29,6 @@ import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
@@ -56,8 +54,7 @@ const PermissionsConfig = () => {
   const [config, setConfig] = useState<PermissionsConfigType | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('permissions');
 
   useEffect(() => {
     ConfigurationsActions.listPermissionsConfig(ConfigurationType.PERMISSIONS_CONFIG).then(() => {
@@ -67,8 +64,6 @@ const PermissionsConfig = () => {
 
   const saveConfig = (values: PermissionsConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.PERMISSIONS_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'permissions',
       app_action_value: 'configuration-save',
     });
 

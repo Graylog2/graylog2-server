@@ -101,7 +101,7 @@ const TimeRangePicker = ({
   limitDuration,
   withinPortal = true,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
   const validateTimeRange = useTimeRangeValidation(limitDuration);
 
   const handleNoOverride = useCallback(() => {
@@ -113,7 +113,6 @@ const TimeRangePicker = ({
     toggleDropdownShow();
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_CANCELED, {
-      app_section: 'search-bar',
       app_action_value: 'search-time-range-cancel-button',
     });
   }, [sendTelemetry, toggleDropdownShow]);
@@ -127,7 +126,6 @@ const TimeRangePicker = ({
       toggleDropdownShow();
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_UPDATED, {
-        app_section: 'search-bar',
         app_action_value: 'search-time-range-confirm-button',
         event_details: {
           timerange: normalizedTimeRange,

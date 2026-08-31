@@ -162,7 +162,7 @@ const IncompatibleIndicesBulkActions = ({ indices }: Props) => {
     refetchClusterJobs,
     refetch,
   } = useIncompatibleIndicesContext();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('opensearch-upgrade');
   const archive = useIndexArchive();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const [confirmedBulkAction, setConfirmedBulkAction] = useState<BulkIndexActionCandidate | undefined>();
