@@ -21,7 +21,7 @@ import { renderPreflight, screen } from 'wrappedTestingLibrary';
 import HelpMenu from 'preflight/navigation/HelpMenu';
 
 describe('HelpMenu', () => {
-  it('opens external help links without requiring a router', async () => {
+  it('shows external help links when the menu is opened', async () => {
     renderPreflight(<HelpMenu />);
 
     await userEvent.click(await screen.findByRole('button', { name: /get help/i }));
