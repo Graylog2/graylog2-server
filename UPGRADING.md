@@ -179,9 +179,8 @@ In addition to the actions the lease table already needed (`CreateTable`, `Descr
   granting `Query` on the table alone still denies this call.
 - **`dynamodb:UpdateTable` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*`.** KCL creates that
   index on first start. If this is denied the index is never created, and the input starts but consumes nothing. The
-  failure detection described above only fires on authorization denials of the operations it watches: it does not
-  cover a missing index or lease table, which surface as not-found errors rather than denials, so an input in that
-  state still starts and consumes nothing.
+  failure detection described above only fires on authorization denials of the operations it watches, not on the
+  not-found errors that a missing index or lease table produce, so it does not cover this case.
 
 The two legacy tables, `<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats`, also need
 access, and how much depends on the input:
@@ -197,17 +196,16 @@ access, and how much depends on the input:
 A policy whose resource is `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*` covers the lease table and
 both legacy tables, because their names share that prefix.
 
-If you enable **Migrate to single DynamoDB table for state tracking**, the migration moves state entities in a
-DynamoDB transaction, which additionally requires `dynamodb:ConditionCheckItem` on the `-CoordinatorState` table
-alongside the item-level actions above. `ConditionCheckItem` is used only by transactions, so policies written for
-non-transactional access usually omit it, and without it the migration never reaches
-`TABLE_MIGRATION_STATUS_COMPLETE` while reporting nothing in the Graylog UI.
+If you enable the single-table migration described in the next section, it moves state entities in a DynamoDB
+transaction, which additionally requires `dynamodb:ConditionCheckItem` on the `-CoordinatorState` table alongside
+the item-level actions above. `ConditionCheckItem` is used only by transactions, so policies written for
+non-transactional access usually omit it, and without it the migration never completes while reporting nothing in
+the Graylog UI.
 
 ## AWS Kinesis/CloudWatch Input: Single DynamoDB Table State Tracking
 
-In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Client Library (KCL) 3.5. 
-The KCL stores its coordination state in DynamoDB. Previously, this used three tables per input: the lease table, plus separate
-`<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats` tables. The AWS KCL 3.5 introduced a
+The KCL stores its coordination state in DynamoDB. Before KCL 3.5, this used three tables per input: the lease table, plus separate
+`<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats` tables. KCL 3.5 introduced a
 single-table format that consolidates all of this into the lease table alone (each item is tagged with an
 `entityType` attribute). This reduces the number of DynamoDB tables and helps you stay under account-level table
 limits.
