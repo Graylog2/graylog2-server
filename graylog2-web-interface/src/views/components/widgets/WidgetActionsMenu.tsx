@@ -66,6 +66,7 @@ import WidgetContext from '../contexts/WidgetContext';
 const Container = styled.div`
   position: relative; // required for absolute positioned widget actions
   display: flex;
+  align-items: center;
   min-height: 100%;
 `;
 
