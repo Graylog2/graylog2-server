@@ -23,9 +23,9 @@ import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -160,7 +160,7 @@ class EventDefinitionFilterFactoryTest {
     }
 
     private static ClusterConfigChangedEvent clusterConfigChanged(String type) {
-        return ClusterConfigChangedEvent.create(DateTime.now(), "node-id", type);
+        return ClusterConfigChangedEvent.create(DateTime.now(DateTimeZone.UTC), "node-id", type);
     }
 
     /**
