@@ -179,8 +179,9 @@ In addition to the actions the lease table already needed (`CreateTable`, `Descr
   granting `Query` on the table alone still denies this call.
 - **`dynamodb:UpdateTable` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*`.** KCL creates that
   index on first start. If this is denied the index is never created, and the input starts but consumes nothing. The
-  failure detection described above does not cover this case, because `UpdateTable` is not one of the watched
-  operations and the missing index surfaces as a not-found error rather than a denial.
+  failure detection described above only fires on authorization denials of the operations it watches: it does not
+  cover a missing index or lease table, which surface as not-found errors rather than denials, so an input in that
+  state still starts and consumes nothing.
 
 The two legacy tables, `<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats`, also need
 access, and how much depends on the input:
