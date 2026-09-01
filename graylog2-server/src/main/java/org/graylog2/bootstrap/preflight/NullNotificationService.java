@@ -51,11 +51,6 @@ public class NullNotificationService implements NotificationService {
     }
 
     @Override
-    public boolean fixed(Notification.Type type, String key, String nodeId) {
-        return false;
-    }
-
-    @Override
     public boolean fixed(Notification.Type type, Node node) {
         return false;
     }
