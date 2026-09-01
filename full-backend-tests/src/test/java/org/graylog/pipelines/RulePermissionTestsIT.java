@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Set;
 
-@GraylogBackendConfiguration
+@ContainerMatrixTestsConfiguration
 public class RulePermissionTestsIT {
     private static final String VALID_RULE_SOURCE = "rule \"test\"\nwhen\n  true\nthen\nend";
     private static final String VALID_MESSAGE = "test message";
@@ -55,32 +55,32 @@ public class RulePermissionTestsIT {
         api.roles().delete(ruleCreatorRole.properJSONPath().read("name", String.class));
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testParseNotPermittedForReader() {
         api.forUser(Users.JOHN_DOE).rules().parse(VALID_RULE_SOURCE, HttpStatus.SC_UNAUTHORIZED);
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testParsePermittedForAdmin() {
         api.forUser(Users.LOCAL_ADMIN).rules().parse(VALID_RULE_SOURCE, HttpStatus.SC_OK);
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testParsePermittedForUser() {
         api.forUser(ruleCreator).rules().parse(VALID_RULE_SOURCE, HttpStatus.SC_OK);
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testSimulateNotPermittedForReader() {
         api.forUser(Users.JOHN_DOE).rules().simulate(VALID_MESSAGE, VALID_RULE_SOURCE, HttpStatus.SC_UNAUTHORIZED);
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testSimulatePermittedForAdmin() {
         api.forUser(Users.LOCAL_ADMIN).rules().simulate(VALID_MESSAGE, VALID_RULE_SOURCE, HttpStatus.SC_OK);
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testSimulatePermittedForUser() {
         api.forUser(ruleCreator).rules().simulate(VALID_MESSAGE, VALID_RULE_SOURCE, HttpStatus.SC_OK);
     }
