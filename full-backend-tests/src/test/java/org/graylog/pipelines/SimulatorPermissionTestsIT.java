@@ -33,7 +33,7 @@ import java.util.Set;
 
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class SimulatorPermissionTestsIT {
     private static final Map<String, Object> TEST_MESSAGE = Map.of(
                 "_id", "1",
@@ -63,17 +63,17 @@ public class SimulatorPermissionTestsIT {
         api.roles().delete(simulatorRole.properJSONPath().read("name", String.class));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSimulateNotPermittedForReader() {
         api.forUser(Users.JOHN_DOE).simulator().simulate(DEFAULT_STREAM_ID, TEST_MESSAGE, HttpStatus.SC_UNAUTHORIZED);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSimulatePermittedForAdmin() {
         api.forUser(Users.LOCAL_ADMIN).simulator().simulate(DEFAULT_STREAM_ID, TEST_MESSAGE, HttpStatus.SC_OK);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSimulatePermittedForUser() {
         api.forUser(simulatorUser).simulator().simulate(DEFAULT_STREAM_ID, TEST_MESSAGE, HttpStatus.SC_OK);
     }
