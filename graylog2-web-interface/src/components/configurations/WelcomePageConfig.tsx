@@ -29,8 +29,6 @@ import { getConfig } from 'components/configurations/helpers';
 import { useStore } from 'stores/connect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import type { WelcomePageConfigType } from 'components/common/types';
 import { DEFAULT_WELCOME_PAGE_CONFIG } from 'logic/welcome/welcomePageConfig';
 
@@ -62,8 +60,7 @@ const WelcomePageConfig = () => {
   const [formConfig, setFormConfig] = useState<FormValues | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('welcome-page');
 
   useEffect(() => {
     ConfigurationsActions.list(configType).then(() => {
@@ -76,8 +73,6 @@ const WelcomePageConfig = () => {
 
   const saveConfig = (values: FormValues) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.WELCOME_PAGE_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'welcome-page',
       app_action_value: 'configuration-save',
     });
 

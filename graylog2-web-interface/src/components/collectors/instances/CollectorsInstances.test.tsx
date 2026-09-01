@@ -44,7 +44,10 @@ jest.mock('components/collectors/hooks', () => ({
 }));
 
 const userWith = (permissions: Array<string>) =>
-  adminUser.toBuilder().permissions(Immutable.List(permissions as Array<Permission>)).build();
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 describe('CollectorsInstances', () => {
   beforeEach(() => {

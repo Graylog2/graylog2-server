@@ -30,7 +30,12 @@ export interface PlotlyHTMLElementWithInternals extends PlotlyHTMLElement {
 }
 
 /** A popover anchor: the DOM element the popover sticks to plus the clicked point(s). */
-export type ElementAnchor = { el: Element; rel: RelativeCoordinates; pt: ClickPoint; pointsInRadius?: Array<ClickPoint> };
+export type ElementAnchor = {
+  el: Element;
+  rel: RelativeCoordinates;
+  pt: ClickPoint;
+  pointsInRadius?: Array<ClickPoint>;
+};
 export type Anchor = ElementAnchor;
 
 /** Builds a popover anchor from a Plotly click event. Provided per visualization. */
