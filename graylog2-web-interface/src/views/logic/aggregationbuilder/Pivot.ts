@@ -35,6 +35,7 @@ export type TimeConfigType = {
 export type ValuesConfigType = {
   limit: number;
   skip_empty_values: boolean;
+  other_bucket?: boolean;
 };
 
 export type PivotConfigType = TimeConfigType | ValuesConfigType;
@@ -56,7 +57,7 @@ type InternalState = {
   config: PivotConfigType;
 };
 
-const DEFAULT_PIVOT_CONFIG = { limit: DEFAULT_PIVOT_LIMIT, skip_empty_values: false };
+const DEFAULT_PIVOT_CONFIG = { limit: DEFAULT_PIVOT_LIMIT, skip_empty_values: false, other_bucket: false };
 
 export default class Pivot {
   _value: InternalState;

@@ -1,0 +1,13 @@
+type = "a"
+message = "Values groupings can now collect all results beyond their configured limit into a single `(Other)` bucket, instead of dropping them silently."
+
+details.user = """
+Enable *Include Other bucket* on a values grouping to collect everything past its limit into one `(Other)` row or column.
+
+  - `count`, `sum`, `sum of squares`, `average`, `standard deviation` and `variance` are calculated exactly.
+  - `minimum`, `maximum`, `cardinality`, `percentile`, `percentage` and `latest` cannot be derived for this bucket and are left empty.
+
+Disabled by default, so existing widgets, event definitions and Scripting API queries are unaffected. Not supported on the Elasticsearch 7 backend.
+"""
+
+pulls = ["27088"]

@@ -92,5 +92,5 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                 : new SortOrders(ordering, List.copyOf(sortingAggregations));
     }
 
-    public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket);
+    public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket, OSGeneratedQueryContext queryContext);
 }

@@ -234,7 +234,7 @@ const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGr
 
 const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
   const { fields, config } = pivot;
-  const { limit, skip_empty_values } = config as ValuesConfigType;
+  const { limit, skip_empty_values, other_bucket } = config as ValuesConfigType;
 
   return addRandomId<ValuesGrouping>({
     direction,
@@ -242,6 +242,7 @@ const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): Valu
     type: ValuesType,
     limit,
     skipEmptyValues: skip_empty_values,
+    otherBucket: other_bucket,
   });
 };
 
@@ -268,7 +269,11 @@ const groupingToPivot = (grouping: GroupByFormValues) => {
   const pivotConfig =
     'interval' in grouping
       ? { interval: grouping.interval }
-      : { limit: parseNumber(grouping.limit), skip_empty_values: grouping.skipEmptyValues };
+      : {
+          limit: parseNumber(grouping.limit),
+          skip_empty_values: grouping.skipEmptyValues,
+          other_bucket: grouping.otherBucket,
+        };
 
   return Pivot.create(grouping.fields, grouping.type, pivotConfig);
 };

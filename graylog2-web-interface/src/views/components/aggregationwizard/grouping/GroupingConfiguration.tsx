@@ -16,61 +16,22 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useFormikContext, Field } from 'formik';
+import { useFormikContext } from 'formik';
 
-import { Checkbox } from 'components/bootstrap';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
-import { FormikFormGroup, HoverForHelp } from 'components/common';
+import { FormikFormGroup } from 'components/common';
 import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 
 import Direction from './configuration/Direction';
 import FieldComponent from './configuration/FieldComponent';
 import Time from './configuration/Time';
+import GroupingCheckbox from './GroupingCheckbox';
 
 const Wrapper = styled.div``;
 
 type Props = {
   index: number;
 };
-
-type SkipEmptyValuesHoverForHelpProps = {
-  children: React.ReactNode;
-  title: string;
-};
-
-const SkipEmptyValuesHoverForHelp = styled((props: SkipEmptyValuesHoverForHelpProps) => <HoverForHelp {...props} />)`
-  margin-left: 5px;
-`;
-
-const SkipEmptyValuesCheckbox = styled(Checkbox)`
-  &.checkbox {
-    padding-top: 0;
-  }
-`;
-const SkipEmptyValuesLabel = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-type SkipEmptyValuesPropes = {
-  index: number;
-};
-const SkipEmptyValues = ({ index }: SkipEmptyValuesPropes) => (
-  <Field name={`groupBy.groupings.${index}.skipEmptyValues`}>
-    {({ field: { name, value, onChange } }) => (
-      <SkipEmptyValuesCheckbox onChange={() => onChange({ target: { name, value: !value } })} checked={value ?? false}>
-        <SkipEmptyValuesLabel>
-          Skip Empty Values
-          <SkipEmptyValuesHoverForHelp title="Skip Empty Values">
-            When this is enabled, messages which do not contain the configured fields will be skipped.
-            <p />
-            Otherwise an &quot;(Empty Value)&quot; bucket will be created.
-          </SkipEmptyValuesHoverForHelp>
-        </SkipEmptyValuesLabel>
-      </SkipEmptyValuesCheckbox>
-    )}
-  </Field>
-);
 
 const GroupingConfiguration = React.memo(({ index }: Props) => {
   const {
@@ -86,7 +47,24 @@ const GroupingConfiguration = React.memo(({ index }: Props) => {
       {fieldType === ValuesType && (
         <>
           <FormikFormGroup label="Limit" name={`groupBy.groupings.${index}.limit`} type="number" bsSize="small" />
-          <SkipEmptyValues index={index} />
+          <GroupingCheckbox
+            name={`groupBy.groupings.${index}.skipEmptyValues`}
+            label="Skip Empty Values"
+            helpTitle="Skip Empty Values">
+            When this is enabled, messages which do not contain the configured fields will be skipped.
+            <p />
+            Otherwise an &quot;(Empty Value)&quot; bucket will be created.
+          </GroupingCheckbox>
+          <GroupingCheckbox
+            name={`groupBy.groupings.${index}.otherBucket`}
+            label="Include Other bucket"
+            helpTitle="Include Other bucket">
+            Groups all values beyond the configured limit into a single &quot;(Other)&quot; bucket.
+            <p />
+            Count, sum, sum of squares, average, standard deviation and variance are calculated exactly.
+            Minimum, maximum, cardinality, percentile, percentage and latest cannot be derived for this bucket
+            and are left empty.
+          </GroupingCheckbox>
         </>
       )}
     </Wrapper>

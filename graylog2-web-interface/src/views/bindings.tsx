@@ -123,6 +123,7 @@ import TextWidget from 'views/logic/widgets/TextWidget';
 import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import containsOtherBucketValue from 'views/components/visualizations/utils/containsOtherBucketValue';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
 import {
   CopyToClipboardFieldActionPlugin,
@@ -367,16 +368,20 @@ const exports: PluginExports = {
         type: 'exclude',
         title: 'Exclude from results',
         thunk: ExcludeFromQueryHandler,
-        isEnabled: ({ field, type, contexts }) =>
-          (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
+        isEnabled: ({ field, value, type, contexts }) =>
+          (!isFunction(field) || hasMultipleValueForActions(contexts)) &&
+          !type.isDecorated() &&
+          !containsOtherBucketValue(value, contexts),
         resetFocus: false,
       },
       {
         type: 'add-to-query',
         title: 'Add to query',
         thunk: AddToQueryHandler,
-        isEnabled: ({ field, type, contexts }) =>
-          (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
+        isEnabled: ({ field, value, type, contexts }) =>
+          (!isFunction(field) || hasMultipleValueForActions(contexts)) &&
+          !type.isDecorated() &&
+          !containsOtherBucketValue(value, contexts),
         resetFocus: false,
       },
       {
@@ -404,7 +409,7 @@ const exports: PluginExports = {
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',
-        isEnabled: () => true,
+        isEnabled: ({ value, contexts }) => !containsOtherBucketValue(value, contexts),
         resetFocus: false,
         component: CreateEventDefinition,
       },

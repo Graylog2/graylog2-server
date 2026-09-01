@@ -485,7 +485,7 @@ public class OSPivotTest {
         }
 
         @Override
-        public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket) {
+        public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket, OSGeneratedQueryContext queryContext) {
             return bucketsByField.getOrDefault(bucketSpecs.fields().get(0), List.of()).stream();
         }
     }

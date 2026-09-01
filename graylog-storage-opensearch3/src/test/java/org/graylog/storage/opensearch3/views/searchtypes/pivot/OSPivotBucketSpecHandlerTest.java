@@ -17,9 +17,17 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSValuesHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,5 +97,71 @@ class OSPivotBucketSpecHandlerTest {
 
         assertThat(sortOrders.orders()).containsExactly(OSPivotBucketSpecHandler.BucketOrder.key(SortOrder.Asc));
         assertThat(sortOrders.sortingAggregations()).isEmpty();
+    }
+
+    private Pivot pivotWithSeries(boolean otherBucket, SeriesSpec... series) {
+        return Pivot.builder()
+                .rollup(true)
+                .series(series)
+                .rowGroups(Values.builder().field("source").limit(5).otherBucket(otherBucket).build())
+                .build();
+    }
+
+    private List<MutableNamedAggregationBuilder> createMetrics(Pivot pivot) {
+        final Query query = mock(Query.class);
+        when(query.effectiveStreams(pivot)).thenReturn(Set.of("stream1"));
+        final OSGeneratedQueryContext queryContext = mock(OSGeneratedQueryContext.class);
+        final Values bucketSpec = (Values) pivot.rowGroups().get(0);
+
+        return handler.doCreateAggregation(BucketSpecHandler.Direction.Row, "agg", pivot, bucketSpec, queryContext, query)
+                .metrics();
+    }
+
+    private static List<String> statsAggregationNames(MutableNamedAggregationBuilder metric) {
+        return metric.build().aggregations().keySet().stream()
+                .filter(name -> name.startsWith("other-stats("))
+                .sorted()
+                .toList();
+    }
+
+    @Test
+    void noStatsCompanionsWhenOtherBucketIsDisabled() {
+        final Pivot pivot = pivotWithSeries(false, Average.builder().field("age").build());
+
+        assertThat(createMetrics(pivot))
+                .allSatisfy(metric -> assertThat(statsAggregationNames(metric)).isEmpty());
+    }
+
+    @Test
+    void noStatsCompanionsWhenNoSeriesNeedsThem() {
+        final Pivot pivot = pivotWithSeries(true,
+                Count.builder().build(),
+                Sum.builder().field("age").build());
+
+        assertThat(createMetrics(pivot))
+                .allSatisfy(metric -> assertThat(statsAggregationNames(metric)).isEmpty());
+    }
+
+    @Test
+    void statsCompanionIsAddedToEveryMetricLevelForAverage() {
+        final Pivot pivot = pivotWithSeries(true, Average.builder().field("age").build());
+
+        assertThat(createMetrics(pivot))
+                .isNotEmpty()
+                .allSatisfy(metric -> assertThat(statsAggregationNames(metric))
+                        .containsExactly("other-stats(age)"));
+    }
+
+    @Test
+    void statsCompanionsAreDeduplicatedPerField() {
+        final Pivot pivot = pivotWithSeries(true,
+                Average.builder().field("age").build(),
+                StdDev.builder().field("age").build(),
+                Variance.builder().field("height").build());
+
+        assertThat(createMetrics(pivot))
+                .isNotEmpty()
+                .allSatisfy(metric -> assertThat(statsAggregationNames(metric))
+                        .containsExactly("other-stats(age)", "other-stats(height)"));
     }
 }

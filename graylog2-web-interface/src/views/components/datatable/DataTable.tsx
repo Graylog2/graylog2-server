@@ -34,6 +34,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import { OTHER_BUCKET_NAME } from 'views/Constants';
 
 import TableHead from './TableHead';
 import DataTableEntry from './DataTableEntry';
@@ -94,6 +95,16 @@ const TBody = styled.tbody<{
   `,
 );
 
+// The (Other) bucket collects everything beyond a grouping's limit, so it always belongs at the end - but its
+// literal key would otherwise sort before any letter.
+const compareKeySegment = (v1: string, v2: string) => {
+  if (v1 === v2) return 0;
+  if (v1 === OTHER_BUCKET_NAME) return 1;
+  if (v2 === OTHER_BUCKET_NAME) return -1;
+
+  return defaultCompare(v1, v2);
+};
+
 const _compareArray = (ary1, ary2) => {
   if (ary1 === undefined) {
     if (ary2 === undefined) {
@@ -111,13 +122,13 @@ const _compareArray = (ary1, ary2) => {
     return -1;
   }
 
-  const diffIdx = ary1.findIndex((v, idx) => defaultCompare(v, ary2[idx]) !== 0);
+  const diffIdx = ary1.findIndex((v, idx) => compareKeySegment(v, ary2[idx]) !== 0);
 
   if (diffIdx === -1) {
     return 0;
   }
 
-  return defaultCompare(ary1[diffIdx], ary2[diffIdx]);
+  return compareKeySegment(ary1[diffIdx], ary2[diffIdx]);
 };
 
 const _extractColumnPivotValues = (rows): Array<Array<string>> => {

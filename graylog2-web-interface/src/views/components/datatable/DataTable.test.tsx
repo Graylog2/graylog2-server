@@ -37,6 +37,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import { createViewWithWidgets } from 'fixtures/searches';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import { OTHER_BUCKET_NAME } from 'views/Constants';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
@@ -270,6 +271,43 @@ describe('DataTable', () => {
     );
 
     await screen.findByRole('columnheader', { name: 'TCP' });
+  });
+
+  it('renders the (Other) column last regardless of key ordering', async () => {
+    const otherBucketData = {
+      chart: [
+        {
+          key: [],
+          values: [
+            { key: [OTHER_BUCKET_NAME, 'count()'], value: 3, rollup: false, source: 'col-leaf' },
+            { key: ['zzz', 'count()'], value: 1, rollup: false, source: 'col-leaf' },
+            { key: ['aaa', 'count()'], value: 2, rollup: false, source: 'col-leaf' },
+          ],
+          source: 'leaf',
+        },
+      ],
+    };
+
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([])
+      .columnPivots([columnPivot])
+      .series([series])
+      .sort([])
+      .visualization('table')
+      .rollup(false)
+      .build();
+    render(
+      <SimplifiedDataTable
+        config={config}
+        // @ts-expect-error
+        data={otherBucketData}
+      />,
+    );
+
+    const headers = await screen.findAllByRole('columnheader');
+    const labels = headers.map((header) => header.textContent);
+
+    expect(labels.indexOf(OTHER_BUCKET_NAME)).toBeGreaterThan(labels.indexOf('zzz'));
   });
 
   it('passes inferred types to fields', async () => {

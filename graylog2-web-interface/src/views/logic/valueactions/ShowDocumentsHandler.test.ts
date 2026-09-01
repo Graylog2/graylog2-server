@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import { MISSING_BUCKET_NAME } from 'views/Constants';
+import { MISSING_BUCKET_NAME, OTHER_BUCKET_NAME } from 'views/Constants';
 import mockDispatch from 'views/test/mockDispatch';
 import { createViewWithWidgets } from 'fixtures/searches';
 import type { RootState } from 'views/types';
@@ -166,6 +166,24 @@ describe('ShowDocumentsHandler', () => {
         }),
       }),
     );
+  });
+
+  describe('isEnabled', () => {
+    it('is enabled for a regular value path', () => {
+      expect(
+        ShowDocumentsHandler.isEnabled({ contexts: { widget, valuePath: [{ [field]: 'Hello!' }] } }),
+      ).toBe(true);
+    });
+
+    it('is disabled when the value path contains the Other bucket', () => {
+      expect(
+        ShowDocumentsHandler.isEnabled({ contexts: { widget, valuePath: [{ [field]: OTHER_BUCKET_NAME }] } }),
+      ).toBe(false);
+    });
+
+    it('is disabled for an empty value path', () => {
+      expect(ShowDocumentsHandler.isEnabled({ contexts: { widget, valuePath: [] } })).toBe(false);
+    });
   });
 
   describe('on dashboard', () => {

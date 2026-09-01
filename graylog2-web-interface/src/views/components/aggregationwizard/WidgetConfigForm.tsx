@@ -64,6 +64,7 @@ export type ValuesGrouping = Required<BaseGrouping, 'id'> & {
   type: typeof ValuesType;
   limit: number;
   skipEmptyValues?: boolean;
+  otherBucket?: boolean;
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
