@@ -84,9 +84,7 @@ describe('CreateNewWidgetModal', () => {
     const button = await screen.findByRole('button', { name: /Create Message Count Widget/i });
     await userEvent.click(button);
 
-    expect(sendTelemetry).toHaveBeenCalledWith('Search Widget Message Count Created', {
-      app_section: 'search-widget',
-    });
+    expect(sendTelemetry).toHaveBeenCalledWith('Search Widget Message Count Created', {});
   });
 
   it('falls back to a generated event name instead of sending an undefined event type for an unmapped widget type', async () => {
@@ -95,8 +93,6 @@ describe('CreateNewWidgetModal', () => {
     const button = await screen.findByRole('button', { name: /Create Custom Aggregation Widget/i });
     await userEvent.click(button);
 
-    expect(sendTelemetry).toHaveBeenCalledWith('Search Widget Custom Aggregation Created', {
-      app_section: 'search-widget',
-    });
+    expect(sendTelemetry).toHaveBeenCalledWith('Search Widget Custom Aggregation Created', {});
   });
 });
