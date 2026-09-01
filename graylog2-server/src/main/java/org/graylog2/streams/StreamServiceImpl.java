@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
@@ -90,6 +91,7 @@ public class StreamServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     public static final String COLLECTION_NAME = "streams";
     private final MongoCollection<StreamDTO> collection;
+    private final com.mongodb.client.MongoCollection<Document> documentCollection;
     private final MongoUtils<StreamDTO> mongoUtils;
     private final ScopedEntityMongoUtils<StreamDTO> scopedMongoUtils;
     private final StreamRuleService streamRuleService;
@@ -114,6 +116,7 @@ public class StreamServiceImpl implements StreamService {
                              EntityScopeService scopeService,
                              StreamCache streamCache) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
+        this.documentCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedMongoUtils = mongoCollections.scopedEntityUtils(collection, scopeService);
         this.streamRuleService = streamRuleService;
@@ -220,7 +223,9 @@ public class StreamServiceImpl implements StreamService {
     @Override
     @MustBeClosed
     public java.util.stream.Stream<String> streamAllIds() {
-        return stream(collection.find()).map(StreamDTO::id);
+        // Projects _ids to avoid loading full StreamDTOs.
+        return stream(documentCollection.find().projection(Projections.include("_id")))
+                .map(doc -> doc.getObjectId("_id").toHexString());
     }
 
     @Override

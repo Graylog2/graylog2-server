@@ -32,12 +32,14 @@ public abstract class EventsConfiguration {
     private static final String FIELD_NOTIFICATIONS_DEFAULT_BACKLOG = "events_notification_default_backlog";
     private static final String FIELD_CATCHUP_WINDOW = "events_catchup_window";
     private static final String FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE = "events_notification_tcp_keepalive";
+    private static final String FIELD_ENFORCE_EVENT_DEFINITION_PERMISSIONS = "enforce_event_definition_permissions";
 
     private static final long DEFAULT_SEARCH_TIMEOUT_MS = 60000;
     private static final long DEFAULT_NOTIFICATIONS_RETRY_MS = 300000;
     private static final long DEFAULT_NOTIFICATIONS_BACKLOG = 50;
     public static final long DEFAULT_CATCH_UP_WINDOW_MS = Duration.standardHours(1).getMillis();
     private static final boolean DEFAULT_NOTIFICATIONS_KEEP_ALIVE_PROBE = false;
+    private static final boolean DEFAULT_ENFORCE_EVENT_DEFINITION_PERMISSIONS = false;
 
     @JsonProperty(FIELD_SEARCH_TIMEOUT)
     public abstract long eventsSearchTimeout();
@@ -54,6 +56,9 @@ public abstract class EventsConfiguration {
     @JsonProperty(FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE)
     public abstract boolean notificationsKeepAliveProbe();
 
+    @JsonProperty(FIELD_ENFORCE_EVENT_DEFINITION_PERMISSIONS)
+    public abstract boolean enforceEventDefinitionPermissions();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -69,7 +74,8 @@ public abstract class EventsConfiguration {
                     .eventNotificationsRetry(DEFAULT_NOTIFICATIONS_RETRY_MS)
                     .eventNotificationsBacklog(DEFAULT_NOTIFICATIONS_BACKLOG)
                     .eventCatchupWindow(DEFAULT_CATCH_UP_WINDOW_MS)
-                    .notificationsKeepAliveProbe(DEFAULT_NOTIFICATIONS_KEEP_ALIVE_PROBE);
+                    .notificationsKeepAliveProbe(DEFAULT_NOTIFICATIONS_KEEP_ALIVE_PROBE)
+                    .enforceEventDefinitionPermissions(DEFAULT_ENFORCE_EVENT_DEFINITION_PERMISSIONS);
         }
 
         @JsonProperty(FIELD_SEARCH_TIMEOUT)
@@ -86,6 +92,9 @@ public abstract class EventsConfiguration {
 
         @JsonProperty(FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE)
         public abstract Builder notificationsKeepAliveProbe(boolean enabled);
+
+        @JsonProperty(FIELD_ENFORCE_EVENT_DEFINITION_PERMISSIONS)
+        public abstract Builder enforceEventDefinitionPermissions(boolean enforceEventDefinitionPermissions);
 
         public abstract EventsConfiguration build();
     }

@@ -52,7 +52,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateSlicesForColumn_groupsByField() {
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                ALL_STREAMS, null, allAllowed(),
+                ALL_STREAMS, null, allAllowed(), EventDefinitionFilter.allAllowed(),
                 Map.of(), "gl2_source_input", null, Map.of(), 100);
 
         final Map<String, Integer> countsByInput = result.stream()
@@ -68,7 +68,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateSlicesForColumn_withQueryFilter() {
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "gl2_source_input:input-1", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                ALL_STREAMS, null, allAllowed(),
+                ALL_STREAMS, null, allAllowed(), EventDefinitionFilter.allAllowed(),
                 Map.of(), "streams", null, Map.of(), 100);
 
         final Map<String, Integer> countsByStream = result.stream()
@@ -83,7 +83,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
     public void aggregateSlicesForColumn_emptyResultForNoMatch() {
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "gl2_source_input:nonexistent", RelativeRange.allTime(), Set.of(INDEX_NAME),
-                ALL_STREAMS, null, allAllowed(),
+                ALL_STREAMS, null, allAllowed(), EventDefinitionFilter.allAllowed(),
                 Map.of(), "streams", null, Map.of(), 100);
 
         assertThat(result).isEmpty();
@@ -100,6 +100,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 Set.of(EVENTS_STREAM), null, SourceStreamFilter.allowList(Set.of("stream-a")),
+                EventDefinitionFilter.allAllowed(),
                 Map.of(), "tags", null, Map.of(), 100);
 
         assertThat(tagCounts(result))
@@ -111,6 +112,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 Set.of(EVENTS_STREAM), null, SourceStreamFilter.allowList(Set.of("stream-b")),
+                EventDefinitionFilter.allAllowed(),
                 Map.of(), "tags", null, Map.of(), 100);
 
         assertThat(tagCounts(result))
@@ -122,6 +124,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 Set.of(EVENTS_STREAM), null, allAllowed(),
+                EventDefinitionFilter.allAllowed(),
                 Map.of(), "tags", null, Map.of(), 100);
 
         assertThat(tagCounts(result)).containsOnlyKeys("windows", "execution", "linux", "credential-access",
@@ -133,6 +136,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 Set.of(EVENTS_STREAM), null, SourceStreamFilter.allowList(Set.of()),
+                EventDefinitionFilter.allAllowed(),
                 Map.of(), "tags", null, Map.of(), 100);
 
         assertThat(result).isEmpty();
@@ -149,6 +153,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 Set.of(EVENTS_STREAM), null, allAllowed(),
+                EventDefinitionFilter.allAllowed(),
                 Map.of(), "tags", ".*access.*", Map.of(), 100);
 
         assertThat(tagCounts(result))
@@ -161,6 +166,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 Set.of(EVENTS_STREAM), null, allAllowed(),
+                EventDefinitionFilter.allAllowed(),
                 Map.of(), "tags", ".*t1003\\.001.*", Map.of(), 100);
 
         assertThat(tagCounts(result)).containsOnlyKeys("t1003.001");
@@ -172,6 +178,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 Set.of(EVENTS_STREAM), null, SourceStreamFilter.allowList(Set.of("stream-b")),
+                EventDefinitionFilter.allAllowed(),
                 Map.of(), "tags", ".*access.*", Map.of(), 100);
 
         assertThat(tagCounts(result)).containsOnlyKeys("credential-access");
@@ -182,6 +189,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 Set.of(EVENTS_STREAM), null, allAllowed(),
+                EventDefinitionFilter.allAllowed(),
                 Map.of(), "tags", ".*doesnotexist.*", Map.of(), 100);
 
         assertThat(result).isEmpty();

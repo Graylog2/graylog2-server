@@ -1,0 +1,219 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "evt-a1"
+          }
+        },
+        {
+          "data": {
+            "id": "evt-a1",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "6a0000000000000000000a01",
+            "origin_context": null,
+            "timestamp": "2025-01-15 10:00:00.000",
+            "timestamp_processing": "2025-01-15 10:00:05.000",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-vis"
+            ],
+            "message": "visibility event evt-a1",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 2.0,
+              "normalized_risk": 2.0
+            },
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "evt-a2"
+          }
+        },
+        {
+          "data": {
+            "id": "evt-a2",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "6a0000000000000000000a01",
+            "origin_context": null,
+            "timestamp": "2025-01-15 11:00:00.000",
+            "timestamp_processing": "2025-01-15 11:00:05.000",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-vis"
+            ],
+            "message": "visibility event evt-a2",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 2.0,
+              "normalized_risk": 2.0
+            },
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "evt-b1"
+          }
+        },
+        {
+          "data": {
+            "id": "evt-b1",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "6a0000000000000000000b01",
+            "origin_context": null,
+            "timestamp": "2025-01-15 12:00:00.000",
+            "timestamp_processing": "2025-01-15 12:00:05.000",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-vis"
+            ],
+            "message": "visibility event evt-b1",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 2.0,
+              "normalized_risk": 2.0
+            },
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "evt-b2"
+          }
+        },
+        {
+          "data": {
+            "id": "evt-b2",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "6a0000000000000000000b01",
+            "origin_context": null,
+            "timestamp": "2025-01-15 13:00:00.000",
+            "timestamp_processing": "2025-01-15 13:00:05.000",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-vis"
+            ],
+            "message": "visibility event evt-b2",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 2.0,
+              "normalized_risk": 2.0
+            },
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "evt-c1"
+          }
+        },
+        {
+          "data": {
+            "id": "evt-c1",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "6a0000000000000000000c01",
+            "origin_context": null,
+            "timestamp": "2025-01-15 14:00:00.000",
+            "timestamp_processing": "2025-01-15 14:00:05.000",
+            "timerange_start": null,
+            "timerange_end": null,
+            "streams": [
+              "000000000000000000000002"
+            ],
+            "source_streams": [
+              "stream-vis"
+            ],
+            "message": "visibility event evt-c1",
+            "source": "test-host",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {
+              "raw_risk": 2.0,
+              "normalized_risk": 2.0
+            },
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    }
+  ]
+}

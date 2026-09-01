@@ -45,15 +45,18 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     private final MoreSearch moreSearch;
     private final StreamService streamService;
+    private final EventDefinitionFilterFactory eventDefinitionFilterFactory;
 
     @Inject
     public EventsSearchService(MoreSearch moreSearch,
                                StreamService streamService,
                                DBEventDefinitionService eventDefinitionService,
-                               ObjectMapper objectMapper) {
+                               ObjectMapper objectMapper,
+                               EventDefinitionFilterFactory eventDefinitionFilterFactory) {
         super(eventDefinitionService, streamService, objectMapper);
         this.moreSearch = moreSearch;
         this.streamService = streamService;
+        this.eventDefinitionFilterFactory = eventDefinitionFilterFactory;
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
@@ -65,7 +68,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         final var filter = buildFilter(parameters);
         final var cleanedParameters = hasAssociatedAssetsForNullFilter(parameters) ? removeAssociatedAssetsForNullFilter(parameters) : parameters;
 
-        final MoreSearch.Result result = moreSearch.eventSearch(cleanedParameters, filter, eventStreams, allowedSourceStreams(subject));
+        final MoreSearch.Result result = moreSearch.eventSearch(cleanedParameters, filter, eventStreams, allowedSourceStreams(subject), allowedEventDefinitions(subject));
 
         return buildResultForSubject(parameters, result, subject);
     }
@@ -97,7 +100,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         }
 
         final var filter = buildFilter(parameters);
-        final var result = moreSearch.histogram(parameters, filter, eventStreams, allowedSourceStreams(subject), timeZone);
+        final var result = moreSearch.histogram(parameters, filter, eventStreams, allowedSourceStreams(subject), allowedEventDefinitions(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
     }
@@ -127,7 +130,8 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
         final var bucketPattern = isNullOrEmpty(request.fieldQuery()) ? null : containsPattern(request.fieldQuery());
         return moreSearch.aggregateSlicesForColumn(request.query(), request.timerange(), eventStreams, "",
-                        allowedSourceStreams(subject), field, bucketPattern, Map.of(), MAX_FILTER_OPTIONS)
+                        allowedSourceStreams(subject), allowedEventDefinitions(subject), field, bucketPattern,
+                        Map.of(), MAX_FILTER_OPTIONS)
                 .stream()
                 .map(Slice::value)
                 .filter(value -> !isNullOrEmpty(value))
@@ -178,6 +182,10 @@ public class EventsSearchService extends AbstractEventsSearchService {
     //       most probably not more efficient.
     private SourceStreamFilter allowedSourceStreams(Subject subject) {
         return SourceStreamFilter.forSubject(subject, streamService);
+    }
+
+    private EventDefinitionFilter allowedEventDefinitions(Subject subject) {
+        return eventDefinitionFilterFactory.forSubject(subject);
     }
 
     private EventsSearchResult buildResultForSubject(EventsSearchParameters parameters,
