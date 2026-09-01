@@ -75,7 +75,7 @@ const SavedSearchForm = ({
   const _saveAsSearch = useCallback(() => saveAsSearch(title, sharePayload), [saveAsSearch, title, sharePayload]);
 
   return (
-    <Popover position="left" width={500} opened={show} withArrow withinPortal>
+    <Popover position="left" width={500} opened={show} onDismiss={toggleModal} withArrow withinPortal>
       <Popover.Target>{children}</Popover.Target>
       <StyledPopoverDropdown title="Name of search" id="saved-search-popover">
         <form onSubmit={stopEvent}>
