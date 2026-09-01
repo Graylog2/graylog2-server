@@ -16,8 +16,8 @@
  */
 package org.graylog.aws.config;
 
-import com.amazonaws.regions.Regions;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.regions.Region;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.aws.config.AWSPluginConfiguration.createDefault;
@@ -30,7 +30,7 @@ public class AWSPluginConfigurationTest {
                 .lookupRegions("us-west-1,eu-west-1 ,  us-east-1 ")
                 .build();
 
-        assertThat(config.getLookupRegions()).containsExactly(Regions.US_WEST_1, Regions.EU_WEST_1, Regions.US_EAST_1);
+        assertThat(config.getLookupRegions()).containsExactly(Region.US_WEST_1, Region.EU_WEST_1, Region.US_EAST_1);
     }
 
     @Test

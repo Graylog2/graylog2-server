@@ -1,0 +1,2 @@
+type = "security"
+message = "Remove the last uses of AWS SDK v1 (`com.amazonaws`) from the AWS plugin, replacing them with AWS SDK v2 (`software.amazon.awssdk`), which the rest of the codebase already uses. AWS SDK v1 entered maintenance mode and its EC2/EOL date has passed."

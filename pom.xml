@@ -100,7 +100,7 @@
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <opensearch.client.version>3.2.0</opensearch.client.version>
         <airline.version>3.2.0</airline.version>
-        <amqp-client.version>5.29.0</amqp-client.version>
+        <amqp-client.version>5.34.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -301,13 +301,6 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
                 <version>${aws-java-sdk-2.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-bom</artifactId>
-                <version>${aws-java-sdk-1.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -886,6 +879,11 @@
                                              megabytes to our production artifacts and must be avoided. -->
                                         <exclude>com.amazonaws:aws-java-sdk-bundle</exclude>
                                         <exclude>software.amazon.awssdk:bundle</exclude>
+                                        <!-- The AWS plugin has been fully migrated to AWS SDK v2 (software.amazon.awssdk).
+                                             Ban the v1 SDK to prevent it from creeping back in. Note: this only bans the
+                                             "aws-java-sdk-*" artifacts; it does not affect com.amazonaws:dynamodb-lock-client,
+                                             an unrelated utility used by the Kinesis Client Library that is itself built on SDK v2. -->
+                                        <exclude>com.amazonaws:aws-java-sdk-*</exclude>
                                         <!-- Ban some javax dependencies after the move to jakarta -->
                                         <exclude>javax.inject:*</exclude>
                                         <exclude>javax.ws.rs:javax.*</exclude>

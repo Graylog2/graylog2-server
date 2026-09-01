@@ -16,20 +16,16 @@
  */
 package org.graylog.aws.config;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.ClientConfigurationFactory;
-import okhttp3.HttpUrl;
-
 import jakarta.validation.constraints.NotNull;
+import okhttp3.HttpUrl;
+import org.graylog.aws.AWSProxyConfigurationProvider;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
 
 public class Proxy {
 
-    public static ClientConfiguration forAWS(@NotNull HttpUrl proxyUrl) {
-        return new ClientConfigurationFactory().getConfig()
-                .withProxyHost(proxyUrl.host())
-                .withProxyPort(proxyUrl.port())
-                .withProxyUsername(proxyUrl.username())
-                .withProxyPassword(proxyUrl.password());
+    public static ApacheHttpClient.Builder forAWS(@NotNull HttpUrl proxyUrl) {
+        return ApacheHttpClient.builder()
+                .proxyConfiguration(AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUrl.uri()));
     }
 
 }
