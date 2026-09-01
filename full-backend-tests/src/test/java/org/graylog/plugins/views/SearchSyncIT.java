@@ -47,7 +47,7 @@ public class SearchSyncIT {
     @BeforeAll
     static void importMongoFixtures(GraylogApis graylogApis) {
         api = graylogApis;
-        api.backend().importMongoDBFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
+        api.backend().dataBaseInstance().importFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
 
         api.gelf().createGelfHttpInput()
                 .postMessage("{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}");

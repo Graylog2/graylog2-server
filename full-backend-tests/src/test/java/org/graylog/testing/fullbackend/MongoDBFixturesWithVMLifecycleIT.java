@@ -34,7 +34,7 @@ class MongoDBFixturesWithVMLifecycleIT {
     @BeforeAll
     static void importMongoFixtures(GraylogApis graylogApis) {
         api = graylogApis;
-        api.backend().importMongoDBFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
+        api.backend().dataBaseInstance().importFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
     }
 
     @FullBackendTest
