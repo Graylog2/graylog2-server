@@ -114,7 +114,8 @@
         <aws-java-sdk-2.version>2.53.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.7</aws-msk-iam-auth.version>
-        <bouncycastle.version>1.85.2</bouncycastle.version>
+        <bouncycastle-prov.version>1.85.2</bouncycastle-prov.version>
+        <bouncycastle-pkix.version>1.85</bouncycastle-pkix.version>
         <caffeine.version>3.2.4</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.192</classgraph.version>
@@ -733,12 +734,12 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
+                <version>${bouncycastle-prov.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
+                <version>${bouncycastle-pkix.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.threeten</groupId>
