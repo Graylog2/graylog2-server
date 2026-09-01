@@ -751,7 +751,8 @@ public class StreamResource extends RestResource {
                 stream.getRemoveMatchesFromDefaultStream(),
                 stream.getIndexSetId(),
                 stream.isEditable(),
-                stream.getCategories()
+                stream.getCategories(),
+                stream.getFavoriteFields()
         );
     }
 
