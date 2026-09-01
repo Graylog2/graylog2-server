@@ -16,11 +16,10 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
+import org.graylog.plugins.views.search.aggregations.PivotKeyScript;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
@@ -30,6 +29,7 @@ import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.Script;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
@@ -121,16 +121,10 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     }
 
     private Script scriptForPivots(Collection<String> pivots) {
-        final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
-                .map(bucket -> """
-                        (doc.containsKey('%1$s') && doc['%1$s'].size() > 0
-                        ? doc['%1$s'].size() > 1
-                            ? doc['%1$s']
-                            : String.valueOf(doc['%1$s'].value)
-                        : "%2$s")
-                        """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
-                .collect(Collectors.toList()));
-        return Script.of(b -> b.inline(s -> s.source(scriptSource)));
+        final PivotKeyScript script = PivotKeyScript.create(pivots, KEY_SEPARATOR_PHRASE);
+        final Map<String, JsonData> params = script.params().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> JsonData.of(entry.getValue())));
+        return Script.of(b -> b.inline(s -> s.source(script.source()).params(params)));
     }
 
     @Override
