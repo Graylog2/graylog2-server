@@ -80,8 +80,7 @@ class SessionPersistenceIT {
                 new SimpleAccount("test-user-id", null, "TestRealm").getPrincipals();
         final var testAuthContext = new TestSessionAuthContext("some-value");
 
-        final var session = new SimpleSession("localhost");
-        session.setStartTimestamp(Date.from(referenceTime));
+        final var session = new SimpleSession("localhost", Date.from(referenceTime));
         session.setTimeout(10_000L);
         session.setExpired(false);
         session.setLastAccessTime(Date.from(referenceTime.plusSeconds(1)));
@@ -125,10 +124,9 @@ class SessionPersistenceIT {
                 new SimpleAccount("test-user-id", null, "TestRealm").getPrincipals();
         final var testAuthContext = new TestSessionAuthContext("some-value");
 
-        final String sessionId = (String) sessionDAO().create(new SimpleSession("example.com"));
+        final String sessionId = (String) sessionDAO().create(new SimpleSession("example.com", Date.from(referenceTime)));
 
         final var session = (SimpleSession) sessionDAO().readSession(sessionId);
-        session.setStartTimestamp(Date.from(referenceTime));
         session.setTimeout(10_000L);
         session.setExpired(false);
         session.setLastAccessTime(Date.from(referenceTime.plusSeconds(1)));
@@ -188,8 +186,7 @@ class SessionPersistenceIT {
     void expireSession() {
         final var referenceTime = Instant.now().truncatedTo(ChronoUnit.MILLIS).minus(1, ChronoUnit.HOURS);
 
-        final var session = new SimpleSession("localhost");
-        session.setStartTimestamp(Date.from(referenceTime));
+        final var session = new SimpleSession("localhost", Date.from(referenceTime));
         session.setTimeout(10_000L);
         session.setExpired(false);
         session.setLastAccessTime(Date.from(referenceTime.plusSeconds(1)));
