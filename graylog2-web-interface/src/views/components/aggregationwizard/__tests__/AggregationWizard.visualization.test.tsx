@@ -159,7 +159,7 @@ describe('AggregationWizard/Visualizations', () => {
   it('sends a telemetry event when selecting a new visualization type', async () => {
     render(<SimpleAggregationWizard />);
 
-    await selectEvent.chooseOption('Select visualization type', 'Without Config');
+    await selectOption('Select visualization type', 'Without Config');
 
     expect(sendTelemetry).toHaveBeenCalledWith('Search Widget Visualization Type Selected', {
       app_section: 'search-widget',
@@ -171,7 +171,7 @@ describe('AggregationWizard/Visualizations', () => {
   it('does not send a telemetry event when re-selecting the current visualization type', async () => {
     render(<SimpleAggregationWizard />);
 
-    await selectEvent.chooseOption('Select visualization type', 'Data Table');
+    await selectOption('Select visualization type', 'Data Table');
 
     expect(sendTelemetry).not.toHaveBeenCalled();
   });
