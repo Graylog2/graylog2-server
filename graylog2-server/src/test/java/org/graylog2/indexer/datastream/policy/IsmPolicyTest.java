@@ -39,6 +39,19 @@ public class IsmPolicyTest {
         return new IsmPolicy("graylog-ism-test-policy", policy);
     }
 
+    /**
+     * Same as {@link #createSimpleTestPolicy()}, but with an ISM template, which is what makes OpenSearch attach the
+     * policy to backing indices created by later data stream rollovers.
+     */
+    public static IsmPolicy createTestPolicyWithIsmTemplate(String policyId, String indexPattern) {
+        Policy.State deleteState = deleteState();
+        Policy.State initialState = transitionState(deleteState.name());
+        Policy policy = new Policy(null, "Test Policy", null, initialState.name(),
+                ImmutableList.of(initialState, deleteState),
+                ImmutableList.of(new Policy.IsmTemplate(ImmutableList.of(indexPattern), 100)));
+        return new IsmPolicy(policyId, policy);
+    }
+
     private static Policy.State transitionState(String nextState) {
         final List<Action> actions = ImmutableList.of();
         final List<Policy.Transition> transitions = ImmutableList.of(
@@ -83,6 +96,30 @@ public class IsmPolicyTest {
               }
             }""";
 
+    String ismTemplatePolicyJson = """
+            {
+              "_id" : "graylog-ism-test-policy",
+              "policy" : {
+                "description" : "Test Policy",
+                "last_updated_time" : 1755678598000,
+                "last_updated_time_in_millis" : "2026-08-20T08:29:58.000Z",
+                "default_state" : "delete",
+                "states" : [ {
+                  "name" : "delete",
+                  "actions" : [ {
+                    "delete" : { }
+                  } ],
+                  "transitions" : [ ]
+                } ],
+                "ism_template" : [ {
+                  "index_patterns" : [ "test-data-stream" ],
+                  "priority" : 100,
+                  "last_updated_time" : 1755678598000,
+                  "last_updated_time_in_millis" : "2026-08-20T08:29:58.000Z"
+                } ]
+              }
+            }""";
+
 
     @Test
     public void testPolicySerializationWorks() throws IOException {
@@ -96,6 +133,32 @@ public class IsmPolicyTest {
         ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final IsmPolicy policy = objectMapper.readValue(simpleTestPolicyJson, IsmPolicy.class);
         assertThat(policy.policy().states()).hasSize(2);
+    }
+
+    @Test
+    public void testIsmTemplateSerializationWorks() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final String json = objectMapper.writeValueAsString(
+                createTestPolicyWithIsmTemplate("graylog-ism-test-policy", "test-data-stream"));
+
+        assertThat(objectMapper.readTree(json).at("/policy/ism_template/0/index_patterns/0").asText())
+                .isEqualTo("test-data-stream");
+        assertThat(objectMapper.readTree(json).at("/policy/ism_template/0/priority").asInt()).isEqualTo(100);
+    }
+
+    /**
+     * OpenSearch always returns {@code ism_template} as an array and adds a {@code last_updated_time} to each entry,
+     * even when the policy was created with a single template object.
+     */
+    @Test
+    public void testIsmTemplateDeserializationWorks() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final IsmPolicy policy = objectMapper.readValue(ismTemplatePolicyJson, IsmPolicy.class);
+
+        assertThat(policy.policy().ismTemplate()).singleElement().satisfies(ismTemplate -> {
+            assertThat(ismTemplate.indexPatterns()).containsExactly("test-data-stream");
+            assertThat(ismTemplate.priority()).isEqualTo(100);
+        });
     }
 
 }
