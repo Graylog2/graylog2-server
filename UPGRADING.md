@@ -169,7 +169,10 @@ In Graylog 7.2, the AWS Kinesis/CloudWatch input has been upgraded to Kinesis Cl
 DynamoDB actions that KCL 2.x did not. **This applies to every Kinesis/CloudWatch input, whether it is new or existed
 before 7.2**, so a policy written for an earlier Graylog release can look correct and still deny the input. A policy
 that grants only the actions KCL 2.x needed leaves the input logging an authorization error on a fixed schedule while
-consuming no records.
+consuming no records. In 7.2 Graylog watches the two calls the consumer cannot work without, DynamoDB lease discovery
+(`Query`) and the Kinesis record fetch (`GetRecords`), and fails the input naming the denied action once one has been
+denied continuously for two minutes; a denial KCL works around, such as one affecting only lease rebalancing, still
+leaves the input running.
 
 In addition to the actions the lease table already needed (`CreateTable`, `DescribeTable`, `GetItem`, `PutItem`,
 `Scan`, `UpdateItem`, `DeleteItem`), KCL 3.5 requires:
@@ -178,9 +181,10 @@ In addition to the actions the lease table already needed (`CreateTable`, `Descr
   leases through a global secondary index on the lease table. An index is a separate IAM resource from its table, so
   granting `Query` on the table alone still denies this call.
 - **`dynamodb:UpdateTable` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*`.** KCL creates that
-  index on first start. If this is denied the index is never created, and the input starts but consumes nothing. The
-  failure detection described above only fires on authorization denials of the operations it watches, not on the
-  not-found errors that a missing index or lease table produce, so it does not cover this case.
+  index on first start. If this is denied, KCL retries the call throughout startup and then aborts, so the input fails
+  with a generic initialization error rather than starting. That is outside the steady-state detection described above,
+  which watches denials of `Query` and `GetRecords` on a running input, but the input still fails visibly instead of
+  consuming nothing.
 
 The two legacy tables, `<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats`, also need
 access, and how much depends on the input:

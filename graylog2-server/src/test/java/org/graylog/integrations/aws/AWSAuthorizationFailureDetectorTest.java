@@ -299,6 +299,22 @@ class AWSAuthorizationFailureDetectorTest {
         assertThat(reportedFailures).isEmpty();
     }
 
+    @Test
+    void ignoresAwsExceptionsWithoutAnErrorCode() {
+        // The JSON error unmarshaller leaves the code null when it cannot parse one (5xx/HTML/proxy body). The
+        // terminal sets reject null, so a missing guard would NPE here rather than skip the exception.
+        final AwsServiceException noCode = AwsServiceException.builder()
+                .awsErrorDetails(AwsErrorDetails.builder().errorMessage("no code").build())
+                .message("no code")
+                .build();
+        for (int i = 0; i < 10; i++) {
+            recordFailure(QUERY, noCode);
+            advance(WIDE_SPACING);
+        }
+
+        assertThat(reportedFailures).isEmpty();
+    }
+
     /**
      * Fail closed. Unnamed calls sharing one bucket would let a success clear an unrelated denial, which is exactly
      * what per-operation tracking exists to prevent.

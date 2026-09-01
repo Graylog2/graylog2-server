@@ -35,6 +35,13 @@ public interface NotificationService extends PersistedService {
 
     boolean fixed(Notification.Type type, String key);
 
+    /**
+     * Remove a notification only if it is owned by the given node. Unlike {@link #fixed(Notification.Type, String)},
+     * a node recovering does not clear a notification another node raised for the same key, so a still-failing node's
+     * notification survives a peer's recovery.
+     */
+    boolean fixed(Notification.Type type, String key, String nodeId);
+
     boolean fixed(Notification.Type type, Node node);
 
     boolean isFirst(Notification.Type type);

@@ -88,8 +88,12 @@ public class InputStateListener {
                 break;
             case RUNNING:
                 notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
-                notificationService.fixed(Notification.Type.INPUT_FAILING, input.getId());
-                notificationService.fixed(Notification.Type.INPUT_FAILED_TO_START, input.getId());
+                // Node-scoped: a global input runs on every node, and once a node latches a terminal failure it never
+                // re-raises. Clearing cluster-wide would let one node's recovery delete another node's still-standing
+                // failure notification for good, so only clear the one this node owns.
+                final String nodeId = serverStatus.getNodeId().toString();
+                notificationService.fixed(Notification.Type.INPUT_FAILING, input.getId(), nodeId);
+                notificationService.fixed(Notification.Type.INPUT_FAILED_TO_START, input.getId(), nodeId);
                 // fall through
             default:
                 activityWriter.write(new Activity(msg, InputStateListener.class));

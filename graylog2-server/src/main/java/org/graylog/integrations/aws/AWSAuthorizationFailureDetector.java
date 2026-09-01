@@ -185,6 +185,9 @@ public class AWSAuthorizationFailureDetector implements ExecutionInterceptor {
         for (int depth = 0; current != null && depth < MAX_CAUSE_DEPTH; depth++) {
             if (current instanceof AwsServiceException awsException
                     && awsException.awsErrorDetails() != null
+                    // The JSON error unmarshaller leaves the code null when it cannot parse one (5xx/HTML/proxy body).
+                    // The terminal sets reject null, so guard before contains() rather than NPE into a new error loop.
+                    && awsException.awsErrorDetails().errorCode() != null
                     && errorCodes.contains(awsException.awsErrorDetails().errorCode())) {
                 return awsException;
             }

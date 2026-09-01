@@ -94,6 +94,17 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     }
 
     @Override
+    public boolean fixed(Notification.Type type, String key, String nodeId) {
+        final BasicDBObject qry = typeAndKeyQuery(type, key);
+        qry.put(NotificationImpl.FIELD_NODE_ID, nodeId);
+        final boolean removed = destroyAll(NotificationImpl.class, qry) > 0;
+        if (removed) {
+            auditEventSender.success(AuditActor.system(this.nodeId), SYSTEM_NOTIFICATION_DELETE, Map.of("notification_type", type.getDeclaringClass().getCanonicalName()));
+        }
+        return removed;
+    }
+
+    @Override
     public boolean fixed(Notification notification) {
         return fixed(notification.getType(), (Node) null);
     }

@@ -5,9 +5,22 @@ issues = ["Graylog2/graylog-plugin-enterprise#15073"]
 pulls = ["26898"]
 
 details.user = """
-When the IAM role used by an AWS Kinesis/CloudWatch input was missing a required DynamoDB permission, the input logged an authorization error every few seconds indefinitely while consuming no records, and still reported as running. The input now reports a failure naming the denied action and resource, and stops its consumer, once a call it cannot work without has been denied for two minutes. Grant the missing permission, then stop and start the input. A denial the Kinesis Client Library works around, such as one affecting only lease rebalancing, is still logged but leaves the input running.
+When the IAM role used by an AWS Kinesis/CloudWatch input was missing a required DynamoDB permission, the input logged
+an authorization error every few seconds indefinitely while consuming no records, and still reported as running.
+The input now reports a failure naming the denied action and resource, and stops its consumer, once a call it cannot
+work without has been denied for two minutes. Grant the missing permission, then stop and start the input. A denial
+the Kinesis Client Library works around, such as one affecting only lease rebalancing, is still logged but leaves the
+input running. KMS access failures on an encrypted stream (for example a disabled or deleted key) are treated the same
+way: restore access to the key, then stop and start the input.
 """
 
 details.ops = """
-This changes what an incorrectly permissioned AWS Kinesis/CloudWatch input does: where it previously kept running while consuming nothing, its consumer now stops and the input reports a failure. Only the calls the consumer cannot work without trigger this, namely DynamoDB lease discovery and the Kinesis record fetch, so a denial the Kinesis Client Library works around leaves the input running. Note that KCL 3.5 requires DynamoDB actions KCL 2.x did not, most notably `dynamodb:Query` on `table/graylog-aws-plugin-*/index/*` and `dynamodb:UpdateTable` on the lease table. See the AWS Kinesis/CloudWatch section of `UPGRADING.md` for the full list. This new fail-fast only fires on authorization denials of the operations it watches; it does not cover a missing lease index or table (for example after a denied `dynamodb:UpdateTable`), which surface as not-found errors rather than denials, so such an input still starts and consumes nothing.
+This changes what an incorrectly permissioned AWS Kinesis/CloudWatch input does: where it previously kept running while
+consuming nothing, its consumer now stops and the input reports a failure. Only the calls the consumer cannot work
+without trigger this, namely DynamoDB lease discovery and the Kinesis record fetch, so a denial the Kinesis Client
+Library works around leaves the input running. Note that KCL 3.5 requires DynamoDB actions KCL 2.x did not, most
+notably `dynamodb:Query` on `table/graylog-aws-plugin-*/index/*` and `dynamodb:UpdateTable` on the lease table. See
+the AWS Kinesis/CloudWatch section of `UPGRADING.md` for the full list. This new fail-fast only fires on authorization
+denials of the operations it watches while the input is running; a denied `dynamodb:UpdateTable` instead aborts KCL
+startup, so that input fails with a generic initialization error rather than starting.
 """
