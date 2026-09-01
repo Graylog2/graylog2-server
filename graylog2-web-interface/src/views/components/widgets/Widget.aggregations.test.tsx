@@ -36,7 +36,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import suppressConsole from 'helpers/suppressConsole';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import type { Stream } from 'logic/streams/types';
 
 import Widget from './Widget';
@@ -65,6 +65,7 @@ const streams = [{ title: 'Stream 1', id: 'stream-id-1', categories: [] }] as Ar
 jest.mock('views/hooks/useViewType');
 
 jest.mock('views/hooks/useAutoRefresh');
+jest.mock('components/streams/hooks/useAllStreams');
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
@@ -90,6 +91,7 @@ describe('Aggregation Widget', () => {
     .build();
 
   beforeEach(() => {
+    mockUseAllStreams(streams);
     jest.useFakeTimers().setSystemTime(mockedUnixTime);
   });
 
@@ -110,22 +112,20 @@ describe('Aggregation Widget', () => {
 
   const AggregationWidget = ({ widget: propsWidget = dataTableWidget, ...props }: AggregationWidgetProps) => (
     <TestStoreProvider>
-      <StreamsContext.Provider value={streams}>
-        <TestFieldTypesContextProvider>
-          <WidgetFocusContext.Provider value={widgetFocusContextState}>
-            <WidgetContext.Provider value={propsWidget}>
-              <Widget
-                widget={propsWidget}
-                id="widgetId"
-                onPositionsChange={() => {}}
-                title="Widget Title"
-                position={new WidgetPosition(1, 1, 1, 1)}
-                {...props}
-              />
-            </WidgetContext.Provider>
-          </WidgetFocusContext.Provider>
-        </TestFieldTypesContextProvider>
-      </StreamsContext.Provider>
+      <TestFieldTypesContextProvider>
+        <WidgetFocusContext.Provider value={widgetFocusContextState}>
+          <WidgetContext.Provider value={propsWidget}>
+            <Widget
+              widget={propsWidget}
+              id="widgetId"
+              onPositionsChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props}
+            />
+          </WidgetContext.Provider>
+        </WidgetFocusContext.Provider>
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 

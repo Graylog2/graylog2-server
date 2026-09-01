@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
 
 import useView from 'views/hooks/useView';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
@@ -180,7 +180,7 @@ type Props = {
 const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props) => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
-  const streams = useContext(StreamsContext);
+  const { data: streams } = useAllStreams();
   const availableStreams = useMemo(
     () =>
       (streams ?? []).map((stream) => ({

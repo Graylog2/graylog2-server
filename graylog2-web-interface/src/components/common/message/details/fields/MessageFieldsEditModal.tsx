@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Alert, Modal, Button } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import StringUtils from 'util/StringUtils';
 import { ModalSubmit } from 'components/common';
@@ -57,7 +57,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
   } = useMessageFavoriteFieldsForEditing();
   const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
   const { message, editableStreams } = useContext(MessageFavoriteFieldsContext);
-  const streams = useContext(StreamsContext);
+  const { data: streams } = useAllStreams();
   const messageStreams = useMemo(
     () => (streams ?? []).filter((stream) => message.fields.streams.includes(stream.id)),
     [streams, message.fields.streams],

@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
+import type { Stream } from 'logic/streams/types';
 
 import CoreKeyMappers from './CoreKeyMappers';
 
@@ -31,14 +31,13 @@ jest.mock('hooks/useNodeSummaries', () => () => ({
   'node-1': { short_node_id: 'abc123', hostname: 'graylog-01' },
 }));
 
+jest.mock('components/streams/hooks/useAllStreams');
+
 describe('CoreKeyMappers', () => {
   it('resolves stream ids to titles and falls back to the raw id', () => {
-    const wrapper = ({ children }: React.PropsWithChildren) => (
-      <StreamsContext.Provider value={[{ id: 'stream-1', title: 'All messages' } as any]}>
-        {children}
-      </StreamsContext.Provider>
-    );
-    const { result } = renderHook(() => mapperFor('streams')([]), { wrapper });
+    mockUseAllStreams([{ id: 'stream-1', title: 'All messages' } as Stream]);
+
+    const { result } = renderHook(() => mapperFor('streams')([]));
 
     expect(result.current('stream-1')).toBe('All messages');
     expect(result.current('unknown')).toBe('unknown');

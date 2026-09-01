@@ -19,7 +19,7 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import SearchComponent from 'views/components/Search';
@@ -50,6 +50,7 @@ jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 jest.mock('views/hooks/useMinimumRefreshInterval');
+jest.mock('components/streams/hooks/useAllStreams');
 
 describe('StreamSearchPage', () => {
   const mockQuery = {
@@ -58,15 +59,12 @@ describe('StreamSearchPage', () => {
     relative: '300',
   };
   const streamId = 'stream-id-1';
-  const SimpleStreamSearchPage = () => (
-    <StreamsContext.Provider value={[{ id: streamId, title: 'Teststream' } as Stream]}>
-      <StreamSearchPage />
-    </StreamsContext.Provider>
-  );
+  const SimpleStreamSearchPage = () => <StreamSearchPage />;
 
   useViewsPlugin();
 
   beforeEach(() => {
+    mockUseAllStreams([{ id: streamId, title: 'Teststream' } as Stream]);
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ streamId });
     asMock(useMinimumRefreshInterval).mockReturnValue({ data: undefined, isInitialLoading: false });
