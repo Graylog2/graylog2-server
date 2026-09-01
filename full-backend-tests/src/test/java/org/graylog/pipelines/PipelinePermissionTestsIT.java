@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class PipelinePermissionTestsIT {
     private static GraylogApis api;
 
@@ -64,16 +64,16 @@ public class PipelinePermissionTestsIT {
         api.roles().delete(ruleCreatorRole.properJSONPath().read("name", String.class));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testParseNotPermittedForReader() {
         api.forUser(Users.JOHN_DOE).pipelines().parse("Title", "Description", "pipeline \"test1\"\nstage 0 match either\nend", HttpStatus.SC_UNAUTHORIZED);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testParsePermittedForAdmin() {
         api.forUser(Users.LOCAL_ADMIN).pipelines().parse("Title", "Description", "pipeline \"test2\"\nstage 0 match either\nend", HttpStatus.SC_OK);
     }
-    @ContainerMatrixTest
+    @FullBackendTest
     void testParsePermittedForUser() {
         api.forUser(ruleCreator).pipelines().parse("Title", "Description", "pipeline \"test3\"\nstage 0 match either\nend", HttpStatus.SC_OK);
     }
