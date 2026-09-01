@@ -36,7 +36,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_SELF;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -63,8 +62,7 @@ class InputStateListenerTest {
     void setUp() {
         when(input.getId()).thenReturn(INPUT_ID);
         when(serverStatus.getNodeId()).thenReturn(new SimpleNodeId("00000000-0000-0000-0000-000000000000"));
-        // Not every transition builds a notification (a recovery does not), so keep this shared stub lenient.
-        lenient().when(notificationService.buildNow()).thenReturn(mock(Notification.class, RETURNS_SELF));
+        when(notificationService.buildNow()).thenReturn(mock(Notification.class, RETURNS_SELF));
 
         listener = new InputStateListener(mock(EventBus.class), notificationService, activityWriter, serverStatus,
                 inputStateService);
@@ -94,8 +92,8 @@ class InputStateListenerTest {
     }
 
     /**
-     * On a real transition there is nothing stale to retire, and retiring would throw away a notification another node
-     * may have raised for the same input.
+     * On a real transition there is nothing stale to retire: {@code publishIfFirst} stores the current message, so the
+     * extra delete would only cost a round trip and an audit event.
      */
     @Test
     void doesNotRetireAnythingOnAStateTransition() {
@@ -103,22 +101,6 @@ class InputStateListenerTest {
 
         verify(notificationService, never()).fixed(any(Notification.Type.class), anyString());
         verify(notificationService).publishIfFirst(any());
-    }
-
-    /**
-     * A global input runs on every node and a node that has latched a terminal failure never re-raises its
-     * notification, so a recovering node must clear only the failure notification it owns. Clearing cluster-wide would
-     * delete a still-failing peer's notification for good.
-     */
-    @Test
-    void clearsOnlyThisNodesFailureNotificationOnRecovery() {
-        listener.inputStateChanged(eventFor(IOState.Type.FAILING, IOState.Type.RUNNING));
-
-        final String nodeId = "00000000-0000-0000-0000-000000000000";
-        verify(notificationService).fixed(Notification.Type.INPUT_FAILING, INPUT_ID, nodeId);
-        verify(notificationService).fixed(Notification.Type.INPUT_FAILED_TO_START, INPUT_ID, nodeId);
-        verify(notificationService, never()).fixed(Notification.Type.INPUT_FAILING, INPUT_ID);
-        verify(notificationService, never()).fixed(Notification.Type.INPUT_FAILED_TO_START, INPUT_ID);
     }
 
     private IOStateChangedEvent<MessageInput> eventFor(IOState.Type oldState, IOState.Type newState) {
