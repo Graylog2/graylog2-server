@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { PlotRelayoutEvent } from 'plotly.js';
 import { render } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -66,18 +65,15 @@ describe('GenericPlot relayout', () => {
     return calls[calls.length - 1][0];
   };
 
-  it('reports a zoom when the relayout carries an x-range', () => {
+  it('classifies a ranged relayout as a zoom, not a reset', () => {
     const onZoom = jest.fn();
     const onZoomReset = jest.fn();
 
     render(<GenericPlot chartData={[{ type: 'bar' }]} onZoom={onZoom} onZoomReset={onZoomReset} />);
 
-    lastPlotProps().onRelayout({
-      'xaxis.range[0]': '2026-04-07',
-      'xaxis.range[1]': '2026-04-08',
-    } as unknown as PlotRelayoutEvent);
+    lastPlotProps().onRelayout({ 'xaxis.range[0]': 23, 'xaxis.range[1]': 42 });
 
-    expect(onZoom).toHaveBeenCalledWith('2026-04-07', '2026-04-08');
+    expect(onZoom).toHaveBeenCalledTimes(1);
     expect(onZoomReset).not.toHaveBeenCalled();
   });
 

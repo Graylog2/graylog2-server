@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import AppConfig from 'util/AppConfig';
 
@@ -36,25 +36,26 @@ const useTrafficGraphZoom = (traffic: Traffic | null | undefined, trafficLimit?:
   const [uiRevision, setUiRevision] = useState(1);
   const [prevTraffic, setPrevTraffic] = useState(traffic);
 
-  const resetToInitialView = useCallback(() => {
+  const resetToInitialView = () => {
     setZoomedToData(false);
     setUserZoomed(false);
     setUiRevision((revision) => revision + 1);
-  }, []);
+  };
 
   if (prevTraffic !== traffic) {
     setPrevTraffic(traffic);
     resetToInitialView();
   }
 
-  const maxPlottedValue = useMemo(() => (traffic ? Math.max(0, ...Object.values(traffic)) : 0), [traffic]);
-  const canZoomToData = Boolean(traffic && trafficLimit && maxPlottedValue < trafficLimit && !isCloud);
+  const plottedValues = traffic ? Object.values(traffic) : [];
+  const maxPlottedValue = Math.max(0, ...plottedValues);
+  const canZoomToData = Boolean(plottedValues.length > 0 && trafficLimit && maxPlottedValue < trafficLimit && !isCloud);
   const canZoomOrReset = zoomedToData || userZoomed || canZoomToData;
 
-  const onUserZoom = useCallback(() => setUserZoomed(true), []);
-  const onUserZoomReset = useCallback(() => setUserZoomed(false), []);
+  const onUserZoom = () => setUserZoomed(true);
+  const onUserZoomReset = () => setUserZoomed(false);
 
-  const onZoomReset = useCallback(() => {
+  const onZoomReset = () => {
     const isPristine = !zoomedToData && !userZoomed;
 
     if (isPristine) {
@@ -66,7 +67,7 @@ const useTrafficGraphZoom = (traffic: Traffic | null | undefined, trafficLimit?:
     }
 
     resetToInitialView();
-  }, [canZoomToData, resetToInitialView, userZoomed, zoomedToData]);
+  };
 
   return { zoomedToData, uiRevision, canZoomOrReset, onZoomReset, onUserZoom, onUserZoomReset };
 };

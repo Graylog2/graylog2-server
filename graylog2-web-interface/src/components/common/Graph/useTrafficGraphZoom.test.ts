@@ -16,6 +16,9 @@
  */
 import { act, renderHook } from 'wrappedTestingLibrary/hooks';
 
+import asMock from 'helpers/mocking/AsMock';
+import AppConfig from 'util/AppConfig';
+
 import type { Traffic } from './types';
 import useTrafficGraphZoom from './useTrafficGraphZoom';
 
@@ -26,6 +29,10 @@ const sampleTraffic: Traffic = {
 };
 
 describe('useTrafficGraphZoom', () => {
+  beforeEach(() => {
+    asMock(AppConfig.isCloud).mockReturnValue(false);
+  });
+
   it('zooms to the data on the first trigger and fully resets on the second when a limit is set', () => {
     const { result } = renderHook(() => useTrafficGraphZoom(sampleTraffic, 1024 * 1024));
 
@@ -125,6 +132,28 @@ describe('useTrafficGraphZoom', () => {
 
   it('is inert while the traffic series is still loading', () => {
     const { result } = renderHook(() => useTrafficGraphZoom(undefined, 1024 * 1024));
+
+    expect(result.current.canZoomOrReset).toBe(false);
+
+    act(() => result.current.onZoomReset());
+
+    expect(result.current.zoomedToData).toBe(false);
+  });
+
+  it('never offers zoom-to-data for an empty plotted series', () => {
+    const { result } = renderHook(() => useTrafficGraphZoom({}, 1024 * 1024));
+
+    expect(result.current.canZoomOrReset).toBe(false);
+
+    act(() => result.current.onZoomReset());
+
+    expect(result.current.zoomedToData).toBe(false);
+  });
+
+  it('never offers zoom-to-data on cloud, even when a limit dwarfs the data', () => {
+    asMock(AppConfig.isCloud).mockReturnValue(true);
+
+    const { result } = renderHook(() => useTrafficGraphZoom(sampleTraffic, 1024 * 1024));
 
     expect(result.current.canZoomOrReset).toBe(false);
 
