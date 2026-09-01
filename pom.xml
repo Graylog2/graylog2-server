@@ -1344,6 +1344,8 @@
                             io.swagger.annotations.** @ Use io.swagger.v3.oas.annotations.**
 
                             org.apache.shiro.authc.credential.AllowAllCredentialsMatcher @ Use ServiceValidatedCredentialsMatcher
+                            org.apache.shiro.subject.SimplePrincipalCollection @ Use org.apache.shiro.subject.ImmutablePrincipalCollection
+                            org.apache.shiro.subject.MutablePrincipalCollection @ Use org.apache.shiro.subject.PrincipalCollection
                         ]]>
 
                     </signatures>
