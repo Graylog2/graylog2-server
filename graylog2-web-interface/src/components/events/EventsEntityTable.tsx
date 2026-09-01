@@ -79,6 +79,7 @@ const EventsEntityTable = () => {
         bulkSelection={bulkSelection}
         topRightCol={<EventsRefreshControls />}
         middleSection={EventsWidgets}
+        simpleSearchValidationRegexp={/^(?:[+-]?(?:\w+:\s*)?(?:"[^"]*"|\([^)]*\)|\[[^\]]*\]|{[^}]*}|\w+\*?)\s*(?:AND|OR|NOT)?\s*)+$/i}
       />
     </EventsRefreshProvider>
   );

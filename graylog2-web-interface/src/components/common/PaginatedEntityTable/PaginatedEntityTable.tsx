@@ -168,6 +168,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   withoutURLParams = false,
   noPageSizeSelect = false,
   noColumnReordering = false,
+  simpleSearchValidationRegexp = undefined,
 }: PaginatedEntityTableInnerProps<T, M>) => {
   const { searchParams, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useTableFilterContext();
   const { mutateAsync: updateTableLayout, resetAsync: resetTableLayout } = useUpdateUserLayoutPreferences(
@@ -286,6 +287,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                   onReset={onSearchReset}
                   query={searchParams.query}
                   placeholder={searchPlaceholder ?? `Search for ${humanName}`}
+                  validationRegexp={simpleSearchValidationRegexp}
                   queryHelpComponent={queryHelpComponent}>
                   {attributes.length > 0 && (
                     <div style={{ marginBottom: 5 }}>
@@ -412,6 +414,7 @@ export type PaginatedEntityTableProps<T extends EntityBase, M> = {
   withoutURLParams?: boolean;
   noPageSizeSelect?: boolean;
   noColumnReordering?: boolean;
+  simpleSearchValidationRegexp?: RegExp;
 };
 
 /*
