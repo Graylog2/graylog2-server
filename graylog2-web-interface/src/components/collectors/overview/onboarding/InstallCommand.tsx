@@ -80,7 +80,13 @@ const HeaderActions = styled.div(
   `,
 );
 
-const InstallCommand = ({ command, platformLabel, tokenDuration, actions = undefined, onCopySuccess = undefined }: Props) => (
+const InstallCommand = ({
+  command,
+  platformLabel,
+  tokenDuration,
+  actions = undefined,
+  onCopySuccess = undefined,
+}: Props) => (
   <Container>
     <Header>
       <Title>Run This on {platformLabel}</Title>

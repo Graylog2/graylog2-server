@@ -29,8 +29,9 @@ import useHistory from 'routing/useHistory';
 
 import DeployTab from './DeployTab';
 
-import { useFleets, useCollectorsConfig, useCollectorsMutations } from '../hooks';
+import { useFleets, useCollectorsConfig, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import { mockCollectorsMutations } from '../testing/mockMutations';
+import { mockCollectorPermissions } from '../testing/mockPermissions';
 import type { Fleet } from '../types';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
@@ -65,6 +66,7 @@ describe('DeployTab', () => {
     asMock(useInstances).mockReturnValue({ data: [], error: null } as ReturnType<typeof useInstances>);
     asMock(useFleetReceivingCounts).mockReturnValue({ counts: undefined, error: null });
     asMock(useCollectorsMutations).mockReturnValue(mockCollectorsMutations({ createEnrollmentToken }));
+    asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions());
 
     createEnrollmentToken.mockResolvedValue({
       token: 'the-token-value',
@@ -346,14 +348,11 @@ describe('DeployTab', () => {
       await user.click(screen.getByRole('button', { name: /generate token/i }));
 
       await waitFor(() => {
-        expect(sendTelemetry).toHaveBeenCalledWith(
-          TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED,
-          {
-            app_action_value: 'deployment-generate-failed',
-            fleet_id: 'fleet-1',
-            mode: 'short-lived',
-          },
-        );
+        expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
+          app_action_value: 'deployment-generate-failed',
+          fleet_id: 'fleet-1',
+          mode: 'short-lived',
+        });
       });
 
       expect(sendTelemetry).not.toHaveBeenCalledWith(

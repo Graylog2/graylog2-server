@@ -84,13 +84,12 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
   const [nextQueriesList, setNextQueriesList] = useState<Immutable.OrderedSet<PageListItem>>(queriesList);
   const disablePageDelete = nextQueriesList.size <= 1;
   const dispatch = useViewsDispatch();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('dashboard');
   const onConfirmPagesConfiguration = useCallback(() => {
     const isActiveQueryDeleted = !nextQueriesList.find(({ id }) => id === activeQueryId);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_UPDATED, {
       app_pathname: 'dashboard',
-      app_section: 'dashboard',
       app_action_value: 'dashboard-page-configuration',
     });
 
@@ -122,7 +121,6 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
   const onPagesConfigurationModalClose = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_CANCELED, {
       app_pathname: 'dashboard',
-      app_section: 'dashboard',
       app_action_value: 'dashboard-page-configuration',
     });
 
@@ -132,7 +130,6 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
     (order: Array<PageListItem>) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_SORTING_UPDATED, {
         app_pathname: 'dashboard',
-        app_section: 'dashboard',
         app_action_value: 'dashboard-page-configuration-sorting',
       });
 
@@ -156,7 +153,6 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
       if (await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds)) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED, {
           app_pathname: 'dashboard',
-          app_section: 'dashboard',
           app_action_value: 'dashboard-page-configuration-remove-page',
         });
 
