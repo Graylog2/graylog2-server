@@ -36,9 +36,11 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -53,6 +55,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.UserOverviewDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,9 +95,12 @@ public class AuthzRolesResource extends RestResource {
     private final UserService userService;
     private final SearchQueryParser searchQueryParser;
     private final SearchQueryParser userSearchQueryParser;
+    private final PrivilegeEscalationGuard privilegeEscalationGuard;
 
     @Inject
-    public AuthzRolesResource(PaginatedAuthzRolesService authzRolesService, PaginatedUserService paginatedUserService, UserService userService) {
+    public AuthzRolesResource(PaginatedAuthzRolesService authzRolesService, PaginatedUserService paginatedUserService, UserService userService,
+                              PrivilegeEscalationGuard privilegeEscalationGuard) {
+        this.privilegeEscalationGuard = privilegeEscalationGuard;
         this.authzRolesService = authzRolesService;
         this.paginatedUserService = paginatedUserService;
         this.userService = userService;
@@ -223,8 +229,9 @@ public class AuthzRolesResource extends RestResource {
     @Path("{roleId}/assignees")
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
-            @ApiParam(name = "usernames") Set<String> usernames) throws ValidationException {
-        updateUserRole(roleId, usernames, Set::add);
+            @ApiParam(name = "usernames") Set<String> usernames,
+            @Context UserContext userContext) throws ValidationException {
+        updateUserRole(roleId, usernames, Set::add, userContext, true);
     }
 
     @DELETE
@@ -233,15 +240,24 @@ public class AuthzRolesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_DELETE)
     public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
-            @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
-        updateUserRole(roleId, ImmutableSet.of(username), Set::remove);
+            @ApiParam(name = "username") @PathParam("username") @NotBlank String username,
+            @Context UserContext userContext) throws ValidationException {
+        updateUserRole(roleId, ImmutableSet.of(username), Set::remove, userContext, false);
     }
 
     interface UpdateRoles {
         boolean update(Set<String> roles, String roleId);
     }
 
-    private void updateUserRole(String roleId, Set<String> usernames, UpdateRoles rolesUpdater) {
+    /**
+     * @param guardPrivilegeEscalation whether the caller must hold every permission the role grants. Required
+     *                                 when assigning a role, since `roles:edit` on a role would otherwise be
+     *                                 enough to hand out permissions the caller does not have. Un-assigning
+     *                                 reduces privileges, so it stays unguarded - otherwise an over-privileged
+     *                                 user could never be demoted by a less privileged administrator.
+     */
+    private void updateUserRole(String roleId, Set<String> usernames, UpdateRoles rolesUpdater,
+                                UserContext userContext, boolean guardPrivilegeEscalation) {
         usernames.forEach(username -> {
             checkPermission(USERS_ROLESEDIT, username);
 
@@ -252,6 +268,9 @@ public class AuthzRolesResource extends RestResource {
             authzRolesService.get(roleId)
                     .ifPresentOrElse(role -> {
                         checkPermission(RestPermissions.ROLES_EDIT, role.name());
+                        if (guardPrivilegeEscalation) {
+                            privilegeEscalationGuard.validatePermissions(role.permissions(), userContext);
+                        }
                     }, () -> {
                         throw new NotFoundException("Cannot find role with id: " + roleId);
                     });
