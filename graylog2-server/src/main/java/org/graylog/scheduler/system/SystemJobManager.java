@@ -142,9 +142,9 @@ public class SystemJobManager {
 
     /**
      * Requests cancellation of the system job with the given trigger ID by setting the trigger's cancel flag. The
-     * running job stops at its next check of {@link SystemJobContext#isCancelled()}. A blank or non-ObjectId id, or an
-     * id with no matching trigger, is a no-op. Callers are responsible for permission checks and for verifying that the
-     * job is cancelable (see {@link SystemJobSummary#isCancelable()}).
+     * running job stops at its next check of {@link SystemJobContext#isCancelled()}. A non-ObjectId id, or an id with
+     * no matching trigger, is a no-op; a blank id is rejected. Callers are responsible for permission checks and for
+     * verifying that the job is cancelable (see {@link SystemJobSummary#isCancelable()}).
      */
     public void cancel(String id) {
         // A trigger ID is a Mongo ObjectId; a non-ObjectId id can't match a job, so there's nothing to cancel.

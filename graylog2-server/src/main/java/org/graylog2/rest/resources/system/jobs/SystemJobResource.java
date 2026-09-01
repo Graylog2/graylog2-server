@@ -237,7 +237,10 @@ public class SystemJobResource extends RestResource {
         }
 
         // Not a legacy job: try the system job scheduler.
+        // Jobs with their own JobResourceHandler are cancelled through that handler instead, so it can apply its own
+        // permission checks. Mirrors the guard in list() and get().
         final SystemJobSummary summary = systemJobManager.getRunningJob(jobId)
+                .filter(job -> !jobResourceHandlerService.handlesJobType(job.jobType()))
                 .orElseThrow(() -> new NotFoundException("No system job with ID <" + jobId + "> found"));
 
         checkPermission(RestPermissions.SYSTEMJOBS_DELETE, summary.jobType());

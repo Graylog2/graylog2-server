@@ -24,7 +24,6 @@ import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.LegacySystemJobFactory;
 import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -54,6 +52,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SystemJobResourceTest {
     private static final String SCHEDULER_JOB_ID = "6890abcdef0123456789abcd";
+    private static final String HANDLER_MANAGED_JOB_TYPE = "archive-create-execution-v1";
 
     @Mock
     private LegacySystemJobFactory legacySystemJobFactory;
@@ -117,6 +116,19 @@ class SystemJobResourceTest {
     }
 
     @Test
+    void cancelLeavesHandlerManagedJobToItsOwnHandler() {
+        // A job type with its own JobResourceHandler must not be cancelled here: the handler applies the plugin's own
+        // permission checks, and ClusterSystemJobResource only falls through to it when every node reports not-found.
+        when(legacySystemJobManager.getRunningJobs()).thenReturn(Collections.emptyMap());
+        when(systemJobManager.getRunningJob(SCHEDULER_JOB_ID)).thenReturn(Optional.of(handlerManagedSummary()));
+        when(jobResourceHandlerService.handlesJobType(HANDLER_MANAGED_JOB_TYPE)).thenReturn(true);
+
+        assertThatThrownBy(() -> resource.cancel(SCHEDULER_JOB_ID)).isInstanceOf(NotFoundException.class);
+
+        verify(systemJobManager, never()).cancel(anyString());
+    }
+
+    @Test
     void cancelChecksDeletePermissionOnSchedulerJob() {
         permissionCheck = permission -> false;
         when(legacySystemJobManager.getRunningJobs()).thenReturn(Collections.emptyMap());
@@ -125,6 +137,11 @@ class SystemJobResourceTest {
         assertThatThrownBy(() -> resource.cancel(SCHEDULER_JOB_ID)).isInstanceOf(ForbiddenException.class);
 
         verify(systemJobManager, never()).cancel(anyString());
+    }
+
+    private static SystemJobSummary handlerManagedSummary() {
+        return SystemJobSummary.create(SCHEDULER_JOB_ID, "Archive create", HANDLER_MANAGED_JOB_TYPE, "",
+                "node-1", null, 0, true, true);
     }
 
     private static SystemJobSummary schedulerSummary(boolean cancelable) {
