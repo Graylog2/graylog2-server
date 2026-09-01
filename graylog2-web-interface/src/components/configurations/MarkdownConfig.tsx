@@ -24,12 +24,10 @@ import FormikInput from 'components/common/FormikInput';
 import { InputDescription, ModalSubmit, IfPermitted } from 'components/common';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import ConfigurationType from 'components/configurations/ConfigurationTypes';
 import getConfig from 'components/configurations/helpers';
 import { useStore } from 'stores/connect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import reloadPage from 'preflight/components/reloadPage';
 import type { MarkdownConfigType } from 'components/common/types';
 
@@ -62,8 +60,7 @@ const MarkdownConfig = () => {
   const [formConfig, setFormConfig] = useState<MarkdownConfigType | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('markdown');
 
   useEffect(() => {
     ConfigurationsActions.list(configType).then(() => {
@@ -76,8 +73,6 @@ const MarkdownConfig = () => {
 
   const saveConfig = (values: MarkdownConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.USER_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'markdown',
       app_action_value: 'configuration-save',
     });
     ConfigurationsActions.update(configType, values).then(() => {

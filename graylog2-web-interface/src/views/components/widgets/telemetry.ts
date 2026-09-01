@@ -22,12 +22,11 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export const useSendWidgetEditTelemetry = () => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-widget');
 
   return useCallback(
     () =>
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_TOGGLED, {
-        app_section: 'search-widget',
         app_action_value: 'widget-edit-button',
       }),
     [sendTelemetry],
@@ -35,12 +34,11 @@ export const useSendWidgetEditTelemetry = () => {
 };
 
 export const useSendWidgetEditCancelTelemetry = () => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-widget');
 
   return useCallback(
     () =>
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_CANCEL_CLICKED, {
-        app_section: 'search-widget',
         app_action_value: 'widget-edit-cancel-button',
       }),
     [sendTelemetry],
@@ -48,12 +46,11 @@ export const useSendWidgetEditCancelTelemetry = () => {
 };
 
 export const useSendWidgetConfigUpdateTelemetry = () => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-widget');
 
   return useCallback(
     () =>
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
-        app_section: 'search-widget',
         app_action_value: 'widget-edit-update-button',
       }),
     [sendTelemetry],

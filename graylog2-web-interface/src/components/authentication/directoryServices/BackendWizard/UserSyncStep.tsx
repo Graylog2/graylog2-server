@@ -25,9 +25,7 @@ import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
 import { FormikFormGroup, Select, InputList, TimezoneSelect } from 'components/common';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel, Input } from 'components/bootstrap';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { WizardFormValues } from './BackendWizardContext';
@@ -75,13 +73,10 @@ const UserSyncStep = ({
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const { backendValidationErrors } = stepsState;
   const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('directory-service');
 
   const _onSubmitAll = (validateForm) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_USER_SYNC_SAVE_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'directory-service',
       app_action_value: 'usersync-save',
     });
 
@@ -245,8 +240,6 @@ const UserSyncStep = ({
               disabled={isSubmitting}
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_GROUP_SYNC_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
-                  app_section: 'directory-service',
                   app_action_value: 'groupsync-button',
                 });
               }}

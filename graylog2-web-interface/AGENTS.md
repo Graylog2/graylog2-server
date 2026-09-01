@@ -87,6 +87,7 @@ yarn tsgo && yarn lint:changes && yarn test
 - Shared components live in - src/components/common.
 - Wrapped Mantine components live in src/components/common/bootstrap.
 - Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components before creating new ones.
+- Consult the graylog-luma design system (`docs/graylog-luma/stories/`) for design and UI conventions that go beyond what's summarized in [CONTRIBUTING.md](./CONTRIBUTING.md). Read every file relevant to the change, not just `.mdx` docs — guidance and token values also live in plain `.tsx` companions and `.stories.tsx` component files.
 
 ## Testing Guidelines
 
