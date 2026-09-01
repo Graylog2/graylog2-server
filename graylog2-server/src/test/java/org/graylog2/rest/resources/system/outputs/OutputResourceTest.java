@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -191,6 +192,23 @@ class OutputResourceTest {
 
         final Map<String, Object> savedConfig = captureSavedConfiguration(outputId);
         assertThat(savedConfig.get("password")).isEqualTo(storedSecret);
+    }
+
+    @Test
+    void updateRejectsUnreadableEncryptedValueWithValidationException() throws NotFoundException {
+        final String outputId = "output-id-1";
+        final String outputType = "custom.EncryptedOutput";
+
+        when(existingOutput.getType()).thenReturn(outputType);
+        when(outputService.load(outputId)).thenReturn(existingOutput);
+        stubEncryptedOutput(outputType);
+
+        // The API masks secrets as {"is_set": true}, which the deserializer cannot read back.
+        final Map<String, Object> deltas = new HashMap<>();
+        deltas.put("configuration", new HashMap<>(Map.of("password", Map.of("is_set", true))));
+
+        assertThatThrownBy(() -> outputResource.update(outputId, deltas))
+                .isInstanceOf(ValidationException.class);
     }
 
     private void stubEncryptedOutput(String outputType) {

@@ -241,11 +241,18 @@ public class OutputResource extends RestResource {
         final Map<String, Object> converted = new HashMap<>(
                 ConfigurationMapConverter.convertValues(plainFields, requestedConfiguration));
 
-        encryptedFields.forEach(field -> {
+        for (String field : encryptedFields) {
             if (configuration.containsKey(field)) {
-                converted.put(field, objectMapper.convertValue(configuration.get(field), EncryptedValue.class));
+                try {
+                    converted.put(field, objectMapper.convertValue(configuration.get(field), EncryptedValue.class));
+                } catch (IllegalArgumentException e) {
+                    // convertValue wraps the mapping failure, which would otherwise surface as a 500. The message is
+                    // intentionally generic because the rejected value can contain the secret.
+                    throw new ValidationException(field,
+                            "Invalid value for encrypted field. Expected one of set_value, keep_value or delete_value.");
+                }
             }
-        });
+        }
 
         return converted;
     }

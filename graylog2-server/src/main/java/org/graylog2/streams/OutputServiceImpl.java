@@ -214,7 +214,9 @@ public class OutputServiceImpl implements OutputService {
                     newConfig.put(field, objectMapper.convertValue(raw, EncryptedValue.class));
                     modified = true;
                 } catch (IllegalArgumentException e) {
-                    LOG.warn("Failed to convert field '{}' to EncryptedValue for output '{}': {}", field, output.getId(), e.getMessage());
+                    // Values written before encryption support was added are left untouched. Logged at debug because
+                    // this repeats on every load and the operator can only fix it by re-entering the secret.
+                    LOG.debug("Failed to convert field '{}' to EncryptedValue for output '{}': {}", field, output.getId(), e.getMessage());
                 }
             }
         }
