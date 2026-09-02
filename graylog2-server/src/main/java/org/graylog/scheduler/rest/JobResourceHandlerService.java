@@ -106,4 +106,11 @@ public class JobResourceHandlerService {
                 true,
                 trigger.status());
     }
+
+    /**
+     * @return true if a plugin lists jobs of this type through its own handler
+     */
+    public boolean handlesJobType(String jobType) {
+        return resourceHandlers.containsKey(jobType);
+    }
 }
