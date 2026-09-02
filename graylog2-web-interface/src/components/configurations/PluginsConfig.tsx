@@ -24,12 +24,12 @@ import { useStore } from 'stores/connect';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { getConfig } from 'components/configurations/helpers';
-import { Col, Nav, NavItem } from 'components/bootstrap';
+import { Col, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import { LinkContainer } from 'components/common';
 import useLocation from 'routing/useLocation';
-import type { SelectCallback } from 'components/bootstrap/types';
 import usePermissions from 'hooks/usePermissions';
+import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 
 type PluginSectionLinkProps = {
   configType: string;
@@ -44,17 +44,16 @@ const PluginSectionLink = ({ configType, displayName }: PluginSectionLinkProps) 
     URI(location.pathname).equals(absolutePath.pathname) || location.pathname.startsWith(absolutePath.pathname);
 
   return (
-    <LinkContainer key={`plugin-nav-${configType}`} to={configType}>
-      <NavItem title={displayName} active={isActive}>
-        {displayName}
-      </NavItem>
-    </LinkContainer>
+    <SectionNavItem className={isActive ? 'active' : undefined}>
+      <LinkContainer key={`plugin-nav-${configType}`} to={configType}>
+        <NavItem title={displayName}>{displayName}</NavItem>
+      </LinkContainer>
+    </SectionNavItem>
   );
 };
 
 const PluginsConfig = () => {
   const { isPermitted } = usePermissions();
-  const [activeSectionKey, setActiveSectionKey] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
   const originalPluginSystemConfigs = usePluginEntities('systemConfigurations');
   const pluginSystemConfigs = useMemo(
@@ -85,13 +84,13 @@ const PluginsConfig = () => {
   return (
     <>
       <Col md={2}>
-        <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={setActiveSectionKey as SelectCallback}>
+        <SectionNav>
           {pluginSystemConfigs.map(({ displayName, configType }) => {
             const name = displayName || configType;
 
             return <PluginSectionLink key={configType} configType={configType} displayName={name} />;
           })}
-        </Nav>
+        </SectionNav>
       </Col>
       <Col md={8} lg={5}>
         <Routes>

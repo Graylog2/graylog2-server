@@ -15,22 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
 import { Badge } from 'components/bootstrap';
 
-type Props = {
-  smallScreen?: boolean;
-};
-
-const DevelopmentHeaderBadge = ({ smallScreen = false }: Props) => {
-  const smallScreenClass = smallScreen ? 'small-scrn-badge' : '';
-
-  return AppConfig.gl2DevMode() ? (
-    <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">
+const StyledBadge = styled(Badge)`
+  min-width: 50px;
+`;
+const DevelopmentHeaderBadge = () =>
+  AppConfig.gl2DevMode() ? (
+    <StyledBadge className="dev-badge" bsStyle="danger">
       {AppConfig.isCloud() ? String.fromCharCode(0x26c8) : ''} DEV
-    </Badge>
+    </StyledBadge>
   ) : null;
-};
 
 export default DevelopmentHeaderBadge;

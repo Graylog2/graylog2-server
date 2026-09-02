@@ -27,9 +27,12 @@ import { MIGRATION_STATE } from 'components/datanode/Constants';
 import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import useProductName from 'brand-customization/useProductName';
+import { WIZARD_STEP_LIST_CLASS } from 'components/common/Wizard';
 
+// The migration decides which step follows, so its steps are shown but not offered as something to
+// pick. `Wizard` renders them as buttons rather than the links it used to.
 const WizardContainer = styled(Col)`
-  .nav-pills > li > a {
+  .${WIZARD_STEP_LIST_CLASS} > li > button {
     pointer-events: none;
   }
 `;

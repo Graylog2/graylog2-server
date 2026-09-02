@@ -21,7 +21,11 @@ import styled, { css } from 'styled-components';
 const indicatorClassName = 'nav-item-state-indicator';
 const indicatorPseudoElement = '::before';
 
-export const itemStateIndicatorSelector = `.${indicatorClassName}${indicatorPseudoElement}`;
+// The indicator draws itself along the bottom of this element, so an item whose content is taller
+// than a line of text has to let it wrap that content to be drawn in the right place.
+export const itemStateIndicatorContainerSelector = `.${indicatorClassName}`;
+
+export const itemStateIndicatorSelector = `${itemStateIndicatorContainerSelector}${indicatorPseudoElement}`;
 
 export const hoverIndicatorStyles = (theme: DefaultTheme) => css`
   ${itemStateIndicatorSelector} {
