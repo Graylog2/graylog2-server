@@ -15,52 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import posthog from 'posthog-js';
-import { PostHogProvider } from 'posthog-js/react';
 
 import { useStore } from 'stores/connect';
-import AppConfig from 'util/AppConfig';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import useTelemetrySettings from 'logic/telemetry/useTelemetrySettings';
+import loadAsync from 'routing/loadAsync';
 
-type PostHogSettings = {
-  host: string;
-  key: string;
-};
-
-const getPostHogSettings = (): PostHogSettings => {
-  const { host, api_key: key } = AppConfig.telemetry() || {};
-
-  return {
-    host: host,
-    key: key,
-  };
-};
-
-const init = (key: string, host: string) => {
-  posthog.init(key, {
-    autocapture: false,
-    api_host: host,
-    capture_pageview: false,
-    capture_pageleave: false,
-    cross_subdomain_cookie: false,
-    persistence: 'cookie',
-    strict_script_versioning: true,
-  });
-
-  return posthog;
-};
+const PostHogProvider = loadAsync(
+  () => import(/* webpackChunkName: "PostHogProvider" */ 'logic/telemetry/PostHogProvider'),
+);
 
 const TelemetryInit = ({ children }: { children: React.ReactElement }) => {
-  const { host, key } = getPostHogSettings();
   const { currentUser } = useStore(CurrentUserStore);
   const { data: settings } = useTelemetrySettings({ enabled: !!currentUser });
 
-  if (!settings?.telemetry_enabled || !host || !key) {
+  if (!settings?.telemetry_enabled) {
     return children;
   }
 
-  return <PostHogProvider client={init(key, host)}>{children}</PostHogProvider>;
+  return <PostHogProvider>{children}</PostHogProvider>;
 };
 
 export default TelemetryInit;
