@@ -103,7 +103,7 @@ class CollectorIngestCodecTest {
         final var codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory,
                 dumpWriter, typeConverter,
                 Map.of("file_log", log -> Map.of(),
-                        CollectorLogRecordProcessor.RECEIVER_TYPE, new CollectorLogRecordProcessor()));
+                        CollectorLogRecordProcessor.RECEIVER_TYPE, new CollectorLogRecordProcessor(typeConverter)));
 
         final var collectorLog = codec.decodeSafe(rawMessageForReceiverType(CollectorLogRecordProcessor.RECEIVER_TYPE));
         assertThat(collectorLog).isPresent();

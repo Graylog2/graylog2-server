@@ -16,19 +16,33 @@
  */
 package org.graylog.collectors.input.processor;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.InstrumentationScope;
 import io.opentelemetry.proto.common.v1.KeyValue;
+import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.resource.v1.Resource;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.inputs.otel.codec.OTelTypeConverter;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CollectorLogRecordProcessorTest {
 
-    private final CollectorLogRecordProcessor processor = new CollectorLogRecordProcessor();
+    // Instrumentation scope of records emitted by unnamed zap loggers (otelzap's fallback
+    // instrumentation name), carried by all embedded-collector records.
+    private static final String MODULE_PATH_SCOPE = "github.com/Graylog2/collector/superv";
+
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final CollectorLogRecordProcessor processor =
+            new CollectorLogRecordProcessor(new OTelTypeConverter(objectMapper));
 
     @Test
     void producesUnaccountedMessages() {
@@ -41,201 +55,272 @@ class CollectorLogRecordProcessorTest {
         final var log = OTelJournal.Log.newBuilder()
                 .setLogRecord(LogRecord.newBuilder().build())
                 .build();
-        final var result = processor.process(log);
-        assertThat(result).isEmpty();
+        assertThat(processor.process(log)).isEmpty();
+    }
+
+    // --- resource attributes ---
+
+    @Test
+    void promotesServiceResourceAttributes() {
+        final var log = logWithResource(
+                kv("service.name", "supervisor"),
+                kv("service.version", "2.0.0-SNAPSHOT+54f4e66"));
+        assertThat(processor.process(log))
+                .containsEntry("service_name", "supervisor")
+                .containsEntry("service_version", "2.0.0-SNAPSHOT+54f4e66");
     }
 
     @Test
-    void extractsResourceAttributes() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder().build())
-                .setResource(Resource.newBuilder()
-                        .addAttributes(kv("service.name", "supervisor"))
-                        .addAttributes(kv("service.version", "2.0.0-SNAPSHOT+54f4e66"))
-                        .build())
-                .build();
-        final var result = processor.process(log);
-        assertThat(result)
-                .containsEntry("collector_service_name", "supervisor")
-                .containsEntry("collector_service_version", "2.0.0-SNAPSHOT+54f4e66");
+    void skipsResourceAttributesDuplicatedByCodecFields() {
+        // service.instance.id and collector.receiver.type are already covered by the
+        // codec-written agent_id/agent_receiver_type and must be mapped nowhere.
+        final var log = logWithResource(
+                kv("service.instance.id", "f33b59b9-fa59-47a9-908e-73cda4ac5695"),
+                kv("collector.receiver.type", "collector_log"));
+        assertThat(processor.process(log)).isEmpty();
     }
+
+    // --- scope ---
 
     @Test
     void extractsScopeName() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder().build())
-                .setScope(InstrumentationScope.newBuilder().setName("supervisor").build())
-                .build();
-        final var result = processor.process(log);
-        assertThat(result).containsEntry("collector_scope", "supervisor");
+        final var log = logWith(scope("supervisor.opamp"), List.of());
+        assertThat(processor.process(log)).containsEntry("collector_scope", "supervisor.opamp");
     }
 
     @Test
     void doesNotExtractEmptyScopeName() {
+        final var log = logWith(InstrumentationScope.newBuilder().build(), List.of());
+        assertThat(processor.process(log)).doesNotContainKey("collector_scope");
+    }
+
+    // --- event_component ---
+
+    @Test
+    void derivesEventComponentFromComponentIdPrefix() {
+        final var log = logWithAttrs(kv("otelcol.component.id", "file_log/69dfb9d78b3d36fe13d10ef4"));
+        assertThat(processor.process(log))
+                .containsEntry("event_component", "file_log")
+                // the full component id stays available for exact attribution
+                .containsEntry("collector_component_id", "file_log/69dfb9d78b3d36fe13d10ef4");
+    }
+
+    @Test
+    void usesWholeComponentIdAsEventComponentWithoutSlash() {
+        final var log = logWithAttrs(kv("otelcol.component.id", "otlp_http"));
+        assertThat(processor.process(log)).containsEntry("event_component", "otlp_http");
+    }
+
+    @Test
+    void derivesEventComponentFromSupervisorScope() {
         final var log = OTelJournal.Log.newBuilder()
+                .setResource(Resource.newBuilder().addAttributes(kv("service.name", "supervisor")))
+                .setScope(scope("supervisor.auth"))
                 .setLogRecord(LogRecord.newBuilder().build())
-                .setScope(InstrumentationScope.newBuilder().build())
                 .build();
-        final var result = processor.process(log);
-        assertThat(result).doesNotContainKey("collector_scope");
+        assertThat(processor.process(log)).containsEntry("event_component", "supervisor.auth");
     }
 
     @Test
-    void extractsOpAMPConnectionAttributes() {
+    void doesNotDeriveEventComponentFromModulePathScope() {
+        // The few supervisor log calls that run before the root logger is named carry the
+        // otelzap fallback scope, which identifies no subsystem.
         final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("endpoint", "https://opamp.example.com/v1/opamp"))
-                        .addAttributes(kv("code.file.path", "/some/path.go"))
-                        .addAttributes(kv("code.line.number", "1097"))
-                        .build())
+                .setResource(Resource.newBuilder().addAttributes(kv("service.name", "supervisor")))
+                .setScope(scope(MODULE_PATH_SCOPE))
+                .setLogRecord(LogRecord.newBuilder().build())
                 .build();
-        final var result = processor.process(log);
-        assertThat(result)
+        assertThat(processor.process(log)).doesNotContainKey("event_component");
+    }
+
+    @Test
+    void doesNotDeriveEventComponentFromScopeOfOtherServices() {
+        // "archive" is a real logger name in the embedded collector (stanza), but scope only
+        // identifies a subsystem for supervisor-process records.
+        final var log = OTelJournal.Log.newBuilder()
+                .setResource(Resource.newBuilder().addAttributes(kv("service.name", "collector")))
+                .setScope(scope("archive"))
+                .setLogRecord(LogRecord.newBuilder().build())
+                .build();
+        assertThat(processor.process(log)).doesNotContainKey("event_component");
+    }
+
+    // --- simple promotions ---
+
+    @Test
+    void promotesOperationalStringAttributes() {
+        final var log = logWithAttrs(
+                kv("endpoint", "https://opamp.example.com/v1/opamp"),
+                kv("exception.message", "connection refused"),
+                kv("otelcol.component.kind", "receiver"),
+                kv("status", "StatusRecoverableError"),
+                kv("interval", "21.9s"),
+                kv("path", "/var/log/syslog"),
+                kv("cert_fingerprint", "ab:cd:ef"));
+        assertThat(processor.process(log))
                 .containsEntry("collector_endpoint", "https://opamp.example.com/v1/opamp")
-                .doesNotContainKey("code.file.path")
-                .doesNotContainKey("code.line.number");
-    }
-
-    @Test
-    void extractsErrorAttributes() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("error", "connection refused"))
-                        .addAttributes(kv("interval", "3.5s"))
-                        .addAttributes(kv("otelcol.component.id", "otlp_grpc"))
-                        .addAttributes(kv("otelcol.component.kind", "exporter"))
-                        .addAttributes(kv("otelcol.signal", "logs"))
-                        .build())
-                .build();
-        final var result = processor.process(log);
-        assertThat(result)
-                .containsEntry("collector_error", "connection refused")
-                .containsEntry("collector_retry_interval", "3.5s")
-                .containsEntry("collector_component_id", "otlp_grpc")
-                .containsEntry("collector_component_kind", "exporter")
-                .containsEntry("collector_signal", "logs");
-    }
-
-    @Test
-    void extractsHealthCheckAttributes() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("otelcol.component.id", "health_check"))
-                        .addAttributes(kv("otelcol.component.kind", "extension"))
-                        .addAttributes(kv("status", "unavailable"))
-                        .build())
-                .build();
-        final var result = processor.process(log);
-        assertThat(result)
-                .containsEntry("collector_component_id", "health_check")
-                .containsEntry("collector_component_kind", "extension")
-                .containsEntry("collector_status", "unavailable");
-    }
-
-    @Test
-    void extractsReceiverLifecycleAttributes() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("otelcol.component.id", "file_log/699c94e23f694890ac6bd6c9"))
-                        .addAttributes(kv("otelcol.component.kind", "receiver"))
-                        .addAttributes(kv("otelcol.signal", "logs"))
-                        .addAttributes(kv("component", "fileconsumer"))
-                        .addAttributes(kv("path", "/var/log/syslog"))
-                        .build())
-                .build();
-        final var result = processor.process(log);
-        assertThat(result)
-                .containsEntry("collector_component_id", "file_log/699c94e23f694890ac6bd6c9")
+                .containsEntry("event_error_description", "connection refused")
                 .containsEntry("collector_component_kind", "receiver")
-                .containsEntry("collector_signal", "logs")
-                .containsEntry("collector_component", "fileconsumer")
-                .containsEntry("collector_path", "/var/log/syslog");
+                .containsEntry("collector_status", "StatusRecoverableError")
+                .containsEntry("collector_retry_interval", "21.9s")
+                .containsEntry("collector_path", "/var/log/syslog")
+                .containsEntry("collector_cert_fingerprint", "ab:cd:ef")
+                .doesNotContainKey("collector_log_attributes");
     }
 
     @Test
-    void extractsOsSignal() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("signal", "terminated"))
-                        .build())
-                .build();
+    void preservesWrongTypedStringAttribute() {
+        // A non-string value on a string-typed field is not promoted; the raw value must
+        // survive in the JSON field instead.
+        final var log = logWithAttrs(kvLong("endpoint", 42));
         final var result = processor.process(log);
-        assertThat(result).containsEntry("collector_os_signal", "terminated");
+        assertThat(result).doesNotContainKey("collector_endpoint");
+        assertThat(jsonAttributes(result)).containsEntry("endpoint", 42);
+    }
+
+    // --- counters ---
+
+    @Test
+    void promotesDroppedItemsToDroppedRecords() {
+        final var log = logWithAttrs(kvLong("dropped_items", 17));
+        assertThat(processor.process(log)).containsEntry("collector_dropped_records", 17L);
     }
 
     @Test
-    void extractsJournalctlErrorAttributes() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("error", "signal: terminated"))
-                        .addAttributes(kv("operator_id", "journald_input"))
-                        .addAttributes(kv("operator_type", "journald_input"))
-                        .addAttributes(kv("otelcol.component.id", "journald/69a2dfee"))
-                        .addAttributes(kv("otelcol.component.kind", "receiver"))
-                        .addAttributes(kv("otelcol.signal", "logs"))
-                        .build())
-                .build();
+    void promotesDroppedLogRecordsToDroppedRecords() {
+        final var log = logWithAttrs(kvLong("dropped_log_records", 3));
+        assertThat(processor.process(log)).containsEntry("collector_dropped_records", 3L);
+    }
+
+    @Test
+    void preservesLosingDroppedCounterWhenBothArePresent() {
+        // The two loss counters never co-occur at the current collector version. If a future
+        // version emits both, the first must win and the loser must survive in the JSON field.
+        final var log = logWithAttrs(kvLong("dropped_items", 17), kvLong("dropped_log_records", 3));
+        final var result = processor.process(log);
+        assertThat(result).containsEntry("collector_dropped_records", 17L);
+        assertThat(jsonAttributes(result)).containsEntry("dropped_log_records", 3);
+    }
+
+    @Test
+    void promotesRejectedItemsToSeparateField() {
+        // Rejections are backpressure, not data loss, and must not be folded into the
+        // dropped counter.
+        final var log = logWithAttrs(kvLong("rejected_items", 8));
+        assertThat(processor.process(log))
+                .containsEntry("collector_rejected_records", 8L)
+                .doesNotContainKey("collector_dropped_records");
+    }
+
+    @Test
+    void promotesProcessLifecycleCounters() {
+        final var log = logWithAttrs(kvLong("exit_code", 2), kvLong("crash_count", 4));
+        assertThat(processor.process(log))
+                .containsEntry("collector_exit_code", 2L)
+                .containsEntry("collector_crash_count", 4L);
+    }
+
+    @Test
+    void preservesNonIntegerCounterValue() {
+        // Counter fields are mapped as long in the index; anything but an integer value is
+        // not promoted (a numeric string would otherwise index a misleading value).
+        final var log = logWithAttrs(kv("dropped_items", "17"));
+        final var result = processor.process(log);
+        assertThat(result).doesNotContainKey("collector_dropped_records");
+        assertThat(jsonAttributes(result)).containsEntry("dropped_items", "17");
+    }
+
+    // --- JSON attributes field ---
+
+    @Test
+    void preservesUnknownAttributesInJsonField() {
+        final var log = logWithAttrs(
+                kv("code.file.path", "/build/supervisor/auth.go"),
+                kvLong("code.line.number", 126),
+                kv("otelcol.signal", "logs"));
+        assertThat(jsonAttributes(processor.process(log)))
+                .containsEntry("code.file.path", "/build/supervisor/auth.go")
+                .containsEntry("code.line.number", 126)
+                .containsEntry("otelcol.signal", "logs");
+    }
+
+    @Test
+    void omitsJsonFieldWhenAllAttributesArePromoted() {
+        final var log = logWithAttrs(kv("endpoint", "https://example.com"));
+        assertThat(processor.process(log)).doesNotContainKey("collector_log_attributes");
+    }
+
+    @Test
+    void preservesEveryAttributeValueExactlyOnce() {
+        // Promoted values must not additionally appear in the JSON field, and unpromoted
+        // values must not be lost.
+        final var log = logWithAttrs(
+                kv("endpoint", "https://example.com"),
+                kv("exception.message", "boom"),
+                kv("cursor", "abc123"),
+                kvLong("bytes", 4096));
         final var result = processor.process(log);
         assertThat(result)
-                .containsEntry("collector_error", "signal: terminated")
-                .containsEntry("collector_operator_id", "journald_input")
-                .containsEntry("collector_operator_type", "journald_input");
+                .containsEntry("collector_endpoint", "https://example.com")
+                .containsEntry("event_error_description", "boom");
+        assertThat(jsonAttributes(result)).containsOnlyKeys("cursor", "bytes")
+                .containsEntry("cursor", "abc123")
+                .containsEntry("bytes", 4096);
     }
 
     @Test
-    void extractsSupervisorStartupAttributes() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("instance_uid", "ab355310-58f8-4af5-a496-7d9c31413c8a"))
-                        .addAttributes(kv("endpoint", "https://opamp.example.com/v1/opamp"))
-                        .build())
+    void preservesNestedAttributeValuesInJsonField() {
+        final var nested = AnyValue.newBuilder()
+                .setKvlistValue(KeyValueList.newBuilder().addValues(kv("inner", "value")))
                 .build();
-        final var result = processor.process(log);
-        assertThat(result)
-                .containsEntry("collector_supervisor_instance_uid", "ab355310-58f8-4af5-a496-7d9c31413c8a")
-                .containsEntry("collector_endpoint", "https://opamp.example.com/v1/opamp");
+        final var log = logWithAttrs(KeyValue.newBuilder().setKey("outer").setValue(nested).build());
+        assertThat(jsonAttributes(processor.process(log)))
+                .containsEntry("outer", Map.of("inner", "value"));
     }
 
-    @Test
-    void extractsCredentialsAndDiscoveryAttributes() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("cert_fingerprint", "df568c6dc083eebdbc3054493c984b6a"))
-                        .build())
-                .build();
-        final var result = processor.process(log);
-        assertThat(result).containsEntry("collector_cert_fingerprint", "df568c6dc083eebdbc3054493c984b6a");
-    }
+    // --- helpers ---
 
-    @Test
-    void extractsAllFieldsFromFullRecord() {
-        final var log = OTelJournal.Log.newBuilder()
-                .setResource(Resource.newBuilder()
-                        .addAttributes(kv("service.name", "supervisor"))
-                        .addAttributes(kv("service.version", "2.0.0-SNAPSHOT"))
-                        .addAttributes(kv("collector.receiver.type", "collector_log"))
-                        .build())
-                .setScope(InstrumentationScope.newBuilder().setName("supervisor").build())
-                .setLogRecord(LogRecord.newBuilder()
-                        .addAttributes(kv("endpoint", "https://opamp.example.com/v1/opamp"))
-                        .addAttributes(kv("code.file.path", "/src/supervisor.go"))
-                        .addAttributes(kv("code.function.name", "some.func"))
-                        .addAttributes(kv("code.line.number", "123"))
-                        .build())
-                .build();
-        final var result = processor.process(log);
-        assertThat(result)
-                .hasSize(4)
-                .containsEntry("collector_service_name", "supervisor")
-                .containsEntry("collector_service_version", "2.0.0-SNAPSHOT")
-                .containsEntry("collector_scope", "supervisor")
-                .containsEntry("collector_endpoint", "https://opamp.example.com/v1/opamp");
+    private Map<String, Object> jsonAttributes(Map<String, Object> result) {
+        assertThat(result).containsKey("collector_log_attributes");
+        try {
+            return objectMapper.readValue((String) result.get("collector_log_attributes"),
+                    new TypeReference<>() {});
+        } catch (Exception e) {
+            throw new AssertionError("collector_log_attributes is not valid JSON", e);
+        }
     }
 
     private static KeyValue kv(String key, String value) {
-        return KeyValue.newBuilder()
-                .setKey(key)
-                .setValue(AnyValue.newBuilder().setStringValue(value).build())
+        return KeyValue.newBuilder().setKey(key)
+                .setValue(AnyValue.newBuilder().setStringValue(value)).build();
+    }
+
+    private static KeyValue kvLong(String key, long value) {
+        return KeyValue.newBuilder().setKey(key)
+                .setValue(AnyValue.newBuilder().setIntValue(value)).build();
+    }
+
+    private static InstrumentationScope scope(String name) {
+        return InstrumentationScope.newBuilder().setName(name).build();
+    }
+
+    private static OTelJournal.Log logWithResource(KeyValue... resourceAttrs) {
+        return OTelJournal.Log.newBuilder()
+                .setResource(Resource.newBuilder().addAllAttributes(List.of(resourceAttrs)))
+                .setLogRecord(LogRecord.newBuilder().build())
+                .build();
+    }
+
+    private static OTelJournal.Log logWithAttrs(KeyValue... attrs) {
+        return OTelJournal.Log.newBuilder()
+                .setLogRecord(LogRecord.newBuilder().addAllAttributes(List.of(attrs)))
+                .build();
+    }
+
+    private static OTelJournal.Log logWith(InstrumentationScope scope, List<KeyValue> attrs) {
+        return OTelJournal.Log.newBuilder()
+                .setScope(scope)
+                .setLogRecord(LogRecord.newBuilder().addAllAttributes(attrs))
                 .build();
     }
 }
