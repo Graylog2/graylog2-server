@@ -251,7 +251,7 @@
         <yarn.version>v1.22.22</yarn.version>
 
         <!-- Plugin versions -->
-        <license-maven.version>5.1.1</license-maven.version>
+        <license-maven.version>5.1.2</license-maven.version>
         <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
