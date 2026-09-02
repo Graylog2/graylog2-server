@@ -29,6 +29,9 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
+import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityDTO;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog.security.CapabilityRegistry;
@@ -42,6 +45,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.lookup.Catalog;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -56,6 +60,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -133,6 +139,36 @@ public class StartPageServiceTest {
         assertThat(list.size()).isEqualTo(3);
         assertThat(list.get(0).grn().entity()).isEqualTo("id1");
         assertThat(list.get(1).grn().entity()).isEqualTo("id3");
+    }
+
+    @Test
+    public void recentActivityPrefersTheCatalogTitleAndFallsBackToTheStoredOne() {
+        final var grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        final var row = RecentActivityDTO.builder()
+                .activityType(ActivityType.SHARE)
+                .itemGrn(grn)
+                .itemTitle("stored at share time")
+                .userName("Jane Doe")
+                .build();
+        final var recentActivities = mock(RecentActivityService.class);
+        doReturn(new PaginatedList<>(List.of(row), 1, 1, 10))
+                .when(recentActivities).findRecentActivitiesFor(any(), anyInt(), anyInt());
+        final var titleRetriever = mock(StartPageItemTitleRetriever.class);
+        final var service = new StartPageService(grnRegistry, mock(LastOpenedService.class), recentActivities, titleRetriever);
+
+        // A catalog hit wins, so facade-backed entities keep showing their current title after a rename.
+        doReturn(Optional.of("from catalog")).when(titleRetriever).retrieveTitle(eq(grn), any());
+        assertThat(recentActivityTitles(service)).containsExactly("from catalog");
+
+        // Only on a catalog miss does the title stored at share time apply. That is what fixes facade-less types.
+        doReturn(Optional.empty()).when(titleRetriever).retrieveTitle(eq(grn), any());
+        assertThat(recentActivityTitles(service)).containsExactly("stored at share time");
+    }
+
+    private List<String> recentActivityTitles(StartPageService service) {
+        var result = service.findRecentActivityFor(searchUser, 1, 10);
+        var list = (List<RecentActivity>) result.jsonValue().get("recentActivity");
+        return list.stream().map(RecentActivity::itemTitle).toList();
     }
 
     @Test
