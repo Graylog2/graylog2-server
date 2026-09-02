@@ -73,7 +73,7 @@ type Props = {
 };
 
 const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAdapter = INIT_ADAPTER }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('lut_data_adapter');
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
   const { createAdapter, creatingAdapter } = useCreateAdapter();
   const { updateAdapter, updatingAdapter } = useUpdateAdapter();
@@ -98,7 +98,6 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
     return promise.then((response) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
         app_pathname: 'lut',
-        app_section: 'lut_data_adapter',
         event_details: {
           type: dataAdapter?.config?.type,
         },

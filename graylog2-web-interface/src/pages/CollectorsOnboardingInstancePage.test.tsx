@@ -23,12 +23,14 @@ import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendColle
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
 import { useFleet } from 'components/collectors/hooks/useFleetQueries';
 import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
+import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import CollectorsOnboardingInstancePage from './CollectorsOnboardingInstancePage';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 jest.mock('components/welcome/hooks/useFinishOnboarding');
+jest.mock('components/welcome/hooks/useOnboardingEligibility');
 
 jest.mock('components/collectors/hooks/useInstanceQueries', () => ({
   useInstance: jest.fn(),
@@ -94,6 +96,11 @@ describe('CollectorsOnboardingInstancePage', () => {
   const sendTelemetry = jest.fn();
   const finish = jest.fn();
 
+  const mockOnboardingStatus = (status: 'setup' | 'finished' | 'dismissed' | 'unknown') =>
+    asMock(useOnboardingEligibility).mockReturnValue({ data: { status }, isLoading: false } as ReturnType<
+      typeof useOnboardingEligibility
+    >);
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -102,6 +109,7 @@ describe('CollectorsOnboardingInstancePage', () => {
       typeof useFinishOnboarding
     >);
     mockUseLocation.mockReturnValue({ state: null });
+    mockOnboardingStatus('setup');
     mockInstanceLookup();
     asMock(useFleet).mockReturnValue({ data: { id: 'fleet-1', name: 'Default Fleet' } } as ReturnType<typeof useFleet>);
   });
@@ -152,6 +160,30 @@ describe('CollectorsOnboardingInstancePage', () => {
 
   it('does not finish the onboarding while the instance is still loading', () => {
     mockInstanceLookup({ data: undefined, isLoading: true });
+
+    render(<CollectorsOnboardingInstancePage />);
+
+    expect(finish).not.toHaveBeenCalled();
+  });
+
+  // `/onboarding/finish` requires `clusterconfigentry:edit`, which collector roles do not hold.
+  // `GET /onboarding` degrades to `unknown` instead of 403 for those users, so treating anything
+  // but `setup` as "not our onboarding to finish" keeps them off the forbidden endpoint.
+  it.each(['finished', 'dismissed', 'unknown'] as const)(
+    'does not finish the onboarding when its status is %s',
+    (status) => {
+      mockOnboardingStatus(status);
+
+      render(<CollectorsOnboardingInstancePage />);
+
+      expect(finish).not.toHaveBeenCalled();
+    },
+  );
+
+  it('does not finish the onboarding while its status is still loading', () => {
+    asMock(useOnboardingEligibility).mockReturnValue({ data: undefined, isLoading: true } as ReturnType<
+      typeof useOnboardingEligibility
+    >);
 
     render(<CollectorsOnboardingInstancePage />);
 

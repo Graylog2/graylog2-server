@@ -120,13 +120,13 @@ describe('InstanceDetailDrawer', () => {
     await screen.findByText(/Active Sources.*1/i);
   });
 
-  it('renders Messages link pointing to collector_instance_uid filter', async () => {
+  it('renders Messages link pointing to agent_id filter', async () => {
     render(
       <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
     );
 
     const link = await screen.findByRole('link', { name: /^received messages$/i });
-    expect(link).toHaveAttribute('href', expect.stringContaining('collector_instance_uid'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('agent_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
   });
 
@@ -384,7 +384,12 @@ describe('InstanceDetailDrawer', () => {
 
     it('reports opening the fleet from the drawer', async () => {
       render(
-        <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+        <InstanceDetailDrawer
+          instance={mockInstance}
+          sources={mockSources}
+          fleetName="production"
+          onClose={jest.fn()}
+        />,
       );
 
       await userEvent.click(await screen.findByRole('link', { name: 'production' }));
@@ -405,7 +410,12 @@ describe('InstanceDetailDrawer', () => {
       [/^received messages$/i, 'Collector Instance Received Messages Clicked', 'instance-drawer-received-messages'],
     ])('reports %s from the drawer surface', async (name, eventType, appActionValue) => {
       render(
-        <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+        <InstanceDetailDrawer
+          instance={mockInstance}
+          sources={mockSources}
+          fleetName="production"
+          onClose={jest.fn()}
+        />,
       );
 
       await userEvent.click(await screen.findByRole('link', { name }));
@@ -424,7 +434,12 @@ describe('InstanceDetailDrawer', () => {
       asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: false });
 
       render(
-        <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+        <InstanceDetailDrawer
+          instance={mockInstance}
+          sources={mockSources}
+          fleetName="production"
+          onClose={jest.fn()}
+        />,
       );
 
       await userEvent.click(await screen.findByRole('button', { name: /show queued transactions \(1\)/i }));

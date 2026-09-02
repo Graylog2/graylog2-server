@@ -23,8 +23,6 @@ import { QueryHelper, PaginatedEntityTable } from 'components/common';
 import type { EventNotification, TestResults } from 'components/event-notifications/hooks/useEventNotifications';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -60,8 +58,7 @@ const customColumnRenderers = (
 const EventNotificationsContainer = () => {
   const currentUser = CurrentUserStore.getInitialState();
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('event-notification');
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventNotification>(null, 'notification');
 
@@ -75,15 +72,13 @@ const EventNotificationsContainer = () => {
   const handleTest = useCallback(
     (notification: EventNotification) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_TEST_CLICKED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-notification',
         app_action_value: 'notification-test',
       });
 
       getNotificationTest(notification);
       queryClient.invalidateQueries({ queryKey: keyFn() });
     },
-    [getNotificationTest, pathname, queryClient, sendTelemetry],
+    [getNotificationTest, queryClient, sendTelemetry],
   );
   const expandedSections = useMemo(
     () => ({
