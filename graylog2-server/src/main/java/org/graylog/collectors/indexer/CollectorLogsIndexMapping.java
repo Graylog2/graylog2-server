@@ -121,11 +121,6 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
                 .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_DROPPED_RECORDS, map().put("type", "long").build())
                 .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_ENDPOINT, map().put("type", "keyword").build())
                 .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_EXIT_CODE, map().put("type", "long").build())
-                // Serialized JSON of all unpromoted log record attributes.
-                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_LOG_ATTRIBUTES, map()
-                        .put("type", "text")
-                        .put("norms", false)
-                        .build())
                 .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_PATH, map().put("type", "keyword").build())
                 .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_REJECTED_RECORDS, map().put("type", "long").build())
                 .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_RETRY_INTERVAL, map().put("type", "keyword").build())
@@ -135,6 +130,8 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
                 .put(EventFields.EVENT_ERROR_DESCRIPTION, map().put("type", "keyword").build())
                 .put(ServiceFields.SERVICE_NAME, map().put("type", "keyword").build())
                 .put(ServiceFields.SERVICE_VERSION, map().put("type", "keyword").build())
+                // All unpromoted log record attributes as an unparsed object
+                .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_LOG_ATTRIBUTES, map().put("enabled", false).build())
                 .build();
     }
 

@@ -100,8 +100,8 @@ public class CollectorLogRecordProcessor implements LogRecordProcessor {
     }
 
     private void extractAttributes(OTelJournal.Log log, Map<String, Object> result) {
-        // Each attribute is either promoted to a top-level message field or preserved in the
-        // collector_log_attributes JSON field. A failed promotion (wrong type) falls back to preservation.
+        // Each attribute is either promoted to a top-level message field or preserved as-is in the
+        // collector_log_attributes map. A failed promotion (wrong type) falls back to preservation.
         final var extraction = new Extraction();
 
         for (final var attr : log.getLogRecord().getAttributesList()) {
@@ -194,8 +194,7 @@ public class CollectorLogRecordProcessor implements LogRecordProcessor {
         void writeTo(Map<String, Object> target) {
             target.putAll(promoted);
             if (!unpromoted.isEmpty()) {
-                typeConverter.toJson(typeConverter.toJavaMap(unpromoted), FIELD_COLLECTOR_LOG_ATTRIBUTES)
-                        .ifPresent(json -> target.put(FIELD_COLLECTOR_LOG_ATTRIBUTES, json));
+                target.put(FIELD_COLLECTOR_LOG_ATTRIBUTES, typeConverter.toJavaMap(unpromoted));
             }
         }
     }
