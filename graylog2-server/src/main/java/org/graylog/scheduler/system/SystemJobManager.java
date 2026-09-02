@@ -20,6 +20,7 @@ import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.scheduler.DBSystemJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
@@ -38,6 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @Singleton
@@ -129,9 +131,27 @@ public class SystemJobManager {
     }
 
     public Optional<SystemJobSummary> getRunningJob(String id) {
-        return triggerService.get(requireNonBlank(id, "id can't be blank"))
+        // A trigger ID is a Mongo ObjectId; a non-ObjectId id can't match a running job, so treat it as not found.
+        if (!ObjectId.isValid(requireNonBlank(id, "id can't be blank"))) {
+            return Optional.empty();
+        }
+        return triggerService.get(id)
                 .filter(trigger -> trigger.status() == JobTriggerStatus.RUNNING)
                 .map(this::toSystemJobInfo);
+    }
+
+    /**
+     * Requests cancellation of the system job with the given trigger ID by setting the trigger's cancel flag. The
+     * running job stops at its next check of {@link SystemJobContext#isCancelled()}. A non-ObjectId id, or an id with
+     * no matching trigger, is a no-op; a blank id is rejected. Callers are responsible for permission checks and for
+     * verifying that the job is cancelable (see {@link SystemJobSummary#isCancelable()}).
+     */
+    public void cancel(String id) {
+        // A trigger ID is a Mongo ObjectId; a non-ObjectId id can't match a job, so there's nothing to cancel.
+        if (!ObjectId.isValid(requireNonBlank(id, "id can't be blank"))) {
+            return;
+        }
+        triggerService.cancelTriggerByQuery(idEq(id));
     }
 
     private Map<String, SystemJobSummary> getJobsByQuery(Bson query) {
