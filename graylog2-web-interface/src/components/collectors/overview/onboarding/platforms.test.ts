@@ -27,19 +27,19 @@ const commandFor = (id: string) => {
 describe('PLATFORMS command templates', () => {
   it('linux pipes the download script into sudo sh with endpoint and token', () => {
     expect(commandFor('linux')).toBe(
-      'curl -fsSL https://downloads.graylog.org/repo/scripts/collector/collector-install-linux.sh | sudo sh -s -- --endpoint https://graylog.example.com --token tok-123',
+      'curl -fsSL https://downloads.graylog.org/repo/scripts/collector/install-linux.sh | sudo sh -s -- --endpoint https://graylog.example.com --token tok-123',
     );
   });
 
   it('macos pipes the download script into sudo sh with endpoint and token', () => {
     expect(commandFor('macos')).toBe(
-      'curl -fsSL https://downloads.graylog.org/repo/scripts/collector/collector-install-macos.sh | sudo sh -s -- --endpoint https://graylog.example.com --token tok-123',
+      'curl -fsSL https://downloads.graylog.org/repo/scripts/collector/install-macos.sh | sudo sh -s -- --endpoint https://graylog.example.com --token tok-123',
     );
   });
 
   it('windows runs the downloaded script as a scriptblock with endpoint and token', () => {
     expect(commandFor('windows')).toBe(
-      '& ([scriptblock]::Create((irm https://downloads.graylog.org/repo/scripts/collector/collector-install-windows.ps1))) -Endpoint https://graylog.example.com -Token tok-123',
+      '& ([scriptblock]::Create((irm https://downloads.graylog.org/repo/scripts/collector/install-windows.ps1))) -Endpoint https://graylog.example.com -Token tok-123',
     );
   });
 });

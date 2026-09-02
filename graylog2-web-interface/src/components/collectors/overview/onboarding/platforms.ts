@@ -43,7 +43,7 @@ const PLATFORMS: Platform[] = [
     id: 'linux',
     label: 'Linux',
     icon: { type: 'brand', name: 'linux' },
-    commandTemplate: shellInstallCommand('collector-install-linux.sh'),
+    commandTemplate: shellInstallCommand('install-linux.sh'),
   },
   {
     id: 'windows',
@@ -52,13 +52,13 @@ const PLATFORMS: Platform[] = [
     // Running the script as a scriptblock passes the parameters through and sidesteps the
     // execution policy, which would block a downloaded `.ps1` file by default.
     commandTemplate: (endpoint, token) =>
-      `& ([scriptblock]::Create((irm ${INSTALL_SCRIPT_BASE_URL}/collector-install-windows.ps1))) -Endpoint ${endpoint} -Token ${token}`,
+      `& ([scriptblock]::Create((irm ${INSTALL_SCRIPT_BASE_URL}/install-windows.ps1))) -Endpoint ${endpoint} -Token ${token}`,
   },
   {
     id: 'macos',
     label: 'macOS',
     icon: { type: 'brand', name: 'apple' },
-    commandTemplate: shellInstallCommand('collector-install-macos.sh'),
+    commandTemplate: shellInstallCommand('install-macos.sh'),
   },
 ];
 

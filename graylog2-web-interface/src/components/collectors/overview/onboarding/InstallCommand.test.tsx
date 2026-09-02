@@ -24,7 +24,7 @@ jest.mock('components/common/Tooltip', () => ({ children }: { children: React.Re
 
 describe('InstallCommand', () => {
   const command =
-    'curl -fsSL https://downloads.graylog.org/repo/scripts/collector/collector-install-linux.sh | sudo sh -s -- --endpoint https://graylog.example --token abc123';
+    'curl -fsSL https://downloads.graylog.org/repo/scripts/collector/install-linux.sh | sudo sh -s -- --endpoint https://graylog.example --token abc123';
 
   it('renders the install command text', () => {
     render(<InstallCommand command={command} platformLabel="Linux" tokenDuration="P1D" />);
