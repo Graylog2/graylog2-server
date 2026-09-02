@@ -371,7 +371,7 @@ const AdaptableQueryTabs = ({
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
   const dispatch = useViewsDispatch();
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('dashboard');
   const queriesConfigBtn = useRef(null);
 
   const toggleCopyToDashboardModal = useCallback(() => {
@@ -489,7 +489,6 @@ const AdaptableQueryTabs = ({
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
               app_pathname: 'dashboard',
-              app_section: 'dashboard',
               app_action_value: 'dashboard-create-page-button',
             });
 
@@ -505,7 +504,6 @@ const AdaptableQueryTabs = ({
         onClick={() => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION, {
             app_pathname: 'dashboard',
-            app_section: 'dashboard',
             app_action_value: 'dashboard-page-configuration-button',
           });
 

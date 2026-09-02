@@ -28,6 +28,7 @@ import { hoverIndicatorStyles } from 'components/common/NavItemStateIndicator';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
 import useNavigationCollapse from 'components/navigation/useNavigationCollapse';
+import { FEATURE_FLAG } from 'components/quick-jump/Constants';
 import { NAV_ITEM_HEIGHT, NAVBAR_GAP } from 'theme/constants';
 
 import UserMenu from './UserMenu';
@@ -115,19 +116,16 @@ const Navigation = React.memo(({ pathname }: Props) => {
       <MainNavAndNotificationBadge aria-label="Main">
         {!collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
         <Badges ref={badgesRef}>
-          {activePluginBadges.length > 0 ? (
-            activePluginBadges.map(({ key, component: PluginBadge }) => <PluginBadge key={key} />)
-          ) : (
-            <NotificationBadge />
-          )}
+          {activePluginBadges.map(({ key, component: PluginBadge }) => (
+            <PluginBadge key={key} />
+          ))}
+          <NotificationBadge />
         </Badges>
       </MainNavAndNotificationBadge>
 
       <Icons ref={iconsRef} aria-label="Utility">
         <Nav>
-          <li>
-            <QuickJumpModalContainer />
-          </li>
+          <li>{AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}</li>
 
           <li>
             {AppConfig.isCloud() ? (

@@ -23,6 +23,9 @@ import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.cluster.lock.AlreadyLockedException;
+import org.graylog2.cluster.lock.RefreshingLockService;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -51,6 +54,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -71,11 +75,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -101,6 +108,10 @@ public class IndexSetsResourceTest {
     private ClusterConfigService clusterConfigService;
     @Mock
     private IndexSetRestrictionsService indexSetRestrictionsService;
+    @Mock
+    private RefreshingLockService.Factory lockServiceFactory;
+    @Mock
+    private RefreshingLockService lockService;
 
     public IndexSetsResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -297,6 +308,69 @@ public class IndexSetsResourceTest {
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
         assertThat(response).isEqualTo(IndexSetResponse.fromIndexSetConfig(savedIndexSetConfig, false, null));
+    }
+
+    @Test
+    public void saveWithoutWarmTierRepositoryTakesNoLock() {
+        final IndexSetConfig indexSetConfig = configWithDataTiering(mock(DataTieringConfig.class));
+        when(indexSetService.save(any())).thenReturn(indexSetConfig);
+
+        indexSetsResource.save(IndexSetTestUtils.toCreationRequest(indexSetConfig));
+
+        verify(indexSetService).save(any());
+        verifyNoInteractions(lockServiceFactory);
+    }
+
+    @Test
+    public void saveHoldsRepositoryLockThroughValidationAndPersistence() throws Exception {
+        final IndexSetConfig indexSetConfig = configWithDataTiering(dataTieringWithLockId());
+        when(lockServiceFactory.create()).thenReturn(lockService);
+        when(indexSetService.save(any())).thenReturn(indexSetConfig);
+
+        indexSetsResource.save(IndexSetTestUtils.toCreationRequest(indexSetConfig));
+
+        final InOrder inOrder = inOrder(lockService, indexSetValidator, indexSetService);
+        inOrder.verify(lockService).acquireAndKeepLock("warm-tier-repository/repo1", 1);
+        inOrder.verify(indexSetValidator).validate(any(IndexSetConfig.class));
+        inOrder.verify(indexSetService).save(any());
+        inOrder.verify(lockService).close();
+    }
+
+    @Test
+    public void saveReturns409WithoutPersistenceOnLockContention() throws Exception {
+        final IndexSetConfig indexSetConfig = configWithDataTiering(dataTieringWithLockId());
+        when(lockServiceFactory.create()).thenReturn(lockService);
+        doThrow(new AlreadyLockedException("locked")).when(lockService).acquireAndKeepLock("warm-tier-repository/repo1", 1);
+
+        final ClientErrorException exception = assertThrows(ClientErrorException.class,
+                () -> indexSetsResource.save(IndexSetTestUtils.toCreationRequest(indexSetConfig)));
+
+        assertThat(exception.getResponse().getStatus()).isEqualTo(409);
+        verify(indexSetService, never()).save(any());
+    }
+
+    @Test
+    public void updateReturns409WithoutPersistenceOnLockContention() throws Exception {
+        final IndexSetConfig indexSetConfig = configWithDataTiering(dataTieringWithLockId());
+        when(indexSetService.get(indexSetConfig.id())).thenReturn(Optional.of(indexSetConfig));
+        when(lockServiceFactory.create()).thenReturn(lockService);
+        doThrow(new AlreadyLockedException("locked")).when(lockService).acquireAndKeepLock("warm-tier-repository/repo1", 1);
+
+        final ClientErrorException exception = assertThrows(ClientErrorException.class,
+                () -> indexSetsResource.update(indexSetConfig.id(), IndexSetTestUtils.toUpdateRequest(indexSetConfig)));
+
+        assertThat(exception.getResponse().getStatus()).isEqualTo(409);
+        verify(indexSetService, never()).save(any());
+    }
+
+    private static DataTieringConfig dataTieringWithLockId() {
+        final DataTieringConfig dataTieringConfig = mock(DataTieringConfig.class);
+        when(dataTieringConfig.repositoryLockId()).thenReturn(Optional.of("warm-tier-repository/repo1"));
+        return dataTieringConfig;
+    }
+
+    private static IndexSetConfig configWithDataTiering(DataTieringConfig dataTieringConfig) {
+        return createIndexSetConfig().toBuilder().dataTieringConfig(dataTieringConfig).build();
     }
 
     @Test
@@ -654,7 +728,7 @@ public class IndexSetsResourceTest {
     private TestResource createIndexSetsResource(Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                 indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories,
-                indexSetRestrictionsService);
+                indexSetRestrictionsService, lockServiceFactory);
     }
 
     private static class TestResource extends IndexSetsResource {
@@ -665,10 +739,11 @@ public class IndexSetsResourceTest {
                      IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                      IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService,
                      LegacySystemJobManager systemJobManager, Provider<Boolean> permitted,
-                     Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
+                     Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService,
+                     RefreshingLockService.Factory lockServiceFactory) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
-                    openIndexSetFilterFactories, indexSetRestrictionsService, mock(EventBus.class));
+                    openIndexSetFilterFactories, indexSetRestrictionsService, mock(EventBus.class), lockServiceFactory);
             this.permitted = permitted;
         }
 

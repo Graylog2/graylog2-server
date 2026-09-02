@@ -97,7 +97,7 @@ const Explanation = styled.p`
 
 const CAUpload = () => {
   const queryClient = useQueryClient();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
   const onRejectUpload = useCallback(() => {
     UserNotification.error('CA upload failed');
   }, []);
@@ -120,7 +120,6 @@ const CAUpload = () => {
     (formValues: FormValues) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_UPLOAD_CA_CLICKED, {
         app_pathname: 'datanode',
-        app_section: 'migration',
       });
 
       return onProcessUpload(formValues).catch(() => {});

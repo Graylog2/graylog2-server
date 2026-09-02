@@ -1,0 +1,4 @@
+type = "s"
+message = "Prevent users from assigning a role granting permissions they do not hold themselves through the role assignment endpoint."
+
+pulls = ["27154"]

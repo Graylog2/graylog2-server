@@ -119,7 +119,7 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
                 <SingleMessageFieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
                   <FieldTypesContext.Consumer>
                     {({ all }) => (
-                      <InteractiveContext.Provider value={false}>
+                      <InteractiveContext.Provider value="disabled">
                         <MessageDetail
                           fields={all}
                           streams={streamsMap}

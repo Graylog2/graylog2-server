@@ -26,6 +26,7 @@ import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
+import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,6 +95,18 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
             assertThat(node.name()).isNotBlank();
             assertThat(node.cpuPercent()).isGreaterThanOrEqualTo(0);
             assertThat(node.jvmHeapUsedPercent()).isGreaterThanOrEqualTo(0);
+        });
+    }
+
+    @Test
+    public void getNodesInfo() {
+        final Map<String, NodeInfo> nodesInfo = cluster.getNodesInfo();
+        assertThat(nodesInfo).isNotEmpty();
+        assertThat(nodesInfo.values()).allSatisfy(node -> {
+            assertThat(node.name()).isNotBlank();
+            assertThat(node.version()).isNotBlank();
+            assertThat(node.jvmMemHeapMaxInBytes()).isGreaterThan(0);
+            assertThat(node.roles()).isNotEmpty();
         });
     }
 
