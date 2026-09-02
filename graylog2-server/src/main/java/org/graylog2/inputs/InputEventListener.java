@@ -149,7 +149,7 @@ public class InputEventListener {
     @Subscribe
     public void inputStopped(InputStopped inputStoppedEvent) {
         LOG.debug("Input stopped: {}", inputStoppedEvent.id());
-        removeFromRegistry(inputStoppedEvent.id());
+        stopButKeepStateInRegistry(inputStoppedEvent.id());
     }
 
     @Subscribe
@@ -163,6 +163,13 @@ public class InputEventListener {
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
             inputRegistry.remove(inputState);
+        }
+    }
+
+    private void stopButKeepStateInRegistry(String inputId) {
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+        if (inputState != null) {
+            inputRegistry.stopButKeepStateInRegistry(inputState);
         }
     }
 

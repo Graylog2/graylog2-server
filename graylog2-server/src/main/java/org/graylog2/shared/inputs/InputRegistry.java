@@ -92,6 +92,12 @@ public class InputRegistry {
         return remove(messageInput);
     }
 
+    public void stopButKeepStateInRegistry(IOState<MessageInput> inputState) {
+        final MessageInput input = inputState.getStoppable();
+        this.stop(input);
+        input.terminate();
+    }
+
     public IOState<MessageInput> stop(MessageInput input) {
         IOState<MessageInput> inputState = inputStates.get(input.getId());
 
@@ -116,7 +122,7 @@ public class InputRegistry {
 
     public boolean add(IOState<MessageInput> messageInputIOState) {
         final String inputId = messageInputIOState.getStoppable().getId();
-        return inputStates.putIfAbsent(inputId, messageInputIOState) == null;
+        return inputStates.put(inputId, messageInputIOState) == null; // TODO: check/remove return value and adjust tests etc.
     }
 
     public Stream<IOState<MessageInput>> stream() {
