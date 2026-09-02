@@ -16,10 +16,23 @@
  */
 package org.graylog.collectors.input.processor;
 
+import io.opentelemetry.proto.common.v1.KeyValue;
+import jakarta.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.inputs.otel.codec.OTelTypeConverter;
+import org.graylog.schema.EventFields;
+import org.graylog.schema.ServiceFields;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalLong;
+
+import static io.opentelemetry.proto.common.v1.AnyValue.ValueCase.INT_VALUE;
+import static io.opentelemetry.proto.common.v1.AnyValue.ValueCase.STRING_VALUE;
 
 /**
  * LogRecordProcessor for collector self-logs (supervisor and OTel collector process).
@@ -28,8 +41,28 @@ import java.util.Map;
  * that carry operational context such as endpoints, component IDs, errors, and health status.
  */
 public class CollectorLogRecordProcessor implements LogRecordProcessor {
-
     public static final String RECEIVER_TYPE = "collector_log";
+
+    public static final String FIELD_COLLECTOR_CERT_FINGERPRINT = "collector_cert_fingerprint";
+    public static final String FIELD_COLLECTOR_COMPONENT_ID = "collector_component_id";
+    public static final String FIELD_COLLECTOR_COMPONENT_KIND = "collector_component_kind";
+    public static final String FIELD_COLLECTOR_CRASH_COUNT = "collector_crash_count";
+    public static final String FIELD_COLLECTOR_DROPPED_RECORDS = "collector_dropped_records";
+    public static final String FIELD_COLLECTOR_ENDPOINT = "collector_endpoint";
+    public static final String FIELD_COLLECTOR_EXIT_CODE = "collector_exit_code";
+    public static final String FIELD_COLLECTOR_LOG_ATTRIBUTES = "collector_log_attributes";
+    public static final String FIELD_COLLECTOR_PATH = "collector_path";
+    public static final String FIELD_COLLECTOR_REJECTED_RECORDS = "collector_rejected_records";
+    public static final String FIELD_COLLECTOR_RETRY_INTERVAL = "collector_retry_interval";
+    public static final String FIELD_COLLECTOR_SCOPE = "collector_scope";
+    public static final String FIELD_COLLECTOR_STATUS = "collector_status";
+
+    private final OTelTypeConverter typeConverter;
+
+    @Inject
+    public CollectorLogRecordProcessor(OTelTypeConverter typeConverter) {
+        this.typeConverter = typeConverter;
+    }
 
     @Override
     public boolean producesUnaccountedMessages() {
@@ -40,9 +73,11 @@ public class CollectorLogRecordProcessor implements LogRecordProcessor {
     public Map<String, Object> process(OTelJournal.Log log) {
         final Map<String, Object> result = new HashMap<>();
 
+        // ordering is important here because some extractions might look at already extracted fields from a previous
+        // step
         extractResourceAttributes(log, result);
         extractScopeName(log, result);
-        extractLogRecordAttributes(log, result);
+        extractAttributes(log, result);
 
         return result;
     }
@@ -50,10 +85,9 @@ public class CollectorLogRecordProcessor implements LogRecordProcessor {
     private static void extractResourceAttributes(OTelJournal.Log log, Map<String, Object> result) {
         for (final var attr : log.getResource().getAttributesList()) {
             switch (attr.getKey()) {
-                case "service.name" -> result.put("collector_service_name",
-                        attr.getValue().getStringValue());
-                case "service.version" -> result.put("collector_service_version",
-                        attr.getValue().getStringValue());
+                case "service.name" -> result.put(ServiceFields.SERVICE_NAME, attr.getValue().getStringValue()); // GIM
+                case "service.version" ->
+                        result.put(ServiceFields.SERVICE_VERSION, attr.getValue().getStringValue()); // GIM
             }
         }
     }
@@ -61,44 +95,107 @@ public class CollectorLogRecordProcessor implements LogRecordProcessor {
     private static void extractScopeName(OTelJournal.Log log, Map<String, Object> result) {
         final var scopeName = log.getScope().getName();
         if (!scopeName.isEmpty()) {
-            result.put("collector_scope", scopeName);
+            result.put(FIELD_COLLECTOR_SCOPE, scopeName);
         }
     }
 
-    private static void extractLogRecordAttributes(OTelJournal.Log log, Map<String, Object> result) {
+    private void extractAttributes(OTelJournal.Log log, Map<String, Object> result) {
+        // Each attribute is either promoted to a top-level message field or preserved in the
+        // collector_log_attributes JSON field. A failed promotion (wrong type) falls back to preservation.
+        final var extraction = new Extraction();
+
         for (final var attr : log.getLogRecord().getAttributesList()) {
             switch (attr.getKey()) {
-                case "endpoint" -> result.put("collector_endpoint",
-                        attr.getValue().getStringValue());
-                case "error" -> result.put("collector_error",
-                        attr.getValue().getStringValue());
-                case "otelcol.component.id" -> result.put("collector_component_id",
-                        attr.getValue().getStringValue());
-                case "otelcol.component.kind" -> result.put("collector_component_kind",
-                        attr.getValue().getStringValue());
-                case "otelcol.signal" -> result.put("collector_signal",
-                        attr.getValue().getStringValue());
-                case "status" -> result.put("collector_status",
-                        attr.getValue().getStringValue());
-                case "signal" -> result.put("collector_os_signal",
-                        attr.getValue().getStringValue());
-                case "interval" -> result.put("collector_retry_interval",
-                        attr.getValue().getStringValue());
-                case "path" -> result.put("collector_path",
-                        attr.getValue().getStringValue());
-                case "component" -> result.put("collector_component",
-                        attr.getValue().getStringValue());
-                case "operator_id" -> result.put("collector_operator_id",
-                        attr.getValue().getStringValue());
-                case "operator_type" -> result.put("collector_operator_type",
-                        attr.getValue().getStringValue());
-                case "instance_uid" -> result.put("collector_supervisor_instance_uid",
-                        attr.getValue().getStringValue());
-                case "cert_fingerprint" -> result.put("collector_cert_fingerprint",
-                        attr.getValue().getStringValue());
-                default -> {
-                    // Skip other attributes
+                case "endpoint" -> extraction.promoteString(FIELD_COLLECTOR_ENDPOINT, attr);
+                case "exception.message" -> extraction.promoteString(EventFields.EVENT_ERROR_DESCRIPTION, attr); // GIM
+                case "otelcol.component.id" -> {
+                    final var componentId = extraction.promoteString(FIELD_COLLECTOR_COMPONENT_ID, attr);
+                    // We extract the part before the slash (e.g. from "file_storage/default") as the GIM
+                    // event_component field.
+                    componentId.map(id -> StringUtils.substringBefore(id, "/"))
+                            .filter(StringUtils::isNotBlank)
+                            .ifPresent(component ->
+                                    extraction.putPromoted(EventFields.EVENT_COMPONENT, component));
                 }
+                case "otelcol.component.kind" -> extraction.promoteString(FIELD_COLLECTOR_COMPONENT_KIND, attr);
+                case "status" -> extraction.promoteString(FIELD_COLLECTOR_STATUS, attr);
+                case "interval" -> extraction.promoteString(FIELD_COLLECTOR_RETRY_INTERVAL, attr);
+                case "path" -> extraction.promoteString(FIELD_COLLECTOR_PATH, attr);
+                case "cert_fingerprint" -> extraction.promoteString(FIELD_COLLECTOR_CERT_FINGERPRINT, attr);
+                case "dropped_items", "dropped_log_records" ->
+                        extraction.promoteLongIfAbsent(FIELD_COLLECTOR_DROPPED_RECORDS, attr);
+                case "rejected_items" -> extraction.promoteLong(FIELD_COLLECTOR_REJECTED_RECORDS, attr);
+                case "exit_code" -> extraction.promoteLong(FIELD_COLLECTOR_EXIT_CODE, attr);
+                case "crash_count" -> extraction.promoteLong(FIELD_COLLECTOR_CRASH_COUNT, attr);
+                default -> extraction.preserve(attr);
+            }
+        }
+
+        // If the component ID was not present, this is most likely a log from the supervisor process. In that case
+        // we will derive the event component field from the scope, which is a good fit.
+        if (extraction.getPromoted(EventFields.EVENT_COMPONENT) == null) {
+            final var scopeName = log.getScope().getName();
+            final var serviceName = result.get(ServiceFields.SERVICE_NAME);
+            if ("supervisor".equals(serviceName) && scopeName.startsWith("supervisor")) {
+                extraction.putPromoted(EventFields.EVENT_COMPONENT, scopeName);
+            }
+        }
+
+        extraction.writeTo(result);
+    }
+
+    private class Extraction {
+        final Map<String, Object> promoted = new HashMap<>();
+        final List<KeyValue> unpromoted = new ArrayList<>();
+
+        Optional<String> promoteString(String field, KeyValue attr) {
+            if (attr.getValue().getValueCase() == STRING_VALUE) {
+                final var value = attr.getValue().getStringValue();
+                promoted.put(field, value);
+                return Optional.of(value);
+            }
+            unpromoted.add(attr);
+            return Optional.empty();
+        }
+
+        OptionalLong promoteLong(String field, KeyValue attr) {
+            if (attr.getValue().getValueCase() == INT_VALUE) {
+                final var value = attr.getValue().getIntValue();
+                promoted.put(field, value);
+                return OptionalLong.of(value);
+            }
+            unpromoted.add(attr);
+            return OptionalLong.empty();
+        }
+
+        OptionalLong promoteLongIfAbsent(String field, KeyValue attr) {
+            if (attr.getValue().getValueCase() == INT_VALUE) {
+                final var value = attr.getValue().getIntValue();
+                if (promoted.putIfAbsent(field, value) == null) {
+                    return OptionalLong.of(value);
+                }
+            }
+            unpromoted.add(attr);
+            return OptionalLong.empty();
+        }
+
+        void putPromoted(String field, Object value) {
+            promoted.put(field, value);
+        }
+
+        Object getPromoted(String field) {
+            return promoted.get(field);
+        }
+
+        void preserve(KeyValue attr) {
+            unpromoted.add(attr);
+        }
+
+        void writeTo(Map<String, Object> target) {
+            target.putAll(promoted);
+            if (!unpromoted.isEmpty()) {
+                typeConverter.toJson(typeConverter.toJavaMap(unpromoted), FIELD_COLLECTOR_LOG_ATTRIBUTES)
+                        .ifPresent(json -> target.put(FIELD_COLLECTOR_LOG_ATTRIBUTES, json));
             }
         }
     }
