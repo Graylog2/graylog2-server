@@ -23,7 +23,8 @@ jest.mock('util/copyToClipboard', () => jest.fn(() => Promise.resolve()));
 jest.mock('components/common/Tooltip', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
 
 describe('InstallCommand', () => {
-  const command = 'curl -fsSL https://graylog.example:4317/collectors/install | ENROLLMENT_TOKEN=abc123 bash';
+  const command =
+    'curl -fsSL https://downloads.graylog.org/repo/scripts/collector/collector-install-linux.sh | sudo sh -s -- --endpoint https://graylog.example --token abc123';
 
   it('renders the install command text', () => {
     render(<InstallCommand command={command} platformLabel="Linux" tokenDuration="P1D" />);
@@ -35,6 +36,12 @@ describe('InstallCommand', () => {
     render(<InstallCommand command={command} platformLabel="Linux" tokenDuration="P1D" />);
 
     expect(screen.getByRole('button', { name: /copy/i })).toBeInTheDocument();
+  });
+
+  it('explains that the command downloads and installs the collector', () => {
+    render(<InstallCommand command={command} platformLabel="Linux" tokenDuration="P1D" />);
+
+    expect(screen.getByText(/downloads and installs the collector/i)).toBeInTheDocument();
   });
 
   it('displays the token expiry note', () => {
