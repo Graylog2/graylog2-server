@@ -17,30 +17,14 @@
 import * as React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
 import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import { useCollectorsConfig } from 'components/collectors/hooks';
-
-import CollectorsSettingsPage from './CollectorsSettingsPage';
 
 const CollectorsOverviewPage = () => {
   const productName = useProductName();
-  const { data: config, isLoading } = useCollectorsConfig();
-
-  if (isLoading) {
-    return (
-      <DocumentTitle title="Collectors Overview">
-        <Spinner />
-      </DocumentTitle>
-    );
-  }
-
-  if (!config?.signing_cert_id) {
-    return <CollectorsSettingsPage />;
-  }
 
   return (
     <DocumentTitle title="Collectors Overview">

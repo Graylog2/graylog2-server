@@ -115,6 +115,18 @@ describe('CollectorsDeploymentPage', () => {
       expect(screen.queryByRole('tab', { name: /enrollment tokens/i })).not.toBeInTheDocument();
     });
 
+    it('redirects to the overview wizard when collectors are not configured', () => {
+      asMock(useCollectorsConfig).mockReturnValue({
+        data: { signing_cert_id: null },
+        isLoading: false,
+      } as ReturnType<typeof useCollectorsConfig>);
+
+      render(<CollectorsDeploymentPage />);
+
+      expect(navigateTo).toHaveBeenCalledWith('/system/collectors');
+      expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    });
+
     it('redirects away when the user holds no enrollment token permissions', () => {
       // This is the Collectors Reader case: neither tab would render, so the page has nothing to show.
       asMock(useCollectorPermissions).mockReturnValue(

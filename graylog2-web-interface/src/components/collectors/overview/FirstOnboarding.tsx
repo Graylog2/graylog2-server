@@ -19,23 +19,32 @@ import { useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { Alert } from 'components/bootstrap';
 import { ClipboardButton, Spinner } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getMajorAndMinorVersion } from 'util/Version';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 import PlatformPicker from './onboarding/PlatformPicker';
 import InstallCommand from './onboarding/InstallCommand';
 import WaitingForConnection from './onboarding/WaitingForConnection';
 import FleetChoice from './onboarding/FleetChoice';
+import IngestEndpointStrip from './onboarding/IngestEndpointStrip';
 import type { FleetChoiceValue } from './onboarding/FleetChoice';
 import PLATFORMS from './onboarding/platforms';
 import type { PlatformId } from './onboarding/platforms';
 import DEFAULT_SOURCES from './onboarding/defaultSources';
 
 import enrollEndpointUrl from '../common/enrollEndpointUrl';
-import { useCollectorsMutations, useCollectorPermissions, useFleets } from '../hooks';
+import {
+  useCollectorInputIds,
+  useCollectorsConfig,
+  useCollectorsMutations,
+  useCollectorPermissions,
+  useFleets,
+} from '../hooks';
 // Imported from the concrete module (not the hooks index) so tests that automock the index
 // still see the real cache key.
 import { INSTANCES_KEY_PREFIX } from '../hooks/useInstanceQueries';
@@ -68,6 +77,9 @@ const FirstOnboarding = () => {
   const [fleetChoice, setFleetChoice] = useState<FleetChoiceValue | null>(null);
   // The fleet the collector will enroll into, once resolved (looked up or freshly created).
   const [resolvedFleet, setResolvedFleet] = useState<Fleet | null>(null);
+  // True once this session had to ask for the ingest endpoint. Stays true afterwards so the strip keeps
+  // showing the endpoint status above the install command.
+  const [needsEndpoint, setNeedsEndpoint] = useState(false);
 
   // The enrollment token is minted once and reused while switching platforms.
   const tokenRef = useRef<string | null>(null);
@@ -80,10 +92,16 @@ const FirstOnboarding = () => {
   const history = useHistory();
   const sendTelemetry = useSendCollectorsTelemetry();
 
+  const { data: config, isLoading: isConfigLoading } = useCollectorsConfig();
+  const { data: collectorInputIds = [], isLoading: isInputIdsLoading } = useCollectorInputIds();
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
   const { createFleet, isCreatingFleet, createSource, createEnrollmentToken, isCreatingEnrollmentToken } =
     useCollectorsMutations();
-  const { canCreateFleet } = useCollectorPermissions();
+  const { canCreateFleet, canEditConfig, canCreateIngestInput } = useCollectorPermissions();
+  const isConfigured = !!config?.signing_cert_id;
+  // In Cloud the ingest endpoint is server-provisioned and no persisted input exists.
+  const isCloud = AppConfig.isCloud();
+  const hasIngestInput = isCloud || collectorInputIds.length > 0;
 
   const buildCommand = useCallback((platformId: PlatformId, token: string) => {
     const platform = PLATFORMS.find((p) => p.id === platformId);
@@ -116,28 +134,12 @@ const FirstOnboarding = () => {
     return null;
   }, [fleets, canCreateFleet]);
 
-  // Both gates (platform, fleet) converge here once both are known. Builds the command box.
-  const showCommand = useCallback(
-    async (platformId: PlatformId, choice: FleetChoiceValue) => {
-      let fleet: Fleet | undefined;
-
+  // Mints the enrollment token (once per fleet) and reveals the command box. Requires the collectors config to
+  // exist: the token is signed with the key the first config save creates.
+  const mintToken = useCallback(
+    async (platformId: PlatformId, fleet: Fleet) => {
       try {
         if (!tokenRef.current) {
-          fleet =
-            choice.kind === 'create-new' ? await createOnboardingFleet() : fleets?.find((f) => f.id === choice.fleetId);
-
-          if (!fleet) return;
-
-          if (choice.kind === 'create-new') {
-            sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATED, {
-              app_action_value: 'onboarding-fleet-create',
-              fleet_id: fleet.id,
-            });
-          }
-
-          // Reflect the fleet right away so the box lands on its details view without a flash of the prompt.
-          setResolvedFleet(fleet);
-
           const { token } = await createEnrollmentToken({ name: 'onboarding', fleetId: fleet.id, expiresIn: 'P1D' });
           tokenRef.current = token;
           setEnrollmentToken(token);
@@ -159,13 +161,65 @@ const FirstOnboarding = () => {
         // Error notification handled by useCollectorsMutations onError callback
         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
           app_action_value: 'onboarding-generate-failed',
-          fleet_id: fleet?.id,
+          fleet_id: fleet.id,
           mode: 'onboarding',
         });
       }
     },
-    [fleets, createOnboardingFleet, createEnrollmentToken, buildCommand, sendTelemetry],
+    [createEnrollmentToken, buildCommand, sendTelemetry],
   );
+
+  // Both gates (platform, fleet) converge here once both are known. Resolves the fleet, then either mints the
+  // token right away or, on a cluster without a collectors config yet, asks for the ingest endpoint first.
+  const showCommand = useCallback(
+    async (platformId: PlatformId, choice: FleetChoiceValue) => {
+      if (tokenRef.current && resolvedFleet) {
+        await mintToken(platformId, resolvedFleet);
+
+        return;
+      }
+
+      let fleet: Fleet | undefined;
+
+      try {
+        fleet =
+          choice.kind === 'create-new' ? await createOnboardingFleet() : fleets?.find((f) => f.id === choice.fleetId);
+      } catch {
+        // Error notification handled by useCollectorsMutations onError callback
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.GENERATE_FAILED, {
+          app_action_value: 'onboarding-generate-failed',
+          fleet_id: undefined,
+          mode: 'onboarding',
+        });
+
+        return;
+      }
+
+      if (!fleet) return;
+
+      if (choice.kind === 'create-new') {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATED, {
+          app_action_value: 'onboarding-fleet-create',
+          fleet_id: fleet.id,
+        });
+      }
+
+      // Reflect the fleet right away so the box lands on its details view without a flash of the prompt.
+      setResolvedFleet(fleet);
+
+      // The strip is needed to confirm a missing endpoint, and stays useful as a status line while the input is
+      // missing (configured cluster whose input was deleted: it offers to create one).
+      setNeedsEndpoint(!isConfigured || !hasIngestInput);
+
+      if (isConfigured) await mintToken(platformId, fleet);
+    },
+    [fleets, resolvedFleet, isConfigured, hasIngestInput, createOnboardingFleet, mintToken, sendTelemetry],
+  );
+
+  // The strip saved the endpoint (and with it the signing key); the token can be minted now.
+  const handleEndpointConfirmed = useCallback(() => {
+    if (selectedPlatform && resolvedFleet) mintToken(selectedPlatform, resolvedFleet);
+  }, [selectedPlatform, resolvedFleet, mintToken]);
 
   const handlePlatformSelect = useCallback(
     (platformId: PlatformId) => {
@@ -237,7 +291,40 @@ const FirstOnboarding = () => {
     [queryClient, history, selectedPlatform, resolvedFleet?.name, sendTelemetry],
   );
 
-  if (isFleetsLoading) return <Spinner />;
+  if (isConfigLoading || isFleetsLoading || isInputIdsLoading) return <Spinner />;
+
+  // The GET failed (a notification was already shown); the wizard cannot seed the endpoint step without it.
+  if (!config) {
+    return (
+      <BodyContainer>
+        <Alert bsStyle="danger">Could not load Collectors config.</Alert>
+      </BodyContainer>
+    );
+  }
+
+  // Say so before the user picks anything: every step below would end at a save they cannot make.
+  if (!isConfigured && !canEditConfig) {
+    return (
+      <BodyContainer>
+        <Alert bsStyle="info" title="Collectors are not set up yet">
+          An administrator must configure the ingest endpoint before Collectors can be enrolled.
+        </Alert>
+      </BodyContainer>
+    );
+  }
+
+  // Without an ingest input nothing a collector sends ever arrives, and creating one is an INPUT permission the
+  // built-in Collectors Manager role lacks. Don't offer a wizard that cannot finish.
+  if (!hasIngestInput && !canCreateIngestInput) {
+    return (
+      <BodyContainer>
+        <Alert bsStyle="info" title="Collectors are not set up yet">
+          An administrator must create the Collector Ingest input before Collectors can be enrolled. Creating inputs
+          requires input permissions your account does not have.
+        </Alert>
+      </BodyContainer>
+    );
+  }
 
   const isBusy = isCreatingFleet || isCreatingEnrollmentToken;
   // Show the fleet box whenever an existing fleet could be chosen. With exactly one fleet it
@@ -261,7 +348,15 @@ const FirstOnboarding = () => {
         />
       )}
 
-      {/* 3. The command box, once the preconditions are satisfied. */}
+      {/* 3. On a cluster without a collectors config: confirm where Collectors send data. Saving it
+            bootstraps the server side; afterwards the strip reports the ingest input status. */}
+      {selectedPlatform && resolvedFleet && needsEndpoint && (
+        <BodyContainer>
+          <IngestEndpointStrip config={config} onConfirmed={handleEndpointConfirmed} />
+        </BodyContainer>
+      )}
+
+      {/* 4. The command box, once the preconditions are satisfied. */}
       {phase === 'waiting' && selectedPlatform && (
         <BodyContainer>
           <InstallCommand
