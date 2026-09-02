@@ -16,8 +16,6 @@
  */
 package org.graylog.collectors.input.processor;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.InstrumentationScope;
 import io.opentelemetry.proto.common.v1.KeyValue;
@@ -40,9 +38,8 @@ class CollectorLogRecordProcessorTest {
     // instrumentation name), carried by all embedded-collector records.
     private static final String MODULE_PATH_SCOPE = "github.com/Graylog2/collector/superv";
 
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final CollectorLogRecordProcessor processor =
-            new CollectorLogRecordProcessor(new OTelTypeConverter(objectMapper));
+            new CollectorLogRecordProcessor(new OTelTypeConverter(new ObjectMapperProvider().get()));
 
     @Test
     void producesUnaccountedMessages() {
@@ -171,11 +168,11 @@ class CollectorLogRecordProcessorTest {
     @Test
     void preservesWrongTypedStringAttribute() {
         // A non-string value on a string-typed field is not promoted; the raw value must
-        // survive in the JSON field instead.
+        // survive in the attributes map instead.
         final var log = logWithAttrs(kvLong("endpoint", 42));
         final var result = processor.process(log);
         assertThat(result).doesNotContainKey("collector_endpoint");
-        assertThat(jsonAttributes(result)).containsEntry("endpoint", 42);
+        assertThat(preservedAttributes(result)).containsEntry("endpoint", 42L);
     }
 
     // --- counters ---
@@ -195,11 +192,11 @@ class CollectorLogRecordProcessorTest {
     @Test
     void preservesLosingDroppedCounterWhenBothArePresent() {
         // The two loss counters never co-occur at the current collector version. If a future
-        // version emits both, the first must win and the loser must survive in the JSON field.
+        // version emits both, the first must win and the loser must survive in the attributes map.
         final var log = logWithAttrs(kvLong("dropped_items", 17), kvLong("dropped_log_records", 3));
         final var result = processor.process(log);
         assertThat(result).containsEntry("collector_dropped_records", 17L);
-        assertThat(jsonAttributes(result)).containsEntry("dropped_log_records", 3);
+        assertThat(preservedAttributes(result)).containsEntry("dropped_log_records", 3L);
     }
 
     @Test
@@ -227,32 +224,32 @@ class CollectorLogRecordProcessorTest {
         final var log = logWithAttrs(kv("dropped_items", "17"));
         final var result = processor.process(log);
         assertThat(result).doesNotContainKey("collector_dropped_records");
-        assertThat(jsonAttributes(result)).containsEntry("dropped_items", "17");
+        assertThat(preservedAttributes(result)).containsEntry("dropped_items", "17");
     }
 
-    // --- JSON attributes field ---
+    // --- preserved attributes map ---
 
     @Test
-    void preservesUnknownAttributesInJsonField() {
+    void preservesUnknownAttributesInAttributesMap() {
         final var log = logWithAttrs(
                 kv("code.file.path", "/build/supervisor/auth.go"),
                 kvLong("code.line.number", 126),
                 kv("otelcol.signal", "logs"));
-        assertThat(jsonAttributes(processor.process(log)))
+        assertThat(preservedAttributes(processor.process(log)))
                 .containsEntry("code.file.path", "/build/supervisor/auth.go")
-                .containsEntry("code.line.number", 126)
+                .containsEntry("code.line.number", 126L)
                 .containsEntry("otelcol.signal", "logs");
     }
 
     @Test
-    void omitsJsonFieldWhenAllAttributesArePromoted() {
+    void omitsAttributesMapWhenAllAttributesArePromoted() {
         final var log = logWithAttrs(kv("endpoint", "https://example.com"));
         assertThat(processor.process(log)).doesNotContainKey("collector_log_attributes");
     }
 
     @Test
     void preservesEveryAttributeValueExactlyOnce() {
-        // Promoted values must not additionally appear in the JSON field, and unpromoted
+        // Promoted values must not additionally appear in the attributes map, and unpromoted
         // values must not be lost.
         final var log = logWithAttrs(
                 kv("endpoint", "https://example.com"),
@@ -263,31 +260,28 @@ class CollectorLogRecordProcessorTest {
         assertThat(result)
                 .containsEntry("collector_endpoint", "https://example.com")
                 .containsEntry("event_error_description", "boom");
-        assertThat(jsonAttributes(result)).containsOnlyKeys("cursor", "bytes")
+        assertThat(preservedAttributes(result)).containsOnlyKeys("cursor", "bytes")
                 .containsEntry("cursor", "abc123")
-                .containsEntry("bytes", 4096);
+                .containsEntry("bytes", 4096L);
     }
 
     @Test
-    void preservesNestedAttributeValuesInJsonField() {
+    void preservesNestedAttributeValuesInAttributesMap() {
         final var nested = AnyValue.newBuilder()
                 .setKvlistValue(KeyValueList.newBuilder().addValues(kv("inner", "value")))
                 .build();
         final var log = logWithAttrs(KeyValue.newBuilder().setKey("outer").setValue(nested).build());
-        assertThat(jsonAttributes(processor.process(log)))
+        assertThat(preservedAttributes(processor.process(log)))
                 .containsEntry("outer", Map.of("inner", "value"));
     }
 
     // --- helpers ---
 
-    private Map<String, Object> jsonAttributes(Map<String, Object> result) {
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> preservedAttributes(Map<String, Object> result) {
         assertThat(result).containsKey("collector_log_attributes");
-        try {
-            return objectMapper.readValue((String) result.get("collector_log_attributes"),
-                    new TypeReference<>() {});
-        } catch (Exception e) {
-            throw new AssertionError("collector_log_attributes is not valid JSON", e);
-        }
+        assertThat(result.get("collector_log_attributes")).isInstanceOf(Map.class);
+        return (Map<String, Object>) result.get("collector_log_attributes");
     }
 
     private static KeyValue kv(String key, String value) {
