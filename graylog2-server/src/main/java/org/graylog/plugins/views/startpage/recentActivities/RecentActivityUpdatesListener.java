@@ -76,7 +76,6 @@ public class RecentActivityUpdatesListener {
         // catalog at read time, so they would otherwise render as a raw id.
         final String title = resolveTitle(event.entity());
 
-        // TODO: maybe remove the filter again? It should be unnecessary, was just a try to remove creation of duplicates
         event.creates().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.SHARE)
@@ -87,7 +86,6 @@ public class RecentActivityUpdatesListener {
                         .build())
                 );
 
-        // TODO: maybe remove the filter again? It should be unnecessary, was just a try to remove creation of duplicates
         event.deletes().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.UNSHARE)
