@@ -194,7 +194,7 @@
         <okhttp.version>5.5.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.65.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.30.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.31.1</opentelemetry-instrumentation.version>
         <opentelemetry-semconv.version>1.43.0</opentelemetry-semconv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
