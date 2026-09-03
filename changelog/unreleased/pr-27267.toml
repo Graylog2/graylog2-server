@@ -1,0 +1,5 @@
+type = "f"
+message = "Capitalize the first letter of stream category names wherever they're displayed in the UI."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15401"]
+pulls = ["27267"]
