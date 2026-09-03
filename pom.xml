@@ -114,10 +114,11 @@
         <aws-java-sdk-2.version>2.53.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.7</aws-msk-iam-auth.version>
-        <bouncycastle.version>1.85</bouncycastle.version>
+        <bouncycastle-prov.version>1.85.2</bouncycastle-prov.version>
+        <bouncycastle-pkix.version>1.85</bouncycastle-pkix.version>
         <caffeine.version>3.2.4</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.192</classgraph.version>
+        <classgraph.version>4.8.194</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -128,7 +129,7 @@
         <commons-io.version>2.22.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.50.0</error-prone.version>
-        <freemarker.version>2.3.34</freemarker.version>
+        <freemarker.version>2.3.35</freemarker.version>
         <gcs.version>2.71.0</gcs.version>
         <azure-blob-storage.version>12.35.0</azure-blob-storage.version>
         <azure-json.version>1.5.1</azure-json.version>
@@ -193,7 +194,7 @@
         <okhttp.version>5.5.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.65.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.30.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.31.1</opentelemetry-instrumentation.version>
         <opentelemetry-semconv.version>1.43.0</opentelemetry-semconv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
@@ -205,10 +206,10 @@
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>2.2.1</shiro.version>
+        <shiro.version>3.0.1</shiro.version>
         <snakeyaml.version>2.6</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>7.5.0</oshi.version>
+        <oshi.version>7.6.0</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.18</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
@@ -236,21 +237,21 @@
         <assertj-core.version>3.27.7</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.5</equalsverifier.version>
+        <equalsverifier.version>4.5.1</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.1.3</junit-jupiter.version>
         <mockito.version>5.23.0</mockito.version>
         <restassured.version>6.0.1</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
-        <graalvm.version>25.2.4</graalvm.version>
+        <graalvm.version>25.3.4.1</graalvm.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v24.13.0</nodejs.version>
         <yarn.version>v1.22.22</yarn.version>
 
         <!-- Plugin versions -->
-        <license-maven.version>5.1.1</license-maven.version>
+        <license-maven.version>5.1.2</license-maven.version>
         <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
@@ -733,12 +734,12 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
+                <version>${bouncycastle-prov.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
+                <version>${bouncycastle-pkix.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.threeten</groupId>
@@ -942,7 +943,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.10.3.0</version>
+                    <version>4.10.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -1004,7 +1005,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.90.2</version>
+                            <version>8.90.4</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
@@ -1343,6 +1344,8 @@
                             io.swagger.annotations.** @ Use io.swagger.v3.oas.annotations.**
 
                             org.apache.shiro.authc.credential.AllowAllCredentialsMatcher @ Use ServiceValidatedCredentialsMatcher
+                            org.apache.shiro.subject.SimplePrincipalCollection @ Use org.apache.shiro.subject.ImmutablePrincipalCollection
+                            org.apache.shiro.subject.MutablePrincipalCollection @ Use org.apache.shiro.subject.PrincipalCollection
                         ]]>
 
                     </signatures>
