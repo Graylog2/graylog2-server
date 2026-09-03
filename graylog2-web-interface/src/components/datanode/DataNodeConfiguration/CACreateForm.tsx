@@ -37,7 +37,7 @@ const createCA = (caData: FormValues) => fetch('POST', qualifyUrl('ca/create'), 
 
 const CaCreateForm = () => {
   const queryClient = useQueryClient();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
   const productName = useProductName();
 
   const { mutateAsync: onCreateCA } = useMutation({
@@ -57,7 +57,6 @@ const CaCreateForm = () => {
   const onSubmit = (formValues: FormValues) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_CREATE_CA_CLICKED, {
       app_pathname: 'datanode',
-      app_section: 'migration',
     });
 
     return onCreateCA(formValues).catch(() => {});

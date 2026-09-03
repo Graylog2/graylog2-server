@@ -22,7 +22,7 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.authz.permission.AllPermission;
-import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.ImmutablePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog.grn.GRN;
@@ -94,7 +94,7 @@ public class UserContext implements HasUser, HasPermissions {
             throw new IllegalArgumentException("Unknown user <" + username + ">");
         }
         final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(user.getId(), "runAs-context"))
+                .principals(ImmutablePrincipalCollection.ofSinglePrincipal(user.getId(), "runAs-context"))
                 .authenticated(true)
                 .sessionCreationEnabled(false)
                 .buildSubject();
