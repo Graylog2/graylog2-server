@@ -28,16 +28,20 @@ import org.graylog.shaded.opensearch2.org.apache.http.ContentTooLongException;
 import org.graylog.shaded.opensearch2.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.PlainActionFuture;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Cancellable;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.storage.errors.ResponseError;
 import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog.storage.function.ThrowingBiFunction;
@@ -123,6 +127,16 @@ public class OpenSearchClient {
         client.msearchAsync(multiSearchRequest, requestOptions(), future);
 
         return future;
+    }
+
+    /**
+     * Issue a cluster-health request asynchronously, returning the handle that cancels it. Lets a caller bound its
+     * own wait and abort both the in-flight request and the client's remaining host retries at the deadline -- a
+     * synchronous call can do neither, since its socket timeout is re-paid per configured host.
+     */
+    public Cancellable clusterHealthAsync(ClusterHealthRequest request,
+                                          ActionListener<ClusterHealthResponse> listener) {
+        return client.cluster().healthAsync(request, requestOptions(), listener);
     }
 
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn) {

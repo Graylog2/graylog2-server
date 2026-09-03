@@ -29,6 +29,7 @@ import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
 import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,18 @@ import java.util.Set;
 
 public interface ClusterAdapter {
     Optional<HealthStatus> health();
+
+    /**
+     * Cluster health, abandoned once {@code timeout} elapses, for callers that must themselves return within a
+     * budget.
+     *
+     * <p>{@link #health()} cannot be bounded by configuration alone: its connect and socket timeouts apply
+     * <em>per host</em> and the REST client retries every configured node inside a single call, so its worst case is
+     * a multiple of them. Implementations therefore issue the request asynchronously and cancel it at the deadline.
+     * A timeout is reported the same way an unreachable cluster is, as an empty {@code Optional} -- to the caller,
+     * "did not answer in time" and "did not answer" are the same fact.
+     */
+    Optional<HealthStatus> health(Duration timeout);
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
 
