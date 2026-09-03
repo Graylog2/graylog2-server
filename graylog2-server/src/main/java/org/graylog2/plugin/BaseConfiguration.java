@@ -34,12 +34,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.shared.messageq.MessageQueueModule;
+import org.graylog2.utilities.ProxyConfig;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.graylog2.utilities.ProxyHostsPatternConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Optional;
 
 import static org.graylog2.shared.messageq.MessageQueueModule.DISK_JOURNAL_MODE;
 import static org.graylog2.shared.messageq.MessageQueueModule.NOOP_JOURNAL_MODE;
@@ -270,6 +272,10 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
 
     public URI getHttpProxyUri() {
         return httpProxyUri;
+    }
+
+    public Optional<ProxyConfig> getHttpProxyConfig() {
+        return ProxyConfig.from(httpProxyUri);
     }
 
     public ProxyHostsPattern getHttpNonProxyHostsPattern() {
