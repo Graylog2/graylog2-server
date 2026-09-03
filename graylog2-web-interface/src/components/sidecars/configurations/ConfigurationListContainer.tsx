@@ -34,7 +34,7 @@ import ConfigurationList from './ConfigurationList';
 
 const ConfigurationListContainer = () => {
   const queryClient = useQueryClient();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('configuration');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -62,7 +62,6 @@ const ConfigurationListContainer = () => {
   const handleClone = (configurationId: string, name: string, callback: () => void) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_CLONED, {
       app_pathname: 'sidecars',
-      app_section: 'configuration',
     });
 
     copyConfiguration(configurationId, name).then((response) => {

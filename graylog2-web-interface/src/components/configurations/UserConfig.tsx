@@ -29,8 +29,6 @@ import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { InputDescription, ModalSubmit, IfPermitted, ISODurationInput } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
@@ -57,8 +55,7 @@ const UserConfig = () => {
   const [formConfig, setFormConfig] = useState<UserConfigType | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('user');
 
   useEffect(() => {
     ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG).then(() => {
@@ -71,8 +68,6 @@ const UserConfig = () => {
 
   const saveConfig = (values: UserConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.USER_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'user',
       app_action_value: 'configuration-save',
     });
     const newConfig = { ...values, restrict_access_token_to_admins: !values?.restrict_access_token_to_admins };
