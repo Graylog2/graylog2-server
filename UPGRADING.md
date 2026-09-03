@@ -95,3 +95,33 @@ the role Graylog uses for the input before or immediately after upgrading.
 
 For more information, see the AWS [KCL 2.x to 3.x migration guide](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html).
 For the full list of IAM permissions required by KCL 3.x, see [IAM permissions for KCL 3.x](https://docs.aws.amazon.com/streams/latest/dev/kcl-migration-from-2-3.html#kcl-migration-from-2-3-IAM-permissions).
+
+#### Required DynamoDB Permissions
+
+**This applies to every Kinesis/CloudWatch input, whether it is new or existed before 7.1**, so a policy written for
+an earlier Graylog release can look correct and still deny the input. A policy that grants only the actions KCL 2.x
+needed leaves the input logging an authorization error on a fixed schedule while consuming no records. Graylog now
+watches the two calls the consumer cannot work without, DynamoDB lease discovery (`Query`) and the Kinesis record
+fetch (`GetRecords`), and fails the input naming the denied action once one has been denied continuously for two
+minutes; a denial KCL works around, such as one affecting only lease rebalancing, still leaves the input running.
+
+In addition to the actions the lease table already needed (`CreateTable`, `DescribeTable`, `GetItem`, `PutItem`,
+`Scan`, `UpdateItem`, `DeleteItem`), KCL 3.x requires:
+
+- **`dynamodb:Query` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*/index/*`.** KCL 3.x discovers
+  leases through a global secondary index on the lease table. An index is a separate IAM resource from its table, so
+  granting `Query` on the table alone still denies this call.
+- **`dynamodb:UpdateTable` on `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*`.** KCL creates that
+  index on first start. If this is denied, KCL retries the call throughout startup and then aborts, so the input fails
+  with a generic initialization error rather than starting. That is outside the steady-state detection described above,
+  which watches denials of `Query` and `GetRecords` on a running input, but the input still fails visibly instead of
+  consuming nothing.
+
+KCL 3.x also adds two tables per input, `<application-name>-CoordinatorState` and `<application-name>-WorkerMetricStats`,
+which need the same item-level actions as the lease table (`GetItem`, `PutItem`, `UpdateItem`, `DeleteItem`, `Scan`) in
+addition to `DescribeTable`: KCL holds its leader lock in `-CoordinatorState` and writes worker metrics to
+`-WorkerMetricStats` every 30 seconds. KCL checks whether both tables exist on every start and treats anything other
+than "table not found" as a failure, so a policy scoped to the lease table alone prevents the input from starting.
+
+A policy whose resource is `arn:aws:dynamodb:<region>:<account>:table/graylog-aws-plugin-*` covers the lease table and
+both additional tables, because their names share that prefix.

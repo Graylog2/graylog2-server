@@ -148,7 +148,8 @@ public class KinesisTransport extends ThrottleableTransport2 {
         final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
 
         this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, input::processRawMessage,
-                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder);
+                streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder,
+                System::nanoTime);
 
         LOG.debug("Starting Kinesis reader thread for input {}", input.toIdentifier());
         executor.submit(this.kinesisConsumer);
