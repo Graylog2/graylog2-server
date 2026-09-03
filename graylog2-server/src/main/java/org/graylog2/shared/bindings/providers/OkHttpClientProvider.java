@@ -17,7 +17,6 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.base.Splitter;
 import com.google.common.net.HttpHeaders;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -32,6 +31,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
+import org.graylog2.utilities.ProxyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,12 +39,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.net.HttpHeaders.PROXY_AUTHORIZATION;
 import static java.util.Objects.requireNonNull;
 
@@ -86,7 +85,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     protected final Duration connectTimeout;
     protected final Duration readTimeout;
     protected final Duration writeTimeout;
-    protected final URI httpProxyUri;
+    protected final Optional<ProxyConfig> proxyConfig;
     private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
     private final ProxySelectorProvider proxySelectorProvider;
 
@@ -102,7 +101,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         this.connectTimeout = requireNonNull(connectTimeout);
         this.readTimeout = requireNonNull(readTimeout);
         this.writeTimeout = requireNonNull(writeTimeout);
-        this.httpProxyUri = httpProxyUri;
+        this.proxyConfig = ProxyConfig.from(httpProxyUri);
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
         this.proxySelectorProvider = proxySelectorProvider;
     }
@@ -121,17 +120,10 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
             clientBuilder.sslSocketFactory(trustManagerAndSocketFactoryProvider.getSslSocketFactory(), trustManagerAndSocketFactoryProvider.getTrustManager());
         }
 
-        if (httpProxyUri != null) {
+        if (proxyConfig.isPresent()) {
             clientBuilder.proxySelector(proxySelectorProvider.get());
-
-            if (!isNullOrEmpty(httpProxyUri.getUserInfo())) {
-                final List<String> list = Splitter.on(":")
-                        .limit(2)
-                        .splitToList(httpProxyUri.getUserInfo());
-                if (list.size() == 2) {
-                    clientBuilder.proxyAuthenticator(new ProxyAuthenticator(list.get(0), list.get(1)));
-                }
-            }
+            proxyConfig.flatMap(ProxyConfig::credentials).ifPresent(credentials ->
+                    clientBuilder.proxyAuthenticator(new ProxyAuthenticator(credentials.username(), credentials.password())));
         }
 
         return clientBuilder.build();
