@@ -33,6 +33,7 @@ import software.amazon.awssdk.core.interceptor.ExecutionInterceptor;
 import software.amazon.awssdk.core.interceptor.SdkExecutionAttribute;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
+import software.amazon.kinesis.common.KinesisClientUtil;
 
 import java.time.Duration;
 import java.util.List;
@@ -139,6 +140,17 @@ class KinesisConsumerTest {
         assertThat(detectorsOn(builders.dynamoDb())).hasSize(1);
         assertThat(detectorsOn(builders.kinesis())).hasSize(1);
         assertThat(detectorsOn(builders.cloudWatch())).isEmpty();
+    }
+
+    /**
+     * Unlike master, this branch hands the Kinesis builder to KCL, which applies its own HTTP client builder before
+     * building the client. The detector has to survive that call, and nothing else here would notice KCL resetting
+     * the override configuration, so pin it.
+     */
+    @Test
+    void theKinesisDetectorSurvivesKclAdjustingTheBuilder() {
+        assertThat(detectorsOn(KinesisClientUtil.adjustKinesisClientBuilder(newClientBuilders().kinesis())))
+                .hasSize(1);
     }
 
     @Test
