@@ -20,7 +20,7 @@ import { OrderedMap } from 'immutable';
 import { Events } from '@graylog/server-api';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
-import { eventsTableElements } from 'components/events/Constants';
+import { eventsTableElements, nonInfoPriorities } from 'components/events/Constants';
 import eventsSliceRenderers from 'components/events/SliceRenderers';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
@@ -34,15 +34,11 @@ import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const additionalSearchFields = {
   key: 'The key of the event',
 };
 
-const nonInfoPriorities = Object.keys(EventDefinitionPriorityEnum.properties)
-  .reverse()
-  .filter((key) => key !== String(EventDefinitionPriorityEnum.INFO));
 const defaultFilters = OrderedMap({ priority: nonInfoPriorities });
 
 const EventsEntityTable = () => {
@@ -68,7 +64,7 @@ const EventsEntityTable = () => {
     <EventsRefreshProvider>
       <PaginatedEntityTable<Event, EventsAdditionalData>
         humanName="events"
-        queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
+        queryHelpComponent={<QueryHelper entityName="event" commonFields={['id', 'description']} fieldMap={additionalSearchFields} />}
         entityActions={entityActions}
         tableLayout={eventsTableElements.defaultLayout}
         defaultFilters={defaultFilters}

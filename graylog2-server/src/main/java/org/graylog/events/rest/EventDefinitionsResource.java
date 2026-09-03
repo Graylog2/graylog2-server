@@ -197,7 +197,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         // the frontend adds a tags attribute with a custom filter_component (EventDefinitionTagsFilter).
         // Including it in both places would cause a duplicate column.
         // extraSearchFields makes `tags:phishing` work in the search bar (OR-joined by SearchQueryParser)
-        // while the filter UI applies multi-tag AND via the predicate in `getPage`.
+        // while the filter UI applies multi-tag OR via the predicate in `getPage`.
         // tactics_techniques is also registered here so API search (`tactics_techniques:T1059`) works,
         // without exposing it as a default column on the Event Definitions list (gated to enterprise UI).
         this.dbQueryCreator = new DbQueryCreator(EventDefinitionDto.FIELD_TITLE, attributes,
@@ -247,7 +247,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                         .filter(v -> !v.isBlank())
                         .toList();
         if (!tagFilters.isEmpty()) {
-            predicate = predicate.and(event -> event.tags().containsAll(tagFilters));
+            predicate = predicate.and(event -> tagFilters.stream().anyMatch(event.tags()::contains));
         }
 
         // Strip tags filters before passing to DbQueryCreator (tags are handled by predicate above)
@@ -567,6 +567,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public EventDefinitionDto duplicate(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId, @Context UserContext userContext) {
+        checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         final EventDefinitionDto eventDefinitionDto = dbService.get(definitionId).orElseThrow(() ->
                 new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
         checkEventDefinitionPermissions(eventDefinitionDto, "create");

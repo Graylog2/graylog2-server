@@ -31,7 +31,7 @@ import useOpenSearchRollingRestart, {
 } from './hooks/useOpenSearchRollingRestart';
 import type { RollingRestartJob, RollingRestartState } from './rollingRestartTypes';
 
-jest.mock('./IncompatibleIndicesTable', () => ({
+jest.mock('components/indices/incompatible-indices/IncompatibleIndicesTable', () => ({
   __esModule: true,
   default: () => <div>incompatible-indices-stub</div>,
 }));
@@ -91,7 +91,10 @@ const mockRollingRestart = (overrides: RollingRestartHookOverrides = {}) => {
   } as unknown as ReturnType<typeof useOpenSearchRollingRestart>);
 };
 
-const mockIncompatibleIndices = (data: Array<unknown> = [], overrides: { isLoading?: boolean; isError?: boolean } = {}) =>
+const mockIncompatibleIndices = (
+  data: Array<unknown> = [],
+  overrides: { isLoading?: boolean; isError?: boolean } = {},
+) =>
   asMock(useIncompatibleIndices).mockReturnValue({
     data,
     isError: false,

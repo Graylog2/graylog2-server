@@ -18,26 +18,30 @@ import * as React from 'react';
 import { useMemo, useCallback } from 'react';
 
 import useLocation from 'routing/useLocation';
-import { Button, ButtonToolbar } from 'components/bootstrap';
-import { LinkContainer } from 'components/common';
+import { ButtonToolbar } from 'components/bootstrap';
+import { LinkContainer, IconButton } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { FleetFormModal } from './index';
 import customColumnRenderers from './ColumnRenderers';
 import { DEFAULT_LAYOUT } from './Constants';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_FLEET_ID_FIELD } from '../common/fields';
-import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from '../hooks';
+import { AGENT_FLEET_ID_FIELD } from '../common/fields';
+import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations, useCollectorPermissions } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
 const CollectorsFleets = () => {
   const { createFleet } = useCollectorsMutations();
+  const { canCreateFleet } = useCollectorPermissions();
   const { pathname } = useLocation();
   const history = useHistory();
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   // The modal is fully URL-driven: /fleets/new shows it, closing navigates back to /fleets.
   const showFleetModal = pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW;
@@ -49,12 +53,23 @@ const CollectorsFleets = () => {
   const fleetActions = useCallback(
     (fleet: Fleet) => (
       <ButtonToolbar>
-        <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
-          <Button bsSize="xsmall">Received messages</Button>
+        <LinkContainer to={collectorReceivedMessagesUrl(AGENT_FLEET_ID_FIELD, fleet.id)}>
+          <IconButton
+            name="search"
+            title="Received messages"
+            bsStyle="default"
+            size="xsmall"
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.RECEIVED_MESSAGES_CLICKED, {
+                app_action_value: 'fleet-received-messages',
+                fleet_id: fleet.id,
+              })
+            }
+          />
         </LinkContainer>
       </ButtonToolbar>
     ),
-    [],
+    [sendTelemetry],
   );
 
   const closeCreateModal = useCallback(() => {
@@ -77,7 +92,7 @@ const CollectorsFleets = () => {
         entityActions={fleetActions}
       />
 
-      {showFleetModal && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
+      {showFleetModal && canCreateFleet && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
     </>
   );
 };

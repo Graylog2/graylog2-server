@@ -26,7 +26,7 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates, selectIsDirty } from 'views/logic/slices/viewSelectors';
@@ -41,7 +41,7 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetPositions, updateWidgetPosition } from 'views/logic/slices/widgetActions';
 import { setIsDirty } from 'views/logic/slices/viewSlice';
 import { widgetDragHandleClass } from 'views/components/widgets/Constants';
-import { selectNewWidget } from 'views/logic/slices/widgetsSlice';
+import { selectNewWidget, clearNewWidget } from 'views/logic/slices/widgetsSlice';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 
 import WidgetContainer from './WidgetContainer';
@@ -91,8 +91,10 @@ type WidgetsProps = {
 };
 
 const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget, isNewWidget }: WidgetsProps) => {
+  const dispatch = useViewsDispatch();
   const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
   const widgetPosition = positions[widgetId];
+  const onSettled = useCallback(() => dispatch(clearNewWidget(widgetId)), [dispatch, widgetId]);
 
   return (
     <>
@@ -101,6 +103,7 @@ const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget,
         scrollContainer={{ current: document.body }}
         title="Scroll to new widget"
         ifTrue={isNewWidget}
+        onSettled={onSettled}
       />
       <WidgetComponent
         editing={editing}
@@ -216,7 +219,7 @@ const renderGaps = (widgets: Widget[], positions: WidgetPositions) => {
 };
 
 const WidgetGrid = () => {
-  const isInteractive = useContext(InteractiveContext);
+  const isInteractive = useIsInteractiveMode();
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
   const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();

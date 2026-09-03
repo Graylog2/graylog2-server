@@ -62,7 +62,7 @@ const getCustomColumnRenderers = (
       renderCell: (_status: string, eventDefinition: EventDefinition) => (
         <StatusCell eventDefinition={eventDefinition} />
       ),
-      staticWidth: 110,
+      staticWidth: 120,
     },
     type: {
       renderCell: (_type: string, eventDefinition: EventDefinition) => (
@@ -78,6 +78,7 @@ const getCustomColumnRenderers = (
       renderCell: (_notifications: EventDefinition['notifications'], eventDefinition: EventDefinition) => (
         <EventDefinitionNotificationsCell eventDefinition={eventDefinition} />
       ),
+      textAlign: 'right',
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (

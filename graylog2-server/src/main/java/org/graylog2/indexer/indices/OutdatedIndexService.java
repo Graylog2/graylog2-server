@@ -19,12 +19,17 @@ package org.graylog2.indexer.indices;
 
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
+import org.graylog2.indexer.indices.stats.IndexStatistics;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.security.IndexerAdminCert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +40,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.mongodb.client.model.Filters.in;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class OutdatedIndexService {
@@ -43,12 +55,17 @@ public class OutdatedIndexService {
 
     private final IndicesAdapter indicesAdapter;
     private final IndexSetRegistry indexSetRegistry;
+    private final IndexRangeService indexRangeService;
+    private final EventBus eventBus;
     private final Cluster cluster;
 
     @Inject
-    public OutdatedIndexService(@IndexerAdminCert IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry, Cluster cluster) {
+    public OutdatedIndexService(@IndexerAdminCert IndicesAdapter indicesAdapter, IndexSetRegistry indexSetRegistry,
+                                IndexRangeService indexRangeService, EventBus eventBus, Cluster cluster) {
         this.indicesAdapter = indicesAdapter;
         this.indexSetRegistry = indexSetRegistry;
+        this.indexRangeService = indexRangeService;
+        this.eventBus = eventBus;
         this.cluster = cluster;
     }
 
@@ -61,10 +78,23 @@ public class OutdatedIndexService {
                         throw new IllegalStateException("Cluster version cannot be determined: " + version);
                     }
                 }).orElseThrow(() -> new IllegalStateException("Cluster version cannot be determined: null"));
-        return indicesAdapter.getOutdatedIndices(currentMajorVersion).stream()
+        final List<OutdatedIndex> outdatedIndices = indicesAdapter.getOutdatedIndices(currentMajorVersion).stream()
                 .map(index -> index.asManaged(indexSetRegistry.isManagedIndex(index.indexName())))
                 .map(index -> index.asActiveWriteIndex(isActiveWriteIndexForSet(index.indexName())))
+                .toList();
+        final Map<String, IndexRange> ranges = findRanges(outdatedIndices);
+        return outdatedIndices.stream()
+                .map(index -> index.withRange(ranges.get(index.indexName())))
                 .sorted().toList();
+    }
+
+    private Map<String, IndexRange> findRanges(List<OutdatedIndex> indices) {
+        final Set<String> indexNames = indices.stream().map(OutdatedIndex::indexName).collect(Collectors.toSet());
+        if (indexNames.isEmpty()) {
+            return Map.of();
+        }
+        return indexRangeService.find(in(IndexRange.FIELD_INDEX_NAME, indexNames)).stream()
+                .collect(Collectors.toMap(IndexRange::indexName, Function.identity(), (existing, replacement) -> existing));
     }
 
     public String isActiveWriteIndexForSet(String index) {
@@ -85,40 +115,92 @@ public class OutdatedIndexService {
         if (sourceSettings == null) {
             throw new IllegalStateException("No index sourceSettings found for index " + index);
         }
+        // Remember how many documents the source holds so we can verify nothing is lost before each destructive step.
+        final long sourceCount = numberOfMessages(index);
         // clean index settings for creation
         Map<String, Object> tempSettings = cleanIndexSettings(sourceSettings, withReplicas);
         String tempIndex = ".gltmp_" + index.replaceAll("\\.", "");
         try {
+            safeCreateTempIndex(index, tempIndex);
+
             // create and reindex into temp index
-            if (indicesAdapter.exists(tempIndex)) {
-                LOG.warn("Temporary index for reindexing already exists, deleting it: {}", tempIndex);
-                indicesAdapter.delete(tempIndex);
-            }
             indicesAdapter.create(tempIndex, new IndexSettings(tempSettings), sourceMapping);
             HealthStatus tempStatus = indicesAdapter.waitForRecovery(tempIndex);
             if (tempStatus != HealthStatus.Green) {
                 throw new IllegalStateException("Temporary index " + tempIndex + " could not be created successfully: " + tempStatus);
             }
             reindex(index, tempIndex);
-            // delete source index
             indicesAdapter.refresh(tempIndex);
-            indicesAdapter.delete(index);
-            // recreate and reindex into source index
-            indicesAdapter.create(index, new IndexSettings(cleanIndexSettings(sourceSettings, true)), sourceMapping);
-            // TODO: Benchmark if creating the target index with replicas 0 and reindexing and setting replicas afterwards is better
-            //  (would need an additional health check before deleting temp)
-            HealthStatus targetStatus = indicesAdapter.waitForRecovery(index);
-            if (targetStatus != HealthStatus.Green) {
-                throw new IllegalStateException("Index " + index + " could not be recreated successfully: " + targetStatus);
+
+            // Safety check: never delete the source index until the temporary index holds at least as many documents
+            // as the source did. A shortfall means the copy lost documents, so we abort. We do not require exact
+            // equality here — only a shortfall is evidence of lost source data, so we abort only when the temp index
+            // has fewer.
+            final long tempCount = numberOfMessages(tempIndex);
+            if (tempCount < sourceCount) {
+                indicesAdapter.delete(tempIndex);
+                throw new IllegalStateException(f("Aborting reindex of index %s: temporary index %s holds %d of %d " +
+                        "documents. The source index was left untouched.", index, tempIndex, tempCount, sourceCount));
             }
-            reindex(tempIndex, index);
-            indicesAdapter.refresh(index);
-            // delete temp index
+
+            // ----- Point of no return: the source index is deleted next. -----
+            // If anything fails from here on, the only complete copy of the data lives in the temporary index, so we
+            // must never delete it in the failure path and we surface its name for manual recovery.
+            indicesAdapter.delete(index);
+            try {
+                // recreate and reindex into source index
+                indicesAdapter.create(index, new IndexSettings(cleanIndexSettings(sourceSettings, true)), sourceMapping);
+                // TODO: Benchmark if creating the target index with replicas 0 and reindexing and setting replicas afterwards is better
+                //  (would need an additional health check before deleting temp)
+                HealthStatus targetStatus = indicesAdapter.waitForRecovery(index);
+                if (targetStatus != HealthStatus.Green) {
+                    throw new IllegalStateException("Index " + index + " could not be recreated successfully: " + targetStatus);
+                }
+                reindex(tempIndex, index);
+                indicesAdapter.refresh(index);
+
+                // The recreated index is built solely from the temp index, so its count must match tempCount exactly.
+                // Verify against tempCount (not the original sourceCount) and abort on any mismatch.
+                final long targetCount = numberOfMessages(index);
+                if (targetCount != tempCount) {
+                    throw new IllegalStateException(f("Recreated index %s holds %d of %d documents.",
+                            index, targetCount, tempCount));
+                }
+            } catch (Exception e) {
+                throw new IllegalStateException(f("Reindexing index %s failed after the original index was deleted: %s. " +
+                                "The complete data is preserved in temporary index %s and was NOT deleted; restore it manually.",
+                        index, e.getMessage(), tempIndex), e);
+            }
+
+            // The recreated index is verified complete, so it is now safe to drop the temporary index.
             indicesAdapter.delete(tempIndex);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    /**
+     * Prepares the temporary index name for use. A leftover temporary index usually means a previous reindex run
+     * failed. We only discard it when the source index still exists — if the source is gone, the temporary index may
+     * hold the only surviving copy of the data and must not be deleted automatically.
+     */
+    private void safeCreateTempIndex(String index, String tempIndex) throws IOException {
+        if (!indicesAdapter.exists(tempIndex)) {
+            return;
+        }
+        if (indicesAdapter.exists(index)) {
+            LOG.warn("Temporary index for reindexing already exists, deleting it: {}", tempIndex);
+            indicesAdapter.delete(tempIndex);
+        } else {
+            throw new IllegalStateException(f("Refusing to reindex %s: the source index is missing but temporary index " +
+                    "%s exists and may hold the only copy of the data from a previous failed reindex. Inspect and " +
+                    "restore %s manually before retrying.", index, tempIndex, tempIndex));
+        }
+    }
+
+    long numberOfMessages(String index) {
+        Optional<IndexStatistics> indexStats = indicesAdapter.getIndexStats(index);
+        return indexStats.map(stat -> stat.primaryShards().documents().count()).orElse(0L);
     }
 
     private void reindex(String source, String target) {
@@ -160,5 +242,7 @@ public class OutdatedIndexService {
 
     public void delete(@NotNull String index) {
         indicesAdapter.delete(index);
+        // Mirror Indices#delete so listeners clean up index ranges and cached field types for managed indices.
+        eventBus.post(IndicesDeletedEvent.create(index));
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,20 +42,23 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.events.processor.systemnotification.TemplateRenderRequest;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.ExplainResults;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -65,6 +69,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @PublicCloudAPI
@@ -201,6 +206,32 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                        ExecutionState executionState,
                                        @Context SearchUser searchUser) {
         return searchExecutor.explain(id, searchUser, executionState);
+    }
+
+    @POST
+    @Operation(summary = "Explain an ad-hoc query plus search filters",
+               description = "Synthesizes a search from the given query and search filters and explains it, so callers "
+                       + "without a saved search (e.g. the event definition editor) can read the effective query from "
+                       + "the returned explain results.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Explain results (read effective_query per search type)",
+                    content = @Content(schema = @Schema(implementation = ExplainResults.class)))
+    })
+    @Path("effective_query")
+    @NoAuditEvent("Does not return any actual data")
+    public ExplainResults explainEffectiveQuery(@RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = EffectiveQueryRequest.class)))
+                                                EffectiveQueryRequest request,
+                                                @Context SearchUser searchUser) {
+        final Query query = Query.builder()
+                .id("effective-query")
+                .searchTypes(Set.of(MessageList.builder().id("effective-query-message-list").build()))
+                .query(ElasticsearchQueryString.of(request.queryString()))
+                .filters(request.filters())
+                .timerange(RelativeRange.allTime())
+                .build();
+        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
+
+        return searchExecutor.explain(search, searchUser, ExecutionState.empty());
     }
 
     @POST

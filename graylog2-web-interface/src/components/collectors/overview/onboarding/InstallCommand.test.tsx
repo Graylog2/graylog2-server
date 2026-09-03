@@ -42,4 +42,24 @@ describe('InstallCommand', () => {
 
     expect(screen.getByText(/token expires in 1 day/i)).toBeInTheDocument();
   });
+
+  it('renders a never-expires note when tokenDuration is null', () => {
+    render(<InstallCommand command={command} platformLabel="Linux" tokenDuration={null} />);
+
+    expect(screen.getByText(/this token never expires/i)).toBeInTheDocument();
+    expect(screen.queryByText(/token expires in/i)).not.toBeInTheDocument();
+  });
+
+  it('renders extra actions next to the copy button', () => {
+    render(
+      <InstallCommand
+        command={command}
+        platformLabel="Linux"
+        tokenDuration="P1D"
+        actions={<button type="button">Copy token only</button>}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /copy token only/i })).toBeInTheDocument();
+  });
 });

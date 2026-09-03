@@ -40,6 +40,11 @@ type Props = {
   selectedRetentionSegment: RetentionConfigSegment;
   setSelectedRetentionSegment: React.Dispatch<React.SetStateAction<RetentionConfigSegment>>;
 };
+const SegmentedControlContainer = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.md};
+  `,
+);
 
 const ConfigSegment = styled.div(
   ({ theme }) => css`
@@ -115,7 +120,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
 
   return (
     <Section title="Rotation & Retention">
-      <>
+      <SegmentedControlContainer>
         <SegmentedControl<RetentionConfigSegment>
           data={retentionConfigSegments}
           value={selectedRetentionSegment}
@@ -142,7 +147,7 @@ const IndexSetRotationRetentionConfigurationSection = ({
             />
           </ConfigSegment>
         )}
-      </>
+      </SegmentedControlContainer>
     </Section>
   );
 };

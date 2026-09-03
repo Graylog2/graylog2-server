@@ -64,7 +64,17 @@ import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import WidgetContext from '../contexts/WidgetContext';
 
 const Container = styled.div`
+  position: relative; // required for absolute positioned widget actions
+  display: flex;
+  align-items: center;
+  min-height: 100%;
+`;
+
+const WidgetActions = styled.div`
+  display: flex;
   line-height: 0;
+  height: 100%;
+  align-items: center;
 
   > *:not(:last-child) {
     margin-right: 2px;
@@ -165,14 +175,13 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
   const dispatch = useViewsDispatch();
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-widget');
   const { parameters, parameterBindings } = useParameters();
   const [overflowingComponents, setOverflowingComponents] = useState<ActionComponents>({});
   const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
 
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
-      app_section: 'search-widget',
       app_action_value: 'widget-duplicate-button',
     });
 
@@ -182,7 +191,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const onCopyToDashboard = useCallback(
     (widgetId: string, dashboardId: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
-        app_section: 'search-widget',
         app_action_value: 'widget-copy-to-dashboard-button',
       });
 
@@ -193,7 +201,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
   const onCreateNewDashboard = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CREATE_NEW_DASHBOARD, {
-      app_section: 'search-widget',
       app_action_value: 'widget-create-new-dashboard-button',
     });
 
@@ -203,7 +210,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const onMoveWidgetToTab = useCallback(
     (widgetId: string, queryId: string, keepCopy: boolean) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.MOVE, {
-        app_section: 'search-widget',
         app_action_value: 'widget-move-button',
       });
 
@@ -213,7 +219,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   );
   const onDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DELETED, {
-      app_section: 'search-widget',
       app_action_value: 'widget-delete-button',
     });
 
@@ -221,7 +226,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [dispatch, sendTelemetry, title, view, widget]);
   const focusWidget = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.FOCUSED, {
-      app_section: 'search-widget',
       app_action_value: 'widget-focus-button',
     });
 
@@ -229,73 +233,77 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   }, [sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container className={widgetActionsMenuClass}>
-      <IfInteractive>
-        <IfDashboard>
-          <ReplaySearchButton
-            queryString={query.query_string}
-            timerange={timerange}
-            streams={streams}
-            streamCategories={streamCategories}
-            parameterBindings={parameterBindings}
-            parameters={parameters}
-            filters={widget.filters}
-            newTab
-          />
-        </IfDashboard>
-        <ExtraMenuWidgetActions widget={widget} />
-        {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
-        {!isFocused && (
-          <>
-            <WidgetHorizontalStretch
-              widgetId={widget.id}
-              widgetType={widget.type}
-              onStretch={onPositionsChange}
-              position={position}
-            />
-            <IconButton name="fullscreen" title="Focus this widget" onClick={focusWidget} />
-          </>
-        )}
-
-        <IconButton name="edit_square" title="Edit" iconType="regular" onClick={toggleEdit} />
-
-        <WidgetActionDropdown>
-          <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
-          <IfSearch>
-            <MenuItem onSelect={() => setShowCopyToDashboard(true)}>Copy to Dashboard</MenuItem>
-          </IfSearch>
+    <Container>
+      <WidgetActions className={widgetActionsMenuClass}>
+        <IfInteractive>
           <IfDashboard>
-            <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>Move to Page</MenuItem>
+            <ReplaySearchButton
+              queryString={query.query_string}
+              timerange={timerange}
+              streams={streams}
+              streamCategories={streamCategories}
+              parameterBindings={parameterBindings}
+              parameters={parameters}
+              filters={widget.filters}
+              newTab
+            />
           </IfDashboard>
-          <ExtraDropdownWidgetActions widget={widget} setComponents={setOverflowingComponents} />
-          <MenuItem divider />
-          <DeleteMenuItem onSelect={onDelete} />
-        </WidgetActionDropdown>
+          {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
+        </IfInteractive>
+        <ExtraMenuWidgetActions widget={widget} />
+        <IfInteractive>
+          {!isFocused && (
+            <>
+              <WidgetHorizontalStretch
+                widgetId={widget.id}
+                widgetType={widget.type}
+                onStretch={onPositionsChange}
+                position={position}
+              />
+              <IconButton name="fullscreen" title="Focus this widget" onClick={focusWidget} />
+            </>
+          )}
 
-        {showCopyToDashboard && (
-          <CopyToDashboard
-            onCopyToDashboard={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
-            onCancel={() => setShowCopyToDashboard(false)}
-            submitLoadingText="Copying widget..."
-            submitButtonText="Copy widget"
-            onCreateNewDashboard={onCreateNewDashboard}
-          />
-        )}
+          <IconButton name="edit_square" title="Edit" iconType="regular" onClick={toggleEdit} />
 
-        {showExport && (
-          <ExportModal view={view} directExportWidgetId={widget.id} closeModal={() => setShowExport(false)} />
-        )}
+          <WidgetActionDropdown>
+            <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
+            <IfSearch>
+              <MenuItem onSelect={() => setShowCopyToDashboard(true)}>Copy to Dashboard</MenuItem>
+            </IfSearch>
+            <IfDashboard>
+              <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>Move to Page</MenuItem>
+            </IfDashboard>
+            <ExtraDropdownWidgetActions widget={widget} setComponents={setOverflowingComponents} />
+            <MenuItem divider />
+            <DeleteMenuItem onSelect={onDelete} />
+          </WidgetActionDropdown>
 
-        {showMoveWidgetToTab && (
-          <MoveWidgetToTabModal
-            view={view}
-            widgetId={widget.id}
-            onCancel={() => setShowMoveWidgetToTab(false)}
-            onSubmit={onMoveWidgetToTab}
-          />
-        )}
-      </IfInteractive>
-      {overflowingComponentsValues}
+          {showCopyToDashboard && (
+            <CopyToDashboard
+              onCopyToDashboard={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
+              onCancel={() => setShowCopyToDashboard(false)}
+              submitLoadingText="Copying widget..."
+              submitButtonText="Copy widget"
+              onCreateNewDashboard={onCreateNewDashboard}
+            />
+          )}
+
+          {showExport && (
+            <ExportModal view={view} directExportWidgetId={widget.id} closeModal={() => setShowExport(false)} />
+          )}
+
+          {showMoveWidgetToTab && (
+            <MoveWidgetToTabModal
+              view={view}
+              widgetId={widget.id}
+              onCancel={() => setShowMoveWidgetToTab(false)}
+              onSubmit={onMoveWidgetToTab}
+            />
+          )}
+        </IfInteractive>
+        {overflowingComponentsValues}
+      </WidgetActions>
     </Container>
   );
 };

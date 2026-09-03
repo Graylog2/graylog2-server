@@ -17,11 +17,15 @@
 
 package org.graylog2.indexer.indices;
 
+import com.google.common.eventbus.EventBus;
 import org.assertj.core.api.Assertions;
+import org.bson.conversions.Bson;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +36,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +49,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,6 +64,12 @@ class OutdatedIndexServiceTest {
 
     @Mock
     IndexSetRegistry indexSetRegistry;
+
+    @Mock
+    IndexRangeService indexRangeService;
+
+    @Mock
+    EventBus eventBus;
 
     @InjectMocks
     OutdatedIndexService outdatedIndexService;
@@ -95,6 +107,7 @@ class OutdatedIndexServiceTest {
         when(noWriteIndex.getActiveWriteIndex()).thenReturn("another_index");
         when(indexSetRegistry.getForIndex("outdated2")).thenReturn(Optional.of(noWriteIndex));
         when(indicesAdapter.getOutdatedIndices(2)).thenReturn(outdatedIndices);
+        when(indexRangeService.find(any(Bson.class))).thenReturn(Collections.<IndexRange>emptySortedSet());
         assertThat(outdatedIndexService.getOutdatedIndices()).isEqualTo(List.of(
                 new OutdatedIndex("outdated1", "1.3.0", false, true, "id1"),
                 new OutdatedIndex("outdated2", "1.3.0", true, false, null)
@@ -179,21 +192,30 @@ class OutdatedIndexServiceTest {
         when(indicesAdapter.exists(".gltmp_my_index")).thenReturn(false);
         when(indicesAdapter.waitForRecovery(".gltmp_my_index")).thenReturn(HealthStatus.Green);
         when(indicesAdapter.waitForRecovery("my_index")).thenReturn(HealthStatus.Green);
+        // Equal counts everywhere so both safety checks pass: source == temp == recreated.
+        OutdatedIndexService spiedService = spy(outdatedIndexService);
+        when(spiedService.numberOfMessages("my_index")).thenReturn(10L);
+        when(spiedService.numberOfMessages(".gltmp_my_index")).thenReturn(10L);
 
-        outdatedIndexService.reindex("my_index", true);
+        spiedService.reindex("my_index", true);
 
-        InOrder inOrder = inOrder(indicesAdapter, indicesAdapter);
+        InOrder inOrder = inOrder(spiedService, indicesAdapter);
         inOrder.verify(indicesAdapter).waitForRecovery("my_index", 2);
         inOrder.verify(indicesAdapter).getStructuredIndexSettings("my_index");
         inOrder.verify(indicesAdapter).getIndexMapping("my_index");
+        inOrder.verify(spiedService).numberOfMessages("my_index"); // capture source count before any destructive step
         inOrder.verify(indicesAdapter).exists(".gltmp_my_index");
         inOrder.verify(indicesAdapter).create(eq(".gltmp_my_index"), any(IndexSettings.class), eq(sourceMapping));
         inOrder.verify(indicesAdapter).waitForRecovery(".gltmp_my_index");
         inOrder.verify(indicesAdapter).reindex(eq("my_index"), eq(".gltmp_my_index"), any());
+        inOrder.verify(indicesAdapter).refresh(".gltmp_my_index");
+        inOrder.verify(spiedService).numberOfMessages(".gltmp_my_index"); // verify temp copy is complete before deleting source
         inOrder.verify(indicesAdapter).delete("my_index");
         inOrder.verify(indicesAdapter).create(eq("my_index"), any(IndexSettings.class), eq(sourceMapping));
         inOrder.verify(indicesAdapter).waitForRecovery("my_index");
         inOrder.verify(indicesAdapter).reindex(eq(".gltmp_my_index"), eq("my_index"), any());
+        inOrder.verify(indicesAdapter).refresh("my_index");
+        inOrder.verify(spiedService).numberOfMessages("my_index"); // verify recreated index is complete before deleting temp
         inOrder.verify(indicesAdapter).delete(".gltmp_my_index");
     }
 

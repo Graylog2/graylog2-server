@@ -61,7 +61,9 @@ const renderIcon = (source: DataSource) =>
 const DataSourceIcons = () => (
   <Sources>
     {DATA_SOURCES.map((source) => (
-      <IconCard key={source.label} title={source.label}>{renderIcon(source)}</IconCard>
+      <IconCard key={source.label} title={source.label}>
+        {renderIcon(source)}
+      </IconCard>
     ))}
     <AndMore>And more</AndMore>
   </Sources>

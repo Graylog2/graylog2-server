@@ -29,6 +29,7 @@ import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -172,6 +173,20 @@ class ClusterAdapterES7Test {
         ));
 
         assertThat(clusterAdapter.deflectorHealth(Set.of("foo_deflector", "bar_deflector", "baz_deflector"))).contains(HealthStatus.Red);
+    }
+
+    @Test
+    void nodesUtilizationParsesPerNodeCpuAndHeapPercent() throws IOException {
+        when(jsonApi.perform(any(), anyString())).thenReturn(objectMapper.readTree("""
+                {"nodes":{
+                  "nodeId1":{"name":"es01","os":{"cpu":{"percent":42}},"jvm":{"mem":{"heap_used_percent":73}}}
+                }}"""));
+
+        final NodeUtilization stats = clusterAdapter.nodesUtilization().get("nodeId1");
+
+        assertThat(stats.name()).isEqualTo("es01");
+        assertThat(stats.cpuPercent()).isEqualTo(42.0);
+        assertThat(stats.jvmHeapUsedPercent()).isEqualTo(73.0);
     }
 
     private void mockNodesResponse() throws IOException {

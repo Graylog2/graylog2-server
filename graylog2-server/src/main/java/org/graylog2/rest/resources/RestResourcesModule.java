@@ -47,6 +47,7 @@ import org.graylog2.rest.resources.entities.preferences.EntityListPreferencesRes
 import org.graylog2.rest.resources.entities.preferences.metrics.EntityListMetricProvider;
 import org.graylog2.rest.resources.messages.MessageResource;
 import org.graylog2.rest.resources.mongodb.MongodbClusterResource;
+import org.graylog2.rest.resources.opensearch.OpensearchClusterResource;
 import org.graylog2.rest.resources.roles.RolesResource;
 import org.graylog2.rest.resources.search.AbsoluteSearchResource;
 import org.graylog2.rest.resources.search.DecoratorResource;
@@ -97,6 +98,7 @@ import org.graylog2.rest.resources.system.indexer.IndexTemplatesResource;
 import org.graylog2.rest.resources.system.indexer.IndexerClusterResource;
 import org.graylog2.rest.resources.system.indexer.IndexerOverviewResource;
 import org.graylog2.rest.resources.system.indexer.IndicesResource;
+import org.graylog2.rest.resources.system.indexer.OutdatedIndexResource;
 import org.graylog2.rest.resources.system.indices.RetentionStrategyResource;
 import org.graylog2.rest.resources.system.indices.RotationStrategyResource;
 import org.graylog2.rest.resources.system.inputs.ExtractorsResource;
@@ -174,6 +176,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(CertificateRenewalResource.class);
         addSystemRestResource(DatanodeResource.class);
         addSystemRestResource(MongodbClusterResource.class);
+        addSystemRestResource(OpensearchClusterResource.class);
         addSystemRestResource(DataNodeApiProxyResource.class);
         addSystemRestResource(DataNodeRestApiProxyResource.class);
         addSystemRestResource(DataNodeManagementResource.class);
@@ -231,6 +234,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(IndexSetDefaultsResource.class);
         addSystemRestResource(IndexTemplatesResource.class);
         addSystemRestResource(IndicesResource.class);
+        addSystemRestResource(OutdatedIndexResource.class);
         addSystemRestResource(IndexRangesResource.class);
         addSystemRestResource(RetentionStrategyResource.class);
         addSystemRestResource(RotationStrategyResource.class);

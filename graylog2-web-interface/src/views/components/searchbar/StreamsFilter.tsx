@@ -46,13 +46,12 @@ const StreamsFilter = ({
   multi = true,
   clearable = true,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
 
   const handleChange = (selected: StreamsAndCategoriesSelection) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_STREAM_INPUT_CHANGED, {
       app_pathname: 'search',
-      app_section: 'search-bar',
       app_action_value: 'search-filter',
       event_details: {
         streamsCount: selected?.streams?.length,

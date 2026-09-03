@@ -27,12 +27,13 @@ import Routes from 'routing/Routes';
 import FleetCard, { getHealthStatus } from './FleetCard';
 
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import useCollectorPermissions from '../hooks/useCollectorPermissions';
 import type { FleetStatsSummary } from '../types';
 
 const Grid = styled.div(
   ({ theme }) => css`
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 300px));
     gap: ${theme.spacings.sm};
   `,
 );
@@ -41,7 +42,7 @@ const EmptyState = styled.div(
   ({ theme }) => css`
     text-align: center;
     padding: ${theme.spacings.xxl};
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -53,6 +54,7 @@ type Props = {
 const FleetCardsGrid = ({ fleets, filter }: Props) => {
   const history = useHistory();
   const sendTelemetry = useSendCollectorsTelemetry();
+  const { canCreateFleet } = useCollectorPermissions();
 
   const filtered = useMemo(() => {
     if (!filter) return fleets;
@@ -62,8 +64,18 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
   }, [fleets, filter]);
 
   if (fleets.length === 0) {
+    // Without create permission every call to action here is a dead end: the setup steps are not
+    // theirs to perform, and the Deployment link goes to a page they cannot use either.
+    if (!canCreateFleet) {
+      return (
+        <EmptyEntity title="No Fleets Yet">
+          <p>Contact an administrator to set up the first Collectors.</p>
+        </EmptyEntity>
+      );
+    }
+
     return (
-      <EmptyEntity title="No fleets yet">
+      <EmptyEntity title="No Fleets Yet">
         <p>
           Fleets let you manage groups of Collectors with shared configuration. Create your first fleet, then add
           sources to define what data its Collectors should collect. Once configured,{' '}

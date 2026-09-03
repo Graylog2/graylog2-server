@@ -28,7 +28,6 @@ import type { Permission } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -39,13 +38,13 @@ import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
+import usePluginEntities from 'hooks/usePluginEntities';
 import RelativeTime from 'components/common/RelativeTime';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type User from 'logic/users/User';
@@ -61,6 +60,7 @@ import type { StreamsAndCategoriesSelection } from 'views/components/common/Stre
 import StreamsAndCategoriesFilter from 'views/components/common/StreamsAndCategoriesFilter';
 import ViewsQueryInput from 'views/components/searchbar/ViewsQueryInput';
 import QueryValidationDisplay from 'views/components/searchbar/queryvalidation/QueryValidationDisplay';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -130,9 +130,7 @@ const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLoo
   );
 
   if (!userCanViewLookupTables) {
-    return (
-      <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>
-    );
+    return <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>;
   }
 
   const parameterButtons = queryParameters.map((queryParam) => {
@@ -183,6 +181,7 @@ const QueryParameters = ({ eventDefinition, onChange, validation, userCanViewLoo
 const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
+  const searchQueryPreviews = usePluginEntities('eventDefinitions.components.searchQueryPreview') ?? [];
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
   const { userTimezone } = useUserDateTime();
@@ -190,9 +189,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const validationState = warnings?.queryString as QueryValidationState;
   const warmTierRanges = indicesInWarmTier(validationState);
 
-  const { pathname } = useLocation();
-
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('event-definition-condition');
 
   const queryId = generateId();
   const searchTypeId = generateId();
@@ -217,6 +214,9 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const [cronDescription, setCronDescription] = useState<string>(
     currentConfig.cron_expression ? describeExpression(currentConfig.cron_expression) : '',
   );
+
+  const { scopePermissions } = useScopePermissions(eventDefinition);
+  const isMutable = scopePermissions?.is_mutable;
 
   const validateQueryString = useCallback(
     (
@@ -371,8 +371,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     (name: string, config: EventDefinitionConfig) => {
       if (name === '_is_scheduled') {
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'event-definition-condition',
           app_action_value: 'enable-checkbox',
           is_scheduled: config._is_scheduled,
         });
@@ -380,7 +378,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
       propagateChange(config);
     },
-    [pathname, propagateChange, sendTelemetry],
+    [propagateChange, sendTelemetry],
   );
 
   const handleQueryChange = useCallback(
@@ -460,8 +458,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const handleStreamsAndCategoriesChange = useCallback(
     (selected: StreamsAndCategoriesSelection) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-definition-condition',
         app_action_value: 'stream-select',
       });
 
@@ -472,22 +468,18 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         ]),
       );
     },
-    [getUpdatedConfigMulti, pathname, propagateChange, sendTelemetry],
+    [getUpdatedConfigMulti, propagateChange, sendTelemetry],
   );
 
   const handleTimeRangeChange = useCallback(
     (fieldName: EventDefinitionConfigKeys) => (nextValue: number, nextUnit: 'hours' | 'minutes' | 'seconds') => {
       if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'event-definition-condition',
           app_action_value: 'searchWithinMsUnit-select',
           new_unit: nextUnit,
         });
       } else if (fieldName === 'execute_every_ms' && nextUnit !== executeEveryMsUnit) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'event-definition-condition',
           app_action_value: 'executeEveryMsUnit-select',
           new_unit: nextUnit,
         });
@@ -509,7 +501,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       setExecuteEveryMsDuration(nextValue);
       setExecuteEveryMsUnit(nextUnit);
     },
-    [executeEveryMsUnit, getUpdatedConfig, pathname, propagateChange, searchWithinMsUnit, sendTelemetry],
+    [executeEveryMsUnit, getUpdatedConfig, propagateChange, searchWithinMsUnit, sendTelemetry],
   );
 
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
@@ -557,6 +549,14 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
         </FormGroup>
       )}
 
+      {/* Extension point (filled by the enterprise search-filters plugin) for a read-only preview of the
+          effective query beneath the Search Query. Scoped (Illuminate) definitions hide the base query, so
+          the preview is not rendered for them. */}
+      {onlyFilters ||
+        searchQueryPreviews.map(({ component: SearchQueryPreview, key }) => (
+          <SearchQueryPreview key={key} queryString={currentConfig.query ?? ''} filters={currentConfig.filters ?? []} />
+        ))}
+
       {onlyFilters || (
         <QueryParameters
           eventDefinition={eventDefinition}
@@ -576,6 +576,8 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               filters={eventDefinition.config.filters}
               onChange={handleSearchFiltersChange}
               hideFiltersPreview={hideFiltersPreview}
+              queryString={currentConfig.query}
+              isParentMutable={isMutable}
             />
           </div>
         </FormGroup>

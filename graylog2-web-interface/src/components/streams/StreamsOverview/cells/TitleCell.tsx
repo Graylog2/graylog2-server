@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Link, Text } from 'components/common';
+import { Link } from 'components/common';
 import type { Stream } from 'logic/streams/types';
 import { Label } from 'components/bootstrap';
 
@@ -30,12 +30,6 @@ const DefaultLabel = styled(Label)`
   vertical-align: inherit;
 `;
 
-const StyledText = styled(Text)(
-  ({ theme }) => css`
-    color: ${theme.colors.text.secondary};
-  `,
-);
-
 const TitleCell = ({ stream }: Props) => (
   <>
     <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
@@ -44,7 +38,6 @@ const TitleCell = ({ stream }: Props) => (
         Default
       </DefaultLabel>
     )}
-    <StyledText>{stream.description}</StyledText>
   </>
 );
 

@@ -16,21 +16,30 @@
  */
 package org.graylog.collectors;
 
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import javax.net.ssl.SSLException;
+import java.util.concurrent.Executor;
 
 @Singleton
 public class CollectorTLSUtils {
     private final CollectorCaKeyManager keyManager;
     private final CollectorCaTrustManager trustManager;
+    private final Executor certVerificationExecutor;
 
     @Inject
-    public CollectorTLSUtils(CollectorCaKeyManager keyManager, CollectorCaTrustManager trustManager) {
+    public CollectorTLSUtils(CollectorCaKeyManager keyManager,
+                             CollectorCaTrustManager trustManager,
+                             @CollectorCertVerificationExecutor Executor certVerificationExecutor) {
         this.keyManager = keyManager;
         this.trustManager = trustManager;
+        this.certVerificationExecutor = certVerificationExecutor;
     }
 
     /**
@@ -58,5 +67,22 @@ public class CollectorTLSUtils {
         } catch (Exception e) {
             throw new RuntimeException("Failed to create OTLP server SSL context", e);
         }
+    }
+
+    /**
+     * Creates an {@link SslHandler} for the OTLP server endpoint whose TLS handshake delegated
+     * tasks run on the {@link CollectorCertVerificationExecutor} rather than the Netty event loop.
+     * <p>
+     * The JDK {@code SSLEngine} performs client-certificate validation
+     * ({@link CollectorCaTrustManager#checkClientTrusted}) as a delegated task; passing the executor
+     * to {@code newHandler} makes Netty run those tasks — including any MongoDB-backed instance
+     * binding lookup — off the event loop. Prefer this over building the context and creating the
+     * handler directly, so the executor is never accidentally omitted.
+     *
+     * @param alloc the allocator for the new handler
+     * @return an {@link SslHandler} configured for mTLS with off-loop handshake task execution
+     */
+    public SslHandler newServerSslHandler(ByteBufAllocator alloc) throws SSLException {
+        return newServerSslContextBuilder().build().newHandler(alloc, certVerificationExecutor);
     }
 }

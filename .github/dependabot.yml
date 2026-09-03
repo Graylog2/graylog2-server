@@ -19,11 +19,25 @@ updates:
       - dependency-name: "org.opensearch:opensearch-core"
       - dependency-name: "org.opensearch.client:opensearch-java"
     groups:
+      # The Google API client libraries are released in lockstep, so bumping
+      # them individually almost always trips the requireUpperBoundDeps
+      # enforcer rule. Deliberately excludes io.grpc and com.google.protobuf,
+      # which are on separate release trains.
+      google-api-libraries:
+        patterns:
+          - "com.google.api:*"
+          - "com.google.api.grpc:*"
+          - "com.google.auth:*"
+          - "com.google.cloud:*"
+          - "com.google.http-client:*"
       openrewrite:
         patterns:
           - "org.openrewrite:*"
           - "org.openrewrite.maven:*"
           - "org.openrewrite.recipe:*"
+      bouncycastle:
+        patterns:
+          - "org.bouncycastle:*"
     open-pull-requests-limit: 25
     labels:
       - dependencies

@@ -143,13 +143,12 @@ class DataTable extends React.Component<
     const { sortByKey, sortBy, dataRowFormatter, useNumericSort } = this.props;
     let sortedDataRows = this._getEffectiveRows();
 
-    if (sortByKey) {
+    if (sortByKey || sortBy) {
+      const sortValue = sortByKey ? (row) => row[sortByKey] : sortBy;
+
+      // Rows are not guaranteed to carry the sort key, so coerce the values to keep the comparison total.
       sortedDataRows = sortedDataRows.sort((a, b) =>
-        a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: useNumericSort }),
-      );
-    } else if (sortBy) {
-      sortedDataRows = sortedDataRows.sort((a, b) =>
-        sortBy(a).localeCompare(sortBy(b), undefined, { numeric: useNumericSort }),
+        String(sortValue(a) ?? '').localeCompare(String(sortValue(b) ?? ''), undefined, { numeric: useNumericSort }),
       );
     }
 

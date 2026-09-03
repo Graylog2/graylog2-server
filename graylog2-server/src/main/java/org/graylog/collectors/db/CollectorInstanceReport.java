@@ -31,7 +31,9 @@ public record CollectorInstanceReport(
         OptionalLong lastProcessedTxnSeq,
         Instant lastSeen,
         Optional<List<Attribute>> identifyingAttributes,
-        Optional<List<Attribute>> nonIdentifyingAttributes
+        Optional<List<Attribute>> nonIdentifyingAttributes,
+        boolean reportsHealth,
+        Optional<ComponentHealthDTO> health
 ) {
     @AutoBuilder
     public interface Builder {
@@ -49,11 +51,17 @@ public record CollectorInstanceReport(
 
         Builder nonIdentifyingAttributes(List<Attribute> nonIdentifyingAttributes);
 
+        Builder reportsHealth(boolean reportsHealth);
+
+        Builder health(ComponentHealthDTO health);
+
         CollectorInstanceReport build();
 
     }
 
     public static Builder builder() {
-        return new AutoBuilder_CollectorInstanceReport_Builder().lastSeen(Instant.now());
+        return new AutoBuilder_CollectorInstanceReport_Builder()
+                .lastSeen(Instant.now())
+                .reportsHealth(false);
     }
 }

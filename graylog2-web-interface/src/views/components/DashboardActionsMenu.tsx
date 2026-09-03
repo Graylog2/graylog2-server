@@ -70,7 +70,7 @@ const DashboardActionsMenu = () => {
   const [saveNewDashboardOpen, setSaveNewDashboardOpen] = useState(false);
   const [editDashboardOpen, setEditDashboardOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('dashboard');
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
@@ -116,7 +116,6 @@ const DashboardActionsMenu = () => {
     async (newDashboard: View, entityShare?: EntitySharePayload) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED, {
         app_pathname: 'dashboard',
-        app_section: 'dashboard',
         app_action_value: 'dashboard-save-new',
       });
 
@@ -139,7 +138,6 @@ const DashboardActionsMenu = () => {
     (updatedView) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_UPDATED, {
         app_pathname: 'dashboard',
-        app_section: 'dashboard',
         app_action_value: 'dashboard-update',
       });
 
@@ -167,12 +165,12 @@ const DashboardActionsMenu = () => {
           entityType="dashboard"
           entityId={view.id}
           onClick={() => setShareViewOpen(true)}
-          bsStyle="default"
+          bsSize="md"
           disabledInfo={isNewView && 'Only saved dashboards can be shared.'}
         />
       )}
       {showDropDownButton && (
-        <MoreActionsMenu id="query-tab-actions-dropdown" pullRight keepMounted>
+        <MoreActionsMenu id="query-tab-actions-dropdown" pullRight keepMounted solid>
           {dashboardActions.length > 0 && (
             <>
               {dashboardActions}

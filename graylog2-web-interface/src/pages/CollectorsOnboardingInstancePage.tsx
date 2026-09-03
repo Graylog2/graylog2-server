@@ -15,43 +15,49 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
+import PreviewBadge from 'components/common/PreviewBadge';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import collectorReceivedMessagesUrl from 'components/collectors/common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
 import { useInstance } from 'components/collectors/hooks/useInstanceQueries';
+import { useFleet } from 'components/collectors/hooks/useFleetQueries';
+import ConnectionSuccess from 'components/collectors/overview/onboarding/ConnectionSuccess';
 import Routes from 'routing/Routes';
+import useLocation from 'routing/useLocation';
 import { extractErrorMessage } from 'util/extractErrorMessage';
-import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
-import useHistory from 'routing/useHistory';
-import UserNotification from 'util/UserNotification';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
+import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
 
 const CollectorsOnboardingInstancePage = () => {
   const { instanceUid } = useParams<{ instanceUid: string }>();
-  const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const location = useLocation<{ fleetName?: string } | null>();
+  // Set by the onboarding wizard's history push; absent on direct visits.
+  const stateFleetName = location.state?.fleetName;
 
   const { data: instance, isLoading, error } = useInstance(instanceUid);
-  const defaultInterval = useDefaultInterval();
+  const { data: fleet } = useFleet(instance?.fleet_id ?? '');
 
-  // using useEffect to guard that the default is actually there when we call the navigate
+  const { mutate: finish } = useFinishOnboarding();
+
+  // Guards that the instance is actually there before we finish the onboarding. `useInstance`
+  // polls on the heartbeat interval and returns a new object each time, so this must be latched
+  // rather than keyed on the instance reference -- otherwise it re-POSTs every poll.
+  // The COMPLETED telemetry event lives in `ConnectionSuccess`, which knows whether messages
+  // are actually arriving.
+  const finishedFor = useRef<string | null>(null);
+
+  const { data: onboarding } = useOnboardingEligibility();
+  const onboardingInProgress = onboarding?.status === 'setup';
+
   useEffect(() => {
-    if (instance && defaultInterval) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ONBOARDING.COMPLETED, {
-        app_section: 'collectors-onboarding',
-        app_action_value: 'collector-onboarding-completed',
-      });
-      history.push(collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid, defaultInterval));
-      UserNotification.success('Collector connected successfully! Showing received messages ...');
-    }
-  }, [defaultInterval, instance, history, sendTelemetry]);
+    if (!onboardingInProgress || !instance || finishedFor.current === instance.instance_uid) return;
+
+    finishedFor.current = instance.instance_uid;
+    finish();
+  }, [onboardingInProgress, instance, finish]);
 
   const content = () => {
     if (isLoading) return <Spinner />;
@@ -69,7 +75,7 @@ const CollectorsOnboardingInstancePage = () => {
       );
     }
 
-    return <Spinner />;
+    return <ConnectionSuccess instance={instance} fleetName={fleet?.name ?? stateFleetName} />;
   };
 
   return (
@@ -78,7 +84,7 @@ const CollectorsOnboardingInstancePage = () => {
       <PageHeader
         title={
           <>
-            Collector Onboarding <BetaBadge />
+            Collector Onboarding <PreviewBadge />
           </>
         }>
         <span>Status of your newly connected collector.</span>

@@ -121,6 +121,10 @@ public class SystemJobResource extends RestResource {
         }
 
         for (final var summary : systemJobManager.getRunningJobs(nodeId).values()) {
+            // Jobs with their own JobResourceHandler are listed through that handler instead
+            if (jobResourceHandlerService.handlesJobType(summary.jobType())) {
+                continue;
+            }
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, summary.jobType())) {
                 jobs.add(summary);
             }
@@ -157,7 +161,8 @@ public class SystemJobResource extends RestResource {
             );
         }
 
-        final Optional<SystemJobSummary> systemJobSummary = systemJobManager.getRunningJob(jobId);
+        final Optional<SystemJobSummary> systemJobSummary = systemJobManager.getRunningJob(jobId)
+                .filter(summary -> !jobResourceHandlerService.handlesJobType(summary.jobType()));
         if (systemJobSummary.isPresent()) {
             checkPermission(RestPermissions.SYSTEMJOBS_READ, systemJobSummary.get().jobType());
             return systemJobSummary.get();
@@ -208,30 +213,44 @@ public class SystemJobResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
     public SystemJobSummary cancel(@Parameter(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
-        LegacySystemJob systemJob = legacySystemJobManager.getRunningJobs().get(jobId);
-        if (systemJob == null) {
-            throw new NotFoundException("No system job with ID <" + jobId + "> found");
+        final LegacySystemJob systemJob = legacySystemJobManager.getRunningJobs().get(jobId);
+        if (systemJob != null) {
+            checkPermission(RestPermissions.SYSTEMJOBS_DELETE, systemJob.getClassName());
+
+            if (systemJob.isCancelable()) {
+                systemJob.requestCancel();
+            } else {
+                throw new ForbiddenException("System job with ID <" + jobId + "> cannot be cancelled");
+            }
+
+            return SystemJobSummary.create(
+                    systemJob.getId(),
+                    systemJob.getDescription(),
+                    systemJob.getClassName(),
+                    systemJob.getInfo(),
+                    nodeId.getNodeId(),
+                    systemJob.getStartedAt(),
+                    systemJob.getProgress(),
+                    systemJob.isCancelable(),
+                    systemJob.providesProgress()
+            );
         }
 
-        checkPermission(RestPermissions.SYSTEMJOBS_DELETE, systemJob.getClassName());
+        // Not a legacy job: try the system job scheduler.
+        // Jobs with their own JobResourceHandler are cancelled through that handler instead, so it can apply its own
+        // permission checks. Mirrors the guard in list() and get().
+        final SystemJobSummary summary = systemJobManager.getRunningJob(jobId)
+                .filter(job -> !jobResourceHandlerService.handlesJobType(job.jobType()))
+                .orElseThrow(() -> new NotFoundException("No system job with ID <" + jobId + "> found"));
 
-        if (systemJob.isCancelable()) {
-            systemJob.requestCancel();
-        } else {
+        checkPermission(RestPermissions.SYSTEMJOBS_DELETE, summary.jobType());
+
+        if (!summary.isCancelable()) {
             throw new ForbiddenException("System job with ID <" + jobId + "> cannot be cancelled");
         }
 
-        return SystemJobSummary.create(
-                systemJob.getId(),
-                systemJob.getDescription(),
-                systemJob.getClassName(),
-                systemJob.getInfo(),
-                nodeId.getNodeId(),
-                systemJob.getStartedAt(),
-                systemJob.getProgress(),
-                systemJob.isCancelable(),
-                systemJob.providesProgress()
-        );
+        systemJobManager.cancel(jobId);
+        return summary;
     }
 
     @DELETE

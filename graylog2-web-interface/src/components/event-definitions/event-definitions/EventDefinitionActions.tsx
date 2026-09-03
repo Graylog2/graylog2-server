@@ -32,19 +32,14 @@ import {
 } from 'components/event-definitions/hooks/useEventDefinitions';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import UserNotification from 'util/UserNotification';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
 import type { EventDefinition } from '../event-definitions-types';
-import {
-  isAggregationEventDefinition,
-  isSystemEventDefinition,
-} from '../event-definitions-types';
+import { isAggregationEventDefinition, isSystemEventDefinition } from '../event-definitions-types';
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -86,7 +81,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState<DialogType | null>(null);
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
   const { actions: pluggableActions, actionModals: pluggableActionModals } =
@@ -122,7 +116,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
     switch (action) {
       case DIALOG_TYPES.COPY:
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_COPY_CLICKED, {
-          app_pathname: getPathnameWithoutId(pathname),
           app_section: 'event-definition-row',
           app_action_value: 'copy-menuitem',
         });
@@ -132,7 +125,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
         break;
       case DIALOG_TYPES.DELETE:
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_DELETE_CLICKED, {
-          app_pathname: getPathnameWithoutId(pathname),
           app_section: 'event-definition-row',
           app_action_value: 'delete-menuitem',
         });
@@ -142,7 +134,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
         break;
       case DIALOG_TYPES.ENABLE:
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_ENABLE_CLICKED, {
-          app_pathname: getPathnameWithoutId(pathname),
           app_section: 'event-definition-row',
           app_action_value: 'enable-menuitem',
         });
@@ -152,7 +143,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
         break;
       case DIALOG_TYPES.DISABLE:
         sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_DISABLE_CLICKED, {
-          app_pathname: getPathnameWithoutId(pathname),
           app_section: 'event-definition-row',
           app_action_value: 'disable-menuitem',
         });
@@ -167,7 +157,6 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
 
   const handleShare = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.ROW_ACTION_SHARE_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-list',
       app_action_value: 'share-button',
     });

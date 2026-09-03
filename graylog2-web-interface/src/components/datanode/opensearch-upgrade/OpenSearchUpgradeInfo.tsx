@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, {css} from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import {Spinner} from 'components/common';
+import { Spinner } from 'components/common';
 
 const InfoList = styled.dl(
   ({ theme }) => css`

@@ -20,9 +20,8 @@ import styled, { css } from 'styled-components';
 import { Button, ControlLabel, FormGroup, Input, ButtonGroup } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import type { RuleType } from 'components/rules/hooks/useRules';
-import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
+import * as JSON from 'util/json';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { PipelineRulesContext, SimulationFieldType } from './RuleContext';
@@ -84,8 +83,7 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
   } = useContext(PipelineRulesContext);
 
   const [highlightedOutput] = useRuleBuilder().useHighlightedOutput;
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('pipeline-rule-simulation');
   const [simulationFieldType, setSimulationFieldType] = useState(SimulationFieldType.JSON);
   const [simulationErrorMessage, setSimulationErrorMessage] = useState(undefined);
 
@@ -149,8 +147,6 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
 
   const handleRunRuleSimulation = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.RUN_RULE_SIMULATION_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-simulation',
       app_action_value: 'run-rule-simulation-button',
       event_details: { is_rule_builder },
     });
@@ -161,8 +157,6 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
 
   const handleResetRuleSimulation = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.RESET_RULE_SIMULATION_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-simulation',
       app_action_value: 'reset-rule-simulation-button',
       event_details: { is_rule_builder },
     });

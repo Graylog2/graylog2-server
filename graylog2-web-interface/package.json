@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@mantine/core": "^8.2.8",
@@ -85,7 +86,7 @@
     "p-debounce": "^4.0.0",
     "patch-package": "^8.0.1",
     "plotly.js": "3.5.0",
-    "posthog-js": "^1.371.1",
+    "posthog-js": "^1.400.1",
     "postinstall-postinstall": "^2.1.0",
     "qs": "^6.15.1",
     "react-ace": "14.0.1",
@@ -170,7 +171,7 @@
     "utility-types": "^3.10.0",
     "webpack-bundle-analyzer": "^5.2.0",
     "webpack-cli": "6.0.1",
-    "webpack-dev-server": "^5.2.2",
+    "webpack-dev-server": "^6.0.0",
     "webpack-merge": "^6.0.1",
     "whatwg-fetch": "^3.6.20"
   },

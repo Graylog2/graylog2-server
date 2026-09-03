@@ -16,20 +16,57 @@
  */
 import * as React from 'react';
 import { Navigate } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, Tabs, Badge } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import BetaBadge from 'components/common/BetaBadge';
-import { DeploymentForm, EnrollmentTokenList } from 'components/collectors/deployment';
+import PreviewBadge from 'components/common/PreviewBadge';
+import { DeployTab, EnrollmentTokenList } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import { useCollectorsConfig } from 'components/collectors/hooks';
+import { useCollectorsConfig, useEnrollmentTokenCount, useCollectorPermissions } from 'components/collectors/hooks';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { COLOR_SCHEME_LIGHT } from 'theme/constants';
 import Routes from 'routing/Routes';
+
+// Mantine's default --tab-border-color (gray-3 / dark-4) is too high-contrast against the content
+// background. The palette vars don't flip with the color scheme, so pick per theme mode. Mantine
+// defines the var via `[data-mantine-color-scheme] .class` (0-2-0), so the override needs higher
+// specificity than a single class.
+const SoftBorderTabs = styled(Tabs)(
+  ({ theme }) => css`
+    &&& {
+      --tab-border-color: var(
+        ${theme.mode === COLOR_SCHEME_LIGHT ? '--mantine-color-gray-1' : '--mantine-color-dark-5'}
+      );
+    }
+  `,
+);
 
 const CollectorsDeploymentPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
+  const tokenCount = useEnrollmentTokenCount();
+  const { canDeployCollectors, canViewEnrollmentTokens } = useCollectorPermissions();
+  const sendTelemetry = useSendCollectorsTelemetry();
+
+  const handleTabChange = (tab: string | null) => {
+    if (!tab) return;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.TAB_SELECTED, {
+      app_action_value: `tab-${tab}`,
+      tab,
+    });
+  };
 
   if (isLoading) {
     return <Spinner />;
+  }
+
+  // Guards a deep link: the nav entry is already hidden for these users, but the route is reachable
+  // by typing the URL. Deliberately the union of the two tab conditions below, so the page can never
+  // render with zero tabs. useCanAccessDeployment mirrors this for the nav entry — keep them in step.
+  if (!canDeployCollectors && !canViewEnrollmentTokens) {
+    return <Navigate to={Routes.SYSTEM.COLLECTORS.OVERVIEW} />;
   }
 
   if (!config?.signing_cert_id) {
@@ -42,27 +79,46 @@ const CollectorsDeploymentPage = () => {
       <PageHeader
         title={
           <>
-            Deploy Collectors <BetaBadge />
+            Deploy Collectors <PreviewBadge />
           </>
         }>
         <span>
-          Deploy Collectors to your infrastructure using enrollment tokens. An enrollment token authorizes a Collector
-          to join a specific fleet and establishes a secure connection using mutual TLS.
+          Run the command on any number of hosts &mdash; they enroll into the fleet you pick and appear as they check
+          in.
         </span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          <DeploymentForm />
-        </Col>
-      </Row>
-      <Row className="content">
-        <Col md={12}>
-          <h2>Enrollment Tokens</h2>
-          <p className="description">
-            Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect already-enrolled
-            Collectors.
-          </p>
-          <EnrollmentTokenList />
+          <SoftBorderTabs defaultValue={canDeployCollectors ? 'deploy' : 'tokens'} onChange={handleTabChange}>
+            <Tabs.List>
+              {canDeployCollectors && <Tabs.Tab value="deploy">Deploy</Tabs.Tab>}
+              {canViewEnrollmentTokens && (
+                <Tabs.Tab value="tokens">
+                  Enrollment tokens
+                  {tokenCount !== undefined && (
+                    <>
+                      {' '}
+                      <Badge>{tokenCount}</Badge>
+                    </>
+                  )}
+                </Tabs.Tab>
+              )}
+            </Tabs.List>
+            {canDeployCollectors && (
+              <Tabs.Panel value="deploy">
+                <DeployTab />
+              </Tabs.Panel>
+            )}
+            {canViewEnrollmentTokens && (
+              <Tabs.Panel value="tokens">
+                <p className="description">
+                  Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect
+                  already-enrolled Collectors.
+                </p>
+                <EnrollmentTokenList />
+              </Tabs.Panel>
+            )}
+          </SoftBorderTabs>
         </Col>
       </Row>
     </DocumentTitle>

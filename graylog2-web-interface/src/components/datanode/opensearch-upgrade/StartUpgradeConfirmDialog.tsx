@@ -78,8 +78,8 @@ const StartUpgradeConfirmDialog = ({
           be briefly degraded while a node leaves and rejoins.
         </Paragraph>
         <Paragraph>
-          After each node the upgrade waits for the cluster to return to green before continuing. If that takes too
-          long it pauses and waits for you to resume.
+          After each node the upgrade waits for the cluster to return to green before continuing. If that takes too long
+          it pauses and waits for you to resume.
         </Paragraph>
         <Paragraph>Once started, it cannot be rolled back to the previous version.</Paragraph>
       </Alert>

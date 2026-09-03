@@ -42,6 +42,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorInstanceService.InstanceCount;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.CollectorsPermissions;
 import org.graylog.collectors.FleetService;
@@ -210,17 +211,26 @@ public class CollectorInstancesResource extends RestResource {
     @Timed
     @Operation(summary = "Get global collector statistics")
     public CollectorStatsResponse stats() {
-        // TODO for a permission check we would need to know which fleets are granted to the user
-        // since we haven't implemented that yet, we can't add them as filters to the count queries, as a consequence
-        // the counts would be wrong in case someone had explicit grants
-        final var instanceCount = collectorInstanceService.countAcrossAllFleets(
-                Instant.now().minus(getOfflineThreshold()));
-        return new CollectorStatsResponse(
-                instanceCount.total(),
-                instanceCount.online(),
-                instanceCount.offline(),
-                fleetService.count(),
-                sourceService.count());
+        final var threshold = Instant.now().minus(getOfflineThreshold());
+        final List<String> grantedFleetIds = fleetService.getAllFleets().stream()
+                .map(FleetDTO::id)
+                .filter(id -> isPermitted(CollectorsPermissions.FLEET_READ, id))
+                .toList();
+
+        final var instanceCounts = collectorInstanceService.countByFleetGrouped(threshold);
+        final var sourceCounts = sourceService.countByFleetGrouped();
+
+        long total = 0L;
+        long online = 0L;
+        long sources = 0L;
+        for (final String fleetId : grantedFleetIds) {
+            final var counts = instanceCounts.getOrDefault(fleetId, new InstanceCount(0L, 0L));
+            total += counts.total();
+            online += counts.online();
+            sources += sourceCounts.getOrDefault(fleetId, 0L);
+        }
+
+        return new CollectorStatsResponse(total, online, total - online, grantedFleetIds.size(), sources);
     }
 
     @GET
@@ -281,8 +291,8 @@ public class CollectorInstancesResource extends RestResource {
         final Duration offlineThreshold = getOfflineThreshold();
         final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
 
-        final var hasPendingChanges = !txnLogService.getUnprocessedMarkers(
-                dto.fleetId(), dto.instanceUid(), dto.lastProcessedTxnSeq()).isEmpty();
+        final var hasPendingChanges = txnLogService.hasPendingChanges(dto.fleetId(), dto.instanceUid(),
+                dto.lastProcessedTxnSeq());
 
         return toResponse(dto, offlineCutoff, hasPendingChanges);
     }
@@ -325,15 +335,14 @@ public class CollectorInstancesResource extends RestResource {
 
         final var markers = txnLogService.getUnprocessedMarkers(collector.fleetId(), collector.instanceUid(),
                 collector.lastProcessedTxnSeq());
-        final var coalesced = txnLogService.coalesce(markers);
+        final var highestPurgedSeq = txnLogService.highestPurgedSeq();
+        final var coalesced = txnLogService.coalesce(markers, collector.lastProcessedTxnSeq(), highestPurgedSeq);
+        final var hasPendingChanges = txnLogService.hasPendingChanges(markers, collector.lastProcessedTxnSeq(), highestPurgedSeq);
         final var activities = activityEntryMapper.toEntries(
                 markers.stream().filter(marker -> marker.type() != MarkerType.UNKNOWN).toList(),
                 this::isPermitted);
-
-        // Any unprocessed marker (including UNKNOWN, which is excluded from `activities`) means the
-        // instance is still pending — matching the instances table's "Sync" column.
-        return new PendingChangesResponse(!markers.isEmpty(),
-                PendingChangesResponse.CoalescedActionsView.from(coalesced), activities);
+        return new PendingChangesResponse(
+                hasPendingChanges, PendingChangesResponse.CoalescedActionsView.from(coalesced), activities);
     }
 
     @POST
@@ -396,7 +405,8 @@ public class CollectorInstancesResource extends RestResource {
                 dto.nextCertificateExpiresAt().orElse(null),
                 attributesToMap(dto.identifyingAttributes()),
                 attributesToMap(dto.nonIdentifyingAttributes()),
-                hasPendingChanges
+                hasPendingChanges,
+                dto.health().orElse(null)
         );
     }
 

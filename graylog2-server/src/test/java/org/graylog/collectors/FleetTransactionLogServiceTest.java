@@ -33,7 +33,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -105,6 +107,7 @@ class FleetTransactionLogServiceTest {
         assertThat(marker.payload()).isInstanceOf(FleetReassignedPayload.class);
         assertThat(((FleetReassignedPayload) marker.payload()).newFleetId()).isEqualTo("fleet-B");
     }
+
     @Test
     void sequenceNumbersAreMonotonicallyIncreasing() {
         long seq1 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
@@ -292,6 +295,211 @@ class FleetTransactionLogServiceTest {
         assertThat(lookup.maxByFleetId()).isEmpty();
         assertThat(lookup.maxByInstanceUid()).isEmpty();
         assertThat(lookup.isPending(instance("uid-A", "fleet-1", 0L))).isFalse();
+    }
+
+    // --- purgeMarkers / highestPurgedSeq tests ---
+
+    @Test
+    void highestPurgedSeqIsZeroOnEmptyLog() {
+        assertThat(service.highestPurgedSeq()).isZero();
+    }
+
+    @Test
+    void highestPurgedSeqIsZeroWhenNothingWasPurged() {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED); // seq 1
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED); // seq 2
+
+        assertThat(service.highestPurgedSeq()).isZero();
+    }
+
+    @Test
+    void purgeMarkersDeletesAllAgedMarkersWhenEnoughYoungMarkersRemain() {
+        appendMarkers(6);
+        backdate(4, Instant.now().minus(Duration.ofDays(10))); // seqs 1-4 aged, 5-6 young
+
+        final long deleted = service.purgeMarkers(Instant.now().minus(Duration.ofDays(1)), 2);
+
+        assertThat(deleted).isEqualTo(4L); // the two young markers already satisfy numToKeep
+        assertThat(service.highestPurgedSeq()).isEqualTo(4L);
+        assertThat(rawCollection.countDocuments()).isEqualTo(2L);
+    }
+
+    @Test
+    void purgeMarkersRetainsNewestAgedMarkersToReachNumToKeep() {
+        appendMarkers(6);
+        backdate(4, Instant.now().minus(Duration.ofDays(10))); // seqs 1-4 aged, 5-6 young
+
+        final long deleted = service.purgeMarkers(Instant.now().minus(Duration.ofDays(1)), 4);
+
+        assertThat(deleted).isEqualTo(2L); // aged seqs 3-4 fill up the total of 4
+        assertThat(service.highestPurgedSeq()).isEqualTo(2L);
+        assertThat(rawCollection.countDocuments()).isEqualTo(4L);
+    }
+
+    @Test
+    void purgeMarkersDoesNothingWhenTotalDoesNotExceedNumToKeep() {
+        appendMarkers(3);
+        backdate(3, Instant.now().minus(Duration.ofDays(10)));
+
+        final long deleted = service.purgeMarkers(Instant.now().minus(Duration.ofDays(1)), 3);
+
+        assertThat(deleted).isZero();
+        assertThat(service.highestPurgedSeq()).isZero();
+    }
+
+    @Test
+    void purgeMarkersDoesNothingWhenAllMarkersAreYoung() {
+        appendMarkers(3);
+
+        final long deleted = service.purgeMarkers(Instant.now().minus(Duration.ofDays(1)), 1);
+
+        assertThat(deleted).isZero();
+        assertThat(rawCollection.countDocuments()).isEqualTo(3L);
+    }
+
+    @Test
+    void purgeMarkersDeletesAllAgedMarkersDespiteInvertedTimestamps() {
+        appendMarkers(4);
+        // created_at inverted relative to seq among the aged markers: seq 2 is the oldest by time
+        backdate(1, 1, Instant.now().minus(Duration.ofDays(35)));
+        backdate(2, 2, Instant.now().minus(Duration.ofDays(40)));
+        backdate(3, 3, Instant.now().minus(Duration.ofDays(38)));
+        // seq 4 stays young
+
+        final long deleted = service.purgeMarkers(Instant.now().minus(Duration.ofDays(30)), 1);
+
+        // the boundary is the highest aged seq (3), so no aged marker survives below a deleted one
+        assertThat(deleted).isEqualTo(3L);
+        assertThat(service.highestPurgedSeq()).isEqualTo(3L);
+    }
+
+    @Test
+    void purgeMarkersIsUnaffectedBySequenceHoles() {
+        // seqs 3 and 4 were issued but their markers never got written (failed appends)
+        for (long seq : new long[]{1L, 2L, 5L, 6L}) {
+            rawCollection.insertOne(new Document("_id", seq)
+                    .append("target", "fleet")
+                    .append("target_id", List.of("fleet-1"))
+                    .append("type", "CONFIG_CHANGED")
+                    .append("created_by", "test")
+                    .append("created_at", new Date()));
+        }
+        backdate(5, Instant.now().minus(Duration.ofDays(10))); // seqs 1, 2, 5 aged; 6 young
+
+        final long deleted = service.purgeMarkers(Instant.now().minus(Duration.ofDays(1)), 2);
+
+        assertThat(deleted).isEqualTo(2L); // seqs 1-2; seq 5 retained to reach numToKeep
+        assertThat(service.highestPurgedSeq()).isEqualTo(4L);
+    }
+
+    @Test
+    void purgeMarkersNeverDeletesMarkersYoungerThanCutoff() {
+        appendMarkers(4);
+        // timestamp inversion across the cutoff: seq 3 is aged but follows the young seq 2
+        backdate(1, 1, Instant.now().minus(Duration.ofDays(40)));
+        // seq 2 stays young
+        backdate(3, 3, Instant.now().minus(Duration.ofDays(38)));
+        // seq 4 stays young
+
+        final long deleted = service.purgeMarkers(Instant.now().minus(Duration.ofDays(30)), 1);
+
+        // deletion stops below the first young marker (seq 2); the aged seq 3 survives this
+        // run and is purged later, once the advancing cutoff passes seq 2
+        assertThat(deleted).isEqualTo(1L);
+        assertThat(service.highestPurgedSeq()).isEqualTo(1L);
+    }
+
+    @Test
+    void purgeMarkersRejectsNonPositiveNumToKeep() {
+        assertThatThrownBy(() -> service.purgeMarkers(Instant.now(), 0))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.purgeMarkers(Instant.now(), -1))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void purgeMarkersIsIdempotent() {
+        appendMarkers(6);
+        backdate(4, Instant.now().minus(Duration.ofDays(10)));
+
+        final var cutoff = Instant.now().minus(Duration.ofDays(1));
+        service.purgeMarkers(cutoff, 2);
+        final long deletedOnSecondRun = service.purgeMarkers(cutoff, 2);
+
+        assertThat(deletedOnSecondRun).isZero();
+        assertThat(service.highestPurgedSeq()).isEqualTo(4L);
+    }
+
+    // --- truncation-aware pending / coalesce tests ---
+
+    @Test
+    void hasPendingChangesConsidersCursorsBelowHighestPurgedSeq() {
+        appendMarkers(6);
+        backdate(4, Instant.now().minus(Duration.ofDays(10)));
+        service.purgeMarkers(Instant.now().minus(Duration.ofDays(1)), 2); // purges seqs 1-4
+
+        // fleet-2 has no retained markers: pending is decided by the purge state alone
+        assertThat(service.hasPendingChanges("fleet-2", null, 3L)).isTrue();
+        assertThat(service.hasPendingChanges("fleet-2", null, 4L)).isFalse(); // saw everything purged
+        // fleet-1 still has retained unprocessed markers (seqs 5-6)
+        assertThat(service.hasPendingChanges("fleet-1", null, 4L)).isTrue();
+        assertThat(service.hasPendingChanges("fleet-1", null, 6L)).isFalse();
+    }
+
+    @Test
+    void coalesceForcesRecomputeForCursorsBelowHighestPurgedSeq() {
+        appendMarkers(6);
+        backdate(4, Instant.now().minus(Duration.ofDays(10)));
+        service.purgeMarkers(Instant.now().minus(Duration.ofDays(1)), 2); // purges seqs 1-4
+
+        final var forced = service.coalesce(List.of(), 3L);
+        assertThat(forced.recomputeConfig()).isTrue();
+        assertThat(forced.recomputeIngestConfig()).isTrue();
+        assertThat(forced.maxSeq()).isEqualTo(4L); // acknowledges the purged range
+
+        final var atBoundary = service.coalesce(List.of(), 4L);
+        assertThat(atBoundary.recomputeConfig()).isFalse();
+        assertThat(atBoundary.recomputeIngestConfig()).isFalse();
+    }
+
+    @Test
+    void coalesceDoesNotForceRecomputeWhenNothingWasPurged() {
+        appendMarkers(2);
+
+        final var coalesced = service.coalesce(List.of(), 0L);
+
+        assertThat(coalesced.recomputeConfig()).isFalse();
+        assertThat(coalesced.recomputeIngestConfig()).isFalse();
+    }
+
+    @Test
+    void pendingChangesLookupCarriesHighestPurgedSeq() {
+        appendMarkers(6);
+        backdate(4, Instant.now().minus(Duration.ofDays(10)));
+        service.purgeMarkers(Instant.now().minus(Duration.ofDays(1)), 2); // purges seqs 1-4
+
+        final var lookup = service.pendingChangesLookup();
+
+        assertThat(lookup.highestPurgedSeq()).isEqualTo(4L);
+        // an instance in a fleet without retained markers is pending purely due to truncation
+        assertThat(lookup.isPending(instance("uid-A", "fleet-2", 3L))).isTrue();
+        assertThat(lookup.isPending(instance("uid-A", "fleet-2", 4L))).isFalse();
+    }
+
+    private void appendMarkers(int count) {
+        for (int i = 0; i < count; i++) {
+            service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
+        }
+    }
+
+    private void backdate(long upToSeq, Instant createdAt) {
+        backdate(1, upToSeq, createdAt);
+    }
+
+    private void backdate(long fromSeq, long toSeq, Instant createdAt) {
+        rawCollection.updateMany(
+                Filters.and(Filters.gte("_id", fromSeq), Filters.lte("_id", toSeq)),
+                new Document("$set", new Document("created_at", Date.from(createdAt))));
     }
 
     private static CollectorInstanceDTO instance(String uid, String fleetId, long lastProcessedTxnSeq) {

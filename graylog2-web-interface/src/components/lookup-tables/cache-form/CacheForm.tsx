@@ -72,7 +72,7 @@ type Props = {
 };
 
 function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_CACHE }: Props) {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('lut_cache');
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const { createCache, creatingCache } = useCreateCache();
   const { updateCache, updatingCache } = useUpdateCache();
@@ -89,7 +89,6 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
     return promise.then((response) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CACHE_CREATED' : 'CACHE_UPDATED'], {
         app_pathname: 'lut',
-        app_section: 'lut_cache',
         event_details: {
           type: values?.config?.type,
         },
