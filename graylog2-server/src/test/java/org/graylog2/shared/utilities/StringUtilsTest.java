@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.shared.utilities.StringUtils.toLowerCase;
 import static org.graylog2.shared.utilities.StringUtils.toUpperCase;
+import static org.graylog2.shared.utilities.StringUtils.truncate;
 
 public class StringUtilsTest {
     @Test
@@ -83,6 +84,20 @@ public class StringUtilsTest {
                 .containsExactlyInAnyOrder("one", "two", "three");
 
 
+    }
+
+    @Test
+    public void testTruncate() {
+        assertThat(truncate(null, 10)).isNull();
+        assertThat(truncate("", 10)).isEqualTo("");
+
+        final String shortValue = "hello";
+        assertThat(truncate(shortValue, 10)).isSameAs(shortValue);
+        final String exact = "1234567890";
+        assertThat(truncate(exact, 10)).isSameAs(exact);
+
+        assertThat(truncate("1234567890abc", 10))
+                .isEqualTo("1234567890… (truncated, 10 of 13 characters shown)");
     }
 
     @Test

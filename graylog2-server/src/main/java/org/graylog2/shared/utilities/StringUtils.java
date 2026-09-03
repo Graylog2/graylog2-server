@@ -106,6 +106,22 @@ public final class StringUtils {
     }
 
     /**
+     * Truncates a string to {@code maxLength} characters, appending a suffix that reports how many
+     * characters were dropped so a reader knows to look elsewhere for the full value rather than
+     * wondering whether the source really produced this little. Returns the same instance when no
+     * truncation is needed (caller can identity-compare to skip rebuilding). Passes {@code null}
+     * through unchanged.
+     */
+    @Nullable
+    public static String truncate(@Nullable final String value, final int maxLength) {
+        if (value == null || value.length() <= maxLength) {
+            return value;
+        }
+        return value.substring(0, maxLength)
+                + f("… (truncated, %d of %d characters shown)", maxLength, value.length());
+    }
+
+    /**
      * Returns the given string if it's not null and not only whitespace. Otherwise, throws an exception.
      *
      * @param value the string value to check
