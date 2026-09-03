@@ -130,16 +130,16 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.50.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.71.0</gcs.version>
+        <gcs.version>2.72.0</gcs.version>
         <azure-blob-storage.version>12.35.0</azure-blob-storage.version>
         <azure-json.version>1.5.1</azure-json.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
-        <google-api-common.version>2.66.0</google-api-common.version>
-        <google-auth-library.version>1.50.0</google-auth-library.version>
-        <google-cloud-core.version>2.73.0</google-cloud-core.version>
+        <google-api-common.version>2.67.0</google-api-common.version>
+        <google-auth-library.version>1.51.0</google-auth-library.version>
+        <google-cloud-core.version>2.74.0</google-cloud-core.version>
         <google-conscrypt.version>2.6.3</google-conscrypt.version>
-        <google-gax.version>2.83.0</google-gax.version>
+        <google-gax.version>2.84.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -200,8 +200,8 @@
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>4.35.1</protobuf.version>
-        <proto-google-common-protos.version>2.74.0</proto-google-common-protos.version>
-        <proto-google-iam-v1.version>1.69.0</proto-google-iam-v1.version>
+        <proto-google-common-protos.version>2.75.0</proto-google-common-protos.version>
+        <proto-google-iam-v1.version>1.70.0</proto-google-iam-v1.version>
         <reactor.version>3.7.19</reactor.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
