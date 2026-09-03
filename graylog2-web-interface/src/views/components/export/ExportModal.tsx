@@ -100,8 +100,7 @@ const ExportModal = ({ closeModal = () => {}, view, directExportWidgetId = null 
   const singleWidgetDownload = !!directExportWidgetId;
 
   const _startDownload = ({ selectedWidget, selectedFields, limit, customSettings, format }: FormState) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_EXPORT_DOWNLOADED, {
-    });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_EXPORT_DOWNLOADED, {});
 
     setLoading(true);
 

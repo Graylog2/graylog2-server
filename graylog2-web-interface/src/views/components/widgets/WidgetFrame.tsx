@@ -107,9 +107,8 @@ const WidgetWrap = styled.div(
       opacity: 0;
       transition: opacity 0.2s;
       transition-delay: 0.5s;
-      top: 50%;
+      top: 0;
       right: 0;
-      transform: translateY(-50%);
     }
 
     &:hover
@@ -120,7 +119,6 @@ const WidgetWrap = styled.div(
       .${widgetActionsMenuClass} {
       position: relative;
       opacity: 1;
-      top: 0;
       transform: none;
       transition-delay: 0s;
     }

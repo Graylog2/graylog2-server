@@ -25,8 +25,7 @@ const NavigationTelemetry = () => {
 
   useEffect(() => {
     if (location.pathname) {
-      sendTelemetry('$pageview', {
-      });
+      sendTelemetry('$pageview', {});
     }
   }, [location.pathname, sendTelemetry]);
 
