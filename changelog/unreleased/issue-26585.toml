@@ -2,4 +2,4 @@ type = "c"
 message = "Change Collector system logs field mapping."
 
 issues = ["26585"]
-pulls = [""]
+pulls = ["27258"]
