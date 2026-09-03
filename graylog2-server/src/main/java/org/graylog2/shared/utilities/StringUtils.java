@@ -113,7 +113,7 @@ public final class StringUtils {
      * through unchanged.
      */
     @Nullable
-    public static String truncate(@Nullable final String value, final int maxLength) {
+    public static String verboseTruncate(@Nullable final String value, final int maxLength) {
         if (value == null || value.length() <= maxLength) {
             return value;
         }
