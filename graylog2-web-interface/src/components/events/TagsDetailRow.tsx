@@ -22,9 +22,13 @@ import useAppendTagFilter from 'components/events/useAppendTagFilter';
 
 type Props = {
   tags: ReadonlyArray<string> | undefined | null;
+  // Tag chips only make sense as filter shortcuts when a filterable list is in scope.
+  // Set to false in contexts without one (e.g. widgets, investigation evidence) to avoid
+  // rendering clickable chips that just pollute the URL with an unused `filter` param.
+  interactive?: boolean;
 };
 
-const TagsDetailRow = ({ tags }: Props) => {
+const TagsDetailRow = ({ tags, interactive = true }: Props) => {
   const onTagClick = useAppendTagFilter();
 
   if (!tags?.length) return null;
@@ -33,7 +37,11 @@ const TagsDetailRow = ({ tags }: Props) => {
     <DefinitionList>
       <dt>Tags</dt>
       <dd>
-        <ChipsCell items={tags} truncate={false} onItemClick={onTagClick} itemLabel="tag" />
+        {interactive ? (
+          <ChipsCell items={tags} truncate={false} onItemClick={onTagClick} itemLabel="tag" />
+        ) : (
+          <ChipsCell items={tags} truncate={false} />
+        )}
       </dd>
     </DefinitionList>
   );
