@@ -46,6 +46,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.apache.commons.validator.routines.InetAddressValidator;
+import org.graylog2.lookup.adapters.LookupDataAdapterValidationContext;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -162,11 +163,6 @@ public class OTXDataAdapter extends LookupDataAdapter {
             throw new IllegalArgumentException("OTX API URL is not valid");
         }
 
-        if (!urlAllowlistService.isAllowlisted(config.apiUrl())) {
-            publishSystemNotificationForAllowlistFailure();
-            throw UrlNotAllowlistedException.forUrl(config.apiUrl());
-        }
-
         this.httpHeaders = builder
                 .add(HttpHeaders.USER_AGENT, config.httpUserAgent())
                 .add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
@@ -196,6 +192,17 @@ public class OTXDataAdapter extends LookupDataAdapter {
 
     @Override
     protected LookupResult doGet(Object keyObject) {
+        if (!urlAllowlistService.isAllowlisted(config.apiUrl())) {
+            LOG.error("Data adapter <{}>: URL <{}> is not allowlisted. Aborting lookup request.", name(), config.apiUrl());
+            publishSystemNotificationForAllowlistFailure();
+            setError(UrlNotAllowlistedException.forUrl(config.apiUrl()));
+            return getErrorResult();
+        } else {
+            // we use this kind of error reporting mechanism only for allowlist errors, so we can safely clear the
+            // error here
+            clearError();
+        }
+
         final String key = String.valueOf(keyObject);
         String otxIndicator = config.indicator();
 
@@ -370,7 +377,7 @@ public class OTXDataAdapter extends LookupDataAdapter {
         public abstract Builder toBuilder();
 
         @Override
-        public Optional<Multimap<String, String>> validate() {
+        public Optional<Multimap<String, String>> validate(LookupDataAdapterValidationContext validationContext) {
             final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
 
             if (!OTX_INDICATORS.contains(indicator())) {
@@ -378,6 +385,8 @@ public class OTXDataAdapter extends LookupDataAdapter {
             }
             if (HttpUrl.parse(apiUrl()) == null) {
                 errors.put("api_url", "Invalid URL");
+            } else if (!validationContext.getUrlAllowlistService().isAllowlisted(apiUrl())) {
+                errors.put("api_url", "URL <" + apiUrl() + "> is not allowlisted.");
             }
             if (httpConnectTimeout() < 1) {
                 errors.put("http_connect_timeout", "Value cannot be smaller than 1");

@@ -17,13 +17,14 @@
 package org.graylog.plugins.threatintel.adapters.otx;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.Multimap;
 import com.google.common.io.Resources;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import org.graylog2.lookup.adapters.LookupDataAdapterValidationContext;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
 import org.graylog2.system.urlallowlist.UrlAllowlistService;
-import org.graylog2.system.urlallowlist.UrlNotAllowlistedException;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,12 +35,12 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.net.URL;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,6 +53,9 @@ public class OTXDataAdapterTest {
 
     @Mock
     private UrlAllowlistNotificationService urlAllowlistNotificationService;
+
+    @Mock
+    private LookupDataAdapterValidationContext validationContext;
 
     private OTXDataAdapter otxDataAdapter;
 
@@ -86,21 +90,48 @@ public class OTXDataAdapterTest {
     }
 
     @Test
-    public void doStart_allowsWhenUrlIsAllowlisted() {
-        when(urlAllowlistService.isAllowlisted("https://otx.alienvault.com")).thenReturn(true);
+    public void doGet_returnsErrorWhenUrlNotAllowlisted() throws Exception {
+        otxDataAdapter.doStart();
+        when(urlAllowlistService.isAllowlisted(OTXDataAdapter.DEFAULT_API_URL)).thenReturn(false);
 
-        assertThatCode(() -> otxDataAdapter.doStart())
-                .doesNotThrowAnyException();
+        final LookupResult result = otxDataAdapter.doGet("8.8.8.8");
+
+        assertThat(result.hasError()).isTrue();
+        verify(urlAllowlistNotificationService).publishAllowlistFailure(anyString());
     }
 
     @Test
-    public void doStart_throwsWhenUrlNotAllowlisted() {
-        when(urlAllowlistService.isAllowlisted("https://otx.alienvault.com")).thenReturn(false);
+    public void doGet_doesNotPublishNotificationWhenUrlIsAllowlisted() throws Exception {
+        otxDataAdapter.doStart();
+        when(urlAllowlistService.isAllowlisted(OTXDataAdapter.DEFAULT_API_URL)).thenReturn(true);
 
-        assertThatThrownBy(() -> otxDataAdapter.doStart())
-                .isInstanceOf(UrlNotAllowlistedException.class)
-                .hasMessageContaining("https://otx.alienvault.com");
+        // The actual HTTP request will fail with an IOException (no server to connect to),
+        // but the allowlist check passes and no allowlist failure notification is published.
+        otxDataAdapter.doGet("8.8.8.8");
 
-        verify(urlAllowlistNotificationService).publishAllowlistFailure(anyString());
+        verify(urlAllowlistNotificationService, never()).publishAllowlistFailure(anyString());
+    }
+
+    @Test
+    public void validate_returnsErrorWhenUrlNotAllowlisted() {
+        when(validationContext.getUrlAllowlistService()).thenReturn(urlAllowlistService);
+        when(urlAllowlistService.isAllowlisted(OTXDataAdapter.DEFAULT_API_URL)).thenReturn(false);
+
+        final OTXDataAdapter.Config config = new OTXDataAdapter.Descriptor(CustomizationConfig.empty()).defaultConfiguration();
+        final Optional<Multimap<String, String>> result = config.validate(validationContext);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().containsKey("api_url")).isTrue();
+    }
+
+    @Test
+    public void validate_returnsNoErrorWhenUrlIsAllowlisted() {
+        when(validationContext.getUrlAllowlistService()).thenReturn(urlAllowlistService);
+        when(urlAllowlistService.isAllowlisted(OTXDataAdapter.DEFAULT_API_URL)).thenReturn(true);
+
+        final OTXDataAdapter.Config config = new OTXDataAdapter.Descriptor(CustomizationConfig.empty()).defaultConfiguration();
+        final Optional<Multimap<String, String>> result = config.validate(validationContext);
+
+        assertThat(result).isEmpty();
     }
 }
