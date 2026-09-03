@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
+import org.graylog2.utilities.ProxyConfig;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,23 +35,24 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Optional;
 
 public class ProxySelectorProvider implements Provider<ProxySelector> {
     private static final Logger LOG = LoggerFactory.getLogger(ProxySelectorProvider.class);
 
-    protected final URI httpProxyUri;
+    protected final Optional<ProxyConfig> proxyConfig;
     protected final ProxyHostsPattern nonProxyHostsPattern;
 
     @Inject
     public ProxySelectorProvider(@Named("http_proxy_uri") @Nullable URI httpProxyUri,
                                  @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern) {
-        this.httpProxyUri = httpProxyUri;
+        this.proxyConfig = ProxyConfig.from(httpProxyUri);
         this.nonProxyHostsPattern = nonProxyHostsPattern;
     }
 
     @Override
     public ProxySelector get() {
-        if (httpProxyUri == null) {
+        if (proxyConfig.isEmpty()) {
             return ProxySelector.getDefault();
         }
         return new ProxySelector() {
@@ -85,6 +87,7 @@ public class ProxySelectorProvider implements Provider<ProxySelector> {
     }
 
     public InetSocketAddress getProxyAddress() {
-        return new InetSocketAddress(httpProxyUri.getHost(), httpProxyUri.getPort());
+        final ProxyConfig config = proxyConfig.orElseThrow();
+        return new InetSocketAddress(config.host(), config.port());
     }
 }
