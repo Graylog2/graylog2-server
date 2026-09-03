@@ -36,7 +36,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   const [selectedAction, setSelectedAction] = useState<string>('');
   const [isConfigurationWarningHidden, setIsConfigurationWarningHidden] = useState(false);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('administration');
 
   const resetSelectedAction = () => {
     setSelectedAction(undefined);
@@ -56,7 +56,6 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   const confirmProcessAction = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.PROCESS_ACTION_SET, {
       app_pathname: 'sidecars',
-      app_section: 'administration',
       event_details: {
         action: selectedAction,
       },

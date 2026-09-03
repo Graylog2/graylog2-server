@@ -63,7 +63,7 @@ const Heading = styled.h4(
 );
 
 const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
-const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
+const TELEMETRY_DEFAULTS = { app_pathname: 'datanode' } as const;
 
 const OpenSearchUpgradeSection = () => {
   const {
@@ -88,7 +88,7 @@ const OpenSearchUpgradeSection = () => {
     resumeRollingRestart,
     startRollingRestart,
   } = useOpenSearchRollingRestart();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('opensearch-upgrade');
   const [forceStartFailedChecks, setForceStartFailedChecks] = useState<Array<string>>([]);
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
