@@ -31,6 +31,7 @@ import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
 import type { Stream } from 'logic/streams/types';
+import streamCategoryName from 'logic/streams/streamCategoryName';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
@@ -188,7 +189,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const renderStreamCategories = () => {
     if (!streamCategories || streamCategories?.length === 0) return null;
 
-    const renderedCategories = streamCategories.map((s) => <StreamOrId key={s} streamOrId={s} />);
+    const renderedCategories = streamCategories.map((s) => <StreamOrId key={s} streamOrId={streamCategoryName(s)} />);
 
     return (
       <>
