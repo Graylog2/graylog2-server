@@ -10,8 +10,8 @@ an authorization error every few seconds indefinitely while consuming no records
 The input now reports a failure naming the denied action and resource, and stops its consumer, once a call it cannot
 work without has been denied for two minutes. Grant the missing permission, then stop and start the input. A denial
 the Kinesis Client Library works around, such as one affecting only lease rebalancing, is still logged but leaves the
-input running. KMS access failures on an encrypted stream (for example a disabled or deleted key) are treated the same
-way: restore access to the key, then stop and start the input.
+input running. On an encrypted stream, only a key that no longer exists fails the input, because a disabled key or a
+withdrawn key permission is usually restored without any change in Graylog, and those are logged and retried instead.
 """
 
 details.ops = """
