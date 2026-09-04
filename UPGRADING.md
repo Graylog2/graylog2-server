@@ -5,7 +5,7 @@ Upgrading to Graylog 7.2.x
 
 ### AlienVault OTX Adapter: URL Allowlist Enforcement
 
-The AlienVault OTX lookup data adapter now enforces the URL Allowlist on startup. Any OTX adapter whose configured API URL is not present in the allowlist will be blocked
+The AlienVault OTX lookup data adapter now enforces the URL Allowlist. Any OTX adapter whose configured API URL is not present in the allowlist will be blocked
 from making requests and will publish a system notification.
 
 **Automatic migration:** Existing instances configured with the default API URL
