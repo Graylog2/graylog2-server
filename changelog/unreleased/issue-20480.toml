@@ -2,3 +2,4 @@ type = "f"
 message = "Clarified Event Key help text to explain it only applies to the Event Correlation condition type."
 
 issues = ["20480"]
+pulls = ["27285"]
