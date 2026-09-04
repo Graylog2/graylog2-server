@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/bootstrap';
 import type { Sort } from 'stores/PaginationTypes';
@@ -43,16 +42,10 @@ export const DEFAULT_LAYOUT = {
   defaultColumnOrder: ['rule', 'pipeline', 'connected_streams'],
 };
 
-const ListCol = styled(Col)(
-  ({ theme }) => css`
-    padding-top: ${theme.spacings.lg};
-  `,
-);
-
 const StreamConnectedPipelines = ({ stream }: Props) => (
   <Section title="Routing from other Streams" collapsible>
     <Row>
-      <ListCol md={12}>
+      <Col md={12}>
         <PaginatedEntityTable<StreamConnectedPipeline>
           humanName="pipelines"
           tableLayout={DEFAULT_LAYOUT}
@@ -62,7 +55,7 @@ const StreamConnectedPipelines = ({ stream }: Props) => (
           externalSearch={EXTERNAL_SEARCH}
           columnRenderers={customColumnRenderers}
         />
-      </ListCol>
+      </Col>
     </Row>
   </Section>
 );
