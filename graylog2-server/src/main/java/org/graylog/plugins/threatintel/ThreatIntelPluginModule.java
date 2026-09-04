@@ -41,6 +41,7 @@ import org.graylog.plugins.threatintel.functions.tor.TorExitNodeLookupFunction;
 import org.graylog.plugins.threatintel.migrations.V20170821100300_MigrateOTXAPIToken;
 import org.graylog.plugins.threatintel.migrations.V20180906112716_RecreateThreatintelLookupTables;
 import org.graylog.plugins.threatintel.migrations.V20240531101100_RemoveAbusechContentPack;
+import org.graylog.plugins.threatintel.migrations.V20260827120000_AddOtxDefaultUrlToAllowlist;
 import org.graylog.plugins.threatintel.whois.ip.WhoisDataAdapter;
 import org.graylog.plugins.threatintel.whois.ip.WhoisLookupIpFunction;
 import org.graylog2.plugin.PluginConfigBean;
@@ -94,6 +95,7 @@ public class ThreatIntelPluginModule extends PluginModule {
         addMigration(V20180906112716_RecreateThreatintelLookupTables.class);
         addMigration(V20170821100300_MigrateOTXAPIToken.class);
         addMigration(V20240531101100_RemoveAbusechContentPack.class);
+        addMigration(V20260827120000_AddOtxDefaultUrlToAllowlist.class);
 
         addDomainFunction("abusech_ransomware", AbuseChRansomDomainLookupFunction.class);
         addIPFunction("abusech_ransomware", AbuseChRansomIpLookupFunction.class);
