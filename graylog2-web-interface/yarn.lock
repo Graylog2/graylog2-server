@@ -2761,10 +2761,10 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.100.9.tgz#dcf44ef25cf42a4da229bcab1d8d33e80a740a99"
   integrity sha512-SJSFw1S8+kQ0+knv/XGfrbocWoAlT7vDKsSImtLx3ZPQmEcR46hkDjLSvynSy25N8Ms4tIEini1FuBd5k7IscQ==
 
-"@tanstack/query-core@5.102.6":
-  version "5.102.6"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.102.6.tgz#874ef53e9f5f4cb56dd2fa62341a0fd7dd880d85"
-  integrity sha512-jp+GucyQ+fel2ILb8ZLQeqMaAqZL/Bzaj+dKOQiPk4vPdf2rQPEV7heUyEVIhatpY42j4AFHav4DzBa1oTIp/A==
+"@tanstack/query-core@5.102.8":
+  version "5.102.8"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.102.8.tgz#c55c31b4f99124054805ce8ec8137c84108f3252"
+  integrity sha512-ZNjkJ33CqvPNec/6lZBnHqLc3EVGPZ9ySLhYahU9TcuRFdmwXewuj0c4hwSWcGHqEUwcSrKeZ+oGcvPBqXcQcg==
 
 "@tanstack/query-persist-client-core@5.100.9":
   version "5.100.9"
@@ -2788,12 +2788,12 @@
   dependencies:
     "@tanstack/query-persist-client-core" "5.100.9"
 
-"@tanstack/react-query@5.102.6":
-  version "5.102.6"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.102.6.tgz#5456c885c75b08f7eb2320eff7f9ff68991fcd63"
-  integrity sha512-ANz4KZ8z80D85fiz5IAHjpb8XBPLrjOb/0natlD9Ascyy/3p96V86Zw8UbOfA0HDLcvK/A4gNd95r723y5UT2w==
+"@tanstack/react-query@5.102.8":
+  version "5.102.8"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.102.8.tgz#bdc5c24485258e6ae2e7ecac0a4cf58c59937839"
+  integrity sha512-TYBea4OuXWD7MhaSHq069TWbFe7rcwWN6kzT7JF0OKi1K6c1gTv2IzD6A6ExJsCMozdkqBWeuIUZmu4KQg0O5A==
   dependencies:
-    "@tanstack/query-core" "5.102.6"
+    "@tanstack/query-core" "5.102.8"
 
 "@tanstack/react-table@^8.21.3":
   version "8.21.3"
@@ -2833,10 +2833,10 @@
     picocolors "^1.1.1"
     redent "^3.0.0"
 
-"@testing-library/react@16.3.2":
-  version "16.3.2"
-  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-16.3.2.tgz#672883b7acb8e775fc0492d9e9d25e06e89786d0"
-  integrity sha512-XU5/SytQM+ykqMnAnvB2umaJNIOsLF3PVv//1Ew4CTcpz0/BRyy/af40qqrt7SjKpDdT1saBMc42CUok5gaw+g==
+"@testing-library/react@16.3.3":
+  version "16.3.3"
+  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-16.3.3.tgz#426907e7716f37038dab8aa69d8f0459f9ec24b2"
+  integrity sha512-Uo193NgQbPMz6lrrhtRQQFcMC6Re/ELLFbbuVL30WDlZxlpZf9/lMHTAVxPRLw1q1iu9OJmR1c2BLiENRstdBg==
   dependencies:
     "@babel/runtime" "^7.12.5"
 
@@ -7108,9 +7108,9 @@ escodegen@^2.1.0:
     eslint "9.39.2"
     eslint-import-resolver-webpack "0.13.11"
     eslint-plugin-compat "7.0.2"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-ca9ea1e2-c6fb-4aec-850b-c7f7e18d6250-1788524823745/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
-    eslint-plugin-jest "29.16.1"
+    eslint-plugin-jest "29.16.5"
     eslint-plugin-jest-dom "5.10.1"
     eslint-plugin-jest-formatting "3.1.0"
     eslint-plugin-jsx-a11y "6.10.2"
@@ -7204,10 +7204,10 @@ eslint-plugin-jest-formatting@3.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest-formatting/-/eslint-plugin-jest-formatting-3.1.0.tgz#b26dd5a40f432b642dcc880021a771bb1c93dcd2"
   integrity sha512-XyysraZ1JSgGbLSDxjj5HzKKh0glgWf+7CkqxbTqb7zEhW7X2WHo5SBQ8cGhnszKN+2Lj3/oevBlHNbHezoc/A==
 
-eslint-plugin-jest@29.16.1:
-  version "29.16.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-29.16.1.tgz#ca686565cb25155edb687eb9cf640766f9f8834d"
-  integrity sha512-tfxOIsjzaBud+f74aLbBMRcnrztt5eCIgnAdeoGdnzMAQ4IdAa/s/p8Ls55mk9MC79N3j2jbv4Qetz6Hclbcfw==
+eslint-plugin-jest@29.16.5:
+  version "29.16.5"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-29.16.5.tgz#d57c287d6aee861d65c32b89c8b2f64049be7b5e"
+  integrity sha512-2JblbVHN+FAF5iEz2Lky3jvzPRRmEOHJxFSvAl698FF6KPo+sdgaVT0j49HOAJ6gBP8Vlf/DAUs9/I6S3fj9VQ==
   dependencies:
     "@typescript-eslint/utils" "^8.0.0"
 
@@ -8623,13 +8623,13 @@ graphemer@^1.4.0:
   dependencies:
     "@graylog/sawmill" "4.0.11"
     "@reduxjs/toolkit" "^2.5.1"
-    "@tanstack/react-query" "5.102.6"
+    "@tanstack/react-query" "5.102.8"
     "@types/react" "18.3.13"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.2.0-SNAPSHOT-d725c70f-a6b1-4b33-96e9-2288eac6c334-1788524823502/node_modules/eslint-config-graylog"
     formik "2.4.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.2.0-SNAPSHOT-d725c70f-a6b1-4b33-96e9-2288eac6c334-1788524823502/node_modules/jest-preset-graylog"
     moment "2.30.1"
     moment-timezone "0.6.3"
     react "18.3.1"
@@ -10169,7 +10169,7 @@ jest-pnp-resolver@^1.2.3:
     "@swc/jest" "^0.2.39"
     "@testing-library/dom" "9.3.4"
     "@testing-library/jest-dom" "6.9.1"
-    "@testing-library/react" "16.3.2"
+    "@testing-library/react" "16.3.3"
     "@testing-library/user-event" "^14.6.1"
     "@types/jest" "30.0.0"
     identity-obj-proxy "^3.0.0"
