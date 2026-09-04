@@ -2,7 +2,7 @@ type = "f"
 message = "Fail the AWS Kinesis/CloudWatch input instead of retrying forever when AWS denies a required permission."
 
 issues = ["Graylog2/graylog-plugin-enterprise#15073"]
-pulls = ["26898"]
+pulls = ["26898", "27263"]
 
 details.user = """
 When the IAM role used by an AWS Kinesis/CloudWatch input was missing a required DynamoDB permission, the input logged
