@@ -31,6 +31,9 @@ public abstract class AbstractMapping implements IndexMappingTemplate {
                 .build());
     }
 
+    /**
+     * Mappings for the processing metadata fields the server stamps on every message.
+     */
     protected Map<String, Map<String, Object>> gl2ProcessingFields() {
         return ImmutableMap.of(
                 Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong(),
