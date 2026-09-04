@@ -21,6 +21,7 @@ import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.ServiceFields;
+import org.graylog.schema.VendorFields;
 import org.graylog2.indexer.ConstantsES7;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
@@ -103,14 +104,14 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
                 .put(CollectorIngestCodec.FIELD_AGENT_SOURCE_ID, map().put("type", "keyword").build())
                 .put(CollectorIngestCodec.FIELD_AGENT_FLEET_ID, map().put("type", "keyword").build())
                 // Severity fields
-                .put("vendor_event_severity", map().put("type", "keyword").build())
-                .put("vendor_event_severity_level", map().put("type", "long").build())
+                .put(VendorFields.VENDOR_EVENT_SEVERITY, map().put("type", "keyword").build())
+                .put(VendorFields.VENDOR_EVENT_SEVERITY_LEVEL, map().put("type", "long").build())
                 // Timestamp fields
-                .put("event_created", map()
+                .put(EventFields.EVENT_CREATED, map()
                         .put("type", "date")
                         .put("format", dateFormat())
                         .build())
-                .put("event_received_time", map()
+                .put(EventFields.EVENT_RECEIVED_TIME, map()
                         .put("type", "date")
                         .put("format", dateFormat())
                         .build())
