@@ -65,11 +65,13 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
 
     @Override
     @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
-    public abstract boolean negation();
+    @Nullable
+    public abstract Boolean negation();
 
     @Override
     @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
-    public abstract boolean disabled();
+    @Nullable
+    public abstract Boolean disabled();
 
     public static ReferencedQueryStringSearchFilter create(final String id) {
         return builder().id(id).build();
@@ -104,11 +106,11 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
         @JsonProperty(FIELD_SCOPE)
         public abstract Builder scope(String scope);
 
-        @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
-        public abstract Builder negation(boolean negation);
+        @JsonProperty(value = NEGATION_FIELD)
+        public abstract Builder negation(@Nullable Boolean negation);
 
-        @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
-        public abstract Builder disabled(boolean disabled);
+        @JsonProperty(value = DISABLED_FIELD)
+        public abstract Builder disabled(@Nullable Boolean disabled);
 
         @JsonCreator
         public static Builder create() {
@@ -134,8 +136,14 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                 .build();
     }
 
+    @Override
     public ReferencedSearchFilter withId(String id) {
         return toBuilder().id(id).build();
+    }
+
+    @Override
+    public ReferencedSearchFilter stripToId() {
+        return builder().id(id()).negation(null).disabled(null).build();
     }
 
     @Override
