@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix lingering polling interval in the lookup table list that kept requesting a deleted table and logging \"does not exist\" errors after navigating away."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14507"]
