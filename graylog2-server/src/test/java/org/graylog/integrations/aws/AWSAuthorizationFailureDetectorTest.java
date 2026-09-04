@@ -217,10 +217,8 @@ class AWSAuthorizationFailureDetectorTest {
             "InvalidClientTokenId",
             "InvalidSignatureException",
             "SignatureDoesNotMatch",
-            "KMSAccessDeniedException",
             "KMSNotFoundException",
-            "KMSOptInRequired",
-            "KMSDisabledException"})
+            "KMSOptInRequired"})
     void treatsDeniedActionsUnusableCredentialsAndUnusableKeysAsTerminal(String errorCode) {
         for (int i = 0; i < 10; i++) {
             recordFailure(QUERY, withErrorCode(errorCode, "denied"));
@@ -233,8 +231,10 @@ class AWSAuthorizationFailureDetectorTest {
     /**
      * Expired session credentials and throttling arrive as authorization-shaped errors but recover on their own.
      * Failing an input over either would be a worse bug than the log spam this class exists to stop.
-     * {@code KMSInvalidStateException} is here because its service documentation does not say which key states
-     * produce it, so an allowlist has to fail safe.
+     * The KMS codes are here because each names a state an operator routinely clears without touching Graylog: a CMK
+     * disabled during rotation, an expired grant or an edited key policy, or a key state
+     * {@code KMSInvalidStateException} does not identify. Failing an input over any of them would stop a stream that
+     * recovers on its own.
      */
     @ParameterizedTest
     @ValueSource(strings = {
@@ -243,7 +243,9 @@ class AWSAuthorizationFailureDetectorTest {
             "ProvisionedThroughputExceededException",
             "ThrottlingException",
             "RequestLimitExceeded",
-            "KMSInvalidStateException"})
+            "KMSInvalidStateException",
+            "KMSAccessDeniedException",
+            "KMSDisabledException"})
     void neverReportsSelfHealingErrors(String errorCode) {
         for (int i = 0; i < 10; i++) {
             recordFailure(QUERY, withErrorCode(errorCode, "retry later"));
