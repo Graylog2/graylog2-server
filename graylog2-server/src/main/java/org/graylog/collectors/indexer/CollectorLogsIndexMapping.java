@@ -129,6 +129,7 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
                 .put(CollectorLogRecordProcessor.FIELD_COLLECTOR_STATUS, map().put("type", "keyword").build())
                 .put(EventFields.EVENT_COMPONENT, map().put("type", "keyword").build())
                 .put(EventFields.EVENT_ERROR_DESCRIPTION, map().put("type", "keyword").build())
+                .put(EventFields.EVENT_SEQUENCE, map().put("type", "long").build())
                 .put(ServiceFields.SERVICE_NAME, map().put("type", "keyword").build())
                 .put(ServiceFields.SERVICE_VERSION, map().put("type", "keyword").build())
                 // All unpromoted log record attributes as an unparsed object

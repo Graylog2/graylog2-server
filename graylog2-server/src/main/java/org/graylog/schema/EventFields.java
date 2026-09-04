@@ -33,6 +33,7 @@ public class EventFields {
     public static final String EVENT_RECEIVED_TIME = "event_received_time";
     public static final String EVENT_REPEAT_COUNT = "event_repeat_count";
     public static final String EVENT_REPORTER = "event_reporter";
+    public static final String EVENT_SEQUENCE = "event_sequence";
     public static final String EVENT_SOURCE = "event_source";
     public static final String EVENT_SOURCE_API_VERSION = "event_source_api_version";
     public static final String EVENT_SOURCE_INPUT = "event_source_input";
