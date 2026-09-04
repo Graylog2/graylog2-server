@@ -62,7 +62,7 @@ const Heading = styled.h4(
   `,
 );
 
-const UpgradeProcess = styled.div(
+const HelpText = styled.div(
   ({ theme }) => css`
     margin-top: ${theme.spacings.md};
     color: ${theme.colors.gray[60]};
@@ -70,13 +70,19 @@ const UpgradeProcess = styled.div(
   `,
 );
 
-const UpgradeProcessHeading = styled.h4`
+const TableContainer = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.sm};
+  `,
+);
+
+const HelpTextHeading = styled.h4`
   margin: 0;
   color: inherit;
   font-size: inherit;
 `;
 
-const UpgradeProcessList = styled.ul(
+const HelpTextList = styled.ul(
   ({ theme }) => css`
     margin: ${theme.spacings.xs} 0 0;
     padding-left: ${theme.spacings.lg};
@@ -100,9 +106,9 @@ const TELEMETRY_DEFAULTS = { app_pathname: 'datanode' } as const;
 const UpgradeProcessInfo = ({ isRollingUpgrade }: { isRollingUpgrade: boolean }) => (
   <Row>
     <Col xs={12}>
-      <UpgradeProcess>
-        <UpgradeProcessHeading>Upgrade process</UpgradeProcessHeading>
-        <UpgradeProcessList>
+      <HelpText>
+        <HelpTextHeading>Upgrade process</HelpTextHeading>
+        <HelpTextList>
           <li>Each Data Node automatically upgrades its embedded OpenSearch to the target version.</li>
           {isRollingUpgrade ? (
             <>
@@ -116,8 +122,8 @@ const UpgradeProcessInfo = ({ isRollingUpgrade }: { isRollingUpgrade: boolean })
             </>
           )}
           <li>Back up MongoDB, Data Node, and Data Lake storage before upgrading to ensure a smooth rollback path.</li>
-        </UpgradeProcessList>
-      </UpgradeProcess>
+        </HelpTextList>
+      </HelpText>
     </Col>
   </Row>
 );
@@ -150,12 +156,14 @@ const OpenSearchUpgradeSection = () => {
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
   const hasIncompatibleIndices = incompatibleIndices.length > 0;
+  const areIncompatibleIndicesResolved =
+    !isLoadingIncompatibleIndices && !isIncompatibleIndicesError && !hasIncompatibleIndices;
   const rollingRestartState = rollingRestart?.data?.sm_state;
   const hasRollingRestartJob = !!rollingRestart?.data;
-  const showIncompatibleIndices = !hasRollingRestartJob;
+  const showIncompatibleIndices = !hasRollingRestartJob && !areIncompatibleIndicesResolved;
   const showStartAction = openSearchStatus === 'outdated';
-  const isStartActionDisabled =
-    isStartingRollingRestart || isLoadingIncompatibleIndices || isIncompatibleIndicesError || hasIncompatibleIndices;
+  const showUpgradeProcess = showStartAction && areIncompatibleIndicesResolved;
+  const isStartActionDisabled = isStartingRollingRestart || !areIncompatibleIndicesResolved;
   const startActionLabel = isRollingUpgradePossible
     ? 'Start OpenSearch Rolling Upgrade'
     : 'Start OpenSearch Upgrade and Restart';
@@ -237,12 +245,28 @@ const OpenSearchUpgradeSection = () => {
         <Row>
           <Col xs={12}>
             <Heading>Incompatible indices</Heading>
-            <IncompatibleIndicesTable />
+            {hasIncompatibleIndices && (
+              <HelpText>
+                <HelpTextHeading>Before upgrading</HelpTextHeading>
+                <HelpTextList>
+                  <li>
+                    OpenSearch 3 cannot read indices created with versions earlier than OpenSearch 2. If these indices
+                    remain during the upgrade, their data will become unavailable.
+                  </li>
+                  <li>
+                    Use the table below to reindex system indices and archive or delete data indices before continuing.
+                  </li>
+                </HelpTextList>
+              </HelpText>
+            )}
+            <TableContainer>
+              <IncompatibleIndicesTable />
+            </TableContainer>
           </Col>
         </Row>
       )}
 
-      {showStartAction && <UpgradeProcessInfo isRollingUpgrade={isRollingUpgradePossible} />}
+      {showUpgradeProcess && <UpgradeProcessInfo isRollingUpgrade={isRollingUpgradePossible} />}
 
       <ActionsRow>
         <Col xs={12}>

@@ -172,6 +172,8 @@ describe('OpenSearchUpgradeSection', () => {
   it('describes the rolling upgrade before the start action', () => {
     render(<OpenSearchUpgradeSection />);
 
+    expect(screen.queryByRole('heading', { name: /incompatible indices/i })).not.toBeInTheDocument();
+    expect(screen.queryByText('incompatible-indices-stub')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /upgrade process/i })).toBeInTheDocument();
     expect(screen.getByText(/automatically upgrades its embedded opensearch/i)).toBeInTheDocument();
     expect(screen.getByText(/restart one at a time to minimize the impact/i)).toBeInTheDocument();
@@ -235,6 +237,10 @@ describe('OpenSearchUpgradeSection', () => {
     mockIncompatibleIndices([{ index_name: 'graylog_0' }]);
     render(<OpenSearchUpgradeSection />);
 
+    expect(screen.getByRole('heading', { name: /before upgrading/i })).toBeInTheDocument();
+    expect(screen.getByText(/their data will become unavailable/i)).toBeInTheDocument();
+    expect(screen.getByText(/archive or delete data indices before continuing/i)).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /upgrade process/i })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
     expect(screen.getByText(/resolve all incompatible indices first/i)).toBeInTheDocument();
   });
@@ -243,6 +249,7 @@ describe('OpenSearchUpgradeSection', () => {
     mockIncompatibleIndices([], { isError: true });
     render(<OpenSearchUpgradeSection />);
 
+    expect(screen.queryByRole('heading', { name: /upgrade process/i })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /start opensearch rolling upgrade/i })).toBeDisabled();
   });
 
