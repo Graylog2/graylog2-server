@@ -156,6 +156,7 @@ class CollectorIngestCodecTest {
         assertThat(decoded).isPresent();
         final var expectedTimestamp = new DateTime(1700000000000L, DateTimeZone.UTC);
         assertThat(decoded.get().getTimestamp()).isEqualTo(expectedTimestamp);
+        assertThat(decoded.get().getField(EventFields.EVENT_CREATED)).isEqualTo(expectedTimestamp);
     }
 
     @Test
@@ -185,6 +186,7 @@ class CollectorIngestCodecTest {
         assertThat(decoded).isPresent();
         final var expectedTimestamp = new DateTime(1700000000000L, DateTimeZone.UTC);
         assertThat(decoded.get().getTimestamp()).isEqualTo(expectedTimestamp);
+        assertThat(decoded.get().getField(EventFields.EVENT_RECEIVED_TIME)).isEqualTo(expectedTimestamp);
     }
 
     @Test
