@@ -1,3 +1,26 @@
+Upgrading to Graylog 8.0.x
+==========================
+
+## Breaking Changes
+
+### Slack and Microsoft Teams Notifications Enforce the URL Allowlist
+
+Starting with Graylog 8.0, Slack and Microsoft Teams event notifications now enforce the URL allowlist
+(System > Configurations > URL Allowlist). If you already have Slack or Teams notifications configured, 
+their webhook URLs need to be added to the URL Allowlist before upgrading so they continue working. 
+
+Installations that have the allowlist disabled entirely are unaffected by this change.
+
+To find the notifications that need to be added to the Allowlist, you can run this query against your 
+Graylog MongoDB database. It returns the title, type, and webhook URL of every configured Slack and Teams notification:
+
+```
+db.event_notifications.find(
+  { "config.type": { $in: ["slack-notification-v1", "teams-notification-v1", "teams-notification-v2"] } },
+  { _id: 0, title: 1, "config.type": 1, "config.webhook_url": 1 }
+)
+```
+
 Upgrading to Graylog 7.2.x
 ==========================
 
