@@ -89,6 +89,7 @@ public class ViewServiceTest {
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityRegistrar.class),
                 mock(ViewSummaryService.class),
+                mock(EntitySourceService.class),
                 mongoCollections,
                 new IgnoreSearchFilters());
 
