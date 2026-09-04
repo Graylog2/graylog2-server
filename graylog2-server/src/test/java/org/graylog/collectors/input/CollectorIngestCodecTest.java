@@ -188,6 +188,64 @@ class CollectorIngestCodecTest {
     }
 
     @Test
+    void timeUnixNanoMapsToEventSequence() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("test"))
+                .setTimeUnixNano(1700000000000000001L)
+                .setObservedTimeUnixNano(1700000000000000002L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        // Full nanosecond precision is kept, and the log record time wins over the observed time.
+        assertThat(decoded.get().getField(EventFields.EVENT_SEQUENCE)).isEqualTo(1700000000000000001L);
+    }
+
+    @Test
+    void observedTimeUnixNanoFallbackForEventSequence() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("test"))
+                .setObservedTimeUnixNano(1700000000000000002L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        assertThat(decoded.get().getField(EventFields.EVENT_SEQUENCE)).isEqualTo(1700000000000000002L);
+    }
+
+    @Test
     void severityTextMapsToLevel() {
         final var logRecord = LogRecord.newBuilder()
                 .setBody(AnyValue.newBuilder().setStringValue("error occurred"))
