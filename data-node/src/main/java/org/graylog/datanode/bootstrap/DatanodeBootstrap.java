@@ -29,13 +29,18 @@ import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
+import org.graylog.datanode.bootstrap.plugin.DatanodePluginLoader;
+import org.graylog.datanode.bootstrap.preflight.inits.DatanodeBlockingInitService;
 import org.graylog.datanode.bootstrap.preflight.PreflightClusterConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.plugin.Plugin;
+import org.graylog2.plugin.PluginLoaderConfig;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
+import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.jsoftbiz.utils.OS;
@@ -63,19 +68,21 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
 
     @Override
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
-        runPreFlightChecks(plugins);
-    }
-
-    private void runPreFlightChecks(Set<Plugin> plugins) {
-        if (configuration.getSkipPreflightChecks()) {
-            LOG.info("Skipping preflight checks");
-            return;
-        }
 
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
+        final Injector preflightInjector = getPreflightInjector(preflightCheckModules);
 
-        getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
+        runPreFlightChecks(preflightInjector);
+        runDatanodeBlockingInits(preflightInjector);
+    }
+
+    private void runPreFlightChecks(Injector preflightInjector) {
+        preflightInjector.getInstance(PreflightCheckService.class).runChecks();
+    }
+
+    private void runDatanodeBlockingInits(Injector preflightInjector) {
+        preflightInjector.getInstance(DatanodeBlockingInitService.class).runInits();
     }
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
@@ -84,9 +91,9 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
                 new PreflightClusterConfigurationModule(chainingClassLoader),
                 new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
-                new PreflightChecksBindings(),
+                new PreflightChecksBindings(chainingClassLoader),
                 new DatanodeConfigurationBindings(),
-        new Module() {
+                new Module() {
                     @Override
                     public void configure(Binder binder) {
                         preflightCheckModules.forEach(binder::install);
@@ -167,4 +174,9 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
     }
 
     protected abstract Class<? extends Runnable> shutdownHook();
+
+    @Override
+    protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
+        return new DatanodePluginLoader(pluginLoaderConfig.getPluginDir().toFile(), classLoader);
+    }
 }

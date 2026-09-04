@@ -18,22 +18,14 @@ import React from 'react';
 import concat from 'lodash/concat';
 import isEqual from 'lodash/isEqual';
 import without from 'lodash/without';
-import IsolatedScroll from 'react-isolated-scroll';
 
-import {
-  FormControl,
-  FormGroup,
-  ListGroup,
-  ListGroupItem,
-} from 'components/bootstrap';
+import { FormControl, FormGroup, ListGroup, ListGroupItem } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 import OverlayTrigger from 'components/common/OverlayTrigger';
 
 import style from './SelectPopover.css';
 
 type SelectPopoverProps = {
-  /** Provides an ID for this popover element. */
-  id: string;
   /** Indicates where the popover should appear. */
   placement?: 'top' | 'right' | 'bottom' | 'left';
   /** Title to use in the popover header. */
@@ -77,9 +69,12 @@ type SelectPopoverProps = {
  * the options with the mouse. The component can (optionally) filter options with a text input
  * and customize how items are displayed with a function.
  */
-class SelectPopover extends React.Component<SelectPopoverProps, {
-  [key: string]: any;
-}> {
+class SelectPopover extends React.Component<
+  SelectPopoverProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     placement: 'bottom',
     triggerAction: 'click',
@@ -92,8 +87,6 @@ class SelectPopover extends React.Component<SelectPopoverProps, {
     clearSelectionText: 'Clear selection',
     disabled: false,
   };
-
-  private overlay: { hide: () => void };
 
   constructor(props) {
     super(props);
@@ -117,6 +110,8 @@ class SelectPopover extends React.Component<SelectPopoverProps, {
       this.filterData(filterText, nextProps.items);
     }
   }
+
+  private overlay: { hide: () => void };
 
   handleSelectionChange = (nextSelection) => {
     const { onItemSelect } = this.props;
@@ -162,10 +157,12 @@ class SelectPopover extends React.Component<SelectPopoverProps, {
 
     return (
       <FormGroup controlId="dataFilterInput" className={style.dataFilterInput}>
-        <FormControl type="text"
-                     placeholder={filterPlaceholder}
-                     value={filterText}
-                     onChange={this.handleFilterChange(items)} />
+        <FormControl
+          type="text"
+          placeholder={filterPlaceholder}
+          value={filterText}
+          onChange={this.handleFilterChange(items)}
+        />
       </FormGroup>
     );
   };
@@ -181,46 +178,39 @@ class SelectPopover extends React.Component<SelectPopoverProps, {
   };
 
   render() {
-    const {
-      displayDataFilter,
-      itemFormatter,
-      items,
-      placement,
-      triggerAction,
-      triggerNode,
-      disabled,
-      title,
-    } = this.props;
+    const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, disabled, title } =
+      this.props;
     const { filteredItems, selectedItems } = this.state;
     const popover = (
       <>
         {displayDataFilter && this.renderDataFilter(items)}
         {selectedItems.length > 0 && this.renderClearSelectionItem()}
-        <IsolatedScroll className={style.scrollableList}>
+        <div className={style.scrollableList}>
           <ListGroup>
             {filteredItems.map((item) => (
-              <ListGroupItem key={item}
-                             onClick={disabled ? () => {
-                             } : this.handleItemSelection(item)}
-                             active={selectedItems.includes(item)}
-                             disabled={disabled}>
+              <ListGroupItem
+                key={item}
+                onClick={disabled ? () => {} : this.handleItemSelection(item)}
+                active={selectedItems.includes(item)}
+                disabled={disabled}>
                 {itemFormatter(item)}
               </ListGroupItem>
             ))}
           </ListGroup>
-        </IsolatedScroll>
+        </div>
       </>
     );
 
     return (
-      <OverlayTrigger ref={(c) => {
-        this.overlay = c;
-      }}
-                      trigger={triggerAction}
-                      placement={placement}
-                      overlay={popover}
-                      title={title}
-                      rootClose>
+      <OverlayTrigger
+        ref={(c) => {
+          this.overlay = c;
+        }}
+        trigger={triggerAction}
+        placement={placement}
+        overlay={popover}
+        title={title}
+        rootClose>
         {triggerNode}
       </OverlayTrigger>
     );

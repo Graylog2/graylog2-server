@@ -18,16 +18,16 @@ package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.plugin.database.Persisted;
+import org.bson.types.ObjectId;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.joda.time.DateTime;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.Strings.emptyToNull;
 
-public interface Stream extends Persisted {
+public interface Stream {
     /**
      * The ID of the default message stream for all messages.
      */
@@ -45,6 +45,10 @@ public interface Stream extends Persisted {
      */
     String FAILURES_STREAM_ID = "000000000000000000000004";
     /**
+     * The ID of the stream for collector system logs.
+     */
+    String COLLECTOR_SYSTEM_LOGS_STREAM_ID = "000000000000000000000005";
+    /**
      * The prefix of all streams managed by OpenSearch as data streams
      */
     String DATASTREAM_PREFIX = "datastream:";
@@ -57,17 +61,17 @@ public interface Stream extends Persisted {
      * Contains streams that are not meant to be managed by the user.
      * These streams also don't work for other stream features like stream rules or outputs.
      */
-    ImmutableSet<String> NON_EDITABLE_STREAM_IDS = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID, FAILURES_STREAM_ID);
+    ImmutableSet<String> NON_EDITABLE_STREAM_IDS = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID, FAILURES_STREAM_ID, COLLECTOR_SYSTEM_LOGS_STREAM_ID);
     /**
      * Contains streams that are not backed by typical {@link org.graylog2.plugin.Message} objects and
      * should be hidden from a default search request.
      */
-    ImmutableSet<String> NON_MESSAGE_STREAM_IDS = NON_EDITABLE_STREAM_IDS;
+    ImmutableSet<String> NON_MESSAGE_STREAM_IDS = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID, FAILURES_STREAM_ID);
 
     /**
      * A list of all streams that are provided by Graylog
      */
-    ImmutableSet<String> ALL_SYSTEM_STREAM_IDS = ImmutableSet.of(DEFAULT_STREAM_ID, DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID, FAILURES_STREAM_ID);
+    ImmutableSet<String> ALL_SYSTEM_STREAM_IDS = ImmutableSet.of(DEFAULT_STREAM_ID, DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID, FAILURES_STREAM_ID, COLLECTOR_SYSTEM_LOGS_STREAM_ID);
 
     enum MatchingType {
         AND,
@@ -81,9 +85,19 @@ public interface Stream extends Persisted {
         }
     }
 
+    String getId();
+
+    String getScope();
+
+    boolean isEditable();
+
     String getTitle();
 
     String getDescription();
+
+    String getCreatorUserId();
+
+    DateTime getCreatedAt();
 
     Boolean getDisabled();
 
@@ -91,23 +105,11 @@ public interface Stream extends Persisted {
 
     List<String> getCategories();
 
-    void setTitle(String title);
-
-    void setDescription(String description);
-
-    void setDisabled(Boolean disabled);
-
-    void setContentPack(String contentPack);
-
-    void setMatchingType(MatchingType matchingType);
-
-    void setCategories(List<String> categories);
-
     Boolean isPaused();
 
-    Map<String, Object> asMap(List<StreamRule> streamRules);
-
     List<StreamRule> getStreamRules();
+
+    Set<ObjectId> getOutputIds();
 
     Set<Output> getOutputs();
 
@@ -115,23 +117,19 @@ public interface Stream extends Persisted {
 
     boolean isDefaultStream();
 
-    void setDefaultStream(boolean defaultStream);
-
     boolean getRemoveMatchesFromDefaultStream();
-
-    void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream);
 
     IndexSet getIndexSet();
 
     String getIndexSetId();
 
-    void setIndexSetId(String indexSetId);
+    List<String> getFavoriteFields();
 
-    static boolean isSystemStreamId(String id) {
-        return ALL_SYSTEM_STREAM_IDS.contains(id);
-    }
-
-    static boolean streamIsEditable(String streamId) {
-        return !NON_EDITABLE_STREAM_IDS.contains(streamId);
-    }
+    /**
+     * A hash code for the stream based on stream routing related fields to determine if
+     * {@link org.graylog2.streams.StreamRouter} needs to reload its engine.
+     *
+     * @return hash code based on routing related fields
+     */
+    int getFingerprint();
 }

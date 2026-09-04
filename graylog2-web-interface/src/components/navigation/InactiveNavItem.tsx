@@ -34,12 +34,19 @@ const StyledInactiveNav = styled(NavItem)`
 
 // Don't pass active prop, since NavItem should always be inactive
 type Props = {
-  active?: boolean,
-  className?: string,
-}
+  active?: boolean;
+  className?: string;
+};
 
-const InactiveNavItem = ({ active: _active, className, children, ...props }: React.PropsWithChildren<Props>) => (
-  <StyledInactiveNav className={className} {...props}>{children}</StyledInactiveNav>
+const InactiveNavItem = ({
+  active: _active = undefined,
+  className = undefined,
+  children = undefined,
+  ...props
+}: React.PropsWithChildren<Props>) => (
+  <StyledInactiveNav className={className} {...props}>
+    {children}
+  </StyledInactiveNav>
 );
 
 export default InactiveNavItem;

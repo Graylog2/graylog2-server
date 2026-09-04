@@ -25,39 +25,41 @@ import type { DataNodesCA } from 'components/datanode/Types';
 import { onSettled } from 'util/conditional/onError';
 
 export const QUERY_KEY = ['data-nodes', 'ca-status'];
-const fetchDataNodesCA = (): Promise<DataNodesCA> => (
-  fetch('GET', qualifyUrl('ca'), undefined, false)
-);
+const fetchDataNodesCA = (): Promise<DataNodesCA> => fetch('GET', qualifyUrl('ca'), undefined, false);
 
-const useDataNodesCA = (refetchInterval: number | false = 3000): {
-  data: DataNodesCA,
-  isFetching: boolean,
-  error: FetchError,
-  isInitialLoading: boolean
+const useDataNodesCA = (
+  refetchInterval: number | false = 3000,
+): {
+  data: DataNodesCA;
+  isFetching: boolean;
+  error: FetchError;
+  isInitialLoading: boolean;
 } => {
   const [metaData, setMetaData] = useState<{
-    error: FetchError | null,
-    isInitialLoading: boolean,
+    error: FetchError | null;
+    isInitialLoading: boolean;
   }>({
     error: null,
     isInitialLoading: false,
   });
-  const {
-    data,
-    isFetching,
-  } = useQuery<DataNodesCA, FetchError>({
+  const { data, isFetching } = useQuery<DataNodesCA, FetchError>({
     queryKey: QUERY_KEY,
-    queryFn: () => onSettled(fetchDataNodesCA(), () => {
-      setMetaData({
-        error: null,
-        isInitialLoading: false,
-      });
-    }, (newError: FetchError) => {
-      setMetaData({
-        error: newError,
-        isInitialLoading: false,
-      });
-    }),
+    queryFn: () =>
+      onSettled(
+        fetchDataNodesCA(),
+        () => {
+          setMetaData({
+            error: null,
+            isInitialLoading: false,
+          });
+        },
+        (newError: FetchError) => {
+          setMetaData({
+            error: newError,
+            isInitialLoading: false,
+          });
+        },
+      ),
     initialData: undefined,
     refetchInterval,
     retry: false,

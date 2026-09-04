@@ -14,76 +14,100 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type * as React from 'react';
 
-export type RecentActivityType = 'create' | 'update' | 'share' | 'delete'
+export type RecentActivityType = 'create' | 'update' | 'share' | 'delete';
 export type Pagination = {
-  page: number,
-  per_page: number,
-  count: number,
-  total: number,
-}
+  page: number;
+  per_page: number;
+  count: number;
+  total: number;
+};
 
 export type FavoriteItem = {
-  grn: string,
-  title: string
-}
+  grn: string;
+  title: string;
+};
 
 export type LastOpenedItem = {
-  timestamp: string,
-  grn: string,
-  title: string
-}
+  timestamp: string;
+  grn: string;
+  title: string;
+};
 
 export type RecentActivityResponseItem = {
-  item_grn: string,
-  id: string,
-  activity_type: RecentActivityType,
-  item_title: string,
-  timestamp: string,
-  user_name?: string,
-}
+  item_grn: string;
+  id: string;
+  activity_type: RecentActivityType;
+  item_title: string;
+  timestamp: string;
+  user_name?: string;
+};
 
 export type RecentActivityItem = {
-  id: string,
-  activityType: RecentActivityType,
-  itemTitle,
-  itemGrn: string,
-  timestamp: string,
-  userName?: string
-}
+  id: string;
+  activityType: RecentActivityType;
+  itemTitle;
+  itemGrn: string;
+  timestamp: string;
+  userName?: string;
+};
 
 export type PaginatedResponseRecentActivity = {
-  recentActivity: Array<RecentActivityResponseItem>,
-  page: number,
-  per_page: number,
-  count: number,
-  total: number,
-}
+  recentActivity: Array<RecentActivityResponseItem>;
+  page: number;
+  per_page: number;
+  count: number;
+  total: number;
+};
 
 export type PaginatedRecentActivity = {
-  recentActivity: Array<RecentActivityItem>,
-  page: number,
-  per_page: number,
-  count: number,
-  total: number,
-}
+  recentActivity: Array<RecentActivityItem>;
+  page: number;
+  per_page: number;
+  count: number;
+  total: number;
+};
 
 export type PaginatedLastOpened = {
-  lastOpened: Array<LastOpenedItem>,
-  page: number,
-  per_page: number,
-  count: number,
-  total: number,
-}
+  lastOpened: Array<LastOpenedItem>;
+  page: number;
+  per_page: number;
+  count: number;
+  total: number;
+};
 
 export type PaginatedFavoriteItems = {
-  favorites: Array<FavoriteItem>,
-  page: number,
-  per_page: number,
-  count: number,
-  total: number,
-}
+  favorites: Array<FavoriteItem>;
+  page: number;
+  per_page: number;
+  count: number;
+  total: number;
+};
 
 export type RequestQuery = {
-  page: number,
+  page: number;
+  per_page?: number;
 };
+
+export type WelcomePageMetricsPluginContext = {
+  isValidSecurityLicense: boolean;
+};
+
+export type WelcomePageMetricsPlugin = {
+  label: string;
+  component: React.ComponentType;
+  isEnabled?: (context: WelcomePageMetricsPluginContext) => boolean;
+};
+
+export type WelcomeGeneralPageMetricsPlugin = {
+  component: React.ComponentType;
+  isEnabled?: (context: WelcomePageMetricsPluginContext) => boolean;
+};
+
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    welcomePageMetrics?: Array<WelcomePageMetricsPlugin>;
+    'welcomePageMetrics.general'?: Array<WelcomeGeneralPageMetricsPlugin>;
+  }
+}

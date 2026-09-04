@@ -28,38 +28,45 @@ import ToggleActionButton from 'components/content-stream/ToggleActionButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { CarouselProvider } from 'components/common/Carousel';
+import useWelcomeCustomization from 'brand-customization/useWelcomeCustomization';
 
-const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled, theme }) => css`
-  overflow: hidden;
-  flex-grow: 3;
-  height: ${$enabled ? 'initial' : 'min-content'};
+const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(
+  ({ $enabled, theme }) => css`
+    overflow: hidden;
+    flex-grow: 3;
+    height: ${$enabled ? 'initial' : 'min-content'};
+    grid-column: span 2;
 
-  @media (max-width: ${theme.breakpoints.max.md}) {
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      flex-grow: 1;
+      grid-column: span 1;
+    }
+  `,
+);
+const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(
+  ({ $enabled }) => css`
     flex-grow: 1;
-  }
-`);
-const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled }) => css`
-  flex-grow: 1;
-  height: ${$enabled ? 'initial' : 'min-content'};
-`);
+    height: ${$enabled ? 'initial' : 'min-content'};
+  `,
+);
 
 const ContentStreamSection = () => {
+  const { isReleaseSectionEnabledForBrand, isNewsSectionEnabledForBrand } = useWelcomeCustomization();
   const { username } = useCurrentUser();
-  const sendTelemetry = useSendTelemetry();
-  const {
-    contentStreamSettings,
-    isLoadingContentStreamSettings,
-    onSaveContentStreamSetting,
-    refetchContentStream,
-  } = useContentStreamSettings();
+  const sendTelemetry = useSendTelemetry('content-stream');
+  const { contentStreamSettings, isLoadingContentStreamSettings, onSaveContentStreamSetting, refetchContentStream } =
+    useContentStreamSettings();
 
   if (isLoadingContentStreamSettings || !contentStreamSettings) {
     return null;
   }
 
-  const updateContentStreamSettings = async ({ enableContentStream, enableRelease }: {
-    enableContentStream?: boolean,
-    enableRelease?: boolean
+  const updateContentStreamSettings = async ({
+    enableContentStream = undefined,
+    enableRelease = undefined,
+  }: {
+    enableContentStream?: boolean;
+    enableRelease?: boolean;
   }) => {
     await onSaveContentStreamSetting({
       settings: {
@@ -78,7 +85,6 @@ const ContentStreamSection = () => {
   const toggleNews = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.NEWS_OPT_IN_TOGGLED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
       event_details: {
         contentStreamEnabled: !contentStreamEnabled,
       },
@@ -93,7 +99,6 @@ const ContentStreamSection = () => {
   const toggleRelease = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.RELEASE_OPT_IN_TOGGLED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
       event_details: {
         contentStreamEnabled: !releasesSectionEnabled,
       },
@@ -106,30 +111,28 @@ const ContentStreamSection = () => {
   };
 
   return (
-    <SectionGrid $columns="2fr 1fr">
-      <StyledNewsSectionComponent title="News"
-                                  $enabled={contentStreamEnabled}
-                                  headerActions={(
-                                    <ToggleActionButton onClick={toggleNews}
-                                                        isOpen={contentStreamEnabled} />
-                                  )}>
-        {contentStreamEnabled && (
-          <CarouselProvider carouselId={CAROUSEL_ID}>
-            <ContentStreamNews />
-            <ContentStreamNewsFooter />
-          </CarouselProvider>
-        )}
-      </StyledNewsSectionComponent>
-      <StyledReleaseSectionComponent title="Releases"
-                                     $enabled={releasesSectionEnabled}
-                                     headerActions={(
-                                       <ToggleActionButton onClick={toggleRelease}
-                                                           isOpen={releasesSectionEnabled} />
-                                     )}>
-        {releasesSectionEnabled && (
-          <ContentStreamReleasesSection />
-        )}
-      </StyledReleaseSectionComponent>
+    <SectionGrid $columns="1fr 1fr 1fr">
+      {isNewsSectionEnabledForBrand && (
+        <StyledNewsSectionComponent
+          title="News"
+          $enabled={contentStreamEnabled}
+          headerActions={<ToggleActionButton onClick={toggleNews} isOpen={contentStreamEnabled} />}>
+          {contentStreamEnabled && (
+            <CarouselProvider carouselId={CAROUSEL_ID}>
+              <ContentStreamNews />
+              <ContentStreamNewsFooter />
+            </CarouselProvider>
+          )}
+        </StyledNewsSectionComponent>
+      )}
+      {isReleaseSectionEnabledForBrand && (
+        <StyledReleaseSectionComponent
+          title="Releases"
+          $enabled={releasesSectionEnabled}
+          headerActions={<ToggleActionButton onClick={toggleRelease} isOpen={releasesSectionEnabled} />}>
+          {releasesSectionEnabled && <ContentStreamReleasesSection />}
+        </StyledReleaseSectionComponent>
+      )}
     </SectionGrid>
   );
 };

@@ -31,7 +31,7 @@ import java.time.Duration;
 import java.util.Optional;
 
 public class S3MinioContainer extends GenericContainer<S3MinioContainer> {
-    private static final String IMAGE_NAME = "minio/minio:latest";
+    public static final String MINIO_LATEST = "minio/minio:latest";
     private static final int PORT = 9000;
     private final String accessKey;
     private final String secretKey;
@@ -43,12 +43,20 @@ public class S3MinioContainer extends GenericContainer<S3MinioContainer> {
         this(Network.newNetwork(), true);
     }
 
+    public S3MinioContainer(String imageName) {
+        this(imageName, Network.newNetwork(), true);
+    }
+
     public S3MinioContainer(Network network) {
         this(network, false);
     }
 
     public S3MinioContainer(Network network, final boolean closeNetwork) {
-        super(IMAGE_NAME);
+        this(MINIO_LATEST, network, closeNetwork);
+    }
+
+    public S3MinioContainer(String imageName, Network network, final boolean closeNetwork) {
+        super(imageName);
         this.closeNetwork = closeNetwork;
         this.network = Optional.of(network);
 

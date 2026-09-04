@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import SearchButton from 'views/components/searchbar/SearchButton';
 
@@ -26,28 +27,30 @@ describe('SearchButton', () => {
     jest.clearAllMocks();
   });
 
-  const SUT = ({ disabled = false, dirty = false }: { dirty?: boolean, disabled?: boolean}) => (
+  const SUT = ({ disabled = false, dirty = false }: { dirty?: boolean; disabled?: boolean }) => (
     <form onSubmit={onFormSubmit}>
       <SearchButton disabled={disabled} dirty={dirty} />
     </form>
   );
 
-  it('should trigger form submit refresh when dirty', () => {
+  it('should trigger form submit refresh when dirty', async () => {
     render(<SUT dirty />);
 
-    const button = screen.getByRole('button', { name: /perform search \(changes were made after last search execution\)/i });
+    const button = screen.getByRole('button', {
+      name: /perform search \(changes were made after last search execution\)/i,
+    });
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onFormSubmit).toHaveBeenCalledTimes(1);
   });
 
-  it('should trigger form submit refresh when not dirty', () => {
+  it('should trigger form submit refresh when not dirty', async () => {
     render(<SUT />);
 
     const button = screen.getByRole('button', { name: /perform search/i });
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onFormSubmit).toHaveBeenCalledTimes(1);
   });

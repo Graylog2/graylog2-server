@@ -87,7 +87,7 @@ public class Beats2Codec extends AbstractCodec {
 
     @Nonnull
     private Message parseEvent(JsonNode event) {
-        final String beatsType = event.path("@metadata").path("beat").asText("beat");
+        final String beatsType = determineBeatsPrefix(event);
         final String rootPath = noBeatsPrefix ? "" : beatsType;
         final String message = event.path("message").asText("-");
         final String timestampField = event.path("@timestamp").asText();
@@ -125,6 +125,31 @@ public class Beats2Codec extends AbstractCodec {
         addFlattened(gelfMessage, rootPath, event);
         return gelfMessage;
     }
+
+    private String determineBeatsPrefix(JsonNode event) {
+        // 1. Try @metadata.beat
+        String beatsType = event.path("@metadata")
+                .path("beat")
+                .asText(null);
+
+        // 2. Try agent.type (Beats 7+/8+), or beat.type for older versions
+        if (beatsType == null || beatsType.isEmpty()) {
+            JsonNode agentNode = event.path("agent");
+            if (agentNode.isMissingNode()) {
+                // backwards compatibility for beats < 7.0
+                agentNode = event.path("beat");
+            }
+            beatsType = agentNode.path("type").asText(null);
+        }
+
+        // 3. Fallback to default
+        if (beatsType == null || beatsType.isEmpty()) {
+            beatsType = "beat";
+        }
+
+        return beatsType;
+    }
+
 
     private void addFlattened(Message message, String currentPath, JsonNode jsonNode) {
         if (jsonNode.isObject()) {
@@ -193,7 +218,9 @@ public class Beats2Codec extends AbstractCodec {
                     CK_NO_BEATS_PREFIX,
                     "Do not add Beats type as prefix",
                     false,
-                    "Do not prefix each field with the Beats type, e. g. \"source\" -> \"filebeat_source\"."
+                    "Do not prefix each field with the Beats type, e. g. \"source\" -> \"filebeat_source\". " +
+                            "Warning: Removing the beats type prefix breaks Illuminate compatibility! " +
+                            "For Illuminate compatibility, the above checkbox should be UNCHECKED."
             ));
 
             return configurationRequest;

@@ -43,7 +43,7 @@ public abstract class StdDev implements SeriesSpec, HasField {
     public abstract String field();
 
     @Override
-    public Optional<String> statsSubfieldName() {
+    public Optional<String> multiValueAggSubfieldName() {
         return Optional.of("std_deviation");
     }
 

@@ -22,6 +22,7 @@ import ContentStreamSection from 'components/content-stream/ContentStreamSection
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
+import AppConfig from 'util/AppConfig';
 
 const mockContentStreamSettings = {
   contentStreamSettings: {
@@ -42,17 +43,11 @@ const mockContentStreamSettings = {
 
 jest.mock('components/content-stream/hook/useContentStreamSettings', () => jest.fn(() => mockContentStreamSettings));
 
-jest.mock('util/AppConfig', () => ({
-  gl2DevMode: jest.fn(() => false),
-  gl2AppPathPrefix: jest.fn(() => ''),
-  isCloud: jest.fn(() => true),
-  gl2ServerUrl: jest.fn(() => 'https://example.org/api/'),
-  contentStream: jest.fn(() => ({ refresh_interval: 'PT168H', rss_url: 'https://example.org/rss' })),
-}));
-
 jest.mock('components/content-stream/ContentStreamNews', () => () => <div>ContentStreamNews</div>);
 
-jest.mock('components/content-stream/ContentStreamReleasesSection', () => () => <div>ContentStreamReleasesSection</div>);
+jest.mock('components/content-stream/ContentStreamReleasesSection', () => () => (
+  <div>ContentStreamReleasesSection</div>
+));
 
 jest.mock('hooks/useCurrentUser');
 
@@ -84,5 +79,38 @@ describe('<ContentStreamSection>', () => {
 
     expect(screen.queryByText('ContentStreamNews')).not.toBeInTheDocument();
     expect(screen.queryByText('ContentStreamNews')).not.toBeInTheDocument();
+  });
+
+  it('Show News and Releases sections by default', async () => {
+    render(<ContentStreamSection />);
+
+    await screen.findByRole('heading', { name: /news/i });
+    await screen.findByRole('heading', { name: /releases/i });
+  });
+
+  it('Show News and Releases sections when enabled in branding', async () => {
+    asMock(AppConfig.branding).mockReturnValue({
+      welcome: {
+        news: { enabled: true },
+        releases: { enabled: true },
+      },
+    });
+    render(<ContentStreamSection />);
+
+    await screen.findByRole('heading', { name: /news/i });
+    await screen.findByRole('heading', { name: /releases/i });
+  });
+
+  it('Hide News and Releases sections when disabled in branding', async () => {
+    asMock(AppConfig.branding).mockReturnValue({
+      welcome: {
+        news: { enabled: false },
+        releases: { enabled: false },
+      },
+    });
+    render(<ContentStreamSection />);
+
+    expect(screen.queryByRole('heading', { name: /news/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /releases/i })).not.toBeInTheDocument();
   });
 });

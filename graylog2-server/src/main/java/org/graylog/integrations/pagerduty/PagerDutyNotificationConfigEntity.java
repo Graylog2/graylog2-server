@@ -21,12 +21,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Configuration entity for PagerDuty notification events.
@@ -54,6 +56,12 @@ public abstract class PagerDutyNotificationConfigEntity implements EventNotifica
 
     @JsonProperty(PagerDutyNotificationConfig.FIELD_CLIENT_URL)
     public abstract ValueReference clientUrl();
+
+    @JsonProperty(PagerDutyNotificationConfig.FIELD_PAGER_DUTY_TITLE)
+    public abstract Optional<ValueReference> pagerDutyTitle();
+
+    @JsonProperty(PagerDutyNotificationConfig.FIELD_INCIDENT_KEY)
+    public abstract Optional<ValueReference> incidentKey();
 
     public static Builder builder() {
         return Builder.create();
@@ -84,6 +92,12 @@ public abstract class PagerDutyNotificationConfigEntity implements EventNotifica
         @JsonProperty(PagerDutyNotificationConfig.FIELD_CLIENT_URL)
         public abstract Builder clientUrl(ValueReference clientUrl);
 
+        @JsonProperty(PagerDutyNotificationConfig.FIELD_PAGER_DUTY_TITLE)
+        public abstract Builder pagerDutyTitle(@Nullable ValueReference pagerDutyTitle);
+
+        @JsonProperty(PagerDutyNotificationConfig.FIELD_INCIDENT_KEY)
+        public abstract Builder incidentKey(@Nullable ValueReference incidentKey);
+
         public abstract PagerDutyNotificationConfigEntity build();
     }
 
@@ -97,6 +111,8 @@ public abstract class PagerDutyNotificationConfigEntity implements EventNotifica
                 .keyPrefix(keyPrefix().asString(parameters))
                 .clientName(clientName().asString(parameters))
                 .clientUrl(clientUrl().asString(parameters))
+                .pagerDutyTitle(pagerDutyTitle().map(vr -> vr.asString(parameters)).orElse(null))
+                .incidentKey(incidentKey().map(vr -> vr.asString(parameters)).orElse(null))
                 .build();
     }
 }

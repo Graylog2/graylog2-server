@@ -49,13 +49,11 @@ public class StartPageService {
     public StartPageService(GRNRegistry grnRegistry,
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
-                            EventBus eventBus,
                             StartPageItemTitleRetriever startPageItemTitleRetriever) {
         this.grnRegistry = grnRegistry;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
         this.startPageItemTitleRetriever = startPageItemTitleRetriever;
-        eventBus.register(this);
     }
 
     public PaginatedResponse<LastOpened> findLastOpenedFor(final SearchUser searchUser, final int page, final int perPage) {

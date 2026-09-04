@@ -17,8 +17,8 @@
 package org.graylog2.configuration.converters;
 
 import com.github.joschi.jadconfig.ParameterException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,12 +27,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SortedPathSetConverterTest {
     private SortedPathSetConverter converter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         converter = new SortedPathSetConverter();
     }
@@ -51,9 +52,9 @@ public class SortedPathSetConverterTest {
         final String unsortedPaths = "/some-dir,/Z-dir,/z-dir,/another-dir/sub,/another-dir";
         final SortedSet<Path> result = converter.convertFrom(unsortedPaths);
         assertEquals(5, result.size());
-        assertEquals("Paths were not sorted as expected",
-                     "/Z-dir,/another-dir,/another-dir/sub,/some-dir,/z-dir",
-                     result.stream().map(Path::toString).collect(Collectors.joining(",")));
+        assertEquals("/Z-dir,/another-dir,/another-dir/sub,/some-dir,/z-dir",
+                     result.stream().map(Path::toString).collect(Collectors.joining(",")),
+                     "Paths were not sorted as expected");
     }
 
     @Test
@@ -77,13 +78,15 @@ public class SortedPathSetConverterTest {
         assertEquals("", converter.convertTo(new TreeSet<>()));
     }
 
-    @Test(expected = ParameterException.class)
+    @Test
     public void testConvertFromNull() {
-        converter.convertFrom(null);
+        assertThrows(ParameterException.class, () ->
+            converter.convertFrom(null));
     }
 
-    @Test(expected = ParameterException.class)
+    @Test
     public void testConvertToNull() {
-        converter.convertTo(null);
+        assertThrows(ParameterException.class, () ->
+            converter.convertTo(null));
     }
 }

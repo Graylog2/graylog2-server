@@ -14,39 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment from 'moment';
-import trim from 'lodash/trim';
+import { parseStringTimerangeFilterValue } from 'components/common/EntityFilters/helpers/timeRange';
+import type { TimeRange } from 'views/logic/queries/Query';
 
-import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
-import { adjustFormat } from 'util/DateTime';
-import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
-
-const allTimesRange: RelativeTimeRange = { type: 'relative', range: 0 };
-
-const isNullOrBlank = (s: string | undefined) => {
-  if (!s) {
-    return true;
-  }
-
-  return trim(s) === '';
-};
-
-const parseTimerangeFilter = (timestamp: string | undefined): TimeRange => {
+const parseTimerangeFilter = (timestamp: string | undefined, defaultTimerange?: TimeRange): TimeRange => {
   if (!timestamp) {
-    return allTimesRange;
+    return defaultTimerange;
   }
 
-  const [from, to] = extractRangeFromString(timestamp);
-
-  if (!from && !to) {
-    return allTimesRange;
-  }
-
-  return {
-    type: 'absolute',
-    from: isNullOrBlank(from) ? adjustFormat(moment(0).utc(), 'internal') : from,
-    to: isNullOrBlank(to) ? adjustFormat(moment().utc(), 'internal') : to,
-  };
+  return parseStringTimerangeFilterValue(timestamp);
 };
 
 export default parseTimerangeFilter;

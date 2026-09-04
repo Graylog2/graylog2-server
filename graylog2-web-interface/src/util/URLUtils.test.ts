@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ * @jest-environment-options {"url":"https://something.foo:2342"}
+ */
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -15,25 +19,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { asMock } from 'helpers/mocking';
-import { qualifyUrl, currentPathnameWithoutPrefix } from 'util/URLUtils';
+import { qualifyUrl, currentPathnameWithoutPrefix, getPathnameWithoutId } from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
-jest.mock('util/AppConfig');
+describe('getPathnameWithoutId', () => {
+  it('strips a Mongo ObjectId path segment', () => {
+    expect(getPathnameWithoutId('/streams/5f3e4c5d6a7b8c9d0e1f2a3b/edit')).toBe('streams/edit');
+  });
 
-const oldLocation = window.location;
+  it('strips a dashed UUID path segment', () => {
+    expect(getPathnameWithoutId('/system/collectors/onboarding/0198c7c2-2c3e-7b90-8f6e-1a2b3c4d5e6f')).toBe(
+      'system/collectors/onboarding',
+    );
+  });
 
-// eslint-disable-next-line compat/compat
-const mockLocation = (url: string): Location => new URL(url) as unknown as Location;
+  it('strips every id segment, not just the first', () => {
+    expect(getPathnameWithoutId('/foo/5f3e4c5d6a7b8c9d0e1f2a3b/bar/0198c7c2-2c3e-7b90-8f6e-1a2b3c4d5e6f/baz')).toBe(
+      'foo/bar/baz',
+    );
+  });
+
+  it('leaves non-id segments untouched', () => {
+    expect(getPathnameWithoutId('/system/collectors/fleets')).toBe('system/collectors/fleets');
+  });
+
+  it('does not strip a partial prefix of a longer hex segment', () => {
+    expect(getPathnameWithoutId('/foo/5f3e4c5d6a7b8c9d0e1f2a3b4c5d/bar')).toBe('foo/5f3e4c5d6a7b8c9d0e1f2a3b4c5d/bar');
+  });
+});
 
 describe('qualifyUrl', () => {
-  afterEach(() => {
-    window.location = oldLocation;
-  });
+  const setLocation = (pathname: string) => {
+    window.history.pushState({}, '', pathname);
+  };
 
   it('qualifies url with hostname/scheme from current location if server url is relative', () => {
     asMock(AppConfig.gl2ServerUrl).mockReturnValue('/api');
-    delete window.location;
-    window.location = mockLocation('https://something.foo:2342/gnarf/42?bar=23');
+    setLocation('/gnarf/42?bar=23');
 
     expect(qualifyUrl('/foo?baz=17')).toEqual('https://something.foo:2342/api/foo?baz=17');
   });
@@ -53,14 +75,8 @@ describe('qualifyUrl', () => {
   });
 
   describe('currentPathnameWithoutPrefix', () => {
-    const setLocation = (pathname: string) => Object.defineProperty(window, 'location', {
-      value: {
-        pathname,
-      },
-      writable: true,
-    });
-
-    const mockPathPrefix = (pathPrefix: string | undefined | null) => asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
+    const mockPathPrefix = (pathPrefix: string | undefined | null) =>
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
 
     it('returns current path when prefix is undefined/null/empty/single slash', () => {
       const pathname = '/welcome';

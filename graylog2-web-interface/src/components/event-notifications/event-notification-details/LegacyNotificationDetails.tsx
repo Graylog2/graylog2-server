@@ -15,12 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 
 import { ReadOnlyFormGroup, Spinner } from 'components/common';
 import { Alert, Well } from 'components/bootstrap';
-import type { LegacyEventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import { useLegacyEventNotificationTypes } from 'components/event-notifications/hooks/useEventNotifications';
 
 import emailStyles from '../event-notification-types/EmailNotificationSummary.css';
 import notificationStyles from '../event-notification-types/LegacyNotificationCommonStyles.css';
@@ -29,46 +27,47 @@ type LegacyNotificationDetailsProps = {
   notification: any;
 };
 
-type LegacyTypes = { [key: string]: LegacyEventNotification };
-
-const LegacyNotificationDetails = ({
-  notification,
-}: LegacyNotificationDetailsProps) => {
-  const [legacyTypes, setLegacyTypes] = useState<LegacyTypes>();
+const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsProps) => {
+  const { data } = useLegacyEventNotificationTypes();
+  const legacyTypes = data?.types;
   const configurationValues = notification.config.configuration;
   const callbackType = notification.config.callback_type;
   const typeData = legacyTypes?.[callbackType];
 
-  useEffect(() => {
-    EventNotificationsActions.listAllLegacyTypes().then((result) => setLegacyTypes(result.types));
-  }, []);
-
   if (!legacyTypes) {
-    return <p><Spinner text="Loading legacy notification information..." /></p>;
+    return (
+      <p>
+        <Spinner text="Loading legacy notification information..." />
+      </p>
+    );
   }
 
   return (
     <>
       {!typeData && (
         <Alert bsStyle="danger" className={notificationStyles.legacyNotificationAlert}>
-          Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>,
-          please ensure the plugin is installed.
+          Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>, please
+          ensure the plugin is installed.
         </Alert>
       )}
-      {typeData && Object.entries(typeData.configuration).map(([key, value]) => {
-        if (key === 'body' || key === 'script_args') {
-          return (
-            <ReadOnlyFormGroup label={value.human_name}
-                               value={(
-                                 <Well bsSize="small" className={emailStyles.bodyPreview}>
-                                   {configurationValues[key] || <em>Empty body</em>}
-                                 </Well>
-                               )} />
-          );
-        }
+      {typeData &&
+        Object.entries(typeData.configuration).map(([key, value]) => {
+          if (key === 'body' || key === 'script_args') {
+            return (
+              <ReadOnlyFormGroup
+                key={key}
+                label={value.human_name}
+                value={
+                  <Well bsSize="small" className={emailStyles.bodyPreview}>
+                    {configurationValues[key] || <em>Empty body</em>}
+                  </Well>
+                }
+              />
+            );
+          }
 
-        return <ReadOnlyFormGroup label={value.human_name} value={configurationValues[key]} />;
-      })}
+          return <ReadOnlyFormGroup key={key} label={value.human_name} value={configurationValues[key]} />;
+        })}
     </>
   );
 };

@@ -22,8 +22,8 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.contentpacks.model.entities.references.Reference;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +31,7 @@ public class ReferenceConverterTest {
     private ReferenceConverter converter;
     private ObjectMapper om;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         converter = new ReferenceConverter();
         om = new ObjectMapperProvider().get();

@@ -35,8 +35,11 @@ import {
   disabledSearchFilter,
   firstSimpleSearchFilter,
   ltParamJSON,
-  messageTable, negationSearchFilter, parameters,
-  pivots, secondSimpleSearchFilter,
+  messageTable,
+  negationSearchFilter,
+  parameters,
+  pivots,
+  secondSimpleSearchFilter,
   testAggregationWidget,
   testWidgetMetricValuePath,
   testWidgetValueValuePath,
@@ -68,30 +71,27 @@ describe('useMappedData helper function', () => {
 
   describe('filtratePathsByPivot', () => {
     it('return pivots for path', () => {
-      const result = filtratePathsByPivot(
-        {
-          flattenPivots: new Set(['http_method']),
-          valuePath,
-        });
+      const result = filtratePathsByPivot({
+        flattenPivots: new Set(['http_method']),
+        valuePath,
+      });
       const expected = [{ http_method: 'GET' }];
 
       expect(result).toEqual(expected);
     });
 
     it('return empty array when no matches', () => {
-      const resultEmptyPath = filtratePathsByPivot(
-        {
-          flattenPivots: new Set(['http_method']),
-          valuePath: [],
-        });
+      const resultEmptyPath = filtratePathsByPivot({
+        flattenPivots: new Set(['http_method']),
+        valuePath: [],
+      });
 
       expect(resultEmptyPath).toEqual([]);
 
-      const resultNoMatches = filtratePathsByPivot(
-        {
-          flattenPivots: new Set(['http_method', 'resources', 'action']),
-          valuePath: [{ controller: 'Controller' }],
-        });
+      const resultNoMatches = filtratePathsByPivot({
+        flattenPivots: new Set(['http_method', 'resources', 'action']),
+        valuePath: [{ controller: 'Controller' }],
+      });
 
       expect(resultNoMatches).toEqual([]);
     });
@@ -186,7 +186,10 @@ describe('useMappedData helper function', () => {
     });
 
     it('with binding value', async () => {
-      const result = getRestParameterValues({ parameters, parameterBindings: Immutable.Map({ newParameter3: new ParameterBinding('value', 'POST') }) });
+      const result = getRestParameterValues({
+        parameters,
+        parameterBindings: Immutable.Map({ newParameter3: new ParameterBinding('value', 'POST') }),
+      });
 
       expect(result).toEqual({ newParameter3: 'POST' });
     });
@@ -200,13 +203,17 @@ describe('useMappedData helper function', () => {
     });
 
     it('without disabled filters', async () => {
-      const result = transformSearchFiltersToQuery(Immutable.List([firstSimpleSearchFilter, disabledSearchFilter, secondSimpleSearchFilter]));
+      const result = transformSearchFiltersToQuery(
+        Immutable.List([firstSimpleSearchFilter, disabledSearchFilter, secondSimpleSearchFilter]),
+      );
 
       expect(result).toEqual('(http_method: GET or http_method: POST) AND (action: show)');
     });
 
     it('with NOT operator for negation filters', async () => {
-      const result = transformSearchFiltersToQuery(Immutable.List([firstSimpleSearchFilter, negationSearchFilter, secondSimpleSearchFilter]));
+      const result = transformSearchFiltersToQuery(
+        Immutable.List([firstSimpleSearchFilter, negationSearchFilter, secondSimpleSearchFilter]),
+      );
 
       expect(result).toEqual('(http_method: GET or http_method: POST) AND NOT(action: login) AND (action: show)');
     });
@@ -222,12 +229,23 @@ describe('useMappedData helper function', () => {
   });
 
   it('getStreams return only  streams ids', async () => {
-    const result = getStreams(Immutable.Map([
-      ['filters', Immutable.Set([
-        Immutable.Map([['type', 'stream'], ['id', 'stream-id']]),
-        Immutable.Map([['type', 'some-type'], ['id', 'non-stream-id']]),
-      ])],
-    ]));
+    const result = getStreams(
+      Immutable.Map([
+        [
+          'filters',
+          Immutable.Set([
+            Immutable.Map([
+              ['type', 'stream'],
+              ['id', 'stream-id'],
+            ]),
+            Immutable.Map([
+              ['type', 'some-type'],
+              ['id', 'non-stream-id'],
+            ]),
+          ]),
+        ],
+      ]),
+    );
 
     expect(result).toEqual(['stream-id']);
   });

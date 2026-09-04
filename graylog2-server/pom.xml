@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>6.2.0-SNAPSHOT</version>
+        <version>7.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -59,10 +59,15 @@
         <mainClass>org.graylog2.bootstrap.Main</mainClass>
         <webInterface.path>../graylog2-web-interface</webInterface.path>
         <skip.web.build>false</skip.web.build>
+        <skip.web.tests>false</skip.web.tests>
 
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
+
+        <!-- OpenAPI generation parameters (for generate-openapi profile) - can be overridden via -D flags -->
+        <openapi.server.output.file>${project.build.directory}/openapi.yaml</openapi.server.output.file>
+        <openapi.server.config.file>${project.basedir}/../misc/graylog.conf</openapi.server.config.file>
     </properties>
 
     <dependencies>
@@ -82,11 +87,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava-testlib</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -136,6 +136,7 @@
         <dependency>
             <groupId>org.graylog</groupId>
             <artifactId>jadconfig</artifactId>
+            <version>${jadconfig.version}</version>
         </dependency>
 
         <dependency>
@@ -155,7 +156,12 @@
 
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
+            <artifactId>okhttp-jvm</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
         </dependency>
 
         <dependency>
@@ -296,6 +302,10 @@
             <artifactId>jersey-container-grizzly2-http</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-websockets</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.hk2</groupId>
             <artifactId>guice-bridge</artifactId>
         </dependency>
@@ -349,6 +359,10 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threeten-extra</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.graylog2.repackaged</groupId>
@@ -374,8 +388,12 @@
             <artifactId>gelfclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2-jakarta</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser-v3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -396,6 +414,11 @@
             <version>${lucene.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-backward-codecs</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
         </dependency>
@@ -403,6 +426,14 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-blob</artifactId>
         </dependency>
 
         <!-- Logging dependencies -->
@@ -452,7 +483,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>elasticsearch</artifactId>
+            <artifactId>testcontainers-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -463,12 +494,18 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-rabbitmq</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jukito</groupId>
-            <artifactId>jukito</artifactId>
+            <groupId>name.falgout.jeffrey.testing.junit5</groupId>
+            <artifactId>guice-extension</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -537,6 +574,10 @@
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
+            <artifactId>netty-transport-classes-epoll</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-epoll</artifactId>
             <classifier>linux-x86_64</classifier>
         </dependency>
@@ -544,6 +585,10 @@
           <groupId>io.netty</groupId>
           <artifactId>netty-transport-native-epoll</artifactId>
           <classifier>linux-aarch_64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-classes-kqueue</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -618,6 +663,11 @@
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
         </dependency>
+        <!-- Explicitly declare lz4 since kafka-clients depends on it and we exclude it from the declaration. -->
+        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
@@ -675,7 +725,26 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Netty async HTTP client, used by the AWS async clients (DynamoDB, CloudWatch, Kinesis) for the Kinesis
+             input. Required for HTTP/2 (Kinesis Client Library) and proxy support on the async clients. -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>netty-nio-client</artifactId>
+        </dependency>
         <!-- additional integrations dependencies -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -704,6 +773,19 @@
             <groupId>software.amazon.kinesis</groupId>
             <artifactId>amazon-kinesis-client</artifactId>
             <version>${aws-kinesis-client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- Glue schema support pulls in outdated Kotlin dependencies. ATM we don't support integrating
+                 Amazon Kinesis Data Streams with the AWS Glue Schema Registry, so we can skip the dependency.
+                 Once we add support, this exclusion has to be revisited. -->
+                <exclusion>
+                    <groupId>software.amazon.glue</groupId>
+                    <artifactId>schema-registry-serde</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- end of additional integrations dependencies -->
 
@@ -713,13 +795,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>mockwebserver</artifactId>
+            <artifactId>mockwebserver3</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -727,24 +804,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!-- used for sanity -->
-        <dependency>
-            <groupId>net.jcip</groupId>
-            <artifactId>jcip-annotations</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog.autovalue</groupId>
-            <artifactId>auto-value-javabean</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>info.leadinglight</groupId>
-            <artifactId>jdot</artifactId>
         </dependency>
         <dependency>
             <groupId>one.util</groupId>
@@ -754,19 +817,56 @@
             <groupId>com.github.stateless4j</groupId>
             <artifactId>stateless4j</artifactId>
         </dependency>
-        <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-alts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-services</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-json-jackson2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-generator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-module-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-module-jakarta-validation</artifactId>
+        </dependency>
+
+        <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-reporting</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -812,6 +912,14 @@
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
             <version>1.5.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.testcontainers/testcontainers-mongodb -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-mongodb</artifactId>
+            <version>2.0.5</version>
             <scope>test</scope>
         </dependency>
 
@@ -922,17 +1030,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.2.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.3.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -955,10 +1058,9 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <minimizeJar>false</minimizeJar>
                     <filters>
-                        <!-- Bouncycastle's JARs are signed. When building a shaded JAR, either remove the signatures, or
-                             add dependency to the main JAR's manifest. Otherwise running the application will fail. -->
+                        <!-- Exclude all signature files from the shaded JARs to avoid server startup failure. -->
                         <filter>
-                            <artifact>org.bouncycastle:*</artifact>
+                            <artifact>*</artifact>
                             <excludes>
                                 <exclude>META-INF/*.SF</exclude>
                                 <exclude>META-INF/*.DSA</exclude>
@@ -1065,20 +1167,51 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>generate-swagger-api-definition</id>
                         <phase>compile</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
+                        <configuration>
+                            <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/swagger</argument>
+                                <argument>org.graylog</argument>
+                                <argument>org.graylog2</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-csv-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <arguments>
+                                <argument>csv</argument>
+                                <argument>${project.build.directory}/server-conf-docs.csv</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-conf-example</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <arguments>
+                                <argument>conf</argument>
+                                <argument>${project.build.directory}/server.conf.generated</argument>
+                                <!-- use the following line if you want to distribute the generated version instead of manually created -->
+                                <!-- <argument>${project.build.directory}/server.conf.example</argument> -->
+                            </arguments>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
-                    <arguments>
-                        <argument>${project.build.directory}/swagger</argument>
-                        <argument>org.graylog</argument>
-                        <argument>org.graylog2</argument>
-                    </arguments>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.cyclonedx</groupId>
@@ -1108,9 +1241,82 @@
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                        <configuration>
+                            <pluginId>grpc-java</pluginId>
+                            <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                            <excludes>
+                                <exclude>opamp/proto/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <!-- We need a separate run for the OpAMP proto files because otherwise they fail to resolve imports -->
+                    <execution>
+                        <id>compile-opamp</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <clearOutputDirectory>false</clearOutputDirectory>
+                            <protoSourceRoot>${project.basedir}/src/main/proto/opamp/proto</protoSourceRoot>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <!-- Generate OpenAPI description using exec:exec (forked JVM) instead of exec:java
+                 to avoid BouncyCastle classloader conflicts in multi-module builds -->
+            <id>generate-openapi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-openapi-description</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>java</executable>
+                                    <arguments>
+                                        <argument>-classpath</argument>
+                                        <classpath/>
+                                        <argument>-Dgraylog.password_secret=dummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummy</argument>
+                                        <argument>-Dgraylog.data_dir=${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-data-${maven.build.timestamp}</argument>
+                                        <argument>-Dgraylog.node_id_file=${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-node-id-${maven.build.timestamp}</argument>
+                                        <argument>org.graylog2.bootstrap.Main</argument>
+                                        <argument>openapi-description</argument>
+                                        <argument>-np</argument>
+                                        <argument>-f</argument>
+                                        <argument>${openapi.server.config.file}</argument>
+                                        <argument>${openapi.server.output.file}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>release</id>
             <build>
@@ -1147,6 +1353,17 @@
             </build>
         </profile>
         <profile>
+            <id>skip-web-interface-tests</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                </property>
+            </activation>
+            <properties>
+                <skip.web.tests>true</skip.web.tests>
+            </properties>
+        </profile>
+        <profile>
             <id>web-interface-build</id>
             <activation>
                 <property>
@@ -1180,6 +1397,7 @@
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
                             <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
+                            <installDirectory>${webInterface.path}</installDirectory>
                         </configuration>
 
                         <executions>
@@ -1214,13 +1432,13 @@
                             </execution>
 
                             <execution>
-                                <id>yarn tsc</id>
+                                <id>yarn tsgo</id>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
                                 <phase>compile</phase>
                                 <configuration>
-                                    <arguments>tsc</arguments>
+                                    <arguments>tsgo</arguments>
                                 </configuration>
                             </execution>
 
@@ -1247,6 +1465,30 @@
                             </execution>
 
                             <execution>
+                                <id>luma: yarn install</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>luma: yarn tsc</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>tsc</arguments>
+                                    <workingDirectory>${webInterface.path}/docs/graylog-luma</workingDirectory>
+                                </configuration>
+                            </execution>
+
+                            <execution>
                                 <id>yarn run check-production-build</id>
                                 <phase>verify</phase>
                                 <goals>
@@ -1265,6 +1507,7 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>test</arguments>
+                                    <skipTests>${skip.web.tests}</skipTests>
                                 </configuration>
                             </execution>
                         </executions>

@@ -19,13 +19,14 @@ package org.graylog.aws.config;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.RestResourceBaseTest;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,9 +35,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AWSConfigurationResourceTest extends RestResourceBaseTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -46,7 +47,7 @@ public class AWSConfigurationResourceTest extends RestResourceBaseTest {
 
     private AWSConfigurationResource awsConfigurationResource;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         when(systemConfiguration.getPasswordSecret()).thenReturn("verySecret123456");
         this.awsConfigurationResource = new AWSConfigurationResource(clusterConfigService, systemConfiguration);

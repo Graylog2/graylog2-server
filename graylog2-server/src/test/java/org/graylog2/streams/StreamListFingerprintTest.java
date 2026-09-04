@@ -20,27 +20,29 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.bson.types.ObjectId;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class StreamListFingerprintTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     Stream stream1;
@@ -59,7 +61,7 @@ public class StreamListFingerprintTest {
 
     private final String expectedEmptyFingerprint = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         output1 = makeOutput(1, "output1");
         output2 = makeOutput(2, "output2");
@@ -73,10 +75,16 @@ public class StreamListFingerprintTest {
     }
 
     private static Stream makeStream(int id, String title, StreamRule[] rules, Output[] outputs) {
-        final HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put(StreamImpl.FIELD_TITLE, title);
-        return new StreamImpl(new ObjectId(String.format(Locale.ENGLISH, "%024d", id)), fields, Lists.newArrayList(rules), Sets.newHashSet(
-                outputs), null);
+        return StreamImpl.Builder.create()
+                .id(String.format(Locale.ENGLISH, "%024d", id))
+                .creatorUserId("testuser")
+                .createdAt(Tools.nowUTC())
+                .disabled(false)
+                .indexSetId(title + "-index-set")
+                .title(title)
+                .rules(Lists.newArrayList(rules))
+                .outputObjects(Sets.newHashSet(outputs))
+                .build();
     }
 
     private static StreamRule makeStreamRule(int id, String field) {
@@ -97,16 +105,16 @@ public class StreamListFingerprintTest {
     }
 
     @Test
-    public void testGetFingerprint() throws Exception {
+    public void testGetFingerprint() {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.newArrayList(stream1, stream2));
 
         // The fingerprint depends on the hashCode of each stream and stream rule and might change if the underlying
         // implementation changed.
-        assertEquals("dc859599e0c4564322fbb7535796e96147ad766b", fingerprint.getFingerprint());
+        assertEquals("752fe74496eb4ce0c7950b7ff3ac023f5b5250d8", fingerprint.getFingerprint());
     }
 
     @Test
-    public void testIdenticalStreams() throws Exception {
+    public void testIdenticalStreams() {
         final StreamListFingerprint fingerprint1 = new StreamListFingerprint(Lists.newArrayList(stream1));
         final StreamListFingerprint fingerprint2 = new StreamListFingerprint(Lists.newArrayList(stream1));
         final StreamListFingerprint fingerprint3 = new StreamListFingerprint(Lists.newArrayList(stream2));
@@ -116,7 +124,7 @@ public class StreamListFingerprintTest {
     }
 
     @Test
-    public void testWithEmptyStreamList() throws Exception {
+    public void testWithEmptyStreamList() {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.<Stream>newArrayList());
 
         assertEquals(expectedEmptyFingerprint, fingerprint.getFingerprint());

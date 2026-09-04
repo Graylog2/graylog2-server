@@ -1,0 +1,5 @@
+type = "added"
+message = "Added 'rename_fields' pipeline function that supports bulk renaming message fields."
+
+issues = ["graylog-plugin-enterprise#9558"]
+pulls = ["24083"]

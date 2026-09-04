@@ -18,9 +18,9 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ExposedConfiguration;
@@ -41,7 +41,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 
 @RequiresAuthentication
-@Api(value = "System/Configuration", description = "Read-only access to configuration settings")
+@Tag(name = "System/Configuration", description = "Read-only access to configuration settings")
 @Path("/system/configuration")
 @Produces(MediaType.APPLICATION_JSON)
 public class ConfigurationResource extends RestResource {
@@ -57,7 +57,7 @@ public class ConfigurationResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get relevant configuration settings and their values")
+    @Operation(summary = "Get relevant configuration settings and their values")
     public ExposedConfiguration getRelevant() {
         return ExposedConfiguration.create(configuration);
     }
@@ -65,8 +65,8 @@ public class ConfigurationResource extends RestResource {
     @GET
     @Path("/{name}")
     @Timed
-    @ApiOperation(value = "Get relevant configuration setting value")
-    public Response getRelevantByName(@ApiParam(name = "name", required = true)
+    @Operation(summary = "Get relevant configuration setting value")
+    public Response getRelevantByName(@Parameter(name = "name", required = true)
                                       @PathParam("name") @NotEmpty String configSettingName) {
 
         final ExposedConfiguration conf = ExposedConfiguration.create(configuration);

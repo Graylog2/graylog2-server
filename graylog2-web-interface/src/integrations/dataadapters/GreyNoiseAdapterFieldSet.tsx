@@ -14,41 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
 import type { ValidationState } from 'components/common/types';
+import type { EncryptedFieldValue } from 'components/configurationforms/types';
 
 type GreyNoiseAdapterFieldSetProps = {
   config: {
     api_token: any;
   };
-  updateConfig: (...args: any[]) => void;
+  setFieldValue: (...args: any[]) => void;
   validationState: (...args: any[]) => ValidationState;
   validationMessage: (...args: any[]) => string;
 };
 
 const GreyNoiseAdapterFieldSet = ({
   config,
-  updateConfig,
+  setFieldValue,
   validationMessage,
   validationState,
 }: GreyNoiseAdapterFieldSetProps) => {
-  const isCreate = useRef(!config.api_token?.is_set);
-  const [showResetPasswordButton, setShowResetPasswordButton] = useState(config.api_token?.is_set === true);
+  const [isCreate] = useState(() => !config.api_token?.keep_value);
+  const [showResetPasswordButton, setShowResetPasswordButton] = useState(!!config.api_token?.keep_value);
 
-  const setUserPassword = useCallback((nextUserPassword) => {
-    updateConfig({ ...config, api_token: nextUserPassword });
-  }, [updateConfig, config]);
-
-  useEffect(() => {
-    // Set a default value on `api_token` that the server can deserialize
-    if (config.api_token?.is_set !== undefined) {
-      // Keeping value is only helpful when editing, but since setting '' as value throws an error during
-      // validation, this at least avoids users seeing validation errors constantly.
-      setUserPassword({ keep_value: true });
-    }
-  }, [setUserPassword, config.api_token]);
+  const setUserPassword = (nextUserPassword: EncryptedFieldValue<string>) => {
+    setFieldValue('config.api_token', nextUserPassword);
+  };
 
   const handleUserPasswordChange = ({ target }) => {
     const typedPassword = target.value;
@@ -76,29 +68,30 @@ const GreyNoiseAdapterFieldSet = ({
   return (
     <fieldset>
       {showResetPasswordButton ? (
-        <Input id="api_token"
-               label="User Password"
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9">
+        <Input id="api_token" label="User Password" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
           <Button onClick={toggleUserPasswordReset}>Reset token</Button>
         </Input>
       ) : (
-        <Input type="password"
-               id="api_token"
-               name="api_token"
-               label="API Token"
-               buttonAfter={!isCreate.current ? (
-                 <Button type="button" onClick={toggleUserPasswordReset}>
-                   Undo Reset
-                 </Button>
-               ) : undefined}
-               onChange={handleUserPasswordChange}
-               help={validationMessage('api_token', 'The API Token.')}
-               bsStyle={validationState('api_token')}
-               value={config.api_token?.set_value || ''}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9"
-               required />
+        <Input
+          type="password"
+          id="api_token"
+          name="api_token"
+          label="API Token"
+          buttonAfter={
+            !isCreate ? (
+              <Button type="button" onClick={toggleUserPasswordReset}>
+                Undo Reset
+              </Button>
+            ) : undefined
+          }
+          onChange={handleUserPasswordChange}
+          help={validationMessage('api_token', 'The API Token.')}
+          bsStyle={validationState('api_token')}
+          value={config.api_token?.set_value || ''}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+          required
+        />
       )}
     </fieldset>
   );

@@ -18,6 +18,11 @@ package org.graylog2.database.entities;
 
 import java.util.Objects;
 
+/**
+ * A generic system to categorize entities and assign properties to these categories.
+ * There are generic subclasses for the combinations of mutability/deletability - use these if possible:
+ * {@link DefaultEntityScope}, {@link ImmutableSystemScope}, {@link NonDeletableSystemScope}, {@link DeletableSystemScope}.
+ */
 public abstract class EntityScope {
 
     public abstract String getName();

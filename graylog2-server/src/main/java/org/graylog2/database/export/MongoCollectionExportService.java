@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.export;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -29,12 +30,16 @@ import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.shared.security.EntityPermissionsUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * A general service for exporting limited list of Documents (with a selection of fields) from a collection in MongoDB.
@@ -43,6 +48,8 @@ import java.util.stream.Stream;
  * but performance may be low in that particular case.
  */
 public class MongoCollectionExportService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongoCollectionExportService.class);
 
     private final MongoConnection mongoConnection;
     private final EntityPermissionsUtils permissionsUtils;
@@ -60,6 +67,10 @@ public class MongoCollectionExportService {
                                  final Bson dbFilter,
                                  final List<Sort> sorts,
                                  final Subject subject) {
+        if (!permissionsUtils.areAllFieldsReadable(collectionName, exportedFieldNames)) {
+            throw new IllegalArgumentException(f("Improper list of fields for collection %s : %s", collectionName, exportedFieldNames));
+        }
+
         final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(collectionName);
         final FindIterable<Document> resultsWithoutLimit = collection.find(Objects.requireNonNullElse(dbFilter, Filters.empty()))
                 .projection(Projections.fields(Projections.include(exportedFieldNames)))
@@ -67,11 +78,12 @@ public class MongoCollectionExportService {
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collectionName);
-        final var documents = userCanReadAllEntities
+        try (var documents = userCanReadAllEntities
                 ? getFromMongo(resultsWithoutLimit, limit)
-                : getWithInMemoryPermissionCheck(resultsWithoutLimit, limit, checkPermission);
+                : getWithInMemoryPermissionCheck(resultsWithoutLimit, limit, checkPermission)) {
 
-        return documents.collect(Collectors.toList());
+            return documents.collect(Collectors.toList());
+        }
 
     }
 
@@ -82,12 +94,14 @@ public class MongoCollectionExportService {
                 .toList());
     }
 
+    @MustBeClosed
     private Stream<Document> getWithInMemoryPermissionCheck(FindIterable<Document> result, int limit, Predicate<Document> checkPermission) {
         return MongoUtils.stream(result)
                 .filter(checkPermission)
                 .limit(limit);
     }
 
+    @MustBeClosed
     private Stream<Document> getFromMongo(FindIterable<Document> result, int limit) {
         return MongoUtils.stream(result.limit(limit));
     }

@@ -20,22 +20,20 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 import java.util.Map;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class ExtractorSummary {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
 
     @JsonProperty("cursor_strategy")
@@ -53,7 +51,7 @@ public abstract class ExtractorSummary {
     @JsonProperty("creator_user_id")
     public abstract String creatorUserId();
 
-    @JsonProperty
+    @JsonProperty("converters")
     public abstract List<Map<String, Object>> converters();
 
     @JsonProperty("condition_type")
@@ -62,16 +60,16 @@ public abstract class ExtractorSummary {
     @JsonProperty("condition_value")
     public abstract String conditionValue();
 
-    @JsonProperty
+    @JsonProperty("order")
     public abstract Long order();
 
-    @JsonProperty
+    @JsonProperty("exceptions")
     public abstract Long exceptions();
 
     @JsonProperty("converter_exceptions")
     public abstract Long converterExceptions();
 
-    @JsonProperty
+    @JsonProperty("metrics")
     public abstract ExtractorMetrics metrics();
 
     @JsonCreator

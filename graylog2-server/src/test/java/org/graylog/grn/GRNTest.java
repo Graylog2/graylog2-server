@@ -16,11 +16,11 @@
  */
 package org.graylog.grn;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GRNTest {
 
@@ -50,7 +50,7 @@ public class GRNTest {
 
     @Test
     public void builderWithEntitytTest() {
-        final GRN grn = GRNType.create("dashboard", "dashboards:").newGRNBuilder().entity("54e3deadbeefdeadbeef0000").build();
+        final GRN grn = GRNType.create("dashboard").newGRNBuilder().entity("54e3deadbeefdeadbeef0000").build();
 
         assertEquals(grn.toString(), "grn::::dashboard:54e3deadbeefdeadbeef0000");
     }
@@ -59,7 +59,7 @@ public class GRNTest {
     public void compareGRNs() {
         final String testGRN = "grn::::stream:000000000000000002";
         final GRN grn1 = GRN.parse(testGRN, GRN_REGISTRY);
-        final GRN grn2 = GRNType.create("stream", "streams:").newGRNBuilder().entity("000000000000000002").build();
+        final GRN grn2 = GRNType.create("stream").newGRNBuilder().entity("000000000000000002").build();
 
         assertEquals(grn1, grn2);
     }

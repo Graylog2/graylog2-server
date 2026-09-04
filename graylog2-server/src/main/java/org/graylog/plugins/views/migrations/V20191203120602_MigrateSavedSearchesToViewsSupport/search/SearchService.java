@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollections;

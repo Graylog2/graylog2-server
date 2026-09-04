@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.utilities;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

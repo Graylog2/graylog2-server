@@ -14,24 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { Spinner, ReadOnlyFormGroup } from 'components/common';
-import type { UserTelemetrySettings } from 'stores/telemetry/TelemetrySettingsStore';
-import {
-  TelemetrySettingsActions,
-} from 'stores/telemetry/TelemetrySettingsStore';
+import useTelemetrySettings from 'logic/telemetry/useTelemetrySettings';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
+import AppConfig from 'util/AppConfig';
 
-const TelemetrySettingsDetails = () => {
-  const [settings, setSettings] = useState<UserTelemetrySettings | undefined>(undefined);
-
-  useEffect(() => {
-    TelemetrySettingsActions.get().then((result) => {
-      setSettings(result);
-    });
-  }, []);
+const TelemetrySettingsDetailsComponent = () => {
+  const { data: settings } = useTelemetrySettings();
 
   if (!settings) {
     return <Spinner />;
@@ -45,4 +37,11 @@ const TelemetrySettingsDetails = () => {
   );
 };
 
+const TelemetrySettingsDetails = () => {
+  const { enabled: isTelemetryEnabled } = AppConfig.telemetry() || {};
+
+  if (!isTelemetryEnabled) return null;
+
+  return <TelemetrySettingsDetailsComponent />;
+};
 export default TelemetrySettingsDetails;

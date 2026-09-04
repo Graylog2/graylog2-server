@@ -17,8 +17,8 @@
 package org.graylog.enterprise;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -34,7 +34,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.Collections;
 
-@Api(value = "Enterprise")
+@Tag(name = "Enterprise")
 @Path("/enterprise")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -48,7 +48,7 @@ public class EnterpriseResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get Graylog Enterprise license info")
+    @Operation(summary = "Get Graylog Enterprise license info")
     @Path("/license/info")
     @RequiresPermissions(RestPermissions.LICENSEINFOS_READ)
     public Response licenseInfo() {

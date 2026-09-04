@@ -29,7 +29,8 @@ export const isTypeKeyword = (token: Token | undefined) => token?.type === 'keyw
 
 export const isKeywordOperator = (token: Token | undefined) => token?.type === 'keyword.operator';
 
-export const isExistsOperator = (token: Token | undefined) => isTypeKeyword(token) && token.value === `${existsOperator.name}:`;
+export const isExistsOperator = (token: Token | undefined) =>
+  isTypeKeyword(token) && token.value === `${existsOperator.name}:`;
 
 export const isCompleteFieldName = (token: Token | undefined) => !!(isTypeKeyword(token) && token?.value.endsWith(':'));
 

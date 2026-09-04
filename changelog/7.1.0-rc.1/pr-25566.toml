@@ -1,0 +1,5 @@
+type = "c"
+message = "Remove Beta badge from MCP configuration page."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13761"]
+pulls = ["25566"]

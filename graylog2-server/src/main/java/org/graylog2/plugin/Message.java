@@ -18,7 +18,9 @@ package org.graylog2.plugin;
 
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -33,10 +35,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.utilities.date.DateTimeConverter;
@@ -65,12 +68,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.CharMatcher.anyOf;
 import static com.google.common.base.CharMatcher.inRange;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_FLEET_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_SOURCE_ID;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -120,6 +128,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public static final String FIELD_GL2_ACCOUNTED_MESSAGE_SIZE = "gl2_accounted_message_size";
 
     /**
+     * Will be set to the raw input message size in bytes (payload size at the transport layer).
+     */
+    public static final String FIELD_GL2_INPUT_MESSAGE_SIZE = "gl2_input_message_size";
+
+    /**
      * This is the message ID. It will be set to a {@link de.huxhorn.sulky.ulid.ULID} during processing.
      * <p></p>
      * <b>Attention:</b> This is currently NOT the "_id" field which is used as ID for the document in Elasticsearch!
@@ -155,6 +168,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * Will be set to the message receive time at the input.
      */
     public static final String FIELD_GL2_RECEIVE_TIMESTAMP = "gl2_receive_timestamp";
+
+    /**
+     * Will be set to the original timestamp of the message, if the timestamp was normalized.
+     */
+    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
 
     /**
      * Reflects the time span from receiving the message till sending it to the output in milliseconds.
@@ -225,6 +243,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
             FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+            FIELD_GL2_INPUT_MESSAGE_SIZE,
             FIELD_GL2_PROCESSING_ERROR,
             FIELD_GL2_PROCESSING_DURATION_MS,
             FIELD_GL2_PROCESSING_TIMESTAMP,
@@ -237,7 +256,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             FIELD_GL2_SOURCE_INPUT,
             FIELD_GL2_SOURCE_NODE,
             FIELD_GL2_SOURCE_RADIO,
-            FIELD_GL2_SOURCE_RADIO_INPUT
+            FIELD_GL2_SOURCE_RADIO_INPUT,
+            FIELD_GL2_FORWARDER_INPUT
     );
 
     // Graylog Illuminate Fields
@@ -254,6 +274,13 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             FIELD_ILLUMINATE_GIM_TAGS,
             FIELD_ILLUMINATE_GIM_VERSION,
             FIELD_ASSOCIATED_ASSETS
+    );
+
+    private static final Set<String> COLLECTOR_FIELDS = ImmutableSet.of(
+            FIELD_AGENT_RECEIVER_TYPE,
+            FIELD_AGENT_SOURCE_ID,
+            FIELD_AGENT_FLEET_ID,
+            FIELD_AGENT_ID
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -336,6 +363,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private List<ProcessingError> processingErrors;
 
+    // Indicates if a message is supposed to be accounted for license usage. Except for some special cases, this will
+    // usually be true.
+    private final boolean accounted;
+
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
 
     static {
@@ -369,7 +400,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(final String message, final String source, final DateTime timestamp) {
+    Message(final String message, final String source, final DateTime timestamp, boolean accounted) {
+        this.accounted = accounted;
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
         addRequiredField(FIELD_SOURCE, source);
@@ -377,15 +409,30 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
+    Message(final String message, final String source, final DateTime timestamp) {
+        this(message, source, timestamp, true);
+    }
+
+    Message(final Map<String, Object> fields, boolean accounted) {
+        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))), accounted);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
     Message(final Map<String, Object> fields) {
-        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))));
+        this(fields, true);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(String id, Map<String, Object> newFields, boolean accounted) {
+        this.accounted = accounted;
+        Preconditions.checkArgument(id != null, "message id cannot be null");
+        fields.put(FIELD_ID, id);
+        addFields(newFields);
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
     Message(String id, Map<String, Object> newFields) {
-        Preconditions.checkArgument(id != null, "message id cannot be null");
-        fields.put(FIELD_ID, id);
-        addFields(newFields);
+        this(id, newFields, true);
     }
 
     public boolean isComplete() {
@@ -489,6 +536,37 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         addField(FIELD_TIMESTAMP, dateTime);
     }
 
+    /**
+     * Normalize the timestamp of the message if it is (significantly) in the future:
+     * - use the receive time, if it is available and viable
+     * - otherwise clamp to current time
+     * Default behavior is do nothing.
+     *
+     * @param gracePeriod do nothing if the timestamp is within this grace period
+     */
+    public void normalizeTimestamp(Duration gracePeriod) {
+        if (gracePeriod == null) {
+            return;
+        }
+        final DateTime timeStamp = getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
+        final DateTime nowUTC = Tools.nowUTC();
+        final DateTime threshold = nowUTC.plus(gracePeriod.toMillis());
+        if (threshold.isBefore(timeStamp)) {
+            DateTime receiveTimeStamp = getReceiveTime();
+            if (receiveTimeStamp != null && threshold.isAfter(receiveTimeStamp)) {
+                updateTimeStamp(timeStamp, receiveTimeStamp);
+            } else {
+                updateTimeStamp(timeStamp, nowUTC);
+            }
+        }
+    }
+
+    @VisibleForTesting
+    public void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
+        addTimestampField(FIELD_TIMESTAMP, newTimeStamp);
+        addTimestampField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
+    }
+
     private DateTime convertToDateTime(@Nonnull Object value) {
         try {
             return DateTimeConverter.convertToDateTime(value);
@@ -505,9 +583,6 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     private DateTime fallbackForNullTimestamp() {
         final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
         LOG.trace(error);
-        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
-                "Replaced invalid timestamp value in message <" + getId() + "> with current time",
-                "<null> value provided"));
         return Tools.nowUTC();
     }
 
@@ -529,7 +604,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final StringBuilder sb = new StringBuilder();
         sb.append("source: ").append(getField(FIELD_SOURCE)).append(" | ");
 
-        final String message = getField(FIELD_MESSAGE).toString().replaceAll("\\n", "").replaceAll("\\t", "");
+        final String message = ObjectUtils.defaultIfNull(getField(FIELD_MESSAGE), "").toString()
+                .replace("\\n", "").replace("\\t", "");
         sb.append("message: ");
 
         if (truncate && message.length() > 225) {
@@ -566,6 +642,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public void addField(final String key, final Object value) {
         addField(key, value, false);
+    }
+
+    private void addTimestampField(final String key, final DateTime value) {
+        addField(key, buildElasticSearchTimeFormat(value.withZone(UTC)), false);
     }
 
     private void addRequiredField(final String key, final Object value) {
@@ -608,7 +688,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private void updateSize(String fieldName, Object newValue, Object previousValue) {
         // don't count internal fields
-        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName)) {
+        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName) || COLLECTOR_FIELDS.contains(fieldName)) {
             return;
         }
         long newValueSize = 0;
@@ -647,9 +727,44 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return valueSize;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the accumulated size of all message fields when the message is accounted, and {@code 0}
+     * when it is not (see {@link #isAccounted()}). Since this value is also stored as
+     * {@link #FIELD_GL2_ACCOUNTED_MESSAGE_SIZE}, an unaccounted message records an accounted size of
+     * {@code 0}.
+     */
     @Override
     public long getSize() {
-        return sizeCounter.getCount();
+        return isAccounted() ? sizeCounter.getCount() : 0L;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the raw input size recorded in {@link #FIELD_GL2_INPUT_MESSAGE_SIZE} (set by the decoding
+     * layer from the original transport payload), falling back to {@link #getSize()} when no input size
+     * was recorded — e.g. for messages created in-process rather than decoded from an input.
+     */
+    @Override
+    @JsonIgnore
+    public long getInputMessageSize() {
+        final Object value = getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        return value instanceof Number n ? n.longValue() : getSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The flag is fixed at construction (a message is created as excluded via the
+     * {@code MessageFactory.createUnaccountedMessage(...)} factory method) and is never toggled
+     * between accounted and unaccounted afterward.
+     */
+    @Override
+    @JsonIgnore
+    public boolean isAccounted() {
+        return accounted;
     }
 
     public static boolean validKey(final String key) {
@@ -674,6 +789,16 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         if (!RESERVED_FIELDS.contains(key)) {
             final Object removedValue = fields.remove(key);
             updateSize(key, null, removedValue);
+        }
+    }
+
+    public void removeFieldsByValue(Predicate<String> removalPredicate) {
+        for (Iterator<Map.Entry<String, Object>> fieldItr = fields.entrySet().iterator(); fieldItr.hasNext(); ) {
+            final Map.Entry<String, Object> entry = fieldItr.next();
+            if (!RESERVED_FIELDS.contains(entry.getKey()) && entry.getValue() instanceof String valStr && removalPredicate.test(valStr)) {
+                fieldItr.remove();
+                updateSize(entry.getKey(), null, valStr);
+            }
         }
     }
 
@@ -717,6 +842,17 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      */
     public Set<Stream> getStreams() {
         return ImmutableSet.copyOf(this.streams);
+    }
+
+    /**
+     * Returns a lightweight, unmodifiable view of the streams this message is currently routed to.
+     * Unlike {@link #getStreams()}, this does not create a copy — changes to the message's streams
+     * will be reflected in the returned set. Only use this when the set is consumed immediately
+     * (e.g. iteration, streaming) and not held across operations that may mutate the message.
+     */
+    @JsonIgnore
+    public Set<Stream> getStreamsUnmodifiable() {
+        return Collections.unmodifiableSet(this.streams);
     }
 
     /**
@@ -877,7 +1013,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setReceiveTime(DateTime receiveTime) {
         if (receiveTime != null) {
             this.receiveTime = receiveTime;
-            addField(FIELD_GL2_RECEIVE_TIMESTAMP, buildElasticSearchTimeFormat(receiveTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_RECEIVE_TIMESTAMP, receiveTime);
         }
     }
 
@@ -896,7 +1032,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setProcessingTime(DateTime processingTime) {
         if (processingTime != null) {
             this.processingTime = processingTime;
-            addField(FIELD_GL2_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(processingTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_PROCESSING_TIMESTAMP, processingTime);
             if (getReceiveTime() != null) {
                 final long duration = processingTime.getMillis() - getReceiveTime().getMillis();
                 addField(FIELD_GL2_PROCESSING_DURATION_MS, Ints.saturatedCast(duration));
@@ -930,7 +1066,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public boolean hasRecordings() {
-        return recordings != null && recordings.size() > 0;
+        return recordings != null && recordings.isEmpty();
     }
 
     private void lazyInitRecordings() {
@@ -980,12 +1116,12 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return true;
     }
 
-    public static abstract class Recording {
-        static Timing timing(String name, long elapsedNanos) {
+    public abstract static class Recording {
+        private static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
 
-        public static Message.Counter counter(String name, int counter) {
+        private static Message.Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }
 

@@ -1,0 +1,5 @@
+type = "a"
+message = "Run replay search for events on separate page. Add extra information about the event to sidebar on replay search page."
+
+issues = ["24554"]
+pulls = ["24589", "graylog-plugin-enterprise#12847"]

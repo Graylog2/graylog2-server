@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import get from 'lodash/get';
 
 import { useStore } from 'stores/connect';
 import User from 'logic/users/User';
@@ -28,21 +27,15 @@ type CurrentUserProviderProps = {
   children: React.ReactNode;
 };
 
-const CurrentUserProvider = ({
-  children,
-}: CurrentUserProviderProps) => {
-  const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
+const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
+  const currentUserJSON = useStore(CurrentUserStore, (state) => state?.currentUser);
   const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;
 
   if (!currentUser) {
     return <Spinner />;
   }
 
-  return (
-    <CurrentUserContext.Provider value={currentUser}>
-      {children}
-    </CurrentUserContext.Provider>
-  );
+  return <CurrentUserContext.Provider value={currentUser}>{children}</CurrentUserContext.Provider>;
 };
 
 export default CurrentUserProvider;

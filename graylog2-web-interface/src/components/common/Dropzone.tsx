@@ -18,13 +18,9 @@ import * as React from 'react';
 import type { DropzoneProps } from '@mantine/dropzone';
 import { Dropzone as MantineDropzone } from '@mantine/dropzone';
 
-type Props = DropzoneProps
+type Props = DropzoneProps;
 
-const Dropzone = ({ children, ...props }: Props) => (
-  <MantineDropzone {...props}>
-    {children}
-  </MantineDropzone>
-);
+const Dropzone = ({ children, ...props }: Props) => <MantineDropzone {...props}>{children}</MantineDropzone>;
 
 Dropzone.Accept = MantineDropzone.Accept;
 Dropzone.Reject = MantineDropzone.Reject;

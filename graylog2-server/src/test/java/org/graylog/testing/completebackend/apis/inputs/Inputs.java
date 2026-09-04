@@ -18,6 +18,7 @@ package org.graylog.testing.completebackend.apis.inputs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.response.ValidatableResponse;
+import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.GraylogRestApi;
 
@@ -81,5 +82,23 @@ public class Inputs implements GraylogRestApi {
                 .then()
                 .log().ifError()
                 .statusCode(204);
+    }
+
+    public void setRunningState(String inputId) {
+        given()
+                .spec(api.requestSpecification())
+                .expect().response().statusCode(200)
+                .when()
+                .put("/system/inputstates/" + inputId);
+    }
+
+    public GraylogApiResponse getInputTypes() {
+        return new GraylogApiResponse(given()
+                .spec(api.requestSpecification())
+                .when()
+                .get("/system/inputs/types")
+                .then()
+                .log().ifError()
+                .statusCode(200));
     }
 }

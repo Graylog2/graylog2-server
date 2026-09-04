@@ -19,11 +19,15 @@ package org.graylog2.rest.resources.system.inputs;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.diagnosis.InputDiagnosticService;
+import org.graylog2.inputs.diagnosis.InputRoutingRulesService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -32,26 +36,32 @@ import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class InputsResourceMaskingPasswordsTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private InputService inputService;
@@ -68,7 +78,11 @@ public class InputsResourceMaskingPasswordsTest {
 
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
-            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, new Configuration());
+            super(inputService, mock(InputDiagnosticService.class), mock(InputRoutingRulesService.class),
+                    mock(StreamService.class), mock(StreamRuleService.class),
+                    mock(PipelineService.class), messageInputFactory, new Configuration(),
+                    mock(MongoDbInputsMetadataService.class), mock(ClusterEventBus.class),
+                    new ComputedFieldRegistry(Set.of()));
         }
 
         @Override
@@ -77,7 +91,7 @@ public class InputsResourceMaskingPasswordsTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.availableInputs = new HashMap<>();
         when(messageInputFactory.getAvailableInputs()).thenReturn(this.availableInputs);
@@ -180,6 +194,7 @@ public class InputsResourceMaskingPasswordsTest {
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(false);
+        when(currentSubject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + inputType)).thenReturn(false);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -214,6 +229,7 @@ public class InputsResourceMaskingPasswordsTest {
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + inputType)).thenReturn(true);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -246,6 +262,7 @@ public class InputsResourceMaskingPasswordsTest {
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(false);
+        when(currentSubject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + inputType)).thenReturn(false);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -283,6 +300,7 @@ public class InputsResourceMaskingPasswordsTest {
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
         when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + inputType)).thenReturn(true);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,

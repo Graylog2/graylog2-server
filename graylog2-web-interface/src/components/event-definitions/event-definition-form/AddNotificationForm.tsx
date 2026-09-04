@@ -18,12 +18,9 @@ import React from 'react';
 
 import { Select } from 'components/common';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
-import EventNotificationFormContainer
-  from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import withTelemetry from 'logic/telemetry/withTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import withLocation from 'routing/withLocation';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -33,12 +30,14 @@ type AddNotificationFormProps = {
   onCancel: (...args: any[]) => void;
   hasCreationPermissions?: boolean;
   sendTelemetry: (...args: any[]) => void;
-  location: any;
 };
 
-class AddNotificationForm extends React.Component<AddNotificationFormProps, {
-  [key: string]: any;
-}> {
+class AddNotificationForm extends React.Component<
+  AddNotificationFormProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     hasCreationPermissions: false,
   };
@@ -54,8 +53,6 @@ class AddNotificationForm extends React.Component<AddNotificationFormProps, {
 
   handleNewNotificationSubmit = (promise) => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.DONE_CLICKED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-notifications',
       app_action_value: 'done-button',
     });
 
@@ -66,8 +63,6 @@ class AddNotificationForm extends React.Component<AddNotificationFormProps, {
 
   handleSubmit = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.DONE_CLICKED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-notifications',
       app_action_value: 'done-button',
     });
 
@@ -79,8 +74,6 @@ class AddNotificationForm extends React.Component<AddNotificationFormProps, {
 
   handleCancel = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.CANCEL_CLICKED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-notifications',
       app_action_value: 'cancel-button',
     });
 
@@ -90,8 +83,6 @@ class AddNotificationForm extends React.Component<AddNotificationFormProps, {
   handleSelectNotificationChange = (nextNotificationId) => {
     if (nextNotificationId === 'create') {
       this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.CREATE_NEW_CLICKED, {
-        app_pathname: getPathnameWithoutId(this.props.location.pathname),
-        app_section: 'event-definition-notifications',
         app_action_value: 'create-new-option',
       });
 
@@ -101,8 +92,6 @@ class AddNotificationForm extends React.Component<AddNotificationFormProps, {
     }
 
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_SELECTED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-notifications',
       app_action_value: 'existing-notification-option',
     });
 
@@ -126,9 +115,15 @@ class AddNotificationForm extends React.Component<AddNotificationFormProps, {
   render() {
     const { notifications } = this.props;
     const { displayNewNotificationForm, selectedNotification } = this.state;
-    const doneButton = displayNewNotificationForm
-      ? <Button bsStyle="success" type="submit" form="new-notification-form">Add notification</Button>
-      : <Button bsStyle="success" onClick={this.handleSubmit}>Add notification</Button>;
+    const doneButton = displayNewNotificationForm ? (
+      <Button bsStyle="primary" type="submit" form="new-notification-form">
+        Add notification
+      </Button>
+    ) : (
+      <Button bsStyle="primary" onClick={this.handleSubmit} disabled={!selectedNotification}>
+        Add notification
+      </Button>
+    );
 
     return (
       <Row>
@@ -138,24 +133,27 @@ class AddNotificationForm extends React.Component<AddNotificationFormProps, {
           <fieldset>
             <FormGroup controlId="notification-select">
               <ControlLabel>Choose Notification</ControlLabel>
-              <Select id="notification-select"
-                      matchProp="label"
-                      placeholder="Select Notification"
-                      onChange={this.handleSelectNotificationChange}
-                      options={this.formatNotifications(notifications)}
-                      value={selectedNotification}
-                      menuPlacement="bottom" />
+              <Select
+                id="notification-select"
+                placeholder="Select Notification"
+                onChange={this.handleSelectNotificationChange}
+                options={this.formatNotifications(notifications)}
+                value={selectedNotification}
+                menuPlacement="bottom"
+              />
               <HelpBlock>
-                Select a Notification to use on Alerts of this kind or create a new Notification that you can
-                later use in other Alerts.
+                Select a Notification to use on Alerts of this kind or create a new Notification that you can later use
+                in other Alerts.
               </HelpBlock>
             </FormGroup>
 
             {displayNewNotificationForm && (
-              <EventNotificationFormContainer action="create"
-                                              formId="new-notification-form"
-                                              onSubmit={this.handleNewNotificationSubmit}
-                                              embedded />
+              <EventNotificationFormContainer
+                action="create"
+                formId="new-notification-form"
+                onSubmit={this.handleNewNotificationSubmit}
+                embedded
+              />
             )}
           </fieldset>
 
@@ -169,4 +167,4 @@ class AddNotificationForm extends React.Component<AddNotificationFormProps, {
   }
 }
 
-export default withLocation(withTelemetry(AddNotificationForm));
+export default withTelemetry(AddNotificationForm, 'event-definition-notifications');

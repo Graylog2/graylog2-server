@@ -20,8 +20,8 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Iterables;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.plugin.GlobalMetricNames;
@@ -40,7 +40,7 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.SortedMap;
 
 @RequiresAuthentication
-@Api(value = "System/Throughput", description = "Message throughput of this node")
+@Tag(name = "System/Throughput", description = "Message throughput of this node")
 @Path("/system/throughput")
 public class ThroughputResource extends RestResource {
     private final MetricRegistry metricRegistry;
@@ -53,7 +53,7 @@ public class ThroughputResource extends RestResource {
     @GET
     @Timed
     @RequiresPermissions(RestPermissions.THROUGHPUT_READ)
-    @ApiOperation(value = "Current throughput of this node in messages per second")
+    @Operation(summary = "Current throughput of this node in messages per second")
     @Produces(MediaType.APPLICATION_JSON)
     public Throughput total() {
         final SortedMap<String, Gauge> gauges = metricRegistry.getGauges(MetricUtils.filterSingleMetric(

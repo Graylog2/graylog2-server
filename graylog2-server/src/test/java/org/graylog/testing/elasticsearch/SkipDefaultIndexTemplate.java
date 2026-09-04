@@ -25,8 +25,10 @@ import java.lang.annotation.Target;
  * This annotation can be used if the {@link ElasticsearchBaseTest} should skip the creation of the default
  * index templates. That can be helpful if you want to run tests against pristine indices without any settings
  * or mapping configuration.
+ * In order to get access to the value in your test or lifecycle method, inject a boolean parameter annotated
+ * with this annotation.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.PARAMETER})
 public @interface SkipDefaultIndexTemplate {
 }

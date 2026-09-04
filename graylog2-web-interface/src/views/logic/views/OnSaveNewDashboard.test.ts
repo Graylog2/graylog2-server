@@ -15,22 +15,42 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import type { HistoryFunction } from 'routing/useHistory';
 import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
+import { createEntityShareState } from 'fixtures/entityShareState';
+import { createView } from 'views/api/views';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import View from './View';
 import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
 import { loadDashboard } from './Actions';
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
+jest.mock('views/api/views', () => ({
+  createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
+}));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 jest.mock('util/UserNotification');
 jest.mock('views/logic/views/Actions');
@@ -45,6 +65,10 @@ const history: HistoryFunction = {
 const OnSaveNewDashboard = (view: View) => OriginalOnSaveNewDashboard(view, history);
 
 describe('OnSaveNewDashboard', () => {
+  beforeEach(() => {
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -55,8 +79,8 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(ViewManagementActions.create).toHaveBeenCalled();
-    expect(ViewManagementActions.create).toHaveBeenCalledWith(view);
+    expect(createView).toHaveBeenCalled();
+    expect(createView).toHaveBeenCalledWith(view, undefined, undefined);
   });
 
   it('loads saved view', async () => {
@@ -106,7 +130,7 @@ describe('OnSaveNewDashboard', () => {
   });
 
   it('does not do anything if saving fails', async () => {
-    asMock(ViewManagementActions.create).mockImplementation(() => Promise.reject(new Error('Something bad happened!')));
+    asMock(createView).mockImplementation(() => Promise.reject(new Error('Something bad happened!')));
 
     const view = View.create();
     const dispatch = mockDispatch({ view: { view } } as RootState);

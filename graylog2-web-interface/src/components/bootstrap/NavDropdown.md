@@ -9,5 +9,5 @@ import { Nav, NavDropdown, MenuItem } from 'components/bootstrap';
     <MenuItem divider />
     <MenuItem eventKey="1.4">Separated link</MenuItem>
   </NavDropdown>
-</Nav>
+</Nav>;
 ```

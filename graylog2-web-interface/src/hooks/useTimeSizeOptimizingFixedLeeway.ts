@@ -14,20 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
-
-import { useStore } from 'stores/connect';
-import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
+import useIndicesConfiguration from 'hooks/useIndicesConfiguration';
 
 const useTimeSizeOptimizingFixedLeeway = () => {
-  const { rotationStrategiesContext } = useStore(IndicesConfigurationStore);
-  const maxTimeSizeOptimizingFixedLeeway = rotationStrategiesContext?.time_size_optimizing_retention_fixed_leeway;
+  const { rotationStrategiesContext } = useIndicesConfiguration();
 
-  useEffect(() => {
-    IndicesConfigurationActions.loadRotationStrategies();
-  }, []);
-
-  return maxTimeSizeOptimizingFixedLeeway;
+  return rotationStrategiesContext?.time_size_optimizing_retention_fixed_leeway;
 };
 
 export default useTimeSizeOptimizingFixedLeeway;

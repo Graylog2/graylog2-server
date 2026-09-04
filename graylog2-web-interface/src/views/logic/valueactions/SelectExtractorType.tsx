@@ -20,25 +20,23 @@ import { ActionContext } from 'views/logic/ActionContext';
 import ExtractorUtils from 'util/ExtractorUtils';
 import Select from 'components/common/Select';
 import { BootstrapModalForm } from 'components/bootstrap';
-import type { ActionContexts } from 'views/types';
+import type { ActionContexts, AdditionalViewsActionHandlerArguments } from 'views/types';
 
 import type { ActionComponentProps } from '../../components/actions/ActionHandler';
 
 type State = {
-  selectedExtractor: string | undefined | null,
+  selectedExtractor: string | undefined | null;
 };
 
 const _renderOption = ({ label }: { label: string }) => <strong>{label}</strong>;
 
-const _getExtractorTypes = () => ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => ({ label: ExtractorUtils.getReadableExtractorTypeName(extractorType), value: extractorType }));
+const _getExtractorTypes = () =>
+  ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => ({
+    label: ExtractorUtils.getReadableExtractorTypeName(extractorType),
+    value: extractorType,
+  }));
 
-class SelectExtractorType extends React.Component<ActionComponentProps, State> {
-  static contextType = ActionContext;
-
-  readonly context: ActionContexts;
-
-  extractorRoutes = {};
-
+class SelectExtractorType extends React.Component<ActionComponentProps<AdditionalViewsActionHandlerArguments>, State> {
   constructor(props) {
     super(props);
 
@@ -52,12 +50,20 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
     const { gl2_source_node, gl2_source_input } = message.fields;
     const { field } = this.props;
 
-    this.extractorRoutes = ExtractorUtils.getNewExtractorRoutes(gl2_source_node,
+    this.extractorRoutes = ExtractorUtils.getNewExtractorRoutes(
+      gl2_source_node,
       gl2_source_input,
       field,
       message.index,
-      message.id);
+      message.id,
+    );
   }
+
+  extractorRoutes = {};
+
+  readonly context: ActionContexts;
+
+  static contextType = ActionContext;
 
   _onSubmit = () => {
     const { onClose } = this.props;
@@ -82,16 +88,19 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
     const { selectedExtractor } = this.state;
 
     return (
-      <BootstrapModalForm title="Select extractor type"
-                          submitButtonDisabled={!selectedExtractor}
-                          show
-                          onCancel={this.props.onClose}
-                          onSubmitForm={this._onSubmit}>
-        <Select placeholder="Select extractor type"
-                optionRenderer={_renderOption}
-                clearable
-                onChange={this._onChange}
-                options={_getExtractorTypes()} />
+      <BootstrapModalForm
+        title="Select extractor type"
+        submitButtonDisabled={!selectedExtractor}
+        show
+        onCancel={this.props.onClose}
+        onSubmitForm={this._onSubmit}>
+        <Select
+          placeholder="Select extractor type"
+          optionRenderer={_renderOption}
+          clearable
+          onChange={this._onChange}
+          options={_getExtractorTypes()}
+        />
       </BootstrapModalForm>
     );
   }

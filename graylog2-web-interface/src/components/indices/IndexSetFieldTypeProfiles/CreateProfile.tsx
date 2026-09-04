@@ -14,65 +14,69 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useCallback } from 'react';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import ProfileForm from 'components/indices/IndexSetFieldTypeProfiles/ProfileForm';
-import type {
-  IndexSetFieldTypeProfileForm,
-} from 'components/indices/IndexSetFieldTypeProfiles/types';
+import type { IndexSetFieldTypeProfileForm } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 
 const CreateProfile = () => {
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
   const { createProfile } = useProfileMutations();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const location = useLocation<{ customFieldMappings: any }>();
   const history = useHistory();
   const initialValues = useMemo<IndexSetFieldTypeProfileForm>(() => {
     const defaultCustomFieldMappings = location?.state?.customFieldMappings;
 
     if (defaultCustomFieldMappings) {
-      return ({
+      return {
         customFieldMappings: defaultCustomFieldMappings,
         name: null,
         description: null,
-      });
+      };
     }
 
     return undefined;
   }, [location?.state?.customFieldMappings]);
 
-  const onSubmit = useCallback((profile: IndexSetFieldTypeProfileForm) => {
-    createProfile(profile).then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CREATED, {
-        app_pathname: telemetryPathName,
-        app_action_value: { mappingsQuantity: profile?.customFieldMappings?.length },
+  const onSubmit = useCallback(
+    (profile: IndexSetFieldTypeProfileForm) => {
+      createProfile(profile).then(() => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.CREATED, {
+          app_action_value: { mappingsQuantity: profile?.customFieldMappings?.length },
+        });
+
+        history.push(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
       });
+    },
+    [createProfile, history, sendTelemetry],
+  );
 
-      navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
-    });
-  }, [createProfile, navigate, sendTelemetry, telemetryPathName]);
-
-  useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_OPENED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-opened' });
-  }, [sendTelemetry, telemetryPathName]);
+  useSendTelemetryOnMount(sendTelemetry, TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_OPENED, {
+    app_action_value: 'create-new-index-set-field-type-profile-opened',
+  });
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_CANCELED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-canceled' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_CANCELED, {
+      app_action_value: 'create-new-index-set-field-type-profile-canceled',
+    });
     history.goBack();
-  }, [history, sendTelemetry, telemetryPathName]);
+  }, [history, sendTelemetry]);
 
   return (
-    <ProfileForm initialValues={initialValues} onCancel={onCancel} submitButtonText="Create profile" submitLoadingText="Creating profile..." onSubmit={onSubmit} />
+    <ProfileForm
+      initialValues={initialValues}
+      onCancel={onCancel}
+      submitButtonText="Create profile"
+      submitLoadingText="Creating profile..."
+      onSubmit={onSubmit}
+    />
   );
 };
 

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
@@ -27,32 +27,38 @@ export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
 
 const fetchEvent = (eventId: string) => fetch('GET', eventsUrl(eventId)).then((data) => data.event);
 
-const useEventById = (eventId: string, { onErrorHandler }: { onErrorHandler?: (e: FetchError)=>void} = {}): {
-  data: Event,
-  refetch: () => void,
-  isLoading: boolean,
-  isFetched: boolean,
+const useEventById = (
+  eventId: string,
+  { onErrorHandler }: { onErrorHandler?: (e: FetchError) => void } = {},
+): {
+  data: Event;
+  refetch: () => void;
+  isLoading: boolean;
+  isFetched: boolean;
 } => {
-  const { data, refetch, isLoading, isFetched } = useQuery<Event>(
-    ['event-by-id', eventId],
-    () => onError(fetchEvent(eventId), (errorThrown: FetchError) => {
-      if (onErrorHandler) onErrorHandler(errorThrown);
+  const { data, refetch, isLoading, isFetched } = useQuery({
+    queryKey: ['event-by-id', eventId],
 
-      UserNotification.error(`Loading event or alert failed with status: ${errorThrown}`,
-        'Could not load event or alert');
-    }),
-    {
-      keepPreviousData: true,
-      enabled: !!eventId,
-    },
-  );
+    queryFn: () =>
+      onError(fetchEvent(eventId), (errorThrown: FetchError) => {
+        if (onErrorHandler) onErrorHandler(errorThrown);
 
-  return ({
+        UserNotification.error(
+          `Loading event or alert failed with status: ${errorThrown}`,
+          'Could not load event or alert',
+        );
+      }),
+
+    placeholderData: keepPreviousData,
+    enabled: !!eventId,
+  });
+
+  return {
     data,
     refetch,
     isLoading,
     isFetched,
-  });
+  };
 };
 
 export default useEventById;

@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Link } from 'components/common/router';
-import { Icon } from 'components/common';
+import { Link, Icon } from 'components/common';
 import { Row } from 'components/bootstrap';
 import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -27,74 +26,104 @@ import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
 import useViewTitle from 'views/hooks/useViewTitle';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
 import { createGRN } from 'logic/permissions/GRN';
-import ExecutionInfo from 'views/components/views/ExecutionInfo';
 import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import ViewsExecutionInfo from 'views/components/views/ViewsExecutionInto';
+import RightSidebarContext from 'contexts/RightSidebarContext';
+import SidebarEventDetails from 'components/events/SidebarEventDetails';
+import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
+import Button from 'components/bootstrap/Button';
 
-const links = {
-  [View.Type.Dashboard]: ({ id, title }) => [{
-    link: Routes.DASHBOARDS,
-    label: 'Dashboards',
-  },
-  {
-    label: title || id,
-    dataTestId: 'view-title',
-  },
+type Crumb = {
+  label: string;
+  link?: string;
+  onClick?: () => void;
+  dataTestId?: string;
+};
+
+type LinkParams = {
+  id: string;
+  title?: string;
+  onShowDetails?: () => void;
+};
+
+const links: Record<string, (params: LinkParams) => Array<Crumb>> = {
+  [View.Type.Dashboard]: ({ id, title }) => [
+    {
+      link: Routes.DASHBOARDS,
+      label: 'Dashboards',
+    },
+    {
+      label: title || id,
+      dataTestId: 'view-title',
+    },
   ],
-  [View.Type.Search]: ({ id, title }) => [{
-    link: Routes.SEARCH,
-    label: 'Search',
-  },
-  {
-    label: title || id,
-    dataTestId: 'view-title',
-  },
+  [View.Type.Search]: ({ id, title }) => [
+    {
+      link: Routes.SEARCH,
+      label: 'Search',
+    },
+    {
+      label: title || id,
+      dataTestId: 'view-title',
+    },
   ],
-  alert: ({ id }) => [
+  alert: ({ id, onShowDetails }) => [
     {
       link: Routes.ALERTS.LIST,
       label: 'Alerts & Events',
     },
     {
       label: id,
+      onClick: onShowDetails,
       dataTestId: 'alert-id-title',
     },
   ],
-  eventDefinition: ({ id, title }) => [
+  eventDefinition: ({ id, title, onShowDetails }) => [
     {
       link: Routes.ALERTS.DEFINITIONS.LIST,
       label: 'Event definitions',
     },
     {
-      link: Routes.ALERTS.DEFINITIONS.show(id),
       label: title || id,
+      onClick: onShowDetails,
       dataTestId: 'event-definition-title',
     },
   ],
 };
 
-const Content = styled.div(({ theme }) => css`
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  margin-bottom: ${theme.spacings.xs};
-  gap: 4px;
-`);
+const Content = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    margin-bottom: ${theme.spacings.xs};
+    gap: ${theme.spacings.sm};
+    justify-content: space-between;
+  `,
+);
 
-const ExecutionInfoContainer = styled.div`
-  margin-left: auto;
-`;
+const Breadcrumb = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: ${theme.spacings.xxs};
+  `,
+);
 
-const EditButton = styled.div(({ theme }) => css`
-  color: ${theme.colors.gray[60]};
-  font-size: ${theme.fonts.size.tiny};
-  cursor: pointer;
-`);
+const EditButton = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+    font-size: ${theme.fonts.size.tiny};
+    cursor: pointer;
+  `,
+);
 
 const TitleWrapper = styled.span`
   display: flex;
@@ -111,12 +140,38 @@ const TitleWrapper = styled.span`
 `;
 
 const StyledIcon = styled(Icon)`
-font-size: 0.5rem;
+  font-size: 0.5rem;
 `;
 
-const CrumbLink = ({ label, link, dataTestId = undefined }: { label: string, link: string | undefined, dataTestId?: string}) => (
-  link ? <Link target="_blank" to={link} data-testid={dataTestId}>{label}</Link> : <span data-testid={dataTestId}>{label}</span>
-);
+const CrumbLink = ({
+  label,
+  link,
+  onClick = undefined,
+  dataTestId = undefined,
+}: {
+  label: string;
+  link: string | undefined;
+  onClick?: () => void;
+  dataTestId?: string;
+}) => {
+  if (link) {
+    return (
+      <Link target="_blank" to={link} data-testid={dataTestId}>
+        {label}
+      </Link>
+    );
+  }
+
+  if (onClick) {
+    return (
+      <Button bsStyle="link" onClick={onClick} data-testid={dataTestId}>
+        {label}
+      </Button>
+    );
+  }
+
+  return <span data-testid={dataTestId}>{label}</span>;
+};
 
 const ViewHeader = () => {
   const view = useView();
@@ -127,65 +182,103 @@ const ViewHeader = () => {
 
   const { alertId, definitionId, type } = useReplaySearchContext();
   const { definitionTitle } = useAlertAndEventDefinitionData(alertId, definitionId);
-  const dispatch = useAppDispatch();
-  const _onSaveView = useCallback(async (updatedView: View) => {
-    await dispatch(onSaveView(updatedView));
-    await dispatch(updateView(updatedView));
-  }, [dispatch]);
+  const dispatch = useViewsDispatch();
+  const rightSidebar = useContext(RightSidebarContext);
+  const showAlertDetails = useCallback(
+    () => rightSidebar?.openSidebar(SidebarEventDetails(alertId, definitionId)),
+    [rightSidebar, alertId, definitionId],
+  );
+  const showEventDefinitionDetails = useCallback(
+    () => rightSidebar?.openSidebar(SidebarEventDefinitionDetails(definitionId)),
+    [rightSidebar, definitionId],
+  );
+  const _onSaveView = useCallback(
+    async (updatedView: View) => {
+      await dispatch(onSaveView(updatedView));
+      await dispatch(updateView(updatedView));
+    },
+    [dispatch],
+  );
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
-  const onChangeFavorite = useCallback((newValue: boolean) => dispatch(updateView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
+  const onChangeFavorite = useCallback(
+    (newValue: boolean) => dispatch(updateView(view.toBuilder().favorite(newValue).build())),
+    [dispatch, view],
+  );
 
-  const breadCrumbs = useMemo(() => {
+  const canShowDetails = !!rightSidebar;
+  const breadcrumbs = useMemo(() => {
     switch (type) {
       case 'alert':
       case 'event':
-        return links.alert({ id: alertId });
+        return links.alert({ id: alertId, onShowDetails: canShowDetails ? showAlertDetails : undefined });
       case 'event_definition':
-        return links.eventDefinition({ id: definitionId, title: definitionTitle });
+        return links.eventDefinition({
+          id: definitionId,
+          title: definitionTitle,
+          onShowDetails: canShowDetails ? showEventDefinitionDetails : undefined,
+        });
       default:
         return links[view.type]({ id: view.id, title });
     }
-  }, [type, alertId, definitionId, definitionTitle, view.type, view.id, title]);
+  }, [
+    type,
+    alertId,
+    canShowDetails,
+    showAlertDetails,
+    definitionId,
+    definitionTitle,
+    showEventDefinitionDetails,
+    view.type,
+    view.id,
+    title,
+  ]);
 
   const showExecutionInfo = view.type === 'SEARCH';
 
   return (
     <Row>
       <Content>
-        {
-          breadCrumbs.map(({ label, link, dataTestId }, index) => {
-            const theLast = index === breadCrumbs.length - 1;
+        <Breadcrumb>
+          {breadcrumbs.map(({ label, link, onClick, dataTestId }, index) => {
+            const theLast = index === breadcrumbs.length - 1;
 
             return (
               <TitleWrapper key={`${label}_${link}`}>
-                <CrumbLink link={link} label={label} dataTestId={dataTestId} />
+                <CrumbLink link={link} label={label} onClick={onClick} dataTestId={dataTestId} />
                 {!theLast && <StyledIcon name="chevron_right" />}
                 {isSavedView && theLast && (
                   <>
-                    <FavoriteIcon isFavorite={view.favorite} grn={createGRN(view.type, view.id)} onChange={onChangeFavorite} />
-                    <EditButton onClick={toggleMetadataEdit}
-                                role="button"
-                                title={`Edit ${typeText} ${view.title} metadata`}
-                                tabIndex={0}>
+                    <FavoriteIcon
+                      isFavorite={view.favorite}
+                      grn={createGRN(view.type, view.id)}
+                      onChange={onChangeFavorite}
+                    />
+                    <EditButton
+                      onClick={toggleMetadataEdit}
+                      role="button"
+                      title={`Edit ${typeText} ${view.title} metadata`}
+                      tabIndex={0}>
                       <Icon name="edit_square" />
                     </EditButton>
                   </>
                 )}
               </TitleWrapper>
             );
-          })
-        }
-        {showMetadataEdit && (
-        <ViewPropertiesModal show
-                             view={view}
-                             title={`Editing saved ${typeText}`}
-                             onClose={toggleMetadataEdit}
-                             onSave={_onSaveView}
-                             submitButtonText={`Save ${typeText}`} />
-        )}
-        {showExecutionInfo && <ExecutionInfoContainer><ExecutionInfo /></ExecutionInfoContainer>}
+          })}
+          {showMetadataEdit && (
+            <ViewPropertiesModal
+              show
+              view={view}
+              title={`Editing saved ${typeText}`}
+              onClose={toggleMetadataEdit}
+              onSave={_onSaveView}
+              submitButtonText={`Save ${typeText}`}
+            />
+          )}
+        </Breadcrumb>
+        {showExecutionInfo && <ViewsExecutionInfo />}
       </Content>
     </Row>
   );

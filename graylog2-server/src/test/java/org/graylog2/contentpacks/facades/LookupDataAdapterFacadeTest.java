@@ -19,9 +19,8 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.graph.Graph;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -42,9 +41,9 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.FallbackAdapterConfig;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -54,9 +53,8 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class LookupDataAdapterFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -64,10 +62,9 @@ public class LookupDataAdapterFacadeTest {
     private DBDataAdapterService dataAdapterService;
     private Set<PluginMetaData> pluginMetaData;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
-        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         dataAdapterService = new DBDataAdapterService(
                 mongoCollections,
@@ -134,7 +131,9 @@ public class LookupDataAdapterFacadeTest {
                         ReferenceMapUtils.toReferenceMap(Collections.emptyMap())
                 ), JsonNode.class))
                 .build();
-        assertThat(dataAdapterService.findAll()).isEmpty();
+        try (var stream = dataAdapterService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
 
         final NativeEntity<DataAdapterDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
 
@@ -144,7 +143,9 @@ public class LookupDataAdapterFacadeTest {
         assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV");
         assertThat(nativeEntity.entity().description()).isEqualTo("HTTP DSV");
 
-        assertThat(dataAdapterService.findAll()).hasSize(1);
+        try (var stream = dataAdapterService.streamAll()) {
+            assertThat(stream).hasSize(1);
+        }
     }
 
     @Test
@@ -193,10 +194,14 @@ public class LookupDataAdapterFacadeTest {
     public void delete() {
         final Optional<DataAdapterDto> dataAdapterDto = dataAdapterService.get("5adf24a04b900a0fdb4e52c8");
 
-        assertThat(dataAdapterService.findAll()).hasSize(1);
+        try (var stream = dataAdapterService.streamAll()) {
+            assertThat(stream).hasSize(1);
+        }
         dataAdapterDto.ifPresent(facade::delete);
 
-        assertThat(dataAdapterService.findAll()).isEmpty();
+        try (var stream = dataAdapterService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
         assertThat(dataAdapterService.get("5adf24a04b900a0fdb4e52c8")).isEmpty();
     }
 

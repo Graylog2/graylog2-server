@@ -18,18 +18,17 @@ package org.graylog2.system.activities;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.client.model.CreateCollectionOptions;
+import com.mongodb.client.model.Indexes;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
-import org.mongojack.DBSort;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -44,13 +43,13 @@ public class SystemMessageServiceImpl extends PersistedServiceImpl implements Sy
 
         // Make sure that the system messages collection is always created capped.
         final String collectionName = SystemMessageImpl.class.getAnnotation(DbEntity.class).collection();
-        if (!mongoConnection.getDatabase().collectionExists(collectionName)) {
-            final DBObject options = BasicDBObjectBuilder.start()
-                    .add("capped", true)
-                    .add("size", MAX_COLLECTION_BYTES)
-                    .get();
-            final DBCollection collection = mongoConnection.getDatabase().createCollection(collectionName, options);
-            collection.createIndex(DBSort.desc("timestamp"));
+        final var database = mongoConnection.getMongoDatabase();
+        if (!database.listCollectionNames().into(new HashSet<>()).contains(collectionName)) {
+            final var options = new CreateCollectionOptions()
+                    .capped(true)
+                    .sizeInBytes(MAX_COLLECTION_BYTES);
+            database.createCollection(collectionName, options);
+            database.getCollection(collectionName).createIndex(Indexes.descending("timestamp"));
         }
     }
 

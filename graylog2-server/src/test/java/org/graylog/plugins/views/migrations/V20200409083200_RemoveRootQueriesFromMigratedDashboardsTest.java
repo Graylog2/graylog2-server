@@ -17,24 +17,25 @@
 package org.graylog.plugins.views.migrations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.json.JSONException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,26 +52,25 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20200409083200_RemoveRootQueriesFromMigratedDashboardsTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ClusterConfigService clusterConfigService;
-
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private Migration migration;
 
     private MongoCollection<Document> viewsCollection;
     private MongoCollection<Document> searchesCollection;
+    private MongoDatabase mongoDatabase;
 
-    @Before
-    public void setUp() {
-        this.searchesCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection("searches"));
-        this.viewsCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection("views"));
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        this.mongoDatabase = mongoCollections.connection().getMongoDatabase();
+        this.searchesCollection = spy(mongoDatabase.getCollection("searches"));
+        this.viewsCollection = spy(mongoDatabase.getCollection("views"));
         this.migration = new V20200409083200_RemoveRootQueriesFromMigratedDashboards(clusterConfigService, this.viewsCollection, this.searchesCollection);
     }
 
@@ -112,9 +112,7 @@ public class V20200409083200_RemoveRootQueriesFromMigratedDashboardsTest {
     }
 
     private MongoCollection<Document> afterSearchesCollection() {
-        return mongodb.mongoConnection()
-                .getMongoDatabase()
-                .getCollection("searches");
+        return mongoDatabase.getCollection("searches");
     }
     private List<String> rootQueryStrings(String searchId) {
         //noinspection unchecked

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.database.BuildableMongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -29,7 +30,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = IndexFieldTypesDTO.Builder.class)
-public abstract class IndexFieldTypesDTO {
+public abstract class IndexFieldTypesDTO implements BuildableMongoEntity<IndexFieldTypesDTO, IndexFieldTypesDTO.Builder> {
     private static final String FIELD_ID = "id";
     static final String FIELD_INDEX_SET_ID = "index_set_id";
     static final String FIELD_INDEX_NAME = "index_name";
@@ -70,7 +71,7 @@ public abstract class IndexFieldTypesDTO {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements BuildableMongoEntity.Builder<IndexFieldTypesDTO, Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_IndexFieldTypesDTO.Builder().hasStreamData(false);

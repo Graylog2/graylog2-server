@@ -131,8 +131,8 @@ public class GenerateApiDefinition {
             throw new RuntimeException("Unable to create file " + file.getAbsolutePath());
         }
 
-        final FileOutputStream outputStream = new FileOutputStream(file);
-
-        objectMapper.writeValue(outputStream, content);
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            objectMapper.writeValue(outputStream, content);
+        }
     }
 }

@@ -23,12 +23,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Map;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = AutoValue_ErrorStates.Builder.class)
 public abstract class ErrorStates {
@@ -55,12 +53,15 @@ public abstract class ErrorStates {
     public abstract static class Builder {
 
         public abstract Map<String, String> dataAdapters();
+
         public abstract Builder dataAdapters(Map<String, String> dataAdapters);
 
         public abstract Map<String, String> caches();
+
         public abstract Builder caches(Map<String, String> caches);
 
         public abstract Map<String, String> tables();
+
         public abstract Builder tables(Map<String, String> tables);
 
         public abstract ErrorStates build();

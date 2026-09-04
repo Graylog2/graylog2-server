@@ -1,0 +1,4 @@
+type = "a"
+message = "Hide widget icons when not hovering over widget to avoid distractions."
+
+pulls = ["22880"]

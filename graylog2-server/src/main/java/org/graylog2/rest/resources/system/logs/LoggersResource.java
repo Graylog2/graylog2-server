@@ -21,11 +21,13 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
@@ -68,7 +70,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "System/Loggers", description = "Internal Graylog loggers")
+@Tag(name = "System/Loggers", description = "Internal Graylog loggers")
 @Path("/system/loggers")
 public class LoggersResource extends RestResource {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(LoggersResource.class);
@@ -85,7 +87,7 @@ public class LoggersResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List all loggers and their current levels")
+    @Operation(summary = "List all loggers and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
     public LoggersSummary loggers() {
         final Collection<LoggerConfig> loggerConfigs = getLoggerConfigs();
@@ -112,7 +114,7 @@ public class LoggersResource extends RestResource {
     @GET
     @Timed
     @Path("/subsystems")
-    @ApiOperation(value = "List all logger subsystems and their current levels")
+    @Operation(summary = "List all logger subsystems and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
     public SubsystemSummary subsystems() {
         final Map<String, SingleSubsystemSummary> subsystems = Maps.newHashMap();
@@ -166,16 +168,17 @@ public class LoggersResource extends RestResource {
 
     @PUT
     @Timed
-    @ApiOperation(value = "Set the loglevel of a whole subsystem",
-                  notes = "Provided level is falling back to DEBUG if it does not exist")
+    @Operation(summary = "Set the loglevel of a whole subsystem",
+                  description = "Provided level is falling back to DEBUG if it does not exist")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such subsystem.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "No such subsystem.")
     })
     @Path("/subsystems/{subsystem}/level/{level}")
     @AuditEvent(type = AuditEventTypes.LOG_LEVEL_UPDATE)
     public void setSubsystemLoggerLevel(
-            @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
-            @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
+            @Parameter(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
+            @Parameter(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
         if (!SUBSYSTEMS.containsKey(subsystemTitle)) {
             final String msg = "No such logging subsystem: [" + subsystemTitle + "]";
             LOG.warn(msg);
@@ -194,13 +197,13 @@ public class LoggersResource extends RestResource {
 
     @PUT
     @Timed
-    @ApiOperation(value = "Set the loglevel of a single logger",
-                  notes = "Provided level is falling back to DEBUG if it does not exist")
+    @Operation(summary = "Set the loglevel of a single logger",
+                  description = "Provided level is falling back to DEBUG if it does not exist")
     @Path("/{loggerName}/level/{level}")
     @AuditEvent(type = AuditEventTypes.LOG_LEVEL_UPDATE)
     public void setSingleLoggerLevel(
-            @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
-            @ApiParam(name = "level", required = true) @NotEmpty @PathParam("level") String level) {
+            @Parameter(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
+            @Parameter(name = "level", required = true) @NotEmpty @PathParam("level") String level) {
         checkPermission(RestPermissions.LOGGERS_EDIT, loggerName);
         final Level newLevel = Level.toLevel(level.toUpperCase(Locale.ENGLISH));
         setLoggerLevel(loggerName, newLevel);
@@ -210,18 +213,20 @@ public class LoggersResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get recent internal log messages")
+    @Operation(summary = "Get recent internal log messages")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Memory appender is disabled."),
-            @ApiResponse(code = 500, message = "Memory appender is broken.")
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "404", description = "Memory appender is disabled."),
+            @ApiResponse(responseCode = "500", description = "Memory appender is broken.")
     })
     @Path("/messages/recent")
     @Produces(MediaType.TEXT_PLAIN)
     @RequiresPermissions(RestPermissions.LOGGERSMESSAGES_READ)
     @HideOnCloud
-    public Response messages(@ApiParam(name = "limit", value = "How many log messages should be returned. 0 returns all existing messages." +
-            "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.",
-                                       defaultValue = "1000", allowableValues = "range[0, infinity]")
+    public Response messages(@Parameter(name = "limit", description = "How many log messages should be returned. 0 returns all existing messages." +
+            "The limit can be rounded up to the next batch size and thus return slightly more logs than requested.")
                              @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) {
         final Appender appender = getAppender(MEMORY_APPENDER_NAME);
         if (appender == null) {

@@ -22,17 +22,17 @@ import type { DirectionJson } from './Direction';
 import Direction from './Direction';
 
 export type SortConfigJson = {
-  type: string,
-  field: string,
-  direction: DirectionJson,
+  type: string;
+  field: string;
+  direction: DirectionJson;
 };
 
 type SortConfigType = 'pivot' | 'series';
 
 type InternalState = {
-  type: SortConfigType,
-  field: string,
-  direction: Direction,
+  type: SortConfigType;
+  field: string;
+  direction: Direction;
 };
 
 export default class SortConfig {
@@ -72,11 +72,7 @@ export default class SortConfig {
     const { type, field, direction } = value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .type(type)
-      .field(field)
-      .direction(Direction.fromJSON(direction))
-      .build();
+    return new Builder().type(type).field(field).direction(Direction.fromJSON(direction)).build();
   }
 
   static __registrations: { [key: string]: typeof SortConfig } = {};
@@ -87,11 +83,7 @@ export default class SortConfig {
 
   static fromSeries(series: Series) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .type(this.SERIES_TYPE)
-      .field(series.function)
-      .direction(Direction.Descending)
-      .build();
+    return new Builder().type(this.SERIES_TYPE).field(series.function).direction(Direction.Descending).build();
   }
 
   toBuilder(): Builder {

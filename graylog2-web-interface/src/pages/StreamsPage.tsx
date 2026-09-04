@@ -14,41 +14,49 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
-import CreateStreamButton from 'components/streams/CreateStreamButton';
 import StreamsOverview from 'components/streams/StreamsOverview';
 import PageHeader from 'components/common/PageHeader';
-import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import { useStore } from 'stores/connect';
+import type { Stream } from 'logic/streams/types';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { EntityShare } from 'actions/permissions/EntityShareActions';
+import useStreamMutations from 'hooks/useStreamMutations';
+import CreateButton from 'components/common/CreateButton';
+import Routes from 'routing/Routes';
+import useLocation from 'routing/useLocation';
+import StreamModal from 'components/streams/StreamModal';
+import useHistory from 'routing/useHistory';
 
 const StreamsPage = () => {
-  const { indexSets } = useStore(IndexSetsStore);
+  const {
+    data: { indexSets },
+    isInitialLoading: isLoadingIndexSets,
+  } = useIndexSetsList(false);
   const sendTelemetry = useSendTelemetry();
+  const { createStream } = useStreamMutations();
+  const { pathname } = useLocation();
+  const showCreateModal = pathname === Routes.STREAM_NEW;
+  const history = useHistory();
+  const closeCreateModal = useCallback(() => history.push(Routes.STREAMS), [history]);
 
-  const onSave = (stream: Stream) => {
+  const onCreate = async (stream: Stream & EntityShare) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
       app_pathname: 'streams',
     });
 
-    return StreamsStore.save(stream, () => {
+    return createStream(stream).then(() => {
       UserNotification.success('Stream has been successfully created.', 'Success');
     });
   };
 
-  useEffect(() => {
-    IndexSetsActions.list(false);
-  }, []);
-
-  const isLoading = !indexSets;
+  const isLoading = isLoadingIndexSets;
 
   if (isLoading) {
     return <Spinner />;
@@ -56,21 +64,16 @@ const StreamsPage = () => {
 
   return (
     <DocumentTitle title="Streams">
-      <PageHeader title="Streams"
-                  documentationLink={{
-                    title: 'Streams documentation',
-                    path: DocsHelper.PAGES.STREAMS,
-                  }}
-                  actions={(
-                    <IfPermitted permissions="streams:create">
-                      <CreateStreamButton bsStyle="success"
-                                          onCreate={onSave}
-                                          indexSets={indexSets} />
-                    </IfPermitted>
-                  )}>
+      <PageHeader
+        title="Streams"
+        documentationLink={{
+          title: 'Streams documentation',
+          path: DocsHelper.PAGES.STREAMS,
+        }}
+        actions={<CreateButton entityKey="Stream" />}>
         <span>
-          You can route incoming messages into streams by applying rules against them. Messages matching
-          the rules of a stream are routed into it. A message can also be routed into multiple streams.
+          You can route incoming messages into streams by applying rules against them. Messages matching the rules of a
+          stream are routed into it. A message can also be routed into multiple streams.
         </span>
       </PageHeader>
 
@@ -79,6 +82,17 @@ const StreamsPage = () => {
           <StreamsOverview indexSets={indexSets} />
         </Col>
       </Row>
+      {showCreateModal && (
+        <StreamModal
+          title="Create stream"
+          submitButtonText="Create stream"
+          submitLoadingText="Creating stream..."
+          indexSets={indexSets}
+          onSubmit={onCreate}
+          onClose={closeCreateModal}
+          isNew
+        />
+      )}
     </DocumentTitle>
   );
 };

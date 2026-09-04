@@ -19,8 +19,9 @@ package org.graylog2.security;
 import jakarta.annotation.Nonnull;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,17 +32,24 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TruststoreCreator {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TruststoreCreator.class);
+
     private final KeyStore truststore;
 
     public TruststoreCreator(KeyStore truststore) {
-        this.truststore = truststore;
+        this.truststore = copyWithoutExpired(truststore);
     }
 
     public static TruststoreCreator newDefaultJvm() {
@@ -60,19 +68,67 @@ public class TruststoreCreator {
         }
     }
 
+    private static KeyStore copyWithoutExpired(KeyStore keyStore) {
+        try {
+            KeyStore cleanTruststore = KeyStore.getInstance(CertConstants.PKCS12);
+            cleanTruststore.load(null, null);
+
+            Enumeration<String> aliases = keyStore.aliases();
+            Set<String> invalidAliases = new HashSet<>();
+
+            while (aliases.hasMoreElements()) {
+                String alias = aliases.nextElement();
+                if (keyStore.isCertificateEntry(alias)) {
+                    Certificate certificate = keyStore.getCertificate(alias);
+                    if (isCertificateValid(certificate)) {
+                        cleanTruststore.setCertificateEntry(alias, certificate);
+                    } else {
+                        invalidAliases.add(alias);
+                    }
+                }
+            }
+            if (!invalidAliases.isEmpty()) {
+                LOG.warn("Truststore contains {} expired or not yet valid certificates, these were be filtered out: {}", invalidAliases.size(), invalidAliases);
+            }
+            return cleanTruststore;
+        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isCertificateValid(Certificate certificate) {
+        try {
+            ((X509Certificate) certificate).checkValidity();
+            return true;
+        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+            return false;
+        }
+    }
+
     /**
      * Originally we added only the root(=selfsigned) certificate to the truststore. But this causes problems with
      * usage of intermediate CAs. There is nothing wrong adding the whole cert chain to the truststore.
      *
-     * @param keystoreInformation access to the keystore, to obtain certificate chains by the given alias
-     * @param alias               which certificate chain should we extract from the provided keystore
+     * @param keystoreInformation access to the keystore, to obtain certificate chains and certificates
      */
-    public TruststoreCreator addFromKeystore(KeystoreInformation keystoreInformation,
-                                             final String alias) throws IOException, GeneralSecurityException {
+    public TruststoreCreator addCertificates(KeystoreInformation keystoreInformation) throws IOException, GeneralSecurityException {
         final KeyStore keystore = keystoreInformation.loadKeystore();
-        final Certificate[] chain = keystore.getCertificateChain(alias);
-        final List<X509Certificate> x509Certs = toX509Certs(chain);
-        return addCertificates(x509Certs);
+        final Enumeration<String> aliases = keystore.aliases();
+        while (aliases.hasMoreElements()) {
+            final String alias = aliases.nextElement();
+            if (keystore.isKeyEntry(alias)) {
+                LOG.info("Adding key certificate chain of alias {} to the truststore", alias);
+                final Certificate[] chain = keystore.getCertificateChain(alias);
+                final List<X509Certificate> x509Certs = toX509Certs(chain);
+                return addCertificates(x509Certs);
+            } else if (keystore.isCertificateEntry(alias)) {
+                LOG.info("Adding certificate of alias {} to the truststore", alias);
+                return addCertificates(toX509Certs(new Certificate[]{keystore.getCertificate(alias)}));
+            } else {
+                LOG.warn("Unsupported keystore alias {}", alias);
+            }
+        }
+        return this;
     }
 
     @Nonnull
@@ -84,14 +140,26 @@ public class TruststoreCreator {
     }
 
     public TruststoreCreator addCertificates(List<X509Certificate> trustedCertificates) {
-        trustedCertificates.forEach(cert -> {
-            try {
-                this.truststore.setCertificateEntry(generateAlias(this.truststore, cert), cert);
-            } catch (KeyStoreException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        trustedCertificates
+                .stream()
+                .filter(this::filterOutInvalidWithLogging)
+                .forEach(cert -> {
+                    try {
+                        this.truststore.setCertificateEntry(generateAlias(this.truststore, cert), cert);
+                    } catch (KeyStoreException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
         return this;
+    }
+
+    private boolean filterOutInvalidWithLogging(X509Certificate cert) {
+        if (isCertificateValid(cert)) {
+            return true;
+        } else {
+            LOG.warn("Certificate {} is not valid, won't be added to the keystore", cert.getSubjectX500Principal().getName());
+            return false;
+        }
     }
 
     /**
@@ -113,9 +181,8 @@ public class TruststoreCreator {
     }
 
     public FilesystemKeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
-
         try (final FileOutputStream fileOutputStream = new FileOutputStream(truststorePath.toFile())) {
-            this.truststore.store(fileOutputStream, truststorePassword);
+            getTruststore().store(fileOutputStream, truststorePassword);
         }
         return new FilesystemKeystoreInformation(truststorePath, truststorePassword);
     }
@@ -123,27 +190,5 @@ public class TruststoreCreator {
     @Nonnull
     public KeyStore getTruststore() {
         return this.truststore;
-    }
-
-    public KeystoreInformation toKeystoreInformation(final char[] truststorePassword) {
-        return new InMemoryKeystoreInformation(this.truststore, truststorePassword);
-    }
-
-
-    private static X509Certificate findRootCert(KeystoreInformation keystoreInformation,
-                                                final String alias) throws Exception {
-        final KeyStore keystore = keystoreInformation.loadKeystore();
-        final Certificate[] certs = keystore.getCertificateChain(alias);
-
-        return Arrays.stream(certs)
-                .filter(cert -> cert instanceof X509Certificate)
-                .map(cert -> (X509Certificate) cert)
-                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)
-                .findFirst()
-                .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
-    }
-
-    private static boolean isRootCaCertificate(X509Certificate cert) {
-        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
     }
 }

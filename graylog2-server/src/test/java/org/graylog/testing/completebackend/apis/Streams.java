@@ -22,6 +22,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog2.plugin.streams.StreamRuleType;
 
 import java.util.Collection;
@@ -65,15 +66,20 @@ public final class Streams implements GraylogRestApi {
     }
 
     public String createStream(String title, String indexSetId, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
-        return waitForStreamRouterRefresh(() -> createStream(title, indexSetId, true, defaultStreamMatches, streamRules));
+        return createStream(title, indexSetId, true, defaultStreamMatches, streamRules);
     }
 
     public String createStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
+        Supplier<String> creationOperation = () -> doCreateStream(title, indexSetId, started, defaultStreamMatches, streamRules);
+        return started ? waitForStreamRouterRefresh(creationOperation) : creationOperation.get();
+    }
+
+    private String doCreateStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule[] streamRules) {
         final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId, defaultStreamMatches == DefaultStreamMatches.REMOVE);
         final String streamId = given()
                 .spec(api.requestSpecification())
                 .when()
-                .body(body)
+                .body(CreateEntityRequest.create(body, null))
                 .post("/streams")
                 .then()
                 .log().ifError()
@@ -90,7 +96,6 @@ public final class Streams implements GraylogRestApi {
                     .log().ifError()
                     .statusCode(204);
         }
-
         return streamId;
     }
 

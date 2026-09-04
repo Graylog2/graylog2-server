@@ -30,12 +30,12 @@ import Time from './configuration/Time';
 const Wrapper = styled.div``;
 
 type Props = {
-  index: number,
-}
+  index: number;
+};
 
 type SkipEmptyValuesHoverForHelpProps = {
-  children: React.ReactNode,
-  title: string,
+  children: React.ReactNode;
+  title: string;
 };
 
 const SkipEmptyValuesHoverForHelp = styled((props: SkipEmptyValuesHoverForHelpProps) => <HoverForHelp {...props} />)`
@@ -53,8 +53,8 @@ const SkipEmptyValuesLabel = styled.div`
 `;
 
 type SkipEmptyValuesPropes = {
-  index: number,
-}
+  index: number;
+};
 const SkipEmptyValues = ({ index }: SkipEmptyValuesPropes) => (
   <Field name={`groupBy.groupings.${index}.skipEmptyValues`}>
     {({ field: { name, value, onChange } }) => (
@@ -73,20 +73,19 @@ const SkipEmptyValues = ({ index }: SkipEmptyValuesPropes) => (
 );
 
 const GroupingConfiguration = React.memo(({ index }: Props) => {
-  const { values: { groupBy } } = useFormikContext<WidgetConfigFormValues>();
+  const {
+    values: { groupBy },
+  } = useFormikContext<WidgetConfigFormValues>();
   const fieldType = groupBy.groupings[index].type;
 
   return (
     <Wrapper data-testid={`grouping-${index}`}>
       <Direction groupingIndex={index} />
       <FieldComponent groupingIndex={index} />
-      {fieldType === DateType && (<Time index={index} />)}
+      {fieldType === DateType && <Time index={index} />}
       {fieldType === ValuesType && (
         <>
-          <FormikFormGroup label="Limit"
-                           name={`groupBy.groupings.${index}.limit`}
-                           type="number"
-                           bsSize="small" />
+          <FormikFormGroup label="Limit" name={`groupBy.groupings.${index}.limit`} type="number" bsSize="small" />
           <SkipEmptyValues index={index} />
         </>
       )}

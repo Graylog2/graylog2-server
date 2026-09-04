@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix event definition creation error for users without stream read permissions."
+
+issues = ["20412"]
+pulls = ["22585"]

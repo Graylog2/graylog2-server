@@ -1,0 +1,6 @@
+type = "a"
+message = "Added support for customizing titles of events with new configuration option in Event Definitions."
+
+pulls = ["24578", "24757", "graylog-plugin-enterprise#12830"]
+
+

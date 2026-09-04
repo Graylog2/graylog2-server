@@ -20,13 +20,10 @@ import * as React from 'react';
 import { Label } from 'components/bootstrap';
 
 type Props = {
-  isAlert: boolean,
-}
+  isAlert: boolean;
+};
 
-const EventTypeLabel = ({ isAlert }: Props) => (
-  isAlert
-    ? <Label bsStyle="warning">Alert</Label>
-    : <Label bsStyle="info">Event</Label>
-);
+const EventTypeLabel = ({ isAlert }: Props) =>
+  isAlert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>;
 
 export default EventTypeLabel;

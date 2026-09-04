@@ -19,42 +19,38 @@ import styled, { css } from 'styled-components';
 
 import { HelpBlock } from 'components/bootstrap';
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.danger};
-`);
+const ErrorMessage = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.danger};
+  `,
+);
 
-const HelpMessage = styled.span<{ $hasError: boolean }>(({ theme, $hasError }) => css`
-  color: ${$hasError ? theme.colors.gray[50] : 'inherit'};
-`);
+const HelpMessage = styled.span<{ $hasError: boolean }>(
+  ({ theme, $hasError }) => css`
+    color: ${$hasError ? theme.colors.gray[50] : 'inherit'};
+  `,
+);
 
 type Props = {
-  className?: string,
-  error?: React.ReactNode,
-  help?: React.ReactNode,
+  className?: string;
+  error?: React.ReactNode;
+  help?: React.ReactNode;
 };
 
 /**
  * Component that renders a help and error message for an input.
  * It always displays both messages.
  */
-const InputDescription = ({ className, error, help }: Props) => {
+const InputDescription = ({ className = undefined, error = undefined, help = undefined }: Props) => {
   if (!help && !error) {
     return null;
   }
 
   return (
     <HelpBlock className={`${className ?? ''} input-description`}>
-      {error && (
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
-      )}
-      {(!!error && !!help) && <br />}
-      {help && (
-        <HelpMessage $hasError={!!error}>
-          {help}
-        </HelpMessage>
-      )}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {!!error && !!help && <br />}
+      {help && <HelpMessage $hasError={!!error}>{help}</HelpMessage>}
     </HelpBlock>
   );
 };

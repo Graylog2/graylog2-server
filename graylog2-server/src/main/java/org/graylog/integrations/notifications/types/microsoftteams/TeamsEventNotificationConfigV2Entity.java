@@ -25,14 +25,12 @@ import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 
 import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.DEFAULT_ADAPTIVE_CARD;
 import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.DEFAULT_BACKLOG_SIZE;
 import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.FIELD_ADAPTIVE_CARD;
-import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.FIELD_TIME_ZONE;
 import static org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2.FIELD_WEBHOOK_URL;
 
 @AutoValue
@@ -48,8 +46,6 @@ public abstract class TeamsEventNotificationConfigV2Entity implements EventNotif
     @JsonProperty(FIELD_ADAPTIVE_CARD)
     public abstract ValueReference adaptiveCard();
 
-    @JsonProperty(FIELD_TIME_ZONE)
-    public abstract ValueReference timeZone();
 
     public static Builder builder() {
         return Builder.create();
@@ -64,8 +60,7 @@ public abstract class TeamsEventNotificationConfigV2Entity implements EventNotif
         public static Builder create() {
             return new AutoValue_TeamsEventNotificationConfigV2Entity.Builder()
                     .type(TYPE_NAME)
-                    .adaptiveCard(ValueReference.of(DEFAULT_ADAPTIVE_CARD))
-                    .timeZone(ValueReference.of("UTC"));
+                    .adaptiveCard(ValueReference.of(DEFAULT_ADAPTIVE_CARD));
         }
 
         @JsonProperty(FIELD_WEBHOOK_URL)
@@ -74,20 +69,22 @@ public abstract class TeamsEventNotificationConfigV2Entity implements EventNotif
         @JsonProperty(FIELD_ADAPTIVE_CARD)
         public abstract Builder adaptiveCard(ValueReference customMessage);
 
-        @JsonProperty(FIELD_TIME_ZONE)
-        public abstract Builder timeZone(ValueReference timeZone);
+        // Absorbs the deprecated time_zone field from old persisted content packs.
+        @JsonProperty("time_zone")
+        public Builder timeZone(ValueReference timeZone) {
+            return this;
+        }
 
         public abstract TeamsEventNotificationConfigV2Entity build();
     }
 
     @Override
-    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters,
+                                                  Map<EntityDescriptor, Object> nativeEntities) {
         return TeamsEventNotificationConfigV2.builder()
                 .webhookUrl(webhookUrl().asString(parameters))
                 .adaptiveCard(adaptiveCard().asString(parameters))
-                .timeZone(DateTimeZone.forID(timeZone().asString(parameters)))
                 .backlogSize(DEFAULT_BACKLOG_SIZE)
                 .build();
     }
 }
-

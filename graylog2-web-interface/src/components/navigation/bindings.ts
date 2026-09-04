@@ -17,17 +17,21 @@
 
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import InputsAggregatedDotBadge from 'components/inputs/InputsAggregatedDotBadge';
 import Routes from 'routing/Routes';
 import filterMenuItems, { filterCloudMenuItems } from 'util/conditional/filterMenuItems';
 import AppConfig from 'util/AppConfig';
+import DocsHelper from 'util/DocsHelper';
 
 export const SYSTEM_DROPDOWN_TITLE = 'System';
+export const SEARCH_LINK_TITLE = 'Search';
+export const DASHBOARDS_LINK_TITLE = 'Dashboards';
 
 const navigationBindings: PluginExports = {
   navigation: [
     {
       path: Routes.SEARCH,
-      description: 'Search',
+      description: SEARCH_LINK_TITLE,
     },
     {
       path: Routes.STREAMS,
@@ -39,35 +43,83 @@ const navigationBindings: PluginExports = {
     },
     {
       path: Routes.DASHBOARDS,
-      description: 'Dashboards',
+      description: DASHBOARDS_LINK_TITLE,
     },
     {
       description: SYSTEM_DROPDOWN_TITLE,
-      position: 'last' as const,
+      BadgeComponent: InputsAggregatedDotBadge,
+      position: { last: true },
       children: filterCloudMenuItems(
         filterMenuItems(
           [
             { path: Routes.SYSTEM.OVERVIEW, description: 'Overview' },
-            { path: Routes.SYSTEM.CONFIGURATIONS, description: 'Configurations', permissions: ['clusterconfigentry:read'] },
-            { path: Routes.SYSTEM.NODES.LIST, description: 'Nodes' },
-            { path: Routes.SYSTEM.DATANODES.LIST, description: 'Data Nodes', permissions: ['datanodes:read'] },
-            { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
+            {
+              path: Routes.SYSTEM.CONFIGURATIONS,
+              description: 'Configurations',
+              permissions: ['clusterconfigentry:read'],
+            },
+            {
+              path: Routes.SYSTEM.CLUSTER.NODES,
+              description: 'Cluster Configuration',
+              permissions: ['clusterconfiguration:read'],
+            },
+            {
+              path: Routes.SYSTEM.INPUTS,
+              description: 'Inputs',
+              permissions: ['inputs:read'],
+              BadgeComponent: InputsAggregatedDotBadge,
+            },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
             { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },
             { path: Routes.SYSTEM.LOGGING, description: 'Logging', permissions: ['loggers:read'] },
-            { path: Routes.SYSTEM.USERS.OVERVIEW, description: 'Users and Teams', permissions: ['users:list'] },
+            { path: Routes.SYSTEM.USERS.OVERVIEW, description: 'Users and Teams' },
             { path: Routes.SYSTEM.AUTHZROLES.OVERVIEW, description: 'Roles', permissions: ['roles:read'] },
-            { path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE, description: 'Authentication', permissions: ['authentication:edit'] },
+            {
+              path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,
+              description: 'Authentication',
+              permissions: ['authentication:edit'],
+            },
             { path: Routes.SYSTEM.CONTENTPACKS.LIST, description: 'Content Packs', permissions: ['contentpack:read'] },
             { path: Routes.SYSTEM.GROKPATTERNS, description: 'Grok Patterns', permissions: ['grok_pattern:read'] },
-            { path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, description: 'Lookup Tables', permissions: ['lookuptables:read'] },
-            { path: Routes.SYSTEM.PIPELINES.OVERVIEW, description: 'Pipelines', permissions: ['pipeline:read', 'pipeline_connection:read'] },
+            {
+              path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW,
+              description: 'Lookup Tables',
+              permissions: ['lookuptables:read'],
+            },
+            {
+              path: Routes.SYSTEM.PIPELINES.OVERVIEW,
+              description: 'Pipelines',
+              permissions: ['pipeline:read', 'pipeline_connection:read'],
+            },
             { path: Routes.SYSTEM.SIDECARS.OVERVIEW, description: 'Sidecars', permissions: ['sidecars:read'] },
+            {
+              path: Routes.SYSTEM.COLLECTORS.OVERVIEW,
+              description: 'Collectors',
+              permissions: ['collector_fleets:read', 'collectors_config:read'],
+              requiredFeatureFlag: 'collectors',
+            },
           ],
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
         ),
-        [Routes.SYSTEM.NODES.LIST, Routes.SYSTEM.DATANODES.LIST, Routes.SYSTEM.OUTPUTS, Routes.SYSTEM.LOGGING, Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE],
+        [
+          Routes.SYSTEM.CLUSTER.NODES,
+          Routes.SYSTEM.OUTPUTS,
+          Routes.SYSTEM.LOGGING,
+          Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,
+        ],
       ),
+    },
+  ],
+  helpMenu: [
+    { description: 'Documentation', externalLink: DocsHelper.versionedDocsHomePage() },
+    ...(AppConfig.gl2DevMode()
+      ? [{ description: 'Design System', externalLink: 'https://graylog2.github.io/design-system' }]
+      : []),
+    { description: 'Keyboard Shortcuts', action: ({ showHotkeysModal }) => showHotkeysModal() },
+    {
+      description: 'API browser',
+      path: Routes.API_BROWSER,
+      permissions: 'api_browser:read',
     },
   ],
 };

@@ -20,9 +20,7 @@ import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import PriorityName from 'components/events/events/PriorityName';
 
 const FilterValueRenderers = {
-  alert: (value: 'true' | 'false') => (
-    <EventTypeLabel isAlert={value === 'true'} />
-  ),
+  alert: (value: 'true' | 'false') => <EventTypeLabel isAlert={value === 'true'} />,
   priority: (value: string) => <PriorityName priority={value} />,
 };
 

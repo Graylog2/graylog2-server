@@ -38,10 +38,10 @@ describe('PivotConfigGenerator', () => {
   });
 
   it('should generate a number config with trend', () => {
-    const widgetConfig = widgetConfigBuilder.visualization('numeric')
-      .visualizationConfig(
-        NumberVisualizationConfig.create(true),
-      ).build();
+    const widgetConfig = widgetConfigBuilder
+      .visualization('numeric')
+      .visualizationConfig(NumberVisualizationConfig.create(true))
+      .build();
     const result = PivotConfigGenerator({ config: widgetConfig });
 
     expect(result).toHaveLength(2);
@@ -82,19 +82,18 @@ describe('PivotConfigGenerator', () => {
   });
 
   describe('maps time units for time pivots with timeunit intervals', () => {
-    const createWidgetConfigWithPivot = (pivot) => AggregationWidgetConfig.builder()
-      .rollup(true)
-      .rowPivots([pivot])
-      .columnPivots([])
-      .series([Series.forFunction('count')])
-      .build();
+    const createWidgetConfigWithPivot = (pivot) =>
+      AggregationWidgetConfig.builder()
+        .rollup(true)
+        .rowPivots([pivot])
+        .columnPivots([])
+        .series([Series.forFunction('count')])
+        .build();
 
     const generateConfigForPivotWithTimeUnit = ({ timeUnit, expectedMappedTimeUnit }) => {
-      const config = createWidgetConfigWithPivot(Pivot.create(
-        ['foo'],
-        'time',
-        { interval: { type: 'timeunit', unit: timeUnit, value: 1 } },
-      ));
+      const config = createWidgetConfigWithPivot(
+        Pivot.create(['foo'], 'time', { interval: { type: 'timeunit', unit: timeUnit, value: 1 } }),
+      );
       const result = PivotConfigGenerator({ config });
       const [{ config: pivotConfig }] = result;
 
@@ -102,21 +101,25 @@ describe('PivotConfigGenerator', () => {
         throw new Error('Expected `config` in first element of result is missing!');
       }
 
-      const { row_groups: [pivot] } = pivotConfig;
-      const { interval: { timeunit } } = pivot;
+      const {
+        row_groups: [pivot],
+      } = pivotConfig;
+      const {
+        interval: { timeunit },
+      } = pivot;
 
       expect(timeunit).toEqual(expectedMappedTimeUnit);
     };
 
     // eslint-disable-next-line jest/expect-expect
     it.each`
-    timeUnit      | expectedMappedTimeUnit
-    ${'seconds'}  | ${'1s'}
-    ${'minutes'}  | ${'1m'}
-    ${'hours'}    | ${'1h'}
-    ${'days'}     | ${'1d'}
-    ${'weeks'}    | ${'1w'}
-    ${'months'}   | ${'1M'}
-  `('maps time unit $timeUnit to short name $expectedMappedTimeUnit', generateConfigForPivotWithTimeUnit);
+      timeUnit     | expectedMappedTimeUnit
+      ${'seconds'} | ${'1s'}
+      ${'minutes'} | ${'1m'}
+      ${'hours'}   | ${'1h'}
+      ${'days'}    | ${'1d'}
+      ${'weeks'}   | ${'1w'}
+      ${'months'}  | ${'1M'}
+    `('maps time unit $timeUnit to short name $expectedMappedTimeUnit', generateConfigForPivotWithTimeUnit);
   });
 });

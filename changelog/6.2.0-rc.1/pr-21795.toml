@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix escaping of response headers in API browser."
+
+pulls = ["21795"]

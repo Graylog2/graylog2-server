@@ -17,7 +17,6 @@
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
-import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import { createSearch } from 'fixtures/searches';
 import type { RootState } from 'views/types';
 
@@ -30,8 +29,11 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsStore: MockStore(),
+jest.mock('@graylog/server-api', () => ({
+  SearchDecorators: {
+    get: jest.fn(() => Promise.resolve([])),
+    getAvailable: jest.fn(() => Promise.resolve({})),
+  },
 }));
 
 describe('Views bindings field actions', () => {
@@ -41,7 +43,7 @@ describe('Views bindings field actions', () => {
     contexts: {},
     type: FieldType.Unknown,
   };
-  const findAction = (type: string): ActionDefinition<{ analysisDisabledFields?: Array<string> }> => fieldActions.find((binding) => binding.type === type);
+  const findAction = (type: string) => fieldActions.find((binding) => binding.type === type);
   const view = createSearch({ queryId: 'query1' });
   const rootState = { view: { view } } as RootState;
   const getState = jest.fn(() => rootState);
@@ -59,50 +61,64 @@ describe('Views bindings field actions', () => {
     });
 
     it('should be disabled for functions', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'avg(something)' }, getState))
-        .toEqual(false);
+      expect(isEnabled({ ...defaultArguments, field: 'avg(something)' }, getState)).toEqual(false);
     });
 
     it('should be enabled for fields', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
-        .toEqual(true);
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState)).toEqual(true);
     });
 
     it('should be disabled for compound fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Compound]),
-      }, getState))
-        .toEqual(false);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Compound]),
+          },
+          getState,
+        ),
+      ).toEqual(false);
     });
 
     it('should be enabled for compound fields if they are enumerable', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('compound(int,long)', [Properties.Compound, Properties.Enumerable]),
-      }, getState))
-        .toEqual(true);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('compound(int,long)', [Properties.Compound, Properties.Enumerable]),
+          },
+          getState,
+        ),
+      ).toEqual(true);
     });
 
     it('should be disabled for decorated fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Decorated]),
-      }, getState))
-        .toEqual(false);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Decorated]),
+          },
+          getState,
+        ),
+      ).toEqual(false);
     });
 
     it('should be disabled when field analysis is disabled', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldTypes.STRING(),
-        contexts: { analysisDisabledFields: ['something'] },
-      }, getState))
-        .toEqual(false);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldTypes.STRING(),
+            contexts: { analysisDisabledFields: ['something'] },
+          },
+          getState,
+        ),
+      ).toEqual(false);
     });
   });
 
@@ -119,32 +135,38 @@ describe('Views bindings field actions', () => {
     });
 
     it('should be disabled for functions', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'avg(something)' }, getState))
-        .toEqual(false);
+      expect(isEnabled({ ...defaultArguments, field: 'avg(something)' }, getState)).toEqual(false);
     });
 
     it('should be enabled for fields', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
-        .toEqual(true);
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState)).toEqual(true);
     });
 
     it('should be enabled for compound fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Compound]),
-      }, getState))
-        .toEqual(true);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Compound]),
+          },
+          getState,
+        ),
+      ).toEqual(true);
     });
 
     it('should be disabled when field analysis is disabled', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldTypes.STRING(),
-        contexts: { analysisDisabledFields: ['something'] },
-      }, getState))
-        .toEqual(false);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldTypes.STRING(),
+            contexts: { analysisDisabledFields: ['something'] },
+          },
+          getState,
+        ),
+      ).toEqual(false);
     });
   });
 
@@ -161,41 +183,51 @@ describe('Views bindings field actions', () => {
     });
 
     it('should be disabled for functions', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'avg(something)' }, getState))
-        .toEqual(false);
+      expect(isEnabled({ ...defaultArguments, field: 'avg(something)' }, getState)).toEqual(false);
     });
 
     it('should be enabled for fields', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
-        .toEqual(true);
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState)).toEqual(true);
     });
 
     it('should be enabled for compound fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Compound]),
-      }, getState))
-        .toEqual(true);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Compound]),
+          },
+          getState,
+        ),
+      ).toEqual(true);
     });
 
     it('should be disabled for decorated fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Decorated]),
-      }, getState))
-        .toEqual(false);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Decorated]),
+          },
+          getState,
+        ),
+      ).toEqual(false);
     });
 
     it('should be enabled when field analisys is disabled', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldTypes.STRING(),
-        contexts: { analysisDisabledFields: ['something'] },
-      }, getState))
-        .toEqual(true);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldTypes.STRING(),
+            contexts: { analysisDisabledFields: ['something'] },
+          },
+          getState,
+        ),
+      ).toEqual(true);
     });
   });
 
@@ -212,41 +244,51 @@ describe('Views bindings field actions', () => {
     });
 
     it('should be disabled for functions', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'avg(something)' }, getState))
-        .toEqual(false);
+      expect(isEnabled({ ...defaultArguments, field: 'avg(something)' }, getState)).toEqual(false);
     });
 
     it('should be enabled for fields', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
-        .toEqual(true);
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState)).toEqual(true);
     });
 
     it('should be enabled for compound fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Compound]),
-      }, getState))
-        .toEqual(true);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Compound]),
+          },
+          getState,
+        ),
+      ).toEqual(true);
     });
 
     it('should be disabled for decorated fields', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldType.create('string', [Properties.Decorated]),
-      }, getState))
-        .toEqual(false);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Decorated]),
+          },
+          getState,
+        ),
+      ).toEqual(false);
     });
 
     it('should be enabled when field analysis is disabled', () => {
-      expect(isEnabled({
-        ...defaultArguments,
-        field: 'something',
-        type: FieldTypes.STRING(),
-        contexts: { analysisDisabledFields: ['something'] },
-      }, getState))
-        .toEqual(true);
+      expect(
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldTypes.STRING(),
+            contexts: { analysisDisabledFields: ['something'] },
+          },
+          getState,
+        ),
+      ).toEqual(true);
     });
   });
 });

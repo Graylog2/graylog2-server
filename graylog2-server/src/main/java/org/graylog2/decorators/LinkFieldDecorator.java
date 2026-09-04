@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
-import org.apache.commons.validator.routines.UrlValidator;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -29,20 +28,20 @@ import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
 public class LinkFieldDecorator implements SearchResponseDecorator {
-
     public static final String CK_LINK_FIELD = "link_field";
-    // UrlValidator.ALLOW_LOCAL_URLS allows local links to be permitted such as http://my-local-server
-    // Some users may reference such local URLs, and there should be no issue with doing so.
-    private final static UrlValidator URL_VALIDATOR = new UrlValidator(new String[]{"http", "https"}, UrlValidator.ALLOW_LOCAL_URLS + UrlValidator.ALLOW_2_SLASHES);
-
     private final String linkField;
     private final MessageFactory messageFactory;
 
@@ -123,6 +122,14 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
      * - or any other javascript expressions.
      */
     private boolean isValidUrl(String url) {
-        return URL_VALIDATOR.isValid(url);
+        try {
+            // uppercase schema is fine per RFC2396 but the parsing in Java considers it an error, so we lowercase the beginning of the url for testing if necessary
+            final var fixedUrl = (url.startsWith("HTTP:") || url.startsWith("HTTPS:")) ?
+                    url.substring(0, 5).toLowerCase(Locale.ROOT) + url.substring(5): url;
+            final var uri = URI.create(fixedUrl);
+            return uri.getScheme() != null && (uri.getScheme().equals("http") || uri.getScheme().equals("https"));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }

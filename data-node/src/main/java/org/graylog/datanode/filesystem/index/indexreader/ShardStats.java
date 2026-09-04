@@ -16,6 +16,15 @@
  */
 package org.graylog.datanode.filesystem.index.indexreader;
 
-public record ShardStats(java.nio.file.Path path, int documentsCount,
-                         org.graylog.shaded.opensearch2.org.apache.lucene.util.Version minSegmentLuceneVersion) {
+import jakarta.annotation.Nullable;
+
+import java.nio.file.Path;
+
+/**
+ * @param minSegmentLuceneVersion the oldest Lucene version among the shard's segments, {@code null} for a shard
+ *                                without any segment. Kept as a plain string because the shard may have been read
+ *                                by a different Lucene version than the one we compile against, and the two
+ *                                {@code org.apache.lucene.util.Version} classes are unrelated types.
+ */
+public record ShardStats(Path path, int documentsCount, @Nullable String minSegmentLuceneVersion) {
 }

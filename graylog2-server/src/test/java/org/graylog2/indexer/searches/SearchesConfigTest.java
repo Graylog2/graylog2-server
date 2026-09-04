@@ -18,9 +18,9 @@ package org.graylog2.indexer.searches;
 
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SearchesConfigTest {
 
@@ -33,7 +33,7 @@ public class SearchesConfigTest {
                 .offset(0)
                 .build();
 
-        assertEquals("Limit should default", SearchesConfig.DEFAULT_LIMIT, config.limit());
+        assertEquals(SearchesConfig.DEFAULT_LIMIT, config.limit(), "Limit should default");
     }
 
     @Test
@@ -45,7 +45,7 @@ public class SearchesConfigTest {
                 .offset(0)
                 .build();
 
-        assertEquals("Limit should default", SearchesConfig.DEFAULT_LIMIT, config.limit());
+        assertEquals(SearchesConfig.DEFAULT_LIMIT, config.limit(), "Limit should default");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class SearchesConfigTest {
                 .offset(0)
                 .build();
 
-        assertEquals("Limit should not default", 23, config.limit());
+        assertEquals(23, config.limit(), "Limit should not default");
     }
 
 }

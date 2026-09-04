@@ -20,10 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.migrations.V20161215163900_MoveIndexSetDefaultConfig.MigrationCompleted;
@@ -33,12 +35,12 @@ import org.graylog2.security.RestrictedChainingClassLoader;
 import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -50,14 +52,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20161215163900_MoveIndexSetDefaultConfigTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
@@ -68,18 +66,19 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
     private Migration migration;
     private MongoCollection<Document> collection;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        final MongoConnection connection = mongoCollections.connection();
         this.clusterConfigService = spy(new ClusterConfigServiceImpl(objectMapperProvider,
-                mongodb.mongoConnection(),
+                connection,
                 nodeId,
                 new RestrictedChainingClassLoader(
                         new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 new ClusterEventBus()));
 
-        this.collection = mongodb.mongoConnection().getMongoDatabase().getCollection("index_sets");
+        this.collection = connection.getMongoDatabase().getCollection("index_sets");
 
-        this.migration = new V20161215163900_MoveIndexSetDefaultConfig(mongodb.mongoConnection(), clusterConfigService);
+        this.migration = new V20161215163900_MoveIndexSetDefaultConfig(connection, clusterConfigService);
     }
 
     @Test

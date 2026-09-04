@@ -42,8 +42,8 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -63,7 +63,7 @@ public class PaloAlto9xTemplatesTest {
     // Code Under Test
     PaloAlto9xCodec cut;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Configuration config = new Configuration(ImmutableMap.of(PaloAlto9xCodec.CK_STORE_FULL_MESSAGE, true,
                 PaloAlto9xCodec.CK_TIMEZONE, TIMEZONE_STRING));

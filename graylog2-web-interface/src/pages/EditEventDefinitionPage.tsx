@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import URI from 'urijs';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import { getEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
@@ -34,36 +35,33 @@ import useQuery from 'routing/useQuery';
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
 const EditEventDefinitionPage = () => {
-  const params = useParams<{definitionId?: string}>();
+  const params = useParams<{ definitionId?: string }>();
   const { step } = useQuery();
   const currentUser = useCurrentUser();
-  const [eventDefinition, setEventDefinition] = React.useState<EventDefinition>(undefined);
+  const [eventDefinition, setEventDefinition] = useState<EventDefinition>(undefined);
   const history = useHistory();
-  const navigate = useNavigate();
 
   const goToOverview = useCallback(() => {
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
-  }, [navigate]);
+    history.push(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [history]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
-      EventDefinitionsActions.get(params.definitionId)
-        .then(
-          (response) => {
-            const eventDefinitionResponse = response.event_definition;
+      getEventDefinition(params.definitionId).then(
+        (response) => {
+          const eventDefinitionResponse = response.eventDefinition;
 
-            // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
-            // backend. This field will be removed in the event definitions store before sending an event definition
-            // back to the server.
-            eventDefinitionResponse.config._is_scheduled = response.context.scheduler.is_scheduled;
-            setEventDefinition(eventDefinitionResponse);
-          },
-          (error) => {
-            if (error.status === 404) {
-              history.push(Routes.ALERTS.DEFINITIONS.LIST);
-            }
-          },
-        );
+          // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
+          // backend. This field will be removed again before sending an event definition back to the server.
+          eventDefinitionResponse.config._is_scheduled = response.context.scheduler.is_scheduled;
+          setEventDefinition(eventDefinitionResponse);
+        },
+        (error) => {
+          if (error.status === 404) {
+            history.push(Routes.ALERTS.DEFINITIONS.LIST);
+          }
+        },
+      );
     }
   }, [params, currentUser, history]);
 
@@ -103,23 +101,24 @@ const EditEventDefinitionPage = () => {
   return (
     <DocumentTitle title={`Edit "${eventDefinition.title}" Event Definition`}>
       <EventsPageNavigation />
-      <PageHeader title={`Edit "${eventDefinition.title}" Event Definition`}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Event Definitions allow you to create Events from different Conditions and alert on them.
-        </span>
+      <PageHeader
+        title={`Edit "${eventDefinition.title}" Event Definition`}
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <span>Event Definitions allow you to create Events from different Conditions and alert on them.</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          <EventDefinitionFormContainer action="edit"
-                                        initialStep={step as string}
-                                        onChangeStep={updateURLStepQueryParam}
-                                        eventDefinition={eventDefinition}
-                                        onSubmit={goToOverview}
-                                        onCancel={goToOverview} />
+          <EventDefinitionFormContainer
+            action="edit"
+            initialStep={normalizeStepKey(step as string)}
+            onChangeStep={updateURLStepQueryParam}
+            eventDefinition={eventDefinition}
+            onSubmit={goToOverview}
+            onCancel={goToOverview}
+          />
         </Col>
       </Row>
     </DocumentTitle>

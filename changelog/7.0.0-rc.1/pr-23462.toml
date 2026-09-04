@@ -1,0 +1,5 @@
+type = "a"
+message = 'Added MCP server to Graylog'
+
+issues = []
+pulls = ["23462"]

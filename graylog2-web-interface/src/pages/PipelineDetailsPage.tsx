@@ -15,20 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
-import { StreamsStore } from 'stores/streams/StreamsStore';
-import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
-import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
+import type { Stream } from 'logic/streams/types';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 import DocsHelper from 'util/DocsHelper';
-import { useStore } from 'stores/connect';
 import useParams from 'routing/useParams';
-import { RulesActions } from 'stores/rules/RulesStore';
+import usePipeline from 'hooks/usePipeline';
+import usePipelineMutations from 'hooks/usePipelineMutations';
+import usePipelineConnections, { usePipelineConnectionMutation } from 'hooks/usePipelineConnections';
+import {
+  EnableDebugMetricsButton,
+  ProcessingLoadDebugMetricsBanner,
+  ProcessingLoadProvider,
+} from 'components/pipelines/processing-load';
 
 import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
@@ -36,35 +42,29 @@ const _isNewPipeline = (pipelineId: string) => pipelineId === 'new';
 
 const PipelineDetailsPage = () => {
   const params = useParams<{ pipelineId: string }>();
-  const pipeline = useStore(PipelinesStore, (state) => state.pipelines?.filter((p) => p.id === params.pipelineId)?.[0]);
-  const connections = useStore(PipelineConnectionsStore, (state) => state.connections?.filter(
-    (c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId),
-  ));
-  const [streams, setStreams] = useState();
+  const isNewPipeline = _isNewPipeline(params.pipelineId);
+  const { data: pipeline } = usePipeline(params?.pipelineId, {
+    enabled: !isNewPipeline && !!params?.pipelineId,
+  });
 
-  useEffect(() => {
-    if (!_isNewPipeline(params.pipelineId)) {
-      PipelinesActions.get(params.pipelineId);
-    }
-  }, [params.pipelineId]);
+  const { createPipeline, updatePipeline } = usePipelineMutations();
+  const { data: allConnections } = usePipelineConnections();
+  const connections = allConnections?.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId));
+  const { connectToPipeline } = usePipelineConnectionMutation();
+  const { data: allStreams } = useAllStreams();
+  const streams = useMemo(
+    () => (allStreams ? allStreams.filter((s: Stream) => s.is_editable) : undefined),
+    [allStreams],
+  );
 
-  useEffect(() => {
-    RulesActions.list();
-    PipelineConnectionsActions.list();
-
-    StreamsStore.listStreams().then((_streams) => {
-      const filteredStreams = _streams.filter((s) => s.is_editable);
-
-      setStreams(filteredStreams);
-    });
-  }, []);
-
-  const _onConnectionsChange = (updatedConnections, callback) => {
-    PipelineConnectionsActions.connectToPipeline(updatedConnections);
-    callback();
+  const _onConnectionsChange = (
+    updatedConnections: { pipeline: string; streams: Array<string> },
+    callback: () => void,
+  ) => {
+    connectToPipeline(updatedConnections).then(() => callback());
   };
 
-  const _onStagesChange = (newStages, callback) => {
+  const _onStagesChange = (newStages: Array<StageType>, callback: () => void) => {
     const pipelineWithNewStages = {
       ...pipeline,
       stages: newStages,
@@ -75,70 +75,85 @@ const PipelineDetailsPage = () => {
       source: SourceGenerator.generatePipeline(pipelineWithNewStages),
     };
 
-    PipelinesActions.update(newPipeline);
+    updatePipeline({ pipelineSource: newPipeline, pipelineId: newPipeline.id });
 
     if (typeof callback === 'function') {
       callback();
     }
   };
 
-  const _savePipeline = (_pipeline, callback) => {
+  const _savePipeline = (_pipeline: PipelineType, callback: (pipeline: PipelineType) => void) => {
     const requestPipeline = {
       ..._pipeline,
       source: SourceGenerator.generatePipeline(_pipeline),
     };
 
-    const promise = requestPipeline.id
-      ? PipelinesActions.update(requestPipeline)
-      : PipelinesActions.save(requestPipeline);
-
-    promise.then((p) => callback(p));
+    if (requestPipeline.id) {
+      updatePipeline({ pipelineSource: requestPipeline, pipelineId: requestPipeline.id }).then((p) => callback(p));
+    } else {
+      createPipeline({ pipelineSource: requestPipeline }).then((p) => callback(p));
+    }
   };
 
-  const _isLoading = !_isNewPipeline(params.pipelineId) && (!pipeline || !connections || !streams);
+  const _isLoading = !isNewPipeline && (!pipeline || !connections || !streams);
 
   if (_isLoading) {
     return <Spinner />;
   }
 
-  const title = _isNewPipeline(params.pipelineId)
-    ? 'New pipeline'
-    : <span>Pipeline <em>{pipeline.title}</em></span>;
+  const title = isNewPipeline ? (
+    'New pipeline'
+  ) : (
+    <span>
+      Pipeline <em>{pipeline.title}</em>
+    </span>
+  );
 
-  const content = _isNewPipeline(params.pipelineId)
-    ? <NewPipeline onChange={_savePipeline} />
-    : (
-      <Pipeline pipeline={pipeline}
-                connections={connections}
-                streams={streams}
-                onConnectionsChange={_onConnectionsChange}
-                onStagesChange={_onStagesChange}
-                onPipelineChange={_savePipeline} />
-    );
+  const content = isNewPipeline ? (
+    <NewPipeline onChange={_savePipeline} />
+  ) : (
+    <Pipeline
+      pipeline={pipeline}
+      connections={connections}
+      streams={streams}
+      onConnectionsChange={_onConnectionsChange}
+      onStagesChange={_onStagesChange}
+      onPipelineChange={_savePipeline}
+    />
+  );
 
-  const pageTitle = _isNewPipeline(params.pipelineId) ? 'New pipeline' : `Pipeline ${pipeline.title}`;
+  const pageTitle = isNewPipeline ? 'New pipeline' : `Pipeline ${pipeline.title}`;
 
   return (
     <DocumentTitle title={pageTitle}>
       <div>
         <PipelinesPageNavigation />
-        <PageHeader title={title}
-                    documentationLink={{
-                      title: 'Pipelines documentation',
-                      path: DocsHelper.PAGES.PIPELINES,
-                    }}>
+        <PageHeader
+          title={title}
+          actions={<EnableDebugMetricsButton />}
+          documentationLink={{
+            title: 'Pipelines documentation',
+            path: DocsHelper.PAGES.PIPELINES,
+          }}>
           <span>
             Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
             rules are evaluated and applied. Messages can go through one or more stages.
             <br />
-            After each stage is completed, you can decide if messages matching all or one of the rules continue to
-            the next stage.
+            After each stage is completed, you can decide if messages matching all or one of the rules continue to the
+            next stage.
           </span>
         </PageHeader>
 
         <Row className="content">
           <Col md={12}>
-            {content}
+            {isNewPipeline ? (
+              content
+            ) : (
+              <ProcessingLoadProvider>
+                <ProcessingLoadDebugMetricsBanner />
+                {content}
+              </ProcessingLoadProvider>
+            )}
           </Col>
         </Row>
       </div>

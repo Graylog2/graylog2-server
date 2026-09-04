@@ -9,5 +9,3 @@ This document is not complete, but we will do our best to make it our to-go refe
 If you encounter a shared component or a best practice which has not been documented, please extend the documentation.
 We all benefit from documenting our processes and components, as it helps us to use them without expending too much time
 reading at the source code, and also to think twice about how we solved a certain problem.
-
-

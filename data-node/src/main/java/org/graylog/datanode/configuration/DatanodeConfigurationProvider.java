@@ -16,36 +16,40 @@
  */
 package org.graylog.datanode.configuration;
 
-import org.graylog.datanode.Configuration;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.system.NodeId;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.graylog.datanode.Configuration;
+import org.graylog.datanode.OpensearchDistribution;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 @Singleton
 public class DatanodeConfigurationProvider implements Provider<DatanodeConfiguration> {
 
-    private final DatanodeConfiguration datanodeConfiguration;
+    private final Configuration localConfiguration;
+    private final IndexerJwtAuthToken jwtAuthToken;
+    private final OpensearchDistributionProvider opensearchDistributionProvider;
+    private final NodeId nodeId;
 
     @Inject
     public DatanodeConfigurationProvider(
             final Configuration localConfiguration,
-            IndexerJwtAuthTokenProvider jwtTokenProvider,
+            IndexerJwtAuthToken jwtAuthToken,
             OpensearchDistributionProvider opensearchDistributionProvider,
             NodeId nodeId) {
-        datanodeConfiguration = new DatanodeConfiguration(
-                opensearchDistributionProvider,
-                DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
-                localConfiguration.getProcessLogsBufferSize(),
-                jwtTokenProvider
-        );
+        this.localConfiguration = localConfiguration;
+        this.jwtAuthToken = jwtAuthToken;
+        this.opensearchDistributionProvider = opensearchDistributionProvider;
+        this.nodeId = nodeId;
     }
 
     @Override
     public DatanodeConfiguration get() {
-        return datanodeConfiguration;
+        return new DatanodeConfiguration(
+                opensearchDistributionProvider.get(),
+                DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
+                localConfiguration.getProcessLogsBufferSize(),
+                jwtAuthToken);
     }
 }

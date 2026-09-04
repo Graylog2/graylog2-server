@@ -80,9 +80,27 @@ public class DatanodeDirectories {
     @Deprecated(forRemoval = true)
     @Nonnull
     protected static Path backwardsCompatible(@Nonnull Path path, NodeId nodeId, String configProperty) {
+        final Path resolved = resolveNodeIdSubdir(path, nodeId);
+        if (!resolved.equals(path)) {
+            LOG.warn("Caution, this datanode instance uses old format of directories. Please configure {} to point directly to {}", configProperty, resolved.toAbsolutePath());
+        }
+        return resolved;
+    }
+
+    /**
+     * Resolves the opensearch data directory the same way {@link #fromConfiguration} would, but without its logging.
+     * Intended for callers that need the path on a hot path — the distribution selector runs on every configuration
+     * rebuild, and going through {@code fromConfiguration} there repeats the whole directory report each time.
+     */
+    @Nonnull
+    public static Path dataTargetDirFromConfiguration(Configuration configuration, NodeId nodeId) {
+        return resolveNodeIdSubdir(configuration.getOpensearchDataLocation(), nodeId).toAbsolutePath();
+    }
+
+    @Nonnull
+    private static Path resolveNodeIdSubdir(@Nonnull Path path, NodeId nodeId) {
         final Path nodeIdSubdir = path.resolve(nodeId.getNodeId());
-        if(Files.exists(nodeIdSubdir) && Files.isDirectory(nodeIdSubdir)) {
-            LOG.warn("Caution, this datanode instance uses old format of directories. Please configure {} to point directly to {}", configProperty, nodeIdSubdir.toAbsolutePath());
+        if (Files.exists(nodeIdSubdir) && Files.isDirectory(nodeIdSubdir)) {
             return nodeIdSubdir;
         }
         return path;
@@ -114,11 +132,15 @@ public class DatanodeDirectories {
     }
 
     public Optional<Path> resolveConfigurationSourceFile(String filename) {
-        final Path filePath = Path.of(filename);
+        return resolveConfigurationSourceFile(Path.of(filename));
+    }
+
+    @Nonnull
+    public Optional<Path> resolveConfigurationSourceFile(Path filePath) {
         if (filePath.isAbsolute()) {
-            return Optional.of(filePath);
+            return Optional.of(filePath).filter(Files::exists);
         } else {
-            return getConfigurationSourceDir().map(dir -> dir.resolve(filename));
+            return getConfigurationSourceDir().map(dir -> dir.resolve(filePath)).filter(Files::exists);
         }
     }
 

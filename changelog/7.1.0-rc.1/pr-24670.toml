@@ -1,0 +1,5 @@
+type = "f"
+message = "Allow owner of stream to delete it."
+
+issues = ["Graylog2/graylog-plugin-enterprise#12743"]
+pulls = ["24670"]

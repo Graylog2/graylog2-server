@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { GranteeType } from 'logic/permissions/types';
 
@@ -26,23 +25,19 @@ type InternalState = GranteeType;
 export default class Grantee implements GranteeInterface {
   _value: InternalState;
 
-  constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    title: $PropertyType<InternalState, 'title'>,
-    type: $PropertyType<InternalState, 'type'>,
-  ) {
+  constructor(id: InternalState['id'], title: InternalState['title'], type: InternalState['type']) {
     this._value = { id, title, type };
   }
 
-  get id(): $PropertyType<InternalState, 'id'> {
+  get id(): InternalState['id'] {
     return this._value.id;
   }
 
-  get title(): $PropertyType<InternalState, 'title'> {
+  get title(): InternalState['title'] {
     return this._value.title;
   }
 
-  get type(): $PropertyType<InternalState, 'type'> {
+  get type(): InternalState['type'] {
     return this._value.type;
   }
 
@@ -62,12 +57,7 @@ export default class Grantee implements GranteeInterface {
   static fromJSON(value: GranteeType): Grantee {
     const { id, title, type } = value;
 
-    return Grantee
-      .builder()
-      .id(id)
-      .title(title)
-      .type(type)
-      .build();
+    return Grantee.builder().id(id).title(title).type(type).build();
   }
 
   static builder(): Builder {
@@ -85,15 +75,15 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>): Builder {
+  id(value: InternalState['id']): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  title(value: $PropertyType<InternalState, 'title'>): Builder {
+  title(value: InternalState['title']): Builder {
     return new Builder(this.value.set('title', value));
   }
 
-  type(value: $PropertyType<InternalState, 'type'>): Builder {
+  type(value: InternalState['type']): Builder {
     return new Builder(this.value.set('type', value));
   }
 

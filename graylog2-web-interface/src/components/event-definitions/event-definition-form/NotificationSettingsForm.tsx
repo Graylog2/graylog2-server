@@ -17,8 +17,6 @@
 import React from 'react';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
-import defaultTo from 'lodash/defaultTo';
-import max from 'lodash/max';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
@@ -29,9 +27,11 @@ import * as FormsUtils from 'util/FormsUtils';
 
 const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
-const Container = styled.div(({ theme }) => css`
-  padding-top: ${theme.spacings.lg};
-`);
+const Container = styled.div(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.lg};
+  `,
+);
 
 type NotificationSettingsFormProps = {
   eventDefinition: any;
@@ -39,9 +39,12 @@ type NotificationSettingsFormProps = {
   onSettingsChange: (...args: any[]) => void;
 };
 
-class NotificationSettingsForm extends React.Component<NotificationSettingsFormProps, {
-  [key: string]: any;
-}> {
+class NotificationSettingsForm extends React.Component<
+  NotificationSettingsFormProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -49,12 +52,12 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
 
     const gracePeriod = extractDurationAndUnit(gracePeriodMs, TIME_UNITS);
     const defaultBacklogSize = props.defaults.default_backlog_size;
-    const effectiveBacklogSize = defaultTo(backlogSize, defaultBacklogSize);
+    const effectiveBacklogSize = backlogSize ?? defaultBacklogSize;
 
     this.state = {
       gracePeriodDuration: gracePeriod.duration,
       gracePeriodUnit: gracePeriod.unit,
-      isBacklogSizeEnabled: (backlogSize === null ? false : (effectiveBacklogSize > 0)),
+      isBacklogSizeEnabled: backlogSize === null ? false : effectiveBacklogSize > 0,
       backlogSize: effectiveBacklogSize,
     };
   }
@@ -68,7 +71,7 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
   };
 
   handleGracePeriodChange = (nextValue, nextUnit, enabled) => {
-    const durationInMs = enabled ? moment.duration(max([nextValue, 0]), nextUnit).asMilliseconds() : 0;
+    const durationInMs = enabled ? moment.duration(Math.max(nextValue, 0), nextUnit).asMilliseconds() : 0;
 
     this.propagateChanges('grace_period_ms', durationInMs);
     this.setState({ gracePeriodDuration: nextValue, gracePeriodUnit: nextUnit });
@@ -79,14 +82,14 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
     const value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
 
     this.setState({ [camelCase(name)]: value });
-    this.propagateChanges(name, max([Number(value), 0]));
+    this.propagateChanges(name, Math.max(Number(value), 0));
   };
 
   toggleBacklogSize = () => {
     const { isBacklogSizeEnabled, backlogSize } = this.state;
 
     this.setState({ isBacklogSizeEnabled: !isBacklogSizeEnabled });
-    this.propagateChanges('backlog_size', (isBacklogSizeEnabled ? 0 : backlogSize));
+    this.propagateChanges('backlog_size', isBacklogSizeEnabled ? 0 : backlogSize);
   };
 
   render() {
@@ -100,17 +103,19 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
     return (
       <Container>
         <FormGroup controlId="grace-period">
-          <TimeUnitInput label="Grace Period"
-                         update={this.handleGracePeriodChange}
-                         defaultEnabled={gracePeriodDuration !== 0}
-                         value={gracePeriodDuration}
-                         unit={gracePeriodUnit}
-                         units={TIME_UNITS}
-                         clearable />
+          <TimeUnitInput
+            label="Grace Period"
+            update={this.handleGracePeriodChange}
+            defaultEnabled={gracePeriodDuration !== 0}
+            value={gracePeriodDuration}
+            unit={gracePeriodUnit}
+            units={TIME_UNITS}
+            clearable
+          />
           <p>
-            Graylog sends Notifications for Alerts every time they occur. Set a Grace Period to control how long
-            Graylog should wait before sending Notifications again. Note that Events with keys will have a Grace
-            Period for each different key value.
+            Notifications for alerts are sent every time they occur. Set a Grace Period to control how long to wait
+            before sending Notifications again. Note that Events with keys will have a Grace Period for each different
+            key value.
           </p>
         </FormGroup>
 
@@ -118,17 +123,22 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
           <ControlLabel>Message Backlog</ControlLabel>
           <InputGroup>
             <InputGroup.Addon>
-              <input id="toggle_backlog_size"
-                     type="checkbox"
-                     checked={isBacklogSizeEnabled}
-                     onChange={this.toggleBacklogSize} />
+              <input
+                id="toggle_backlog_size"
+                type="checkbox"
+                aria-label="Toggle message backlog"
+                checked={isBacklogSizeEnabled}
+                onChange={this.toggleBacklogSize}
+              />
             </InputGroup.Addon>
-            <FormControl type="number"
-                         id="backlog_size"
-                         name="backlog_size"
-                         onChange={this.handleBacklogSizeChange}
-                         value={backlogSize}
-                         disabled={!isBacklogSizeEnabled} />
+            <FormControl
+              type="number"
+              id="backlog_size"
+              name="backlog_size"
+              onChange={this.handleBacklogSizeChange}
+              value={backlogSize}
+              disabled={!isBacklogSizeEnabled}
+            />
           </InputGroup>
           <p>Number of messages to be included in Notifications.</p>
         </FormGroup>

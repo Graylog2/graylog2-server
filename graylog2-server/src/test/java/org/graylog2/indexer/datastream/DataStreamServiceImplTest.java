@@ -20,13 +20,14 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.streams.Stream;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +39,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class DataStreamServiceImplTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
     private DataStreamAdapter dataStreamAdapter;
     @Mock
@@ -48,7 +49,7 @@ public class DataStreamServiceImplTest {
 
     private DataStreamService dataStreamService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         dataStreamService = new DataStreamServiceImpl(dataStreamAdapter, indexFieldTypesService, 0);
     }

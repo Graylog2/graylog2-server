@@ -25,6 +25,7 @@ import Entity from 'logic/content-packs/Entity';
 import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
 
 jest.useFakeTimers();
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
@@ -66,10 +67,7 @@ describe('<ContentPackEntitiesList />', () => {
     .fromServer(true)
     .build();
 
-  const contentPack = ContentPack.builder()
-    .entities([entity1, entity2])
-    .parameters([parameter])
-    .build();
+  const contentPack = ContentPack.builder().entities([entity1, entity2]).parameters([parameter]).build();
 
   it('should render with empty entities', async () => {
     const emptyContentPack = { entities: [] };
@@ -81,8 +79,7 @@ describe('<ContentPackEntitiesList />', () => {
   it('should render with entities and parameters without readOnly', async () => {
     const appliedParameter = { '111-beef': [{ configKey: 'title', paramName: 'A parameter name' }] };
 
-    render(<ContentPackEntitiesList contentPack={contentPack}
-                                    appliedParameter={appliedParameter} />);
+    render(<ContentPackEntitiesList contentPack={contentPack} appliedParameter={appliedParameter} />);
 
     await screen.findByText('test');
   });
@@ -93,7 +90,7 @@ describe('<ContentPackEntitiesList />', () => {
     await screen.findByText('test');
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
-    await userEvent.type(searchInput, 'Bad');
+    await setupUser().type(searchInput, 'Bad');
 
     act(() => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
@@ -103,7 +100,7 @@ describe('<ContentPackEntitiesList />', () => {
       expect(screen.queryByText('test')).not.toBeInTheDocument();
     });
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Reset search' }));
+    await setupUser().click(await screen.findByRole('button', { name: 'Reset search' }));
 
     await screen.findByText('test');
   });

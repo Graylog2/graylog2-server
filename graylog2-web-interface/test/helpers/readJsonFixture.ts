@@ -24,8 +24,7 @@ import { readFileSync } from 'fs';
  *
  * @param {fixturePath} - name of the fixture file.
  */
-const readJsonFixture = (fixtureDir: string, fixtureName: string) => (
-  JSON.parse(readFileSync(`${fixtureDir}/${fixtureName}`).toString('utf8'))
-);
+const readJsonFixture = (fixtureDir: string, fixtureName: string) =>
+  JSON.parse(readFileSync(`${fixtureDir}/${fixtureName}`).toString('utf8'));
 
 export default readJsonFixture;

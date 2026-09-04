@@ -14,30 +14,41 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { alice } from 'fixtures/users';
-import { UsersActions } from 'stores/users/UsersStore';
+import usePasswordComplexityConfig from 'components/users/usePasswordComplexityConfig';
+import { PASSWORD_SPECIAL_CHARACTERS } from 'logic/users/passwordComplexity';
+import { changeUserPassword } from 'hooks/useUsers';
 
 import PasswordSection from './PasswordSection';
 
 const exampleUser = alice;
+const passwordComplexityConfig = {
+  min_length: 8,
+  require_uppercase: true,
+  require_lowercase: true,
+  require_numbers: true,
+  require_special_chars: true,
+};
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('components/users/usePasswordComplexityConfig');
 
-jest.mock('stores/users/UsersStore', () => ({
-  UsersActions: {
-    changePassword: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('hooks/useUsers', () => ({
+  USERS_QUERY_KEY: ['users'],
+  changeUserPassword: jest.fn(() => Promise.resolve()),
 }));
 
 describe('<PasswordSection />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(usePasswordComplexityConfig).mockReturnValue(passwordComplexityConfig);
   });
 
   afterEach(() => {
@@ -51,14 +62,14 @@ describe('<PasswordSection />', () => {
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
-    fireEvent.change(newPasswordInput, { target: { value: 'newpassword' } });
-    fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
-    fireEvent.click(submitButton);
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
+    await userEvent.click(submitButton);
 
-    await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(changeUserPassword).toHaveBeenCalledTimes(1));
 
-    expect(UsersActions.changePassword).toHaveBeenCalledWith(exampleUser.id, {
-      password: 'newpassword',
+    expect(changeUserPassword).toHaveBeenCalledWith(exampleUser.id, {
+      password: 'Abcdef1!',
     });
   });
 
@@ -71,16 +82,16 @@ describe('<PasswordSection />', () => {
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
-    fireEvent.change(passwordInput, { target: { value: 'oldpassword' } });
-    fireEvent.change(newPasswordInput, { target: { value: 'newpassword' } });
-    fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
-    fireEvent.click(submitButton);
+    await userEvent.type(passwordInput, 'oldpassword');
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
+    await userEvent.click(submitButton);
 
-    await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(changeUserPassword).toHaveBeenCalledTimes(1));
 
-    expect(UsersActions.changePassword).toHaveBeenCalledWith(exampleUser.id, {
+    expect(changeUserPassword).toHaveBeenCalledWith(exampleUser.id, {
       old_password: 'oldpassword',
-      password: 'newpassword',
+      password: 'Abcdef1!',
     });
   });
 
@@ -90,10 +101,49 @@ describe('<PasswordSection />', () => {
     const newPasswordInput = screen.getByLabelText('New Password');
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
 
-    fireEvent.change(newPasswordInput, { target: { value: 'thepassword' } });
-    fireEvent.change(newPasswordRepeatInput, { target: { value: 'notthepassword' } });
-    fireEvent.blur(newPasswordRepeatInput);
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1?');
+    await userEvent.tab();
 
     await screen.findByText('Passwords do not match');
+  });
+
+  it('hides the helper once password meets requirements', async () => {
+    render(<PasswordSection user={exampleUser} />);
+
+    expect(screen.getByText('Password must be at least 8 characters long.', { exact: false })).toBeInTheDocument();
+
+    const newPasswordInput = screen.getByLabelText('New Password');
+
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Password must be at least 8 characters long.', { exact: false }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows only unmet rules when password is invalid', async () => {
+    render(<PasswordSection user={exampleUser} />);
+
+    const newPasswordInput = screen.getByLabelText('New Password');
+
+    await userEvent.type(newPasswordInput, 'abc');
+    await userEvent.tab();
+
+    expect(screen.getByText('Password must be at least 8 characters long.', { exact: false })).toBeInTheDocument();
+    expect(
+      screen.getByText('Password must contain at least one uppercase letter.', { exact: false }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Password must contain at least one number.', { exact: false })).toBeInTheDocument();
+    expect(
+      screen.getByText(`Password must contain at least one special character from: ${PASSWORD_SPECIAL_CHARACTERS}`, {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('Password must contain at least one lowercase letter.', { exact: false }),
+    ).not.toBeInTheDocument();
   });
 });

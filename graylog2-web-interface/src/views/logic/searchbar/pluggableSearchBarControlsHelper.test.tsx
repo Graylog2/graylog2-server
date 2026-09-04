@@ -42,7 +42,7 @@ describe('pluggableSearchBarControlsHandler', () => {
       // @ts-ignore
       const { pluggableControl } = values;
 
-      return ({ customKey: pluggableControl });
+      return { customKey: pluggableControl };
     },
     onValidate: () => ({}),
     placement: 'right',
@@ -65,11 +65,21 @@ describe('pluggableSearchBarControlsHandler', () => {
   const dispatch = mockDispatch();
 
   it('useInitialSearchValues should catch errors', async () => {
-    PluginStore.register(new PluginManifest({}, {
-      'views.components.searchBar': [
-        () => ({ ...pluggableSearchBarControl, useInitialSearchValues: () => { throw Error('something went wrong!'); } }),
-      ],
-    }));
+    PluginStore.register(
+      new PluginManifest(
+        {},
+        {
+          'views.components.searchBar': [
+            () => ({
+              ...pluggableSearchBarControl,
+              useInitialSearchValues: () => {
+                throw Error('something went wrong!');
+              },
+            }),
+          ],
+        },
+      ),
+    );
 
     const ExampleComponent = () => {
       const initialValuesFromPlugin = useInitialSearchValues();
@@ -79,26 +89,28 @@ describe('pluggableSearchBarControlsHandler', () => {
 
     render(<ExampleComponent />);
 
-    await waitFor(() => expect(mockConsoleError).toHaveBeenCalledWith(
-      'An error occurred when collecting initial search bar form values from a plugin: Error: something went wrong!',
-    ));
+    await waitFor(() =>
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'An error occurred when collecting initial search bar form values from a plugin: Error: something went wrong!',
+      ),
+    );
 
     await screen.findByText('Plugin initial values: {}');
   });
 
   it('executeSearchSubmitHandler should catch errors', async () => {
-    const result = await executeSearchSubmitHandler(
-      dispatch,
-      {},
-      [() => ({
+    const result = await executeSearchSubmitHandler(dispatch, {}, [
+      () => ({
         ...pluggableSearchBarControl,
         onSearchSubmit: () => Promise.reject(new Error('something went wrong!')),
-      })],
-    );
+      }),
+    ]);
 
-    await waitFor(() => expect(mockConsoleError).toHaveBeenCalledWith(
-      'An error occurred when executing a submit handler from a plugin: Error: something went wrong!',
-    ));
+    await waitFor(() =>
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'An error occurred when executing a submit handler from a plugin: Error: something went wrong!',
+      ),
+    );
 
     expect(result).toStrictEqual(undefined);
   });
@@ -109,32 +121,39 @@ describe('pluggableSearchBarControlsHandler', () => {
   };
 
   it('pluggableValidationPayload should catch errors', async () => {
-    const result = pluggableValidationPayload(
-      {},
-      handlerContext,
-      [() => ({
+    const result = pluggableValidationPayload({}, handlerContext, [
+      () => ({
         ...pluggableSearchBarControl,
-        validationPayload: () => { throw Error('something went wrong!'); },
-      })],
-    );
+        validationPayload: () => {
+          throw Error('something went wrong!');
+        },
+      }),
+    ]);
 
-    await waitFor(() => expect(mockConsoleError).toHaveBeenCalledWith(
-      'An error occurred when preparing search bar validation for a plugin: Error: something went wrong!',
-    ));
+    await waitFor(() =>
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'An error occurred when preparing search bar validation for a plugin: Error: something went wrong!',
+      ),
+    );
 
     expect(result).toStrictEqual({});
   });
 
   it('validatePluggableValues should catch errors', async () => {
-    const result = validatePluggableValues(
-      {},
-      handlerContext,
-      [() => ({ ...pluggableSearchBarControl, onValidate: () => { throw Error('something went wrong!'); } })],
-    );
+    const result = validatePluggableValues({}, handlerContext, [
+      () => ({
+        ...pluggableSearchBarControl,
+        onValidate: () => {
+          throw Error('something went wrong!');
+        },
+      }),
+    ]);
 
-    await waitFor(() => expect(mockConsoleError).toHaveBeenCalledWith(
-      'An error occurred when validating search bar values from a plugin: Error: something went wrong!',
-    ));
+    await waitFor(() =>
+      expect(mockConsoleError).toHaveBeenCalledWith(
+        'An error occurred when validating search bar values from a plugin: Error: something went wrong!',
+      ),
+    );
 
     expect(result).toStrictEqual({});
   });

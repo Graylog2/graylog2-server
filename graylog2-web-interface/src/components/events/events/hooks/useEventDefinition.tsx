@@ -14,27 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import { defaultOnError } from 'util/conditional/onError';
 
-export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> => (
-  fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`))
-);
+export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> =>
+  fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`));
 
 const useEventDefinition = (eventDefId: string, enabled = true) => {
-  const { data, isFetching, isInitialLoading } = useQuery({
+  const { data, isFetching, isInitialLoading, isError } = useQuery({
     queryKey: ['get-event-definition-details', eventDefId],
-    queryFn: () => defaultOnError(fetchEventDefinitionDetails(eventDefId), 'Loading archives failed with status'),
+    queryFn: () => fetchEventDefinitionDetails(eventDefId),
     retry: 0,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     enabled: !!eventDefId && enabled,
   });
 
-  return { data, isFetching, isInitialLoading };
+  return { data, isFetching, isInitialLoading, isError };
 };
 
 export default useEventDefinition;

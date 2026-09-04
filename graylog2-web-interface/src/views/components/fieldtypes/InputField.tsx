@@ -17,22 +17,26 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import useInputs from 'hooks/useInputs';
+import { useInputs } from 'hooks/useInputs';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
-  value: string,
-}
+  value: string;
+};
 
 const useForwarderInput = (inputId: string, enabled: boolean) => {
   const { fetchForwarderInput } = usePluginEntities('forwarder')[0] ?? {};
-  const { data: forwarderInput, isError, isLoading } = useQuery(
-    ['forwarder', 'input', inputId],
-    () => fetchForwarderInput(inputId),
-    { enabled: fetchForwarderInput && enabled },
-  );
+  const {
+    data: forwarderInput,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ['forwarder', 'input', inputId],
+    queryFn: () => fetchForwarderInput(inputId),
+    enabled: !!fetchForwarderInput && enabled,
+  });
 
-  return (isLoading || isError) ? undefined : forwarderInput;
+  return isLoading || isError ? undefined : forwarderInput;
 };
 
 const InputField = ({ value }: Props) => {

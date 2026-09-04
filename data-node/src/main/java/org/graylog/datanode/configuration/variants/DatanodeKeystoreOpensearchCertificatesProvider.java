@@ -17,11 +17,18 @@
 package org.graylog.datanode.configuration.variants;
 
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
+import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.util.function.Supplier;
 
 public final class DatanodeKeystoreOpensearchCertificatesProvider implements OpensearchCertificatesProvider {
     private final DatanodeKeystore datanodeKeystore;
@@ -42,11 +49,20 @@ public final class DatanodeKeystoreOpensearchCertificatesProvider implements Ope
 
     @Override
     public OpensearchCertificates build() {
-        try {
-            final InMemoryKeystoreInformation safeCopy = this.datanodeKeystore.getSafeCopy();
-            return new OpensearchCertificates(safeCopy, safeCopy);
-        } catch (DatanodeKeystoreException e) {
-            throw new OpensearchConfigurationException(e);
-        }
+        final char[] oneTimePassword = RandomStringUtils.secure().nextAlphabetic(256).toCharArray();
+
+        Supplier<KeyStore> keyStoreSupplier = createKeystoreSupplier(oneTimePassword);
+        return new OpensearchCertificates(oneTimePassword, keyStoreSupplier, null, keyStoreSupplier, null);
+    }
+
+    private Supplier<KeyStore> createKeystoreSupplier(char[] oneTimePassword) {
+        return () -> {
+            try {
+                final InMemoryKeystoreInformation safeCopy = this.datanodeKeystore.getSafeCopy();
+                return KeystoreUtils.newStoreCopyContent(safeCopy.loadKeystore(), safeCopy.password(), oneTimePassword);
+            } catch (DatanodeKeystoreException | GeneralSecurityException | IOException e) {
+                throw new RuntimeException("Failed to obtain datanode keystore", e);
+            }
+        };
     }
 }

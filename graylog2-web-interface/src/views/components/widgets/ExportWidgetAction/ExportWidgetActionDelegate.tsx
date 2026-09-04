@@ -22,9 +22,12 @@ import useWidgetExportActionComponent from 'views/components/widgets/useWidgetEx
 
 const ExportWidgetActionDelegate = ({ widget, contexts, disabled }: WidgetMenuActionComponentProps) => {
   const ExportActionComponent = useWidgetExportActionComponent(widget);
-  if (!ExportActionComponent) return <ExportWidgetPlug />;
 
-  return <ExportActionComponent widget={widget} contexts={contexts} disabled={disabled} />;
+  return !ExportActionComponent ? (
+    <ExportWidgetPlug />
+  ) : (
+    <ExportActionComponent widget={widget} contexts={contexts} disabled={disabled} />
+  );
 };
 
 export default ExportWidgetActionDelegate;

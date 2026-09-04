@@ -1,4 +1,5 @@
 Regular `ReactGridContainer`:
+
 ```js
 class ReactGridContainerExample extends React.Component {
   constructor(props) {
@@ -16,7 +17,7 @@ class ReactGridContainerExample extends React.Component {
 
   onPositionsChange(nextPositions) {
     console.log('positions changed to ', nextPositions);
-  };
+  }
 
   widgetDiv(id) {
     return (
@@ -38,9 +39,7 @@ class ReactGridContainerExample extends React.Component {
     };
 
     return (
-      <ReactGridContainer positions={positions}
-                          onPositionsChange={this.onPositionsChange}
-                          columns={columns}>
+      <ReactGridContainer positions={positions} onPositionsChange={this.onPositionsChange} columns={columns}>
         {this.widgetDiv(1)}
         {this.widgetDiv(2)}
         {this.widgetDiv(3)}
@@ -50,11 +49,11 @@ class ReactGridContainerExample extends React.Component {
   }
 }
 
-<ReactGridContainerExample />
+<ReactGridContainerExample />;
 ```
 
-
 Lock or block resizing in `ReactGridContainer`:
+
 ```js
 import { Button, ButtonToolbar } from 'components/bootstrap';
 
@@ -81,11 +80,11 @@ class ReactGridContainerExampleLocked extends React.Component {
 
   toggleLocked() {
     this.setState({ locked: !this.state.locked });
-  };
+  }
 
   toggleIsResizable() {
     this.setState({ isResizable: !this.state.isResizable });
-  };
+  }
 
   widgetDiv(id) {
     return (
@@ -116,13 +115,14 @@ class ReactGridContainerExampleLocked extends React.Component {
             isResizable is {String(isResizable)}
           </Button>
         </ButtonToolbar>
-        <br/>
-        <ReactGridContainer positions={positions}
-                            onPositionsChange={this.onPositionsChange}
-                            columns={columns}
-                            rowHeight={100}
-                            locked={locked}
-                            isResizable={isResizable}>
+        <br />
+        <ReactGridContainer
+          positions={positions}
+          onPositionsChange={this.onPositionsChange}
+          columns={columns}
+          rowHeight={100}
+          locked={locked}
+          isResizable={isResizable}>
           {this.widgetDiv(1)}
           {this.widgetDiv(2)}
           {this.widgetDiv(3)}
@@ -133,5 +133,5 @@ class ReactGridContainerExampleLocked extends React.Component {
   }
 }
 
-<ReactGridContainerExampleLocked />
+<ReactGridContainerExampleLocked />;
 ```

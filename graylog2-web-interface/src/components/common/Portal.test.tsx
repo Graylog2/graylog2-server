@@ -33,12 +33,8 @@ describe('Portal', () => {
 
       return (
         <>
-          <div ref={container}>
-            Current container children
-          </div>
-          <Portal container={container.current}>
-            The portal children
-          </Portal>
+          <div ref={container}>Current container children</div>
+          <Portal container={container.current}>The portal children</Portal>
         </>
       );
     };

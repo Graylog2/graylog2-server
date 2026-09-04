@@ -26,7 +26,8 @@ const Container = styled.a`
   display: inline-flex;
   align-items: center;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     text-decoration: none;
 
     .documentation-link-text {
@@ -43,17 +44,13 @@ type Props = {
   page: string;
   text: ReactNode;
   title?: string;
-  displayIcon?: boolean
-}
+  displayIcon?: boolean;
+};
 
 const DocumentationLink = ({ page, title = '', text, displayIcon = false }: Props) => (
   <Container href={DocsHelper.toString(page)} title={title} target="_blank">
     <span className="documentation-link-text">{text}</span>
-    {displayIcon && (
-      <StyledIcon name="lightbulb_circle"
-                  type="regular"
-                  size="lg" />
-    )}
+    {displayIcon && <StyledIcon name="lightbulb_circle" type="regular" size="lg" />}
   </Container>
 );
 

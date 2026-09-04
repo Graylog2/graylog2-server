@@ -24,19 +24,40 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useEventById from 'hooks/useEventById';
 import { mockEventData, mockEventDefinitionTwoAggregations } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
+import RightSidebarProvider from 'contexts/RightSidebarProvider';
 
 import EventDetails from './EventDetails';
 
+jest.mock('hooks/usePluginEntities');
 jest.mock('hooks/useEventById');
 jest.mock('hooks/useCurrentUser');
-jest.mock('hooks/usePluginEntities');
 jest.mock('components/events/events/hooks/useEventDefinition');
 
+const renderEventDetails = () =>
+  render(
+    <RightSidebarProvider>
+      <EventDetails eventId="event-id" />
+    </RightSidebarProvider>,
+  );
 describe('EventDetails', () => {
   beforeEach(() => {
-    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.widgets.events.detailsComponent': [],
+          'views.components.eventActions': [],
+          eventDefinitionTypes: [],
+          'views.components.eventProcedureSummary': [],
+        })[entityKey],
+    );
+
     asMock(useCurrentUser).mockReturnValue(adminUser);
-    asMock(useEventDefinition).mockReturnValue({ data: undefined, isFetching: false, isInitialLoading: false });
+    asMock(useEventDefinition).mockReturnValue({
+      data: undefined,
+      isFetching: false,
+      isInitialLoading: false,
+      isError: false,
+    });
 
     asMock(useEventById).mockImplementation(() => ({
       data: mockEventData.event,
@@ -47,22 +68,33 @@ describe('EventDetails', () => {
   });
 
   it('should render pluggable event details', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.widgets.events.detailsComponent': [{
-        component: () => <div>Pluggable details component</div>,
-        useCondition: () => true,
-        key: 'details-component',
-      }],
-    }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.widgets.events.detailsComponent': [
+            {
+              component: () => <div>Pluggable details component</div>,
+              useCondition: () => true,
+              key: 'details-component',
+            },
+          ],
+        })[entityKey],
+    );
 
-    render(<EventDetails eventId="event-id" />);
+    renderEventDetails();
 
     await screen.findByText('Pluggable details component');
   });
 
   it('should render default event details', async () => {
-    asMock(useEventDefinition).mockReturnValue({ data: mockEventDefinitionTwoAggregations, isFetching: false, isInitialLoading: false });
-    render(<EventDetails eventId="event-id" />);
+    asMock(useEventDefinition).mockReturnValue({
+      data: mockEventDefinitionTwoAggregations,
+      isFetching: false,
+      isInitialLoading: false,
+      isError: false,
+    });
+
+    renderEventDetails();
 
     await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith('event-definition-id-1', true));
     await screen.findByText('Additional Fields');
@@ -70,7 +102,7 @@ describe('EventDetails', () => {
 
   it('should not fetch event definition when user does not have required permissions', async () => {
     asMock(useCurrentUser).mockReturnValue(alice);
-    render(<EventDetails eventId="event-id" />);
+    renderEventDetails();
 
     await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith('event-definition-id-1', false));
     await screen.findByText('Additional Fields');

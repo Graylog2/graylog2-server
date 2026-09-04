@@ -27,7 +27,7 @@ jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 const ErroneusComponent = () => {
   // eslint-disable-next-line no-throw-literal
   throw {
-    message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
+    message: "Oh no, a banana peel fell on the party gorilla's head!",
     stack: 'This the stack trace.',
   };
 };
@@ -54,6 +54,6 @@ describe('RouterErrorBoundary', () => {
       );
     });
 
-    expect(screen.getByText('Oh no, a banana peel fell on the party gorilla\'s head!')).not.toBeNull();
+    expect(screen.getByText("Oh no, a banana peel fell on the party gorilla's head!")).not.toBeNull();
   });
 });

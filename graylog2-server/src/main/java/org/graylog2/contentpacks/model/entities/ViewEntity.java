@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
@@ -41,7 +40,6 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = ViewEntity.Builder.class)
-@WithBeanGetter
 public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builder> {
     public enum Type {
         SEARCH,

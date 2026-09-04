@@ -26,7 +26,6 @@ import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
-import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
@@ -59,6 +58,7 @@ public class LegacyDatanodeKeystoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(LegacyDatanodeKeystoreProvider.class);
     public static final String LEGACY_COLLECTION_NAME = "data_node_certificates";
     public static final String ENCRYPTED_CERTIFICATE_FIELD = "encrypted_certificate_keystore";
+    public static final String LEGACY_KEY_ALIAS = "datanode";
 
     private final NodeId nodeId;
     private final String passwordSecret;
@@ -96,7 +96,7 @@ public class LegacyDatanodeKeystoreProvider {
     }
 
     private boolean hasPrivateKey(KeyStore keystore) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
-        return keystore.getKey(CertConstants.DATANODE_KEY_ALIAS, passwordSecret.toCharArray()) != null;
+        return keystore.getKey(LEGACY_KEY_ALIAS, passwordSecret.toCharArray()) != null;
     }
 
     private Optional<KeyStore> loadKeystore() throws KeyStoreStorageException {

@@ -4,7 +4,5 @@ const pairs = {
   two: '2',
 };
 
-<KeyValueTable pairs={pairs}
-               headers={['Word', 'Number', 'Actions']}
-               editable />
+<KeyValueTable pairs={pairs} headers={['Word', 'Number', 'Actions']} editable />;
 ```

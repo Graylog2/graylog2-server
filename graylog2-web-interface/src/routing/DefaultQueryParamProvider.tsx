@@ -19,8 +19,12 @@ import type { PropsWithChildren } from 'react';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
+const queryParamOptions = {
+  enableBatching: true,
+};
+
 const DefaultQueryParamProvider = ({ children }: PropsWithChildren) => (
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
+  <QueryParamProvider adapter={ReactRouter6Adapter} options={queryParamOptions}>
     {children}
   </QueryParamProvider>
 );

@@ -15,37 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import type { DataNode } from 'preflight/types';
-
-const StatusLabel = styled(Label)`
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`;
+import type { DataNode } from 'components/datanode/Types';
 
 type Props = {
-  dataNode: DataNode,
+  dataNode: DataNode;
 };
 
 const DataNodeStatusCell = ({ dataNode }: Props) => {
-  const datanodeDisabled = dataNode.data_node_status !== 'AVAILABLE';
+  const datanodeDisabled = dataNode.datanode_status !== 'AVAILABLE';
 
   return (
     <>
-      <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                   title={dataNode.data_node_status}
-                   aria-label={dataNode.data_node_status}>
-        {dataNode.data_node_status}
-      </StatusLabel>&nbsp;
+      <Label
+        bsStyle={datanodeDisabled ? 'warning' : 'success'}
+        title={dataNode.datanode_status}
+        aria-label={dataNode.datanode_status}>
+        {dataNode.datanode_status}
+      </Label>
+      &nbsp;
       {dataNode.action_queue && (
-        <StatusLabel bsStyle="warning"
-                     title={dataNode.data_node_status}
-                     aria-label={dataNode.data_node_status}>
+        <Label bsStyle="warning" title={dataNode.datanode_status} aria-label={dataNode.datanode_status}>
           queued for {dataNode.action_queue}
-        </StatusLabel>
+        </Label>
       )}
     </>
   );

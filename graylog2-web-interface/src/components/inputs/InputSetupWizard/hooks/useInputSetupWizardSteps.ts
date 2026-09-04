@@ -17,9 +17,10 @@
 import { useContext } from 'react';
 
 import InputSetupWizardStepsContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardStepsContext';
+import type { InputSetupWizardStepsContextType } from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardStepsContext';
 
-const useInputSetupWizardSteps = () => {
-  const inputSetupWizardSteps = useContext(InputSetupWizardStepsContext);
+const useInputSetupWizardSteps = <StepsData>() => {
+  const inputSetupWizardSteps = useContext(InputSetupWizardStepsContext) as InputSetupWizardStepsContextType<StepsData>;
 
   if (!inputSetupWizardSteps) {
     throw new Error('useInputSetupWizardSteps hook needs to be used inside InputSetupWizardContextSteps.Provider');

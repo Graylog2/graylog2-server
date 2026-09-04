@@ -33,23 +33,28 @@ const resetMigration = async () => fetch('DELETE', qualifyUrl('/migration/state'
 const ResetMigrationButton = () => {
   const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
 
-  const { mutateAsync: onResetMigration } = useMutation(resetMigration, {
+  const { mutateAsync: onResetMigration } = useMutation({
+    mutationFn: resetMigration,
+
     onSuccess: () => {
       UserNotification.success('Migration state reset successful.');
-      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
-      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
+
     onError: (error) => {
-      UserNotification.error(`Resetting migration state failed with status: ${error}`, 'Could not reset the migration state.');
+      UserNotification.error(
+        `Resetting migration state failed with status: ${error}`,
+        'Could not reset the migration state.',
+      );
     },
   });
 
   const handleResetClick = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.RESET_MIGRATION_CLICKED, {
       app_pathname: 'datanode',
-      app_section: 'migration',
     });
 
     setShowDialog(true);
@@ -58,7 +63,6 @@ const ResetMigrationButton = () => {
   const handleConfirmClick = async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.RESET_MIGRATION_CONFIRM_CLICKED, {
       app_pathname: 'datanode',
-      app_section: 'migration',
     });
 
     await onResetMigration();
@@ -71,10 +75,11 @@ const ResetMigrationButton = () => {
         Reset Migration
       </Button>
       {showDialog && (
-        <ConfirmDialog title="Reset Migration"
-                       show
-                       onConfirm={handleConfirmClick}
-                       onCancel={() => setShowDialog(false)}>
+        <ConfirmDialog
+          title="Reset Migration"
+          show
+          onConfirm={handleConfirmClick}
+          onCancel={() => setShowDialog(false)}>
           Are you sure you want to reset the migration?
         </ConfirmDialog>
       )}

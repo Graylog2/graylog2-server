@@ -1,0 +1,5 @@
+type = "f"
+message = "Allow the Kinesis/Cloudwatch input to be created for empty Kinesis streams."
+
+issues = ["22138"]
+pulls = ["22370"]

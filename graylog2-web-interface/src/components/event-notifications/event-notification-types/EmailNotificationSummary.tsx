@@ -17,6 +17,7 @@
 import React from 'react';
 
 import { Well } from 'components/bootstrap';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
 import styles from './EmailNotificationSummary.css';
@@ -27,10 +28,7 @@ type EmailNotificationSummaryProps = {
   definitionNotification: any;
 };
 
-const EmailNotificationSummary = ({
-  notification = {},
-  ...otherProps
-}: EmailNotificationSummaryProps) => (
+const EmailNotificationSummary = ({ notification = {}, ...otherProps }: EmailNotificationSummaryProps) => (
   <CommonNotificationSummary notification={notification} {...otherProps}>
     <>
       <tr>
@@ -48,13 +46,12 @@ const EmailNotificationSummary = ({
             <td>{notification.config.sender_lut_key}</td>
           </tr>
         </>
-      )
-        : (
-          <tr>
-            <td>Sender</td>
-            <td>{notification.config.sender}</td>
-          </tr>
-        )}
+      ) : (
+        <tr>
+          <td>Sender</td>
+          <td>{notification.config.sender}</td>
+        </tr>
+      )}
       <tr>
         <td>Subject</td>
         <td>{notification.config.subject}</td>
@@ -78,13 +75,12 @@ const EmailNotificationSummary = ({
             <td>{notification.config.reply_to_lut_key}</td>
           </tr>
         </>
-      )
-        : (
-          <tr>
-            <td>Reply-To</td>
-            <td>{notification.config.reply_to}</td>
-          </tr>
-        )}
+      ) : (
+        <tr>
+          <td>Reply-To</td>
+          <td>{notification.config.reply_to}</td>
+        </tr>
+      )}
 
       <tr>
         <td>User Recipients</td>
@@ -105,19 +101,19 @@ const EmailNotificationSummary = ({
             <td>{notification.config.recipients_lut_key}</td>
           </tr>
         </>
-      )
-        : (
-          <tr>
-            <td>Email Recipients</td>
-            <td>
-              {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
-            </td>
-          </tr>
-        )}
+      ) : (
+        <tr>
+          <td>Email Recipients</td>
+          <td>
+            {notification.config.email_recipients.join(', ') ||
+              'No email addresses are configured to receive this notification.'}
+          </td>
+        </tr>
+      )}
 
       <tr>
         <td>Users to CC</td>
-        <td>{notification.config.cc_users.join(', ') || 'No users will be cc\'d on this notification.'}</td>
+        <td>{notification.config.cc_users.join(', ') || "No users will be cc'd on this notification."}</td>
       </tr>
       <tr>
         <td>Use Lookup Table for CC Emails</td>
@@ -134,19 +130,19 @@ const EmailNotificationSummary = ({
             <td>{notification.config.cc_emails_lut_key}</td>
           </tr>
         </>
-      )
-        : (
-          <tr>
-            <td>CC Emails</td>
-            <td>
-              {notification.config.cc_emails.join(', ') || 'No email addresses are configured to be cc\'d on this notification.'}
-            </td>
-          </tr>
-        )}
+      ) : (
+        <tr>
+          <td>CC Emails</td>
+          <td>
+            {notification.config.cc_emails.join(', ') ||
+              "No email addresses are configured to be cc'd on this notification."}
+          </td>
+        </tr>
+      )}
 
       <tr>
         <td>Users to BCC</td>
-        <td>{notification.config.bcc_users.join(', ') || 'No users will be bcc\'d on this notification.'}</td>
+        <td>{notification.config.bcc_users.join(', ') || "No users will be bcc'd on this notification."}</td>
       </tr>
       <tr>
         <td>Use Lookup Table for BCC Emails</td>
@@ -163,15 +159,15 @@ const EmailNotificationSummary = ({
             <td>{notification.config.bcc_emails_lut_key}</td>
           </tr>
         </>
-      )
-        : (
-          <tr>
-            <td>BCC Emails</td>
-            <td>
-              {notification.config.bcc_emails.join(', ') || 'No email addresses are configured to be bcc\'d on this notification.'}
-            </td>
-          </tr>
-        )}
+      ) : (
+        <tr>
+          <td>BCC Emails</td>
+          <td>
+            {notification.config.bcc_emails.join(', ') ||
+              "No email addresses are configured to be bcc'd on this notification."}
+          </td>
+        </tr>
+      )}
 
       <tr>
         <td>Email Body</td>
@@ -189,6 +185,12 @@ const EmailNotificationSummary = ({
           </Well>
         </td>
       </tr>
+      {usePluggableLicenseCheck('/license/security')?.data?.valid && (
+        <tr>
+          <td>Include Event Procedure in Email Body</td>
+          <td>{notification.config.include_event_procedure ? 'Yes' : 'No'}</td>
+        </tr>
+      )}
     </>
   </CommonNotificationSummary>
 );

@@ -16,15 +16,12 @@
  */
 package org.graylog2.lookup;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LookupDefaultSingleValueTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void createSingle() throws Exception {
@@ -55,9 +52,9 @@ public class LookupDefaultSingleValueTest {
     }
 
     @Test
-    public void createMultiObject() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void createMultiObject() {
+        assertThrows(IllegalArgumentException.class, () ->
 
-        LookupDefaultSingleValue.create("{\"hello\":\"world\",\"number\":42}", LookupDefaultSingleValue.Type.OBJECT);
+            LookupDefaultSingleValue.create("{\"hello\":\"world\",\"number\":42}", LookupDefaultSingleValue.Type.OBJECT));
     }
 }

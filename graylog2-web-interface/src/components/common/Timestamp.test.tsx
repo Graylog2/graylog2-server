@@ -21,8 +21,7 @@ import Timestamp from './Timestamp';
 
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
-jest.useFakeTimers()
-  .setSystemTime(mockedUnixTime);
+jest.useFakeTimers().setSystemTime(mockedUnixTime);
 
 describe('Timestamp', () => {
   it('should render date time', () => {

@@ -29,10 +29,7 @@ const CreateClientCertificateButton = () => {
         Generate client certificate
       </Button>
       {showCertificateForm && (
-        <BootstrapModalWrapper showModal={showCertificateForm}
-                               onHide={() => onCancel()}
-                               bsSize="lg">
-
+        <BootstrapModalWrapper showModal={showCertificateForm} onHide={() => onCancel()} bsSize="lg">
           <ClientCertForm onCancel={onCancel} />
         </BootstrapModalWrapper>
       )}

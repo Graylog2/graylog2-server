@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.messages;
 
-import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;

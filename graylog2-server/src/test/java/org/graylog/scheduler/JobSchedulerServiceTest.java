@@ -17,7 +17,7 @@
 package org.graylog.scheduler;
 
 import org.graylog.scheduler.JobSchedulerService.InterruptibleSleeper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;

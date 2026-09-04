@@ -3,66 +3,42 @@
     "type": "scatter",
     "name": "index-count()",
     "originalName": "index⸱count()",
-    "x": [
-      "2018-05-24T14:03:00.000Z⸱PostsController"
-    ],
-    "y": [
-      2696
-    ]
+    "x": ["2018-05-24T14:03:00.000Z⸱PostsController"],
+    "y": [2696]
   },
   {
     "type": "scatter",
     "name": "index-sum(took_ms)",
     "originalName": "index⸱sum(took_ms)",
-    "x": [
-      "2018-05-24T14:03:00.000Z⸱PostsController"
-    ],
-    "y": [
-      239622
-    ]
+    "x": ["2018-05-24T14:03:00.000Z⸱PostsController"],
+    "y": [239622]
   },
   {
     "type": "scatter",
     "name": "edit-count()",
     "originalName": "edit⸱count()",
-    "x": [
-      "2018-05-24T14:03:00.000Z⸱PostsController"
-    ],
-    "y": [
-      118
-    ]
+    "x": ["2018-05-24T14:03:00.000Z⸱PostsController"],
+    "y": [118]
   },
   {
     "type": "scatter",
     "name": "edit-sum(took_ms)",
     "originalName": "edit⸱sum(took_ms)",
-    "x": [
-      "2018-05-24T14:03:00.000Z⸱PostsController"
-    ],
-    "y": [
-      6580
-    ]
+    "x": ["2018-05-24T14:03:00.000Z⸱PostsController"],
+    "y": [6580]
   },
   {
     "type": "scatter",
     "name": "count()",
     "originalName": "count()",
-    "x": [
-      "2018-05-24T14:03:00.000Z⸱PostsController"
-    ],
-    "y": [
-      3680
-    ]
+    "x": ["2018-05-24T14:03:00.000Z⸱PostsController"],
+    "y": [3680]
   },
   {
     "type": "scatter",
     "name": "sum(took_ms)",
     "originalName": "sum(took_ms)",
-    "x": [
-      "2018-05-24T14:03:00.000Z⸱PostsController"
-    ],
-    "y": [
-      327284
-    ]
+    "x": ["2018-05-24T14:03:00.000Z⸱PostsController"],
+    "y": [327284]
   }
 ]

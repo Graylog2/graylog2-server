@@ -19,43 +19,52 @@ import React, { useCallback } from 'react';
 import {
   updateHighlightingRules,
   addHighlightingRule,
-  updateHighlightingRule, removeHighlightingRule,
+  updateHighlightingRule,
+  removeHighlightingRule,
 } from 'views/logic/slices/highlightActions';
 import HighlightingRules from 'views/components/sidebar/highlighting/HighlightingRules';
-import type {
-  Value,
-  Condition,
-  Color,
-} from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type { Value, Condition, Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import useAppDispatch from 'stores/useAppDispatch';
-
-const DESCRIPTION = 'Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the graylog server config.\n'
-  + 'Any field value can be highlighted by clicking on the value and selecting "Highlight this value".\n'
-  + 'If a term or a value has more than one rule, the first matching rule is used.';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import useProductName from 'brand-customization/useProductName';
 
 const ViewsHighlightingRules = () => {
-  const dispatch = useAppDispatch();
-  const onUpdateRules = useCallback((newRules: Array<HighlightingRule>) => dispatch(updateHighlightingRules(newRules)).then(() => {}), [dispatch]);
+  const dispatch = useViewsDispatch();
+  const productName = useProductName();
+  const onUpdateRules = useCallback(
+    (newRules: Array<HighlightingRule>) => dispatch(updateHighlightingRules(newRules)).then(() => {}),
+    [dispatch],
+  );
 
-  const onCreateRule = useCallback((newRule: HighlightingRule) => (
-    dispatch(addHighlightingRule(newRule)).then(() => {})
-  ), [dispatch]);
+  const onCreateRule = useCallback(
+    (newRule: HighlightingRule) => dispatch(addHighlightingRule(newRule)).then(() => {}),
+    [dispatch],
+  );
 
-  const onUpdateRule = useCallback((targetRule: HighlightingRule, field: string, value: Value, condition: Condition, color: Color) => (
-    dispatch(updateHighlightingRule(targetRule, { field, value, condition, color })).then(() => {})
-  ), [dispatch]);
+  const onUpdateRule = useCallback(
+    (targetRule: HighlightingRule, field: string, value: Value, condition: Condition, color: Color) =>
+      dispatch(updateHighlightingRule(targetRule, { field, value, condition, color })).then(() => {}),
+    [dispatch],
+  );
 
-  const onDeleteRule = useCallback((rule: HighlightingRule) => (
-    dispatch(removeHighlightingRule(rule)).then(() => {})
-  ), [dispatch]);
+  const onDeleteRule = useCallback(
+    (rule: HighlightingRule) => dispatch(removeHighlightingRule(rule)).then(() => {}),
+    [dispatch],
+  );
+
+  const description =
+    `Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the ${productName} server config.` +
+    'Any field value can be highlighted by clicking on the value and selecting "Highlight this value".\n' +
+    'If a term or a value has more than one rule, the first matching rule is used.';
 
   return (
-    <HighlightingRules description={DESCRIPTION}
-                       onDeleteRule={onDeleteRule}
-                       onUpdateRules={onUpdateRules}
-                       onCreateRule={onCreateRule}
-                       onUpdateRule={onUpdateRule} />
+    <HighlightingRules
+      description={description}
+      onDeleteRule={onDeleteRule}
+      onUpdateRules={onUpdateRules}
+      onCreateRule={onCreateRule}
+      onUpdateRule={onUpdateRule}
+    />
   );
 };
 

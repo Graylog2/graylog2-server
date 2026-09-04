@@ -19,16 +19,16 @@ export type Key = any;
 export type Value = any;
 
 type Keyed = {
-  key: Array<Key>,
+  key: Array<Key>;
 };
 
 type SingleValue = {
-  rollup: boolean,
-  value: Value,
+  rollup: boolean;
+  value: Value;
 };
 
 type MultiValue = {
-  values: Array<Row>,
+  values: Array<Row>;
 };
 
 export type Leaf = { source: 'leaf' } & Keyed & MultiValue;
@@ -45,10 +45,10 @@ export type Row = Leaf | NonLeaf | ColLeaf | RowLeaf | RowInner;
 export type ResultId = string;
 export type Rows = Array<Row>;
 export type Result = {
-  id: ResultId,
-  rows: Rows,
-  total: number,
-  type: 'pivot',
+  id: ResultId;
+  rows: Rows;
+  total: number;
+  type: 'pivot';
 };
 
 export default {

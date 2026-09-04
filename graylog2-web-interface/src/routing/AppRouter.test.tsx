@@ -22,6 +22,7 @@ import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
 import { defaultUser } from 'defaultMockValues';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
+import { dataRouterFuture } from 'reactRouterFutureFlags';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -30,7 +31,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
-import { defaultPerspective as mockDefaultPerspective } from 'fixtures/perspectives';
+import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 import AppRouter from './AppRouter';
 
@@ -44,58 +45,48 @@ jest.mock('pages/StartPage', () => () => <>This is the start page</>);
 jest.mock('hooks/usePluginEntities');
 jest.mock('contexts/GlobalContextProviders', () => jest.fn(({ children }: React.PropsWithChildren<{}>) => children));
 
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  gl2ServerUrl: jest.fn(() => undefined),
-  gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => false),
-  isCloud: jest.fn(() => false),
-}));
-
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   createBrowserRouter: jest.fn(),
 }));
 
-jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
-  __esModule: true,
-  default: () => ({
-    activePerspective: mockDefaultPerspective,
-  }),
-}));
+jest.mock('components/navigation/NotificationBadge', () => () => null);
 
 const AppRouterWithContext = () => (
   <HotkeysProvider>
-    <DefaultProviders>
-      <CurrentUserContext.Provider value={defaultUser}>
-        <AppRouter />
-      </CurrentUserContext.Provider>
-    </DefaultProviders>
+    <DefaultQueryClientProvider>
+      <DefaultProviders>
+        <CurrentUserContext.Provider value={defaultUser}>
+          <AppRouter />
+        </CurrentUserContext.Provider>
+      </DefaultProviders>
+    </DefaultQueryClientProvider>
   </HotkeysProvider>
 );
 
 const setInitialPath = (path: string) => {
-  asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes, {
-    initialEntries: [path],
-  }));
+  asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
+    createMemoryRouter(routes, {
+      initialEntries: [path],
+      future: dataRouterFuture,
+    }),
+  );
 };
 
 const mockRoutes = (routes: PluginExports['routes']) => {
   const pluginExports: PluginExports = {
     routes,
   };
-  asMock(usePluginEntities).mockImplementation((key: keyof PluginExports) => pluginExports[key] ?? []);
+  asMock(usePluginEntities).mockImplementation((key: 'routes'): PluginExports['routes'] => pluginExports[key] ?? []);
 };
 
 describe('AppRouter', () => {
-  const defaultPlugins = {
-    perspectives: [mockDefaultPerspective],
-  };
-
   beforeEach(() => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => (defaultPlugins[entityKey] ?? []));
-    AppConfig.isFeatureEnabled = jest.fn(() => false);
-    asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
+    asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
+    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
+      createMemoryRouter(routes, { future: dataRouterFuture }),
+    );
   });
 
   it('routes to Getting Started Page for `/` or empty location', async () => {
@@ -132,7 +123,9 @@ describe('AppRouter', () => {
     });
 
     it('does not render plugin route when required feature flag is not enabled', async () => {
-      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
+      mockRoutes([
+        { component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' },
+      ]);
       setInitialPath('/a-plugin-route');
       render(<AppRouterWithContext />);
 
@@ -143,7 +136,9 @@ describe('AppRouter', () => {
 
     it('render plugin route when required feature flag is enabled', async () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
-      mockRoutes([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
+      mockRoutes([
+        { component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' },
+      ]);
       setInitialPath('/a-plugin-route');
       const { findByText } = render(<AppRouterWithContext />);
 
@@ -152,7 +147,9 @@ describe('AppRouter', () => {
 
     it('renders null-parent component plugin wrapped in global providers', async () => {
       const TestContext = React.createContext(undefined);
-      asMock(GlobalContextProviders).mockImplementation(({ children }: React.PropsWithChildren<{}>) => <TestContext.Provider value={42}>{children}</TestContext.Provider>);
+      asMock(GlobalContextProviders).mockImplementation(({ children }: React.PropsWithChildren<{}>) => (
+        <TestContext.Provider value={42}>{children}</TestContext.Provider>
+      ));
 
       const TestComponent = () => {
         const contextValue = useContext(TestContext);

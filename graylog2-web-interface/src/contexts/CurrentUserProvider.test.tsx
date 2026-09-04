@@ -37,9 +37,7 @@ describe('CurrentUserProvider', () => {
 
     render(
       <CurrentUserProvider>
-        <CurrentUserContext.Consumer>
-          {consume}
-        </CurrentUserContext.Consumer>
+        <CurrentUserContext.Consumer>{consume}</CurrentUserContext.Consumer>
       </CurrentUserProvider>,
       { wrapper: undefined },
     );

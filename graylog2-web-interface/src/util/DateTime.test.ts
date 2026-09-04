@@ -28,6 +28,7 @@ import {
   relativeDifferenceDays,
   toDateObject,
   toUTCFromTz,
+  readableDifference,
 } from 'util/DateTime';
 
 const mockRootTimeZone = 'America/Chicago';
@@ -42,8 +43,7 @@ jest.mock('moment-timezone', () => {
 
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
-jest.useFakeTimers()
-  .setSystemTime(mockedUnixTime);
+jest.useFakeTimers().setSystemTime(mockedUnixTime);
 
 describe('DateTime utils', () => {
   const exampleUTCInput = [
@@ -57,7 +57,8 @@ describe('DateTime utils', () => {
 
   const invalidDate = '2020-00-00T04:00:00.000Z';
 
-  const expectErrorForInvalidDate = (message = `Date time ${invalidDate} is not valid.`) => expect(console.error).toHaveBeenCalledWith(message);
+  const expectErrorForInvalidDate = (message = `Date time ${invalidDate} is not valid.`) =>
+    expect(console.error).toHaveBeenCalledWith(message);
   const original = console.error;
 
   beforeEach(() => {
@@ -81,13 +82,17 @@ describe('DateTime utils', () => {
     });
 
     it('should return date with specified time zone', () => {
-      expect(toDateObject(exampleBerlinTime, undefined, moscowTZ).format(DATE_TIME_FORMATS.internal)).toBe('2020-01-01T12:00:00.000+03:00');
+      expect(toDateObject(exampleBerlinTime, undefined, moscowTZ).format(DATE_TIME_FORMATS.internal)).toBe(
+        '2020-01-01T12:00:00.000+03:00',
+      );
     });
 
     it('should validate date based on defined format', () => {
       toDateObject('2020-01-01T10:00:00.000Z', ['date']);
 
-      expect(console.error).toHaveBeenCalledWith('Date time 2020-01-01T10:00:00.000Z is not valid. Expected formats: YYYY-MM-DD.');
+      expect(console.error).toHaveBeenCalledWith(
+        'Date time 2020-01-01T10:00:00.000Z is not valid. Expected formats: YYYY-MM-DD.',
+      );
     });
 
     it('should throw an error for an invalid date', () => {
@@ -102,21 +107,29 @@ describe('DateTime utils', () => {
     });
 
     it('should return date with UTC time zone per default', () => {
-      expect(parseFromIsoString(exampleBerlinTime).format(DATE_TIME_FORMATS.internal)).toBe('2020-01-01T09:00:00.000+00:00');
+      expect(parseFromIsoString(exampleBerlinTime).format(DATE_TIME_FORMATS.internal)).toBe(
+        '2020-01-01T09:00:00.000+00:00',
+      );
     });
 
     it('should return date with specified time zone', () => {
-      expect(parseFromIsoString(exampleBerlinTime, moscowTZ).format(DATE_TIME_FORMATS.internal)).toBe('2020-01-01T12:00:00.000+03:00');
+      expect(parseFromIsoString(exampleBerlinTime, moscowTZ).format(DATE_TIME_FORMATS.internal)).toBe(
+        '2020-01-01T12:00:00.000+03:00',
+      );
     });
 
     it('should log an error when provided date string is not an ISO 8601 date', () => {
       parseFromIsoString('2020-01-01T04:00:00.000');
-      expectErrorForInvalidDate('Date time 2020-01-01T04:00:00.000 is not valid. Expected formats: YYYY-MM-DDTHH:mm:ss.SSSZ.');
+      expectErrorForInvalidDate(
+        'Date time 2020-01-01T04:00:00.000 is not valid. Expected formats: YYYY-MM-DDTHH:mm:ss.SSSZ.',
+      );
     });
 
     it('should throw an error for an invalid date', () => {
       parseFromIsoString(invalidDate);
-      expectErrorForInvalidDate('Date time 2020-00-00T04:00:00.000Z is not valid. Expected formats: YYYY-MM-DDTHH:mm:ss.SSSZ.');
+      expectErrorForInvalidDate(
+        'Date time 2020-00-00T04:00:00.000Z is not valid. Expected formats: YYYY-MM-DDTHH:mm:ss.SSSZ.',
+      );
     });
   });
 
@@ -171,6 +184,16 @@ describe('DateTime utils', () => {
     });
   });
 
+  describe('readableDifference', () => {
+    it('should return a readable difference for two dates', () => {
+      expect(readableDifference('2020-01-01T10:00:00.000', '2020-01-10T10:00:00.000')).toBe('9 days');
+    });
+
+    it('should return a readable difference for two dates in ms', () => {
+      expect(readableDifference('2020-01-01T10:00:00.000', '2020-01-01T10:00:00.120')).toBe('120 milliseconds');
+    });
+  });
+
   describe('relativeDifferenceDays', () => {
     it('should return relative difference for time in days', () => {
       expect(relativeDifferenceDays('2019-01-01T10:00:00.000Z')).toBe(364);
@@ -183,7 +206,9 @@ describe('DateTime utils', () => {
     });
 
     it('should prioritize time zone of date time over provided time zone when calculating UTC time', () => {
-      expect(toUTCFromTz('2020-01-01T12:00:00.000+05:00', 'Europe/Berlin').toISOString()).toBe('2020-01-01T07:00:00.000Z');
+      expect(toUTCFromTz('2020-01-01T12:00:00.000+05:00', 'Europe/Berlin').toISOString()).toBe(
+        '2020-01-01T07:00:00.000Z',
+      );
     });
   });
 });

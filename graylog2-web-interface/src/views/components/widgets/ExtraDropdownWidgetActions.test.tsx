@@ -29,9 +29,11 @@ import type { WidgetActionType } from 'views/components/widgets/Types';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
-const ExtraWidgetActionsWithoutMenu = (props: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
+const ExtraWidgetActionsWithoutMenu = ({
+  ...props
+}: Omit<React.ComponentProps<typeof OriginalExtraWidgetActions>, 'setComponents'>) => (
   <TestStoreProvider>
-    <OriginalExtraWidgetActions {...props} />
+    <OriginalExtraWidgetActions setComponents={jest.fn()} {...props} />
   </TestStoreProvider>
 );
 
@@ -41,6 +43,7 @@ describe('ExtraWidgetActions', () => {
   const widget = Widget.empty();
   const dummyActionWithoutIsHidden: WidgetActionType = {
     type: 'dummy-action',
+    position: 'dropdown',
     title: () => 'Dummy Action',
     action: jest.fn(() => async () => {}),
   };
@@ -59,8 +62,7 @@ describe('ExtraWidgetActions', () => {
   const dummyActionWithMenuPosition: WidgetActionType = {
     position: 'menu',
     type: 'dummy-action',
-    title: () => 'Dummy Action',
-    action: jest.fn(() => async () => {}),
+    component: () => <>Dummy Action</>,
   };
   useViewsPlugin();
 
@@ -105,14 +107,18 @@ describe('ExtraWidgetActions', () => {
 
     await userEvent.click(menuItem);
 
-    await waitFor(() => expect(dummyActionWhichIsNotHidden.action)
-      .toHaveBeenCalledWith(widget, expect.objectContaining({
-        widgetFocusContext: expect.objectContaining({
-          focusedWidget: undefined,
-          setWidgetFocusing: expect.any(Function),
-          setWidgetEditing: expect.any(Function),
+    await waitFor(() =>
+      expect(dummyActionWhichIsNotHidden.action).toHaveBeenCalledWith(
+        widget,
+        expect.objectContaining({
+          widgetFocusContext: expect.objectContaining({
+            focusedWidget: undefined,
+            setWidgetFocusing: expect.any(Function),
+            setWidgetEditing: expect.any(Function),
+          }),
         }),
-      })));
+      ),
+    );
   });
 
   it('renders divider if at least one action is present', async () => {

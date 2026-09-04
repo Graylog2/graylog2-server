@@ -19,19 +19,19 @@ import { useParams } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
-import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
+import { fetchThreadDump } from 'hooks/useClusterOverview';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 
 const ThreadDumpPage = () => {
   const { nodeId } = useParams();
   const { nodes } = useStore(NodesStore);
-  const [threadDump, setThreadDump] = useState();
+  const [threadDump, setThreadDump] = useState<string>();
   const node = nodes?.[nodeId];
 
   useEffect(() => {
     if (nodeId) {
-      ClusterOverviewStore.threadDump(nodeId).then((result) => setThreadDump(result));
+      fetchThreadDump(nodeId).then((result) => setThreadDump(result));
     }
   }, [nodeId]);
 
@@ -42,19 +42,19 @@ const ThreadDumpPage = () => {
   return (
     <DocumentTitle title={`Thread dump of node ${node.short_node_id} / ${node.hostname}`}>
       <div>
-        <PageHeader title={(
-          <span>
-            Thread dump of node {node.short_node_id} / {node.hostname}
-            &nbsp;
-            <small>Taken at <Timestamp dateTime={new Date()} /></small>
-          </span>
-        )} />
+        <PageHeader
+          title={
+            <span>
+              Thread dump of node {node.short_node_id} / {node.hostname}
+              &nbsp;
+              <small>
+                Taken at <Timestamp dateTime={new Date()} />
+              </small>
+            </span>
+          }
+        />
         <Row className="content">
-          <Col md={12}>
-            {threadDump
-              ? <pre className="threaddump">{threadDump}</pre>
-              : <Spinner />}
-          </Col>
+          <Col md={12}>{threadDump ? <pre className="threaddump">{threadDump}</pre> : <Spinner />}</Col>
         </Row>
       </div>
     </DocumentTitle>

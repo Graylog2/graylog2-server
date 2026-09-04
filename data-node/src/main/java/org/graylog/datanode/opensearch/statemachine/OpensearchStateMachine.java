@@ -16,19 +16,14 @@
  */
 package org.graylog.datanode.opensearch.statemachine;
 
-import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import org.graylog.datanode.opensearch.OpensearchProcess;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracerAggregator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog.datanode.process.statemachine.ProcessStateMachine;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 
 import java.util.Set;
 
-public class OpensearchStateMachine extends StateMachine<OpensearchState, OpensearchEvent> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchStateMachine.class);
+public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState, OpensearchEvent> {
 
     /**
      * How many times can the OS rest api call fail before we switch to the failed state
@@ -37,14 +32,13 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
     public static final int MAX_REST_STARTUP_FAILURES = 5;
     public static final int MAX_REBOOT_FAILURES = 3;
 
-    StateMachineTracerAggregator tracerAggregator = new StateMachineTracerAggregator();
-
-    public OpensearchStateMachine(OpensearchState initialState, StateMachineConfig<OpensearchState, OpensearchEvent> config) {
-        super(initialState, config);
-        setTrace(tracerAggregator);
+    public OpensearchStateMachine(OpensearchState initialState,
+                                  StateMachineConfig<OpensearchState, OpensearchEvent> config,
+                                  Set<StateMachineTracer<OpensearchState, OpensearchEvent>> tracer) {
+        super(initialState, config, tracer);
     }
 
-    public static OpensearchStateMachine createNew(OpensearchProcess process, Set<StateMachineTracer> tracer) {
+    public static OpensearchStateMachine createNew(OpensearchProcess process, Set<StateMachineTracer<OpensearchState, OpensearchEvent>> tracer) {
         final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
         final FailuresCounter rebootCounter = FailuresCounter.oneBased(MAX_REBOOT_FAILURES);
@@ -57,12 +51,15 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 // jump to started only allowed to facilitate startup with insecure config
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING)
                 .ignore(OpensearchEvent.PROCESS_STOPPED)
-                .ignore(OpensearchEvent.HEALTH_CHECK_FAILED);
+                .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
+                .ignore(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
 
         config.configure(OpensearchState.PREPARED)
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED);
 
         // the process has started already, now we have to wait for a running OS and available REST api
@@ -73,9 +70,12 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permitDynamic(OpensearchEvent.HEALTH_CHECK_FAILED,
                         () -> startupFailuresCounter.failedTooManyTimes() ? OpensearchState.FAILED : OpensearchState.STARTING,
                         startupFailuresCounter::increment)
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
-                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
+                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
+                .permitReentry(OpensearchEvent.PROCESS_STARTED); // allow restarts when the process is already starting
 
         // the process is running and responding to the REST status, it's available for any usage
         config.configure(OpensearchState.AVAILABLE)
@@ -83,11 +83,13 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .onEntry(rebootCounter::resetFailuresCounter)
                 .onEntry(process::available)
                 .permitReentry(OpensearchEvent.HEALTH_CHECK_OK)
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.HEALTH_CHECK_FAILED, OpensearchState.NOT_RESPONDING)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_REMOVE, OpensearchState.REMOVING)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED, process::stop) //restart if reconfigured
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING); // allow restarts
 
         // if the REST api is not responding, we'll jump to this state and count how many times the failure
@@ -97,62 +99,55 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                         () -> restFailureCounter.failedTooManyTimes() ? OpensearchState.FAILED : OpensearchState.NOT_RESPONDING,
                         restFailureCounter::increment
                 )
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
 
         // failed and we see the process as not recoverable.
         // TODO: what to do if the process fails? Reboot?
         config.configure(OpensearchState.FAILED)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
+                .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED) //restart if reconfigured
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
-                .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING);
+                .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration);
 
         // final state, the process is not alive anymore, terminated on the operating system level
         config.configure(OpensearchState.TERMINATED)
                 .onEntry(process::stop)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING, rebootCounter::increment)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
                 .ignore(OpensearchEvent.PROCESS_STOPPED)
-                .ignore(OpensearchEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
+                .ignore(OpensearchEvent.PROCESS_TERMINATED) // final state, all following terminate events are ignored
+                .ignore(OpensearchEvent.CERTIFICATES_RELOAD);
 
         config.configure(OpensearchState.REMOVING)
                 .onEntry(process::remove)
                 .ignore(OpensearchEvent.HEALTH_CHECK_OK)
+                .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
+                .ignore(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED)
                 .permit(OpensearchEvent.HEALTH_CHECK_FAILED, OpensearchState.FAILED)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.REMOVED);
 
         config.configure(OpensearchState.REMOVED)
                 .onEntry(process::stop)
+                .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
-        OpensearchStateMachine stateMachine = new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
-        tracer.forEach(t -> {
-            t.setStateMachine(stateMachine);
-            stateMachine.getTracerAggregator().addTracer(t);
-        });
-        return stateMachine;
-    }
-
-    public StateMachineTracerAggregator getTracerAggregator() {
-        return tracerAggregator;
-    }
-
-    private void fire(OpensearchEvent trigger, OpensearchEvent errorEvent) {
-        try {
-            super.fire(trigger);
-        } catch (Exception e) {
-            LOG.error("Failed to fire event " + trigger, e);
-            super.fire(errorEvent);
-        }
+        return new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config, tracer);
     }
 
     @Override
-    public void fire(OpensearchEvent trigger) {
-        fire(trigger, OpensearchEvent.HEALTH_CHECK_FAILED);
+    protected OpensearchEvent getErrorEvent() {
+        return OpensearchEvent.HEALTH_CHECK_FAILED;
     }
+
 }

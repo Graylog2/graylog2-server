@@ -24,16 +24,13 @@ import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 type Props = {
-  contentPackId: string,
-  revision: number,
-  show?: boolean
-  onHide?: () => void
-}
+  contentPackId: string;
+  revision: number;
+  show?: boolean;
+  onHide?: () => void;
+};
 
-const ContentPackDownloadControl = ({
-  contentPackId, revision, show = false, onHide = () => {
-  },
-}: Props) => {
+const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onHide = () => {} }: Props) => {
   const [showDownloadModal, setShowDownloadModal] = useState(show);
 
   const getDownloadUrl = () => qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);
@@ -47,17 +44,15 @@ const ContentPackDownloadControl = ({
   const modalTitle = 'Download Content Pack';
 
   return (
-    <BootstrapModalWrapper showModal={showDownloadModal}
-                           onHide={closeModal}
-                           bsSize="large">
-      <Modal.Header closeButton>
+    <BootstrapModalWrapper showModal={showDownloadModal} onHide={closeModal} bsSize="large">
+      <Modal.Header>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p>{infoText}</p>
         <p>
           <a href={getDownloadUrl()} target="_blank" rel="noopener noreferrer">
-            <Icon name="download" />{' '}Download
+            <Icon name="download" /> Download
           </a>
         </p>
       </Modal.Body>

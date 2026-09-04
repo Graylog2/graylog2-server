@@ -18,9 +18,13 @@ package org.graylog.datanode.opensearch.configuration.beans;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
+import org.graylog.datanode.process.configuration.files.TextConfigFile;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 
 class DatanodeConfigurationPartTest {
 
@@ -30,10 +34,14 @@ class DatanodeConfigurationPartTest {
                 .addNodeRole("cluster_manager")
                 .addNodeRole("data")
                 .addNodeRole("search")
-                .keystoreItems(Collections.singletonMap("foo", "bar"))
+                .keystoreItems(Collections.singletonList(new OpensearchKeystoreStringItem("foo", "bar")))
                 .properties(Collections.singletonMap("reindex.remote.allowlist", "localhost:9201"))
                 .systemProperty("file.encoding", "utf-8")
                 .systemProperty("java.home", "/jdk")
+                .withWarning("Unsupported property foo")
+                .withWarning("Unsupported property bar")
+                .withConfigFile(new TextConfigFile(Path.of("bar.txt"), "bar"))
+                .withConfigFiles(List.of(new TextConfigFile(Path.of("foo.txt"), "foo")))
                 .build();
 
         Assertions.assertThat(configurationPart.nodeRoles())
@@ -42,7 +50,7 @@ class DatanodeConfigurationPartTest {
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .hasSize(1)
-                .containsEntry("foo", "bar");
+                .anySatisfy(entry -> Assertions.assertThat(entry.key()).isEqualTo("foo"));
 
         Assertions.assertThat(configurationPart.properties())
                 .hasSize(1)
@@ -52,5 +60,15 @@ class DatanodeConfigurationPartTest {
                 .hasSize(2)
                 .containsEntry("file.encoding", "utf-8")
                 .containsEntry("java.home", "/jdk");
+
+        Assertions.assertThat(configurationPart.warnings())
+                .hasSize(2)
+                .contains("Unsupported property foo")
+                .contains("Unsupported property bar");
+
+        Assertions.assertThat(configurationPart.configFiles())
+                .hasSize(2)
+                .extracting(cf -> cf.relativePath().getFileName().toString())
+                .contains("bar.txt", "foo.txt");
     }
 }

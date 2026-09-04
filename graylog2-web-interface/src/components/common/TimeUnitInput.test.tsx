@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import TimeUnitInput from './TimeUnitInput';
@@ -38,7 +38,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'SECONDS', true));
   });
@@ -55,7 +55,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', false));
   });
@@ -72,7 +72,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown('days');
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(1, 'DAYS', false));
   });
@@ -89,7 +89,7 @@ describe('<TimeUnitInput />', () => {
 
     await findUnitDropdown();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(124, 'SECONDS', true));
   });
@@ -103,8 +103,8 @@ describe('<TimeUnitInput />', () => {
 
     const timeInput = await findTimeInput();
 
-    userEvent.clear(timeInput);
-    userEvent.paste(timeInput, '42');
+    // eslint-disable-next-line testing-library/prefer-user-event
+    fireEvent.change(timeInput, { target: { value: '42' } });
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
@@ -123,7 +123,9 @@ describe('<TimeUnitInput />', () => {
   });
 
   it('should use required and enabled when hideCheckbox is set', async () => {
-    const { rerender } = render(<TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />);
+    const { rerender } = render(
+      <TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />,
+    );
 
     expect(queryCheckbox()).not.toBeInTheDocument();
     expect(await findTimeInput()).toBeEnabled();
@@ -141,7 +143,7 @@ describe('<TimeUnitInput />', () => {
 
     render(<TimeUnitInput update={onUpdate} defaultEnabled value={9} defaultValue={42} />);
 
-    userEvent.type(await findTimeInput(), '{backspace}');
+    await userEvent.type(await findTimeInput(), '{backspace}');
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
@@ -150,7 +152,7 @@ describe('<TimeUnitInput />', () => {
     const onUpdate = jest.fn();
     render(<TimeUnitInput update={onUpdate} defaultEnabled value={9} defaultValue={42} />);
     const timeInput = await findTimeInput();
-    userEvent.type(timeInput, '{backspace}adsasd');
+    await userEvent.type(timeInput, '{backspace}adsasd');
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
@@ -159,29 +161,23 @@ describe('<TimeUnitInput />', () => {
     it('should use undefined when clearing input', async () => {
       const onUpdate = jest.fn();
 
-      render(
-        <TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
-      );
+      render(<TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />);
 
-      userEvent.type(await findTimeInput(), '{backspace}');
+      await userEvent.type(await findTimeInput(), '{backspace}');
       await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(undefined, 'SECONDS', true));
     });
 
     it('should use undefined when input receives some text', async () => {
       const onUpdate = jest.fn();
 
-      render(
-        <TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
-      );
+      render(<TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />);
 
-      userEvent.type(await findTimeInput(), '{backspace}adasd');
+      await userEvent.type(await findTimeInput(), '{backspace}adasd');
       await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(undefined, 'SECONDS', true));
     });
 
     it('should render empty string when value is undefined', async () => {
-      render(
-        <TimeUnitInput update={() => {}} defaultEnabled clearable value={undefined} defaultValue={42} />,
-      );
+      render(<TimeUnitInput update={() => {}} defaultEnabled clearable value={undefined} defaultValue={42} />);
 
       expect(await findTimeInput()).toHaveValue(null);
     });

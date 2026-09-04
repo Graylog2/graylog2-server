@@ -23,11 +23,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-public record KeystoreConfigFile(Path relativePath, KeystoreInformation keystoreInformation) implements DatanodeConfigFile {
+public record KeystoreConfigFile(Path relativePath,
+                                 KeystoreInformation keystoreInformation) implements DatanodeConfigFile {
 
     @Override
     public void write(OutputStream stream) throws IOException {
         try {
+            if (keystoreInformation.password().length == 0) {
+                throw new IllegalArgumentException("Keystore password is empty!");
+            }
             keystoreInformation().loadKeystore().store(stream, keystoreInformation.password());
         } catch (Exception e) {
             throw new OpensearchConfigurationException("Failed to persist opensearch keystore file " + relativePath, e);

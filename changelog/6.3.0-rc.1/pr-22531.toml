@@ -1,0 +1,5 @@
+type = "f" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "When inlining a global search filter, add a newly created ID"
+
+issues = ["graylog-plugin-enterprise#9719"]
+pulls = ["22531"]

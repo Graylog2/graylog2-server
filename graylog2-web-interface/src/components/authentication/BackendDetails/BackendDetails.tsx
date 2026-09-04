@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
-import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import type { PaginatedRoles } from 'hooks/useAuthzRoles';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import { Spinner } from 'components/common';
@@ -34,7 +34,7 @@ const _loadRoles = (setPaginatedRoles) => {
 };
 
 type Props = {
-  authenticationBackend: AuthenticationBackend,
+  authenticationBackend: AuthenticationBackend;
 };
 
 type TypedConfig = { type: string };
@@ -46,7 +46,9 @@ const BackendDetails = ({ authenticationBackend }: Props) => {
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   if (!authService) {
-    return <>{`No authentication service plugin configured for type "${(authenticationBackend.config as TypedConfig).type}"`}</>;
+    return (
+      <>{`No authentication service plugin configured for type "${(authenticationBackend.config as TypedConfig).type}"`}</>
+    );
   }
 
   if (!paginatedRoles) {

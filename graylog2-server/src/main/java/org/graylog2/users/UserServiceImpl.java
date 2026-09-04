@@ -27,6 +27,8 @@ import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
@@ -53,10 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -243,6 +241,25 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    public Optional<User> loadByAuthServiceUid(String authServiceUid) {
+        checkArgument(!isBlank(authServiceUid), "authServiceUid cannot be blank");
+
+        final DBObject query = new BasicDBObject(UserImpl.AUTH_SERVICE_UID, authServiceUid);
+        final List<DBObject> result = query(UserImpl.class, query);
+
+        if (result.size() > 1) {
+            final String msg = "There was more than one matching user for auth service UID <" + authServiceUid + ">. " +
+                    "This should never happen.";
+            LOG.error(msg);
+            throw new DuplicateUserException(msg);
+        }
+
+        return result.stream()
+                .map(dbObj -> (User) userFactory.create((ObjectId) dbObj.get("_id"), dbObj.toMap()))
+                .findFirst();
+    }
+
+    @Override
     public int delete(final String username) {
         DBObject query = new BasicDBObject();
         query.put(UserImpl.USERNAME, username);
@@ -340,6 +357,21 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public long count() {
         return totalCount(UserImpl.class);
+    }
+
+    @Override
+    public Map<String, Long> countByPrivilege() {
+        ObjectId adminRoleId = new ObjectId(roleService.getAdminRoleObjectId());
+
+        final long adminCount = collection(UserImpl.class)
+                .count(new BasicDBObject(UserImpl.ROLES, adminRoleId)) + (configuration.isRootUserDisabled() ? 0 : 1);
+
+        final long totalUsers = collection(UserImpl.class).count();
+
+        return Map.of(
+                "admin_users", adminCount,
+                "non_admin_users", totalUsers - adminCount
+        );
     }
 
     @Override

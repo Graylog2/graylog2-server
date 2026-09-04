@@ -20,18 +20,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class ExtractorSummaryList {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
-    @JsonProperty
+    @JsonProperty("extractors")
     public abstract List<ExtractorSummary> extractors();
 
     @JsonCreator

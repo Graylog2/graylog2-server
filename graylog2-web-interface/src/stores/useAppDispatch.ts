@@ -18,7 +18,7 @@ import { useDispatch } from 'react-redux';
 
 import type createStore from 'store';
 
-export type AppDispatch = ReturnType<typeof createStore>['dispatch'];
-const useAppDispatch: () => AppDispatch = useDispatch;
+export type AppDispatch<T extends object> = ReturnType<typeof createStore<T>>['dispatch'];
+const useAppDispatch: <T extends object>() => AppDispatch<T> = useDispatch;
 
 export default useAppDispatch;

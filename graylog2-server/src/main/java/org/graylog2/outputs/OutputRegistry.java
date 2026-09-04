@@ -27,6 +27,10 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -44,11 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
@@ -127,7 +126,7 @@ public class OutputRegistry {
         }
 
         final Set<String> expectedRunningOutputs = streamService.loadAllEnabled().stream()
-                .flatMap(stream -> stream.getOutputs().stream()).map(Output::getId).collect(Collectors.toSet());
+                .flatMap(stream -> stream.getOutputIds().stream()).map(ObjectId::toHexString).collect(Collectors.toSet());
         final Set<String> currentlyRunningOutputs = runningMessageOutputs.asMap().keySet();
 
         Sets.difference(currentlyRunningOutputs, expectedRunningOutputs).forEach(this::removeOutput);
@@ -183,21 +182,18 @@ public class OutputRegistry {
     }
 
     public Callable<MessageOutput> loadForIdAndStream(final String id, final Stream stream) {
-        return new Callable<>() {
-            @Override
-            public MessageOutput call() throws Exception {
-                // Check if the output is still assigned to the given stream before loading and starting it.
-                // The stream assignment of the output could have been removed while the message object went
-                // through processing and output buffer processing handling.
-                // Without this check, we would start the output again after it has been stopped by removing it
-                // from a stream.
-                final Stream dbStream = streamService.load(stream.getId());
-                if (dbStream.getOutputs().stream().map(Output::getId).anyMatch(id::equalsIgnoreCase)) {
-                    final Output output = outputService.load(id);
-                    return launchOutput(output, stream);
-                }
-                throw new IllegalArgumentException("Output not assigned to stream");
+        return () -> {
+            // Check if the output is still assigned to the given stream before loading and starting it.
+            // The stream assignment of the output could have been removed while the message object went
+            // through processing and output buffer processing handling.
+            // Without this check, we would start the output again after it has been stopped by removing it
+            // from a stream.
+            final Stream dbStream = streamService.load(stream.getId());
+            if (dbStream.getOutputIds().stream().map(ObjectId::toHexString).anyMatch(id::equalsIgnoreCase)) {
+                final Output output = outputService.load(id);
+                return launchOutput(output, stream);
             }
+            throw new IllegalArgumentException("Output not assigned to stream");
         };
     }
 

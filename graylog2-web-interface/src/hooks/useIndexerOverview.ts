@@ -16,41 +16,82 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
-import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
+import { defaultOnError } from 'util/conditional/onError';
 
-const fetchIndexerOverview = (indexSetId: string) => fetch('GET', qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url));
+export type IndexRange = {
+  index_name?: string;
+  begin: string;
+  end: string;
+  calculated_at: string;
+  took_ms: number;
+};
 
-const useIndexerOverview = (indexSetId: string): {
-  data: IndexerOverview,
-  refetch: () => void,
-  isLoading: boolean,
-  error: FetchError,
-  isSuccess: boolean,
-} => {
-  const { data, refetch, isLoading, error, isSuccess } = useQuery<IndexerOverview, FetchError>(
-    ['indexerOverview', indexSetId, 'stats'],
-    () => fetchIndexerOverview(indexSetId),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading indexer overview for index set failed with status: ${errorThrown}`,
-          'Could not load indexer overview.');
-      },
-      notifyOnChangeProps: ['data', 'error'],
-    },
-  );
+export type IndexTier = 'WARM' | 'HOT';
 
-  return ({
+export type IndexSummary = {
+  index_name?: string;
+  size: {
+    events: number;
+    deleted: number;
+    bytes: number;
+  };
+  range: IndexRange;
+  is_deflector: boolean;
+  is_closed: boolean;
+  is_reopened: boolean;
+  shard_count: number;
+  tier: IndexTier;
+};
+
+export type IndexerOverview = {
+  deflector: {
+    current_target: string;
+    is_up: boolean;
+  };
+  indexer_cluster: {
+    health: {
+      status: string;
+      name?: string;
+      shards: {
+        active: number;
+        initializing: number;
+        relocating: number;
+        unassigned: number;
+      };
+    };
+  };
+  counts: {
+    events: number;
+  };
+  indices: Array<IndexSummary>;
+};
+
+const fetchIndexerOverview = (indexSetId: string): Promise<IndexerOverview> =>
+  fetch('GET', qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url));
+
+const useIndexerOverview = (indexSetId: string) => {
+  const { data, refetch, isLoading, error, isSuccess } = useQuery({
+    queryKey: ['indexerOverview', indexSetId, 'stats'],
+    queryFn: () =>
+      defaultOnError(
+        fetchIndexerOverview(indexSetId),
+        `Loading indexer overview for index set failed with status`,
+        'Could not load indexer overview.',
+      ),
+
+    notifyOnChangeProps: ['data', 'error'],
+  });
+
+  return {
     data,
     refetch,
     isLoading,
     error,
     isSuccess,
-  });
+  };
 };
 
 export default useIndexerOverview;

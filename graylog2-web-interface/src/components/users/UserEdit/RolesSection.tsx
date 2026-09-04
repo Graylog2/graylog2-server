@@ -18,23 +18,22 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
-import UsersDomain from 'domainActions/users/UsersDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
+import { USERS_QUERY_KEY } from 'hooks/useUsers';
 import { ErrorAlert } from 'components/common';
 import type User from 'logic/users/User';
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
-import PaginatedItemOverview, {
-  DEFAULT_PAGINATION,
-} from 'components/common/PaginatedItemOverview';
-import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
+import PaginatedItemOverview, { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
+import type { PaginatedRoles } from 'hooks/useAuthzRoles';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import RolesSelector from 'components/permissions/RolesSelector';
 import RolesQueryHelper from 'components/roles/RolesQueryHelper';
 
 type Props = {
-  user: User,
-  onSubmit: (payload: { roles: string[] }) => Promise<void>,
+  user: User;
+  onSubmit: (payload: { roles: string[] }) => Promise<void>;
 };
 
 const Container = styled.div`
@@ -44,24 +43,29 @@ const Container = styled.div`
 
 const RolesSection = ({ user, onSubmit }: Props) => {
   const { username, id } = user;
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [errors, setErrors] = useState<string | undefined>();
 
-  const _onLoad = useCallback((pagination = DEFAULT_PAGINATION) => {
-    setLoading(true);
+  const _onLoad = useCallback(
+    (pagination = DEFAULT_PAGINATION) => {
+      setLoading(true);
 
-    return AuthzRolesDomain.loadRolesForUser(username, pagination).then((newPaginatedRoles) => {
-      setLoading(false);
+      return AuthzRolesDomain.loadRolesForUser(username, pagination).then((newPaginatedRoles) => {
+        setLoading(false);
 
-      return newPaginatedRoles;
+        return newPaginatedRoles;
+      });
+    },
+    [username],
+  );
+
+  const onRolesUpdate = (data: { roles: Array<string> }) =>
+    onSubmit(data).then(() => {
+      _onLoad().then(setPaginatedRoles);
+      queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, id] });
     });
-  }, [username]);
-
-  const onRolesUpdate = (data: { roles: Array<string> }) => onSubmit(data).then(() => {
-    _onLoad().then(setPaginatedRoles);
-    UsersDomain.load(id);
-  });
 
   const _onAssignRole = (newRoles: Immutable.Set<DescriptiveItem>) => {
     const userRoles = user.roles;
@@ -73,7 +77,8 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     return onRolesUpdate({ roles: newUserRoles });
   };
 
-  const ensureReaderOrAdminRole = (newRoles) => newRoles.includes('Reader') || newRoles.includes('Admin');
+  const ensureReaderOrAdminRole = (newRoles: Array<string>) =>
+    newRoles.includes('Reader') || newRoles.includes('Admin');
 
   const onDeleteRole = (role: DescriptiveItem) => {
     const newUserRoles = Immutable.Set(user.roles.toJS()).remove(role.name).toJS();
@@ -94,16 +99,16 @@ const RolesSection = ({ user, onSubmit }: Props) => {
         <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
       </Container>
 
-      <ErrorAlert onClose={setErrors}>
-        {errors}
-      </ErrorAlert>
+      <ErrorAlert onClose={setErrors}>{errors}</ErrorAlert>
       <h3>Selected Roles</h3>
       <Container>
-        <PaginatedItemOverview noDataText="No selected roles have been found."
-                               onLoad={_onLoad}
-                               overrideList={paginatedRoles}
-                               onDeleteItem={onDeleteRole}
-                               queryHelper={<RolesQueryHelper />} />
+        <PaginatedItemOverview
+          noDataText="No selected roles have been found."
+          onLoad={_onLoad}
+          overrideList={paginatedRoles}
+          onDeleteItem={onDeleteRole}
+          queryHelper={<RolesQueryHelper />}
+        />
       </Container>
     </SectionComponent>
   );

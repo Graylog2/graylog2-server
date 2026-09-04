@@ -20,15 +20,17 @@ import type { Moment } from 'moment';
 import { relativeDifference, adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime?: string | number | Date | Moment,
+  dateTime?: string | number | Date | Moment;
+  /** Render "12 days" instead of "12 days ago" (moment's fromNow(true)). */
+  withoutSuffix?: boolean;
 };
 
 /**
  * This component receives any date time and displays the relative time until now in a human-readable format.
  */
-const RelativeTime = ({ dateTime: dateTimeProp }: Props) => {
+const RelativeTime = ({ dateTime: dateTimeProp = undefined, withoutSuffix = false }: Props) => {
   const dateTime = dateTimeProp ?? new Date();
-  const relativeTime = relativeDifference(dateTime);
+  const relativeTime = relativeDifference(dateTime, withoutSuffix);
   const dateTimeString = adjustFormat(dateTime, 'internal');
 
   return (

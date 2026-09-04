@@ -14,27 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import get from 'lodash/get';
 import * as Immutable from 'immutable';
 
 import SeriesConfig from './SeriesConfig';
 import type { SeriesConfigJson } from './SeriesConfig';
 
 export type SeriesJson = {
-  config: SeriesConfigJson,
-  function: string,
+  config: SeriesConfigJson;
+  function: string;
 };
 
 type InternalState = {
-  config: SeriesConfig,
-  function: string,
+  config: SeriesConfig;
+  function: string;
 };
 
 export type Definition = {
-  type: string,
-  field?: string,
-  percentile?: string,
-  strategy?: string,
+  type: string;
+  field?: string;
+  percentile?: string;
+  strategy?: string;
 };
 
 const parametersRegex = /\((.+)\)/;
@@ -94,7 +93,7 @@ export default class Series {
   }
 
   get effectiveName(): string {
-    const overridenName = get(this, 'config.name');
+    const overridenName = this?.config?.name;
 
     return overridenName || this.function;
   }
@@ -116,10 +115,7 @@ export default class Series {
 
   static forFunction(func: string) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .function(func)
-      .config(SeriesConfig.empty())
-      .build();
+    return new Builder().function(func).config(SeriesConfig.empty()).build();
   }
 
   static create(func: string, field?: string, parameter?: string | number) {

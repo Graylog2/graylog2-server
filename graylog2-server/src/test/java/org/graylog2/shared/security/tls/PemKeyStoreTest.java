@@ -18,8 +18,8 @@ package org.graylog2.shared.security.tls;
 
 import com.google.common.io.Resources;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PemKeyStoreTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Security.addProvider(new BouncyCastleProvider());
     }

@@ -16,18 +16,16 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
 
-import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
-import { Icon, Section, Spinner } from 'components/common';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import { Table, Button, Alert } from 'components/bootstrap';
-import { LinkContainer } from 'components/common/router';
+import { ARCHIVE_RETENTION_STRATEGY } from 'hooks/useIndices';
+import { Section, Spinner, Link } from 'components/common';
+import { Table, Alert } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { useStore } from 'stores/connect';
-import type { Stream } from 'stores/streams/StreamsStore';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import type { Stream } from 'logic/streams/types';
 import NumberUtils from 'util/NumberUtils';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
+import useExcludedArchiveStreams from 'components/streams/hooks/useExcludedArchiveStreams';
 import IndexSetArchivingCell from 'components/streams/StreamDetails/routing-destination/IndexSetArchivingCell';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
@@ -37,23 +35,32 @@ import useIndexSetStats from 'hooks/useIndexSetStats';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import useIndexerOverview from 'hooks/useIndexerOverview';
 import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
+import useProductName from 'brand-customization/useProductName';
 
 import IndexSetOldestMessageCell from './IndexSetOldestMessageCell';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
-const ActionButtonsWrap = styled.span(() => css`
-  float: right;
-`);
-
 const DestinationIndexSetSection = ({ stream }: Props) => {
+  const productName = useProductName();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { data: indexSet, isInitialLoading: isLoadingIndexSet } = useSingleIndexSet(stream.index_set_id);
-  const archivingEnabled = indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
-  const { indexSets } = useStore(IndexSetsStore);
-  const { data: streamOutputFilters, isLoading: isLoadingStreamOutputFilters } = useStreamOutputFilters(stream.id, 'indexer', pagination);
+  const excludedStreams = useExcludedArchiveStreams();
+  const indexSetArchivingEnabled =
+    indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY ||
+    indexSet?.data_tiering?.archive_before_deletion;
+  // A stream is only archived when its index set archives AND the stream is not excluded from archiving.
+  const archivingEnabled = Boolean(indexSetArchivingEnabled) && !excludedStreams.includes(stream.id);
+  const {
+    data: { indexSets },
+  } = useIndexSetsList(false);
+  const { data: streamOutputFilters, isLoading: isLoadingStreamOutputFilters } = useStreamOutputFilters(
+    stream.id,
+    'indexer',
+    pagination,
+  );
   const { data: indexerOverview, isSuccess: isLoadingIndexerOverviewSuccess } = useIndexerOverview(stream.index_set_id);
   /* eslint-disable no-constant-condition */
   const title = true ? 'Enabled' : 'Disabled'; // TODO use api to check if enabled
@@ -63,36 +70,42 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
     <Spinner />;
   }
 
-  const onPaginationChange = (newPage: number, newPerPage: number) => setPagination({
-    ...pagination,
-    page: newPage,
-    perPage: newPerPage,
-  });
+  const onPaginationChange = (newPage: number, newPerPage: number) =>
+    setPagination({
+      ...pagination,
+      page: newPage,
+      perPage: newPerPage,
+    });
 
   return (
-    <Section title="Index Set"
-             collapsible
-             defaultClosed
-             headerLeftSection={(
-               <>
-                 <DestinationSwitch aria-label="Toggle index set"
-                                    name="toggle-indexset"
-                                    checked
-                                    label={title}
-                                    disabled
-                                    onChange={() => {}} />
-                 <SectionCountLabel>FILTERS {streamOutputFilters?.pagination?.total || 0}</SectionCountLabel>
-               </>
-             )}
-             actions={(
-               <IndexSetUpdateForm initialValues={{ index_set_id: stream.index_set_id }}
-                                   indexSets={indexSets}
-                                   stream={stream} />
-            )}>
+    <Section
+      title="Index Set"
+      collapsible
+      defaultClosed
+      headerLeftSection={
+        <>
+          <DestinationSwitch
+            aria-label="Toggle index set"
+            name="toggle-indexset"
+            checked
+            label={title}
+            disabled
+            onChange={() => {}}
+          />
+          <SectionCountLabel>FILTERS {streamOutputFilters?.pagination?.total || 0}</SectionCountLabel>
+        </>
+      }
+      actions={
+        <IndexSetUpdateForm
+          initialValues={{ index_set_id: stream.index_set_id }}
+          indexSets={indexSets}
+          stream={stream}
+        />
+      }>
       <Alert bsStyle="default">
-        Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License usage.<br />
-        These messages will be stored in the defined Index Set until the retention policy criteria is met.<br />
-        Note: Messages not routed to the <b>Search Cluster</b> will not be searchable in Graylog.
+        Messages routed to the <b>Search Cluster</b> will be searchable and count towards the {productName} License
+        usage. These messages will be stored in the defined Index Set until the retention policy criteria is met. Note:
+        Messages not routed to the <b>Search Cluster</b> will not be searchable.
       </Alert>
       <Table>
         <thead>
@@ -100,35 +113,35 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
             <td>Name</td>
             <td>Total size</td>
             <td>Oldest Message (date)</td>
-            <td colSpan={2}>Archiving</td>
+            <td>Archiving</td>
           </tr>
         </thead>
         <tbody>
           {indexSet && (
             <tr>
-              <td>{indexSet?.title}</td>
-              <td>{(isStatsLoaded && indexSetStats?.size) ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
-              <td>{isLoadingIndexerOverviewSuccess && <IndexSetOldestMessageCell index={indexerOverview?.indices?.pop()} />}</td>
               <td>
-                <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
+                <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>{indexSet?.title}</Link>
+              </td>
+              <td>{isStatsLoaded && indexSetStats?.size ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
+              <td>
+                {isLoadingIndexerOverviewSuccess && (
+                  <IndexSetOldestMessageCell index={indexerOverview?.indices?.pop()} />
+                )}
               </td>
               <td>
-                <ActionButtonsWrap>
-                  <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>
-                    <Button bsStyle="default"
-                            bsSize="xsmall"
-                            onClick={() => {}}
-                            title="View index set">
-                      <Icon name="pageview" type="regular" />
-                    </Button>
-                  </LinkContainer>
-                </ActionButtonsWrap>
+                <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
               </td>
             </tr>
           )}
         </tbody>
       </Table>
-      {streamOutputFilters && (<IndexSetFilters streamId={stream.id} paginatedFilters={streamOutputFilters} onPaginationChange={onPaginationChange} />)}
+      {streamOutputFilters && (
+        <IndexSetFilters
+          streamId={stream.id}
+          paginatedFilters={streamOutputFilters}
+          onPaginationChange={onPaginationChange}
+        />
+      )}
     </Section>
   );
 };

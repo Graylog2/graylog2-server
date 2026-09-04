@@ -23,9 +23,11 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
-import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
+import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.exceptions.SkippableEntityException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -36,24 +38,22 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class StreamReferenceFacade extends StreamFacade {
+public class StreamReferenceFacade extends StreamFacade implements UpdatableEntityFacade<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(StreamReferenceFacade.class);
 
     public static final ModelType TYPE_V1 = ModelTypes.STREAM_REF_V1;
@@ -62,8 +62,9 @@ public class StreamReferenceFacade extends StreamFacade {
     private final StreamService streamService;
 
     @Inject
-    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration, IndexSetService indexSetService, UserService userService) {
-        super(objectMapper, streamService, streamRuleService, legacyAlertsMigration, indexSetService, userService);
+    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService,
+                                 IndexSetService indexSetService, UserService userService, FavoriteFieldsService favoriteFieldsService) {
+        super(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService);
         this.objectMapper = objectMapper;
         this.streamService = streamService;
     }
@@ -87,7 +88,7 @@ public class StreamReferenceFacade extends StreamFacade {
         try {
             final Stream stream = streamService.load(modelId.id());
             return Optional.of(exportNativeEntity(stream, entityDescriptorIds));
-        } catch (NotFoundException e) {
+        } catch (Exception e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
             return Optional.empty();
         }
@@ -133,10 +134,13 @@ public class StreamReferenceFacade extends StreamFacade {
                                                    Map<EntityDescriptor, Object> nativeEntities,
                                                    String username) {
         if (entity instanceof EntityV1) {
-            // Throw an exception if this is reached. Install process should fail earlier if no existing Stream found.
-            // A native entity cannot be created as this is only a reference to an existing stream.
+            // A stream reference only points at an existing stream; it can never be created. Reaching this point
+            // means the referenced stream is absent (e.g. during a revision upgrade), so skip the reference instead
+            // of aborting the whole content pack installation.
             final StreamReferenceEntity streamEntity = objectMapper.convertValue(((EntityV1) entity).data(), StreamReferenceEntity.class);
-            throw new ContentPackException("Stream with title <" + streamEntity.title().asString(parameters) + "> does not exist!");
+            final String title = streamEntity.title().asString(parameters);
+            LOG.warn("Skipping content pack stream reference: no stream titled <{}> exists on this system", title);
+            throw new SkippableEntityException("Stream with title <" + title + "> does not exist!");
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
@@ -144,31 +148,25 @@ public class StreamReferenceFacade extends StreamFacade {
 
     private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
         final StreamReferenceEntity streamEntity = objectMapper.convertValue(entity.data(), StreamReferenceEntity.class);
-        final List<Stream> streams = streamService.loadAllByTitle(streamEntity.title().asString(parameters));
+        final String title = streamEntity.title().asString(parameters);
+        final List<Stream> streams = streamService.loadAllByTitle(title);
         if (streams.size() == 1) {
             final Stream stream = streams.get(0);
             return Optional.of(NativeEntity.create(entity.id(), stream.getId(), ModelTypes.STREAM_V1, stream.getTitle(), stream));
+        } else if (streams.isEmpty()) {
+            // The referenced stream does not exist on this system. Skip the reference instead of aborting the whole
+            // content pack installation; views that point at it drop the reference during resolution.
+            LOG.warn("Skipping content pack stream reference: no stream titled <{}> exists on this system", title);
+            throw new SkippableEntityException("Stream with title <" + title + "> does not exist!");
         } else {
-            throw new ContentPackException(streams.isEmpty()
-                    ? "Stream with title <" + streamEntity.title().asString(parameters) + "> does not exist!"
-                    : "Multiple Streams with title <" + streamEntity.title().asString(parameters) + "> exist!");
+            // A duplicate stream title is a genuine, admin-fixable conflict, so it must still abort the install.
+            throw new ContentPackException("Multiple Streams with title <" + title + "> exist!");
         }
     }
 
     @Override
-    public EntityExcerpt createExcerpt(Stream stream) {
-        return EntityExcerpt.builder()
-                .id(ModelId.of(stream.getTitle()))
-                .type(ModelTypes.STREAM_REF_V1)
-                .title(stream.getTitle())
-                .build();
-    }
-
-    @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return streamService.loadAll().stream()
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        return Set.of();
     }
 
     public static Entity resolveStreamEntity(String id, Map<EntityDescriptor, Entity> entities) {
@@ -194,5 +192,23 @@ public class StreamReferenceFacade extends StreamFacade {
     public static String getStreamEntityIdOrThrow(String id, EntityDescriptorIds entityDescriptorIds) {
         return getStreamEntityId(id, entityDescriptorIds).orElseThrow(() ->
                 new ContentPackException("Couldn't find entity " + id + "/" + ModelTypes.STREAM_V1 + " or " + ModelTypes.STREAM_REF_V1));
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.STREAMS_CREATE);
+    }
+
+    /**
+     * Deliberate no-op: a stream reference only points at an existing stream resolved by title.
+     * The stream itself is created and maintained outside the content pack (e.g. by the Illuminate
+     * bundle installer), so there is no content to update in place on upgrade.
+     */
+    @Override
+    public void updateNativeEntity(Entity entity,
+                                   NativeEntity<Stream> existingEntity,
+                                   Map<String, ValueReference> parameters,
+                                   Map<EntityDescriptor, Object> nativeEntities,
+                                   String username) {
     }
 }

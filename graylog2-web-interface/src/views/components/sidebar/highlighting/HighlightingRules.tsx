@@ -21,13 +21,8 @@ import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 import IconButton from 'components/common/IconButton';
 import { SortableList } from 'components/common';
-import type {
-  Value,
-  Condition,
-  Color,
-} from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type { Value, Condition, Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingRuleClass from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 import HighlightingRule, { Container, RuleContainer } from './HighlightingRule';
 import ColorPreview from './ColorPreview';
@@ -37,71 +32,99 @@ import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
 
 type SortableHighlightingRuleProps = {
-  item: { id: string, rule: HighlightingRuleClass },
-  draggableProps: DraggableProps,
-  dragHandleProps: DragHandleProps,
-  className?: string,
-  onUpdate: (existingRule: HighlightingRuleClass, field: string, value: Value, condition: Condition, color: Color) => Promise<void>,
-  onDelete: (rule: HighlightingRuleClass) => Promise<void>,
-}
+  item: { id: string; rule: HighlightingRuleClass };
+  dragHandle: React.ReactNode;
+  className?: string;
+  onUpdate: (
+    existingRule: HighlightingRuleClass,
+    field: string,
+    value: Value,
+    condition: Condition,
+    color: Color,
+  ) => Promise<void>;
+  onDelete: (rule: HighlightingRuleClass) => Promise<void>;
+};
 
-const SortableHighlightingRule = forwardRef<HTMLDivElement, SortableHighlightingRuleProps>(({
-  item: { id, rule }, draggableProps, dragHandleProps, className = undefined,
-  onUpdate, onDelete,
-}, ref) => (
-  <HighlightingRule key={id}
-                    rule={rule}
-                    onUpdate={onUpdate}
-                    onDelete={onDelete}
-                    dragHandleProps={dragHandleProps}
-                    draggableProps={draggableProps}
-                    className={className}
-                    ref={ref} />
-));
+const SortableHighlightingRule = (
+  { item: { id, rule }, dragHandle, className = undefined, onUpdate, onDelete }: SortableHighlightingRuleProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <HighlightingRule
+    key={id}
+    rule={rule}
+    onUpdate={onUpdate}
+    onDelete={onDelete}
+    dragHandle={dragHandle}
+    className={className}
+    ref={ref}
+  />
+);
+
+const SortableHighlightingRuleWrapper = forwardRef(SortableHighlightingRule);
 
 type Props = {
-  description: string,
-  onUpdateRules: (newRules: Array<HighlightingRuleClass>) => Promise<void>,
-  onCreateRule: (newRule: HighlightingRuleClass) => Promise<void>,
-  onUpdateRule: (targetRule: HighlightingRuleClass, field: string, value: Value, condition: Condition, color: Color) => Promise<void>,
-  onDeleteRule: (rule: HighlightingRuleClass) => Promise<void>,
-  showSearchHighlightInfo?: boolean,
-}
+  description: string;
+  onUpdateRules: (newRules: Array<HighlightingRuleClass>) => Promise<void>;
+  onCreateRule: (newRule: HighlightingRuleClass) => Promise<void>;
+  onUpdateRule: (
+    targetRule: HighlightingRuleClass,
+    field: string,
+    value: Value,
+    condition: Condition,
+    color: Color,
+  ) => Promise<void>;
+  onDeleteRule: (rule: HighlightingRuleClass) => Promise<void>;
+  showSearchHighlightInfo?: boolean;
+};
 
-const HighlightingRules = ({ description, onUpdateRules, onCreateRule: onCreateRuleProp, onUpdateRule, onDeleteRule, showSearchHighlightInfo = true }: Props) => {
+const HighlightingRules = ({
+  description,
+  onUpdateRules,
+  onCreateRule: onCreateRuleProp,
+  onUpdateRule,
+  onDeleteRule,
+  showSearchHighlightInfo = true,
+}: Props) => {
   const [showForm, setShowForm] = useState(false);
   const rules = useContext(HighlightingRulesContext) ?? [];
-  const rulesWithId = rules.map((rule) => ({ rule, id: `${rule.field}-${rule.value}-${rule.color}-${rule.condition}` }));
+  const rulesWithId = rules.map((rule) => ({
+    rule,
+    id: `${rule.field}-${rule.value}-${rule.color}-${rule.condition}`,
+  }));
 
-  const updateRules = useCallback((newRulesWithId: Array<{ id: string, rule: HighlightingRuleClass }>) => {
-    const newRules = newRulesWithId.map(({ rule }) => rule);
+  const updateRules = useCallback(
+    (newRulesWithId: Array<{ id: string; rule: HighlightingRuleClass }>) => {
+      const newRules = newRulesWithId.map(({ rule }) => rule);
 
-    return onUpdateRules(newRules);
-  }, [onUpdateRules]);
+      return onUpdateRules(newRules);
+    },
+    [onUpdateRules],
+  );
 
-  const onCreateRule = useCallback((field: string, value: Value, condition: Condition, color: Color) => (
-    onCreateRuleProp(HighlightingRuleClass.create(field, value, condition, color))
-  ), [onCreateRuleProp]);
+  const onCreateRule = useCallback(
+    (field: string, value: Value, condition: Condition, color: Color) =>
+      onCreateRuleProp(HighlightingRuleClass.create(field, value, condition, color)),
+    [onCreateRuleProp],
+  );
 
-  const listItemRender = useCallback((props: {
-    item: { id: string, rule: HighlightingRuleClass },
-    draggableProps: DraggableProps,
-    dragHandleProps: DragHandleProps,
-    className?: string,
-  }) => (
-    <SortableHighlightingRule {...props} onUpdate={onUpdateRule} onDelete={onDeleteRule} />
-  ), [onDeleteRule, onUpdateRule]);
+  const listItemRender = useCallback(
+    (props: { item: { id: string; rule: HighlightingRuleClass }; dragHandle: React.ReactNode; className?: string }) => (
+      <SortableHighlightingRuleWrapper {...props} onUpdate={onUpdateRule} onDelete={onDeleteRule} />
+    ),
+    [onDeleteRule, onUpdateRule],
+  );
 
   return (
     <>
-      <SectionInfo>
-        {description}
-      </SectionInfo>
+      <SectionInfo>{description}</SectionInfo>
       <SectionSubheadline>
-        Active highlights <IconButton className="pull-right"
-                                      name="add"
-                                      onClick={() => setShowForm(!showForm)}
-                                      title="Add highlighting rule" />
+        Active highlights{' '}
+        <IconButton
+          className="pull-right"
+          name="add"
+          onClick={() => setShowForm(!showForm)}
+          title="Add highlighting rule"
+        />
       </SectionSubheadline>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} onSubmit={onCreateRule} />}
 
@@ -111,9 +134,7 @@ const HighlightingRules = ({ description, onUpdateRules, onCreateRule: onCreateR
           <RuleContainer>Search terms</RuleContainer>
         </Container>
       )}
-      <SortableList items={rulesWithId}
-                    onMoveItem={updateRules}
-                    customListItemRender={listItemRender} />
+      <SortableList items={rulesWithId} onMoveItem={updateRules} customListItemRender={listItemRender} />
     </>
   );
 };

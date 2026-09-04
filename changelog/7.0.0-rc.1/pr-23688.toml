@@ -1,0 +1,5 @@
+type = "a"
+message = "External data lake search and retrieval enabled in enterprise."
+
+pulls = ["23688"]
+issues = ['Graylog2/graylog-plugin-enterprise#11933']

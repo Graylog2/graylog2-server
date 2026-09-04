@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/// <reference path="./types.ts" />
 import React from 'react';
+
+import './types';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import SecurityPage from 'components/security/teaser/SecurityPage';
@@ -24,13 +25,17 @@ const SecurityPageEntry = () => {
   const securityPagePlugins = usePluginEntities('securityPage');
 
   if (securityPagePlugins?.length) {
-    // eslint-disable-next-line react/no-array-index-key
-    return <>{securityPagePlugins.map((Page, index) => <Page key={index} />)}</>;
+    return (
+      <>
+        {securityPagePlugins.map((Page, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Page key={index} />
+        ))}
+      </>
+    );
   }
 
-  return (
-    <SecurityPage />
-  );
+  return <SecurityPage />;
 };
 
 export default SecurityPageEntry;

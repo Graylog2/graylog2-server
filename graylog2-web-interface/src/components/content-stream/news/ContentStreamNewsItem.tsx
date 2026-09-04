@@ -17,54 +17,60 @@
 import React from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-import DOMPurify from 'dompurify';
 
-import { Carousel, Timestamp } from 'components/common';
+import { Carousel, Sanitize, Timestamp } from 'components/common';
 import { Panel } from 'components/bootstrap';
 import type { FeedItem, FeedMediaContent } from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-  feed: FeedItem
-}
+  feed: FeedItem;
+};
 
-const StyledImage = styled.img(({ theme }: { theme: DefaultTheme }) => css`
-  max-width: 100%;
-  width: 100%;
-  object-fit: contain;
-  border-radius: ${theme.spacings.xxs} ${theme.spacings.xxs} 0 0;
-`);
-const StyledPanelBody = styled(Panel.Body)(({ theme }: { theme: DefaultTheme }) => css`
-  flex-grow: 1;
-  background-color: ${theme.colors.newsCards.background};
+const StyledImage = styled.img(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    max-width: 100%;
+    width: 100%;
+    object-fit: contain;
+    border-radius: ${theme.spacings.xxs} ${theme.spacings.xxs} 0 0;
+  `,
+);
+const StyledPanelBody = styled(Panel.Body)(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    flex-grow: 1;
+    background-color: ${theme.colors.newsCards.background};
 
-  > a {
-    font-weight: bold;
-  }
-`);
-const StyledPanelFooter = styled(Panel.Footer)(({ theme }: { theme: DefaultTheme }) => css`
-  background-color: ${theme.colors.newsCards.background};
-  border-radius: 0 0 ${theme.spacings.xxs} ${theme.spacings.xxs};
-`);
-const StyledPanel = styled(Panel)(({ theme }: { theme: DefaultTheme }) => css`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  border: none;
-  border-radius: ${theme.spacings.xxs};
-`);
-const _sanitizeText = (text) => DOMPurify.sanitize(text);
+    > a {
+      font-weight: bold;
+    }
+  `,
+);
+const StyledPanelFooter = styled(Panel.Footer)(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    background-color: ${theme.colors.newsCards.background};
+    border-radius: 0 0 ${theme.spacings.xxs} ${theme.spacings.xxs};
+  `,
+);
+const StyledPanel = styled(Panel)(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: none;
+    border-radius: ${theme.spacings.xxs};
+  `,
+);
 
-const getImage = (media: FeedMediaContent | Array<FeedMediaContent>) => (Array.isArray(media) ? media?.[0]?.attr_url : media?.attr_url);
+const getImage = (media: FeedMediaContent | Array<FeedMediaContent>) =>
+  Array.isArray(media) ? media?.[0]?.attr_url : media?.attr_url;
 
 const ContentStreamNewsItem = ({ feed }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('content-stream');
 
   const handleSendTelemetry = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.ARTICLE_CLICKED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
       event_details: {
         title: feed?.title,
         link: feed?.link,
@@ -80,16 +86,12 @@ const ContentStreamNewsItem = ({ feed }: Props) => {
         </a>
 
         <StyledPanelBody>
-          <a href={feed?.link}
-             target="_blank"
-             onClick={() => handleSendTelemetry()}
-             rel="noreferrer">
-            {/* eslint-disable-next-line react/no-danger */}
-            <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
+          <a href={feed?.link} target="_blank" onClick={() => handleSendTelemetry()} rel="noreferrer">
+            <Sanitize html={feed?.title} />
           </a>
         </StyledPanelBody>
         <StyledPanelFooter>
-          <Timestamp dateTime={_sanitizeText(feed?.pubDate)} format="shortReadable" />
+          <Timestamp dateTime={feed?.pubDate} format="shortReadable" />
         </StyledPanelFooter>
       </StyledPanel>
     </Carousel.Slide>

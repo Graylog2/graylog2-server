@@ -16,16 +16,12 @@
  */
 package org.graylog.plugins.views.migrations;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
-import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -36,12 +32,11 @@ import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class V20240704100700_DashboardAddLastUpdated extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20190127111728_MigrateWidgetFormatSettings.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V20240704100700_DashboardAddLastUpdated.class);
     private final ClusterConfigService clusterConfigService;
     private final MongoCollection<ViewDTO> viewsCollection;
     private final MongoCollection<Search> searchesCollection;

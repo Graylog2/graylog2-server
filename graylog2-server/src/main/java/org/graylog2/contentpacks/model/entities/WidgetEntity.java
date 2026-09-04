@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -52,6 +51,8 @@ import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -65,11 +66,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetEntity.Builder.class)
-@WithBeanGetter
 public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
+    private static final Logger LOG = LoggerFactory.getLogger(WidgetEntity.class);
+
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FILTER = "filter";
@@ -79,6 +82,8 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
     public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_CONTEXT = "context";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -107,6 +112,14 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
 
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
+
+    @JsonProperty(FIELD_CONTEXT)
+    @Nullable
+    public abstract String context();
 
     public static Builder builder() {
         return Builder.builder();
@@ -146,6 +159,12 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 visible = true)
         public abstract Builder config(WidgetConfigDTO config);
 
+        @JsonProperty(FIELD_DESCRIPTION)
+        public abstract Builder description(@Nullable String description);
+
+        @JsonProperty(FIELD_CONTEXT)
+        public abstract Builder context(@Nullable String context);
+
         public abstract WidgetEntity build();
 
         @JsonCreator
@@ -160,22 +179,17 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     @Override
     public WidgetDTO toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
+                .description(this.description())
+                .context(this.context())
                 .config(this.config())
                 .filter(this.filter())
                 .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .id(this.id())
                 .streams(this.streams().stream()
-                        .map(id -> resolveStreamEntityObject(id, nativeEntities))
-                        .map(object -> {
-                            if (object == null) {
-                                throw new ContentPackException("Missing Stream for widget entity");
-                            } else if (object instanceof final Stream stream) {
-                                return stream.getId();
-                            } else {
-                                throw new ContentPackException(
-                                        "Invalid type for stream Stream for event definition: " + object.getClass());
-                            }
-                        }).collect(Collectors.toSet()))
+                        .map(streamId -> resolveStreamReference(streamId, nativeEntities))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toSet()))
                 .streamCategories(this.streamCategories())
                 .type(this.type());
         if (this.query().isPresent()) {
@@ -185,6 +199,27 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
             widgetBuilder.timerange(this.timerange().get());
         }
         return widgetBuilder.build();
+    }
+
+    /**
+     * Resolves a single stream reference from the widget's {@code streams} set to the native stream id.
+     * <p>
+     * A reference that cannot be resolved (e.g. a dangling reference left over in an exported content pack) is
+     * skipped with a warning rather than aborting the whole content pack installation. This mirrors the export
+     * side ({@link org.graylog.plugins.views.search.views.WidgetDTO#toContentPackEntity}), which also silently
+     * drops stream references it cannot map.
+     */
+    private Optional<String> resolveStreamReference(String streamId, Map<EntityDescriptor, Object> nativeEntities) {
+        final Object object = resolveStreamEntityObject(streamId, nativeEntities);
+        if (object == null) {
+            LOG.warn("Skipping unresolvable stream reference <{}> for widget <{}> during content pack installation", streamId, id());
+            return Optional.empty();
+        } else if (object instanceof final Stream stream) {
+            return Optional.of(stream.getId());
+        } else {
+            throw new ContentPackException(
+                    f("Invalid type for stream <%s> in widget <%s>: %s", streamId, id(), object.getClass()));
+        }
     }
 
     @Override
@@ -230,11 +265,11 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
 
     private List<SortSpec> toSortSpec(AggregationConfigDTO config) {
         return config.sort().stream().map(sortConfig -> {
-           final PivotSortConfig pivotSortConfig = (PivotSortConfig) sortConfig;
-           final SortSpec.Direction dir = pivotSortConfig.direction().equals(SortConfigDTO.Direction.Ascending)
+            final PivotSortConfig pivotSortConfig = (PivotSortConfig) sortConfig;
+            final SortSpec.Direction dir = pivotSortConfig.direction().equals(SortConfigDTO.Direction.Ascending)
                     ? SortSpec.Direction.Ascending
                     : SortSpec.Direction.Descending;
-           return PivotSort.create(PivotSort.Type, pivotSortConfig.field(), dir);
+            return PivotSort.create(PivotSort.Type, pivotSortConfig.field(), dir);
         }).collect(Collectors.toList());
 
     }

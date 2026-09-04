@@ -28,7 +28,9 @@ import type { AggregationElement } from '../AggregationElementType';
 import type { VisualizationConfigFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const findVisualizationType = (visualizationType: string) => {
-  const visualizationTypeDefinition = PluginStore.exports('visualizationTypes').find(({ type }) => (type === visualizationType));
+  const visualizationTypeDefinition = PluginStore.exports('visualizationTypes').find(
+    ({ type }) => type === visualizationType,
+  );
 
   if (!visualizationTypeDefinition) {
     throw new Error(`Invalid visualization type: ${visualizationType}`);
@@ -61,14 +63,15 @@ const fromConfig = (config: AggregationWidgetConfig) => ({
   },
 });
 
-const toConfig = (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
-  .visualization(formValues.visualization.type)
-  .visualizationConfig(formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config))
-  .eventAnnotation(formValues.visualization.eventAnnotation);
+const toConfig = (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) =>
+  configBuilder
+    .visualization(formValues.visualization.type)
+    .visualizationConfig(
+      formValuesToVisualizationConfig(formValues.visualization.type, formValues.visualization.config),
+    )
+    .eventAnnotation(formValues.visualization.eventAnnotation);
 
-const hasErrors = (errors: {}) => Object.values(errors)
-  .filter((value) => value !== undefined)
-  .length > 0;
+const hasErrors = (errors: {}) => Object.values(errors).filter((value) => value !== undefined).length > 0;
 
 const validateConfig = (visualizationType: VisualizationType<any>, config: VisualizationConfigFormValues) => {
   const { fields = [] } = visualizationType.config;
@@ -82,7 +85,9 @@ const validateConfig = (visualizationType: VisualizationType<any>, config: Visua
 };
 
 const validate = (formValues: WidgetConfigFormValues) => {
-  const { visualization: { type, config } } = formValues;
+  const {
+    visualization: { type, config },
+  } = formValues;
 
   if (!type) {
     return { 'visualization.type': 'Type is required.' };
@@ -92,9 +97,7 @@ const validate = (formValues: WidgetConfigFormValues) => {
 
   const visualizationErrors = visualizationType.validate?.(formValues) ?? {};
 
-  const configErrors = visualizationType.config
-    ? validateConfig(visualizationType, config)
-    : {};
+  const configErrors = visualizationType.config ? validateConfig(visualizationType, config) : {};
 
   return hasErrors(configErrors) || hasErrors(visualizationErrors)
     ? { visualization: { ...visualizationErrors, config: configErrors } }

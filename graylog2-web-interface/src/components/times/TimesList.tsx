@@ -14,20 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 
 import { Col, Row } from 'components/bootstrap';
 import { Spinner, Timestamp, BrowserTime } from 'components/common';
-import { SystemStore } from 'stores/system/SystemStore';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { useStore } from 'stores/connect';
+import useSystemInfo from 'hooks/useSystemStore';
+import useProductName from 'brand-customization/useProductName';
 
 const TimesList = () => {
+  const productName = useProductName();
   const [time, setTime] = useState(moment());
   const currentUser = useCurrentUser();
-  const { system } = useStore(SystemStore);
+  const { data: system } = useSystemInfo();
 
   useEffect(() => {
     const interval = setInterval(() => setTime(moment()), 1000);
@@ -48,17 +49,26 @@ const TimesList = () => {
         <h2>Time configuration</h2>
 
         <p className="description">
-          Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your system.
-          You can check timezone settings of specific graylog-server nodes on their respective detail page.
+          Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your
+          system. You can check timezone settings of specific {productName} server nodes on their respective detail
+          page.
         </p>
 
         <dl className="system-dl">
-          <dt>User <em>{currentUser.username}</em>:</dt>
-          <dd><Timestamp dateTime={time} format={timeFormat} /></dd>
+          <dt>
+            User <em>{currentUser.username}</em>:
+          </dt>
+          <dd>
+            <Timestamp dateTime={time} format={timeFormat} />
+          </dd>
           <dt>Your web browser:</dt>
-          <dd><BrowserTime dateTime={time} format={timeFormat} /></dd>
-          <dt>Graylog server:</dt>
-          <dd><Timestamp dateTime={time} format={timeFormat} tz={serverTimezone} /></dd>
+          <dd>
+            <BrowserTime dateTime={time} format={timeFormat} />
+          </dd>
+          <dt>{productName} server:</dt>
+          <dd>
+            <Timestamp dateTime={time} format={timeFormat} tz={serverTimezone} />
+          </dd>
         </dl>
       </Col>
     </Row>

@@ -18,29 +18,29 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import withParams from 'routing/withParams';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, PageHeader, DocumentTitle } from 'components/common';
 import RoleEdit from 'components/roles/RoleEdit';
 import Routes from 'routing/Routes';
 import RoleActionLinks from 'components/roles/navigation/RoleActionLinks';
 import { Button } from 'components/bootstrap';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import { loadRole } from 'hooks/useAuthzRoles';
 import DocsHelper from 'util/DocsHelper';
-import { PageHeader, DocumentTitle } from 'components/common';
 import type Role from 'logic/roles/Role';
 
 type Props = {
   params: {
-    roleId: string,
-  },
+    roleId: string;
+  };
 };
 
 const PageTitle = ({ name }: { name: string | undefined | null }) => (
   <>
-    Edit Role {name && (
+    Edit Role{' '}
+    {name && (
       <>
         - <i>{name}</i>
       </>
-  )}
+    )}
   </>
 );
 
@@ -49,25 +49,24 @@ const RoleEditPage = ({ params }: Props) => {
   const roleId = params?.roleId;
 
   useEffect(() => {
-    AuthzRolesActions.load(roleId).then(setLoadedRole);
+    loadRole(roleId).then(setLoadedRole);
   }, [roleId]);
 
   return (
     <DocumentTitle title={`Edit Role ${loadedRole?.name ?? ''}`}>
-      <PageHeader title={<PageTitle name={loadedRole?.name} />}
-                  actions={<RoleActionLinks roleId={roleId} />}
-                  topActions={(
-                    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-                      <Button bsStyle="info">Roles Overview</Button>
-                    </LinkContainer>
-                  )}
-                  documentationLink={{
-                    title: 'Permissions documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
-        <span>
-          You can assign the role to users.
-        </span>
+      <PageHeader
+        title={<PageTitle name={loadedRole?.name} />}
+        actions={<RoleActionLinks roleId={roleId} />}
+        topActions={
+          <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+            <Button bsStyle="info">Roles Overview</Button>
+          </LinkContainer>
+        }
+        documentationLink={{
+          title: 'Permissions documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}>
+        <span>You can assign the role to users.</span>
       </PageHeader>
       <RoleEdit role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

@@ -22,8 +22,14 @@ import org.graylog.scheduler.audit.JobSchedulerAuditEventTypes;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
-import org.graylog.scheduler.eventbus.JobSchedulerEventBusProvider;
+import org.graylog.scheduler.system.SystemJobFactories;
+import org.graylog.scheduler.system.SystemJobManager;
+import org.graylog.scheduler.system.SystemJobSchedulerService;
 import org.graylog.scheduler.worker.JobWorkerPool;
+import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
+import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.plugin.PluginModule;
 
 /**
@@ -32,10 +38,13 @@ import org.graylog2.plugin.PluginModule;
 public class JobSchedulerModule extends PluginModule {
     @Override
     protected void configure() {
-        bind(JobSchedulerService.class).asEagerSingleton();
+        bind(SystemJobSchedulerService.class).asEagerSingleton();
+        bind(UserJobSchedulerService.class).asEagerSingleton();
         bind(JobSchedulerClock.class).toInstance(JobSchedulerSystemClock.INSTANCE);
-        bind(JobSchedulerEventBus.class).toProvider(JobSchedulerEventBusProvider.class).asEagerSingleton();
+        bind(SystemJobManager.class).asEagerSingleton();
+        bind(SystemJobFactories.class).asEagerSingleton();
 
+        install(new FactoryModuleBuilder().build(JobSchedulerEventBus.Factory.class));
         install(new FactoryModuleBuilder().build(JobExecutionEngine.Factory.class));
         install(new FactoryModuleBuilder().build(JobWorkerPool.Factory.class));
         install(new FactoryModuleBuilder().build(JobTriggerUpdates.Factory.class));
@@ -43,7 +52,28 @@ public class JobSchedulerModule extends PluginModule {
         OptionalBinder.newOptionalBinder(binder(), JobSchedulerConfig.class)
                 .setDefault().to(DefaultJobSchedulerConfig.class);
 
-        addInitializer(JobSchedulerService.class);
+        addInitializer(SystemJobSchedulerService.class);
+        addInitializer(UserJobSchedulerService.class);
         addAuditEventTypes(JobSchedulerAuditEventTypes.class);
+
+        // Ensure that system job factories are bound
+        systemJobBinder();
+
+        addSystemSchedulerJob(CreateNewSingleIndexRangeJob.TYPE_NAME,
+                CreateNewSingleIndexRangeJob.class,
+                CreateNewSingleIndexRangeJob.Factory.class,
+                CreateNewSingleIndexRangeJob.Config.class);
+        addSystemSchedulerJob(SetIndexReadOnlyAndCalculateRangeJob.TYPE_NAME,
+                SetIndexReadOnlyAndCalculateRangeJob.class,
+                SetIndexReadOnlyAndCalculateRangeJob.Factory.class,
+                SetIndexReadOnlyAndCalculateRangeJob.Config.class);
+        addSystemSchedulerJob(OptimizeIndexJob.TYPE_NAME,
+                OptimizeIndexJob.class,
+                OptimizeIndexJob.Factory.class,
+                OptimizeIndexJob.Config.class);
+        addSystemSchedulerJob(RebuildIndexRangesJob.TYPE_NAME,
+                RebuildIndexRangesJob.class,
+                RebuildIndexRangesJob.Factory.class,
+                RebuildIndexRangesJob.Config.class);
     }
 }

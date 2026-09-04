@@ -64,6 +64,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     private static final String FIELD_LOOKUP_BCC_EMAILS = "lookup_bcc_emails";
     private static final String FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME = "bcc_emails_lut_name";
     private static final String FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY = "bcc_emails_lut_key";
+    private static final String FIELD_INCLUDE_EVENT_PROCEDURE = "include_event_procedures";
 
     @JsonProperty(FIELD_SENDER)
     public abstract ValueReference sender();
@@ -149,6 +150,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY)
     public abstract ValueReference bccEmailsLUTKey();
 
+    @JsonProperty(FIELD_INCLUDE_EVENT_PROCEDURE)
+    public abstract ValueReference includeEventProcedure();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -184,7 +188,8 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                     .ccEmailsLUTKey(ValueReference.of(""))
                     .lookupBccEmails(ValueReference.of(false))
                     .bccEmailsLUTName(ValueReference.of(""))
-                    .bccEmailsLUTKey(ValueReference.of(""));
+                    .bccEmailsLUTKey(ValueReference.of(""))
+                    .includeEventProcedure(ValueReference.of(false));
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -271,6 +276,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY)
         public abstract Builder bccEmailsLUTKey(ValueReference bccEmailsLUTKey);
 
+        @JsonProperty(FIELD_INCLUDE_EVENT_PROCEDURE)
+        public abstract Builder includeEventProcedure(ValueReference includeEventProcedure);
+
         public abstract EmailEventNotificationConfigEntity build();
     }
 
@@ -289,7 +297,8 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
                 .ccUsers(ccUsers())
                 .ccEmails(ccEmails())
                 .bccUsers(bccUsers())
-                .bccEmails(bccEmails());
+                .bccEmails(bccEmails())
+                .includeEventProcedure(includeEventProcedure().asBoolean(parameters));
         final boolean lookupRecipientEmails = lookupRecipientEmails().asBoolean(parameters);
         builder.lookupRecipientEmails(lookupRecipientEmails);
         if (lookupRecipientEmails) {

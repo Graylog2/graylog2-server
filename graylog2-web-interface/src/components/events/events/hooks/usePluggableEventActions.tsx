@@ -20,28 +20,45 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventActionComponentProps } from 'views/types';
 import type { Event } from 'components/events/events/types';
 
-const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = false) => {
+const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = false, onEventCallback?: () => void) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.eventActions');
   const availableActions = pluggableActions.filter(
-    (perspective) => (onlyBulk ? perspective.isBulk : true) && (perspective.useCondition ? !!perspective.useCondition(events) : true),
+    (action) => (onlyBulk ? action.isBulk : true) && (action.useCondition ? !!action.useCondition(events) : true),
   );
 
-  const actions = availableActions.map(({ component: PluggableEventAction, key }: { component: React.ComponentType<EventActionComponentProps>, key: string }) => (
-    <PluggableEventAction key={`event-action-${key}`}
-                          events={events}
-                          modalRef={() => modalRefs.current[key]} />
-  ));
+  const actions = availableActions.map(
+    ({
+      component: PluggableEventAction,
+      key,
+    }: {
+      component: React.ComponentType<EventActionComponentProps>;
+      key: string;
+    }) => (
+      <PluggableEventAction
+        key={`event-action-${key}`}
+        events={events}
+        modalRef={() => modalRefs.current[key]}
+        fromBulk={onlyBulk}
+        onEventCallback={onEventCallback}
+      />
+    ),
+  );
 
   const actionModals = availableActions
     .filter(({ modal }) => !!modal)
     .map(({ modal: ActionModal, key }) => (
-      <ActionModal key={`event-action-modal-${key}`}
-                   events={events}
-                   ref={(r) => { modalRefs.current[key] = r; }} />
+      <ActionModal
+        key={`event-action-modal-${key}`}
+        events={events}
+        ref={(r) => {
+          modalRefs.current[key] = r;
+        }}
+        fromBulk={onlyBulk}
+      />
     ));
 
-  return ({ actions, actionModals });
+  return { actions, actionModals };
 };
 
 export default usePluggableEventActions;

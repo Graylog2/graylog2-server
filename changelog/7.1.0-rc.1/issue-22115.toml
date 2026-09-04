@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix inability to switch event definition from aggregation to filter-only."
+
+pulls = ["25569"]
+issues = ["22115"]

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed broken filtering on Dashboards page."
+
+pulls = ["23572"]
+issues = ["21720"]

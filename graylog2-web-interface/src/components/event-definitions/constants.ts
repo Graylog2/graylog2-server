@@ -14,19 +14,63 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Sort } from 'stores/PaginationTypes';
+import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
 
-export const DEFAULT_LAYOUT = {
-  entityTableId: 'event_definitions',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['title', 'description', 'priority', 'scheduling', 'status', 'matched_at'],
-};
-export const COLUMNS_ORDER = ['title', 'description', 'priority', 'matched_at', 'status', 'scheduling'];
+const getEventDefinitionTableElements = (
+  pluggableAttributes?: {
+    attributeNames?: Array<string>;
+    attributes?: Array<Attribute>;
+  },
+  tacticsTechniquesAttribute?: Attribute,
+) => {
+  const defaultLayout = {
+    entityTableId: 'event_definitions',
+    defaultPageSize: 20,
+    defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+    defaultDisplayedAttributes: [
+      'title',
+      'description',
+      'priority',
+      'notifications',
+      'scheduling',
+      'status',
+      'matched_at',
+      'tags',
+      ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
+    ],
+    defaultColumnOrder: [
+      'title',
+      'description',
+      'priority',
+      'notifications',
+      '_entity_source.source',
+      'matched_at',
+      'status',
+      'type',
+      'scheduling',
+      'tags',
+      ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
+      ...(pluggableAttributes?.attributeNames || []),
+    ],
+  };
 
-export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'scheduling', title: 'Scheduling', sortable: false },
-  { id: 'matched_at', title: 'Last Matched', sortable: true },
-];
+  // `tags` is supplied via the fetchEventDefinitions response (so it shows up in the filter
+  // dropdown with its custom filter_component) and is NOT added here, otherwise
+  // PaginatedEntityTable would render a duplicate Tags column.
+  const additionalAttributes: Array<Attribute> = [
+    { id: 'scheduling', title: 'Scheduling', sortable: false },
+    { id: 'matched_at', title: 'Last Matched', sortable: true },
+    { id: 'notifications', title: 'Notifications', sortable: false },
+    ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute] : []),
+    ...(pluggableAttributes?.attributes || []),
+  ];
+
+  return {
+    defaultLayout,
+    additionalAttributes,
+  };
+};
+
+export default getEventDefinitionTableElements;

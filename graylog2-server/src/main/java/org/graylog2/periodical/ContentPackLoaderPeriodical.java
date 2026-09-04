@@ -19,6 +19,9 @@ package org.graylog2.periodical;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
@@ -28,9 +31,6 @@ import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -184,7 +184,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
                 }
 
                 contentPackService.installContentPack(contentPack, Collections.emptyMap(),
-                        "Installed by auto loader", configuration.getRootUsername());
+                        "Installed by auto loader", configuration.getRootUsername(), EntityShareRequest.EMPTY);
             }
 
         }

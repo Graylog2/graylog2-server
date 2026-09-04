@@ -18,17 +18,25 @@ package org.graylog.plugins.pipelineprocessor;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineMetadataClusterEventHandler;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineMetadataUpdateJob;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.ProcessingLoadResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.SimulatorResource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderModule;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.quickjump.QuickJumpProvider;
 
 public class PipelineProcessorModule extends PluginModule {
     @Override
@@ -40,6 +48,7 @@ public class PipelineProcessorModule extends PluginModule {
 
         addSystemRestResource(PipelineConnectionsResource.class);
         addSystemRestResource(PipelineResource.class);
+        addSystemRestResource(ProcessingLoadResource.class);
         addSystemRestResource(RuleResource.class);
         addSystemRestResource(SimulatorResource.class);
 
@@ -53,6 +62,20 @@ public class PipelineProcessorModule extends PluginModule {
         install(new FactoryModuleBuilder().build(PipelineInterpreter.State.Factory.class));
         install(new FactoryModuleBuilder().build(PipelineResolver.Factory.class));
 
+        bind(PipelineMetadataClusterEventHandler.class).asEagerSingleton();
+
+        addSystemSchedulerJob(PipelineMetadataUpdateJob.TYPE_NAME,
+                PipelineMetadataUpdateJob.class,
+                PipelineMetadataUpdateJob.Factory.class,
+                PipelineMetadataUpdateJob.Config.class);
+
         addAuditEventTypes(PipelineProcessorAuditEventTypes.class);
+
+        addDbEntities(RuleDao.class, PipelineDao.class);
+
+        addQuickJumpProvider(QuickJumpProvider.create("pipeline", MongoDbPipelineService.COLLECTION,
+                (id, user) -> user.isPermitted(PipelineRestPermissions.PIPELINE_READ, id)));
+        addQuickJumpProvider(QuickJumpProvider.create("pipeline_rule", MongoDbRuleService.COLLECTION,
+                (id, user) -> user.isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, id)));
     }
 }

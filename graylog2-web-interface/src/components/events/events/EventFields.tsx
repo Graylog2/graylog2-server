@@ -17,7 +17,7 @@
 import React from 'react';
 
 type Props = {
-  fields: Record<string, string>,
+  fields: Record<string, string>;
 };
 
 const EventFields = ({ fields }: Props) => {
@@ -26,7 +26,9 @@ const EventFields = ({ fields }: Props) => {
   return (
     <>
       {fieldNames.map((fieldName) => (
-        <div key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</div>
+        <div key={fieldName}>
+          <b>{fieldName}</b> {fields[fieldName]}
+        </div>
       ))}
     </>
   );

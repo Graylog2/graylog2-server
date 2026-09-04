@@ -1,0 +1,5 @@
+type = "fised"
+message = "Fixed error preventing content pack creation when selecting Stream title entities."
+
+pulls = ["24124"]
+issues = ["24106"]

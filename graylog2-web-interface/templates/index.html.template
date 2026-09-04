@@ -2,15 +2,16 @@
 <html<% if(htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"<% } %> lang="en">
   <head>
     <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
     <title><%=htmlWebpackPlugin.options.title || 'Webpack App'%></title>
     <script defer src="/config.js"></script>
     <% for (var vendorChunk in vendorModule().files.js) { %>
     <script defer src="/<%= vendorModule().files.js[vendorChunk] %>"></script>
     <% } %>
-    <%= htmlWebpackPlugin.tags.headTags %>
     <% for (var idx in pluginNames()) { %>
     <script defer src="/<%= pluginNames()[idx] %>.js"></script>
     <% } %>
+    <%= htmlWebpackPlugin.tags.headTags %>
   </head>
   <body>
     <%= htmlWebpackPlugin.tags.bodyTags %>

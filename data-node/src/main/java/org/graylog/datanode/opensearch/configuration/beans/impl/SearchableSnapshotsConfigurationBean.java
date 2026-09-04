@@ -22,58 +22,98 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
-import org.graylog.datanode.configuration.S3RepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This opensearch configuration bean manages searchable snapshots and their S3 or local filesystem configuration.
  * It configures the search role for the node if snapshots are enabled and also validates the node search cache size.
  * If there is neither S3 nor local filesystem snapshot configuration, both search role and cache are disabled,
  * preventing unnecessary disk space consumption on the node.
+ *
+ * The search role and cache configuration will be skipped if explicit list of {@code node_roles} is provided in the
+ * configuration, and it doesn't contain the {@code search} role.
  */
 public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchableSnapshotsConfigurationBean.class);
 
-    static final String SEARCH_NODE_ROLE = "search";
     private final Configuration localConfiguration;
-    private final S3RepositoryConfiguration s3RepositoryConfiguration;
+
+    private final Set<RepositoryConfiguration> repositoryConfigurations;
+
+
     private final Provider<OpensearchUsableSpace> usableSpaceProvider;
 
     @Inject
-    public SearchableSnapshotsConfigurationBean(Configuration localConfiguration, S3RepositoryConfiguration s3RepositoryConfiguration, Provider<OpensearchUsableSpace> usableSpaceProvider) {
+    public SearchableSnapshotsConfigurationBean(
+            Configuration localConfiguration,
+            DatanodeConfiguration datanodeConfiguration,
+            Set<RepositoryConfiguration> repositoryConfigurations,
+            Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
-        this.s3RepositoryConfiguration = s3RepositoryConfiguration;
+        this.repositoryConfigurations = repositoryConfigurations;
         this.usableSpaceProvider = usableSpaceProvider;
     }
 
     @Override
-    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
-        if (snapshotsAreEnabled()) {
-            validateUsableSpace();
-            return DatanodeConfigurationPart.builder()
-                    .properties(properties())
-                    .keystoreItems(keystoreItems())
-                    .addNodeRole(SEARCH_NODE_ROLE)
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
+        final String searchableSnapshotsRole = configurationParams.datanodeConfiguration().opensearchDistribution().distributionProperties().searchableSnapshotsRole();
+
+        final Set<RepositoryConfiguration> enabledRepositories = repositoryConfigurations.stream()
+                .filter(RepositoryConfiguration::isRepositoryEnabled)
+                .collect(Collectors.toSet());
+
+        if (!enabledRepositories.isEmpty()) {
+            LOG.info("Searchable snapshots are configured, adding opensearch configuration");
+            final DatanodeConfigurationPart.Builder builder = DatanodeConfigurationPart.builder();
+
+            final boolean searchRoleEnabled = searchRoleEnabled(searchableSnapshotsRole);
+            if (searchRoleEnabled) {
+                LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
+                validateUsableSpace();
+                builder.addNodeRole(searchableSnapshotsRole);
+            }
+            return builder
+                    .properties(properties(searchRoleEnabled, enabledRepositories))
+                    .keystoreItems(keystoreItems(enabledRepositories, configurationParams))
                     .build();
+        } else if (searchRoleExplicitlyConfigured(searchableSnapshotsRole)) {
+            throw new OpensearchConfigurationException("Your configuration contains the search node role in node_roles but there is no" +
+                    "snapshots repository configured. Please remove the role or provide path_repo or S3 repository credentials.");
         } else {
             LOG.info("Opensearch snapshots not configured, skipping search role and cache configuration.");
             return DatanodeConfigurationPart.builder().build();
         }
+    }
+
+    private boolean searchRoleExplicitlyConfigured(String searchableSnapshotsRole) {
+        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(searchableSnapshotsRole);
+    }
+
+    private boolean searchRoleEnabled(String searchableSnapshotsRole) {
+        final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
+        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(searchableSnapshotsRole);
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {
@@ -94,7 +134,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     }
 
     private double percentageUsage(long usableSpace, long cacheSize) {
-        return 100.0 / usableSpace * cacheSize;
+        return Tools.percentageOf(usableSpace, cacheSize);
     }
 
     @Nonnull
@@ -126,37 +166,23 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         return returnValue;
     }
 
-    private Map<String, String> properties() {
+    private Map<String, String> properties(boolean searchRoleEnabled, Set<RepositoryConfiguration> enabledRepositories) {
         final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
 
-        if (isSharedFileSystemRepo()) {
-            // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
-            if (localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
-                builder.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
-            }
+        if (searchRoleEnabled) { // configure cache only if we also have the search role
+            builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
         }
 
-        if (s3RepositoryConfiguration.isRepositoryEnabled()) {
-            builder.putAll(s3RepositoryConfiguration.toOpensearchProperties());
-        }
+        enabledRepositories.stream()
+                .map(RepositoryConfiguration::opensearchProperties)
+                .forEach(builder::putAll);
+
         return builder.build();
     }
 
-    private Map<String, String> keystoreItems() {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        if (s3RepositoryConfiguration.isRepositoryEnabled()) {
-            builder.put("s3.client.default.access_key", s3RepositoryConfiguration.getS3ClientDefaultAccessKey());
-            builder.put("s3.client.default.secret_key", s3RepositoryConfiguration.getS3ClientDefaultSecretKey());
-        }
-        return builder.build();
-    }
-
-    private boolean snapshotsAreEnabled() {
-        return s3RepositoryConfiguration.isRepositoryEnabled() || isSharedFileSystemRepo();
-    }
-
-    private boolean isSharedFileSystemRepo() {
-        return localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty();
+    private Collection<OpensearchKeystoreItem> keystoreItems(Set<RepositoryConfiguration> enabledRepositories, OpensearchConfigurationParams configurationParams) {
+        return enabledRepositories.stream()
+                .flatMap(repo -> repo.keystoreItems(configurationParams.datanodeConfiguration().datanodeDirectories()).stream())
+                .collect(Collectors.toSet());
     }
 }

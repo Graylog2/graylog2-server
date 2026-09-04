@@ -21,17 +21,18 @@ import Routes from 'routing/Routes';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { useStore } from 'stores/connect';
 import useHistory from 'routing/useHistory';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 
 const StartPage = () => {
   const { currentUser } = useStore(CurrentUserStore);
-  const { activePerspective } = useActivePerspective();
   const isLoading = !currentUser;
   const history = useHistory();
 
-  const redirect = useCallback((page: string) => {
-    history.replace(page);
-  }, [history]);
+  const redirect = useCallback(
+    (page: string) => {
+      history.replace(page);
+    },
+    [history],
+  );
 
   const redirectToStartPage = useCallback(() => {
     const startPage = currentUser?.startpage;
@@ -42,7 +43,9 @@ const StartPage = () => {
         redirect(Routes.dashboard_show(startPage.id));
       } else if (startPage.type === 'stream') {
         redirect(Routes.stream_search(startPage.id));
-      } else if (startPage.id !== 'default') {
+      } else if (startPage.type === 'graylog_security_welcome') {
+        redirect(Routes.SECURITY.OVERVIEW);
+      } else if (startPage?.id !== 'default') {
         redirect(Routes.show_saved_search(startPage.id));
       } else {
         redirect(Routes.SEARCH);
@@ -51,8 +54,8 @@ const StartPage = () => {
       return;
     }
 
-    redirect(activePerspective.welcomeRoute);
-  }, [activePerspective, currentUser?.startpage, redirect]);
+    redirect(Routes.WELCOME);
+  }, [currentUser?.startpage, redirect]);
 
   useEffect(() => {
     CurrentUserStore.reload();

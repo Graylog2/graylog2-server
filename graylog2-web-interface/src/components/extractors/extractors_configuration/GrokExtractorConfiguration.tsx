@@ -20,49 +20,51 @@ import { Icon } from 'components/common';
 import { Row, Col, ControlLabel, Button, Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
-import FormUtils from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
-import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
-import type CancellablePromise from 'logic/rest/CancellablePromise';
+import { getValueFromInput } from 'util/FormsUtils';
+import { testGrok } from 'api/tools';
+import { loadGrokPatterns } from 'hooks/useGrokPatterns';
 
 import Style from './GrokExtractorConfiguration.css';
 
-type GrokExtractorConfigurationProps = {
+type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
   onExtractorPreviewLoad: (...args: any[]) => void;
 };
 
-class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurationProps, {
-  [key: string]: any;
-}> {
+class GrokExtractorConfiguration extends React.Component<
+  Props,
+  {
+    trying: boolean;
+    patterns: Array<any>;
+  }
+> {
   static defaultProps = {
     exampleMessage: undefined,
   };
 
-  state = {
-    trying: false,
-    patterns: [],
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      trying: false,
+      patterns: [],
+    };
+  }
 
   componentDidMount() {
     this.loadData();
   }
 
-  private loadPromise: CancellablePromise<void>;
-
   componentWillUnmount() {
-    if (this.loadPromise) {
-      this.loadPromise.cancel();
-    }
+    this._unmounted = true;
   }
 
-  loadData = () => {
-    this.loadPromise = GrokPatternsStore.loadPatterns((patterns) => {
-      if (!this.loadPromise.isCancelled()) {
-        this.loadPromise = undefined;
+  private _unmounted = false;
 
+  loadData = () => {
+    loadGrokPatterns((patterns) => {
+      if (!this._unmounted) {
         this.setState({
           patterns: patterns,
         });
@@ -77,7 +79,7 @@ class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurat
       onExtractorPreviewLoad(undefined);
       const newConfig = configuration;
 
-      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      newConfig[key] = getValueFromInput(event.target);
       onChange(newConfig);
     };
   };
@@ -97,11 +99,13 @@ class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurat
 
     this.setState({ trying: true });
 
-    const promise = ToolsStore.testGrok(configuration.grok_pattern, configuration.named_captures_only, exampleMessage);
+    const promise = testGrok(configuration.grok_pattern, configuration.named_captures_only, exampleMessage);
 
     promise.then((result) => {
       if (result.error_message != null) {
-        UserNotification.error(`We were not able to run the grok extraction because of the following error: ${result.error_message}`);
+        UserNotification.error(
+          `We were not able to run the grok extraction because of the following error: ${result.error_message}`,
+        );
 
         return;
       }
@@ -116,10 +120,14 @@ class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurat
 
       result.matches.forEach((match) => {
         matches.push(<dt key={`${match.name}-name`}>{match.name}</dt>);
-        matches.push(<dd key={`${match.name}-value`}><samp>{match.match}</samp></dd>);
+        matches.push(
+          <dd key={`${match.name}-value`}>
+            <samp>{match.match}</samp>
+          </dd>,
+        );
       });
 
-      const preview = (matches.length === 0 ? '' : <dl>{matches}</dl>);
+      const preview = matches.length === 0 ? '' : <dl>{matches}</dl>;
 
       onExtractorPreviewLoad(preview);
     });
@@ -140,23 +148,27 @@ class GrokExtractorConfiguration extends React.Component<GrokExtractorConfigurat
 
     return (
       <div>
-        <Input type="checkbox"
-               id="named_captures_only"
-               label="Named captures only"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked={configuration.named_captures_only}
-               onChange={this._onChange('named_captures_only')}
-               help="Only put the explicitly named captures into the message." />
+        <Input
+          type="checkbox"
+          id="named_captures_only"
+          label="Named captures only"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked={configuration.named_captures_only}
+          onChange={this._onChange('named_captures_only')}
+          help="Only put the explicitly named captures into the message."
+        />
 
         <Row>
           <Col mdOffset={1} md={1}>
             <ControlLabel className="col-md-offset-2">Grok pattern</ControlLabel>
           </Col>
           <Col md={10}>
-            <GrokPatternInput onPatternChange={this._onPatternChange}
-                              pattern={configuration.grok_pattern || ''}
-                              patterns={patterns}
-                              className={Style.grokInput} />
+            <GrokPatternInput
+              onPatternChange={this._onPatternChange}
+              pattern={configuration.grok_pattern || ''}
+              patterns={patterns}
+              className={Style.grokInput}
+            />
           </Col>
         </Row>
         <Row>

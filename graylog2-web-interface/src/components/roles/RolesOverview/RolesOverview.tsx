@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
-import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import { AUTHZ_ROLES_QUERY_KEY } from 'hooks/useAuthzRoles';
 import { DataTable, Spinner, PaginatedList, NoSearchResult } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -42,10 +42,12 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => `
+const LoadingSpinner = styled(Spinner)(
+  ({ theme }) => `
   margin-left: 10px;
   font-size: ${theme.fonts.size.h3};
-`);
+`,
+);
 
 const StyledPaginatedList = styled(PaginatedList)`
   .pagination {
@@ -62,20 +64,6 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
-  setLoading(true);
-
-  AuthzRolesDomain.loadRolesPaginated(pagination).then((paginatedRoles) => {
-    setPaginatedRoles(paginatedRoles);
-    setLoading(false);
-  });
-};
-
-const _updateListOnRoleDelete = (pagination, setLoading, setPaginatedRoles, callback: () => void) => AuthzRolesActions.delete.completed.listen(() => {
-  _loadRoles(pagination, setLoading, setPaginatedRoles);
-  callback();
-});
-
 const getUseTeamMembersHook = () => {
   const defaultHook = () => ({ loading: false, users: [] });
   const teamsPlugin = PluginStore.exports('teams');
@@ -85,30 +73,41 @@ const getUseTeamMembersHook = () => {
 
 const RolesOverview = () => {
   const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
-  const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined | null>();
-  const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
-  const { list: roles } = paginatedRoles || {};
+  const queryClient = useQueryClient();
   const useTeamMembersByRole = getUseTeamMembersHook();
   const teamMembersByRole = useTeamMembersByRole();
 
-  useEffect(() => _loadRoles({ page, perPage, query }, setLoading, setPaginatedRoles), [page, perPage, query]);
-  useEffect(() => _updateListOnRoleDelete({ page, perPage, query }, setLoading, setPaginatedRoles, resetPage), [page, perPage, query, resetPage]);
+  const { data: paginatedRoles, isFetching } = useQuery({
+    queryKey: [...AUTHZ_ROLES_QUERY_KEY, 'paginated', { page, perPage, query }],
+    queryFn: () => AuthzRolesDomain.loadRolesPaginated({ page, perPage, query }),
+    placeholderData: keepPreviousData,
+  });
 
-  const handleSearch = (newQuery) => {
+  const { list: roles } = paginatedRoles || {};
+
+  const handleSearch = (newQuery: string) => {
     resetPage();
     setQuery(newQuery);
   };
 
-  const _rolesOverviewItem = useCallback((role) => {
-    const { id: roleId } = role;
-    const roleUsers = paginatedRoles?.context.users[roleId];
-    const users = teamMembersByRole.users[roleId]
-      ? [...teamMembersByRole.users[roleId], ...roleUsers]
-      : paginatedRoles?.context?.users[roleId];
+  const onRoleDeleted = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: AUTHZ_ROLES_QUERY_KEY });
+    resetPage();
+  }, [queryClient, resetPage]);
 
-    return <RolesOverviewItem role={role} users={users} />;
-  }, [teamMembersByRole, paginatedRoles?.context]);
+  const _rolesOverviewItem = useCallback(
+    (role) => {
+      const { id: roleId } = role;
+      const roleUsers = paginatedRoles?.context.users[roleId];
+      const users = teamMembersByRole.users[roleId]
+        ? [...teamMembersByRole.users[roleId], ...roleUsers]
+        : paginatedRoles?.context?.users[roleId];
+
+      return <RolesOverviewItem role={role} users={users} onDeleted={onRoleDeleted} />;
+    },
+    [teamMembersByRole, paginatedRoles?.context, onRoleDeleted],
+  );
 
   if (!paginatedRoles) {
     return <Spinner />;
@@ -122,24 +121,23 @@ const RolesOverview = () => {
         <Col xs={12}>
           <Header>
             <h2>Roles</h2>
-            {loading && <LoadingSpinner text="" delay={0} />}
+            {isFetching && <LoadingSpinner text="" delay={0} />}
           </Header>
-          <p className="description">
-            Found {paginatedRoles.pagination.total} roles on the system.
-          </p>
+          <p className="description">Found {paginatedRoles.pagination.total} roles on the system.</p>
           <StyledPaginatedList totalItems={paginatedRoles.pagination.total}>
-            <DataTable id="roles-overview"
-                       className="table-hover"
-                       rowClassName="no-bm"
-                       headers={TABLE_HEADERS}
-                       headerCellFormatter={_headerCellFormatter}
-                       sortByKey="name"
-                       rows={roles.toJS()}
-                       noDataText={<NoSearchResult>No roles have been found.</NoSearchResult>}
-                       customFilter={searchFilter}
-                       dataRowFormatter={_rolesOverviewItem}
-                       filterKeys={[]}
-                       filterLabel="Filter Roles" />
+            <DataTable
+              id="roles-overview"
+              rowClassName="no-bm"
+              headers={TABLE_HEADERS}
+              headerCellFormatter={_headerCellFormatter}
+              sortByKey="name"
+              rows={roles.toJS()}
+              noDataText={<NoSearchResult>No roles have been found.</NoSearchResult>}
+              customFilter={searchFilter}
+              dataRowFormatter={_rolesOverviewItem}
+              filterKeys={[]}
+              filterLabel="Filter Roles"
+            />
           </StyledPaginatedList>
         </Col>
       </Row>

@@ -16,20 +16,19 @@
  */
 package org.graylog2.storage.providers;
 
-import org.graylog2.configuration.IndexerHosts;
-import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
-import org.graylog2.storage.SearchVersion;
-import org.graylog2.storage.versionprobe.VersionProbe;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
+import org.graylog2.storage.versionprobe.VersionProbe;
+import org.graylog2.storage.versionprobe.VersionProbeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -43,13 +42,13 @@ public class ElasticsearchVersionProvider implements Provider<SearchVersion> {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<SearchVersion> versionOverride;
     private final List<URI> elasticsearchHosts;
-    private final VersionProbe versionProbe;
+    private final VersionProbeFactory versionProbe;
     private final AtomicCache<Optional<SearchVersion>> cachedVersion;
 
     @Inject
     public ElasticsearchVersionProvider(@Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
                                         @IndexerHosts List<URI> elasticsearchHosts,
-                                        VersionProbe versionProbe,
+                                        VersionProbeFactory versionProbe,
                                         AtomicCache<Optional<SearchVersion>> cachedVersion) {
 
         this.versionOverride = Optional.ofNullable(versionOverride);
@@ -68,7 +67,8 @@ public class ElasticsearchVersionProvider implements Provider<SearchVersion> {
 
         try {
             return this.cachedVersion.get(() -> {
-                        final Optional<SearchVersion> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
+                        final VersionProbe versionProbe = this.versionProbe.createDefault();
+                        final Optional<SearchVersion> probedVersion = versionProbe.probe(this.elasticsearchHosts);
                         probedVersion.ifPresent(version -> LOG.info("Elasticsearch cluster is running " + version));
                         return probedVersion;
                     })

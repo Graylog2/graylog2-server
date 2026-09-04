@@ -18,19 +18,37 @@ package org.graylog.storage.elasticsearch7;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Streams;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.events.search.MitreBackwardsCompatibilityFilter;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.ToXContent;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.ParsedMultiBucketAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.IncludeExclude;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.NumericMetricsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
@@ -40,15 +58,25 @@ import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
+import org.graylog2.search.QueryStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,53 +92,40 @@ import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.Qu
 public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES7.class);
     public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
+    private static final String termsAggregationName = "alert_type";
+    private static final String histogramAggregationName = "histogram";
+    private static final String slicesAggregationName = "slices";
+    private static final String GROUP_BY_AGGREGATION_NAME = "group_by";
+    private static final String SUB_TERMS_AGGREGATION_NAME = "sub_terms";
+    private static final String METRIC_AGGREGATION_NAME = "metric";
     private final ES7ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final Boolean allowLeadingWildcard;
-    private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
 
     @Inject
     public MoreSearchAdapterES7(ES7ResultMessageFactory resultMessageFactory,
                                 ElasticsearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
-                                SortOrderMapper sortOrderMapper,
                                 MultiChunkResultRetriever multiChunkResultRetriever) {
         this.resultMessageFactory = resultMessageFactory;
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.sortOrderMapper = sortOrderMapper;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
     }
 
     @Override
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
-                                         String filterString, Set<String> forbiddenSourceStreams) {
-        final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*")) ?
-                matchAllQuery() :
-                queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
-
-        final BoolQueryBuilder filter = boolQuery()
-                .filter(query)
-                .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
-
-        if (!isNullOrEmpty(filterString)) {
-            filter.filter(queryStringQuery(filterString));
-        }
-
-        if (!forbiddenSourceStreams.isEmpty()) {
-            // If an event has any stream in "source_streams" that the calling search user is not allowed to access,
-            // the event must not be in the search result.
-            filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
-        }
+                                         String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
                 .from((page - 1) * perPage)
                 .size(perPage)
                 .trackTotalHits(true);
+
         final var sortBuilders = createSorting(sorting);
         sortBuilders.forEach(searchSourceBuilder::sort);
 
@@ -141,8 +156,133 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 .build();
     }
 
-    private List<FieldSortBuilder> createSorting(Sorting sorting) {
-        final SortOrder order = sortOrderMapper.fromSorting(sorting);
+    @Override
+    public MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
+                                               Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter, ZoneId timeZone,
+                                               Map<String, Set<String>> extraFilters) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(filter)
+                .size(0)
+                .trackTotalHits(true);
+
+        final var autoInterval = AutoInterval.create();
+        final var interval = autoInterval.toDateInterval(timerange);
+
+        final var histogramAggregation = new DateHistogramAggregationBuilder(histogramAggregationName)
+                .field(EventDto.FIELD_EVENT_TIMESTAMP)
+                .timeZone(timeZone)
+                .minDocCount(0)
+                .extendedBounds(new ExtendedBounds(Tools.buildElasticSearchTimeFormat(timerange.from()), Tools.buildElasticSearchTimeFormat(timerange.to())));
+
+        final var dateInterval = new DateHistogramInterval(interval.getQuantity().toString() + interval.getUnit());
+
+        if (interval.getQuantity().intValue() > 1) {
+            histogramAggregation.fixedInterval(dateInterval);
+        } else {
+            histogramAggregation.calendarInterval(dateInterval);
+        }
+
+        final var termsAggregation = AggregationBuilders.terms(termsAggregationName)
+                .field(EventDto.FIELD_ALERT);
+
+        searchSourceBuilder.aggregation(histogramAggregation.subAggregation(termsAggregation));
+
+        final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
+        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
+                .source(searchSourceBuilder)
+                .indicesOptions(INDICES_OPTIONS);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
+            LOG.debug("Execute search: {}", searchRequest);
+        }
+
+        final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
+
+        final ParsedDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
+        final var histogramBuckets = histogramResult.getBuckets();
+
+        final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+        final var events = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+
+        histogramBuckets.forEach(bucket -> {
+            final var parsedTerms = (ParsedTerms) bucket.getAggregations().get(termsAggregationName);
+            final var dateTime = (ZonedDateTime) bucket.getKey();
+            final var alertCount = Optional.ofNullable(parsedTerms.getBucketByKey("true")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+            final var eventCount = Optional.ofNullable(parsedTerms.getBucketByKey("false")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+            alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
+            events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
+        });
+
+        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts), timerange);
+    }
+
+    private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString,
+                                     SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
+        final QueryBuilder query = QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
+                ? matchAllQuery()
+                : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
+
+        final BoolQueryBuilder filter = boolQuery()
+                .filter(query)
+                .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
+                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
+
+        final BoolQueryBuilder mitreOr = boolQuery().minimumShouldMatch(1);
+        if (MitreBackwardsCompatibilityFilter.emitShouldClauses(extraFilters,
+                (k, v) -> mitreOr.should(buildExtraFilter(k, v)))) {
+            filter.filter(mitreOr);
+        }
+
+        extraFilters.entrySet().stream()
+                .filter(e -> !MitreBackwardsCompatibilityFilter.isMitreKey(e.getKey()))
+                .forEach(e -> {
+            final var field = e.getKey();
+            final var values = e.getValue();
+            values.stream()
+                    .filter(MoreSearchAdapter::isRangeValue)
+                    .map(value -> buildExtraFilter(field, value))
+                    .forEach(filter::filter);
+            final var termQueries = values.stream()
+                    .filter(v -> !MoreSearchAdapter.isRangeValue(v))
+                    .map(value -> buildExtraFilter(field, value))
+                    .toList();
+            if (!termQueries.isEmpty()) {
+                final BoolQueryBuilder shouldQuery = boolQuery().minimumShouldMatch(1);
+                termQueries.forEach(shouldQuery::should);
+                filter.filter(shouldQuery);
+            }
+        });
+
+        if (!isNullOrEmpty(filterString)) {
+            filter.filter(queryStringQuery(filterString));
+        }
+
+        if (!sourceStreamFilter.isAllAllowed()) {
+            filter.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
+        }
+
+        return filter;
+    }
+
+    static QueryBuilder buildExtraFilter(String field, String value) {
+        // Handle range queries, which require special query builders.
+        if (value.startsWith("<=")) {
+            return QueryBuilders.rangeQuery(field).lte(value.replace("<=", ""));
+        } else if (value.startsWith(">=")) {
+            return QueryBuilders.rangeQuery(field).gte(value.replace(">=", ""));
+        } else if (value.startsWith("<")) {
+            return QueryBuilders.rangeQuery(field).lt(value.replace("<", ""));
+        } else if (value.startsWith(">")) {
+            return QueryBuilders.rangeQuery(field).gt(value.replace(">", ""));
+        }
+        return QueryBuilders.multiMatchQuery(value, field);
+    }
+
+    List<FieldSortBuilder> createSorting(Sorting sorting) {
+        final SortOrder order = SortOrder.valueOf(sorting.getUppercasedDirection());
         final List<FieldSortBuilder> sortBuilders;
         if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
             sortBuilders = List.of(
@@ -160,6 +300,167 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                     return sortBuilder.order(order);
                 })
                 .toList();
+    }
+
+    public List<Slice> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                       Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                       Map<String, Set<String>> extraFilters, Map<String, Object> meta, AggregationBuilder aggregationBuilder) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(filter)
+                .aggregation(aggregationBuilder)
+                .size(0);
+
+        final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
+        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
+                .source(searchSourceBuilder)
+                .indicesOptions(INDICES_OPTIONS);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
+            LOG.debug("Execute aggregation: {}", searchRequest);
+        }
+
+        final SearchResponse searchResult = client.search(searchRequest, "Unable to perform slice aggregation query");
+        final ParsedMultiBucketAggregation<ParsedMultiBucketAggregation.ParsedBucket> result = searchResult.getAggregations().get(slicesAggregationName);
+
+        return result.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, Math.toIntExact(e.getDocCount()), meta)).toList();
+    }
+
+    @Override
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                                Map<String, Set<String>> extraFilters, String slicingColumn, @Nullable String bucketPattern,
+                                                Map<String, Object> meta, int maxBuckets) {
+        final var builder = AggregationBuilders.terms(slicesAggregationName)
+                .field(slicingColumn)
+                .size(maxBuckets);
+        if (bucketPattern != null) {
+            builder.includeExclude(new IncludeExclude(bucketPattern, null));
+        }
+
+        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, sourceStreamFilter, extraFilters, meta, builder);
+    }
+
+    @Override
+    public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                    Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                                    Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
+        final RangeAggregationBuilder builder = AggregationBuilders.range(slicesAggregationName).field(slicingColumn);
+        ranges.forEach(r -> {
+            final Double from = r.from();
+            final Double to = r.to();
+            if (from != null && to != null) {
+                builder.addRange(from, to);
+            } else if (to != null) {
+                builder.addUnboundedTo(to);
+            } else if (from != null) {
+                builder.addUnboundedFrom(from);
+            }
+        });
+        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, sourceStreamFilter, extraFilters, meta, builder);
+    }
+
+    @Override
+    public Map<String, Map<String, Long>> aggregateGroupedTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                                String groupByField, String termsField,
+                                                                int maxBuckets, int maxSubBuckets,
+                                                                Collection<String> includeTerms) {
+        final var filter = createSimpleQuery(queryString, timerange);
+        final var termsAgg = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(groupByField).size(maxBuckets);
+        if (includeTerms != null && !includeTerms.isEmpty()) {
+            termsAgg.includeExclude(new IncludeExclude(includeTerms.toArray(String[]::new), null));
+        }
+        final var aggregation = termsAgg.subAggregation(AggregationBuilders.terms(SUB_TERMS_AGGREGATION_NAME).field(termsField).size(maxSubBuckets));
+
+        final SearchResponse searchResult = executeAggregation(filter, affectedIndices, aggregation);
+        final ParsedTerms outerTerms = searchResult.getAggregations().get(GROUP_BY_AGGREGATION_NAME);
+
+        final Map<String, Map<String, Long>> result = new HashMap<>();
+        outerTerms.getBuckets().forEach(outerBucket -> {
+            final ParsedTerms subTerms = outerBucket.getAggregations().get(SUB_TERMS_AGGREGATION_NAME);
+            result.put(outerBucket.getKeyAsString(), extractTermsBucketCounts(subTerms));
+        });
+        return result;
+    }
+
+    @Override
+    public Map<String, Long> aggregateTerms(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                            String termsField, int maxBuckets,
+                                            Collection<String> includeTerms) {
+        final var filter = createSimpleQuery(queryString, timerange);
+        final var termsAgg = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(termsField).size(maxBuckets);
+        if (includeTerms != null && !includeTerms.isEmpty()) {
+            termsAgg.includeExclude(new IncludeExclude(includeTerms.toArray(String[]::new), null));
+        }
+
+        final SearchResponse searchResult = executeAggregation(filter, affectedIndices, termsAgg);
+        final ParsedTerms terms = searchResult.getAggregations().get(GROUP_BY_AGGREGATION_NAME);
+
+        return extractTermsBucketCounts(terms);
+    }
+
+    @Override
+    public Map<String, Double> aggregateGroupedMetric(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                      String groupByField, AggregationType metricType, String metricField,
+                                                      int maxBuckets, Collection<String> includeTerms) {
+        final var filter = createSimpleQuery(queryString, timerange);
+        final var metricAgg = switch (metricType) {
+            case AVG -> AggregationBuilders.avg(METRIC_AGGREGATION_NAME).field(metricField);
+            case MAX -> AggregationBuilders.max(METRIC_AGGREGATION_NAME).field(metricField);
+        };
+        final var termsAgg = AggregationBuilders.terms(GROUP_BY_AGGREGATION_NAME).field(groupByField).size(maxBuckets);
+        if (includeTerms != null && !includeTerms.isEmpty()) {
+            termsAgg.includeExclude(new IncludeExclude(includeTerms.toArray(String[]::new), null));
+        }
+        final var aggregation = termsAgg.subAggregation(metricAgg);
+
+        final SearchResponse searchResult = executeAggregation(filter, affectedIndices, aggregation);
+        final ParsedTerms outerTerms = searchResult.getAggregations().get(GROUP_BY_AGGREGATION_NAME);
+
+        final Map<String, Double> result = new HashMap<>();
+        outerTerms.getBuckets().forEach(bucket -> {
+            final var metric = (NumericMetricsAggregation.SingleValue) bucket.getAggregations().get(METRIC_AGGREGATION_NAME);
+            final double value = metric.value();
+            result.put(bucket.getKeyAsString(), Double.isFinite(value) ? value : 0.0);
+        });
+        return result;
+    }
+
+    private SearchResponse executeAggregation(QueryBuilder filter, Set<String> affectedIndices,
+                                              AggregationBuilder aggregation) {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(filter)
+                .aggregation(aggregation)
+                .size(0);
+
+        final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
+        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
+                .source(searchSourceBuilder)
+                .indicesOptions(INDICES_OPTIONS);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Execute aggregation: {}", searchRequest);
+        }
+
+        return client.search(searchRequest, "Unable to perform aggregation query");
+    }
+
+    private Map<String, Long> extractTermsBucketCounts(ParsedTerms terms) {
+        final Map<String, Long> counts = new HashMap<>();
+        terms.getBuckets().forEach(b -> counts.put(b.getKeyAsString(), b.getDocCount()));
+        return counts;
+    }
+
+    private QueryBuilder createSimpleQuery(String queryString, TimeRange timerange) {
+        final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*"))
+                ? matchAllQuery()
+                : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
+
+        return boolQuery()
+                .filter(query)
+                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
     }
 
     @Override
@@ -198,23 +499,5 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             }
             LOG.debug("Scrolling done - took {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
         }
-    }
-
-    private ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
-        ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
-                .query(queryString)
-                .range(timeRange)
-                .indices(affectedIndices)
-                .filters(filters == null ? Collections.emptyList() : filters)
-                .batchSize(batchSize)
-                // For correlation need the oldest messages to come in first
-                .sorting(new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.ASC));
-
-        if (!streams.isEmpty()) {
-            commandBuilder = commandBuilder.streams(streams);
-        }
-
-        return commandBuilder
-                .build();
     }
 }

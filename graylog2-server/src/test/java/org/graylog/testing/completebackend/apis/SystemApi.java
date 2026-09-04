@@ -19,8 +19,6 @@ package org.graylog.testing.completebackend.apis;
 import java.net.URI;
 import java.util.Locale;
 
-import static io.restassured.RestAssured.given;
-
 public class SystemApi implements GraylogRestApi {
     private final GraylogApis api;
 
@@ -28,7 +26,7 @@ public class SystemApi implements GraylogRestApi {
         this.api = api;
     }
 
-    public void urlWhitelist(URI uri) {
+    public void urlAllowlist(URI uri) {
         final String approvedUrlsReq = """
                 {
                   "entries": [
@@ -42,7 +40,7 @@ public class SystemApi implements GraylogRestApi {
                   "disabled": false
                 }
                 """;
-        api.put("/system/urlwhitelist", String.format(Locale.ROOT, approvedUrlsReq, uri), 204);
+        api.put("/system/urlallowlist", String.format(Locale.ROOT, approvedUrlsReq, uri), 204);
     }
 
     public GraylogApiResponse datanodes() {

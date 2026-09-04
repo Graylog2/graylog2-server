@@ -22,9 +22,7 @@ import isNumber from 'lodash/isNumber';
 import type Immutable from 'immutable';
 
 import type { MappedData } from 'views/logic/valueactions/createEventDefinition/types';
-import type { ActionContexts } from 'views/types';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
-import type { ActionComponentProps } from 'views/components/actions/ActionHandler';
 import {
   getAggregationHandler,
   getLutParameters,
@@ -35,39 +33,59 @@ import {
 } from 'views/logic/valueactions/createEventDefinition/hooks/hookHelpers';
 import type ValueParameter from 'views/logic/parameters/ValueParameter';
 import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import type { FieldValue, FieldName } from 'views/logic/fieldtypes/FieldType';
+import type { ActionContexts } from 'views/types';
 
-type HookProps = Pick<ActionComponentProps, 'field' | 'queryId' | 'value'> & { contexts: ActionContexts }
-const useMappedData = ({ contexts, field, queryId, value }: HookProps) => useMemo<MappedData>(() => {
-  const aggregationHandler = getAggregationHandler({ widget: contexts.widget, field: field });
-  const curQuery = contexts.view.search.queries.find((query) => query.id === queryId);
-  const { parameters, parameterBindings } = contexts;
-  const searchWithinMs = curQuery.timerange.type === 'relative' ? (curQuery.timerange as RelativeTimeRangeWithEnd).from * 1000 : undefined;
-  const lutParameters = getLutParameters(parameters);
-  const restParameterValues = getRestParameterValues({ parameters: parameters as Immutable.Set<ValueParameter | LookupTableParameter>, parameterBindings });
-  const searchFilterQuery = transformSearchFiltersToQuery(curQuery.filters);
-  const queryWithReplacedParams = replaceParametersInQueryString({ query: curQuery.query.query_string, restParameterValues });
-  const streams = getStreams(curQuery.filter);
-  const { ...aggregationVales } = aggregationHandler({ valuePath: contexts.valuePath, widget: contexts.widget, value: value, field: field });
-  const data: MappedData = {
-    searchWithinMs,
-    lutParameters,
-    searchFilterQuery,
-    queryWithReplacedParams,
-    streams,
-    ...aggregationVales,
-  };
+type HookProps = {
+  contexts: ActionContexts;
+  field: FieldName;
+  queryId: string;
+  value: FieldValue;
+};
+const useMappedData = ({ contexts, field, queryId, value }: HookProps) =>
+  useMemo<MappedData>(() => {
+    const aggregationHandler = getAggregationHandler({ widget: contexts.widget, field });
+    const curQuery = contexts.view.search.queries.find((query) => query.id === queryId);
+    const { parameters, parameterBindings } = contexts;
+    const searchWithinMs =
+      curQuery.timerange.type === 'relative' ? (curQuery.timerange as RelativeTimeRangeWithEnd).from * 1000 : undefined;
+    const lutParameters = getLutParameters(parameters);
+    const restParameterValues = getRestParameterValues({
+      parameters: parameters as Immutable.Set<ValueParameter | LookupTableParameter>,
+      parameterBindings,
+    });
+    const searchFilterQuery = transformSearchFiltersToQuery(curQuery.filters);
+    const queryWithReplacedParams = replaceParametersInQueryString({
+      query: curQuery.query.query_string,
+      restParameterValues,
+    });
+    const streams = getStreams(curQuery.filter);
+    const { ...aggregationVales } = aggregationHandler({
+      valuePath: contexts.valuePath as Array<Record<string, string>>,
+      widget: contexts.widget,
+      value: value,
+      field: field,
+    });
+    const data: MappedData = {
+      searchWithinMs,
+      lutParameters,
+      searchFilterQuery,
+      queryWithReplacedParams,
+      streams,
+      ...aggregationVales,
+    };
 
-  return pickBy(data, (v) => {
-    if (isArray(v)) {
-      return !!v.length;
-    }
+    return pickBy(data, (v) => {
+      if (isArray(v)) {
+        return !!v.length;
+      }
 
-    if (isNumber(v)) {
-      return true;
-    }
+      if (isNumber(v)) {
+        return true;
+      }
 
-    return !!v?.trim();
-  });
-}, [contexts, field, queryId, value]);
+      return !!v?.trim();
+    });
+  }, [contexts, field, queryId, value]);
 
 export default useMappedData;

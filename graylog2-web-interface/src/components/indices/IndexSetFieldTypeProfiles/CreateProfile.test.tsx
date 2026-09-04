@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
+import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
@@ -27,20 +27,12 @@ import CreateProfile from 'components/indices/IndexSetFieldTypeProfiles/CreatePr
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import { simpleFields } from 'fixtures/fields';
 
-const renderCreateNewProfile = () => render(
-  <CreateProfile />,
-);
+const renderCreateNewProfile = () => render(<CreateProfile />);
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
-
-const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  selectEvent.openMenu(select);
-
-  return selectEvent.select(select, option);
-};
 
 describe('CreateProfile', () => {
   const createMock = jest.fn(() => Promise.resolve());
@@ -63,18 +55,16 @@ describe('CreateProfile', () => {
       isLoading: false,
     });
 
-    asMock(useProfileMutations).mockReturnValue(({
+    asMock(useProfileMutations).mockReturnValue({
       editProfile: editMock,
       isEditLoading: false,
       createProfile: createMock,
       isCreateLoading: false,
       isLoading: false,
       deleteProfile: deleteMock,
-    }));
+    });
 
-    asMock(useFieldTypes).mockImplementation(() => (
-      { data: simpleFields().toArray(), refetch: jest.fn() }
-    ));
+    asMock(useFieldTypes).mockImplementation(() => ({ data: simpleFields().toArray(), refetch: jest.fn() }));
   });
 
   it('Run createProfile with form data', async () => {
@@ -82,28 +72,24 @@ describe('CreateProfile', () => {
 
     const name = await screen.findByRole('textbox', {
       name: /name/i,
-      hidden: true,
     });
     const description = await screen.findByRole('textbox', {
       name: /description/i,
-      hidden: true,
     });
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
     await userEvent.click(addMappingButton);
 
-    const fieldFirst = await screen.findByLabelText(/select customFieldMappings.0.field/i);
-    const typeFirst = await screen.findByLabelText(/select customFieldMappings.0.type/i);
-    const fieldSecond = await screen.findByLabelText(/select customFieldMappings.1.field/i);
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByTitle(/create profile/i);
 
-    fireEvent.change(name, { target: { value: 'Profile new' } });
-    fireEvent.change(description, { target: { value: 'Profile description' } });
-    await selectItem(fieldFirst, 'date');
-    await selectItem(typeFirst, 'String type');
-    await selectItem(fieldSecond, 'http_method');
-    await selectItem(typeSecond, 'String type');
+    await userEvent.type(name, 'Profile new');
+    await userEvent.type(description, 'Profile description');
+
+    await selectEvent.chooseOption('select customFieldMappings.0.field', 'date');
+    await selectEvent.chooseOption('select customFieldMappings.0.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.1.field', 'http_method');
+    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
+
     await waitFor(() => expect(submitButton.hasAttribute('disabled')).toBe(false));
     await userEvent.click(submitButton);
 

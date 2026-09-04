@@ -19,6 +19,10 @@ package org.graylog.plugins.views.search.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
+import org.apache.shiro.authz.Permission;
 import org.apache.shiro.subject.Subject;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
@@ -42,21 +46,22 @@ import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -130,7 +135,7 @@ public class ViewsResourceTest {
         );
 
 
-        viewsResource.create(TEST_DASHBOARD_VIEW, mockUserContext(), SEARCH_USER);
+        viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mockUserContext(), SEARCH_USER);
 
         final ArgumentCaptor<ViewDTO> viewCaptor = ArgumentCaptor.forClass(ViewDTO.class);
         final ArgumentCaptor<User> ownerCaptor = ArgumentCaptor.forClass(User.class);
@@ -154,7 +159,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -172,7 +177,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -190,7 +195,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -212,7 +217,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        viewsResource.update(VIEW_ID, TEST_SEARCH_VIEW, SEARCH_USER);
+        viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_SEARCH_VIEW, null), SEARCH_USER);
         verify(viewService).update(TEST_SEARCH_VIEW);
     }
 
@@ -229,7 +234,7 @@ public class ViewsResourceTest {
                 SEARCH
         );
 
-        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER))
+        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
@@ -250,7 +255,89 @@ public class ViewsResourceTest {
                 EMPTY_VIEW_RESOLVERS,
                 SEARCH
         );
-        viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER);
+        viewsResource.update(VIEW_ID, CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), SEARCH_USER);
+        verify(viewService).update(TEST_DASHBOARD_VIEW);
+    }
+
+    @Test
+    public void throwsExceptionWhenUpdatingSharingOfViewUserDoesNotOwn() {
+        final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
+
+        // the default mock Subject is not permitted to own the entity
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW, EntityShareRequest.create(ImmutableMap.of()));
+
+        assertThatThrownBy(() -> viewsResource.update(VIEW_ID, request, SEARCH_USER))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Not authorized to access entity");
+
+        verify(viewService, times(0)).update(any());
+    }
+
+    /**
+     * Test for security fix in #26715, where we now additionally make sure that the ID from the path and in the body with the entity have to match.
+     * We only use the path ID in the end for the update operation but a mismatch can signify a possible malicious request.
+     */
+    @Test
+    public void throwsExceptionWhenUpdatingViewWithPathAndIDMismatch() {
+        final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
+
+        // making sure that the invalid view id is different from the view id used in all tests by adding a prefix
+        final String INVALID_VIEW_ID = "invalid_" + VIEW_ID;
+        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW.toBuilder().id(INVALID_VIEW_ID).build(), EntityShareRequest.create(ImmutableMap.of()));
+
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        assertThatThrownBy(() -> viewsResource.update(VIEW_ID, request, SEARCH_USER))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Invalid update request");
+
+        verify(viewService, times(0)).update(any());
+    }
+
+
+    @Test
+    public void updatesSharingWhenUserOwnsView() {
+        final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
+        when(viewService.update(any())).thenReturn(TEST_DASHBOARD_VIEW);
+
+        final Subject owner = mock(Subject.class);
+        when(owner.isPermitted(any(Permission.class))).thenReturn(true);
+
+        final ViewsResource viewsResource = createViewsResource(
+                owner,
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        final CreateEntityRequest<ViewDTO> request = CreateEntityRequest.create(TEST_DASHBOARD_VIEW, EntityShareRequest.create(ImmutableMap.of()));
+
+        viewsResource.update(VIEW_ID, request, SEARCH_USER);
         verify(viewService).update(TEST_DASHBOARD_VIEW);
     }
 
@@ -351,7 +438,7 @@ public class ViewsResourceTest {
                 .canCreateDashboards(false)
                 .build();
 
-        assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), user))
+        assertThatThrownBy(() -> viewsResource.create(CreateEntityRequest.create(TEST_DASHBOARD_VIEW, null), mock(UserContext.class), user))
                 .isInstanceOf(ForbiddenException.class);
     }
 
@@ -438,16 +525,22 @@ public class ViewsResourceTest {
     }
 
     private ViewsResource createViewsResource(final ViewService viewService, final StartPageService startPageService, final RecentActivityService recentActivityService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {
+        return createViewsResource(mock(Subject.class), viewService, startPageService, recentActivityService, clusterEventBus, referencedSearchFiltersHelper, searchFilterVisibilityChecker, viewResolvers, existingSearches);
+    }
+
+    private ViewsResource createViewsResource(final Subject subject, final ViewService viewService, final StartPageService startPageService, final RecentActivityService recentActivityService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {
 
         final SearchDomain searchDomain = mock(SearchDomain.class);
         for (Search search : existingSearches) {
             when(searchDomain.getForUser(eq(search.id()), eq(SEARCH_USER))).thenReturn(Optional.of(search));
         }
 
-        return new ViewsResource(viewService, startPageService, recentActivityService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper, mock(AuditEventSender.class), mock(ObjectMapper.class)) {
+        return new ViewsResource(viewService, startPageService, recentActivityService, clusterEventBus, searchDomain,
+                viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper,
+                mock(AuditEventSender.class), mock(ObjectMapper.class), mock(EntitySharesService.class), mock(EntitySourceService.class)) {
             @Override
             protected Subject getSubject() {
-                return mock(Subject.class);
+                return subject;
             }
 
             @Override
@@ -466,7 +559,7 @@ public class ViewsResourceTest {
 
     private UserContext mockUserContext() {
         final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "testuser"));
         final UserContext userContext = mock(UserContext.class);
         when(userContext.getUser()).thenReturn(testUser);
         return userContext;

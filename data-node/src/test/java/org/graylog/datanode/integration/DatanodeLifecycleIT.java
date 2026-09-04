@@ -96,7 +96,7 @@ public class DatanodeLifecycleIT {
         final RestOperationParameters restParameters = RestOperationParameters.builder()
                 .port(backend.getDatanodeRestPort())
                 .truststore(trustStore)
-                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                 .build();
         final DatanodeRestApiWait waitApi = new DatanodeRestApiWait(restParameters);
         final DatanodeStatusChangeOperation statusApi = new DatanodeStatusChangeOperation(restParameters);

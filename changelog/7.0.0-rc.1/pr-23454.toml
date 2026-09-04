@@ -1,0 +1,5 @@
+type = "a"
+message = 'Allow sharing Content Pack Entities after installation'
+
+issues = []
+pulls = ["23454"]

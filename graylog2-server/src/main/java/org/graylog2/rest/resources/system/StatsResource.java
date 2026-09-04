@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.system.stats.StatsService;
@@ -36,7 +36,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-@Api(value = "System/Stats", description = "Node system stats")
+@Tag(name = "System/Stats", description = "Node system stats")
 @Path("/system/stats")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -50,8 +50,8 @@ public class StatsResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "System information about this node.",
-                  notes = "This resource returns information about the system this node is running on.")
+    @Operation(summary = "System information about this node.",
+                  description = "This resource returns information about the system this node is running on.")
     public SystemStats systemStats() {
         return statsService.systemStatsWithoutNetwork();
     }
@@ -59,8 +59,8 @@ public class StatsResource extends RestResource {
     @GET
     @Path("/fs")
     @Timed
-    @ApiOperation(value = "Filesystem information about this node.",
-                  notes = "This resource returns information about the filesystems of this node.")
+    @Operation(summary = "Filesystem information about this node.",
+                  description = "This resource returns information about the filesystems of this node.")
     public FsStats fsStats() {
         return statsService.fsStats();
     }
@@ -68,8 +68,8 @@ public class StatsResource extends RestResource {
     @GET
     @Path("/jvm")
     @Timed
-    @ApiOperation(value = "JVM information about this node.",
-                  notes = "This resource returns information about the Java Virtual Machine of this node.")
+    @Operation(summary = "JVM information about this node.",
+                  description = "This resource returns information about the Java Virtual Machine of this node.")
     public JvmStats jvmStats() {
         return statsService.jvmStats();
     }
@@ -77,8 +77,8 @@ public class StatsResource extends RestResource {
     @GET
     @Path("/network")
     @Timed
-    @ApiOperation(value = "Networking information about this node.",
-                  notes = "This resource returns information about the networking system this node is running with.")
+    @Operation(summary = "Networking information about this node.",
+                  description = "This resource returns information about the networking system this node is running with.")
     public NetworkStats networkStats() {
         return statsService.networkStats();
     }
@@ -86,8 +86,8 @@ public class StatsResource extends RestResource {
     @GET
     @Path("/os")
     @Timed
-    @ApiOperation(value = "OS information about this node.",
-                  notes = "This resource returns information about the operating system this node is running on.")
+    @Operation(summary = "OS information about this node.",
+                  description = "This resource returns information about the operating system this node is running on.")
     public OsStats osStats() {
         return statsService.osStats();
     }
@@ -95,8 +95,8 @@ public class StatsResource extends RestResource {
     @GET
     @Path("/process")
     @Timed
-    @ApiOperation(value = "Process information about this node.",
-                  notes = "This resource returns information about the process this node is running as.")
+    @Operation(summary = "Process information about this node.",
+                  description = "This resource returns information about the process this node is running as.")
     public ProcessStats processStats() {
         return statsService.processStats();
     }

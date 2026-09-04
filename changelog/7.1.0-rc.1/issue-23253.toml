@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix hidden confirmation prompt when assigning sidecar collector configurations."
+
+issues = ["23253"]
+pulls = ["24792"]

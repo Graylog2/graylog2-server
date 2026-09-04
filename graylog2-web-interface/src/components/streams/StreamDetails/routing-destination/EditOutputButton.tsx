@@ -16,28 +16,30 @@
  */
 
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import URI from 'urijs';
 
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
 import type { ConfigurationFormData } from 'components/configurationforms';
 import { ConfigurationForm } from 'components/configurationforms';
-import type { Output } from 'stores/outputs/OutputsStore';
-import { Button } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import type { Output } from 'hooks/useOutputs';
+import { IconButton, IfPermitted } from 'components/common';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
+import useQuery from 'routing/useQuery';
+import useHistory from 'routing/useHistory';
 
 type Props = {
-  output: Output,
-  disabled?: boolean,
-  onUpdate: (output: Output, data: ConfigurationFormData<Output['configuration']>) => void,
-  getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration,
+  output: Output;
+  disabled?: boolean;
+  onUpdate: (output: Output, data: ConfigurationFormData<Output['configuration']>) => void;
+  getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration;
 };
 
 const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinition }: Props) => {
-  const currentUser = useCurrentUser();
   const [typeDefinition, setTypeDefinition] = useState<AvailableOutputRequestedConfiguration>(undefined);
   const configFormRef = useRef(null);
+  const { edit_output: editOutputParam } = useQuery();
+  const history = useHistory();
+  const autoOpenedRef = useRef(false);
 
   const onClick = () => {
     setTypeDefinition(getTypeDefinition(output.type));
@@ -47,28 +49,37 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
     }
   };
 
+  useEffect(() => {
+    if (disabled || autoOpenedRef.current || editOutputParam !== output.id) {
+      return;
+    }
+
+    autoOpenedRef.current = true;
+    setTypeDefinition(getTypeDefinition(output.type));
+    configFormRef.current?.open();
+
+    const cleanedUrl = new URI(window.location.href).removeSearch('edit_output').resource();
+    history.replace(cleanedUrl);
+  }, [disabled, editOutputParam, output.id, output.type, getTypeDefinition, history]);
+
   const handleUpdate = (data: ConfigurationFormData<Output['configuration']>) => onUpdate(output, data);
 
   return (
-    <>
-      <Button bsStyle="link"
-              disabled={!isPermitted(currentUser.permissions, 'stream:edit') || disabled}
-              bsSize="xsmall"
-              onClick={onClick}
-              title="Edit Output">
-        <Icon name="edit_square" />
-      </Button>
-      <ConfigurationForm<Output['configuration']> ref={configFormRef}
-                                                  key={`configuration-form-output-${output.id}`}
-                                                  configFields={typeDefinition}
-                                                  title={`Editing Output ${output.title}`}
-                                                  typeName={output.type}
-                                                  titleHelpText="Select a name of your new output that describes it."
-                                                  submitAction={handleUpdate}
-                                                  submitButtonText="Update output"
-                                                  values={output.configuration}
-                                                  titleValue={output.title} />
-    </>
+    <IfPermitted permissions={`outputs:edit:${output.id}`}>
+      <IconButton name="edit_square" title="Edit Output" bsStyle="default" disabled={disabled} onClick={onClick} />
+      <ConfigurationForm<Output['configuration']>
+        ref={configFormRef}
+        key={`configuration-form-output-${output.id}`}
+        configFields={typeDefinition}
+        title={`Editing Output ${output.title}`}
+        typeName={output.type}
+        titleHelpText="Select a name of your new output that describes it."
+        submitAction={handleUpdate}
+        submitButtonText="Update output"
+        values={output.configuration}
+        titleValue={output.title}
+      />
+    </IfPermitted>
   );
 };
 

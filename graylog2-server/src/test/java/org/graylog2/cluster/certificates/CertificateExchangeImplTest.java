@@ -28,41 +28,43 @@ import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+@ExtendWith(MongoDBExtension.class)
 public class CertificateExchangeImplTest {
+
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
 
     public static final String FIRST_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
     public static final String SECOND_NODE_ID = "5ca1ab1e-0000-4000-a000-111111111111";
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
     private CertificateExchange certificateExchange;
 
     private final String encryptionPassword = RandomStringUtils.randomAlphabetic(20);
     private final char[] keystorePassword = RandomStringUtils.randomAlphabetic(20).toCharArray();
+    private final String keyAlias = RandomStringUtils.randomAlphabetic(20);
     private KeyStore keystore;
 
     private KeyPair ca;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         EncryptedValueService encryptedValueService = new EncryptedValueService(encryptionPassword);
-        certificateExchange = new CertificateExchangeImpl(mongodb.mongoConnection(), encryptedValueService);
-        this.keystore = generateNodeKeypair().toKeystore(CertConstants.DATANODE_KEY_ALIAS, keystorePassword);
+        certificateExchange = new CertificateExchangeImpl(mongoCollections.mongoConnection(), encryptedValueService);
+        this.keystore = generateNodeKeypair().toKeystore(keyAlias, keystorePassword);
         this.ca = generateCa();
     }
 
@@ -157,15 +159,15 @@ public class CertificateExchangeImplTest {
 
     private PKCS10CertificationRequest createCertificateSigningRequest(String hostname) throws CSRGenerationException {
         final InMemoryKeystoreInformation keystore = new InMemoryKeystoreInformation(this.keystore, keystorePassword);
-        return CsrGenerator.generateCSR(keystore, CertConstants.DATANODE_KEY_ALIAS, hostname, Collections.emptyList());
+        return CsrGenerator.generateCSR(keystore, keyAlias, hostname, Collections.emptyList());
     }
 
-    private static KeyPair generateNodeKeypair() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(CertConstants.DATANODE_KEY_ALIAS)
+    private KeyPair generateNodeKeypair() throws Exception {
+        final CertRequest certRequest = CertRequest.selfSigned(keyAlias)
                 .isCA(false)
                 .validity(Duration.ofDays(99 * 365));
 
-        return CertificateGenerator.generate(certRequest);
+        return CERTIFICATE_GENERATOR.generateKeyPair(certRequest);
     }
 
     private static KeyPair generateCa() throws Exception {
@@ -173,6 +175,6 @@ public class CertificateExchangeImplTest {
                 .isCA(true)
                 .validity(Duration.ofDays(99 * 365));
 
-        return CertificateGenerator.generate(certRequest);
+        return CERTIFICATE_GENERATOR.generateKeyPair(certRequest);
     }
 }

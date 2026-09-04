@@ -21,9 +21,7 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';
 import withTelemetry from 'logic/telemetry/withTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import withLocation from 'routing/withLocation';
 
 import styles from './FieldsList.css';
 
@@ -43,7 +41,9 @@ const providerFormatter = (config) => {
   return (
     <p>
       {configKeys.map((key) => (
-        <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
+        <span key={key} className={styles.providerOptions}>
+          {key}: <em>{JSON.stringify(config[key])}</em>
+        </span>
       ))}
     </p>
   );
@@ -56,16 +56,16 @@ type FieldsListProps = {
   onEditFieldClick: (...args: any[]) => void;
   onRemoveFieldClick: (...args: any[]) => void;
   sendTelemetry: (...args: any[]) => void;
-  location: any;
 };
 
-class FieldsList extends React.Component<FieldsListProps, {
-  [key: string]: any;
-}> {
+class FieldsList extends React.Component<
+  FieldsListProps,
+  {
+    [key: string]: any;
+  }
+> {
   handleAddFieldClick = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.ADD_CUSTOM_FIELD_CLICKED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-fields',
       app_action_value: 'add-custom-field-button',
     });
 
@@ -102,10 +102,12 @@ class FieldsList extends React.Component<FieldsListProps, {
         <td>{providerFormatter(config.providers[0])}</td>
         <td className={styles.actions}>
           <ButtonToolbar>
-            <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
+            {}
+            <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
               Remove Field
             </Button>
-            <Button bsStyle="info" bsSize="xsmall" onClick={this.handleEditClick(fieldName)}>
+            {}
+            <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleEditClick(fieldName)}>
               Edit
             </Button>
           </ButtonToolbar>
@@ -119,7 +121,7 @@ class FieldsList extends React.Component<FieldsListProps, {
 
     const fieldNames = Object.keys(fields).sort(naturalSort);
     const addCustomFieldButton = (
-      <Button bsStyle="success" onClick={this.handleAddFieldClick}>
+      <Button bsStyle="primary" onClick={this.handleAddFieldClick}>
         Add custom field
       </Button>
     );
@@ -127,9 +129,7 @@ class FieldsList extends React.Component<FieldsListProps, {
     if (fieldNames.length === 0) {
       return (
         <>
-          <p>
-            This Event does not have any custom Fields yet.
-          </p>
+          <p>This Event does not have any custom Fields yet.</p>
           {addCustomFieldButton}
         </>
       );
@@ -137,16 +137,17 @@ class FieldsList extends React.Component<FieldsListProps, {
 
     return (
       <>
-        <DataTable id="event-definition-fields"
-                   className="table-striped table-hover"
-                   headers={HEADERS}
-                   rows={fieldNames}
-                   dataRowFormatter={this.fieldFormatter}
-                   filterKeys={[]} />
+        <DataTable
+          id="event-definition-fields"
+          headers={HEADERS}
+          rows={fieldNames}
+          dataRowFormatter={this.fieldFormatter}
+          filterKeys={[]}
+        />
         {addCustomFieldButton}
       </>
     );
   }
 }
 
-export default withLocation(withTelemetry(FieldsList));
+export default withTelemetry(FieldsList, 'event-definition-fields');

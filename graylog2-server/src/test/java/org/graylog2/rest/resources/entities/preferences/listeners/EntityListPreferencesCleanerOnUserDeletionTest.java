@@ -19,9 +19,8 @@ package org.graylog2.rest.resources.entities.preferences.listeners;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
@@ -34,9 +33,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MongoDBExtension.class)
@@ -45,15 +43,13 @@ import static org.mockito.Mockito.verify;
 class EntityListPreferencesCleanerOnUserDeletionTest {
     private AsyncEventBus eventBus;
     private EntityListPreferencesService service;
-    @SuppressWarnings("unused")
-    private EntityListPreferencesCleanerOnUserDeletion listener;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider objectMapperProvider) {
+    @SuppressWarnings("unused")
+    void setUp(MongoCollections mongoCollections) {
         this.eventBus = new AsyncEventBus(MoreExecutors.directExecutor());
-        this.service = Mockito.spy(new EntityListPreferencesServiceImpl(mongodb.mongoConnection(), objectMapperProvider));
-        this.listener = new EntityListPreferencesCleanerOnUserDeletion(eventBus, service);
+        this.service = Mockito.spy(new EntityListPreferencesServiceImpl(mongoCollections));
+        final EntityListPreferencesCleanerOnUserDeletion listener = new EntityListPreferencesCleanerOnUserDeletion(eventBus, service);
     }
 
     @Test
@@ -67,7 +63,7 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
                 .build();
         service.save(StoredEntityListPreferences.builder()
                 .preferencesId(preferenceId1)
-                .preferences(new EntityListPreferences(List.of(), 42, null))
+                .preferences(mock(EntityListPreferences.class))
                 .build());
 
         final StoredEntityListPreferencesId preferenceId2 = StoredEntityListPreferencesId.builder()
@@ -76,7 +72,7 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
                 .build();
         service.save(StoredEntityListPreferences.builder()
                 .preferencesId(preferenceId2)
-                .preferences(new EntityListPreferences(List.of(), 42, null))
+                .preferences(mock(EntityListPreferences.class))
                 .build());
 
         //verify they are present

@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
 
+import { Table } from 'components/bootstrap';
 import { TableHead, TableHeaderCell } from 'views/components/datatable';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
@@ -42,21 +43,22 @@ const ActionsHeader = styled(TableHeaderCell)`
 `;
 
 type Props = {
-  config: EventsWidgetConfig,
-  events: Array<EventListItem>,
-  onSortChange: (sort: EventsWidgetSortConfig) => Promise<unknown>,
-  setLoadingState: (loading: boolean) => void,
-}
+  config: EventsWidgetConfig;
+  events: Array<EventListItem>;
+  onSortChange: (sort: EventsWidgetSortConfig) => Promise<unknown>;
+  setLoadingState: (loading: boolean) => void;
+};
 
 const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) => {
   const eventAttributes = useEventAttributes();
-  const _onSortChange = useCallback((fieldName: string, nextDirection: Direction) => (
-    onSortChange(new EventsWidgetSortConfig(fieldName, nextDirection))
-  ), [onSortChange]);
+  const _onSortChange = useCallback(
+    (fieldName: string, nextDirection: Direction) => onSortChange(new EventsWidgetSortConfig(fieldName, nextDirection)),
+    [onSortChange],
+  );
 
   return (
     <TableWrapper>
-      <table className="table table-condensed">
+      <Table condensed>
         <TableHead>
           <tr>
             {config.fields.toArray().map((field) => {
@@ -66,12 +68,14 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
                 <TableHeaderCell key={field}>
                   {eventAttribute?.title ?? <UnknownAttributeTitle />}
                   {eventAttribute?.sortable && (
-                    <AttributeSortIcon onSortChange={_onSortChange}
-                                       attribute={field}
-                                       attributeTitle={eventAttribute.title}
-                                       activeAttribute={config.sort.field}
-                                       activeDirection={config.sort.direction}
-                                       setLoadingState={setLoadingState} />
+                    <AttributeSortIcon
+                      onSortChange={_onSortChange}
+                      attribute={field}
+                      attributeTitle={eventAttribute.title}
+                      activeAttribute={config.sort.field}
+                      activeDirection={config.sort.direction}
+                      setLoadingState={setLoadingState}
+                    />
                   )}
                 </TableHeaderCell>
               );
@@ -83,12 +87,10 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
         </TableHead>
         <tbody>
           {events?.map((event) => (
-            <EventsTableRow key={event.id}
-                            event={event}
-                            fields={config.fields} />
+            <EventsTableRow key={event.id} event={event} fields={config.fields} />
           ))}
         </tbody>
-      </table>
+      </Table>
     </TableWrapper>
   );
 };

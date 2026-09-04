@@ -16,66 +16,84 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useDisclosure } from '@mantine/hooks';
 import { Collapse } from '@mantine/core';
 
-import Icon from './Icon';
+import useDisclosure from 'util/hooks/useDisclosure';
+import sizeForMantine from 'theme/utils/sizeForMantine';
 
-import { Button } from '../bootstrap';
+import IconButton from './IconButton';
 
-const Container = styled.div<{ $collapsible: boolean, $opened: boolean}>(({ $collapsible, $opened, theme }) => css`
-  background-color: ${theme.colors.section.filled.background};
-  border: 1px solid ${theme.colors.section.filled.border};
-  border-radius: 10px;
-  padding: ${($collapsible && !$opened) ? 0 : theme.spacings.md};
-  margin-bottom: ${theme.spacings.xxs};
-`);
+const Container = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize: SectionBsSize }>(
+  ({ $collapsible, $opened, $bsSize, theme }) => css`
+    background-color: ${theme.colors.section.filled.background};
+    border: 1px solid ${theme.colors.section.filled.border};
+    border-radius: 10px;
+    padding: ${$collapsible && !$opened ? 0 : theme.spacings[sizeForMantine($bsSize)]};
+    margin-bottom: ${theme.spacings.xxs};
+  `,
+);
 
-const Header = styled.div<{ $collapsible: boolean, $opened: boolean}>(({ $collapsible, $opened, theme }) => css`
-  display: flex;
-  justify-content: space-between;
-  gap: ${theme.spacings.xs};
-  align-items: center;
-  border-radius: 10px;
-  padding: ${($collapsible && !$opened) ? theme.spacings.md : 0};
-  flex-wrap: wrap;
+const Header = styled.div<{ $collapsible: boolean; $opened: boolean; $bsSize: SectionBsSize }>(
+  ({ $collapsible, $opened, $bsSize, theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    gap: ${theme.spacings.xs};
+    align-items: center;
+    border-radius: 10px;
+    padding: ${$collapsible && !$opened ? theme.spacings[sizeForMantine($bsSize)] : 0};
+    flex-wrap: wrap;
 
     &:hover {
-    background-color: ${($collapsible && !$opened) ? theme.colors.table.row.backgroundHover : 'initial'};
-  }
-`);
+      background-color: ${$collapsible && !$opened ? theme.colors.table.row.backgroundHover : 'initial'};
+    }
+  `,
+);
 
-const FlexWrapper = styled.div(({ theme }) => css`
-  display: flex;
-  justify-content: flex-start;
-  gap: ${theme.spacings.sm};
-  align-items: center;
-`);
+const FlexWrapper = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: flex-start;
+    gap: ${theme.spacings.sm};
+    align-items: center;
+  `,
+);
+
+type SectionBsSize = 'md' | 'xs';
 
 type Props = React.PropsWithChildren<{
-  title: string,
-  header?: React.ReactNode,
-  actions?: React.ReactNode,
-  headerLeftSection?: React.ReactNode,
-  collapsible?: boolean,
-  onCollapse?: (opened?: boolean) => void,
-  defaultClosed?: boolean,
-  disableCollapseButton?: boolean,
-}>
+  title: string;
+  titleAs?: 'h2' | 'h3' | 'h4' | 'h5';
+  header?: React.ReactNode;
+  actions?: React.ReactNode;
+  preHeaderSection?: React.ReactNode;
+  headerLeftSection?: React.ReactNode;
+  collapsible?: boolean;
+  onCollapse?: (opened?: boolean) => void;
+  defaultClosed?: boolean;
+  disableCollapseButton?: boolean;
+  collapseButtonPosition?: 'left' | 'right';
+  className?: string;
+  bsSize?: SectionBsSize;
+}>;
 
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
 const Section = ({
   title,
+  titleAs: TitleAs = 'h2',
   header = null,
   actions = null,
+  preHeaderSection = null,
   headerLeftSection = null,
   collapsible = false,
   defaultClosed = false,
   onCollapse = () => {},
   disableCollapseButton = false,
+  collapseButtonPosition = 'left',
   children = null,
+  className = undefined,
+  bsSize = 'md',
 }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
 
@@ -84,36 +102,63 @@ const Section = ({
     onCollapse(opened);
   };
 
-  const onHeaderClick = () => (!disableCollapseButton && onToggle());
+  const onHeaderClick = () => !disableCollapseButton && onToggle();
+
+  const collapseButton = collapsible && (
+    <IconButton
+      data-testid="collapseButton"
+      title={`Toggle ${title.toLowerCase()} section`}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!disableCollapseButton) {
+          onToggle();
+        }
+      }}
+      disabled={disableCollapseButton}
+      name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+      size="lg"
+    />
+  );
 
   return (
-    <Container $opened={opened} $collapsible={collapsible}>
-      <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
+    <Container $opened={opened} $collapsible={collapsible} className={className} $bsSize={bsSize}>
+      <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick} $bsSize={bsSize}>
         <FlexWrapper>
-          <h2>{header ?? title}</h2>
-          {headerLeftSection && <FlexWrapper onClick={(e) => { e.stopPropagation(); }}>{headerLeftSection}</FlexWrapper>}
+          {collapseButtonPosition === 'left' && collapseButton}
+          {preHeaderSection && (
+            <FlexWrapper
+              onClick={(e) => {
+                e.stopPropagation();
+              }}>
+              {preHeaderSection}
+            </FlexWrapper>
+          )}
+          <TitleAs>{header ?? title}</TitleAs>
+          {headerLeftSection && (
+            <FlexWrapper
+              onClick={(e) => {
+                e.stopPropagation();
+              }}>
+              {headerLeftSection}
+            </FlexWrapper>
+          )}
         </FlexWrapper>
         <FlexWrapper>
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-          {actions && <div onClick={(e) => { e.stopPropagation(); }}>{actions}</div>}
-          {collapsible && (
-          <Button bsSize="sm"
-                  bsStyle={opened ? 'primary' : 'default'}
-                  onClick={toggle}
-                  data-testid="collapseButton"
-                  title={`Toggle ${title.toLowerCase()} section`}
-                  disabled={disableCollapseButton}>
-            <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-          </Button>
+          {actions && (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+              }}>
+              {actions}
+            </div>
           )}
+          {collapseButtonPosition === 'right' && collapseButton}
         </FlexWrapper>
       </Header>
       {!collapsible && children}
-      {collapsible && (
-      <Collapse in={opened}>
-        {children}
-      </Collapse>
-      )}
+      {collapsible && <Collapse in={opened}>{children}</Collapse>}
     </Container>
   );
 };

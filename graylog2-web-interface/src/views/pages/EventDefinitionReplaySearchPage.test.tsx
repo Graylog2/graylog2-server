@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import SearchComponent from 'views/components/Search';
 import StreamsContext from 'contexts/StreamsContext';
@@ -34,7 +33,7 @@ import {
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
-import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 const mockView = createSearch();
 
@@ -47,22 +46,27 @@ jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 
 jest.mock('hooks/useEventDefinition');
+jest.mock('hooks/useRightSidebar', () => (): { openSidebar: () => void; closeSidebar: () => void; sidebar: null } => ({
+  openSidebar: jest.fn(),
+  closeSidebar: jest.fn(),
+  sidebar: null,
+}));
 jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: {
-    listAll: jest.fn(async () => Promise.resolve()),
-  },
-  EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] as Array<EventNotification> }, isFetched: true })),
 }));
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -78,7 +82,11 @@ describe('EventDefinitionReplaySearchPage', () => {
   beforeEach(() => {
     asMock(useParams).mockReturnValue({ definitionId: mockEventDefinitionTwoAggregations.id });
     asMock(UseCreateViewForEvent).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view: mockView,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
 
     asMock(useEventDefinition).mockImplementation(() => ({
@@ -90,25 +98,19 @@ describe('EventDefinitionReplaySearchPage', () => {
   });
 
   it('should run useEventDefinition, UseCreateViewForEvent with correct parameters', async () => {
-    asMock(useAlertAndEventDefinitionData).mockReturnValue({
-      eventData: undefined,
-      eventDefinition: mockEventDefinitionTwoAggregations,
-      aggregations: mockedMappedAggregation,
-      alertId: undefined,
-      definitionId: mockEventDefinitionTwoAggregations.id,
-      definitionTitle: mockEventDefinitionTwoAggregations.title,
-      isLoading: false,
-    });
-
     render(<SimpleReplaySearchPage />);
 
-    await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id, {
-      onErrorHandler,
-    }));
+    await waitFor(() =>
+      expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id, {
+        onErrorHandler,
+      }),
+    );
 
     await waitFor(() => {
       expect(UseCreateViewForEvent).toHaveBeenCalledWith({
-        eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
+        eventDefinition: mockEventDefinitionTwoAggregations,
+        aggregations: mockedMappedAggregation,
+        eventData: undefined,
       });
     });
   });

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed input diagnosis page shows UDP for OpenTelemetry (gRPC) Input"
+
+issues = ["22691"]
+pulls = ["24646"]

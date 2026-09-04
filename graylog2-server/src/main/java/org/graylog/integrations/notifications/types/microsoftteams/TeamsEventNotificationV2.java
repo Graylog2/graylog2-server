@@ -20,27 +20,26 @@ import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;
-import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
+import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.integrations.notifications.types.util.RequestClient;
-import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.jackson.TypeReferences;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,25 +52,22 @@ public class TeamsEventNotificationV2 implements EventNotification {
     private final EventNotificationService notificationCallbackService;
     private final Engine jsonTemplateEngine;
     private final NotificationService notificationService;
-    private final ObjectMapperProvider objectMapperProvider;
     private final NodeId nodeId;
     private final RequestClient requestClient;
-    private final URI httpExternalUri;
+    private final TemplateModelProvider templateModelProvider;
 
     @Inject
     public TeamsEventNotificationV2(EventNotificationService notificationCallbackService,
-                                    ObjectMapperProvider objectMapperProvider,
                                     @Named("JsonSafe") Engine jsonTemplateEngine,
                                     NotificationService notificationService,
                                     NodeId nodeId, RequestClient requestClient,
-                                    HttpConfiguration httpConfiguration) {
+                                    TemplateModelProvider templateModelProvider) {
         this.notificationCallbackService = notificationCallbackService;
-        this.objectMapperProvider = requireNonNull(objectMapperProvider);
         this.jsonTemplateEngine = requireNonNull(jsonTemplateEngine);
         this.notificationService = requireNonNull(notificationService);
         this.nodeId = requireNonNull(nodeId);
         this.requestClient = requireNonNull(requestClient);
-        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
+        this.templateModelProvider = templateModelProvider;
     }
 
     /**
@@ -119,7 +115,7 @@ public class TeamsEventNotificationV2 implements EventNotification {
     @VisibleForTesting
     String generateBody(EventNotificationContext ctx, TeamsEventNotificationConfigV2 config) throws PermanentEventNotificationException {
         final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
-        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog, config.timeZone());
+        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog);
         try {
             return jsonTemplateEngine.transform(config.adaptiveCard(), model);
         } catch (Exception e) {
@@ -139,15 +135,27 @@ public class TeamsEventNotificationV2 implements EventNotification {
     }
 
     @VisibleForTesting
-    Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog, DateTimeZone timeZone) {
-        final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
-        LOG.debug("Custom message model: {}", modelData);
+    Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog) {
+        Map<String, Object> model = new HashMap<>(
+                templateModelProvider.of(ctx, backlog, DateTimeZone.UTC, Map.of("type", type)));
+        // Override timestamp fields with RFC 3339 strings. The Adaptive Card template wraps these
+        // values with DATE()/TIME() so that Teams automatically displays them in the viewer's local timezone.
+        EventDto event = ctx.event();
+        model.put("event", overrideEventTimestamps(model, event));
 
-        final Map<String, Object> objectMap = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
-        objectMap.put("type", type);
-        objectMap.put("http_external_uri", this.httpExternalUri);
+        return model;
+    }
 
-        return objectMap;
+    /**
+     * Returns a copy of the serialised event map with timestamp fields replaced by RFC 3339 strings
+     * that are intended to be wrapped with DATE()/TIME() functions in the Adaptive Card template.
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> overrideEventTimestamps(Map<String, Object> model, EventDto event) {
+        Map<String, Object> eventMap = new HashMap<>((Map<String, Object>) model.get("event"));
+        eventMap.put("timestamp", Tools.getISO8601StringWithoutMillis(event.eventTimestamp()));
+        eventMap.put("timestamp_processing", Tools.getISO8601StringWithoutMillis(event.processingTimestamp()));
+        return eventMap;
     }
 
     public interface Factory extends EventNotification.Factory<TeamsEventNotificationV2> {

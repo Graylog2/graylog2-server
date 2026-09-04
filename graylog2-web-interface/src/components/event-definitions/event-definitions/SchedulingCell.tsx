@@ -17,16 +17,20 @@
 import React from 'react';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { describeExpression } from 'util/CronUtils';
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
 import Button from 'components/bootstrap/Button';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import {
+  clearNotificationQueue,
+  EVENT_DEFINITIONS_QUERY_KEY,
+} from 'components/event-definitions/hooks/useEventDefinitions';
 
 import type { Scheduler, EventDefinition } from '../event-definitions-types';
 
 type Props = {
-  definition: EventDefinition,
+  definition: EventDefinition;
 };
 
 const DetailTitle = styled.dt`
@@ -34,19 +38,21 @@ const DetailTitle = styled.dt`
   clear: left;
 `;
 
-const DetailValue = styled.dd(({ theme }) => css`
-  margin-left: 180px;
-  word-wrap: break-word;
+const DetailValue = styled.dd(
+  ({ theme }) => css`
+    margin-left: 180px;
+    overflow-wrap: break-word;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.variant.lightest.default};
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-  }
-`);
+    &:not(:last-child) {
+      border-bottom: 1px solid ${theme.colors.variant.lightest.default};
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+    }
+  `,
+);
 
-const DetailsButton = styled(Button)`
-  padding: 6px 8px;
+const DetailsOverlayTrigger = styled(OverlayTrigger)`
+  vertical-align: bottom;
 `;
 
 const getTimeRange = (scheduler: Scheduler) => {
@@ -56,7 +62,9 @@ const getTimeRange = (scheduler: Scheduler) => {
   return (
     <>
       <DetailTitle>Next time range:</DetailTitle>
-      <DetailValue><Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} /></DetailValue>
+      <DetailValue>
+        <Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} />
+      </DetailValue>
     </>
   );
 };
@@ -69,7 +77,8 @@ const describeSchedule = (isCron: boolean, value: number | string) => {
     return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);
   }
 
-  return `every ${moment.duration(value)
+  return `every ${moment
+    .duration(value)
     .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false })}`;
 };
 
@@ -80,18 +89,23 @@ const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) =>
     {scheduler.triggered_at && (
       <>
         <DetailTitle>Last execution:</DetailTitle>
-        <DetailValue><Timestamp dateTime={scheduler.triggered_at} /></DetailValue>
+        <DetailValue>
+          <Timestamp dateTime={scheduler.triggered_at} />
+        </DetailValue>
       </>
     )}
     {scheduler.next_time && (
       <>
         <DetailTitle>Next execution:</DetailTitle>
-        <DetailValue><Timestamp dateTime={scheduler.next_time} /></DetailValue>
+        <DetailValue>
+          <Timestamp dateTime={scheduler.next_time} />
+        </DetailValue>
       </>
     )}
     {getTimeRange(scheduler)}
     <DetailTitle>Queued notifications:</DetailTitle>
-    <DetailValue>{scheduler.queued_notifications}
+    <DetailValue>
+      {scheduler.queued_notifications}
       {scheduler.queued_notifications > 0 && (
         <Button bsStyle="link" bsSize="xsmall" onClick={() => clearNotifications()}>
           clear
@@ -109,35 +123,43 @@ const SchedulingInfo = ({
   scheduler,
   title,
   clearNotifications,
-}:{
-  executeEveryMs: number,
-  searchWithinMs: number,
-  useCronScheduling: boolean,
-  cronExpression: string,
-  scheduler: Scheduler,
-  title: string,
-  clearNotifications: () => void,
+}: {
+  executeEveryMs: number;
+  searchWithinMs: number;
+  useCronScheduling: boolean;
+  cronExpression: string;
+  scheduler: Scheduler;
+  title: string;
+  clearNotifications: () => void;
 }) => {
-  const executeEveryFormatted = describeSchedule(useCronScheduling, useCronScheduling ? cronExpression : executeEveryMs);
-  const searchWithinFormatted = moment.duration(searchWithinMs)
+  const executeEveryFormatted = describeSchedule(
+    useCronScheduling,
+    useCronScheduling ? cronExpression : executeEveryMs,
+  );
+  const searchWithinFormatted = moment
+    .duration(searchWithinMs)
     .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
+  const searchWithinMessage = searchWithinMs ? `, searching within the last ${searchWithinFormatted}.` : '.';
 
   return (
     <>
-      {`Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
-      <OverlayTrigger trigger="click"
-                      rootClose
-                      placement="left"
-                      title={`${title} details.`}
-                      overlay={detailsPopover(scheduler, clearNotifications)}
-                      width={500}>
-        <DetailsButton bsStyle="link"><Icon name="info" /></DetailsButton>
-      </OverlayTrigger>
+      {`Runs ${executeEveryFormatted}${searchWithinMessage} `}
+      <DetailsOverlayTrigger
+        trigger="click"
+        rootClose
+        placement="left"
+        title={`${title} details.`}
+        overlay={detailsPopover(scheduler, clearNotifications)}
+        width={500}>
+        <Icon name="info" title={`${title} details.`} bsStyle={'info'} />
+      </DetailsOverlayTrigger>
     </>
   );
 };
 
-const SchedulingCell = ({ definition } : Props) => {
+const SchedulingCell = ({ definition }: Props) => {
+  const queryClient = useQueryClient();
+
   if (!definition?.config?.search_within_ms && !definition?.config?.execute_every_ms) {
     return <>Not Scheduled.</>;
   }
@@ -145,7 +167,12 @@ const SchedulingCell = ({ definition } : Props) => {
   const clearNotifications = (eventDefinition: EventDefinition) => () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to clear queued notifications for "${eventDefinition.title}"?`)) {
-      EventDefinitionsActions.clearNotificationQueue(eventDefinition);
+      clearNotificationQueue(eventDefinition).then(
+        () => queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY }),
+        () => {
+          // Error feedback is handled by `clearNotificationQueue` itself.
+        },
+      );
     }
   };
 
@@ -161,13 +188,15 @@ const SchedulingCell = ({ definition } : Props) => {
   } = definition;
 
   return (
-    <SchedulingInfo executeEveryMs={executeEveryMs}
-                    searchWithinMs={searchWithinMs}
-                    useCronScheduling={useCronScheduling}
-                    cronExpression={cronExpression}
-                    title={title}
-                    scheduler={scheduler}
-                    clearNotifications={clearNotifications(definition)} />
+    <SchedulingInfo
+      executeEveryMs={executeEveryMs}
+      searchWithinMs={searchWithinMs}
+      useCronScheduling={useCronScheduling}
+      cronExpression={cronExpression}
+      title={title}
+      scheduler={scheduler}
+      clearNotifications={clearNotifications(definition)}
+    />
   );
 };
 

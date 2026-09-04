@@ -45,8 +45,13 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.Delete
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.bytes.BytesReference;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.ToXContent;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentFactory;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentHelper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.ReindexRequest;
@@ -68,8 +73,11 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexStatus;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.ShardsInfo;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -130,7 +138,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
+    public void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback) {
         final ReindexRequest request = new ReindexRequest();
         request.setSourceIndices(source);
         request.setDestIndex(target);
@@ -209,7 +217,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public Map<String, Object> getFlattenIndexSettings(@Nonnull String index) {
+    public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
 
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(index)
@@ -217,10 +225,14 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            Settings settings = settingsResponse.getIndexToSettings().get(index);
-            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-            settings.keySet().forEach(k -> Optional.ofNullable(settings.get(k)).ifPresent(v -> builder.put(k, v)));
-            return builder.build();
+            final Settings settings = settingsResponse.getIndexToSettings().get(index);
+            final XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
+            xContentBuilder.startObject();
+            settings.toXContent(xContentBuilder, ToXContent.EMPTY_PARAMS);
+            xContentBuilder.endObject();
+            final BytesReference bytes = BytesReference.bytes(xContentBuilder);
+
+            return XContentHelper.convertToMap(bytes, true, xContentBuilder.contentType()).v2();
         }, "Couldn't read settings of index " + index);
     }
 
@@ -349,16 +361,6 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 "Unable to close index " + index);
     }
 
-    @Override
-    public long numberOfMessages(String index) {
-        final JsonNode result = statsApi.indexStats(index);
-        final JsonNode count = result.path("_all").path("primaries").path("docs").path("count");
-        if (count.isMissingNode()) {
-            throw new RuntimeException("Unable to extract count from response.");
-        }
-        return count.asLong();
-    }
-
     private GetSettingsResponse settingsFor(String indexOrAlias) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(indexOrAlias)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
@@ -467,8 +469,16 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> indices(String indexWildcard, List<String> status, String indexSetId) {
-        return catApi.indices(indexWildcard, status, "Couldn't get index list for index set <" + indexSetId + ">");
+    public Set<String> indices(String indexWildcard, List<IndexStatus> status, String indexSetId) {
+        final List<String> indexStatus = status.stream().map(this::toStatusName).toList();
+        return catApi.indices(indexWildcard, indexStatus, "Couldn't get index list for index set <" + indexSetId + ">");
+    }
+
+    private String toStatusName(IndexStatus status) {
+        return switch (status) {
+            case OPEN -> "open";
+            case CLOSED -> "close";
+        };
     }
 
     @Override
@@ -643,5 +653,10 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public Optional<WarmIndexInfo> getWarmIndexInfo(String index) {
         return Optional.empty();
+    }
+
+    @Override
+    public Set<OutdatedIndex> getOutdatedIndices(int currentMajorVersion) {
+        throw new UnsupportedOperationException("Outdated indices check only supported in OpenSearch versions > 2.x.");
     }
 }

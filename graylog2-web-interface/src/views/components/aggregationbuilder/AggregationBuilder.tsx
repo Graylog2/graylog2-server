@@ -26,48 +26,54 @@ import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { OnVisualizationConfigChange } from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
 import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
+import KeyMapperProvider from 'views/components/visualizations/KeyMapperProvider';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 
 const defaultVisualizationType = 'table';
 
 type RowResult = {
-  type: 'pivot',
-  total: number,
-  rows: Rows,
-  effective_timerange: AbsoluteTimeRange,
+  type: 'pivot';
+  total: number;
+  rows: Rows;
+  effective_timerange: AbsoluteTimeRange;
 };
 
 type EventResult = {
-  events: Events,
-  type: 'events',
-  name: 'events',
+  events: Events;
+  type: 'events';
+  name: 'events';
 };
 
 type VisualizationResult = { [key: string]: Rows } & { events?: Events };
 
 export type VisualizationComponentProps = {
-  config: AggregationWidgetConfig,
-  data: VisualizationResult,
-  editing?: boolean,
-  effectiveTimerange: AbsoluteTimeRange,
-  fields: FieldTypeMappingsList,
-  height: number,
-  onChange: OnVisualizationConfigChange,
-  setLoadingState: (loading: boolean) => void,
-  toggleEdit: () => void,
-  width: number,
+  config: AggregationWidgetConfig;
+  data: VisualizationResult;
+  editing?: boolean;
+  effectiveTimerange: AbsoluteTimeRange;
+  fields: FieldTypeMappingsList;
+  height: number;
+  onChange: OnVisualizationConfigChange;
+  setLoadingState: (loading: boolean) => void;
+  toggleEdit: () => void;
+  width: number;
 };
 
-export type VisualizationComponent<T extends string> =
-  { type: T, propTypes?: any }
-  & React.ComponentType<VisualizationComponentProps>;
+export type VisualizationComponent<T extends string> = {
+  type: T;
+  propTypes?: any;
+} & React.ComponentType<VisualizationComponentProps>;
 
-export const retrieveChartData = (data: VisualizationResult): Rows => data.chart ?? data[Object.keys(data).filter((name) => name !== 'events')[0]];
+export const retrieveChartData = (data: VisualizationResult): Rows =>
+  data.chart ?? data[Object.keys(data).filter((name) => name !== 'events')[0]];
 
-export const makeVisualization = <T extends string, P extends VisualizationComponentProps> (component: React.ComponentType<P>, type: T): VisualizationComponent<T> => Object.assign(component, { type });
+export const makeVisualization = <T extends string, P extends VisualizationComponentProps>(
+  component: React.ComponentType<P>,
+  type: T,
+): VisualizationComponent<T> => Object.assign(component, { type });
 
-const _visualizationForType = <T extends string> (type: T): VisualizationComponent<T> => {
+const _visualizationForType = <T extends string>(type: T): VisualizationComponent<T> => {
   const visualizationTypes = PluginStore.exports('visualizationTypes');
   const visualization = visualizationTypes.filter((viz) => viz.type === type)[0];
 
@@ -107,23 +113,27 @@ const AggregationBuilder = ({
 
   const rows = Object.fromEntries(
     Object.entries(data)
-      .map((tuple) => tuple as ([string, RowResult] | ['events', EventResult]))
-      .map(
-        ([key, value]): [string, Rows | Events] => [key, getResult(value)],
-      ),
+      .map((tuple) => tuple as [string, RowResult] | ['events', EventResult])
+      .map(([key, value]): [string, Rows | Events] => [key, getResult(value)]),
   ) as VisualizationResult;
 
   return (
-    <VisComponent config={config}
-                  data={rows}
-                  setLoadingState={setLoadingState}
-                  effectiveTimerange={effectiveTimerange}
-                  editing={editing}
-                  fields={fields}
-                  height={height}
-                  width={width}
-                  toggleEdit={toggleEdit}
-                  onChange={onVisualizationConfigChange} />
+    <KeyMapperProvider data={rows} config={config} fields={fields}>
+      {/* VisComponent is resolved by visualization type at render time and cannot be hoisted. */}
+      {/* eslint-disable-next-line react-hooks/static-components */}
+      <VisComponent
+        config={config}
+        data={rows}
+        setLoadingState={setLoadingState}
+        effectiveTimerange={effectiveTimerange}
+        editing={editing}
+        fields={fields}
+        height={height}
+        width={width}
+        toggleEdit={toggleEdit}
+        onChange={onVisualizationConfigChange}
+      />
+    </KeyMapperProvider>
   );
 };
 

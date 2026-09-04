@@ -1,0 +1,4 @@
+type = "f"
+message = "Keep highlighting rules in saved searches in order."
+
+pulls = ["24347"]

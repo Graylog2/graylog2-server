@@ -19,14 +19,19 @@ package org.graylog2.inputs.transports;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import io.netty.channel.EventLoopGroup;
+import jakarta.inject.Named;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.utilities.IpSubnet;
+
+import java.util.Set;
 
 /**
  * Raw version of the HttpTransport which uses the `/raw` path instead of the `/gelf` path.
@@ -41,9 +46,11 @@ public class RawHttpTransport extends AbstractHttpTransport {
                             NettyTransportConfiguration nettyTransportConfiguration,
                             ThroughputCounter throughputCounter,
                             LocalMetricRegistry localRegistry,
-                            TLSProtocolsConfiguration tlsConfiguration) {
+                            TLSProtocolsConfiguration tlsConfiguration,
+                            EncryptedValueService encryptedValueService,
+                            @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
         super(configuration, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration,
-                throughputCounter, localRegistry, tlsConfiguration, PATH);
+                throughputCounter, localRegistry, tlsConfiguration, encryptedValueService, trustedProxies, PATH);
 
     }
 

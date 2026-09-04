@@ -27,7 +27,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ChunkedResult;
-import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
@@ -35,7 +34,6 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
-import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
@@ -63,49 +61,6 @@ public class SearchesAdapterOS2 implements SearchesAdapter {
         this.scroll = scroll;
         this.searchRequestFactory = searchRequestFactory;
         this.resultMessageFactory = resultMessageFactory;
-    }
-
-    @Override
-    public CountResult count(Set<String> affectedIndices, String query, TimeRange range, String filter) {
-        final SearchesConfig config = SearchesConfig.builder()
-                .query(query)
-                .range(range)
-                .filter(filter)
-                .limit(0)
-                .offset(0)
-                .build();
-        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
-        final SearchRequest searchRequest = new SearchRequest(affectedIndices.toArray(new String[0]))
-                .source(searchSourceBuilder);
-
-        final SearchResponse result = client.search(searchRequest, "Fetching message count failed for indices ");
-
-        return CountResult.create(result.getHits().getTotalHits().value, result.getTook().getMillis());
-    }
-
-    @Override
-    public ChunkedResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields) {
-        return scroll(ChunkCommand.builder()
-                .indices(indexWildcards)
-                .sorting(sorting)
-                .filter(filter)
-                .query(query)
-                .range(range)
-                .limit(limit)
-                .offset(offset)
-                .fields(fields)
-                .build());
-    }
-
-    @Override
-    public ChunkedResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize) {
-        return scroll(ChunkCommand.builder()
-                .indices(indexWildcards)
-                .sorting(sorting)
-                .filter(filter)
-                .query(query)
-                .batchSize(batchSize)
-                .build());
     }
 
     @Override

@@ -17,7 +17,7 @@
 package org.graylog.plugins.views.search.views;
 
 import com.google.errorprone.annotations.MustBeClosed;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;

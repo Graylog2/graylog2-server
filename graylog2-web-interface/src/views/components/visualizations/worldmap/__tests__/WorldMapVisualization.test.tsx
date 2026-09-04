@@ -16,23 +16,34 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import type { HTMLAttributes } from 'enzyme';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
+import MockViewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import Series from 'views/logic/aggregationbuilder/Series';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import MapVisualization from 'views/components/visualizations/worldmap/MapVisualization';
 
 import WorldMapVisualization from '../WorldMapVisualization';
 
-jest.mock('../MapVisualization', () => 'map-visualization');
+jest.mock('../MapVisualization', () =>
+  jest.fn(({ onChange, onRenderComplete }: MapVisualizationProps) => {
+    onRenderComplete();
 
-type MapVisualizationProps = HTMLAttributes & {
-  onChange: (viewPort: Viewport) => void;
+    return (
+      <button type="button" onClick={() => onChange(MockViewport.create([0, 0], 0))}>
+        Trigger change
+      </button>
+    );
+  }),
+);
+
+type MapVisualizationProps = {
+  onChange: (viewPort: MockViewport) => void;
   onRenderComplete: () => void;
 };
 
@@ -57,30 +68,18 @@ describe('WorldMapVisualization', () => {
     width: 800,
   };
 
-  it('does not call onChange when not editing', () => {
+  it('does not call onChange when not editing', async () => {
     const onChange = jest.fn();
-    const wrapper = mount(<WorldMapVisualization {...defaultProps} onChange={onChange} />);
-    const mapVisualization = wrapper.find('map-visualization');
-
-    const { onChange: _onChange } = mapVisualization.at(0).props() as MapVisualizationProps;
-
-    const viewport = Viewport.create([0, 0], 0);
-
-    _onChange(viewport);
+    render(<WorldMapVisualization {...defaultProps} onChange={onChange} />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Trigger change' }));
 
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('does call onChange when editing', () => {
+  it('does call onChange when editing', async () => {
     const onChange = jest.fn();
-    const wrapper = mount(<WorldMapVisualization {...defaultProps} onChange={onChange} editing />);
-    const mapVisualization = wrapper.find('map-visualization');
-
-    const { onChange: _onChange } = mapVisualization.at(0).props() as MapVisualizationProps;
-
-    const viewport = Viewport.create([0, 0], 0);
-
-    _onChange(viewport);
+    render(<WorldMapVisualization {...defaultProps} onChange={onChange} editing />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Trigger change' }));
 
     expect(onChange).toHaveBeenCalledWith({
       zoom: 0,
@@ -91,22 +90,21 @@ describe('WorldMapVisualization', () => {
 
   it('calls render completion callback after first render', () => {
     const renderCompletionCallback = jest.fn();
-    const wrapper = mount((
+    render(
       <RenderCompletionCallback.Provider value={renderCompletionCallback}>
         <WorldMapVisualization {...defaultProps} editing />
-      </RenderCompletionCallback.Provider>
-    ));
-
-    const { onRenderComplete } = wrapper.find('map-visualization').props() as MapVisualizationProps;
-
-    onRenderComplete();
+      </RenderCompletionCallback.Provider>,
+    );
 
     expect(renderCompletionCallback).toHaveBeenCalled();
   });
 
   it('renders Map component with correct data, when a metric is defined', () => {
     const series = new Series('count()');
-    const configWithMetric = AggregationWidgetConfig.builder().series([series]).visualization(WorldMapVisualization.type).build();
+    const configWithMetric = AggregationWidgetConfig.builder()
+      .series([series])
+      .visualization(WorldMapVisualization.type)
+      .build();
     const data: Record<string, Rows> = {
       chart: [
         {
@@ -121,20 +119,16 @@ describe('WorldMapVisualization', () => {
         },
       ],
     };
-    const mapData = [{
-      keys: [{}, {}],
-      name: 'count()',
-      values: { '37.751,-97.822': 25, '35.69,139.69': 6 },
-    }];
-    const wrapper = mount((
-      <WorldMapVisualization {...defaultProps}
-                             config={configWithMetric}
-                             data={data}
-                             editing />
-    ));
-    const mapVisualization = wrapper.find('map-visualization');
+    const mapData = [
+      {
+        keys: [{}, {}],
+        name: 'count()',
+        values: { '37.751,-97.822': 25, '35.69,139.69': 6 },
+      },
+    ];
+    render(<WorldMapVisualization {...defaultProps} config={configWithMetric} data={data} editing />);
 
-    expect(mapVisualization).toHaveProp('data', mapData);
+    expect(MapVisualization).toHaveBeenCalledWith(expect.objectContaining({ data: mapData }), {});
   });
 
   it('renders Map component with correct data, when no metric is defined', () => {
@@ -145,19 +139,15 @@ describe('WorldMapVisualization', () => {
         { key: ['35.69,139.69'], values: [], source: 'leaf' },
       ],
     };
-    const mapData = [{
-      keys: [{}, {}],
-      name: 'No metric defined',
-      values: { '37.751,-97.822': null, '35.69,139.69': null },
-    }];
-    const wrapper = mount((
-      <WorldMapVisualization {...defaultProps}
-                             config={configWithoutMetric}
-                             data={data}
-                             editing />
-    ));
-    const mapVisualization = wrapper.find('map-visualization');
+    const mapData = [
+      {
+        keys: [{}, {}],
+        name: 'No metric defined',
+        values: { '37.751,-97.822': null, '35.69,139.69': null },
+      },
+    ];
+    render(<WorldMapVisualization {...defaultProps} config={configWithoutMetric} data={data} editing />);
 
-    expect(mapVisualization).toHaveProp('data', mapData);
+    expect(MapVisualization).toHaveBeenCalledWith(expect.objectContaining({ data: mapData }), {});
   });
 });

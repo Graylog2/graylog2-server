@@ -17,18 +17,21 @@
 import * as React from 'react';
 
 import useOutputs from 'hooks/useOutputs';
-import { Section, Spinner } from 'components/common';
-import type { Stream } from 'stores/streams/StreamsStore';
+import { IfPermitted, Section, Spinner } from 'components/common';
+import type { Stream } from 'logic/streams/types';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
-import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
+import useAvailableOutputTypes, {
+  getOutputTypeDefinition,
+  getRequestedOutputConfiguration,
+} from 'components/streams/useAvailableOutputTypes';
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import AddOutputButton from 'components/streams/StreamDetails/routing-destination/AddOutputButton';
 import OutputsList from 'components/streams/StreamDetails/routing-destination/OutputsList';
 import DestinationSwitch from 'components/streams/StreamDetails/routing-destination/DestinationSwitch';
 
 type Props = {
-  stream: Stream
+  stream: Stream;
 };
 
 const DestinationOutputs = ({ stream }: Props) => {
@@ -37,13 +40,13 @@ const DestinationOutputs = ({ stream }: Props) => {
   const { data: availableOutputTypes, isInitialLoading: isLoadingOutputTypes } = useAvailableOutputTypes();
 
   const getTypeDefinition = (type: string, callback?: (available: AvailableOutputSummary) => void) => {
-    const definitition = availableOutputTypes.types[type];
+    const definition = getOutputTypeDefinition(availableOutputTypes, type);
 
-    if (callback && definitition) {
-      callback(definitition);
+    if (callback && definition) {
+      callback(definition);
     }
 
-    return definitition?.requested_configuration;
+    return getRequestedOutputConfiguration(availableOutputTypes, type);
   };
 
   if (isInitialLoading || isLoadingOutput || isLoadingOutputTypes) {
@@ -59,31 +62,40 @@ const DestinationOutputs = ({ stream }: Props) => {
     .sort((output1, output2) => output1.title.localeCompare(output2.title));
 
   return (
-    <Section title="Outputs"
-             collapsible
-             defaultClosed
-             disableCollapseButton={!hasAssignedOutput}
-             headerLeftSection={(
-               <>
-                 <DestinationSwitch aria-label="Toggle Output"
-                                    name="toggle-indexset"
-                                    checked={hasAssignedOutput}
-                                    disabled
-                                    onChange={(e) => e.preventDefault()}
-                                    label={title} />
-                 <SectionCountLabel>OUTPUTS {data.outputs.length}</SectionCountLabel>
-               </>
-             )}
-             actions={(
-               <AddOutputButton stream={stream}
-                                availableOutputTypes={availableOutputTypes.types}
-                                assignableOutputs={assignableOutputs}
-                                getTypeDefinition={getTypeDefinition} />
-            )}>
-      <OutputsList streamId={stream.id}
-                   outputs={data.outputs}
-                   isLoadingOutputTypes={isLoadingOutputTypes}
-                   getTypeDefinition={getTypeDefinition} />
+    <Section
+      title="Outputs"
+      collapsible
+      defaultClosed
+      disableCollapseButton={!hasAssignedOutput}
+      headerLeftSection={
+        <>
+          <DestinationSwitch
+            aria-label="Toggle Output"
+            name="toggle-indexset"
+            checked={hasAssignedOutput}
+            disabled
+            onChange={(e) => e.preventDefault()}
+            label={title}
+          />
+          <SectionCountLabel>OUTPUTS {data.outputs.length}</SectionCountLabel>
+        </>
+      }
+      actions={
+        <IfPermitted permissions="stream_outputs:create">
+          <AddOutputButton
+            stream={stream}
+            availableOutputTypes={availableOutputTypes}
+            assignableOutputs={assignableOutputs}
+            getTypeDefinition={getTypeDefinition}
+          />
+        </IfPermitted>
+      }>
+      <OutputsList
+        streamId={stream.id}
+        outputs={data.outputs}
+        isLoadingOutputTypes={isLoadingOutputTypes}
+        getTypeDefinition={getTypeDefinition}
+      />
     </Section>
   );
 };

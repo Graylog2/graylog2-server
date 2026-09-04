@@ -20,20 +20,19 @@ import styled from 'styled-components';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
-import InteractiveContext from './contexts/InteractiveContext';
+import { useIsInteractiveMode } from './contexts/InteractiveContext';
 
 type Props = {
-  field: string,
-  value: any,
-  render?: ValueRenderer,
-  type: FieldType,
-  unit?: FieldUnit,
+  field: string;
+  value: any;
+  render?: ValueRenderer;
+  type?: FieldType;
+  unit?: FieldUnit;
 };
 
 const ValueActionTitle = styled.span`
@@ -41,29 +40,47 @@ const ValueActionTitle = styled.span`
 `;
 
 type TypeSpecificValueWithHighlightProps = {
-  field: string,
-  value?: any,
-  type?: FieldType
-  render?: React.ComponentType<ValueRendererProps>,
-  unit?: FieldUnit,
-}
-const TypeSpecificValueWithHighlight = ({ field, value, type, render, unit }: TypeSpecificValueWithHighlightProps) => (
-  <CustomHighlighting field={field}
-                      value={value}>
+  field: string;
+  value?: any;
+  type?: FieldType;
+  render?: React.ComponentType<ValueRendererProps>;
+  unit?: FieldUnit;
+};
+const TypeSpecificValueWithHighlight = ({
+  field,
+  value = undefined,
+  type = undefined,
+  render = undefined,
+  unit = undefined,
+}: TypeSpecificValueWithHighlightProps) => (
+  <CustomHighlighting field={field} value={value}>
     <TypeSpecificValue field={field} value={value} type={type} render={render} unit={unit} />
   </CustomHighlighting>
 );
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit }: Props) => {
-  const queryId = useActiveQueryId();
-  const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
-  const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
-  const element = <TypeSpecificValueWithHighlight field={field} value={value} type={type} render={Component} unit={unit} />;
+const InteractiveValue = ({
+  field,
+  value,
+  render = defaultRenderer,
+  type = FieldType.Unknown,
+  unit = undefined,
+}: Props) => {
+  const RenderComponent: ValueRenderer = useMemo(
+    () => render ?? ((props: ValueRendererProps) => props.value),
+    [render],
+  );
+  const Component = useCallback(
+    ({ value: componentValue }: { value: any }) => <RenderComponent field={field} value={componentValue} />,
+    [RenderComponent, field],
+  );
+  const element = (
+    <TypeSpecificValueWithHighlight field={field} value={value} type={type} render={Component} unit={unit} />
+  );
 
   return (
-    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
+    <ValueActions element={element} field={field} type={type} value={value}>
       <ValueActionTitle data-testid="value-actions-title">
         {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
       </ValueActionTitle>
@@ -71,12 +88,17 @@ const InteractiveValue = ({ field, value, render = defaultRenderer, type, unit }
   );
 };
 
-const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, unit }: Props) => (
-  <InteractiveContext.Consumer>
-    {(interactive) => (interactive
-      ? <InteractiveValue field={field} value={value} render={render} type={type} unit={unit} />
-      : <span><TypeSpecificValueWithHighlight field={field} value={value} render={render} type={type} unit={unit} /></span>)}
-  </InteractiveContext.Consumer>
-);
+const Value = ({ field, value, render = defaultRenderer, type = undefined, unit = undefined }: Props) => {
+  const _type = type ?? FieldType.Unknown;
+  const isInteractive = useIsInteractiveMode();
+
+  return isInteractive ? (
+    <InteractiveValue field={field} value={value} render={render} type={_type} unit={unit} />
+  ) : (
+    <span>
+      <TypeSpecificValueWithHighlight field={field} value={value} render={render} type={_type} unit={unit} />
+    </span>
+  );
+};
 
 export default Value;

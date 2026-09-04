@@ -17,17 +17,20 @@
 package org.graylog2.lookup.dto;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.mongojack.Id;
 
 import javax.annotation.Nullable;
 
 @AutoValue
-@JsonDeserialize(builder = AutoValue_CacheDto.Builder.class)
-public abstract class CacheDto extends ScopedEntity {
+@JsonDeserialize(builder = CacheDto.Builder.class)
+public abstract class CacheDto implements ScopedEntity<CacheDto.Builder> {
 
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -50,14 +53,29 @@ public abstract class CacheDto extends ScopedEntity {
     public abstract LookupCacheConfiguration config();
 
     public static Builder builder() {
-        return new AutoValue_CacheDto.Builder();
+        return Builder.create();
     }
 
     public abstract Builder toBuilder();
 
     @JsonAutoDetect
     @AutoValue.Builder
-    public abstract static class Builder extends AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_CacheDto.Builder()
+                    .scope(DefaultEntityScope.NAME);
+        }
+
+        @Override
+        @Id
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(String id);
+
+        @Override
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
+
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
 

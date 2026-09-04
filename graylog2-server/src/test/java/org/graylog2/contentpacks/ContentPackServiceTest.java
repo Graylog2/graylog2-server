@@ -31,15 +31,19 @@ import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.fields.FieldValueType;
-import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.aggregation.AggregationConditions;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
+import org.graylog.grn.providers.BultinGRNTypeProvider;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.views.DisplayModeSettings;
@@ -50,29 +54,37 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.scheduler.DBJobDefinitionService;
+import org.graylog.security.Capability;
+import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.exceptions.SkippableEntityException;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.InputFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.SearchFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
+import org.graylog2.contentpacks.facades.StreamReferenceFacade;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
+import org.graylog2.contentpacks.model.ContentPackUpgrade;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
@@ -97,11 +109,15 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.security.SecurityTestUtils;
+import org.graylog2.security.WithAuthorization;
+import org.graylog2.security.WithAuthorizationExtension;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.OutputImpl;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
@@ -111,33 +127,39 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.streams.matchers.StreamRuleMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog2.plugin.streams.Stream.ALL_SYSTEM_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class, WithAuthorizationExtension.class})
 public class ContentPackServiceTest {
     private final String TEST_USER = "test_user";
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -170,31 +192,29 @@ public class ContentPackServiceTest {
     @Mock
     private ContentPackInstallationPersistenceService contentPackInstallService;
     @Mock
-    private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
-
+    private InputService inputService;
     @Mock
-    InputService inputService;
+    private InputRegistry inputRegistry;
     @Mock
-    InputRegistry inputRegistry;
+    private DBLookupTableService lookupTableService;
     @Mock
-    DBLookupTableService lookupTableService;
+    private GrokPatternService grokPatternService;
     @Mock
-    GrokPatternService grokPatternService;
+    private MessageInputFactory messageInputFactory;
     @Mock
-    MessageInputFactory messageInputFactory;
+    private ExtractorFactory extractorFactory;
     @Mock
-    ExtractorFactory extractorFactory;
+    private ConverterFactory converterFactory;
     @Mock
-    ConverterFactory converterFactory;
+    private ServerStatus serverStatus;
     @Mock
-    ServerStatus serverStatus;
+    private Configuration configuration;
     @Mock
-    Configuration configuration;
+    private EntitySharesService entitySharesService;
+    @Mock
+    private FavoriteFieldsService favoriteFieldsService;
 
     private ContentPackService contentPackService;
-    private Set<PluginMetaData> pluginMetaData;
-    private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
-    private Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2;
 
     private ContentPackV1 contentPack;
     private ContentPackInstallation contentPackInstallation;
@@ -202,24 +222,26 @@ public class ContentPackServiceTest {
     private ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors;
     private ImmutableMap<ModelId, Object> entityObjectMap;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
                 contentPackInstallService;
         final Set<ConstraintChecker> constraintCheckers = Collections.singleton(new GraylogVersionConstraintChecker());
-        pluginMetaData = new HashSet<>();
-        outputFactories = new HashMap<>();
-        outputFactories2 = new HashMap<>();
+        final Set<PluginMetaData> pluginMetaData = new HashSet<>();
+        final Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories = new HashMap<>();
+        final Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService),
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
+                ModelTypes.STREAM_REF_V1, new StreamReferenceFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService),
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
-                );
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration);
+        );
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades,
+                new ObjectMapper(), configuration, userService, streamService, new GRNRegistry(Set.of(new BultinGRNTypeProvider())), entitySharesService);
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
@@ -262,6 +284,7 @@ public class ContentPackServiceTest {
     }
 
     @Test
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, RestPermissions.EVENT_DEFINITIONS_CREATE})
     public void installContentPackWithSystemStreamDependencies() throws Exception {
         ImmutableSet<Entity> entities = ImmutableSet.of(createTestViewEntity(), createTestEventDefinitionEntity());
         ContentPackV1 contentPack = ContentPackV1.builder()
@@ -275,18 +298,60 @@ public class ContentPackServiceTest {
                 .id(ModelId.of("dead-beef"))
                 .build();
 
-        for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
             when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
         }
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
         when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
         when(searchDbService.save(any())).thenReturn(Search.builder().id("id").build());
         when(viewService.saveWithOwner(any(), any())).thenReturn(ViewDTO.builder().id("id").title("title").searchId("id").state(Collections.emptyMap()).build());
         when(eventDefinitionHandler.create(any(), any())).thenReturn(createTestEventDefinitionDto());
 
-        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
+
+        verify(entitySharesService, never()).updateEntityShares(any(GRN.class), any(EntityShareRequest.class), any(User.class));
     }
 
     @Test
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, RestPermissions.EVENT_DEFINITIONS_CREATE})
+    public void installContentPackWithSharingConfiguration() throws Exception {
+        ImmutableSet<Entity> entities = ImmutableSet.of(createTestViewEntity(), createTestEventDefinitionEntity());
+        ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
+            when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
+        }
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
+        when(searchDbService.save(any())).thenReturn(Search.builder().id("id").build());
+        when(viewService.saveWithOwner(any(), any())).thenReturn(ViewDTO.builder().id("id").title("title").searchId("id").state(Collections.emptyMap()).build());
+        when(eventDefinitionHandler.create(any(), any())).thenReturn(createTestEventDefinitionDto());
+
+        final var entityShareRequest = EntityShareRequest.create(Map.of(GRN.builder().type("user").grnType(GRNTypes.USER).entity("deadbeef").build(), Capability.VIEW));
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, entityShareRequest);
+
+        verify(entitySharesService, times(entities.size())).updateEntityShares(any(GRN.class), eq(entityShareRequest), any(User.class));
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create", "input_types:create:org.graylog2.inputs.gelf.udp.GELFUDPInput"})
     public void installContentPackWithCloudCheck() throws Exception {
         ImmutableSet<Entity> entities = ImmutableSet.of(createTestGelfUDPEntity());
         ContentPackV1 contentPack = ContentPackV1.builder()
@@ -311,69 +376,71 @@ public class ContentPackServiceTest {
         when(contentPackInstallService.insert(captor.capture())).thenReturn(null);
 
         when(configuration.isCloud()).thenReturn(false);
-        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
         assertThat(captor.getValue().entities()).hasSize(1);
 
         when(configuration.isCloud()).thenReturn(true);
-        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
         assertThat(captor.getValue().entities()).isEmpty();
     }
 
     @Test
-    public void resolveEntitiesWithEmptyInput() {
-        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(Collections.emptySet());
-        assertThat(resolvedEntities).isEmpty();
+    @WithAuthorization(permissions = {RestPermissions.STREAMS_CREATE})
+    public void installContentPackSkipsUnresolvableStreamReference() throws Exception {
+        // A stream_title reference to a stream that does not exist on the target system must be skipped (with a
+        // warning) rather than aborting the whole content pack installation.
+        final EntityV1 streamReference = EntityV1.builder()
+                .id(ModelId.of("stream-ref-cp-id"))
+                .type(ModelTypes.STREAM_REF_V1)
+                .data(objectMapper.convertValue(StreamReferenceEntity.create(ValueReference.of("Missing Stream")), JsonNode.class))
+                .build();
+        final ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(ImmutableSet.of(streamReference))
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        when(streamService.loadAllByTitle("Missing Stream")).thenReturn(Collections.emptyList());
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
+
+        final ArgumentCaptor<ContentPackInstallation> captor = ArgumentCaptor.forClass(ContentPackInstallation.class);
+        when(contentPackInstallService.insert(captor.capture())).thenReturn(null);
+
+        contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER, EntityShareRequest.EMPTY);
+
+        assertThat(captor.getValue().entities()).isEmpty();
     }
 
     @Test
-    public void resolveEntitiesWithNoDependencies() throws NotFoundException {
-        final StreamMock streamMock = new StreamMock(ImmutableMap.of(
-                "_id", "stream-1234",
-                StreamImpl.FIELD_TITLE, "Stream Title"
-        ));
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void installContentPackWithMissingPermissionFails() throws Exception {
+        ImmutableSet<Entity> entities = ImmutableSet.of(createTestGelfUDPEntity());
+        ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
 
-        when(streamService.load("stream-1234")).thenReturn(streamMock);
-
-        final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1)
-        );
-
-        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
-        assertThat(resolvedEntities).containsOnly(EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1));
-    }
-
-    @Test
-    public void resolveEntitiesWithTransitiveDependencies() throws NotFoundException {
-        final StreamMock streamMock = new StreamMock(ImmutableMap.of(
-                "_id", "stream-1234",
-                StreamImpl.FIELD_TITLE, "Stream Title")) {
-            @Override
-            public Set<Output> getOutputs() {
-                return Collections.singleton(
-                        OutputImpl.create(
-                                "output-1234",
-                                "Output Title",
-                                "org.example.outputs.SomeOutput",
-                                "admin",
-                                Collections.emptyMap(),
-                                new Date(0L),
-                                null
-                        )
-                );
-            }
-        };
-
-        when(streamService.load("stream-1234")).thenReturn(streamMock);
-
-        final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1)
-        );
-
-        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
-        assertThat(resolvedEntities).containsOnly(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1),
-                EntityDescriptor.create("output-1234", ModelTypes.OUTPUT_V1)
-        );
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        assertThatThrownBy(() -> contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", userContext, EntityShareRequest.EMPTY))
+                .isInstanceOf(ContentPackException.class);
     }
 
     @Test
@@ -390,7 +457,7 @@ public class ContentPackServiceTest {
         ContentPackUninstallation resultSuccess = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultSuccess).isEqualTo(expectSuccess);
 
-       /* Test skipped uninstall */
+        /* Test skipped uninstall */
         when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("dead-beef1"))).thenReturn((long) 2);
         ContentPackUninstallation expectSkip = ContentPackUninstallation.builder()
                 .skippedEntities(nativeEntityDescriptors)
@@ -429,6 +496,265 @@ public class ContentPackServiceTest {
     }
 
     @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackRecreatesNonUpdatableEntityType() throws Exception {
+        // GrokPatternFacade does not implement UpdatableEntityFacade, so an existing grok pattern
+        // falls back to delete-and-recreate on upgrade: content stays fresh, but the ID changes.
+        GrokPattern existingPattern = GrokPattern.builder().id("dead-beef1").name("NAME").pattern("\\w").build();
+        when(patternService.load("dead-beef1")).thenReturn(existingPattern);
+        GrokPattern recreatedPattern = GrokPattern.builder().id("recreated-id").name("NAME").pattern("\\w").build();
+        when(patternService.save(any())).thenReturn(recreatedPattern);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                contentPack, contentPackInstallation, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        verify(patternService).delete("dead-beef1");
+
+        assertThat(result.installation().entities()).hasSize(1);
+        NativeEntityDescriptor descriptor = result.installation().entities().iterator().next();
+        assertThat(descriptor.id()).isEqualTo(ModelId.of("recreated-id"));
+        assertThat(descriptor.contentPackEntityId()).isEqualTo(ModelId.of("12345"));
+
+        // The old entity is still snapshotted for the preservation service.
+        assertThat(result.oldEntitySnapshots().entityObjects()).containsKey(ModelId.of("12345"));
+        assertThat(result.oldEntitySnapshots().entityObjects().get(ModelId.of("12345"))).isEqualTo(existingPattern);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, RestPermissions.EVENT_DEFINITIONS_CREATE})
+    public void upgradeContentPackWithMultipleEntityTypes() throws Exception {
+        ImmutableSet<Entity> entities = ImmutableSet.of(createTestViewEntity(), createTestEventDefinitionEntity());
+        ContentPackV1 newPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(2)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        NativeEntityDescriptor viewDescriptor = NativeEntityDescriptor.create(
+                ModelId.of("1"), "view-native-id", ModelTypes.SEARCH_V1, "title", false);
+        NativeEntityDescriptor eventDefDescriptor = NativeEntityDescriptor.create(
+                ModelId.of("beef-1337"), "eventdef-native-id", ModelTypes.EVENT_DEFINITION_V1, "title", false);
+
+        ContentPackInstallation oldInstall = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(1)
+                .entities(ImmutableSet.of(viewDescriptor, eventDefDescriptor))
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
+            when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
+        }
+
+        ViewDTO existingView = ViewDTO.builder().id("view-native-id").title("title").searchId("search-id").state(Collections.emptyMap()).build();
+        when(viewService.get("view-native-id")).thenReturn(Optional.of(existingView));
+
+        EventDefinitionDto existingEventDef = createTestEventDefinitionDto().toBuilder().id("eventdef-native-id").build();
+        when(eventDefinitionService.get("eventdef-native-id")).thenReturn(Optional.of(existingEventDef));
+
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                newPack, oldInstall, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        assertThat(result.installation().entities()).hasSize(2);
+        Set<ModelId> preservedIds = result.installation().entities().stream()
+                .map(NativeEntityDescriptor::id)
+                .collect(Collectors.toSet());
+        assertThat(preservedIds).containsExactlyInAnyOrder(
+                ModelId.of("view-native-id"), ModelId.of("eventdef-native-id"));
+
+        assertThat(result.oldEntitySnapshots().entityObjects()).hasSize(2);
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackCreatesNewEntityWhenNotInOldInstallation() throws Exception {
+        GrokPattern savedPattern = GrokPattern.builder().id("new-id").name("NAME").pattern("\\w").build();
+        when(patternService.save(any())).thenReturn(savedPattern);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        ContentPackInstallation emptyOldInstall = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(0)
+                .entities(ImmutableSet.of())
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                contentPack, emptyOldInstall, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        assertThat(result.installation().entities()).hasSize(1);
+        assertThat(result.oldEntitySnapshots().entityObjects()).isEmpty();
+        assertThat(result.oldEntitySnapshots().entities()).isEmpty();
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackFallsBackToCreateWhenOldEntityMissing() throws Exception {
+        when(patternService.load("dead-beef1")).thenThrow(new NotFoundException("Not found."));
+
+        GrokPattern newGrokPattern = GrokPattern.builder()
+                .id("new-id")
+                .pattern("\\w")
+                .name("NAME")
+                .build();
+        when(patternService.save(any())).thenReturn(newGrokPattern);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                contentPack, contentPackInstallation, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        assertThat(result.installation().entities()).hasSize(1);
+        NativeEntityDescriptor descriptor = result.installation().entities().iterator().next();
+        assertThat(descriptor.id()).isEqualTo(ModelId.of("new-id"));
+
+        assertThat(result.oldEntitySnapshots().entityObjects()).isEmpty();
+        assertThat(result.oldEntitySnapshots().entities()).hasSize(1);
+        assertThat(result.oldEntitySnapshots().entities().iterator().next().id()).isEqualTo(ModelId.of("dead-beef1"));
+    }
+
+    @Test
+    @WithAuthorization(permissions = {ViewsRestPermissions.VIEW_CREATE, "inputs:create"})
+    public void upgradeContentPackMixedExistingAndNewEntities() throws Exception {
+        // Existing entity: a view (updatable facade, update branch). New entity: a grok pattern
+        // (create branch, which does not require update support).
+        Map<String, String> entityData = new HashMap<>();
+        entityData.put("name", "NEW_PATTERN");
+        entityData.put("pattern", "\\d+");
+        EntityV1 newEntityV1 = EntityV1.builder()
+                .id(ModelId.of("entity-2"))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .data(objectMapper.convertValue(entityData, JsonNode.class))
+                .build();
+
+        ContentPackV1 newPack = ContentPackV1.builder()
+                .description("test")
+                .entities(ImmutableSet.of(createTestViewEntity(), newEntityV1))
+                .name("test")
+                .revision(2)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+
+        NativeEntityDescriptor oldDescriptor = NativeEntityDescriptor.create(
+                ModelId.of("1"), "view-native-id", ModelTypes.SEARCH_V1, "title", false);
+        ContentPackInstallation oldInstall = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(1)
+                .entities(ImmutableSet.of(oldDescriptor))
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        when(streamService.getSystemStreamIds(true)).thenReturn(ALL_SYSTEM_STREAM_IDS);
+        for (String id : ALL_SYSTEM_STREAM_IDS) {
+            when(streamService.load(id)).thenReturn(createTestStream(id));
+            when(streamService.isSystemStream(id)).thenReturn(true);
+        }
+
+        ViewDTO existingView = ViewDTO.builder().id("view-native-id").title("title").searchId("search-id").state(Collections.emptyMap()).build();
+        when(viewService.get("view-native-id")).thenReturn(Optional.of(existingView));
+
+        GrokPattern newPattern = GrokPattern.builder().id("native-2").name("NEW_PATTERN").pattern("\\d+").build();
+        when(patternService.save(any())).thenReturn(newPattern);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+        when(contentPackInstallService.insert(any())).thenAnswer(i -> i.getArgument(0));
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        ContentPackUpgrade result = contentPackService.upgradeContentPack(
+                newPack, oldInstall, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY);
+
+        assertThat(result.installation().entities()).hasSize(2);
+        Set<ModelId> nativeIds = result.installation().entities().stream()
+                .map(NativeEntityDescriptor::id)
+                .collect(Collectors.toSet());
+        assertThat(nativeIds).containsExactlyInAnyOrder(ModelId.of("view-native-id"), ModelId.of("native-2"));
+
+        assertThat(result.oldEntitySnapshots().entityObjects()).hasSize(1);
+        assertThat(result.oldEntitySnapshots().entityObjects()).containsKey(ModelId.of("1"));
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackRollsBackNewlyCreatedEntitiesOnFailure() throws Exception {
+        when(patternService.save(any())).thenThrow(new RuntimeException("DB failure"));
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+
+        ContentPackInstallation emptyOldInstall = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(0)
+                .entities(ImmutableSet.of())
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        assertThatThrownBy(() -> contentPackService.upgradeContentPack(
+                contentPack, emptyOldInstall, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY))
+                .isInstanceOf(ContentPackException.class)
+                .hasMessageContaining("upgrade");
+
+        verify(patternService, never()).delete(any());
+    }
+
+    @Test
+    @WithAuthorization(permissions = {"inputs:create"})
+    public void upgradeContentPackAbortsWhenNonUpdatableEntityCannotBeRecreatedAfterDelete() throws Exception {
+        // A non-updatable facade upgrades via delete-and-recreate. If createNativeEntity then throws
+        // SkippableEntityException, the old entity has already been deleted, so silently skipping it would lose the
+        // entity while still reporting success. The upgrade must abort (and roll back) instead of swallowing it.
+        GrokPattern existingPattern = GrokPattern.builder().id("dead-beef1").name("NAME").pattern("\\w").build();
+        when(patternService.load("dead-beef1")).thenReturn(existingPattern);
+        when(patternService.save(any())).thenThrow(new SkippableEntityException("simulated unresolvable reference"));
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.loadById(any())).thenReturn(mockUser);
+
+        UserContext userContext = SecurityTestUtils.getUserContext(userService);
+        assertThatThrownBy(() -> contentPackService.upgradeContentPack(
+                contentPack, contentPackInstallation, Collections.emptyMap(), "Upgrade", userContext, EntityShareRequest.EMPTY))
+                .isInstanceOf(ContentPackException.class)
+                .hasMessageContaining("upgrade");
+
+        // The old entity was already deleted as part of the recreate attempt.
+        verify(patternService).delete("dead-beef1");
+    }
+
+    @Test
     public void getUninstallDetails() {
         /* Test will be uninstalled */
         when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("dead-beef1"))).thenReturn((long) 1);
@@ -455,7 +781,7 @@ public class ContentPackServiceTest {
                 .build();
         final AggregationEventProcessorConfigEntity aggregationConfig = AggregationEventProcessorConfigEntity.builder()
                 .query(ValueReference.of("author: \"Jane Hopper\""))
-                .streams(Stream.ALL_SYSTEM_STREAM_IDS)
+                .streams(ALL_SYSTEM_STREAM_IDS)
                 .groupBy(ImmutableList.of("project"))
                 .series(ImmutableList.of(series).stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(condition)
@@ -507,7 +833,7 @@ public class ContentPackServiceTest {
                 .filters(Collections.emptyList())
                 .timerange(KeywordRange.create("last 5 minutes", "Etc/UTC"))
                 .query(ElasticsearchQueryString.of("author: Talon Karrde"))
-                .streams(Stream.ALL_SYSTEM_STREAM_IDS)
+                .streams(ALL_SYSTEM_STREAM_IDS)
                 .config(MessageListConfigDTO.Builder.builder()
                         .fields(ImmutableSet.of())
                         .showMessageRow(false)
@@ -519,7 +845,7 @@ public class ContentPackServiceTest {
                 .widgets(ImmutableSet.of(widgetEntity))
                 .widgetMapping(ImmutableMap.of())
                 .widgetPositions(ImmutableMap.of())
-                .formatting(FormattingSettings.builder().highlighting(ImmutableSet.of()).build())
+                .formatting(FormattingSettings.builder().highlighting(List.of()).build())
                 .displayModeSettings(DisplayModeSettings.empty())
                 .build();
         final ViewEntity entity = ViewEntity.builder()
@@ -580,7 +906,7 @@ public class ContentPackServiceTest {
         );
         final ImmutableSet<Output> outputs = ImmutableSet.of();
         final ObjectId streamId = new ObjectId(id);
-        return new StreamImpl(streamId, streamFields, streamRules, outputs, null);
+        return new StreamMock(streamId, streamFields, streamRules, outputs, null);
     }
 
     private EventDefinitionDto createTestEventDefinitionDto() {

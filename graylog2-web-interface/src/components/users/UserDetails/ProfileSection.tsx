@@ -21,7 +21,7 @@ import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
-  user: User,
+  user: User;
 };
 
 const ProfileSection = ({
@@ -38,7 +38,7 @@ const ProfileSection = ({
     authServiceEnabled,
   },
 }: Props) => {
-  const isOldUser = () => fullName && (!firstName && !lastName);
+  const isOldUser = () => fullName && !firstName && !lastName;
 
   return (
     <SectionComponent title="Profile">
@@ -50,9 +50,15 @@ const ProfileSection = ({
       <ReadOnlyFormGroup label="Client Address" value={clientAddress} />
       <ReadOnlyFormGroup label="Last Activity" value={lastActivity} />
       <ReadOnlyFormGroup label="Logged In" value={sessionActive} />
-      <ReadOnlyFormGroup label="Enabled"
-                         value={accountStatus === 'enabled'}
-                         help={(!authServiceEnabled && accountStatus === 'enabled') ? 'Authentication service is disabled, user cannot log in' : ''} />
+      <ReadOnlyFormGroup
+        label="Enabled"
+        value={accountStatus === 'enabled'}
+        help={
+          !authServiceEnabled && accountStatus === 'enabled'
+            ? 'Authentication service is disabled, user cannot log in'
+            : ''
+        }
+      />
     </SectionComponent>
   );
 };

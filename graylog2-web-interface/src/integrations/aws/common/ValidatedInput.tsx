@@ -21,12 +21,26 @@ import { Input } from 'components/bootstrap';
 import formValidation from 'integrations/aws/utils/formValidation';
 import Icon from 'components/common/Icon';
 
+const Error = styled.span`
+  display: block;
+  font-weight: normal;
+  padding-left: 15px;
+  font-size: 0.85em;
+`;
+
+const ErrorContainer = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
 const Label = ({ label, error }) => {
   if (error) {
     return (
       <ErrorContainer>
         {label}
-        <Error><Icon name="warning" /> {error}</Error>
+        <Error>
+          <Icon name="warning" /> {error}
+        </Error>
       </ErrorContainer>
     );
   }
@@ -50,19 +64,17 @@ type ValidatedInputProps = {
 } & React.ComponentProps<typeof Input>;
 
 const ValidatedInput = ({
-  className,
+  className = undefined,
   help = '',
   onChange = () => {},
   id,
   label,
-
   fieldData = {
     dirty: false,
     error: undefined,
     value: undefined,
   },
-
-  type,
+  type = undefined,
   required = false,
   ...restProps
 }: ValidatedInputProps) => {
@@ -77,31 +89,21 @@ const ValidatedInput = ({
   };
 
   return (
-    <Input {...restProps}
-           required={required}
-           id={id}
-           type={type}
-           onChange={onChange}
-           onBlur={checkValidity}
-           className={className}
-           bsStyle={(error && dirty && 'error') || undefined}
-           defaultValue={(type !== 'select' && value) || undefined}
-           value={(type === 'select' && value) || undefined}
-           label={<Label label={label} error={error} />}
-           help={help} />
+    <Input
+      {...restProps}
+      required={required}
+      id={id}
+      type={type}
+      onChange={onChange}
+      onBlur={checkValidity}
+      className={className}
+      bsStyle={(error && dirty && 'error') || undefined}
+      defaultValue={(type !== 'select' && value) || undefined}
+      value={(type === 'select' && value) || undefined}
+      label={<Label label={label} error={error} />}
+      help={help}
+    />
   );
 };
-
-const Error = styled.span`
-  display: block;
-  font-weight: normal;
-  padding-left: 15px;
-  font-size: 0.85em;
-`;
-
-const ErrorContainer = styled.span`
-  display: flex;
-  align-items: center;
-`;
 
 export default ValidatedInput;

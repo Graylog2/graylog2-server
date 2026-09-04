@@ -17,11 +17,11 @@
 import type { RuleBuilderType } from 'components/rules/rule-builder/types';
 
 export type StreamOutputFilterRule = {
-  id: string
-  stream_id: string
-  destination_type: string
-  title: string
-  description: string
-  status: 'enabled'| 'disabled'
-  rule: RuleBuilderType,
-}
+  id: string;
+  stream_id: string;
+  destination_type: string;
+  title: string;
+  description: string;
+  status: 'enabled' | 'disabled';
+  rule: RuleBuilderType;
+};

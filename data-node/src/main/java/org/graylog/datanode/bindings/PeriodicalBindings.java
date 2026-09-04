@@ -23,18 +23,16 @@ import org.graylog.datanode.bootstrap.preflight.DataNodeConfigurationPeriodical;
 import org.graylog.datanode.periodicals.MetricsCollector;
 import org.graylog.datanode.periodicals.NodePingPeriodical;
 import org.graylog.datanode.periodicals.OpensearchNodeHeartbeat;
-import org.graylog2.events.ClusterEventCleanupPeriodical;
-import org.graylog2.events.ClusterEventPeriodical;
+import org.graylog2.events.Offset;
+import org.graylog2.events.OffsetFromCurrentMongoDBTimeProvider;
 import org.graylog2.plugin.periodical.Periodical;
 
 public class PeriodicalBindings extends AbstractModule {
     @Override
     protected void configure() {
+        bind(Offset.class).toProvider(OffsetFromCurrentMongoDBTimeProvider.class).asEagerSingleton();
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
-        periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
-        periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
         periodicalBinder.addBinding().to(OpensearchNodeHeartbeat.class);
-//        periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
         periodicalBinder.addBinding().to(NodePingPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeConfigurationPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeCertRenewalPeriodical.class);

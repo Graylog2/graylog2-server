@@ -26,15 +26,13 @@ import { inputs } from 'components/messageloaders/MessageLoaders.fixtures';
 
 import RecentMessageLoader from './RecentMessageLoader';
 
-jest.mock('util/AppConfig', () => ({
-  isCloud: jest.fn(() => false),
-}));
-
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
     exports: jest.fn(),
   },
 }));
+
+jest.mock('components/inputs/useInputTypes', () => () => ({}));
 
 describe('<RecentMessageLoader>', () => {
   it('shows server input select when no forwarder plugin is installed', () => {
@@ -51,7 +49,9 @@ describe('<RecentMessageLoader>', () => {
   it('selects input when preselected input id is given', () => {
     asMock(PluginStore.exports).mockReturnValue([]);
 
-    render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a2" />);
+    render(
+      <RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a2" />,
+    );
 
     expect(screen.getByText(/click on "load message" to load/i)).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toBeDisabled();
@@ -61,18 +61,21 @@ describe('<RecentMessageLoader>', () => {
 
   describe('with forwarder plugin installed', () => {
     beforeEach(() => {
-      asMock(PluginStore.exports).mockImplementation((type) => ({
-        forwarder: [{
-          messageLoaders: {
-            ForwarderInputDropdown: () => <>Forwarder Inputs</>,
-          },
-        }],
-      }[type]));
+      asMock(PluginStore.exports).mockImplementation(
+        (type) =>
+          ({
+            forwarder: [
+              {
+                messageLoaders: {
+                  ForwarderInputDropdown: () => <>Forwarder Inputs</>,
+                },
+              },
+            ],
+          })[type],
+      );
     });
 
-    it('allows user to select between server and forwarder input on premise', () => {
-      asMock(AppConfig.isCloud).mockImplementation(() => false);
-
+    it('allows user to select between server and forwarder input on premise', async () => {
       render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} />);
 
       expect(screen.getByRole('combobox', { name: /input type select/i })).toBeInTheDocument();
@@ -81,7 +84,7 @@ describe('<RecentMessageLoader>', () => {
 
       expect(inputTypeSelect).toBeInTheDocument();
 
-      userEvent.selectOptions(inputTypeSelect, ['server']);
+      await userEvent.selectOptions(inputTypeSelect, ['server']);
 
       expect(screen.getByText(/select an input from the list below/i)).toBeInTheDocument();
       expect(screen.getByRole('combobox', { name: /server input select/i })).toBeInTheDocument();
@@ -90,7 +93,7 @@ describe('<RecentMessageLoader>', () => {
       expect(screen.queryByText(/select an input profile from the list/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/forwarder inputs/i)).not.toBeInTheDocument();
 
-      userEvent.selectOptions(inputTypeSelect, ['forwarder']);
+      await userEvent.selectOptions(inputTypeSelect, ['forwarder']);
 
       expect(screen.getByText(/select an input profile from the list/i)).toBeInTheDocument();
       expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
@@ -98,7 +101,9 @@ describe('<RecentMessageLoader>', () => {
     });
 
     it('preselects server input type when selectedInputId is in inputs', () => {
-      render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a2" />);
+      render(
+        <RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a2" />,
+      );
 
       const inputTypeSelect = screen.getByDisplayValue(/server input/i);
 
@@ -114,7 +119,9 @@ describe('<RecentMessageLoader>', () => {
     });
 
     it('preselects forwarder input type when selectedInputId is not in inputs', () => {
-      render(<RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a4" />);
+      render(
+        <RecentMessageLoader onMessageLoaded={jest.fn()} inputs={inputs} selectedInputId="5c26a37b3885e50480aa12a4" />,
+      );
 
       const inputTypeSelect = screen.getByDisplayValue(/forwarder input/i);
 

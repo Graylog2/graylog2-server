@@ -23,11 +23,11 @@ import WidgetErrorBoundary from './WidgetErrorBoundary';
 
 describe('WidgetErrorBoundary', () => {
   it('renders children if no error is thrown', async () => {
-    const { findByText } = render((
+    const { findByText } = render(
       <WidgetErrorBoundary>
         <div>Hello World!</div>
-      </WidgetErrorBoundary>
-    ));
+      </WidgetErrorBoundary>,
+    );
 
     await findByText('Hello World!');
   });
@@ -37,12 +37,14 @@ describe('WidgetErrorBoundary', () => {
     // eslint-disable-next-line no-console
     asMock(console.error).mockImplementation(jest.fn());
 
-    const Component = () => { throw new Error('The dungeon collapses, you die!'); };
-    const { findByText } = render((
+    const Component = () => {
+      throw new Error('The dungeon collapses, you die!');
+    };
+    const { findByText } = render(
       <WidgetErrorBoundary>
         <Component />
-      </WidgetErrorBoundary>
-    ));
+      </WidgetErrorBoundary>,
+    );
 
     await findByText('While rendering this widget, the following error occurred:');
     await findByText('Error: The dungeon collapses, you die!');
@@ -52,13 +54,12 @@ describe('WidgetErrorBoundary', () => {
   });
 
   it('passes own props to its children', async () => {
-    // eslint-disable-next-line react/require-default-props
-    const Component = ({ extraProp }: { extraProp?: string }) => <div>{extraProp}</div>;
-    const { findByText } = render((
+    const Component = ({ extraProp = undefined }: { extraProp?: string }) => <div>{extraProp}</div>;
+    const { findByText } = render(
       <WidgetErrorBoundary extraProp="The extra prop">
         <Component />
-      </WidgetErrorBoundary>
-    ));
+      </WidgetErrorBoundary>,
+    );
 
     await findByText('The extra prop');
   });

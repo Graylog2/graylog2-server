@@ -23,7 +23,9 @@ public interface CertConstants {
     String KEY_GENERATION_ALGORITHM = "RSA";
     String SIGNING_ALGORITHM = "SHA256withRSA";
     String PKCS12 = "PKCS12";
-    @Deprecated
-    String DATANODE_KEY_ALIAS = "datanode";
     String CA_KEY_ALIAS = "ca";
+    /**
+     * Maximum length of the CN (common name) attribute, per RFC 5280's ub-common-name upper bound.
+     */
+    int CN_MAX_LENGTH = 64;
 }

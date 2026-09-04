@@ -20,10 +20,12 @@ import styled, { css } from 'styled-components';
 import { Col, FormControl, FormGroup } from 'components/bootstrap';
 import { Select } from 'components/common';
 
-const OperatorSelector = styled.div(({ theme }) => css`
-  margin-bottom: 15px;
-  font-size: ${theme.fonts.size.body};
-`);
+const OperatorSelector = styled.div(
+  ({ theme }) => css`
+    margin-bottom: 15px;
+    font-size: ${theme.fonts.size.body};
+  `,
+);
 
 const BooleanOperatorSelect = styled(({ isFirstElement: _ignored, ...props }) => <FormGroup {...props} />)`
   width: 100px;
@@ -32,6 +34,7 @@ const BooleanOperatorSelect = styled(({ isFirstElement: _ignored, ...props }) =>
 `;
 
 type BooleanOperatorSelectorProps = {
+  placeholder?: string;
   initialText?: string;
   operator: string;
   onOperatorChange: (...args: any[]) => void;
@@ -41,26 +44,28 @@ const BooleanOperatorSelector = ({
   initialText = '',
   operator,
   onOperatorChange,
+  placeholder = 'Boolean operator',
 }: BooleanOperatorSelectorProps) => (
   <Col md={12}>
     <OperatorSelector className="form-inline">
       {initialText && (
-      <FormGroup>
-        <FormControl.Static>{initialText} </FormControl.Static>
-      </FormGroup>
+        <FormGroup>
+          <FormControl.Static>{initialText} </FormControl.Static>
+        </FormGroup>
       )}
       <BooleanOperatorSelect isFirstElement={!initialText}>
-        <Select className="boolean-operator"
-                matchProp="label"
-                aria-label="Boolean Operator"
-                size="small"
-                onChange={onOperatorChange}
-                options={[
-                  { label: 'all', value: '&&' },
-                  { label: 'any', value: '||' },
-                ]}
-                value={operator}
-                clearable={false} />
+        <Select
+          className="boolean-operator"
+          placeholder={placeholder}
+          size="small"
+          onChange={onOperatorChange}
+          options={[
+            { label: 'all', value: '&&' },
+            { label: 'any', value: '||' },
+          ]}
+          value={operator}
+          clearable={false}
+        />
       </BooleanOperatorSelect>
       <FormGroup>
         <FormControl.Static> of the following rules:</FormControl.Static>

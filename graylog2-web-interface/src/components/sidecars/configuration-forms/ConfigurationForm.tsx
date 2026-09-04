@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import clone from 'lodash/clone';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import upperFirst from 'lodash/upperFirst';
 
-import { ColorPickerPopover, FormSubmit, Select, SourceCodeEditor } from 'components/common';
+import { ColorPickerPopover, FormSubmit, InputDescription, Select, SourceCodeEditor } from 'components/common';
 import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
-import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
-import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
+import { createConfiguration, updateConfiguration, validateConfiguration } from 'hooks/useCollectorConfigurations';
+import { fetchCollector, useCollectorsAll } from 'hooks/useCollectors';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -37,9 +37,9 @@ import ConfigurationTagsSelect from './ConfigurationTagsSelect';
 import type { Collector, Configuration, ConfigurationSidecarsResponse } from '../types';
 
 type Props = {
-  action?: string
-  configuration?: Configuration
-  configurationSidecars?: ConfigurationSidecarsResponse
+  action?: string;
+  configuration?: Configuration;
+  configurationSidecars?: ConfigurationSidecarsResponse;
 };
 
 const ConfigurationForm = ({
@@ -52,7 +52,7 @@ const ConfigurationForm = ({
     color: '#FFFFFF',
     tags: [],
   },
-  configurationSidecars,
+  configurationSidecars = undefined,
 }: Props) => {
   const initFormData = {
     id: configuration.id,
@@ -63,25 +63,21 @@ const ConfigurationForm = ({
     tags: configuration.tags || [],
   };
 
-  const [collectors, setCollectors] = useState<Collector[]>([]);
+  const { data: collectors = [] } = useCollectorsAll();
   const [formData, setFormData] = useState(initFormData);
   const [error, setError] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const defaultTemplates = useRef({});
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
-
-  useEffect(() => {
-    CollectorsActions.all().then((response) => setCollectors(response.collectors));
-  }, []);
+  const sendTelemetry = useSendTelemetry('configuration');
 
   const _isTemplateSet = (template: string) => template !== undefined && template !== '';
 
   const _hasErrors = () => error || !_isTemplateSet(formData.template);
 
   const _validateFormData = (nextFormData: Partial<Configuration>, checkForRequiredFields: boolean) => {
-    CollectorConfigurationsActions.validate(nextFormData).then((validation) => {
+    validateConfiguration(nextFormData).then((validation) => {
       const nextValidation = clone(validation);
 
       if (checkForRequiredFields && !_isTemplateSet(nextFormData.template)) {
@@ -100,7 +96,6 @@ const ConfigurationForm = ({
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`CONFIGURATION_${isCreate ? 'CREATED' : 'UPDATED'}`], {
       app_pathname: 'sidecars',
-      app_section: 'configuration',
     });
 
     if (_hasErrors()) {
@@ -113,10 +108,9 @@ const ConfigurationForm = ({
     let promise;
 
     if (isCreate) {
-      promise = CollectorConfigurationsActions.createConfiguration(formData)
-        .then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
+      promise = createConfiguration(formData).then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
     } else {
-      promise = CollectorConfigurationsActions.updateConfiguration(formData);
+      promise = updateConfiguration(formData);
     }
 
     await promise;
@@ -124,17 +118,18 @@ const ConfigurationForm = ({
 
   const _debouncedValidateFormData = debounce(_validateFormData, 200);
 
-  const _formDataUpdate = (key: string) => (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
-    const nextFormData = cloneDeep(formData);
+  const _formDataUpdate =
+    (key: string) => (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
+      const nextFormData = cloneDeep(formData);
 
-    nextFormData[key] = nextValue;
-    _debouncedValidateFormData(nextFormData, false);
-    setFormData(nextFormData);
+      nextFormData[key] = nextValue;
+      _debouncedValidateFormData(nextFormData, false);
+      setFormData(nextFormData);
 
-    if (hideCallback) {
-      hideCallback();
-    }
-  };
+      if (hideCallback) {
+        hideCallback();
+      }
+    };
 
   const _onTemplateChange = (nextTemplate: string) => {
     _formDataUpdate('template')(nextTemplate);
@@ -171,7 +166,7 @@ const ConfigurationForm = ({
       return new Promise<string>((resolve) => resolve(storedTemplate));
     }
 
-    return CollectorsActions.getCollector(collectorId).then((collector) => {
+    return fetchCollector(collectorId).then((collector) => {
       defaultTemplates.current[collectorId] = collector.default_template;
 
       return collector.default_template;
@@ -186,8 +181,11 @@ const ConfigurationForm = ({
 
     nextFormData.collector_id = nextId;
 
-    // eslint-disable-next-line no-alert
-    if (!nextFormData.template || window.confirm('Do you want to use the default template for the selected Configuration?')) {
+    if (
+      !nextFormData.template ||
+      // eslint-disable-next-line no-alert
+      window.confirm('Do you want to use the default template for the selected Configuration?')
+    ) {
       _onTemplateChange(defaultTemplate);
       nextFormData.template = defaultTemplate;
     }
@@ -209,7 +207,8 @@ const ConfigurationForm = ({
     setShowPreviewModal(true);
   };
 
-  const _formatCollector = (collector: Collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
+  const _formatCollector = (collector: Collector) =>
+    collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector';
 
   const _formatCollectorOptions = () => {
     const options = [];
@@ -241,7 +240,11 @@ const ConfigurationForm = ({
     return null;
   };
 
-  const _renderCollectorTypeField = (collectorId: string, _collectors: Array<Collector>, _configurationSidecars: ConfigurationSidecarsResponse) => {
+  const _renderCollectorTypeField = (
+    collectorId: string,
+    _collectors: Array<Collector>,
+    _configurationSidecars: ConfigurationSidecarsResponse,
+  ) => {
     const isConfigurationInUse = _configurationSidecars?.sidecar_ids?.length > 0;
 
     if (isConfigurationInUse) {
@@ -250,22 +253,24 @@ const ConfigurationForm = ({
       return (
         <>
           <FormControl.Static>{_formatCollector(collector)}</FormControl.Static>
-          <HelpBlock bsClass="warning">
-            <b>Note:</b> Log Collector cannot change while the Configuration is in use. Clone the Configuration
-            to test it using another Collector.
-          </HelpBlock>
+          <InputDescription
+            error="Log Collector cannot change while the Configuration is in use. Clone the Configuration to test
+            it using another Collector."
+          />
         </>
       );
     }
 
     return (
       <>
-        <Select inputId="collector_id"
-                options={_formatCollectorOptions()}
-                value={collectorId}
-                onChange={_onCollectorChange}
-                placeholder="Collector"
-                required />
+        <Select
+          inputId="collector_id"
+          options={_formatCollectorOptions()}
+          value={collectorId}
+          onChange={_onCollectorChange}
+          placeholder="Collector"
+          required
+        />
         <HelpBlock>Choose the log collector this configuration is meant for.</HelpBlock>
       </>
     );
@@ -277,25 +282,29 @@ const ConfigurationForm = ({
         <div>
           <form onSubmit={_onSubmit}>
             <fieldset>
-              <Input type="text"
-                     id="name"
-                     label="Name"
-                     onChange={_onNameChange}
-                     bsStyle={_validationState('name')}
-                     help={_formatValidationMessage('name', 'Required. Name for this configuration')}
-                     value={formData.name || ''}
-                     autoFocus
-                     required />
+              <Input
+                type="text"
+                id="name"
+                label="Name"
+                onChange={_onNameChange}
+                bsStyle={_validationState('name')}
+                help={_formatValidationMessage('name', 'Required. Name for this configuration')}
+                value={formData.name || ''}
+                autoFocus
+                required
+              />
               <FormGroup controlId="color">
                 <ControlLabel>Configuration color</ControlLabel>
                 <div>
                   <ColorLabel color={formData.color} />
                   <div style={{ display: 'inline-block', marginLeft: 15 }}>
-                    <ColorPickerPopover id="color"
-                                        placement="right"
-                                        color={formData.color}
-                                        triggerNode={<Button bsSize="xsmall">Change color</Button>}
-                                        onChange={_formDataUpdate('color')} />
+                    <ColorPickerPopover
+                      id="color"
+                      placement="right"
+                      color={formData.color}
+                      triggerNode={<Button bsSize="xsmall">Change color</Button>}
+                      onChange={_formDataUpdate('color')}
+                    />
                   </div>
                 </div>
                 <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
@@ -304,11 +313,15 @@ const ConfigurationForm = ({
               <FormGroup controlId="tags">
                 <ControlLabel>Configuration Assignment Tags</ControlLabel>
                 <div>
-                  <ConfigurationTagsSelect availableTags={formData.tags.map((tag) => ({ name: tag }))}
-                                           tags={formData.tags}
-                                           onChange={_onTagsChange} />
+                  <ConfigurationTagsSelect
+                    availableTags={formData.tags.map((tag) => ({ name: tag }))}
+                    tags={formData.tags}
+                    onChange={_onTagsChange}
+                  />
                 </div>
-                <HelpBlock>Sidecars which are configured with a matching tag will automatically receive this configuration.</HelpBlock>
+                <HelpBlock>
+                  Sidecars which are configured with a matching tag will automatically receive this configuration.
+                </HelpBlock>
               </FormGroup>
 
               <FormGroup controlId="collector_id">
@@ -316,36 +329,41 @@ const ConfigurationForm = ({
                 {_renderCollectorTypeField(formData.collector_id, collectors, configurationSidecars)}
               </FormGroup>
 
-              <FormGroup controlId="template"
-                         validationState={_validationState('template')}>
+              <FormGroup controlId="template" validationState={_validationState('template')}>
                 <ControlLabel>Configuration</ControlLabel>
-                <SourceCodeEditor id="template"
-                                  height={400}
-                                  value={formData.template || ''}
-                                  onChange={_onTemplateChange} />
-                <Button className="pull-right"
-                        bsStyle="link"
-                        bsSize="sm"
-                        onClick={_onShowSource}>
+                <SourceCodeEditor
+                  id="template"
+                  height={400}
+                  value={formData.template || ''}
+                  onChange={_onTemplateChange}
+                />
+                <Button className="pull-right" bsStyle="link" bsSize="sm" onClick={_onShowSource}>
                   Preview
                 </Button>
                 <HelpBlock>
-                  {_formatValidationMessage('template', 'Required. Collector configuration, see quick reference for more information.')}
+                  {_formatValidationMessage(
+                    'template',
+                    'Required. Collector configuration, see quick reference for more information.',
+                  )}
                 </HelpBlock>
               </FormGroup>
             </fieldset>
 
             <Row>
               <Col md={12}>
-                <FormSubmit submitButtonText={`${action === 'create' ? 'Create' : 'Update'} configuration`}
-                            disabledSubmit={_hasErrors()}
-                            onCancel={_onCancel} />
+                <FormSubmit
+                  submitButtonText={`${action === 'create' ? 'Create' : 'Update'} configuration`}
+                  disabledSubmit={_hasErrors()}
+                  onCancel={_onCancel}
+                />
               </Col>
             </Row>
           </form>
-          <SourceViewModal showModal={showPreviewModal}
-                           onHide={() => setShowPreviewModal(false)}
-                           templateString={formData.template} />
+          <SourceViewModal
+            showModal={showPreviewModal}
+            onHide={() => setShowPreviewModal(false)}
+            templateString={formData.template}
+          />
         </div>
       </Col>
       <Col md={6}>

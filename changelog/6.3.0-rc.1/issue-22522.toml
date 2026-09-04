@@ -1,0 +1,5 @@
+type = "a"
+message = "Added ignoreExtraCsvValues parameter for the csv_to_map pipeline function."
+
+pulls = ["22649"]
+issues = ["22522"]

@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -36,7 +36,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 
 @RequiresAuthentication
-@Api(value = "System/Processing", description = "System processing status control.")
+@Tag(name = "System/Processing", description = "System processing status control.")
 @Path("/system/processing")
 public class SystemProcessingResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SystemProcessingResource.class);
@@ -51,8 +51,8 @@ public class SystemProcessingResource extends RestResource {
     // TODO Change to @POST
     @PUT
     @Timed
-    @ApiOperation(value = "Pauses message processing",
-                  notes = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
+    @Operation(summary = "Pauses message processing",
+                  description = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
                           "you might lose messages from inputs which cannot buffer themselves, like AMQP or Kafka-based inputs.")
     @Path("pause")
     @AuditEvent(type = AuditEventTypes.MESSAGE_PROCESSING_STOP)
@@ -65,7 +65,7 @@ public class SystemProcessingResource extends RestResource {
 
     @PUT
     @Timed
-    @ApiOperation(value = "Resume message processing")
+    @Operation(summary = "Resume message processing")
     @Path("resume")
     @AuditEvent(type = AuditEventTypes.MESSAGE_PROCESSING_START)
     public void resumeProcessing() {

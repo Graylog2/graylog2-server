@@ -29,18 +29,11 @@ import java.util.Locale;
 
 @AutoValue
 public abstract class ConfigurationVariable implements MongoEntity {
-    public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_CONTENT = "content";
 
     public static final String VARIABLE_PREFIX = "user";
-
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
 
     @JsonProperty(FIELD_NAME)
     public abstract String name();
@@ -53,7 +46,7 @@ public abstract class ConfigurationVariable implements MongoEntity {
     public abstract String content();
 
     @JsonCreator
-    public static ConfigurationVariable create(@JsonProperty(FIELD_ID) String id,
+    public static ConfigurationVariable create(@JsonProperty(FIELD_ID) @Id @ObjectId String id,
                                                @JsonProperty(FIELD_NAME) String name,
                                                @JsonProperty(FIELD_DESCRIPTION) String description,
                                                @JsonProperty(FIELD_CONTENT) String content) {
@@ -69,6 +62,11 @@ public abstract class ConfigurationVariable implements MongoEntity {
 
     @JsonIgnore
     public String fullName() {
-        return String.format(Locale.ENGLISH, "${%s.%s}", VARIABLE_PREFIX, name());
+        return reference(name());
+    }
+
+    /** Template reference for a variable {@code name}, e.g. {@code ${user.graylog_host}}. */
+    public static String reference(String name) {
+        return String.format(Locale.ENGLISH, "${%s.%s}", VARIABLE_PREFIX, name);
     }
 }

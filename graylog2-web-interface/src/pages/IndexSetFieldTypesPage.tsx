@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo } from 'react';
 
+import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
-import { useStore } from 'stores/connect';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -32,39 +31,36 @@ import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFie
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const { indexSet } = useStore(IndexSetsStore);
+  const { push } = useHistory();
+  const { data: indexSet, isInitialLoading } = useSingleIndexSet(indexSetId);
   const hasMappingPermission = useHasTypeMappingPermission();
 
   useEffect(() => {
     if (!hasMappingPermission) {
-      navigate(Routes.NOTFOUND);
-    } else {
-      IndexSetsActions.get(indexSetId).then(() => setIsLoading(false));
+      push(Routes.NOTFOUND);
     }
-  }, [hasMappingPermission, indexSetId, navigate]);
+  }, [hasMappingPermission, push]);
 
   const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
 
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
       <IndicesPageNavigation />
-      <PageHeader title={`Configure ${indexSet ? indexSet.title : 'Index Set'} Field Types`}
-                  documentationLink={{
-                    title: 'Index model documentation',
-                    path: DocsHelper.PAGES.INDEX_MODEL,
-                  }}
-                  actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}>
+      <PageHeader
+        title={`Configure ${indexSet ? indexSet.title : 'Index Set'} Field Types`}
+        documentationLink={{
+          title: 'Index model documentation',
+          path: DocsHelper.PAGES.INDEX_MODEL,
+        }}
+        actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}>
         <span>
-          The data represents field types from 2 last indices and the fields with custom field type. You can modify the current field types configuration for this index set.
+          The data represents field types from 2 last indices and the fields with custom field type. You can modify the
+          current field types configuration for this index set.
         </span>
       </PageHeader>
 
       <Row className="content">
-        <Col md={12}>
-          {isLoading ? <Spinner /> : <IndexSetFieldTypesList />}
-        </Col>
+        <Col md={12}>{isInitialLoading ? <Spinner /> : <IndexSetFieldTypesList />}</Col>
       </Row>
     </DocumentTitle>
   );

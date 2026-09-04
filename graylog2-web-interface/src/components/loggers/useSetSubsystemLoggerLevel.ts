@@ -19,16 +19,24 @@ import { useCallback } from 'react';
 
 import { ClusterSystemLoggers } from '@graylog/server-api';
 
-const _setSubsystemLoggerLevel = (args: { nodeId: string, name: string, level: string }) => ClusterSystemLoggers.setSubsystemLoggerLevel(args.nodeId, args.name, args.level);
+const _setSubsystemLoggerLevel = (args: { nodeId: string; name: string; level: string }) =>
+  ClusterSystemLoggers.setSubsystemLoggerLevel(args.nodeId, args.name, args.level);
 
 const useSetSubsystemLoggerLevel = () => {
   const queryClient = useQueryClient();
-  const { mutateAsync, isLoading } = useMutation(_setSubsystemLoggerLevel, {
+  const { mutateAsync, isPending: isLoading } = useMutation({
+    mutationFn: _setSubsystemLoggerLevel,
+
     onSuccess: () => {
-      queryClient.invalidateQueries(['loggers']);
+      queryClient.invalidateQueries({
+        queryKey: ['loggers'],
+      });
     },
   });
-  const setSubsystemLoggerLevel = useCallback((nodeId: string, name: string, level: string) => mutateAsync({ nodeId, name, level }), [mutateAsync]);
+  const setSubsystemLoggerLevel = useCallback(
+    (nodeId: string, name: string, level: string) => mutateAsync({ nodeId, name, level }),
+    [mutateAsync],
+  );
 
   return { setSubsystemLoggerLevel, isLoading };
 };

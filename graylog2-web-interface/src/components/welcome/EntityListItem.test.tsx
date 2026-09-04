@@ -21,8 +21,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 import EntityListItem from 'components/welcome/EntityListItem';
 import { createGRN } from 'logic/permissions/GRN';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x, dashboard_show: (x) => `/route/DASHBOARDS_VIEWID/${x}` }));
-
 const grn = createGRN('dashboard', '1');
 
 describe('EntityListItem', () => {
@@ -35,9 +33,8 @@ describe('EntityListItem', () => {
   it('Show correct link', async () => {
     render(<EntityListItem grn={grn} title="Title 1" />);
 
-    const title = await screen.findByText('Title 1');
-    const link = title.closest('a');
+    const link = await screen.findByText('Title 1');
 
-    expect(link).toHaveAttribute('href', '/route/DASHBOARDS_VIEWID/1');
+    expect(link).toHaveAttribute('href', '/dashboards/1');
   });
 });

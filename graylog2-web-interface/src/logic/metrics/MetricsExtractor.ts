@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { NodeMetric } from 'stores/metrics/MetricsStore';
+import type { NodeMetric } from 'types/metrics';
 
 const MetricsExtractor = {
   /*
@@ -22,7 +22,10 @@ const MetricsExtractor = {
    * Short names are the keys of the metricNames object, which should look like:
    * { shortName: "metricFullName" }
    */
-  getValuesForNode(nodeMetrics: NodeMetric, metricNames: { [key: string]: string }): { [key: string]: number | undefined | null } {
+  getValuesForNode(
+    nodeMetrics: NodeMetric,
+    metricNames: { [key: string]: string },
+  ): { [key: string]: number | undefined | null } {
     if (nodeMetrics === null || nodeMetrics === undefined || Object.keys(nodeMetrics).length === 0) {
       return {};
     }

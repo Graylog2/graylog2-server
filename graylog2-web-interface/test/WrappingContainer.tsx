@@ -15,28 +15,36 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { MemoryRouter } from 'react-router-dom';
+
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import MetricsContext from 'contexts/MetricsContext';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 import DefaultProviders from './DefaultProviders';
+import { memoryRouterFuture } from './reactRouterFutureFlags';
 
 type Props = {
-  children: React.ReactNode,
-}
+  children: React.ReactNode;
+};
+
+const noopMetricsContext = {
+  metrics: {},
+  isLoading: false,
+  subscribe: () => {},
+  unsubscribe: () => {},
+};
 
 const WrappingContainer = ({ children }: Props) => (
   <DefaultQueryClientProvider>
-    <MemoryRouter>
-      <DefaultProviders>
-        {children}
-      </DefaultProviders>
-    </MemoryRouter>
+    <MetricsContext.Provider value={noopMetricsContext}>
+      <MemoryRouter future={memoryRouterFuture}>
+        <DefaultQueryParamProvider>
+          <DefaultProviders env="test">{children}</DefaultProviders>
+        </DefaultQueryParamProvider>
+      </MemoryRouter>
+    </MetricsContext.Provider>
   </DefaultQueryClientProvider>
 );
-
-WrappingContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export default WrappingContainer;

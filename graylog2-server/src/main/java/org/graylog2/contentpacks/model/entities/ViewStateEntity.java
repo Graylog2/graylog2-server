@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.DisplayModeSettings;
 import org.graylog.plugins.views.search.views.FormattingSettings;
 import org.graylog.plugins.views.search.views.Titles;
@@ -39,7 +38,6 @@ import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = ViewStateEntity.Builder.class)
-@WithBeanGetter
 public abstract class ViewStateEntity implements NativeEntityConverter<ViewStateDTO> {
     static final String FIELD_SELECTED_FIELDS = "selected_fields";
     static final String FIELD_STATIC_MESSAGE_LIST_ID = "static_message_list_id";

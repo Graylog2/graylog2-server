@@ -22,9 +22,9 @@ import useIsDirty from 'views/hooks/useIsDirty';
 const WindowLeaveMessage = () => {
   const dirty = useIsDirty();
 
-  return dirty
-    ? <ConfirmLeaveDialog question="Are you sure you want to leave the page? Any unsaved changes will be lost." />
-    : null;
+  return dirty ? (
+    <ConfirmLeaveDialog question="Are you sure you want to leave the page? Any unsaved changes will be lost." />
+  ) : null;
 };
 
 export default WindowLeaveMessage;

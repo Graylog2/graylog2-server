@@ -16,30 +16,44 @@
  */
 import React from 'react';
 
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimelineComponent';
 import DocsHelper from 'util/DocsHelper';
-import CreatePipelineButton from 'components/pipelines/CreatePipelineButton';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
+import CreateButton from 'components/common/CreateButton';
+import {
+  EnableDebugMetricsButton,
+  ProcessingLoadDebugMetricsBanner,
+  ProcessingLoadProvider,
+} from 'components/pipelines/processing-load';
 
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
     <PipelinesPageNavigation />
-    <PageHeader title="Pipelines overview"
-                actions={<CreatePipelineButton />}
-                documentationLink={{
-                  title: 'Pipelines documentation',
-                  path: DocsHelper.PAGES.PIPELINES,
-                }}>
+    <PageHeader
+      title="Pipelines overview"
+      actions={
+        <ButtonToolbar>
+          <EnableDebugMetricsButton />
+          <CreateButton entityKey="Pipeline" />
+        </ButtonToolbar>
+      }
+      documentationLink={{
+        title: 'Pipelines documentation',
+        path: DocsHelper.PAGES.PIPELINES,
+      }}>
       <span>
-        Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
-        rules are evaluated and applied. Messages can go through one or more stages.
+        Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules
+        are evaluated and applied. Messages can go through one or more stages.
       </span>
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        <ProcessingTimelineComponent />
+        <ProcessingLoadProvider>
+          <ProcessingLoadDebugMetricsBanner />
+          <ProcessingTimelineComponent />
+        </ProcessingLoadProvider>
       </Col>
     </Row>
   </DocumentTitle>

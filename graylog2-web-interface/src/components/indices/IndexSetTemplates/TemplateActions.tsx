@@ -18,21 +18,20 @@ import React, { useState } from 'react';
 
 import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { ConfirmDialog } from 'components/common';
-import { LinkContainer } from 'components/common/router';
+import { ConfirmDialog, LinkContainer } from 'components/common';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
 import useTemplateMutation from 'components/indices/IndexSetTemplates/hooks/useTemplateMutation';
 
 type Props = {
-  id: string,
-  title: string,
-  built_in: boolean,
-  isDefault: boolean,
-  isEnabled: boolean
-}
+  id: string;
+  title: string;
+  built_in: boolean;
+  isDefault: boolean;
+  isEnabled: boolean;
+};
 
-const TemplateActions = ({ id, title, built_in, isDefault, isEnabled } : Props) => {
+const TemplateActions = ({ id, title, built_in, isDefault, isEnabled }: Props) => {
   const { deselectEntity } = useSelectedEntities();
   const { deleteTemplate, setAsDefault } = useTemplateMutation();
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
@@ -65,27 +64,24 @@ const TemplateActions = ({ id, title, built_in, isDefault, isEnabled } : Props) 
   return (
     <>
       {showDeleteDialog && (
-      <ConfirmDialog show={showDeleteDialog}
-                     title={`Deleting "${title}"`}
-                     onCancel={cancelDelete}
-                     onConfirm={handleDelete}>
-        <p>You are about to delete the template: &quot;{title}&quot;. Are you sure?</p>
-      </ConfirmDialog>
+        <ConfirmDialog
+          show={showDeleteDialog}
+          title={`Deleting "${title}"`}
+          onCancel={cancelDelete}
+          onConfirm={handleDelete}>
+          <p>You are about to delete the template: &quot;{title}&quot;. Are you sure?</p>
+        </ConfirmDialog>
       )}
 
       <ButtonToolbar>
         <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(id)}>
-          <Button bsSize="xs">
-            Edit
-          </Button>
+          <Button bsSize="xs">Edit</Button>
         </LinkContainer>
         {!isDefault && (
-        <MoreActions>
-          <MenuItem onSelect={onSetAsDefault}>
-            Set as default
-          </MenuItem>
-          <DeleteMenuItem onSelect={onDelete} />
-        </MoreActions>
+          <MoreActions>
+            <MenuItem onSelect={onSetAsDefault}>Set as default</MenuItem>
+            <DeleteMenuItem onSelect={onDelete} />
+          </MoreActions>
         )}
       </ButtonToolbar>
     </>

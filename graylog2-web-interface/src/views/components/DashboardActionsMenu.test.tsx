@@ -18,6 +18,7 @@ import React from 'react';
 import * as mockImmutable from 'immutable';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -25,7 +26,6 @@ import type { LayoutState } from 'views/components/contexts/SearchPageLayoutCont
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -33,42 +33,57 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import { createView } from 'views/api/views';
 
 import DashboardActionsMenu from './DashboardActionsMenu';
 
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
-jest.mock('bson-objectid', () => jest.fn(() => ({
-  toString: jest.fn(() => 'new-dashboard-id'),
-})));
-
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
+jest.mock('views/api/views', () => ({
+  createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ state: undefined })),
-  },
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: Immutable.List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
 }));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
+
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
 describe('DashboardActionsMenu', () => {
-  const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)
+  const mockView = View.create()
+    .toBuilder()
+    .id('view-id')
+    .type(View.Type.Dashboard)
     .search(Search.builder().build())
     .title('View title')
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const SUT = ({ providerOverrides, view = mockView }: { providerOverrides?: Partial<LayoutState>, view?: View }) => (
+  const SUT = ({
+    providerOverrides = undefined,
+    view = mockView,
+  }: {
+    providerOverrides?: Partial<LayoutState>;
+    view?: View;
+  }) => (
     <TestStoreProvider view={view}>
       <HotkeysProvider>
         <SearchPageLayoutProvider value={providerOverrides}>
@@ -81,27 +96,29 @@ describe('DashboardActionsMenu', () => {
   useViewsPlugin();
 
   const submitDashboardSaveForm = async () => {
-    const saveDashboardModal = await screen.findByTestId('modal-form');
+    const saveDashboardModal = await screen.findByRole('dialog', { name: /Save new dashboard/i });
 
     const saveButton = within(saveDashboardModal).getByRole('button', {
       name: /create dashboard/i,
-      hidden: true,
     });
 
-    userEvent.click(saveButton);
+    await userEvent.click(saveButton);
   };
 
   const openDashboardSaveForm = async () => {
     const saveAsMenuItem = await screen.findByRole('button', { name: /save as new dashboard/i });
 
-    userEvent.click(saveAsMenuItem);
+    await userEvent.click(saveAsMenuItem);
   };
 
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-      .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
-      .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
-      .build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
+        .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
+        .build(),
+    );
 
     asMock(useSaveViewFormControls).mockReturnValue([]);
   });
@@ -114,44 +131,49 @@ describe('DashboardActionsMenu', () => {
 
     const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
+    await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedDashboard, null, undefined));
   });
 
   it('should extend a dashboard with plugin data on duplication', async () => {
-    asMock(useSaveViewFormControls).mockReturnValue([{
-      component: () => <div>Pluggable component!</div>,
-      id: 'example-plugin-component',
-      onDashboardDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This dashboard has been extended by a plugin').build()),
-    }],
-    );
+    asMock(useSaveViewFormControls).mockReturnValue([
+      {
+        component: () => <div>Pluggable component!</div>,
+        id: 'example-plugin-component',
+        onDashboardDuplication: (view: View) =>
+          Promise.resolve(view.toBuilder().summary('This dashboard has been extended by a plugin').build()),
+      },
+    ]);
 
     render(<SUT view={mockView} />);
 
     await openDashboardSaveForm();
     await submitDashboardSaveForm();
 
-    const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').summary('This dashboard has been extended by a plugin').build();
+    const updatedDashboard = mockView
+      .toBuilder()
+      .id('new-dashboard-id')
+      .summary('This dashboard has been extended by a plugin')
+      .build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
+    await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedDashboard, null, 'view-id'));
   });
 
   it('should open edit dashboard meta information modal', async () => {
     const { findByText } = render(<SUT />);
-    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     const editMenuItem = await screen.findByText(/Edit metadata/i);
 
-    userEvent.click(editMenuItem);
+    await userEvent.click(editMenuItem);
 
     await findByText(/Editing dashboard/);
   });
 
-  it('should open dashboard share modal', () => {
-    const { getByRole, getByText } = render(<SUT />);
-    const openShareButton = getByText(/Share/i);
+  it('should open dashboard share modal', async () => {
+    render(<SUT />);
+    const openShareButton = await screen.findByRole('button', { name: /Share/i });
+    await userEvent.click(openShareButton);
 
-    userEvent.click(openShareButton);
-
-    expect(getByRole('button', { name: /update sharing/i, hidden: true })).not.toBeNull();
+    await screen.findByRole('button', { name: /update sharing/i });
   });
 
   it('should use FULL_MENU layout option by default and render all buttons', async () => {
@@ -159,15 +181,17 @@ describe('DashboardActionsMenu', () => {
 
     await findByTitle(/Save dashboard/);
     await findByTitle(/Save as new dashboard/);
-    await findByTitle(/Share/);
+    await findByRole('button', { name: /Share/i });
     await findByRole('button', { name: /more actions/i });
   });
 
   it('should only render "Save As" button in SAVE_COPY layout option', async () => {
-    const { findByTitle, queryByRole, queryByTitle } = render(<SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: SAVE_COPY }} />);
+    const { findByTitle, queryByRole, queryByTitle } = render(
+      <SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: SAVE_COPY }} />,
+    );
 
     const saveButton = queryByTitle(/Save dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
@@ -178,11 +202,13 @@ describe('DashboardActionsMenu', () => {
   });
 
   it('should render no action menu items in BLANK layout option', () => {
-    const { queryByRole, queryByTitle } = render(<SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: BLANK }} />);
+    const { queryByRole, queryByTitle } = render(
+      <SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: BLANK }} />,
+    );
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);
-    const shareButton = queryByTitle(/Share/);
+    const shareButton = queryByRole('button', { name: /Share/i });
     const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
@@ -193,7 +219,7 @@ describe('DashboardActionsMenu', () => {
 
   it('should save view when pressing related keyboard shortcut', async () => {
     render(<SUT />);
-    userEvent.keyboard('{Meta>}s{/Meta}');
+    await userEvent.keyboard('{Meta>}s{/Meta}');
     await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
   });
 });

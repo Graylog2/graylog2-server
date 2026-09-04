@@ -20,26 +20,36 @@ import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
 import { Modal, BootstrapModalWrapper, Button, SegmentedControl } from 'components/bootstrap';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import CreateOutputDropdown from 'components/outputs/CreateOutputDropdown';
 import AssignOutputDropdown from 'components/outputs/AssignOutputDropdown';
-import { OutputsStore, type Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
+import useOutputMutations from 'hooks/useOutputMutations';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
-import type { AvailableOutputRequestedConfiguration, AvailableOutputTypes } from 'components/streams/useAvailableOutputTypes';
+import type {
+  AvailableOutputRequestedConfiguration,
+  AvailableOutputSummary,
+  AvailableOutputTypes,
+} from 'components/streams/useAvailableOutputTypes';
 import { Icon } from 'components/common';
 
 type Props = {
-  stream: Stream
-  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration,
-  availableOutputTypes: AvailableOutputTypes['types'],
-  assignableOutputs: Array<Output>,
+  stream: Stream;
+  getTypeDefinition: (
+    type: string,
+    callback?: (available: AvailableOutputSummary) => void,
+  ) => AvailableOutputRequestedConfiguration | undefined;
+  availableOutputTypes: AvailableOutputTypes;
+  assignableOutputs: Array<Output>;
 };
 
-const SegmentedContainer = styled.div(({ theme }) => css`
-  padding: ${theme.spacings.sm} ${theme.spacings.xxs};
-`);
+const SegmentedContainer = styled.div(
+  ({ theme }) => css`
+    padding: ${theme.spacings.sm} ${theme.spacings.xxs};
+  `,
+);
 
 type SegmentType = 'create' | 'assign';
 
@@ -47,6 +57,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
   const [showAddOutput, setShowAddOutput] = useState(false);
   const sendTelemetry = useSendTelemetry();
   const { addStreamOutput } = useStreamOutputMutation();
+  const { saveOutput } = useOutputMutations();
   const queryClient = useQueryClient();
   const CREATE_SEGMENT = 'create';
   const ASSIGN_SEGMENT = 'assign';
@@ -72,24 +83,24 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
       app_pathname: 'stream',
     });
 
-    OutputsStore.save(data, (result: Output) => {
-      addStreamOutput({ streamId: stream.id, outputs: { outputs: [result.id] } })
-        .then(() => {
-          queryClient.invalidateQueries(['outputs', 'overview']);
-
-          onCancel();
+    saveOutput(data).then((result: any) => {
+      addStreamOutput({ streamId: stream.id, outputs: { outputs: [result.id] } }).then(() => {
+        queryClient.invalidateQueries({
+          queryKey: ['outputs', 'overview'],
         });
 
-      return result;
+        onCancel();
+      });
     });
   };
 
   const handleAssignOutput = (outputId: string) => {
-    addStreamOutput({ streamId: stream.id, outputs: { outputs: [outputId] } })
-      .then(() => {
-        queryClient.invalidateQueries(['outputs', 'overview']);
-        onCancel();
+    addStreamOutput({ streamId: stream.id, outputs: { outputs: [outputId] } }).then(() => {
+      queryClient.invalidateQueries({
+        queryKey: ['outputs', 'overview'],
       });
+      onCancel();
+    });
   };
 
   const onShowAddOutput = () => {
@@ -102,44 +113,37 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
 
   return (
     <>
-      <Button bsStyle="default"
-              bsSize="sm"
-              onClick={onShowAddOutput}
-              title="Edit Output">
+      <Button bsStyle="default" bsSize="sm" onClick={onShowAddOutput} title="Edit Output">
         <Icon name="add" size="sm" /> Add output
       </Button>
       {showAddOutput && (
-      <BootstrapModalWrapper showModal
-                             role="alertdialog"
-                             onHide={() => setShowAddOutput(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add output to stream</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <SegmentedControl<SegmentType> data={SEGMENTS}
-                                         value={currentSegment}
-                                         onChange={setCurrentSegment} />
-          <SegmentedContainer>
-            {currentSegment === CREATE_SEGMENT && (
-            <CreateOutputDropdown types={availableOutputTypes}
-                                  onSubmit={handleCreateOutput}
-                                  getTypeDefinition={getTypeDefinition} />
-            )}
-            {currentSegment === ASSIGN_SEGMENT && (
-            <AssignOutputDropdown outputs={assignableOutputs}
-                                  onSubmit={handleAssignOutput} />
-            )}
-          </SegmentedContainer>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button type="button" onClick={onCancel}>
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </BootstrapModalWrapper>
+        <BootstrapModalWrapper showModal onHide={() => setShowAddOutput(false)}>
+          <Modal.Header>
+            <Modal.Title>Add output to stream</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <SegmentedControl<SegmentType> data={SEGMENTS} value={currentSegment} onChange={setCurrentSegment} />
+            <SegmentedContainer>
+              {currentSegment === CREATE_SEGMENT && (
+                <CreateOutputDropdown
+                  types={availableOutputTypes}
+                  onSubmit={handleCreateOutput}
+                  getTypeDefinition={getTypeDefinition}
+                />
+              )}
+              {currentSegment === ASSIGN_SEGMENT && (
+                <AssignOutputDropdown outputs={assignableOutputs} onSubmit={handleAssignOutput} />
+              )}
+            </SegmentedContainer>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button type="button" onClick={onCancel}>
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </BootstrapModalWrapper>
       )}
     </>
-
   );
 };
 

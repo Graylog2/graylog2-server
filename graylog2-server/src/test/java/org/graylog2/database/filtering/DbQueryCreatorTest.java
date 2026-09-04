@@ -58,7 +58,7 @@ class DbQueryCreatorTest {
     @Test
     void returnsEmptyQueryOnEmptySearchQueryAndNoFilterExpressions() {
         doReturn(new SearchQuery("")).when(searchQueryParser).parse(eq(""));
-        doReturn(List.of()).when(dbFilterParser).parse(List.of(), attributes);
+        doReturn(List.of()).when(dbFilterParser).parse(List.of(), attributes, null);
 
         final Bson dbQuery = toTest.createDbQuery(List.of(), "");
         assertSame(DbQueryCreator.EMPTY_QUERY, dbQuery);
@@ -69,7 +69,7 @@ class DbQueryCreatorTest {
         final SearchQuery searchQuery = mock(SearchQuery.class);
         doReturn(List.of(Filters.eq("nvmd", "lalala"))).when(searchQuery).toBsonFilterList();
         doReturn(searchQuery).when(searchQueryParser).parse(eq("nvmd:lalala"));
-        doReturn(List.of()).when(dbFilterParser).parse(List.of(), attributes);
+        doReturn(List.of()).when(dbFilterParser).parse(List.of(), attributes, null);
 
         final Bson dbQuery = toTest.createDbQuery(List.of(), "nvmd:lalala");
         assertEquals(Filters.and(Filters.eq("nvmd", "lalala")), dbQuery);
@@ -80,7 +80,7 @@ class DbQueryCreatorTest {
         doReturn(new SearchQuery("")).when(searchQueryParser).parse(eq(""));
         doReturn(List.of(Filters.eq("nvmd", "lalala"), Filters.eq("hohoho", "42")))
                 .when(dbFilterParser)
-                .parse(List.of("nvmd:lalala", "hohoho:42"), attributes);
+                .parse(List.of("nvmd:lalala", "hohoho:42"), attributes, null);
 
         final Bson dbQuery = toTest.createDbQuery(List.of("nvmd:lalala", "hohoho:42"), "");
         assertEquals(Filters.and(
@@ -96,7 +96,7 @@ class DbQueryCreatorTest {
         doReturn(searchQuery).when(searchQueryParser).parse(eq("title:carramba"));
         doReturn(List.of(Filters.eq("nvmd", "lalala"), Filters.eq("hohoho", "42")))
                 .when(dbFilterParser)
-                .parse(List.of("nvmd:lalala", "hohoho:42"), attributes);
+                .parse(List.of("nvmd:lalala", "hohoho:42"), attributes, null);
 
         final Bson dbQuery = toTest.createDbQuery(List.of("nvmd:lalala", "hohoho:42"), "title:carramba");
         assertEquals(Filters.and(
@@ -116,7 +116,7 @@ class DbQueryCreatorTest {
     @Test
     void throwsBadRequestExceptionIfDbFilterParserThrowsIllegalArgumentException() {
         doReturn(new SearchQuery("")).when(searchQueryParser).parse(eq(""));
-        doThrow(IllegalArgumentException.class).when(dbFilterParser).parse(eq(List.of("wrong #$%#$%$ filter")), eq(attributes));
+        doThrow(IllegalArgumentException.class).when(dbFilterParser).parse(eq(List.of("wrong #$%#$%$ filter")), eq(attributes), eq(null));
 
         assertThrows(BadRequestException.class, () -> toTest.createDbQuery(List.of("wrong #$%#$%$ filter"), ""));
     }

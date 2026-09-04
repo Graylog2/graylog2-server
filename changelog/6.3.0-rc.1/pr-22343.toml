@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed erroneously adding fields to group_by on event replay function."
+
+issues = ["19862"]
+pulls = ["22343"]

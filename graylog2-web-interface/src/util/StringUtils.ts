@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as JSON from 'util/json';
+
 const StringUtils = {
   tempDocument: document.createElement('textarea'),
   capitalizeFirstLetter(text: string) {
@@ -29,17 +31,24 @@ const StringUtils = {
 
     return this.tempDocument.textContent;
   },
-  pluralize(number: string | number, singular: string, plural: string) {
-    return (number === 1 || number === '1' ? singular : plural);
+  escapeRegExp(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   },
-  stringify(text) {
+  pluralize(number: string | number, singular: string, plural: string) {
+    return number === 1 || number === '1' ? singular : plural;
+  },
+  stringify(text: unknown) {
     return (typeof text === 'object' ? JSON.stringify(text) : String(text)) || '';
   },
   replaceSpaces(text: string, newCharacter = '-') {
     return text.replace(/\s/g, newCharacter);
   },
   toTitleCase(str: string, splitCharacter: string = ' ') {
-    return str.toLowerCase().split(splitCharacter).map((word) => (`${word.charAt(0).toUpperCase()}${word.slice(1)}`)).join(' ');
+    return str
+      .toLowerCase()
+      .split(splitCharacter)
+      .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+      .join(' ');
   },
   truncateWithEllipses(text = '', maxLength = 10, end = '...') {
     if (text.length > maxLength) {
@@ -48,7 +57,7 @@ const StringUtils = {
 
     return text;
   },
-  getRecursiveChildText(reactNode: string|React.ReactNode) {
+  getRecursiveChildText(reactNode: string | React.ReactNode): string {
     if (typeof reactNode === 'string') {
       return reactNode;
     }
@@ -56,7 +65,7 @@ const StringUtils = {
     const { children } = (reactNode as any)?.props || {};
 
     if (Array.isArray(reactNode)) {
-      const joinedNodes = [];
+      const joinedNodes: string[] = [];
 
       reactNode.forEach((node) => {
         if (typeof node === 'object') joinedNodes.push(StringUtils.getRecursiveChildText(node));

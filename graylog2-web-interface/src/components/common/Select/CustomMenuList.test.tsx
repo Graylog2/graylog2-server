@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import CustomMenuList from './CustomMenuList';
 
-const getChildrenList: Function = (n: number): React.ReactElement[] => {
+const getChildrenList = (n: number): React.ReactElement[] => {
   const list = Array(n).fill(null);
 
   return list.map(() => <div key={Math.random()}>{Math.random()}</div>);
@@ -40,11 +40,7 @@ describe('CustomMenuList', () => {
   });
 
   it('Check if List component rendered for number of items more than 1000', () => {
-    render(
-      <CustomMenuList>
-        {getChildrenList(1001)}
-      </CustomMenuList>,
-    );
+    render(<CustomMenuList>{getChildrenList(1001)}</CustomMenuList>);
 
     const list = screen.getAllByTestId('react-window-list-item');
 

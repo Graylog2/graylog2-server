@@ -45,10 +45,7 @@
           "id": "6a8eebc7-53f3-447e-8f81-f997d42a376a",
           "type": "messages",
           "config": {
-            "fields": [
-              "timestamp",
-              "source"
-            ],
+            "fields": ["timestamp", "source"],
             "show_message_row": true
           },
           "streams": []
@@ -75,15 +72,9 @@
         }
       ],
       "widget_mapping": {
-        "9f194c3a-3db8-4d9a-8b93-8f356477d976": [
-          "a6bf206a-9c95-4b4f-b7f6-7a72f8faaa53"
-        ],
-        "6a8eebc7-53f3-447e-8f81-f997d42a376a": [
-          "8c88b360-0321-4868-9642-5d8dd6979856"
-        ],
-        "4d73ccaa-aabf-451a-b36e-309f55798e04": [
-          "aad57131-ad8d-4721-8762-196ca0d880a4"
-        ]
+        "9f194c3a-3db8-4d9a-8b93-8f356477d976": ["a6bf206a-9c95-4b4f-b7f6-7a72f8faaa53"],
+        "6a8eebc7-53f3-447e-8f81-f997d42a376a": ["8c88b360-0321-4868-9642-5d8dd6979856"],
+        "4d73ccaa-aabf-451a-b36e-309f55798e04": ["aad57131-ad8d-4721-8762-196ca0d880a4"]
       },
       "positions": {
         "9f194c3a-3db8-4d9a-8b93-8f356477d976": {

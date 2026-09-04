@@ -15,86 +15,115 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor, act, within } from 'wrappedTestingLibrary';
+import Immutable from 'immutable';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
-import { MockStore, asMock } from 'helpers/mocking';
-import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import { asMock } from 'helpers/mocking';
+import { adminUser } from 'fixtures/users';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useNotificationBadgeCount from 'components/notifications/hooks/useNotificationBadgeCount';
 
 import NotificationBadge from './NotificationBadge';
 
-jest.mock('stores/notifications/NotificationsStore', () => ({
-  NotificationsActions: { list: jest.fn() },
-  NotificationsStore: MockStore(),
-}));
-
 const BADGE_ID = 'notification-badge';
 
-type NotificationsStoreType = ReturnType<typeof NotificationsStore.getInitialState>;
+jest.mock('hooks/useCurrentUser');
+jest.mock('components/notifications/hooks/useNotificationBadgeCount');
 
-const setNotificationCount = (count: number) => {
-  asMock(NotificationsStore.getInitialState).mockReturnValue({ total: count } as NotificationsStoreType);
-};
+const setBadgeCount = (count: number) =>
+  asMock(useNotificationBadgeCount).mockReturnValue({
+    data: count,
+    isLoading: false,
+  });
 
 describe('NotificationBadge', () => {
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
   beforeEach(() => {
-    jest.restoreAllMocks();
-    jest.clearAllMocks();
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+    setBadgeCount(0);
   });
 
-  it('triggers update of notifications', async () => {
-    expect(NotificationsActions.list).not.toHaveBeenCalled();
+  it('renders nothing when user has no notification permissions', () => {
+    const userWithoutPermissions = adminUser
+      .toBuilder()
+      .permissions(Immutable.List(['dashboards:read']))
+      .build();
+    asMock(useCurrentUser).mockReturnValue(userWithoutPermissions);
 
     render(<NotificationBadge />);
 
-    jest.advanceTimersByTime(3000);
-    await waitFor(() => { expect(NotificationsActions.list).toHaveBeenCalled(); });
-  });
-
-  it('renders nothing when there are no notifications', () => {
-    setNotificationCount(0);
-    render(<NotificationBadge />);
-
+    expect(useNotificationBadgeCount).toHaveBeenCalledWith({ enabled: false });
     expect(screen.queryByTestId(BADGE_ID)).not.toBeInTheDocument();
   });
 
-  it('renders count when there are notifications', async () => {
-    setNotificationCount(42);
-
+  it('links to the system notifications page', async () => {
     render(<NotificationBadge />);
 
-    await screen.findByTestId(BADGE_ID);
-    const badge = await screen.findByTestId(BADGE_ID);
-
-    expect(within(badge).getByText(42)).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'No unread system notifications' })).toHaveAttribute(
+      'href',
+      '/system/notifications',
+    );
   });
 
-  it('updates notification count when triggered by store', async () => {
-    setNotificationCount(42);
+  it('shows the icon without a count when there are no unread notifications', async () => {
+    render(<NotificationBadge />);
+
+    const badge = await screen.findByTestId(BADGE_ID);
+
+    expect(badge).toHaveAccessibleName('No unread system notifications');
+    expect(badge).not.toHaveTextContent('0');
+  });
+
+  it('shows no count while loading', async () => {
+    asMock(useNotificationBadgeCount).mockReturnValue({ data: 0, isLoading: true });
 
     render(<NotificationBadge />);
 
-    const badgeBefore = await screen.findByTestId(BADGE_ID);
+    expect(await screen.findByTestId(BADGE_ID)).toHaveAccessibleName('No unread system notifications');
+  });
 
-    expect(within(badgeBefore).getByText(42)).toBeInTheDocument();
+  it('renders count when there are unread notifications', async () => {
+    setBadgeCount(42);
 
-    const cb = asMock(NotificationsStore.listen).mock.calls[0][0];
+    render(<NotificationBadge />);
 
-    act(() => {
-      cb({ total: 23 } as NotificationsStoreType);
-    });
+    const badge = await screen.findByTestId(BADGE_ID);
 
-    const badgeAfter = await screen.findByTestId(BADGE_ID);
+    expect(badge).toHaveTextContent('42');
+    expect(badge).toHaveAccessibleName('42 unread system notifications');
+  });
+
+  it('uses a singular accessible name for a single notification', async () => {
+    setBadgeCount(1);
+
+    render(<NotificationBadge />);
+
+    expect(await screen.findByTestId(BADGE_ID)).toHaveAccessibleName('1 unread system notification');
+  });
+
+  it('caps the displayed count', async () => {
+    setBadgeCount(120);
+
+    render(<NotificationBadge />);
+
+    const badge = await screen.findByTestId(BADGE_ID);
+
+    expect(badge).toHaveTextContent('99+');
+    expect(badge).toHaveAccessibleName('120 unread system notifications');
+  });
+
+  it('updates the badge count on subsequent polls', async () => {
+    setBadgeCount(42);
+
+    const { rerender } = render(<NotificationBadge />);
+
+    expect(await screen.findByTestId(BADGE_ID)).toHaveTextContent('42');
+
+    setBadgeCount(23);
+
+    rerender(<NotificationBadge />);
 
     await waitFor(() => {
-      expect(within(badgeAfter).getByText(23)).toBeInTheDocument();
+      expect(screen.getByTestId(BADGE_ID)).toHaveTextContent('23');
     });
   });
 });

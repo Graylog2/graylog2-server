@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
  * Address (A/AAAA) DNS lookup response from {@link DnsClient}.
  */
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = ADnsAnswer.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)

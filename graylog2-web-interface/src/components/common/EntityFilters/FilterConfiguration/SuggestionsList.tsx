@@ -18,122 +18,167 @@ import React, { useCallback } from 'react';
 import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
 
-import { Input, ListGroupItem } from 'components/bootstrap';
+import { Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
-import type { Filters, Filter } from 'components/common/EntityFilters/types';
-import { PaginatedList, NoSearchResult } from 'components/common';
+import type { Filters } from 'components/common/EntityFilters/types';
+import NoSearchResult from 'components/common/NoSearchResult';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 import Spinner from 'components/common/Spinner';
+import PaginatedList from 'components/common/PaginatedList';
 
-const Container = styled.div(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  padding: 3px 10px;
-`);
+const Container = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.text.primary};
+    padding: ${theme.spacings.xs} 0;
+  `,
+);
+
+const sidePaddings = ({ theme }) => css`
+  padding: 0 ${theme.spacings.sm};
+`;
+
+const PaddingContainer = styled.div(sidePaddings);
 
 const SearchInput = styled(Input)`
   margin-bottom: 6px;
 `;
 
-const StyledListGroup = styled.div`
+const ScrollableArea = styled.div`
+  max-height: 50vh;
+  overflow: auto;
+`;
+const StyledListGroup = styled(ListGroup)`
   margin-bottom: 0;
 `;
 
-const Hint = styled.div(({ theme }) => css`
-  margin-top: 9px;
-  font-size: ${theme.fonts.size.small};
-`);
+const Hint = styled.div(
+  ({ theme }) => css`
+    margin-top: 9px;
+    font-size: ${theme.fonts.size.small};
+  `,
+);
+
+const StyledPaginatedList = styled(PaginatedList)(sidePaddings);
 
 type SearchParams = {
-  query: string,
-  page: number,
-  pageSize: number,
-}
+  query: string;
+  page: number;
+  pageSize: number;
+};
 
 type Suggestion = {
-  id: string,
-  value: string,
-}
+  id: string;
+  target_id?: string;
+  value: string;
+};
 
 type Props = {
-  allActiveFilters: Filters | undefined,
-  attribute: Attribute,
-  filter: Filter | undefined
-  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: { title: string, value: string }, closeDropdown: boolean) => void,
-  suggestions: Array<Suggestion>,
-  isLoading: boolean,
-  total: number,
-  page: number,
-  pageSize: number,
-  setSearchParams: (updater: (current: SearchParams) => SearchParams) => void,
-}
+  allActiveFilters: Filters | undefined;
+  attribute: Attribute;
+  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined;
+  isLoading: boolean;
+  multiSelect: boolean;
+  onSubmit: (filter: { title: string; value: string }, closeDropdown: boolean) => void;
+  page: number;
+  pageSize: number;
+  setSearchParams: (updater: (current: SearchParams) => SearchParams) => void;
+  suggestions: Array<Suggestion>;
+  total: number;
+};
 
-const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, filter, isLoading, suggestions, total, setSearchParams, page, pageSize }: Props) => {
+const SuggestionsList = ({
+  allActiveFilters,
+  attribute,
+  filterValueRenderer,
+  isLoading,
+  multiSelect,
+  onSubmit,
+  page,
+  pageSize,
+  setSearchParams,
+  suggestions,
+  total,
+}: Props) => {
   const isShiftHeld = useIsKeyHeld('Shift');
-  const handleSearchChange = useCallback((newSearchQuery: string) => {
-    setSearchParams((cur) => ({ ...cur, page: 1, query: newSearchQuery }));
-  }, [setSearchParams]);
+  const handleSearchChange = useCallback(
+    (newSearchQuery: string) => {
+      setSearchParams((cur) => ({ ...cur, page: 1, query: newSearchQuery }));
+    },
+    [setSearchParams],
+  );
 
-  const handlePaginationChange = useCallback((newPage: number) => {
-    setSearchParams((cur) => ({ ...cur, page: newPage }));
-  }, [setSearchParams]);
+  const handlePaginationChange = useCallback(
+    (newPage: number) => {
+      setSearchParams((cur) => ({ ...cur, page: newPage }));
+    },
+    [setSearchParams],
+  );
 
   const debounceOnSearch = debounce((value: string) => handleSearchChange(value), 1000);
 
   return (
     <Container>
-      <SearchInput type="text"
-                   id="search-filters-input"
-                   formGroupClassName=""
-                   placeholder={`Search for ${attribute.title.toLowerCase()}`}
-                   onChange={({ target: { value } }) => debounceOnSearch(value)} />
-      {isLoading && <Spinner />}
-
+      <PaddingContainer>
+        <SearchInput
+          type="text"
+          id="search-filters-input"
+          formGroupClassName=""
+          placeholder={`Search for ${attribute.title.toLowerCase()}`}
+          onChange={({ target: { value } }) => debounceOnSearch(value)}
+        />
+        {isLoading && <Spinner />}
+      </PaddingContainer>
       {!!suggestions?.length && (
-        <PaginatedList showPageSizeSelect={false}
-                       totalItems={total}
-                       hidePreviousAndNextPageLinks
-                       hideFirstAndLastPageLinks
-                       activePage={page}
-                       pageSize={pageSize}
-                       onChange={handlePaginationChange}
-                       useQueryParameter={false}>
-          <StyledListGroup>
-            {suggestions.map((suggestion) => {
-              const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === suggestion.id);
+        <StyledPaginatedList
+          showPageSizeSelect={false}
+          totalItems={total}
+          hidePreviousAndNextPageLinks
+          hideFirstAndLastPageLinks
+          activePage={page}
+          pageSize={pageSize}
+          onChange={handlePaginationChange}
+          useQueryParameter={false}>
+          <ScrollableArea>
+            <PaddingContainer>
+              <StyledListGroup>
+                {suggestions.map((suggestion) => {
+                  const filterValue = suggestion.target_id || suggestion.id;
+                  const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === filterValue);
 
-              const onClick = () => {
-                if (disabled) {
-                  return;
-                }
+                  const onClick = () => {
+                    if (disabled) {
+                      return;
+                    }
 
-                onSubmit({
-                  value: suggestion.id,
-                  title: suggestion.value,
-                }, !isShiftHeld);
-              };
+                    onSubmit(
+                      {
+                        value: filterValue,
+                        title: suggestion.value,
+                      },
+                      !multiSelect ? true : !isShiftHeld,
+                    );
+                  };
 
-              return (
-                <ListGroupItem onClick={onClick}
-                               key={`filter-value-${suggestion.id}`}
-                               disabled={disabled}>
-                  {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.value) : suggestion.value}
-                </ListGroupItem>
-              );
-            })}
-          </StyledListGroup>
-        </PaginatedList>
+                  return (
+                    <ListGroupItem onClick={onClick} key={`filter-value-${suggestion.id}`} disabled={disabled}>
+                      {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.value) : suggestion.value}
+                    </ListGroupItem>
+                  );
+                })}
+              </StyledListGroup>
+            </PaddingContainer>
+          </ScrollableArea>
+        </StyledPaginatedList>
       )}
+      <PaddingContainer>
+        {!suggestions?.length && <NoSearchResult>No entities found</NoSearchResult>}
 
-      {!suggestions?.length && <NoSearchResult>No entities found</NoSearchResult>}
-
-      {!filter && (
-        <Hint>
-          <i>
-            Hold Shift to select multiple
-          </i>
-        </Hint>
-      )}
+        {multiSelect && (
+          <Hint>
+            <i>Hold Shift to select multiple</i>
+          </Hint>
+        )}
+      </PaddingContainer>
     </Container>
   );
 };

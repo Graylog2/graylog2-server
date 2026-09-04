@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>6.2.0-SNAPSHOT</version>
+        <version>7.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -40,11 +40,17 @@
 
     <properties>
         <mainClass>org.graylog.datanode.bootstrap.Main</mainClass>
-
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.15.0</opensearch.version>
+
+        <!-- 2.x versions -->
+        <opensearch.compat.version>2.19.6</opensearch.compat.version>
+        <lucene.compat.version>9.12.3-1</lucene.compat.version>
+        <!-- 3.x versions -->
+        <opensearch.latest.version>3.7.0</opensearch.latest.version>
+        <opensearch.cache.url>
+            https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/datanode-opensearch
+        </opensearch.cache.url>
+        <opensearch.distribution.platform>linux</opensearch.distribution.platform>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -65,7 +71,7 @@
         </dependency>
         <dependency>
             <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-opensearch2</artifactId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -76,11 +82,6 @@
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog.autovalue</groupId>
-            <artifactId>auto-value-javabean</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -193,9 +194,9 @@
             <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-epoll</artifactId>
-          <classifier>linux-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <classifier>linux-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -203,9 +204,9 @@
             <classifier>osx-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-kqueue</artifactId>
-          <classifier>osx-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -213,9 +214,9 @@
             <classifier>osx-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-tcnative-boringssl-static</artifactId>
-          <classifier>osx-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-tcnative-boringssl-static</artifactId>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -223,9 +224,9 @@
             <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-tcnative-boringssl-static</artifactId>
-          <classifier>linux-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-tcnative-boringssl-static</artifactId>
+            <classifier>linux-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -239,6 +240,16 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-backward-codecs</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>lucene9</artifactId>
+            <version>${lucene.compat.version}</version>
         </dependency>
 
         <dependency>
@@ -379,33 +390,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch2-rest-high-level-client</artifactId>
-            <version>${opensearch.shaded.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.opensearch</groupId>
+            <artifactId>opensearch-core</artifactId>
+            <version>${opensearch.latest.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch2-rest-client-sniffer</artifactId>
-            <version>${opensearch.shaded.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.4</version>
+            <version>4.6.0</version>
         </dependency>
 
         <dependency>
@@ -466,6 +459,14 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
@@ -519,17 +520,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.2.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.3.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -541,179 +537,83 @@
                 <version>${download-maven-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>unpack-opensearch-tar-linux-x64</id>
+                        <id>unpack-opensearch-compat-linux-x64</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.compat.skip}</skip>
                             <url>
-                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
+                                ${opensearch.cache.url}/opensearch-${opensearch.compat.version}-${opensearch.distribution.platform}-x64-datanode.tar.gz
                             </url>
-                            <sha512>
-                                a72f218b581903b1ddf1072498560bc5304516ed57feb39735f920985740366c2779ed9174251a13b9a9dabdfc184119c325bb387dadf96485dc7964ecf32d54
-                            </sha512>
-                            <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
+                            <outputFileName>
+                                opensearch-${opensearch.compat.version}-${opensearch.distribution.platform}-x64-datanode.tar.gz
+                            </outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
-                            <fileMappers>
-                                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-                                    <pattern>^(opensearch-\d+\.\d+\.\d+)/</pattern>
-                                    <replacement>$1-linux-x64/</replacement>
-                                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-                            </fileMappers>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>unpack-opensearch-tar-linux-aarch64</id>
+                        <id>unpack-opensearch-compat-linux-aarch64</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.compat.skip}</skip>
                             <url>
-                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
+                                ${opensearch.cache.url}/opensearch-${opensearch.compat.version}-${opensearch.distribution.platform}-aarch64-datanode.tar.gz
                             </url>
-                            <sha512>
-                                866c348ac39b7b35e671917349269383c75e1f9d10768742067807569180d1914fd09c6ae7e71d5e74bd77c8c8165ea17c19290b71f887f074dfe8e68dff66bb
-                            </sha512>
-                            <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
+                            <outputFileName>
+                                opensearch-${opensearch.compat.version}-${opensearch.distribution.platform}-aarch64-datanode.tar.gz
+                            </outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
-                            <fileMappers>
-                                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-                                    <pattern>^(opensearch-\d+\.\d+\.\d+)/</pattern>
-                                    <replacement>$1-linux-aarch64/</replacement>
-                                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-                            </fileMappers>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>download-repository-s3-plugin</id>
+                        <id>unpack-opensearch-latest-linux-x64</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
                         </goals>
                         <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.latest.skip}</skip>
                             <url>
-                                https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version}/repository-s3-${opensearch.version}.zip
+                                ${opensearch.cache.url}/opensearch-${opensearch.latest.version}-${opensearch.distribution.platform}-x64-datanode.tar.gz
                             </url>
-                            <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
-                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
-                            <sha512>
-                                de44a181133a33a08703e8464b52aa2ac29d1d9918d9478c307b98909a571baaaf0c9dcb664349802c3dd85fa53275bd2228248fd129179631b9096d470eb8d5
-                            </sha512>
+                            <outputFileName>
+                                opensearch-${opensearch.latest.version}-${opensearch.distribution.platform}-x64-datanode.tar.gz
+                            </outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
+                            <unpack>true</unpack>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-opensearch-latest-linux-aarch64</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <!--suppress UnresolvedMavenProperty, MavenModelInspection -->
+                            <skip>${opensearch.unpack.latest.skip}</skip>
+                            <url>
+                                ${opensearch.cache.url}/opensearch-${opensearch.latest.version}-${opensearch.distribution.platform}-aarch64-datanode.tar.gz
+                            </url>
+                            <outputFileName>
+                                opensearch-${opensearch.latest.version}-${opensearch.distribution.platform}-aarch64-datanode.tar.gz
+                            </outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
+                            <unpack>true</unpack>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>fix-opensearch-config-permissions</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <!-- Some config files in opensearch-*/config/ use 660 permissions. That's a problem
-                                     when running OpenSearch under a different user account than the owner of the
-                                     OpenSearch config files. (OS packages or container image)
-                                -->
-                                <chmod dir="${project.build.directory}/opensearch"
-                                       includes="opensearch-*/config/**"
-                                       perm="ugo+r"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>remove-unused-opensearch-plugins</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <!-- Remove unused OpenSearch plugins -->
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-alerting"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-custom-codecs"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-geospatial"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-knn"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-neural-search"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications-core"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-performance-analyzer"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-reports-scheduler"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-security-analytics"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-sql"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-observability"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-alerting"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-custom-codecs"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-geospatial"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-knn"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-neural-search"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications-core"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-performance-analyzer"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-reports-scheduler"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-security-analytics"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-sql"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins//opensearch-observability"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>exec-maven-plugin</artifactId>
-                <groupId>org.codehaus.mojo</groupId>
-                <executions>
-                    <execution>
-                        <id>install-required-opensearch-plugins-x64</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>bash</executable>
-                            <environmentVariables>
-                                <OPENSEARCH_JAVA_HOME>${java.home}</OPENSEARCH_JAVA_HOME><!-- no matter which architecture we configure, we need our own jdk to run the script -->
-                                <BIN>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/bin/opensearch-plugin</BIN>
-                                <FILE>file://${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</FILE>
-                            </environmentVariables>
-                            <arguments>
-                                <argument>-c</argument>
-                                <argument>$BIN list repository-s3 | grep -q repository-s3 || $BIN install --batch $FILE</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-required-opensearch-plugins-aarch64</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>bash</executable>
-                            <environmentVariables>
-                                <OPENSEARCH_JAVA_HOME>${java.home}</OPENSEARCH_JAVA_HOME><!-- no matter which architecture we configure, we need our own jdk to run the script -->
-                                <BIN>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/bin/opensearch-plugin</BIN>
-                                <FILE>file://${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</FILE>
-                            </environmentVariables>
-                            <arguments>
-                                <argument>-c</argument>
-                                <argument>$BIN list repository-s3 | grep -q repository-s3 || $BIN install --batch $FILE</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -726,10 +626,48 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
+                            <includeScope>runtime</includeScope>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-csv-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <arguments>
+                                <argument>csv</argument>
+                                <argument>${project.build.directory}/datanode-conf-docs.csv</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-conf-example</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <arguments>
+                                <argument>conf</argument>
+                                <argument>${project.build.directory}/datanode.conf.generated</argument>
+                                <!-- use the following line if you want to distribute the generated version instead of manually created -->
+                                <!-- <argument>${project.build.directory}/datanode.conf.example</argument> -->
+                            </arguments>
                         </configuration>
                     </execution>
                 </executions>
@@ -817,6 +755,27 @@
                             <propertyPrefix>maven</propertyPrefix>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>check-opensearch-unpack-state</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>bsh-property</goal>
+                        </goals>
+                        <configuration>
+                            <source><![CDATA[
+                                String dir = project.getBuild().getDirectory();
+                                String cv = project.getProperties().getProperty("opensearch.compat.version");
+                                String lv = project.getProperties().getProperty("opensearch.latest.version");
+                                boolean compat = new java.io.File(dir, "opensearch/opensearch-" + cv + "-linux-x64").isDirectory()
+                                              && new java.io.File(dir, "opensearch/opensearch-" + cv + "-linux-aarch64").isDirectory();
+                                boolean latest = new java.io.File(dir, "opensearch/opensearch-" + lv + "-linux-x64").isDirectory()
+                                              && new java.io.File(dir, "opensearch/opensearch-" + lv + "-linux-aarch64").isDirectory();
+                                project.getProperties().setProperty("opensearch.unpack.compat.skip", compat ? "true" : "false");
+                                project.getProperties().setProperty("opensearch.unpack.latest.skip", latest ? "true" : "false");
+                                log.info("OpenSearch unpack skip flags: compat=" + compat + " latest=" + latest);
+                            ]]></source>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -834,6 +793,25 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <RestrictImports>
+                            <groups>
+                                <group>
+                                    <reason>Data Node packages must be allowed for the data-node/ module.</reason>
+                                    <allowedImports>
+                                        <allowedImport>org.graylog.datanode.**</allowedImport>
+                                    </allowedImports>
+                                </group>
+                            </groups>
+                        </RestrictImports>
+                    </rules>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -874,5 +852,18 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>run-on-mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <opensearch.distribution.platform>macos</opensearch.distribution.platform>
+            </properties>
+        </profile>
     </profiles>
+
 </project>

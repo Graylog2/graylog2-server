@@ -42,7 +42,7 @@ public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapte
     }
 
     private <T> T get(InetAddress ipAddress, String type, Class<T> valueClass) throws IOException, AddressNotFoundException {
-        final String databaseType = reader.getMetadata().getDatabaseType();
+        final String databaseType = reader.getMetadata().databaseType();
         if (!disableIpInfoDbTypeCheck && (!databaseType.contains("ipinfo") || !databaseType.contains(type))) {
             final String caller = Thread.currentThread().getStackTrace()[2].getMethodName();
             throw new UnsupportedOperationException("Invalid attempt to open a \"" + databaseType + "\" database using the " + caller + " method");

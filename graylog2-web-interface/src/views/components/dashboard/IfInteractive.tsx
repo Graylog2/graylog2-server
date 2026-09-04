@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type * as React from 'react';
 
-import InteractiveContext from '../contexts/InteractiveContext';
+import { useIsInteractiveMode } from '../contexts/InteractiveContext';
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  children: React.ReactElement | React.ReactElement[];
 };
-const IfInteractive = ({ children }: Props) => (
-  <InteractiveContext.Consumer>
-    {(interactive) => (interactive ? children : null)}
-  </InteractiveContext.Consumer>
-);
+const IfInteractive = ({ children }: Props) => {
+  const isInteractive = useIsInteractiveMode();
+
+  return isInteractive ? children : null;
+};
 
 export default IfInteractive;

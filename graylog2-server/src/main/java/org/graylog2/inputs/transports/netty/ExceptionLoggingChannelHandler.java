@@ -25,16 +25,10 @@ import org.slf4j.Logger;
 public class ExceptionLoggingChannelHandler extends ChannelInboundHandlerAdapter {
     private final MessageInput input;
     private final Logger logger;
-    private final boolean keepAliveEnabled;
 
     public ExceptionLoggingChannelHandler(MessageInput input, Logger logger) {
-        this(input, logger, false);
-    }
-
-    public ExceptionLoggingChannelHandler(MessageInput input, Logger logger, boolean keepAliveEnabled) {
         this.input = input;
         this.logger = logger;
-        this.keepAliveEnabled = keepAliveEnabled;
     }
 
     @Override
@@ -44,9 +38,11 @@ public class ExceptionLoggingChannelHandler extends ChannelInboundHandlerAdapter
                     cause.getMessage(),
                     input.toIdentifier(),
                     ctx.channel());
-        } else if (this.keepAliveEnabled && cause instanceof ReadTimeoutException) {
+        } else if (cause instanceof ReadTimeoutException) {
+            // A read timeout is raised when the io.netty.handler.timeout.ReadTimeoutHandler closes an idle connection.
+            // This is desired behavior.
             if (logger.isTraceEnabled()) {
-                logger.trace("KeepAlive Timeout in input {} (channel {})",
+                logger.trace("Read timeout in input {} (channel {})",
                         input.toIdentifier(),
                         ctx.channel());
             }

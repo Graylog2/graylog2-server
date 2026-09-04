@@ -16,11 +16,11 @@
  */
 import { useEffect, useRef } from 'react';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectSearchJobId } from 'views/logic/slices/searchExecutionSelectors';
 
 const useOnSearchExecution = (fn: () => void) => {
-  const searchResultId = useAppSelector(selectSearchJobId);
+  const searchResultId = useViewsSelector(selectSearchJobId);
   const lastSearchResultId = useRef<string | undefined>();
 
   useEffect(() => {

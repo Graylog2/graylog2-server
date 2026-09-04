@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import EventDefinitionFormContainer
-  from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -30,53 +30,59 @@ import useQuery from 'routing/useQuery';
 
 const CreateEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
   const { step } = useQuery();
 
-  const handleEventDefinitionChange = useCallback((eventDefinition) => {
-    if (eventDefinition.title !== eventDefinitionTitle) {
-      setEventDefinitionTitle(eventDefinition.title);
-    }
-  }, [eventDefinitionTitle]);
+  const handleEventDefinitionChange = useCallback(
+    (eventDefinition) => {
+      if (eventDefinition.title !== eventDefinitionTitle) {
+        setEventDefinitionTitle(eventDefinition.title);
+      }
+    },
+    [eventDefinitionTitle],
+  );
 
-  const pageTitle = useMemo(() => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'), [eventDefinitionTitle]);
+  const pageTitle = useMemo(
+    () => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'),
+    [eventDefinitionTitle],
+  );
 
   const goToOverview = useCallback(() => {
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
-  }, [navigate]);
+    push(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [push]);
 
   useEffect(() => {
     if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
-      navigate(Routes.NOTFOUND);
+      push(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, navigate]);
+  }, [currentUser.permissions, push]);
 
   return (
     <DocumentTitle title={pageTitle}>
       <EventsPageNavigation />
 
-      <PageHeader title={pageTitle}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Event Definitions allow you to create Alerts from different Conditions and alert on them.
-        </span>
+      <PageHeader
+        title={pageTitle}
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <span>Event Definitions allow you to create Alerts from different Conditions and alert on them.</span>
       </PageHeader>
 
       <Row className="content">
         <Col md={12}>
-          <EventDefinitionFormContainer action="create"
-                                        onEventDefinitionChange={handleEventDefinitionChange}
-                                        initialStep={step as string}
-                                        onSubmit={goToOverview}
-                                        onCancel={goToOverview} />
+          <EventDefinitionFormContainer
+            action="create"
+            onEventDefinitionChange={handleEventDefinitionChange}
+            initialStep={normalizeStepKey(step as string)}
+            onSubmit={goToOverview}
+            onCancel={goToOverview}
+          />
         </Col>
       </Row>
-
     </DocumentTitle>
   );
 };

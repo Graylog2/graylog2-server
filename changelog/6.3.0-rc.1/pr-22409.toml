@@ -1,0 +1,5 @@
+type = "f"
+message = "Adding correct handling for streams filter in legacy searches."
+
+issues = ["21836"]
+pulls = ["22409"]

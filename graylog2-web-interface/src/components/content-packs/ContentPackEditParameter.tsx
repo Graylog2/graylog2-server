@@ -28,26 +28,19 @@ type ContentPackEditParameterProps = {
   parameterToEdit?: any;
 };
 
-class ContentPackEditParameter extends React.Component<ContentPackEditParameterProps, {
-  [key: string]: any;
-}> {
+class ContentPackEditParameter extends React.Component<
+  ContentPackEditParameterProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
-    onUpdateParameter: () => { },
+    onUpdateParameter: () => {},
     parameters: [],
     parameterToEdit: undefined,
   };
 
-  static emptyParameter = {
-    name: '',
-    title: '',
-    description: '',
-    type: 'string',
-    default_value: '',
-  };
-
-  private titleInput: Input;
-
-  constructor(props) {
+  constructor(props: ContentPackEditParameterProps) {
     super(props);
 
     this.state = {
@@ -59,7 +52,17 @@ class ContentPackEditParameter extends React.Component<ContentPackEditParameterP
     };
   }
 
-  addNewParameter = (e) => {
+  static emptyParameter = {
+    name: '',
+    title: '',
+    description: '',
+    type: 'string',
+    default_value: '',
+  };
+
+  private titleInput: Input;
+
+  addNewParameter = (e: React.FormEvent<HTMLFormElement>) => {
     if (e) {
       e.preventDefault();
     }
@@ -68,8 +71,10 @@ class ContentPackEditParameter extends React.Component<ContentPackEditParameterP
       return;
     }
 
-    const realDefaultValue = ContentPackUtils.convertValue(this.state.newParameter.type,
-      this.state.newParameter.default_value);
+    const realDefaultValue = ContentPackUtils.convertValue(
+      this.state.newParameter.type,
+      this.state.newParameter.default_value,
+    );
     const updatedParameter = ObjectUtils.clone(this.state.newParameter);
 
     updatedParameter.default_value = realDefaultValue;
@@ -79,15 +84,80 @@ class ContentPackEditParameter extends React.Component<ContentPackEditParameterP
     this.setState({ newParameter: ObjectUtils.clone(ContentPackEditParameter.emptyParameter) });
   };
 
-  _updateField = (name, value) => {
-    const updatedParameter = ObjectUtils.clone(this.state.newParameter);
-
-    updatedParameter[name] = value;
-    this.setState({ newParameter: updatedParameter });
+  _updateField = (name: string, value: any) => {
+    this.setState((parameter) => ({ newParameter: { ...parameter.newParameter, [name]: value } }));
   };
 
-  _bindValue = (event) => {
+  _bindValue = (event: React.ChangeEvent<HTMLInputElement>) => {
     this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
+  };
+
+  _validateName = () => {
+    const value = this.state.newParameter.name;
+
+    if (value.match(/\W/)) {
+      this.setState({ nameError: 'The parameter name must only contain A-Z, a-z, 0-9 and _' });
+
+      return false;
+    }
+
+    if (
+      (this.props.parameterToEdit || {}).name !== value &&
+      this.props.parameters.findIndex((parameter) => parameter.name === value) >= 0
+    ) {
+      this.setState({ nameError: 'The parameter name must be unique.' });
+
+      return false;
+    }
+
+    this.setState({ nameError: undefined });
+
+    return true;
+  };
+
+  _validateDefaultValue = () => {
+    const value = this.state.newParameter.default_value;
+
+    if (value) {
+      switch (this.state.newParameter.type) {
+        case 'integer': {
+          if (`${parseInt(value, 10)}` !== value) {
+            this.setState({ defaultValueError: 'This is not an integer value.' });
+
+            return false;
+          }
+
+          break;
+        }
+
+        case 'double': {
+          if (Number.isNaN(Number.parseFloat(value))) {
+            this.setState({ defaultValueError: 'This is not a double value.' });
+
+            return false;
+          }
+
+          break;
+        }
+
+        case 'boolean': {
+          if (value !== 'true' && value !== 'false') {
+            this.setState({ defaultValueError: 'This is not a boolean value. It must be either true or false.' });
+
+            return false;
+          }
+
+          break;
+        }
+
+        default:
+          break;
+      }
+    }
+
+    this.setState({ defaultValueError: undefined });
+
+    return true;
   };
 
   _validateParameter() {
@@ -120,72 +190,6 @@ class ContentPackEditParameter extends React.Component<ContentPackEditParameterP
     return this._validateDefaultValue() && this._validateName();
   }
 
-  _validateName = () => {
-    const value = this.state.newParameter.name;
-
-    if (value.match(/\W/)) {
-      this.setState({ nameError: 'The parameter name must only contain A-Z, a-z, 0-9 and _' });
-
-      return false;
-    }
-
-    if ((this.props.parameterToEdit || {}).name !== value
-      && this.props.parameters.findIndex((parameter) => parameter.name === value) >= 0) {
-      this.setState({ nameError: 'The parameter name must be unique.' });
-
-      return false;
-    }
-
-    this.setState({ nameError: undefined });
-
-    return true;
-  };
-
-  _validateDefaultValue = () => {
-    const value = this.state.newParameter.default_value;
-
-    if (value) {
-      switch (this.state.newParameter.type) {
-        case 'integer': {
-          if (`${parseInt(value, 10)}` !== value) {
-            this.setState({ defaultValueError: 'This is not an integer value.' });
-
-            return false;
-          }
-
-          break;
-        }
-
-        case 'double': {
-          if (isNaN(value)) {
-            this.setState({ defaultValueError: 'This is not a double value.' });
-
-            return false;
-          }
-
-          break;
-        }
-
-        case 'boolean': {
-          if (value !== 'true' && value !== 'false') {
-            this.setState({ defaultValueError: 'This is not a boolean value. It must be either true or false.' });
-
-            return false;
-          }
-
-          break;
-        }
-
-        default:
-          break;
-      }
-    }
-
-    this.setState({ defaultValueError: undefined });
-
-    return true;
-  };
-
   render() {
     const header = this.props.parameterToEdit ? 'Edit parameter' : 'Create parameter';
     const disableType = !!this.props.parameterToEdit;
@@ -194,66 +198,89 @@ class ContentPackEditParameter extends React.Component<ContentPackEditParameterP
       <div>
         <h2>{header}</h2>
         <br />
-        <form className="parameter-form" id="parameter-form" onSubmit={this.addNewParameter}>
+        <form
+          className="parameter-form"
+          id="parameter-form"
+          data-testid="parameter-form"
+          onSubmit={this.addNewParameter}>
           <fieldset>
-            <Input ref={(node) => { this.titleInput = node; }}
-                   name="title"
-                   id="title"
-                   type="text"
-                   maxLength={250}
-                   value={this.state.newParameter.title}
-                   onChange={this._bindValue}
-                   bsStyle={this.state.titleError ? 'error' : null}
-                   label="Title"
-                   help={this.state.titleError ? this.state.titleError
-                     : 'Give a descriptive title for this content pack.'}
-                   required />
-            <Input name="name"
-                   id="name"
-                   type="text"
-                   maxLength={250}
-                   bsStyle={this.state.nameError ? 'error' : null}
-                   value={this.state.newParameter.name}
-                   onChange={this._bindValue}
-                   label="Name"
-                   help={this.state.nameError ? this.state.nameError
-                     : 'This is used as the parameter reference and must not contain a space.'}
-                   required />
-            <Input name="description"
-                   id="description"
-                   type="text"
-                   bsStyle={this.state.descrError ? 'error' : null}
-                   maxLength={250}
-                   value={this.state.newParameter.description}
-                   onChange={this._bindValue}
-                   label="Description"
-                   help={this.state.descrError ? this.state.descrError
-                     : 'Give a description explaining what will be done with this parameter.'}
-                   required />
-            <Input name="type"
-                   id="type"
-                   type="select"
-                   disabled={disableType}
-                   value={this.state.newParameter.type}
-                   onChange={this._bindValue}
-                   label="Value Type"
-                   help="Give the type of the parameter."
-                   required>
+            <Input
+              ref={(node) => {
+                this.titleInput = node;
+              }}
+              name="title"
+              id="title"
+              type="text"
+              maxLength={250}
+              value={this.state.newParameter.title}
+              onChange={this._bindValue}
+              bsStyle={this.state.titleError ? 'error' : null}
+              label="Title"
+              help={this.state.titleError ? this.state.titleError : 'Give a descriptive title for this content pack.'}
+              required
+            />
+            <Input
+              name="name"
+              id="name"
+              type="text"
+              maxLength={250}
+              bsStyle={this.state.nameError ? 'error' : null}
+              value={this.state.newParameter.name}
+              onChange={this._bindValue}
+              label="Name"
+              help={
+                this.state.nameError
+                  ? this.state.nameError
+                  : 'This is used as the parameter reference and must not contain a space.'
+              }
+              required
+            />
+            <Input
+              name="description"
+              id="description"
+              type="text"
+              bsStyle={this.state.descrError ? 'error' : null}
+              maxLength={250}
+              value={this.state.newParameter.description}
+              onChange={this._bindValue}
+              label="Description"
+              help={
+                this.state.descrError
+                  ? this.state.descrError
+                  : 'Give a description explaining what will be done with this parameter.'
+              }
+              required
+            />
+            <Input
+              name="type"
+              id="type"
+              type="select"
+              disabled={disableType}
+              value={this.state.newParameter.type}
+              onChange={this._bindValue}
+              label="Value Type"
+              help="Give the type of the parameter."
+              required>
               <option value="string">String</option>
               <option value="integer">Integer</option>
               <option value="double">Double</option>
               <option value="boolean">Boolean</option>
             </Input>
-            <Input name="default_value"
-                   id="default_value"
-                   type="text"
-                   maxLength={250}
-                   bsStyle={this.state.defaultValueError ? 'error' : null}
-                   value={this.state.newParameter.default_value}
-                   onChange={this._bindValue}
-                   label="Default value"
-                   help={this.state.defaultValueError ? this.state.defaultValueError
-                     : 'Give a default value if the parameter is not optional.'} />
+            <Input
+              name="default_value"
+              id="default_value"
+              type="text"
+              maxLength={250}
+              bsStyle={this.state.defaultValueError ? 'error' : null}
+              value={this.state.newParameter.default_value}
+              onChange={this._bindValue}
+              label="Default value"
+              help={
+                this.state.defaultValueError
+                  ? this.state.defaultValueError
+                  : 'Give a default value if the parameter is not optional.'
+              }
+            />
           </fieldset>
         </form>
       </div>

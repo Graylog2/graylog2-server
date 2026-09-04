@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import { IconButton, ModalSubmit } from 'components/common';
+import { IconButton, LinkContainer, ModalSubmit } from 'components/common';
 import { ButtonToolbar, Modal, Menu, MenuItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import Routes from 'routing/Routes';
@@ -29,31 +29,31 @@ import EventDetails from './EventDetails';
 const usePluggableDashboardActions = (eventId: string) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.widgets.events.actions');
-  const availableActions = pluggableActions.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
-  );
+  const availableActions = pluggableActions.filter((action) => (action.useCondition ? !!action.useCondition() : true));
   const actions = availableActions.map(({ component: PluggableDashboardAction, key }) => (
-    <PluggableDashboardAction key={`event-action-${key}`}
-                              eventId={eventId}
-                              modalRef={() => modalRefs.current[key]} />
+    <PluggableDashboardAction key={`event-action-${key}`} eventId={eventId} modalRef={() => modalRefs.current[key]} />
   ));
 
   const actionModals = availableActions
     .filter(({ modal }) => !!modal)
     .map(({ modal: ActionModal, key }) => (
-      <ActionModal key={`event-action-modal-${key}`}
-                   eventId={eventId}
-                   ref={(r) => { modalRefs.current[key] = r; }} />
+      <ActionModal
+        key={`event-action-modal-${key}`}
+        eventId={eventId}
+        ref={(r) => {
+          modalRefs.current[key] = r;
+        }}
+      />
     ));
 
-  return ({ actions, actionModals });
+  return { actions, actionModals };
 };
 
 type Props = {
-  eventId: string,
-  hasReplayInfo: boolean,
-  eventDefinitionId: string,
-}
+  eventId: string;
+  hasReplayInfo: boolean;
+  eventDefinitionId: string;
+};
 
 const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   const user = useCurrentUser();
@@ -62,10 +62,10 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(eventId);
 
   const moreActions = [
-    (hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`)) ? (
-      <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank" key="replay-search">
-        Replay search
-      </MenuItem>
+    hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`) ? (
+      <LinkContainer to={Routes.ALERTS.replay_search(eventId)} key="replay-search">
+        <MenuItem>Replay search</MenuItem>
+      </LinkContainer>
     ) : null,
     pluggableActions.length ? pluggableActions : null,
   ].filter(Boolean);
@@ -77,29 +77,27 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
         {!!moreActions.length && (
           <Menu position="bottom-end">
             <Menu.Target>
-              <IconButton name="more_vert" title="Toggle event actions" />
+              <IconButton name="more_vert" title="Toggle event actions" showTooltip={false} />
             </Menu.Target>
-            <Menu.Dropdown>
-              {moreActions}
-            </Menu.Dropdown>
+            <Menu.Dropdown>{moreActions}</Menu.Dropdown>
           </Menu>
         )}
       </ButtonToolbar>
       {showDetailsModal && (
-        <Modal show={showDetailsModal}
-               bsSize="large"
-               onHide={toggleDetailsModal}>
-          <Modal.Header closeButton>
+        <Modal show={showDetailsModal} bsSize="large" onHide={toggleDetailsModal}>
+          <Modal.Header>
             <Modal.Title>Event details</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <EventDetails eventId={eventId} />
           </Modal.Body>
           <Modal.Footer>
-            <ModalSubmit displayCancel={false}
-                         onSubmit={toggleDetailsModal}
-                         submitButtonType="button"
-                         submitButtonText="Close" />
+            <ModalSubmit
+              displayCancel={false}
+              onSubmit={toggleDetailsModal}
+              submitButtonType="button"
+              submitButtonText="Close"
+            />
           </Modal.Footer>
         </Modal>
       )}

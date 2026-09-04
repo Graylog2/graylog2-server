@@ -18,13 +18,12 @@ import React from 'react';
 
 import IfFeatureEnabled from './IfFeatureEnabled';
 
-const withFeature = <Props extends {}>(
-  featureName: string,
-  Component: React.ComponentType<Props>,
-): React.ComponentType<Props> => (props) => (
-  <IfFeatureEnabled name={featureName}>
-    <Component {...props} />
-  </IfFeatureEnabled>
+const withFeature =
+  <Props extends {}>(featureName: string, Component: React.ComponentType<Props>): React.ComponentType<Props> =>
+  (props) => (
+    <IfFeatureEnabled name={featureName}>
+      <Component {...props} />
+    </IfFeatureEnabled>
   );
 
 export default withFeature;

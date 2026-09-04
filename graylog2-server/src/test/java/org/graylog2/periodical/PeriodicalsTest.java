@@ -18,12 +18,13 @@ package org.graylog2.periodical;
 
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.periodical.Periodical;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -34,9 +35,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeastOnce;
@@ -45,9 +46,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class PeriodicalsTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ScheduledExecutorService scheduler;
@@ -58,7 +59,7 @@ public class PeriodicalsTest {
     private ScheduledFuture<Object> future;
     private Periodicals periodicals;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         periodicals = new Periodicals(scheduler, daemonScheduler);
         future = createScheduledFuture();
@@ -96,7 +97,7 @@ public class PeriodicalsTest {
         //      Fixable by using an injectable ThreadFactoryBuilder so we can properly mock?
         //verify(periodical).run();
 
-        assertFalse("Periodical should not be in the futures Map", periodicals.getFutures().containsKey(periodical));
+        assertFalse(periodicals.getFutures().containsKey(periodical), "Periodical should not be in the futures Map");
     }
 
     @Test
@@ -116,7 +117,7 @@ public class PeriodicalsTest {
 
         verify(periodical, never()).run();
 
-        assertTrue("Periodical was not added to the futures Map", periodicals.getFutures().containsKey(periodical));
+        assertTrue(periodicals.getFutures().containsKey(periodical), "Periodical was not added to the futures Map");
     }
 
     @Test
@@ -136,14 +137,14 @@ public class PeriodicalsTest {
 
         verify(periodical, never()).run();
 
-        assertEquals("Future for the periodical was not added to the futures Map", future, periodicals.getFutures().get(periodical));
+        assertEquals(future, periodicals.getFutures().get(periodical), "Future for the periodical was not added to the futures Map");
     }
 
     @Test
     public void testGetAll() throws Exception {
         periodicals.registerAndStart(periodical);
 
-        assertEquals("getAll() did not return all periodicals", Lists.newArrayList(periodical), periodicals.getAll());
+        assertEquals(Lists.newArrayList(periodical), periodicals.getAll(), "getAll() did not return all periodicals");
     }
 
     @Test
@@ -152,7 +153,7 @@ public class PeriodicalsTest {
 
         periodicals.getAll().add(periodical);
 
-        assertEquals("getAll() did not return a copy of the periodicals List", 1, periodicals.getAll().size());
+        assertEquals(1, periodicals.getAll().size(), "getAll() did not return a copy of the periodicals List");
     }
 
     @Test
@@ -165,16 +166,16 @@ public class PeriodicalsTest {
 
         List<Periodical> allStoppedOnGracefulShutdown = periodicals.getAllStoppedOnGracefulShutdown();
 
-        assertFalse("periodical without graceful shutdown is in the list", allStoppedOnGracefulShutdown.contains(periodical));
-        assertTrue("graceful shutdown periodical is not in the list", allStoppedOnGracefulShutdown.contains(periodical2));
-        assertEquals("more graceful shutdown periodicals in the list", 1, allStoppedOnGracefulShutdown.size());
+        assertFalse(allStoppedOnGracefulShutdown.contains(periodical), "periodical without graceful shutdown is in the list");
+        assertTrue(allStoppedOnGracefulShutdown.contains(periodical2), "graceful shutdown periodical is not in the list");
+        assertEquals(1, allStoppedOnGracefulShutdown.size(), "more graceful shutdown periodicals in the list");
     }
 
     @Test
     public void testGetFutures() throws Exception {
         periodicals.registerAndStart(periodical);
 
-        assertTrue("missing periodical in future Map", periodicals.getFutures().containsKey(periodical));
+        assertTrue(periodicals.getFutures().containsKey(periodical), "missing periodical in future Map");
         assertEquals(1, periodicals.getFutures().size());
     }
 
@@ -186,7 +187,7 @@ public class PeriodicalsTest {
 
         periodicals.getFutures().put(periodical2, null);
 
-        assertFalse("getFutures() did not return a copy of the Map", periodicals.getFutures().containsKey(periodical2));
+        assertFalse(periodicals.getFutures().containsKey(periodical2), "getFutures() did not return a copy of the Map");
         assertEquals(1, periodicals.getFutures().size());
     }
 

@@ -16,22 +16,21 @@
  */
 import React from 'react';
 
-import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification, TestResults } from 'components/event-notifications/hooks/useEventNotifications';
 import { Spinner } from 'components/common';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
+import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 
 type Props = {
-  notification: EventNotification
-  testResults: TestResults
-}
+  notification: EventNotification;
+  testResults: TestResults;
+};
 
 const NotificationTitle = ({ notification, testResults }: Props) => {
   const result = testResults?.[notification.id];
 
   return (
     <>
-      <Link to={Routes.ALERTS.NOTIFICATIONS.show(notification.id)}>{notification.title}</Link>
+      <EventNotificationLink title={notification.title} id={notification.id} />
       {result?.id === notification.id ? (
         <div>
           {result.isLoading ? (

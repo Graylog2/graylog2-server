@@ -1,0 +1,127 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React from 'react';
+import { render, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+
+import FieldSortIcon from './FieldSortIcon';
+
+describe('FieldSortIcon', () => {
+  const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending);
+  const config = new MessagesWidgetConfig(['timestamp', 'source'], true, true, [], [currentSort]);
+
+  it('should set descending sort on click, if field sort is not defined', async () => {
+    const onSortChangeStub = jest.fn(() => Promise.resolve());
+    const setLoadingState = jest.fn();
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingState}
+      />,
+    );
+
+    const sortIcon = getByTitle('Sort source Descending');
+
+    await userEvent.click(sortIcon);
+
+    const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)];
+
+    expect(onSortChangeStub).toHaveBeenCalledTimes(1);
+    expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
+
+    await waitFor(() => {
+      expect(setLoadingState).toHaveBeenCalledWith(false);
+    });
+  });
+
+  it('should set ascending sort on click, if field sort is descending', async () => {
+    const onSortChangeStub = jest.fn(() => Promise.resolve());
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="timestamp"
+        onSortChange={onSortChangeStub}
+        setLoadingState={() => {}}
+      />,
+    );
+
+    const sortIcon = getByTitle('Sort timestamp Ascending');
+
+    await userEvent.click(sortIcon);
+
+    const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Ascending)];
+
+    expect(onSortChangeStub).toHaveBeenCalledTimes(1);
+    expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
+  });
+
+  it('should set descending sort on click, if field sort is descending', async () => {
+    const initialSort = new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Ascending);
+    const initialConfig = new MessagesWidgetConfig(['timestamp', 'source'], true, true, [], [initialSort]);
+    const onSortChangeStub = jest.fn(() => Promise.resolve());
+    const setLoadingState = jest.fn();
+
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={initialConfig}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingState}
+      />,
+    );
+
+    const sortIcon = getByTitle('Sort source Descending');
+
+    await userEvent.click(sortIcon);
+
+    const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)];
+
+    expect(onSortChangeStub).toHaveBeenCalledTimes(1);
+    expect(onSortChangeStub).toHaveBeenCalledWith(expectedSort);
+
+    await waitFor(() => {
+      expect(setLoadingState).toHaveBeenCalledWith(false);
+    });
+  });
+
+  it('should set loading state while changing sort', async () => {
+    const onSortChangeStub = jest.fn(() => Promise.resolve());
+    const setLoadingStateStub = jest.fn();
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingStateStub}
+      />,
+    );
+
+    const sortIcon = getByTitle('Sort source Descending');
+
+    await userEvent.click(sortIcon);
+
+    expect(setLoadingStateStub).toHaveBeenNthCalledWith(1, true);
+
+    await waitFor(() => expect(setLoadingStateStub).toHaveBeenNthCalledWith(2, false));
+  });
+});

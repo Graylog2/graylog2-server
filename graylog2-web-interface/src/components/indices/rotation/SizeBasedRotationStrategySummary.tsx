@@ -22,9 +22,7 @@ type SizeBasedRotationStrategySummaryProps = {
   config: any;
 };
 
-const SizeBasedRotationStrategySummary = ({
-  config,
-}: SizeBasedRotationStrategySummaryProps) => {
+const SizeBasedRotationStrategySummary = ({ config }: SizeBasedRotationStrategySummaryProps) => {
   const { max_size: maxSize } = config;
 
   return (
@@ -33,7 +31,9 @@ const SizeBasedRotationStrategySummary = ({
         <dt>Index rotation strategy:</dt>
         <dd>Index Size</dd>
         <dt>Max index size:</dt>
-        <dd>{maxSize} bytes ({NumberUtils.formatBytes(maxSize)})</dd>
+        <dd>
+          {maxSize} bytes ({NumberUtils.formatBytes(maxSize)})
+        </dd>
       </dl>
     </div>
   );

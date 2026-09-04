@@ -1,13 +1,9 @@
 [
   {
-    "key": [
-      "index"
-    ],
+    "key": ["index"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": 27142,
         "rollup": true,
         "source": "row-leaf"
@@ -16,14 +12,10 @@
     "source": "leaf"
   },
   {
-    "key": [
-      "show"
-    ],
+    "key": ["show"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": 7826,
         "rollup": true,
         "source": "row-leaf"
@@ -32,14 +24,10 @@
     "source": "leaf"
   },
   {
-    "key": [
-      "login"
-    ],
+    "key": ["login"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": 6626,
         "rollup": true,
         "source": "row-leaf"
@@ -48,14 +36,10 @@
     "source": "leaf"
   },
   {
-    "key": [
-      "edit"
-    ],
+    "key": ["edit"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": 1246,
         "rollup": true,
         "source": "row-leaf"
@@ -67,9 +51,7 @@
     "key": [],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": 42851,
         "rollup": true,
         "source": "row-inner"

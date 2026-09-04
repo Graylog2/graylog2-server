@@ -17,51 +17,76 @@
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import type { RuleType, MetricsConfigType, RulesContext } from 'stores/rules/RulesStore';
+import type { RuleType, RulesContext } from 'components/rules/hooks/useRules';
+import { useProcessingLoadContext, type ProcessingLoadResponse } from 'components/pipelines/processing-load';
 
 import RuleListEntry from './RuleListEntry';
 
+const headerCellFormatter = (header: React.ReactNode) => <th>{header}</th>;
+
 type Props = {
-  rules: Array<RuleType>,
-  metricsConfig?: MetricsConfigType,
-  rulesContext?: RulesContext,
-  onDelete: (RuleType) => () => void,
-  searchFilter: React.ReactNode,
+  rules: Array<RuleType>;
+  rulesContext?: RulesContext;
+  onDelete: (ruleType: RuleType) => () => void;
+  searchFilter: React.ReactNode;
+  showLoadColumn?: boolean;
+  processingLoad?: ProcessingLoadResponse;
+  processingLoadError?: boolean;
 };
 
-type State = {
-  openMetricsConfig: boolean,
+const RuleList = ({
+  rules,
+  searchFilter,
+  onDelete,
+  rulesContext = undefined,
+  showLoadColumn: showLoadColumnProp = undefined,
+  processingLoad: processingLoadProp = undefined,
+  processingLoadError: processingLoadErrorProp = undefined,
+}: Props) => {
+  const {
+    metricsEnabled,
+    processingLoad: processingLoadContext,
+    processingLoadError: processingLoadErrorContext,
+  } = useProcessingLoadContext();
+  const showLoadColumn = showLoadColumnProp ?? metricsEnabled;
+  const processingLoad = processingLoadProp ?? processingLoadContext;
+  const processingLoadError = processingLoadErrorProp ?? processingLoadErrorContext;
+  const headers = [
+    'Title',
+    'Description',
+    'Created',
+    'Last modified',
+    'Throughput',
+    'Errors',
+    ...(showLoadColumn ? ['Pipeline Load (15m)'] : []),
+    'Pipelines',
+    'Actions',
+  ];
+
+  const ruleInfoFormatter = (rule: RuleType) => (
+    <RuleListEntry
+      key={rule.id}
+      rule={rule}
+      usingPipelines={rulesContext?.used_in_pipelines[rule.id]}
+      onDelete={onDelete}
+      showLoadColumn={showLoadColumn}
+      processingLoad={processingLoad}
+      processingLoadError={processingLoadError}
+    />
+  );
+
+  return (
+    <DataTable
+      id="rule-list"
+      headers={headers}
+      headerCellFormatter={headerCellFormatter}
+      sortByKey="title"
+      rows={rules}
+      customFilter={searchFilter}
+      dataRowFormatter={ruleInfoFormatter}
+      filterKeys={[]}
+    />
+  );
 };
-
-class RuleList extends React.Component<Props, State> {
-  static defaultProps = {
-    rulesContext: undefined,
-  };
-
-  _headerCellFormatter = (header) => <th>{header}</th>;
-
-  _ruleInfoFormatter = (rule) => {
-    const { onDelete, rulesContext: { used_in_pipelines: usingPipelines } = {} } = this.props;
-
-    return <RuleListEntry key={rule.id} rule={rule} usingPipelines={usingPipelines[rule.id]} onDelete={onDelete} />;
-  };
-
-  render() {
-    const { rules, searchFilter } = this.props;
-    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
-
-    return (
-      <DataTable id="rule-list"
-                 className="table-hover"
-                 headers={headers}
-                 headerCellFormatter={this._headerCellFormatter}
-                 sortByKey="title"
-                 rows={rules}
-                 customFilter={searchFilter}
-                 dataRowFormatter={this._ruleInfoFormatter}
-                 filterKeys={[]} />
-    );
-  }
-}
 
 export default RuleList;

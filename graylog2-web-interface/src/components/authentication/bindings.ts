@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import ConfigParser from 'logic/authentication/directoryServices/BackendConfigParser';
+import Routes from 'routing/Routes';
 
 import BackendCreateLDAP from './directoryServices/ldap/BackendCreate';
 import BackendEditLDAP from './directoryServices/ldap/BackendEdit';
@@ -25,7 +26,9 @@ import BackendConfigDetailsLDAP from './directoryServices/ldap/BackendConfigDeta
 import BackendCreateAD from './directoryServices/activeDirectory/BackendCreate';
 import BackendEditAD from './directoryServices/activeDirectory/BackendEdit';
 
-PluginStore.register(new PluginManifest({}, {
+export const PAGE_NAV_TITLE = 'Authentication';
+
+const bindings: PluginExports = {
   'authentication.services': [
     {
       name: 'ldap',
@@ -46,4 +49,15 @@ PluginStore.register(new PluginManifest({}, {
       configFromJson: ConfigParser.fromJson,
     },
   ],
-}));
+  pageNavigation: [
+    {
+      description: PAGE_NAV_TITLE,
+      children: [
+        { description: 'Authentication Services', path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW },
+        { description: 'Authenticators', path: Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW },
+      ],
+    },
+  ],
+};
+
+export default bindings;

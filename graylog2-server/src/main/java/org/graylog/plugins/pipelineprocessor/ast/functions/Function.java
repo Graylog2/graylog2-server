@@ -24,11 +24,11 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 
 import java.util.Map;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public interface Function<T> {
 
-    RateLimitedLog log = getRateLimitedLog(Function.class);
+    RateLimitedLog log = createDefaultRateLimitedLog(Function.class);
 
     Function ERROR_FUNCTION = new AbstractFunction<Void>() {
         @Override

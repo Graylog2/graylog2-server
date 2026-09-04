@@ -23,35 +23,42 @@ import ClipboardContainer from 'components/common/ClipboardContainer';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
- * The text to be copied can be given in the `text` prop, or in an external element through a CSS selector in the `target` prop.
+ * The text to be copied can be given in the `text` prop.
  */
 
 type Props = {
-  bsSize?: BsSize,
-  bsStyle?: StyleProps,
-  buttonTitle?: string,
-  className?: string,
-  disabled?: boolean,
-  onSuccess?: () => void,
-  text: string,
-  title: React.ReactNode,
-}
+  bsSize?: BsSize;
+  bsStyle?: StyleProps;
+  buttonTitle?: string;
+  className?: string;
+  disabled?: boolean;
+  onSuccess?: () => void;
+  text: string;
+  title: React.ReactNode;
+};
 
 const ClipboardButton = ({
-  bsSize = undefined, bsStyle = undefined, buttonTitle = undefined, className = undefined,
-  disabled = undefined, onSuccess = undefined, text, title,
+  bsSize = undefined,
+  bsStyle = undefined,
+  buttonTitle = undefined,
+  className = undefined,
+  disabled = undefined,
+  onSuccess = undefined,
+  text,
+  title,
 }: Props) => (
   <ClipboardContainer text={text}>
     {({ copy }) => (
-      <Button bsSize={bsSize}
-              bsStyle={bsStyle}
-              className={className}
-              disabled={disabled}
-              title={buttonTitle}
-              onClick={() => {
-                copy();
-                onSuccess?.();
-              }}>
+      <Button
+        bsSize={bsSize}
+        bsStyle={bsStyle}
+        className={className}
+        disabled={disabled}
+        title={buttonTitle}
+        onClick={() => {
+          copy();
+          onSuccess?.();
+        }}>
         {title}
       </Button>
     )}

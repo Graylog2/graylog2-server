@@ -9,7 +9,7 @@ class TimezoneSelectExample extends React.Component {
 
   onChange(nextTZ) {
     this.setState({ tz: nextTZ });
-  };
+  }
 
   render() {
     const { tz } = this.state;
@@ -22,5 +22,5 @@ class TimezoneSelectExample extends React.Component {
   }
 }
 
-<TimezoneSelectExample />
+<TimezoneSelectExample />;
 ```

@@ -20,13 +20,15 @@ import React from 'react';
 import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import EntityItem from 'components/welcome/EntityListItem';
-import { NoSearchResult, Spinner } from 'components/common';
-import { Link } from 'components/common/router';
+import { NoSearchResult, Spinner, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import useLastOpened from 'components/welcome/hooks/useLastOpened';
 
 const LastOpenList = () => {
-  const { data: { lastOpened }, isFetching } = useLastOpened(DEFAULT_PAGINATION);
+  const {
+    data: { lastOpened },
+    isFetching,
+  } = useLastOpened(DEFAULT_PAGINATION);
 
   if (isFetching) return <Spinner />;
 
@@ -35,15 +37,17 @@ const LastOpenList = () => {
       <NoSearchResult>
         You have not opened any searches/dashboards yet.
         <br />
-        From now on, whenever you open a saved search/dashboard, it will show up here.
-        In the meantime, you can start a new <Link to={Routes.SEARCH}>Search</Link> or <Link to={Routes.pluginRoute('DASHBOARDS_NEW')}>Dashboard</Link>.
+        From now on, whenever you open a saved search/dashboard, it will show up here. In the meantime, you can start a
+        new <Link to={Routes.SEARCH}>Search</Link> or <Link to={Routes.DASHBOARD.NEW}>Dashboard</Link>.
       </NoSearchResult>
     );
   }
 
   return (
     <ListGroup>
-      {lastOpened.map(({ grn, title, timestamp }) => <EntityItem key={grn} grn={grn} title={title} timestamp={timestamp} />)}
+      {lastOpened.map(({ grn, title, timestamp }) => (
+        <EntityItem key={grn} grn={grn} title={title} timestamp={timestamp} />
+      ))}
     </ListGroup>
   );
 };

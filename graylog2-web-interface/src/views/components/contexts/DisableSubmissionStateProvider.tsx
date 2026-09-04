@@ -20,27 +20,28 @@ import { useCallback, useState, useMemo } from 'react';
 import DisableSubmissionStateContext from './DisableSubmissionStateContext';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
 };
 
 const DisableSubmissionStateProvider = ({ children }: Props) => {
   const [isDisabledMap, setIsDisabledMap] = useState({});
 
-  const setDisabled = useCallback((sectionKey, disabled) => {
-    if (Boolean(isDisabledMap[sectionKey]) !== disabled) {
-      setIsDisabledMap({
-        ...isDisabledMap,
-        [sectionKey]: disabled,
-      });
-    }
-  }, [isDisabledMap]);
+  const setDisabled = useCallback(
+    (sectionKey, disabled) => {
+      if (Boolean(isDisabledMap[sectionKey]) !== disabled) {
+        setIsDisabledMap({
+          ...isDisabledMap,
+          [sectionKey]: disabled,
+        });
+      }
+    },
+    [isDisabledMap],
+  );
   const disabled = Object.values(isDisabledMap).includes(true);
   const contextValue = useMemo(() => ({ disabled, setDisabled }), [disabled, setDisabled]);
 
   return (
-    <DisableSubmissionStateContext.Provider value={contextValue}>
-      {children}
-    </DisableSubmissionStateContext.Provider>
+    <DisableSubmissionStateContext.Provider value={contextValue}>{children}</DisableSubmissionStateContext.Provider>
   );
 };
 

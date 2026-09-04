@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
-import mockAction from 'helpers/mocking/MockAction';
+import { loadRolesPaginated } from 'hooks/useAuthzRoles';
 import { rolesList as mockRoles } from 'fixtures/roles';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import RolesOverview from './RolesOverview';
 
@@ -43,28 +43,22 @@ const loadRolesPaginatedResponse = {
 
 const mockLoadRolesPaginatedPromise = Promise.resolve(loadRolesPaginatedResponse);
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesStore: {
-    listen: jest.fn(),
-  },
-  AuthzRolesActions: {
-    delete: mockAction(),
-    loadRolesPaginated: jest.fn(() => mockLoadRolesPaginatedPromise),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  deleteRole: jest.fn(() => Promise.resolve()),
+  loadRolesPaginated: jest.fn(() => mockLoadRolesPaginatedPromise),
 }));
 
 describe('RolesOverview', () => {
+  const renderSUT = () => render(<RolesOverview />);
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should display table header', async () => {
-    render(<RolesOverview />);
-    const headers = [
-      'Name',
-      'Description',
-      'Actions',
-    ];
+    renderSUT();
+    const headers = ['Name', 'Description', 'Actions'];
 
     // wait until list is displayed
     await screen.findByText('Roles');
@@ -75,32 +69,44 @@ describe('RolesOverview', () => {
   });
 
   it('should fetch and list roles with name and description', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     await screen.findByText(mockRoles.first().name);
     await screen.findByText(mockRoles.first().description);
   });
 
   it('should allow searching for roles', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
-    fireEvent.change(searchInput, { target: { value: 'name:manager' } });
+    await userEvent.type(searchInput, 'name:manager');
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'name:manager' }));
+    await waitFor(() =>
+      expect(loadRolesPaginated).toHaveBeenCalledWith({
+        page: 1,
+        perPage: 10,
+        query: 'name:manager',
+      }),
+    );
   });
 
   it('should reset search', async () => {
-    render(<RolesOverview />);
+    renderSUT();
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
-    fireEvent.change(searchInput, { target: { value: 'name:manager' } });
+    await userEvent.type(searchInput, 'name:manager');
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'name:manager' }));
+    await waitFor(() =>
+      expect(loadRolesPaginated).toHaveBeenCalledWith({
+        page: 1,
+        perPage: 10,
+        query: 'name:manager',
+      }),
+    );
 
     const resetSearchButton = await screen.findByRole('button', { name: 'Reset search' });
-    fireEvent.click(resetSearchButton);
+    await userEvent.click(resetSearchButton);
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }));
+    await waitFor(() => expect(loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }));
   });
 });

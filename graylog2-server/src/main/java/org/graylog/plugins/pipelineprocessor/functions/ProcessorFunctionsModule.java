@@ -27,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.HexToDecimalConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
@@ -35,10 +36,12 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsLong;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.ListConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.DateDiff;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.IsDate;
@@ -111,7 +114,9 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RenameFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
@@ -159,7 +164,9 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LongConversion.NAME, LongConversion.class);
         addMessageProcessorFunction(StringConversion.NAME, StringConversion.class);
         addMessageProcessorFunction(MapConversion.NAME, MapConversion.class);
+        addMessageProcessorFunction(ListConversion.NAME, ListConversion.class);
         addMessageProcessorFunction(CsvMapConversion.NAME, CsvMapConversion.class);
+        addMessageProcessorFunction(HexToDecimalConversion.NAME, HexToDecimalConversion.class);
 
         // Comparison functions
         addMessageProcessorFunction(IsBoolean.NAME, IsBoolean.class);
@@ -182,9 +189,11 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(SetField.NAME, SetField.class);
         addMessageProcessorFunction(SetFields.NAME, SetFields.class);
         addMessageProcessorFunction(RenameField.NAME, RenameField.class);
+        addMessageProcessorFunction(RenameFields.NAME, RenameFields.class);
         addMessageProcessorFunction(RemoveField.NAME, RemoveField.class);
         addMessageProcessorFunction(RemoveSingleField.NAME, RemoveSingleField.class);
         addMessageProcessorFunction(RemoveMultipleFields.NAME, RemoveMultipleFields.class);
+        addMessageProcessorFunction(RemoveStringFieldsByValue.NAME, RemoveStringFieldsByValue.class);
         addMessageProcessorFunction(NormalizeFields.NAME, NormalizeFields.class);
 
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
@@ -238,6 +247,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(ParseUnixMilliseconds.NAME, ParseUnixMilliseconds.class);
         addMessageProcessorFunction(FlexParseDate.NAME, FlexParseDate.class);
         addMessageProcessorFunction(FormatDate.NAME, FormatDate.class);
+        addMessageProcessorFunction(DateDiff.NAME, DateDiff.class);
         addMessageProcessorFunction(Years.NAME, Years.class);
         addMessageProcessorFunction(Months.NAME, Months.class);
         addMessageProcessorFunction(Weeks.NAME, Weeks.class);

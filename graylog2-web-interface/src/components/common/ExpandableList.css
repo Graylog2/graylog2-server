@@ -1,8 +1,8 @@
 :local(.list) {
-    padding-left: 0;
-    margin-bottom: 20px;
+  padding-left: 0;
+  margin-bottom: 20px;
 }
 
 :local(.list) :local(.list) {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }

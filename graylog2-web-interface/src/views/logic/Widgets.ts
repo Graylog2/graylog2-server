@@ -18,6 +18,11 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TIMESTAMP_FIELD, DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import generateId from 'logic/generateId';
+import BarVisualizationConfig, {
+  DEFAULT_BARMODE,
+} from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 import pivotForField from './searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from './aggregationbuilder/AggregationWidget';
@@ -30,8 +35,8 @@ import FieldType from './fieldtypes/FieldType';
 
 const widgetsKey = 'enterpriseWidgets' as const;
 
-const _findWidgetDefinition = (type: string) => PluginStore.exports(widgetsKey)
-  .find((widget) => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
+const _findWidgetDefinition = (type: string) =>
+  PluginStore.exports(widgetsKey).find((widget) => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
 
 export function widgetDefinition(type: string) {
   const typeDefinition = _findWidgetDefinition(type);
@@ -49,30 +54,36 @@ export function widgetDefinition(type: string) {
   throw new Error(`Neither a widget of type "${type}" nor a default widget are registered!`);
 }
 
-export const resultHistogram = (id: string = generateId()) => AggregationWidget.builder()
-  .id(id)
-  .config(
-    AggregationWidgetConfig.builder()
-      .columnPivots([])
-      .rowPivots([
-        pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], [])),
-      ])
-      .series([
-        Series.forFunction('count()'),
-      ])
-      .sort([])
-      .visualization('bar')
-      .rollup(true)
-      .build(),
-  )
-  .build();
+export const resultHistogram = (id: string = generateId()) =>
+  AggregationWidget.builder()
+    .id(id)
+    .config(
+      AggregationWidgetConfig.builder()
+        .columnPivots([])
+        .rowPivots([pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], []))])
+        .series([Series.forFunction('count()')])
+        .sort([])
+        .visualization('bar')
+        .visualizationConfig(
+          BarVisualizationConfig.create(DEFAULT_BARMODE, DEFAULT_AXIS_TYPE, {
+            [DEFAULT_AXIS_KEY]: { title: 'Count' },
+            xaxis: { title: 'Time Range' },
+          }),
+        )
+        .rollup(true)
+        .build(),
+    )
+    .build();
 
-export const allMessagesTable = (id: string = generateId(), decorators: Array<Decorator> = []) => MessageWidget.builder()
-  .id(id)
-  .config(MessageWidgetConfig.builder()
-    .fields(DEFAULT_MESSAGE_FIELDS)
-    .showMessageRow(true)
-    .showSummary(true)
-    .decorators(decorators)
-    .build())
-  .build();
+export const allMessagesTable = (id: string = generateId(), decorators: Array<Decorator> = []) =>
+  MessageWidget.builder()
+    .id(id)
+    .config(
+      MessageWidgetConfig.builder()
+        .fields(DEFAULT_MESSAGE_FIELDS)
+        .showMessageRow(true)
+        .showSummary(true)
+        .decorators(decorators)
+        .build(),
+    )
+    .build();

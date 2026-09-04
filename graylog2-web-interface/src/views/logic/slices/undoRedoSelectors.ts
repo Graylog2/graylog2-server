@@ -22,5 +22,5 @@ export const selectRootUndoRedo = (state: RootState) => state.undoRedo;
 
 export const selectUndoRedoAvailability = createSelector(selectRootUndoRedo, ({ currentRevision, revisions }) => ({
   isUndoAvailable: currentRevision > 0,
-  isRedoAvailable: currentRevision < (revisions.length - 1),
+  isRedoAvailable: currentRevision < revisions.length - 1,
 }));

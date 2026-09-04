@@ -25,30 +25,32 @@ import type { CustomThemesColors } from 'theme/theme-types';
 import usePreferredColorScheme from 'theme/hooks/usePreferredColorScheme';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const useMantineTheme = (
-  colorScheme: ColorScheme,
-  useCustomThemeColors: () => ({ data: CustomThemesColors }),
-) => {
+const useMantineTheme = (colorScheme: ColorScheme, useCustomThemeColors: () => { data: CustomThemesColors }) => {
   const { data: customThemeColors } = useCustomThemeColors?.() ?? {};
 
-  return useMemo(() => SawmillMantine({
-    colorScheme,
-    customColors: customThemeColors?.[colorScheme],
-  }), [colorScheme, customThemeColors]);
+  return useMemo(
+    () =>
+      SawmillMantine({
+        colorScheme,
+        customColors: customThemeColors?.[colorScheme],
+      }),
+    [colorScheme, customThemeColors],
+  );
 };
 
 const useStyledComponentsTheme = (
   changeColorScheme: (newColorScheme: ColorScheme) => void,
   mantineTheme: MantineTheme,
-) => useMemo(() => {
-  const theme = SawmillSC(mantineTheme);
+) =>
+  useMemo(() => {
+    const theme = SawmillSC(mantineTheme);
 
-  return ({
-    ...theme,
-    changeMode: changeColorScheme,
-    mantine: mantineTheme,
-  });
-}, [changeColorScheme, mantineTheme]);
+    return {
+      ...theme,
+      changeMode: changeColorScheme,
+      mantine: mantineTheme,
+    };
+  }, [changeColorScheme, mantineTheme]);
 
 const useThemes = (initialThemeModeOverride: ColorScheme, userIsLoggedIn: boolean) => {
   const [colorScheme, changeColorScheme] = usePreferredColorScheme(initialThemeModeOverride, userIsLoggedIn);

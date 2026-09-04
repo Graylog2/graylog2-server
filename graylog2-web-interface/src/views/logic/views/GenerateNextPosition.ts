@@ -27,21 +27,24 @@ export const ConcatPositions = (
 ) => {
   let rowIncrement = 0;
 
-  const newUpdatedPositions = newPositions.map((initialPosition) => {
-    const defaultHeight = initialPosition.height;
-    const row = rowIncrement + initialPosition.row;
-    const widgetPosition = initialPosition.toBuilder().row(row).build();
-    rowIncrement += defaultHeight;
+  const newUpdatedPositions = newPositions
+    .map((initialPosition) => {
+      const defaultHeight = initialPosition.height;
+      const row = rowIncrement + initialPosition.row;
+      const widgetPosition = initialPosition.toBuilder().row(row).build();
+      rowIncrement += defaultHeight;
 
-    return widgetPosition;
-  }).toMap();
+      return widgetPosition;
+    })
+    .toMap();
 
-  const curUpdatedPositions = curPositions.map((initialPosition) => {
-    const row = rowIncrement + initialPosition.row;
-    const widgetPosition = initialPosition.toBuilder().row(row).build();
+  const curUpdatedPositions = curPositions
+    .map((initialPosition) => {
+      const row = rowIncrement + initialPosition.row;
 
-    return widgetPosition;
-  }).toMap();
+      return initialPosition.toBuilder().row(row).build();
+    })
+    .toMap();
 
   return newUpdatedPositions.merge(curUpdatedPositions);
 };
@@ -49,20 +52,17 @@ export const ConcatPositions = (
 export default (
   widgetPositions: Immutable.Map<string, WidgetPosition>,
   widgets: Array<Widget>,
+  height: number = undefined,
+  width: number = undefined,
 ): Immutable.Map<string, WidgetPosition> => {
-  const widgetsWithPosition = widgets
-    .filter((widget) => widgetPositions.has(widget.id));
+  const widgetsWithoutPosition = widgets.filter((widget) => !widgetPositions.has(widget.id));
 
-  const widgetsWithoutPosition = widgets
-    .filter((widget) => !widgetPositions.has(widget.id));
+  const newPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map(
+    widgetsWithoutPosition.map((widget) => [
+      widget.id,
+      GetPositionForNewWidget(widget, widgetPositions, height, width),
+    ]),
+  );
 
-  const newPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map(widgetsWithoutPosition.map((widget) => [widget.id, GetPositionForNewWidget(widget)]));
-
-  const updatedPositions: Immutable.Map<string, WidgetPosition> = Immutable.Map(widgetsWithPosition.map((widget) => {
-    const widgetPosition = widgetPositions.get(widget.id);
-
-    return [widget.id, widgetPosition];
-  }));
-
-  return ConcatPositions(newPositions, updatedPositions);
+  return widgetPositions.merge(newPositions);
 };

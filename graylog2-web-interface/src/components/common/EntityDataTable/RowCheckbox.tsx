@@ -21,12 +21,14 @@ import { Checkbox } from 'components/bootstrap';
 const RowCheckbox = styled(Checkbox)`
   &.checkbox {
     margin: 0;
-  
+    padding-top: 2px;
+
     label {
       display: flex;
       align-items: center;
       padding: 0;
-      
+      min-height: 14px;
+
       input {
         width: 14px;
         height: 14px;

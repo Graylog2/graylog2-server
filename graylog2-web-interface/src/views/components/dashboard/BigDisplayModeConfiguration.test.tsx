@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
+import { asElement, render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { Optional } from 'utility-types';
 
-import Routes from 'routing/Routes';
 import type { ViewStateMap } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -32,16 +32,10 @@ import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
 jest.mock('routing/useHistory');
 
 const search = Search.create();
-const view = View.create()
-  .toBuilder()
-  .id('deadbeef')
-  .type(View.Type.Dashboard)
-  .search(search)
-  .build();
+const view = View.create().toBuilder().id('deadbeef').type(View.Type.Dashboard).search(search).build();
 
 const createViewWithQueries = () => {
   const queries = [
@@ -51,17 +45,14 @@ const createViewWithQueries = () => {
   ];
   const states: ViewStateMap = Immutable.Map({
     'query-id-1': ViewState.create(),
-    'query-id-2': ViewState.builder().titles(Immutable.fromJS({ tab: { title: 'My awesome Query tab' } })).build(),
+    'query-id-2': ViewState.builder()
+      .titles(Immutable.fromJS({ tab: { title: 'My awesome Query tab' } }))
+      .build(),
     'other-query-id': ViewState.create(),
   });
-  const searchWithQueries = search.toBuilder()
-    .queries(queries)
-    .build();
+  const searchWithQueries = search.toBuilder().queries(queries).build();
 
-  return view.toBuilder()
-    .state(states)
-    .search(searchWithQueries)
-    .build();
+  return view.toBuilder().state(states).search(searchWithQueries).build();
 };
 
 describe('BigDisplayModeConfiguration', () => {
@@ -73,7 +64,7 @@ describe('BigDisplayModeConfiguration', () => {
     const { queryByText, findByText } = render(<SUT disabled />);
     const menuItem = await findByText('Full Screen');
 
-    fireEvent.click(menuItem);
+    await userEvent.click(menuItem);
 
     expect(queryByText('Configuring Full Screen')).toBeNull();
   });
@@ -82,7 +73,7 @@ describe('BigDisplayModeConfiguration', () => {
     const { findByText, getByText } = render(<SUT />);
     const menuItem = getByText('Full Screen');
 
-    fireEvent.click(menuItem);
+    await userEvent.click(menuItem);
 
     await findByText('Configuring Full Screen');
   });
@@ -102,22 +93,24 @@ describe('BigDisplayModeConfiguration', () => {
     expect(getByText('Page#3')).not.toBeNull();
   });
 
-  it('should not allow strings for the refresh interval', () => {
+  it('should not allow strings for the refresh interval', async () => {
     const { getByLabelText } = render(<SUT show />);
 
     const refreshInterval = asElement(getByLabelText('Refresh Interval'), HTMLInputElement);
 
-    fireEvent.change(refreshInterval, { target: { value: 'a string' } });
+    await userEvent.clear(refreshInterval);
+    await userEvent.type(refreshInterval, 'a string');
 
     expect(refreshInterval.value).toBe('');
   });
 
-  it('should not allow strings for the cycle interval', () => {
+  it('should not allow strings for the cycle interval', async () => {
     const { getByLabelText } = render(<SUT show />);
 
     const cycleInterval = asElement(getByLabelText('Tab cycle interval'), HTMLInputElement);
 
-    fireEvent.change(cycleInterval, { target: { value: 'a string' } });
+    await userEvent.clear(cycleInterval);
+    await userEvent.type(cycleInterval, 'a string');
 
     expect(cycleInterval.value).toBe('');
   });
@@ -128,64 +121,53 @@ describe('BigDisplayModeConfiguration', () => {
     beforeEach(() => {
       history = mockHistory();
       asMock(useHistory).mockReturnValue(history);
-      Routes.pluginRoute = jest.fn(() => (viewId) => `/dashboards/tv/${viewId}`);
     });
 
-    it('on form submit', () => {
-      const { getByTestId } = render(<SUT show />);
-      const form = getByTestId('modal-form');
+    it('on form submit', async () => {
+      render(<SUT show />);
+      const submit = await screen.findByRole('button', { name: /start full screen view/i });
 
-      expect(form).not.toBeNull();
+      await userEvent.click(submit);
 
-      fireEvent.submit(form);
-
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10');
     });
 
-    it('including changed refresh interval', () => {
-      const { getByLabelText, getByTestId } = render(<SUT show />);
+    it('including changed refresh interval', async () => {
+      render(<SUT show />);
 
-      const refreshInterval = getByLabelText('Refresh Interval');
+      const refreshInterval = screen.getByLabelText('Refresh Interval');
 
-      fireEvent.change(refreshInterval, { target: { value: 42 } });
+      await userEvent.clear(refreshInterval);
+      await userEvent.type(refreshInterval, '42');
 
-      const form = getByTestId('modal-form');
+      await userEvent.click(await screen.findByRole('button', { name: /start full screen view/i }));
 
-      fireEvent.submit(form);
-
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=42');
     });
 
-    it('including tab cycle interval setting', () => {
-      const { getByLabelText, getByTestId } = render(<SUT show />);
+    it('including tab cycle interval setting', async () => {
+      render(<SUT show />);
 
-      const cycleInterval = getByLabelText('Tab cycle interval');
+      const cycleInterval = screen.getByLabelText('Tab cycle interval');
 
-      fireEvent.change(cycleInterval, { target: { value: 4242 } });
+      await userEvent.clear(cycleInterval);
+      await userEvent.type(cycleInterval, '4242');
 
-      const form = getByTestId('modal-form');
+      await userEvent.click(await screen.findByRole('button', { name: /start full screen view/i }));
 
-      fireEvent.submit(form);
-
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&refresh=10');
     });
 
-    it('including selected tabs', () => {
+    it('including selected tabs', async () => {
       const viewWithQueries = createViewWithQueries();
-      const { getByLabelText, getByTestId } = render(<SUT view={viewWithQueries} show />);
+      render(<SUT view={viewWithQueries} show />);
 
-      const query1 = getByLabelText('Page#1');
+      const query1 = screen.getByLabelText('Page#1');
 
-      fireEvent.click(query1);
+      await userEvent.click(query1);
 
-      const form = getByTestId('modal-form');
+      await userEvent.click(await screen.findByRole('button', { name: /start full screen view/i }));
 
-      fireEvent.submit(form);
-
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10&tabs=1%2C2');
     });
   });

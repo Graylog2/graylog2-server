@@ -18,25 +18,27 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class TimeLimitIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public TimeLimitIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     @AfterEach
     public void resetConfig() {
-        final ValidatableResponse response = given()
+        final ValidatableResponse ignored = given()
                 .spec(api.requestSpecification())
                 .when()
                 .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/cluster-search-config-reset.json"))
@@ -45,7 +47,7 @@ public class TimeLimitIT {
                 .statusCode(202);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testQueryTimeRangeLimit() {
         given()
                 .spec(api.requestSpecification())

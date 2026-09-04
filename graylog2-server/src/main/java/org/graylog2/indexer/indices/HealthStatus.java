@@ -28,12 +28,11 @@ public enum HealthStatus {
     public static HealthStatus fromString(String value) {
         checkNotNull(value);
         final String normalizedValue = value.toUpperCase(Locale.ENGLISH);
-        switch (normalizedValue) {
-            case "RED": return Red;
-            case "YELLOW": return Yellow;
-            case "GREEN": return Green;
-
-            default: throw new IllegalArgumentException("Unable to parse health status from string (known: GREEN/YELLOW/RED): " + normalizedValue);
-        }
+        return switch (normalizedValue) {
+            case "RED" -> Red;
+            case "YELLOW" -> Yellow;
+            case "GREEN" -> Green;
+            default -> throw new IllegalArgumentException("Unable to parse health status from string (known: GREEN/YELLOW/RED): " + normalizedValue);
+        };
     }
 }

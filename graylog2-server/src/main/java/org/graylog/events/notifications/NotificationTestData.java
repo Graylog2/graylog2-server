@@ -24,6 +24,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.event.EventOriginContext;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorConfig;
+import org.graylog.security.UserContext;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -61,7 +62,7 @@ public class NotificationTestData {
                         return "test-dummy-v1";
                     }
                     @Override
-                    public ValidationResult validate() {
+                    public ValidationResult validate(UserContext userContext) {
                         return null;
                     }
                     @Override

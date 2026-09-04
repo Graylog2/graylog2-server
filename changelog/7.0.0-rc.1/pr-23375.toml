@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix inconsistent use of units GB and GiB on traffic chart. Resolves timezone mismatch between total and daily traffic values. Fixes Zoom/Reset button behavior to ensure zoomed state is retained reliably."
+
+issues = ["graylog-plugin-enterprise#7440", "9862"]
+pulls = ["23375"]

@@ -19,7 +19,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
+import { fetchCollector } from 'hooks/useCollectors';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import DocsHelper from 'util/DocsHelper';
@@ -33,7 +33,7 @@ const SidecarEditCollectorPage = () => {
   const [collector, setCollector] = useState<Collector>();
 
   const _reloadCollector = useCallback(() => {
-    CollectorsActions.getCollector(collectorId).then(
+    fetchCollector(collectorId).then(
       (result) => setCollector(result),
       (error) => {
         if (error.status === 404) {
@@ -54,14 +54,13 @@ const SidecarEditCollectorPage = () => {
   return (
     <DocumentTitle title="Log Collector">
       <SidecarsPageNavigation />
-      <PageHeader title="Log Collector"
-                  documentationLink={{
-                    title: 'Sidecar documentation',
-                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                  }}>
-        <span>
-          Some words about log collectors.
-        </span>
+      <PageHeader
+        title="Log Collector"
+        documentationLink={{
+          title: 'Sidecar documentation',
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
+        <span>Some words about log collectors.</span>
       </PageHeader>
 
       <Row className="content">

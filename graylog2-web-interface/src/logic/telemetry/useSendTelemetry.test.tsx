@@ -21,28 +21,20 @@ import TelemetryContext from 'logic/telemetry/TelemetryContext';
 
 import useSendTelemetry from './useSendTelemetry';
 
-jest.mock('util/AppConfig');
+jest.mock('routing/useLocation', () => () => ({ pathname: '/foo' }));
 
 const contextValue = {
   sendTelemetry: jest.fn(),
+  sendErrorReport: jest.fn(),
 };
 const DummyTelemetryContext = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <TelemetryContext.Provider value={contextValue}>{children}</TelemetryContext.Provider>
 );
 
 describe('useSendTelemetry', () => {
-  const setLocation = (pathname: string) => Object.defineProperty(window, 'location', {
-    value: {
-      pathname,
-    },
-    writable: true,
-  });
-
-  const oldLocation = window.location;
-
-  afterEach(() => {
-    window.location = oldLocation;
-  });
+  const setLocation = (pathname: string) => {
+    window.history.pushState({}, '', pathname);
+  };
 
   it('should return `sendTelemetry` that retrieves current route', () => {
     setLocation('/welcome');
@@ -54,6 +46,36 @@ describe('useSendTelemetry', () => {
 
     sendTelemetry('$pageview', { app_section: 'welcome section' });
 
-    expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', { app_path_pattern: undefined, app_section: 'welcome section' });
+    expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', {
+      app_path_pattern: undefined,
+      app_pathname: 'foo',
+      app_section: 'welcome section',
+    });
+  });
+
+  it('should prefill `app_section` when passed to the hook', () => {
+    setLocation('/welcome');
+    const { result } = renderHook(() => useSendTelemetry('welcome section'), { wrapper: DummyTelemetryContext });
+
+    result.current('$pageview', {});
+
+    expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', {
+      app_path_pattern: undefined,
+      app_pathname: 'foo',
+      app_section: 'welcome section',
+    });
+  });
+
+  it('should let a per-call `app_section` override the one passed to the hook', () => {
+    setLocation('/welcome');
+    const { result } = renderHook(() => useSendTelemetry('welcome section'), { wrapper: DummyTelemetryContext });
+
+    result.current('$pageview', { app_section: 'override section' });
+
+    expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', {
+      app_path_pattern: undefined,
+      app_pathname: 'foo',
+      app_section: 'override section',
+    });
   });
 });

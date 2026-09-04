@@ -19,7 +19,7 @@ package org.graylog2.indexer.retention.executors;
 import com.google.common.base.Joiner;
 import jakarta.inject.Inject;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.shared.system.activities.Activity;

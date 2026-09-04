@@ -18,12 +18,12 @@ import Immutable from 'immutable';
 
 export default class EntityIndex {
   private _value: {
-    id: string,
-    title: string,
-    type: string,
+    id: string;
+    title: string;
+    type: string;
   };
 
-  constructor(id, title, type) {
+  constructor(id: string, title: string, type: string) {
     this._value = { id, title, type };
   }
 
@@ -42,10 +42,11 @@ export default class EntityIndex {
   toBuilder() {
     const { id, title, type } = this._value;
 
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ id, title, type }));
   }
 
-  static create(id, title, type) {
+  static create(id: string, title: string, type: string) {
     return new EntityIndex(id, title, type);
   }
 
@@ -64,7 +65,7 @@ export default class EntityIndex {
   }
 
   /* implement custom instanceof */
-  static [Symbol.hasInstance](obj) {
+  static [Symbol.hasInstance](obj: any) {
     if (obj.isEntityIndex) {
       return true;
     }
@@ -72,7 +73,7 @@ export default class EntityIndex {
     return false;
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: { id: string; title: string; type: any }) {
     const { id, title, type } = value;
 
     return EntityIndex.create(id, title, type);
@@ -86,15 +87,15 @@ class Builder {
     this.value = value;
   }
 
-  id(value) {
+  id(value: string) {
     return new Builder(this.value.set('id', value));
   }
 
-  title(value) {
+  title(value: string) {
     return new Builder(this.value.set('title', value));
   }
 
-  type(value) {
+  type(value: string) {
     return new Builder(this.value.set('type', value));
   }
 

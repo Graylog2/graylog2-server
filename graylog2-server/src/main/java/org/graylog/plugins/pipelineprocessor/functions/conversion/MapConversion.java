@@ -31,7 +31,7 @@ import java.util.Map;
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
-public class MapConversion extends AbstractFunction<Map> {
+public class MapConversion extends AbstractConversion<Map> {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static final String NAME = "to_map";
@@ -49,7 +49,7 @@ public class MapConversion extends AbstractFunction<Map> {
         final Object value = valueParam.required(args, context);
 
         if (value == null) {
-            return Collections.emptyMap();
+            return defaultToNull(args, context) ? null : Collections.emptyMap();
         } else if (value instanceof Map) {
             return (Map) value;
         } else if (value instanceof JsonNode) {
@@ -65,7 +65,7 @@ public class MapConversion extends AbstractFunction<Map> {
         return FunctionDescriptor.<Map>builder()
                 .name(NAME)
                 .returnType(Map.class)
-                .params(of(valueParam))
+                .params(of(valueParam, defaultToNullParam))
                 .description("Converts a map-like value into a map usable by set_fields()")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to map")

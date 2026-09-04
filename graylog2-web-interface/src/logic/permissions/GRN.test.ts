@@ -39,9 +39,9 @@ describe('GRN', () => {
 
   describe('getShowRouteFromGRN should return correct route for', () => {
     it.each`
-      type            | grn                                 | entityShowURL
-      ${'user'}       | ${'grn::::user:user-id'}            | ${Routes.SYSTEM.USERS.show('user-id')}
-      ${'stream'}     | ${'grn::::stream:stream-id'}        | ${Routes.stream_search('stream-id')}
+      type        | grn                          | entityShowURL
+      ${'user'}   | ${'grn::::user:user-id'}     | ${Routes.SYSTEM.USERS.show('user-id')}
+      ${'stream'} | ${'grn::::stream:stream-id'} | ${Routes.stream_search('stream-id')}
     `('type $type with grn $grn', ({ grn, entityShowURL }) => {
       const { result } = renderHook(() => useShowRouteFromGRN(grn));
 

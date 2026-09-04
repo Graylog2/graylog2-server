@@ -16,12 +16,11 @@
  */
 package org.graylog2.outputs;
 
+import jakarta.inject.Inject;
+import org.bson.types.ObjectId;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-
-import jakarta.inject.Inject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,8 +38,8 @@ public class OutputRouter {
 
     protected Set<MessageOutput> getMessageOutputsForStream(Stream stream) {
         Set<MessageOutput> result = new HashSet<>();
-        for (Output output : stream.getOutputs()) {
-            final MessageOutput messageOutput = outputRegistry.getOutputForIdAndStream(output.getId(), stream);
+        for (ObjectId output : stream.getOutputIds()) {
+            final MessageOutput messageOutput = outputRegistry.getOutputForIdAndStream(output.toHexString(), stream);
             if (messageOutput != null) {
                 result.add(messageOutput);
             }

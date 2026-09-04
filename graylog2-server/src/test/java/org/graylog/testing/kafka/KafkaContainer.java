@@ -34,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -45,11 +44,17 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * An Apache Kafka container that is optimized for fast startup. The container is using the
- * <a href="https://hub.docker.com/r/bitnami/kafka">bitnami/kafka</a> image.
+ * <a href="https://hub.docker.com/r/apache/kafka">apache/kafka</a> image.
  */
 public class KafkaContainer extends GenericContainer<KafkaContainer> {
     public enum Version {
-        V34("3.4.0");
+        V37("3.7.2"),
+        V38("3.8.1"),
+        V39("3.9.2"),
+        V40("4.0.2"),
+        V41("4.1.2"),
+        V42("4.2.1"),
+        V43("4.3.1");
 
         private final String version;
 
@@ -63,7 +68,7 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaContainer.class);
-    private static final Version DEFAULT_VERSION = Version.V34;
+    private static final Version DEFAULT_VERSION = Version.V37;
     private static final String KAFKA_ADVERTISED_LISTENERS_FILE = "/.env-kafka-advertised-listeners";
 
     private Admin adminClient = null;
@@ -90,37 +95,36 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
 
     @SuppressWarnings("resource")
     private KafkaContainer(Version version, Network network) {
-        super(DockerImageName.parse(f("bitnami/kafka:%s", version.getVersion())));
+        super(DockerImageName.parse(f("apache/kafka:%s", version.getVersion())));
         this.network = network;
 
         withExposedPorts(9092);
         withNetwork(requireNonNull(network, "network cannot be null"));
 
         withEnv("KAFKA_HEAP_OPTS", "-Xmx256m -Xms256m");
-        withEnv("ALLOW_PLAINTEXT_LISTENER", "yes");
         withEnv("KAFKA_KRAFT_CLUSTER_ID", generateKraftClusterId());
-        withEnv("KAFKA_CFG_NODE_ID", "1");
-        withEnv("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", "1@127.0.0.1:9093");
-        withEnv("KAFKA_CFG_PROCESS_ROLES", "broker,controller");
-        withEnv("KAFKA_CFG_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
-        withEnv("KAFKA_CFG_LISTENERS", "EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,INTERNAL://0.0.0.0:9094");
-        withEnv("KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP", "EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT");
-        withEnv("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", "INTERNAL");
+        withEnv("KAFKA_NODE_ID", "1");
+        withEnv("KAFKA_CONTROLLER_QUORUM_VOTERS", "1@127.0.0.1:9093");
+        withEnv("KAFKA_PROCESS_ROLES", "broker,controller");
+        withEnv("KAFKA_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
+        withEnv("KAFKA_LISTENERS", "EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,INTERNAL://0.0.0.0:9094");
+        withEnv("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT");
+        withEnv("KAFKA_INTER_BROKER_LISTENER_NAME", "INTERNAL");
 
         // The following settings speed up group rebalancing. Without it, it can take several seconds before a
         // consumer receives the first message.
-        withEnv("KAFKA_CFG_GROUP_INITIAL_REBALANCE_DELAY_MS", "0");
-        withEnv("KAFKA_CFG_OFFSETS_TOPIC_NUM_PARTITIONS", "1");
-        withEnv("KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR", "1");
-        withEnv("KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1");
-        withEnv("KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR", "1");
+        withEnv("KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS", "0");
+        withEnv("KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS", "1");
+        withEnv("KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR", "1");
+        withEnv("KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1");
+        withEnv("KAFKA_TRANSACTION_STATE_LOG_MIN_ISR", "1");
 
         // Override the default entrypoint, so we only start Kafka once our listeners files is written.
         withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint("sh"));
         withCommand("-c",
                 // The EXTERNAL listener must use the mapped host port for port 9092. We only know this once the
                 // container is started, so we have to set the advertised.listeners in the command script.
-                f("while [ ! -f %s ]; do sleep 0.1; done; export KAFKA_CFG_ADVERTISED_LISTENERS=\"$(cat %s)\"; /entrypoint.sh /run.sh",
+                f("while [ ! -f %s ]; do sleep 0.1; done; export KAFKA_ADVERTISED_LISTENERS=\"$(cat %s)\"; /etc/kafka/docker/run",
                         KAFKA_ADVERTISED_LISTENERS_FILE, KAFKA_ADVERTISED_LISTENERS_FILE)
         );
 
@@ -171,17 +175,36 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
 
     /**
      * Returns a new {@code KafkaProducer<String, byte[]>} instance that is connected to the Kafka container.
+     * The producer doesn't compress record batches.
      *
      * @return the new producer instance
      */
     public KafkaProducer<String, byte[]> createByteArrayProducer() {
+        return createByteArrayProducer("none");
+    }
+
+    /**
+     * Returns a new {@code KafkaProducer<String, byte[]>} instance that is connected to the Kafka container and
+     * compresses record batches using the given compression type.
+     * <p>
+     * To make the producer actually build a compressed record batch that contains more than a single record,
+     * {@code linger.ms} is raised so that records sent in quick succession are grouped into the same batch.
+     *
+     * @param compressionType the {@code compression.type} producer setting (e.g. {@code none}, {@code gzip},
+     *                        {@code snappy}, {@code lz4} or {@code zstd})
+     * @return the new producer instance
+     */
+    public KafkaProducer<String, byte[]> createByteArrayProducer(String compressionType) {
         final var props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:" + getKafkaPort());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "graylog-node-" + UUID.randomUUID());
         props.put(ProducerConfig.ACKS_CONFIG, "1");
-        props.put(ProducerConfig.LINGER_MS_CONFIG, 0);
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, requireNonNull(compressionType, "compressionType cannot be null"));
+        // Give records a chance to accumulate in a single (compressed) record batch instead of being sent
+        // immediately in a batch of their own.
+        props.put(ProducerConfig.LINGER_MS_CONFIG, "none".equals(compressionType) ? 0 : 100);
 
         return new KafkaProducer<>(props);
     }
@@ -221,8 +244,14 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void stop() {
+        // Close the admin client while the broker is still reachable. A leaked client outliving the container spins in
+        // the Kafka 4.x metadata rebootstrap loop forever, flooding the log until the JVM exits.
+        if (adminClient != null) {
+            adminClient.close(Duration.ofSeconds(10));
+            adminClient = null;
+        }
+        super.stop();
         network.close();
     }
 }

@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -28,27 +28,32 @@ const fetchStream = (streamId: string) => {
   return fetch('GET', qualifyUrl(url));
 };
 
-const useStream = (streamId: string, { enabled } = { enabled: true }): {
-  data: Stream
-  refetch: () => void,
-  isFetching: boolean,
-  isError,
+const useStream = (
+  streamId: string,
+  { enabled, refetchInterval }: { enabled?: boolean; refetchInterval?: false | number } | undefined = {
+    enabled: true,
+    refetchInterval: false,
+  },
+): {
+  data: Stream;
+  refetch: () => void;
+  isFetching: boolean;
+  isError;
 } => {
-  const { data, refetch, isFetching, isError } = useQuery(
-    ['stream', streamId],
-    () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load Stream'),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+  const { data, refetch, isFetching, isError } = useQuery({
+    queryKey: ['stream', streamId],
+    queryFn: () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load Stream'),
+    placeholderData: keepPreviousData,
+    enabled,
+    refetchInterval,
+  });
 
-  return ({
+  return {
     data,
     refetch,
     isFetching,
     isError,
-  });
+  };
 };
 
 export default useStream;

@@ -1,6 +1,7 @@
 rule "dateConversion"
 when true
 then
-    set_field ("utcHour", to_long(to_date($message.timestamp).hourOfDay));
-    set_field ("manilaHour", to_long(to_date($message.timestamp, "Asia/Manila").hourOfDay));
+    set_field ("utcHour", to_long(to_date($message.timestamp).hourOfDay)); // 10
+    set_field ("manilaHour", to_long(to_date($message.timestamp, "Asia/Manila").hourOfDay)); // 18
+    set_field ("null_value", to_date($message.not_there)); // Null
 end

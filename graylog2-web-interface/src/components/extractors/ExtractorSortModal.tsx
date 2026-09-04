@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Row, Col, Modal, BootstrapModalWrapper } from 'components/bootstrap';
 import SortableList from 'components/common/SortableList';
-import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { orderExtractors } from 'hooks/useExtractors';
 import { ModalSubmit } from 'components/common/index';
 
 type ExtractorSortModalProps = {
@@ -28,9 +28,12 @@ type ExtractorSortModalProps = {
   onSort: (...args: any[]) => void;
 };
 
-class ExtractorSortModal extends React.Component<ExtractorSortModalProps, {
-  [key: string]: any;
-}> {
+class ExtractorSortModal extends React.Component<
+  ExtractorSortModalProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -63,7 +66,7 @@ class ExtractorSortModal extends React.Component<ExtractorSortModalProps, {
       onClose();
     }
 
-    await ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
+    await orderExtractors(input.id, sortedExtractors);
 
     onSort();
     onClose();
@@ -74,11 +77,12 @@ class ExtractorSortModal extends React.Component<ExtractorSortModalProps, {
     const { input } = this.props;
 
     return (
-      <BootstrapModalWrapper showModal
-                             onHide={this._cancel}>
-        <Modal.Header closeButton>
+      <BootstrapModalWrapper showModal onHide={this._cancel}>
+        <Modal.Header>
           <Modal.Title>
-            <span>Sort extractors for <em>{input.title}</em></span>
+            <span>
+              Sort extractors for <em>{input.title}</em>
+            </span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

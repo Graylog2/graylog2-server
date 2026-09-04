@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import Button from 'preflight/components/common/Button';
+import Button from 'components/bootstrap/Button';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -31,6 +31,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import ViewsRefreshControls from './ViewsRefreshControls';
 
 jest.useFakeTimers();
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 jest.mock('hooks/useSearchConfiguration');
 jest.mock('views/hooks/useAutoRefresh');
@@ -47,7 +48,13 @@ const autoRefreshOptions = {
 describe('RefreshControls', () => {
   useViewsPlugin();
 
-  const SUT = ({ onSubmit = () => {}, children }: { onSubmit?: () => void, children?: React.ReactNode }) => (
+  const SUT = ({
+    onSubmit = () => {},
+    children = undefined,
+  }: {
+    onSubmit?: () => void;
+    children?: React.ReactNode;
+  }) => (
     <TestStoreProvider>
       <Formik initialValues={{}} onSubmit={onSubmit}>
         <Form>
@@ -64,9 +71,7 @@ describe('RefreshControls', () => {
     return (
       <>
         Current value is: {values['example-field']}
-        <Button onClick={() => setFieldValue('example-field', 'example-value')}>
-          Change form field value
-        </Button>
+        <Button onClick={() => setFieldValue('example-field', 'example-value')}>Change form field value</Button>
       </>
     );
   };
@@ -93,22 +98,23 @@ describe('RefreshControls', () => {
         default_auto_refresh_option: 'PT5S',
       } as unknown as SearchesConfig,
       refresh: jest.fn(),
+      isInitialLoading: false,
     });
   });
 
   describe('rendering', () => {
     it.each`
-    enabled      | interval
-    ${true}      | ${1000}
-    ${true}      | ${2000}
-    ${true}      | ${5000}
-    ${true}      | ${10000}
-    ${true}      | ${30000}
-    ${true}      | ${60000}
-    ${true}      | ${300000}
-    ${false}     | ${300000}
-    ${false}     | ${1000}
-  `('renders refresh controls with enabled: $enabled and interval: $interval', async ({ enabled, interval }) => {
+      enabled  | interval
+      ${true}  | ${1000}
+      ${true}  | ${2000}
+      ${true}  | ${5000}
+      ${true}  | ${10000}
+      ${true}  | ${30000}
+      ${true}  | ${60000}
+      ${true}  | ${300000}
+      ${false} | ${300000}
+      ${false} | ${1000}
+    `('renders refresh controls with enabled: $enabled and interval: $interval', async ({ enabled, interval }) => {
       asMock(useAutoRefresh).mockReturnValue({
         ...autoRefreshContextValue,
         refreshConfig: { enabled, interval },
@@ -131,7 +137,7 @@ describe('RefreshControls', () => {
 
     render(<SUT />);
 
-    userEvent.click(await screen.findByTitle(/start refresh/i));
+    await setupUser().click(await screen.findByTitle(/start refresh/i));
 
     await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledWith(1000));
   });
@@ -147,7 +153,7 @@ describe('RefreshControls', () => {
 
     render(<SUT />);
 
-    userEvent.click(await screen.findByTitle(/pause refresh/i));
+    await setupUser().click(await screen.findByTitle(/pause refresh/i));
 
     expect(stopAutoRefresh).toHaveBeenCalled();
   });
@@ -161,8 +167,8 @@ describe('RefreshControls', () => {
       </SUT>,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
-    userEvent.click(await screen.findByTitle(/start refresh/i));
+    await setupUser().click(await screen.findByRole('button', { name: /change form field value/i }));
+    await setupUser().click(await screen.findByTitle(/start refresh/i));
 
     await waitFor(() => expect(onSubmitMock).toHaveBeenCalled());
   });
@@ -176,13 +182,13 @@ describe('RefreshControls', () => {
       refreshConfig: { enabled: true, interval: 5000 },
     });
 
-    render((
+    render(
       <SUT>
         <TriggerFormChangeButton />
-      </SUT>
-    ));
+      </SUT>,
+    );
 
-    await userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
+    await setupUser().click(await screen.findByRole('button', { name: /change form field value/i }));
 
     await screen.findByText(/example-value/i);
 

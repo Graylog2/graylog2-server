@@ -28,21 +28,23 @@ const fromConfig = (config: AggregationWidgetConfig) => ({
   units: config.units.toFormValues(),
 });
 
-const toConfig = (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
-  .units(new UnitsConfig(mapValues(formValues.units, (unit) => new FieldUnit(unit.unitType, unit.abbrev))));
+const toConfig = (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) =>
+  configBuilder.units(
+    new UnitsConfig(mapValues(formValues.units, (unit) => new FieldUnit(unit.unitType, unit.abbrev))),
+  );
 
 const validate = () => ({});
 
 const UnitsElement: AggregationElement<'units'> = {
-  title: 'Units',
+  title: null,
   key: 'units',
   order: 5,
   allowCreate: () => false,
-  component: () => null,
+  component: null,
   fromConfig,
   toConfig,
   validate,
-  isEmpty: () => false,
+  isEmpty: () => true,
 };
 
 export default UnitsElement;

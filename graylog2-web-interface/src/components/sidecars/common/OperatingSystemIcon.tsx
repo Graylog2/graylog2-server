@@ -28,7 +28,7 @@ const Container = styled.div`
 `;
 
 type Props = {
-  operatingSystem?: string
+  operatingSystem?: string;
 };
 
 const defaultIcon = {
@@ -77,13 +77,7 @@ const matchIcon = (_os: string) => {
 const OperatingSystemIcon = ({ operatingSystem = undefined }: Props) => {
   const { iconName, iconType } = matchIcon(operatingSystem);
 
-  return (
-    <Container>
-      {iconType === 'brand'
-        ? <BrandIcon name={iconName} />
-        : <Icon name={iconName} />}
-    </Container>
-  );
+  return <Container>{iconType === 'brand' ? <BrandIcon name={iconName} /> : <Icon name={iconName} />}</Container>;
 };
 
 export default OperatingSystemIcon;

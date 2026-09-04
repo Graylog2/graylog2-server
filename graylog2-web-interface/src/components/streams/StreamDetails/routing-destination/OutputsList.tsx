@@ -16,10 +16,10 @@
  */
 
 import * as React from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { Table } from 'components/bootstrap';
-import { OutputsStore, type Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
+import useOutputMutations from 'hooks/useOutputMutations';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { ConfigurationFormData } from 'components/configurationforms';
@@ -28,15 +28,15 @@ import type { AvailableOutputRequestedConfiguration } from 'components/streams/u
 import OutputItem from './OutputItem';
 
 type Props = {
-  outputs: Array<Output>,
-  streamId: string,
-  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration,
-  isLoadingOutputTypes: boolean,
-}
+  outputs: Array<Output>;
+  streamId: string;
+  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration;
+  isLoadingOutputTypes: boolean;
+};
 
 const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputTypes }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const queryClient = useQueryClient();
+  const { updateOutput } = useOutputMutations();
 
   const handleUpdate = (output: Output, data: ConfigurationFormData<Output['configuration']>) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_UPDATED, {
@@ -44,15 +44,11 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
       app_action_value: 'create-output',
     });
 
-    OutputsStore.update(output, data, (result) => {
-      queryClient.invalidateQueries(['outputs', 'overview']);
-
-      return result;
-    });
+    updateOutput({ outputId: output.id, title: output.title, deltas: data });
   };
 
   return (
-    <Table condensed striped hover>
+    <Table condensed>
       <thead>
         <tr>
           <th colSpan={2}>Name</th>
@@ -60,22 +56,23 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
       </thead>
       <tbody>
         {outputs.map((output) => (
-          <OutputItem key={output.id}
-                      output={output}
-                      streamId={streamId}
-                      onUpdate={handleUpdate}
-                      isLoadingOutputTypes={isLoadingOutputTypes}
-                      getTypeDefinition={getTypeDefinition} />
+          <OutputItem
+            key={output.id}
+            output={output}
+            streamId={streamId}
+            onUpdate={handleUpdate}
+            isLoadingOutputTypes={isLoadingOutputTypes}
+            getTypeDefinition={getTypeDefinition}
+          />
         ))}
 
-        {(outputs.length <= 0) && (
-        <tr>
-          <td colSpan={2}>No output defined.</td>
-        </tr>
+        {outputs.length <= 0 && (
+          <tr>
+            <td colSpan={2}>No output defined.</td>
+          </tr>
         )}
       </tbody>
     </Table>
-
   );
 };
 

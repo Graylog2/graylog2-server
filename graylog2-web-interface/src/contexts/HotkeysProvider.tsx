@@ -25,11 +25,16 @@ import Immutable from 'immutable';
 
 import type { ScopeName, ActiveHotkeys, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
+import { isMacOS } from 'util/OSUtils';
+import AppConfig from 'util/AppConfig';
+import { FEATURE_FLAG } from 'components/quick-jump/Constants';
 
 const viewActions = {
   undo: { keys: 'mod+shift+z', description: 'Undo last action' },
   redo: { keys: 'mod+shift+y', description: 'Redo last action' },
 };
+
+const isQuickJumpEnabled = AppConfig.isFeatureEnabled(FEATURE_FLAG);
 
 export const hotKeysCollections: HotkeyCollections = {
   general: {
@@ -37,6 +42,9 @@ export const hotKeysCollections: HotkeyCollections = {
     description: 'General keyboard shortcuts',
     actions: {
       'show-hotkeys-modal': { keys: 'shift+?', displayKeys: '?', description: 'Show available keyboard shorts' },
+      ...(isQuickJumpEnabled
+        ? { 'show-quick-jump-modal': { keys: ['mod+k', 'mod+space'], description: 'Quick Jump' } }
+        : {}),
       'submit-form': { keys: 'enter', description: 'Submit form' },
       'close-modal': { keys: 'esc', description: 'Close modal' },
       'show-scratchpad-modal': { keys: 'mod+/', description: 'Show scratchpad' },
@@ -68,7 +76,10 @@ export const hotKeysCollections: HotkeyCollections = {
       'submit-search': { keys: 'return', description: 'Execute the search' },
       'insert-newline': { keys: 'shift+return', description: 'Create a new line' },
       'create-search-filter': { keys: 'alt+return', description: 'Create search filter based on current query' },
-      'show-suggestions': { keys: 'alt+space', description: 'Show suggestions, displays query history when input is empty' },
+      'show-suggestions': {
+        keys: isMacOS() ? 'alt+space' : 'mod+space',
+        description: 'Show suggestions, displays query history when input is empty',
+      },
       'show-history': { keys: 'alt+shift+h', description: 'View your search query history' },
     },
   },
@@ -87,44 +98,48 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   const { enabledScopes } = useOriginalHotkeysContext();
   const [showHotkeysModal, setShowHotkeysModal] = useState(false);
 
-  const addActiveHotkey = useCallback(({ scope, actionKey, options }: {
-    scope: ScopeName,
-    actionKey: string,
-    options: Options & { scope: ScopeName }
-  }) => {
-    setActiveHotkeys((cur) => cur.set(`${scope}.${actionKey}`, { options }));
-  }, []);
+  const addActiveHotkey = useCallback(
+    ({
+      scope,
+      actionKey,
+      options,
+    }: {
+      scope: ScopeName;
+      actionKey: string;
+      options: Options & { scope: ScopeName };
+    }) => {
+      setActiveHotkeys((cur) => cur.set(`${scope}.${actionKey}`, { options }));
+    },
+    [],
+  );
 
-  const removeActiveHotkey = useCallback(({ scope, actionKey }: { scope: ScopeName, actionKey: string }) => {
+  const removeActiveHotkey = useCallback(({ scope, actionKey }: { scope: ScopeName; actionKey: string }) => {
     setActiveHotkeys((cur) => cur.delete(`${scope}.${actionKey}`));
   }, []);
 
-  const value = useMemo(() => ({
-    enabledScopes: enabledScopes as Array<ScopeName>,
-    hotKeysCollections,
-    activeHotkeys,
-    addActiveHotkey,
-    removeActiveHotkey,
-    showHotkeysModal,
-    setShowHotkeysModal,
-  }), [activeHotkeys, addActiveHotkey, enabledScopes, removeActiveHotkey, showHotkeysModal]);
-
-  return (
-    <HotkeysContext.Provider value={value}>
-      {children}
-    </HotkeysContext.Provider>
+  const value = useMemo(
+    () => ({
+      enabledScopes: enabledScopes as Array<ScopeName>,
+      hotKeysCollections,
+      activeHotkeys,
+      addActiveHotkey,
+      removeActiveHotkey,
+      showHotkeysModal,
+      setShowHotkeysModal,
+    }),
+    [activeHotkeys, addActiveHotkey, enabledScopes, removeActiveHotkey, showHotkeysModal],
   );
+
+  return <HotkeysContext.Provider value={value}>{children}</HotkeysContext.Provider>;
 };
 
 type Props = {
-  children: React.ReactElement,
-}
+  children: React.ReactElement;
+};
 
 const HotkeysProvider = ({ children }: Props) => (
   <OriginalHotkeysProvider>
-    <CustomHotkeysProvider>
-      {children}
-    </CustomHotkeysProvider>
+    <CustomHotkeysProvider>{children}</CustomHotkeysProvider>
   </OriginalHotkeysProvider>
 );
 

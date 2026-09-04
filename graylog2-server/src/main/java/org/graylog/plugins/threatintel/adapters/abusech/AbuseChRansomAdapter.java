@@ -25,7 +25,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.assistedinject.Assisted;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.threatintel.tools.AdapterDisabledException;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
@@ -120,7 +119,6 @@ public class AbuseChRansomAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_AbuseChRansomAdapter_Config.Builder.class)
     @JsonTypeName(NAME)

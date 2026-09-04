@@ -21,6 +21,7 @@ import 'moment-precise-range-plugin';
 
 import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import type { EffectiveTimeRange } from 'components/events/EventsHistogram';
 
 export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
   const rangeAsSeconds = timerange?.[fieldName];
@@ -48,7 +49,10 @@ const relativeTimeRangeToString = (timerange: RelativeTimeRange): string => {
   return `${readableRange(timerange, 'from')} - ${readableRange(timerange, 'to', 'Now')}`;
 };
 
-const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange, localizer = (str) => str): string => {
+const absoluteTimeRangeToString = (
+  timerange: AbsoluteTimeRange,
+  localizer = (dateTime: string) => dateTime,
+): string => {
   const { from, to } = timerange;
 
   return `${localizer(from)} - ${localizer(to)}`;
@@ -56,13 +60,19 @@ const absoluteTimeRangeToString = (timerange: AbsoluteTimeRange, localizer = (st
 
 const keywordTimeRangeToString = (timerange: KeywordTimeRange): string => timerange.keyword;
 
-const TimeRangeToString = (timerange?: TimeRange, localizer?: (string) => string): string => {
+const TimeRangeToString = (
+  timerange?: TimeRange | EffectiveTimeRange,
+  localizer?: (dateTime: string) => string,
+): string => {
   const { type } = timerange || {};
 
   switch (type) {
-    case 'relative': return relativeTimeRangeToString(timerange as RelativeTimeRange);
-    case 'absolute': return absoluteTimeRangeToString(timerange as AbsoluteTimeRange, localizer);
-    case 'keyword': return keywordTimeRangeToString(timerange as KeywordTimeRange);
+    case 'relative':
+      return relativeTimeRangeToString(timerange as RelativeTimeRange);
+    case 'absolute':
+      return absoluteTimeRangeToString(timerange as AbsoluteTimeRange, localizer);
+    case 'keyword':
+      return keywordTimeRangeToString(timerange as KeywordTimeRange);
 
     default: {
       return '';

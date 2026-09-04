@@ -19,14 +19,21 @@ import styled from 'styled-components';
 
 import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import type { StartPage } from 'logic/users/User';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
+import useProductName from 'brand-customization/useProductName';
+import { hasAdminPermission } from 'util/PermissionsMixin';
+import useFeature from 'hooks/useFeature';
+import SectionHeader from 'components/welcome/SectionHeader';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
+import OnboardingBanner from './OnboardingBanner';
+import WelcomeMetricsSection from './WelcomeMetricsSection';
+import useWelcomePageConfig from './hooks/useWelcomePageConfig';
 
 import SectionGrid from '../common/Section/SectionGrid';
 import useCurrentUser from '../../hooks/useCurrentUser';
@@ -35,59 +42,64 @@ const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
-type HelperProps = { readOnly: boolean, userId: string, startpage: StartPage }
+type HelperProps = { readOnly: boolean; userId: string; startpage: StartPage };
 
 const ChangeStartPageHelper = ({ readOnly, userId, startpage }: HelperProps) => {
   const defaultPageIsDefined = startpage !== null;
 
   if (defaultPageIsDefined || readOnly) {
-    return (
-      <span>
-        This is your personal page, allowing easy access to the content most relevant for you.
-      </span>
-    );
+    return <span>This is your personal page, allowing easy access to the content most relevant for you.</span>;
   }
 
   return (
     <>
-      <span>
-        This is your personal start page, allowing easy access to the content most relevant for you.
-      </span>
+      <span>This is your personal start page, allowing easy access to the content most relevant for you.</span>
       <span>
         {' '}
-        You can change your personal start page on the <Link to={Routes.SYSTEM.USERS.edit(userId)}>edit profile</Link> page.
+        You can change your personal start page on the <Link to={Routes.SYSTEM.USERS.edit(userId)}>
+          edit profile
+        </Link>{' '}
+        page.
       </span>
     </>
   );
 };
 
 const Welcome = () => {
+  const productName = useProductName();
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
-  const isAdmin = permissions.includes('*');
+  const isAdmin = hasAdminPermission(permissions);
+  const onboardingEnabled = useFeature('onboarding_experience');
+  const { metricsEnabled } = useWelcomePageConfig();
 
   return (
     <>
-      <PageHeader title="Welcome to Graylog!">
+      <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
-      <SectionGrid>
-        <StyledSectionComponent title="Last Opened">
-          <p className="description">Overview of recently visited saved searches and dashboards.</p>
-          <LastOpenList />
-        </StyledSectionComponent>
-        <StyledSectionComponent title="Favorite Items">
+      {onboardingEnabled && <OnboardingBanner />}
+      {metricsEnabled && <WelcomeMetricsSection />}
+      <SectionHeader>
+        <h2>Search and Usage</h2>
+      </SectionHeader>
+      <SectionGrid $columns="1fr 1fr 1fr">
+        <StyledSectionComponent title="Favorite Items" titleAs="h3">
           <p className="description">Overview of your favorite saved searches and dashboards.</p>
           <FavoriteItemsList />
         </StyledSectionComponent>
+        <StyledSectionComponent title="Recent Activity" titleAs="h3">
+          <p className="description">
+            {isAdmin
+              ? 'This list includes all actions users performed, like creating or sharing an entity.'
+              : 'Overview of actions you made with entities or somebody else made with entities which relates to you, like creating or sharing an entity.'}
+          </p>
+          <RecentActivityList />
+        </StyledSectionComponent>
+        <StyledSectionComponent title="Last Opened" titleAs="h3">
+          <p className="description">Overview of recently visited saved searches and dashboards.</p>
+          <LastOpenList />
+        </StyledSectionComponent>
       </SectionGrid>
-      <StyledSectionComponent title="Recent Activity">
-        <p className="description">
-          {isAdmin
-            ? 'This list includes all actions Graylog users performed, like creating or sharing an entity.'
-            : 'Overview of actions you made with entities or somebody else made with entities which relates to you, like creating or sharing an entity.'}
-        </p>
-        <RecentActivityList />
-      </StyledSectionComponent>
       <ContentStreamContainer />
     </>
   );

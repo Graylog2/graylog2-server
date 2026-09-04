@@ -16,7 +16,7 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectParameterBindings } from 'views/logic/slices/searchExecutionSelectors';
 import { selectParameters } from 'views/logic/slices/viewSelectors';
 
@@ -26,6 +26,6 @@ const selectParametersAndBindings = createSelector(
   (parameterBindings, parameters) => ({ parameterBindings, parameters }),
 );
 
-const useParameters = () => useAppSelector(selectParametersAndBindings);
+const useParameters = () => useViewsSelector(selectParametersAndBindings);
 
 export default useParameters;

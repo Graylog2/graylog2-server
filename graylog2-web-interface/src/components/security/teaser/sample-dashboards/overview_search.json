@@ -26,6 +26,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "d131d892-f0dc-4c12-a1d0-8a0e5a603755",
           "name": "trend",
           "series": [
@@ -55,6 +56,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(failure)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "0374d9ce-61dc-43d9-9715-45a2f8691193",
           "name": "trend",
           "series": [
@@ -84,6 +86,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity) AND alert_severity:(high OR critical)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "cf0149a8-906d-4a29-b0f6-6cc22b3f0d30",
           "name": "trend",
           "series": [
@@ -111,6 +114,7 @@
             "query_string": "_exists_:(gim_event_type_code OR anomaly_detector_name) AND _exists_:(timestamp)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "c89d6eca-ea11-43cd-b931-8d3b96e43226",
           "name": "chart",
           "series": [
@@ -126,9 +130,7 @@
           "row_groups": [
             {
               "type": "time",
-              "fields": [
-                "timestamp"
-              ],
+              "fields": ["timestamp"],
               "interval": {
                 "type": "auto",
                 "scaling": 1
@@ -149,6 +151,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity AND event_source) AND alert_severity:(high OR critical)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "de1e5a85-4947-48e2-b8a2-88c99e6133e5",
           "name": "chart",
           "series": [
@@ -164,9 +167,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source"
-              ],
+              "fields": ["event_source"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -185,6 +186,7 @@
             "query_string": "_exists_:(gim_event_category) AND _exists_:(event_source_product AND event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "6ffb5cda-7534-4eaf-b9fe-5aba76a720dc",
           "name": "chart",
           "series": [
@@ -200,9 +202,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source_product"
-              ],
+              "fields": ["event_source_product"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -210,9 +210,7 @@
           "column_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_outcome"
-              ],
+              "fields": ["event_outcome"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -230,6 +228,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity AND user_name) AND alert_severity:(high OR critical)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "1af3fa21-0856-4e40-b6bb-d3770c7b405f",
           "name": "chart",
           "series": [
@@ -245,9 +244,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "user_name"
-              ],
+              "fields": ["user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -266,6 +263,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_subcategory)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "e8bd4945-b4dd-49ef-83aa-479e638b0957",
           "name": "chart",
           "series": [
@@ -281,9 +279,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "gim_event_subcategory"
-              ],
+              "fields": ["gim_event_subcategory"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -302,6 +298,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(success OR failure)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "cb1c4108-ec60-434d-8811-93d52aee5510",
           "name": "chart",
           "series": [
@@ -329,6 +326,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity) AND alert_severity:(high OR critical)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "fb0aa7b5-9bac-429f-ae3d-c6206d81e2b5",
           "name": "chart",
           "series": [
@@ -356,6 +354,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_source AND gim_event_subcategory)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "3a78178a-18c7-48ad-9cfc-b55f4bb3cd73",
           "name": "chart",
           "series": [
@@ -371,9 +370,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source"
-              ],
+              "fields": ["event_source"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -392,6 +389,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:event_source_product"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "55b21db0-c39a-4824-a791-419c62d7c0de",
           "name": "chart",
           "series": [
@@ -407,9 +405,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source_product"
-              ],
+              "fields": ["event_source_product"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -428,6 +424,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_outcome AND gim_event_type) AND gim_event_type:(logon) AND event_outcome:(failure)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "9246abe7-14b7-427c-abc8-ed48b36a4061",
           "name": "chart",
           "series": [
@@ -455,6 +452,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity AND alert_signature) AND alert_severity:(high OR critical)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "7d34455e-9680-47b7-b781-7fe648461fa3",
           "name": "chart",
           "series": [
@@ -470,9 +468,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "alert_signature"
-              ],
+              "fields": ["alert_signature"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -491,6 +487,7 @@
             "query_string": "_exists_:(gim_event_type_code) AND _exists_:(alert_severity AND event_source_product) AND alert_severity:(high OR critical)"
           },
           "streams": [],
+          "stream_categories": [],
           "id": "4a6d4d7e-0cce-48a9-89cb-f2d1fd822c91",
           "name": "chart",
           "series": [
@@ -506,9 +503,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source_product"
-              ],
+              "fields": ["event_source_product"],
               "limit": 15,
               "skip_empty_values": false
             }

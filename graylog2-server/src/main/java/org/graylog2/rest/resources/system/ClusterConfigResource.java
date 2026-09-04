@@ -21,9 +21,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -49,15 +50,13 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
 import org.graylog2.security.RestrictedChainingClassLoader;
 import org.graylog2.security.UnsafeClassLoadingAttemptException;
+import org.graylog2.security.encryption.ConfigUpdatePreparation;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -65,7 +64,7 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-@Api(value = "System/ClusterConfig", description = "Graylog Cluster Configuration")
+@Tag(name = "System/ClusterConfig", description = "Graylog Cluster Configuration")
 @RequiresAuthentication
 @Path("/system/cluster_config")
 @Produces(MediaType.APPLICATION_JSON)
@@ -90,7 +89,7 @@ public class ClusterConfigResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "List all configuration classes")
+    @Operation(summary = "List all configuration classes")
     @Timed
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
     public ClusterConfigList list() {
@@ -101,10 +100,10 @@ public class ClusterConfigResource extends RestResource {
 
     @GET
     @Path("{configClass}")
-    @ApiOperation(value = "Get configuration settings from database")
+    @Operation(summary = "Get configuration settings from database")
     @Timed
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
-    public Object read(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
+    public Object read(@Parameter(name = "configClass", description = "The name of the cluster configuration class", required = true)
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
@@ -119,23 +118,31 @@ public class ClusterConfigResource extends RestResource {
     @Timed
     @Path("{configClass}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update configuration in database")
+    @Operation(summary = "Update configuration in database")
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
     @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_UPDATE)
-    public Response update(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
+    public Response update(@Parameter(name = "configClass", description = "The name of the cluster configuration class", required = true)
                            @PathParam("configClass") @NotBlank String configClass,
-                           @ApiParam(name = "body", value = "The payload of the cluster configuration", required = true)
+                           @Parameter(name = "body", description = "The payload of the cluster configuration", required = true)
                            @NotNull InputStream body) throws IOException {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
             throw new NotFoundException(createNoClassMsg(configClass));
         }
 
-        final Object configObject = parseConfigObject(configClass, body, cls);
-        validateConfigObject(configObject);
-        writeConfigObject(configClass, configObject);
+        final Object updatedConfigObject = parseConfigObject(configClass, body, cls);
+        final Object preparedConfig;
+        final Object existingConfig = clusterConfigService.get(cls);
+        if (existingConfig != null && updatedConfigObject instanceof ConfigUpdatePreparation encryptedConfig) {
+            preparedConfig = encryptedConfig.prepareConfigUpdate(existingConfig);
+        } else {
+            preparedConfig = updatedConfigObject;
+        }
 
-        return Response.accepted(configObject).build();
+        validateConfigObject(preparedConfig);
+        writeConfigObject(configClass, preparedConfig);
+
+        return Response.accepted(updatedConfigObject).build();
     }
 
     private void writeConfigObject(String configClass, Object configObject) {
@@ -170,11 +177,11 @@ public class ClusterConfigResource extends RestResource {
 
     @DELETE
     @Path("{configClass}")
-    @ApiOperation(value = "Delete configuration settings from database")
+    @Operation(summary = "Delete configuration settings from database")
     @Timed
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_DELETE)
     @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_DELETE)
-    public void delete(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
+    public void delete(@Parameter(name = "configClass", description = "The name of the cluster configuration class", required = true)
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {
@@ -187,10 +194,10 @@ public class ClusterConfigResource extends RestResource {
     @GET
     @Path("{configClass}")
     @Produces(MoreMediaTypes.APPLICATION_SCHEMA_JSON)
-    @ApiOperation(value = "Get JSON schema of configuration class")
+    @Operation(summary = "Get JSON schema of configuration class")
     @Timed
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
-    public JsonSchema schema(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
+    public JsonSchema schema(@Parameter(name = "configClass", description = "The name of the cluster configuration class", required = true)
                              @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
         if (cls == null) {

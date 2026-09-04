@@ -20,11 +20,11 @@ import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "System/Metrics", description = "Internal Graylog metrics")
+@Tag(name = "System/Metrics", description = "Internal Graylog metrics")
 @Path("/system/metrics")
 public class MetricsResource extends RestResource {
 
@@ -69,8 +69,8 @@ public class MetricsResource extends RestResource {
     @GET
     @Timed
     @RequiresPermissions(RestPermissions.METRICS_READALL)
-    @ApiOperation(value = "Get all metrics",
-                  notes = "Note that this might return a huge result set.")
+    @Operation(summary = "Get all metrics",
+                  description = "Note that this might return a huge result set.")
     @Produces(MediaType.APPLICATION_JSON)
     public MetricRegistry metrics() {
         return metricRegistry;
@@ -79,7 +79,7 @@ public class MetricsResource extends RestResource {
     @GET
     @Timed
     @Path("/names")
-    @ApiOperation(value = "Get all metrics keys/names")
+    @Operation(summary = "Get all metrics keys/names")
     @RequiresPermissions(RestPermissions.METRICS_ALLKEYS)
     @Produces(MediaType.APPLICATION_JSON)
     public MetricNamesResponse metricNames() {
@@ -89,12 +89,13 @@ public class MetricsResource extends RestResource {
     @GET
     @Timed
     @Path("/{metricName}")
-    @ApiOperation(value = "Get a single metric")
+    @Operation(summary = "Get a single metric")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such metric")
+            @ApiResponse(responseCode = "200", description = "Returns the metric", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such metric")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public Metric singleMetric(@ApiParam(name = "metricName", required = true)
+    public Metric singleMetric(@Parameter(name = "metricName", required = true)
                                @PathParam("metricName") String metricName) {
         checkPermission(RestPermissions.METRICS_READ, metricName);
 
@@ -111,12 +112,13 @@ public class MetricsResource extends RestResource {
     @POST
     @Timed
     @Path("/multiple")
-    @ApiOperation("Get the values of multiple metrics at once")
+    @Operation(summary = "Get the values of multiple metrics at once")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Malformed body")
+            @ApiResponse(responseCode = "200", description = "Returns metrics", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "400", description = "Malformed body")
     })
     @NoAuditEvent("only used to retrieve multiple metrics")
-    public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "Requested metrics", required = true)
+    public MetricsSummaryResponse multipleMetrics(@Parameter(name = "Requested metrics", required = true)
                                                   @Valid @NotNull MetricsReadRequest request) {
         final Map<String, Metric> metrics = metricRegistry.getMetrics();
 
@@ -139,12 +141,13 @@ public class MetricsResource extends RestResource {
     @GET
     @Timed
     @Path("/namespace/{namespace}")
-    @ApiOperation(value = "Get all metrics of a namespace")
+    @Operation(summary = "Get all metrics of a namespace")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such metric namespace")
+            @ApiResponse(responseCode = "200", description = "Returns metrics by namespace", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such metric namespace")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public MetricsSummaryResponse byNamespace(@ApiParam(name = "namespace", required = true)
+    public MetricsSummaryResponse byNamespace(@Parameter(name = "namespace", required = true)
                                               @PathParam("namespace") String namespace) {
         final List<Map<String, Object>> metrics = Lists.newArrayList();
         for (Map.Entry<String, Metric> e : metricRegistry.getMetrics().entrySet()) {

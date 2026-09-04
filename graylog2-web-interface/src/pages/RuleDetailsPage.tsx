@@ -14,63 +14,49 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useStore } from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
 import Routes from 'routing/Routes';
 import useQuery from 'routing/useQuery';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
-import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
-import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
+import { useRule } from 'components/rules/hooks/useRules';
+import usePipelines from 'hooks/usePipelines';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 
 import useHistory from '../routing/useHistory';
 
-function filterRules(rule, ruleId) {
-  return rule?.rules?.filter((r) => r.id === ruleId)[0];
-}
-
-function filterPipelines(pipelines = [], title = '') {
-  return pipelines.filter((pipeline) => pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1));
+function filterPipelines(pipelines: Array<PipelineType> = [], title = '') {
+  return pipelines.filter((pipeline) => pipeline.stages.some((stage: StageType) => stage.rules.indexOf(title) !== -1));
 }
 
 const RuleDetailsPage = () => {
   const { ruleId } = useParams<{ ruleId: string }>();
-  const rule = useStore(RulesStore);
-  const pipelines = useStore(PipelinesStore, ({ pipelines: state }) => state);
-  const [isLoading, setIsLoading] = useState(true);
-  const [filteredRule, setFilteredRule] = useState(undefined);
+  const isNewRule = ruleId === 'new';
+  const { data: pipelines, isInitialLoading: isInitialLoadingPipelines } = usePipelines({ enabled: !isNewRule });
+  const {
+    data: currentRule,
+    isInitialLoading: isInitialLoadingRule,
+    error: ruleError,
+  } = useRule(ruleId, { enabled: !isNewRule });
   const history = useHistory();
   const { rule_builder } = useQuery();
 
   const isRuleBuilder = rule_builder === 'true';
-  const isNewRule = ruleId === 'new';
-  const title = filteredRule?.title || '';
+  const title = currentRule?.title || '';
   const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
 
   const pipelinesUsingRule = isNewRule ? [] : filterPipelines(pipelines, title);
 
   useEffect(() => {
-    setFilteredRule(filterRules(rule, ruleId));
-  }, [ruleId, rule]);
-
-  useEffect(() => {
-    if (isNewRule) {
-      setIsLoading(false);
-    } else {
-      PipelinesActions.list();
-
-      RulesActions.get(ruleId).then(() => {}, (error) => {
-        if (error.status === 404) {
-          history.push(Routes.SYSTEM.PIPELINES.RULES);
-        }
-      });
-
-      setIsLoading(!(filteredRule && pipelines));
+    if (!isNewRule && (ruleError as { status?: number })?.status === 404) {
+      history.push(Routes.SYSTEM.PIPELINES.RULES);
     }
-  }, [filteredRule, history, isNewRule, ruleId, pipelines]);
+  }, [history, isNewRule, ruleError]);
+
+  const isLoading = !isNewRule && (isInitialLoadingRule || isInitialLoadingPipelines);
 
   if (isLoading) {
     return <Spinner text="Loading Rule Details..." />;
@@ -78,7 +64,7 @@ const RuleDetailsPage = () => {
 
   return (
     <DocumentTitle title={pageTitle}>
-      <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={filteredRule}>
+      <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={currentRule}>
         <Rule create={isNewRule} isRuleBuilder={isRuleBuilder} title={title} />
       </PipelineRulesProvider>
     </DocumentTitle>

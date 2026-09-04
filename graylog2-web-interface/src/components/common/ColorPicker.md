@@ -6,11 +6,11 @@ class ColorPickerExample extends React.Component {
       color: undefined,
     };
     this.handleColorChange = this.handleColorChange.bind(this);
-  };
+  }
 
   handleColorChange(color) {
     this.setState({ color: color });
-  };
+  }
 
   render() {
     const { color } = this.state;
@@ -20,8 +20,8 @@ class ColorPickerExample extends React.Component {
         <ColorPicker color={color} onChange={this.handleColorChange} />
       </div>
     );
-  };
+  }
 }
 
-<ColorPickerExample />
+<ColorPickerExample />;
 ```

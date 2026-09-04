@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,7 +36,7 @@ class GRNRegistryTest {
     class WithBuiltins {
         @BeforeEach
         void setup() {
-            type = GRNType.create("test", "tests:");
+            type = GRNType.create("test");
             registry = GRNRegistry.createWithTypes(Collections.singleton(type));
         }
 
@@ -47,7 +48,6 @@ class GRNRegistryTest {
                 assertThat(grn.cluster()).isEmpty();
                 assertThat(grn.type()).isEqualTo("test");
                 assertThat(grn.entity()).isEqualTo("123");
-                assertThat(grn.grnType().permissionPrefix()).isEqualTo("tests:");
             });
         }
 
@@ -69,6 +69,42 @@ class GRNRegistryTest {
         void newGRNBuilder() {
             assertThat(registry.newGRNBuilder("test").entity("123").build().toString()).isEqualTo("grn::::test:123");
             assertThat(registry.newGRNBuilder(type).entity("123").build().toString()).isEqualTo("grn::::test:123");
+        }
+    }
+
+    @Nested
+    @DisplayName("with providers")
+    class WithProviders {
+        @BeforeEach
+        void setup() {
+            registry = new GRNRegistry(Set.of(
+                    new GRNTypeProvider() {
+                        @Override
+                        public Set<GRNType> getTypes() {
+                            return Set.of(GRNType.create("provided1"));
+                        }
+                    },
+                    new GRNTypeProvider() {
+                        @Override
+                        public Set<GRNType> getTypes() {
+                            return Set.of(GRNType.create("provided2"));
+                        }
+                    }
+            ));
+        }
+
+        @Test
+        void parse() {
+            final GRN parse1 = registry.parse("grn::::provided1:123");
+            final GRN parse2 = registry.parse("grn::::provided2:123");
+            assertThat(parse1.type()).isEqualTo("provided1");
+            assertThat(parse2.type()).isEqualTo("provided2");
+        }
+
+        @Test
+        void parseIllegal() {
+            assertThatThrownBy(() -> registry.parse("grn::::dummy:123"))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 

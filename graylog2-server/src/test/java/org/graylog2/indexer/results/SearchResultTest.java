@@ -19,8 +19,8 @@ package org.graylog2.indexer.results;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.Message;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Set;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class SearchResultTest {
     private SearchResult searchResult;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.searchResult = new SearchResult(Collections.emptyList(), 0L, null, null, null, 0L);
     }

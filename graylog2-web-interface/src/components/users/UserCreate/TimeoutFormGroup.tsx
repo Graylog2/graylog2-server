@@ -22,8 +22,7 @@ import TimeoutInput from 'components/users/TimeoutInput';
 const TimeoutFormGroup = () => (
   <Field name="session_timeout_ms">
     {({ field: { name, value, onChange } }) => (
-      <TimeoutInput value={value}
-                    onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+      <TimeoutInput value={value} onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
     )}
   </Field>
 );

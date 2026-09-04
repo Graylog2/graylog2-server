@@ -14,51 +14,53 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback } from 'react';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import TemplateForm from 'components/indices/IndexSetTemplates/TemplateForm';
-import type {
-  IndexSetTemplate,
-} from 'components/indices/IndexSetTemplates/types';
+import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import useTemplateMutation from 'components/indices/IndexSetTemplates/hooks/useTemplateMutation';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 
 const CreateTemplate = () => {
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
   const { createTemplate } = useTemplateMutation();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const history = useHistory();
 
-  const onSubmit = useCallback((template: IndexSetTemplate) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.CREATED, {
-      app_pathname: telemetryPathName,
-      app_action_value: 'create-new-index-set-template-created',
-    });
+  const onSubmit = useCallback(
+    (template: IndexSetTemplate) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.CREATED, {
+        app_action_value: 'create-new-index-set-template-created',
+      });
 
-    createTemplate(template).then(() => {
-      navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
-    });
-  }, [createTemplate, navigate, sendTelemetry, telemetryPathName]);
+      createTemplate(template).then(() => {
+        history.push(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
+      });
+    },
+    [createTemplate, history, sendTelemetry],
+  );
 
-  useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_OPENED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-template-opened' });
-  }, [sendTelemetry, telemetryPathName]);
+  useSendTelemetryOnMount(sendTelemetry, TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_OPENED, {
+    app_action_value: 'create-new-index-set-template-opened',
+  });
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_CANCELLED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-template-cancelled' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_CANCELLED, {
+      app_action_value: 'create-new-index-set-template-cancelled',
+    });
     history.goBack();
-  }, [history, sendTelemetry, telemetryPathName]);
+  }, [history, sendTelemetry]);
 
   return (
-    <TemplateForm onCancel={onCancel} submitButtonText="Create template" submitLoadingText="Creating template..." onSubmit={onSubmit} />
+    <TemplateForm
+      onCancel={onCancel}
+      submitButtonText="Create template"
+      submitLoadingText="Creating template..."
+      onSubmit={onSubmit}
+    />
   );
 };
 

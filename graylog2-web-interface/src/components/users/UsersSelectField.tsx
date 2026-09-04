@@ -23,39 +23,45 @@ import useCurrentUser from 'hooks/useCurrentUser';
 
 import PaginatedSelect from '../common/Select/PaginatedSelect';
 
-const formatUsers = (users) => users.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username }));
+const formatUsers = (users) =>
+  users.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username }));
 
 type Props = {
-  value: string,
-  onChange: (nextValue) => void,
-}
+  value: string;
+  onChange: (nextValue) => void;
+};
 
 const UsersSelectField = ({ value, onChange }: Props) => {
   const currentUser = useCurrentUser();
 
-  const loadUsers = useCallback((pagination: { page: number, perPage: number, query: string }) => {
-    if (!isPermitted(currentUser.permissions, 'users:list')) {
-      return Promise.resolve({
-        pagination,
-        total: 0,
-        list: [],
-      });
-    }
+  const loadUsers = useCallback(
+    (pagination: { page: number; perPage: number; query: string }) => {
+      if (!isPermitted(currentUser.permissions, 'users:list')) {
+        return Promise.resolve({
+          pagination,
+          total: 0,
+          list: [],
+        });
+      }
 
-    return UsersDomain.loadUsersPaginated(pagination).then((results) => ({
-      total: results.pagination.total,
-      list: formatUsers(results.list.toArray()),
-      pagination,
-    }));
-  }, [currentUser.permissions]);
+      return UsersDomain.loadUsersPaginated(pagination).then((results) => ({
+        total: results.pagination.total,
+        list: formatUsers(results.list.toArray()),
+        pagination,
+      }));
+    },
+    [currentUser.permissions],
+  );
 
   return (
-    <PaginatedSelect id="user-select-list"
-                     value={value}
-                     placeholder="Select user(s)..."
-                     onLoadOptions={loadUsers}
-                     multi
-                     onChange={onChange} />
+    <PaginatedSelect
+      id="user-select-list"
+      value={value}
+      placeholder="Select user(s)..."
+      onLoadOptions={loadUsers}
+      multi
+      onChange={onChange}
+    />
   );
 };
 

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
@@ -27,10 +27,9 @@ const OverriddenProfileExpandedSection = ({ type, fieldName }: ExpandedSectionPr
 
   return (
     <div>
-      Field type <i>{type}</i> comes from the individual, custom field type mapping.
-      It overrides not only possible mappings from the search engine index mapping,
-      but also mapping <b>{fieldName}: </b><i>{profileFieldType}</i> present in
-      profile <Link to={Routes.SYSTEM.INDICES.LIST}>{profileName}</Link>
+      Field type <i>{type}</i> comes from the individual, custom field type mapping. It overrides not only possible
+      mappings from the search engine index mapping, but also mapping <b>{fieldName}: </b>
+      <i>{profileFieldType}</i> present in profile <Link to={Routes.SYSTEM.INDICES.LIST}>{profileName}</Link>
     </div>
   );
 };

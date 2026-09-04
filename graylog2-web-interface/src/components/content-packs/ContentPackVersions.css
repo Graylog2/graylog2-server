@@ -4,5 +4,5 @@
    table we show the overflow event though it might make problems
    with responsiveness (but no problems could be found). */
 #content-packs-versions {
-    overflow-x: visible;
+  overflow-x: visible;
 }

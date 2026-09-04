@@ -16,48 +16,54 @@
  */
 import { useState } from 'react';
 
-import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import useProductName from 'brand-customization/useProductName';
+import type {
+  EventNotification,
+  TestResult,
+  TestResults,
+} from 'components/event-notifications/hooks/useEventNotifications';
+import { testPersistedEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 type UseNotificationTestType = {
-  isLoadingTest: boolean,
-  testResults: TestResults
-  getNotificationTest: (notification: EventNotification) => void,
-}
+  isLoadingTest: boolean;
+  testResults: TestResults;
+  getNotificationTest: (notification: EventNotification) => void;
+};
 
 const useNotificationTest = (): UseNotificationTestType => {
   const [testResults, setTestResults] = useState(undefined);
+  const productName = useProductName();
 
   const getNotificationTest = (notification: EventNotification) => {
     setTestResults({ [notification.id]: { isLoading: true, id: notification.id } });
-    let result = { isLoading: false, id: null, error: null, message: null };
+    let result: TestResult = { isLoading: false, id: undefined, error: undefined, message: undefined };
 
-    EventNotificationsActions.testPersisted(notification)
-      .then(
-        (response) => {
-          result = {
-            ...result,
-            id: notification.id,
-            error: false,
-            message: 'Notification was executed successfully.',
-          };
+    testPersistedEventNotification(notification).then(
+      (response) => {
+        result = {
+          ...result,
+          id: notification.id,
+          error: false,
+          message: 'Notification was executed successfully.',
+        };
 
-          setTestResults({ [notification.id]: result });
+        setTestResults({ [notification.id]: result });
 
-          return response;
-        },
-        (errorResponse) => {
-          result = { isLoading: false, id: notification.id, error: true, message: null };
+        return response;
+      },
+      (errorResponse) => {
+        result = { isLoading: false, id: notification.id, error: true, message: undefined };
 
-          if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
-            result.message = errorResponse.responseMessage || 'Unknown errorResponse, please check your Graylog server logs.';
-          }
+        if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
+          result.message =
+            errorResponse.responseMessage || `Unknown errorResponse, please check your ${productName} server logs.`;
+        }
 
-          setTestResults({ [notification.id]: result });
+        setTestResults({ [notification.id]: result });
 
-          return errorResponse;
-        },
-      );
+        return errorResponse;
+      },
+    );
   };
 
   return {

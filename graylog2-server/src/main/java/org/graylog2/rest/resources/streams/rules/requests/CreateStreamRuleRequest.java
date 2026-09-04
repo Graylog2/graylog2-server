@@ -20,27 +20,25 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class CreateStreamRuleRequest {
-    @JsonProperty
+    @JsonProperty("type")
     public abstract int type();
 
-    @JsonProperty
+    @JsonProperty("value")
     public abstract String value();
 
-    @JsonProperty
+    @JsonProperty("field")
     public abstract String field();
 
-    @JsonProperty
+    @JsonProperty("inverted")
     public abstract boolean inverted();
 
-    @JsonProperty
+    @JsonProperty("description")
     @Nullable
     public abstract String description();
 

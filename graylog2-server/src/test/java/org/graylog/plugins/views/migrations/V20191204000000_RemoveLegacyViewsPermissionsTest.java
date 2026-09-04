@@ -20,10 +20,12 @@ import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,23 +35,22 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class V20191204000000_RemoveLegacyViewsPermissionsTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private MongoCollection<Document> rolesCollection;
     private MongoCollection<Document> usersCollection;
 
     private V20191204000000_RemoveLegacyViewsPermissions migration;
 
-    @Before
-    public void setUp() throws Exception {
-        MongoDatabase mongoDatabase = mongodb.mongoConnection().getMongoDatabase();
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        final MongoConnection connection = mongoCollections.connection();
+        MongoDatabase mongoDatabase = connection.getMongoDatabase();
         mongoDatabase.drop();
         rolesCollection = mongoDatabase.getCollection("roles");
         usersCollection = mongoDatabase.getCollection("users");
-        migration = new V20191204000000_RemoveLegacyViewsPermissions(mongodb.mongoConnection());
+        migration = new V20191204000000_RemoveLegacyViewsPermissions(connection);
     }
 
     @Test
@@ -87,7 +88,7 @@ public class V20191204000000_RemoveLegacyViewsPermissionsTest {
 
         assertThat(getList(userAfter, "roles")).containsOnly(otherRole.getObjectId("_id"));
     }
-    
+
     // convenience method to avoid casting and suppressing warnings in assertions
     private <T> List<T> getList(Document d, String key) {
         //noinspection unchecked

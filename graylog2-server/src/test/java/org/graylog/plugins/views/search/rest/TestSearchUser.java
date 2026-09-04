@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static org.graylog2.plugin.streams.Stream.NON_EDITABLE_STREAM_IDS;
 import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
@@ -54,6 +55,11 @@ public class TestSearchUser {
 
     public TestSearchUser allowNodeRead(String nodeId) {
         this.permissions.put("nodes:read:" + nodeId, true);
+        return this;
+    }
+
+    public TestSearchUser allowUserRead(String userId) {
+        this.permissions.put(RestPermissions.USERS_READ + ":" + userId, true);
         return this;
     }
 
@@ -126,7 +132,7 @@ public class TestSearchUser {
                 Optional.ofNullable(user).orElseGet(() -> Mockito.mock(User.class)),
                 permission -> verifyPermission(permissions, permission),
                 (permission, entityid) -> verifyPermission(permissions, permission, entityid),
-                new PermittedStreams(knownStreamIDs::stream, (categories) -> Stream.of()),
+                new PermittedStreams(knownStreamIDs::stream, (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS),
                 new HashMap<>());
     }
 

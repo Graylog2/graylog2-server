@@ -15,23 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { OrderedMap } from 'immutable';
 
-import type { SearchParams } from 'stores/PaginationTypes';
-import { type Attribute } from 'stores/PaginationTypes';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
 export type PaginatedResponse<T, M = unknown> = {
-  list: Array<T>,
+  list: Array<T>;
   pagination: {
-    total: number
-  },
-  attributes: Array<Attribute>,
-  meta?: M
-}
+    total: number;
+  };
+  attributes: Array<Attribute>;
+  meta?: M;
+};
 
 export type FetchOptions = {
-  refetchInterval?: number,
+  refetchInterval?: number;
+};
+
+export const slicesToFilters = (searchParams: SearchParams) => {
+  const newSearchParams = { ...searchParams };
+
+  delete newSearchParams.slice;
+  delete newSearchParams.sliceCol;
+
+  if (searchParams.sliceCol && searchParams.slice) {
+    const filters = newSearchParams.filters ?? OrderedMap<string, Array<string>>();
+    newSearchParams.filters = filters.set(searchParams.sliceCol, [searchParams.slice]);
+  }
+
+  return newSearchParams;
 };
 
 const useFetchEntities = <T, M = unknown>({
@@ -42,32 +56,41 @@ const useFetchEntities = <T, M = unknown>({
   humanName,
   fetchOptions = {},
 }: {
-  fetchKey: Array<unknown>,
-  searchParams: SearchParams,
-  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T, M>>
-  enabled: boolean,
-  humanName: string
-  fetchOptions?: FetchOptions,
+  fetchKey: Array<unknown>;
+  searchParams: SearchParams;
+  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T, M>>;
+  enabled: boolean;
+  humanName: string;
+  fetchOptions?: FetchOptions;
 }): {
-  isInitialLoading: boolean,
-  data: PaginatedResponse<T, M>,
-  refetch: () => void,
+  isInitialLoading: boolean;
+  data: PaginatedResponse<T, M>;
+  refetch: () => void;
+  isError?: boolean;
+  error?: Error | null;
 } => {
-  const { data, isInitialLoading, refetch } = useQuery(
-    fetchKey,
-    () => defaultOnError(fetchEntities(searchParams), `Fetching ${humanName} failed with status`, `Could not retrieve ${humanName}`),
-    {
-      enabled,
-      keepPreviousData: true,
-      ...fetchOptions,
-    },
-  );
+  const { data, isInitialLoading, refetch, isError, error } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: fetchKey,
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchEntities(slicesToFilters(searchParams)),
+        `Fetching ${humanName} failed with status`,
+        `Could not retrieve ${humanName}`,
+      ),
+    enabled,
+    placeholderData: keepPreviousData,
+    ...fetchOptions,
+  });
+
+  return {
     data,
     isInitialLoading,
     refetch,
-  });
+    isError,
+    error,
+  };
 };
 
 export default useFetchEntities;

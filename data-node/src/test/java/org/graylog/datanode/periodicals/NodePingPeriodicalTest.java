@@ -16,22 +16,23 @@
  */
 package org.graylog.datanode.periodicals;
 
+import io.jsonwebtoken.lang.Collections;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
-import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MongoDBExtension.class)
 class NodePingPeriodicalTest {
@@ -39,8 +40,8 @@ class NodePingPeriodicalTest {
     private DataNodeClusterService nodeService;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb) {
-        nodeService = new DataNodeClusterService(mongodb.mongoConnection(), new org.graylog2.Configuration());
+    void setUp(MongoCollections mongoCollections) {
+        nodeService = new DataNodeClusterService(mongoCollections, new org.graylog2.Configuration());
     }
 
     @Test
@@ -50,19 +51,18 @@ class NodePingPeriodicalTest {
         final URI uri = URI.create("http://localhost:9200");
         final String cluster = "localhost:9300";
         final String datanodeRestApi = "http://localhost:8999";
-        @SuppressWarnings("unchecked")
-
-
 
         final NodePingPeriodical task = new NodePingPeriodical(
                 nodeService,
                 nodeID,
                 new Configuration(),
-                () -> uri,
+                () -> Optional.of(uri),
                 () -> cluster,
                 () -> datanodeRestApi,
                 () -> OpensearchState.AVAILABLE,
-                Date::new
+                Date::new,
+                () -> List.of("search", "ingest"),
+                Collections::emptyList
         );
 
         task.doRun();
@@ -76,6 +76,7 @@ class NodePingPeriodicalTest {
                     Assertions.assertThat(nodeDto.getNodeId()).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
                     Assertions.assertThat(nodeDto.getLastSeen()).isNotNull();
                     Assertions.assertThat(nodeDto.getProvisioningInformation().certValidUntil()).isNotNull();
+                    Assertions.assertThat(nodeDto.getOpensearchRoles().containsAll(List.of("search", "ingest"))).isTrue();
                 });
     }
 

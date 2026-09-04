@@ -22,21 +22,20 @@ import { useQueryClient } from '@tanstack/react-query';
 import ApiRoutes from 'routing/ApiRoutes';
 import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
-import { getPathnameWithoutId, qualifyUrl } from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { DeleteMenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import { EVENT_NOTIFICATIONS_QUERY_KEY } from 'components/event-notifications/hooks/useEventNotifications';
 
 const BulkActions = () => {
   const queryClient = useQueryClient();
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('event-notification-bulk');
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const selectedItemsAmount = selectedEntities?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event notification', 'event notifications');
@@ -44,46 +43,68 @@ const BulkActions = () => {
 
   const onDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.BULK_ACTION_DELETE_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-notification-bulk',
       app_action_value: 'bulk-delete-button',
     });
 
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
-      const deleteCalls = selectedEntities.map((notificationId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(() => notificationId));
+      const deleteCalls = selectedEntities.map((notificationId) =>
+        fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(
+          () => notificationId,
+        ),
+      );
 
       Promise.allSettled(deleteCalls).then((result) => {
         const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{
-          status: 'fulfilled',
-          value: string
+          status: 'fulfilled';
+          value: string;
         }>;
         const deletedNotificationIds = fulfilledRequests.map(({ value }) => value);
-        const notDeletedNotificationIds = selectedEntities?.filter((streamId) => !deletedNotificationIds.includes(streamId));
+        const notDeletedNotificationIds = selectedEntities?.filter(
+          (streamId) => !deletedNotificationIds.includes(streamId),
+        );
 
         if (notDeletedNotificationIds.length) {
           const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{
-            status: 'rejected',
-            reason: FetchError
+            status: 'rejected';
+            reason: FetchError;
           }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
           if (notDeletedNotificationIds.length !== selectedEntities.length) {
-            queryClient.invalidateQueries(['eventNotifications', 'overview']);
+            queryClient.invalidateQueries({
+              queryKey: EVENT_NOTIFICATIONS_QUERY_KEY,
+            });
+            refetchEventNotifications();
           }
 
-          UserNotification.error(`${notDeletedNotificationIds.length} out of ${selectedEntities} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
+          UserNotification.error(
+            `${notDeletedNotificationIds.length} out of ${selectedEntities} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`,
+          );
 
           return;
         }
 
-        queryClient.invalidateQueries(['eventNotifications', 'overview']);
+        queryClient.invalidateQueries({
+          queryKey: EVENT_NOTIFICATIONS_QUERY_KEY,
+        });
         setSelectedEntities(notDeletedNotificationIds);
         refetchEventNotifications();
-        UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
+        UserNotification.success(
+          `${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`,
+          'Success',
+        );
       });
     }
-  }, [sendTelemetry, pathname, selectedItemsAmount, descriptor, selectedEntities, queryClient, setSelectedEntities, refetchEventNotifications]);
+  }, [
+    sendTelemetry,
+    selectedItemsAmount,
+    descriptor,
+    selectedEntities,
+    queryClient,
+    setSelectedEntities,
+    refetchEventNotifications,
+  ]);
 
   return (
     <BulkActionsDropdown>

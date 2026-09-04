@@ -15,29 +15,41 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useRef } from 'react';
 import * as React from 'react';
+import { useRef } from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamCountBadge from 'components/streams/StreamCountBadge';
+import type { Stream } from 'logic/streams/types';
+import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import { CountBadge } from 'components/common';
 
 type Props = {
-  stream: Stream
-}
+  stream: Stream;
+};
 
 const OutputsCell = ({ stream }: Props) => {
   const buttonRef = useRef();
+  const { toggleSection, expandedSections } = useExpandedSections();
 
-  if (stream.is_default || !stream.is_editable) {
+  if (!stream.is_editable) {
     return null;
   }
 
-  const outputCount = stream.outputs?.length || 0;
+  const outputCount = stream.outputs?.length ?? 0;
+  if (outputCount === 0) {
+    return null;
+  }
+
+  const outputsSectionIsOpen = expandedSections?.[stream.id]?.includes('outputs');
+  const outputsSectionTitle = `${outputsSectionIsOpen ? 'Hide' : 'Show'} stream outputs`;
 
   return (
-    <StreamCountBadge $disabled={outputCount === 0} ref={buttonRef} title="Stream Outputs">
-      {outputCount}
-    </StreamCountBadge>
+    <CountBadge
+      count={outputCount}
+      iconName={outputsSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+      onClick={() => toggleSection(stream.id, 'outputs')}
+      ref={buttonRef}
+      title={outputsSectionTitle}
+    />
   );
 };
 

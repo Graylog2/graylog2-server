@@ -17,19 +17,24 @@
 package org.graylog2.database.validators;
 
 import org.graylog2.plugin.database.validators.ValidationResult;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LimitedOptionalStringValidatorTest {
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testNegativeMaxLength() {
-        new LimitedOptionalStringValidator(-1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LimitedOptionalStringValidator(-1);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testZeroMaxLength() {
-        new LimitedOptionalStringValidator(0);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LimitedOptionalStringValidator(0);
+        });
     }
 
     @Test

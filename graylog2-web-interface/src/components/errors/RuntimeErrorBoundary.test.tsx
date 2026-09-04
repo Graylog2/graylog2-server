@@ -20,6 +20,7 @@ import { render } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { ReactErrorType } from 'logic/errors/ReportedErrors';
+import asMock from 'helpers/mocking/AsMock';
 
 import RuntimeErrorBoundary from './RuntimeErrorBoundary';
 
@@ -30,7 +31,7 @@ jest.mock('actions/errors/ErrorsActions', () => ({
 const ErroneusComponent = () => {
   // eslint-disable-next-line no-throw-literal
   throw {
-    message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
+    message: "Oh no, a banana peel fell on the party gorilla's head!",
     stack: 'This the stack trace.',
   };
 };
@@ -57,14 +58,18 @@ describe('RuntimeErrorBoundary', () => {
       );
     });
 
-    expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
+    expect(asMock(ErrorsActions.report)).toHaveBeenCalledTimes(1);
 
-    expect(ErrorsActions.report.mock.calls[0][0].error).toStrictEqual({
-      message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
+    const reportMock = asMock(ErrorsActions.report);
+
+    expect(reportMock.mock.calls[0][0].error).toStrictEqual({
+      message: "Oh no, a banana peel fell on the party gorilla's head!",
       stack: 'This the stack trace.',
     });
 
-    expect(ErrorsActions.report.mock.calls[0][0].type).toEqual(ReactErrorType);
-    expect(ErrorsActions.report.mock.calls[0][0].componentStack).not.toBeNull();
+    const reportedError = reportMock.mock.calls[0][0];
+
+    expect(reportedError.type).toEqual(ReactErrorType);
+    expect((reportedError as { info: { componentStack: string } }).info.componentStack).not.toBeNull();
   });
 });

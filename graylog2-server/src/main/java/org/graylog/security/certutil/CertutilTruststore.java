@@ -74,7 +74,9 @@ public class CertutilTruststore implements CliCommand {
 
             char[] password = console.readPassword(PROMPT_ENTER_CA_PASSWORD);
             KeyStore caKeystore = KeyStore.getInstance(PKCS12);
-            caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
+            try (FileInputStream fis = new FileInputStream(caKeystorePath.toFile())) {
+                caKeystore.load(fis, password);
+            }
 
             final X509Certificate caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
 
@@ -101,7 +103,7 @@ public class CertutilTruststore implements CliCommand {
 
     }
 
-    private static String certificateInfo(X509Certificate cert) {
+    public static String certificateInfo(X509Certificate cert) {
         return String.format(Locale.ROOT, "Subject: %s, issuer: %s, not before: %s, not after: %s", cert.getSubjectX500Principal(), cert.getIssuerX500Principal(), cert.getNotBefore(), cert.getNotAfter());
     }
 }

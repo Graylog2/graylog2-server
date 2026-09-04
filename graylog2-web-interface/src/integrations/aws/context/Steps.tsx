@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useMemo, useCallback } from 'react';
 
 // TODO: Fix typing
 export const StepsContext = createContext<any>(undefined);
@@ -23,27 +23,31 @@ type StepsProviderProps = {
   children: any;
 };
 
-export const StepsProvider = ({
-  children,
-}: StepsProviderProps) => {
+export const StepsProvider = ({ children }: StepsProviderProps) => {
   const [currentStep, setCurrentStep] = useState('authorize');
   const [enabledSteps, enableStep] = useState(['authorize']);
   const [availableSteps, setAvailableStep] = useState([]);
 
-  const isDisabledStep = (step) => {
-    if (!enabledSteps || enabledSteps.length === 0) {
-      return true;
-    }
+  const isDisabledStep = useCallback(
+    (step) => {
+      if (!enabledSteps || enabledSteps.length === 0) {
+        return true;
+      }
 
-    return !enabledSteps.includes(step);
-  };
+      return !enabledSteps.includes(step);
+    },
+    [enabledSteps],
+  );
 
-  const setEnabledStep = (step) => {
-    enableStep([...enabledSteps, step]);
-  };
+  const setEnabledStep = useCallback(
+    (step) => {
+      enableStep([...enabledSteps, step]);
+    },
+    [enabledSteps],
+  );
 
-  return (
-    <StepsContext.Provider value={{
+  const contextValue = useMemo(
+    () => ({
       availableSteps,
       currentStep,
       enabledSteps,
@@ -51,8 +55,9 @@ export const StepsProvider = ({
       setAvailableStep,
       setCurrentStep,
       setEnabledStep,
-    }}>
-      {children}
-    </StepsContext.Provider>
+    }),
+    [availableSteps, currentStep, enabledSteps, isDisabledStep, setEnabledStep],
   );
+
+  return <StepsContext.Provider value={contextValue}>{children}</StepsContext.Provider>;
 };

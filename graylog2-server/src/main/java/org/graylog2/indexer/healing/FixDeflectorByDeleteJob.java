@@ -18,15 +18,15 @@ package org.graylog2.indexer.healing;
 
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.buffers.Buffers;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ import static org.graylog2.buffers.Buffers.Type.PROCESS;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class FixDeflectorByDeleteJob extends SystemJob {
+public class FixDeflectorByDeleteJob extends LegacySystemJob {
 
     public interface Factory {
 
@@ -75,7 +75,7 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     @Override
     public void execute() {
-        indexSetRegistry.forEach(this::doExecute);
+        indexSetRegistry.getAllIndexSets().forEach(this::doExecute);
     }
 
     public void doExecute(IndexSet indexSet) {

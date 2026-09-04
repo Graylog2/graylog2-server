@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 

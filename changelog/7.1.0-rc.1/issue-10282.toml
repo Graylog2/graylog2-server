@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix Beats Kafka input to correctly determine field prefix when @metadata is missing by falling back to agent.type or beat.type fields."
+
+issues = ["graylog-plugin-enterprise#10282"]
+pulls = ["24225"]

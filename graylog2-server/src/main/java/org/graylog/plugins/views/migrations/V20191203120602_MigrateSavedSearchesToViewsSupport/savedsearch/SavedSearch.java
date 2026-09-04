@@ -22,11 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
 @AutoValue
 @JsonAutoDetect
 public abstract class SavedSearch implements MongoEntity {
-    public abstract String id();
     public abstract String title();
     public abstract Query query();
     public abstract DateTime createdAt();
@@ -34,7 +35,7 @@ public abstract class SavedSearch implements MongoEntity {
 
     @JsonCreator
     static SavedSearch create(
-            @JsonProperty("_id") String id,
+            @JsonProperty(FIELD_ID) @Id @ObjectId String id,
             @JsonProperty("title") String title,
             @JsonProperty("query") Query query,
             @JsonProperty("created_at") DateTime createdAt,

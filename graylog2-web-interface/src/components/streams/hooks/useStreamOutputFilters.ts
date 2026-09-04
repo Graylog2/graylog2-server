@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import * as Immutable from 'immutable';
 
 import PaginationURL from 'util/PaginationURL';
@@ -26,15 +26,20 @@ import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/ou
 import { defaultOnError } from 'util/conditional/onError';
 
 type PaginatedResponse = {
-  total: number,
-  page: number,
-  per_page: number,
-  count: number,
-  elements: Array<StreamOutputFilterRule>,
-  query: string
-}
+  total: number;
+  page: number;
+  per_page: number;
+  count: number;
+  elements: Array<StreamOutputFilterRule>;
+  query: string;
+};
 export const KEY_PREFIX = ['streams', 'output', 'filters'];
-export const keyFn = (streamId: string, destinationType: string, pagination?: Pagination) => [...KEY_PREFIX, streamId, destinationType, pagination];
+export const keyFn = (streamId: string, destinationType?: string, pagination?: Pagination) => [
+  ...KEY_PREFIX,
+  streamId,
+  destinationType ?? 'all',
+  pagination,
+];
 const defaultParams = { page: 1, perPage: 10, query: '' };
 
 export const fetchStreamOutputFilters = async (streamId: string, pagination: Pagination) => {
@@ -46,14 +51,7 @@ export const fetchStreamOutputFilters = async (streamId: string, pagination: Pag
   );
 
   return fetch('GET', qualifyUrl(url)).then((response: PaginatedResponse) => {
-    const {
-      elements,
-      query,
-      total,
-      page,
-      per_page: perPage,
-      count,
-    } = response;
+    const { elements, query, total, page, per_page: perPage, count } = response;
 
     return {
       list: Immutable.List(elements),
@@ -69,28 +67,37 @@ export const fetchStreamOutputFilters = async (streamId: string, pagination: Pag
   });
 };
 
-const useStreamOutputFilters = (streamId: string, destinationType: string, pagination: Pagination = defaultParams): {
-  data: PaginatedList<StreamOutputFilterRule>,
-  refetch: () => void,
-  isLoading: boolean,
-  isSuccess: boolean,
+const useStreamOutputFilters = (
+  streamId: string,
+  destinationType: string | undefined,
+  pagination: Pagination = defaultParams,
+): {
+  data: PaginatedList<StreamOutputFilterRule>;
+  refetch: () => void;
+  isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { data, refetch, isLoading, isSuccess } = useQuery(
-    keyFn(streamId, destinationType, pagination),
-    () => defaultOnError(fetchStreamOutputFilters(streamId, { ...pagination, query: `destination_type:${destinationType}` }),
-      'Loading stream output filters failed with status',
-      'Could not load stream output filters'),
-    {
-      keepPreviousData: true,
-    },
-  );
+  const { data, refetch, isLoading, isSuccess } = useQuery({
+    queryKey: keyFn(streamId, destinationType, pagination),
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchStreamOutputFilters(streamId, {
+          ...pagination,
+          query: destinationType ? `destination_type:${destinationType}` : pagination.query,
+        }),
+        'Loading stream output filters failed with status',
+        'Could not load stream output filters',
+      ),
+    placeholderData: keepPreviousData,
+  });
+
+  return {
     data,
     refetch,
     isLoading,
     isSuccess,
-  });
+  };
 };
 
 export default useStreamOutputFilters;

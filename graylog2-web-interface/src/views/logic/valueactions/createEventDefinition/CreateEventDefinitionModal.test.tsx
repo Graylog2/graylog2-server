@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { mappedDataResult, modalDataResult } from 'fixtures/createEventDefinitionFromValue';
 import CreateEventDefinitionModal from 'views/logic/valueactions/createEventDefinition/CreateEventDefinitionModal';
@@ -38,20 +39,17 @@ const checked = {
   streams: true,
 };
 const onClose = jest.fn();
-const renderCreateDefinitionModal = ({
-  modalData = modalDataResult,
-  mappedData = mappedDataResult,
-}) => render(
-  <CreateEventDefinitionModal onClose={onClose} modalData={modalData} mappedData={mappedData} show />,
-);
+const renderCreateDefinitionModal = ({ modalData = modalDataResult, mappedData = mappedDataResult }) =>
+  render(<CreateEventDefinitionModal onClose={onClose} modalData={modalData} mappedData={mappedData} show />);
 
-const renderWithAllChecked = () => renderCreateDefinitionModal({
-  mappedData: {
-    ...mappedDataResult,
-    rowValuePath: 'action:login',
-    columnValuePath: 'action:login',
-  },
-});
+const renderWithAllChecked = () =>
+  renderCreateDefinitionModal({
+    mappedData: {
+      ...mappedDataResult,
+      rowValuePath: 'action:login',
+      columnValuePath: 'action:login',
+    },
+  });
 const mockedDispatch = jest.fn();
 
 describe('CreateEventDefinitionModal', () => {
@@ -134,7 +132,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const allButton = await screen.findByText('Exactly this value');
-      fireEvent.click(allButton);
+      await userEvent.click(allButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_EXACT_STRATEGY',
@@ -154,7 +152,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const rowButton = await screen.findByText('Any in row');
-      fireEvent.click(rowButton);
+      await userEvent.click(rowButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_ROW_STRATEGY',
@@ -174,7 +172,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const colButton = await screen.findByText('Any in column');
-      fireEvent.click(colButton);
+      await userEvent.click(colButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_COL_STRATEGY',
@@ -194,7 +192,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const widgetButton = await screen.findByText('Any in widget');
-      fireEvent.click(widgetButton);
+      await userEvent.click(widgetButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_ALL_STRATEGY',
@@ -214,7 +212,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const customButton = await screen.findByText('Custom');
-      fireEvent.click(customButton);
+      await userEvent.click(customButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_CUSTOM_STRATEGY',
@@ -234,7 +232,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const checkbox = await screen.findByText('count(action): 400');
-      fireEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'UPDATE_CHECKED_ITEMS',
@@ -263,7 +261,6 @@ describe('CreateEventDefinitionModal', () => {
 
     const linkButton = await screen.findByRole<HTMLAnchorElement>('link', {
       name: /continue configuration/i,
-      hidden: true,
     });
 
     expect(linkButton.href).toContain('/alerts/definitions/new?step=condition&session-id=cedfv-session-id');

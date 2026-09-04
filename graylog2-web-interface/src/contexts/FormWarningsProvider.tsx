@@ -23,26 +23,25 @@ import type { Warnings } from './FormWarningsContext';
 import FormWarningsContext from './FormWarningsContext';
 
 type Props = {
-  children: React.ReactNode
+  children: React.ReactNode;
 };
 
 const FormWarningsProvider = ({ children }: Props) => {
   const isMountedRef = useIsMountedRef();
   const [warnings, setWarnings] = useState<Warnings>({});
 
-  const setFieldWarning = useCallback(<T extends keyof Warnings>(fieldName: T, warning: Warnings[T]) => {
-    if (isMountedRef.current === true) {
-      setWarnings((curWarnings) => ({ ...curWarnings, [fieldName]: warning }));
-    }
-  }, [isMountedRef]);
+  const setFieldWarning = useCallback(
+    <T extends keyof Warnings>(fieldName: T, warning: Warnings[T]) => {
+      if (isMountedRef.current === true) {
+        setWarnings((curWarnings) => ({ ...curWarnings, [fieldName]: warning }));
+      }
+    },
+    [isMountedRef],
+  );
 
   const formWarningsContextValue = useMemo(() => ({ warnings, setFieldWarning }), [setFieldWarning, warnings]);
 
-  return (
-    <FormWarningsContext.Provider value={formWarningsContextValue}>
-      {children}
-    </FormWarningsContext.Provider>
-  );
+  return <FormWarningsContext.Provider value={formWarningsContextValue}>{children}</FormWarningsContext.Provider>;
 };
 
 export default FormWarningsProvider;

@@ -16,10 +16,11 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { AdditionalContext } from 'views/logic/ActionContext';
+import type { ActionContexts } from 'views/types';
 
 import SelectExtractorType from './SelectExtractorType';
 
@@ -46,25 +47,37 @@ describe('SelectExtractorType', () => {
   it('should render', async () => {
     render(
       <AdditionalContext.Provider key="message-key" value={{ message }}>
-        <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
+        <SelectExtractorType
+          onClose={() => {}}
+          queryId="query-id"
+          field={field}
+          type={FieldType.Unknown}
+          value={value}
+          contexts={{} as ActionContexts}
+        />
       </AdditionalContext.Provider>,
     );
 
-    await screen.findByRole('heading', { name: /select extractor type/i, hidden: true });
+    await screen.findByRole('heading', { name: /select extractor type/i });
   });
 
   it('should select a extractor and open a new window', async () => {
     render(
       <AdditionalContext.Provider key="message-key" value={{ message }}>
-        <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
+        <SelectExtractorType
+          onClose={() => {}}
+          queryId="query-id"
+          field={field}
+          type={FieldType.Unknown}
+          value={value}
+          contexts={{} as ActionContexts}
+        />
       </AdditionalContext.Provider>,
     );
 
-    const extractorType = (await screen.findAllByText(/select extractor type/i))[1];
-    await selectEvent.openMenu(extractorType);
-    await selectEvent.select(extractorType, 'Grok pattern');
+    await selectEvent.chooseOption('select extractor type', 'Grok pattern');
 
-    await userEvent.click(await screen.findByRole('button', { name: /submit/i, hidden: true }));
+    await userEvent.click(await screen.findByRole('button', { name: /submit/i }));
 
     expect(window.open).toHaveBeenCalled();
     expect(focus).toHaveBeenCalled();

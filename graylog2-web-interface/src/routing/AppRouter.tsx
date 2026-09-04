@@ -31,12 +31,12 @@ import {
   ContentPacksPage,
   CreateContentPackPage,
   CreateEventDefinitionPage,
+  SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
-  DataNodesPage,
   DataNodePage,
+  DataNodeUpgradePage,
   DataNodesClusterManagementPage,
-  DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
@@ -68,12 +68,18 @@ import {
   InputDiagnosisPage,
   KeyboardShortcutsPage,
   LoggersPage,
+  LUTCacheDetailsPage,
   LUTCachesPage,
+  LUTCachesFormPage,
   LUTDataAdaptersPage,
+  LUTDataAdaptersFormPage,
+  LUTDataAdapterDetailsPage,
   LUTTablesPage,
+  LUTFormPage,
+  LUTDetailsPage,
   NodeInputsPage,
-  NodesPage,
   NotFoundPage,
+  ApiBrowserPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,
@@ -95,12 +101,20 @@ import {
   SidecarNewConfigurationPage,
   SidecarsPage,
   SidecarStatusPage,
+  CollectorsOverviewPage,
+  CollectorsFleetsPage,
+  CollectorsFleetDetailPage,
+  CollectorsInstancesPage,
+  CollectorsOnboardingInstancePage,
+  CollectorsDeploymentPage,
+  CollectorsSettingsPage,
   SimulatorPage,
   StartPage,
   StreamEditPage,
   StreamOutputsPage,
   StreamsPage,
   StreamDetailsPage,
+  SystemNotificationsPage,
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
@@ -113,6 +127,8 @@ import {
   ViewEventDefinitionPage,
   SidecarFailureTrackingPage,
   IndexSetFieldTypesPage,
+  ClusterConfigurationPage,
+  ClusterCertificateManagementPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -122,6 +138,8 @@ import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import TokenManagementPage from 'pages/TokenManagementPage';
+import { withLUTModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -145,10 +163,18 @@ const routeHasAppParent = (route: PluginRoute) => route.parentComponent === App;
 
 const AppRouter = () => {
   const pluginRoutes = usePluginEntities('routes');
-  const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map((route) => renderPluginRoute({ ...route, parentComponent: GlobalContextProviders }));
-  const pluginRoutesWithAppParent = pluginRoutes.filter((route) => routeHasAppParent(route)).map((route) => renderPluginRoute({ ...route, parentComponent: null }));
-  const pluginRoutesWithParent = pluginRoutes.filter((route) => (route.parentComponent && !routeHasAppParent(route))).map(renderPluginRoute);
-  const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map(renderPluginRoute);
+  const pluginRoutesWithNullParent = pluginRoutes
+    .filter((route) => route.parentComponent === null)
+    .map((route) => renderPluginRoute({ ...route, parentComponent: GlobalContextProviders }));
+  const pluginRoutesWithAppParent = pluginRoutes
+    .filter((route) => routeHasAppParent(route))
+    .map((route) => renderPluginRoute({ ...route, parentComponent: null }));
+  const pluginRoutesWithParent = pluginRoutes
+    .filter((route) => route.parentComponent && !routeHasAppParent(route))
+    .map(renderPluginRoute);
+  const standardPluginRoutes = pluginRoutes
+    .filter((route) => route.parentComponent === undefined)
+    .map(renderPluginRoute);
 
   const isCloud = AppConfig.isCloud();
 
@@ -159,13 +185,18 @@ const AppRouter = () => {
   }
 
   const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
+  const enableCollectors = AppConfig.isFeatureEnabled('collectors');
 
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
 
     {
       path: RoutePaths.STARTPAGE,
-      element: <GlobalContextProviders><App /></GlobalContextProviders>,
+      element: (
+        <GlobalContextProviders>
+          <App />
+        </GlobalContextProviders>
+      ),
       children: [
         { path: RoutePaths.STARTPAGE, element: <StartPage /> },
         { path: RoutePaths.SEARCH, element: <DelegatedSearchPage /> },
@@ -177,7 +208,9 @@ const AppRouter = () => {
           children: [
             { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
             { path: RoutePaths.WELCOME, element: <WelcomePage /> },
+            { path: RoutePaths.API_BROWSER, element: <ApiBrowserPage /> },
             { path: RoutePaths.STREAMS, element: <StreamsPage /> },
+            { path: RoutePaths.STREAM_NEW, element: <StreamsPage /> },
             { path: RoutePaths.stream_view(':streamId'), element: <StreamDetailsPage /> },
             { path: RoutePaths.stream_edit(':streamId'), element: <StreamEditPage /> },
             !isCloud && { path: RoutePaths.stream_outputs(':streamId'), element: <StreamOutputsPage /> },
@@ -185,6 +218,8 @@ const AppRouter = () => {
             { path: RoutePaths.ALERTS.LIST, element: <EventsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.LIST, element: <EventDefinitionsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.CREATE, element: <CreateEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.GIT_IMPORT, element: <SigmaEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.FILE_IMPORT, element: <SigmaEventDefinitionPage /> },
             {
               path: RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId'),
               element: <EditEventDefinitionPage />,
@@ -205,14 +240,23 @@ const AppRouter = () => {
             },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
+            { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
             !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
             !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
             !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },
             !isCloud && { path: RoutePaths.new_extractor(':nodeId', ':inputId'), element: <CreateExtractorsPage /> },
-            !isCloud && { path: RoutePaths.edit_extractor(':nodeId', ':inputId', ':extractorId'), element: <EditExtractorsPage /> },
-            !isCloud && { path: RoutePaths.import_extractors(':nodeId', ':inputId'), element: <ImportExtractorsPage /> },
-            !isCloud && { path: RoutePaths.export_extractors(':nodeId', ':inputId'), element: <ExportExtractorsPage /> },
+            !isCloud && {
+              path: RoutePaths.edit_extractor(':nodeId', ':inputId', ':extractorId'),
+              element: <EditExtractorsPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.import_extractors(':nodeId', ':inputId'),
+              element: <ImportExtractorsPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.export_extractors(':nodeId', ':inputId'),
+              element: <ExportExtractorsPage />,
+            },
 
             { path: `${RoutePaths.SYSTEM.CONFIGURATIONS}/*`, element: <ConfigurationsPage /> },
 
@@ -232,24 +276,30 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.INDEX_SETS.FIELD_TYPES(':indexSetId'), element: <IndexSetFieldTypesPage /> },
 
             { path: RoutePaths.SYSTEM.INDICES.LIST, element: <IndicesPage /> },
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> }
-            ),
+            !isCloud && { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> },
 
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: <LUTTablesPage /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTTablesPage action="create" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':tableName'), element: <LUTTablesPage action="show" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':tableName'), element: <LUTTablesPage action="edit" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: withLUTModalProvider(LUTTablesPage) },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':lutIdOrName'), element: <LUTDetailsPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTFormPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':lutIdOrName'), element: <LUTFormPage /> },
 
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: <LUTCachesPage /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesPage action="create" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName'), element: <LUTCachesPage action="show" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName'), element: <LUTCachesPage action="edit" /> },
-
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW, element: <LUTDataAdaptersPage /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE, element: <LUTDataAdaptersPage action="create" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName'), element: <LUTDataAdaptersPage action="show" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName'), element: <LUTDataAdaptersPage action="edit" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: withLUTModalProvider(LUTCachesPage) },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheIdOrName'), element: <LUTCacheDetailsPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesFormPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheIdOrName'), element: <LUTCachesFormPage /> },
+            {
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW,
+              element: withLUTModalProvider(LUTDataAdaptersPage),
+            },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE, element: <LUTDataAdaptersFormPage /> },
+            {
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterIdOrName'),
+              element: <LUTDataAdaptersFormPage />,
+            },
+            {
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterIdOrName'),
+              element: <LUTDataAdapterDetailsPage />,
+            },
 
             { path: RoutePaths.SYSTEM.PIPELINES.OVERVIEW, element: <PipelinesOverviewPage /> },
             { path: RoutePaths.SYSTEM.PIPELINES.RULES, element: <RulesPage /> },
@@ -257,55 +307,71 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.PIPELINES.SIMULATOR, element: <SimulatorPage /> },
             { path: RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId'), element: <PipelineDetailsPage /> },
 
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODES, element: <ClusterConfigurationPage /> },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
+              element: <DataNodesClusterManagementPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
+              element: <ClusterCertificateManagementPage />,
+            },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
+            !isCloud &&
+              enableDataNodeMigration && {
+                path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
+                element: <DataNodesMigrationPage />,
+              },
+
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },
+
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterManagementPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CONFIGURATION, element: <DataNodesClusterConfigurationPage /> },
-            !isCloud && enableDataNodeMigration && { path: RoutePaths.SYSTEM.DATANODES.MIGRATION, element: <DataNodesMigrationPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE, element: <AuthenticationPage /> }
-            ),
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.CREATE, element: <AuthenticationCreatePage /> }
-            ),
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW, element: <AuthenticationOverviewPage /> }
-            ),
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId'), element: <AuthenticationBackendDetailsPage /> }
-            ),
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId'), element: <AuthenticationBackendEditPage /> }
-            ),
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name'), element: <AuthenticationBackendCreatePage /> }
-            ),
+            !isCloud && { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE, element: <AuthenticationPage /> },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.CREATE,
+              element: <AuthenticationCreatePage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW,
+              element: <AuthenticationOverviewPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId'),
+              element: <AuthenticationBackendDetailsPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId'),
+              element: <AuthenticationBackendEditPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name'),
+              element: <AuthenticationBackendCreatePage />,
+            },
 
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW, element: <AuthenticatorsPage /> }
-            ),
-            !isCloud && (
-              { path: RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT, element: <AuthenticatorsEditPage /> }
-            ),
+            !isCloud && { path: RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW, element: <AuthenticatorsPage /> },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT,
+              element: <AuthenticatorsEditPage />,
+            },
 
             { path: RoutePaths.SYSTEM.USERS.OVERVIEW, element: <UsersOverviewPage /> },
             { path: RoutePaths.SYSTEM.USERS.CREATE, element: <UserCreatePage /> },
             { path: RoutePaths.SYSTEM.USERS.show(':userId'), element: <UserDetailsPage /> },
             { path: RoutePaths.SYSTEM.USERS.edit(':userId'), element: <UserEditPage /> },
             { path: RoutePaths.SYSTEM.USERS.TOKENS.edit(':userId'), element: <UserTokensEditPage /> },
+            { path: RoutePaths.SYSTEM.USERS_TOKEN_MANAGEMENT.overview, element: <TokenManagementPage /> },
 
             { path: RoutePaths.SYSTEM.AUTHZROLES.OVERVIEW, element: <RolesOverviewPage /> },
             { path: RoutePaths.SYSTEM.AUTHZROLES.show(':roleId'), element: <RoleDetailsPage /> },
             { path: RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId'), element: <RoleEditPage /> },
 
             { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
+            { path: RoutePaths.SYSTEM.NOTIFICATIONS, element: <SystemNotificationsPage /> },
             { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },
@@ -317,17 +383,52 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.SIDECARS.CONFIGURATION, element: <SidecarConfigurationPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.FAILURE_TRACKING, element: <SidecarFailureTrackingPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_CONFIGURATION, element: <SidecarNewConfigurationPage /> },
-            { path: RoutePaths.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId'), element: <SidecarEditConfigurationPage /> },
+            {
+              path: RoutePaths.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId'),
+              element: <SidecarEditConfigurationPage />,
+            },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
+
+            ...(enableCollectors
+              ? [
+                  { path: RoutePaths.SYSTEM.COLLECTORS.OVERVIEW, element: <CollectorsOverviewPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.FLEETS, element: <CollectorsFleetsPage /> },
+                  { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/new`, element: <CollectorsFleetsPage /> },
+                  { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/:fleetId`, element: <CollectorsFleetDetailPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.INSTANCES, element: <CollectorsInstancesPage /> },
+                  {
+                    path: RoutePaths.SYSTEM.COLLECTORS.ONBOARDING_INSTANCE(':instanceUid'),
+                    element: <CollectorsOnboardingInstancePage />,
+                  },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.DEPLOYMENT, element: <CollectorsDeploymentPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.SETTINGS, element: <CollectorsSettingsPage /> },
+                ]
+              : []),
+
             { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
-            { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, element: <IndexSetFieldTypeProfilesPage /> },
-            { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(':profileId'), element: <IndexSetFieldTypeProfileEditPage /> },
-            { path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE, element: <IndexSetFieldTypeProfileCreatePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.INDICES.TEMPLATES.view(':templateId'), element: <IndexSetTemplatePage /> },
+            {
+              path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
+              element: <IndexSetFieldTypeProfilesPage />,
+            },
+            {
+              path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(':profileId'),
+              element: <IndexSetFieldTypeProfileEditPage />,
+            },
+            {
+              path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE,
+              element: <IndexSetFieldTypeProfileCreatePage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.INDICES.TEMPLATES.view(':templateId'),
+              element: <IndexSetTemplatePage />,
+            },
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.TEMPLATES.OVERVIEW, element: <IndexSetTemplatesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.TEMPLATES.CREATE, element: <IndexSetTemplateCreatePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.INDICES.TEMPLATES.edit(':templateId'), element: <IndexSetTemplateEditPage /> },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.INDICES.TEMPLATES.edit(':templateId'),
+              element: <IndexSetTemplateEditPage />,
+            },
             ...standardPluginRoutes,
             { path: '*', element: <NotFoundPage displayPageLayout={false} /> },
           ].filter((route) => !!route),
@@ -339,7 +440,7 @@ const AppRouter = () => {
 
   return (
     <RouterErrorBoundary>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </RouterErrorBoundary>
   );
 };

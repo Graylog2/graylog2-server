@@ -19,7 +19,7 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { css } from 'styled-components';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import DestinationOutputs from 'components/streams/StreamDetails/routing-destination/DestinationOutputs';
 import DestinationIndexSetSection from 'components/streams/StreamDetails/routing-destination/DestinationIndexSetSection';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -31,23 +31,33 @@ type Props = {
   stream: Stream;
 };
 
-const Container = styled.div(({ theme }) => css`
-  > div {
-    margin-bottom: ${theme.spacings.sm};
-  }
-`);
+const Container = styled.div(
+  ({ theme }) => css`
+    > div {
+      margin-bottom: ${theme.spacings.sm};
+    }
+  `,
+);
 
 const StreamDataRoutingDestinations = ({ stream }: Props) => {
   const currentUser = useCurrentUser();
-  const StreamDataWarehouseComponent = PluginStore.exports('dataWarehouse')?.[0]?.StreamDataWarehouse;
+  const StreamDataLakeComponent = PluginStore.exports('dataLake')?.[0]?.StreamDataLake;
 
-  const destinationIndexset = isPermitted(currentUser.permissions, ['indexsets:read']) ? <DestinationIndexSetSection stream={stream} /> : <DestinationPermissionAlert sectionName="Index Set" />;
-  const destinationOutput = isPermitted(currentUser.permissions, ['output:read']) ? <DestinationOutputs stream={stream} /> : <DestinationPermissionAlert sectionName="Outputs" />;
+  const destinationIndexset = isPermitted(currentUser.permissions, ['indexsets:read']) ? (
+    <DestinationIndexSetSection stream={stream} />
+  ) : (
+    <DestinationPermissionAlert sectionName="Index Set" />
+  );
+  const destinationOutput = isPermitted(currentUser.permissions, ['outputs:read', 'stream_outputs:read']) ? (
+    <DestinationOutputs stream={stream} />
+  ) : (
+    <DestinationPermissionAlert sectionName="Outputs" />
+  );
 
   return (
     <Container>
       {destinationIndexset}
-      {StreamDataWarehouseComponent && <StreamDataWarehouseComponent permissions={currentUser.permissions} />}
+      {StreamDataLakeComponent && <StreamDataLakeComponent permissions={currentUser.permissions} />}
       {destinationOutput}
     </Container>
   );

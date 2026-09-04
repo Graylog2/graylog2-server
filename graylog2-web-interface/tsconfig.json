@@ -6,8 +6,8 @@
       "dom.iterable",
       "esnext"
     ],
+    "types": ["node"],
     "allowJs": false,
-    "downlevelIteration": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -23,14 +23,13 @@
 
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "baseUrl": ".",
     "paths": {
-      "*": ["*", "./src/*", "./test/*"],
+      "*": ["./src/*", "./test/*"],
       "@graylog/server-api": ["./target/api"]
     }
   },
@@ -40,7 +39,8 @@
   ],
   "ts-node": {
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "commonjs",
+      "moduleResolution": "node10"
     }
   }
 }

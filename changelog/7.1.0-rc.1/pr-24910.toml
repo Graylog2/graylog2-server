@@ -1,0 +1,4 @@
+type = "r"
+message = "Removed support for remote-reindex migration to data node"
+
+pulls = ["24910"]

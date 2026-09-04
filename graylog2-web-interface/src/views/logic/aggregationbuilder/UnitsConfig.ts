@@ -22,9 +22,9 @@ import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import type { FieldUnitsFormValues } from 'views/types';
 
 type FieldName = string;
-export type UnitsConfigJson = Record<FieldName, FieldUnitJson>
+export type UnitsConfigJson = Record<FieldName, FieldUnitJson>;
 
-type InternalState = Record<FieldName, FieldUnit>
+type InternalState = Record<FieldName, FieldUnit>;
 
 export default class UnitsConfig {
   private readonly _value: InternalState;

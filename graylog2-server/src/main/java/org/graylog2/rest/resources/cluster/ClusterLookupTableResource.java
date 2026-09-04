@@ -17,26 +17,12 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.rest.resources.system.RemoteLookupTableResource;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import jakarta.validation.constraints.NotEmpty;
-
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -45,18 +31,29 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.resources.system.RemoteLookupTableResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.ProxiedResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 /**
  * The primary objective of this API is to provide facilities for managing Lookup Tables on the cluster level.
  * Originally was introduced to perform cluster-wide Cache purging.
  */
 @RequiresAuthentication
-@Api(value = "Cluster/LookupTable", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Cluster/LookupTable")
 @Path("/cluster/system/lookup")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterLookupTableResource extends ProxiedResource {
@@ -78,12 +75,12 @@ public class ClusterLookupTableResource extends ProxiedResource {
     @POST
     @Timed
     @Path("tables/{idOrName}/purge")
-    @ApiOperation(value = "Purge Lookup Table Cache on the cluster-wide level")
+    @Operation(summary = "Purge Lookup Table Cache on the cluster-wide level")
     @NoAuditEvent("Cache purge only")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public Map<String, CallResult<Void>> performPurge(
-            @ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-            @ApiParam(name = "key") @QueryParam("key") String key) {
+            @Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+            @Parameter(name = "key") @QueryParam("key") String key) {
         return requestOnAllNodes(RemoteLookupTableResource.class, client -> client.performPurge(idOrName, key));
     }
 }

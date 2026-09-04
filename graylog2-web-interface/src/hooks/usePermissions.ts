@@ -15,15 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback, useMemo } from 'react';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 
 const usePermissions = () => {
   const currentUser = useCurrentUser();
-  const _isPermitted = useCallback((permissions: Array<string> | string) => isPermitted(currentUser?.permissions, permissions), [currentUser?.permissions]);
+  const _isPermitted = useCallback(
+    (permissions: Array<Permission> | Permission) => isPermitted(currentUser?.permissions, permissions),
+    [currentUser?.permissions],
+  );
 
-  return useMemo(() => ({ isPermitted: _isPermitted }), [_isPermitted]);
+  const _isAnyPermitted = useCallback(
+    (permissions: Array<Permission>) => isAnyPermitted(currentUser?.permissions, permissions),
+    [currentUser?.permissions],
+  );
+
+  return useMemo(
+    () => ({ isPermitted: _isPermitted, isAnyPermitted: _isAnyPermitted }),
+    [_isPermitted, _isAnyPermitted],
+  );
 };
 
 export default usePermissions;

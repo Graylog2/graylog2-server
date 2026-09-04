@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
-import type { Stream } from 'stores/streams/StreamsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import { searchStreamsPaginated } from 'api/streams';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -31,46 +31,49 @@ const INITIAL_DATA = {
 export const KEY_PREFIX = ['streams', 'overview'];
 export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParams];
 
-export const fetchStreams = (searchParams: SearchParams) => StreamsStore.searchPaginated(
-  searchParams.page,
-  searchParams.pageSize,
-  searchParams.query,
-  {
+export const fetchStreams = (searchParams: SearchParams) =>
+  searchStreamsPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
     filters: FiltersForQueryParams(searchParams.filters),
-  },
-);
+  });
 
 type Options = {
-  enabled: boolean,
-}
-
-type StreamsResponse = {
-  list: Array<Stream>,
-  pagination: { total: number }
-  attributes: Array<Attribute>
+  enabled: boolean;
 };
 
-const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: StreamsResponse,
-  refetch: () => void,
-  isInitialLoading: boolean,
-} => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(searchParams),
-    () => defaultOnError<StreamsResponse>(fetchStreams(searchParams), 'Loading streams failed with status', 'Could not load streams'),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+type StreamsResponse = {
+  list: Array<Stream>;
+  pagination: { total: number };
+  attributes: Array<Attribute>;
+};
 
-  return ({
+const useStreams = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
+  data: StreamsResponse;
+  refetch: () => void;
+  isInitialLoading: boolean;
+} => {
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
+
+    queryFn: () =>
+      defaultOnError<StreamsResponse>(
+        fetchStreams(searchParams),
+        'Loading streams failed with status',
+        'Could not load streams',
+      ),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+
+  return {
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useStreams;

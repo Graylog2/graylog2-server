@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.rulebuilder.db.migrations;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
@@ -24,8 +25,6 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragmentService;
 import org.graylog2.migrations.Migration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 
@@ -136,14 +135,14 @@ public class V20230720161500_AddExtractorFragments extends Migration {
                                 string("field").description("Field to extract").build(),
                                 string("pattern").description("The regular expression used for extraction.").build(),
                                 string("replacement").description("The replacement used for the matching text. Please refer to the Matcher API documentation for the possible options.").build(),
-                                bool("replaceAll").description("Replace all occurences of the pattern, or only the first occurence. (default: true)").build(),
+                                bool("replaceAll").optional().description("Replace all occurrences of the pattern, or only the first occurrence. (default: true)").build(),
                                 string("newField").description("New field to copy value to").build()
                         ))
                         .returnType(String.class)
-                        .description("Copy extracted regular expression of field value to a new field")
+                        .description("Copy and replace extracted regular expression of field value to a new field")
                         .ruleBuilderEnabled()
-                        .ruleBuilderName("Extract regular expression to new field")
-                        .ruleBuilderTitle("Extract regular expression '${pattern}' for field '${field}' and set to new field '${newField}'")
+                        .ruleBuilderName("Extract regular expression to new field with replacement")
+                        .ruleBuilderTitle("Extract regular expression '${pattern}' for field '${field}', replace with '${replacement}' and set to new field '${newField}'")
                         .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.EXTRACTORS)
                         .build())
                 .fragmentOutputVariable(resultvariable)

@@ -20,19 +20,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 
 import java.util.ArrayList;
@@ -54,27 +54,24 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MongoDBExtension.class)
 public class MongoDbGrokPatternServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private MongoCollection<Document> collection;
     private MongoDbGrokPatternService service;
     private ClusterEventBus clusterEventBus;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        collection = mongoConnection.getMongoDatabase().getCollection(MongoDbGrokPatternService.COLLECTION_NAME);
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         clusterEventBus = spy(new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor()));
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         service = new MongoDbGrokPatternService(
-                mongodb.mongoConnection(),
-                mapperProvider,
+                mongoCollections,
                 clusterEventBus);
+        collection = mongoCollections.nonEntityCollection(MongoDbGrokPatternService.COLLECTION_NAME, Document.class);
     }
 
     @Test
@@ -437,7 +434,7 @@ public class MongoDbGrokPatternServiceTest {
     }
 
     @Test
-    @Ignore("Disabled until MongoDbGrokPatternService#validate() has been fixed")
+    @Disabled("Disabled until MongoDbGrokPatternService#validate() has been fixed")
     public void validateInvalidGrokPattern() {
         assertThat(service.validate(GrokPattern.create("Test", "%{"))).isFalse();
         assertThat(service.validate(GrokPattern.create("Test", ""))).isFalse();

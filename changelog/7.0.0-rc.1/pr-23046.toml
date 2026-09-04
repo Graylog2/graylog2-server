@@ -1,0 +1,5 @@
+type = "a"
+message = "Added data preview feature for lookup tables with supported data adapters."
+
+issues = ["graylog-plugin-enterprise#11114"]
+pulls = ["23046"]

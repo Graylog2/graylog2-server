@@ -1,0 +1,5 @@
+type = "f"
+message = "Avoid permissions error during filter preview if user has no access to any streams."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10869"]
+pulls = ["22771"]

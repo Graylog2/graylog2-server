@@ -27,29 +27,18 @@ import CAUpload from './CAUpload';
 
 jest.mock('logic/rest/FetchProvider', () => ({ fetchMultiPartFormData: jest.fn() }));
 jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
-jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
-
 describe('CAUpload', () => {
   beforeEach(() => {
     asMock(fetchMultiPartFormData).mockReturnValue(Promise.resolve());
   });
 
-  const files = [
-    new File(['fileBits'], 'fileName', { type: 'application/x-pem-file' }),
-  ];
+  const files = [new File(['fileBits'], 'fileName', { type: 'application/x-pem-file' })];
 
   const formData = () => {
     const f = new FormData();
@@ -69,14 +58,12 @@ describe('CAUpload', () => {
     render(<CAUpload />);
 
     const dropzone = await findDropZone();
-    userEvent.upload(dropzone, files);
-    userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
+    await userEvent.upload(dropzone, files);
+    await userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
-    await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
-      expect.stringContaining('/ca/upload'),
-      formData(),
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetchMultiPartFormData).toHaveBeenCalledWith(expect.stringContaining('/ca/upload'), formData(), false),
+    );
 
     expect(UserNotification.success).toHaveBeenCalledWith('CA uploaded successfully');
   });
@@ -85,21 +72,19 @@ describe('CAUpload', () => {
     asMock(fetchMultiPartFormData).mockRejectedValue(new Error('Something bad happened'));
 
     render(
-      <DefaultQueryClientProvider options={{ logger }}>
+      <DefaultQueryClientProvider>
         <CAUpload />
       </DefaultQueryClientProvider>,
     );
 
     const dropzone = await findDropZone();
-    userEvent.upload(dropzone, files);
+    await userEvent.upload(dropzone, files);
 
-    userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
-    await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
-      expect.stringContaining('/ca/upload'),
-      formData(),
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetchMultiPartFormData).toHaveBeenCalledWith(expect.stringContaining('/ca/upload'), formData(), false),
+    );
 
     expect(UserNotification.error).toHaveBeenCalledWith('CA upload failed with error: Error: Something bad happened');
   });

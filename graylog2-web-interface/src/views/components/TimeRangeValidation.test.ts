@@ -16,22 +16,24 @@
  */
 import asMock from 'helpers/mocking/AsMock';
 import TimeRangeValidation from 'views/components/TimeRangeValidation';
-import ToolsStore from 'stores/tools/ToolsStore';
+import * as ToolsApi from 'api/tools';
 import { adjustFormat } from 'util/DateTime';
 
-jest.mock('stores/tools/ToolsStore', () => ({
+jest.mock('api/tools', () => ({
   testNaturalDate: jest.fn(),
 }));
 
 describe('TimeRangeValidation', () => {
   describe('keyword', () => {
     beforeEach(() => {
-      asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
-        type: 'absolute',
-        from: '2018-11-14 13:52:38',
-        to: '2018-11-14 13:57:38',
-        timezone: 'Europe/Berlin',
-      }));
+      asMock(ToolsApi.testNaturalDate).mockImplementation(() =>
+        Promise.resolve({
+          type: 'absolute',
+          from: '2018-11-14 13:52:38',
+          to: '2018-11-14 13:57:38',
+          timezone: 'Europe/Berlin',
+        }),
+      );
     });
 
     it('should error on empty keyword', async () => {
@@ -46,7 +48,7 @@ describe('TimeRangeValidation', () => {
     });
 
     it('should error when keyword is not valid', async () => {
-      asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
+      asMock(ToolsApi.testNaturalDate).mockImplementation(() => Promise.reject());
 
       const errors = await TimeRangeValidation(
         { type: 'keyword', keyword: 'Last five minutes' },
@@ -59,12 +61,14 @@ describe('TimeRangeValidation', () => {
     });
 
     it('should error when keyword exceeds limit', async () => {
-      asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
-        type: 'absolute',
-        from: '2018-11-14 13:52:38',
-        to: '2018-11-14 13:57:38',
-        timezone: 'Europe/Berlin',
-      }));
+      asMock(ToolsApi.testNaturalDate).mockImplementation(() =>
+        Promise.resolve({
+          type: 'absolute',
+          from: '2018-11-14 13:52:38',
+          to: '2018-11-14 13:57:38',
+          timezone: 'Europe/Berlin',
+        }),
+      );
 
       const errors = await TimeRangeValidation(
         { type: 'keyword', keyword: 'Last ten days' },

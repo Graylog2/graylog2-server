@@ -18,11 +18,11 @@ package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexFailure;
@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "Indexer/Failures", description = "Indexer failures")
+@Tag(name = "Indexer/Failures", description = "Indexer failures")
 @Path("/system/indexer/failures")
 public class FailuresResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(FailuresResource.class);
@@ -65,14 +65,15 @@ public class FailuresResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Total count of failed index operations since the given date.")
+    @Operation(summary = "Total count of failed index operations since the given date.")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid date parameter provided.")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "400", description = "Invalid date parameter provided.")
     })
     @RequiresPermissions(RestPermissions.INDICES_FAILURES)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("count")
-    public FailureCount count(@ApiParam(name = "since", value = "ISO8601 date", required = true)
+    public FailureCount count(@Parameter(name = "since", description = "ISO8601 date", required = true)
                               @QueryParam("since") @NotEmpty String since) {
         final DateTime sinceDate;
         try {
@@ -88,12 +89,12 @@ public class FailuresResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a list of failed index operations.")
+    @Operation(summary = "Get a list of failed index operations.")
     @RequiresPermissions(RestPermissions.INDICES_FAILURES)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> single(@ApiParam(name = "limit", value = "Limit", required = true)
+    public Map<String, Object> single(@Parameter(name = "limit", description = "Limit", required = true)
                                       @QueryParam("limit") @Min(0) int limit,
-                                      @ApiParam(name = "offset", value = "Offset", required = true)
+                                      @Parameter(name = "offset", description = "Offset", required = true)
                                       @QueryParam("offset") @Min(0) int offset) {
         final List<IndexFailure> indexFailures = indexFailureService.all(limit, offset);
         final List<Map<String, Object>> failures = new ArrayList<>(indexFailures.size());

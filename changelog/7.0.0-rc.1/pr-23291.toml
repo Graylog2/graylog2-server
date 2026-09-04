@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix logging section just shows a loading spinner."
+
+issues = ["11431"]
+pulls = ["23291"]

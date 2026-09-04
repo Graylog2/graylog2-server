@@ -43,7 +43,6 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
 
     public static final long DEFAULT_BACKLOG_SIZE = 0;
     private static final String WEBHOOK_URL = "https://server.region.logic.azure.com:443/workflows/xxxxxxx";
-    private static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
     public static final String DEFAULT_ADAPTIVE_CARD = "{\n" +
             "  \"contentType\": \"application/vnd.microsoft.card.adaptive\",\n" +
             "  \"content\": {\n" +
@@ -74,6 +73,13 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
     static final String FIELD_WEBHOOK_URL = "webhook_url";
     static final String FIELD_ADAPTIVE_CARD = "adaptive_card";
     static final String FIELD_BACKLOG_SIZE = "backlog_size";
+    /**
+     * @deprecated The timezone is no longer user-configurable. Timestamps are sent in UTC
+     * and displayed in the viewer's local Teams timezone via the Adaptive
+     * Cards DATE() function. This field is retained only for backward-compatible
+     * deserialization of existing installations.
+     */
+    @Deprecated
     static final String FIELD_TIME_ZONE = "time_zone";
 
     @JsonProperty(FIELD_BACKLOG_SIZE)
@@ -86,8 +92,6 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
     @JsonProperty(FIELD_ADAPTIVE_CARD)
     public abstract String adaptiveCard();
 
-    @JsonProperty(FIELD_TIME_ZONE)
-    public abstract DateTimeZone timeZone();
 
     @Override
     @JsonIgnore
@@ -100,11 +104,12 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
         return TeamsEventNotificationConfigV2Entity.builder()
                 .webhookUrl(ValueReference.of(webhookUrl()))
                 .adaptiveCard(ValueReference.of(adaptiveCard()))
-                .timeZone(ValueReference.of(timeZone().getID()))
                 .build();
     }
 
-    public static Builder builder() { return Builder.create(); }
+    public static Builder builder() {
+        return Builder.create();
+    }
 
     @Override
     @JsonIgnore
@@ -132,8 +137,7 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
                     .type(TYPE_NAME)
                     .webhookUrl(WEBHOOK_URL)
                     .adaptiveCard(DEFAULT_ADAPTIVE_CARD)
-                    .backlogSize(DEFAULT_BACKLOG_SIZE)
-                    .timeZone(DEFAULT_TIME_ZONE);
+                    .backlogSize(DEFAULT_BACKLOG_SIZE);
         }
 
         @JsonProperty(FIELD_BACKLOG_SIZE)
@@ -145,8 +149,11 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
         @JsonProperty(FIELD_ADAPTIVE_CARD)
         public abstract Builder adaptiveCard(String adaptiveCard);
 
+        // Absorbs the deprecated time_zone field from old persisted documents.
         @JsonProperty(FIELD_TIME_ZONE)
-        public abstract Builder timeZone(DateTimeZone timeZone);
+        public Builder timeZone(DateTimeZone timeZone) {
+            return this;
+        }
 
         public abstract TeamsEventNotificationConfigV2 build();
     }

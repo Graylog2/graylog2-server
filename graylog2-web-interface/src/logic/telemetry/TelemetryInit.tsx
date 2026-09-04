@@ -17,17 +17,16 @@
 import * as React from 'react';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
-import { useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
-import { TelemetrySettingsStore, TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
 import AppConfig from 'util/AppConfig';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import useTelemetrySettings from 'logic/telemetry/useTelemetrySettings';
 
 type PostHogSettings = {
   host: string;
   key: string;
-}
+};
 
 const getPostHogSettings = (): PostHogSettings => {
   const { host, api_key: key } = AppConfig.telemetry() || {};
@@ -39,41 +38,29 @@ const getPostHogSettings = (): PostHogSettings => {
 };
 
 const init = (key: string, host: string) => {
-  posthog.init(
-    key,
-    {
-      autocapture: false,
-      api_host: host,
-      capture_pageview: false,
-      capture_pageleave: false,
-      cross_subdomain_cookie: false,
-      persistence: 'cookie',
-    },
-  );
+  posthog.init(key, {
+    autocapture: false,
+    api_host: host,
+    capture_pageview: false,
+    capture_pageleave: false,
+    cross_subdomain_cookie: false,
+    persistence: 'cookie',
+    strict_script_versioning: true,
+  });
 
   return posthog;
 };
 
 const TelemetryInit = ({ children }: { children: React.ReactElement }) => {
-  const settings = useStore(TelemetrySettingsStore, (state) => state.telemetrySetting);
   const { host, key } = getPostHogSettings();
   const { currentUser } = useStore(CurrentUserStore);
+  const { data: settings } = useTelemetrySettings({ enabled: !!currentUser });
 
-  useEffect(() => {
-    if (currentUser) {
-      TelemetrySettingsActions.get();
-    }
-  }, [currentUser]);
-
-  if ((!settings?.telemetry_enabled) || !host || !key) {
+  if (!settings?.telemetry_enabled || !host || !key) {
     return children;
   }
 
-  return (
-    <PostHogProvider client={init(key, host)}>
-      {children}
-    </PostHogProvider>
-  );
+  return <PostHogProvider client={init(key, host)}>{children}</PostHogProvider>;
 };
 
 export default TelemetryInit;

@@ -14,9 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import type { $PropertyType } from 'utility-types';
-
 import type FetchError from 'logic/errors/FetchError';
 
 export const ReactErrorType = 'ReactError';
@@ -25,39 +22,39 @@ export const UnauthorizedErrorType = 'UnauthorizedError';
 export const StreamPermissionErrorType = 'StreamPermissionError';
 
 type ReactError = {
-  error: Error,
-  info: { componentStack: string },
-  type: 'ReactError',
+  error: Error;
+  info: { componentStack: string };
+  type: 'ReactError';
 };
 type NotFoundError = {
-  error: FetchError,
-  type: 'NotFoundError',
+  error: FetchError;
+  type: 'NotFoundError';
 };
 type UnauthorizedError = {
-  error: FetchError,
-  type: 'UnauthorizedError',
+  error: FetchError;
+  type: 'UnauthorizedError';
 };
 type StreamPermissionError = {
-  error: FetchError,
-  type: 'StreamPermissionError',
+  error: FetchError;
+  type: 'StreamPermissionError';
 };
 
 export type ReportedError = ReactError | NotFoundError | UnauthorizedError | StreamPermissionError;
 
-export const createReactError = (error: $PropertyType<ReactError, 'error'>, info: $PropertyType<ReactError, 'info'>): ReactError => ({
+export const createReactError = (error: ReactError['error'], info: ReactError['info']): ReactError => ({
   error,
   info,
   type: ReactErrorType,
 });
-export const createNotFoundError = (error: $PropertyType<NotFoundError, 'error'>): NotFoundError => ({
+export const createNotFoundError = (error: NotFoundError['error']): NotFoundError => ({
   error,
   type: NotFoundErrorType,
 });
-export const createUnauthorizedError = (error: $PropertyType<UnauthorizedError, 'error'>): UnauthorizedError => ({
+export const createUnauthorizedError = (error: UnauthorizedError['error']): UnauthorizedError => ({
   error,
   type: UnauthorizedErrorType,
 });
-export const createStreamPermissionError = (error: $PropertyType<StreamPermissionError, 'error'>): StreamPermissionError => ({
+export const createStreamPermissionError = (error: StreamPermissionError['error']): StreamPermissionError => ({
   error,
   type: StreamPermissionErrorType,
 });
@@ -65,10 +62,14 @@ export const createStreamPermissionError = (error: $PropertyType<StreamPermissio
 export const createFromFetchError = (error: FetchError) => {
   switch (error.status) {
     case 403:
-      return error?.additional?.body?.type === 'MissingStreamPermission' ? createStreamPermissionError(error) : createUnauthorizedError(error);
+      return error?.additional?.body?.type === 'MissingStreamPermission'
+        ? createStreamPermissionError(error)
+        : createUnauthorizedError(error);
     case 404:
       return createNotFoundError(error);
     default:
-      throw Error(`Provided FetchError is not a valid ReportedError because status code ${error.status} is not supported`);
+      throw Error(
+        `Provided FetchError is not a valid ReportedError because status code ${error.status} is not supported`,
+      );
   }
 };

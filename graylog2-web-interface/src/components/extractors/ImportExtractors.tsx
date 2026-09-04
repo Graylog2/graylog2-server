@@ -18,15 +18,18 @@ import React from 'react';
 
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { importExtractors } from 'hooks/useExtractors';
 
 type ImportExtractorsProps = {
   input: any;
 };
 
-class ImportExtractors extends React.Component<ImportExtractorsProps, {
-  [key: string]: any;
-}> {
+class ImportExtractors extends React.Component<
+  ImportExtractorsProps,
+  {
+    [key: string]: any;
+  }
+> {
   private extractorsInput: Input;
 
   _onSubmit = (event) => {
@@ -36,10 +39,12 @@ class ImportExtractors extends React.Component<ImportExtractorsProps, {
       const parsedExtractors = JSON.parse(this.extractorsInput.getValue() as string);
       const { extractors } = parsedExtractors;
 
-      ExtractorsActions.import(this.props.input.id, extractors);
+      importExtractors(this.props.input.id, extractors);
     } catch (error) {
-      UserNotification.error(`There was an error while parsing extractors. Are they in JSON format? ${error}`,
-        'Could not import extractors');
+      UserNotification.error(
+        `There was an error while parsing extractors. Are they in JSON format? ${error}`,
+        'Could not import extractors',
+      );
     }
   };
 
@@ -55,8 +60,17 @@ class ImportExtractors extends React.Component<ImportExtractorsProps, {
           <Row>
             <Col md={12}>
               <form onSubmit={this._onSubmit}>
-                <Input type="textarea" ref={(extractorsInput) => { this.extractorsInput = extractorsInput; }} id="extractor-export-textarea" rows={30} />
-                <Button type="submit" bsStyle="success">Add extractors to input</Button>
+                <Input
+                  type="textarea"
+                  ref={(extractorsInput) => {
+                    this.extractorsInput = extractorsInput;
+                  }}
+                  id="extractor-export-textarea"
+                  rows={30}
+                />
+                <Button type="submit" bsStyle="primary">
+                  Add extractors to input
+                </Button>
               </form>
             </Col>
           </Row>

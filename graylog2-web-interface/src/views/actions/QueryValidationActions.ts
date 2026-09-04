@@ -20,12 +20,11 @@ import type { RefluxActions } from 'stores/StoreTypes';
 import { singletonActions } from 'logic/singleton';
 
 type QueryValidationActionsType = RefluxActions<{
-  displayValidationErrors: () => Promise<void>,
+  displayValidationErrors: () => Promise<void>;
 }>;
 
-const QueryValidationActions: QueryValidationActionsType = singletonActions(
-  'views.QueryValidation',
-  () => Reflux.createActions({
+const QueryValidationActions: QueryValidationActionsType = singletonActions('views.QueryValidation', () =>
+  Reflux.createActions({
     displayValidationErrors: {
       asyncResult: false,
     },

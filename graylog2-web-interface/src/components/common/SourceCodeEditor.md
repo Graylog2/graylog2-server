@@ -1,4 +1,5 @@
 Light-themed editor:
+
 ```js
 class MarkdownSourceEditor extends React.Component {
   constructor(props) {
@@ -20,11 +21,7 @@ class MarkdownSourceEditor extends React.Component {
     const { code } = this.state;
     return (
       <div>
-        <SourceCodeEditor id="editor-1"
-                          mode="markdown"
-                          theme="light"
-                          value={code}
-                          onChange={this.handleChange} />
+        <SourceCodeEditor id="editor-1" mode="markdown" theme="light" value={code} onChange={this.handleChange} />
         <p>Preview:</p>
         <pre>{code}</pre>
       </div>
@@ -32,10 +29,11 @@ class MarkdownSourceEditor extends React.Component {
   }
 }
 
-<MarkdownSourceEditor />
+<MarkdownSourceEditor />;
 ```
 
 Read-only dark-themed editor:
+
 ```js
 class TextSourceEditor extends React.Component {
   constructor(props) {
@@ -51,7 +49,7 @@ class TextSourceEditor extends React.Component {
 
   handleChange(nextValue) {
     this.setState({ code: nextValue });
-  };
+  }
 
   render() {
     const { code } = this.state;
@@ -61,20 +59,16 @@ class TextSourceEditor extends React.Component {
       { row: 3, column: -1, text: 'info!', type: 'info' },
     ];
     return (
-        <SourceCodeEditor id="editor-2"
-                          annotations={annotations}
-                          resizable={false}
-                          readOnly
-                          theme="dark"
-                          value={code} />
+      <SourceCodeEditor id="editor-2" annotations={annotations} resizable={false} readOnly theme="dark" value={code} />
     );
   }
 }
 
-<TextSourceEditor />
+<TextSourceEditor />;
 ```
 
 Non-resizable editor without toolbar and with custom height and width:
+
 ```js
 class JsonSourceEditor extends React.Component {
   constructor(props) {
@@ -94,22 +88,24 @@ class JsonSourceEditor extends React.Component {
 
   handleChange(nextValue) {
     this.setState({ code: nextValue });
-  };
+  }
 
   render() {
     const { code } = this.state;
     return (
-      <SourceCodeEditor id="editor-2"
-                      height={100}
-                      mode="json"
-                      onChange={this.handleChange}
-                      resizable={false}
-                      toolbar={false}
-                      width={400}
-                      value={code} />
-      );
+      <SourceCodeEditor
+        id="editor-2"
+        height={100}
+        mode="json"
+        onChange={this.handleChange}
+        resizable={false}
+        toolbar={false}
+        width={400}
+        value={code}
+      />
+    );
   }
 }
 
-<JsonSourceEditor />
+<JsonSourceEditor />;
 ```

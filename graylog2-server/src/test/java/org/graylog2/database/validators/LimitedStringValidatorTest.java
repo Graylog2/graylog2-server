@@ -17,34 +17,45 @@
 package org.graylog2.database.validators;
 
 import org.graylog2.plugin.database.validators.ValidationResult;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LimitedStringValidatorTest {
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testNegativeMinLength() {
-        new LimitedStringValidator(-1, 1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LimitedStringValidator(-1, 1);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testNegativeMaxLength() {
-        new LimitedStringValidator(1, -1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LimitedStringValidator(1, -1);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testZeroMinLength() {
-        new LimitedStringValidator(0, 1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LimitedStringValidator(0, 1);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testZeroMaxLength() {
-        new LimitedStringValidator(1, 0);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LimitedStringValidator(1, 0);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testMinLengthGreaterThanMaxLength() {
-        new LimitedStringValidator(10, 1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LimitedStringValidator(10, 1);
+        });
     }
 
     @Test

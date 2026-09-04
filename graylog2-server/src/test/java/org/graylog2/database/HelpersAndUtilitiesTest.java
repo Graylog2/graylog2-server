@@ -17,7 +17,6 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import jakarta.annotation.Nullable;
@@ -60,8 +59,7 @@ class HelpersAndUtilitiesTest {
     }
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
         collection = mongoCollections.collection("test", TestDTO.class);
         utils = mongoCollections.utils(collection);
         paginationHelper = mongoCollections.paginationHelper(collection);
@@ -196,6 +194,7 @@ class HelpersAndUtilitiesTest {
     }
 
     @Test
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamAll() {
         collection.insertOne(newDto("hello1"));
         collection.insertOne(newDto("hello2"));

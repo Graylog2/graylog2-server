@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix issue when running add to query action for multiple values from chart creates wrong query."
+
+issues = ["24002"]
+pulls = ["24003"]

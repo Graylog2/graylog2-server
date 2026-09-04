@@ -1,0 +1,5 @@
+type = "c"
+message = "Renamed all remaining occurrences of 'Data Warehouse' to 'Data Lake'."
+
+issues = ["Graylog2/graylog-plugin-enterprise#9752"]
+pulls = ["Graylog2/graylog-plugin-enterprise#1804", "23558", "Graylog2/e2e-tests#1285"]

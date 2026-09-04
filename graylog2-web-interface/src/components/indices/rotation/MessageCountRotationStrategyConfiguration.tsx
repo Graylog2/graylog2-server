@@ -23,11 +23,13 @@ import { Input } from 'components/bootstrap';
 type MessageCountRotationStrategyConfigurationProps = {
   config: any;
   updateConfig: (...args: any[]) => void;
+  disabled?: boolean;
 };
 
 const MessageCountRotationStrategyConfiguration = ({
   config,
   updateConfig,
+  disabled = false,
 }: MessageCountRotationStrategyConfigurationProps) => {
   const { max_docs_per_index } = config;
   const [maxDocsPerIndex, setMaxDocsPerIndex] = useState(max_docs_per_index);
@@ -43,13 +45,16 @@ const MessageCountRotationStrategyConfiguration = ({
 
   return (
     <div>
-      <Input type="number"
-             id="max-docs-per-index"
-             label="Max documents per index"
-             onChange={_onInputUpdate('max_docs_per_index')}
-             value={maxDocsPerIndex}
-             help="Maximum number of documents in an index before it gets rotated"
-             required />
+      <Input
+        disabled={disabled}
+        type="number"
+        id="max-docs-per-index"
+        label="Max documents per index"
+        onChange={_onInputUpdate('max_docs_per_index')}
+        value={maxDocsPerIndex}
+        help="Maximum number of documents in an index before it gets rotated"
+        required
+      />
     </div>
   );
 };

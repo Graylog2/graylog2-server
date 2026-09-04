@@ -16,4 +16,4 @@
  */
 import type { ColorScheme, CustomColors } from '@graylog/sawmill';
 
-export type CustomThemesColors = Record<ColorScheme, CustomColors>
+export type CustomThemesColors = Record<ColorScheme, CustomColors>;

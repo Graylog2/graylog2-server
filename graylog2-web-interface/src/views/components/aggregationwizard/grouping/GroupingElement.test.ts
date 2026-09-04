@@ -14,9 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { WidgetConfigFormValues, GroupingValidationErrors } from 'views/components/aggregationwizard/WidgetConfigForm';
+import * as Immutable from 'immutable';
 
-import GroupingElement from './GroupingElement';
+import type {
+  WidgetConfigFormValues,
+  GroupingValidationErrors,
+} from 'views/components/aggregationwizard/WidgetConfigForm';
+import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { ValuesType, DateType } from 'views/logic/aggregationbuilder/Pivot';
+import { DEFAULT_PIVOT_LIMIT } from 'views/Constants';
+
+import GroupingElement, { onGroupingFieldsChange } from './GroupingElement';
 
 describe('GroupByElement', () => {
   describe('Validation', () => {
@@ -37,13 +46,17 @@ describe('GroupByElement', () => {
           ...valuesGrouping,
           fields: undefined,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].fields).toBe('Field is required.');
       });
 
       it('should not add an error if everything is fine', () => {
-        const result = validate({ groupBy: { ...groupBy, groupings: [valuesGrouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [valuesGrouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy).toBeUndefined();
       });
@@ -53,7 +66,9 @@ describe('GroupByElement', () => {
           ...valuesGrouping,
           limit: undefined,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].limit).toBe('Limit is required.');
       });
@@ -63,7 +78,9 @@ describe('GroupByElement', () => {
           ...valuesGrouping,
           limit: -1,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].limit).toBe('Must be greater than 0.');
       });
@@ -83,7 +100,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           fields: undefined,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].fields).toBe('Field is required.');
       });
@@ -99,7 +118,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           interval: { type: 'auto', scaling: undefined } as const,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].interval).toBe('Scaling is required.');
       });
@@ -109,7 +130,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           interval: { type: 'auto', scaling: -1 } as const,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].interval).toBe('Must be greater than 0 and smaller or equals 10.');
       });
@@ -119,7 +142,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           interval: { type: 'timeunit', value: -1, unit: 'seconds' } as const,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].interval).toBe('Must be greater than 0.');
       });
@@ -129,7 +154,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           interval: { type: 'timeunit', value: undefined, unit: 'seconds' } as const,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].interval).toBe('Value is required.');
       });
@@ -192,6 +219,76 @@ describe('GroupByElement', () => {
       const result = onRemove(4, { groupBy: { ...groupBy, groupings: [grouping1, grouping2] } });
 
       expect(result.groupBy.groupings).toStrictEqual([grouping1, grouping2]);
+    });
+  });
+
+  describe('onGroupingFieldsChange', () => {
+    const knownFields = Immutable.List([
+      new FieldTypeMapping('http_method', new FieldType('string', [], [])),
+      new FieldTypeMapping('timestamp', FieldTypes.DATE()),
+    ]);
+    const fieldTypes = { all: knownFields, currentQuery: knownFields, queryFields: Immutable.Map() };
+
+    const timeGrouping = {
+      id: 'grouping-id',
+      direction: 'row' as const,
+      type: 'time' as const,
+      fields: [] as Array<string>,
+      interval: { type: 'auto', scaling: 1 } as const,
+    };
+
+    it('treats an unknown field as a values grouping', () => {
+      const setFieldValue = jest.fn();
+
+      onGroupingFieldsChange({
+        fieldTypes,
+        activeQueryId: 'queryId',
+        groupingIndex: 0,
+        grouping: timeGrouping,
+        newFields: ['arbitrary_field'],
+        setFieldValue,
+      });
+
+      expect(setFieldValue).toHaveBeenCalledWith(
+        'groupBy.groupings.0',
+        expect.objectContaining({ type: ValuesType, fields: ['arbitrary_field'], limit: DEFAULT_PIVOT_LIMIT }),
+      );
+    });
+
+    it('treats a known non-date field as a values grouping', () => {
+      const setFieldValue = jest.fn();
+
+      onGroupingFieldsChange({
+        fieldTypes,
+        activeQueryId: 'queryId',
+        groupingIndex: 0,
+        grouping: timeGrouping,
+        newFields: ['http_method'],
+        setFieldValue,
+      });
+
+      expect(setFieldValue).toHaveBeenCalledWith(
+        'groupBy.groupings.0',
+        expect.objectContaining({ type: ValuesType, fields: ['http_method'] }),
+      );
+    });
+
+    it('keeps a known date field as a date grouping', () => {
+      const setFieldValue = jest.fn();
+
+      onGroupingFieldsChange({
+        fieldTypes,
+        activeQueryId: 'queryId',
+        groupingIndex: 0,
+        grouping: timeGrouping,
+        newFields: ['timestamp'],
+        setFieldValue,
+      });
+
+      expect(setFieldValue).toHaveBeenCalledWith(
+        'groupBy.groupings.0',
+        expect.objectContaining({ type: DateType, fields: ['timestamp'] }),
+      );
     });
   });
 });

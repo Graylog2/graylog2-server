@@ -16,31 +16,8 @@
  */
 package org.graylog2.rest.resources.entities.preferences.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = SingleFieldSortPreferences.class),
-        //in the future, we may want to store multiple-field sort as well
-})
-public interface SortPreferences {
-
-    enum SortOrder {
-        ASC("asc"), DESC("desc");
-
-        private String title;
-
-        SortOrder(String title) {
-            this.title = title;
-        }
-
-        @JsonValue
-        public String getTitle() {
-            return title;
-        }
-    }
+public record SortPreferences(@JsonProperty("field") String sortField,
+                              @JsonProperty("order") SortOrder sortOrder) {
 }

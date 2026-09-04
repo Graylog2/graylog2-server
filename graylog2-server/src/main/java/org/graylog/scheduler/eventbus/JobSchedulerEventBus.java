@@ -20,6 +20,8 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.eventbus.EventBus;
+import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -31,8 +33,12 @@ public class JobSchedulerEventBus extends EventBus {
     private final Counter registrationsCount;
     private final Timer postTimer;
 
-    @SuppressWarnings("WeakerAccess")
-    public JobSchedulerEventBus(String name, MetricRegistry metricRegistry) {
+    public interface Factory {
+        JobSchedulerEventBus create(String name);
+    }
+
+    @Inject
+    public JobSchedulerEventBus(@Assisted String name, MetricRegistry metricRegistry) {
         super(name);
         this.registrationsCount = metricRegistry.counter(name(getClass(), name, "registrations"));
         this.postTimer = metricRegistry.timer(name(getClass(), name, "posts"));

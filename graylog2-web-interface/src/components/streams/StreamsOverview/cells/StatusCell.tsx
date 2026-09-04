@@ -15,45 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 import { useCallback } from 'react';
 
-import { Icon } from 'components/common';
-import { Label } from 'components/bootstrap';
-import { StreamsStore } from 'stores/streams/StreamsStore';
-import type { Stream } from 'stores/streams/StreamsStore';
+import { isAnyPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { Badge } from 'components/bootstrap';
+import useStreamMutations from 'hooks/useStreamMutations';
+import type { Stream } from 'logic/streams/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
-  cursor: ${$clickable ? 'pointer' : 'default'};
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`);
-
-const Spacer = styled.div`
-  border-left: 1px solid currentColor;
-  height: 1em;
-`;
-
-const _title = (disabled: boolean, disabledChange: boolean, description: string) => {
-  if (disabledChange) {
-    return description;
-  }
-
-  return disabled ? 'Start stream' : 'Pause stream';
-};
-
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
 const StatusCell = ({ stream }: Props) => {
-  const disableChange = stream.is_default || !stream.is_editable;
-  const description = stream.disabled ? 'Paused' : 'Running';
-  const title = _title(stream.disabled, disableChange, description);
+  const currentUser = useCurrentUser();
+  const userHasPermissions = isAnyPermitted(currentUser.permissions, [
+    `streams:changestate:${stream.id}`,
+    `streams:edit:${stream.id}`,
+  ]);
+  const disableChange = stream.is_default || !stream.is_editable || !userHasPermissions;
+  const statusLabel = stream.disabled ? 'Paused' : 'Running';
+  const toggleLabel = stream.disabled ? 'Start stream' : 'Pause stream';
+  const toggleIcon = stream.disabled ? 'play_arrow' : 'pause';
+  const title = disableChange ? statusLabel : toggleLabel;
   const sendTelemetry = useSendTelemetry();
+  const { pauseStream, resumeStream } = useStreamMutations();
 
   const toggleStreamStatus = useCallback(async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_STATUS_TOGGLED, {
@@ -64,31 +52,28 @@ const StatusCell = ({ stream }: Props) => {
       },
     });
 
+    // The api fns handle the error toast on rejection, so we swallow it here to avoid an unhandled rejection.
     if (stream.disabled) {
-      await StreamsStore.resume(stream.id, (response) => response);
+      await resumeStream(stream.id).catch(() => {});
     }
 
     // eslint-disable-next-line no-alert
     if (!stream.disabled && window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
-      await StreamsStore.pause(stream.id, (response) => response);
+      await pauseStream(stream.id).catch(() => {});
     }
-  }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
+  }, [sendTelemetry, stream.disabled, stream.id, stream.title, resumeStream, pauseStream]);
 
   return (
-    <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'}
-                 onClick={disableChange ? undefined : toggleStreamStatus}
-                 title={title}
-                 aria-label={title}
-                 role="button"
-                 $clickable={!disableChange}>
-      {stream.disabled ? 'Paused' : 'Running'}
-      {!disableChange && (
-        <>
-          <Spacer />
-          <Icon name={stream.disabled ? 'play_arrow' : 'pause'} />
-        </>
-      )}
-    </StatusLabel>
+    <Badge
+      color={stream.disabled ? 'warning' : 'success'}
+      variant="light"
+      dot
+      onClick={disableChange ? undefined : toggleStreamStatus}
+      title={title}
+      aria-label={title}
+      rightIcon={disableChange ? undefined : toggleIcon}>
+      {statusLabel}
+    </Badge>
   );
 };
 

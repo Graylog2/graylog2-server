@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import mockAction from 'helpers/mocking/MockAction';
-import { StreamsActions } from 'views/stores/StreamsStore';
+import { STREAMS_QUERY_KEY } from 'components/streams/hooks/useAllStreams';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { createSearch } from 'fixtures/searches';
@@ -30,13 +30,20 @@ import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
 import OriginalSearch from './Search';
 
-import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
+import useSyncWithQueryParameters from '../hooks/useSyncWithQueryParameters';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
-jest.mock('views/stores/StreamsStore');
+jest.mock('@tanstack/react-query', () => {
+  const actual = jest.requireActual('@tanstack/react-query');
+
+  return {
+    ...actual,
+    useQueryClient: jest.fn(),
+  };
+});
 jest.mock('views/components/common/WindowLeaveMessage', () => jest.fn(mockComponent('WindowLeaveMessage')));
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 jest.mock('hooks/useHotkey', () => jest.fn());
@@ -44,16 +51,23 @@ jest.mock('hooks/useHotkey', () => jest.fn());
 const mockRefreshSearch = jest.fn();
 
 jest.mock('views/components/DashboardSearchBar', () => () => (
-  <button type="button" onClick={mockRefreshSearch}>Execute Query</button>
+  <button type="button" onClick={mockRefreshSearch}>
+    Execute Query
+  </button>
 ));
 
-jest.mock('views/hooks/SyncWithQueryParameters');
+jest.mock('views/hooks/useSyncWithQueryParameters');
 
 jest.mock('routing/withLocation', () => (Component) => (props) => (
   <Component location={{ query: {}, pathname: '', search: '' }} {...props} />
 ));
 
-jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
+jest.mock(
+  'views/components/contexts/WidgetFieldTypesContextProvider',
+  () =>
+    ({ children }) =>
+      children,
+);
 
 jest.mock('hooks/useSearchConfiguration');
 
@@ -68,9 +82,18 @@ const Search = () => (
 describe('Search', () => {
   useViewsPlugin();
 
+  let queryClient: QueryClient;
+  let invalidateQueriesSpy: jest.SpyInstance;
+
   beforeEach(() => {
-    StreamsActions.refresh = mockAction();
-    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
+    queryClient = new QueryClient();
+    invalidateQueriesSpy = jest.spyOn(queryClient, 'invalidateQueries').mockResolvedValue(undefined);
+    asMock(useQueryClient).mockReturnValue(queryClient);
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchesClusterConfig,
+      refresh: () => {},
+      isInitialLoading: false,
+    });
   });
 
   it('register a WindowLeaveMessage', async () => {
@@ -88,7 +111,7 @@ describe('Search', () => {
   it('refreshes Streams upon mount', async () => {
     render(<Search />);
 
-    await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
+    await waitFor(() => expect(invalidateQueriesSpy).toHaveBeenCalledWith({ queryKey: STREAMS_QUERY_KEY }));
   });
 
   it('synchronizes URL upon mount', async () => {

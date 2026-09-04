@@ -35,7 +35,11 @@ const Welcome = ({ currentStep, onTriggerStep, hideActions }: MigrationStepCompo
         <Col md={6}>
           <h3>Welcome</h3>
           <p>An In-Place migration will migrate the data folder of your existing cluster to a Data Node cluster.</p>
-          <p>To start please install Data Node on every OS/ES node from your previous setup. You can find more information on how to download and install the Data Node <DocumentationLink page="graylog-data-node" text="here" />.</p>
+          <p>
+            To start please install Data Node on every OS/ES node from your previous setup. You can find more
+            information on how to download and install the Data Node{' '}
+            <DocumentationLink page="graylog-data-node" text="here" />.
+          </p>
           <MigrationDatanodeList />
         </Col>
         <Col md={6}>
@@ -44,7 +48,12 @@ const Welcome = ({ currentStep, onTriggerStep, hideActions }: MigrationStepCompo
           <JwtAuthenticationInfo />
         </Col>
       </Row>
-      <MigrationStepTriggerButtonToolbar hidden={hideActions} disabled={dataNodes?.list?.length <= 0} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar
+        hidden={hideActions}
+        disabled={dataNodes?.list?.length <= 0}
+        nextSteps={currentStep.next_steps}
+        onTriggerStep={onTriggerStep}
+      />
     </>
   );
 };

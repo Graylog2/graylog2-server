@@ -20,11 +20,11 @@ const versionRegex = /(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(-(?<preRelease
 const defaultVersion = pjson.version;
 
 export type Version = {
-  major: string,
-  minor: string,
-  patch: string,
-  preRelease?: string,
-  buildMetadata?: string,
+  major: string;
+  minor: string;
+  patch: string;
+  preRelease?: string;
+  buildMetadata?: string;
 };
 
 export const parseVersion = (version: string = defaultVersion): Version | void => {

@@ -29,47 +29,53 @@ import type { WidgetMapping } from './types';
 
 type FieldNameList = Array<string>;
 type State = {
-  fields: FieldNameList,
-  formatting: FormattingSettings,
-  titles: TitlesMap,
-  widgets: List<Widget>,
-  widgetMapping: WidgetMapping,
-  widgetPositions: Map<string, WidgetPosition>,
-  staticMessageListId?: string,
+  fields: FieldNameList;
+  formatting: FormattingSettings;
+  titles: TitlesMap;
+  widgets: List<Widget>;
+  widgetMapping: WidgetMapping;
+  widgetPositions: Map<string, WidgetPosition>;
+  staticMessageListId?: string;
 };
 
 type BuilderState = Map<string, any>;
 
 export type ViewStateJson = {
-  formatting?: FormattingSettingsJSON,
-  positions: { [key: string]: WidgetPositionJSON },
-  selected_fields: FieldNameList,
-  titles: TitlesMap,
-  widgets: Array<any>,
-  widget_mapping: WidgetMapping,
-  staticMessageListId?: string,
+  formatting?: FormattingSettingsJSON;
+  positions: { [key: string]: WidgetPositionJSON };
+  selected_fields: FieldNameList;
+  titles: TitlesMap;
+  widgets: Array<any>;
+  widget_mapping: WidgetMapping;
+  staticMessageListId?: string;
 };
 
 export default class ViewState {
   _value: State;
 
-  constructor(fields: FieldNameList,
+  constructor(
+    fields: FieldNameList,
     titles: TitlesMap,
     widgets: Array<Widget>,
     widgetMapping: WidgetMapping,
     widgetPositions: { [key: string]: WidgetPosition },
     formatting: FormattingSettings,
-    staticMessageListId?: string) {
-    this._value = { fields, titles, widgets: List(widgets), widgetMapping, widgetPositions: Map(widgetPositions), formatting, staticMessageListId };
+    staticMessageListId?: string,
+  ) {
+    this._value = {
+      fields,
+      titles,
+      widgets: List(widgets),
+      widgetMapping,
+      widgetPositions: Map(widgetPositions),
+      formatting,
+      staticMessageListId,
+    };
   }
 
   static create(): ViewState {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .widgets(List())
-      .widgetPositions(Map())
-      .titles(Map())
-      .build();
+    return new Builder().widgets(List()).widgetPositions(Map()).titles(Map()).build();
   }
 
   get fields(): FieldNameList {
@@ -102,18 +108,24 @@ export default class ViewState {
 
   duplicate() {
     const widgetIdTranslation = {};
-    const newWidgets = this.widgets.map((widget) => {
-      const newWidget = widget.toBuilder().newId().build();
+    const newWidgets = this.widgets
+      .map((widget) => {
+        const newWidget = widget.toBuilder().newId().build();
 
-      widgetIdTranslation[widget.id] = newWidget.id;
+        widgetIdTranslation[widget.id] = newWidget.id;
 
-      return newWidget;
-    }).toList();
-    const newWidgetTitles = Map<string, string>(this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]));
+        return newWidget;
+      })
+      .toList();
+    const newWidgetTitles = Map<string, string>(
+      this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]),
+    );
     const newTitles = this.titles
       .set(TitleTypes.Widget, newWidgetTitles)
       .updateIn([TitleTypes.Tab, 'title'], (value) => (value ? `${value} (Copy)` : value));
-    const newWidgetPositions = Map(this.widgetPositions).mapEntries(([key, value]) => [widgetIdTranslation[key], value]).toJS();
+    const newWidgetPositions = Map(this.widgetPositions)
+      .mapEntries(([key, value]) => [widgetIdTranslation[key], value])
+      .toJS();
 
     return this.toBuilder()
       .widgetMapping(Map())
@@ -139,12 +151,14 @@ export default class ViewState {
       return false;
     }
 
-    return isDeepEqual(this.fields, other.fields)
-      && isDeepEqual(this.titles, other.titles)
-      && isDeepEqual(this.widgets, other.widgets)
-      && isDeepEqual(this.widgetMapping, other.widgetMapping)
-      && isDeepEqual(this.widgetPositions, other.widgetPositions)
-      && isDeepEqual(this.formatting, other.formatting);
+    return (
+      isDeepEqual(this.fields, other.fields) &&
+      isDeepEqual(this.titles, other.titles) &&
+      isDeepEqual(this.widgets, other.widgets) &&
+      isDeepEqual(this.widgetMapping, other.widgetMapping) &&
+      isDeepEqual(this.widgetPositions, other.widgetPositions) &&
+      isDeepEqual(this.formatting, other.formatting)
+    );
   }
 
   toJSON() {
@@ -161,7 +175,14 @@ export default class ViewState {
   }
 
   static fromJSON(value: ViewStateJson): ViewState {
-    const { selected_fields: selectedFields, titles, widgets, widget_mapping: widgetMapping, positions, formatting } = value;
+    const {
+      selected_fields: selectedFields,
+      titles,
+      widgets,
+      widget_mapping: widgetMapping,
+      positions,
+      formatting,
+    } = value;
 
     return ViewState.builder()
       .titles(fromJS(titles))
@@ -194,11 +215,11 @@ class Builder {
     return new Builder(this.value.set('formatting', value));
   }
 
-  titles(value: (TitlesMap | { tab?: { [key: string]: string }, widget: { [key: string]: string } })): Builder {
+  titles(value: TitlesMap | { tab?: { [key: string]: string }; widget: { [key: string]: string } }): Builder {
     return new Builder(this.value.set('titles', fromJS(value)));
   }
 
-  widgets(value: (List<Widget> | Array<Widget>)): Builder {
+  widgets(value: List<Widget> | Array<Widget>): Builder {
     return new Builder(this.value.set('widgets', List(value)));
   }
 
@@ -206,7 +227,7 @@ class Builder {
     return new Builder(this.value.set('widgetMapping', value));
   }
 
-  widgetPositions(value: (Map<string, WidgetPosition> | { [key: string]: WidgetPosition })): Builder {
+  widgetPositions(value: Map<string, WidgetPosition> | { [key: string]: WidgetPosition }): Builder {
     return new Builder(this.value.set('widgetPositions', Map(value)));
   }
 

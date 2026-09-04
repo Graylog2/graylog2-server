@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.startpage.recentActivities;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -23,24 +25,31 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.TestUser;
+import org.graylog.security.CapabilityRegistry;
+import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
+import org.graylog.security.shares.GranteeService;
+import org.graylog.security.shares.PluggableEntityService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.TestUserService;
 import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -53,6 +62,7 @@ public class RecentActivityServiceTest {
     RecentActivityService recentActivityService;
     TestUserService testUserService;
     GRNRegistry grnRegistry;
+    EventBus eventBus;
 
     PermissionAndRoleResolver permissionAndRoleResolver;
 
@@ -63,11 +73,13 @@ public class RecentActivityServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+               MongoCollections mongoCollections,
                GRNRegistry grnRegistry,
                TestUserService testUserService) {
         admin = TestUser.builder().withId("637748db06e1d74da0a54331").withUsername("local:admin").isLocalAdmin(true).build();
         user = TestUser.builder().withId("637748db06e1d74da0a54330").withUsername("test").isLocalAdmin(false).build();
+        // TestUser only stubs getName(). Activity rows carry getFullName(), so stub it here to tell the two apart.
+        when(user.getFullName()).thenReturn("Test User");
         searchUser = TestSearchUser.builder().withUser(user).build();
         searchAdmin = TestSearchUser.builder().withUser(admin).build();
 
@@ -90,12 +102,19 @@ public class RecentActivityServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
-        this.recentActivityService = new RecentActivityService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()),
+        this.eventBus = new EventBus();
+        this.recentActivityService = new RecentActivityService(
+                mongoCollections,
                 mongodb.mongoConnection(),
-               null,
+                eventBus,
                 grnRegistry,
                 permissionAndRoleResolver,
-                MAXIMUM);
+                MAXIMUM,
+                new DBGrantService(mongoCollections),
+                mock(GranteeService.class),
+                new PluggableEntityService(Set.of()),
+                mock(CapabilityRegistry.class)
+        );
      }
 
     @Test
@@ -176,5 +195,44 @@ public class RecentActivityServiceTest {
 
         assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemGrn().entity(), "2")).toList().size()).isEqualTo(1);
         assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemGrn().entity(), "3")).toList().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testCreateWithTitleStoresTheGivenTitle() {
+        final var collector = new RecentActivityEventCollector();
+        eventBus.register(collector);
+
+        recentActivityService.create("1", GRNTypes.DASHBOARD, "My Dashboard", user);
+
+        assertThat(collector.events).singleElement().satisfies(event -> {
+            assertThat(event.activityType()).isEqualTo(ActivityType.CREATE);
+            assertThat(event.grn()).isEqualTo(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1"));
+            assertThat(event.itemTitle()).isEqualTo("My Dashboard");
+            assertThat(event.userName()).isEqualTo("Test User");
+        });
+    }
+
+    @Test
+    public void testUpdateWithTitleStoresTheGivenTitle() {
+        final var collector = new RecentActivityEventCollector();
+        eventBus.register(collector);
+
+        recentActivityService.update("1", GRNTypes.DASHBOARD, "My Dashboard", user);
+
+        assertThat(collector.events).singleElement().satisfies(event -> {
+            assertThat(event.activityType()).isEqualTo(ActivityType.UPDATE);
+            assertThat(event.grn()).isEqualTo(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1"));
+            assertThat(event.itemTitle()).isEqualTo("My Dashboard");
+            assertThat(event.userName()).isEqualTo("Test User");
+        });
+    }
+
+    static class RecentActivityEventCollector {
+        final List<RecentActivityEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void handle(RecentActivityEvent event) {
+            events.add(event);
+        }
     }
 }

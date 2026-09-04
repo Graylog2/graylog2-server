@@ -21,9 +21,9 @@ import type { Command } from 'views/components/searchbar/queryinput/ace-types';
 import type { Usage } from 'views/components/searchbar/queryinput/types';
 
 type Props = {
-  children: (commands: Array<Command>) => React.ReactElement,
-  usage: Usage,
-}
+  children: (commands: Array<Command>) => React.ReactElement;
+  usage: Usage;
+};
 
 const PluggableCommands = ({ children, usage }: Props) => {
   const customCommands = usePluggableCommands(usage);

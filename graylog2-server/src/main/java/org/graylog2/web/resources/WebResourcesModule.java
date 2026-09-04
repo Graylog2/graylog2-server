@@ -16,6 +16,7 @@
  */
 package org.graylog2.web.resources;
 
+import org.graylog2.configuration.MarkdownCSPResourceProvider;
 import org.graylog2.plugin.inject.Graylog2Module;
 
 public class WebResourcesModule extends Graylog2Module {
@@ -23,5 +24,7 @@ public class WebResourcesModule extends Graylog2Module {
     protected void configure() {
         addSystemRestResource(AppConfigResource.class);
         addSystemRestResource(WebInterfaceAssetsResource.class);
+
+        addCspResourceProvider(MarkdownCSPResourceProvider.class);
     }
 }

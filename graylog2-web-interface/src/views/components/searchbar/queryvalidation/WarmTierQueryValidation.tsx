@@ -25,14 +25,16 @@ type Props = {
   validationState: QueryValidationState;
 };
 
-const WarmTierQueryValidation = ({ validationState } : Props) => {
+const WarmTierQueryValidation = ({ validationState }: Props) => {
   const warmTierIndices = indicesInWarmTier(validationState);
 
   if (!isSearchingWarmTier(warmTierIndices)) return null;
 
   return (
     <Explanation>
-      <span><b>Warm Tier Search</b>: <WarmTierErrorMessage warmTierIndices={warmTierIndices} /></span>
+      <span>
+        <b>Warm Tier Search</b>: <WarmTierErrorMessage warmTierIndices={warmTierIndices} />
+      </span>
     </Explanation>
   );
 };

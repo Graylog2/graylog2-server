@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
+import org.graylog.plugins.onboarding.audit.OnboardingAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
@@ -28,7 +29,7 @@ import org.graylog.security.SecurityAuditEventTypes;
 import org.graylog.security.certutil.audit.CaAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -61,6 +62,7 @@ public class AuditCoverageTest {
                 .addAll(new SecurityAuditEventTypes().auditEventTypes())
                 .addAll(new IntegrationsAuditEventTypes().auditEventTypes())
                 .addAll(new CaAuditEventTypes().auditEventTypes())
+                .addAll(new OnboardingAuditEventTypes().auditEventTypes())
                 .build();
         final Reflections reflections = new Reflections(configurationBuilder);
 

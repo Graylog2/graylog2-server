@@ -15,39 +15,48 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
 import type { ConfigurationFormData } from 'components/configurationforms';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
 import EditOutputButton from 'components/streams/StreamDetails/routing-destination/EditOutputButton';
 import RemoveOutputButton from 'components/streams/StreamDetails/routing-destination/RemoveOutputButton';
+import { IfPermitted } from 'components/common';
+import { ButtonToolbar } from 'components/bootstrap';
 
 type Props = {
-  output: Output,
-  streamId: string,
-  isLoadingOutputTypes: boolean,
-  onUpdate: (output: Output, data: ConfigurationFormData<Output['configuration']>) => void,
-  getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration,
+  output: Output;
+  streamId: string;
+  isLoadingOutputTypes: boolean;
+  onUpdate: (output: Output, data: ConfigurationFormData<Output['configuration']>) => void;
+  getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration;
 };
 
-const ActionButtonsWrap = styled.span(({ theme }) => css`
-  margin-right: ${theme.spacings.xs};
-  float: right;
-`);
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  justify-content: flex-end;
+`;
 
 const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeDefinition }: Props) => (
   <tr>
-    <td>{output.title} <small>{`(Type: ${output.type})`}</small> </td>
+    <td>
+      {output.title} <small>{`(Type: ${output.type})`}</small>{' '}
+    </td>
     {}
     <td>
-      <ActionButtonsWrap className="align-right">
-        <EditOutputButton disabled={isLoadingOutputTypes}
-                          output={output}
-                          onUpdate={onUpdate}
-                          getTypeDefinition={getTypeDefinition} />
-        <RemoveOutputButton output={output} streamId={streamId} />
-      </ActionButtonsWrap>
+      <StyledButtonToolbar>
+        <IfPermitted permissions="stream_outputs:create">
+          <EditOutputButton
+            disabled={isLoadingOutputTypes}
+            output={output}
+            onUpdate={onUpdate}
+            getTypeDefinition={getTypeDefinition}
+          />
+        </IfPermitted>
+        <IfPermitted permissions="stream_outputs:delete">
+          <RemoveOutputButton output={output} streamId={streamId} />
+        </IfPermitted>
+      </StyledButtonToolbar>
     </td>
   </tr>
 );

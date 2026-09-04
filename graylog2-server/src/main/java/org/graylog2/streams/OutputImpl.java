@@ -22,20 +22,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.streams.Output;
+import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Map;
 
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.OUTPUTS_READ;
+import static org.graylog2.streams.OutputImpl.FIELD_CONTENT_PACK;
+import static org.graylog2.streams.OutputImpl.FIELD_CREATED_AT;
+import static org.graylog2.streams.OutputImpl.FIELD_CREATOR_USER_ID;
+import static org.graylog2.streams.OutputImpl.FIELD_ID;
+import static org.graylog2.streams.OutputImpl.FIELD_TITLE;
+import static org.graylog2.streams.OutputImpl.FIELD_TYPE;
 
 @AutoValue
 @JsonAutoDetect
 @DbEntity(collection = "outputs",
-          readPermission = OUTPUTS_READ)
+          readPermission = OUTPUTS_READ,
+          readableFields = {ID_FIELD, FIELD_ID, FIELD_TITLE, FIELD_TYPE, FIELD_CREATOR_USER_ID, FIELD_CREATED_AT, FIELD_CONTENT_PACK})
 public abstract class OutputImpl implements Output {
-    static final String FIELD_ID = "_id";
+    static final String FIELD_ID = "id";
     static final String FIELD_TITLE = "title";
     static final String FIELD_TYPE = "type";
     static final String FIELD_CONFIGURATION = "configuration";
@@ -45,6 +54,7 @@ public abstract class OutputImpl implements Output {
 
     @Override
     @JsonProperty(FIELD_ID)
+    @Id
     @ObjectId
     public abstract String getId();
 
@@ -74,7 +84,7 @@ public abstract class OutputImpl implements Output {
     public abstract String getContentPack();
 
     @JsonCreator
-    public static OutputImpl create(@JsonProperty(FIELD_ID) String _id,
+    public static OutputImpl create(@JsonProperty(FIELD_ID) @Id @ObjectId String _id,
                                     @JsonProperty(FIELD_TITLE) String title,
                                     @JsonProperty(FIELD_TYPE) String type,
                                     @JsonProperty(FIELD_CREATOR_USER_ID) String creator_user_id,

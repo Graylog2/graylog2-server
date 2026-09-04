@@ -26,10 +26,10 @@ const Container = styled.div`
 `;
 
 type Props = {
-  disabled?: boolean
-  value?: Array<string>
-  streamCategories: Array<{ key: string, value: string }>,
-  onChange: (newStreamCategories: Array<string>) => void,
+  disabled?: boolean;
+  value?: Array<string>;
+  streamCategories: Array<{ key: string; value: string }>;
+  onChange: (newStreamCategories: Array<string>) => void;
 };
 
 const StreamCategoryFilter = ({ disabled = false, value = [], streamCategories, onChange }: Props) => {
@@ -45,14 +45,16 @@ const StreamCategoryFilter = ({ disabled = false, value = [], streamCategories, 
 
   return (
     <Container data-testid="stream-category-filter" title={placeholder}>
-      <Select placeholder={placeholder}
-              disabled={disabled}
-              displayKey="key"
-              inputId="stream-categories-filter"
-              onChange={handleChange}
-              options={options}
-              multi
-              value={selectedCategories} />
+      <Select
+        placeholder={placeholder}
+        disabled={disabled}
+        displayKey="key"
+        inputId="stream-categories-filter"
+        onChange={handleChange}
+        options={options}
+        multi
+        value={selectedCategories}
+      />
     </Container>
   );
 };

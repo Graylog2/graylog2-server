@@ -24,16 +24,19 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CloudWatchFlowLogCodecTest {
 
     private KinesisCloudWatchFlowLogCodec codec;
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         this.codec = new KinesisCloudWatchFlowLogCodec(Configuration.EMPTY_CONFIGURATION,
@@ -49,27 +52,45 @@ public class CloudWatchFlowLogCodecTest {
         final String flowLogMessage = "2 423432432432 eni-3244234 172.1.1.2 172.1.1.2 80 2264 6 1 52 1559738144 1559738204 ACCEPT OK";
         final DateTime timestamp = DateTime.now(DateTimeZone.UTC);
         final KinesisLogEntry logEvent = KinesisLogEntry.create("a-stream", "log-group", "log-stream",
-                                                                timestamp, flowLogMessage);
+                timestamp, flowLogMessage, "123456789", "TEST_STREAM_ARN", new ArrayList<>());
         final Message message = codec.decodeLogData(logEvent).get();
-        Assert.assertEquals("log-group", message.getField(AbstractKinesisCodec.FIELD_LOG_GROUP));
-        Assert.assertEquals("log-stream", message.getField(AbstractKinesisCodec.FIELD_LOG_STREAM));
-        Assert.assertEquals("a-stream", message.getField(AbstractKinesisCodec.FIELD_KINESIS_STREAM));
-        Assert.assertEquals(6, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_PROTOCOL_NUMBER));
-        Assert.assertEquals("172.1.1.2", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_SRC_ADDR));
-        Assert.assertEquals(KinesisCloudWatchFlowLogCodec.SOURCE, message.getField("source"));
-        Assert.assertEquals("eni-3244234 ACCEPT TCP 172.1.1.2:80 -> 172.1.1.2:2264", message.getField("message"));
-        Assert.assertEquals(1L, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_PACKETS));
-        Assert.assertEquals(80, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_SRC_PORT));
-        Assert.assertEquals(60, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_CAPTURE_WINDOW_DURATION));
-        Assert.assertEquals("TCP", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_PROTOCOL));
-        Assert.assertEquals("423432432432", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_ACCOUNT_ID));
-        Assert.assertEquals("eni-3244234", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_INTERFACE_ID));
-        Assert.assertEquals("OK", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_LOG_STATUS));
-        Assert.assertEquals(52L, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_BYTES));
-        Assert.assertEquals(true, message.getField(KinesisCloudWatchFlowLogCodec.SOURCE_GROUP_IDENTIFIER));
-        Assert.assertEquals("172.1.1.2", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_DST_ADDR));
-        Assert.assertEquals(2264, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_DST_PORT));
-        Assert.assertEquals("ACCEPT", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_ACTION));
-        Assert.assertEquals(timestamp, message.getTimestamp());
+        Assertions.assertEquals("log-group", message.getField(AbstractKinesisCodec.FIELD_LOG_GROUP));
+        Assertions.assertEquals("log-stream", message.getField(AbstractKinesisCodec.FIELD_LOG_STREAM));
+        Assertions.assertEquals("a-stream", message.getField(AbstractKinesisCodec.FIELD_KINESIS_STREAM));
+        Assertions.assertEquals(6, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_PROTOCOL_NUMBER));
+        Assertions.assertEquals("172.1.1.2", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_SRC_ADDR));
+        Assertions.assertEquals(KinesisCloudWatchFlowLogCodec.SOURCE, message.getField("source"));
+        Assertions.assertEquals("eni-3244234 ACCEPT TCP 172.1.1.2:80 -> 172.1.1.2:2264", message.getField("message"));
+        Assertions.assertEquals(1L, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_PACKETS));
+        Assertions.assertEquals(80, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_SRC_PORT));
+        Assertions.assertEquals(60, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_CAPTURE_WINDOW_DURATION));
+        Assertions.assertEquals("TCP", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_PROTOCOL));
+        Assertions.assertEquals("423432432432", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_ACCOUNT_ID));
+        Assertions.assertEquals("eni-3244234", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_INTERFACE_ID));
+        Assertions.assertEquals("OK", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_LOG_STATUS));
+        Assertions.assertEquals(52L, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_BYTES));
+        Assertions.assertEquals(true, message.getField(KinesisCloudWatchFlowLogCodec.SOURCE_GROUP_IDENTIFIER));
+        Assertions.assertEquals("172.1.1.2", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_DST_ADDR));
+        Assertions.assertEquals(2264, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_DST_PORT));
+        Assertions.assertEquals("ACCEPT", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_ACTION));
+        Assertions.assertEquals(timestamp, message.getTimestamp());
+        Assertions.assertNull(message.getField(Message.FIELD_FULL_MESSAGE));
+    }
+
+    @Test
+    public void testFlowLogCodecStoresFullMessage() {
+
+        final HashMap<String, Object> configMap = new HashMap<>();
+        configMap.put(AWSCodec.CK_STORE_FULL_MESSAGE, true);
+        final KinesisCloudWatchFlowLogCodec codecWithFullMessage = new KinesisCloudWatchFlowLogCodec(
+                new Configuration(configMap), new ObjectMapperProvider().get(), messageFactory);
+
+        final String flowLogMessage = "2 423432432432 eni-3244234 172.1.1.2 172.1.1.2 80 2264 6 1 52 1559738144 1559738204 ACCEPT OK";
+        final DateTime timestamp = DateTime.now(DateTimeZone.UTC);
+        final KinesisLogEntry logEvent = KinesisLogEntry.create("a-stream", "log-group", "log-stream",
+                timestamp, flowLogMessage, "123456789", "TEST_STREAM_ARN", new ArrayList<>());
+
+        final Message message = codecWithFullMessage.decodeLogData(logEvent).get();
+        Assertions.assertEquals(flowLogMessage, message.getField(Message.FIELD_FULL_MESSAGE));
     }
 }

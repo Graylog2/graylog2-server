@@ -53,8 +53,11 @@ export const addToQuery = (oldQuery: string, newTerm: string, operator: string =
   return `${oldQuery} ${operator} ${newTerm}`;
 };
 
-export const concatQueryStrings = (queryStrings: Array<string>, { operator = 'AND', withBrackets = true } = {}): string => {
-  const withRemovedEmpty = queryStrings.filter((s: string) => !!(s?.trim()));
+export const concatQueryStrings = (
+  queryStrings: Array<string>,
+  { operator = 'AND', withBrackets = true } = {},
+): string => {
+  const withRemovedEmpty = queryStrings.filter((s: string) => !!s?.trim());
   const showBracketsForChild = withBrackets && withRemovedEmpty.length > 1;
 
   return withRemovedEmpty.map((s) => (showBracketsForChild ? `(${s})` : s)).join(` ${operator} `);
@@ -66,8 +69,19 @@ export const formatTimestamp = (value: string | number) => {
   return `"${utc.format(DATE_TIME_FORMATS.internalIndexer)}"`;
 };
 
-export const predicate = (field: string, value: string | number) => ((value === MISSING_BUCKET_NAME || value === escape(MISSING_BUCKET_NAME))
-  ? `NOT _exists_:${field}`
-  : `${field}:${value}`);
+export const predicate = (field: string, value: string | number) =>
+  value === MISSING_BUCKET_NAME || value === escape(MISSING_BUCKET_NAME)
+    ? `NOT _exists_:${field}`
+    : `${field}:${value}`;
 
-export const not = (query:string) => `NOT ${query}`.replace(/^NOT NOT /, '');
+export const not = (query: string) => `NOT ${query}`.replace(/^NOT NOT /, '');
+
+export const edgeClause = (
+  a: { field: string; value: string | number },
+  b: { field: string; value: string | number },
+) => {
+  const pair = (v1: string | number, v2: string | number) =>
+    `${predicate(a.field, escape(v1))} AND ${predicate(b.field, escape(v2))}`;
+
+  return `((${pair(a.value, b.value)}) OR (${pair(b.value, a.value)}))`;
+};

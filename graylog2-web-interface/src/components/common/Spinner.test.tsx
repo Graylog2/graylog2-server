@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { act } from 'react';
 
@@ -43,12 +43,12 @@ describe('<Spinner />', () => {
   });
 
   it('should be visible after when delay is completed', async () => {
-    const { container } = render(<Spinner />);
+    render(<Spinner />);
 
     act(() => {
       jest.advanceTimersByTime(200);
     });
 
-    expect(container.firstChild).toHaveStyle('visibility: visible');
+    expect(screen.getByText('Loading...')).toBeVisible();
   });
 });

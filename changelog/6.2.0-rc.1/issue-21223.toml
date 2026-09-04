@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix JNA temp directory to be located in the configured server data dir."
+
+issues = ["21223"]
+pulls = ["21298"]

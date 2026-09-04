@@ -27,7 +27,7 @@ import type { Event } from 'components/events/events/types';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
-
+jest.mock('components/events/events/hooks/useSendEventActionTelemetry');
 const getEvent = (id: string): Event => ({
   id,
   event_definition_id: 'event_definition_id_1',
@@ -43,6 +43,7 @@ const getEvent = (id: string): Event => ({
   replay_info: undefined,
   alert: undefined,
   message: '',
+  timestamp_processing: null,
 });
 
 const mockedSelectedEntitiesData = {
@@ -68,9 +69,12 @@ const mockedEventActions: Array<EventAction> = [
 ];
 const renderBulkAction = () => render(<BulkActions selectedEntitiesData={mockedSelectedEntitiesData} />);
 
-const openActionsDropdown = async () => userEvent.click(await screen.findByRole('button', {
-  name: /bulk actions/i,
-}));
+const openActionsDropdown = async () =>
+  await userEvent.click(
+    await screen.findByRole('button', {
+      name: /bulk actions/i,
+    }),
+  );
 
 describe('Events Bulk Action', () => {
   beforeEach(() => {
@@ -80,6 +84,8 @@ describe('Events Bulk Action', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: true,
+      isAllRowsSelected: false,
     });
   });
 

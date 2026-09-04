@@ -22,22 +22,30 @@ import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigratio
 import UserNotification from 'util/UserNotification';
 import type { MigrationState, MigrationStepRequest } from 'components/datanode/Types';
 
+// @ts-expect-error
+const triggerMigration = (step: MigrationStepRequest): Promise<MigrationState> => Migration.trigger(step);
 const useTriggerMigrationState = (): {
-  onTriggerNextState: (step: MigrationStepRequest) => Promise<MigrationState>,
-  isLoadingNextMigrationState: boolean,
-  isError: boolean,
-  error: Error,
+  onTriggerNextState: (step: MigrationStepRequest) => Promise<MigrationState>;
+  isLoadingNextMigrationState: boolean;
+  isError: boolean;
+  error: Error;
 } => {
   const queryClient = useQueryClient();
-  const { mutateAsync: onTriggerNextState, isLoading: isLoadingNextMigrationState, error, isError } = useMutation(Migration.trigger, {
+  const {
+    mutateAsync: onTriggerNextState,
+    isPending: isLoadingNextMigrationState,
+    error,
+    isError,
+  } = useMutation({
+    mutationFn: triggerMigration,
     onSuccess: () => {
-      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
     onError: (err: Error) => UserNotification.error(err.message),
   });
 
   return {
-    onTriggerNextState: onTriggerNextState as (step: MigrationStepRequest) => Promise<MigrationState>,
+    onTriggerNextState,
     isLoadingNextMigrationState,
     isError,
     error,

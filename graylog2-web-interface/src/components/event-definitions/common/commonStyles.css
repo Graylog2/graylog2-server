@@ -1,22 +1,22 @@
 :local(.title) {
-    margin-top: 10px;
-    margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 :local(.fixedTable) {
-    table-layout: fixed;
+  table-layout: fixed;
 }
 
 :local(.validationSummary).alert {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 :local(.validationSummary) h4 {
-    font-size: 1.44rem; /* theme.fonts.size.body h4 */
-    margin-bottom: 0.5em;
+  font-size: 1.44rem; /* theme.fonts.size.body h4 */
+  margin-bottom: 0.5em;
 }
 
 :local(.validationSummary) ul {
-    list-style: disc;
-    margin: 0.5em 0;
+  list-style: disc;
+  margin: 0.5em 0;
 }

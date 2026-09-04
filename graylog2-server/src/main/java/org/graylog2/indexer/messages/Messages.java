@@ -16,17 +16,17 @@
  */
 package org.graylog2.indexer.messages;
 
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
-import com.github.rholder.retry.WaitStrategy;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog2.indexer.IncompleteBulkResponseException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.results.ResultMessage;
@@ -36,16 +36,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
+import static org.graylog2.indexer.messages.RetryWait.MAX_WAIT_TIME;
 
 @Singleton
 public class Messages {
@@ -57,25 +55,21 @@ public class Messages {
 
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
 
-    private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
 
     // the wait strategy uses powers of 2 to compute wait times.
     // see https://github.com/rholder/guava-retrying/blob/177b6c9b9f3e7957f404f0bdb8e23374cb1de43f/src/main/java/com/github/rholder/retry/WaitStrategies.java#L304
     // using 500 leads to the expected exponential pattern of 1000, 2000, 4000, 8000, ...
     private static final int retrySecondsMultiplier = 500;
 
-    @VisibleForTesting
-    static final WaitStrategy exponentialWaitSeconds = WaitStrategies.exponentialWait(retrySecondsMultiplier, MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
-
-    @VisibleForTesting
-    static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+    static final RetryWait retryWait = new RetryWait(retrySecondsMultiplier);
 
     @SuppressWarnings("UnstableApiUsage")
     private RetryerBuilder<IndexingResults> createBulkRequestRetryerBuilder() {
         return RetryerBuilder.<IndexingResults>newBuilder()
                 .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class)
                         || t instanceof InvalidWriteTargetException
-                        || t instanceof MasterNotDiscoveredException)
+                        || t instanceof MasterNotDiscoveredException
+                        || t instanceof IncompleteBulkResponseException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override
@@ -131,7 +125,7 @@ public class Messages {
         }
 
         final List<IndexingRequest> indexingRequestList = messageList.stream()
-                .map(entry -> IndexingRequest.create(entry.indexSet(), entry.message()))
+                .map(entry -> IndexingRequest.create(entry.writeIndex(), entry.message()))
                 .collect(Collectors.toList());
 
         return bulkIndexRequests(indexingRequestList, isSystemTraffic, indexingListener);
@@ -144,7 +138,7 @@ public class Messages {
     public IndexingResults bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic, IndexingListener indexingListener) {
         final IndexingResults indexingResults = runBulkRequest(indexingRequestList, indexingRequestList.size(), indexingListener);
 
-        final IndexingResults retryBlockResults = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingResults.errors(), indexingListener);
+        final IndexingResults retryBlockResults = retryQualifyingIndividualItems(indexingRequestList, indexingResults.errors(), indexingListener);
 
         final IndexingResults finalResults = retryBlockResults.mergeWith(indexingResults.successes(), List.of());
 
@@ -158,32 +152,32 @@ public class Messages {
         return finalResults;
     }
 
-    private IndexingResults retryOnlyIndexBlockItemsForever(List<IndexingRequest> messages, List<IndexingError> allFailedItems, IndexingListener indexingListener) {
-        Set<IndexingError> indexBlocks = indexBlocksFrom(allFailedItems);
-        final Set<IndexingError> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
-        List<IndexingRequest> blockedMessages = messagesForResultItems(messages, indexBlocks);
+    private IndexingResults retryQualifyingIndividualItems(List<IndexingRequest> messages, List<IndexingError> allFailedItems, IndexingListener indexingListener) {
+        Set<IndexingError> retryableErrors = retryableErrorsFrom(allFailedItems);
+        final Set<IndexingError> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), retryableErrors));
+        List<IndexingRequest> blockedMessages = messagesForResultItems(messages, retryableErrors);
 
-        if (!indexBlocks.isEmpty()) {
-            LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
+        if (!retryableErrors.isEmpty()) {
+            LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", retryableErrors.size());
         }
 
         long attempt = 1;
 
         final IndexingResults.Builder builder = IndexingResults.Builder.create();
-        while (!indexBlocks.isEmpty()) {
-            waitBeforeRetrying(attempt++);
+        while (!retryableErrors.isEmpty()) {
+            retryWait.waitBeforeRetrying(attempt++);
 
             final IndexingResults indexingResults = runBulkRequest(blockedMessages, messages.size(), indexingListener);
 
             builder.addSuccesses(indexingResults.successes());
             final var failedItems = indexingResults.errors();
-            indexBlocks = indexBlocksFrom(failedItems);
-            blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
+            retryableErrors = retryableErrorsFrom(failedItems);
+            blockedMessages = messagesForResultItems(blockedMessages, retryableErrors);
 
-            final Set<IndexingError> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
+            final Set<IndexingError> newOtherFailures = Sets.difference(new HashSet<>(failedItems), retryableErrors);
             otherFailures.addAll(newOtherFailures);
 
-            if (indexBlocks.isEmpty()) {
+            if (retryableErrors.isEmpty()) {
                 LOG.info("Retries were successful after {} attempts. Ingestion will continue now.", attempt);
             }
         }
@@ -198,21 +192,13 @@ public class Messages {
         return chunk.stream().filter(entry -> blockedMessageIds.contains(entry.message().getId())).collect(Collectors.toList());
     }
 
-    private Set<IndexingError> indexBlocksFrom(List<IndexingError> allFailedItems) {
-        return allFailedItems.stream().filter(this::hasFailedDueToBlockedIndex).collect(Collectors.toSet());
+    private Set<IndexingError> retryableErrorsFrom(List<IndexingError> allFailedItems) {
+        return allFailedItems.stream().filter(this::isRetryable).collect(Collectors.toSet());
     }
 
-    private boolean hasFailedDueToBlockedIndex(IndexingError indexingError) {
-        return indexingError.error().type().equals(IndexingError.Type.IndexBlocked);
-    }
-
-    private void waitBeforeRetrying(long attempt) {
-        try {
-            final long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
-            Thread.sleep(sleepTime);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    private boolean isRetryable(IndexingError indexingError) {
+        final var errorType = indexingError.error().type();
+        return errorType.equals(IndexingError.Type.IndexBlocked) || errorType.equals(IndexingError.Type.DataTooLarge);
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -250,13 +236,21 @@ public class Messages {
     private void accountTotalMessageSizes(List<IndexingSuccess> requests, boolean isSystemTraffic) {
         final long totalSizeOfIndexedMessages = requests.stream()
                 .map(IndexingSuccess::message)
+                .filter(Indexable::isAccounted)
                 .mapToLong(Indexable::getSize)
+                .sum();
+
+        final long totalInputSizeOfIndexedMessages = requests.stream()
+                .map(IndexingSuccess::message)
+                .filter(Indexable::isAccounted)
+                .mapToLong(Indexable::getInputMessageSize)
                 .sum();
 
         if (isSystemTraffic) {
             trafficAccounting.addSystemTraffic(totalSizeOfIndexedMessages);
         } else {
             trafficAccounting.addOutputTraffic(totalSizeOfIndexedMessages);
+            trafficAccounting.addIndexedInputTraffic(totalInputSizeOfIndexedMessages);
         }
     }
 

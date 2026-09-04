@@ -16,9 +16,4 @@
  */
 export type Traffic = { [key: string]: number };
 
-export const DAYS = [
-  30,
-  90,
-  180,
-  365,
-] as const;
+export const DAYS = [30, 90, 180, 365] as const;

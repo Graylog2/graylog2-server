@@ -33,7 +33,9 @@ class FeatureFlagsResources {
     }
 
     Map<String, String> customProperties(String file) throws IOException {
-        return loadProperties(new FileInputStream(file));
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return loadProperties(fis);
+        }
     }
 
     private Map<String, String> loadProperties(InputStream inputStream) throws IOException {

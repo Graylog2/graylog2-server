@@ -1,0 +1,7 @@
+rule "positional_args_trailing_comma"
+when
+    true
+then
+    let x = concat("a", 1, true,);
+    trigger_test();
+end

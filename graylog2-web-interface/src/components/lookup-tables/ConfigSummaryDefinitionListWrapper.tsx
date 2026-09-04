@@ -27,7 +27,7 @@ const ConfigSummaryDefinitionListWrapper = styled.div`
 
     dd {
       margin-left: 185px;
-      word-wrap: break-word;
+      overflow-wrap: break-word;
 
       &:not(:last-child) {
         border-bottom: 1px solid #ececec;

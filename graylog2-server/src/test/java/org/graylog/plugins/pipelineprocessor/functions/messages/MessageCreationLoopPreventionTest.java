@@ -36,8 +36,9 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamCon
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateBuilder;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.plugin.Message;
@@ -55,7 +56,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -79,6 +80,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         final RuleService ruleService = mock(RuleService.class);
         when(ruleService.loadAll()).thenReturn(Collections.singleton(
                 RuleDao.create("r1",
+                        null,
                         "title",
                         "description",
                         ruleForTest(),
@@ -88,7 +90,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         """
                                 pipeline "pipeline"
                                 stage 0 match all
@@ -131,21 +133,26 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
+        final PipelineInterpreterStateBuilder stateBuilder = new PipelineInterpreterStateBuilder(
+                ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
-                metricRegistry,
-                Executors.newScheduledThreadPool(1),
-                eventBus,
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
+        );
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
+                stateBuilder,
+                metricRegistry,
+                mock(ScheduledExecutorService.class),
+                eventBus
         );
         this.pipelineInterpreter = new PipelineInterpreter(
                 messageQueueAcknowledger,
                 new MetricRegistry(),
-                stateUpdater);
+                stateUpdater,
+                1);
     }
 
     // make sure a naive call to clone_message() will not cause a loop

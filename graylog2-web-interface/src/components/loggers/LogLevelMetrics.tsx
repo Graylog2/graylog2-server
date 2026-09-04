@@ -14,47 +14,47 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 import capitalize from 'lodash/capitalize';
 import numeral from 'numeral';
 
 import { Col } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import { useStore } from 'stores/connect';
+import { useNodeMetric } from 'hooks/useMetrics';
 
 type Props = {
-  nodeId: string,
-  loglevel: string,
-}
+  nodeId: string;
+  loglevel: string;
+};
 
 const LogLevelMetrics = ({ nodeId, loglevel }: Props) => {
-  const { metrics } = useStore(MetricsStore);
   const metricName = `org.apache.logging.log4j.core.Appender.${loglevel}`;
-
-  useEffect(() => {
-    MetricsActions.add(nodeId, metricName);
-
-    return () => { MetricsActions.remove(nodeId, metricName); };
-  }, [metricName, nodeId]);
+  const { data: nodeMetrics } = useNodeMetric(nodeId, metricName);
 
   let metricsDetails;
 
-  if (!metrics?.[nodeId]?.[metricName]) {
+  if (!nodeMetrics?.[metricName]) {
     metricsDetails = <Spinner />;
   } else {
-    const { metric } = metrics[nodeId][metricName];
+    const { metric } = nodeMetrics[metricName];
 
-    metricsDetails = 'rate' in metric ? (
-      <dl className="loglevel-metrics-list">
-        <dt>Total written:</dt>
-        <dd><span className="loglevel-metric-total">{metric.rate.total}</span></dd>
-        <dt>Mean rate:</dt>
-        <dd><span className="loglevel-metric-mean">{numeral(metric.rate.mean).format('0.00')}</span> / second</dd>
-        <dt>1 min rate:</dt>
-        <dd><span className="loglevel-metric-1min">{numeral(metric.rate.one_minute).format('0.00')}</span> / second</dd>
-      </dl>
-    ) : null;
+    metricsDetails =
+      'rate' in metric ? (
+        <dl className="loglevel-metrics-list">
+          <dt>Total written:</dt>
+          <dd>
+            <span className="loglevel-metric-total">{metric.rate.total}</span>
+          </dd>
+          <dt>Mean rate:</dt>
+          <dd>
+            <span className="loglevel-metric-mean">{numeral(metric.rate.mean).format('0.00')}</span> / second
+          </dd>
+          <dt>1 min rate:</dt>
+          <dd>
+            <span className="loglevel-metric-1min">{numeral(metric.rate.one_minute).format('0.00')}</span> / second
+          </dd>
+        </dl>
+      ) : null;
   }
 
   return (

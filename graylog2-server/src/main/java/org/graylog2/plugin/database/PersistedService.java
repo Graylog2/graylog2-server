@@ -23,6 +23,19 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Interface for persistent data services.
+ *
+ * <p><strong>IMPLEMENTATION NOTICE:</strong> This interface is considered legacy code and should not be
+ * implemented by new services. Existing implementations and callers can continue using it without
+ * changes. For new persistence services, please use the MongoDB storage based on Jackson serialization
+ * via {@code MongoCollections} instead.</p>
+ *
+ * <p>The traditional MongoDB access in this interface will be phased out in favor of the more
+ * type-safe Jackson-based serialization approach.</p>
+ *
+ * @see org.graylog2.database.MongoCollections
+ */
 public interface PersistedService {
     <T extends Persisted> int destroy(T model);
 

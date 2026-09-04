@@ -16,7 +16,6 @@
  */
 import type { WidgetExport } from 'views/types';
 
-// eslint-disable-next-line import/prefer-default-export
 export const createWidget = (type: string): WidgetExport => ({
   type,
   visualizationComponent: () => null,

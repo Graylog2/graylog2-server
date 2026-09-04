@@ -23,12 +23,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import NewWidgetPlaceholder from './NewWidgetPlaceholder';
 
 describe('NewWidgetPlaceholder', () => {
-  const widgetPosition = WidgetPosition.builder()
-    .col(3)
-    .row(3)
-    .height(4)
-    .width(8)
-    .build();
+  const widgetPosition = WidgetPosition.builder().col(3).row(3).height(4).width(8).build();
 
   it('shows helpful text when rendered', async () => {
     render(<NewWidgetPlaceholder position={widgetPosition} component={() => null} />);
@@ -39,7 +34,7 @@ describe('NewWidgetPlaceholder', () => {
     const component = () => <>Hey there!</>;
     render(<NewWidgetPlaceholder position={widgetPosition} component={component} />);
     const text = await screen.findByText('Create a new widget here');
-    userEvent.click(text);
+    await userEvent.click(text);
 
     await screen.findByText('Hey there!');
   });
@@ -48,7 +43,7 @@ describe('NewWidgetPlaceholder', () => {
     const component = jest.fn(() => <>Hey there!</>);
     render(<NewWidgetPlaceholder position={widgetPosition} component={component} />);
     const text = await screen.findByText('Create a new widget here');
-    userEvent.click(text);
+    await userEvent.click(text);
 
     await screen.findByText('Hey there!');
 
@@ -56,13 +51,17 @@ describe('NewWidgetPlaceholder', () => {
   });
 
   it('unmounts custom component after calling `onCancel`', async () => {
-    const component = ({ onCancel }) => <button type="button" onClick={onCancel}>Close</button>;
+    const component = ({ onCancel }) => (
+      <button type="button" onClick={onCancel}>
+        Close
+      </button>
+    );
     render(<NewWidgetPlaceholder position={widgetPosition} component={component} />);
     const text = await screen.findByText('Create a new widget here');
-    userEvent.click(text);
+    await userEvent.click(text);
 
     const close = await screen.findByRole('button', { name: 'Close' });
-    userEvent.click(close);
+    await userEvent.click(close);
 
     expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
   });

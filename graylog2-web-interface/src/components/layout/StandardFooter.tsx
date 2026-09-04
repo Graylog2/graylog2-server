@@ -14,63 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { getFullVersion } from 'util/Version';
-import connect from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
-import { SystemStore } from 'stores/system/SystemStore';
+import useProductName from 'brand-customization/useProductName';
+import useSystemDetails from 'hooks/useSystemDetails';
+import { fetchSystemJvm } from 'hooks/useSystemStore';
 
-type SystemStoreState = {
-  system: {
-    version?: string,
-    hostname?: string,
-  };
-};
+const StandardFooter = () => {
+  const productName = useProductName();
+  const { data: jvm } = useQuery({ queryKey: ['system', 'jvm'], queryFn: fetchSystemJvm });
+  const system = useSystemDetails();
 
-type Jvm = {
-  info: string;
-};
-
-type Props = {
-  system?: {
-    version?: string,
-    hostname?: string,
-  },
-};
-
-const StandardFooter = ({ system }: Props) => {
-  const [jvm, setJvm] = useState<Jvm | undefined>();
-
-  useEffect(() => {
-    let mounted = true;
-
-    SystemStore.jvm().then((jvmInfo) => {
-      if (mounted) {
-        setJvm(jvmInfo);
-      }
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (!(system && jvm)) {
-    return (
-      <>Graylog {getFullVersion()}</>
-    );
-  }
-
-  return (
+  return !(system && jvm) ? (
     <>
-      Graylog {system.version} on {system.hostname} ({jvm.info})
+      {productName} {getFullVersion()}
+    </>
+  ) : (
+    <>
+      {productName} {system.version} on {system.hostname} ({jvm.info})
     </>
   );
 };
 
-export default connect(
-  StandardFooter,
-  { system: SystemStore as Store<SystemStoreState> },
-  ({ system: { system } = { system: undefined } }) => ({ system }),
-);
+export default StandardFooter;

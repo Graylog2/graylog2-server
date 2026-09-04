@@ -1,0 +1,5 @@
+type = "f"
+message = "Add additional data fields for the Kinesis/Cloudwatch input."
+
+issues = ["22085"]
+pulls = ["22370"]

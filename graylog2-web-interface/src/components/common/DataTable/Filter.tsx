@@ -27,10 +27,7 @@ const Wrapper = styled.div`
 
 type FilterProps = {
   children?: React.ReactNode;
-  displayKey?: string;
-  filterBy?: string;
-  filterKeys?: any[];
-  filterSuggestions?: any[];
+  filterKeys?: string[];
   id?: string;
   label?: string;
   onDataFiltered: (...args: any[]) => void;
@@ -38,13 +35,10 @@ type FilterProps = {
 };
 
 const Filter = ({
-  children,
-  displayKey,
-  filterBy,
-  filterKeys,
-  filterSuggestions,
-  id,
-  label,
+  children = undefined,
+  filterKeys = undefined,
+  id = undefined,
+  label = undefined,
   onDataFiltered,
   rows,
 }: FilterProps) => {
@@ -52,20 +46,15 @@ const Filter = ({
     return (
       <Wrapper className="row">
         <div className="col-md-8">
-          <TypeAheadDataFilter id={`${id}-data-filter`}
-                               label={label}
-                               data={rows}
-                               displayKey={displayKey}
-                               filterBy={filterBy}
-                               filterSuggestions={filterSuggestions}
-                               searchInKeys={filterKeys}
-                               onDataFiltered={onDataFiltered} />
+          <TypeAheadDataFilter
+            id={`${id}-data-filter`}
+            label={label}
+            data={rows}
+            searchInKeys={filterKeys}
+            onDataFiltered={onDataFiltered}
+          />
         </div>
-        {children && (
-          <div className="col-md-4">
-            {children}
-          </div>
-        )}
+        {children && <div className="col-md-4">{children}</div>}
       </Wrapper>
     );
   }

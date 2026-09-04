@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix App Owner: Acknowledging a restored archive job shows error."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10888"]
+pulls = ["24860"]

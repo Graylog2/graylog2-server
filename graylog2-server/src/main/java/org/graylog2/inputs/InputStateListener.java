@@ -19,6 +19,7 @@ package org.graylog2.inputs;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.lang3.ObjectUtils;
+import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.IOState;
@@ -43,15 +44,18 @@ public class InputStateListener {
     private final NotificationService notificationService;
     private final ActivityWriter activityWriter;
     private final ServerStatus serverStatus;
+    private final InputStateService inputStateService;
 
     @Inject
     public InputStateListener(EventBus eventBus,
                               NotificationService notificationService,
                               ActivityWriter activityWriter,
-                              ServerStatus serverStatus) {
+                              ServerStatus serverStatus,
+                              InputStateService inputStateService) {
         this.notificationService = notificationService;
         this.activityWriter = activityWriter;
         this.serverStatus = serverStatus;
+        this.inputStateService = inputStateService;
         eventBus.register(this);
     }
 
@@ -74,6 +78,12 @@ public class InputStateListener {
                 notification.addNode(serverStatus.getNodeId().toString());
                 notification.addDetail("input_id", input.toIdentifier());
                 notification.addDetail("reason", ObjectUtils.defaultIfNull(state.getDetailedMessage(), ""));
+                if (event.oldState() == event.newState()) {
+                    // Same state with a changed message, i.e. a failure that retrying cannot resolve replacing an
+                    // earlier transient one. publishIfFirst() will not overwrite the stored reason, so retire the
+                    // stale notification first and let the actionable message re-raise it.
+                    notificationService.fixed(type, input.getId());
+                }
                 notificationService.publishIfFirst(notification);
                 break;
             case RUNNING:
@@ -88,5 +98,24 @@ public class InputStateListener {
 
         LOG.debug("Input State of {} changed: {} -> {}", input.toIdentifier(), event.oldState(), event.newState());
         LOG.info("Input {} is now {}", input.toIdentifier(), event.newState());
+
+        final String inputId = input.getId();
+        if (inputId != null) {
+            try {
+                if (event.newState() == IOState.Type.TERMINATED) {
+                    inputStateService.removeState(inputId);
+                } else {
+                    inputStateService.upsertState(
+                            inputId,
+                            state.getState(),
+                            state.getStartedAt(),
+                            state.getLastFailedAt(),
+                            state.getDetailedMessage());
+                }
+            } catch (Exception e) {
+                LOG.warn("Failed to persist runtime state for input {}: {}", inputId, e.getMessage());
+                LOG.debug("Exception details:", e);
+            }
+        }
     }
 }

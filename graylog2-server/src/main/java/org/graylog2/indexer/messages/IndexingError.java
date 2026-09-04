@@ -20,7 +20,8 @@ public record IndexingError(Indexable message, String index, Error error) implem
     public enum Type {
         IndexBlocked,
         MappingError,
-        Unknown;
+        Unknown,
+        DataTooLarge
     }
 
     public static IndexingError create(Indexable message, String index, Type errorType, String errorMessage) {

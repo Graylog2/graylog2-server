@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix static field value not updated in messages when re-adding with same key"
+
+issues = ["Graylog2/graylog-plugin-enterprise#13649"]
+pulls = ["25681"]

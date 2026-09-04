@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
@@ -33,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class NodePingPeriodical extends Periodical {
@@ -40,13 +43,14 @@ public class NodePingPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(NodePingPeriodical.class);
     private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
-    private final Supplier<URI> opensearchBaseUri;
+    private final Supplier<Optional<URI>> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
     private final Supplier<String> datanodeRestApiUri;
     private final Configuration configuration;
     private final Supplier<OpensearchState> processState;
-
     private final Supplier<Date> certValidUntil;
+    private final Supplier<List<String>> opensearchRoles;
+    private final Supplier<List<String>> configurationWarnings;
 
     private final Version version = Version.CURRENT_CLASSPATH;
 
@@ -61,7 +65,9 @@ public class NodePingPeriodical extends Periodical {
                 managedOpenSearch::getOpensearchClusterUrl,
                 managedOpenSearch::getDatanodeRestApiUrl,
                 () -> managedOpenSearch.processInfo().state(),
-                datanodeKeystore::getCertificateExpiration
+                datanodeKeystore::getCertificateExpiration,
+                managedOpenSearch::getOpensearchRoles,
+                managedOpenSearch::configurationWarnings
         );
     }
 
@@ -69,11 +75,13 @@ public class NodePingPeriodical extends Periodical {
             NodeService<DataNodeDto> nodeService,
             NodeId nodeId,
             Configuration configuration,
-            Supplier<URI> opensearchBaseUri,
+            Supplier<Optional<URI>> opensearchBaseUri,
             Supplier<String> opensearchClusterUri,
             Supplier<String> datanodeRestApiUri,
             Supplier<OpensearchState> processState,
-            Supplier<Date> certValidUntil
+            Supplier<Date> certValidUntil,
+            Supplier<List<String>> opensearchRoles,
+            Supplier<List<String>> configurationWarnings
     ) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -83,6 +91,8 @@ public class NodePingPeriodical extends Periodical {
         this.configuration = configuration;
         this.processState = processState;
         this.certValidUntil = certValidUntil;
+        this.opensearchRoles = opensearchRoles;
+        this.configurationWarnings = configurationWarnings;
     }
 
     @Override
@@ -130,28 +140,40 @@ public class NodePingPeriodical extends Periodical {
     public void doRun() {
         final DataNodeDto dto = DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setTransportAddress(opensearchBaseUri.get().toString())
+                .setTransportAddress(opensearchBaseUri.get().map(URI::toString).orElse(null))
                 .setClusterAddress(opensearchClusterUri.get())
                 .setDataNodeStatus(processState.get().getDataNodeStatus())
                 .setHostname(configuration.getHostname())
                 .setRestApiAddress(datanodeRestApiUri.get())
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
+                .setOpensearchRoles(getOpensearchRoles())
+                .setConfigurationWarnings(configurationWarnings.get())
                 .build();
 
         nodeService.ping(dto);
 
     }
 
+    private List<String> getOpensearchRoles() {
+        List<String> roles = opensearchRoles.get();
+        if (roles == null || roles.isEmpty()) {
+            return OpensearchCommonConfigurationBean.getNodeRoles(configuration);
+        }
+        return roles;
+    }
+
     private void registerServer() {
         final boolean registrationSucceeded = nodeService.registerServer(DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setTransportAddress(opensearchBaseUri.get().toString())
+                .setTransportAddress(opensearchBaseUri.get().map(URI::toString).orElse(null))
                 .setClusterAddress(opensearchClusterUri.get())
                 .setHostname(configuration.getHostname())
                 .setDataNodeStatus(DataNodeStatus.STARTING)
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
+                .setOpensearchRoles(getOpensearchRoles())
+                .setConfigurationWarnings(configurationWarnings.get())
                 .build());
 
         if (!registrationSucceeded) {

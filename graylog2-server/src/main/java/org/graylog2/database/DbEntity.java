@@ -22,6 +22,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation to mark a class as a database entity.
+ * <p>
+ * <strong>Bindings need to be added explicitly with {@code org.graylog2.plugin.PluginModule#addDbEntities}</strong>.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Repeatable(DbEntities.class)
@@ -31,6 +36,15 @@ public @interface DbEntity {
     String titleField() default "title";
 
     String readPermission() default NOBODY_ALLOWED;
+
+    /**
+     * List of document field names that are permitted to be read through general-purpose services
+     * (e.g. {@code MongoEntitySuggestionService}) when the caller has the appropriate {@link #readPermission()}.
+     * <p>
+     * Only fields that are safe to expose should be listed here — sensitive data such as passwords,
+     * tokens, or internal configuration objects must be excluded.
+     */
+    String[] readableFields() default {};
 
     //use for DBEntities that do not have string representations/ titles at all
     String NO_TITLE = "";

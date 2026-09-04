@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import SearchComponent from 'views/components/Search';
 import StreamsContext from 'contexts/StreamsContext';
@@ -37,9 +36,13 @@ import {
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
+import RightSidebarProvider from 'contexts/RightSidebarProvider';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
 const mockView = createSearch();
-
+jest.mock('util/AppConfig', () => jest.requireActual('util/AppConfig'));
 jest.mock('views/components/Search');
 jest.mock('routing/useParams');
 
@@ -51,28 +54,30 @@ jest.mock('hooks/useEventById');
 jest.mock('hooks/useEventDefinition');
 jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: {
-    listAll: jest.fn(async () => Promise.resolve()),
-  },
-  EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] as Array<EventNotification> }, isFetched: true })),
 }));
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
 describe('EventReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
-    <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
-      <EventReplaySearchPage />
-    </StreamsContext.Provider>
+    <RightSidebarProvider>
+      <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
+        <EventReplaySearchPage />
+      </StreamsContext.Provider>
+    </RightSidebarProvider>
   );
 
   useViewsPlugin();
@@ -80,7 +85,11 @@ describe('EventReplaySearchPage', () => {
   beforeEach(() => {
     asMock(useParams).mockReturnValue({ alertId: mockEventData.event.id });
     asMock(UseCreateViewForEvent).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view: mockView,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
 
     asMock(useEventById).mockImplementation(() => ({
@@ -114,7 +123,9 @@ describe('EventReplaySearchPage', () => {
     await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventData.event.event_definition_id));
 
     await expect(UseCreateViewForEvent).toHaveBeenCalledWith({
-      eventData: mockEventData.event, eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
+      eventData: mockEventData.event,
+      eventDefinition: mockEventDefinitionTwoAggregations,
+      aggregations: mockedMappedAggregation,
     });
   });
 });

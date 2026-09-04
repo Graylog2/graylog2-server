@@ -137,4 +137,25 @@ class KeyValueTest {
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(expectedResult);
     }
+
+    @Test
+    void testEscapeHandling() {
+        final Map<String, Expression> arguments = Map.of(
+                "value", new StringExpression(new CommonToken(0), "field1=value1,dn=CN=Network Automation User\\,OU=Service Accounts\\,OU=GR\\,OU=Region\\,DC=company\\,DC=local,field3=value3"),
+                "kv_delimiters", new StringExpression(new CommonToken(0), "="),
+                "delimiters", new StringExpression(new CommonToken(0), ","),
+                "allow_dup_keys", new BooleanExpression(new CommonToken(0), true),
+                "use_escape_char", new BooleanExpression(new CommonToken(0), true),
+                "handle_dup_keys", new StringExpression(new CommonToken(0), ",")
+        );
+
+        Map<String, String> result = classUnderTest.evaluate(new FunctionArgs(classUnderTest, arguments), evaluationContext);
+
+        Map<String, String> expectedResult = new HashMap<>();
+        expectedResult.put("field1", "value1");
+        expectedResult.put("dn", "CN=Network Automation User\\,OU=Service Accounts\\,OU=GR\\,OU=Region\\,DC=company\\,DC=local");
+        expectedResult.put("field3", "value3");
+
+        assertThat(result).containsExactlyInAnyOrderEntriesOf(expectedResult);
+    }
 }

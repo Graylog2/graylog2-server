@@ -17,14 +17,12 @@
 import * as React from 'react';
 
 import { Timestamp } from 'components/common';
-import type { IndexSummary } from 'stores/indexers/IndexerOverviewStore';
+import type { IndexSummary } from 'hooks/useIndexerOverview';
 
 type Props = {
   index?: IndexSummary;
 };
 
-const IndexSetOldestMessageCell = ({ index = null }: Props) => (
-  <Timestamp dateTime={index?.range?.begin} />
-);
+const IndexSetOldestMessageCell = ({ index = null }: Props) => <Timestamp dateTime={index?.range?.begin} />;
 
 export default IndexSetOldestMessageCell;

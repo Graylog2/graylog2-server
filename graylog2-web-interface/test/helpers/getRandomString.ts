@@ -16,6 +16,7 @@
  */
 
 const randomNumber = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
-const getRandomString = (minLength: number, maxLength: number) => [...Array(randomNumber(minLength, maxLength))].map(() => Math.random().toString(36)[2]).join('');
+const getRandomString = (minLength: number, maxLength: number) =>
+  [...Array(randomNumber(minLength, maxLength))].map(() => Math.random().toString(36)[2]).join('');
 
 export default getRandomString;

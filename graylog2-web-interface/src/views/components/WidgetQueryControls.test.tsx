@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
@@ -24,7 +25,9 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { asMock } from 'helpers/mocking';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
-import { setGlobalOverrideTimerange, setGlobalOverrideQuery, execute } from 'views/logic/slices/searchExecutionSlice';
+import { setGlobalOverrideTimerange, setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useSearchResultTimeRangeErrorCheck from 'views/hooks/useSearchResultTimeRangeErrorCheck';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
@@ -36,59 +39,56 @@ jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useGlobalOverride');
+jest.mock('views/hooks/useSearchResultTimeRangeErrorCheck');
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
   setGlobalOverrideTimerange: jest.fn(() => async () => {}),
   setGlobalOverrideQuery: jest.fn(() => async () => {}),
-  execute: jest.fn(() => async () => {}),
+}));
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  executeActiveQuery: jest.fn(() => async () => {}),
 }));
 
 describe('WidgetQueryControls', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
   });
 
   useViewsPlugin();
 
-  const config = {
-    relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-    query_time_range_limit: 'PT0S',
-  };
-
-  const defaultProps = {
-    availableStreams: [],
-    config,
-  };
-
   const emptyGlobalOverride = GlobalOverride.empty();
-  const globalOverrideWithQuery = GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'source:foo' });
-  const globalOverrideWithTimeRange = GlobalOverride.create({ type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' });
+  const globalOverrideWithQuery = GlobalOverride.create(undefined, {
+    type: 'elasticsearch',
+    query_string: 'source:foo',
+  });
+  const globalOverrideWithTimeRange = GlobalOverride.create({
+    type: 'absolute',
+    from: '2020-01-01T10:00:00.850Z',
+    to: '2020-01-02T10:00:00.000Z',
+  });
   const globalOverrideWithQueryAndTimeRange = GlobalOverride.create(
     { type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' },
     { type: 'elasticsearch', query_string: 'source:foo' },
   );
-  const widget = Widget.builder()
-    .id('deadbeef')
-    .type('dummy')
-    .config({})
-    .build();
+  const widget = Widget.builder().id('deadbeef').type('dummy').config({}).build();
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <TestStoreProvider>
-      <WidgetContext.Provider value={widget}>
-        {children}
-      </WidgetContext.Provider>
+      <WidgetContext.Provider value={widget}>{children}</WidgetContext.Provider>
     </TestStoreProvider>
   );
 
-  const renderSUT = (props = {}) => render(
-    <Wrapper>
-      <WidgetQueryControls {...defaultProps}
-                           {...props} />
-    </Wrapper>,
-  );
+  const renderSUT = (props = {}) =>
+    render(
+      <Wrapper>
+        <WidgetQueryControls {...props} />
+      </Wrapper>,
+    );
 
   describe('displays if global override is set', () => {
     const resetTimeRangeButtonTitle = /reset global override/i;
@@ -122,7 +122,9 @@ describe('WidgetQueryControls', () => {
     });
 
     it('does not show global override query indicator if global override query is an object with an empty query string', async () => {
-      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: '' }));
+      asMock(useGlobalOverride).mockReturnValue(
+        GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: '' }),
+      );
       renderSUT();
 
       expect(screen.queryByRole('button', { name: resetQueryButtonTitle })).toBeNull();
@@ -134,7 +136,7 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
-      fireEvent.click(resetTimeRangeOverrideButton);
+      await userEvent.click(resetTimeRangeOverrideButton);
 
       expect(setGlobalOverrideTimerange).toHaveBeenCalledWith(undefined);
     });
@@ -145,7 +147,7 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
-      fireEvent.click(resetQueryFilterButton);
+      await userEvent.click(resetQueryFilterButton);
 
       expect(setGlobalOverrideQuery).toHaveBeenCalledWith(undefined);
     });
@@ -156,8 +158,8 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
-      fireEvent.click(resetTimeRangeOverrideButton);
-      await waitFor(() => expect(execute).toHaveBeenCalled());
+      await userEvent.click(resetTimeRangeOverrideButton);
+      await waitFor(() => expect(executeActiveQuery).toHaveBeenCalled());
     });
 
     it('executes search when reset query filter button is clicked', async () => {
@@ -166,8 +168,8 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
-      fireEvent.click(resetQueryFilterButton);
-      await waitFor(() => expect(execute).toHaveBeenCalled());
+      await userEvent.click(resetQueryFilterButton);
+      await waitFor(() => expect(executeActiveQuery).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notifications', async () => {
@@ -182,12 +184,52 @@ describe('WidgetQueryControls', () => {
 
       rerender(
         <Wrapper>
-          <WidgetQueryControls {...defaultProps} />
+          <WidgetQueryControls />
         </Wrapper>,
       );
 
       expect(screen.queryByText(queryOverrideInfo)).toBeNull();
       expect(screen.queryByText(timeRangeOverrideInfo)).toBeNull();
     });
+  });
+
+  it('shows warning icon on timerange button when search result timerange check returns true', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => true);
+
+    renderSUT();
+
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+
+    await waitFor(() => expect(within(timeRangePickerButton).getByText('warning')).toBeInTheDocument());
+  });
+
+  it('disables the search button when search result timerange check returns true', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => true);
+
+    renderSUT();
+
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton).toHaveAttribute('data-disabled'));
+  });
+
+  it('does not show warning icon on timerange button when search result timerange check returns false', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
+
+    renderSUT();
+
+    const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+
+    expect(within(timeRangePickerButton).queryByText('warning')).not.toBeInTheDocument();
+  });
+
+  it('does not disable the search button when search result timerange check returns false', async () => {
+    asMock(useSearchResultTimeRangeErrorCheck).mockReturnValue(() => false);
+
+    renderSUT();
+
+    const searchButton = await screen.findByRole('button', { name: /perform search/i });
+
+    await waitFor(() => expect(searchButton).not.toHaveAttribute('data-disabled'));
   });
 });

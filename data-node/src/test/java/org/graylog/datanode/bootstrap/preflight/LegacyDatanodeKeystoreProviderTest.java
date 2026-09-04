@@ -23,6 +23,7 @@ import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bson.Document;
+import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
@@ -33,14 +34,13 @@ import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
@@ -61,22 +61,13 @@ import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 import static org.graylog.datanode.configuration.DatanodeKeystore.DATANODE_KEY_ALIAS;
 
+@ExtendWith(MongoDBExtension.class)
 class LegacyDatanodeKeystoreProviderTest {
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
-    @BeforeEach
-    void setUp() {
-        mongodb.start();
-    }
-
-    @AfterEach
-    void tearDown() {
-        mongodb.close();
-    }
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
 
     @Test
-    void testReadLegacyKeystore() throws Exception {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
+    void testReadLegacyKeystore(MongoConnection mongoConnection) throws Exception {
 
         final String passwordSecret = "this_is_my_secret_password";
         final SimpleNodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
@@ -117,7 +108,7 @@ class LegacyDatanodeKeystoreProviderTest {
 
     @Nonnull
     private static KeyStore createSignedKeystore(String passwordSecret) throws Exception {
-        final KeyPair keyPair = generateKeyPair();
+        final KeyPair keyPair = DatanodeTestUtils.generateKeyPair(Duration.ofDays(31));
         final KeyStore keystore = keyPair.toKeystore("datanode", passwordSecret.toCharArray());
         final CertificateChain signed = singCertChain(keystore, passwordSecret);
 
@@ -130,7 +121,7 @@ class LegacyDatanodeKeystoreProviderTest {
     private static CertificateChain singCertChain(KeyStore keystore, String passwordSecret) throws Exception {
         final PKCS10CertificationRequest csr = csr(keystore, passwordSecret);
         final CsrSigner signer = new CsrSigner();
-        final KeyPair ca = CertificateGenerator.generate(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
         final X509Certificate datanodeCert = signer.sign(ca.privateKey(), ca.certificate(), csr, 30);
         final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
         return certChain;
@@ -141,13 +132,6 @@ class LegacyDatanodeKeystoreProviderTest {
         return CsrGenerator.generateCSR(keystoreInformation, DATANODE_KEY_ALIAS, "my-hostname", Collections.emptyList());
     }
 
-    @Nonnull
-    private static KeyPair generateKeyPair() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(DATANODE_KEY_ALIAS)
-                .isCA(false)
-                .validity(Duration.ofDays(31));
-        return CertificateGenerator.generate(certRequest);
-    }
 
     private static String keystoreToBase64(final KeyStore keyStore, char[] keystorePassword) throws KeyStoreStorageException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {

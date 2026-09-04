@@ -18,25 +18,25 @@ import * as React from 'react';
 
 import { ReadOnlyFormGroup } from 'components/common';
 
+import type { PagerDutyConfig } from './PagerDutyConfig';
+
 type PagerDutyNotificationDetailsProps = {
   notification: {
-    config: {
-      routing_key?: string;
-      custom_incident?: boolean;
-      key_prefix?: string;
-      client_name?: string;
-      client_url?: string;
-    };
+    config: PagerDutyConfig;
   };
 };
 
-const PagerDutyNotificationDetails = ({
-  notification,
-}: PagerDutyNotificationDetailsProps) => (
+const PagerDutyNotificationDetails = ({ notification }: PagerDutyNotificationDetailsProps) => (
   <>
     <ReadOnlyFormGroup label="Routing Key" value={notification.config?.routing_key} />
+    <ReadOnlyFormGroup label="Incident Title" value={notification.config?.pager_duty_title} />
     <ReadOnlyFormGroup label="Custom Incident" value={notification.config?.custom_incident} />
-    <ReadOnlyFormGroup label="Key Prefix" value={notification.config?.key_prefix} />
+    {notification?.config?.custom_incident && notification.config?.key_prefix && (
+      <ReadOnlyFormGroup label="Key Prefix" value={notification.config?.key_prefix} />
+    )}
+    {notification?.config?.custom_incident && notification.config?.incident_key && (
+      <ReadOnlyFormGroup label="Incident Key" value={notification.config?.incident_key} />
+    )}
     <ReadOnlyFormGroup label="Client Name" value={notification.config?.client_name} />
     <ReadOnlyFormGroup label="Client URL" value={notification.config?.client_url} />
   </>

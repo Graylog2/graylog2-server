@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 import omit from 'lodash/omit';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
@@ -27,21 +27,27 @@ import HoverForHelp from 'components/common/HoverForHelp';
 
 import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
+import TagsEditor from './TagsEditor';
 
 import type { EventDefinition } from '../event-definitions-types';
+import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
 type Props = {
-  currentUser: User,
-  eventDefinition: EventDefinition,
+  currentUser: User;
+  eventDefinition: EventDefinition;
   validation: {
     errors: {
-      title?: string,
-    }
-  },
-  onChange: (name: string, value: unknown) => void,
-  canEdit: boolean,
-}
+      title?: string;
+      field_spec?: string[];
+      key_spec?: string[];
+      tags?: string[] | string;
+      tactics_techniques?: string[] | string;
+    };
+  };
+  onChange: (name: string, value: unknown) => void;
+  canEdit: boolean;
+};
 
 const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdit }: Props) => {
   const [editField, setEditField] = useState<string | undefined>(undefined);
@@ -65,9 +71,10 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
   };
 
   const addCustomField = (prevFieldName, fieldName, config, isKey, keyPosition) => {
-    const nextFieldSpec = (prevFieldName === fieldName
-      ? cloneDeep(eventDefinition.field_spec)
-      : omit(eventDefinition.field_spec, prevFieldName));
+    const nextFieldSpec =
+      prevFieldName === fieldName
+        ? cloneDeep(eventDefinition.field_spec)
+        : omit(eventDefinition.field_spec, prevFieldName);
 
     nextFieldSpec[fieldName] = config;
     onChange('field_spec', nextFieldSpec);
@@ -86,45 +93,80 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
     toggleFieldForm();
   };
 
-  const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
-  const canEditCondition = canEdit && !isSystemEventDefinition;
+  const canEditCondition = canEdit && !isSystemEventDefinition(eventDefinition);
+  const tacticsTechniquesEditorPlugin = PluginStore.exports('eventDefinitions.components.tacticsTechniquesEditor')[0];
 
   if (showFieldForm) {
     return (
-      <FieldForm keys={eventDefinition.key_spec}
-                 fieldName={editField}
-                 config={editField ? eventDefinition.field_spec[editField] : undefined}
-                 onChange={addCustomField}
-                 onCancel={toggleFieldForm}
-                 currentUser={currentUser} />
+      <FieldForm
+        keys={eventDefinition.key_spec}
+        fieldName={editField}
+        config={editField ? eventDefinition.field_spec[editField] : undefined}
+        onChange={addCustomField}
+        onCancel={toggleFieldForm}
+        currentUser={currentUser}
+      />
     );
   }
 
-  const fieldErrors = get(validation, 'errors.field_spec', []);
-  const keyErrors = get(validation, 'errors.key_spec', []);
+  const fieldErrors = validation?.errors?.field_spec ?? [];
+  const keyErrors = validation?.errors?.key_spec ?? [];
   const errors = [...fieldErrors, ...keyErrors];
 
   return (
     <Row>
       <Col md={12}>
-        <h2 className={commonStyles.title}>Event Fields <small>(optional)</small></h2>
+        <h2 className={commonStyles.title}>
+          Tags <small>(optional)</small>
+        </h2>
+        <p>
+          Attach labels to this Event Definition. Tags propagate onto every Event it produces and make filtering and
+          grouping easier on the Alerts &amp; Events list.
+        </p>
+        <TagsEditor
+          tags={eventDefinition.tags ?? []}
+          onChange={(next) => onChange('tags', next)}
+          disabled={!canEditCondition}
+          error={
+            Array.isArray(validation?.errors?.tags)
+              ? validation.errors.tags.join(' ')
+              : (validation?.errors?.tags ?? null)
+          }
+        />
+
+        {tacticsTechniquesEditorPlugin ? (
+          <tacticsTechniquesEditorPlugin.component
+            value={eventDefinition.tactics_techniques ?? []}
+            onChange={(next: string[]) => onChange('tactics_techniques', next)}
+            disabled={!canEditCondition}
+            error={
+              Array.isArray(validation?.errors?.tactics_techniques)
+                ? validation.errors.tactics_techniques.join(' ')
+                : (validation?.errors?.tactics_techniques ?? null)
+            }
+          />
+        ) : null}
+
+        <h2 className={commonStyles.title}>
+          Event Fields <small>(optional)</small>
+        </h2>
 
         {!canEditCondition ? (
-          <p>
-            The event fields of this event definition type cannot be edited.
-          </p>
+          <p>The event fields of this event definition type cannot be edited.</p>
         ) : (
           <>
             <p>
-              Include additional information in Events generated from this Event Definition by adding custom Fields. That
-              can help you search Events or having more context when receiving Notifications.
+              Include additional information in Events generated from this Event Definition by adding custom Fields.
+              That can help you search Events or having more context when receiving Notifications.
             </p>
 
             {errors.length > 0 && (
               <Alert bsStyle="danger" className={commonStyles.validationSummary} title="Fields with errors">
                 <p>Please correct the following errors before saving this Event Definition:</p>
                 <ul>
-                  {errors.map((error) => <li key={error}>{error}</li>)}
+                  {errors.map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
                 </ul>
               </Alert>
             )}
@@ -137,15 +179,21 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
                     <EventKeyHelpPopover />
                   </HoverForHelp>
                 </dt>
-                <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>
+                <dd>
+                  {eventDefinition.key_spec.length > 0
+                    ? eventDefinition.key_spec.join(', ')
+                    : 'No Keys configured yet.'}
+                </dd>
               </dl>
             )}
-            <FieldsList fields={eventDefinition.field_spec}
-                        validation={validation}
-                        keys={eventDefinition.key_spec}
-                        onAddFieldClick={toggleFieldForm}
-                        onEditFieldClick={toggleFieldForm}
-                        onRemoveFieldClick={removeCustomField} />
+            <FieldsList
+              fields={eventDefinition.field_spec}
+              validation={validation}
+              keys={eventDefinition.key_spec}
+              onAddFieldClick={toggleFieldForm}
+              onEditFieldClick={toggleFieldForm}
+              onRemoveFieldClick={removeCustomField}
+            />
           </>
         )}
       </Col>

@@ -22,9 +22,11 @@ import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,9 +45,17 @@ public class FieldTypesResourceTest {
                 .denyStream("2323")
                 .build();
 
-        final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
-            // for each streamID return a field that's called exactly like the streamID
-            return streamIds.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+        final MappedFieldTypesService fieldTypesService = new MappedFieldTypesService() {
+            @Override
+            public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
+                // for each streamID return a field that's called exactly like the streamID
+                return streamIds.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+            }
+
+            @Override
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
+                return streams.stream().map(streamID -> MappedFieldTypeDTO.create(field, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+            }
         };
 
         final FieldTypesResource resource = new FieldTypesResource(fieldTypesService, mock(IndexFieldTypePollerPeriodical.class));
@@ -65,12 +75,20 @@ public class FieldTypesResourceTest {
                 .allowStream("4242")
                 .build();
 
-        final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
-            if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
-                return Collections.singleton(MappedFieldTypeDTO.create("foobar",
-                        FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
-            } else {
-                return Collections.emptySet();
+        final MappedFieldTypesService fieldTypesService = new MappedFieldTypesService() {
+            @Override
+            public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
+                if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
+                    return Collections.singleton(MappedFieldTypeDTO.create("foobar",
+                            FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
+                } else {
+                    return Collections.emptySet();
+                }
+            }
+
+            @Override
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
+                return Set.of();
             }
         };
 
@@ -97,13 +115,21 @@ public class FieldTypesResourceTest {
                 .timerange(RelativeRange.create(250))
                 .build();
 
-        final MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> {
-            if (timeRange.equals(RelativeRange.create(250))) {
-                final FieldTypes.Type fieldType = FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"));
-                final MappedFieldTypeDTO field = MappedFieldTypeDTO.create("foobar", fieldType);
-                return Collections.singleton(field);
-            } else {
-                throw new AssertionError("Expected relative range of 250");
+        final MappedFieldTypesService mappedFieldTypesService = new MappedFieldTypesService() {
+            @Override
+            public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
+                if (timeRange.equals(RelativeRange.create(250))) {
+                    final FieldTypes.Type fieldType = FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"));
+                    final MappedFieldTypeDTO field = MappedFieldTypeDTO.create("foobar", fieldType);
+                    return Collections.singleton(field);
+                } else {
+                    throw new AssertionError("Expected relative range of 250");
+                }
+            }
+
+            @Override
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
+                return Set.of();
             }
         };
 
@@ -126,11 +152,19 @@ public class FieldTypesResourceTest {
                 .streams(ImmutableSet.of("2323", "4242"))
                 .build();
 
-        final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
-            // for each streamID return a field that's called exactly like the streamID
-            return streamIds.stream()
-                    .map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build()))
-                    .collect(Collectors.toSet());
+        final MappedFieldTypesService fieldTypesService = new MappedFieldTypesService() {
+            @Override
+            public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
+                // for each streamID return a field that's called exactly like the streamID
+                return streamIds.stream()
+                        .map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build()))
+                        .collect(Collectors.toSet());
+            }
+
+            @Override
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
+                return Set.of();
+            }
         };
 
         final FieldTypesResource resource = new FieldTypesResource(fieldTypesService, mock(IndexFieldTypePollerPeriodical.class));
@@ -150,13 +184,21 @@ public class FieldTypesResourceTest {
                 .allowStream("4242")
                 .build();
 
-        final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
-            if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
-                final FieldTypes.Type fieldType = FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"));
-                final MappedFieldTypeDTO field = MappedFieldTypeDTO.create("foobar", fieldType);
-                return Collections.singleton(field);
-            } else {
-                throw new AssertionError("Expected allTime range and 2323, 4242 stream IDs");
+        final MappedFieldTypesService fieldTypesService = new MappedFieldTypesService() {
+            @Override
+            public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
+                if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
+                    final FieldTypes.Type fieldType = FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"));
+                    final MappedFieldTypeDTO field = MappedFieldTypeDTO.create("foobar", fieldType);
+                    return Collections.singleton(field);
+                } else {
+                    throw new AssertionError("Expected allTime range and 2323, 4242 stream IDs");
+                }
+            }
+
+            @Override
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
+                return Set.of();
             }
         };
 
@@ -187,7 +229,17 @@ public class FieldTypesResourceTest {
                 .streams(ImmutableSet.of("2323", "4242"))
                 .build();
 
-        final FieldTypesResource resource = new FieldTypesResource((streamIds, timeRange) -> Collections.emptySet(), mock(IndexFieldTypePollerPeriodical.class));
+        final FieldTypesResource resource = new FieldTypesResource(new MappedFieldTypesService() {
+            @Override
+            public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
+                return Set.of();
+            }
+
+            @Override
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
+                return Set.of();
+            }
+        }, mock(IndexFieldTypePollerPeriodical.class));
         assertThatExceptionOfType(MissingStreamPermissionException.class)
                 .isThrownBy(() -> resource.byStreams(req, searchUser))
                 .satisfies(ex -> assertThat(ex.streamsWithMissingPermissions()).contains("2323"));

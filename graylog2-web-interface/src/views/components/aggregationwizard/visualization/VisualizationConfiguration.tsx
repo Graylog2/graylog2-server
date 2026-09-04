@@ -27,6 +27,8 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import VisualizationConfigurationOptions from './VisualizationConfigurationOptions';
 import VisualizationElement from './VisualizationElement';
@@ -52,25 +54,45 @@ const isTimeline = (values: WidgetConfigFormValues) => {
 
 const VisualizationConfiguration = () => {
   const visualizationTypes = usePluginEntities('visualizationTypes');
-  const findVisualizationType = useCallback((type: string) => visualizationTypes
-    .find((visualizationType) => visualizationType.type === type), [visualizationTypes]);
+  const findVisualizationType = useCallback(
+    (type: string) => visualizationTypes.find((visualizationType) => visualizationType.type === type),
+    [visualizationTypes],
+  );
 
-  const visualizationTypeOptions = useMemo(() => visualizationTypes
-    .sort((v1, v2) => defaultCompare(v1.displayName, v2.displayName))
-    .map(({ displayName, type }) => ({ label: displayName, value: type })), [visualizationTypes]);
+  const visualizationTypeOptions = useMemo(
+    () =>
+      visualizationTypes
+        .sort((v1, v2) => defaultCompare(v1.displayName, v2.displayName))
+        .map(({ displayName, type }) => ({ label: displayName, value: type })),
+    [visualizationTypes],
+  );
 
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const currentVisualizationType = findVisualizationType(values.visualization.type);
+  const sendTelemetry = useSendTelemetry();
 
-  const setNewVisualizationType = useCallback((newValue: string) => {
-    const type = findVisualizationType(newValue);
-    const createConfig = type.config?.createConfig ?? (() => ({}));
+  const setNewVisualizationType = useCallback(
+    (newValue: string) => {
+      const type = findVisualizationType(newValue);
+      const createConfig = type.config?.createConfig ?? (() => ({}));
 
-    setFieldValue('visualization', {
-      type: newValue,
-      config: createConfig(),
-    }, true);
-  }, [findVisualizationType, setFieldValue]);
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.VISUALIZATION_TYPE_SELECTED, {
+        app_section: 'search-widget',
+        app_action_value: 'visualization-type-select',
+        event_details: { visualizationType: newValue },
+      });
+
+      setFieldValue(
+        'visualization',
+        {
+          type: newValue,
+          config: createConfig(),
+        },
+        true,
+      );
+    },
+    [findVisualizationType, sendTelemetry, setFieldValue],
+  );
 
   const isTimelineChart = isTimeline(values);
   const supportsEventAnnotations = currentVisualizationType.capabilities?.includes('event-annotations') ?? false;
@@ -86,43 +108,47 @@ const VisualizationConfiguration = () => {
     <ElementConfigurationContainer elementTitle={VisualizationElement.title}>
       <Field name="visualization.type">
         {({ field: { name, value }, meta: { error } }) => (
-          <Input id="visualization-type-select"
-                 label="Type"
-                 error={error}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Select options={visualizationTypeOptions}
-                    aria-label="Select visualization type"
-                    clearable={false}
-                    name={name}
-                    value={value}
-                    menuPortalTarget={document.body}
-                    onChange={(newValue: string) => {
-                      if (newValue !== value) {
-                        setNewVisualizationType(newValue);
-                      }
-                    }}
-                    size="small" />
+          <Input
+            id="visualization-type-select"
+            label="Type"
+            error={error}
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9">
+            <Select
+              options={visualizationTypeOptions}
+              aria-label="Select visualization type"
+              clearable={false}
+              name={name}
+              value={value}
+              onChange={(newValue: string) => {
+                if (newValue !== value) {
+                  setNewVisualizationType(newValue);
+                }
+              }}
+              size="small"
+            />
           </Input>
         )}
       </Field>
       {isTimelineChart && supportsEventAnnotations && (
         <Field name="visualization.eventAnnotation">
           {({ field: { name, value = false }, meta: { error } }) => (
-            <Input id={`${name}-input`}
-                   label="Show Event annotations"
-                   error={error}
-                   labelClassName="col-sm-11"
-                   wrapperClassName="col-sm-1">
-              <EventAnnotationCheckbox id={`${name}-input`}
-                                       name={name}
-                                       onChange={() => setFieldValue(name, !value)}
-                                       checked={value}
-                                       className="pull-right" />
+            <Input
+              id={`${name}-input`}
+              label="Show Event annotations"
+              error={error}
+              labelClassName="col-sm-11"
+              wrapperClassName="col-sm-1">
+              <EventAnnotationCheckbox
+                id={`${name}-input`}
+                name={name}
+                onChange={() => setFieldValue(name, !value)}
+                checked={value}
+                className="pull-right"
+              />
             </Input>
           )}
         </Field>
-
       )}
       <VisualizationConfigurationOptions name="visualization.config" fields={configurationOptionFields} />
     </ElementConfigurationContainer>

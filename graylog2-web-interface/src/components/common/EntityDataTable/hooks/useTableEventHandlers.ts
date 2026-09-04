@@ -18,75 +18,110 @@ import { useCallback } from 'react';
 
 import type { Sort } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
-import type { TableLayoutPreferences } from 'components/common/EntityDataTable/types';
+import type { TableLayoutPreferences, ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const useTableEventHandlers = ({
   updateTableLayout,
   paginationQueryParameter,
   setQuery,
   appSection,
+  resetTableLayout,
 }: {
-  updateTableLayout: (preferences: TableLayoutPreferences) => void,
-  paginationQueryParameter: PaginationQueryParameterResult,
-  setQuery: (query: string) => void,
-  appSection: string
+  updateTableLayout: (preferences: TableLayoutPreferences) => Promise<void>;
+  paginationQueryParameter: PaginationQueryParameterResult;
+  setQuery: (query: string) => void;
+  appSection: string;
+  resetTableLayout: () => Promise<void>;
 }) => {
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(appSection);
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.PAGE_SIZE_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'page-size-select',
-      page_size: newPageSize,
+  const onPageSizeChange = useCallback(
+    (newPageSize: number) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.PAGE_SIZE_CHANGED, {
+        app_action_value: 'page-size-select',
+        page_size: newPageSize,
+      });
+
+      paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
+      updateTableLayout({ perPage: newPageSize });
+    },
+    [paginationQueryParameter, sendTelemetry, updateTableLayout],
+  );
+
+  const onSearch = useCallback(
+    (newQuery: string) => {
+      paginationQueryParameter.resetPage();
+      setQuery(newQuery);
+    },
+    [paginationQueryParameter, setQuery],
+  );
+
+  const onLayoutPreferencesChange = useCallback(
+    (layoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> }) => {
+      if (layoutPreferences.order) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMN_ORDER_CHANGED, {
+          app_action_value: 'column-order-change',
+          column_order: layoutPreferences.order,
+        });
+      }
+
+      if (layoutPreferences.attributes) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
+          app_action_value: 'columns-select',
+          columns: layoutPreferences.attributes,
+        });
+      }
+
+      const newLayoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> } = {};
+
+      if ('order' in layoutPreferences) {
+        newLayoutPreferences.order = layoutPreferences.order;
+      }
+
+      if ('attributes' in layoutPreferences) {
+        newLayoutPreferences.attributes = layoutPreferences.attributes;
+      }
+
+      return updateTableLayout(newLayoutPreferences);
+    },
+    [sendTelemetry, updateTableLayout],
+  );
+
+  const onResetLayoutPreferences = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_RESET, {
+      app_action_value: 'columns-select',
     });
 
-    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
-    updateTableLayout({ perPage: newPageSize });
-  }, [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
-
-  const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setQuery(newQuery);
-  }, [paginationQueryParameter, setQuery]);
+
+    return resetTableLayout();
+  }, [paginationQueryParameter, resetTableLayout, sendTelemetry]);
 
   const onSearchReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'columns-select',
-      columns: displayedAttributes,
-    });
+  const onSortChange = useCallback(
+    (newSort: Sort) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SORT_CHANGED, {
+        app_action_value: 'sort-select',
+        sort: newSort,
+      });
 
-    updateTableLayout({ displayedAttributes });
-  }, [appSection, pathname, sendTelemetry, updateTableLayout]);
-
-  const onSortChange = useCallback((newSort: Sort) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SORT_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'sort-select',
-      sort: newSort,
-    });
-
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
+      paginationQueryParameter.resetPage();
+      updateTableLayout({ sort: newSort });
+    },
+    [paginationQueryParameter, sendTelemetry, updateTableLayout],
+  );
 
   return {
+    onLayoutPreferencesChange,
     onPageSizeChange,
+    onResetLayoutPreferences,
     onSearch,
     onSearchReset,
-    onColumnsChange,
     onSortChange,
   };
 };

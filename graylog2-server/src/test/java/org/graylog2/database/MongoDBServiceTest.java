@@ -17,15 +17,14 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 
+@ExtendWith(MongoDBExtension.class)
 public class MongoDBServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     protected final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 

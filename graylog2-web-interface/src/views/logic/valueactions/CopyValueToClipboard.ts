@@ -16,7 +16,11 @@
  */
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import copyToClipboard from 'util/copyToClipboard';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 
 const CopyValueToClipboard = ({ value }: ActionHandlerArguments) => copyToClipboard(value);
+
+const isEnabled = ({ contexts }: ActionHandlerArguments) => !hasMultipleValueForActions(contexts);
+CopyValueToClipboard.isEnabled = isEnabled;
 
 export default CopyValueToClipboard;

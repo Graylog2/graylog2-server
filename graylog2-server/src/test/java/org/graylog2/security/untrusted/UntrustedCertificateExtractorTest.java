@@ -57,6 +57,8 @@ import java.util.List;
 
 class UntrustedCertificateExtractorTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     private HttpServer httpsServer;
 
     private static HttpServer startServer(KeyStore keyStore, String password) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
@@ -71,7 +73,7 @@ class UntrustedCertificateExtractorTest {
 
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
-        String baseUri = "https://localhost:" + findFreePort();
+        String baseUri = "https://127.0.0.1:" + findFreePort();
 
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUri), rc, true, new SSLEngineConfigurator(sslCon).setClientMode(false).setNeedClientAuth(false));
     }
@@ -91,7 +93,7 @@ class UntrustedCertificateExtractorTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned("junit-extractor-test").validity(Duration.ofDays(1)));
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("junit-extractor-test").validity(Duration.ofDays(1)));
         final char[] password = "my-password".toCharArray();
         final KeyStore keystore = keyPair.toKeystore("ca", password);
         httpsServer = startServer(keystore, "my-password");
@@ -134,7 +136,7 @@ class UntrustedCertificateExtractorTest {
     @Nonnull
     private String getHttpHost() {
         final int port = httpsServer.getListeners().iterator().next().getPort();
-        return "https://localhost:" + port;
+        return "https://127.0.0.1:" + port;
     }
 
     @Nonnull

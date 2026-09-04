@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { $PropertyType } from 'utility-types';
 import * as Immutable from 'immutable';
 
 export type AccountStatus = 'enabled' | 'disabled' | 'deleted';
@@ -59,21 +58,21 @@ export default class UserOverview {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    username: $PropertyType<InternalState, 'username'>,
-    fullName: $PropertyType<InternalState, 'fullName'>,
-    email: $PropertyType<InternalState, 'email'>,
-    roles: $PropertyType<InternalState, 'roles'>,
-    readOnly: $PropertyType<InternalState, 'readOnly'>,
-    external: $PropertyType<InternalState, 'external'>,
-    sessionActive: $PropertyType<InternalState, 'sessionActive'>,
-    clientAddress: $PropertyType<InternalState, 'clientAddress'>,
-    lastActivity: $PropertyType<InternalState, 'lastActivity'>,
-    enabled: $PropertyType<InternalState, 'enabled'>,
-    authServiceId: $PropertyType<InternalState, 'authServiceId'>,
-    authServiceUid: $PropertyType<InternalState, 'authServiceUid'>,
-    authServiceEnabled: $PropertyType<InternalState, 'authServiceEnabled'>,
-    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    id: InternalState['id'],
+    username: InternalState['username'],
+    fullName: InternalState['fullName'],
+    email: InternalState['email'],
+    roles: InternalState['roles'],
+    readOnly: InternalState['readOnly'],
+    external: InternalState['external'],
+    sessionActive: InternalState['sessionActive'],
+    clientAddress: InternalState['clientAddress'],
+    lastActivity: InternalState['lastActivity'],
+    enabled: InternalState['enabled'],
+    authServiceId: InternalState['authServiceId'],
+    authServiceUid: InternalState['authServiceUid'],
+    authServiceEnabled: InternalState['authServiceEnabled'],
+    accountStatus: InternalState['accountStatus'],
   ) {
     this._value = {
       id,
@@ -182,41 +181,43 @@ export default class UserOverview {
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      id,
-      username,
-      fullName,
-      email,
-      roles,
-      readOnly,
-      external,
-      sessionActive,
-      clientAddress,
-      lastActivity,
-      enabled,
-      authServiceId,
-      authServiceUid,
-      authServiceEnabled,
-      accountStatus,
-    }));
+    return new Builder(
+      Immutable.Map({
+        id,
+        username,
+        fullName,
+        email,
+        roles,
+        readOnly,
+        external,
+        sessionActive,
+        clientAddress,
+        lastActivity,
+        enabled,
+        authServiceId,
+        authServiceUid,
+        authServiceEnabled,
+        accountStatus,
+      }),
+    );
   }
 
   static create(
-    id: $PropertyType<InternalState, 'id'>,
-    username: $PropertyType<InternalState, 'username'>,
-    fullName: $PropertyType<InternalState, 'fullName'>,
-    email: $PropertyType<InternalState, 'email'>,
-    roles: $PropertyType<InternalState, 'roles'>,
-    readOnly: $PropertyType<InternalState, 'readOnly'>,
-    external: $PropertyType<InternalState, 'external'>,
-    sessionActive: $PropertyType<InternalState, 'sessionActive'>,
-    clientAddress: $PropertyType<InternalState, 'clientAddress'>,
-    lastActivity: $PropertyType<InternalState, 'lastActivity'>,
-    enabled: $PropertyType<InternalState, 'enabled'>,
-    authServiceId: $PropertyType<InternalState, 'authServiceId'>,
-    authServiceUid: $PropertyType<InternalState, 'authServiceUid'>,
-    authServiceEnabled: $PropertyType<InternalState, 'authServiceEnabled'>,
-    accountStatus: $PropertyType<InternalState, 'accountStatus'>,
+    id: InternalState['id'],
+    username: InternalState['username'],
+    fullName: InternalState['fullName'],
+    email: InternalState['email'],
+    roles: InternalState['roles'],
+    readOnly: InternalState['readOnly'],
+    external: InternalState['external'],
+    sessionActive: InternalState['sessionActive'],
+    clientAddress: InternalState['clientAddress'],
+    lastActivity: InternalState['lastActivity'],
+    enabled: InternalState['enabled'],
+    authServiceId: InternalState['authServiceId'],
+    authServiceUid: InternalState['authServiceUid'],
+    authServiceEnabled: InternalState['authServiceEnabled'],
+    accountStatus: InternalState['accountStatus'],
   ) {
     return new UserOverview(
       id,
@@ -294,7 +295,8 @@ export default class UserOverview {
       account_status: accountStatus,
     } = value;
 
-    return UserOverview.create(id,
+    return UserOverview.create(
+      id,
       username,
       fullName,
       email,
@@ -308,7 +310,8 @@ export default class UserOverview {
       authServiceId,
       authServiceUid,
       authServiceEnabled,
-      accountStatus);
+      accountStatus,
+    );
   }
 
   static builder(): Builder {
@@ -326,63 +329,63 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>) {
+  id(value: InternalState['id']) {
     return new Builder(this.value.set('id', value));
   }
 
-  username(value: $PropertyType<InternalState, 'username'>) {
+  username(value: InternalState['username']) {
     return new Builder(this.value.set('username', value));
   }
 
-  fullName(value: $PropertyType<InternalState, 'fullName'>) {
+  fullName(value: InternalState['fullName']) {
     return new Builder(this.value.set('fullName', value));
   }
 
-  email(value: $PropertyType<InternalState, 'email'>) {
+  email(value: InternalState['email']) {
     return new Builder(this.value.set('email', value));
   }
 
-  roles(value: $PropertyType<InternalState, 'roles'>) {
+  roles(value: InternalState['roles']) {
     return new Builder(this.value.set('roles', value));
   }
 
-  readOnly(value: $PropertyType<InternalState, 'readOnly'>) {
+  readOnly(value: InternalState['readOnly']) {
     return new Builder(this.value.set('readOnly', value));
   }
 
-  external(value: $PropertyType<InternalState, 'external'>) {
+  external(value: InternalState['external']) {
     return new Builder(this.value.set('external', value));
   }
 
-  sessionActive(value: $PropertyType<InternalState, 'sessionActive'>) {
+  sessionActive(value: InternalState['sessionActive']) {
     return new Builder(this.value.set('sessionActive', value));
   }
 
-  clientAddress(value: $PropertyType<InternalState, 'clientAddress'>) {
+  clientAddress(value: InternalState['clientAddress']) {
     return new Builder(this.value.set('clientAddress', value));
   }
 
-  lastActivity(value: $PropertyType<InternalState, 'lastActivity'>) {
+  lastActivity(value: InternalState['lastActivity']) {
     return new Builder(this.value.set('lastActivity', value));
   }
 
-  enabled(value: $PropertyType<InternalState, 'enabled'>) {
+  enabled(value: InternalState['enabled']) {
     return new Builder(this.value.set('enabled', value));
   }
 
-  authServiceId(value: $PropertyType<InternalState, 'authServiceId'>) {
+  authServiceId(value: InternalState['authServiceId']) {
     return new Builder(this.value.set('authServiceId', value));
   }
 
-  authServiceUid(value: $PropertyType<InternalState, 'authServiceUid'>) {
+  authServiceUid(value: InternalState['authServiceUid']) {
     return new Builder(this.value.set('authServiceUid', value));
   }
 
-  authServiceEnabled(value: $PropertyType<InternalState, 'authServiceEnabled'>) {
+  authServiceEnabled(value: InternalState['authServiceEnabled']) {
     return new Builder(this.value.set('authServiceEnabled', value));
   }
 
-  accountStatus(value: $PropertyType<InternalState, 'accountStatus'>) {
+  accountStatus(value: InternalState['accountStatus']) {
     return new Builder(this.value.set('accountStatus', value));
   }
 

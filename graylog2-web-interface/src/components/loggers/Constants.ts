@@ -14,13 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export const availableLoglevels = [
-  'fatal',
-  'error',
-  'warn',
-  'info',
-  'debug',
-  'trace',
-] as const;
+export const availableLoglevels = ['fatal', 'error', 'warn', 'info', 'debug', 'trace'] as const;
 
 export type AvailableLogLevels = typeof availableLoglevels;

@@ -24,7 +24,11 @@ type ResultEntry = Result | string | number;
 type Result = { [key: string]: ResultEntry };
 type Results = Array<Result>;
 
-const expandRows = (fieldNames: Array<string>, columnFieldNames: Array<string>, rows: Array<Leaf | NonLeaf>): Results => {
+const expandRows = (
+  fieldNames: Array<string>,
+  columnFieldNames: Array<string>,
+  rows: Array<Leaf | NonLeaf>,
+): Results => {
   if (!rows) {
     return [];
   }
@@ -40,7 +44,9 @@ const expandRows = (fieldNames: Array<string>, columnFieldNames: Array<string>, 
     });
 
     (values as Array<ColLeaf | RowLeaf | RowInner>).forEach(({ key, value }) => {
-      const translatedKeys = flatten(key.map((k, idx) => (idx < key.length - 1 && columnFieldNames[idx] ? [columnFieldNames[idx], k] : k)));
+      const translatedKeys = flatten(
+        key.map((k, idx) => (idx < key.length - 1 && columnFieldNames[idx] ? [columnFieldNames[idx], k] : k)),
+      );
 
       setWith(result, translatedKeys, value, Object);
     });

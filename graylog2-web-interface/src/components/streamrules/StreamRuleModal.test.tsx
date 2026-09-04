@@ -16,36 +16,34 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
-import { MockStore, asMock } from 'helpers/mocking';
+import selectEvent from 'helpers/selectEvent';
+import { asMock } from 'helpers/mocking';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 
 import StreamRuleModal from './StreamRuleModal';
 
 jest.mock('components/streams/hooks/useStreamRuleTypes');
-
-jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
-  StreamRulesInputsActions: {
-    list: jest.fn(),
+jest.mock('hooks/useStreamRulesInputs');
+jest.mock('@graylog/server-api', () => ({
+  SystemFields: {
+    fields: async () => ({ fields: [] }),
   },
-  StreamRulesInputsStore: MockStore(['getInitialState', () => ({
-    inputs: [
-      { id: 'my-id', title: 'input title', name: 'name' },
-    ],
-  })]),
 }));
 
 describe('StreamRuleModal', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof StreamRuleModal>>) => (
-    <StreamRuleModal onSubmit={() => Promise.resolve()}
-                     onClose={() => {}}
-                     submitButtonText="Update rule"
-                     submitLoadingText="Updating rule..."
-                     title="Bach"
-                     {...props} />
+    <StreamRuleModal
+      onSubmit={() => Promise.resolve()}
+      onClose={() => {}}
+      submitButtonText="Update rule"
+      submitLoadingText="Updating rule..."
+      title="Bach"
+      {...props}
+    />
   );
 
   const getStreamRule = (type = 1) => ({
@@ -59,59 +57,47 @@ describe('StreamRuleModal', () => {
 
   beforeEach(() => {
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
+    asMock(useStreamRulesInputs).mockReturnValue({
+      data: [{ id: 'my-id', title: 'input title', name: 'name' }],
+    } as any);
   });
 
   it('should render without provided stream rule', async () => {
     render(<SUT />);
 
-    await screen.findByRole('textbox', {
+    await screen.findByRole('combobox', {
       name: /field/i,
-      hidden: true,
     });
   });
 
   it('should render with provided stream rule', async () => {
     render(<SUT initialValues={getStreamRule()} />);
 
-    const fieldInput = await screen.findByRole('textbox', {
-      name: /field/i,
-      hidden: true,
-    });
+    await screen.findByRole('combobox', { name: /field/i });
 
     const valueInput = await screen.findByRole('textbox', {
       name: /value/i,
-      hidden: true,
     });
 
-    expect(fieldInput).toHaveValue('field_1');
+    expect(await screen.findAllByText('field_1')).toHaveLength(2);
     expect(valueInput).toHaveValue('value_1');
   });
 
   it('should require selected input when type is `match input`', async () => {
     const submit = jest.fn(() => Promise.resolve());
 
-    render(
-      <SUT onSubmit={submit}
-           initialValues={getStreamRule()} />,
-    );
+    render(<SUT onSubmit={submit} initialValues={getStreamRule()} />);
 
     const submitBtn = await screen.findByRole('button', {
       name: /update rule/i,
-      hidden: true,
     });
 
-    const ruleTypeSelect = await screen.findByLabelText('Type');
-    selectEvent.openMenu(ruleTypeSelect);
-    await selectEvent.select(ruleTypeSelect, 'match input');
+    await selectEvent.chooseOption('Type', 'match input');
 
-    expect(submitBtn).toBeDisabled();
-
-    const inputSelect = await screen.findByLabelText('Input');
-    selectEvent.openMenu(inputSelect);
-    await selectEvent.select(inputSelect, 'input title (name)');
+    await selectEvent.chooseOption('Input', 'input title (name)');
 
     await waitFor(() => expect(submitBtn).toBeEnabled());
-    userEvent.click(submitBtn);
+    await userEvent.click(submitBtn);
 
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
 

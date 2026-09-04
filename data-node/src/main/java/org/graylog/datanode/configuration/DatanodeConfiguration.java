@@ -16,16 +16,17 @@
  */
 package org.graylog.datanode.configuration;
 
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.graylog.datanode.OpensearchDistribution;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 /**
  * DatanodeConfiguration holds the static configuration as parsed during the datanode startup, either from the
  * config file or from the ENV properties.
  */
 public record DatanodeConfiguration(
-        OpensearchDistributionProvider opensearchDistributionProvider,
+        OpensearchDistribution opensearchDistribution,
         DatanodeDirectories datanodeDirectories,
         int processLogsBufferSize,
-        IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider
+        IndexerJwtAuthToken indexerJwtAuthToken
 ) {
 }

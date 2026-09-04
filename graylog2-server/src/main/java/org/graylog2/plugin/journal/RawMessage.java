@@ -18,6 +18,8 @@ package org.graylog2.plugin.journal;
 
 import com.eaio.uuid.UUID;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.Iterables;
+import com.google.common.primitives.Ints;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UninitializedMessageException;
@@ -40,6 +42,8 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -66,7 +70,7 @@ public class RawMessage implements Serializable {
 
     private transient final JournalMessage.Builder msgBuilder;
     private final UUID id;
-    private Object messageQueueId;
+    private final Object messageQueueId;
     private int sequenceNr;
     private Configuration codecConfig;
 
@@ -194,6 +198,21 @@ public class RawMessage implements Serializable {
         return msgBuilder.getPayload().toByteArray(); // TODO PERFORMANCE array copy
     }
 
+    /**
+     * Returns the input message size if set, otherwise the payload size.
+     */
+    public int getInputMessageSize() {
+        return msgBuilder.hasInputMessageSize() ? msgBuilder.getInputMessageSize() : getPayloadSize();
+    }
+
+    public int getPayloadSize() {
+        return msgBuilder.getPayload().size();
+    }
+
+    public void setInputMessageSize(long inputMessageSize) {
+        msgBuilder.setInputMessageSize(Ints.saturatedCast(inputMessageSize));
+    }
+
     public UUID getId() {
         return id;
     }
@@ -275,13 +294,27 @@ public class RawMessage implements Serializable {
         return sequenceNr;
     }
 
+    public Optional<String> getInputIdOnCurrentNode() {
+        return getLastSourceNode().map(sourceNode -> sourceNode.inputId);
+    }
+
+    public Optional<SourceNode> getLastSourceNode() {
+        SourceNode lastNode;
+        try {
+            lastNode = Iterables.getLast(getSourceNodes());
+        } catch (NoSuchElementException e) {
+            lastNode = null;
+        }
+        return Optional.ofNullable(lastNode);
+    }
+
     @Override
     public String toString() {
         final MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(this);
         helper.add("id", getId())
                 .add("messageQueueId", getMessageQueueId())
                 .add("codec", getCodecName())
-                .add("payloadSize", getPayload().length)
+                .add("payloadSize", getPayloadSize())
                 .add("timestamp", getTimestamp())
                 .add("seqenceNr", getSequenceNr());
         if (getRemoteAddress() != null) {

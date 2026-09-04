@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import selectEvent from 'react-select-event';
-import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 
+import { loadRolesForUser } from 'hooks/useAuthzRoles';
+import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
-import { manager as assignedRole1, reader as assignedRole2, reportCreator as notAssignedRole } from 'fixtures/roles';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import { manager as assignedRole1, reader as assignedRole2, viewsManager as notAssignedRole } from 'fixtures/roles';
 
 import RolesSection from './RolesSection';
 
-const exampleUser = alice.toBuilder()
+const exampleUser = alice
+  .toBuilder()
   .roles(Immutable.Set([assignedRole1.name]))
   .build();
 const mockRolesForUserPromise = Promise.resolve({
@@ -37,11 +39,10 @@ const mockLoadRolesPromise = Promise.resolve({
   pagination: { page: 1, perPage: 10, total: 1 },
 });
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesActions: {
-    loadRolesForUser: jest.fn(() => mockRolesForUserPromise),
-    loadRolesPaginated: jest.fn(() => mockLoadRolesPromise),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  loadRolesForUser: jest.fn(() => mockRolesForUserPromise),
+  loadRolesPaginated: jest.fn(() => mockLoadRolesPromise),
 }));
 
 describe('<RolesSection />', () => {
@@ -56,10 +57,8 @@ describe('<RolesSection />', () => {
     await act(() => mockLoadRolesPromise.then());
 
     const assignRoleButton = screen.getByRole('button', { name: 'Assign Role' });
-    const rolesSelector = screen.getByLabelText('Search for roles');
-    await selectEvent.openMenu(rolesSelector);
-    await selectEvent.select(rolesSelector, notAssignedRole.name);
-    fireEvent.click(assignRoleButton);
+    await selectEvent.chooseOption('Search for roles', notAssignedRole.name);
+    await userEvent.click(assignRoleButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
@@ -73,11 +72,11 @@ describe('<RolesSection />', () => {
     await act(() => mockLoadRolesPromise.then());
 
     const filterInput = screen.getByPlaceholderText('Enter query to filter');
-    fireEvent.change(filterInput, { target: { value: 'name of an assigned role' } });
+    await userEvent.type(filterInput, 'name of an assigned role');
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(loadRolesForUser).toHaveBeenCalledTimes(2));
 
-    expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledWith(exampleUser.username, {
+    expect(loadRolesForUser).toHaveBeenCalledWith(exampleUser.username, {
       page: 1,
       perPage: 5,
       query: 'name of an assigned role',
@@ -85,7 +84,8 @@ describe('<RolesSection />', () => {
   });
 
   it('should unassign a role', async () => {
-    const newExampleUser = alice.toBuilder()
+    const newExampleUser = alice
+      .toBuilder()
       .roles(Immutable.Set([assignedRole1.name, assignedRole2.name]))
       .build();
 
@@ -95,7 +95,7 @@ describe('<RolesSection />', () => {
     await act(() => mockLoadRolesPromise.then());
 
     const unassignRoleButton = screen.getByRole('button', { name: `Remove ${assignedRole1.name}` });
-    fireEvent.click(unassignRoleButton);
+    await userEvent.click(unassignRoleButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 

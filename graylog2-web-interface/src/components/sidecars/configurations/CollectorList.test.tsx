@@ -74,16 +74,18 @@ const collectors: Array<Collector> = [
 ];
 
 const SUT = (props: Partial<React.ComponentProps<typeof CollectorList>>) => (
-  <CollectorList collectors={collectors}
-                 onClone={jest.fn()}
-                 onDelete={jest.fn()}
-                 onPageChange={jest.fn()}
-                 onQueryChange={jest.fn()}
-                 validateCollector={jest.fn()}
-                 pagination={{ page: 1, pageSize: 10, total: 1 }}
-                 query=""
-                 total={collectors.length}
-                 {...props} />
+  <CollectorList
+    collectors={collectors}
+    onClone={jest.fn()}
+    onDelete={jest.fn()}
+    onPageChange={jest.fn()}
+    onQueryChange={jest.fn()}
+    validateCollector={jest.fn()}
+    pagination={{ page: 1, pageSize: 10, total: 1 }}
+    query=""
+    total={collectors.length}
+    {...props}
+  />
 );
 
 describe('CollectorList', () => {
@@ -101,7 +103,7 @@ describe('CollectorList', () => {
     render(<SUT onQueryChange={onQueryChange} />);
 
     const queryInput = await screen.findByPlaceholderText('Find collectors');
-    userEvent.type(queryInput, 'newquery{enter}');
+    await userEvent.type(queryInput, 'newquery{enter}');
 
     await waitFor(() => {
       expect(onQueryChange).toHaveBeenCalledWith('newquery', expect.any(Function));
@@ -113,9 +115,9 @@ describe('CollectorList', () => {
     render(<SUT onPageChange={onPageChange} />);
 
     const pageDropdown = await screen.findByRole('button', { name: /configure page size/i });
-    userEvent.click(pageDropdown);
+    await userEvent.click(pageDropdown);
 
-    userEvent.click(await screen.findByRole('menuitem', { name: '25' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: '25' }));
 
     await waitFor(() => {
       expect(onPageChange).toHaveBeenCalledWith(1, 25);

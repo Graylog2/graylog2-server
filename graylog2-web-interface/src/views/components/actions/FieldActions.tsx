@@ -20,39 +20,46 @@ import styled, { css } from 'styled-components';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
-import type { QueryId } from 'views/logic/queries/Query';
 import Action from 'views/components/actions/Action';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 type Props = {
-  children: React.ReactNode,
-  disabled: boolean,
-  element: React.ReactNode,
-  menuContainer: HTMLElement | undefined | null,
-  name: string,
-  queryId: QueryId,
-  type: FieldType,
+  children: React.ReactNode;
+  disabled: boolean;
+  element: React.ReactNode;
+  menuContainer: HTMLElement | undefined | null;
+  name: string;
+  type: FieldType;
 };
 
 type FieldElementProps = {
-  $active: boolean,
-  $disabled: boolean,
+  $active: boolean;
+  $disabled: boolean;
 };
 
 const FieldElement = styled.span.attrs({
-  className: 'field-element', /* stylelint-disable-line property-no-unknown */
-})<FieldElementProps>(({ $active, $disabled, theme }) => css`
-  color: ${$active ? theme.colors.variant.info : 'currentColor'};
-  opacity: ${$disabled ? '0.3' : '1'};
-`);
+  className: 'field-element' /* stylelint-disable-line property-no-unknown */,
+})<FieldElementProps>(
+  ({ $active, $disabled, theme }) => css`
+    color: ${$active ? theme.colors.variant.info : 'currentColor'};
+    opacity: ${$disabled ? '0.3' : '1'};
+  `,
+);
 
-const FieldActions = ({ children, disabled, element, menuContainer, name, type, queryId }: Props) => {
+const FieldActions = ({ children, disabled, element, menuContainer, name, type }: Props) => {
   const actionContext = useContext(ActionContext);
+  const { additionalHandlerArgs } = useFieldActions();
   const wrappedElement = ({ active }: { active: boolean }) => (
-    <FieldElement $active={active}
-                  $disabled={disabled}>{element}
+    <FieldElement $active={active} $disabled={disabled}>
+      {element}
     </FieldElement>
   );
-  const handlerArgs = { queryId, field: name, type, contexts: actionContext };
+  const handlerArgs = {
+    field: name,
+    type,
+    contexts: actionContext,
+    ...additionalHandlerArgs,
+  };
 
   return (
     <Action element={wrappedElement} handlerArgs={handlerArgs} menuContainer={menuContainer} type="field">

@@ -17,18 +17,12 @@
 import * as React from 'react';
 
 import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
-
-const NAV_ITEMS = [
-  { title: 'Alerts & Events', path: Routes.ALERTS.LIST, exactPathMatch: true },
-  { title: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST },
-  { title: 'Notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST },
-];
+import { PAGE_NAVIGATION_TITLE } from 'components/events/bindings';
 
 const EventsPageNavigation = () => (
   <Row>
-    <PageNavigation items={NAV_ITEMS} />
+    <PageNavigation page={PAGE_NAVIGATION_TITLE} />
   </Row>
 );
 

@@ -18,6 +18,7 @@ package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
+import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,16 +27,19 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 import static org.graylog.testing.completebackend.DefaultPluginJarsProvider.getProjectReposPath;
@@ -56,6 +60,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
     private Map<String, String> env;
+    private PluginJarsProvider pluginJarsProvider;
 
     protected static Path getPath() {
         return getProjectReposPath().resolve(Path.of("graylog2-server", "data-node", "target"));
@@ -121,6 +126,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         return this;
     }
 
+    @Override
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder pluginJarsProvider(PluginJarsProvider pluginJarsProvider) {
+        this.pluginJarsProvider = pluginJarsProvider;
+        return this;
+    }
+
     public GenericContainer<?> build() {
         final Path graylog = getPath().resolve("graylog-datanode-" + getProjectVersion() + ".jar");
         if (!Files.exists(graylog)) {
@@ -168,7 +179,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
                 // disable disk threshold in tests, it causes problems in github builds where we don't have
                 // enough free space
-                .withEnv("opensearch.cluster.routing.allocation.disk.threshold_enabled", "false")
+                .withCopyToContainer(Transferable.of(
+                        """
+                                cluster.routing.allocation.disk.threshold_enabled=false
+                                """
+                ), IMAGE_WORKING_DIR + "/config/opensearch.overrides")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIGURATION_OVERRIDES_FILE", IMAGE_WORKING_DIR + "/config/opensearch.overrides")
 
                 .withNetworkAliases(nodeName)
                 .waitingFor(new LogMessageWaitStrategy()
@@ -176,30 +192,52 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                         .withStartupTimeout(Duration.ofSeconds(60)));
 
         // explicitly configured ENV variables will override those set above
-        if(env != null) {
+        if (env != null) {
             env.forEach(container::withEnv);
         }
 
-        final String opensearchDistributionName = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
-        final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchDistributionName));
-
-        if (!Files.exists(downloadedOpensearch)) {
-            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
-        }
-
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
-                .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/")
-                .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_ONLY);
+                .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/");
+
+        bindOpensearchDistributions(container);
+
+        if (pluginJarsProvider != null) {
+            pluginJarsProvider.getJars().forEach(hostPath -> {
+                if (Files.exists(hostPath)) {
+                    final Path containerPath = Paths.get(IMAGE_WORKING_DIR, "plugin", hostPath.getFileName().toString());
+                    container.withFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+                }
+            });
+        }
 
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
     }
 
-    private static String getOpensearchVersion() {
+    private void bindOpensearchDistributions(GenericContainer<?> container) {
+        // see opensearch.properties file, mapping the versions from pom.xml
+        Stream.of("opensearchCompatVersion", "opensearchLatestVersion")
+                .map(DatanodeDevContainerBuilder::getOpensearchVersion)
+                .map(DatanodeDevContainerBuilder::readOpensearchDistribution)
+                .forEach(d -> container.withFileSystemBind(d.distributionPath().toString(), IMAGE_WORKING_DIR + "/" + d.distributionName(), BindMode.READ_ONLY));
+    }
+
+    private static OpensearchDistribution readOpensearchDistribution(String version) {
+        final String distributionName = "opensearch-" + version + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
+        final Path distributionPath = getPath().resolve(Path.of("opensearch", distributionName));
+        if (!Files.exists(distributionPath)) {
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + distributionPath.toAbsolutePath() + " does not exist!");
+        }
+        return new OpensearchDistribution(distributionPath, distributionName);
+    }
+
+    private record OpensearchDistribution(Path distributionPath, String distributionName) {}
+
+    private static String getOpensearchVersion(String propertyName) {
         try {
             final Properties props = new Properties();
             props.load(DatanodeContainerizedBackend.class.getResourceAsStream("/opensearch.properties"));
-            return props.getProperty("opensearchVersion");
+            return props.getProperty(propertyName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -207,11 +245,11 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     private static ImageFromDockerfile createImage() {
 
-        final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false);
+        final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-full-backend-test-datanode:latest", false);
 
         return image.withDockerfileFromBuilder(builder ->
         {
-            final DockerfileBuilder fileBuilder = builder.from("eclipse-temurin:17-jre-jammy")
+            final DockerfileBuilder fileBuilder = builder.from("eclipse-temurin:21-jre-jammy")
                     .workDir(IMAGE_WORKING_DIR)
                     .run("mkdir -p opensearch/config")
                     .run("mkdir -p opensearch/data")

@@ -18,7 +18,7 @@ package org.graylog2.indexer.messages;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.messageq.Acknowledgeable;
 
@@ -54,4 +54,14 @@ public interface ImmutableMessage extends Indexable, Acknowledgeable {
     String getSource();
 
     ImmutableSet<String> getStreamIds();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Re-declared as abstract — overriding {@link Indexable}'s {@code 0} default — so that every
+     * {@link ImmutableMessage} implementation must supply a real input size. This prevents a wrapper
+     * from silently inheriting the {@code 0} default and under-counting input-based traffic.
+     */
+    @Override
+    long getInputMessageSize();
 }

@@ -29,22 +29,22 @@ jest.mock('hooks/usePluginEntities');
 describe('WidgetOverrideElements', () => {
   it('renders original children if no elements are present', async () => {
     asMock(usePluginEntities).mockReturnValue([]);
-    const { findByText } = render((
+    const { findByText } = render(
       <WidgetOverrideElements>
         <span>Hello world!</span>
-      </WidgetOverrideElements>
-    ));
+      </WidgetOverrideElements>,
+    );
 
     await findByText('Hello world!');
   });
 
   it('renders original children if element does not throw', async () => {
     asMock(usePluginEntities).mockReturnValue([() => null]);
-    const { findByText } = render((
+    const { findByText } = render(
       <WidgetOverrideElements>
         <span>Hello world!</span>
-      </WidgetOverrideElements>
-    ));
+      </WidgetOverrideElements>,
+    );
 
     await findByText('Hello world!');
   });
@@ -57,11 +57,13 @@ describe('WidgetOverrideElements', () => {
 
       asMock(usePluginEntities).mockReturnValue([throwElement]);
 
-      expect(() => render((
-        <WidgetOverrideElements>
-          <span>Hello world!</span>
-        </WidgetOverrideElements>
-      ))).toThrow('The dungeon collapses, you die!');
+      expect(() =>
+        render(
+          <WidgetOverrideElements>
+            <span>Hello world!</span>
+          </WidgetOverrideElements>,
+        ),
+      ).toThrow('The dungeon collapses, you die!');
     });
   });
 
@@ -76,11 +78,11 @@ describe('WidgetOverrideElements', () => {
 
     asMock(usePluginEntities).mockReturnValue([OverridingElement]);
 
-    const { findByText, queryByText } = render((
+    const { findByText, queryByText } = render(
       <WidgetOverrideElements>
         <span>Hello world!</span>
-      </WidgetOverrideElements>
-    ));
+      </WidgetOverrideElements>,
+    );
 
     await findByText('I was thrown!');
 

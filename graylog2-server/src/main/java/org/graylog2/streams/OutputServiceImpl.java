@@ -16,83 +16,109 @@
  */
 package org.graylog2.streams;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Updates;
+import jakarta.inject.Inject;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.DbEntity;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.inputs.encryption.EncryptedInputConfigs;
+import org.graylog2.outputs.MessageOutputFactory;
 import org.graylog2.outputs.events.OutputChangedEvent;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
-import org.mongojack.DBQuery;
-import org.mongojack.DBUpdate;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
-
-import jakarta.inject.Inject;
+import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueMapperConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static org.graylog2.database.utils.MongoUtils.idEq;
 
 public class OutputServiceImpl implements OutputService {
-    private final JacksonDBCollection<OutputImpl, String> coll;
-    private final DBCollection dbCollection;
+    private static final Logger LOG = LoggerFactory.getLogger(OutputServiceImpl.class);
+
     private final StreamService streamService;
     private final ClusterEventBus clusterEventBus;
+    private final MessageOutputFactory messageOutputFactory;
+    private final ObjectMapper objectMapper;
+    private final MongoCollection<OutputImpl> collection;
+    private final MongoCollection<Document> rawCollection;
 
     @Inject
-    public OutputServiceImpl(MongoConnection mongoConnection,
-                             MongoJackObjectMapperProvider mapperProvider,
+    public OutputServiceImpl(MongoCollections mongoCollections,
                              StreamService streamService,
-                             ClusterEventBus clusterEventBus) {
+                             ClusterEventBus clusterEventBus,
+                             MessageOutputFactory messageOutputFactory,
+                             ObjectMapper objectMapper) {
         this.streamService = streamService;
+        this.messageOutputFactory = messageOutputFactory;
+        this.objectMapper = objectMapper.copy();
+        EncryptedValueMapperConfig.enableDatabase(this.objectMapper);
         final String collectionName = OutputImpl.class.getAnnotation(DbEntity.class).collection();
-        this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
-        this.coll = JacksonDBCollection.wrap(dbCollection, OutputImpl.class, String.class, mapperProvider.get());
+        this.collection = mongoCollections.nonEntityCollection(collectionName, OutputImpl.class);
+        this.rawCollection = mongoCollections.nonEntityCollection(collectionName, Document.class);
         this.clusterEventBus = clusterEventBus;
     }
 
     @Override
     public Output load(String streamOutputId) throws NotFoundException {
-        final Output output = coll.findOneById(streamOutputId);
+        final OutputImpl output = collection.find(idEq(streamOutputId)).first();
         if (output == null) {
             throw new NotFoundException("Couldn't find output with id " + streamOutputId);
         }
 
-        return output;
+        return withEncryptedFields(output);
     }
 
     @Override
     public Set<Output> loadAll() {
-        try (org.mongojack.DBCursor<OutputImpl> outputs = coll.find()) {
-            return ImmutableSet.copyOf((Iterable<OutputImpl>) outputs);
+        final Map<String, AvailableOutputSummary> availableOutputs = messageOutputFactory.getAvailableOutputs();
+        try (final var stream = MongoUtils.stream(collection.find())) {
+            return stream.map(output -> withEncryptedFields(output, availableOutputs)).collect(ImmutableSet.toImmutableSet());
         }
     }
 
     @Override
     public Set<Output> loadByIds(Collection<String> ids) {
-        final DBQuery.Query query = DBQuery.in(OutputImpl.FIELD_ID, ids);
-        try (org.mongojack.DBCursor<OutputImpl> dbCursor = coll.find(query)) {
-            return ImmutableSet.copyOf((Iterable<? extends Output>) dbCursor);
+        final Map<String, AvailableOutputSummary> availableOutputs = messageOutputFactory.getAvailableOutputs();
+        try (final var stream = MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))) {
+            return stream.map(output -> withEncryptedFields(output, availableOutputs)).collect(ImmutableSet.toImmutableSet());
         }
     }
 
     @Override
-    public Output create(Output request) throws ValidationException {
-        final OutputImpl outputImpl = implOrFail(request);
-        final WriteResult<OutputImpl, String> writeResult = coll.save(outputImpl);
-
-        return writeResult.getSavedObject();
+    public Output create(Output output) throws ValidationException {
+        final OutputImpl outputImpl = implOrFail(output);
+        if (output.getId() == null) {
+            final var insertedId = MongoUtils.insertedIdAsString(collection.insertOne(outputImpl));
+            return OutputImpl.create(insertedId, outputImpl.getTitle(), outputImpl.getType(),
+                    outputImpl.getCreatorUserId(), outputImpl.getConfiguration(), outputImpl.getCreatedAt(),
+                    outputImpl.getContentPack());
+        }
+        collection.replaceOne(idEq(outputImpl.getId()), outputImpl, new ReplaceOptions().upsert(true));
+        return outputImpl;
     }
 
     @Override
@@ -103,7 +129,7 @@ public class OutputServiceImpl implements OutputService {
 
     @Override
     public void destroy(Output model) throws NotFoundException {
-        coll.removeById(model.getId());
+        collection.deleteOne(idEq(model.getId()));
 
         // Removing the output from all streams will emit a StreamsChangedEvent for affected streams.
         // The OutputRegistry will handle this event and stop the output.
@@ -112,49 +138,91 @@ public class OutputServiceImpl implements OutputService {
 
     @Override
     public Output update(String id, Map<String, Object> deltas) {
-        DBUpdate.Builder update = new DBUpdate.Builder();
-        for (Map.Entry<String, Object> fields : deltas.entrySet()) {
-            update = update.set(fields.getKey(), fields.getValue());
+        final List<Bson> updates = deltas.entrySet().stream()
+                .map(field -> Updates.set(field.getKey(), field.getValue()))
+                .toList();
+
+        final OutputImpl updatedOutput = collection.findOneAndUpdate(idEq(id), Updates.combine(updates),
+                new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER));
+
+        if (updatedOutput != null) {
+            this.clusterEventBus.post(OutputChangedEvent.create(updatedOutput.getId()));
         }
 
-        final OutputImpl updatedOutput =
-                coll.findAndModify(DBQuery.is(OutputImpl.FIELD_ID, id), null, null, false, update, true, false);
-
-        this.clusterEventBus.post(OutputChangedEvent.create(updatedOutput.getId()));
-
-        return updatedOutput;
+        return updatedOutput == null ? null : withEncryptedFields(updatedOutput);
     }
 
     @Override
     public long count() {
-        return coll.count();
+        return collection.countDocuments();
     }
 
     @Override
     public Map<String, Long> countByType() {
-        final Map<String, Long> outputsCountByType = new HashMap<>();
-        try (DBCursor outputTypes = dbCollection.find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1))) {
+        final Map<String, Long> outputsCountByType;
+        try (final var stream = MongoUtils.stream(rawCollection.find()
+                .projection(Projections.include(OutputImpl.FIELD_TYPE)))) {
 
-            for (DBObject outputType : outputTypes) {
-                final String type = (String) outputType.get(OutputImpl.FIELD_TYPE);
-                if (type != null) {
-                    final Long oldValue = outputsCountByType.get(type);
-                    final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
-                    outputsCountByType.put(type, newValue);
-                }
-            }
+            outputsCountByType = new HashMap<>(stream.map(doc -> doc.getString(OutputImpl.FIELD_TYPE))
+                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())));
         }
 
         return outputsCountByType;
     }
 
     private OutputImpl implOrFail(Output output) {
-        final OutputImpl outputImpl;
-        if (output instanceof OutputImpl) {
-            outputImpl = (OutputImpl) output;
+        if (output instanceof OutputImpl outputImpl) {
             return outputImpl;
         } else {
             throw new IllegalArgumentException("Supplied output must be of implementation type OutputImpl, not " + output.getClass());
         }
+    }
+
+    private Set<String> getEncryptedFields(String type, Map<String, AvailableOutputSummary> availableOutputs) {
+        final AvailableOutputSummary summary = availableOutputs.get(type);
+        if (summary == null) {
+            return Set.of();
+        }
+        return EncryptedInputConfigs.getEncryptedFields(summary.requestedConfiguration());
+    }
+
+    private Output withEncryptedFields(OutputImpl output) {
+        return withEncryptedFields(output, messageOutputFactory.getAvailableOutputs());
+    }
+
+    /**
+     * Converts the raw {@code {encrypted_value, salt}} sub-documents stored in MongoDB back into {@link EncryptedValue}
+     * objects for those configuration fields declared as encrypted. This ensures secrets are masked in API responses
+     * and exposed as {@link EncryptedValue} to running outputs.
+     */
+    private Output withEncryptedFields(OutputImpl output, Map<String, AvailableOutputSummary> availableOutputs) {
+        final Set<String> encryptedFields = getEncryptedFields(output.getType(), availableOutputs);
+        if (encryptedFields.isEmpty()) {
+            return output;
+        }
+        final Map<String, Object> originalConfig = output.getConfiguration();
+        if (originalConfig == null || originalConfig.isEmpty()) {
+            return output;
+        }
+
+        boolean modified = false;
+        final Map<String, Object> newConfig = new HashMap<>(originalConfig);
+        for (String field : encryptedFields) {
+            final Object raw = newConfig.get(field);
+            if (raw != null && !(raw instanceof EncryptedValue)) {
+                try {
+                    newConfig.put(field, objectMapper.convertValue(raw, EncryptedValue.class));
+                    modified = true;
+                } catch (IllegalArgumentException e) {
+                    // Values written before encryption support was added are left untouched. Logged at debug because
+                    // this repeats on every load and the operator can only fix it by re-entering the secret.
+                    LOG.debug("Failed to convert field '{}' to EncryptedValue for output '{}': {}", field, output.getId(), e.getMessage());
+                }
+            }
+        }
+        return modified
+                ? OutputImpl.create(output.getId(), output.getTitle(), output.getType(), output.getCreatorUserId(),
+                newConfig, output.getCreatedAt(), output.getContentPack())
+                : output;
     }
 }

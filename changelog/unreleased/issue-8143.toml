@@ -1,0 +1,5 @@
+type = "a"
+message = "Accept Search Query and Time Range as URL Parameters for Dashboards"
+
+issues = ["8143"]
+pulls = ["26034"]

@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix pipeline details page loading issue."
+
+issues = ["22018"]
+pulls = ["22455"]

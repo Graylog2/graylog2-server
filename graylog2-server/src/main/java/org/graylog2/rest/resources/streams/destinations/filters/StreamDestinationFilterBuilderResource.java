@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.streams.destinations.filters;
 
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -38,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderServi
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -46,9 +47,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNullElse;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Stream/Destinations/Filters/Builder", description = "Stream destination filter builder", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Stream/Destinations/Filters/Builder", description = "Stream destination filter builder")
 @Path("/streams/destinations/filters/builder")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -93,7 +94,7 @@ public class StreamDestinationFilterBuilderResource extends RestResource {
 
     @GET
     @Path("/conditions")
-    @ApiOperation(value = "Get available filter rule conditions")
+    @Operation(summary = "Get available filter rule conditions")
     @RequiresPermissions(RestPermissions.STREAM_DESTINATION_FILTERS_READ)
     public Response getConditions() {
         final var conditions = ruleBuilderRegistry.conditions()
@@ -109,9 +110,9 @@ public class StreamDestinationFilterBuilderResource extends RestResource {
 
     @POST
     @Path("/validate")
-    @ApiOperation("Validate rule builder")
+    @Operation(summary = "Validate rule builder")
     @NoAuditEvent("No data changes. Only used to validate a rule builder.")
-    public Response validateRule(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
+    public Response validateRule(@Parameter(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
         final var validatedDto = validatorService.validate(ruleBuilderDto);
         final var dtoWithTitles = validatedDto.toBuilder()
                 .ruleBuilder(ruleBuilderService.generateTitles(validatedDto.ruleBuilder()))
@@ -122,7 +123,7 @@ public class StreamDestinationFilterBuilderResource extends RestResource {
 
     @POST
     @Path("/simulate")
-    @ApiOperation(value = "Run the simulator for the given rule and message")
+    @Operation(summary = "Run the simulator for the given rule and message")
     @NoAuditEvent("No data changes. Only used to simulate a filter rule.")
     @RequiresPermissions(RestPermissions.STREAM_DESTINATION_FILTERS_READ)
     public Response simulateRule() {

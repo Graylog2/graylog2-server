@@ -51,4 +51,14 @@ public interface EventProcessor {
      * @param limit           the maximum number of messages to get
      */
     void sourceMessagesForEvent(Event event, Consumer<List<MessageSummary>> messageConsumer, long limit) throws EventProcessorException;
+
+    /**
+     * Perform necessary actions on the EventDefinition before execution.
+     *
+     * @param eventDefinition the event definition to be preprocessed
+     * @return the preprocessed event definition
+     */
+    default EventDefinition preprocessEventDefinition(EventDefinition eventDefinition) {
+        return eventDefinition;
+    }
 }

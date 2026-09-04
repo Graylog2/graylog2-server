@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Show loading indicator in event definition filter preview during in-flight queries instead of briefly displaying \"no matches found\"."
+
+issues = ["25431"]
+pulls = ["25444"]

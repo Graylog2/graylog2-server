@@ -23,9 +23,9 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
@@ -36,12 +36,12 @@ import static org.mockito.Mockito.when;
 public class QueryEffectiveTimeRangeTest {
     private Query query;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.query = Query.emptyRoot();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         // Some tests modify the time so we make sure to reset it after each test even if assertions fail
         DateTimeUtils.setCurrentMillisSystem();

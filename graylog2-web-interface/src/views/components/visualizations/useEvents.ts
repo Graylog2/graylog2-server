@@ -25,7 +25,7 @@ const useEvents = (config: AggregationWidgetConfig, events: Event[] | undefined)
   const { formatTime } = useUserDateTime();
   const formatTimestamp = useCallback((timestamp: string) => formatTime(timestamp, 'internal'), [formatTime]);
 
-  return (config.eventAnnotation && events)
+  return config.eventAnnotation && events
     ? EventHandler.toVisualizationData(events, formatTimestamp)
     : { eventChartData: undefined, shapes: undefined };
 };

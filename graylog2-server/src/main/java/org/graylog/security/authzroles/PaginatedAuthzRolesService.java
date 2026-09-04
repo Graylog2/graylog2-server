@@ -18,13 +18,13 @@ package org.graylog.security.authzroles;
 
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
@@ -36,16 +36,18 @@ import org.graylog2.shared.users.UserService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class PaginatedAuthzRolesService {
     private static final String COLLECTION_NAME = "roles";
 
     private final MongoCollection<AuthzRoleDTO> collection;
-    private final MongoCollection<Document> documentCollection;
+    private final com.mongodb.client.MongoCollection<Document> documentCollection;
     private final UserService userService;
 
     private final MongoUtils<AuthzRoleDTO> mongoUtils;
@@ -74,43 +76,33 @@ public class PaginatedAuthzRolesService {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
+    public Map<String, String> getRolesByIdAndName() {
+        final FindIterable<Document> docs = documentCollection.find()
+                .projection(Projections.include("_id", "name"));
+
+        return StreamSupport.stream(docs.spliterator(), false)
+                .collect(Collectors.toMap(
+                        doc -> doc.getObjectId("_id").toHexString(),
+                        doc -> doc.getString("name")
+                ));
+    }
+
     public List<AuthzRoleDTO> findByIds(Collection<String> ids) {
         return collection.find(MongoUtils.stringIdsIn(ids)).into(new ArrayList<>());
     }
 
-    /**
-     * @deprecated Use {@link #findPaginated(SearchQuery, int, int, String, SortOrder)}
-     */
-    @Deprecated
-    public PaginatedList<AuthzRoleDTO> findPaginated(SearchQuery searchQuery, int page,
-                                                     int perPage, String sortField, String order) {
-        return findPaginated(searchQuery, page, perPage, sortField, SortOrder.fromString(order));
-    }
-
-    public PaginatedList<AuthzRoleDTO> findPaginated(SearchQuery searchQuery, int page,
+    public PaginatedList<AuthzRoleDTO> findPaginated(Predicate<String> roleNamePermissionPredicate, SearchQuery searchQuery, int page,
                                                      int perPage, String sortField, SortOrder order) {
         return paginationHelper
                 .filter(searchQuery.toBson())
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
                 .includeGrandTotal(true)
-                .page(page);
+                .page(page, role -> roleNamePermissionPredicate.test(role.name()));
     }
 
-    /**
-     * @deprecated use {@link #findPaginatedByIds(SearchQuery, int, int, String, SortOrder, Set)}
-     */
-    @Deprecated
-    public PaginatedList<AuthzRoleDTO> findPaginatedByIds(SearchQuery searchQuery,
-                                                          int page,
-                                                          int perPage,
-                                                          String sortField,
-                                                          String order,
-                                                          Set<String> roleIds) {
-        return findPaginatedByIds(searchQuery, page, perPage, sortField, SortOrder.fromString(order), roleIds);
-    }
-
-    public PaginatedList<AuthzRoleDTO> findPaginatedByIds(SearchQuery searchQuery,
+    public PaginatedList<AuthzRoleDTO> findPaginatedByIds(Predicate<String> roleNamePermissionPredicate,
+                                                          SearchQuery searchQuery,
                                                           int page,
                                                           int perPage,
                                                           String sortField,
@@ -121,7 +113,7 @@ public class PaginatedAuthzRolesService {
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
                 .includeGrandTotal(true)
-                .page(page);
+                .page(page, role -> roleNamePermissionPredicate.test(role.name()));
     }
 
     /**

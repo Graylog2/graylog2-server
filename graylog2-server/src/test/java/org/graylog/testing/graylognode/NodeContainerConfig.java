@@ -41,12 +41,11 @@ public class NodeContainerConfig {
     public final SearchVersion elasticsearchVersion;
     public final String elasticsearchUri;
     public final boolean enableDebugging;
-    public final boolean skipPackaging;
     public final PluginJarsProvider pluginJarsProvider;
     public final MavenProjectDirProvider mavenProjectDirProvider;
     private final List<String> enabledFeatureFlags;
     public final Optional<String> proxiedRequestsTimeout;
-    public final Map<String, String> configParams;
+    public final Map<String, String> env;
 
     public NodeContainerConfig(Network network,
                                String mongoDbUri,
@@ -57,7 +56,7 @@ public class NodeContainerConfig {
                                PluginJarsProvider pluginJarsProvider,
                                MavenProjectDirProvider mavenProjectDirProvider,
                                List<String> enabledFeatureFlags,
-                               Map<String, String> configParams) {
+                               Map<String, String> env) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.passwordSecret = passwordSecret;
@@ -65,12 +64,11 @@ public class NodeContainerConfig {
         this.elasticsearchUri = elasticsearchUri;
         this.elasticsearchVersion = elasticsearchVersion;
         this.enableDebugging = flagFromEnvVar("GRAYLOG_IT_DEBUG_SERVER");
-        this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
         this.pluginJarsProvider = pluginJarsProvider;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
         this.enabledFeatureFlags = enabledFeatureFlags == null ? Collections.emptyList() : enabledFeatureFlags;
         this.proxiedRequestsTimeout = stringFromEnvVar("GRAYLOG_IT_PROXIED_REQUESTS_TIMEOUT");
-        this.configParams = configParams;
+        this.env = env;
     }
 
     public static boolean flagFromEnvVar(String flagName) {
@@ -83,7 +81,7 @@ public class NodeContainerConfig {
     }
 
     public Integer[] portsToExpose() {
-        int[] allPorts = new int[] {GELF_HTTP_PORT};
+        int[] allPorts = new int[]{GELF_HTTP_PORT};
         allPorts = ArrayUtils.add(allPorts, 0, API_PORT);
 
         if (enableDebugging) {

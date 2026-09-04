@@ -15,9 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link, RestrictedAccessTooltip } from 'components/common';
 import Routes from 'routing/Routes';
+import { createGRN } from 'logic/permissions/GRN';
+import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import type UserOverview from 'logic/users/UserOverview';
 import RolesCell from 'components/permissions/RolesCell';
 
@@ -26,9 +29,16 @@ import LoggedInCell from './LoggedInCell';
 import StatusCell from './StatusCell';
 
 type Props = {
-  user: UserOverview,
-  isActive: boolean,
+  user: UserOverview;
+  isActive: boolean;
+  onDeleted?: () => void;
+  onStatusChange?: () => void;
 };
+
+const NameColumnWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const UsersOverviewItem = ({
   user,
@@ -45,23 +55,35 @@ const UsersOverviewItem = ({
     authServiceEnabled,
   },
   isActive,
-}: Props) => (
-  <tr key={username} className={isActive ? 'active' : ''}>
-    <LoggedInCell lastActivity={lastActivity}
-                  sessionActive={sessionActive}
-                  clientAddress={clientAddress} />
-    <td className="limited">
-      <Link to={Routes.SYSTEM.USERS.show(id)}>
-        {fullName}
-      </Link>
-    </td>
-    <td className="limited">{username}</td>
-    <td className="limited">{email}</td>
-    <td className="limited">{clientAddress}</td>
-    <StatusCell accountStatus={accountStatus} authServiceEnabled={authServiceEnabled} />
-    <RolesCell roles={roles} />
-    <ActionsCell user={user} />
-  </tr>
-);
+  onDeleted = undefined,
+  onStatusChange = undefined,
+}: Props) => {
+  const grn = createGRN('user', username);
+  const hasEditPermissions = useHasEntityPermissionByGRN(grn, 'edit');
+
+  return (
+    <tr key={username} className={isActive ? 'active' : ''}>
+      <LoggedInCell lastActivity={lastActivity} sessionActive={sessionActive} clientAddress={clientAddress} />
+      <td className="limited">
+        <NameColumnWrapper>
+          {hasEditPermissions ? (
+            <Link to={Routes.SYSTEM.USERS.show(id)}>{fullName}</Link>
+          ) : (
+            <>
+              {fullName}
+              <RestrictedAccessTooltip entityName="user" capabilityName="view" />
+            </>
+          )}
+        </NameColumnWrapper>
+      </td>
+      <td className="limited">{username}</td>
+      <td className="limited">{email}</td>
+      <td className="limited">{clientAddress}</td>
+      <StatusCell accountStatus={accountStatus} authServiceEnabled={authServiceEnabled} />
+      <RolesCell roles={roles} />
+      <ActionsCell user={user} onDeleted={onDeleted} onStatusChange={onStatusChange} />
+    </tr>
+  );
+};
 
 export default UsersOverviewItem;

@@ -1,0 +1,5 @@
+type = "a"
+message = "Prevent nested key/value pair parsing in Fortigate Syslog messages."
+
+pulls = [""]
+issues = ["22886"]

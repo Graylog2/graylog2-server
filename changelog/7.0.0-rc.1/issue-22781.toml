@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Display delete button completely in saved searches overview."
+
+issues = ["22781"]
+pulls = ["22929"]

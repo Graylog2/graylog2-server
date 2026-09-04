@@ -1,5 +1,5 @@
 ```js
-import SortableList from './SortableList'
+import SortableList from './SortableList';
 
 class SortableListExample extends React.Component {
   constructor(props) {
@@ -19,19 +19,19 @@ class SortableListExample extends React.Component {
 
   onSortList(nextSortedList) {
     this.setState({ sortedList: nextSortedList });
-  };
+  }
 
   render() {
     const { list, sortedList } = this.state;
 
     return (
       <div>
-        <p>Sorted list: {sortedList.map(item => item.title).join(', ')}</p>
+        <p>Sorted list: {sortedList.map((item) => item.title).join(', ')}</p>
         <SortableList items={list} onMoveItem={this.onSortList} />
       </div>
     );
   }
 }
 
-<SortableListExample />
+<SortableListExample />;
 ```

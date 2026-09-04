@@ -16,23 +16,26 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import type { FormikErrors } from 'formik';
 import { useFormikContext } from 'formik';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 import { SEARCH_BUTTON_WIDTH } from 'views/components/searchbar/SearchButton';
+import TimeRangePickerButton from 'views/components/time-range-picker/TimeRangePickerButton';
 
 import RangePresetDropdown from './TimeRangePresetDropdown';
-import TimeRangePickerButton from './time-range-picker/TimeRangePickerButton';
 
 type Props = {
-  disabled?: boolean,
-  hasErrorOnMount?: boolean,
-  onPresetSelectOpen: () => void,
-  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
-  toggleShow: () => void,
-  showPresetDropdown?: boolean,
+  disabled?: boolean;
+  hasErrorOnMount?: boolean;
+  onPresetSelectOpen: () => void;
+  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void | Promise<void | FormikErrors<any>>;
+  toggleShow: () => void;
+  showPresetDropdown?: boolean;
+  submitOnPresetChange?: boolean;
+  limitDuration: number;
 };
 
 const StyledRangePresetDropdown = styled(RangePresetDropdown)`
@@ -52,21 +55,22 @@ const TimeRangeFilterButtons = ({
   setCurrentTimeRange,
   showPresetDropdown = true,
   toggleShow,
+  limitDuration,
+  submitOnPresetChange = true,
 }: Props) => {
-  const { submitForm, isValid } = useFormikContext();
+  const { submitForm } = useFormikContext();
 
   const _onClick = (e: React.MouseEvent<HTMLElement>) => {
     e.currentTarget.blur();
     toggleShow();
   };
 
-  const selectRelativeTimeRangePreset = (timerange: TimeRange | {}) => {
-    setCurrentTimeRange(normalizeIfAllMessagesRange(timerange));
-
-    if (isValid) {
-      submitForm();
-    }
-  };
+  const selectRelativeTimeRangePreset = (timerange: TimeRange | {}) =>
+    Promise.resolve(setCurrentTimeRange(normalizeIfAllMessagesRange(timerange))).then(() => {
+      if (submitOnPresetChange) {
+        submitForm();
+      }
+    });
 
   const _onPresetSelectToggle = (open: boolean) => {
     if (open) {
@@ -76,16 +80,17 @@ const TimeRangeFilterButtons = ({
 
   return (
     <StyledButtonGroup>
-      <TimeRangePickerButton hasError={hasErrorOnMount}
-                             disabled={disabled}
-                             onClick={_onClick} />
+      <TimeRangePickerButton hasError={hasErrorOnMount} disabled={disabled} onClick={_onClick} />
       {showPresetDropdown && (
-        <StyledRangePresetDropdown disabled={disabled}
-                                   displayTitle={false}
-                                   onChange={selectRelativeTimeRangePreset}
-                                   onToggle={_onPresetSelectToggle}
-                                   header="Select time range"
-                                   bsSize={null} />
+        <StyledRangePresetDropdown
+          limitDuration={limitDuration}
+          disabled={disabled}
+          displayTitle={false}
+          onChange={selectRelativeTimeRangePreset}
+          onToggle={_onPresetSelectToggle}
+          header="Select time range"
+          bsSize={null}
+        />
       )}
     </StyledButtonGroup>
   );

@@ -48,14 +48,14 @@ const mapTimeunit = (unit: TimeUnit) => {
 };
 
 type FormattedInterval = {
-  timeunit: string,
-  type: string,
-}
+  timeunit: string;
+  type: string;
+};
 
 type FormattedPivot = {
-  type: string,
-  fields: Array<string>,
-  interval: FormattedInterval,
+  type: string;
+  fields: Array<string>;
+  interval: FormattedInterval;
 };
 
 const formatPivot = (pivot: Pivot): FormattedPivot => {
@@ -67,7 +67,7 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
       if ((config as TimeConfigType).interval.type === 'timeunit') {
         const { interval } = config as TimeConfigType;
 
-        const { unit, value } = (interval as TimeUnitConfig);
+        const { unit, value } = interval as TimeUnitConfig;
 
         (newConfig as { interval: FormattedInterval }).interval = {
           type: 'timeunit',
@@ -86,17 +86,17 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
   } as FormattedPivot;
 };
 
-type FormattedSeries = $Shape<{
-  id: string,
-} & Definition>;
+type FormattedSeries = $Shape<
+  {
+    id: string;
+  } & Definition
+>;
 
-const generateConfig = (id: string, name: string, {
-  rollupForBackendQuery,
-  rowPivots,
-  columnPivots,
-  series,
-  sort,
-}: AggregationWidgetConfig) => ({
+const generateConfig = (
+  id: string,
+  name: string,
+  { rollupForBackendQuery, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig,
+) => ({
   id,
   name,
   type: 'pivot',
@@ -117,9 +117,13 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
   const configBuilder = ConfigBuilder.create([chartConfig]);
 
   // TODO: This should go into a visualization config specific function
-  if (config.visualization === 'numeric' && config.visualizationConfig && (config.visualizationConfig as NumberVisualizationConfig).trend) {
+  if (
+    config.visualization === 'numeric' &&
+    config.visualizationConfig &&
+    (config.visualizationConfig as NumberVisualizationConfig).trend
+  ) {
     const trendConfig = {
-      ...(generateConfig(generateId(), 'trend', config)),
+      ...generateConfig(generateId(), 'trend', config),
       timerange: { type: 'offset', source: 'search_type', id: chartConfig.id },
     };
 
@@ -140,22 +144,22 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
 };
 
 type Config = {
-  id: string,
-  name: string,
-  type: string,
+  id: string;
+  name: string;
+  type: string;
   config?: {
-    id: string,
-    rollup: boolean,
-    row_groups: Array<FormattedPivot>,
-    column_groups: Array<FormattedPivot>,
-    series: Array<FormattedSeries>,
-    sort: Array<SortConfig>,
-  },
+    id: string;
+    rollup: boolean;
+    row_groups: Array<FormattedPivot>;
+    column_groups: Array<FormattedPivot>;
+    series: Array<FormattedSeries>;
+    sort: Array<SortConfig>;
+  };
   timerange?: {
-    type: string,
-    source: string,
-    id: string,
-  },
+    type: string;
+    source: string;
+    id: string;
+  };
 };
 
 class ConfigBuilder {

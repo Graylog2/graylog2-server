@@ -23,10 +23,12 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQueryField;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.database.filtering.inmemory.SingleFilterParser.FIELD_AND_VALUE_SEPARATOR;
@@ -40,7 +42,7 @@ class DbFilterExpressionParserTest {
 
     @BeforeEach
     void setUp() {
-        toTest = new DbFilterExpressionParser();
+        toTest = new DbFilterExpressionParser(new ComputedFieldRegistry(Set.of()));
     }
 
     @Test
@@ -320,5 +322,46 @@ class DbFilterExpressionParserTest {
                 toTest.parseSingleExpression("text:42" + RANGE_VALUES_SEPARATOR + "53",
                         entityAttributes
                 ));
+    }
+
+    @Test
+    void delegatesToComputedFieldRegistryForComputedFields() {
+        final String id1 = "507f1f77bcf86cd799439011";
+        final String id2 = "507f1f77bcf86cd799439012";
+
+        final DbFilterExpressionParser parserWithComputed = getTestDbFilterExpParser();
+
+        final List<EntityAttribute> attributes = List.of(
+                EntityAttribute.builder()
+                        .id("computed_status")
+                        .title("Status")
+                        .type(SearchQueryField.Type.STRING)
+                        .filterable(true)
+                        .build()
+        );
+
+        final List<Bson> result = parserWithComputed.parse(List.of("computed_status:RUNNING"), attributes);
+
+        assertEquals(1, result.size());
+        assertEquals(Filters.in("_id", List.of(new ObjectId(id1), new ObjectId(id2))), result.get(0));  // IDs sorted lexicographically
+    }
+
+    private static @NonNull DbFilterExpressionParser getTestDbFilterExpParser() {
+        final ComputedFieldProvider provider = new ComputedFieldProvider() {
+            @Override
+            public Set<String> getMatchingIds(String filterValue, String authToken) {
+                if ("RUNNING".equals(filterValue)) {
+                    return Set.of("507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012");
+                }
+                return Set.of();
+            }
+
+            @Override
+            public String getFieldName() {
+                return "computed_status";
+            }
+        };
+
+        return new DbFilterExpressionParser(new ComputedFieldRegistry(Set.of(provider)));
     }
 }

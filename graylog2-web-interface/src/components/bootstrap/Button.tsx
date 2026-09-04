@@ -19,21 +19,10 @@ import type { ColorVariant } from '@graylog/sawmill';
 import { Button as MantineButton } from '@mantine/core';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
-import { Link } from 'react-router-dom';
 
+import Link from 'components/common/Link';
 import type { BsSize } from 'components/bootstrap/types';
-
-const sizeForMantine = (size: BsSize) => {
-  switch (size) {
-    case 'xs':
-    case 'xsmall': return 'xs';
-    case 'sm':
-    case 'small': return 'sm';
-    case 'lg':
-    case 'large': return 'lg';
-    default: return 'md';
-  }
-};
+import sizeForMantine from 'theme/utils/sizeForMantine';
 
 export type StyleProps = ColorVariant | 'link' | 'transparent';
 
@@ -43,8 +32,10 @@ const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
 
 const stylesProps = (style: StyleProps) => {
   switch (style) {
-    case 'link': return { variant: 'subtle' };
-    default: return {};
+    case 'link':
+      return { variant: 'subtle' };
+    default:
+      return {};
   }
 };
 
@@ -88,7 +79,7 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
   const isSpecialStyle = isLinkStyle(style) || isTransparentStyle(style);
 
   const colors = isSpecialStyle
-    ? { color: themeColors.global.textDefault, background: 'transparent' }
+    ? { color: themeColors.text.primary, background: 'transparent' }
     : themeColors.disabled[style];
 
   return css`
@@ -116,27 +107,35 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
     case 'warning':
     case 'transparent':
       return css`
-          color: ${themeColors.global.textDefault};
+        color: ${themeColors.text.primary};
 
         &:hover {
-          color: ${themeColors.global.textDefault};
+          color: ${themeColors.text.primary};
         }
 
         &:focus {
-          color: ${themeColors.global.textDefault};
+          color: ${themeColors.text.primary};
         }
-    `;
-    default: return '';
+      `;
+    default:
+      return '';
   }
 };
 
 // Other link styles are defined in e.g. the size specific function
 const linkStyles = css`
   vertical-align: baseline;
+  user-select: text;
 
   &:hover {
     background: transparent;
     text-decoration: underline;
+  }
+
+  .mantine-Button-label {
+    word-break: break-word;
+    white-space: normal;
+    text-align: left;
   }
 `;
 
@@ -152,22 +151,18 @@ const textColor = (style: StyleProps, colors: DefaultTheme['colors']) => {
     case 'link':
       return colors.global.link;
     case 'transparent':
-      return colors.global.textDefault;
+      return colors.text.primary;
     default:
       return colors.button[style].color;
   }
 };
 
 const StyledButton = styled(MantineButton)<{
-  $bsStyle: StyleProps,
-  $bsSize: BsSize,
-  $active: boolean
-}>(({
-  theme,
-  $bsStyle,
-  $bsSize,
-  $active,
-}) => {
+  $bsStyle: StyleProps;
+  $bsSize: BsSize;
+  $active: boolean;
+  $showOverflow: boolean;
+}>(({ theme, $bsStyle, $bsSize, $active, $showOverflow = false }) => {
   const isLink = isLinkStyle($bsStyle);
   const isTransparent = isTransparentStyle($bsStyle);
   const color = textColor($bsStyle, theme.colors);
@@ -175,7 +170,7 @@ const StyledButton = styled(MantineButton)<{
   return css`
     color: ${color};
     font-weight: 400;
-    overflow: visible;
+    ${$showOverflow ? 'overflow: visible;' : null}
 
     ${disabledStyles(theme.colors, $bsStyle)}
     ${stylesForSize($bsSize, $bsStyle)}
@@ -188,6 +183,10 @@ const StyledButton = styled(MantineButton)<{
     &:focus {
       color: ${color};
       text-decoration: none;
+
+      &:not(:focus-visible) {
+        outline: none;
+      }
     }
 
     ${$active && activeStyles(theme.colors, $bsStyle)}
@@ -196,7 +195,7 @@ const StyledButton = styled(MantineButton)<{
 
     .mantine-Button-label {
       gap: 0.25em;
-      overflow: visible;
+      ${$showOverflow ? 'overflow: visible;' : null}
     }
 
     .mantine-Button-loader {
@@ -206,79 +205,132 @@ const StyledButton = styled(MantineButton)<{
 });
 
 type Props = React.PropsWithChildren<{
-  active?: boolean,
-  'aria-label'?: string,
-  bsStyle?: StyleProps,
-  bsSize?: BsSize,
-  className?: string,
-  'data-testid'?: string,
-  disabled?: boolean,
-  form?: string,
-  href?: string,
-  id?: string,
-  name?: string,
-  onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void),
-  rel?: 'noopener noreferrer',
-  role?: string,
-  style?: React.ComponentProps<typeof StyledButton>['style'],
-  tabIndex?: number,
-  target?: '_blank',
-  title?: string,
-  type?: 'button' | 'reset' | 'submit',
+  active?: boolean;
+  allowClickWhenDisabled?: boolean;
+  'aria-label'?: string;
+  'aria-disabled'?: boolean;
+  bsStyle?: StyleProps;
+  bsSize?: BsSize;
+  className?: string;
+  'data-testid'?: string;
+  disabled?: boolean;
+  form?: string;
+  href?: string;
+  id?: string;
+  name?: string;
+  onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void);
+  onFocus?: (e: React.FocusEvent) => void;
+  onBlur?: (e: React.FocusEvent) => void;
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: (e: React.MouseEvent) => void;
+  onMouseMove?: (e: React.MouseEvent) => void;
+  onPointerDown?: (e: React.PointerEvent) => void;
+  onPointerEnter?: (e: React.PointerEvent) => void;
+  rel?: 'noopener noreferrer';
+  role?: string;
+  showOverflow?: boolean;
+  style?: React.ComponentProps<typeof StyledButton>['style'];
+  tabIndex?: number;
+  target?: '_blank';
+  title?: string;
+  type?: 'button' | 'reset' | 'submit';
 }>;
 
-const Button = React.forwardRef<HTMLButtonElement, Props>(
-  ({
-    'aria-label': ariaLabel, bsStyle = 'default', bsSize, className, 'data-testid': dataTestId, id, onClick, disabled = false, href,
-    title, form, target, type, rel, role, name, tabIndex, children, active,
-  }, ref) => {
-    const theme = useTheme();
-    const style = mapStyle(bsStyle);
-    const color = (isLinkStyle(style) || isTransparentStyle(style))
-      ? 'transparent'
-      : theme.colors.button[style].background;
+const Button = (
+  {
+    'aria-label': ariaLabel,
+    'aria-disabled': ariaDisabled = undefined,
+    allowClickWhenDisabled = false,
+    bsStyle = 'default',
+    bsSize = undefined,
+    className = undefined,
+    'data-testid': dataTestId,
+    id = undefined,
+    onClick = undefined,
+    onFocus = undefined,
+    onBlur = undefined,
+    onMouseEnter = undefined,
+    onMouseLeave = undefined,
+    onMouseMove = undefined,
+    onPointerDown = undefined,
+    onPointerEnter = undefined,
+    disabled = false,
+    href = undefined,
+    title = undefined,
+    form = undefined,
+    target = undefined,
+    type = undefined,
+    rel = undefined,
+    role = undefined,
+    name = undefined,
+    tabIndex = undefined,
+    children = undefined,
+    active = undefined,
+    showOverflow = false,
+  }: Props,
+  ref: React.ForwardedRef<HTMLButtonElement>,
+) => {
+  const theme = useTheme();
+  const style = mapStyle(bsStyle);
+  const color = isLinkStyle(style) || isTransparentStyle(style) ? 'transparent' : theme.colors.button[style].background;
 
-    const sharedProps = {
-      id,
-      'aria-label': ariaLabel,
-      className,
-      ...stylesProps(style),
-      $active: active,
-      $bsStyle: style,
-      $bsSize: bsSize,
-      variant: active ? 'outline' : 'filled',
-      color,
-      'data-testid': dataTestId,
-      disabled,
-      role,
-      size: sizeForMantine(bsSize),
-      tabIndex,
-      title,
-      type,
-    } as const;
+  const sharedProps = {
+    id,
+    'aria-label': ariaLabel,
+    'aria-disabled': ariaDisabled,
+    onFocus,
+    onBlur,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseMove,
+    onPointerDown,
+    onPointerEnter,
+    className,
+    ...stylesProps(style),
+    $active: active,
+    $bsStyle: style,
+    $bsSize: bsSize,
+    variant: active ? 'outline' : 'filled',
+    color,
+    'data-testid': dataTestId,
+    disabled: allowClickWhenDisabled ? false : disabled,
+    'data-disabled': (allowClickWhenDisabled && disabled) || undefined,
+    role,
+    size: sizeForMantine(bsSize),
+    tabIndex,
+    title,
+    type,
+    '$showOverflow': showOverflow,
+  } as const;
 
-    if (href) {
-      return (
-        <StyledButton component={Link}
-                      to={href}
-                      target={target}
-                      rel={rel}
-                      onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-                      {...sharedProps}>
-          {children}
-        </StyledButton>
-      );
-    }
-
+  if (href) {
     return (
-      <StyledButton ref={ref}
-                    form={form}
-                    onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-                    name={name}
-                    {...sharedProps}>
+      <StyledButton
+        ref={ref as unknown as React.Ref<HTMLAnchorElement>}
+        component={Link}
+        to={href}
+        target={target}
+        rel={rel}
+        onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+        {...sharedProps}>
         {children}
       </StyledButton>
     );
-  });
+  }
 
-export default Button;
+  return (
+    <StyledButton
+      ref={ref}
+      form={form}
+      onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+      name={name}
+      {...sharedProps}>
+      {children}
+    </StyledButton>
+  );
+};
+
+const ForwardedButton = React.forwardRef(Button);
+ForwardedButton.displayName = 'Button';
+
+export default ForwardedButton;

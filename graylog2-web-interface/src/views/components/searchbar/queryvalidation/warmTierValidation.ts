@@ -17,7 +17,6 @@
 
 import type { IndexRange, QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
-export const indicesInWarmTier = (validationState: QueryValidationState) => (
-  validationState?.context?.searched_index_ranges?.filter((range) => range.is_warm_tiered)
-);
+export const indicesInWarmTier = (validationState: QueryValidationState) =>
+  validationState?.context?.searched_index_ranges?.filter((range) => range.is_warm_tiered);
 export const isSearchingWarmTier = (warmTierRanges: Array<IndexRange>) => warmTierRanges?.length > 0;

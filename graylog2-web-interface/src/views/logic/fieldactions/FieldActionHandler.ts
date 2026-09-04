@@ -14,13 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ActionContexts } from 'views/types';
-import type {
-  ActionHandler,
-  ActionHandlerArguments,
-  ActionConditions,
-} from 'views/components/actions/ActionHandler';
+import type { ResolvedActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
-export type FieldActionHandlerCondition<Contexts = ActionContexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
-
-export type FieldActionHandler<Contexts = ActionContexts> = ActionHandler<Contexts> & ActionConditions<Contexts>;
+export type FieldActionHandlerCondition<Args extends object = {}> = (
+  args: ResolvedActionHandlerArguments<Args>,
+) => boolean;

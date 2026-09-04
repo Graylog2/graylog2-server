@@ -17,18 +17,19 @@
 import { useMemo } from 'react';
 
 import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/useCurrentStream';
-import {
-  isTemplateTypeAllowsFieldTypeChang,
-} from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
+import { isTemplateTypeAllowsFieldTypeChang } from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 import useAllIndexSetIds from 'views/logic/fieldactions/ChangeFieldType/hooks/useAllIndexSetIds';
 
 const useInitialSelection = () => {
   const currentStreams = useCurrentStream();
   const { data, isLoading } = useAllIndexSetIds(currentStreams);
 
-  const list = useMemo(() => data.filter(({ type }) => isTemplateTypeAllowsFieldTypeChang(type)).map(({ id }) => id), [data]);
+  const list = useMemo(
+    () => data.filter(({ type }) => isTemplateTypeAllowsFieldTypeChang(type)).map(({ id }) => id),
+    [data],
+  );
 
-  return ({ list, isLoading });
+  return { list, isLoading };
 };
 
 export default useInitialSelection;

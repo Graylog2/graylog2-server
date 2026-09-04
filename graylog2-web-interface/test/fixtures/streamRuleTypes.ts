@@ -19,7 +19,12 @@
 
 export const streamRuleTypes = [
   { id: 1, short_desc: 'match exactly', long_desc: 'match exactly', name: 'Stream rule match exactly' },
-  { id: 2, short_desc: 'match regular expression', long_desc: 'match regular expression', name: 'Stream rule match regular' },
+  {
+    id: 2,
+    short_desc: 'match regular expression',
+    long_desc: 'match regular expression',
+    name: 'Stream rule match regular',
+  },
   { id: 3, short_desc: 'greater than', long_desc: 'greater than', name: 'Stream rule greater than' },
   { id: 4, short_desc: 'smaller than', long_desc: 'smaller than', name: 'Stream rule smaller than' },
   { id: 5, short_desc: 'field presence', long_desc: 'field presence', name: 'Stream rule field presence' },

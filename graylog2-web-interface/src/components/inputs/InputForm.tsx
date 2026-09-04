@@ -18,44 +18,47 @@ import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
 
 import { NodeOrGlobalSelect } from 'components/inputs';
+import type { ConfigurationField } from 'components/configurationforms';
 import { ConfigurationForm } from 'components/configurationforms';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import AppConfig from 'util/AppConfig';
 import type { Input } from 'components/messageloaders/Types';
-import type { ConfigurationField } from 'components/configurationforms';
+import { Alert } from 'components/bootstrap';
 
 type FormValues = Input['attributes'];
 
 type Props = {
-  globalValue?: boolean,
+  globalValue?: boolean;
   configFields: {
-    [key: string]: ConfigurationField,
-  },
-  nodeValue?: string,
-  titleValue?: string,
-  typeName: string,
-  title: string,
-  includeTitleField: boolean,
-  handleSubmit: (data: any) => void,
-  values?: FormValues,
-  setShowModal: (boolean) => void;
-  submitButtonText: string,
-}
+    [key: string]: ConfigurationField;
+  };
+  nodeValue?: string;
+  titleValue?: string;
+  typeName: string;
+  title: React.ReactNode;
+  includeTitleField?: boolean;
+  handleSubmit: (data: any) => void;
+  values?: FormValues;
+  setShowModal: (show: boolean) => void;
+  submitButtonText: string;
+  description?: string;
+};
 
 const InputForm = ({
-  globalValue,
+  globalValue = true,
   configFields,
-  nodeValue,
-  titleValue,
+  nodeValue = undefined,
+  titleValue = undefined,
   title,
   typeName,
-  includeTitleField,
+  description = undefined,
+  includeTitleField = undefined,
   handleSubmit,
-  values,
+  values = undefined,
   setShowModal,
   submitButtonText,
-} : Props) => {
-  const [global, setGlobal] = useState<boolean>(globalValue ?? false);
+}: Props) => {
+  const [global, setGlobal] = useState<boolean>(globalValue ?? true);
   const [node, setNode] = useState<string | undefined>(nodeValue);
   const configFormRef = useRef(null);
 
@@ -77,7 +80,7 @@ const InputForm = ({
     const newData = {
       ...data,
       ...{
-        global: AppConfig.isCloud() || global,
+        global: AppConfig.isCloud() || AppConfig.globalInputsOnly() || global,
         node: node,
       },
     };
@@ -119,28 +122,23 @@ const InputForm = ({
   const formTitleValue = getTitleValue();
 
   return (
-    <ConfigurationForm<FormValues> ref={configFormRef}
-                                   configFields={configFields}
-                                   includeTitleField={includeTitleField}
-                                   title={title}
-                                   values={formValues}
-                                   titleValue={formTitleValue}
-                                   submitButtonText={submitButtonText}
-                                   submitAction={onSubmit}
-                                   typeName={typeName}
-                                   cancelAction={onCancel}>
+    <ConfigurationForm<FormValues>
+      ref={configFormRef}
+      configFields={configFields}
+      includeTitleField={includeTitleField}
+      title={title}
+      values={formValues}
+      titleValue={formTitleValue}
+      submitButtonText={submitButtonText}
+      submitAction={onSubmit}
+      typeName={typeName}
+      cancelAction={onCancel}>
+      {description && <Alert bsStyle="info">{description}</Alert>}
       <HideOnCloud>
-        <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
+        {!AppConfig.globalInputsOnly() && <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />}
       </HideOnCloud>
     </ConfigurationForm>
   );
 };
 
 export default InputForm;
-
-InputForm.defaultProps = {
-  globalValue: false,
-  nodeValue: undefined,
-  titleValue: undefined,
-  values: undefined,
-};

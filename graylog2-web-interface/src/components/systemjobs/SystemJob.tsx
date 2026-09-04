@@ -16,12 +16,15 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { ClusterJobs, SystemJobs } from '@graylog/server-api';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
-import { Button } from 'components/bootstrap';
-import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
+import { Button, Badge } from 'components/bootstrap';
+import type { BadgeColor } from 'components/bootstrap/Badge';
 import UserNotification from 'util/UserNotification';
-import Badge from 'components/bootstrap/Badge';
+import { SYSTEM_JOBS_QUERY_KEY } from 'components/systemjobs/useSystemJobs';
 
 enum JobStatus {
   Cancelled = 'cancelled',
@@ -32,29 +35,13 @@ enum JobStatus {
   Running = 'running',
 }
 
-const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
-  const {
-    primary,
-    success,
-    info,
-    warning,
-    danger,
-  } = theme.colors.variant.dark;
-  const statuses = {
-    cancelled: warning,
-    complete: success,
-    error: danger,
-    queued: info,
-    running: primary,
-  };
-  const color = statuses[status] ?? info;
-
-  return css`
-    margin-left: 4px;
-    background-color: ${color};
-    color: ${theme.utils.readableColor(color)};
-`;
-});
+const BADGE_COLOR_BY_STATUS: Record<string, BadgeColor> = {
+  cancelled: 'warning',
+  complete: 'success',
+  error: 'danger',
+  queued: 'gray',
+  running: 'primary',
+};
 
 const StyledProgressBar = styled(ProgressBar)`
   margin-top: 2px;
@@ -65,15 +52,17 @@ const JobWrap = styled.div`
   margin-bottom: 5px;
 `;
 
-const AcknowledgeButton = styled(Button)(({ theme }) => css`
-  && {
-    color: ${theme.colors.global.textDefault};
-    
-    &:hover {
-      color: ${theme.colors.variant.default};
+const AcknowledgeButton = styled(Button)(
+  ({ theme }) => css`
+    && {
+      color: ${theme.colors.text.primary};
+
+      &:hover {
+        color: ${theme.colors.variant.default};
+      }
     }
-  }
-`);
+  `,
+);
 
 type SystemJobProps = {
   job: {
@@ -86,25 +75,29 @@ type SystemJobProps = {
     started_at?: string;
     execution_duration?: string;
     job_status?: string;
-    provides_progress?: boolean,
+    provides_progress?: boolean;
   };
 };
 
-const SystemJob = ({
-  job,
-}: SystemJobProps) => {
-  const jobIsOver = job.job_status === JobStatus.Complete
-                    || job.percent_complete === 100
-                    || job.job_status === JobStatus.Cancelled
-                    || job.job_status === JobStatus.Error;
+const SystemJob = ({ job }: SystemJobProps) => {
+  const queryClient = useQueryClient();
+  const jobIsOver =
+    job.job_status === JobStatus.Complete ||
+    job.percent_complete === 100 ||
+    job.job_status === JobStatus.Cancelled ||
+    job.job_status === JobStatus.Error;
   const mappedJobStatus = job.job_status === JobStatus.Runnable ? 'queued' : job.job_status;
 
   const _onAcknowledge = () => (e) => {
     e.preventDefault();
 
-    SystemJobsActions.acknowledgeJob(job.id).catch((error) => {
-      UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
-    });
+    SystemJobs.acknowledgeJob(job.id)
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
+      })
+      .catch((error) => {
+        UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
+      });
   };
 
   const _onCancel = () => (e) => {
@@ -112,9 +105,13 @@ const SystemJob = ({
 
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
-      SystemJobsActions.cancelJob(job.id).catch((error) => {
-        UserNotification.error(error.responseMessage, 'Unable to cancel the job');
-      });
+      ClusterJobs.cancelJob(job.id)
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
+        })
+        .catch((error) => {
+          UserNotification.error(error.responseMessage, 'Unable to cancel the job');
+        });
     }
   };
 
@@ -122,18 +119,35 @@ const SystemJob = ({
     <div>
       <JobWrap>
         <Icon name="settings" />{' '}
-        <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
-        - on <LinkToNode nodeId={job.node_id} />{' '}
-        <RelativeTime dateTime={job.started_at} />{' '}
+        <span data-toggle="tooltip" title={job.name}>
+          {job.info}
+        </span>{' '}
+        - on <LinkToNode nodeId={job.node_id} /> <RelativeTime dateTime={job.started_at} />{' '}
         <span data-toggle="tooltip" title={`runtime: ${job.execution_duration}`}>
-          <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
+          <Badge color={BADGE_COLOR_BY_STATUS[mappedJobStatus] ?? 'gray'} variant="light" dot style={{ marginLeft: 4 }}>
+            {mappedJobStatus}
+          </Badge>
         </span>
-        {!jobIsOver && job.is_cancelable
-          ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
-          : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="close" /></AcknowledgeButton>)}
+        {!jobIsOver && job.is_cancelable ? (
+          <Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>
+            Cancel
+          </Button>
+        ) : (
+          <AcknowledgeButton
+            type="button"
+            bsStyle="link"
+            onClick={_onAcknowledge()}
+            bsSize="xs"
+            className="pull-right"
+            title="Acknowledge">
+            <Icon name="close" />
+          </AcknowledgeButton>
+        )}
       </JobWrap>
 
-      {!jobIsOver && job.provides_progress && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
+      {!jobIsOver && job.provides_progress && (
+        <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />
+      )}
     </div>
   );
 };

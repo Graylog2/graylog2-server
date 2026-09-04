@@ -31,11 +31,12 @@ const fieldTypesUrl = qualifyUrl('/views/fields');
 type FieldTypesResponse = Array<FieldTypeMappingJSON>;
 
 type FieldTypesRequest = {
-  streams?: Array<string>,
-  timerange?: TimeRange,
+  streams?: Array<string>;
+  timerange?: TimeRange;
 };
 
-const _deserializeFieldTypes = (response: FieldTypesResponse) => response.map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
+const _deserializeFieldTypes = (response: FieldTypesResponse) =>
+  response.map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
 
 const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): FieldTypesRequest => {
   let request: FieldTypesRequest = {};
@@ -51,10 +52,8 @@ const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): F
   return request;
 };
 
-const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch(
-  'POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange),
-)
-  .then(_deserializeFieldTypes);
+const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> =>
+  fetch('POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange)).then(_deserializeFieldTypes);
 
 const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => {
   switch (timerange?.type) {
@@ -69,15 +68,34 @@ const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => 
   }
 };
 
-const useFieldTypes = (streams: Array<string>, timerange: TimeRange, enabled: boolean = true): { data: FieldTypeMapping[], refetch: () => void, isLoading?: boolean, isFetching?: boolean } => {
+// An empty list of streams results in the same request as no streams at all, so both need to end up with the
+// same query key. Otherwise we would keep two cache entries around and issue two identical requests for them.
+const normalizeStreams = (streams: Array<string>) => (streams?.length > 0 ? streams : undefined);
+
+type RefetchOptions = { cancelRefetch?: boolean };
+
+const useFieldTypes = (
+  streams: Array<string>,
+  timerange: TimeRange,
+  enabled: boolean = true,
+): {
+  data: FieldTypeMapping[];
+  refetch: (options?: RefetchOptions) => void;
+  isLoading?: boolean;
+  isFetching?: boolean;
+} => {
   const { userTimezone } = useUserDateTime();
   const _timerange = useMemo(() => normalizeTimeRange(timerange, userTimezone), [timerange, userTimezone]);
+  const _streams = useMemo(() => normalizeStreams(streams), [streams]);
 
-  return useQuery(
-    ['fieldTypes', streams, _timerange],
-    () => fetchAllFieldTypes(streams, _timerange),
-    { staleTime: 30000, refetchOnWindowFocus: false, cacheTime: 0, enabled },
-  );
+  return useQuery({
+    queryKey: ['fieldTypes', _streams, _timerange],
+    queryFn: () => fetchAllFieldTypes(_streams, _timerange),
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
+    gcTime: 0,
+    enabled,
+  });
 };
 
 export default singleton('hooks.useFieldTypes', () => useFieldTypes);

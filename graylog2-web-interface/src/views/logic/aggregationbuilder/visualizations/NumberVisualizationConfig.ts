@@ -15,31 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import VisualizationConfig from './VisualizationConfig';
 
 export type TrendPreference = 'LOWER' | 'NEUTRAL' | 'HIGHER';
+export type NumberAlignment = 'center' | 'bottom-right' | 'bottom-left';
 
 type InternalState = {
-  trend: boolean,
-  trendPreference: TrendPreference,
+  trend: boolean;
+  trendPreference: TrendPreference;
+  alignment: NumberAlignment | undefined;
 };
 
 export type NumberVisualizationConfigJSON = {
-  trend: boolean,
-  trend_preference: TrendPreference,
+  trend: boolean;
+  trend_preference: TrendPreference;
+  alignment?: NumberAlignment;
 };
 
 export default class NumberVisualizationConfig extends VisualizationConfig {
   private readonly _value: InternalState;
 
   constructor(
-    trend: $PropertyType<InternalState, 'trend'>,
-    trendPreference: $PropertyType<InternalState, 'trendPreference'>,
+    trend: InternalState['trend'],
+    trendPreference: InternalState['trendPreference'],
+    alignment: InternalState['alignment'] = 'bottom-right',
   ) {
     super();
-    this._value = { trend, trendPreference };
+    this._value = { trend, trendPreference, alignment };
   }
 
   get trend() {
@@ -50,16 +53,22 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     return this._value.trendPreference;
   }
 
+  // Where the value/trend are anchored within the widget. Defaults to 'bottom-right' for existing widgets.
+  get alignment() {
+    return this._value.alignment;
+  }
+
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 
   static create(
-    trend: $PropertyType<InternalState, 'trend'> = false,
-    lowerIsBetter: $PropertyType<InternalState, 'trendPreference'> = 'NEUTRAL',
+    trend: InternalState['trend'] = false,
+    trendPreference: InternalState['trendPreference'] = 'NEUTRAL',
+    alignment: InternalState['alignment'] = 'bottom-right',
   ) {
-    return new NumberVisualizationConfig(trend, lowerIsBetter);
+    return new NumberVisualizationConfig(trend, trendPreference, alignment);
   }
 
   static empty() {
@@ -67,11 +76,12 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
   }
 
   toJSON(): NumberVisualizationConfigJSON {
-    const { trend, trendPreference } = this._value;
+    const { trend, trendPreference, alignment } = this._value;
 
     return {
       trend,
       trend_preference: trendPreference,
+      alignment,
     };
   }
 
@@ -80,9 +90,9 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
   }
 
   static fromJSON(_type: string, value: NumberVisualizationConfigJSON) {
-    const { trend, trend_preference: trendPreference } = value;
+    const { trend, trend_preference: trendPreference, alignment } = value;
 
-    return NumberVisualizationConfig.create(trend, trendPreference);
+    return NumberVisualizationConfig.create(trend, trendPreference, alignment);
   }
 }
 
@@ -95,17 +105,21 @@ class Builder {
     this.value = value;
   }
 
-  trend(value: $PropertyType<InternalState, 'trend'>) {
+  trend(value: InternalState['trend']) {
     return new Builder(this.value.set('trend', value));
   }
 
-  trendPreference(value: $PropertyType<InternalState, 'trendPreference'>): Builder {
+  trendPreference(value: InternalState['trendPreference']): Builder {
     return new Builder(this.value.set('trendPreference', value));
   }
 
-  build() {
-    const { trend, trendPreference } = this.value.toObject();
+  alignment(value: InternalState['alignment']): Builder {
+    return new Builder(this.value.set('alignment', value));
+  }
 
-    return new NumberVisualizationConfig(trend, trendPreference);
+  build() {
+    const { trend, trendPreference, alignment } = this.value.toObject();
+
+    return new NumberVisualizationConfig(trend, trendPreference, alignment);
   }
 }

@@ -1,0 +1,5 @@
+type = "a"
+message = "Set the default timerange to 30-day for filtering Alerts Entity Table"
+
+pulls = ["24950"]
+issues = ["24361"]

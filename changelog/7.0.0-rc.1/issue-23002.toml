@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing issue with message table pagination on search page, where active page was not reset correctly when executing new search."
+
+pulls = ["23013"]
+issues = ["23002"]

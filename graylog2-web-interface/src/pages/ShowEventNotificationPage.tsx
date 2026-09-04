@@ -27,9 +27,10 @@ import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventNotificationDetails from 'components/event-notifications/event-notification-details/EventNotificationDetails';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import { getEventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import PageDescription from 'components/event-notifications/PageDescription';
 
 import useHistory from '../routing/useHistory';
 
@@ -40,7 +41,7 @@ const ShowEventDefinitionPage = () => {
   const history = useHistory();
 
   useEffect(() => {
-    EventNotificationsActions.get(notificationId).then(
+    getEventNotification(notificationId).then(
       (result) => setNotification(result),
       (error) => {
         if (error.status === 404) {
@@ -69,16 +70,14 @@ const ShowEventDefinitionPage = () => {
   return (
     <DocumentTitle title={`View "${notification.title}" Notification`}>
       <EventsPageNavigation />
-      <PageHeader title={`View "${notification.title}" Notification`}
-                  actions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-          to you or to other systems you use for that purpose.
-        </span>
+      <PageHeader
+        title={`View "${notification.title}" Notification`}
+        actions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <PageDescription />
       </PageHeader>
 
       <EventNotificationDetails notification={notification} />

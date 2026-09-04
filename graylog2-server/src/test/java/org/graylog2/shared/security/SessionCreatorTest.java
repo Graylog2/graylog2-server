@@ -17,45 +17,49 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
-import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.lang.util.LifecycleUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.InMemoryRolePermissionResolver;
+import org.graylog2.security.OrderedAuthenticatingRealms;
+import org.graylog2.security.sessions.AuthenticationInfoWithSessionAuthContext;
+import org.graylog2.security.sessions.SessionAuthContext;
+import org.graylog2.security.sessions.SessionDAO;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.users.UserService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.graylog2.rest.models.system.sessions.SessionUtils.AUTH_CONTEXT_SESSION_KEY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anyString;
@@ -65,6 +69,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SessionCreatorTest {
+    private AutoCloseable mocks;
     private static final long SESSION_TIMEOUT = Long.MAX_VALUE;
     private final ActorAwareUsernamePasswordToken validToken = new ActorAwareUsernamePasswordToken("username",
             "password");
@@ -82,23 +87,26 @@ public class SessionCreatorTest {
 
     private DefaultSecurityManager securityManager;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
 
         SimpleAccountRealm realm = new SimpleAccountRealm();
         realm.addAccount(validToken.getUsername(), String.valueOf(validToken.getPassword()));
 
-        // Set up a security manager like in DefaultSecurityManagerProvider
-        securityManager = new DefaultSecurityManager(realm);
-        FirstSuccessfulStrategy strategy = new ThrowingFirstSuccessfulStrategy();
-        strategy.setStopAfterFirstSuccess(true);
-        ((ModularRealmAuthenticator) securityManager.getAuthenticator()).setAuthenticationStrategy(strategy);
-        SecurityUtils.setSecurityManager(securityManager);
+        // Build the SecurityManager through the production provider so the test reflects real wiring
+        // (auth listeners, strategy, session manager, subject DAO) instead of duplicating it. A change to
+        // DefaultSecurityManagerProvider that breaks session attribute persistence should fail tests here.
+        securityManager = new DefaultSecurityManagerProvider(
+                new SessionDAO(mock(SessionService.class), new EventBus()),
+                Map.of(),
+                mock(InMemoryRolePermissionResolver.class),
+                new TestOrderedAuthenticatingRealms(List.of(realm))
+        ).get();
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    public void tearDown() throws Exception {
         try {
             LifecycleUtils.destroy(SecurityUtils.getSecurityManager());
             SecurityUtils.setSecurityManager(null);
@@ -106,6 +114,7 @@ public class SessionCreatorTest {
         } catch (Exception e) {
             // OK, we don't care
         }
+        mocks.close();
     }
 
     @Test
@@ -113,7 +122,7 @@ public class SessionCreatorTest {
         setUpUserMock();
 
         assertFalse(SecurityUtils.getSubject().isAuthenticated());
-        Optional<Session> session = sessionCreator.login(null, "host", validToken);
+        Optional<Session> session = sessionCreator.login("host", validToken);
         assertTrue(session.isPresent());
         assertEquals(SESSION_TIMEOUT, session.get().getTimeout());
         assertTrue(SecurityUtils.getSubject().isAuthenticated());
@@ -122,46 +131,8 @@ public class SessionCreatorTest {
 
     @Test
     public void invalidAuthToken() {
-        sessionCreator.login(null, "host", invalidToken);
+        sessionCreator.login("host", invalidToken);
         verify(auditEventSender).failure(eq(validToken.getActor()), anyString(), anyMap());
-    }
-
-    @Test
-    public void extendSession() {
-        setUpUserMock();
-
-        // Create a session and store it.
-        SimpleSession oldSession = new SimpleSession();
-        ((DefaultSessionManager) securityManager.getSessionManager()).getSessionDAO().create(oldSession);
-        String oldSessionId = oldSession.getId().toString();
-
-        assertFalse(SecurityUtils.getSubject().isAuthenticated());
-        Optional<Session> session = sessionCreator.login(oldSessionId, "host", validToken);
-        assertTrue(session.isPresent());
-        assertEquals(SESSION_TIMEOUT, session.get().getTimeout());
-        assertEquals(oldSessionId, session.get().getId());
-        assertTrue(SecurityUtils.getSubject().isAuthenticated());
-        verify(auditEventSender).success(eq(AuditActor.user("username")), anyString(), anyMap());
-    }
-
-    @Test
-    public void extendExpiredSession() {
-        setUpUserMock();
-
-        // Create an expired session and store it.
-        SimpleSession oldSession = new SimpleSession();
-        oldSession.setLastAccessTime(new Date(0));
-        ((DefaultSessionManager) securityManager.getSessionManager()).getSessionDAO().create(oldSession);
-        String oldSessionId = oldSession.getId().toString();
-
-        assertFalse(SecurityUtils.getSubject().isAuthenticated());
-        Optional<Session> session = sessionCreator.login(oldSessionId, "host", validToken);
-        assertTrue(session.isPresent());
-
-        // User will get a new session
-        assertNotEquals(oldSessionId, session.get().getId());
-
-        assertTrue(SecurityUtils.getSubject().isAuthenticated());
     }
 
     @Test
@@ -176,7 +147,7 @@ public class SessionCreatorTest {
         realms.add(0, throwingRealm());
         securityManager.setRealms(realms);
 
-        assertThat(sessionCreator.login(null, "host", validToken)).isPresent();
+        assertThat(sessionCreator.login("host", validToken)).isPresent();
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isTrue();
         verify(auditEventSender).success(eq(AuditActor.user("username")), anyString(), anyMap());
     }
@@ -190,7 +161,7 @@ public class SessionCreatorTest {
         // First realm will throw, second realm will be unable to authenticate because user has no account
         securityManager.setRealms(ImmutableList.of(throwingRealm(), new SimpleAccountRealm()));
 
-        assertThatThrownBy(() -> sessionCreator.login(null, "host", validToken)).isInstanceOf(
+        assertThatThrownBy(() -> sessionCreator.login("host", validToken)).isInstanceOf(
                 AuthenticationServiceUnavailableException.class);
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
         verify(auditEventSender).failure(eq(AuditActor.user("username")), anyString(),
@@ -222,14 +193,14 @@ public class SessionCreatorTest {
         securityManager.setRealms(ImmutableList.of(switchableRealm, new SimpleAccountRealm()));
 
         // realm will throw an exception on auth attempt
-        assertThatThrownBy(() -> sessionCreator.login(null, "host", validToken)).isInstanceOf(
+        assertThatThrownBy(() -> sessionCreator.login("host", validToken)).isInstanceOf(
                 AuthenticationServiceUnavailableException.class);
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
 
         // switch realm to not throw an exception but simply reject the credentials
         doThrow.set(false);
 
-        sessionCreator.login(null, "host", validToken);
+        sessionCreator.login("host", validToken);
         assertThat(SecurityUtils.getSubject().isAuthenticated()).isFalse();
     }
 
@@ -250,5 +221,58 @@ public class SessionCreatorTest {
                 throw new AuthenticationServiceUnavailableException("not available");
             }
         };
+    }
+
+    /**
+     * Login must persist a {@link SessionAuthContext} emitted by an authenticating realm onto the resulting session.
+     * This is what SAML/OIDC backends rely on for logout (e.g. SAML SLO matching by SessionIndex).
+     */
+    @Test
+    public void loginPersistsSessionAuthContextOnReturnedSession() {
+        setUpUserMock();
+
+        final SessionAuthContext expectedAuthContext = new TestSessionAuthContext("expected-value");
+        securityManager.setRealms(ImmutableList.of(new AuthContextEmittingRealm(validToken, expectedAuthContext)));
+
+        final Optional<Session> session = sessionCreator.login("host", validToken);
+
+        assertThat(session).isPresent();
+        assertThat(session.get().getAttribute(AUTH_CONTEXT_SESSION_KEY)).isEqualTo(expectedAuthContext);
+    }
+
+    private record TestSessionAuthContext(String value) implements SessionAuthContext {
+        @Override
+        public String type() {
+            return "TEST";
+        }
+    }
+
+    /**
+     * Realm that wraps a successful authentication with a {@link SessionAuthContext}, like SAML/OIDC backends do.
+     */
+    private static final class AuthContextEmittingRealm extends SimpleAccountRealm {
+        private final SessionAuthContext authContext;
+
+        AuthContextEmittingRealm(ActorAwareUsernamePasswordToken validToken, SessionAuthContext authContext) {
+            addAccount(validToken.getUsername(), String.valueOf(validToken.getPassword()));
+            this.authContext = authContext;
+        }
+
+        @Override
+        protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+            final AuthenticationInfo info = super.doGetAuthenticationInfo(token);
+            return info == null ? null : new AuthenticationInfoWithSessionAuthContext(info, authContext);
+        }
+    }
+
+    private static final class TestOrderedAuthenticatingRealms extends ArrayList<Realm> implements OrderedAuthenticatingRealms {
+        TestOrderedAuthenticatingRealms(List<Realm> realms) {
+            super(realms);
+        }
+
+        @Override
+        public Optional<Realm> getRootAccountRealm() {
+            return Optional.empty();
+        }
     }
 }

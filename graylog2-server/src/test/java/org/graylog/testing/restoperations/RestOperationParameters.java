@@ -19,9 +19,10 @@ package org.graylog.testing.restoperations;
 import com.google.auto.value.AutoValue;
 import io.restassured.specification.RequestSpecification;
 import jakarta.annotation.Nullable;
-import jakarta.inject.Provider;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 import java.security.KeyStore;
+import java.util.Optional;
 
 @AutoValue
 public abstract class RestOperationParameters {
@@ -32,7 +33,7 @@ public abstract class RestOperationParameters {
     abstract KeyStore truststore();
 
     @Nullable
-    abstract Provider<String> jwtTokenProvider();
+    abstract IndexerJwtAuthToken jwtAuthToken();
 
     abstract boolean relaxedHTTPSValidation();
 
@@ -41,16 +42,17 @@ public abstract class RestOperationParameters {
     abstract int attempts_count();
 
     public void addAuthorizationHeaders(RequestSpecification req) {
-        if (jwtTokenProvider() != null) {
-            req.header("Authorization", jwtTokenProvider().get());
-        }
+        Optional.ofNullable(jwtAuthToken())
+                .flatMap(IndexerJwtAuthToken::headerValue)
+                .ifPresent(authHeader -> req.header("Authorization", authHeader));
+
     }
 
     public String formatCurlAuthentication() {
-        if (jwtTokenProvider() != null) {
-            return "-H \"Authorization: " + jwtTokenProvider().get() + "\"";
-        }
-        return "";
+        return Optional.ofNullable(jwtAuthToken())
+                .flatMap(IndexerJwtAuthToken::headerValue)
+                .map(headerValue -> "-H \"Authorization: " + headerValue + "\"")
+                .orElse("");
     }
 
     public static Builder builder() {
@@ -67,7 +69,7 @@ public abstract class RestOperationParameters {
 
         public abstract Builder truststore(KeyStore truststore);
 
-        public abstract Builder jwtTokenProvider(Provider<String> jwtToken);
+        public abstract Builder jwtAuthToken(IndexerJwtAuthToken jwtToken);
 
         public abstract Builder attempts_count(int attempts_count);
 

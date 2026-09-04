@@ -35,6 +35,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.plugin.streams.Stream.NON_EDITABLE_STREAM_IDS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +49,7 @@ class SearchUserTest {
     }
 
     private SearchUser searchUser() {
-        return new SearchUser(mockUser(), (perm) -> true, (perm, id) -> true, new PermittedStreams(Stream::of, (categories) -> Stream.of()),
+        return new SearchUser(mockUser(), (perm) -> true, (perm, id) -> true, new PermittedStreams(Stream::of, (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS),
                 new HashMap<>());
     }
 
@@ -111,7 +112,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals(permission),
                 (perm, pId) -> perm.equals(permission) && id.equals(pId),
-                new PermittedStreams(Stream::of, (categories) -> Stream.of()),
+                new PermittedStreams(Stream::of, (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS),
                 viewResolvers);
     }
 
@@ -140,7 +141,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals("allowed-permission"),
                 (perm, pId) -> perm.equals("allowed-permission") && "resolved-id".equals(pId),
-                new PermittedStreams(Stream::of, (categories) -> Stream.of()),
+                new PermittedStreams(Stream::of, (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS),
                 viewResolvers);
     }
 
@@ -182,7 +183,7 @@ class SearchUserTest {
         return new SearchUser(mockUser(),
                 (perm) -> perm.equals("allowed-permission"),
                 (perm, pId) -> perm.equals("allowed-permission") && "resolved-id".equals(pId),
-                new PermittedStreams(Stream::of, (categories) -> Stream.of()),
+                new PermittedStreams(Stream::of, (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS),
                 viewResolvers);
     }
 

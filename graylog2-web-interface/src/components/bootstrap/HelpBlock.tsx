@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { HelpBlock as BootstrapHelpBlock } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-const HelpBlock = styled(BootstrapHelpBlock)(({ theme }) => css`
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  color: ${theme.colors.gray[50]};
-`);
+const HelpBlock = styled.div(
+  ({ theme }) => css`
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color: ${theme.colors.text.secondary};
+  `,
+);
 
 /** @component */
 export default HelpBlock;

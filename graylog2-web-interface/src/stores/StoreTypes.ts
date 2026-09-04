@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export type PromiseProvider = (...args: any[]) => Promise<any>;
-type ExtractResultType<R extends PromiseProvider> = ExtractTypeFromPromise<ReturnType<R>>;
-type ExtractTypeFromPromise<P> = P extends Promise<infer R> ? R : P;
+type ExtractResultType<R extends PromiseProvider> = Awaited<ReturnType<R>>;
 type SyncAction = (...args: any[]) => void;
 
 export type ListenableAction<R extends PromiseProvider> = R & {
   triggerPromise: R;
-  listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
+  listen: (cb: (...args: Parameters<R>) => any) => () => void;
   completed: {
     (result: ExtractResultType<R>): void;
     listen: (cb: (result: ExtractResultType<R>) => any) => () => void;

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix issue with left button position by moving it to the left."
+
+issues = ["24110"]
+pulls = ["24111"]

@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -29,22 +27,21 @@ import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class RoleResponse {
 
-    @JsonProperty
+    @JsonProperty("name")
     @NotBlank
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("description")
     public abstract Optional<String> description();
 
-    @JsonProperty
+    @JsonProperty("permissions")
     @NotNull
     public abstract Set<String> permissions();
 
-    @JsonProperty
+    @JsonProperty("read_only")
     public abstract boolean readOnly();
 
     @JsonCreator

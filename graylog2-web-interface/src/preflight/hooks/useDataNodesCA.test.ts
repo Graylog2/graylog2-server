@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -29,7 +29,7 @@ describe('useDataNodesCA', () => {
   });
 
   it('should return fetched data nodes', async () => {
-    const { result, waitFor } = renderHook(() => useDataNodesCA());
+    const { result } = renderHook(() => useDataNodesCA());
 
     expect(result.current.data).toEqual(undefined);
 

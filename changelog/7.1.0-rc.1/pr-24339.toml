@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixing Traffic Graph to handle empty traffic data."
+
+pulls = ["24339"]

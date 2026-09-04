@@ -16,21 +16,12 @@
  */
 package org.graylog.plugins.views.favorites;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.grn.GRN;
-import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
-import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.rest.models.PaginatedResponse;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -41,12 +32,17 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 
 import java.util.Optional;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Favorites", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Favorites")
 @Path("/favorites")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -59,27 +55,27 @@ public class FavoritesResource {
     }
 
     @GET
-    @ApiOperation("Get the Favorites for the Start Page for the user")
-    public PaginatedResponse<Favorite> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
-                                                        @ApiParam(name = "type") @QueryParam("type") Optional<String> type,
+    @Operation(summary = "Get the Favorites for the Start Page for the user")
+    public PaginatedResponse<Favorite> getFavoriteItems(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") @Min(1) int page,
+                                                        @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("5") @Min(1) int perPage,
+                                                        @Parameter(name = "type") @QueryParam("type") Optional<String> type,
                                                         @Context SearchUser searchUser) {
         return favoritesService.findFavoritesFor(searchUser, type, page, perPage);
     }
 
     @PUT
     @Path("/{grn}")
-    @ApiOperation("Add an item for inclusion on the Start Page for the user")
+    @Operation(summary = "Add an item for inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
-    public void addItemToFavorites(@ApiParam(name = "grn", required = true) @PathParam("grn") @NotEmpty String grn, @Context SearchUser searchUser) {
+    public void addItemToFavorites(@Parameter(name = "grn", required = true) @PathParam("grn") @NotEmpty String grn, @Context SearchUser searchUser) {
         favoritesService.addFavoriteItemFor(grn, searchUser);
     }
 
     @DELETE
     @Path("/{grn}")
-    @ApiOperation("Remove an item from inclusion on the Start Page for the user")
+    @Operation(summary = "Remove an item from inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM)
-    public void removeItemFromFavorites(@ApiParam(name = "grn", required = true) @PathParam("grn") @NotEmpty String grn, @Context SearchUser searchUser) {
+    public void removeItemFromFavorites(@Parameter(name = "grn", required = true) @PathParam("grn") @NotEmpty String grn, @Context SearchUser searchUser) {
         favoritesService.removeFavoriteItemFor(grn, searchUser);
     }
 

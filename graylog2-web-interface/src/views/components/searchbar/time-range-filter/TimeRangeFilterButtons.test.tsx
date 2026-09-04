@@ -29,7 +29,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
 }));
 
 jest.mock('hooks/useSearchConfiguration', () => () => ({
-  config: { ...mockSearchClusterConfig, query_time_range_limit: undefined },
+  config: mockSearchClusterConfig,
   refresh: () => {},
 }));
 
@@ -37,21 +37,27 @@ const selectRangePreset = async (optionLabel: string) => {
   const timeRangePresetButton = screen.getByRole('button', {
     name: /open time range preset select/i,
   });
-  userEvent.click(timeRangePresetButton);
+  await userEvent.click(timeRangePresetButton);
   const rangePresetOption = await screen.findByRole('menuitem', {
     name: new RegExp(optionLabel, 'i'),
   });
-  userEvent.click(rangePresetOption);
+  await userEvent.click(rangePresetOption);
 };
 
 describe('TimeRangeFilterButtons', () => {
   type SUTProps = Partial<React.ComponentProps<typeof TimeRangeFilterButtons>> & {
-    onSubmit?: () => void
-  }
+    onSubmit?: () => void;
+  };
 
   const SUTTimeRangeFilterButtons = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
-      <TimeRangeFilterButtons toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
+      <TimeRangeFilterButtons
+        limitDuration={0}
+        toggleShow={() => {}}
+        onPresetSelectOpen={() => {}}
+        setCurrentTimeRange={() => {}}
+        {...props}
+      />
     </Formik>
   );
 
@@ -61,7 +67,7 @@ describe('TimeRangeFilterButtons', () => {
 
     const timeRangePickerButton = screen.getByLabelText('Open Time Range Selector');
 
-    userEvent.click(timeRangePickerButton);
+    await userEvent.click(timeRangePickerButton);
 
     expect(toggleShow).toHaveBeenCalled();
   });

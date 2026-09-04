@@ -19,36 +19,37 @@ import React from 'react';
 import { Button } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import type { Input } from 'components/messageloaders/Types';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import recentMessagesTimeRange from 'util/TimeRangeHelper';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Routes from 'routing/Routes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 
 type Props = {
-  input: Input,
-}
+  input: Input;
+};
 
 const ShowReceivedMessagesButton = ({ input }: Props) => {
   const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
 
-  const queryField = (input?.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput') ? 'gl2_forwarder_input' : 'gl2_source_input';
+  const queryField =
+    input?.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput'
+      ? 'gl2_forwarder_input'
+      : 'gl2_source_input';
 
   if (input?.id && isPermitted(currentUser.permissions, ['searches:relative'])) {
     return (
-      <LinkContainer key={`received-messages-${input.id}`}
-                     to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
-        <Button onClick={() => {
-          sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
-            app_pathname: getPathnameWithoutId(pathname),
-            app_action_value: 'show-received-messages',
-          });
-        }}>
+      <LinkContainer
+        key={`received-messages-${input.id}`}
+        to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
+        <Button
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
+              app_action_value: 'show-received-messages',
+            });
+          }}>
           Show received messages
         </Button>
       </LinkContainer>

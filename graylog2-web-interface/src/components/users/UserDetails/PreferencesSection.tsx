@@ -23,7 +23,7 @@ import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
-  user: User,
+  user: User;
 };
 
 const defaultPreferences = {
@@ -38,19 +38,14 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
 
   if (readOnly) {
     const localStoragePreferences = {
-      searchSidebarIsPinned: Store.get('searchSidebarIsPinned'),
-      dashboardSidebarIsPinned: Store.get('dashboardSidebarIsPinned'),
-      [PREFERENCES_THEME_MODE]: Store.get(PREFERENCES_THEME_MODE),
+      searchSidebarIsPinned: Store.get<boolean>('searchSidebarIsPinned'),
+      dashboardSidebarIsPinned: Store.get<boolean>('dashboardSidebarIsPinned'),
+      [PREFERENCES_THEME_MODE]: Store.get<string>(PREFERENCES_THEME_MODE),
     };
     preferences = { ...preferences, ...localStoragePreferences };
   }
 
-  const {
-    enableSmartSearch,
-    updateUnfocussed,
-    searchSidebarIsPinned,
-    dashboardSidebarIsPinned,
-  } = preferences;
+  const { enableSmartSearch, updateUnfocussed, searchSidebarIsPinned, dashboardSidebarIsPinned } = preferences;
 
   return (
     <SectionComponent title="Preferences">

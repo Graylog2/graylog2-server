@@ -159,16 +159,8 @@ const searchClusterConfig: SearchesConfig = {
     PT5M: '5 minutes',
     PT3M: '3 minutes',
   },
-  surrounding_filter_fields: [
-    'file',
-    'source',
-    'gl2_source_input',
-    'source_file',
-  ],
-  analysis_disabled_fields: [
-    'full_message',
-    'message',
-  ],
+  surrounding_filter_fields: ['file', 'source', 'gl2_source_input', 'source_file'],
+  analysis_disabled_fields: ['full_message', 'message'],
   auto_refresh_timerange_options: {
     PT1S: '1 second',
     PT5S: '5 seconds',

@@ -82,26 +82,26 @@ class TableListExampleNoBulkActions extends React.Component {
   }
 
   itemActionsFactory(selectedNumber) {
-      return (
-        <Button bsStyle="primary"
-                bsSize="xsmall"
-                onClick={this.action(JSON.stringify(selectedNumber))}>
-          Do something
-        </Button>
-      );
-    }
+    return (
+      <Button bsStyle="primary" bsSize="xsmall" onClick={this.action(JSON.stringify(selectedNumber))}>
+        Do something
+      </Button>
+    );
+  }
 
   render() {
     const { items } = this.state;
 
     return (
-      <TableList items={items}
-                 enableFilter={false}
-                 enableBulkActions={false}
-                 itemActionsFactory={this.itemActionsFactory} />
+      <TableList
+        items={items}
+        enableFilter={false}
+        enableBulkActions={false}
+        itemActionsFactory={this.itemActionsFactory}
+      />
     );
   }
 }
 
-<TableListExampleNoBulkActions />
+<TableListExampleNoBulkActions />;
 ```

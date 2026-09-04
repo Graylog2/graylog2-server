@@ -25,20 +25,28 @@ const StyledRow = styled(Row)`
   margin-bottom: 0 !important;
 `;
 
-const Container = styled.div<{ margin: number }>(({ margin }) => `
+const Container = styled.div<{ margin: number }>(
+  ({ margin }) => `
   margin-top: ${margin}px;
   margin-bottom: ${margin}px;
-`);
+`,
+);
 
 type Props = {
-  onClose?: (msg?: string) => void
-  children?: React.ReactNode
-  bsStyle?: ColorVariant
-  marginTopBottom?: number
-  runtimeError?: boolean
+  onClose?: (msg?: string) => void;
+  children?: React.ReactNode;
+  bsStyle?: ColorVariant;
+  marginTopBottom?: number;
+  runtimeError?: boolean;
 };
 
-const ErrorAlert = ({ children = null, onClose = () => undefined, bsStyle = 'warning', marginTopBottom = 15, runtimeError = false }: Props) => {
+const ErrorAlert = ({
+  children = null,
+  onClose = () => undefined,
+  bsStyle = 'warning',
+  marginTopBottom = 15,
+  runtimeError = false,
+}: Props) => {
   const finalBsStyle = runtimeError ? 'danger' : bsStyle;
 
   if (!children) {

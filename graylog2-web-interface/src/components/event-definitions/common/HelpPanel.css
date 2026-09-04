@@ -1,16 +1,16 @@
 :local(.helpPanel) .panel-title {
-    font-size: 1rem; /* theme.fonts.size.body */
+  font-size: 1rem; /* theme.fonts.size.body */
 }
 
 :local(.helpPanel) .panel-title > a {
-    cursor: pointer;
-    display: block;
+  cursor: pointer;
+  display: block;
 }
 
 :local(.helpPanel) .panel-body {
-    padding: 10px;
+  padding: 10px;
 }
 
 :local(.helpPanel) ul {
-    padding-left: 0;
+  padding-left: 0;
 }

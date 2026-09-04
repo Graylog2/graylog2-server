@@ -30,9 +30,7 @@ describe('<ContentPackEntityConfig />', () => {
     const appliedParameter = [{ configKey: 'descr', paramName: 'descrParam' }];
     const parameter = [{ name: 'descrParam', title: 'A descr Parameter', type: 'string' }];
 
-    render(<ContentPackEntityConfig entity={entity}
-                                    appliedParameter={appliedParameter}
-                                    parameters={parameter} />);
+    render(<ContentPackEntityConfig entity={entity} appliedParameter={appliedParameter} parameters={parameter} />);
 
     await screen.findByText(/franz/i);
   });

@@ -22,11 +22,11 @@ import type { HighlightingRuleJSON } from './highlighting/HighlightingRule';
 type HighlightingRules = Array<HighlightingRule>;
 
 type InternalState = {
-  highlighting: HighlightingRules,
+  highlighting: HighlightingRules;
 };
 
 export type FormattingSettingsJSON = {
-  highlighting: Array<HighlightingRuleJSON>,
+  highlighting: Array<HighlightingRuleJSON>;
 };
 
 export default class FormattingSettings {

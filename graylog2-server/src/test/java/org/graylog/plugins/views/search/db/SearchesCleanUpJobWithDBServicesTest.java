@@ -16,44 +16,47 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import name.falgout.jeffrey.testing.junit.guice.GuiceExtension;
+import name.falgout.jeffrey.testing.junit.guice.IncludeModule;
+import name.falgout.jeffrey.testing.junit.guice.IncludeModules;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog.testing.inject.InputConfigurationModule;
 import org.graylog.testing.inject.TestPasswordSecretModule;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
-import org.jukito.JukitoRunner;
-import org.jukito.UseModules;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(JukitoRunner.class)
-@UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
+@ExtendWith(MongoDBExtension.class)
+@ExtendWith(GuiceExtension.class)
+@IncludeModules({
+        @IncludeModule(InputConfigurationModule.class),
+        @IncludeModule(ObjectMapperModule.class),
+        @IncludeModule(ValidatorModule.class),
+        @IncludeModule(TestPasswordSecretModule.class)
+})
 public class SearchesCleanUpJobWithDBServicesTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private SearchesCleanUpJob searchesCleanUpJob;
     private SearchDbService searchDbService;
@@ -64,17 +67,15 @@ public class SearchesCleanUpJobWithDBServicesTest {
         }
     }
 
-    @Before
-    public void setup(MongoJackObjectMapperProvider mapperProvider) {
+    @BeforeEach
+    public void setup(MongoCollections mongoCollections) {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
 
-        final ViewSummaryService viewService = new TestViewService(
-                new MongoCollections(mapperProvider, mongodb.mongoConnection())
-        );
+        final ViewSummaryService viewService = new TestViewService(mongoCollections);
         this.searchDbService = spy(
                 new SearchDbService(
-                        new MongoCollections(mapperProvider, mongodb.mongoConnection()),
+                        mongoCollections,
                         dto -> new SearchRequirements(Collections.emptySet(), dto),
                         new IgnoreSearchFilters()
                 )
@@ -83,8 +84,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 new HashMap<>(), new HashSet<>());
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    public void cleanup() throws Exception {
         DateTimeUtils.setCurrentMillisSystem();
     }
 
@@ -100,10 +101,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
     public void testMixedExpiredAndNonExpiredSearches() {
         this.searchesCleanUpJob.doRun();
 
-        final ArgumentCaptor<String> idCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchDbService, times(1)).delete(idCaptor.capture());
-
-        assertThat(idCaptor.getAllValues()).containsExactly("5b3b44ca77196aa4679e4da0");
+        verify(searchDbService, times(1)).delete(anyString());
+        verify(searchDbService).delete("5b3b44ca77196aa4679e4da0");
     }
 
     @Test
@@ -111,9 +110,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
     public void testMixedExpiredNonExpiredReferencedAndNonReferencedSearches() {
         this.searchesCleanUpJob.doRun();
 
-        final ArgumentCaptor<String> idCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchDbService, times(2)).delete(idCaptor.capture());
-
-        assertThat(idCaptor.getAllValues()).containsExactly("5b3b44ca77196aa4679e4da1", "5b3b44ca77196aa4679e4da2");
+        verify(searchDbService, times(2)).delete(anyString());
+        verify(searchDbService).delete("5b3b44ca77196aa4679e4da1");
+        verify(searchDbService).delete("5b3b44ca77196aa4679e4da2");
     }
 }

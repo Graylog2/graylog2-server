@@ -27,10 +27,12 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SyslogSeverityMapperDecoratorTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
@@ -106,25 +108,29 @@ public class SyslogSeverityMapperDecoratorTest {
         Assertions.assertThat(response.messages().get(9).message().get("foo")).isEqualTo("1");
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testNullSourceField() throws Exception {
-        final DecoratorImpl decorator = DecoratorImpl.create("id",
-                SyslogSeverityMapperDecorator.class.getCanonicalName(),
-                ImmutableMap.of("target_field", "severity"),
-                Optional.empty(),
-                1);
+        assertThrows(NullPointerException.class, () -> {
+            final DecoratorImpl decorator = DecoratorImpl.create("id",
+                    SyslogSeverityMapperDecorator.class.getCanonicalName(),
+                    ImmutableMap.of("target_field", "severity"),
+                    Optional.empty(),
+                    1);
 
-        new SyslogSeverityMapperDecorator(decorator, messageFactory);
+            new SyslogSeverityMapperDecorator(decorator, messageFactory);
+        });
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testNullTargetField() throws Exception {
-        final DecoratorImpl decorator = DecoratorImpl.create("id",
-                SyslogSeverityMapperDecorator.class.getCanonicalName(),
-                ImmutableMap.of("source_field", "level"),
-                Optional.empty(),
-                1);
+        assertThrows(NullPointerException.class, () -> {
+            final DecoratorImpl decorator = DecoratorImpl.create("id",
+                    SyslogSeverityMapperDecorator.class.getCanonicalName(),
+                    ImmutableMap.of("source_field", "level"),
+                    Optional.empty(),
+                    1);
 
-        new SyslogSeverityMapperDecorator(decorator, messageFactory);
+            new SyslogSeverityMapperDecorator(decorator, messageFactory);
+        });
     }
 }

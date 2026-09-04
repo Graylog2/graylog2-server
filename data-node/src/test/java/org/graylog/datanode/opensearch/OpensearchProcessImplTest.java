@@ -18,42 +18,50 @@ package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog.storage.opensearch3.ClusterAdapterOS;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog2.datanode.DataNodeNotficationEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.security.CustomCAX509TrustManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.PhysicalMemory;
+import oshi.hardware.VirtualMemory;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class OpensearchProcessImplTest {
 
     OpensearchProcessImpl opensearchProcess;
@@ -71,63 +79,196 @@ public class OpensearchProcessImplTest {
     private final NodeId nodeId = new SimpleNodeId(nodeName);
     @Mock
     private EventBus eventBus;
+    @Mock
+    private ClusterAdapterOS clusterAdapter;
+    @Mock
+    private OfficialOpensearchClient client;
 
     @Mock
-    RestHighLevelClient restClient;
-    @Mock
-    ClusterClient clusterClient;
+    ClusterEventBus clusterEventBus;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         when(datanodeConfiguration.processLogsBufferSize()).thenReturn(100);
         when(configuration.getDatanodeNodeName()).thenReturn(nodeName);
         this.opensearchProcess = spy(new OpensearchProcessImpl(datanodeConfiguration, trustmManager, configuration,
-                 objectMapper, processState, nodeId, eventBus));
-        when(opensearchProcess.restClient()).thenReturn(Optional.of(restClient));
-        when(restClient.cluster()).thenReturn(clusterClient);
+                objectMapper, processState, nodeId, eventBus, clusterEventBus));
+        when(opensearchProcess.openSearchClient()).thenReturn(Optional.of(client));
+        when(opensearchProcess.clusterAdapter()).thenReturn(clusterAdapter);
     }
 
 
     @Test
-    public void testResetAllocation() throws IOException {
-        Settings settings = Settings.builder()
-                .put(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, nodeName)
-                .build();
-        when(clusterClient.getSettings(any(), any())).thenReturn(new ClusterGetSettingsResponse(null, settings, null));
+    public void testResetAllocation() {
+        when(clusterAdapter.getClusterSetting(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING))
+                .thenReturn(nodeName);
         opensearchProcess.available();
 
-        ArgumentCaptor<ClusterUpdateSettingsRequest> settingsRequest =
-                ArgumentCaptor.forClass(ClusterUpdateSettingsRequest.class);
-        verify(clusterClient).putSettings(settingsRequest.capture(), eq(RequestOptions.DEFAULT));
-        assertNull(settingsRequest.getValue()
-                .transientSettings()
-                .get(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING)
+        verify(clusterAdapter).updateClusterSetting(
+                OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING,
+                "",
+                false
         );
+
         assertTrue(opensearchProcess.allocationExcludeChecked);
     }
 
     @Test
-    public void testResetAllocationUnneccessary() throws IOException {
-        Settings settings = Settings.builder()
-                .put(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, "notmynodename")
-                .build();
-        when(clusterClient.getSettings(any(), any())).thenReturn(new ClusterGetSettingsResponse(null, settings, null));
+    public void testResetAllocationUnnecessary() throws IOException {
+        when(clusterAdapter.getClusterSetting(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING))
+                .thenReturn("notMyNodeName");
         opensearchProcess.available();
-        verify(clusterClient).getSettings(any(), any());
-        verifyNoMoreInteractions(clusterClient);
+        opensearchProcess.available();
+        verify(clusterAdapter).getClusterSetting(any());
+        verifyNoMoreInteractions(clusterAdapter);
         assertTrue(opensearchProcess.allocationExcludeChecked);
     }
 
     @Test
     public void testShutdownWhenRemovedSuccessfully() throws IOException {
-        ClusterHealthResponse health = mock(ClusterHealthResponse.class);
-        when(health.getRelocatingShards()).thenReturn(0);
-        when(clusterClient.health(any(), any())).thenReturn(health);
+        ClusterHealth health = ClusterHealth.create("green",
+                ClusterHealth.ShardStatus.create(
+                        1, 0, 0, 0
+                )); // relocating shards  are important for the removal
+        when(clusterAdapter.clusterHealthStats()).thenReturn(Optional.of(health));
+
         final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
-        opensearchProcess.executorService = executor;
-        opensearchProcess.checkRemovalStatus();
+        opensearchProcess.checkRemovalStatus(executor);
         verify(processState).fire(OpensearchEvent.PROCESS_STOPPED);
         verify(executor).shutdown();
     }
 
+    @Test
+    public void testHeapThresholdWarning() {
+        when(configuration.isOpensearchHeapSizeWarningEnabled()).thenReturn(true);
+        when(configuration.getHostname()).thenReturn("datanode");
+        when(configuration.getOpensearchHeap()).thenReturn("1g");
+        when(opensearchProcess.getContainerMemory()).thenReturn(Optional.empty());
+        when(opensearchProcess.getGlobalMemory()).thenReturn(mockMemory(gigabytes(8), gigabytes(16)));
+        opensearchProcess.checkConfiguredHeap();
+        verify(clusterEventBus, times(1)).post(any(DataNodeNotficationEvent.class));
+    }
+
+    @Test
+    public void testHeapThresholdWarningDisabled() {
+        when(configuration.isOpensearchHeapSizeWarningEnabled()).thenReturn(false);
+        opensearchProcess.checkConfiguredHeap();
+        verifyNoInteractions(clusterEventBus);
+    }
+
+    @Test
+    public void testNoHeapThresholdWarning() {
+        when(configuration.isOpensearchHeapSizeWarningEnabled()).thenReturn(true);
+        when(configuration.getOpensearchHeap()).thenReturn("1g");
+        when(opensearchProcess.getContainerMemory()).thenReturn(Optional.empty());
+        when(opensearchProcess.getGlobalMemory()).thenReturn(mockMemory(gigabytes(2), gigabytes(3)));
+        opensearchProcess.checkConfiguredHeap();
+        verifyNoInteractions(clusterEventBus);
+    }
+
+    @Test
+    void testGetContainerMemoryCgroupV2(@TempDir Path tempDir) throws Exception {
+        final Path memoryMax = tempDir.resolve("memory.max");
+        final Path memoryCurrent = tempDir.resolve("memory.current");
+        Files.writeString(memoryMax, "4294967296\n");
+        Files.writeString(memoryCurrent, "1073741824\n");
+
+        when(opensearchProcess.cgroupV2MemoryMaxPath()).thenReturn(memoryMax);
+        when(opensearchProcess.cgroupV2MemoryCurrentPath()).thenReturn(memoryCurrent);
+
+        final Optional<OpensearchProcessImpl.MemoryValues> memory = opensearchProcess.getContainerMemory();
+
+        Assertions.assertThat(memory).isPresent();
+        Assertions.assertThat(memory.get().total()).isEqualTo(4294967296L);
+        Assertions.assertThat(memory.get().available()).isEqualTo(3221225472L);
+    }
+
+    @Test
+    void testGetContainerMemoryCgroupV1Fallback(@TempDir Path tempDir) throws Exception {
+        final Path memoryMax = tempDir.resolve("memory.max");
+        final Path memoryCurrent = tempDir.resolve("memory.current");
+        Files.writeString(memoryMax, "max\n");
+        Files.writeString(memoryCurrent, "100\n");
+
+        final Path memoryLimit = tempDir.resolve("memory.limit_in_bytes");
+        final Path memoryUsage = tempDir.resolve("memory.usage_in_bytes");
+        Files.writeString(memoryLimit, "4294967296\n");
+        Files.writeString(memoryUsage, "1073741824\n");
+
+        when(opensearchProcess.cgroupV2MemoryMaxPath()).thenReturn(memoryMax);
+        when(opensearchProcess.cgroupV2MemoryCurrentPath()).thenReturn(memoryCurrent);
+        when(opensearchProcess.cgroupV1MemoryLimitPath()).thenReturn(memoryLimit);
+        when(opensearchProcess.cgroupV1MemoryUsagePath()).thenReturn(memoryUsage);
+
+        final Optional<OpensearchProcessImpl.MemoryValues> memory = opensearchProcess.getContainerMemory();
+
+        Assertions.assertThat(memory).isPresent();
+        Assertions.assertThat(memory.get().total()).isEqualTo(4294967296L);
+        Assertions.assertThat(memory.get().available()).isEqualTo(3221225472L);
+    }
+
+    @Test
+    void testGetContainerMemoryCgroupV1UnlimitedIgnored(@TempDir Path tempDir) throws Exception {
+        final Path memoryMax = tempDir.resolve("memory.max");
+        final Path memoryCurrent = tempDir.resolve("memory.current");
+        Files.writeString(memoryMax, "max\n");
+        Files.writeString(memoryCurrent, "100\n");
+
+        final Path memoryLimit = tempDir.resolve("memory.limit_in_bytes");
+        final Path memoryUsage = tempDir.resolve("memory.usage_in_bytes");
+        Files.writeString(memoryLimit, Long.toString(Long.MAX_VALUE));
+        Files.writeString(memoryUsage, "1073741824\n");
+
+        when(opensearchProcess.cgroupV2MemoryMaxPath()).thenReturn(memoryMax);
+        when(opensearchProcess.cgroupV2MemoryCurrentPath()).thenReturn(memoryCurrent);
+        when(opensearchProcess.cgroupV1MemoryLimitPath()).thenReturn(memoryLimit);
+        when(opensearchProcess.cgroupV1MemoryUsagePath()).thenReturn(memoryUsage);
+
+        final Optional<OpensearchProcessImpl.MemoryValues> memory = opensearchProcess.getContainerMemory();
+
+        Assertions.assertThat(memory).isEmpty();
+    }
+
+    private GlobalMemory mockMemory(long availableMemory, long totalMemory) {
+        return new GlobalMemory() {
+
+            @Override
+            public long getTotal() {
+                return totalMemory;
+            }
+
+            @Override
+            public long getAvailable() {
+                return availableMemory;
+            }
+
+            @Override
+            public long getPageSize() {
+                throw new UnsupportedOperationException("Not supported here");
+            }
+
+            @Override
+            public VirtualMemory getVirtualMemory() {
+                throw new UnsupportedOperationException("Not supported here");
+            }
+
+            @Override
+            public List<PhysicalMemory> getPhysicalMemory() {
+                throw new UnsupportedOperationException("Not supported here");
+            }
+        };
+    }
+
+    private static long gigabytes(int i) {
+        return i * 1024 * 1024 * 1024L;
+    }
+
+    @Test
+    public void recommendedMemorySettingValue() {
+        Assertions.assertThat(OpensearchProcessImpl.recommendedMemorySetting("7 GB"))
+                .isEqualTo("7g");
+
+        Assertions.assertThat(OpensearchProcessImpl.recommendedMemorySetting("512 MB"))
+                .isEqualTo("512m");
+    }
 }

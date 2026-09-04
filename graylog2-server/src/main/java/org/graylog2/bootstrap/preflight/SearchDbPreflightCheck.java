@@ -16,16 +16,15 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import jakarta.inject.Inject;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.graylog2.storage.versionprobe.VersionProbe;
+import org.graylog2.storage.versionprobe.VersionProbeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.net.URI;
 import java.util.List;
@@ -35,21 +34,20 @@ import static org.graylog2.configuration.validators.ElasticsearchVersionValidato
 public class SearchDbPreflightCheck implements PreflightCheck {
     private static final Logger LOG = LoggerFactory.getLogger(SearchDbPreflightCheck.class);
 
-    private final VersionProbe elasticVersionProbe;
+    private final VersionProbeFactory versionProbeFactory;
     private final List<URI> elasticsearchHosts;
 
     @Inject
-    public SearchDbPreflightCheck(
-            VersionProbe elasticVersionProbe,
-            @IndexerHosts List<URI> elasticsearchHosts) {
-        this.elasticVersionProbe = elasticVersionProbe;
+    public SearchDbPreflightCheck(VersionProbeFactory versionProbeFactory, @IndexerHosts List<URI> elasticsearchHosts) {
+        this.versionProbeFactory = versionProbeFactory;
         this.elasticsearchHosts = elasticsearchHosts;
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
         try {
-            final SearchVersion searchVersion = elasticVersionProbe.probe(elasticsearchHosts)
+            final VersionProbe versionProbe = versionProbeFactory.createDefault();
+            final SearchVersion searchVersion = versionProbe.probe(elasticsearchHosts)
                     .orElseThrow(() -> new PreflightCheckException("Could not get Elasticsearch version"));
 
             if (SUPPORTED_ES_VERSIONS.stream().noneMatch(searchVersion::satisfies)) {

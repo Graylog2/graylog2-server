@@ -21,33 +21,42 @@ import type { DataRouterContextObject } from 'react-router/dist/lib/context';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
-import { currentPathname, stripPrefixFromPathname } from 'util/URLUtils';
+import { currentPathname, stripPrefixFromPathname, getPathnameWithoutId } from 'util/URLUtils';
 import { singleton } from 'logic/singleton';
+import useLocation from 'routing/useLocation';
 
 const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
   if (!dataRouterContext?.router?.routes) {
     return undefined;
   }
 
-  const { router: { routes } } = dataRouterContext;
+  const {
+    router: { routes },
+  } = dataRouterContext;
   const pathname = currentPathname();
   const matches = matchRoutes(routes, pathname);
 
   return stripPrefixFromPathname(matches?.at(-1)?.route.path);
 };
 
-const useSendTelemetry = () => {
+const useSendTelemetry = (appSection?: string) => {
+  const { pathname } = useLocation();
   const { sendTelemetry } = useContext(TelemetryContext);
   const dataRouterContext = useContext(DataRouterContext);
 
-  return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
-    const route = retrieveCurrentRoute(dataRouterContext);
+  return useCallback(
+    (eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
+      const route = retrieveCurrentRoute(dataRouterContext);
+      const baseEvent = {
+        app_path_pattern: route,
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: appSection,
+      };
 
-    return sendTelemetry(
-      eventType,
-      { app_path_pattern: route, ...event },
-    );
-  }, [dataRouterContext, sendTelemetry]);
+      return sendTelemetry(eventType, { ...baseEvent, ...event });
+    },
+    [appSection, dataRouterContext, pathname, sendTelemetry],
+  );
 };
 
 export default singleton('core.useSendTelemetry', () => useSendTelemetry);

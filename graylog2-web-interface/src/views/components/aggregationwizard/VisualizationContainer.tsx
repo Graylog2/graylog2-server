@@ -29,15 +29,21 @@ const Container = styled.div`
 `;
 
 type Props = {
-  children: React.ReactElement
-}
+  children: React.ReactElement;
+};
 
 const VisualizationContainer = ({ children }: Props) => {
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
 
-  const onVisualizationConfigChange = useCallback((newVisualizationConfig) => {
-    setFieldValue('visualization', { ...values.visualization, config: { ...values.visualization.config, ...newVisualizationConfig } });
-  }, [values.visualization, setFieldValue]);
+  const onVisualizationConfigChange = useCallback(
+    (newVisualizationConfig) => {
+      setFieldValue('visualization', {
+        ...values.visualization,
+        config: { ...values.visualization.config, ...newVisualizationConfig },
+      });
+    },
+    [values.visualization, setFieldValue],
+  );
 
   return (
     <Container>

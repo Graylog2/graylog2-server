@@ -17,9 +17,11 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 
 public class EventBusConfiguration {
-    
+
+    @Documentation("Number of threads used exclusively for dispatching internal events. Default is 2.")
     @Parameter(value = "async_eventbus_processors")
     private final int asyncEventbusProcessors = 2;
 

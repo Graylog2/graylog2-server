@@ -18,7 +18,7 @@ package org.graylog.plugins.sidecar.services;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.IndexOptions;
@@ -37,6 +37,7 @@ import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.rest.models.SidecarSummary;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.RegistrationRequest;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
@@ -54,6 +55,7 @@ import org.joda.time.Period;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -98,6 +100,10 @@ public class SidecarService {
 
     public long count() {
         return collection.countDocuments();
+    }
+
+    public Map<String, Long> countByVersion() {
+        return mongoUtils.countByField(Sidecar.FIELD_SIDECAR_VERSION);
     }
 
     public Sidecar save(Sidecar sidecar) {
@@ -149,6 +155,7 @@ public class SidecarService {
         }
     }
 
+    @MustBeClosed
     private Stream<Sidecar> streamAll() {
         return MongoUtils.stream(collection.find());
     }
@@ -313,6 +320,7 @@ public class SidecarService {
                 .collect(Collectors.toList());
     }
 
+    @MustBeClosed
     public Stream<Sidecar> findByTagsAndOS(Collection<String> tags, String os) {
         return MongoUtils.stream(collection.find(
                 and(

@@ -16,77 +16,37 @@
  */
 package org.graylog.datanode.filesystem.index.statefile;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamReadFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.smile.SmileFactory;
-import com.fasterxml.jackson.dataformat.smile.SmileGenerator;
-import org.graylog.datanode.filesystem.index.IndexerInformationParserException;
-import org.graylog.shaded.opensearch2.org.apache.lucene.backward_codecs.store.EndiannessReverserUtil;
-import org.graylog.shaded.opensearch2.org.apache.lucene.codecs.CodecUtil;
-import org.graylog.shaded.opensearch2.org.apache.lucene.store.IOContext;
-import org.graylog.shaded.opensearch2.org.apache.lucene.store.IndexInput;
-import org.graylog.shaded.opensearch2.org.opensearch.common.lucene.store.InputStreamIndexInput;
-import org.graylog2.jackson.TypeReferences;
-
 import jakarta.inject.Singleton;
+import org.apache.lucene.backward_codecs.store.EndiannessReverserUtil;
+import org.apache.lucene.codecs.CodecUtil;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.IOContext;
+import org.apache.lucene.store.IndexInput;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
 
 @Singleton
-public class StateFileParserImpl implements StateFileParser {
-
-    private static final String STATE_FILE_CODEC = "state";
-    private static final int MIN_COMPATIBLE_STATE_FILE_VERSION = 1;
-    private static final int STATE_FILE_VERSION = 1;
-
-    private final ObjectMapper objectMapper;
-
-    public StateFileParserImpl() {
-        this.objectMapper = new ObjectMapper(createSmileFactory());
-    }
-
-    private SmileFactory createSmileFactory() {
-        final SmileFactory factory = new SmileFactory();
-        // for now, this is an overhead, might make sense for web sockets
-        factory.configure(SmileGenerator.Feature.ENCODE_BINARY_AS_7BIT, false);
-        factory.configure(SmileFactory.Feature.FAIL_ON_SYMBOL_HASH_OVERFLOW, false); // this trips on many mappings now...
-        // Do not automatically close unclosed objects/arrays in com.fasterxml.jackson.dataformat.smile.SmileGenerator#close() method
-        factory.configure(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT, false);
-        factory.configure(JsonParser.Feature.STRICT_DUPLICATE_DETECTION, true);
-        factory.setStreamReadConstraints(StreamReadConstraints.builder().maxStringLength(50000000).build());
-        factory.configure(StreamReadFeature.USE_FAST_DOUBLE_PARSER.mappedFeature(), true);
-        return factory;
-    }
+public class StateFileParserImpl extends AbstractStateFileParser {
 
     @Override
-    public StateFile parse(Path file) throws IndexerInformationParserException {
-        try {
-            return parseStateFile(file);
-        } catch (IOException e) {
-            throw new IndexerInformationParserException("Failed to parse state file", e);
-        }
-    }
-
-    private StateFile parseStateFile(Path file) throws IOException {
+    protected byte[] readPayload(Path file) throws IOException {
         final Path dir = file.getParent();
         final String filename = file.getFileName().toString();
-        final org.graylog.shaded.opensearch2.org.apache.lucene.store.FSDirectory directory = org.graylog.shaded.opensearch2.org.apache.lucene.store.FSDirectory.open(dir);
-        IndexInput indexInput = EndiannessReverserUtil.openInput(directory, filename, IOContext.DEFAULT);
-        // We checksum the entire file before we even go and parse it. If it's corrupted we barf right here.
-        CodecUtil.checksumEntireFile(indexInput);
-        CodecUtil.checkHeader(indexInput, STATE_FILE_CODEC, MIN_COMPATIBLE_STATE_FILE_VERSION, STATE_FILE_VERSION);
-        final int xcontentTypeValue = indexInput.readInt();
-        long filePointer = indexInput.getFilePointer();
-        long contentSize = indexInput.length() - CodecUtil.footerLength() - filePointer;
-        try (IndexInput slice = indexInput.slice("state_xcontent", filePointer, contentSize)) {
-            final InputStreamIndexInput input = new InputStreamIndexInput(slice, contentSize);
-            final Map<String, Object> readValue = objectMapper.readValue(input, TypeReferences.MAP_STRING_OBJECT);
-            return new StateFile(file, readValue);
+        try (
+                FSDirectory directory = FSDirectory.open(dir);
+                // IOContext.READONCE signals sequential single-pass access, enabling read-ahead
+                IndexInput indexInput = EndiannessReverserUtil.openInput(directory, filename, IOContext.READONCE)
+        ) {
+            // We checksum the entire file before we even go and parse it. If it's corrupted we barf right here.
+            CodecUtil.checksumEntireFile(indexInput);
+            CodecUtil.checkHeader(indexInput, STATE_FILE_CODEC, MIN_COMPATIBLE_STATE_FILE_VERSION, STATE_FILE_VERSION);
+            indexInput.skipBytes(Integer.BYTES); // xcontentType, not used
+            final long filePointer = indexInput.getFilePointer();
+            final int contentSize = Math.toIntExact(indexInput.length() - CodecUtil.footerLength() - filePointer);
+            final byte[] contentBytes = new byte[contentSize];
+            indexInput.readBytes(contentBytes, 0, contentSize);
+            return contentBytes;
         }
     }
 }

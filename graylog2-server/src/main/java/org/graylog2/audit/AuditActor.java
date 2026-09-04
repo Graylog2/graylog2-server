@@ -17,7 +17,7 @@
 package org.graylog2.audit;
 
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.annotation.Nonnull;
@@ -26,7 +26,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
 @AutoValue
-@WithBeanGetter
 public abstract class AuditActor {
     private static final String URN_GRAYLOG_NODE = "urn:graylog:node:";
     private static final String URN_GRAYLOG_USER = "urn:graylog:user:";
@@ -40,6 +39,10 @@ public abstract class AuditActor {
             throw new IllegalArgumentException("username must not be null or empty");
         }
         return new AutoValue_AuditActor(URN_GRAYLOG_USER + username);
+    }
+
+    public static AuditActor user(User user) {
+        return user(requireNonNull(user, "user must not be null").getName());
     }
 
     public static AuditActor system(@Nonnull NodeId nodeId) {

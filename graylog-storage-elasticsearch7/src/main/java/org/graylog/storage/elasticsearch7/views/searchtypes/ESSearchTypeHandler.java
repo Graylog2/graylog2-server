@@ -17,11 +17,9 @@
 package org.graylog.storage.elasticsearch7.views.searchtypes;
 
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 
 /**
@@ -32,12 +30,9 @@ import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
  */
 public interface ESSearchTypeHandler<S extends SearchType> extends SearchTypeHandler<S, ESGeneratedQueryContext, SearchResponse> {
     @Override
-    default SearchType.Result doExtractResultImpl(SearchJob job, Query query, S searchType, SearchResponse queryResult, ESGeneratedQueryContext queryContext) {
-        // if the search type was filtered, extract the sub-aggregation before passing it to the handler
-        // this way we don't have to duplicate this step everywhere
-        final Aggregations aggregations = queryResult.getAggregations();
-        return doExtractResult(job, query, searchType, queryResult, aggregations, queryContext);
+    default SearchType.Result doExtractResultImpl(Query query, S searchType, SearchResponse queryResult, ESGeneratedQueryContext queryContext) {
+        return doExtractResult(query, searchType, queryResult, queryContext);
     }
 
-    SearchType.Result doExtractResult(SearchJob job, Query query, S searchType, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext);
+    SearchType.Result doExtractResult(Query query, S searchType, SearchResponse queryResult, ESGeneratedQueryContext queryContext);
 }

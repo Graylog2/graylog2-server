@@ -16,22 +16,26 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginManifest } from 'graylog-web-plugin/plugin';
+
+import { Messages } from '@graylog/server-api';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import type { Stream } from 'views/stores/StreamsStore';
-import { InputsActions } from 'stores/inputs/InputsStore';
-import useMessage from 'views/hooks/useMessage';
-import type { Message } from 'views/components/messagelist/Types';
+import type { Stream } from 'logic/streams/types';
+import { fetchInput } from 'hooks/useInputs';
 import StreamsContext from 'contexts/StreamsContext';
+import FetchError from 'logic/errors/FetchError';
+import suppressConsole from 'helpers/suppressConsole';
+import { usePlugin } from 'views/test/testPlugins';
 
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
 
-jest.mock('views/components/messagelist/MessageDetail',
-  () => (props) => <span>{JSON.stringify(props, null, 2)}</span>);
+jest.mock('components/common/message/details/MessageDetail', () => (props) => (
+  <span>{JSON.stringify(props, null, 2)}</span>
+));
 
 const mockGetInput = jest.fn();
 const mockListNodes = jest.fn();
@@ -41,22 +45,22 @@ jest.mock('stores/nodes/NodesStore', () => ({
   NodesStore: MockStore(['getInitialState', () => ({ nodes: {} })]),
 }));
 
-jest.mock('views/hooks/useMessage');
+jest.mock('@graylog/server-api', () => ({
+  Messages: { search: jest.fn() },
+}));
 
-jest.mock('stores/inputs/InputsStore', () => ({
-  InputsActions: {
-    get: jest.fn(),
-  },
-  InputsStore: MockStore(),
+jest.mock('hooks/useInputs', () => ({
+  ...jest.requireActual('hooks/useInputs'),
+  fetchInput: jest.fn(),
 }));
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 jest.mock('routing/withParams', () => (x) => x);
 
 type SimpleShowMessagePageProps = {
-  index: string,
-  messageId: string,
-  streams?: Array<{ id: string }>,
+  index: string;
+  messageId: string;
+  streams?: Array<{ id: string }>;
 };
 
 const SimpleShowMessagePage = ({ index, messageId, streams = [] }: SimpleShowMessagePageProps) => (
@@ -68,25 +72,25 @@ const SimpleShowMessagePage = ({ index, messageId, streams = [] }: SimpleShowMes
 
 describe('ShowMessagePage', () => {
   const isLocalNode = jest.fn();
-  const messageHookReturnValue = (data: Message) => ({ data, isInitialLoading: false });
 
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useFieldTypes).mockReturnValue({ data: [], refetch: () => {} });
     asMock(isLocalNode).mockResolvedValue(true);
-    asMock(useMessage).mockReturnValue(messageHookReturnValue(message));
+    asMock(Messages.search).mockResolvedValue(message);
+    asMock(fetchInput).mockResolvedValue(input);
   });
 
-  const testForwarderPlugin = new PluginManifest({}, {
-    // @ts-expect-error
-    forwarder: [{ isLocalNode }],
-  });
+  const testForwarderPlugin = new PluginManifest(
+    {},
+    {
+      // @ts-expect-error
+      forwarder: [{ isLocalNode }],
+    },
+  );
 
   useViewsPlugin();
-
-  beforeAll(() => PluginStore.register(testForwarderPlugin));
-
-  afterAll(() => PluginStore.unregister(testForwarderPlugin));
+  usePlugin(testForwarderPlugin);
 
   it('triggers a node list refresh on mount', async () => {
     mockGetInput.mockImplementation(() => Promise.resolve(input));
@@ -97,28 +101,57 @@ describe('ShowMessagePage', () => {
   });
 
   it('renders for generic message', async () => {
-    asMock(InputsActions.get).mockResolvedValue(input);
+    asMock(fetchInput).mockResolvedValue(input);
 
-    render(<SimpleShowMessagePage index="graylog_5"
-                                  messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
 
     await screen.findByText(/Deprecated field/);
     await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
     await screen.findByText(/"index": "graylog_5"/);
   });
 
+  it('renders for generic message if streams are (yet) missing', async () => {
+    asMock(fetchInput).mockResolvedValue(input);
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" streams={null} />);
+
+    await screen.findByText(/Deprecated field/);
+    await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
+    await screen.findByText(/"index": "graylog_5"/);
+  });
+
+  it('renders the message when its source input no longer exists', async () => {
+    // The in-memory collector ingest input (and any deleted input) has no persisted record, so the lookup 404s.
+    // That must not break the message view.
+    asMock(fetchInput).mockRejectedValue(new FetchError('Not Found', 404, "Couldn't find input deadbeef"));
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
+    await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
+  });
+
   it('retrieves field types only for user-accessible streams', async () => {
     const messageWithMultipleStreams = {
       ...message,
-      fields: {
-        ...message.fields,
-        streams: ['000000000000000000000001', 'deadbeef'],
+      message: {
+        ...message.message,
+        fields: {
+          ...message.message.fields,
+          streams: ['000000000000000000000001', 'deadbeef'],
+        },
       },
     };
-    asMock(useMessage).mockReturnValue(messageHookReturnValue(messageWithMultipleStreams));
+    asMock(Messages.search).mockResolvedValue(messageWithMultipleStreams);
     mockGetInput.mockImplementation(() => Promise.resolve(input));
 
-    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" streams={[{ id: 'deadbeef' }]} />);
+    render(
+      <SimpleShowMessagePage
+        index="graylog_5"
+        messageId="20f683d2-a874-11e9-8a11-0242ac130004"
+        streams={[{ id: 'deadbeef' }]}
+      />,
+    );
 
     await screen.findByText(/Deprecated field/);
 
@@ -130,7 +163,7 @@ describe('ShowMessagePage', () => {
   });
 
   it('renders for generic event', async () => {
-    asMock(useMessage).mockReturnValue(messageHookReturnValue(event));
+    asMock(Messages.search).mockResolvedValue(event);
     mockGetInput.mockImplementation(() => Promise.resolve());
 
     render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
@@ -147,6 +180,19 @@ describe('ShowMessagePage', () => {
     render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
     await screen.findByText(/Deprecated field/);
 
-    expect(InputsActions.get).not.toHaveBeenCalled();
+    expect(fetchInput).not.toHaveBeenCalled();
+  });
+
+  it('renders explanation when fetching of message fails because index does not exist', async () => {
+    asMock(Messages.search).mockRejectedValue(
+      new FetchError('Not found.', 404, 'Index not found for query: graylog_5. Try recalculating your index ranges.'),
+    );
+
+    await suppressConsole(async () => {
+      render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+      await screen.findByText(/The index or message specified was not found./i);
+      await screen.findAllByText(/Try recalculating your index ranges./i);
+    });
   });
 });

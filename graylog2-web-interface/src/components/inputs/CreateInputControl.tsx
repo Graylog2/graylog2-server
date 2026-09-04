@@ -16,22 +16,26 @@
  */
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useStore } from 'stores/connect';
-import { InputsActions } from 'stores/inputs/InputsStore';
-import { InputTypesActions, InputTypesStore } from 'stores/inputs/InputTypesStore';
-import type { InputDescription } from 'stores/inputs/InputTypesStore';
-import { getPathnameWithoutId } from 'util/URLUtils';
+import { createInput as createInputRequest } from 'hooks/useInputs';
+import type { InputDescription } from 'hooks/useInputType';
+import { fetchInputType } from 'hooks/useInputType';
+import Store from 'logic/local-storage/Store';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { Col, Row, Button } from 'components/bootstrap';
-import { ExternalLinkButton, Select } from 'components/common';
+import { Select } from 'components/common';
 import { InputForm } from 'components/inputs';
-import type { ConfiguredInput } from 'components/messageloaders/Types';
+import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
+import useInputTypes from 'components/inputs/useInputTypes';
+import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
+import useFeature from 'hooks/useFeature';
+import useInput from 'hooks/useInput';
+import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 const StyledForm = styled.form`
   display: flex;
@@ -45,14 +49,61 @@ const FormGroup = styled.div`
   vertical-align: middle;
 `;
 
+export const SETUP_WIZARD_INPUT_ID_KEY = 'setup_wizard_input_id';
+
 const CreateInputControl = () => {
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
   const [selectedInput, setSelectedInput] = useState<string | undefined>(undefined);
   const [selectedInputDefinition, setSelectedInputDefinition] = useState<InputDescription | undefined>(undefined);
   const [customInputConfiguration, setCustomInputConfiguration] = useState(undefined);
+  const [showWizard, setShowWizard] = useState<boolean>(false);
+  const [createdInputId, setCreatedInputId] = useState<string | null>(null);
+  const [createdInputData, setCreatedInputData] = useState<ConfiguredInput | null>(null);
+  const [pendingWizardInputId, setPendingWizardInputId] = useState<string | null>(
+    () => Store.sessionGet<string>(SETUP_WIZARD_INPUT_ID_KEY) ?? null,
+  );
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const { inputTypes } = useStore(InputTypesStore);
+  const inputTypes = useInputTypes();
+  const queryClient = useQueryClient();
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+  const { data: pendingWizardInputData } = useInput(pendingWizardInputId);
+
+  const hasPendingStorageWizard = inputSetupFeatureFlagIsEnabled && !!pendingWizardInputId;
+  const showWizardFromStorage = hasPendingStorageWizard && !!pendingWizardInputData && !showWizard;
+  const wizardInputFromStorage = pendingWizardInputData ? (pendingWizardInputData as unknown as Input) : null;
+
+  useEffect(() => {
+    if (showWizardFromStorage) {
+      Store.sessionDelete(SETUP_WIZARD_INPUT_ID_KEY);
+    }
+  }, [showWizardFromStorage]);
+
+  const openWizard = (inputId: string, inputData: ConfiguredInput) => {
+    setCreatedInputId(inputId);
+    setCreatedInputData(inputData);
+    setShowWizard(true);
+  };
+
+  const closeLocalWizard = () => {
+    setShowWizard(false);
+    setCreatedInputId(null);
+    setCreatedInputData(null);
+  };
+
+  const closeStorageWizard = () => {
+    Store.sessionDelete(SETUP_WIZARD_INPUT_ID_KEY);
+    setPendingWizardInputId(null);
+  };
+
+  const closeWizard = () => {
+    if (showWizard) {
+      closeLocalWizard();
+
+      return;
+    }
+
+    closeStorageWizard();
+  };
 
   const resetFields = () => {
     setSelectedInput(undefined);
@@ -67,7 +118,9 @@ const CreateInputControl = () => {
 
       options = inputTypesIds.map((id) => ({ value: id, label: inputTypes[id] }));
 
-      options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()));
+      options.sort((inputTypeA, inputTypeB) =>
+        inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()),
+      );
     } else {
       options.push({ value: 'none', label: 'No inputs available', disabled: true });
     }
@@ -83,12 +136,11 @@ const CreateInputControl = () => {
     setSelectedInput(selected);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SELECTED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-select',
       event_details: { value: selected },
     });
 
-    InputTypesActions.get.triggerPromise(selected).then((inputDefinition: InputDescription) => setSelectedInputDefinition(inputDefinition));
+    fetchInputType(selected).then((inputDefinition: InputDescription) => setSelectedInputDefinition(inputDefinition));
   };
 
   const onCustomInputClose = () => {
@@ -98,8 +150,13 @@ const CreateInputControl = () => {
   const handleInputTypeSubmit = (event) => {
     event.preventDefault();
 
-    const customConfiguration = PluginStore.exports('inputConfiguration')
-      .find((inputConfig) => inputConfig.type === selectedInput);
+    if (hasPendingStorageWizard) {
+      return;
+    }
+
+    const customConfiguration = PluginStore.exports('inputConfiguration').find(
+      (inputConfig) => inputConfig.type === selectedInput,
+    );
 
     setCustomInputConfiguration(customConfiguration);
 
@@ -108,20 +165,31 @@ const CreateInputControl = () => {
 
   const createInput = (data: ConfiguredInput) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_CREATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-create',
     });
 
-    InputsActions.create(data).then(() => {
+    createInputRequest(data).then((response: { id: string }) => {
+      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
+
+      if (inputSetupFeatureFlagIsEnabled && response?.id) {
+        setTimeout(() => openWizard(response.id, data), 500);
+      }
+
       resetFields();
     });
   };
 
-  const handleMarketplaceClick = () => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.FIND_MORE_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_action_value: 'inputs-find-more',
-    });
+  const createInputForWizard = () => {
+    if (!createdInputId || !createdInputData) return null;
+
+    return {
+      id: createdInputId,
+      title: createdInputData.title,
+      type: createdInputData.type,
+      attributes: createdInputData.configuration,
+      global: createdInputData.global || false,
+      node: createdInputData.node || null,
+    } as Input;
   };
 
   const CustomInputsConfiguration = customInputConfiguration ? customInputConfiguration.component : null;
@@ -131,35 +199,45 @@ const CreateInputControl = () => {
       <Col md={12}>
         <StyledForm className="form-inline" onSubmit={handleInputTypeSubmit}>
           <FormGroup>
-            <Select placeholder="Select input"
-                    options={formatSelectOptions()}
-                    matchProp="label"
-                    onChange={onInputSelect}
-                    value={selectedInput} />
+            <Select
+              placeholder="Select input"
+              options={formatSelectOptions()}
+              onChange={onInputSelect}
+              value={selectedInput}
+            />
           </FormGroup>
-            &nbsp;
-          <Button bsStyle="success" type="submit" disabled={!selectedInput}>Launch new input</Button>
-          <ExternalLinkButton href="https://marketplace.graylog.org/"
-                              bsStyle="info"
-                              onClick={handleMarketplaceClick}>
-            Find more inputs
-          </ExternalLinkButton>
+          &nbsp;
+          <Button bsStyle="primary" type="submit" disabled={!selectedInput || hasPendingStorageWizard}>
+            Launch new input
+          </Button>
         </StyledForm>
-        {selectedInputDefinition && (
-          customInputConfiguration ? (
+        {selectedInputDefinition &&
+          (customInputConfiguration ? (
             <CustomInputsConfiguration onClose={onCustomInputClose} />
           ) : (
             showConfigurationForm && (
-            <InputForm key="configuration-form-input"
-                       setShowModal={setShowConfigurationForm}
-                       configFields={selectedInputDefinition.requested_configuration}
-                       title={<span>Launch new <em>{inputTypes[selectedInput] ?? ''}</em> input</span>}
-                       submitButtonText="Launch Input"
-                       helpBlock="Select a name of your new input that describes it."
-                       typeName={selectedInput}
-                       handleSubmit={createInput} />
+              <InputForm
+                key="configuration-form-input"
+                setShowModal={setShowConfigurationForm}
+                configFields={selectedInputDefinition.requested_configuration}
+                description={selectedInputDefinition.description}
+                title={
+                  <span>
+                    Launch new <em>{inputTypes[selectedInput] ?? ''}</em> input
+                  </span>
+                }
+                submitButtonText="Launch Input"
+                typeName={selectedInput}
+                handleSubmit={createInput}
+              />
             )
-          )
+          ))}
+        {inputSetupFeatureFlagIsEnabled && (showWizard || showWizardFromStorage) && (
+          <InputSetupWizard
+            input={showWizard ? createInputForWizard() : wizardInputFromStorage}
+            show
+            onClose={closeWizard}
+          />
         )}
       </Col>
     </Row>

@@ -18,20 +18,21 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { LinkContainer, Link } from 'components/common/router';
+import { LinkContainer, Link, TextOverflowEllipsis } from 'components/common';
 import StringUtils from 'util/StringUtils';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import { AUTHENTICATION_QUERY_KEY } from 'hooks/useAuthentication';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
-import { TextOverflowEllipsis } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 
 type Props = {
-  authenticationBackend: AuthenticationBackend,
-  isActive: boolean,
-  roles: Immutable.List<Role>,
+  authenticationBackend: AuthenticationBackend;
+  isActive: boolean;
+  roles: Immutable.List<Role>;
 };
 
 const StyledButtonToolbar = styled(ButtonToolbar)`
@@ -44,7 +45,9 @@ const DescriptionCell = styled.td`
 `;
 
 const rolesList = (defaultRolesIds: Immutable.List<string>, roles: Immutable.List<Role>) => {
-  const defaultRolesNames = defaultRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found');
+  const defaultRolesNames = defaultRolesIds.map(
+    (roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found',
+  );
 
   return defaultRolesNames.join(', ');
 };
@@ -61,11 +64,22 @@ const EditButton = ({ authenticationBackend }: { authenticationBackend: Authenti
   );
 };
 
-const confirmMessage = (authBackendTitle: string, actionName: string) => `Do you really want to ${actionName} the authentication service "${StringUtils.truncateWithEllipses(authBackendTitle, 30)}"`;
+const confirmMessage = (authBackendTitle: string, actionName: string) =>
+  `Do you really want to ${actionName} the authentication service "${StringUtils.truncateWithEllipses(authBackendTitle, 30)}"`;
 
-const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBackend: AuthenticationBackend, isActive: boolean }) => {
+const ActionsCell = ({
+  isActive,
+  authenticationBackend,
+}: {
+  authenticationBackend: AuthenticationBackend;
+  isActive: boolean;
+}) => {
   const { title, id } = authenticationBackend;
-  const _setActiveBackend = (backendId) => AuthenticationDomain.setActiveBackend(backendId, title);
+  const queryClient = useQueryClient();
+  const _setActiveBackend = (backendId) =>
+    AuthenticationDomain.setActiveBackend(backendId, title).then(() =>
+      queryClient.invalidateQueries({ queryKey: AUTHENTICATION_QUERY_KEY }),
+    );
 
   const _deactivateBackend = () => {
     if (window.confirm(confirmMessage(title, 'deactivate'))) {
@@ -81,7 +95,9 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
 
   const _deleteBackend = () => {
     if (window.confirm(confirmMessage(title, 'delete'))) {
-      AuthenticationDomain.delete(id, title);
+      AuthenticationDomain.delete(id, title).then(() =>
+        queryClient.invalidateQueries({ queryKey: AUTHENTICATION_QUERY_KEY }),
+      );
     }
   };
 
@@ -113,23 +129,19 @@ const ActionsCell = ({ isActive, authenticationBackend }: { authenticationBacken
 
 const BackendsOverviewItem = ({ authenticationBackend, isActive, roles }: Props) => {
   const { title, description, defaultRoles, id } = authenticationBackend;
-  const detailsLink = isActive ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE : Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(id);
+  const detailsLink = isActive
+    ? Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE
+    : Routes.SYSTEM.AUTHENTICATION.BACKENDS.show(id);
 
   return (
     <tr key={id} className={isActive ? 'active' : ''}>
       <td className="limited">
-        <Link to={detailsLink}>
-          {title}
-        </Link>
+        <Link to={detailsLink}>{title}</Link>
       </td>
       <DescriptionCell>
-        <TextOverflowEllipsis>
-          {description}
-        </TextOverflowEllipsis>
+        <TextOverflowEllipsis>{description}</TextOverflowEllipsis>
       </DescriptionCell>
-      <td className="limited">
-        {rolesList(defaultRoles, roles)}
-      </td>
+      <td className="limited">{rolesList(defaultRoles, roles)}</td>
       <ActionsCell authenticationBackend={authenticationBackend} isActive={isActive} />
     </tr>
   );

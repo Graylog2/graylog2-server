@@ -19,29 +19,46 @@ import { SegmentedControl as MantineSegmentedControl } from '@mantine/core';
 import { useTheme } from 'styled-components';
 import type { MantineRadius, SegmentedControlItem } from '@mantine/core';
 
-type Props<OptionValue> = {
-  data: Array<SegmentedControlItem & { value: OptionValue }>,
-  defaultValue?: string,
-  disabled?: boolean,
-  onChange?: (value: OptionValue) => void,
-  value?: OptionValue,
-  className?: string,
-  radius?: MantineRadius,
-}
+type Variant = 'info' | 'warning' | 'danger' | 'success' | 'primary' | 'default';
 
-const SegmentedControl = <OptionValue extends string>({ className, data, defaultValue, disabled = false, onChange, value, radius = 'xs' }: Props<OptionValue>) => {
+type Props<OptionValue> = {
+  data: Array<SegmentedControlItem & { value: OptionValue }>;
+  defaultValue?: string;
+  disabled?: boolean;
+  onChange?: (value: OptionValue) => void;
+  value?: OptionValue;
+  className?: string;
+  radius?: MantineRadius;
+  color?: Variant;
+  autoContrast?: boolean;
+};
+
+const SegmentedControl = <OptionValue extends string>({
+  autoContrast = false,
+  className = undefined,
+  data,
+  defaultValue = undefined,
+  disabled = false,
+  onChange = undefined,
+  value = undefined,
+  radius = 'xs',
+  color = 'info',
+}: Props<OptionValue>) => {
   const theme = useTheme();
 
   return (
-    <MantineSegmentedControl color={theme.colors.variant.info}
-                             className={className}
-                             data={data}
-                             defaultValue={defaultValue}
-                             radius={radius}
-                             disabled={disabled}
-                             value={value}
-                             onChange={onChange}
-                             styles={{ label: { marginBottom: 0 } }} />
+    <MantineSegmentedControl
+      color={theme.colors.variant[color]}
+      autoContrast={autoContrast}
+      className={className}
+      data={data}
+      defaultValue={defaultValue}
+      radius={radius}
+      disabled={disabled}
+      value={value}
+      onChange={onChange}
+      styles={{ label: { marginBottom: 0 } }}
+    />
   );
 };
 

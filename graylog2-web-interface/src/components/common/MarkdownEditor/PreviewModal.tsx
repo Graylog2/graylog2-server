@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactDom from 'react-dom';
 import styled from 'styled-components';
 
@@ -54,7 +55,7 @@ const CloseIcon = styled(Icon)`
   color: ${({ theme }) => theme.colors.input.placeholder};
 
   &:hover {
-    color: ${({ theme }) => theme.colors.global.textDefault};
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
@@ -74,30 +75,36 @@ type Props = {
   value: string;
   show: boolean;
   onClose: () => void;
-}
+};
 
 function PreviewModal({ value, show, onClose }: Props) {
-  const [height, setHeight] = React.useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const contentHeight = document.getElementById('preview-body')?.scrollHeight;
     setHeight(contentHeight);
   }, [show]);
 
-  const Component = React.useMemo(() => (show ? (
-    <Backdrop onClick={() => onClose()}>
-      <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
-        <Row>
-          <h2 style={{ marginBottom: '1rem' }}>Markdown Preview</h2>
-          <CloseIcon name="close" onClick={() => onClose()} />
-        </Row>
-        <Preview value={value} height={height} show />
-        <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-          <Button bsStyle="success" role="button" onClick={() => onClose()}>Close</Button>
-        </Row>
-      </Content>
-    </Backdrop>
-  ) : null), [show, value, height, onClose]);
+  const Component = useMemo(
+    () =>
+      show ? (
+        <Backdrop onClick={() => onClose()}>
+          <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
+            <Row>
+              <h2 style={{ marginBottom: '1rem' }}>Markdown Preview</h2>
+              <CloseIcon name="close" onClick={() => onClose()} />
+            </Row>
+            <Preview value={value} height={height} show />
+            <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+              <Button bsStyle="primary" role="button" onClick={() => onClose()}>
+                Close
+              </Button>
+            </Row>
+          </Content>
+        </Backdrop>
+      ) : null,
+    [show, value, height, onClose],
+  );
 
   return <>{ReactDom.createPortal(Component, document.body)}</>;
 }

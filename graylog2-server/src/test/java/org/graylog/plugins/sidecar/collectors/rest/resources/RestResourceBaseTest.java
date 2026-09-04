@@ -19,19 +19,19 @@ package org.graylog.plugins.sidecar.collectors.rest.resources;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class RestResourceBaseTest {
-    @Before
+    @BeforeEach
     public void setUpInjector() throws Exception {
         // The list of modules is empty for now so only JIT injection will be used.
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -44,9 +44,9 @@ public class RestResourceBaseTest {
         final AllPermissionsGrantedResource allGranted = new AllPermissionsGrantedResource();
         final SomePermissionsGrantedResource someGranted = new SomePermissionsGrantedResource();
 
-        assertFalse("User doesn't have any permissions", failingResource.runCheck());
-        assertTrue("User has all permissions", allGranted.runCheck());
-        assertTrue("User has some permissions", someGranted.runCheck());
+        assertFalse(failingResource.runCheck(), "User doesn't have any permissions");
+        assertTrue(allGranted.runCheck(), "User has all permissions");
+        assertTrue(someGranted.runCheck(), "User has some permissions");
     }
 
     private static class PermissionDeniedResource extends RestResource {

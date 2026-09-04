@@ -21,13 +21,17 @@ import { singleton } from 'logic/singleton';
 
 import type { EntityBase } from '../types';
 
-type ContextValue = {
-  selectedEntities: Array<EntityBase['id']>,
-  setSelectedEntities: (setSelectedEntitiesArgument: SetStateAction<EntityBase['id'][]>) => void,
-  selectEntity: (entityId: EntityBase['id']) => void,
-  deselectEntity: (entityId: EntityBase['id']) => void,
-  toggleEntitySelect: (entityId: EntityBase['id']) => void,
-} | undefined
+type ContextValue =
+  | {
+      selectedEntities: Array<EntityBase['id']>;
+      setSelectedEntities: (setSelectedEntitiesArgument: SetStateAction<EntityBase['id'][]>) => void;
+      selectEntity: (entityId: EntityBase['id']) => void;
+      deselectEntity: (entityId: EntityBase['id']) => void;
+      toggleEntitySelect: (entityId: EntityBase['id']) => void;
+      isAllRowsSelected: boolean;
+      isSomeRowsSelected: boolean;
+    }
+  | undefined;
 
 const SelectEntitiesContext = React.createContext<ContextValue>(undefined);
 

@@ -1,39 +1,42 @@
 :local(.customPopover) {
-    padding-left: 0;
-    padding-right: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 :local(.customPopover) .popover-content {
-    min-width: 200px;
-    padding: 0;
+  min-width: 200px;
+  padding: 0;
 }
 
-:local(.customPopover) .list-group {
-    margin-bottom: 0;
+:local(.customPopover) ul {
+  margin-bottom: 0;
 }
 
-:local(.customPopover) .list-group-item {
-    border-right: 0;
-    border-left: 0;
-    padding: 6px 15px;
+:local(.customPopover) li > div,
+:local(.customPopover) li > a {
+  border-right: 0;
+  border-left: 0;
+  padding: 6px 15px;
 }
 
-:local(.customPopover) .list-group-item:first-child {
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
+:local(.customPopover) li:first-child > div,
+:local(.customPopover) li:first-child > a {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
 }
 
-:local(.customPopover) .list-group-item:last-child {
-    border-bottom: 0;
+:local(.customPopover) li:last-child {
+  border-bottom: 0;
 }
 
 :local(.scrollableList) {
-    min-width: 200px;
-    max-height: 340px; /* 10 items */
-    overflow: auto;
+  min-width: 200px;
+  max-height: 340px; /* 10 items */
+  overflow: auto;
+  overscroll-behavior: contain; /* prevent scroll chaining to the page behind the popover */
 }
 
 :local(.dataFilterInput) {
-    margin-bottom: 0 !important;
-    padding: 5px;
+  margin-bottom: 0 !important;
+  padding: 5px;
 }

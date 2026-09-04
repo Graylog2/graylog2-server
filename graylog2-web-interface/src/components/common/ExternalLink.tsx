@@ -22,11 +22,11 @@ import type { IconName } from 'components/common/Icon';
 import Icon from './Icon';
 
 type Props = {
-  href?: string,
-  children: React.ReactNode,
-  target?: string,
-  iconName?: IconName,
-  className?: string,
+  href?: string;
+  children: React.ReactNode;
+  target?: string;
+  iconName?: IconName;
+  className?: string;
 };
 
 /**
@@ -34,7 +34,7 @@ type Props = {
  */
 const ExternalLink = ({ children, className = '', href = '', iconName = 'open_in_new', target = '_blank' }: Props) => {
   const content = (
-    <span>
+    <span className="external-link-inner">
       {children}
       &nbsp;
       <Icon name={iconName} />

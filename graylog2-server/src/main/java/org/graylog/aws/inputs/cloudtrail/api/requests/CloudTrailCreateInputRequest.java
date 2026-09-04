@@ -1,0 +1,83 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.aws.inputs.cloudtrail.api.requests;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
+
+@JsonAutoDetect
+@AutoValue
+@JsonDeserialize(builder = CloudTrailCreateInputRequest.Builder.class)
+public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest {
+
+    private static final String NAME = "name";
+    private static final String THROTTLING_ALLOWED = "enable_throttling";
+    private static final String POLLING_INTERVAL = "polling_interval";
+    private static final String OVERRIDE_SOURCE = "override_source";
+    private static final String SQS_MESSAGE_BATCH_SIZE = "sqs_message_batch_size";
+    private static final String INCLUDE_FULL_MESSAGE_JSON = "include_full_message_json";
+
+    @JsonProperty(NAME)
+    public abstract String name();
+
+    @JsonProperty(THROTTLING_ALLOWED)
+    public abstract boolean throttlingAllowed();
+
+    @JsonProperty(POLLING_INTERVAL)
+    public abstract long pollingInterval();
+
+    @JsonProperty(OVERRIDE_SOURCE)
+    public abstract String overrideSource();
+
+    @JsonProperty(SQS_MESSAGE_BATCH_SIZE)
+    public abstract int sqsMessageBatchSize();
+
+    @JsonProperty(INCLUDE_FULL_MESSAGE_JSON)
+    public abstract boolean includeFullMessageJson();
+
+    @AutoValue.Builder
+    public static abstract class Builder implements CloudTrailRequest.Builder<Builder> {
+
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_CloudTrailCreateInputRequest.Builder();
+        }
+
+        @JsonProperty(NAME)
+        public abstract Builder name(String name);
+
+        @JsonProperty(THROTTLING_ALLOWED)
+        public abstract Builder throttlingAllowed(boolean throttlingAllowed);
+
+        @JsonProperty(POLLING_INTERVAL)
+        public abstract Builder pollingInterval(long pollingInterval);
+
+        @JsonProperty(OVERRIDE_SOURCE)
+        public abstract Builder overrideSource(String overrideSource);
+
+        @JsonProperty(SQS_MESSAGE_BATCH_SIZE)
+        public abstract Builder sqsMessageBatchSize(int sqsMessageBatchSize);
+
+        @JsonProperty(INCLUDE_FULL_MESSAGE_JSON)
+        public abstract Builder includeFullMessageJson(boolean includeFullMessageJson);
+
+        public abstract CloudTrailCreateInputRequest build();
+    }
+}

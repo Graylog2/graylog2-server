@@ -16,17 +16,18 @@
  */
 package org.graylog2.users;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.users.requests.DashboardStartPage;
 import org.graylog2.rest.models.users.requests.Startpage;
+import org.graylog2.rest.models.users.requests.StreamStartPage;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.events.StreamDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 public class StartPageCleanupListener {
     private static final Logger LOG = LoggerFactory.getLogger(StartPageCleanupListener.class);
@@ -34,23 +35,24 @@ public class StartPageCleanupListener {
     private final UserService userService;
 
     @Inject
-    public StartPageCleanupListener(EventBus serverEventBus,
+    public StartPageCleanupListener(ClusterEventBus clusterEventBus,
                                     UserService userService) {
         this.userService = userService;
-        serverEventBus.register(this);
+        // Subscribe on ClusterEventBus to only receive events originating on this node (local-only delivery).
+        clusterEventBus.registerClusterEventSubscriber(this);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void removeStartpageReferencesIfStreamDeleted(StreamDeletedEvent streamDeletedEvent) {
-        final Startpage deletedStartpage = Startpage.create("stream", streamDeletedEvent.streamId());
+        final Startpage deletedStartpage = new StreamStartPage(streamDeletedEvent.streamId());
         resetReferencesToStartpage(deletedStartpage);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void removeStartpageReferencesIfDashboardDeleted(DashboardDeletedEvent dashboardDeletedEvent) {
-        final Startpage deletedStartpage = Startpage.create("dashboard", dashboardDeletedEvent.dashboardId());
+        final Startpage deletedStartpage = new DashboardStartPage(dashboardDeletedEvent.dashboardId());
         resetReferencesToStartpage(deletedStartpage);
     }
 

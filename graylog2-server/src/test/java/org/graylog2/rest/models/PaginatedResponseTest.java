@@ -25,8 +25,8 @@ import com.jayway.jsonpath.PathNotFoundException;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class PaginatedResponseTest {
     private ObjectMapper objectMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.objectMapper = new ObjectMapperProvider(getClass().getClassLoader(), Collections.emptySet()).get();
     }

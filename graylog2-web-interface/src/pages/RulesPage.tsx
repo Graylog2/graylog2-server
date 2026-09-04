@@ -14,72 +14,52 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
+import {
+  EnableDebugMetricsButton,
+  ProcessingLoadDebugMetricsBanner,
+  ProcessingLoadProvider,
+} from 'components/pipelines/processing-load';
 import DocsHelper from 'util/DocsHelper';
-import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
+import { Row, Col, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, PaginatedList, DocumentTitle, PageHeader, Spinner, QueryHelper } from 'components/common';
 import RuleList from 'components/rules/RuleList';
-import RuleMetricsConfigContainer from 'components/rules/RuleMetricsConfigContainer';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
-import type { Pagination } from 'stores/PaginationTypes';
-import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
-import { RulesActions } from 'stores/rules/RulesStore';
+import type { RuleType } from 'components/rules/hooks/useRules';
+import { useRulesPaginated, deleteRule, RULES_QUERY_KEY } from 'components/rules/hooks/useRules';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import useHistory from 'routing/useHistory';
-import Routes from 'routing/Routes';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import CreateButton from 'components/common/CreateButton';
 
 const Flex = styled.div`
   display: flex;
 `;
 
-const SpinnerWrapper = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.h3};
-  padding: ${theme.spacings.xxs} ${theme.spacings.sm};
-`);
+const SpinnerWrapper = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.h3};
+    padding: ${theme.spacings.xxs} ${theme.spacings.sm};
+  `,
+);
 
-const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
-  setIsLoading(true);
-
-  RulesActions.listPaginated(pagination).then((paginatedRules) => {
-    setPaginatedRules(paginatedRules);
-    setIsLoading(false);
-  });
-};
-
-const _loadRuleMetricData = (setMetricsConfig) => {
-  RulesActions.loadMetricsConfig().then((metricsConfig: MetricsConfigType) => {
-    setMetricsConfig(metricsConfig);
-  });
-};
+const rulesButtonToolbar = (
+  <ButtonToolbar className="pull-right">
+    <EnableDebugMetricsButton />
+    <CreateButton entityKey="Pipeline Rule" />
+  </ButtonToolbar>
+);
 
 const RulesPage = () => {
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
-  const { pathname } = useLocation();
-  const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
-  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
-  const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
-  const [metricsConfig, setMetricsConfig] = useState<MetricsConfigType>();
-  const [paginatedRules, setPaginatedRules] = useState<PaginatedRules | undefined>();
+  const { data: paginatedRules, isFetching: isDataLoading } = useRulesPaginated({ query, page, perPage });
   const { list: rules, pagination: { total = 0 } = {}, context: rulesContext } = paginatedRules ?? {};
 
-  useEffect(() => {
-    _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
-  }, [query, page, perPage]);
-
-  useEffect(() => {
-    _loadRuleMetricData(setMetricsConfig);
-  }, []);
-
-  const handleSearch = (nextQuery) => {
+  const handleSearch = (nextQuery: string) => {
     resetPage();
     setQuery(nextQuery);
   };
@@ -88,91 +68,74 @@ const RulesPage = () => {
     // TODO: Replace with custom confirm dialog
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
-      RulesActions.delete(rule).then(() => {
-        _loadData({ query, page, perPage }, setIsDataLoading, setPaginatedRules);
-        setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
-      });
+      deleteRule(rule)
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: RULES_QUERY_KEY });
+          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
+        })
+        .catch(() => {
+          /* feedback handled in deleteRule */
+        });
     }
   };
-
-  const onCloseMetricsConfig = () => {
-    _loadRuleMetricData(setMetricsConfig);
-    toggleMetricsConfig(false);
-  };
-
-  const renderDebugMetricsButton = () => {
-    if (metricsConfig && metricsConfig.metrics_enabled) {
-      return <Button bsStyle="warning" onClick={toggleMetricsConfig}>Debug Metrics: ON</Button>;
-    }
-
-    return <Button onClick={toggleMetricsConfig}>Debug Metrics</Button>;
-  };
-
-  // eslint-disable-next-line react/no-unstable-nested-components
-  const RulesButtonToolbar = () => (
-    <ButtonToolbar className="pull-right">
-      <Button bsStyle="success"
-              onClick={() => {
-                sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_RULE_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
-                  app_section: 'pipeline-rules',
-                  app_action_value: 'create-rule-button',
-                });
-
-                history.push(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
-              }}>
-        Create Rule
-      </Button>
-      {renderDebugMetricsButton()}
-    </ButtonToolbar>
-  );
 
   const isLoading = !rules;
 
   const searchFilter = (
     <Flex>
-      <SearchForm query={query}
-                  onSearch={handleSearch}
-                  queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
-                  wrapperClass="has-bm"
-                  onReset={() => handleSearch('')}
-                  topMargin={0} />
-      {isDataLoading && <SpinnerWrapper><Spinner text="" delay={0} /></SpinnerWrapper>}
+      <SearchForm
+        query={query}
+        onSearch={handleSearch}
+        queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
+        wrapperClass="has-bm"
+        onReset={() => handleSearch('')}
+        topMargin={0}
+      />
+      {isDataLoading && (
+        <SpinnerWrapper>
+          <Spinner text="" delay={0} />
+        </SpinnerWrapper>
+      )}
     </Flex>
   );
 
   return (
     <DocumentTitle title="Pipeline rules">
       <PipelinesPageNavigation />
-      <PageHeader title="Pipeline Rules"
-                  actions={<RulesButtonToolbar />}
-                  documentationLink={{
-                    title: 'Pipeline rules documentation',
-                    path: DocsHelper.PAGES.PIPELINE_RULES,
-                  }}>
+      <PageHeader
+        title="Pipeline Rules"
+        actions={rulesButtonToolbar}
+        documentationLink={{
+          title: 'Pipeline rules documentation',
+          path: DocsHelper.PAGES.PIPELINE_RULES,
+        }}>
         <span>
-          Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
-          Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
+          Rules are a way of applying changes to messages. A rule consists of a condition and a list of actions. The
+          condition is evaluated against a message, and the actions are executed if the condition is satisfied.
         </span>
       </PageHeader>
 
       <Row className="content">
         <Col md={12}>
-          {isLoading ? (
-            <Spinner />
-          ) : (
-            <Row>
-              <Col md={12}>
-                <PaginatedList totalItems={total}>
-                  <RuleList rules={rules}
-                            rulesContext={rulesContext}
-                            onDelete={handleDelete}
-                            searchFilter={searchFilter} />
-                  {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
-                </PaginatedList>
-              </Col>
-            </Row>
-          )}
+          <ProcessingLoadProvider>
+            <ProcessingLoadDebugMetricsBanner />
+            {isLoading ? (
+              <Spinner />
+            ) : (
+              <Row>
+                <Col md={12}>
+                  <PaginatedList totalItems={total}>
+                    <RuleList
+                      rules={rules}
+                      rulesContext={rulesContext}
+                      onDelete={handleDelete}
+                      searchFilter={searchFilter}
+                    />
+                  </PaginatedList>
+                </Col>
+              </Row>
+            )}
+          </ProcessingLoadProvider>
         </Col>
       </Row>
     </DocumentTitle>

@@ -14,24 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import useMigrationState from './useMigrationState';
+import useRunsWithDataNode from './useRunsWithDataNode';
 
-const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl('/datanode/configured'));
+const useShowDatanodeMigration = (): {
+  isDatanodeConfiguredAndUsed: boolean;
+  showDatanodeMigration: boolean;
+} => {
+  const { permissions } = useCurrentUser();
+  const canStartDataNode = useMemo(() => isPermitted(permissions, 'datanode:start'), [permissions]);
 
-const useShowDatanodeMigration = () : boolean => {
-  const { data: isDatanodeConfiguredAndUsed } = useQuery(
-    ['show_datanode_migration'],
-    fetchShowDatanodeMigration,
-  );
+  const { data: isDatanodeConfiguredAndUsed } = useRunsWithDataNode({ enabled: canStartDataNode });
 
-  const { currentStep } = useMigrationState();
+  const { currentStep } = useMigrationState({ enabled: canStartDataNode });
+  const noMigrationInProgress = !currentStep || currentStep?.state === 'NEW' || currentStep?.state === 'FINISHED';
 
-  return !(isDatanodeConfiguredAndUsed && (!currentStep || currentStep?.state === 'FINISHED'));
+  return {
+    isDatanodeConfiguredAndUsed: canStartDataNode && !!isDatanodeConfiguredAndUsed,
+    showDatanodeMigration: canStartDataNode && (!isDatanodeConfiguredAndUsed || !noMigrationInProgress),
+  };
 };
 
 export default useShowDatanodeMigration;

@@ -22,11 +22,11 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 import { UPDATE_WIDGET_BTN_TEXT } from 'views/components/widgets/SaveOrCancelButtons';
 import { UPDATE_WIDGET_PREVIEW_BTN_TEXT } from 'views/components/aggregationwizard/ElementsConfigurationActions';
 
-import InteractiveContext from '../contexts/InteractiveContext';
+import { useIsInteractiveMode } from '../contexts/InteractiveContext';
 
 type Props = {
-  toggleEdit: () => void,
-  editing: boolean,
+  toggleEdit: () => void;
+  editing?: boolean;
 };
 
 const Container = styled.div`
@@ -37,9 +37,11 @@ const Container = styled.div`
   height: inherit;
 `;
 
-const SpacedHeading = styled.h2(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
+const SpacedHeading = styled.h2(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
@@ -50,17 +52,30 @@ const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
     }
   }, [onRenderComplete]);
 
-  const interactive = useContext(InteractiveContext);
-  const text = editing
-    ? (
-      <p>
-        You are now editing the widget.<br />
-        To see results, add at least one metric. You can group data by adding rows/columns.<br />
-        You can preview widget search results by clicking on &quot;{UPDATE_WIDGET_PREVIEW_BTN_TEXT}&quot;.<br />
-        To finish, click &quot;{UPDATE_WIDGET_BTN_TEXT}&quot; to save, &quot;Cancel&quot; to abandon changes.
-      </p>
-    )
-    : (<p>Please {interactive ? <Button bsStyle="info" onClick={toggleEdit}>Edit</Button> : 'edit'} the widget to see results here.</p>);
+  const interactive = useIsInteractiveMode();
+  const text = editing ? (
+    <p>
+      You are now editing the widget.
+      <br />
+      To see results, add at least one metric. You can group data by adding rows/columns.
+      <br />
+      You can preview widget search results by clicking on &quot;{UPDATE_WIDGET_PREVIEW_BTN_TEXT}&quot;.
+      <br />
+      To finish, click &quot;{UPDATE_WIDGET_BTN_TEXT}&quot; to save, &quot;Cancel&quot; to abandon changes.
+    </p>
+  ) : (
+    <p>
+      Please{' '}
+      {interactive ? (
+        <Button bsStyle="info" onClick={toggleEdit}>
+          Edit
+        </Button>
+      ) : (
+        'edit'
+      )}{' '}
+      the widget to see results here.
+    </p>
+  );
 
   return (
     <Container>

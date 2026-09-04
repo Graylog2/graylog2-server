@@ -16,27 +16,26 @@
  */
 package org.graylog2.lookup.adapters;
 
-import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
-
 import jakarta.inject.Inject;
+import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 
 /**
  * Context object for configurations which require access to services to perform validation.
  */
 public class LookupDataAdapterValidationContext {
-    private final UrlWhitelistService urlWhitelistService;
+    private final UrlAllowlistService urlAllowlistService;
     private final AllowedAuxiliaryPathChecker pathChecker;
 
     @Inject
-    public LookupDataAdapterValidationContext(UrlWhitelistService urlWhitelistService,
+    public LookupDataAdapterValidationContext(UrlAllowlistService allowlistService,
                                               AllowedAuxiliaryPathChecker pathChecker) {
-        this.urlWhitelistService = urlWhitelistService;
+        this.urlAllowlistService = allowlistService;
         this.pathChecker = pathChecker;
     }
 
-    public UrlWhitelistService getUrlWhitelistService() {
-        return urlWhitelistService;
+    public UrlAllowlistService getUrlAllowlistService() {
+        return urlAllowlistService;
     }
 
     public AllowedAuxiliaryPathChecker getPathChecker() {

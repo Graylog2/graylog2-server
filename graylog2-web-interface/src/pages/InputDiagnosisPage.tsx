@@ -14,182 +14,139 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { DocumentTitle, LinkToNode, PageHeader } from 'components/common';
+import useHistory from 'routing/useHistory';
+import { Icon } from 'components/common';
 import useParams from 'routing/useParams';
-import { Row, Col, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Button, SegmentedControl } from 'components/bootstrap';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
-import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
-import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
+import type { Input } from 'components/messageloaders/Types';
+import useProductName from 'brand-customization/useProductName';
+import InputDiagnosisOverviewTab from 'components/inputs/InputDiagnosis/InputDiagnosisOverviewTab';
+import InputDiagnosisRulesTab from 'components/inputs/InputDiagnosis/InputDiagnosisRulesTab';
+import { EditInputButton } from 'components/inputs';
 
-const StyledDl = styled.dl`
-  margin: 0;
+const LeftCol = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    place-content: center center;
 
-  dt {
-    float: left;
-    clear: left;
-  }
+    > p {
+      color: ${theme.colors.gray[50]};
+    }
+  `,
+);
 
-  dd {
-    margin-left: 260px;
-  }
+const Header = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    padding-top: ${theme.spacings.sm};
+    margin-bottom: ${theme.spacings.md};
+    gap: ${theme.spacings.sm};
+    margin-left: -15px;
+    margin-right: -15px;
+    align-items: center;
+  `,
+);
+
+const Actions = styled.div`
+  margin-left: auto;
 `;
 
-const ContainerCol = styled(Col)(({ theme }) => css`
-  margin-left: ${theme.spacings.sm};
-  margin-right: ${theme.spacings.sm};
-`);
-
-const InfoCol = styled(Col)(({ theme }) => css`
-  border: 1px solid;
-  border-radius: ${theme.spacings.sm};
-  padding: ${theme.spacings.sm};
-`);
-
-const MetricsCol = styled(Col)(({ theme }) => css`
-  padding: ${theme.spacings.sm};
-`);
-
-const InputNodeInfo = styled.div`
-  max-width: 500px;
-  white-space: break-spaces;
+const ControlsRow = styled.div`
+  display: flex;
+  align-items: center;
 `;
+
+const StyledSegmentedControl = styled(SegmentedControl)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.section.filled.background};
+    border: 1px solid ${theme.colors.section.filled.border};
+    margin-bottom: ${theme.spacings.md};
+
+    .mantine-SegmentedControl-innerLabel {
+      vertical-align: middle;
+    }
+
+    .mantine-SegmentedControl-indicator {
+      height: 70% !important;
+    }
+  `,
+);
+
+type DiagnosisTab = 'overview' | 'rules';
+
+const TABS = [
+  { value: 'overview' as const, label: 'Overview' },
+  { value: 'rules' as const, label: 'Rules' },
+];
+
+const getListeningProtocol = (input?: Input) => {
+  if (!input) {
+    return undefined;
+  }
+
+  const protocolHints = `${input.name ?? ''} ${input.type ?? ''}`.toLowerCase();
+
+  if (protocolHints.includes('udp')) return 'UDP Traffic.';
+
+  return 'TCP Traffic.';
+};
 
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
   const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
+  const { push } = useHistory();
+  const productName = useProductName();
+  const listeningProtocol = getListeningProtocol(input);
+  const [currentTab, setCurrentTab] = useState<DiagnosisTab>('overview');
+
+  const isInputStateDown =
+    inputNodeStates.total === 0 ||
+    ['FAILED', 'STOPPED', 'FAILING'].some((failedState) => Object.keys(inputNodeStates.states).includes(failedState));
+  const hasReceivedMessageMetrics = inputMetrics.incomingMessagesTotal > 0;
+  const hasReceivedMessage = inputMetrics.stream_message_count?.some((stream) => stream.count > 0);
 
   return (
-    <DocumentTitle title="Input Diagnosis">
-      <PageHeader title="Input Diagnosis">
-        <span>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</span>
-      </PageHeader>
-      {input && (
-        <Row className="content">
-          <ContainerCol xs={12}>
-            <Row>
-              <InfoCol xs={6}>
-                <StyledDl>
-                  <dt>Input Title:</dt>
-                  <dd>{input.title}</dd>
-                  <dt>Input Type:</dt>
-                  <dd>{input.name}</dd>
-                  <dt>This Input is running on:</dt>
-                  <dd>{input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}</dd>
-                  {input.attributes?.bind_address && input.attributes?.port && (
-                    <>
-                      <dt>This Input is listening on:</dt>
-                      <dd>
-                        Bind address {input.attributes?.bind_address},
-                        Port {input.attributes?.port}.
-                      </dd>
-                      <dt>This Input is listening for:</dt>
-                      <dd>{('tcp_keepalive' in (input.attributes || {})) ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
-                    </>
-                  )}
-                </StyledDl>
-              </InfoCol>
-              <MetricsCol xs={6}>
-                {inputMetrics && (
-                  <StyledDl>
-                    <dt>Total Messages received by Input:</dt>
-                    <dd>{inputMetrics.incomingMessagesTotal} events</dd>
-                    <dt>Empty Messages discarded:</dt>
-                    <dd>{inputMetrics.emptyMessages}</dd>
-                    {Number.isInteger(inputMetrics.open_connections) && Number.isInteger(inputMetrics.total_connections) && (
-                      <>
-                        <dt>Active Connections:</dt>
-                        <dd>
-                          {inputMetrics.open_connections}&nbsp;
-                          ({inputMetrics.total_connections} total)
-                        </dd>
-                      </>
-                    )}
-                    {Number.isInteger(inputMetrics.read_bytes_1sec) && Number.isInteger(inputMetrics.read_bytes_total) && (
-                      <>
-                        <dt>Network I/O:</dt>
-                        <dd>
-                          <NetworkStats readBytes1Sec={inputMetrics.read_bytes_1sec}
-                                        readBytesTotal={inputMetrics.read_bytes_total}
-                                        writtenBytes1Sec={inputMetrics.write_bytes_1sec}
-                                        writtenBytesTotal={inputMetrics.write_bytes_total} />
-                        </dd>
-                      </>
-                    )}
-                  </StyledDl>
-                )}
-              </MetricsCol>
-            </Row>
-            <br /><br />
-            <Row>
-              <Col xs={6}>
-                <h3>Input Test Results</h3>
-                Metrics show the last 15 minutes:
-              </Col>
-            </Row>
-            <br /><br />
-            <Row>
-              <Col xs={3}>
-                <dt>Input State</dt>
-                {Object.keys(inputNodeStates.states).map((state) => (
-                  <DropdownButton title={<dd key={state}>{state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</dd>}
-                                  key={state}
-                                  bsSize="xs">
-                    {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
-                      <LinkContainer key={node_id} to={Routes.SYSTEM.NODES.SHOW(node_id)}>
-                        <MenuItem>
-                          {node_id && (
-                            <div><b>Node ID:</b> {node_id}</div>
-                          )}
-                          {detailed_message && (
-                            <InputNodeInfo><b>Message:</b> {detailed_message}</InputNodeInfo>
-                          )}
-                        </MenuItem>
-                      </LinkContainer>
-                    ))}
-                  </DropdownButton>
-                ))}
-              </Col>
-              <Col xs={3}>
-                <dt>Message Error at Input</dt>
-                <dd>{inputMetrics.failures_inputs_codecs}</dd>
-              </Col>
-              <Col xs={3}>
-                <dt>Message Failed to process</dt>
-                <dd>{inputMetrics.failures_processing}</dd>
-              </Col>
-              <Col xs={3}>
-                <dt>Message Failed to index</dt>
-                <dd>{inputMetrics.failures_indexing}</dd>
-              </Col>
-            </Row>
-            <br /><br />
-            <Row>
-              <Col xs={6}>
-                <h3>Received Message count by Stream</h3>
-                {inputMetrics.stream_message_count?.length && (
-                  <StyledDl>
-                    {inputMetrics.stream_message_count.map(([key, value]) => (
-                      <span key={key}>
-                        <dt>{key}</dt>
-                        <dd>{value}</dd>
-                      </span>
-                    ))}
-                  </StyledDl>
-                )}
-              </Col>
-              <Col xs={6}>
-                <ShowReceivedMessagesButton input={input} />
-              </Col>
-            </Row>
-          </ContainerCol>
-        </Row>
+    <>
+      <Header>
+        <Button onClick={() => push(Routes.SYSTEM.INPUTS)}>
+          <Icon name="arrow_left_alt" size="sm" /> Back
+        </Button>
+        <LeftCol>
+          <h1>Input Diagnosis: {input?.name}</h1>
+
+          <p>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</p>
+        </LeftCol>
+      </Header>
+      <ControlsRow>
+        <StyledSegmentedControl<DiagnosisTab> data={TABS} radius="sm" value={currentTab} onChange={setCurrentTab} />
+        {input && (
+          <Actions>
+            <EditInputButton input={input} />
+          </Actions>
+        )}
+      </ControlsRow>
+      {input && currentTab === 'overview' && (
+        <InputDiagnosisOverviewTab
+          input={input}
+          inputId={inputId}
+          inputNodeStates={inputNodeStates}
+          inputMetrics={inputMetrics}
+          productName={productName}
+          listeningProtocol={listeningProtocol}
+          isInputStateDown={isInputStateDown}
+          hasReceivedMessageMetrics={hasReceivedMessageMetrics}
+          hasReceivedMessage={hasReceivedMessage}
+        />
       )}
-    </DocumentTitle>
+      {currentTab === 'rules' && <InputDiagnosisRulesTab inputId={inputId} />}
+    </>
   );
 };
 

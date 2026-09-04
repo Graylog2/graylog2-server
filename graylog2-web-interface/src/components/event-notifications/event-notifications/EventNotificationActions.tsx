@@ -16,41 +16,43 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
-import { ConfirmDialog, IfPermitted, ShareButton } from 'components/common';
-import { LinkContainer } from 'components/common/router';
+import { ConfirmDialog, IfPermitted, ShareButton, LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
 import { MenuItem, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
-import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import {
+  deleteEventNotification,
+  EVENT_NOTIFICATIONS_QUERY_KEY,
+} from 'components/event-notifications/hooks/useEventNotifications';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
 type Props = {
-  isTestLoading: boolean,
-  notification: EventNotification,
-  onTest: (notification: EventNotification) => void,
+  isTestLoading: boolean;
+  notification: EventNotification;
+  onTest: (notification: EventNotification) => void;
 };
 
 const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props) => {
   const { refetch: refetchEventNotification } = useTableFetchContext();
   const { deselectEntity } = useSelectedEntities();
+  const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(undefined);
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('event-notification');
+  const { actions: pluggableActions, actionModals: pluggableActionModals } =
+    usePluggableEntitySharedActions<EventNotification>(notification, 'notification');
+  const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
 
   const onDelete = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_DELETE_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-notification',
       app_action_value: 'notification-delete',
     });
 
@@ -63,69 +65,68 @@ const EventNotificationActions = ({ isTestLoading, notification, onTest }: Props
   };
 
   const handleDelete = () => {
-    EventNotificationsActions.delete(notification).then(
-      () => {
+    deleteEventNotification(notification)
+      .then(() => {
         deselectEntity(notification.id);
-
-        UserNotification.success('Event Notification deleted successfully',
-          `Event Notification "${notification.title}" was deleted successfully.`);
-      },
-      (error) => {
-        UserNotification.error(`Deleting Event Notification "${notification.title}" failed with status: ${error}`,
-          'Could not delete Event Notification');
-      },
-    ).finally(() => {
-      handleClearState();
-    });
+        // Refresh non-table consumers (e.g. the event-definition form notification dropdown),
+        // which read from EVENT_NOTIFICATIONS_QUERY_KEY rather than the table fetch context.
+        queryClient.invalidateQueries({ queryKey: EVENT_NOTIFICATIONS_QUERY_KEY });
+      })
+      .catch(() => {
+        /* feedback handled in deleteEventNotification */
+      })
+      .finally(() => {
+        handleClearState();
+      });
   };
 
   return (
     <>
       <ButtonToolbar>
-        <ShareButton entityType="notification"
-                     entityId={notification.id}
-                     onClick={() => setShowShareNotification(notification)}
-                     bsSize="xsmall" />
+        <ShareButton
+          entityType="notification"
+          entityId={notification.id}
+          onClick={() => setShowShareNotification(notification)}
+          bsSize="xsmall"
+        />
 
         <MoreActions>
-
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
-              <MenuItem>
-                Edit
-              </MenuItem>
+              <MenuItem>Edit</MenuItem>
             </LinkContainer>
           </IfPermitted>
-          <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]}
-                       anyPermissions>
+          <IfPermitted
+            permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]}
+            anyPermissions>
             <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
               <MenuItem disabled={isTestLoading} onClick={() => onTest(notification)}>
                 {isTestLoading ? 'Testing...' : 'Test Notification'}
               </MenuItem>
             </IfPermitted>
+            {moreActions}
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
               <DeleteMenuItem onClick={onDelete} />
             </IfPermitted>
           </IfPermitted>
         </MoreActions>
-
       </ButtonToolbar>
       {showDialog && (
-        <ConfirmDialog title="Delete Notification"
-                       show
-                       onConfirm={handleDelete}
-                       onCancel={handleClearState}>
+        <ConfirmDialog title="Delete Notification" show onConfirm={handleDelete} onCancel={handleClearState}>
           {`Are you sure you want to delete "${notification.title}"`}
         </ConfirmDialog>
       )}
       {showShareNotification && (
-        <EntityShareModal entityId={notification.id}
-                          entityType="notification"
-                          description="Search for a user or team to add as collaborator on this notification."
-                          entityTitle={notification.title}
-                          onClose={() => setShowShareNotification(undefined)} />
+        <EntityShareModal
+          entityId={notification.id}
+          entityType="notification"
+          description="Search for a user or team to add as collaborator on this notification."
+          entityTitle={notification.title}
+          onClose={() => setShowShareNotification(undefined)}
+        />
       )}
+      {pluggableActionModals}
     </>
   );
 };

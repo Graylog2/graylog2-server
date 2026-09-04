@@ -16,6 +16,9 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.security.shares.CreateEntityRequest;
+
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -51,12 +54,9 @@ public class Dashboards implements GraylogRestApi {
                 .extract().body().jsonPath().getString("id");
     }
 
-    private Map<String, Object> createDashboardRequest(String title, String searchId) {
-        return Map.of(
-                "title", title,
-                "search_id", searchId,
-                "state", Map.of(),
-                "type", "DASHBOARD"
-        );
+    private CreateEntityRequest<ViewDTO> createDashboardRequest(String title, String searchId) {
+        return CreateEntityRequest.create(
+                ViewDTO.builder().title(title).searchId(searchId).state(Map.of()).type(ViewDTO.Type.DASHBOARD).build(),
+                null);
     }
 }

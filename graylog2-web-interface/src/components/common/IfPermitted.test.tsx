@@ -28,12 +28,24 @@ import IfPermitted from './IfPermitted';
 jest.mock('stores/connect', () => (x) => x);
 jest.mock('hooks/useCurrentUser');
 
+declare module 'graylog-web-plugin/plugin' {
+  interface EntityActions {
+    entity: 'action' | 'otheraction';
+    someentity: 'read';
+    someother: 'read';
+    someotherentity: 'read';
+    something: 'read';
+  }
+}
+
 describe('IfPermitted', () => {
   type SUTProps = Partial<React.ComponentProps<typeof IfPermitted>>;
 
   const defaultChildren = <p>Something!</p>;
   const SimpleIfPermitted = ({ children = defaultChildren, permissions, ...rest }: SUTProps) => (
-    <IfPermitted permissions={permissions} {...rest}>{children}</IfPermitted>
+    <IfPermitted permissions={permissions} {...rest}>
+      {children}
+    </IfPermitted>
   );
 
   beforeEach(() => {
@@ -47,17 +59,15 @@ describe('IfPermitted', () => {
 
     it('no user is present', () => {
       asMock(useCurrentUser).mockReturnValue(undefined);
-      render(<SimpleIfPermitted permissions={['somepermission']} />);
+      render(<SimpleIfPermitted permissions={['someentity:read']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user does not have permissions', () => {
-      const user = adminUser.toBuilder()
-        .permissions(undefined)
-        .build();
+      const user = adminUser.toBuilder().permissions(undefined).build();
       asMock(useCurrentUser).mockReturnValue(user);
-      render(<SimpleIfPermitted permissions={['somepermission']} />);
+      render(<SimpleIfPermitted permissions={['someentity:read']} />);
 
       expectToNotRenderChildren();
     });
@@ -65,35 +75,38 @@ describe('IfPermitted', () => {
     it('user has empty permissions', () => {
       const user = adminUser.toBuilder().permissions(Immutable.List()).build();
       asMock(useCurrentUser).mockReturnValue(user);
-      render(<SimpleIfPermitted permissions={['somepermission']} />);
+      render(<SimpleIfPermitted permissions={['someentity:read']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user has different permissions', () => {
-      const user = adminUser.toBuilder()
-        .permissions(Immutable.List(['someotherpermission']))
+      const user = adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['someotherentity:read']))
         .build();
 
       asMock(useCurrentUser).mockReturnValue(user);
-      render(<SimpleIfPermitted permissions={['somepermission']} />);
+      render(<SimpleIfPermitted permissions={['someentity:read']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user is missing one permission', () => {
-      const user = adminUser.toBuilder()
-        .permissions(Immutable.List(['someotherpermission']))
+      const user = adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['someotherentity:read']))
         .build();
 
       asMock(useCurrentUser).mockReturnValue(user);
-      render(<SimpleIfPermitted permissions={['somepermission', 'someotherpermission']} />);
+      render(<SimpleIfPermitted permissions={['someentity:read', 'someotherentity:read']} />);
 
       expectToNotRenderChildren();
     });
 
     it('user is missing permission for specific id', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['entity:action:otherid']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
@@ -103,7 +116,8 @@ describe('IfPermitted', () => {
     });
 
     it('user has permission for different action', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['entity:otheraction']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
@@ -113,7 +127,8 @@ describe('IfPermitted', () => {
     });
 
     it('user has permission for id only', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['entity:action:id']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
@@ -129,9 +144,7 @@ describe('IfPermitted', () => {
     };
 
     it('empty permissions were passed', () => {
-      const user = adminUser.toBuilder()
-        .permissions(Immutable.List([]))
-        .build();
+      const user = adminUser.toBuilder().permissions(Immutable.List([])).build();
       asMock(useCurrentUser).mockReturnValue(user);
       render(<SimpleIfPermitted permissions={[]} />);
 
@@ -151,27 +164,30 @@ describe('IfPermitted', () => {
     });
 
     it('user has exact required permissions', () => {
-      const user = adminUser.toBuilder()
-        .permissions(Immutable.List(['something']))
+      const user = adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['something:read']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
-      render(<SimpleIfPermitted permissions={['something']} />);
+      render(<SimpleIfPermitted permissions={['something:read']} />);
 
       expectToRenderChildren();
     });
 
     it('user has any exact required permission', () => {
-      const user = adminUser.toBuilder()
-        .permissions(Immutable.List(['something']))
+      const user = adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['something:read']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
-      render(<SimpleIfPermitted permissions={['something', 'someother']} anyPermissions />);
+      render(<SimpleIfPermitted permissions={['something:read', 'someother:read']} anyPermissions />);
 
       expectToRenderChildren();
     });
 
     it('user has exact required permission for action with entity id', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['entity:action:id']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
@@ -181,17 +197,19 @@ describe('IfPermitted', () => {
     });
 
     it('user has wildcard permission', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['*']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
-      render(<SimpleIfPermitted permissions={['something']} />);
+      render(<SimpleIfPermitted permissions={['something:read']} />);
 
       expectToRenderChildren();
     });
 
     it('user has wildcard permission for action', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['entity:action']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
@@ -201,7 +219,8 @@ describe('IfPermitted', () => {
     });
 
     it('user has wildcard permission for id', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['entity:action:*']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
@@ -211,7 +230,8 @@ describe('IfPermitted', () => {
     });
 
     it('user has wildcard permission for entity', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['entity:*']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
@@ -221,7 +241,8 @@ describe('IfPermitted', () => {
     });
 
     it('user has wildcard permission for entity when permission for id is required', () => {
-      const user = adminUser.toBuilder()
+      const user = adminUser
+        .toBuilder()
         .permissions(Immutable.List(['entity:*']))
         .build();
       asMock(useCurrentUser).mockReturnValue(user);
@@ -229,37 +250,5 @@ describe('IfPermitted', () => {
 
       expectToRenderChildren();
     });
-  });
-
-  it('passes props to children', () => {
-    const Foo = jest.fn(() => <p>Something else!</p>) as React.ElementType;
-    const Bar = jest.fn(() => <p>Something else!</p>) as React.ElementType;
-
-    render((
-      // @ts-ignore
-      (<IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
-        <Foo />
-        <Bar />
-      </IfPermitted>)
-    ));
-
-    expect(Foo).toHaveBeenLastCalledWith({ something: 42, otherProp: { foo: 'bar!' } }, {});
-    expect(Bar).toHaveBeenLastCalledWith({ something: 42, otherProp: { foo: 'bar!' } }, {});
-  });
-
-  it('does not pass property to children if already present', () => {
-    const Foo = jest.fn(() => <p>Something else!</p>) as React.ElementType;
-    const Bar = jest.fn(() => <p>Something else!</p>) as React.ElementType;
-
-    render(
-      // @ts-ignore
-      <IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
-        <Foo something={23} />
-        <Bar otherProp={{ hello: 'world!' }} />
-      </IfPermitted>,
-    );
-
-    expect(Foo).toHaveBeenLastCalledWith({ something: 23, otherProp: { foo: 'bar!' } }, {});
-    expect(Bar).toHaveBeenLastCalledWith({ something: 42, otherProp: { hello: 'world!' } }, {});
   });
 });

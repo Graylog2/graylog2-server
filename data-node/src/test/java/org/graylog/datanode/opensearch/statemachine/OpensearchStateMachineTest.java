@@ -18,7 +18,7 @@ package org.graylog.datanode.opensearch.statemachine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import org.graylog.datanode.opensearch.OpensearchProcess;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,12 +27,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
 class OpensearchStateMachineTest {
 
     @Mock
     OpensearchProcess opensearchProcess;
-    Set<StateMachineTracer> tracer = Set.of();
+    Set<StateMachineTracer<OpensearchState, OpensearchEvent>> tracer = Set.of();
 
     @Test
     void testOptimalScenario() {
@@ -166,6 +168,29 @@ class OpensearchStateMachineTest {
         machine.fire(OpensearchEvent.HEALTH_CHECK_FAILED);
         Assertions.assertEquals(OpensearchState.FAILED, machine.getState());
 
+    }
+
+    @Test
+    void testRemoveConfigurationFromTerminated() {
+        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew(opensearchProcess, tracer);
+        Assertions.assertEquals(machine.getState(), OpensearchState.WAITING_FOR_CONFIGURATION);
+
+        machine.fire(OpensearchEvent.PROCESS_PREPARED);
+        Assertions.assertEquals(OpensearchState.PREPARED, machine.getState());
+
+        machine.fire(OpensearchEvent.PROCESS_STARTED);
+        Assertions.assertEquals(OpensearchState.STARTING, machine.getState());
+
+        machine.fire(OpensearchEvent.HEALTH_CHECK_OK);
+        Assertions.assertEquals(OpensearchState.AVAILABLE, machine.getState());
+
+        machine.fire(OpensearchEvent.PROCESS_TERMINATED);
+        Assertions.assertEquals(OpensearchState.TERMINATED, machine.getState());
+
+        machine.fire(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
+        Assertions.assertEquals(OpensearchState.WAITING_FOR_CONFIGURATION, machine.getState());
+
+        verify(opensearchProcess).removeConfiguration();
     }
 
 }

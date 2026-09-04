@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useMemo } from 'react';
 
 // TODO: Fix typing
 export const ApiContext = createContext<any>(undefined);
@@ -23,9 +23,7 @@ type ApiProviderProps = {
   children: any;
 };
 
-export const ApiProvider = ({
-  children,
-}: ApiProviderProps) => {
+export const ApiProvider = ({ children }: ApiProviderProps) => {
   const [availableRegions, setRegionsState] = useState([]);
   const [availableStreams, setStreamsState] = useState([]);
   const [availableGroups, setGroupsState] = useState([]);
@@ -55,8 +53,8 @@ export const ApiProvider = ({
     setLogDataState(null);
   };
 
-  return (
-    <ApiContext.Provider value={{
+  const contextValue = useMemo(
+    () => ({
       availableStreams,
       setStreams,
       availableRegions,
@@ -66,8 +64,9 @@ export const ApiProvider = ({
       clearLogData,
       availableGroups,
       setGroups,
-    }}>
-      {children}
-    </ApiContext.Provider>
+    }),
+    [availableGroups, availableRegions, availableStreams, logData],
   );
+
+  return <ApiContext.Provider value={contextValue}>{children}</ApiContext.Provider>;
 };

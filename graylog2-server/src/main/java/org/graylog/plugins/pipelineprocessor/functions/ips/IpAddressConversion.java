@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.AbstractConversion;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
 import java.net.InetAddress;
@@ -30,7 +31,7 @@ import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
 
-public class IpAddressConversion extends AbstractFunction<IpAddress> {
+public class IpAddressConversion extends AbstractConversion<IpAddress> {
 
     public static final String NAME = "to_ip";
     private static final InetAddress ANYV4 = InetAddresses.forString("0.0.0.0");
@@ -54,6 +55,9 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
                 return new IpAddress(InetAddresses.forString(String.valueOf(ip)));
             }
         } catch (IllegalArgumentException e) {
+            if (defaultToNull(args, context)) {
+                return null;
+            }
             final Optional<String> defaultValue = defaultParam.optional(args, context);
             if (!defaultValue.isPresent()) {
                 return new IpAddress(ANYV4);
@@ -74,7 +78,8 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
                 .returnType(IpAddress.class)
                 .params(of(
                         ipParam,
-                        defaultParam
+                        defaultParam,
+                        defaultToNullParam
                 ))
                 .description("Converts a value to an IPAddress using its string representation")
                 .ruleBuilderEnabled()

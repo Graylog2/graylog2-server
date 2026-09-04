@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.zafarkhaja.semver.Version;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
@@ -29,6 +30,7 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.parameters.Parameter;
+import org.graylog2.security.html.HTMLSanitizerConverter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -44,8 +46,8 @@ import java.util.stream.Collectors;
 public abstract class ContentPackV1 implements ContentPack {
     static final String VERSION = "1";
     public static final String FIELD_NAME = "name";
-    static final String FIELD_SUMMARY = "summary";
-    static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_SUMMARY = "summary";
+    public static final String FIELD_DESCRIPTION = "description";
     static final String FIELD_VENDOR = "vendor";
     static final String FIELD_URL = "url";
     static final String FIELD_PARAMETERS = "parameters";
@@ -69,6 +71,7 @@ public abstract class ContentPackV1 implements ContentPack {
 
     @JsonView(ContentPackView.HttpView.class)
     @JsonProperty(FIELD_DESCRIPTION)
+    @JsonSerialize(converter = HTMLSanitizerConverter.class)
     public abstract String description();
 
     @JsonView(ContentPackView.HttpView.class)

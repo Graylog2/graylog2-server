@@ -15,14 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { createContext, useEffect, useRef, useCallback, useState, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 
-import type { RuleType } from 'stores/rules/RulesStore';
-import { RulesActions } from 'stores/rules/RulesStore';
+import type { RuleType, RuleParseError } from 'components/rules/hooks/useRules';
+import type { PipelineType } from 'components/pipelines/types';
+import {
+  parseRule,
+  simulateRule as simulateRuleRequest,
+  saveRule,
+  updateRule,
+  RULES_QUERY_KEY,
+} from 'components/rules/hooks/useRules';
 import { getSavedRuleSourceCode, removeSavedRuleSourceCode } from 'hooks/useRuleBuilder';
 
 import { jsonifyText } from './rule-builder/helpers';
 
-let VALIDATE_TIMEOUT;
+let VALIDATE_TIMEOUT: ReturnType<typeof setTimeout> | null;
 
 export const DEFAULT_SIMULATOR_JSON_MESSAGE = 'message: test\nsource: unknown\n';
 
@@ -45,25 +54,30 @@ const getMessageToSimulate = (rawMessage: string, messageType: SimulationFieldTy
   }
 };
 
-const savePipelineRule = (nextRule: RuleType, callback: (rule: RuleType) => void = () => {}, onError: (error: object) => void = () => {}) => {
-  let promise;
+const savePipelineRule = (
+  nextRule: RuleType,
+  queryClient: QueryClient,
+  callback: (rule: RuleType) => void = () => {},
+  onError: (error: object) => void = () => {},
+) => {
+  const promise = nextRule?.id ? updateRule(nextRule) : saveRule(nextRule);
 
-  if (nextRule?.id) {
-    promise = RulesActions.update(nextRule);
-  } else {
-    promise = RulesActions.save(nextRule);
-  }
-
-  promise.then(callback).catch(onError);
+  promise
+    .then((response) => {
+      queryClient.invalidateQueries({ queryKey: RULES_QUERY_KEY });
+      callback(response);
+    })
+    .catch(onError);
 };
 
 type Props = {
-  children: React.ReactNode,
-  usedInPipelines?: Array<string>
-  rule?: RuleType
-}
+  children: React.ReactNode;
+  usedInPipelines?: Array<PipelineType>;
+  rule?: RuleType;
+};
 
-export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: Props) => {
+export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = undefined }: Props) => {
+  const queryClient = useQueryClient();
   const ruleSourceRef = useRef(undefined);
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);
@@ -73,6 +87,9 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: 
 
   useEffect(() => {
     const savedSourceCode = getSavedRuleSourceCode();
+    // This effect reads and clears persisted draft source from local storage, so the state
+    // update cannot be expressed as a render-time derivation.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRuleSource(savedSourceCode || rule?.source);
     setDescription(rule?.description);
     removeSavedRuleSourceCode();
@@ -82,27 +99,54 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: 
     }
   }, [rule]);
 
-  const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
-    const nextErrorAnnotations = nextErrors.map((e) => ({ row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' }));
+  const createAnnotations = useCallback(
+    (nextErrors: Array<{ line: number; position_in_line: number; reason: string }>) => {
+      const nextErrorAnnotations = nextErrors.map((e) => ({
+        row: e.line - 1,
+        column: e.position_in_line - 1,
+        text: e.reason,
+        type: 'error',
+      }));
 
-    ruleSourceRef?.current?.editor?.getSession().setAnnotations(nextErrorAnnotations);
-  }, []);
+      ruleSourceRef?.current?.editor?.getSession().setAnnotations(nextErrorAnnotations);
+    },
+    [],
+  );
 
-  const validateNewRule = useCallback((callback) => {
-    const nextRule = {
-      ...rule,
-      source: ruleSourceRef?.current?.editor?.getSession().getValue(),
-      simulator_message: rawMessageToSimulate,
-      description,
-    };
+  const validateNewRule = useCallback(
+    (callback: (errors: Array<RuleParseError>) => void) => {
+      const nextRule = {
+        ...rule,
+        source: ruleSourceRef?.current?.editor?.getSession().getValue(),
+        simulator_message: rawMessageToSimulate,
+        description,
+      };
 
-    RulesActions.parse(nextRule, callback);
-  }, [rule, description, rawMessageToSimulate]);
+      parseRule(nextRule)
+        .then(callback)
+        .catch(() => {
+          /* non-parse errors are intentionally ignored, matching the old store behavior */
+        });
+    },
+    [rule, description, rawMessageToSimulate],
+  );
 
-  const simulateRule = useCallback((_rule: RuleType, simulationType: SimulationFieldType, messageString: string = rawMessageToSimulate, callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult) => {
-    const messageToSimulate = getMessageToSimulate(messageString, simulationType);
-    RulesActions.simulate(messageToSimulate, _rule, callback);
-  }, [rawMessageToSimulate, setRuleSimulationResult]);
+  const simulateRule = useCallback(
+    (
+      _rule: RuleType,
+      simulationType: SimulationFieldType,
+      messageString: string = rawMessageToSimulate,
+      callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult,
+    ) => {
+      const messageToSimulate = getMessageToSimulate(messageString, simulationType);
+      simulateRuleRequest(messageToSimulate, _rule)
+        .then(callback)
+        .catch(() => {
+          /* simulation errors are intentionally ignored, matching the old store behavior */
+        });
+    },
+    [rawMessageToSimulate, setRuleSimulationResult],
+  );
 
   useEffect(() => {
     if (ruleSourceRef?.current) {
@@ -119,11 +163,18 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: 
         description,
       };
 
-      RulesActions.parse(savedRule, () => callback(savedRule));
+      parseRule(savedRule)
+        .then(() => callback(savedRule))
+        .catch(() => {
+          /* non-parse errors are intentionally ignored, matching the old store behavior */
+        });
     };
 
-    const handleSavePipelineRule = (callback: (rule: RuleType) => void = () => {}, onError: (error: object) => void = () => {}) => {
-      validateBeforeSave((nextRule) => savePipelineRule(nextRule, callback, onError));
+    const handleSavePipelineRule = (
+      callback: (rule: RuleType) => void = () => {},
+      onError: (error: object) => void = () => {},
+    ) => {
+      validateBeforeSave((nextRule) => savePipelineRule(nextRule, queryClient, callback, onError));
     };
 
     const onChangeSource = (source: string) => {
@@ -135,7 +186,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: 
       }
 
       VALIDATE_TIMEOUT = setTimeout(() => {
-        validateNewRule((errors) => {
+        validateNewRule((errors: Array<RuleParseError>) => {
           const nextErrors = errors || [];
 
           createAnnotations(nextErrors);
@@ -143,7 +194,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: 
       }, 500);
     };
 
-    return ({
+    return {
       rule: {
         ...rule,
         description,
@@ -163,10 +214,11 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: 
       setRawMessageToSimulate,
       ruleSimulationResult,
       setRuleSimulationResult,
-    });
+    };
   }, [
     description,
     createAnnotations,
+    queryClient,
     rule,
     ruleSource,
     usedInPipelines,
@@ -176,9 +228,5 @@ export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: 
     ruleSimulationResult,
   ]);
 
-  return (
-    <PipelineRulesContext.Provider value={pipelineRulesContextValue}>
-      {children}
-    </PipelineRulesContext.Provider>
-  );
+  return <PipelineRulesContext.Provider value={pipelineRulesContextValue}>{children}</PipelineRulesContext.Provider>;
 };

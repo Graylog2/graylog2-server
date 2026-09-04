@@ -69,6 +69,11 @@ public class InMemoryPipelineService implements PipelineService {
     }
 
     @Override
+    public PipelineDao save(PipelineDao pipeline, boolean checkMutability) {
+        return save(pipeline);
+    }
+
+    @Override
     public PipelineDao load(String id) throws NotFoundException {
         final PipelineDao pipeline = store.get(id);
         if (pipeline == null) {

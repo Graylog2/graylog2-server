@@ -21,9 +21,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.MustBeClosed;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.InsertOneModel;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog.grn.GRN;
@@ -240,6 +241,13 @@ public class DBGrantService {
 
     public GrantDTO save(GrantDTO grantDTO) {
         return mongoUtils.save(grantDTO);
+    }
+
+    public void bulkCreate(List<GrantDTO> grants) {
+        List<InsertOneModel<GrantDTO>> bulkWrites = grants.stream()
+                .map(InsertOneModel::new)
+                .toList();
+        collection.bulkWrite(bulkWrites);
     }
 
     public Optional<GrantDTO> get(String id) {

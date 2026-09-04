@@ -16,9 +16,10 @@
  */
 import EntityDataTable from './EntityDataTable';
 import MoreActions from './MoreActions';
-import type { ColumnRenderers, Column } from './types';
+import type { ColumnRenderers, ColumnSchema } from './types';
+import ExpandedSectionToggleWrapper from './ExpandedSectionToggleWrapper';
 
 export { default as useTableEventHandlers } from './hooks/useTableEventHandlers';
 
-export { ColumnRenderers, Column, MoreActions };
+export { ColumnRenderers, ColumnSchema, MoreActions, ExpandedSectionToggleWrapper };
 export default EntityDataTable;

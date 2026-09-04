@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { ConfigurationField } from 'components/configurationforms';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -27,20 +27,29 @@ export const KEY_PREFIX = ['outputs', 'types'];
 export const keyFn = () => [...KEY_PREFIX];
 
 export type AvailableOutputRequestedConfiguration = {
-  [key: string]: ConfigurationField,
+  [key: string]: ConfigurationField;
 };
 export type AvailableOutputSummary = {
   human_name: string;
-  requested_configuration: AvailableOutputRequestedConfiguration,
+  requested_configuration: AvailableOutputRequestedConfiguration;
   link_to_docs: string;
   name: string;
   type: string;
 };
 export type AvailableOutputTypes = {
-  [_key: string]: {
-    [_key: string]: AvailableOutputSummary;
-  };
+  [_key: string]: AvailableOutputSummary;
 };
+
+export const getOutputTypeDefinition = (
+  outputTypes: AvailableOutputTypes | undefined,
+  outputType: string,
+): AvailableOutputSummary | undefined => outputTypes?.[outputType];
+
+export const getRequestedOutputConfiguration = (
+  outputTypes: AvailableOutputTypes | undefined,
+  outputType: string,
+): AvailableOutputRequestedConfiguration | undefined =>
+  getOutputTypeDefinition(outputTypes, outputType)?.requested_configuration;
 
 export const fetchOutputsTypes = () => {
   const url = qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
@@ -49,28 +58,30 @@ export const fetchOutputsTypes = () => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useAvailableOutputTypes = ({ enabled }: Options = { enabled: true }): {
-  data: AvailableOutputTypes,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const useAvailableOutputTypes = (
+  { enabled }: Options = { enabled: true },
+): {
+  data: AvailableOutputTypes;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(),
-    () => defaultOnError(fetchOutputsTypes(), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(),
 
-  return ({
-    data,
+    queryFn: () =>
+      defaultOnError(fetchOutputsTypes(), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+
+  return {
+    data: data?.types,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useAvailableOutputTypes;

@@ -18,7 +18,7 @@ import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
 
-import { Clearfix } from 'components/bootstrap';
+import { ClearFloat } from 'components/common';
 import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
@@ -60,15 +60,21 @@ const GroupExpression = ({
 
   return (
     <>
-      <BooleanOperatorSelector operator={expression.operator} onOperatorChange={handleOperatorChange} />
-      <Clearfix />
+      <BooleanOperatorSelector
+        operator={expression.operator}
+        onOperatorChange={handleOperatorChange}
+        placeholder={`Boolean operator group ${level + 1}`}
+      />
+      <ClearFloat />
       <Group>
-        <AggregationConditionExpression {...props}
-                                        expression={expression.child}
-                                        validation={validation.child}
-                                        parent={expression}
-                                        onChange={onChildChange('child')}
-                                        level={level + 1} />
+        <AggregationConditionExpression
+          {...props}
+          expression={expression.child}
+          validation={validation.child}
+          parent={expression}
+          onChange={onChildChange('child')}
+          level={level + 1}
+        />
       </Group>
     </>
   );

@@ -25,25 +25,33 @@ import { IconButton } from 'components/common';
  */
 
 type Props = {
-  buttonTitle?: string,
-  className?: string,
-  disabled?: boolean,
-  onSuccess?: () => void,
-  text: string,
-}
+  buttonTitle?: string;
+  className?: string;
+  disabled?: boolean;
+  onSuccess?: () => void;
+  text: string;
+};
 
-const ClipboardIconButton = ({ buttonTitle = undefined, className = undefined, disabled = undefined, onSuccess = undefined, text }: Props) => (
+const ClipboardIconButton = ({
+  buttonTitle = undefined,
+  className = undefined,
+  disabled = undefined,
+  onSuccess = undefined,
+  text,
+}: Props) => (
   <ClipboardContainer text={text}>
     {({ copy }) => (
-      <IconButton className={className}
-                  name="content_copy"
-                  iconType="regular"
-                  disabled={disabled}
-                  title={buttonTitle}
-                  onClick={() => {
-                    copy();
-                    onSuccess?.();
-                  }} />
+      <IconButton
+        className={className}
+        name="content_copy"
+        iconType="regular"
+        disabled={disabled}
+        title={buttonTitle}
+        onClick={() => {
+          copy();
+          onSuccess?.();
+        }}
+      />
     )}
   </ClipboardContainer>
 );

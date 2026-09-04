@@ -18,10 +18,9 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Icon } from 'components/common';
+import { Icon, Link } from 'components/common';
 import { useStore } from 'stores/connect';
 import { NodesStore } from 'stores/nodes/NodesStore';
-import { Link } from 'components/common/router';
 import AppConfig from 'util/AppConfig';
 
 type NodeId = string;
@@ -31,25 +30,21 @@ const BreakWord = styled.span`
 `;
 
 type NodeTitleProps = {
-  shortNodeId: string,
-  hostname: string
-}
+  shortNodeId: string;
+  hostname: string;
+};
 
 const NodeTitle = ({ shortNodeId, hostname }: NodeTitleProps) => (
   <>
     <Icon name="lan" />
     &nbsp;
-    <BreakWord>
-      {shortNodeId}
-    </BreakWord>&nbsp;/&nbsp;
-    <BreakWord>
-      {hostname}
-    </BreakWord>
+    <BreakWord>{shortNodeId}</BreakWord>&nbsp;/&nbsp;
+    <BreakWord>{hostname}</BreakWord>
   </>
 );
 
 type Props = {
-  nodeId: NodeId,
+  nodeId: NodeId;
 };
 
 const NodeName = ({ nodeId }: Props) => {
@@ -64,7 +59,7 @@ const NodeName = ({ nodeId }: Props) => {
   }
 
   return (
-    <Link to={Routes.node(nodeId)}>
+    <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)} title={`Cluster node ${node.short_node_id} / ${node.hostname}`}>
       <NodeTitle shortNodeId={node.short_node_id} hostname={node.hostname} />
     </Link>
   );

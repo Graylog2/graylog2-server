@@ -18,18 +18,41 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.RangeBucket;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 
+import java.util.List;
 import java.util.function.Function;
 
 public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec> {
-
+    /**
+     * Only one of 'scaling', 'timeunit', or 'ranges' should be present, this is validated in Grouping.java on deserializing the JSON
+     */
     @Override
     public BucketSpec apply(final Grouping grouping) {
-        return Values.builder()
-                .field(grouping.requestedField().name())
-                .type(Values.NAME)
-                .limit(grouping.limit())
-                .build();
+        if(grouping.ranges().isPresent()) {
+            return new RangeBucket(List.of(grouping.requestedField().name()), grouping.ranges().get());
+        } else if(grouping.scaling().isPresent()) {
+            return Time.builder()
+                    .field(grouping.requestedField().name())
+                    .type(Time.NAME)
+                    .interval(AutoInterval.create(grouping.scaling().get()))
+                    .build();
+        } else if(grouping.timeunit().isPresent()) {
+            return Time.builder()
+                    .field(grouping.requestedField().name())
+                    .type(Time.NAME)
+                    .interval(TimeUnitInterval.Builder.builder().timeunit(grouping.timeunit().get()).build())
+                    .build();
+        } else {
+            return Values.builder()
+                        .field(grouping.requestedField().name())
+                        .type(Values.NAME)
+                        .limit(grouping.limit().orElse(Values.DEFAULT_LIMIT))
+                        .build();
+        }
     }
 }

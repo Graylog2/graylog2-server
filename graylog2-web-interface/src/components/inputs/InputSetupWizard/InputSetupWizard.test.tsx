@@ -32,19 +32,18 @@ const input = {
   name: 'inputName',
   created_at: '',
   creator_user_id: 'creatorId',
-  static_fields: { },
-  attributes: { },
+  static_fields: {},
+  attributes: {},
 };
 
 const onClose = jest.fn();
 
-const renderWizard = () => (
+const renderWizard = () =>
   render(
     <InputSetupWizardProvider>
       <InputSetupWizard show input={input} onClose={onClose} />
     </InputSetupWizardProvider>,
-  )
-);
+  );
 
 jest.mock('components/streams/hooks/useStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
@@ -74,7 +73,7 @@ describe('InputSetupWizard', () => {
   it('should render the wizard and shows routing step as first step', async () => {
     renderWizard();
 
-    const wizard = await screen.findByText('Setup Routing');
+    const wizard = await screen.findByText('Routing');
 
     expect(wizard).toBeInTheDocument();
   });

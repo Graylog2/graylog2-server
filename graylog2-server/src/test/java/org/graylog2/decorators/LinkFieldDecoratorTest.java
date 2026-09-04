@@ -26,9 +26,9 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class LinkFieldDecoratorTest {
     private static final String TEST_FIELD = "test_field";
     private LinkFieldDecorator decorator;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final HashMap<String, Object> config = new HashMap<>();
         config.put(LinkFieldDecorator.CK_LINK_FIELD, TEST_FIELD);
@@ -49,22 +49,28 @@ public class LinkFieldDecoratorTest {
 
     @Test
     public void verifyUnsafeLinksAreRemoved() {
-
         // Verify that real, safe URLs are rendered as links.
-        Assert.assertEquals("http://full-local-allowed", getDecoratorUrl("http://full-local-allowed"));
-        Assert.assertEquals("http://full-url-allowed.com", getDecoratorUrl("http://full-url-allowed.com"));
-        Assert.assertEquals("http://full-url-allowed.com/test", getDecoratorUrl("http://full-url-allowed.com/test"));
-        Assert.assertEquals("http://full-url-allowed.com/test?with=param", getDecoratorUrl("http://full-url-allowed.com/test?with=param"));
-        Assert.assertEquals("https://https-is-allowed-too.com", getDecoratorUrl("https://https-is-allowed-too.com"));
-        Assert.assertEquals("HTTPS://upper-case-https-all-good.com", getDecoratorUrl("HTTPS://upper-case-https-all-good.com"));
+        Assertions.assertEquals("http://full-local-allowed", getDecoratorUrl("http://full-local-allowed"));
+        Assertions.assertEquals("http://full-url-allowed.com", getDecoratorUrl("http://full-url-allowed.com"));
+        Assertions.assertEquals("http://full-url-allowed.com/test", getDecoratorUrl("http://full-url-allowed.com/test"));
+        Assertions.assertEquals("http://full-url-allowed.com/test?with=param", getDecoratorUrl("http://full-url-allowed.com/test?with=param"));
+        Assertions.assertEquals("https://https-is-allowed-too.com", getDecoratorUrl("https://https-is-allowed-too.com"));
+        Assertions.assertEquals("HTTPS://upper-case-https-all-good.com", getDecoratorUrl("HTTPS://upper-case-https-all-good.com"));
+        Assertions.assertEquals("HTTP://upper-case-https-all-good.com", getDecoratorUrl("HTTP://upper-case-https-all-good.com"));
+        Assertions.assertEquals("https://nedlog.local:9000/search?q=event_source_product%3Alinux", getDecoratorUrl("https://nedlog.local:9000/search?q=event_source_product%3Alinux"));
 
         // Links with double slashes should be allowed.
-        Assert.assertEquals("https://graylog.com//releases", getDecoratorUrl("https://graylog.com//releases"));
+        Assertions.assertEquals("https://graylog.com//releases", getDecoratorUrl("https://graylog.com//releases"));
 
         // Verify that unsafe URLs are rendered as text.
-        Assert.assertEquals("javascript:alert('Javascript is not allowed.')", getDecoratorMessage("javascript:alert('Javascript is not allowed.')"));
-        Assert.assertEquals("alert('Javascript this way is still not allowed", getDecoratorMessage("alert('Javascript this way is still not allowed"));
-        Assert.assertEquals("ntp://other-stuff-is-not-allowed", getDecoratorMessage("ntp://other-stuff-is-not-allowed"));
+        Assertions.assertEquals("javascript:alert('Javascript is not allowed.')", getDecoratorMessage("javascript:alert('Javascript is not allowed.')"));
+        Assertions.assertEquals("alert('Javascript this way is still not allowed", getDecoratorMessage("alert('Javascript this way is still not allowed"));
+        Assertions.assertEquals("ntp://other-stuff-is-not-allowed", getDecoratorMessage("ntp://other-stuff-is-not-allowed"));
+        Assertions.assertEquals("ftp://ftp-not-allowed", getDecoratorMessage("ftp://ftp-not-allowed"));
+        Assertions.assertEquals("HTTP:", getDecoratorMessage("HTTP:"));
+        Assertions.assertEquals("HTTP", getDecoratorMessage("HTTP"));
+        Assertions.assertEquals("HTTPS:", getDecoratorMessage("HTTPS:"));
+        Assertions.assertEquals("HTTPS", getDecoratorMessage("HTTPS"));
     }
 
     /**

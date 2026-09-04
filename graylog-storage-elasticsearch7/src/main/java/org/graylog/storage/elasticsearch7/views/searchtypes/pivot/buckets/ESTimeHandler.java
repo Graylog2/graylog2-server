@@ -50,6 +50,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Time timeSpec, ESGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
+        final var timeZone = queryContext.timezone().toTimeZone().toZoneId();
 
         final Interval interval = timeSpec.interval();
         final TimeRange timerange = query.timerange();
@@ -59,7 +60,8 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
                 final AutoDateHistogramAggregationBuilder builder = new AutoDateHistogramAggregationBuilder(name)
                         .field(timeField)
                         .setNumBuckets((int) (BASE_NUM_BUCKETS / autoInterval.scaling()))
-                        .format(DATE_TIME_FORMAT);
+                        .format(DATE_TIME_FORMAT)
+                        .timeZone(timeZone);
 
                 if (root == null && leaf == null) {
                     root = builder;
@@ -76,7 +78,8 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
                 final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                         .field(timeField)
                         .order(ordering.orders())
-                        .format(DATE_TIME_FORMAT);
+                        .format(DATE_TIME_FORMAT)
+                        .timeZone(timeZone);
 
                 setInterval(builder, dateHistogramInterval);
 
@@ -94,8 +97,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
     }
 
     private boolean isAllMessages(final TimeRange timerange) {
-        return timerange instanceof RelativeRange
-                && ((RelativeRange) timerange).isAllMessages();
+        return timerange instanceof RelativeRange && timerange.isAllMessages();
     }
 
     private void setInterval(DateHistogramAggregationBuilder builder, DateHistogramInterval interval) {

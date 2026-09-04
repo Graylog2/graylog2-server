@@ -26,19 +26,19 @@ import DecoratorStyles from './decoratorStyles.css';
 const PopoverHelp = () => (
   <Popover width={275} position="right" withArrow withinPortal>
     <Popover.Target>
-      <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
+      <Button bsStyle="link" className={DecoratorStyles.helpLink}>
+        What are message decorators?
+      </Button>
     </Popover.Target>
     <Popover.Dropdown>
       <p className="description">
         Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only
         shown in the search results. Decorator config is stored <strong>per stream</strong>.
       </p>
-      <p className="description">
-        Use drag and drop to modify the order in which decorators are processed.
-      </p>
+      <p className="description">Use drag and drop to modify the order in which decorators are processed.</p>
       <p>
-        Read more about message decorators in the <DocumentationLink page={DocsHelper.PAGES.DECORATORS}
-                                                                     text="documentation" />.
+        Read more about message decorators in the{' '}
+        <DocumentationLink page={DocsHelper.PAGES.DECORATORS} text="documentation" />.
       </p>
     </Popover.Dropdown>
   </Popover>

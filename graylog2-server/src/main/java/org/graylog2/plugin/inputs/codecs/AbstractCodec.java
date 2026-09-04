@@ -28,8 +28,11 @@ import javax.annotation.Nullable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import static org.graylog2.plugin.inputs.codecs.Codec.Config.CK_CHARSET_NAME;
+
 public abstract class AbstractCodec implements Codec {
     private static final Logger log = LoggerFactory.getLogger(AbstractCodec.class);
+    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     protected final Configuration configuration;
     protected final Charset charset;
@@ -37,12 +40,7 @@ public abstract class AbstractCodec implements Codec {
 
     protected AbstractCodec(Configuration configuration) {
         this.configuration = configuration;
-        if (configuration.stringIsSet(Codec.Config.CK_CHARSET_NAME)) {
-            this.charset = Charset.forName(configuration.getString(Codec.Config.CK_CHARSET_NAME));
-        }
-        else {
-            this.charset = StandardCharsets.UTF_8;
-        }
+        this.charset = getCharsetOrDefault(configuration);
     }
 
     @Override
@@ -59,10 +57,17 @@ public abstract class AbstractCodec implements Codec {
                 name = this.getClass().getAnnotation(org.graylog2.plugin.inputs.annotations.Codec.class).name();
             } else {
                 log.error("Annotation {} missing on codec {}. This is a bug and this codec will not be available.",
-                          org.graylog2.plugin.inputs.annotations.Codec.class, this.getClass());
+                        org.graylog2.plugin.inputs.annotations.Codec.class, this.getClass());
             }
         }
         return name;
+    }
+
+    protected static Charset getCharsetOrDefault(Configuration configuration) {
+        if (configuration == null || !configuration.stringIsSet(CK_CHARSET_NAME)) {
+            return DEFAULT_CHARSET;
+        }
+        return Charset.forName(configuration.getString(CK_CHARSET_NAME, DEFAULT_CHARSET.name()));
     }
 
     @Nullable
@@ -89,7 +94,7 @@ public abstract class AbstractCodec implements Codec {
             configurationRequest.addField(new TextField(
                     CK_CHARSET_NAME,
                     "Encoding",
-                    StandardCharsets.UTF_8.name(),
+                    DEFAULT_CHARSET.name(),
                     "Default encoding is UTF-8. Set this to a standard charset name if you want override the default.",
                     ConfigurationField.Optional.OPTIONAL
             ));

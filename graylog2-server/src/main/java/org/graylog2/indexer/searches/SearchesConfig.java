@@ -19,38 +19,36 @@ package org.graylog2.indexer.searches;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 @AutoValue
-@WithBeanGetter
 public abstract class SearchesConfig {
     public final static int DEFAULT_LIMIT = 150;
 
-    @JsonProperty
+    @JsonProperty("query")
     public abstract String query();
 
-    @JsonProperty
+    @JsonProperty("filter")
     @Nullable
     public abstract String filter();
 
-    @JsonProperty
+    @JsonProperty("fields")
     @Nullable
     public abstract List<String> fields();
 
-    @JsonProperty
+    @JsonProperty("range")
     public abstract TimeRange range();
 
-    @JsonProperty
+    @JsonProperty("limit")
     public abstract int limit();
 
-    @JsonProperty
+    @JsonProperty("offset")
     public abstract int offset();
 
-    @JsonProperty
+    @JsonProperty("sorting")
     @Nullable
     public abstract Sorting sorting();
 

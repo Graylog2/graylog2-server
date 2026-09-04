@@ -17,15 +17,17 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Variable;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.rest.models.SortOrder;
@@ -34,22 +36,23 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class PaginatedStreamService {
-
     private static final String COLLECTION_NAME = "streams";
-    private static final List<String> STRING_FIELDS = List.of("title", "description", "index_set_title");
     private final MongoCollection<StreamDTO> collection;
+    private final EntityScopeService scopeService;
 
     @Inject
-    public PaginatedStreamService(MongoCollections mongoCollections) {
+    public PaginatedStreamService(MongoCollections mongoCollections,
+                                  EntityScopeService scopeService) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
+        this.scopeService = scopeService;
     }
 
     public long count() {
         return collection.countDocuments();
     }
 
-    public PaginatedList<StreamDTO> findPaginated(Bson dbQuery, //query executed on DB level
-                                                  Predicate<StreamDTO> predicate, //predicate executed on code level, AFTER data is fetched
+    public PaginatedList<StreamImpl> findPaginated(Bson dbQuery, //query executed on DB level
+                                                   Predicate<StreamImpl> predicate, //predicate executed on code level, AFTER data is fetched
                                                   int page,
                                                   int perPage,
                                                   String sortField,
@@ -69,29 +72,29 @@ public class PaginatedStreamService {
                     .add(Aggregates.unset("index_set"));
         }
 
-        if (isStringField(sortField)) {
-            pipelineBuilder.add(Aggregates.set(new Field<>("lower" + sortField, doc("$toLower", "$" + sortField))))
-                    .add(Aggregates.sort(order.toBsonSort("lower" + sortField)))
-                    .add(Aggregates.unset("lower" + sortField));
-        } else {
-            pipelineBuilder.add(Aggregates.sort(order.toBsonSort(sortField)));
-        }
+        pipelineBuilder.add(Aggregates.sort(order.toBsonSort(sortField)));
 
         if (sortField.equals("index_set_title")) {
             pipelineBuilder.add(Aggregates.unset("index_set_title"));
         }
 
-        final List<StreamDTO> streamsList;
-        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build()))) {
-            streamsList = results.filter(predicate).toList();
+        final List<StreamImpl> streamsList;
+        try (final var results = MongoUtils.stream(collection.aggregate(pipelineBuilder.build()).collation(DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING))) {
+            streamsList = results
+                    // Since we are bypassing the StreamService which properly sets the isEditable field when loading
+                    // streams we need to set the field here.
+                    .map(s -> s.toBuilder().isEditable(scopeService.isMutable(s)).build())
+                    .map(StreamImpl::fromDTO)
+                    .filter(predicate)
+                    .toList();
         }
 
         final long grandTotal;
-        try (final var stream = MongoUtils.stream(collection.find())) {
+        try (final var stream = MongoUtils.stream(collection.find()).map(StreamImpl::fromDTO)) {
             grandTotal = stream.filter(predicate).count();
         }
 
-        final List<StreamDTO> paginatedStreams = perPage > 0
+        final List<StreamImpl> paginatedStreams = perPage > 0
                 ? streamsList.stream()
                 .skip((long) perPage * Math.max(0, page - 1))
                 .limit(perPage)
@@ -99,10 +102,6 @@ public class PaginatedStreamService {
                 : streamsList;
 
         return new PaginatedList<>(paginatedStreams, streamsList.size(), page, perPage, grandTotal);
-    }
-
-    private boolean isStringField(String sortField) {
-        return STRING_FIELDS.contains(sortField);
     }
 
     private Document doc(String key, Object value) {

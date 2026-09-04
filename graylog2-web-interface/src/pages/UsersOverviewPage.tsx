@@ -16,28 +16,23 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { Button } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UsersOverview from 'components/users/UsersOverview';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
+import CreateButton from 'components/common/CreateButton';
 
 const UsersOverviewPage = () => (
   <DocumentTitle title="Users Overview">
     <UsersPageNavigation />
-    <PageHeader title="Users Overview"
-                actions={(
-                  <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-                    <Button bsStyle="success">Create user</Button>
-                  </LinkContainer>
-                )}
-                documentationLink={{
-                  title: 'Permissions documentation',
-                  path: DocsHelper.PAGES.USERS_ROLES,
-                }}>
-      <span>Overview of Graylog&apos;s registered users.</span>
+    <PageHeader
+      title="Users Overview"
+      actions={<CreateButton entityKey="User" />}
+      documentationLink={{
+        title: 'Permissions documentation',
+        path: DocsHelper.PAGES.USERS_ROLES,
+      }}>
+      <span>Overview of all registered users.</span>
     </PageHeader>
 
     <UsersOverview />

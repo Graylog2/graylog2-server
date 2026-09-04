@@ -21,18 +21,13 @@ import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 
 describe('<EditPatternModal />', () => {
   it('should render a modal button with as edit', async () => {
-    render(<EditPatternModal savePattern={() => {}}
-                             testPattern={() => {}}
-                             validPatternName={() => {}} />);
+    render(<EditPatternModal savePattern={() => {}} testPattern={() => {}} validPatternName={() => {}} />);
 
     await screen.findByRole('button', { name: /edit/i });
   });
 
   it('should render a modal button with as create', async () => {
-    render(<EditPatternModal create
-                             savePattern={() => {}}
-                             testPattern={() => {}}
-                             validPatternName={() => {}} />);
+    render(<EditPatternModal create savePattern={() => {}} testPattern={() => {}} validPatternName={() => {}} />);
 
     await screen.findByRole('button', { name: /create pattern/i });
   });

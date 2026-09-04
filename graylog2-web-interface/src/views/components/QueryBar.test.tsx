@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import OriginalQueryBar from 'views/components/QueryBar';
@@ -26,8 +27,9 @@ import useQueryTitles from 'views/hooks/useQueryTitles';
 import useViewMetadata from 'views/hooks/useViewMetadata';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery, removeQuery } from 'views/logic/slices/viewSlice';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'bar');
@@ -50,7 +52,7 @@ const viewMetadata = {
 jest.mock('views/hooks/useQueryIds');
 jest.mock('views/hooks/useQueryTitles');
 jest.mock('views/hooks/useViewMetadata');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -65,21 +67,13 @@ const QueryBar = () => (
 );
 
 describe('QueryBar', () => {
-  let oldWindowConfirm;
-
+  useWindowConfirmMock();
   useViewsPlugin();
 
   beforeEach(() => {
-    oldWindowConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
-
     asMock(useQueryIds).mockReturnValue(queries);
     asMock(useQueryTitles).mockReturnValue(queryTitles);
     asMock(useViewMetadata).mockReturnValue(viewMetadata);
-  });
-
-  afterEach(() => {
-    window.confirm = oldWindowConfirm;
   });
 
   it('renders existing tabs', async () => {
@@ -92,28 +86,29 @@ describe('QueryBar', () => {
 
   it('allows changing tab', async () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<QueryBar />);
 
     const nextTab = await screen.findByRole('button', { name: /third query/i });
 
-    fireEvent.click(nextTab);
+    await userEvent.click(nextTab);
 
     await waitFor(() => expect(selectQuery).toHaveBeenCalledWith('baz'));
   });
 
   it('allows closing current tab', async () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const setDashboard = jest.fn();
 
     render(
-      <DashboardPageContext.Provider value={{
-        setDashboardPage: setDashboard,
-        unsetDashboardPage: jest.fn(),
-        dashboardPage: undefined,
-      }}>
+      <DashboardPageContext.Provider
+        value={{
+          setDashboardPage: setDashboard,
+          unsetDashboardPage: jest.fn(),
+          dashboardPage: undefined,
+        }}>
         <QueryBar />
       </DashboardPageContext.Provider>,
     );
@@ -122,11 +117,11 @@ describe('QueryBar', () => {
 
     const dropdown = await within(currentTab).findByTestId('query-action-dropdown');
 
-    fireEvent.click(dropdown);
+    await userEvent.click(dropdown);
 
-    const closeButton = await screen.findByRole('menuitem', { name: /delete/i, hidden: true });
+    const closeButton = await screen.findByRole('menuitem', { name: /delete/i });
 
-    fireEvent.click(closeButton);
+    await userEvent.click(closeButton);
 
     await waitFor(() => expect(removeQuery).toHaveBeenCalledWith('bar'));
 

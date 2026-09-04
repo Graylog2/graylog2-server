@@ -60,8 +60,6 @@ public class GrantsCleanupListenerTest {
             grnRegistry.newGRN(GRNTypes.USER, "a"), Capability.VIEW, grnRegistry.newGRN(GRNTypes.DASHBOARD, "d"));
     private final GrantDTO grantUserB = GrantDTO.of(
             grnRegistry.newGRN(GRNTypes.USER, "b"), Capability.VIEW, grnRegistry.newGRN(GRNTypes.DASHBOARD, "d"));
-    private final GrantDTO grantTeam = GrantDTO.of(
-            grnRegistry.newGRN(GRNTypes.TEAM, "t"), Capability.VIEW, grnRegistry.newGRN(GRNTypes.DASHBOARD, "d"));
 
     @BeforeEach
     void setUp() {
@@ -81,7 +79,7 @@ public class GrantsCleanupListenerTest {
     @Test
     void userRemoved() {
         when(userService.streamAll()).thenReturn(Stream.of(userA));
-        when(grantService.streamAll()).thenReturn(Stream.of(grantUserA, grantUserB, grantTeam));
+        when(grantService.streamAll()).thenReturn(Stream.of(grantUserA, grantUserB));
 
         cleanupListener.handleUserDeletedEvent(mock(UserDeletedEvent.class));
 

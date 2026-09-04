@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.retention.executors.CountBasedRetentionExecutor;

@@ -18,6 +18,7 @@ package org.graylog.integrations.aws.transports;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.cloudwatch.CloudWatchLogSubscriptionData;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
@@ -26,8 +27,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +40,9 @@ import java.util.stream.Collectors;
  * Responsible for decoding the raw Kinesis byte array payload.
  */
 public class KinesisPayloadDecoder {
+
+    record ProcessedMessages(List<KinesisLogEntry> entries, long decompressedSize) {}
+
 
     private static final Logger LOG = LoggerFactory.getLogger(KinesisPayloadDecoder.class);
 
@@ -70,35 +72,40 @@ public class KinesisPayloadDecoder {
      * @param payloadBytes                A Kinesis payload in byte array form.
      * @param approximateArrivalTimestamp The approximate instant that the message was written to Kinesis. This is used only
      *                                    for the {@code AWSMessageType.KINESIS_RAW} message timestamp.
-     * @return A list of {@link KinesisLogEntry} messages, which are fully ready to be written to the Graylog Journal.
+     * @return A {@link ProcessedMessages} containing the decoded log entries and the decompressed payload size.
      * @throws IOException
      */
-    List<KinesisLogEntry> processMessages(final byte[] payloadBytes, Instant approximateArrivalTimestamp) throws IOException {
-
+    ProcessedMessages processMessages(final byte[] payloadBytes, Instant approximateArrivalTimestamp) throws IOException {
         // This method will be called from a codec, and therefore will not perform any detection. It will rely
         // exclusively on the AWSMessageType detected in the setup HealthCheck.
         // If a user needs to change the type of data stored in a stream, they will need to set the integration up again.
         if (awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS || awsMessageType == AWSMessageType.KINESIS_CLOUDWATCH_RAW) {
-            final CloudWatchLogSubscriptionData logSubscriptionData = decompressCloudWatchMessages(payloadBytes, objectMapper);
-            return logSubscriptionData.logEvents().stream()
+            final byte[] decompressed = decompressPayload(payloadBytes);
+            final CloudWatchLogSubscriptionData logSubscriptionData = parseCloudWatchData(decompressed, objectMapper);
+            final List<KinesisLogEntry> entries = logSubscriptionData.logEvents().stream()
                     .map(le -> {
                         DateTime timestamp = new DateTime(le.timestamp(), DateTimeZone.UTC);
                         return KinesisLogEntry.create(kinesisStream,
-                                // Use the log group and stream returned from CloudWatch.
                                 logSubscriptionData.logGroup(),
-                                logSubscriptionData.logStream(), timestamp, le.message());
+                                logSubscriptionData.logStream(),
+                                timestamp,
+                                le.message(),
+                                logSubscriptionData.owner(),
+                                logSubscriptionData.messageType(),
+                                logSubscriptionData.subscriptionFilters());
                     })
-                    .collect(Collectors.toList());
+                    .toList();
+            return new ProcessedMessages(entries, decompressed.length);
         } else if (awsMessageType == AWSMessageType.KINESIS_RAW) {
             // The best timestamp available is the approximate arrival time of the message to the Kinesis stream.
             final DateTime timestamp = new DateTime(approximateArrivalTimestamp.toEpochMilli(), DateTimeZone.UTC);
             final KinesisLogEntry kinesisLogEntry = KinesisLogEntry.create(kinesisStream,
                     "", "",
-                    timestamp, new String(payloadBytes, StandardCharsets.UTF_8));
-            return Collections.singletonList(kinesisLogEntry);
+                    timestamp, new String(payloadBytes, StandardCharsets.UTF_8), "", awsMessageType.getLabel(), new ArrayList<>());
+            return new ProcessedMessages(Collections.singletonList(kinesisLogEntry), payloadBytes.length);
         } else {
             LOG.error("The AWSMessageType [{}] is not supported by the KinesisTransport", awsMessageType);
-            return new ArrayList<>();
+            return new ProcessedMessages(new ArrayList<>(), 0);
         }
     }
 
@@ -112,15 +119,20 @@ public class KinesisPayloadDecoder {
      * @see <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html">AWS Subscription Filters</a>
      */
     public static CloudWatchLogSubscriptionData decompressCloudWatchMessages(byte[] payloadBytes, ObjectMapper objectMapper) throws IOException {
+        final byte[] decompressed = decompressPayload(payloadBytes);
+        return parseCloudWatchData(decompressed, objectMapper);
+    }
 
-        LOG.debug("The supplied payload is GZip compressed. Proceeding to decompress and parse as a CloudWatch log message.");
-
+    private static byte[] decompressPayload(byte[] payloadBytes) throws IOException {
+        LOG.debug("The supplied payload is GZip compressed. Proceeding to decompress.");
         final byte[] bytes = Tools.decompressGzip(payloadBytes).getBytes(StandardCharsets.UTF_8);
-        LOG.debug("They payload was decompressed successfully. size [{}]", bytes.length);
+        LOG.debug("The payload was decompressed successfully. size [{}]", bytes.length);
+        return bytes;
+    }
 
-        final CloudWatchLogSubscriptionData logSubscriptionData = objectMapper.readValue(bytes, CloudWatchLogSubscriptionData.class);
+    private static CloudWatchLogSubscriptionData parseCloudWatchData(byte[] decompressed, ObjectMapper objectMapper) throws IOException {
+        final CloudWatchLogSubscriptionData logSubscriptionData = objectMapper.readValue(decompressed, CloudWatchLogSubscriptionData.class);
 
-        // The CloudWatch payload often contains many messages. We might need to check how many when debugging throttling issues.
         if (LOG.isTraceEnabled()) {
             LOG.trace("[{}] messages obtained from CloudWatch", logSubscriptionData.logEvents().size());
         }

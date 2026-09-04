@@ -22,7 +22,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog2.Configuration;
-import org.graylog2.plugin.Message;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,12 +137,10 @@ public class FailureHandlingService extends AbstractExecutionThreadService {
                     }
                 });
 
-        final List<Message> requiresAcknowledgement = failureBatch.getFailures().stream()
+        final List<? extends Acknowledgeable> requiresAcknowledgement = failureBatch.getFailures().stream()
                 .filter(Failure::requiresAcknowledgement)
-                .map(Failure::failedMessage)
-                .filter(Message.class::isInstance)
-                .map(Message.class::cast)
-                .collect(Collectors.toList());
+                .filter(a -> a.getMessageQueueId() != null)
+                .toList();
 
         if (!requiresAcknowledgement.isEmpty()) {
             acknowledger.acknowledge(requiresAcknowledgement);

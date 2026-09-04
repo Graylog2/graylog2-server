@@ -17,8 +17,8 @@
 package org.graylog2.datatiering;
 
 import jakarta.validation.constraints.NotNull;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 
 import java.util.Optional;
 

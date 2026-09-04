@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -26,25 +27,21 @@ import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/h
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
-const getData = (list = [profile1]) => (
-  {
-    list,
-    pagination: {
-      total: 1,
-    },
-    attributes,
-  }
-);
+const getData = (list = [profile1]) => ({
+  list,
+  pagination: {
+    total: 1,
+  },
+  attributes,
+});
 
-const renderIndexSetFieldTypeProfilesList = () => render(
-  <DefaultQueryParamProvider>
+const renderIndexSetFieldTypeProfilesList = () =>
+  render(
     <TestStoreProvider>
       <ProfilesList />
     </TestStoreProvider>,
-  </DefaultQueryParamProvider>,
-);
+  );
 
 jest.mock('routing/useParams', () => jest.fn());
 
@@ -60,12 +57,15 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['name',
-          'description',
-          'type',
-          'custom_field_mappings'],
+        attributes: {
+          name: { status: 'show' },
+          description: { status: 'show' },
+          type: { status: 'show' },
+          custom_field_mappings: { status: 'show' },
+        },
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useFieldTypesForMappings).mockReturnValue({
@@ -117,7 +117,7 @@ describe('IndexSetFieldTypesList', () => {
 
     const customFieldTypeMappingAmount = await within(tableRow2).findByText('3');
 
-    fireEvent.click(customFieldTypeMappingAmount);
+    await userEvent.click(customFieldTypeMappingAmount);
 
     expect(tableRow2.textContent).toContain('Custom Field Mappings');
     expect(tableRow2.textContent).toContain('user_name:String type');

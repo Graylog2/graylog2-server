@@ -20,28 +20,35 @@ import { createContext, useState, useMemo } from 'react';
 import Store from 'logic/local-storage/Store';
 import useHotkey from 'hooks/useHotkey';
 
-export const ScratchpadContext = createContext(undefined);
+type ScratchPadContextType = {
+  isScratchpadVisible: boolean;
+  localStorageItem: string;
+  setScratchpadVisibility: (opened: boolean) => void;
+  toggleScratchpadVisibility: () => void;
+};
+export const ScratchpadContext = createContext<ScratchPadContextType>(undefined);
 
 type Props = {
-  children: React.ReactNode,
-  loginName: string,
-}
+  children: React.ReactNode;
+  loginName: string;
+};
 
 export const ScratchpadProvider = ({ children, loginName }: Props) => {
   const localStorageItem = `gl-scratchpad-${loginName}`;
-  const scratchpadStore = Store.get(localStorageItem) || {};
+  type ScratchpadStoreData = Record<string, unknown> & { opened?: boolean };
+  const scratchpadStore = Store.get<ScratchpadStoreData>(localStorageItem) || {};
   const [isScratchpadVisible, setVisibility] = useState(scratchpadStore.opened || false);
 
   const scratchpadContextValue = useMemo(() => {
     const toggleScratchpadVisibility = () => {
-      const currentStorage = Store.get(localStorageItem);
+      const currentStorage = Store.get<ScratchpadStoreData>(localStorageItem);
 
       Store.set(localStorageItem, { ...currentStorage, opened: !isScratchpadVisible });
       setVisibility(!isScratchpadVisible);
     };
 
     const setScratchpadVisibility = (opened: boolean) => {
-      const currentStorage = Store.get(localStorageItem);
+      const currentStorage = Store.get<ScratchpadStoreData>(localStorageItem);
 
       Store.set(localStorageItem, { ...currentStorage, opened });
       setVisibility(opened);
@@ -53,10 +60,7 @@ export const ScratchpadProvider = ({ children, loginName }: Props) => {
       setScratchpadVisibility,
       toggleScratchpadVisibility,
     };
-  }, [
-    isScratchpadVisible,
-    localStorageItem,
-  ]);
+  }, [isScratchpadVisible, localStorageItem]);
 
   useHotkey({
     actionKey: 'show-scratchpad-modal',
@@ -66,9 +70,5 @@ export const ScratchpadProvider = ({ children, loginName }: Props) => {
     scope: 'general',
   });
 
-  return (
-    <ScratchpadContext.Provider value={scratchpadContextValue}>
-      {children}
-    </ScratchpadContext.Provider>
-  );
+  return <ScratchpadContext.Provider value={scratchpadContextValue}>{children}</ScratchpadContext.Provider>;
 };

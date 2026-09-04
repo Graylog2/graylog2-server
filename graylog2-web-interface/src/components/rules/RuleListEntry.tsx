@@ -17,34 +17,70 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { LinkContainer, Link } from 'components/common/router';
+import { LinkContainer, Link, RelativeTime, OverlayTrigger, CountBadge, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { RelativeTime, OverlayTrigger, CountBadge } from 'components/common';
-import { Button, ButtonToolbar } from 'components/bootstrap';
+import { Button, ButtonToolbar, Label } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
+import type { RuleType, PipelineSummary } from 'components/rules/hooks/useRules';
 import StringUtils from 'util/StringUtils';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
+import {
+  PipelineLoadCell,
+  getRuleLoadPercent,
+  useProcessingLoadContext,
+  type ProcessingLoadResponse,
+} from 'components/pipelines/processing-load';
 
 type Props = {
-  rule: RuleType,
-  usingPipelines: Array<PipelineSummary>
-  onDelete: (rule: RuleType) => () => void,
-}
+  rule: RuleType;
+  usingPipelines: Array<PipelineSummary>;
+  onDelete: (rule: RuleType) => () => void;
+  showLoadColumn?: boolean;
+  processingLoad?: ProcessingLoadResponse;
+  processingLoadError?: boolean;
+};
 const STRING_SIZE_LIMIT = 30;
 
-const LimitedTd = styled.td(({ theme }) => css`
-  max-width: 250px;
-  min-width: 250px;
-  
-  @media screen and (max-width: ${theme.breakpoints.max.md}) {
-    white-space: normal !important;
-  }
-`);
+const LimitedTd = styled.td(
+  ({ theme }) => css`
+    max-width: 250px;
+    min-width: 250px;
 
-const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
+    @media screen and (max-width: ${theme.breakpoints.max.md}) {
+      white-space: normal !important;
+    }
+  `,
+);
+const DefaultLabel = styled(Label)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xxs};
+    vertical-align: inherit;
+  `,
+);
+
+const RuleListEntry = ({
+  rule,
+  onDelete,
+  usingPipelines,
+  showLoadColumn: showLoadColumnProp = undefined,
+  processingLoad: processingLoadProp = undefined,
+  processingLoadError: processingLoadErrorProp = undefined,
+}: Props) => {
+  const {
+    metricsEnabled,
+    processingLoad: processingLoadContext,
+    processingLoadError: processingLoadErrorContext,
+  } = useProcessingLoadContext();
+  const showLoadColumn = showLoadColumnProp ?? metricsEnabled;
+  const processingLoad = processingLoadProp ?? processingLoadContext;
+  const processingLoadError = processingLoadErrorProp ?? processingLoadErrorContext;
+  const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
   const { id, title, description, created_at, modified_at } = rule;
+
   const pipelinesLength = usingPipelines.length;
   const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
+  const isManaged = scopePermissions && !scopePermissions?.is_mutable;
   const actions = (
     <ButtonToolbar>
       <LinkContainer to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
@@ -56,33 +92,43 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
     </ButtonToolbar>
   );
 
-  const _showPipelines = (pipelines: Array<PipelineSummary>) => pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => (
-    <React.Fragment key={pipelineId}>
-      {pipelineTitle.length > STRING_SIZE_LIMIT ? (
-        <OverlayTrigger placement="top" trigger="hover" overlay={pipelineTitle} rootClose>
-          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-            {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
-          </Link>
-        </OverlayTrigger>
-      ) : (
-        <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-          {pipelineTitle}
-        </Link>
-      )}
-      {index < (pipelinesLength - 1) && ',  '}
-    </React.Fragment>
-  ));
+  const _showPipelines = (pipelines: Array<PipelineSummary>) =>
+    pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => (
+      <React.Fragment key={pipelineId}>
+        {pipelineTitle.length > STRING_SIZE_LIMIT ? (
+          <OverlayTrigger placement="top" trigger="hover" overlay={pipelineTitle} rootClose>
+            <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
+              {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
+            </Link>
+          </OverlayTrigger>
+        ) : (
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>{pipelineTitle}</Link>
+        )}
+        {index < pipelinesLength - 1 && ',  '}
+      </React.Fragment>
+    ));
+  if (loadingScopePermissions) {
+    return <Spinner text="Loading Rule" />;
+  }
 
   return (
     <tr key={title}>
       <td>
-        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
-          {title}
-        </Link>
+        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>{title}</Link>
+        {isManaged && (
+          <DefaultLabel bsStyle="default" bsSize="xsmall">
+            Managed by Application
+          </DefaultLabel>
+        )}
+        <RuleDeprecationInfo ruleId={id} />
       </td>
       <td className="limited">{description}</td>
-      <td className="limited"><RelativeTime dateTime={created_at} /></td>
-      <td className="limited"><RelativeTime dateTime={modified_at} /></td>
+      <td className="limited">
+        <RelativeTime dateTime={created_at} />
+      </td>
+      <td className="limited">
+        <RelativeTime dateTime={modified_at} />
+      </td>
       <td>
         <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${id}.executed`} zeroOnMissing>
           <CounterRate suffix="msg/s" />
@@ -93,10 +139,13 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
           <CounterRate showTotal suffix="errors/s" hideOnMissing />
         </MetricContainer>
       </td>
+      {showLoadColumn && (
+        <td>
+          <PipelineLoadCell loadPercent={getRuleLoadPercent(processingLoad, id)} error={processingLoadError} />
+        </td>
+      )}
       <LimitedTd>
-        <CountBadge>{pipelinesLength}</CountBadge>
-        {' '}
-        {_showPipelines(usingPipelines)}
+        <CountBadge count={pipelinesLength} /> {_showPipelines(usingPipelines)}
       </LimitedTd>
       <td className="actions">{actions}</td>
     </tr>

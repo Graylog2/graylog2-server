@@ -1,0 +1,156 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+
+import * as React from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import type { Row } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
+import styled, { css } from 'styled-components';
+import useResizeObserver from '@react-hook/resize-observer';
+
+import { ButtonToolbar } from 'components/bootstrap';
+import {
+  TABLE_ROW_HOVER_TRANSITION,
+  TABLE_ROW_PINNED_HOVER_BG_VAR,
+  flattenTableBackground,
+  isStripedRowIndex,
+} from 'components/bootstrap/Table';
+import type { EntityBase } from 'components/common/EntityDataTable/types';
+import {
+  ACTIONS_COL_ID,
+  CELL_PADDING_HORIZONTAL,
+  CELL_PADDING_VERTICAL,
+} from 'components/common/EntityDataTable/Constants';
+import { actionsHeaderWidthVar } from 'components/common/EntityDataTable/CSSVariables';
+
+const AlignRight = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  height: 100%;
+`;
+
+const BackgroundFoundation = styled.div`
+  height: 100%;
+  width: var(${actionsHeaderWidthVar});
+  overflow: hidden;
+`;
+
+const HeaderBackground = styled(BackgroundFoundation)(
+  ({ theme }) => css`
+    background-color: ${flattenTableBackground(theme, theme.colors.table.head.background)};
+  `,
+);
+
+const Actions = styled.div<{ $isStripedRow: boolean }>(
+  ({ $isStripedRow, theme }) => css`
+    display: flex;
+    justify-content: flex-end;
+    padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
+    background-color: ${flattenTableBackground(
+      theme,
+      $isStripedRow ? theme.colors.table.row.backgroundStriped : theme.colors.table.row.background,
+    )};
+    height: 100%;
+    align-items: center;
+    transition: ${TABLE_ROW_HOVER_TRANSITION};
+
+    tr:hover & {
+      background-color: var(${TABLE_ROW_PINNED_HOVER_BG_VAR});
+    }
+  `,
+);
+
+const ActionCell = <Entity extends EntityBase>({
+  row,
+  entityActions,
+  onWidthChange,
+}: {
+  row: Row<Entity>;
+  entityActions: (entity: Entity) => React.ReactNode | undefined;
+  onWidthChange: (rowId: string, width: number) => void;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (ref.current) {
+      onWidthChange(row.id, ref.current.getBoundingClientRect().width);
+    }
+  }, [row.id, onWidthChange]);
+
+  useResizeObserver(ref, ({ contentRect: { width } }) => onWidthChange(row.id, width));
+
+  return (
+    <AlignRight>
+      <BackgroundFoundation>
+        <Actions $isStripedRow={isStripedRowIndex(row.index + 1)}>
+          <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
+        </Actions>
+      </BackgroundFoundation>
+    </AlignRight>
+  );
+};
+
+const useActionsColumnDefinition = <Entity extends EntityBase>({
+  colWidth,
+  entityActions,
+  hasRowActions,
+  onWidthChange,
+}: {
+  colWidth: number;
+  entityActions: (entity: Entity) => React.ReactNode | undefined;
+  hasRowActions: boolean;
+  minWidth: number;
+  onWidthChange: (colId: string, width: number) => void;
+}) => {
+  const columnHelper = createColumnHelper<Entity>();
+
+  const cell = useCallback(
+    ({ row }: { row: Row<Entity> }) =>
+      entityActions ? (
+        <ActionCell<Entity> row={row} entityActions={entityActions} onWidthChange={onWidthChange} />
+      ) : null,
+    [entityActions, onWidthChange],
+  );
+
+  const header = useCallback(
+    () => (
+      <AlignRight>
+        <HeaderBackground />
+      </AlignRight>
+    ),
+    [],
+  );
+
+  return useMemo(
+    () =>
+      columnHelper.display({
+        id: ACTIONS_COL_ID,
+        size: colWidth,
+        enableHiding: false,
+        enablePinning: true,
+        enableResizing: false,
+        // The actions/tail column is always present. We only hide its content when there are no row actions.
+        header: hasRowActions ? header : undefined,
+        cell: hasRowActions ? cell : undefined,
+        meta: {
+          hideCellPadding: true,
+        },
+      }),
+    [colWidth, cell, columnHelper, hasRowActions, header],
+  );
+};
+export default useActionsColumnDefinition;

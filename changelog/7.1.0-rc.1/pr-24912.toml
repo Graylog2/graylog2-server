@@ -1,0 +1,5 @@
+type = "added"
+message = "Add more metrics to used journals."
+
+pulls = ["24912"]
+issues = ["graylog-plugin-enterprise#12466"]

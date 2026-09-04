@@ -19,8 +19,8 @@ package org.graylog2.filters;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.inputs.Input;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -30,9 +30,6 @@ import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.Collections;
 import java.util.List;
@@ -68,19 +65,31 @@ public class StaticFieldFilter implements MessageFilter {
 
     @Override
     public boolean filter(Message msg) {
-        if (msg.getSourceInputId() == null) {
-            return false;
+        applyStaticFields(msg, msg.getSourceInputId());
+
+        // Forwarded messages arrive on the local Forwarder input but carry the remote input's ID in
+        // sourceInputId/gl2_source_input. Static fields configured on the local Forwarder input are keyed by
+        // its own ID, which is available in gl2_forwarder_input, so apply those as well.
+        final Object forwarderInputId = msg.getField(Message.FIELD_GL2_FORWARDER_INPUT);
+        if (forwarderInputId != null) {
+            applyStaticFields(msg, forwarderInputId.toString());
         }
 
-        for (final Map.Entry<String, String> field : staticFields.getOrDefault(msg.getSourceInputId(), Collections.emptyList())) {
+        return false;
+    }
+
+    private void applyStaticFields(Message msg, String inputId) {
+        if (inputId == null) {
+            return;
+        }
+
+        for (final Map.Entry<String, String> field : staticFields.getOrDefault(inputId, Collections.emptyList())) {
             if (!msg.hasField(field.getKey())) {
                 msg.addField(field.getKey(), field.getValue());
             } else {
                 LOG.debug("Message already contains field [{}]. Not overwriting.", field.getKey());
             }
         }
-
-        return false;
     }
 
     @Subscribe
@@ -121,12 +130,7 @@ public class StaticFieldFilter implements MessageFilter {
 
     private void loadStaticFields(final String inputId) {
         LOG.debug("Re-loading static fields for input <{}> into cache.", inputId);
-        try {
-            final Input input = inputService.find(inputId);
-            staticFields.put(inputId, ImmutableList.copyOf(inputService.getStaticFields(input)));
-        } catch (NotFoundException e) {
-            LOG.warn("Unable to load input: {}", e.getMessage());
-        }
+        staticFields.put(inputId, ImmutableList.copyOf(inputService.getStaticFields(inputId)));
     }
 
     @Override

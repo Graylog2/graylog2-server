@@ -24,18 +24,54 @@ import type { ContentPackInstallation, ContentPackMetadata } from './Types';
 
 describe('<ContentPacksList />', () => {
   const contentPacks = [
-    { id: '1', rev: 1, name: 'UFW Grok Patterns', summary: 'Content Pack: Grok Patterns to extract informations from UFW logfiles', server_version: '1.0' },
-    { id: '2', rev: 1, name: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', server_version: '2.1' },
+    {
+      id: '1',
+      rev: 1,
+      name: 'UFW Grok Patterns',
+      summary: 'Content Pack: Grok Patterns to extract informations from UFW logfiles',
+      server_version: '1.0',
+    },
+    {
+      id: '2',
+      rev: 1,
+      name: 'Rails Log Patterns',
+      summary: 'Patterns to retreive rails production logs',
+      server_version: '2.1',
+    },
     { id: '3', rev: 1, name: 'Backup Content Pack', summary: '', server_version: '3.0' },
     { id: '4', rev: 1, name: 'SSH Archive', summary: 'A crypted backup over ssh.', server_version: '3.4' },
     { id: '5', rev: 1, name: 'FTP Backup', summary: 'Fast but insecure backup', server_version: '1.0' },
-    { id: '6', rev: 1, name: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles', server_version: '1.0' },
-    { id: '7', rev: 1, name: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', server_version: '2.1' },
+    {
+      id: '6',
+      rev: 1,
+      name: 'UFW Grok Patterns',
+      summary: 'Grok Patterns to extract informations from UFW logfiles',
+      server_version: '1.0',
+    },
+    {
+      id: '7',
+      rev: 1,
+      name: 'Rails Log Patterns',
+      summary: 'Patterns to retreive rails production logs',
+      server_version: '2.1',
+    },
     { id: '8', rev: 1, name: 'Backup Content Pack', summary: '', server_version: '3.0', states: ['installed'] },
     { id: '9', rev: 1, name: 'SSH Archive', summary: 'A crypted backup over ssh.', server_version: '3.4' },
     { id: '10', rev: 1, name: 'FTP Backup', summary: 'Fast but insecure backup', server_version: '1.0' },
-    { id: '11', rev: 1, name: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles', server_version: '1.0' },
-    { id: '12', rev: 1, name: 'Rails Log Patterns', summary: 'Patterns to retreive rails production logs', server_version: '2.1' },
+    {
+      id: '11',
+      rev: 1,
+      name: 'UFW Grok Patterns',
+      summary: 'Grok Patterns to extract informations from UFW logfiles',
+      server_version: '1.0',
+    },
+    {
+      id: '12',
+      rev: 1,
+      name: 'Rails Log Patterns',
+      summary: 'Patterns to retreive rails production logs',
+      server_version: '2.1',
+    },
     { id: '13', rev: 1, name: 'Backup Content Pack', summary: '', server_version: '3.0' },
     { id: '14', rev: 1, name: 'SSH Archive', summary: 'A crypted backup over ssh.', server_version: '3.4' },
     { id: '15', rev: 1, name: 'FTP Backup', summary: 'Fast but insecure backup', server_version: '1.0' },
@@ -62,7 +98,7 @@ describe('<ContentPacksList />', () => {
 
     expect(await screen.findAllByText(/Latest Version:/)).toHaveLength(10);
 
-    userEvent.click((await screen.findAllByRole('button', { name: /open page 2/i }))[0]);
+    await userEvent.click((await screen.findAllByRole('button', { name: /open page 2/i }))[0]);
 
     const activePage = (await screen.findAllByTitle('Active page'))[0];
 
@@ -74,9 +110,9 @@ describe('<ContentPacksList />', () => {
     const deleteFn = jest.fn();
     render(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
 
-    userEvent.click((await screen.findAllByRole('button', { name: /more actions/i }))[0]);
+    await userEvent.click((await screen.findAllByRole('button', { name: /more actions/i }))[0]);
 
-    userEvent.click(await screen.findByRole('menuitem', { name: 'Delete All Versions' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete All Versions' }));
 
     expect(deleteFn).toHaveBeenCalledTimes(1);
   });

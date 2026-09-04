@@ -1,0 +1,4 @@
+type = "changed"
+message = "Changed format of event aggregation conditions to use underscores instead of parentheses, e.g. 'count(source)' is now 'count_source'"
+
+pulls = ["24703"]

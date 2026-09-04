@@ -18,10 +18,10 @@ import type View from 'views/logic/views/View';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 export type ViewHookArguments = {
-  view: View,
-  executionState: SearchExecutionState,
-  retry: (args: { view: View, executionState: SearchExecutionState }) => Promise<unknown>,
-  query: { [key: string]: any },
+  view: View;
+  executionState: SearchExecutionState;
+  retry: (args: { view: View; executionState: SearchExecutionState }) => Promise<unknown>;
+  query: { [key: string]: any };
 };
 
 export type ViewHook = (args: ViewHookArguments) => Promise<readonly [View, SearchExecutionState]>;

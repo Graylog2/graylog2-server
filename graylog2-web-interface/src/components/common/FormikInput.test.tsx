@@ -14,16 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 import * as React from 'react';
-import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 
 import FormikInput from './FormikInput';
 
 type FormValues = { [key: string]: unknown };
 
 describe('<FormikInput />', () => {
-  const SimpleForm = ({ children, onSubmit, initialValues = {} }: { children: React.ReactNode, onSubmit: (FormValues) => Promise<void>, initialValues?: FormValues}) => (
+  const SimpleForm = ({
+    children,
+    onSubmit,
+    initialValues = {},
+  }: {
+    children: React.ReactNode;
+    onSubmit: (formValues: FormValues) => Promise<void>;
+    initialValues?: FormValues;
+  }) => (
     <Formik onSubmit={(data) => onSubmit(data)} initialValues={initialValues}>
       <Form>
         {children}
@@ -36,17 +45,14 @@ describe('<FormikInput />', () => {
     const submitStub = jest.fn();
     const { getByLabelText, getByText } = render(
       <SimpleForm onSubmit={submitStub}>
-        <FormikInput label="Username"
-                     id="username"
-                     name="username"
-                     type="text" />
+        <FormikInput label="Username" id="username" name="username" type="text" />
       </SimpleForm>,
     );
 
     const usernameInput = getByLabelText('Username');
     const submitButton = getByText('Submit Form');
-    fireEvent.change(usernameInput, { target: { value: 'A username' } });
-    fireEvent.click(submitButton);
+    await userEvent.type(usernameInput, 'A username');
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitStub).toHaveBeenCalledWith({ username: 'A username' }));
   });
@@ -55,15 +61,12 @@ describe('<FormikInput />', () => {
     const submitStub = jest.fn();
     const { getByText } = render(
       <SimpleForm onSubmit={submitStub} initialValues={{ username: 'Initial username' }}>
-        <FormikInput label="Username"
-                     id="username"
-                     name="username"
-                     type="text" />
+        <FormikInput label="Username" id="username" name="username" type="text" />
       </SimpleForm>,
     );
 
     const submitButton = getByText('Submit Form');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitStub).toHaveBeenCalledWith({ username: 'Initial username' }));
   });
@@ -72,17 +75,14 @@ describe('<FormikInput />', () => {
     const submitStub = jest.fn();
     const { getByLabelText, getByText } = render(
       <SimpleForm onSubmit={submitStub}>
-        <FormikInput label="Newsletter Subscription"
-                     id="newsletter"
-                     name="newsletter"
-                     type="checkbox" />
+        <FormikInput label="Newsletter Subscription" id="newsletter" name="newsletter" type="checkbox" />
       </SimpleForm>,
     );
 
     const newsletterCheckbox = getByLabelText('Newsletter Subscription');
     const submitButton = getByText('Submit Form');
-    fireEvent.click(newsletterCheckbox);
-    fireEvent.click(submitButton);
+    await userEvent.click(newsletterCheckbox);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitStub).toHaveBeenCalledWith({ newsletter: true }));
   });
@@ -91,11 +91,7 @@ describe('<FormikInput />', () => {
     const submitStub = jest.fn();
     const { getByLabelText } = render(
       <SimpleForm onSubmit={submitStub}>
-        <FormikInput label="Username"
-                     id="username"
-                     name="username"
-                     type="text"
-                     disabled />
+        <FormikInput label="Username" id="username" name="username" type="text" disabled />
       </SimpleForm>,
     );
 

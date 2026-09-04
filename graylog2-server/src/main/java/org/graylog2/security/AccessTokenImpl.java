@@ -29,7 +29,11 @@ import java.util.Map;
 import static org.graylog2.security.AccessTokenImpl.COLLECTION_NAME;
 import static org.graylog2.security.AccessTokenImpl.NAME;
 
-@DbEntity(collection = COLLECTION_NAME, titleField = NAME)
+@DbEntity(
+        collection = COLLECTION_NAME,
+        titleField = NAME,
+        readableFields = {} // Intentional, no fields are readable, the tokens should not be exposed
+        )
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public enum Type {
         PLAINTEXT(0), AES_SIV(1);
@@ -46,12 +50,15 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     }
 
     public static final String COLLECTION_NAME = "access_tokens";
+    public static final String ID_FIELD = "_id";
     public static final String USERNAME = "username";
     public static final String TOKEN = "token";
     public static final String TOKEN_TYPE = "token_type";
     public static final String NAME = "NAME";
 
+    public static final String CREATED_AT = "created_at";
     public static final String LAST_ACCESS = "last_access";
+    public static final String EXPIRES_AT = "expires_at";
 
     public AccessTokenImpl(Map<String, Object> fields) {
         super(fields);
@@ -76,9 +83,18 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     }
 
     @Override
+    public DateTime getCreatedAt() {
+        return getDateTimeField(CREATED_AT);
+    }
+
+    @Override
     public DateTime getLastAccess() {
-        final Object o = fields.get(LAST_ACCESS);
-        return (DateTime) o;
+        return getDateTimeField(LAST_ACCESS);
+    }
+
+    @Override
+    public DateTime getExpiresAt() {
+        return getDateTimeField(EXPIRES_AT);
     }
 
     @Override
@@ -111,5 +127,9 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     @Override
     public void setName(String name) {
         fields.put(NAME, name);
+    }
+
+    private DateTime getDateTimeField(String fileName) {
+        return (DateTime) fields.get(fileName);
     }
 }

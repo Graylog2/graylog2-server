@@ -1,0 +1,6 @@
+type = "a"
+message = "Adding slicing functionality for easier grouping/searching on the Alerts and Events table for the alert and priority column."
+
+issues = ["graylog-plugin-enterprise#12910","graylog-plugin-enterprise#12912"]
+pulls = ["24958"]
+

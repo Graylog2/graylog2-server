@@ -23,11 +23,11 @@ import Widget from 'views/logic/widgets/Widget';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
-import type { WidgetActionType } from 'views/components/widgets/Types';
+import type { WidgetActionType, WidgetDropdownType } from 'views/components/widgets/Types';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
-const ExtraMenuWidgetActions = (props: React.ComponentProps<typeof OriginalExtraMenuWidgetActions>) => (
+const ExtraMenuWidgetActions = ({ ...props }: React.ComponentProps<typeof OriginalExtraMenuWidgetActions>) => (
   <TestStoreProvider>
     <OriginalExtraMenuWidgetActions {...props} />
   </TestStoreProvider>
@@ -38,7 +38,11 @@ describe('ExtraMenuWidgetActions', () => {
   const dummyActionWithoutIsHidden: WidgetActionType = {
     position: 'menu',
     type: 'dummy-action',
-    component: ({ disabled }) => <button type="button" title="dummy action" disabled={disabled}>dummy action</button>,
+    component: ({ disabled }) => (
+      <button type="button" title="dummy action" disabled={disabled}>
+        dummy action
+      </button>
+    ),
   };
   const dummyActionWhichIsHidden = {
     ...dummyActionWithoutIsHidden,
@@ -52,9 +56,11 @@ describe('ExtraMenuWidgetActions', () => {
     ...dummyActionWithoutIsHidden,
     disabled: jest.fn(() => true),
   };
-  const dummyActionWithDropdownPosition: WidgetActionType = {
+  const dummyActionWithDropdownPosition: WidgetDropdownType = {
     ...dummyActionWithoutIsHidden,
     position: 'dropdown',
+    title: () => 'Dummy Action',
+    component: () => <>Foo</>,
   };
   useViewsPlugin();
 

@@ -15,26 +15,131 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import styled, { css } from 'styled-components';
+import chroma from 'chroma-js';
 
-import UIUtils from 'util/UIUtils';
+import Icon from 'components/common/Icon';
 
-type Props = {
-  children: React.ReactNode,
-  value: any,
+const HINT_VISIBILITY_DURATION_MS = 2000;
+const HINT_WIDTH_PX = 200;
+
+const ScrollHint = styled.button(
+  ({ theme }) => css`
+    position: fixed;
+    left: calc(50% - ${HINT_WIDTH_PX / 2}px);
+    top: 50px;
+    color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
+    font-size: ${theme.fonts.size.huge};
+    padding: 20px;
+    z-index: 2000;
+    width: ${HINT_WIDTH_PX}px;
+    border-radius: 10px;
+    border: 0;
+    background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
+  `,
+);
+
+export const isElementVisibleInContainer = (target: HTMLElement, scrollContainer: HTMLElement) => {
+  const containerRect = scrollContainer.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+
+  return targetRect.top >= containerRect.top && targetRect.bottom <= containerRect.bottom;
 };
 
-const ScrollToHint = ({ children, value }: Props) => {
-  const spanRef = useRef();
+type Props = {
+  scrollContainer: React.RefObject<HTMLElement>;
+  title: string;
+  // When the dependency changes, the hint will be displayed if this component is not visible.
+  ifValueChanges?: unknown;
+  ifTrue?: boolean;
+  autoScroll?: boolean;
+  // Called once the target is confirmed visible, either because it already was or because this
+  // component just scrolled it into view. Lets callers that track "still needs attention" state
+  // (e.g. a newly created widget) clear it based on the outcome instead of guessing a delay.
+  onSettled?: () => void;
+};
 
+const ScrollToHint = ({
+  ifValueChanges = undefined,
+  scrollContainer,
+  title,
+  ifTrue = true,
+  autoScroll = false,
+  onSettled = undefined,
+}: Props) => {
+  const scrollTargetRef = useRef<HTMLDivElement | null>(null);
+  const [showHint, setShowHint] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const timeoutRef = useRef(null);
+
+  const scrollToTarget = useCallback(() => {
+    setShowHint(false);
+    setIsHovered(false);
+    if (scrollTargetRef.current) {
+      scrollTargetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  // show the scroll hint if necessary
   useEffect(() => {
-    UIUtils.scrollToHint(spanRef.current);
-  }, [value]);
+    if (!ifTrue || !scrollTargetRef.current || !scrollContainer.current) {
+      return;
+    }
+
+    if (
+      isElementVisibleInContainer(
+        scrollTargetRef.current.parentElement ?? scrollTargetRef.current,
+        scrollContainer.current,
+      )
+    ) {
+      onSettled?.();
+
+      return;
+    }
+
+    if (autoScroll) {
+      scrollToTarget();
+      onSettled?.();
+    } else {
+      setShowHint(true);
+    }
+  }, [ifTrue, ifValueChanges, setShowHint, scrollContainer, scrollToTarget, autoScroll, onSettled]);
+
+  // hide the hint automatically
+  useEffect(() => {
+    if (showHint && !isHovered) {
+      timeoutRef.current = setTimeout(() => setShowHint(false), HINT_VISIBILITY_DURATION_MS);
+    }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [showHint, isHovered]);
+
+  const iconName = useMemo(() => {
+    const currentScroll = scrollContainer.current?.scrollTop;
+    // eslint-disable-next-line react-hooks/refs
+    const elementTop = scrollTargetRef?.current?.getBoundingClientRect().top;
+
+    return elementTop !== undefined && currentScroll !== undefined && elementTop > currentScroll
+      ? 'arrow_downward'
+      : 'arrow_upward';
+  }, [scrollContainer]);
 
   return (
-    <span ref={spanRef}>
-      {children}
-    </span>
+    <>
+      <div ref={scrollTargetRef} />
+      {showHint && (
+        <ScrollHint
+          onClick={scrollToTarget}
+          aria-label={title}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}>
+          <Icon name={iconName} />
+        </ScrollHint>
+      )}
+    </>
   );
 };
 

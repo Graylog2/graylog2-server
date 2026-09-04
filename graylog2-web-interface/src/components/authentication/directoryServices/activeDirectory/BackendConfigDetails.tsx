@@ -26,15 +26,14 @@ import UserSyncSection from '../BackendConfigDetails/UserSyncSection';
 import GroupSyncSection from '../BackendConfigDetails/GroupSyncSection';
 
 type Props = {
-  authenticationBackend: DirectoryServiceBackend,
-  roles: Immutable.List<Role>,
+  authenticationBackend: DirectoryServiceBackend;
+  roles: Immutable.List<Role>;
 };
 
 const BackendConfigDetails = ({ authenticationBackend, roles }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const {
-    excludedFields: groupSyncExcludedFields = {},
-  } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
+  const { excludedFields: groupSyncExcludedFields = {} } =
+    enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
   const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true, emailAttributes: true };
 
   return (

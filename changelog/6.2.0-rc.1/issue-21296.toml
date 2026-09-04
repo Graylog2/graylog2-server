@@ -1,0 +1,12 @@
+type = "a"
+message = "Add option to render a pluggable navigation item after another specific item."
+
+issues = ["21296"]
+pulls = ["21827"]
+
+
+details.user = """
+It is now possible to render a pluggable navigation item after another specific navigation item.
+For example when you want to display a navigation item after the "Streams" link you can extend it with `position: { after: 'Search' }` to it,
+before registering it in the plugin store.
+"""

@@ -1,0 +1,5 @@
+type = "added"
+message = "Added support for favorite fields in streams, controllable from message expansion."
+
+issues = ["24058", "graylog-plugin-enterprise#12391", "graylog-plugin-enterprise#12290", "graylog-plugin-enterprise#12291", "graylog-plugin-enterprise#12292"]
+pulls = ["21131", "23990", "24096"]

@@ -1,0 +1,5 @@
+type = "f"
+message = "Queries modified via 'Add to query' or 'Exclude from query' widget actions now appear in query history."
+
+issues = ["24894"]
+pulls = ["24932"]

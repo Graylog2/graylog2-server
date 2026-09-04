@@ -15,20 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { parse, stringify } from 'qs';
 
+import useHistory from 'routing/useHistory';
 import useLocation from 'routing/useLocation';
 import type { Pagination } from 'stores/PaginationTypes';
 
 type UseLocationSearchPaginationType = {
-  isInitialized: boolean,
-  pagination: Pagination,
-  setPagination: (nextPagination: Pagination) => void,
-}
+  isInitialized: boolean;
+  pagination: Pagination;
+  setPagination: (nextPagination: Pagination) => void;
+};
 
 const useLocationSearchPagination = (defaultPagination: Pagination): UseLocationSearchPaginationType => {
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const location = useLocation();
   const [parsedPagination, setParsedPagination] = useState<Pagination>(defaultPagination);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
@@ -37,7 +37,7 @@ const useLocationSearchPagination = (defaultPagination: Pagination): UseLocation
     const convertToSafePositiveInteger = (maybeNumber: any): number | undefined => {
       const parsedNumber = Number.parseInt(maybeNumber, 10);
 
-      return (Number.isSafeInteger(parsedNumber) && parsedNumber > 0) ? parsedNumber : undefined;
+      return Number.isSafeInteger(parsedNumber) && parsedNumber > 0 ? parsedNumber : undefined;
     };
 
     const parsePaginationFromSearch = (search: string): Pagination => {
@@ -51,15 +51,13 @@ const useLocationSearchPagination = (defaultPagination: Pagination): UseLocation
       };
     };
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setParsedPagination(parsePaginationFromSearch(location.search));
     setIsInitialized(true);
   }, [location.search, defaultPagination]);
 
   const setLocationSearchPagination = (nextPagination: Pagination) => {
-    navigate({
-      pathname: location.pathname,
-      search: stringify(nextPagination),
-    });
+    push(`${location.pathname}${stringify(nextPagination, { addQueryPrefix: true })}`);
   };
 
   return {

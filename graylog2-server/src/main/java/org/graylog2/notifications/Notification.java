@@ -16,17 +16,44 @@
  */
 package org.graylog2.notifications;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public interface Notification extends Persisted {
-    // Some pre-defined detail keys
-    final String KEY_TITLE = "title";
-    final String KEY_DESCRIPTION = "description";
+
+    /**
+     * Notification types that are not actionable by cloud users and should be
+     * suppressed from the UI listing in cloud installations ({@code is_cloud=true}).
+     * These notifications will still be persisted and will still generate system events.
+     */
+    Set<Type> CLOUD_SUPPRESSED_TYPES = Set.copyOf(EnumSet.of(
+            Type.DATA_NODE_NEEDS_PROVISIONING,
+            Type.DEFLECTOR_EXISTS_AS_INDEX,
+            Type.ES_OPEN_FILES,
+            Type.ES_CLUSTER_RED,
+            Type.ES_UNAVAILABLE,
+            Type.CHECK_SERVER_CLOCKS,
+            Type.EMAIL_TRANSPORT_FAILED,
+            Type.INDEX_RANGES_RECALCULATION,
+            Type.ES_INDEX_BLOCKED,
+            Type.ES_NODE_DISK_WATERMARK_LOW,
+            Type.ES_NODE_DISK_WATERMARK_HIGH,
+            Type.ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
+            Type.ES_SHARD_ALLOCATION_MAXIMUM,
+            Type.ES_VERSION_MISMATCH,
+            Type.MULTI_LEADER,
+            Type.NO_LEADER,
+            Type.DATA_NODE_VERSION_MISMATCH,
+            Type.DATA_NODE_HEAP_WARNING
+    ));
 
     Notification addType(Type type);
 
@@ -86,6 +113,7 @@ public interface Notification extends Persisted {
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
         ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
+        ES_SHARD_ALLOCATION_MAXIMUM,
         ES_VERSION_MISMATCH,
         LEGACY_LDAP_CONFIG_MIGRATION,
         MULTI_LEADER,
@@ -97,10 +125,22 @@ public interface Notification extends Persisted {
         DRAWDOWN_LICENSE_ERROR,
         REMOTE_REINDEX_RUNNING,
         REMOTE_REINDEX_FINISHED,
-        DATA_TIERING_ROLLOVER_ERROR
+        DATA_NODE_VERSION_MISMATCH,
+        DATA_TIERING_ROLLOVER_ERROR,
+        DATA_NODE_HEAP_WARNING;
+
+        @JsonValue
+        public String json() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     }
 
     enum Severity {
-        NORMAL, URGENT
+        NORMAL, URGENT;
+
+        @JsonValue
+        public String json() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     }
 }

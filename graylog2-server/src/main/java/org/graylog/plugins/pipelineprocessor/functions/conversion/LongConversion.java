@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.functions.conversion;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
@@ -26,10 +25,11 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
 import static com.google.common.primitives.Longs.tryParse;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
-public class LongConversion extends AbstractFunction<Long> {
+public class LongConversion extends AbstractConversion<Long> {
 
     public static final String NAME = "to_long";
 
@@ -50,7 +50,7 @@ public class LongConversion extends AbstractFunction<Long> {
         final Long defaultValue = defaultParam.optional(args, context).orElse(0L);
 
         if (evaluated == null) {
-            return defaultValue;
+            return defaultToNull(args, context) ? null : defaultValue;
         } else if (evaluated instanceof Number) {
             return ((Number) evaluated).longValue();
         } else {
@@ -66,7 +66,8 @@ public class LongConversion extends AbstractFunction<Long> {
                 .returnType(Long.class)
                 .params(of(
                         valueParam,
-                        defaultParam
+                        defaultParam,
+                        defaultToNullParam
                 ))
                 .description("Converts a value to a long value using its string representation")
                 .ruleBuilderEnabled()

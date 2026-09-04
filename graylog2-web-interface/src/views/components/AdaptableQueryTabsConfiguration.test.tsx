@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { act, render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import React from 'react';
 import Immutable, { OrderedSet } from 'immutable';
 import userEvent from '@testing-library/user-event';
@@ -24,6 +24,7 @@ import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabs
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -32,33 +33,24 @@ jest.mock('views/logic/slices/viewSlice', () => ({
 }));
 
 describe('AdaptableQueryTabsConfiguration', () => {
-  let oldConfirm;
-
-  beforeEach(() => {
-    oldConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-    window.confirm = oldConfirm;
-  });
-
+  useWindowConfirmMock();
   useViewsPlugin();
 
-  const renderConfiguration = () => render((
-    <TestStoreProvider>
-      <AdaptableQueryTabsConfiguration show
-                                       setShow={() => {}}
-                                       activeQueryId="queryId-1"
-                                       dashboardId="dashboard-id"
-                                       queriesList={OrderedSet(
-                                         [
-                                           { id: 'queryId-1', title: 'Query Title 1' },
-                                           { id: 'queryId-2', title: 'Query Title 2' },
-                                         ])} />
-    </TestStoreProvider>
-  ));
+  const renderConfiguration = () =>
+    render(
+      <TestStoreProvider>
+        <AdaptableQueryTabsConfiguration
+          show
+          setShow={() => {}}
+          activeQueryId="queryId-1"
+          dashboardId="dashboard-id"
+          queriesList={OrderedSet([
+            { id: 'queryId-1', title: 'Query Title 1' },
+            { id: 'queryId-2', title: 'Query Title 2' },
+          ])}
+        />
+      </TestStoreProvider>,
+    );
 
   it('should display modal window', async () => {
     renderConfiguration();
@@ -76,7 +68,7 @@ describe('AdaptableQueryTabsConfiguration', () => {
   it('should run setOrder and patchQueriesTitle with correct tab order and titles on submit', async () => {
     renderConfiguration();
     const submitButton = await screen.findByTitle('Update configuration');
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await expect(setQueriesOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1', 'queryId-2']));
 
@@ -90,13 +82,13 @@ describe('AdaptableQueryTabsConfiguration', () => {
     renderConfiguration();
     const deleteButton = await screen.findByRole('button', {
       name: /remove page query title 2/i,
-      hidden: true,
     });
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.click(deleteButton);
-    });
+    await userEvent.click(deleteButton);
+
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: /remove page query title 2/i })).not.toBeInTheDocument(),
+    );
 
     const submitButton = await screen.findByTitle('Update configuration');
 

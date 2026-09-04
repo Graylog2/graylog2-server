@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -32,6 +33,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import type View from 'views/logic/views/View';
 import type { Stream } from 'logic/streams/types';
+import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 
 import NewSearchPage from './NewSearchPage';
 
@@ -44,6 +46,7 @@ jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
+jest.mock('views/hooks/useMinimumRefreshInterval');
 
 describe('NewSearchPage', () => {
   const query = {
@@ -61,8 +64,13 @@ describe('NewSearchPage', () => {
 
   beforeEach(() => {
     asMock(useQuery).mockReturnValue(query);
+    asMock(useMinimumRefreshInterval).mockReturnValue({ data: undefined, isInitialLoading: false });
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view: mockView,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
     asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
@@ -86,27 +94,34 @@ describe('NewSearchPage', () => {
       asMock(useQuery).mockReturnValue({});
       render(<SimpleNewSearchPage />);
 
-      await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith({
-        parameters: undefined,
-        queryString: undefined,
-        streamId: [],
-        streamCategory: [],
-        timeRange: undefined,
-      }));
+      await waitFor(() =>
+        expect(useCreateSavedSearch).toHaveBeenCalledWith({
+          parameters: undefined,
+          queryString: undefined,
+          streamId: [],
+          streamCategory: [],
+          timeRange: undefined,
+        }),
+      );
     });
 
     it('should process hooks with provided location query', async () => {
       render(<SimpleNewSearchPage />);
 
-      await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), {
-        q: '',
-        rangetype: 'relative',
-        relative: '300',
-      }));
+      await waitFor(() =>
+        expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), {
+          q: '',
+          rangetype: 'relative',
+          relative: '300',
+        }),
+      );
     });
 
     it('should display errors which occur when processing hooks', async () => {
-      asMock(useProcessHooksForView).mockImplementation(() => ({ status: 'interrupted', component: <span>An unknown error has occurred.</span> }));
+      asMock(useProcessHooksForView).mockImplementation(() => ({
+        status: 'interrupted',
+        component: <span>An unknown error has occurred.</span>,
+      }));
 
       render(<SimpleNewSearchPage />);
 
@@ -119,8 +134,8 @@ describe('NewSearchPage', () => {
       asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => (
-            <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load
-              view
+            <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>
+              Load view
             </button>
           )}
         </ViewLoaderContext.Consumer>
@@ -128,7 +143,7 @@ describe('NewSearchPage', () => {
 
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewLoadButton = await findByText('Load view');
-      fireEvent.click(viewLoadButton);
+      await userEvent.click(viewLoadButton);
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
@@ -140,7 +155,11 @@ describe('NewSearchPage', () => {
     beforeEach(() => {
       asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <NewViewLoaderContext.Consumer>
-          {(_loadNewView) => <button type="button" onClick={() => _loadNewView()}>Load new view</button>}
+          {(_loadNewView) => (
+            <button type="button" onClick={() => _loadNewView()}>
+              Load new view
+            </button>
+          )}
         </NewViewLoaderContext.Consumer>
       ));
     });
@@ -148,7 +167,7 @@ describe('NewSearchPage', () => {
     it('should be supported', async () => {
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await findByText('Load new view');
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(loadNewView).toHaveBeenCalled());
     });
@@ -156,7 +175,7 @@ describe('NewSearchPage', () => {
     it('should process hooks with query', async () => {
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await findByText('Load new view');
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 

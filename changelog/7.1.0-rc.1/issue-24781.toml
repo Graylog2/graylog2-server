@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix overly strict parsing of escaped characters in pipeline function parse_json."
+
+issues = ["24781"]
+pulls = ["24785"]

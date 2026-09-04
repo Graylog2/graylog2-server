@@ -16,81 +16,86 @@
  */
 import { useMutation } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
+import { PipelinesPipelines, Streams, PipelinesRules, PipelinesConnections } from '@graylog/server-api';
+
+import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import type { Stream } from 'logic/streams/types';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { NewPipelineType, PipelineType } from 'components/pipelines/types';
+import { DEFAULT_PIPELINE } from 'components/pipelines/types';
 
 export type RoutingParams = {
-  stream_id?: string,
-  input_id: string,
-}
-
-export type StreamConfiguration = Pick<Stream,
-  'index_set_id' |
-  'title' |
-  'remove_matches_from_default_stream'
-> & Partial<Pick<Stream, 'description'>>
-
-type PipelineConfiguration = Pick<PipelineType,
-  'title' |
-  'description' |
-  'source'
->
-
-const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> => {
-  const url = qualifyUrl(ApiRoutes.StreamsApiController.create().url);
-
-  return fetch('POST', url, stream);
+  stream_id?: string;
+  input_id: string;
+  remove_from_default?: boolean;
 };
 
-const startStream = async (streamId) => {
-  const url = qualifyUrl(ApiRoutes.StreamsApiController.resume(streamId).url);
+export type StreamConfiguration = Pick<Stream, 'index_set_id' | 'title' | 'remove_matches_from_default_stream'> &
+  Partial<Pick<Stream, 'description'>>;
 
-  return fetch('POST', url);
+const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> =>
+  Streams.create({
+    entity: {
+      matching_type: undefined,
+      rules: undefined,
+      content_pack: undefined,
+      description: undefined,
+      ...stream,
+    },
+    share_request: undefined,
+  });
+
+const startStream = async (streamId) => Streams.resume(streamId);
+
+const createPipeline = (pipeline: NewPipelineType): Promise<PipelineType> => {
+  const requestPipeline = {
+    ...DEFAULT_PIPELINE,
+    ...pipeline,
+  };
+
+  return PipelinesPipelines.createFromParser({
+    ...requestPipeline,
+    source: SourceGenerator.generatePipeline(requestPipeline),
+  });
 };
 
-const createPipeline = (pipeline: PipelineConfiguration) : Promise<PipelineType> => {
-  const url = qualifyUrl(ApiRoutes.PipelinesController.create().url);
+const updateRouting = async (params: RoutingParams): Promise<{ rule_id: string }> =>
+  PipelinesPipelines.routing({ remove_from_default: undefined, stream_id: undefined, ...params });
 
-  return fetch('POST', url, pipeline);
-};
+const deleteStream = async (streamId: string) => Streams.remove(streamId);
 
-const updateRouting = async (params: RoutingParams): Promise <{ id: string }> => {
-  const url = qualifyUrl(ApiRoutes.PipelinesController.updateRouting().url);
+const deletePipeline = async (pipelineId: string) => PipelinesPipelines.remove(pipelineId);
 
-  return fetch('PUT', url, params);
-};
+const deleteRoutingRule = async (ruleId: string) => PipelinesRules.remove(ruleId);
+const connectPipeline = async ({ pipelineId, streamId }: { pipelineId: string; streamId: string }) =>
+  PipelinesConnections.connectStreams({ stream_ids: [streamId], pipeline_id: pipelineId });
 
-const deleteStream = async (streamId: string) => {
-  const url = qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);
+const useSetupInputMutations = () => {
+  const createStreamMutation = useMutation({
+    mutationFn: createStream,
+  });
+  const startStreamMutation = useMutation({
+    mutationFn: startStream,
+  });
+  const createPipelineMutation = useMutation({
+    mutationFn: createPipeline,
+  });
+  const updateRoutingMutation = useMutation({
+    mutationFn: updateRouting,
+  });
+  const deleteStreamMutation = useMutation({
+    mutationFn: deleteStream,
+  });
+  const deletePipelineMutation = useMutation({
+    mutationFn: deletePipeline,
+  });
+  const deleteRoutingRuleMutation = useMutation({
+    mutationFn: deleteRoutingRule,
+  });
+  const connectPipelineMutation = useMutation({
+    mutationFn: connectPipeline,
+  });
 
-  return fetch('DELETE', url);
-};
-
-const deletePipeline = async (pipelineId: string) => {
-  const url = qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
-
-  return fetch('DELETE', url);
-};
-
-const deleteRoutingRule = async (ruleId: string) => {
-  const url = qualifyUrl(ApiRoutes.RulesController.delete(ruleId).url);
-
-  return fetch('DELETE', url);
-};
-
-const usePipelineRoutingMutation = () => {
-  const createStreamMutation = useMutation(createStream);
-  const startStreamMutation = useMutation(startStream);
-  const createPipelineMutation = useMutation(createPipeline);
-  const updateRoutingMutation = useMutation(updateRouting);
-  const deleteStreamMutation = useMutation(deleteStream);
-  const deletePipelineMutation = useMutation(deletePipeline);
-  const deleteRoutingRuleMutation = useMutation(deleteRoutingRule);
-
-  return ({
+  return {
     createStreamMutation,
     startStreamMutation,
     createPipelineMutation,
@@ -98,7 +103,8 @@ const usePipelineRoutingMutation = () => {
     deleteStreamMutation,
     deletePipelineMutation,
     deleteRoutingRuleMutation,
-  });
+    connectPipelineMutation,
+  };
 };
 
-export default usePipelineRoutingMutation;
+export default useSetupInputMutations;

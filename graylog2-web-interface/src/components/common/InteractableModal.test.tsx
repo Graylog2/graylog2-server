@@ -21,7 +21,11 @@ import InteractableModal from './InteractableModal';
 
 describe('<InteractableModal />', () => {
   it('properly renders', async () => {
-    render(<InteractableModal><div>This is the modal</div></InteractableModal>);
+    render(
+      <InteractableModal>
+        <div>This is the modal</div>
+      </InteractableModal>,
+    );
 
     await screen.findByText('This is the modal');
   });

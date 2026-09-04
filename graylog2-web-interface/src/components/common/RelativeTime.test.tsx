@@ -20,17 +20,22 @@ import { render, screen } from 'wrappedTestingLibrary';
 import RelativeTime from './RelativeTime';
 
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
+const twelveDaysAgo = new Date(mockedUnixTime - 12 * 24 * 60 * 60 * 1000);
 
-jest.useFakeTimers()
-  .setSystemTime(mockedUnixTime);
+jest.useFakeTimers().setSystemTime(mockedUnixTime);
 
 describe('RelativeTime', () => {
   it('should display relative time', () => {
-    render(
-      <RelativeTime dateTime="2019-01-01 10:00:00" />,
-    );
+    render(<RelativeTime dateTime="2019-01-01 10:00:00" />);
 
     expect(screen.getByText('a year ago')).toBeInTheDocument();
+  });
+
+  it('renders the relative time without suffix when withoutSuffix is set', async () => {
+    render(<RelativeTime dateTime={twelveDaysAgo} withoutSuffix />);
+
+    await screen.findByText('12 days');
+    expect(screen.queryByText(/12 days ago/)).not.toBeInTheDocument();
   });
 
   it('should display time relative to current time, when date time is not defined', () => {

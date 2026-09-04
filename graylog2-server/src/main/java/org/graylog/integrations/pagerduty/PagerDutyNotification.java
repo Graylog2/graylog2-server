@@ -17,6 +17,7 @@
 package org.graylog.integrations.pagerduty;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationException;
@@ -28,8 +29,6 @@ import org.graylog.integrations.pagerduty.dto.PagerDutyResponse;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.util.List;
@@ -71,7 +70,7 @@ public class PagerDutyNotification implements EventNotification {
         try {
             PagerDutyResponse response = pagerDutyClient.enqueue(payloadString);
             List<String> errors = response.getErrors();
-            if (errors != null && errors.size() > 0) {
+            if (errors != null && !errors.isEmpty()) {
                 throw new IllegalStateException(
                         "There was an error triggering the PagerDuty event, details: " + errors);
             }

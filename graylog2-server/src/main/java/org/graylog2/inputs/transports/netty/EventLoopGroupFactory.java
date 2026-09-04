@@ -21,13 +21,13 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.kqueue.KQueueEventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.epoll.EpollIoHandler;
+import io.netty.channel.kqueue.KQueueIoHandler;
+import io.netty.channel.nio.NioIoHandler;
+import jakarta.inject.Inject;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.plugin.LocalMetricRegistry;
-
-import jakarta.inject.Inject;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -46,16 +46,12 @@ public class EventLoopGroupFactory {
         final ThreadFactory threadFactory = threadFactory(metricPrefix, metricRegistry);
         final Executor executor = executor(metricPrefix, numThreads, threadFactory, metricRegistry);
 
-        switch (configuration.getType()) {
-            case EPOLL:
-                return epollEventLoopGroup(numThreads, executor);
-            case KQUEUE:
-                return kqueueEventLoopGroup(numThreads, executor);
-            case NIO:
-                return nioEventLoopGroup(numThreads, executor);
-            default:
-                throw new RuntimeException("Invalid or unknown netty transport type " + configuration.getType());
-        }
+        var handlerFactory = switch (configuration.getType()) {
+            case EPOLL -> EpollIoHandler.newFactory();
+            case KQUEUE -> KQueueIoHandler.newFactory();
+            case NIO -> NioIoHandler.newFactory();
+        };
+        return new MultiThreadIoEventLoopGroup(numThreads, executor, handlerFactory);
     }
 
     private ThreadFactory threadFactory(String name, MetricRegistry metricRegistry) {
@@ -69,18 +65,5 @@ public class EventLoopGroupFactory {
         final String executorMetricName = LocalMetricRegistry.name(name, "executor-service");
         final ExecutorService cachedThreadPool = Executors.newFixedThreadPool(numThreads, threadFactory);
         return new InstrumentedExecutorService(cachedThreadPool, metricRegistry, executorMetricName);
-    }
-
-    private EventLoopGroup nioEventLoopGroup(int numThreads, Executor executor) {
-        return new NioEventLoopGroup(numThreads, executor);
-    }
-
-
-    private EventLoopGroup epollEventLoopGroup(int numThreads, Executor executor) {
-        return new EpollEventLoopGroup(numThreads, executor);
-    }
-
-    private EventLoopGroup kqueueEventLoopGroup(int numThreads, Executor executor) {
-        return new KQueueEventLoopGroup(numThreads, executor);
     }
 }

@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { createGRN } from 'logic/permissions/GRN';
 import { asMock } from 'helpers/mocking';
@@ -31,22 +32,28 @@ describe('<ShareButton />', () => {
   const entityType = 'dashboard';
   const entityId = 'dashboard-id';
   const entityGRN = createGRN(entityType, entityId);
-  const currentUser = adminUser.toBuilder()
+  const currentUser = adminUser
+    .toBuilder()
     .permissions(Immutable.List([]))
     .grnPermissions(Immutable.List([`entity:own:${entityGRN}`]))
     .build();
 
-  const SimpleShareButton = ({ onClick, ...rest }: { onClick: () => void, disabledInfo?: string | undefined }) => (
+  const SimpleShareButton = ({ onClick, ...rest }: { onClick: () => void; disabledInfo?: string | undefined }) => (
     <ShareButton {...rest} onClick={onClick} entityType={entityType} entityId={entityId} />
   );
 
   it('should be clickable if user has correct permissions', async () => {
     const onClickStub = jest.fn();
-    asMock(useCurrentUser).mockReturnValue(currentUser.toBuilder().grnPermissions(Immutable.List([`entity:own:${entityGRN}`])).build());
+    asMock(useCurrentUser).mockReturnValue(
+      currentUser
+        .toBuilder()
+        .grnPermissions(Immutable.List([`entity:own:${entityGRN}`]))
+        .build(),
+    );
     render(<SimpleShareButton onClick={onClickStub} />);
 
     const button = screen.getByRole('button', { name: /Share/ });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onClickStub).toHaveBeenCalledTimes(1);
   });
@@ -57,19 +64,37 @@ describe('<ShareButton />', () => {
     render(<SimpleShareButton onClick={onClickStub} />);
 
     const button = screen.getByRole('button', { name: /Share/ });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onClickStub).not.toHaveBeenCalled();
   });
 
   it('should not be clickable if disabledInfo is provided', async () => {
     const onClickStub = jest.fn();
-    asMock(useCurrentUser).mockReturnValue(currentUser.toBuilder().grnPermissions(Immutable.List([`entity:own:${entityGRN}`])).build());
+    asMock(useCurrentUser).mockReturnValue(
+      currentUser
+        .toBuilder()
+        .grnPermissions(Immutable.List([`entity:own:${entityGRN}`]))
+        .build(),
+    );
     render(<SimpleShareButton onClick={onClickStub} disabledInfo="Only saved entities can be shared" />);
 
     const button = screen.getByRole('button', { name: /Share/ });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onClickStub).not.toHaveBeenCalled();
+  });
+
+  it('should stay focusable and show the disabled reason in a tooltip when focused via keyboard', async () => {
+    const onClickStub = jest.fn();
+    asMock(useCurrentUser).mockReturnValue(currentUser.toBuilder().grnPermissions(Immutable.List([])).build());
+    render(<SimpleShareButton onClick={onClickStub} />);
+
+    await userEvent.tab();
+
+    const button = screen.getByRole('button', { name: /Share/ });
+    expect(button).toHaveFocus();
+
+    await screen.findByText(/Only owners of this dashboard can share it/);
   });
 });

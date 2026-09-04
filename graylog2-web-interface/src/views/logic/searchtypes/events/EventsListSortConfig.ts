@@ -17,13 +17,13 @@
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type EventsListSortConfigJson = {
-  field: string,
-  direction: 'ASC' | 'DESC',
+  field: string;
+  direction: 'ASC' | 'DESC';
 };
 
 type InternalState = {
-  field: string,
-  direction: Direction,
+  field: string;
+  direction: Direction;
 };
 
 export default class EventsListSortConfig {

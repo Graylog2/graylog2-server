@@ -23,6 +23,7 @@ import com.google.common.net.HttpHeaders;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -37,7 +38,8 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -49,6 +51,7 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -58,7 +61,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
-    private final IndexerJwtAuthTokenProvider authTokenProvider;
+    private final Provider<IndexerJwtAuthToken> authToken;
     private final NodeService<DataNodeDto> nodeService;
     private final ObjectMapper objectMapper;
     private final DatanodeResolver datanodeResolver;
@@ -67,7 +70,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
     @Inject
     public DatanodeRestApiProxy(IndexerJwtAuthTokenProvider authTokenProvider, NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper, DatanodeResolver datanodeResolver, OkHttpClient okHttpClient, @Named("proxied_requests_default_call_timeout")
     com.github.joschi.jadconfig.util.Duration defaultProxyTimeout) {
-        this.authTokenProvider = authTokenProvider;
+        this.authToken = authTokenProvider.alwaysEnabled();
         this.nodeService = nodeService;
         this.objectMapper = objectMapper;
         this.datanodeResolver = datanodeResolver;
@@ -133,8 +136,9 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         request.queryParameters().forEach((key, values) -> values.forEach(value -> urlBuilder.addQueryParameter(key, value)));
 
         final Request.Builder builder = new Request.Builder()
-                .url(urlBuilder.build())
-                .addHeader("Authorization", authTokenProvider.get());
+                .url(urlBuilder.build());
+
+        authToken.get().headerValue().ifPresent(headerValue -> builder.addHeader(HttpHeaders.AUTHORIZATION, headerValue));
 
         switch (request.method().toUpperCase(Locale.ROOT)) {
             case "GET" -> builder.get();
@@ -150,31 +154,35 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
     public <RemoteInterfaceType, RemoteResponseType> Map<String, RemoteResponseType> remoteInterface(String nodeSelector, Class<RemoteInterfaceType> interfaceClass, Function<RemoteInterfaceType, Call<RemoteResponseType>> function) {
         final Collection<DataNodeDto> hosts = resolveHosts(nodeSelector);
-        return hosts.stream()
+        // synchronizedMap on HashMap so we can safely insert null values from parallel threads.
+        // null is the expected body for void-typed Retrofit calls (Call<Void>) and 204 No Content responses;
+        // we still want the entry in the result map to signal that the host responded successfully.
+        final Map<String, RemoteResponseType> result = Collections.synchronizedMap(new HashMap<>());
+        hosts.stream()
                 .filter(n -> Objects.nonNull(n.getRestApiAddress()))
                 .parallel()
-                .collect(Collectors.toMap(NodeDto::getHostname, n -> {
+                .forEach(n -> {
                     final Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(StringUtils.removeEnd(n.getRestApiAddress(), "/"))
                             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
                             .client(httpClient.newBuilder().addInterceptor(chain -> {
-                                final Request req = chain.request().newBuilder()
-                                        .header(HttpHeaders.AUTHORIZATION, authTokenProvider.get())
-                                        .build();
-                                return chain.proceed(req);
+                                final Request.Builder req = chain.request().newBuilder();
+                                authToken.get().headerValue().ifPresent(headerValue -> req.addHeader(HttpHeaders.AUTHORIZATION, headerValue));
+                                return chain.proceed(req.build());
                             }).build())
                             .build();
                     try {
                         final retrofit2.Response<RemoteResponseType> response = function.apply(retrofit.create(interfaceClass)).execute();
-                        if (response.isSuccessful() && response.body() != null) { // TODO: this causes exceptions when the remote if returns no body but ok state!
-                            return response.body();
+                        if (response.isSuccessful()) {
+                            result.put(n.getHostname(), response.body());
                         } else {
                             throw new IllegalStateException("Failed to trigger datanode request. Code: " + response.code() + ", message: " + response.message());
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }));
+                });
+        return Collections.unmodifiableMap(new HashMap<>(result));
     }
 
     private Collection<DataNodeDto> resolveHosts(String nodeSelector) {
@@ -183,7 +191,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         } else {
             return datanodeResolver.findByHostname(nodeSelector)
                     .map(Collections::singleton)
-                    .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + nodeSelector));
+                    .orElseThrow(() -> new DatanodeNotFoundException("No datanode found matching name " + nodeSelector));
         }
     }
 

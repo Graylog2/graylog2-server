@@ -22,11 +22,11 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 
 public class SearchServerInstanceProvider {
-    private static ServiceLoader<SearchServerInterfaceProvider> loader = ServiceLoader.load(SearchServerInterfaceProvider.class);
+    private static final ServiceLoader<SearchServerInterfaceProvider> loader = ServiceLoader.load(SearchServerInterfaceProvider.class);
 
-    public static Optional<SearchServerBuilder> getBuilderFor(SearchVersion searchVersion) {
+    public static Optional<SearchServerBuilder<?>> getBuilderFor(SearchVersion searchVersion) {
         for (SearchServerInterfaceProvider provider : loader) {
-            SearchServerBuilder builder = provider.getBuilderFor(searchVersion);
+            SearchServerBuilder<?> builder = provider.getBuilderFor(searchVersion);
             if (builder != null) {
                 return Optional.of(builder);
             }

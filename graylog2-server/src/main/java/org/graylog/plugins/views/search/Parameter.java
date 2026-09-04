@@ -21,6 +21,11 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Maps;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -41,7 +46,7 @@ import java.util.Objects;
         property = Parameter.TYPE_FIELD,
         visible = true,
         defaultImpl = ValueParameter.class)
-public interface Parameter {
+public interface Parameter extends ContentPackable<Parameter>, NativeEntityConverter<Parameter> {
     String TYPE_FIELD = "type";
 
     @JsonProperty(TYPE_FIELD)
@@ -73,6 +78,22 @@ public interface Parameter {
     Binding binding();
 
     Parameter applyBindings(Map<String,  Parameter.Binding> bindings);
+
+    @Override
+    default Parameter toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        return this;
+    }
+
+    /**
+     * On content pack installation, resolve any content-pack entity references this parameter carries back to native
+     * entity ids using the resolved {@code nativeEntities}. Default is a no-op for parameters that reference no
+     * entities; the install-ordering counterpart is {@link NativeEntityConverter#resolveForInstallation}.
+     */
+    @Override
+    default Parameter toNativeEntity(Map<String, ValueReference> parameters,
+                                     Map<EntityDescriptor, Object> nativeEntities) {
+        return this;
+    }
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)

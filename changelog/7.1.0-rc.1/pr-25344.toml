@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed excessive MongoDB queries caused by uncacheable TimeStampConfig."
+
+pulls = ["25344"]

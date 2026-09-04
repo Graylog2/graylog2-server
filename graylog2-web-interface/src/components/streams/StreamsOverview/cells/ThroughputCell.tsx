@@ -15,42 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Spinner } from 'components/common';
-import { useStore } from 'stores/connect';
+import { useMetric } from 'hooks/useMetrics';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
 const ThroughputCell = ({ stream }: Props) => {
-  const { metrics } = useStore(MetricsStore);
   const metricName = `org.graylog2.plugin.streams.Stream.${stream.id}.incomingMessages.1-sec-rate`;
+  const { data: metrics, isLoading } = useMetric(metricName);
 
-  useEffect(() => {
-    MetricsActions.addGlobal(metricName);
-
-    return () => {
-      MetricsActions.removeGlobal(metricName);
-    };
-  });
-
-  if (!metrics) {
-    return <Spinner />;
+  if (isLoading || Object.keys(metrics).length === 0) {
+    return <Spinner size="xs" />;
   }
 
   const throughput = Object.keys(metrics)
     .map((nodeId) => {
       const metricDefinition = metrics[nodeId]?.[metricName];
 
-      return (metricDefinition?.metric && 'value' in metricDefinition.metric) ? metricDefinition.metric.value : 0;
+      return metricDefinition?.metric && 'value' in metricDefinition.metric ? metricDefinition.metric.value : 0;
     })
     .reduce((throughput1, throughput2) => throughput1 + throughput2, 0);
 
-  return (<>{throughput} msg/s</>);
+  return <>{throughput} msg/s</>;
 };
 
 export default ThroughputCell;

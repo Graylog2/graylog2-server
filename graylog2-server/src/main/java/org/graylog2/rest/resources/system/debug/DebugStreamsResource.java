@@ -16,8 +16,8 @@
  */
 package org.graylog2.rest.resources.system.debug;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.streams.StreamRouter;
@@ -32,7 +32,7 @@ import jakarta.ws.rs.core.Response;
 
 
 @RequiresAuthentication
-@Api(value = "System/Debug/Streams", description = "For debugging local and cluster events.")
+@Tag(name = "System/Debug/Streams", description = "For debugging local and cluster events.")
 @Path("/system/debug/streams")
 @Produces(MediaType.APPLICATION_JSON)
 public class DebugStreamsResource extends RestResource {
@@ -46,7 +46,7 @@ public class DebugStreamsResource extends RestResource {
 
     @GET
     @Path("/router_engine_info")
-    @ApiOperation(value = "Get information about currently active stream router engine.")
+    @Operation(summary = "Get information about currently active stream router engine.")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEngineFingerprint() {
         return Response.status(Response.Status.OK)

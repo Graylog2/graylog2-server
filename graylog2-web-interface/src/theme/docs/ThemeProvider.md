@@ -3,9 +3,11 @@
 This will allow developers to access all `theme` props in each component. In most cases, on a new component, you can access the `theme` prop via Styled-Components like the following:
 
 ```jsx static
-const StyledElement = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-`);
+const StyledElement = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+  `,
+);
 ```
 
 If you need to base some styles off of props, you can access them as well.

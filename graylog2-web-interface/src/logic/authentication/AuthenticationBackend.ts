@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { DirectoryServiceAuthenticationService } from 'components/authentication/types';
 import { getAuthServicePlugin } from 'util/AuthenticationService';
@@ -23,26 +22,28 @@ import type { DirectoryServiceBackendConfig } from 'logic/authentication/directo
 import type { OktaBackendConfig } from 'logic/authentication/okta/types';
 
 type InternalState = {
-  id: string,
-  title: string,
-  description: string,
-  defaultRoles: Immutable.List<string>,
-  config: DirectoryServiceBackendConfig | OktaBackendConfig,
+  id: string;
+  title: string;
+  description: string;
+  defaultRoles: Immutable.List<string>;
+  defaultUserTimezone: string;
+  config: DirectoryServiceBackendConfig | OktaBackendConfig;
 };
 
 type TypedConfig = {
-  type: string,
+  type: string;
 };
 
 export type AuthenticationBackendJSON = {
-  id: string,
-  title: string,
-  description: string,
-  default_roles: Array<string>,
-  config: DirectoryServiceBackendConfig | OktaBackendConfig,
+  id: string;
+  title: string;
+  description: string;
+  default_roles: Array<string>;
+  default_user_timezone: string;
+  config: DirectoryServiceBackendConfig | OktaBackendConfig;
 };
 
-const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
+const configFromJson = (config: AuthenticationBackendJSON['config']) => {
   const authService = getAuthServicePlugin((config as TypedConfig).type, true);
 
   if (authService && typeof authService.configFromJson === 'function') {
@@ -52,7 +53,7 @@ const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config
   return config;
 };
 
-const configToJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
+const configToJson = (config: AuthenticationBackendJSON['config']) => {
   const authService = getAuthServicePlugin((config as TypedConfig).type, true);
 
   if (authService && typeof authService.configToJson === 'function') {
@@ -66,68 +67,65 @@ export default class AuthenticationBackend {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    title: $PropertyType<InternalState, 'title'>,
-    description: $PropertyType<InternalState, 'description'>,
-    defaultRoles: $PropertyType<InternalState, 'defaultRoles'>,
-    config: $PropertyType<InternalState, 'config'>,
+    id: InternalState['id'],
+    title: InternalState['title'],
+    description: InternalState['description'],
+    defaultRoles: InternalState['defaultRoles'],
+    defaultUserTimezone: InternalState['defaultUserTimezone'],
+    config: InternalState['config'],
   ) {
     this._value = {
       id,
       title,
       description,
       defaultRoles,
+      defaultUserTimezone,
       config,
     };
   }
 
-  get id(): $PropertyType<InternalState, 'id'> {
+  get id(): InternalState['id'] {
     return this._value.id;
   }
 
-  get title(): $PropertyType<InternalState, 'title'> {
+  get title(): InternalState['title'] {
     return this._value.title;
   }
 
-  get description(): $PropertyType<InternalState, 'description'> {
+  get description(): InternalState['description'] {
     return this._value.description;
   }
 
-  get defaultRoles(): $PropertyType<InternalState, 'defaultRoles'> {
+  get defaultRoles(): InternalState['defaultRoles'] {
     return this._value.defaultRoles;
   }
 
-  get config(): $PropertyType<InternalState, 'config'> {
+  get defaultUserTimezone(): InternalState['defaultUserTimezone'] {
+    return this._value.defaultUserTimezone;
+  }
+
+  get config(): InternalState['config'] {
     return this._value.config;
   }
 
   toBuilder(): Builder {
-    const {
-      id,
-      title,
-      description,
-      defaultRoles,
-      config,
-    } = this._value;
+    const { id, title, description, defaultRoles, defaultUserTimezone, config } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      id,
-      title,
-      description,
-      defaultRoles,
-      config,
-    }));
+    return new Builder(
+      Immutable.Map({
+        id,
+        title,
+        description,
+        defaultRoles,
+        defaultUserTimezone,
+        config,
+      }),
+    );
   }
 
   toJSON() {
-    const {
-      id,
-      title,
-      description,
-      defaultRoles = Immutable.List(),
-      config,
-    } = this._value;
+    const { id, title, description, defaultRoles = Immutable.List(), defaultUserTimezone, config } = this._value;
 
     const formattedConfig = configToJson(config);
 
@@ -136,6 +134,7 @@ export default class AuthenticationBackend {
       title,
       description,
       default_roles: defaultRoles.toJS(),
+      default_user_timezone: defaultUserTimezone,
       config: formattedConfig,
     };
   }
@@ -146,6 +145,7 @@ export default class AuthenticationBackend {
       title,
       description,
       default_roles: defaultRoles,
+      default_user_timezone: defaultUserTimezone,
       config,
     } = value;
 
@@ -156,6 +156,7 @@ export default class AuthenticationBackend {
       title,
       description,
       Immutable.List(defaultRoles),
+      defaultUserTimezone,
       formattedConfig,
     );
   }
@@ -175,41 +176,29 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>): Builder {
+  id(value: InternalState['id']): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  title(value: $PropertyType<InternalState, 'title'>): Builder {
+  title(value: InternalState['title']): Builder {
     return new Builder(this.value.set('title', value));
   }
 
-  description(value: $PropertyType<InternalState, 'description'>): Builder {
+  description(value: InternalState['description']): Builder {
     return new Builder(this.value.set('description', value));
   }
 
-  defaultRoles(value: $PropertyType<InternalState, 'defaultRoles'>): Builder {
+  defaultRoles(value: InternalState['defaultRoles']): Builder {
     return new Builder(this.value.set('defaultRoles', value));
   }
 
-  config(value: $PropertyType<InternalState, 'config'>): Builder {
+  config(value: InternalState['config']): Builder {
     return new Builder(this.value.set('config', value));
   }
 
   build(): AuthenticationBackend {
-    const {
-      id,
-      title,
-      description,
-      defaultRoles,
-      config,
-    } = this.value.toObject();
+    const { id, title, description, defaultRoles, defaultUserTimezone, config } = this.value.toObject();
 
-    return new AuthenticationBackend(
-      id,
-      title,
-      description,
-      defaultRoles,
-      config,
-    );
+    return new AuthenticationBackend(id, title, description, defaultRoles, defaultUserTimezone, config);
   }
 }

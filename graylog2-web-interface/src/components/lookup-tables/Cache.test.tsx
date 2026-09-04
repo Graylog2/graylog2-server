@@ -22,43 +22,56 @@ import { asMock } from 'helpers/mocking';
 import { createLookupTableCache } from 'fixtures/lookupTables';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
+import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 
 import CaffeineCacheSummary from './caches/CaffeineCacheSummary';
 import Cache from './Cache';
 
 jest.mock('hooks/useScopePermissions');
 
-PluginStore.register(new PluginManifest({}, {
-  lookupTableCaches: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'guava_cache',
-      displayName: 'Node-local, in-memory cache',
-      summaryComponent: CaffeineCacheSummary,
+      lookupTableCaches: [
+        {
+          type: 'guava_cache',
+          displayName: 'Node-local, in-memory cache',
+          summaryComponent: CaffeineCacheSummary,
+        },
+      ],
     },
-  ],
-}));
+  ),
+);
 
 const renderedCache = (scope: string) => {
   const cache = createLookupTableCache(1, { _scope: scope });
 
-  return render(<Cache cache={cache} />);
+  return render(
+    <ModalProvider>
+      <Cache cache={cache} />
+    </ModalProvider>,
+  );
 };
 
 describe('Cache', () => {
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
 
-        return {
-          loadingScopePermissions: false,
-          scopePermissions: scopes[entity._scope],
-        };
-      },
-    );
+      return {
+        loadingScopePermissions: false,
+        scopePermissions: scopes[entity?._scope || 'DEFAULT'],
+        checkPermissions: (inEntity: Partial<GenericEntityType>) => {
+          const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
+
+          return scopes[entityScope].is_mutable;
+        },
+      };
+    });
   });
 
   it('should show "edit" button', async () => {

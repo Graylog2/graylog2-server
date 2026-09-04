@@ -30,11 +30,16 @@ describe('<TeamsSection />', () => {
   });
 
   it('should display enterprise user teams assignment plugin', async () => {
-    PluginStore.register(new PluginManifest({}, {
-      teams: {
-        UserTeamsAssignment: () => <>UserTeamsAssignment</>,
-      },
-    }));
+    PluginStore.register(
+      new PluginManifest(
+        {},
+        {
+          teams: {
+            UserTeamsAssignment: () => <>UserTeamsAssignment</>,
+          },
+        },
+      ),
+    );
 
     render(<TeamsSection user={exampleUser} />);
 

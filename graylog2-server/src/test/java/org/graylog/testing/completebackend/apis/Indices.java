@@ -23,9 +23,11 @@ import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.joda.time.Duration;
 import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -37,6 +39,9 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class Indices implements GraylogRestApi {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
+
     private final GraylogApis api;
 
     public Indices(GraylogApis api) {
@@ -54,12 +59,12 @@ public class Indices implements GraylogRestApi {
                 .extract().body().jsonPath().getString("index_sets.find { it.default == true }.id");
     }
 
-    public String createIndexSet(IndexSetSummary indexSetSummary) {
-        return given()
+    public String createIndexSet(IndexSetCreationRequest indexSetCreationRequest) throws ExecutionException, RetryException {
+        final var id = given()
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
-                .body(indexSetSummary)
+                .body(indexSetCreationRequest)
                 .post("/system/indices/index_sets")
                 .then()
                 .log().ifError()
@@ -67,40 +72,41 @@ public class Indices implements GraylogRestApi {
                 .statusCode(200)
                 .assertThat().body("id", notNullValue())
                 .extract().body().jsonPath().getString("id");
+        waitForIndexNames(id);
+        waitForDeflector(id);
+        return id;
     }
 
-    public String createIndexSet(String title, String description, String prefix) {
-        var indexSetSummary = IndexSetSummary.create(null,
-                title,
-                description,
-                false,
-                true,
-                false,
-                prefix,
-                4,
-                0,
-                "org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy",
-                TimeBasedRotationStrategyConfig.builder()
+    public String createIndexSet(String title, String description, String prefix) throws ExecutionException, RetryException {
+        var indexSetSummary = IndexSetCreationRequest.builder()
+                .title(title)
+                .description(description)
+                .isWritable(true)
+                .indexPrefix(prefix)
+                .shards(4)
+                .replicas(0)
+                .rotationStrategyClass("org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy")
+                .rotationStrategyConfig(TimeBasedRotationStrategyConfig.builder()
                         .rotationPeriod(Period.days(1))
                         .rotateEmptyIndexSet(false)
-                        .build(),
-                "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy",
-                DeletionRetentionStrategyConfig.create(20),
-                ZonedDateTime.now(ZoneId.of("UTC")),
-                "standard",
-                1,
-                false,
-                Duration.standardSeconds(5L),
-                null,
-                null,
-                null,
-                true,
-                null
-        );
+                        .build())
+                .retentionStrategyClass("org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy")
+                .retentionStrategyConfig(DeletionRetentionStrategyConfig.create(20))
+                .creationDate(ZonedDateTime.now(ZoneId.of("UTC")))
+                .indexAnalyzer("standard")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
+                .fieldTypeRefreshInterval(Duration.standardSeconds(5L))
+                .indexTemplateType(null)
+                .fieldTypeProfile(null)
+                .dataTieringConfig(null)
+                .useLegacyRotation(true)
+                .build();
 
         return createIndexSet(indexSetSummary);
     }
 
+    // fails with a 404 if the index set does not exist
     public GraylogApiResponse listOpenIndices(String indexSetId) {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -115,13 +121,75 @@ public class Indices implements GraylogRestApi {
         return new GraylogApiResponse(response);
     }
 
+    // lists all open indices
+    public List<String> listOpenIndices() {
+        final var response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/indices/open");
+
+        if(response.statusCode() == 200) {
+            return new GraylogApiResponse(response.then()).properJSONPath().read("indices.*.index_name");
+        } else {
+            return List.of();
+        }
+    }
+
+    // can be used as in "waitForIndexNames", does not fail if the index set does not exist/is not yet available
+    public List<String> listOpenIndicesWithEmptyResultOnError(String indexSetId) {
+        final var response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/indices/" + indexSetId + "/open");
+
+        if(response.statusCode() == 200) {
+            return new GraylogApiResponse(response.then()).properJSONPath().read("indices.*.index_name");
+        } else {
+            LOG.info("Failed to obtain open indices of index set {}. Error: {}. Returning empty list.", indexSetId, response.statusLine());
+            return List.of();
+        }
+    }
+
+    public List<String> waitForIndex(final String name) throws ExecutionException, RetryException {
+        return RetryerBuilder.<List<String>>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
+                .retryIfResult(l -> l == null || l.isEmpty() || !l.contains(name))
+                .build()
+                .call(this::listOpenIndices);
+    }
+
     public List<String> waitForIndexNames(String indexSetId) throws ExecutionException, RetryException {
         return RetryerBuilder.<List<String>>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(30))
                 .retryIfResult(List::isEmpty)
                 .build()
-                .call(() -> listOpenIndices(indexSetId).properJSONPath().read("indices.*.index_name"));
+                .call(() -> listOpenIndicesWithEmptyResultOnError(indexSetId));
+    }
+
+    private boolean isDeflectorUp(String indexSetId) {
+        final var response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/overview/" + indexSetId);
+        if (response.statusCode() == 200) {
+            return new GraylogApiResponse(response.then()).properJSONPath().read("deflector.is_up", Boolean.class);
+        } else {
+            return false;
+        }
+    }
+
+    private void waitForDeflector(String indexSetId) throws ExecutionException, RetryException {
+        RetryerBuilder.<Boolean>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
+                .retryIfResult(result -> result == null || result.equals(false))
+                .build()
+                .call(() -> isDeflectorUp(indexSetId));
     }
 
     public void rotateIndexSet(String indexSetId) {
@@ -187,5 +255,18 @@ public class Indices implements GraylogRestApi {
                 .log()
                 .ifValidationFails()
                 .statusCode(202);
+    }
+
+    public String getDeflectorIndex(String indexSetId) {
+        final var response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/overview/" + indexSetId);
+        if (response.statusCode() == 200) {
+            return new GraylogApiResponse(response.then()).properJSONPath().read("deflector.current_target", String.class);
+        } else {
+            return null;
+        }
     }
 }

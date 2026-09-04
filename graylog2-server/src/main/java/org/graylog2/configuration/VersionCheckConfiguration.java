@@ -17,13 +17,19 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 
 import java.net.URI;
 
+
+@DocumentationSection(heading = "Version check configuration", description = "")
 public class VersionCheckConfiguration {
+    @Documentation(value = "tbd", visible = false)
     @Parameter(value = "versionchecks")
     private boolean enabled = true;
 
+    @Documentation(value = "tbd", visible = false)
     @Parameter(value = "versionchecks_uri")
     private URI uri = URI.create("https://versioncheck.graylog.com/check");
 

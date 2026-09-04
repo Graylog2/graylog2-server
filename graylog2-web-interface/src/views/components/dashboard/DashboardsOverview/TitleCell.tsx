@@ -18,28 +18,28 @@ import React from 'react';
 
 import type View from 'views/logic/views/View';
 import type { Requirements } from 'views/logic/views/View';
-import { HoverForHelp } from 'components/common';
-import { Link } from 'components/common/router';
+import { HoverForHelp, Link } from 'components/common';
 import Routes from 'routing/Routes';
 
-const missingRequirements = (requires: Requirements, requirementsProvided: Array<string>) => (
+const missingRequirements = (requires: Requirements, requirementsProvided: Array<string>) =>
   Object.entries(requires)
     .filter(([require]) => !requirementsProvided.includes(require))
-    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {})
-);
+    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
 const RequirementsList = ({ requirements }: { requirements: Requirements }) => (
   <div>
     {Object.values(requirements).map(({ url, name }) => (
-      <a href={url} target="_blank" rel="noopener noreferrer"><strong>{name}</strong></a>
+      <a key={name} href={url} target="_blank" rel="noopener noreferrer">
+        <strong>{name}</strong>
+      </a>
     ))}
   </div>
 );
 
 type Props = {
-  dashboard: View,
-  requirementsProvided: Array<string>,
-}
+  dashboard: View;
+  requirementsProvided: Array<string>;
+};
 
 const TitleCell = ({ dashboard: { id, requires, title }, requirementsProvided }: Props) => {
   const _missingRequirements = missingRequirements(requires, requirementsProvided);
@@ -49,12 +49,14 @@ const TitleCell = ({ dashboard: { id, requires, title }, requirementsProvided }:
     return (
       <>
         {title}
-        <HoverForHelp title="Missing Requirements"><RequirementsList requirements={_missingRequirements} /></HoverForHelp>
+        <HoverForHelp title="Missing Requirements">
+          <RequirementsList requirements={_missingRequirements} />
+        </HoverForHelp>
       </>
     );
   }
 
-  return <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(id)}>{title}</Link>;
+  return <Link to={Routes.DASHBOARD.SHOW(id)}>{title}</Link>;
 };
 
 export default TitleCell;

@@ -14,26 +14,37 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
+import { SystemAuthenticationHTTPHeaderAuthConfig } from '@graylog/server-api';
 
-import notifyingAction from '../notifyingAction';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
+import type { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
+import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
+import UserNotification from 'util/UserNotification';
+import { defaultOnError } from 'util/conditional/onError';
 
-const load = notifyingAction({
-  action: HTTPHeaderAuthConfigActions.load,
-  error: (error) => ({
-    message: `Loading HTTP header authentication config failed with status: ${error}`,
-  }),
-});
+const load = (): Promise<HTTPHeaderAuthConfig> =>
+  defaultOnError(
+    SystemAuthenticationHTTPHeaderAuthConfig.getConfig().then(HTTPHeaderAuthConfig.fromJSON),
+    'Loading HTTP header authentication config failed',
+  );
 
-const update = notifyingAction({
-  action: HTTPHeaderAuthConfigActions.update,
-  success: () => ({
-    message: 'Successfully updated HTTP header authentication config',
-  }),
-  error: (error) => ({
-    message: `Updating HTTP header authentication config failed with status: ${error}`,
-  }),
-});
+const update = (payload: HTTPHeaderAuthConfigJSON): Promise<HTTPHeaderAuthConfig> => {
+  const url = qualifyUrl(ApiRoutes.HTTPHeaderAuthConfigController.update().url);
+  const promise = fetch('PUT', url, payload).then(HTTPHeaderAuthConfig.fromJSON);
+
+  return promise
+    .then((result) => {
+      UserNotification.success('Successfully updated HTTP header authentication config');
+
+      return result;
+    })
+    .catch((error) => {
+      UserNotification.error(`Updating HTTP header authentication config failed with status: ${error}`);
+      throw error;
+    });
+};
 
 export default {
   load,

@@ -21,16 +21,11 @@ import { alice } from 'fixtures/users';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
-import { createSearch } from 'fixtures/searches';
-import mockDispatch from 'views/test/mockDispatch';
-import type { RootState } from 'views/types';
-import { asMock } from 'helpers/mocking';
-import useAppDispatch from 'stores/useAppDispatch';
 import wrapWithMenu from 'helpers/components/wrapWithMenu';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import OriginalActionMenuItem from './ActionMenuItem';
-
-jest.mock('stores/useAppDispatch');
 
 const ActionMenuItem = wrapWithMenu(OriginalActionMenuItem);
 
@@ -63,11 +58,7 @@ describe('ActionMenuItem', () => {
     },
   };
 
-  beforeEach(() => {
-    const view = createSearch();
-    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
-    asMock(useAppDispatch).mockReturnValue(dispatch);
-  });
+  useViewsPlugin();
 
   it('should display help text for actions with handler', () => {
     const action = {
@@ -76,12 +67,18 @@ describe('ActionMenuItem', () => {
       help: () => ({ title: 'The help title', description: 'The help description' }),
     };
 
-    render(<ActionMenuItem action={action}
-                           handlerArgs={handlerArgs}
-                           onMenuToggle={() => {}}
-                           overflowingComponents={{ foo: <span /> }}
-                           setOverflowingComponents={() => {}}
-                           type="value" />);
+    render(
+      <TestStoreProvider>
+        <ActionMenuItem
+          action={action}
+          handlerArgs={handlerArgs}
+          onMenuToggle={() => {}}
+          overflowingComponents={{ foo: <span /> }}
+          setOverflowingComponents={() => {}}
+          type="value"
+        />
+      </TestStoreProvider>,
+    );
 
     expect(screen.getByTestId('menu-item-help')).toBeInTheDocument();
   });
@@ -93,12 +90,18 @@ describe('ActionMenuItem', () => {
       help: () => ({ title: 'The help title', description: 'The help description' }),
     };
 
-    render(<ActionMenuItem action={action}
-                           handlerArgs={handlerArgs}
-                           onMenuToggle={() => {}}
-                           overflowingComponents={{ foo: <span /> }}
-                           setOverflowingComponents={() => {}}
-                           type="value" />);
+    render(
+      <TestStoreProvider>
+        <ActionMenuItem
+          action={action}
+          handlerArgs={handlerArgs}
+          onMenuToggle={() => {}}
+          overflowingComponents={{ foo: <span /> }}
+          setOverflowingComponents={() => {}}
+          type="value"
+        />
+      </TestStoreProvider>,
+    );
 
     expect(screen.getByTestId('menu-item-help')).toBeInTheDocument();
   });

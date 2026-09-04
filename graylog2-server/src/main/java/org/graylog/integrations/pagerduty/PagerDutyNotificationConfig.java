@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
@@ -33,6 +34,7 @@ import org.graylog2.plugin.rest.ValidationResult;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 /**
  * Configuration class for Pager Duty notifications.
@@ -51,6 +53,8 @@ public abstract class PagerDutyNotificationConfig implements EventNotificationCo
     static final String FIELD_KEY_PREFIX = "key_prefix";
     static final String FIELD_CLIENT_NAME = "client_name";
     static final String FIELD_CLIENT_URL = "client_url";
+    static final String FIELD_PAGER_DUTY_TITLE = "pager_duty_title";
+    static final String FIELD_INCIDENT_KEY = "incident_key";
 
     @JsonProperty(FIELD_ROUTING_KEY)
     public abstract String routingKey();
@@ -66,6 +70,12 @@ public abstract class PagerDutyNotificationConfig implements EventNotificationCo
 
     @JsonProperty(FIELD_CLIENT_URL)
     public abstract String clientUrl();
+
+    @JsonProperty(FIELD_PAGER_DUTY_TITLE)
+    public abstract Optional<String> pagerDutyTitle();
+
+    @JsonProperty(FIELD_INCIDENT_KEY)
+    public abstract Optional<String> incidentKey();
 
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -87,8 +97,8 @@ public abstract class PagerDutyNotificationConfig implements EventNotificationCo
         else if (routingKey().length() != 32) {
             validation.addError(FIELD_ROUTING_KEY, "Routing Key must be 32 characters long.");
         }
-        if (customIncident() && keyPrefix().isEmpty()) {
-            validation.addError(FIELD_KEY_PREFIX, "Incident Key Prefix cannot be empty when Custom Incident Key is selected.");
+        if (customIncident() && keyPrefix().isEmpty() && incidentKey().isEmpty()) {
+            validation.addError(FIELD_KEY_PREFIX, "Incident Key or Incident Key Prefix must be provided when Custom Incident Key is selected.");
         }
         if (clientName().isEmpty()) {
             validation.addError(FIELD_CLIENT_NAME, "Client Name cannot be empty.");
@@ -122,19 +132,25 @@ public abstract class PagerDutyNotificationConfig implements EventNotificationCo
         }
 
         @JsonProperty(FIELD_ROUTING_KEY)
-        public abstract PagerDutyNotificationConfig.Builder routingKey(String routingKey);
+        public abstract Builder routingKey(String routingKey);
 
         @JsonProperty(FIELD_CUSTOM_INCIDENT)
-        public abstract PagerDutyNotificationConfig.Builder customIncident(boolean customIncident);
+        public abstract Builder customIncident(boolean customIncident);
 
         @JsonProperty(FIELD_KEY_PREFIX)
-        public abstract PagerDutyNotificationConfig.Builder keyPrefix(String keyPrefix);
+        public abstract Builder keyPrefix(String keyPrefix);
 
         @JsonProperty(FIELD_CLIENT_NAME)
-        public abstract PagerDutyNotificationConfig.Builder clientName(String clientName);
+        public abstract Builder clientName(String clientName);
 
         @JsonProperty(FIELD_CLIENT_URL)
-        public abstract PagerDutyNotificationConfig.Builder clientUrl(String clientUrl);
+        public abstract Builder clientUrl(String clientUrl);
+
+        @JsonProperty(FIELD_PAGER_DUTY_TITLE)
+        public abstract Builder pagerDutyTitle(@Nullable String pagerDutyTitle);
+
+        @JsonProperty(FIELD_INCIDENT_KEY)
+        public abstract Builder incidentKey(@Nullable String incidentKey);
 
         public abstract PagerDutyNotificationConfig build();
     }
@@ -149,6 +165,8 @@ public abstract class PagerDutyNotificationConfig implements EventNotificationCo
                 .keyPrefix(ValueReference.of(keyPrefix()))
                 .clientName(ValueReference.of(clientName()))
                 .clientUrl(ValueReference.of(clientUrl()))
+                .pagerDutyTitle(ValueReference.ofNullable(pagerDutyTitle().orElse(null)))
+                .incidentKey(ValueReference.ofNullable(incidentKey().orElse(null)))
                 .build();
     }
 }

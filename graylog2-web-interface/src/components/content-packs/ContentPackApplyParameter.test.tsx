@@ -40,17 +40,21 @@ describe('<ContentPackApplyParameter />', () => {
   const appliedParameterReadOnly = { configKey: 'configuration.port', paramName: parameter.name, readOnly: true };
 
   it('should render with full props', async () => {
-    render(<ContentPackApplyParameter entity={entity}
-                                      parameters={[parameter]}
-                                      appliedParameter={[appliedParameter]} />);
+    render(
+      <ContentPackApplyParameter entity={entity} parameters={[parameter]} appliedParameter={[appliedParameter]} />,
+    );
 
     await screen.findByLabelText('Parameter');
   });
 
   it('should render with readOnly', async () => {
-    render(<ContentPackApplyParameter entity={entity}
-                                      parameters={[parameter]}
-                                      appliedParameter={[appliedParameterReadOnly]} />);
+    render(
+      <ContentPackApplyParameter
+        entity={entity}
+        parameters={[parameter]}
+        appliedParameter={[appliedParameterReadOnly]}
+      />,
+    );
 
     await screen.findByLabelText('Parameter');
   });
@@ -64,16 +68,20 @@ describe('<ContentPackApplyParameter />', () => {
   it('should apply a parameter', async () => {
     const applyFn = jest.fn();
 
-    render(<ContentPackApplyParameter entity={entity}
-                                      parameters={[parameter]}
-                                      appliedParameter={[]}
-                                      onParameterApply={applyFn} />);
+    render(
+      <ContentPackApplyParameter
+        entity={entity}
+        parameters={[parameter]}
+        appliedParameter={[]}
+        onParameterApply={applyFn}
+      />,
+    );
 
     const selectConfigKey = await screen.findByLabelText('Config Key');
-    userEvent.selectOptions(selectConfigKey, 'configuration.port');
+    await userEvent.selectOptions(selectConfigKey, 'configuration.port');
 
     const selectParameter = await screen.findByLabelText('Parameter');
-    userEvent.selectOptions(selectParameter, 'Port (PORT)');
+    await userEvent.selectOptions(selectParameter, 'Port (PORT)');
 
     const submitButton = await screen.findByRole('button', { name: 'Apply' });
 
@@ -81,7 +89,7 @@ describe('<ContentPackApplyParameter />', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(applyFn).toHaveBeenCalledWith('configuration.port', 'PORT');
@@ -91,10 +99,14 @@ describe('<ContentPackApplyParameter />', () => {
   it('should apply a parameter only once', async () => {
     const applyFn = jest.fn();
 
-    render(<ContentPackApplyParameter entity={entity}
-                                      parameters={[parameter]}
-                                      appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
-                                      onParameterApply={applyFn} />);
+    render(
+      <ContentPackApplyParameter
+        entity={entity}
+        parameters={[parameter]}
+        appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
+        onParameterApply={applyFn}
+      />,
+    );
 
     expect(screen.queryByRole('option', { name: 'configuration.port' })).not.toBeInTheDocument();
   });
@@ -104,10 +116,14 @@ describe('<ContentPackApplyParameter />', () => {
       expect(configKey).toEqual('configuration.port');
     });
 
-    render(<ContentPackApplyParameter entity={entity}
-                                      parameters={[parameter]}
-                                      appliedParameter={[appliedParameter]}
-                                      onParameterClear={clearFn} />);
+    render(
+      <ContentPackApplyParameter
+        entity={entity}
+        parameters={[parameter]}
+        appliedParameter={[appliedParameter]}
+        onParameterClear={clearFn}
+      />,
+    );
 
     (await screen.findByRole('button', { name: 'Clear' })).click();
 

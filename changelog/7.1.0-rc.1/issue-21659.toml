@@ -1,0 +1,5 @@
+type = "a"
+message = "Allow sorting saved searches & dashboards based on favorite state"
+
+pulls = ["24809"]
+issues = ["Graylog2/graylog2-server#21659"]

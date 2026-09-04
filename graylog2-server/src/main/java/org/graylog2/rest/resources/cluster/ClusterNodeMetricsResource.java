@@ -17,11 +17,11 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -59,7 +59,7 @@ import java.util.concurrent.ExecutorService;
 import static jakarta.ws.rs.core.Response.Status.BAD_GATEWAY;
 
 @RequiresAuthentication
-@Api(value = "Cluster/Node/Metrics", description = "Cluster-wide Internal Graylog node metrics")
+@Tag(name = "Cluster/Node/Metrics", description = "Cluster-wide Internal Graylog node metrics")
 @Path("/cluster/{nodeId}/metrics")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterNodeMetricsResource extends ProxiedResource {
@@ -79,9 +79,9 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
     @GET
     @Timed
     @Path("/names")
-    @ApiOperation(value = "Get all metrics keys/names from node")
+    @Operation(summary = "Get all metrics keys/names from node")
     @RequiresPermissions(RestPermissions.METRICS_ALLKEYS)
-    public MetricNamesResponse metricNames(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
+    public MetricNamesResponse metricNames(@Parameter(name = "nodeId", description = "The id of the node whose metrics we want.", required = true)
                                            @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response<MetricNamesResponse> result = getResourceForNode(nodeId).metricNames().execute();
         if (result.isSuccessful()) {
@@ -94,14 +94,15 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
     @POST
     @Timed
     @Path("/multiple")
-    @ApiOperation("Get the values of multiple metrics at once from node")
+    @Operation(summary = "Get the values of multiple metrics at once from node")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Malformed body")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "400", description = "Malformed body")
     })
     @NoAuditEvent("only used to get multiple metric values")
-    public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
+    public MetricsSummaryResponse multipleMetrics(@Parameter(name = "nodeId", description = "The id of the node whose metrics we want.", required = true)
                                                   @PathParam("nodeId") String nodeId,
-                                                  @ApiParam(name = "Requested metrics", required = true)
+                                                  @Parameter(name = "Requested metrics", required = true)
                                                   @Valid @NotNull MetricsReadRequest request) throws IOException, NodeNotFoundException {
         final Response<MetricsSummaryResponse> result = getResourceForNode(nodeId).multipleMetrics(request).execute();
         if (result.isSuccessful()) {
@@ -114,13 +115,14 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
     @GET
     @Timed
     @Path("/namespace/{namespace}")
-    @ApiOperation(value = "Get all metrics of a namespace from node")
+    @Operation(summary = "Get all metrics of a namespace from node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such metric namespace")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such metric namespace")
     })
-    public MetricsSummaryResponse byNamespace(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
+    public MetricsSummaryResponse byNamespace(@Parameter(name = "nodeId", description = "The id of the node whose metrics we want.", required = true)
                                               @PathParam("nodeId") String nodeId,
-                                              @ApiParam(name = "namespace", required = true)
+                                              @Parameter(name = "namespace", required = true)
                                               @PathParam("namespace") String namespace) throws IOException, NodeNotFoundException {
         final Response<MetricsSummaryResponse> result = getResourceForNode(nodeId).byNamespace(namespace).execute();
         if (result.isSuccessful()) {

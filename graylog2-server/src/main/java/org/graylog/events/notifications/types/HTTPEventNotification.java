@@ -19,6 +19,7 @@ package org.graylog.events.notifications.types;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -32,15 +33,15 @@ import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
-import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 
@@ -63,12 +64,14 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
 
     @Inject
     public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
-                                 UrlWhitelistService whitelistService,
-                                 UrlWhitelistNotificationService urlWhitelistNotificationService,
+                                 UrlAllowlistService allowlistService,
+                                 UrlAllowlistNotificationService urlAllowlistNotificationService,
                                  EncryptedValueService encryptedValueService,
                                  EventsConfigurationProvider configurationProvider,
+                                 NotificationService notificationService,
+                                 NodeId nodeId,
                                  final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
-        super(whitelistService, urlWhitelistNotificationService, encryptedValueService);
+        super(allowlistService, urlAllowlistNotificationService, encryptedValueService, notificationService, nodeId);
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
         this.configurationProvider = configurationProvider;
@@ -100,7 +103,9 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
         try {
             body = objectMapper.writeValueAsBytes(model);
         } catch (JsonProcessingException e) {
-            throw new PermanentEventNotificationException("Unable to serialize notification", e);
+            final String errorMessage = "Unable to serialize notification";
+            createSystemErrorNotification(errorMessage, ctx);
+            throw new PermanentEventNotificationException(errorMessage, e);
         }
 
         final Request request = builder
@@ -114,11 +119,20 @@ public class HTTPEventNotification extends HTTPNotification implements EventNoti
         final OkHttpClient httpClient = selectClient(config);
         try (final Response r = httpClient.newCall(request).execute()) {
             if (!r.isSuccessful()) {
-                throw new PermanentEventNotificationException(
-                        "Expected successful HTTP response [2xx] but got [" + r.code() + "]. " + config.url());
+                final int status = r.code();
+                if (HTTPUtils.isRetryableStatus(status)) {
+                    final String retryMessage = buildRetryMessage(status);
+                    createSystemErrorNotification(retryMessage, ctx);
+                    throw new TemporaryEventNotificationException(retryMessage);
+                }
+                final String errorMessage = "Expected successful HTTP response [2xx] but got [" + status + "]. " + config.url();
+                createSystemErrorNotification(errorMessage, ctx);
+                throw new PermanentEventNotificationException(errorMessage);
             }
         } catch (IOException e) {
-            throw new PermanentEventNotificationException(e.getMessage());
+            final String errorMessage = e.getMessage();
+            createSystemErrorNotification("Error: " + errorMessage, ctx);
+            throw new PermanentEventNotificationException(errorMessage);
         }
     }
 }

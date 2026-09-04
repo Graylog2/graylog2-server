@@ -21,24 +21,19 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { UserJSON } from 'logic/users/User';
 import { singletonStore } from 'logic/singleton';
-import { PreferencesActions } from 'stores/users/PreferencesStore';
 import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
-import { StartpageStore } from 'stores/users/StartpageStore';
 
 export type CurrentUserStoreState = {
-  currentUser: UserJSON,
+  currentUser: UserJSON;
 };
 
-export const CurrentUserStore = singletonStore(
-  'core.CurrentUser',
-  () => Reflux.createStore<CurrentUserStoreState>({
+export const CurrentUserStore = singletonStore('core.CurrentUser', () =>
+  Reflux.createStore<CurrentUserStoreState>({
     listenables: [SessionActions],
     currentUser: undefined,
 
     init() {
       this.listenTo(SessionStore, this.sessionUpdate, this.sessionUpdate);
-      this.listenTo(StartpageStore, this.reload, this.reload);
-      PreferencesActions.saveUserPreferences.completed.listen(this.reload);
     },
 
     getInitialState() {
@@ -69,13 +64,15 @@ export const CurrentUserStore = singletonStore(
     },
 
     update(username) {
-      return fetch('GET', qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url))
-        .then((resp) => {
-          this.currentUser = resp;
-          this.trigger({ currentUser: this.currentUser });
+      return fetch(
+        'GET',
+        qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url),
+      ).then((resp) => {
+        this.currentUser = resp;
+        this.trigger({ currentUser: this.currentUser });
 
-          return resp;
-        });
+        return resp;
+      });
     },
   }),
 );

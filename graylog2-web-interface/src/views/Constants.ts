@@ -20,12 +20,12 @@ import type { TimeRange, RelativeTimeRangeWithEnd, RelativeTimeRange } from 'vie
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import type { ArrayElement } from 'views/types';
 import type { AutoTimeConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type { StreamsAndCategoriesSelection } from 'views/components/common/StreamsAndCategoriesFilter';
 
 export type SearchBarFormValues = {
-  timerange: TimeRange,
-  streams: Array<string>,
-  streamCategories: Array<string>,
-  queryString: string,
+  timerange: TimeRange;
+  streamsAndCategories: StreamsAndCategoriesSelection;
+  queryString: string;
 };
 
 export const FULL_MESSAGE_FIELD = 'full_message';
@@ -48,6 +48,7 @@ export const FILTERED_FIELDS = [
 
   // Our reserved fields.
   'gl2_accounted_message_size',
+  'gl2_input_message_size',
   'gl2_processing_error',
   'gl2_processing_duration_ms',
   'gl2_processing_timestamp',
@@ -98,7 +99,8 @@ export const DEFAULT_TIMERANGE: RelativeTimeRangeWithEnd = { type: DEFAULT_RANGE
 export const NO_TIMERANGE_OVERRIDE = {};
 
 export const DEFAULT_HIGHLIGHT_COLOR = StaticColor.create('#ffec3d');
-export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
+export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma
+  .scale(['lightyellow', 'lightgreen', 'lightblue', 'red'])
   .mode('lch')
   .colors(40);
 
@@ -125,13 +127,16 @@ export const RELATIVE_RANGE_TYPES = [
   {
     type: 'seconds',
     label: 'Seconds',
-  }, {
+  },
+  {
     type: 'minutes',
     label: 'Minutes',
-  }, {
+  },
+  {
     type: 'hours',
     label: 'Hours',
-  }, {
+  },
+  {
     type: 'days',
     label: 'Days',
   },
@@ -148,8 +153,8 @@ export const showSearchPath = `${searchPath}/:viewId`;
 
 export const dashboardsPath = '/dashboards';
 export const newDashboardsPath = `${dashboardsPath}/new`;
-export const dashboardsTvPath = `${dashboardsPath}/tv/:viewId`;
-export const showDashboardsPath = `${dashboardsPath}/:viewId`;
+export const dashboardsTvPath = (viewId: string = ':viewId') => `${dashboardsPath}/tv/${viewId}`;
+export const showDashboardsPath = (viewId: string = ':viewId') => `${dashboardsPath}/${viewId}`;
 
 export const extendedSearchPath = '/extendedsearch';
 
@@ -163,3 +168,7 @@ export const VISUALIZATION_TABLE_HEADER_HEIGHT = 28;
 
 export const keySeparator = '\u2E31';
 export const humanSeparator = '-';
+export const thresholdsSupportedVisualizations = ['bar', 'area', 'line', 'scatter'];
+export const multipleValuesActionsSupportedVisualizations = ['bar', 'area', 'line', 'scatter', 'sankey', 'network'];
+export const QUERY_TIME_RANGE_LIMIT_ERROR_TYPE = 'query_time_range_limit';
+export const SEARCH_TYPE_RANGE_LIMIT_ERROR_TYPE = 'search_type_time_range_limit';

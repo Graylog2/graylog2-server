@@ -17,7 +17,7 @@
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
 const path = require('path');
 
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
 const webpackConfig = require('./webpack.config.js');
 
@@ -30,13 +30,7 @@ const defaultComponentIgnore = [
 
 module.exports = {
   skipComponentsWithoutExample: true,
-  require: [
-    'core-js/stable',
-    'regenerator-runtime/runtime',
-    'bootstrap/less/bootstrap.less',
-    'toastr/toastr.less',
-    './fetch-mock',
-  ],
+  require: ['core-js/stable', 'regenerator-runtime/runtime', 'bootstrap/less/bootstrap.less', './fetch-mock'],
   sections: [
     {
       name: 'Introduction',
@@ -108,7 +102,10 @@ module.exports = {
   title: 'Graylog UI documentation',
   webpackConfig: {
     module: webpackConfig.module,
-    resolve: merge.smart({ modules: ['node_modules'] }, webpackConfig.resolve),
+    resolve: {
+      ...webpackConfig.resolve,
+      modules: ['node_modules', ...(webpackConfig.resolve?.modules ?? [])],
+    },
     resolveLoader: webpackConfig.resolveLoader,
     devServer: {
       client: {

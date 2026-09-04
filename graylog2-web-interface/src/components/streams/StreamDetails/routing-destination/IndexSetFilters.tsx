@@ -21,18 +21,19 @@ import FilterRulesList from 'components/streams/StreamDetails/output-filter/Filt
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
 type Props = {
-  streamId: string,
-  paginatedFilters: PaginatedListType<StreamOutputFilterRule>,
-  onPaginationChange: (newPage: number, newPerPage: number) => void,
+  streamId: string;
+  paginatedFilters: PaginatedListType<StreamOutputFilterRule>;
+  onPaginationChange: (newPage: number, newPerPage: number) => void;
 };
 
 const IndexSetFilters = ({ streamId, paginatedFilters, onPaginationChange }: Props) => (
-  <FilterRulesList streamId={streamId}
-                   paginatedFilters={paginatedFilters}
-                   destinationType="indexer"
-                   onPaginationChange={onPaginationChange}
-                   requiredPermissions={['indexsets:edit']} />
-
+  <FilterRulesList
+    streamId={streamId}
+    paginatedFilters={paginatedFilters}
+    destinationType="indexer"
+    onPaginationChange={onPaginationChange}
+    requiredPermissions={['indexsets:edit']}
+  />
 );
 
 export default IndexSetFilters;

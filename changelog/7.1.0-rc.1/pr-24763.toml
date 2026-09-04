@@ -1,0 +1,4 @@
+type = "c"
+message = "Switch four index maintenance jobs to the system job scheduler."
+
+pulls = ["24763", "graylog-plugin-enterprise#12986"]

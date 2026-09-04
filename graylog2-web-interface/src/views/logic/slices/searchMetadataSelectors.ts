@@ -22,5 +22,11 @@ import type SearchMetadata from 'views/logic/search/SearchMetadata';
 
 export const selectSearchMetadataState = (state: RootState) => state.searchMetadata;
 export const selectSearchMetadata = createSelector(selectSearchMetadataState, (state) => state.metadata);
-export const selectUndeclaredParameters = createSelector(selectSearchMetadata, (searchMetadata: SearchMetadata) => searchMetadata?.undeclared ?? Immutable.Set<string>());
-export const selectHasUndeclaredParameters = createSelector(selectUndeclaredParameters, (undeclared) => undeclared?.size > 0);
+export const selectUndeclaredParameters = createSelector(
+  selectSearchMetadata,
+  (searchMetadata: SearchMetadata) => searchMetadata?.undeclared ?? Immutable.Set<string>(),
+);
+export const selectHasUndeclaredParameters = createSelector(
+  selectUndeclaredParameters,
+  (undeclared) => undeclared?.size > 0,
+);

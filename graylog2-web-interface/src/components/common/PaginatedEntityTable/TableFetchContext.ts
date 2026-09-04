@@ -16,13 +16,13 @@
  */
 import * as React from 'react';
 
-import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+import type { Attribute } from 'stores/PaginationTypes';
 import { singleton } from 'logic/singleton';
 
 export type ContextValue = {
-  searchParams: SearchParams,
-  refetch: () => void,
-  attributes: Array<Attribute>,
+  refetch: () => void;
+  attributes: Array<Attribute>;
+  entityTableId: string;
 };
 
 const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);

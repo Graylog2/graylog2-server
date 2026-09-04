@@ -20,6 +20,6 @@ import type { StyledComponentsTheme } from '@graylog/sawmill/styled-components';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends StyledComponentsTheme {
-    changeMode: (newColorScheme: ColorScheme) => void,
+    changeMode: (newColorScheme: ColorScheme) => void;
   }
 }

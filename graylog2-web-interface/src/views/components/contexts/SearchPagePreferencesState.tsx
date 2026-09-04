@@ -23,14 +23,14 @@ import type { UserPreferences } from 'contexts/UserPreferencesContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Store from 'logic/local-storage/Store';
-import { PreferencesActions } from 'stores/users/PreferencesStore';
+import { saveUserPreferences } from 'api/preferences';
 import type User from 'logic/users/User';
 import useViewType from 'views/hooks/useViewType';
 
 type Props = {
   children: (preferencesConsumer: {
-    setPreference: (stateKey: string, value: boolean) => void,
-    getPreference: (stateKey: string, defaultValue: boolean) => boolean,
+    setPreference: (stateKey: string, value: boolean) => void;
+    getPreference: (stateKey: string, defaultValue: boolean) => boolean;
   }) => React.ReactElement;
 };
 
@@ -44,13 +44,19 @@ const _getPinningPreferenceKey = (viewType: ViewType | undefined): PinningPrefer
   const preferenceKey = viewType && preferenceKeyMapping[viewType];
 
   if (!preferenceKey) {
-    throw new Error(`User sidebar pinning preference key is missing for view type ${viewType ?? '(type not provided)'}`);
+    throw new Error(
+      `User sidebar pinning preference key is missing for view type ${viewType ?? '(type not provided)'}`,
+    );
   }
 
   return preferenceKey;
 };
 
-const _userSidebarPinningPref = (currentUser: User, userPreferences: UserPreferences, viewType: ViewType | undefined) => {
+const _userSidebarPinningPref = (
+  currentUser: User,
+  userPreferences: UserPreferences,
+  viewType: ViewType | undefined,
+) => {
   const sidebarPinningPrefKey = _getPinningPreferenceKey(viewType);
 
   if (currentUser?.readOnly) {
@@ -60,7 +66,12 @@ const _userSidebarPinningPref = (currentUser: User, userPreferences: UserPrefere
   return userPreferences[sidebarPinningPrefKey];
 };
 
-const _updateUserSidebarPinningPref = (currentUser: User, userPreferences: UserPreferences, viewType: ViewType | undefined, newIsPinned: boolean) => {
+const _updateUserSidebarPinningPref = (
+  currentUser: User,
+  userPreferences: UserPreferences,
+  viewType: ViewType | undefined,
+  newIsPinned: boolean,
+) => {
   const sidebarPinningPrefKey: string = _getPinningPreferenceKey(viewType);
 
   if (currentUser?.readOnly) {
@@ -70,7 +81,7 @@ const _updateUserSidebarPinningPref = (currentUser: User, userPreferences: UserP
       ...userPreferences,
       [sidebarPinningPrefKey]: newIsPinned,
     };
-    PreferencesActions.saveUserPreferences(currentUser?.username, newUserPreferences, undefined, false);
+    saveUserPreferences(currentUser?.username, newUserPreferences, undefined, false);
   }
 };
 
@@ -82,17 +93,26 @@ const SearchPagePreferencesState = ({ children }: Props) => {
     sidebarIsPinned: _userSidebarPinningPref(currentUser, userPreferences, viewType),
   });
 
-  const _onSidebarPinningChange = useCallback((newIsPinned: boolean) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned), [currentUser, userPreferences, viewType]);
+  const _onSidebarPinningChange = useCallback(
+    (newIsPinned: boolean) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned),
+    [currentUser, userPreferences, viewType],
+  );
 
-  const getPreference = useCallback((stateKey: string, defaultValue: boolean) => state[stateKey] ?? defaultValue, [state]);
+  const getPreference = useCallback(
+    (stateKey: string, defaultValue: boolean) => state[stateKey] ?? defaultValue,
+    [state],
+  );
 
-  const setPreference = useCallback((stateKey: string, value: boolean) => {
-    if (stateKey === 'sidebarIsPinned') {
-      _onSidebarPinningChange(value);
-    }
+  const setPreference = useCallback(
+    (stateKey: string, value: boolean) => {
+      if (stateKey === 'sidebarIsPinned') {
+        _onSidebarPinningChange(value);
+      }
 
-    setState({ ...state, [stateKey]: value });
-  }, [_onSidebarPinningChange, state]);
+      setState({ ...state, [stateKey]: value });
+    },
+    [_onSidebarPinningChange, state],
+  );
 
   return children({ getPreference: getPreference, setPreference: setPreference });
 };

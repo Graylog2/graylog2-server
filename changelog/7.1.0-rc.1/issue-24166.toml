@@ -1,0 +1,10 @@
+type = "changed"
+message = "Updated content pack creation wizard to no longer include stream titles for manual content selection."
+
+details.user = """
+The behavior of Stream title references in content packs remains unchanged.
+This change simply clears up ambiguity, as they are included when necessary automatically.
+"""
+
+pulls = ["24186"]
+issues = ["24166"]

@@ -17,15 +17,17 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-const StatusIndicator = styled.div<{ $disabled: 'true' | 'false' }>(({ $disabled, theme }) => css`
-  display: inline-flex;
-  border-radius: 50%;
-  height: 10px;
-  width: 10px;
-  background-color: ${$disabled === 'true' ? theme.colors.variant.warning : theme.colors.variant.success};
-  margin-right: 3px;
-  border: 1px solid ${theme.colors.gray[70]};
-`);
+const StatusIndicator = styled.div<{ $disabled: 'true' | 'false' }>(
+  ({ $disabled, theme }) => css`
+    display: inline-flex;
+    border-radius: 50%;
+    height: 10px;
+    width: 10px;
+    background-color: ${$disabled === 'true' ? theme.colors.variant.warning : theme.colors.variant.success};
+    margin-right: 3px;
+    border: 1px solid ${theme.colors.gray[70]};
+  `,
+);
 
 const FilterValueRenderers = {
   disabled: (value: 'true' | 'false', title: string) => (

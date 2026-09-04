@@ -71,30 +71,38 @@ const FieldResultWrap = styled.div<{ resultType: string }>(({ resultType, theme 
   `;
 });
 
-const FieldValue = styled.dd<{ removed: boolean }>(({ removed, theme }) => css`
-  font-family: ${theme.fonts.family.monospace};
+const FieldValue = styled.dd<{ removed: boolean }>(
+  ({ removed, theme }) => css`
+    font-family: ${theme.fonts.family.monospace};
 
-  ${removed && css`
-    text-decoration: line-through;
-    font-style: italic;
-`}
-`);
+    ${removed &&
+    css`
+      text-decoration: line-through;
+      font-style: italic;
+    `}
+  `,
+);
 
 type Props = {
   originalMessage: {
-    id: string,
-  },
+    id: string;
+  };
   simulationResults: {
-    messages: any[]
-  },
-}
+    messages: any[];
+  };
+};
 
 const SimulationChanges = (props: Props) => {
-  const _isOriginalMessageRemoved = (originalMessage, processedMessages) => !processedMessages.find((message) => message.id === originalMessage.id);
+  const _isOriginalMessageRemoved = (originalMessage, processedMessages) =>
+    !processedMessages.find((message) => message.id === originalMessage.id);
 
   const _formatFieldTitle = (field) => <dt key={`${field}-key`}>{field}</dt>;
 
-  const _formatFieldValue = (field, value, isRemoved = false) => <FieldValue key={`${field}-value`} removed={isRemoved}>{String(value)}</FieldValue>;
+  const _formatFieldValue = (field, value, isRemoved = false) => (
+    <FieldValue key={`${field}-value`} removed={isRemoved}>
+      {String(value)}
+    </FieldValue>
+  );
 
   const _formatAddedFields = (addedFields) => {
     const keys = Object.keys(addedFields);
@@ -113,9 +121,7 @@ const SimulationChanges = (props: Props) => {
     return (
       <FieldResultWrap resultType="added">
         <h4>Added fields</h4>
-        <dl>
-          {formattedFields}
-        </dl>
+        <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
   };
@@ -137,9 +143,7 @@ const SimulationChanges = (props: Props) => {
     return (
       <FieldResultWrap resultType="removed">
         <h4>Removed fields</h4>
-        <dl>
-          {formattedFields}
-        </dl>
+        <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
   };
@@ -162,9 +166,7 @@ const SimulationChanges = (props: Props) => {
     return (
       <FieldResultWrap resultType="mutated">
         <h4>Mutated fields</h4>
-        <dl>
-          {formattedFields}
-        </dl>
+        <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
   };
@@ -204,7 +206,9 @@ const SimulationChanges = (props: Props) => {
         <Col md={12}>
           <h3>
             Changes in original message{' '}
-            <small><em>{originalMessage.id}</em></small>
+            <small>
+              <em>{originalMessage.id}</em>
+            </small>
           </h3>
           {_getOriginalMessageChanges()}
         </Col>
@@ -227,8 +231,8 @@ const SimulationChanges = (props: Props) => {
           <h3>Other changes</h3>
           <p>
             There would be {createdMessages.length}{' '}
-            <Pluralize singular="message" plural="messages" value={createdMessages.length} /> created.{' '}
-            Switch to the <em>Results preview</em> view option to see{' '}
+            <Pluralize singular="message" plural="messages" value={createdMessages.length} /> created. Switch to the{' '}
+            <em>Results preview</em> view option to see{' '}
             <Pluralize singular="it" plural="them" value={createdMessages.length} />.
           </p>
         </Col>

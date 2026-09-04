@@ -14,40 +14,67 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import QueryHelper from 'components/common/QueryHelper';
 import type View from 'views/logic/views/View';
 import { fetchDashboards, keyFn } from 'views/components/dashboard/hooks/useDashboards';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import useColumnRenderers from 'views/components/dashboard/DashboardsOverview/useColumnRenderers';
-import { DEFAULT_LAYOUT, COLUMNS_ORDER } from 'views/components/dashboard/DashboardsOverview/Constants';
+import getDashboardTableElements from 'views/components/dashboard/DashboardsOverview/Constants';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
 
 import BulkActions from './BulkActions';
 
 type Props = {
-  isEvidenceModal?: boolean,
+  hideShare?: boolean;
+  hideAdditionalColumns?: boolean;
+  hideDelete?: boolean;
 };
 
-const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
-  const customColumnRenderers = useColumnRenderers();
+const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, hideDelete = false }: Props) => {
+  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
+    usePluggableEntityTableElements<View>(null, 'dashboard');
+  const { getDefaultLayout, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
+  const customColumnRenderers = useColumnRenderers(pluggableColumnRenderers);
 
-  const renderDashboardActions = useCallback((dashboard: View) => (
-    <DashboardActions dashboard={dashboard} isEvidenceModal={isEvidenceModal} />
-  ), [isEvidenceModal]);
+  const renderDashboardActions = useCallback(
+    (dashboard: View) => <DashboardActions dashboard={dashboard} hideDelete={hideDelete} hideShare={hideShare} />,
+    [hideDelete, hideShare],
+  );
+  const expandedSections = useMemo(
+    () => ({
+      ...pluggableExpandedSections,
+    }),
+    [pluggableExpandedSections],
+  );
+
+  const fetchEntities = (searchParams: SearchParamsForDashboards): Promise<PaginatedResponse<View>> => {
+    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+    return fetchDashboards(searchParams);
+  };
 
   return (
-    <PaginatedEntityTable<View> humanName="dashboards"
-                                columnsOrder={COLUMNS_ORDER}
-                                queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
-                                entityActions={renderDashboardActions}
-                                tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
-                                fetchEntities={fetchDashboards}
-                                keyFn={keyFn}
-                                entityAttributesAreCamelCase
-                                bulkSelection={{ actions: <BulkActions /> }}
-                                columnRenderers={customColumnRenderers} />
+    <PaginatedEntityTable<View>
+      humanName="dashboards"
+      queryHelpComponent={
+        <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
+      }
+      entityActions={renderDashboardActions}
+      tableLayout={getDefaultLayout(hideAdditionalColumns)}
+      fetchEntities={fetchEntities}
+      additionalAttributes={additionalAttributes}
+      expandedSectionRenderers={expandedSections}
+      keyFn={keyFn}
+      entityAttributesAreCamelCase
+      bulkSelection={{ actions: <BulkActions /> }}
+      columnRenderers={customColumnRenderers}
+    />
   );
 };
 

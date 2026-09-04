@@ -25,39 +25,40 @@ import { qualifyUrl } from 'util/URLUtils';
 import { onSettled } from 'util/conditional/onError';
 
 export const QUERY_KEY = ['data-nodes', 'renewal-policy'];
-const fetchRenewalPolicy = (): Promise<RenewalPolicy> => (
-  fetch('GET', qualifyUrl('/api/renewal_policy'), undefined, false)
-);
+const fetchRenewalPolicy = (): Promise<RenewalPolicy> =>
+  fetch('GET', qualifyUrl('/api/renewal_policy'), undefined, false);
 
 const useRenewalPolicy = (): {
-  data: RenewalPolicy,
-  isFetching: boolean,
-  error: FetchError,
-  isInitialLoading: boolean
+  data: RenewalPolicy;
+  isFetching: boolean;
+  error: FetchError;
+  isInitialLoading: boolean;
 } => {
   const [metaData, setMetaData] = useState<{
-    error: FetchError | null,
-    isInitialLoading: false,
+    error: FetchError | null;
+    isInitialLoading: false;
   }>({
     error: null,
     isInitialLoading: false,
   });
-  const {
-    data,
-    isFetching,
-  } = useQuery<RenewalPolicy, FetchError>({
+  const { data, isFetching } = useQuery<RenewalPolicy, FetchError>({
     queryKey: QUERY_KEY,
-    queryFn: () => onSettled(fetchRenewalPolicy(), () => {
-      setMetaData({
-        error: null,
-        isInitialLoading: false,
-      });
-    }, (newError: FetchError) => {
-      setMetaData({
-        error: newError,
-        isInitialLoading: false,
-      });
-    }),
+    queryFn: () =>
+      onSettled(
+        fetchRenewalPolicy(),
+        () => {
+          setMetaData({
+            error: null,
+            isInitialLoading: false,
+          });
+        },
+        (newError: FetchError) => {
+          setMetaData({
+            error: newError,
+            isInitialLoading: false,
+          });
+        },
+      ),
     initialData: undefined,
     refetchInterval: 3000,
     retry: false,

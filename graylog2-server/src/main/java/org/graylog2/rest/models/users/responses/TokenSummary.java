@@ -20,26 +20,36 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
+
+import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class TokenSummary {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("last_access")
     public abstract DateTime lastAccess();
+
+    @JsonProperty("created_at")
+    @Nullable
+    public abstract DateTime createdAt();
+
+    @JsonProperty("expires_at")
+    @Nullable
+    public abstract DateTime expiresAt();
 
     @JsonCreator
     public static TokenSummary create(@JsonProperty("id") String id,
                                       @JsonProperty("name") String name,
-                                      @JsonProperty("last_access") DateTime lastAccess) {
-        return new AutoValue_TokenSummary(id, name, lastAccess);
+                                      @JsonProperty("last_access") DateTime lastAccess,
+                                      @Nullable @JsonProperty("created_at") DateTime createdAt,
+                                      @Nullable @JsonProperty("expires_at") DateTime expiresAt) {
+        return new AutoValue_TokenSummary(id, name, lastAccess, createdAt, expiresAt);
     }
 }

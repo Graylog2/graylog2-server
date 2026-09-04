@@ -23,12 +23,6 @@ import AppConfig from 'util/AppConfig';
 import type { Config } from './MaxmindAdapterFieldSet';
 import MaxmindAdapterFieldSet from './MaxmindAdapterFieldSet';
 
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  gl2ServerUrl: jest.fn(() => ''),
-  isCloud: jest.fn(() => false),
-}));
-
 describe('MaxmindAdapterFieldSet', () => {
   describe('in cloud mode', () => {
     beforeEach(() => {
@@ -36,11 +30,15 @@ describe('MaxmindAdapterFieldSet', () => {
     });
 
     it('renders MaxmindAdapterFieldSet without path input', async () => {
-      render(<MaxmindAdapterFieldSet config={{} as Config}
-                                     updateConfig={() => {}}
-                                     handleFormEvent={() => {}}
-                                     validationState={() => undefined}
-                                     validationMessage={() => undefined} />);
+      render(
+        <MaxmindAdapterFieldSet
+          config={{} as Config}
+          updateConfig={() => {}}
+          handleFormEvent={() => {}}
+          validationState={() => undefined}
+          validationMessage={() => undefined}
+        />,
+      );
 
       expect(screen.getByText(/select the type of the database file/i)).toBeInTheDocument();
 
@@ -54,11 +52,15 @@ describe('MaxmindAdapterFieldSet', () => {
     });
 
     it('renders MaxmindAdapterFieldSet with path input', async () => {
-      render(<MaxmindAdapterFieldSet config={{} as Config}
-                                     updateConfig={() => {}}
-                                     handleFormEvent={() => {}}
-                                     validationState={() => undefined}
-                                     validationMessage={() => undefined} />);
+      render(
+        <MaxmindAdapterFieldSet
+          config={{} as Config}
+          updateConfig={() => {}}
+          handleFormEvent={() => {}}
+          validationState={() => undefined}
+          validationMessage={() => undefined}
+        />,
+      );
 
       expect(screen.getByText(/Select the type of the database file/i)).toBeInTheDocument();
 

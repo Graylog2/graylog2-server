@@ -4,7 +4,7 @@ An error occurred while trying to send an email!
 
 <#if _description>
 <span>
-The Graylog server encountered an error while trying to send an email.
+An error was encountered while trying to send an email.
 This is the detailed error message: ${exception}
 </span>
 </#if>

@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { useState, useEffect } from 'react';
+
+import useIntersectionObserver from 'hooks/useIntersectionObserver';
+import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
 const Container = styled.div`
   height: 100%;
@@ -32,29 +35,25 @@ const Content = styled.div`
   position: relative;
 `;
 
-const Actions = styled.div<{ $scrolledToBottom: boolean, $alignAtBottom: boolean }>(({ theme, $scrolledToBottom, $alignAtBottom }) => css`
-  position: sticky;
-  width: 100%;
-  bottom: 0;
-  background: ${theme.colors.global.contentBackground};
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
-  padding-top: 5px;
+const Actions = styled.div<{ $scrolledToBottom: boolean; $alignAtBottom: boolean }>(
+  ({ theme, $scrolledToBottom, $alignAtBottom }) => css`
+    position: sticky;
+    width: 100%;
+    bottom: 0;
+    background: ${theme.colors.global.contentBackground};
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
+    padding-top: 5px;
 
-  &::before {
-    box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
-    content: ' ';
-    display: ${$scrolledToBottom ? 'block' : 'none'};
-    height: 3px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-  }
-`);
+    ${ScrollShadow('top')}
+    &::before {
+      display: ${$scrolledToBottom ? 'block' : 'none'};
+    }
+  `,
+);
 
 const ScrolledToBottomIndicator = styled.div`
   width: 1px;
@@ -64,49 +63,25 @@ const ScrolledToBottomIndicator = styled.div`
   z-index: 0;
 `;
 
-const useScrolledToBottom = (): {
-  setScrolledToBottomIndicatorRef: (ref: HTMLDivElement) => void,
-  scrolledToBottom: boolean
-} => {
-  const [scrolledToBottomIndicatorRef, setScrolledToBottomIndicatorRef] = useState(null);
-  const [scrolledToBottom, setScrolledToBottom] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setScrolledToBottom(!entry.isIntersecting);
-    }, { threshold: 0.9 });
-
-    if (scrolledToBottomIndicatorRef) {
-      observer.observe(scrolledToBottomIndicatorRef);
-    }
-
-    return () => {
-      if (scrolledToBottomIndicatorRef) {
-        observer.unobserve(scrolledToBottomIndicatorRef);
-      }
-    };
-  }, [scrolledToBottomIndicatorRef]);
-
-  return { setScrolledToBottomIndicatorRef, scrolledToBottom };
+type Props = {
+  actions: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+  // Set this to align the actions at the bottom of the free space
+  alignActionsAtBottom?: boolean;
 };
 
-type Props = {
-  actions: React.ReactNode,
-  children: React.ReactNode,
-  className?: string,
-  // Set this to align the actions at the bottom of the free space
-  alignActionsAtBottom?: boolean,
-}
-
-const StickyBottomActions = ({ actions, children, className, alignActionsAtBottom = false }: Props) => {
-  const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
+const StickyBottomActions = ({ actions, children, className = undefined, alignActionsAtBottom = false }: Props) => {
+  const scrollContainerRef = useRef<HTMLDivElement>();
+  const scrolledToBottomIndicatorRef = useRef<HTMLDivElement>();
+  const scrolledToBottom = useIntersectionObserver(scrollContainerRef, scrolledToBottomIndicatorRef);
 
   return (
     <Container className={className}>
-      <ScrollContainer>
+      <ScrollContainer ref={scrollContainerRef}>
         <Content>
           {children}
-          <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />
+          <ScrolledToBottomIndicator ref={scrolledToBottomIndicatorRef} />
         </Content>
       </ScrollContainer>
       <Actions $scrolledToBottom={scrolledToBottom} $alignAtBottom={alignActionsAtBottom}>

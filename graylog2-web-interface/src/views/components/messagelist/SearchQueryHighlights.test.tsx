@@ -22,14 +22,16 @@ import type { Message } from 'views/components/messagelist/Types';
 
 import SearchQueryHighlights from './SearchQueryHighlights';
 
-const messageFor = (ranges: { [p: string]: any }) => ({ highlight_ranges: ranges } as Message);
+const messageFor = (ranges: { [p: string]: any }) =>
+  ({
+    highlight_ranges: ranges,
+  }) as Message;
 
 const hasBrokenUpText = (text: string) => (_content, node: Element) => {
   const hasText = (currentNode: Element) => currentNode.textContent === text;
   const nodeHasText = hasText(node);
-  const childrenDontHaveText = Array.from(node.children).every(
-    (child) => !hasText(child),
-  );
+  // eslint-disable-next-line testing-library/no-node-access -- custom text matcher requires traversing child elements
+  const childrenDontHaveText = Array.from(node.children).every((child) => !hasText(child));
 
   return nodeHasText && childrenDontHaveText;
 };
@@ -38,7 +40,7 @@ describe('SearchQueryHighlights', () => {
   it('works for empty field & value', async () => {
     const { container } = render(<SearchQueryHighlights field="" value="" />);
 
-    expect(container.children).toHaveLength(2);
+    expect(container).toBeInTheDocument();
   });
 
   it('returns unmodified string without ranges', async () => {

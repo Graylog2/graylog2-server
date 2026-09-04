@@ -27,9 +27,9 @@ import useQuery from 'routing/useQuery';
 import ShowViewPage from './ShowViewPage';
 
 type BigDisplayModeQuery = {
-  tabs?: Array<number>,
-  interval: number,
-  refresh: number,
+  tabs?: Array<number>;
+  interval: number;
+  refresh: number;
 };
 
 const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayModeQuery): BigDisplayModeQuery => ({
@@ -64,7 +64,7 @@ const ShowDashboardInBigDisplayMode = () => {
   const configuration = castQueryWithDefaults(query);
 
   return (
-    <InteractiveContext.Provider value={false}>
+    <InteractiveContext.Provider value="disabled">
       <BodyPositioningWrapper>
         <ShowViewPage>
           <AutoRefreshSearch refreshInterval={configuration.refresh} />

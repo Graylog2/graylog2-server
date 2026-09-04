@@ -1,6 +1,7 @@
 {
   "name": "chart",
   "id": "1031c586-2eb1-4459-8c2c-2a91dec5dd72",
+  "column_names" : ["http_response_code", "[count()]", "[max(http_response_code)]", "[DELETE, count()]", "[DELETE, max(http_response_code)]", "[GET, count()]", "[GET, max(http_response_code)]", "[POST, count()]", "[POST, max(http_response_code)]", "[PUT, count()]", "[PUT, max(http_response_code)]"],
   "rows": [
     {
       "key": [

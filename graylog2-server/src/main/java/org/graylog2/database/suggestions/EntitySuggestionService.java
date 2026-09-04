@@ -18,10 +18,16 @@ package org.graylog2.database.suggestions;
 
 import org.apache.shiro.subject.Subject;
 
+import javax.annotation.Nullable;
+import java.util.List;
+
 public interface EntitySuggestionService {
 
     EntitySuggestionResponse suggest(final String collection,
+                                     final String identifier,
                                      final String valueColumn,
+                                     @Nullable final List<String> displayFields,
+                                     @Nullable final String displayTemplate,
                                      final String query,
                                      final int page,
                                      final int perPage,

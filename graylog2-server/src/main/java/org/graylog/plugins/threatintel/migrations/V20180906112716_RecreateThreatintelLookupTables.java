@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import jakarta.inject.Inject;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ContentPack;
@@ -95,7 +94,6 @@ public class V20180906112716_RecreateThreatintelLookupTables extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("content_bundle_ids")
         public abstract List<String> contentBundleIds();

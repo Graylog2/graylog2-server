@@ -33,7 +33,6 @@ import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
 import org.graylog.testing.completebackend.apis.inputs.Inputs;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +53,9 @@ public class GraylogApis implements GraylogRestApi {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogApis.class);
     private static final ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
 
+    private final String username;
+    private final String password;
+
     private final GraylogBackend backend;
     private final Users users;
     private final Streams streams;
@@ -68,9 +70,19 @@ public class GraylogApis implements GraylogRestApi {
     private final EventDefinitions eventDefinitions;
     private final Dashboards dashboards;
     private final Pipelines pipelines;
+    private final Rules rules;
+    private final Simulator simulator;
     private final Inputs inputs;
+    private final Roles roles;
 
     public GraylogApis(GraylogBackend backend) {
+        this(backend, "admin", "admin");
+    }
+
+    public GraylogApis(GraylogBackend backend, String username, String password) {
+        this.username = username;
+        this.password = password;
+
         this.backend = backend;
         this.users = new Users(this);
         this.streams = new Streams(this);
@@ -85,7 +97,18 @@ public class GraylogApis implements GraylogRestApi {
         this.eventDefinitions = new EventDefinitions(this);
         this.dashboards = new Dashboards(this);
         this.pipelines = new Pipelines(this);
+        this.rules = new Rules(this);
+        this.simulator = new Simulator(this);
         this.inputs = new Inputs(this);
+        this.roles = new Roles(this);
+    }
+
+    public GraylogApis forUser(String username, String password) {
+        return new GraylogApis(backend, username, password);
+    }
+
+    public GraylogApis forUser(Users.User user) {
+        return new GraylogApis(backend, user.username(), user.password());
     }
 
     public RequestSpecification requestSpecification() {
@@ -96,11 +119,11 @@ public class GraylogApis implements GraylogRestApi {
                 .accept(JSON)
                 .contentType(JSON)
                 .header("X-Requested-By", "peterchen")
-                .auth().basic("admin", "admin");
+                .auth().basic(username, password);
     }
 
     public Supplier<RequestSpecification> requestSpecificationSupplier() {
-        return () -> this.requestSpecification();
+        return this::requestSpecification;
     }
 
     public GraylogBackend backend() {
@@ -159,8 +182,20 @@ public class GraylogApis implements GraylogRestApi {
         return pipelines;
     }
 
+    public Rules rules() {
+        return rules;
+    }
+
+    public Simulator simulator() {
+        return simulator;
+    }
+
     public Inputs inputs() {
         return inputs;
+    }
+
+    public Roles roles() {
+        return roles;
     }
 
     protected RequestSpecification prefix(final Users.User user) {
@@ -260,9 +295,21 @@ public class GraylogApis implements GraylogRestApi {
                 .statusCode(expectedResult);
     }
 
-    private boolean errorRunningIndexer(final String logs) {
+    public static boolean errorRunningIndexer(final String logs) {
         return logs.contains("Elasticsearch cluster not available")
                 || logs.contains("Elasticsearch cluster is unreachable or unhealthy");
+    }
+
+    public void log() {
+        final var backendLogs = this.backend.getLogs();
+        LOG.error("------------------------ Output from graylog docker container start ------------------------\n"
+                + backendLogs
+                + "\n------------------------ Output from graylog docker container ends  ------------------------");
+        if(errorRunningIndexer(backendLogs)) {
+            LOG.error("------------------------ Output from indexer docker container start ------------------------\n"
+                    + this.backend.getSearchLogs()
+                    + "\n------------------------ Output from indexer docker container ends  ------------------------");
+        }
     }
 
     public RestAssuredConfig withGraylogBackendFailureConfig() {
@@ -277,15 +324,7 @@ public class GraylogApis implements GraylogRestApi {
                 .failureConfig(FailureConfig.failureConfig().with().failureListeners(
                         (reqSpec, respSpec, resp) -> {
                             if (resp.statusCode() >= minError) {
-                                final var backendLogs = this.backend.getLogs();
-                                LOG.error("------------------------ Output from graylog docker container start ------------------------\n"
-                                        + backendLogs
-                                        + "\n------------------------ Output from graylog docker container ends  ------------------------");
-                                if(errorRunningIndexer(backendLogs)) {
-                                    LOG.error("------------------------ Output from indexer docker container start ------------------------\n"
-                                            + this.backend.getSearchLogs()
-                                            + "\n------------------------ Output from indexer docker container ends  ------------------------");
-                                }
+                                log();
                             }
                         })
                 );
@@ -333,7 +372,12 @@ public class GraylogApis implements GraylogRestApi {
         }
 
         public void waitForMessages(Collection<String> messages) {
-            search().waitForMessages(messages, RelativeRange.allTime(), Set.of(streamId));
+            search().waitForMessages(messages);
+        }
+
+        public void putDeflectorFieldMapping(final String field, final String type) {
+            final var deflectorIndex = indices().getDeflectorIndex(this.indexSetId);
+            backend().searchServerInstance().client().putFieldMapping(deflectorIndex, field, type);
         }
 
         @Override
@@ -346,7 +390,6 @@ public class GraylogApis implements GraylogRestApi {
     public SearchEnvironment createEnvironment(PortBoundGelfInputApi gelfPort) throws ExecutionException, RetryException {
         final var randomId = RandomStringUtils.secure().next(8, false, true);
         final var indexSetId = this.indices().createIndexSet("Test Environment " + randomId, "An index set for tests", "searchenvironment" + randomId);
-        this.indices().waitForIndexNames(indexSetId);
         final var streamId = this.streams().createStream("Test Stream " + randomId, indexSetId, true, DefaultStreamMatches.REMOVE, Streams.StreamRule.exact(randomId, "test-environment", false));
 
         return new SearchEnvironment(randomId, streamId, indexSetId, gelfPort);

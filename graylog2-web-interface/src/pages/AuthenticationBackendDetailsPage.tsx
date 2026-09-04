@@ -19,12 +19,11 @@ import { useState, useEffect } from 'react';
 
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import withParams from 'routing/withParams';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, Spinner, PageHeader, DocumentTitle } from 'components/common';
 import 'components/authentication/bindings'; // Bind all authentication plugins
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import { Spinner, PageHeader, DocumentTitle } from 'components/common';
 import BackendDetails from 'components/authentication/BackendDetails';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
@@ -32,8 +31,8 @@ import type AuthenticationBackend from 'logic/authentication/AuthenticationBacke
 
 type Props = {
   params: {
-    backendId: string,
-  },
+    backendId: string;
+  };
 };
 
 const _pageTitle = (authBackendTitle, returnString = false) => {
@@ -44,7 +43,11 @@ const _pageTitle = (authBackendTitle, returnString = false) => {
     return `${pageName} - ${backendTitle}`;
   }
 
-  return <>{pageName} - <i>{backendTitle}</i></>;
+  return (
+    <>
+      {pageName} - <i>{backendTitle}</i>
+    </>
+  );
 };
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
@@ -61,20 +64,20 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   return (
     <DocumentTitle title={_pageTitle(authBackend.title, true)}>
       <AuthenticationPageNavigation />
-      <PageHeader title={_pageTitle(authBackend.title)}
-                  actions={(
-                    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
-                      <Button bsStyle="success"
-                              type="button">
-                        Edit Service
-                      </Button>
-                    </LinkContainer>
-                  )}
-                  documentationLink={{
-                    title: 'Authentication documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
-        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+      <PageHeader
+        title={_pageTitle(authBackend.title)}
+        actions={
+          <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
+            <Button bsStyle="primary" type="button">
+              Edit Service
+            </Button>
+          </LinkContainer>
+        }
+        documentationLink={{
+          title: 'Authentication documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}>
+        <span>Configure authentication services of this cluster.</span>
       </PageHeader>
       <BackendDetails authenticationBackend={authBackend} />
     </DocumentTitle>

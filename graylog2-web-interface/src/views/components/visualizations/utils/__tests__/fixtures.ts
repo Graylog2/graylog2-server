@@ -18,6 +18,7 @@ import type { DefaultTheme } from 'styled-components';
 
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type { UnitTypeMapper } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 export const layoutMapperWith4AxisFor4series = {
   fieldNameToAxisCountMapper: {
@@ -42,7 +43,7 @@ export const layoutMapperWith4AxisFor4series = {
     'avg(field1)': 'time',
     'avg(field2)': 'size',
     'avg(field3)': 'percent',
-    'count()': 'withoutUnit',
+    'count()': DEFAULT_AXIS_KEY,
   },
   unitTypeMapper: {
     percent: {
@@ -57,7 +58,7 @@ export const layoutMapperWith4AxisFor4series = {
       axisCount: 1,
       axisKeyName: 'yaxis',
     },
-    withoutUnit: {
+    [DEFAULT_AXIS_KEY]: {
       axisCount: 4,
       axisKeyName: 'yaxis4',
     },
@@ -95,7 +96,7 @@ export const layoutMapperWith4AxisFor6series = {
     'avg(field1)': 'time',
     'avg(field2)': 'size',
     'avg(field3)': 'percent',
-    'count()': 'withoutUnit',
+    'count()': DEFAULT_AXIS_KEY,
     'latest(field3)': 'percent',
     'sum(field2)': 'size',
   },
@@ -112,7 +113,7 @@ export const layoutMapperWith4AxisFor6series = {
       axisCount: 1,
       axisKeyName: 'yaxis',
     },
-    withoutUnit: {
+    [DEFAULT_AXIS_KEY]: {
       axisCount: 4,
       axisKeyName: 'yaxis4',
     },
@@ -148,19 +149,9 @@ export const chartData4Charts: Array<ChartDefinition> = [
       '2024-08-12T16:00:00.000+02:00',
     ],
     y: [
-      0.209526395173454,
-      0.20606304909560721,
-      0.2045749718151071,
-      0.20425480283114256,
-      0.20677467811158798,
-      0.20645807770961144,
-      0.20535445544554454,
-      0.20544767899291896,
-      0.20599992046975862,
-      0.20602506644991617,
-      0.20605278798408763,
-      0.20609160421539727,
-      0.20599850540664644,
+      0.209526395173454, 0.20606304909560721, 0.2045749718151071, 0.20425480283114256, 0.20677467811158798,
+      0.20645807770961144, 0.20535445544554454, 0.20544767899291896, 0.20599992046975862, 0.20602506644991617,
+      0.20605278798408763, 0.20609160421539727, 0.20599850540664644,
     ],
     opacity: 1,
     originalName: 'Name1',
@@ -209,21 +200,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
       '2024-08-12T14:00:00.000+02:00',
       '2024-08-12T16:00:00.000+02:00',
     ],
-    y: [
-      510,
-      510,
-      510,
-      510,
-      510,
-      510,
-      510,
-      510,
-      510,
-      510,
-      510,
-      521,
-      510,
-    ],
+    y: [510, 510, 510, 510, 510, 510, 510, 510, 510, 510, 510, 521, 510],
     opacity: 1,
     originalName: 'Name2',
     yaxis: 'y2',
@@ -271,21 +248,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
       '2024-08-12T14:00:00.000+02:00',
       '2024-08-12T16:00:00.000+02:00',
     ],
-    y: [
-      0.44,
-      0.46,
-      0.48,
-      0.45,
-      0.48,
-      0.44,
-      0.5,
-      0.56,
-      0.59,
-      0.59,
-      0.59,
-      0.59,
-      0.01,
-    ],
+    y: [0.44, 0.46, 0.48, 0.45, 0.48, 0.44, 0.5, 0.56, 0.59, 0.59, 0.59, 0.59, 0.01],
     opacity: 1,
     originalName: 'Name3',
     yaxis: 'y3',
@@ -316,21 +279,7 @@ export const chartData4Charts: Array<ChartDefinition> = [
       '2024-08-12T14:00:00.000+02:00',
       '2024-08-12T16:00:00.000+02:00',
     ],
-    y: [
-      663,
-      1935,
-      1774,
-      989,
-      1864,
-      978,
-      1515,
-      1271,
-      75443,
-      214071,
-      210654,
-      197087,
-      111067,
-    ],
+    y: [663, 1935, 1774, 989, 1864, 978, 1515, 1271, 75443, 214071, 210654, 197087, 111067],
     opacity: 1,
     originalName: 'count()',
     yaxis: 'y4',
@@ -357,7 +306,7 @@ export const unitTypeMapper4Charts: UnitTypeMapper = {
     axisCount: 3,
     axisKeyName: 'yaxis3',
   },
-  withoutUnit: {
+  [DEFAULT_AXIS_KEY]: {
     axisCount: 4,
     axisKeyName: 'yaxis4',
   },
@@ -366,11 +315,15 @@ export const unitTypeMapper4Charts: UnitTypeMapper = {
 export const theme = {
   colors: {
     variant: { lightest: { default: '#000' } },
-    global: { textDefault: '#fff' },
+    text: { primary: '#fff' },
   },
   fonts: {
     family: { body: 'defaultFont' },
     size: { small: '1rem' },
+  },
+  utils: {
+    opacify: (color: string, _: number) => color,
+    readableColor: (color: string) => color,
   },
 } as DefaultTheme;
 
@@ -380,7 +333,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
-    position: 0,
+    range: [0, 0.21],
     rangemode: 'tozero',
     side: 'left',
     tickfont: {
@@ -388,33 +341,29 @@ export const layoutsFor4axis = {
       family: 'defaultFont',
       size: 16,
     },
-    ticktext: [
-      '52.4 ms',
-      '104.8 ms',
-      '157.1 ms',
-      '209.5 ms',
-    ],
-    tickvals: [
-      0.0523815987933635,
-      0.104763197586727,
-      0.1571447963800905,
-      0.209526395173454,
-    ],
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 10,
+    ticktext: ['55 ms', '105 ms', '160 ms', '210 ms'],
+    tickvals: [0.055, 0.105, 0.16, 0.21],
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis2: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 1,
+    range: [0, 525],
     rangemode: 'tozero',
     side: 'right',
     tickfont: {
@@ -422,33 +371,28 @@ export const layoutsFor4axis = {
       family: 'defaultFont',
       size: 16,
     },
-    ticktext: [
-      '130.3 B',
-      '260.5 B',
-      '390.8 B',
-      '521.0 B',
-    ],
-    tickvals: [
-      130.25,
-      260.5,
-      390.75,
-      521,
-    ],
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 10,
+    ticktext: ['135 B', '265 B', '395 B', '525 B'],
+    tickvals: [135, 265, 395, 525],
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis3: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 0.1,
     rangemode: 'tozero',
     side: 'left',
     tickfont: {
@@ -457,21 +401,26 @@ export const layoutsFor4axis = {
       size: 16,
     },
     tickformat: '.1%',
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 80,
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis4: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 0.9,
     rangemode: 'tozero',
     side: 'right',
     tickfont: {
@@ -480,13 +429,17 @@ export const layoutsFor4axis = {
       size: 16,
     },
     tickformat: ',~r',
-    ticklabelposition: 'inside',
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 80,
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
 };

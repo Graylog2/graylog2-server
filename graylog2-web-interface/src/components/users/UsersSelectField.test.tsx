@@ -16,8 +16,8 @@
  */
 import React from 'react';
 import { render, screen, act, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import mockAction from 'helpers/mocking/MockAction';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { adminUser } from 'fixtures/users';
@@ -37,11 +37,12 @@ describe('<UsersSelectField>', () => {
   const onChange = jest.fn();
   const value = 'Baker Owens,Wiggins Vicki,tester,Abbott Schneider';
 
-  const renderUSF = (values) => render(
-    <CurrentUserContext.Provider value={adminUser}>
-      <UsersSelectField value={values} onChange={onChange} />
-    </CurrentUserContext.Provider>,
-  );
+  const renderUSF = (values) =>
+    render(
+      <CurrentUserContext.Provider value={adminUser}>
+        <UsersSelectField value={values} onChange={onChange} />
+      </CurrentUserContext.Provider>,
+    );
 
   it('should render UserSelectField', async () => {
     UsersDomain.loadUsersPaginated = mockAction(jest.fn(() => mockLoadUserPaginatedPromise));
@@ -58,11 +59,8 @@ describe('<UsersSelectField>', () => {
     renderUSF('');
     await act(() => mockLoadUserPaginatedPromise.then());
 
-    const select = screen.getByText(/select user\(s\)\.\.\./i);
-    await selectEvent.openMenu(select);
+    await selectEvent.chooseOption('select user', 'admin (Administrator)');
 
-    await selectEvent.select(select, 'admin (Administrator)');
-
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith('admin'));
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith('admin', expect.any(Object)));
   });
 });

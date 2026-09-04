@@ -22,9 +22,9 @@ import type { QueryClientConfig } from '@tanstack/react-query';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 
 type Props = {
-  children: React.ReactNode,
-  options?: QueryClientConfig
-}
+  children: React.ReactNode;
+  options?: QueryClientConfig;
+};
 
 const defaultQueryClientOptions = {
   defaultOptions: {
@@ -34,17 +34,10 @@ const defaultQueryClientOptions = {
   },
 };
 
-const QueryClientProviderForTests = ({
-  children,
-  options: optionsProp,
-}: Props) => {
+const QueryClientProviderForTests = ({ children, options: optionsProp }: Props) => {
   const options = merge(defaultQueryClientOptions, optionsProp);
 
-  return (
-    <DefaultQueryClientProvider options={options}>
-      {children}
-    </DefaultQueryClientProvider>
-  );
+  return <DefaultQueryClientProvider options={options}>{children}</DefaultQueryClientProvider>;
 };
 
 QueryClientProviderForTests.defaultProps = {

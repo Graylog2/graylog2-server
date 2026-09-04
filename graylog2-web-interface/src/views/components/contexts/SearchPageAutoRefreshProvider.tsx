@@ -18,23 +18,40 @@ import * as React from 'react';
 import { useCallback } from 'react';
 
 import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
-import useAppDispatch from 'stores/useAppDispatch';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
+import { durationToMS } from 'util/DateTime';
+import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 
 const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
-  const dispatch = useAppDispatch();
-  const jobIds = useAppSelector(selectJobIds);
+  const dispatch = useViewsDispatch();
+  const jobIds = useViewsSelector(selectJobIds);
+  const { autoRefresh } = useSearchURLQueryParams();
+
+  const { data: minimumRefresh, isInitialLoading: isLoadingMinimumRefresh } = useMinimumRefreshInterval();
+  const minimumRefreshInterval = minimumRefresh ? durationToMS(minimumRefresh) : 0;
+  const autoRefreshInterval = durationToMS(autoRefresh);
+  const interval = minimumRefreshInterval > autoRefreshInterval ? minimumRefreshInterval : autoRefreshInterval;
+
+  const refreshConfig = autoRefresh && !isLoadingMinimumRefresh ? { interval: interval, enabled: true } : null;
 
   const onRefresh = useCallback(() => {
     if (!jobIds) {
-      dispatch(execute());
+      dispatch(executeActiveQuery());
     }
   }, [dispatch, jobIds]);
 
+  // `AutoRefreshProvider` only seeds its state from `defaultRefreshConfig` when it mounts, so it needs to be
+  // remounted once the minimum refresh interval has been loaded. That is only relevant when auto refresh is
+  // requested through the URL, otherwise `refreshConfig` stays `null` either way and remounting would throw
+  // away and rebuild the complete search page, causing a second search execution and duplicate requests.
+  const providerKey = autoRefresh && isLoadingMinimumRefresh ? 'loading' : 'ready';
+
   return (
-    <AutoRefreshProvider onRefresh={onRefresh}>
+    <AutoRefreshProvider key={providerKey} defaultRefreshConfig={refreshConfig} onRefresh={onRefresh}>
       {children}
     </AutoRefreshProvider>
   );

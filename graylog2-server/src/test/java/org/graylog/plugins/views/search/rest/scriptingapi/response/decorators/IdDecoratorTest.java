@@ -27,9 +27,9 @@ class IdDecoratorTest {
     @Test
     void accept() {
         final FieldDecorator decorator = new IdDecorator();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("streams.id"))).isTrue();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input.id"))).isTrue();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_node.id"))).isTrue();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("streams#id"))).isTrue();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input#id"))).isTrue();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_node#id"))).isTrue();
 
         // default is to decorate as title, we don't want IDs
         Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_node"))).isFalse();
@@ -41,7 +41,7 @@ class IdDecoratorTest {
     void decorate() {
         final FieldDecorator decorator = new IdDecorator();
         final SearchUser searchUser = TestSearchUser.builder().build();
-        Assertions.assertThat(decorator.decorate(RequestedField.parse("streams.id"), "123", searchUser))
+        Assertions.assertThat(decorator.decorate(RequestedField.parse("streams#id"), "123", searchUser))
                 .isEqualTo("123");
     }
 }

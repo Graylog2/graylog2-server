@@ -18,6 +18,7 @@ import {
   convertValueToBaseUnit,
   convertValueToUnit,
   getPrettifiedValue,
+  roundValue,
 } from 'views/components/visualizations/utils/unitConverters';
 
 describe('Unit converter functions', () => {
@@ -64,6 +65,22 @@ describe('Unit converter functions', () => {
           abbrev: 'b',
           name: 'byte',
           unitType: 'size',
+          useInPrettier: true,
+          conversion: undefined,
+        },
+      });
+    });
+
+    it('for binary_size should convert bigger unit to bytes', () => {
+      const result = convertValueToBaseUnit(1, { abbrev: 'KiB', unitType: 'binary_size' });
+
+      expect(result).toEqual({
+        value: 1024,
+        unit: {
+          type: 'base',
+          abbrev: 'b',
+          name: 'byte',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: undefined,
         },
@@ -117,7 +134,11 @@ describe('Unit converter functions', () => {
 
   describe('convertValueToUnit converts value to needed unit', () => {
     it('for time should convert smaller unit (ms) to bigger (d)', () => {
-      const result = convertValueToUnit(86400000, { abbrev: 'ms', unitType: 'time' }, { abbrev: 'd', unitType: 'time' });
+      const result = convertValueToUnit(
+        86400000,
+        { abbrev: 'ms', unitType: 'time' },
+        { abbrev: 'd', unitType: 'time' },
+      );
 
       expect(result).toEqual({
         value: 1,
@@ -155,7 +176,11 @@ describe('Unit converter functions', () => {
     });
 
     it('for size should convert smaller unit (kb) to bigger (Gb)', () => {
-      const result = convertValueToUnit(1000000, { abbrev: 'kb', unitType: 'size' }, { abbrev: 'Gb', unitType: 'size' });
+      const result = convertValueToUnit(
+        1000000,
+        { abbrev: 'kb', unitType: 'size' },
+        { abbrev: 'Gb', unitType: 'size' },
+      );
 
       expect(result).toEqual({
         value: 1,
@@ -192,12 +217,89 @@ describe('Unit converter functions', () => {
       });
     });
 
+    it('for binary_size should convert smaller unit (KiB) to bigger (GiB)', () => {
+      const result = convertValueToUnit(
+        1048576,
+        { abbrev: 'KiB', unitType: 'binary_size' },
+        { abbrev: 'GiB', unitType: 'binary_size' },
+      );
+
+      expect(result).toEqual({
+        value: 1,
+        unit: {
+          type: 'derived',
+          abbrev: 'GiB',
+          name: 'gibibyte',
+          unitType: 'binary_size',
+          useInPrettier: true,
+          conversion: {
+            value: 1073741824,
+            action: 'MULTIPLY',
+          },
+        },
+      });
+    });
+
+    it('for binary_size should convert bytes to GiB', () => {
+      const result = convertValueToUnit(
+        3221225472,
+        { abbrev: 'b', unitType: 'binary_size' },
+        { abbrev: 'GiB', unitType: 'binary_size' },
+      );
+
+      expect(result).toEqual({
+        value: 3,
+        unit: {
+          type: 'derived',
+          abbrev: 'GiB',
+          name: 'gibibyte',
+          unitType: 'binary_size',
+          useInPrettier: true,
+          conversion: {
+            value: 1073741824,
+            action: 'MULTIPLY',
+          },
+        },
+      });
+    });
+
+    it('for binary_size should convert bytes to MiB', () => {
+      const result = convertValueToUnit(
+        1572864,
+        { abbrev: 'b', unitType: 'binary_size' },
+        { abbrev: 'MiB', unitType: 'binary_size' },
+      );
+
+      expect(result).toEqual({
+        value: 1.5,
+        unit: {
+          type: 'derived',
+          abbrev: 'MiB',
+          name: 'mebibyte',
+          unitType: 'binary_size',
+          useInPrettier: true,
+          conversion: {
+            value: 1048576,
+            action: 'MULTIPLY',
+          },
+        },
+      });
+    });
+
     it('return nulls when some params where missed', () => {
       const result1 = convertValueToUnit(50, { abbrev: 'Gb', unitType: 'size' }, undefined);
       const result2 = convertValueToUnit(50, undefined, { abbrev: 'Gb', unitType: 'size' });
       const result3 = convertValueToUnit(null, { abbrev: 'Gb', unitType: 'size' }, { abbrev: 'kb', unitType: 'size' });
-      const result4 = convertValueToUnit(50, { abbrev: 'Gb', unitType: 'size' }, { abbrev: undefined, unitType: 'size' });
-      const result5 = convertValueToUnit(50, { abbrev: undefined, unitType: 'size' }, { abbrev: undefined, unitType: 'size' });
+      const result4 = convertValueToUnit(
+        50,
+        { abbrev: 'Gb', unitType: 'size' },
+        { abbrev: undefined, unitType: 'size' },
+      );
+      const result5 = convertValueToUnit(
+        50,
+        { abbrev: undefined, unitType: 'size' },
+        { abbrev: undefined, unitType: 'size' },
+      );
 
       expect(result1).toEqual({ value: null, unit: null });
       expect(result2).toEqual({ value: null, unit: null });
@@ -284,6 +386,82 @@ describe('Unit converter functions', () => {
       });
     });
 
+    it('for binary_size should convert smaller then 1 value to the value with lower unit', () => {
+      const result = getPrettifiedValue(0.5, { abbrev: 'GiB', unitType: 'binary_size' });
+
+      expect(result).toEqual({
+        value: 512,
+        unit: {
+          type: 'derived',
+          abbrev: 'MiB',
+          name: 'mebibyte',
+          unitType: 'binary_size',
+          useInPrettier: true,
+          conversion: {
+            value: 1048576,
+            action: 'MULTIPLY',
+          },
+        },
+      });
+    });
+
+    it('for binary_size should convert bigger then 1 value to the value with higher unit', () => {
+      const result = getPrettifiedValue(2048, { abbrev: 'MiB', unitType: 'binary_size' });
+
+      expect(result).toEqual({
+        value: 2,
+        unit: {
+          type: 'derived',
+          abbrev: 'GiB',
+          name: 'gibibyte',
+          unitType: 'binary_size',
+          useInPrettier: true,
+          conversion: {
+            value: 1073741824,
+            action: 'MULTIPLY',
+          },
+        },
+      });
+    });
+
+    it('for binary_size should prettify larger bytes to GiB', () => {
+      const result = getPrettifiedValue(3221225472, { abbrev: 'b', unitType: 'binary_size' });
+
+      expect(result).toEqual({
+        value: 3,
+        unit: {
+          type: 'derived',
+          abbrev: 'GiB',
+          name: 'gibibyte',
+          unitType: 'binary_size',
+          useInPrettier: true,
+          conversion: {
+            value: 1073741824,
+            action: 'MULTIPLY',
+          },
+        },
+      });
+    });
+
+    it('for binary_size should prettify larger bytes to MiB', () => {
+      const result = getPrettifiedValue(1572864, { abbrev: 'b', unitType: 'binary_size' });
+
+      expect(result).toEqual({
+        value: 1.5,
+        unit: {
+          type: 'derived',
+          abbrev: 'MiB',
+          name: 'mebibyte',
+          unitType: 'binary_size',
+          useInPrettier: true,
+          conversion: {
+            value: 1048576,
+            action: 'MULTIPLY',
+          },
+        },
+      });
+    });
+
     it('for percent should always convert to integer % unit', () => {
       const result1 = getPrettifiedValue(100, { abbrev: 'd%', unitType: 'percent' });
       const result2 = getPrettifiedValue(10000, { abbrev: '%', unitType: 'percent' });
@@ -304,6 +482,18 @@ describe('Unit converter functions', () => {
 
       expect(result1).toEqual(expectedResult);
       expect(result2).toEqual(expectedResult);
+    });
+  });
+
+  describe('Round value', () => {
+    it('for value less then 10 do round ceil', () => {
+      expect(roundValue(3.3)).toEqual(4);
+      expect(roundValue(9.7)).toEqual(10);
+    });
+
+    it('for value more then 10 round ceil with 5 or 0 as last number', () => {
+      expect(roundValue(43.3)).toEqual(45);
+      expect(roundValue(899.7)).toEqual(900);
     });
   });
 });

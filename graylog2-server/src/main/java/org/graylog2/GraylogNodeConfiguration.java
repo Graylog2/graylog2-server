@@ -75,4 +75,6 @@ public interface GraylogNodeConfiguration {
      * Enables message recording in ServerStatus.
      */
     boolean isMessageRecordingsEnabled();
+
+    boolean isCloud();
 }

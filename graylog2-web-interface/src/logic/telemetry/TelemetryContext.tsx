@@ -20,21 +20,22 @@ import { singleton } from 'logic/singleton';
 import type { EventType } from 'logic/telemetry/types';
 
 export type TelemetryEvent = {
-  app_path_pattern?: string,
-  app_pathname?: string,
-  app_section?: string,
-  app_action_value?: string
-  [key: string]: unknown,
+  app_path_pattern?: string;
+  app_pathname?: string;
+  app_section?: string;
+  app_action_value?: string;
+  [key: string]: unknown;
 };
 
 export type TelemetryEventType = '$pageview' | EventType;
 
 type ContextType = {
-  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent | { [key: string]: unknown }) => void,
-}
+  sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent | { [key: string]: unknown }) => void;
+  sendErrorReport: (error: unknown) => void;
+};
 const TelemetryContext = React.createContext<ContextType>({
-  sendTelemetry: () => {
-  },
+  sendTelemetry: () => {},
+  sendErrorReport: () => {},
 });
 
 export default singleton('contexts.TelemetryContext', () => TelemetryContext);

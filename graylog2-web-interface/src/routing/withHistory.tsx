@@ -23,10 +23,14 @@ export type HistoryContext = {
   history: HistoryFunction;
 };
 
-const withParams = <Props extends HistoryContext>(Component: React.ComponentType<Props>): React.ComponentType<Omit<Props, keyof HistoryContext>> => (props) => {
-  const history = useHistory();
+const withParams =
+  <Props extends HistoryContext>(
+    Component: React.ComponentType<Props>,
+  ): React.ComponentType<Omit<Props, keyof HistoryContext>> =>
+  (props) => {
+    const history = useHistory();
 
-  return <Component {...props as Props} history={history} />;
-};
+    return <Component {...(props as Props)} history={history} />;
+  };
 
 export default withParams;

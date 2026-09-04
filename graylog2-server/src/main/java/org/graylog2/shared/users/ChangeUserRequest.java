@@ -21,55 +21,51 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.rest.models.users.requests.Startpage;
-
-import javax.annotation.Nullable;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
+import org.graylog2.rest.models.users.requests.Startpage;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class ChangeUserRequest {
-    @JsonProperty
+    @JsonProperty("email")
     @Nullable
     public abstract String email();
 
-    @JsonProperty
+    @JsonProperty("first_name")
     @Nullable
     public abstract String firstName();
 
-    @JsonProperty
+    @JsonProperty("last_name")
     @Nullable
     public abstract String lastName();
 
-    @JsonProperty
+    @JsonProperty("permissions")
     @Nullable
     public abstract List<String> permissions();
 
-    @JsonProperty
+    @JsonProperty("timezone")
     @Nullable
     public abstract String timezone();
 
-    @JsonProperty
+    @JsonProperty("startpage")
     @Nullable
     public abstract Startpage startpage();
 
-    @JsonProperty
+    @JsonProperty("session_timeout_ms")
     @Nullable
     public abstract Long sessionTimeoutMs();
 
-    @JsonProperty
+    @JsonProperty("roles")
     @Nullable
     public abstract List<String> roles();
 
-    @JsonProperty
+    @JsonProperty("service_account")
     @Nullable
     public abstract Boolean isServiceAccount();
 

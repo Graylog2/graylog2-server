@@ -1,0 +1,264 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.indexer.indexset.validation;
+
+import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
+import jakarta.inject.Inject;
+import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatiering.DataTieringChecker;
+import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.datatiering.DataTieringOrchestrator;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.fields.RotationAndRetentionFields;
+import org.graylog2.indexer.indexset.index.IndexPattern;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
+import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingValidator;
+import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.plugin.rest.ValidationResult;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
+
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_DATA_TIERING;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.index.IndexPattern.WARM_INDEX_INFIX;
+import static org.graylog2.shared.utilities.StringUtils.f;
+
+public class IndexSetValidator {
+    private static final Duration MINIMUM_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(1L);
+    private final IndexSetRegistry indexSetRegistry;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
+    private final DataTieringOrchestrator dataTieringOrchestrator;
+    private final DataTieringChecker dataTieringChecker;
+
+    @Inject
+    public IndexSetValidator(IndexSetRegistry indexSetRegistry,
+                             ElasticsearchConfiguration elasticsearchConfiguration,
+                             DataTieringOrchestrator dataTieringOrchestrator, DataTieringChecker dataTieringChecker) {
+        this.indexSetRegistry = indexSetRegistry;
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
+        this.dataTieringOrchestrator = dataTieringOrchestrator;
+        this.dataTieringChecker = dataTieringChecker;
+    }
+
+    public Optional<Violation> validate(IndexSetConfig newConfig) {
+
+        // Don't validate prefix conflicts in case of an update
+        if (Strings.isNullOrEmpty(newConfig.id())) {
+            final Violation prefixViolation = validatePrefix(newConfig);
+            if (prefixViolation != null) {
+                return Optional.of(prefixViolation);
+            }
+        }
+
+        final Violation fieldMappingViolation = validateMappingChangesAreLegal(newConfig);
+        if (fieldMappingViolation != null) {
+            return Optional.of(fieldMappingViolation);
+        }
+
+        Violation refreshIntervalViolation = validateSimpleIndexSetConfig(newConfig);
+        if (refreshIntervalViolation != null) {
+            return Optional.of(refreshIntervalViolation);
+        }
+        return Optional.empty();
+    }
+
+    private Violation validateSimpleIndexSetConfig(RotationAndRetentionFields newConfig) {
+        final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
+        if (refreshIntervalViolation != null) {
+            return refreshIntervalViolation;
+        }
+        if (newConfig.dataTieringConfig() != null) {
+            return validateDataTieringConfig(newConfig.dataTieringConfig());
+        } else {
+            return validateStrategyFields(newConfig);
+        }
+    }
+
+
+    public Violation validateStrategyFields(RotationAndRetentionFields newConfig) {
+        if (newConfig.retentionStrategyConfig() == null) {
+            return Violation.create(FIELD_RETENTION_STRATEGY + " cannot be null!");
+        }
+
+        if (newConfig.retentionStrategyClass() == null) {
+            return Violation.create(FIELD_RETENTION_STRATEGY_CLASS + " cannot be null!");
+        }
+
+        if (newConfig.rotationStrategyConfig() == null) {
+            return Violation.create(FIELD_ROTATION_STRATEGY + " cannot be null!");
+        }
+
+        if (newConfig.rotationStrategyClass() == null) {
+            return Violation.create(FIELD_ROTATION_STRATEGY_CLASS + " cannot be null!");
+        }
+
+        final Violation rotationViolation = validateRotation(newConfig.rotationStrategyConfig());
+        if (rotationViolation != null) {
+            return rotationViolation;
+        }
+
+        final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategyConfig());
+        if (retentionConfigViolation != null) {
+            return retentionConfigViolation;
+        }
+
+        return validateRetentionPeriod(newConfig.rotationStrategyConfig(),
+                newConfig.retentionStrategyConfig());
+    }
+
+
+    public Violation validateMappingChangesAreLegal(final IndexSetConfig config) {
+        if (!config.canHaveProfile() && config.fieldTypeProfile() != null && !config.fieldTypeProfile().isEmpty()) {
+            return Violation.create("Profiles cannot be set for events and failures index sets");
+        }
+        if (!config.canHaveCustomFieldMappings() && config.customFieldMappings() != null && !config.customFieldMappings().isEmpty()) {
+            return Violation.create("Custom field mappings cannot be set for events and failures index sets");
+        }
+        return null;
+    }
+
+    @Nullable
+    public Violation validateRefreshInterval(Duration readableDuration) {
+        // Ensure fieldTypeRefreshInterval is not shorter than a second, as that may impact performance
+        if (readableDuration.isShorterThan(MINIMUM_FIELD_TYPE_REFRESH_INTERVAL)) {
+            return Violation.create("Index field_type_refresh_interval \"" + readableDuration + "\" is too short. It must be 1 second or longer.");
+        }
+        return null;
+    }
+
+    @Nullable
+    private Violation validatePrefix(IndexSetConfig newConfig) {
+        if (newConfig.indexPrefix().contains(WARM_INDEX_INFIX)) {
+            return Violation.create(f("Index prefix '%s' contains reserved keyword '%s'!",
+                    newConfig.indexPrefix(), WARM_INDEX_INFIX));
+        }
+
+        // Build an example index name with the new prefix and check if this would be managed by an existing index set
+        final String indexName = newConfig.indexPrefix() + IndexPattern.SEPARATOR + "0";
+        if (indexSetRegistry.isManagedIndex(indexName)) {
+            return Violation.create(f("Index prefix '%s' would conflict with an existing index set!", newConfig.indexPrefix()));
+        }
+
+        // Check if the new index set configuration has a more generic index prefix than an existing index set,
+        // or vice versa.
+        // Example: new=graylog_foo existing=graylog => graylog is more generic so this is an error
+        // Example: new=gray        existing=graylog => gray    is more generic so this is an error
+        // This avoids problems with wildcard matching like "graylog_*".
+        for (final IndexSet indexSet : indexSetRegistry.getAllIndexSets()) {
+            if (newConfig.indexPrefix().startsWith(indexSet.getIndexPrefix()) || indexSet.getIndexPrefix().startsWith(newConfig.indexPrefix())) {
+                return Violation.create(f("Index prefix '%s' would conflict with existing index set prefix '%s'",
+                        newConfig.indexPrefix(),
+                        indexSet.getIndexPrefix()));
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public Violation validateRotation(RotationStrategyConfig rotationStrategyConfig) {
+        if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
+            return TimeSizeOptimizingValidator.validate(
+                    elasticsearchConfiguration,
+                    IndexLifetimeConfig.builder()
+                            .indexLifetimeMin(config.indexLifetimeMin())
+                            .indexLifetimeMax(config.indexLifetimeMax())
+                            .build()).orElse(null);
+        }
+        return null;
+    }
+
+    @Nullable
+    public Violation checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {
+        if (!useLegacyRotation && dataTieringConfig == null) {
+            return Violation.create(FIELD_DATA_TIERING + " cannot be null!");
+        }
+        return null;
+    }
+
+
+    @Nullable
+    public Violation validateDataTieringConfig(DataTieringConfig dataTieringConfig) {
+        if (!dataTieringChecker.isEnabled()) {
+            return Violation.create("data tiering feature is disabled!");
+        }
+        return dataTieringOrchestrator.validate(dataTieringConfig).orElse(null);
+    }
+
+    @Nullable
+    public Violation validateRetentionPeriod(RotationStrategyConfig rotationStrategyConfig, RetentionStrategyConfig retentionStrategyConfig) {
+        final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
+
+        if (maxRetentionPeriod == null) {
+            return null;
+        }
+
+        if (!(rotationStrategyConfig instanceof TimeBasedRotationStrategyConfig)) {
+            return null;
+        }
+
+        final Period rotationPeriod =
+                ((TimeBasedRotationStrategyConfig) rotationStrategyConfig).rotationPeriod().normalizedStandard();
+
+        final Period effectiveRetentionPeriod =
+                rotationPeriod.multipliedBy(retentionStrategyConfig.maxNumberOfIndices()).normalizedStandard();
+
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        if (now.plus(effectiveRetentionPeriod).isAfter(now.plus(maxRetentionPeriod))) {
+            return Violation.create(
+                    f("Index retention setting %s=%d would result in an effective index retention period of %s. This exceeds the configured maximum of %s=%s.",
+                            RetentionStrategyConfig.MAX_NUMBER_OF_INDEXES_FIELD, retentionStrategyConfig.maxNumberOfIndices(), effectiveRetentionPeriod,
+                            ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public Violation validateRetentionConfig(RetentionStrategyConfig retentionStrategyConfig) {
+        ValidationResult validationResult = retentionStrategyConfig.validate(elasticsearchConfiguration);
+
+        if (validationResult.failed()) {
+            Optional<String> error = validationResult.getErrors().keySet().stream().findFirst();
+            return Violation.create(error.orElse("Unknown retention config validation error"));
+        }
+
+        return null;
+    }
+
+    @AutoValue
+    public abstract static class Violation {
+        public static Violation create(String message) {
+            return new AutoValue_IndexSetValidator_Violation(message);
+        }
+
+        public abstract String message();
+    }
+}

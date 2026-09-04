@@ -18,7 +18,7 @@ const path = require('path');
 
 const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
 const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 
@@ -98,6 +98,8 @@ const webpackConfig = {
 // eslint-disable-next-line import/no-mutable-exports
 let defaultExport = webpackConfig;
 
+const urlHeader = 'X-Graylog-Server-URL';
+
 if (TARGET === 'start') {
   defaultExport = merge(webpackConfig, {
     devServer: {
@@ -107,10 +109,25 @@ if (TARGET === 'start') {
       historyApiFallback: {
         disableDotRule: true,
       },
-      proxy: [{
-        context: ['/api', '/config.js'],
-        target: apiUrl,
-      }],
+      proxy: [
+        {
+          context: ['/api', '/config.js', '/sso', '/.well-known', '/v1/opamp'],
+          target: apiUrl,
+          ws: true,
+          // Skip proxying for /api-browser - it's a frontend route, not an API endpoint
+          bypass: (req) => (req.path.startsWith('/api-browser') ? req.path : null),
+          onProxyReq: (proxyReq, req) => {
+            if (!proxyReq.getHeader(urlHeader)?.trim()) {
+              proxyReq.setHeader(urlHeader, `${req.protocol}://${req.get('host')}`);
+            }
+          },
+          onProxyReqWs: (proxyReq, req) => {
+            if (!proxyReq.getHeader(urlHeader)?.trim()) {
+              proxyReq.setHeader(urlHeader, req.headers.origin || `http://${req.headers.host}`);
+            }
+          },
+        },
+      ],
     },
   });
 }
@@ -121,10 +138,12 @@ if (TARGET.startsWith('build')) {
     optimization: {
       concatenateModules: false,
       sideEffects: false,
-      minimizer: [new EsbuildPlugin({
-        format: 'cjs',
-        target: supportedBrowsers,
-      })],
+      minimizer: [
+        new EsbuildPlugin({
+          format: 'cjs',
+          target: supportedBrowsers,
+        }),
+      ],
     },
     plugins: [
       new webpack.DefinePlugin({

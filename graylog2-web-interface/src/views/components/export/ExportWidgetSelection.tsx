@@ -25,39 +25,42 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import Select from 'components/common/Select';
 
-const sortOptions = (options) => options.sort(
-  (option1, option2) => defaultCompare(option1.label, option2.label),
-);
+const sortOptions = (options) => options.sort((option1, option2) => defaultCompare(option1.label, option2.label));
 
 type Props = {
-  selectWidget: (widget: Widget) => void,
-  widgets: List<Widget>,
-  view: View,
+  selectWidget: (widget: Widget) => void;
+  widgets: List<Widget>;
+  view: View;
 };
 
 const WidgetSelection = ({ selectWidget, widgets, view }: Props) => {
   const widgetOption = (widget) => ({ label: view.getWidgetTitleByWidget(widget), value: widget });
-  const widgetOptions = sortOptions(widgets.map((widget) => (widgetOption(widget))).toArray());
+  const widgetOptions = sortOptions(widgets.map((widget) => widgetOption(widget)).toArray());
 
   return (
     <>
       <Row>
         <IfSearch>
-          The export will contain all messages for your current search.<br />
+          The export will contain all messages for your current search.
+          <br />
           Please select a message table to adopt its fields. You can adjust all settings in the next step.
         </IfSearch>
         <IfDashboard>
-          Please select the message table you want to export the search results for. You can adjust its fields in the next step.<br />
+          Please select the message table you want to export the search results for. You can adjust its fields in the
+          next step.
+          <br />
           Selecting a message table equals using the option &quot;Export to CSV&quot; in a message table action menu.
         </IfDashboard>
       </Row>
       {widgets.size !== 0 ? (
         <Row>
           <label htmlFor="widget-selection">Select message table</label>
-          <Select placeholder="Select message table"
-                  onChange={selectWidget}
-                  options={widgetOptions}
-                  inputId="widget-selection" />
+          <Select
+            placeholder="Select message table"
+            onChange={selectWidget}
+            options={widgetOptions}
+            inputId="widget-selection"
+          />
         </Row>
       ) : (
         <Row>

@@ -19,31 +19,34 @@ import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGu
 import assertUnreachable from 'logic/assertUnreachable';
 
 type RelativeRangeStartOnlyQueryParameter = {
-  rangetype: 'relative',
-  relative: string,
+  rangetype: 'relative';
+  relative: string;
 };
 
 type RelativeRangeWithEndQueryParameter = {
-  rangetype: 'relative',
-  from: string,
-  to?: string,
+  rangetype: 'relative';
+  from: string;
+  to?: string;
 };
 
 type RelativeRangeQueryParameter = RelativeRangeStartOnlyQueryParameter | RelativeRangeWithEndQueryParameter;
 
 export type AbsoluteRangeQueryParameter = {
-  rangetype: 'absolute',
-  from: string,
-  to: string,
+  rangetype: 'absolute';
+  from: string;
+  to: string;
 };
 
 type KeywordRangeQueryParameter = {
-  rangetype: 'keyword',
-  keyword: string,
-  timezone?: string,
+  rangetype: 'keyword';
+  keyword: string;
+  timezone?: string;
 };
 
-export type TimeRangeQueryParameter = AbsoluteRangeQueryParameter | RelativeRangeQueryParameter | KeywordRangeQueryParameter;
+export type TimeRangeQueryParameter =
+  | AbsoluteRangeQueryParameter
+  | RelativeRangeQueryParameter
+  | KeywordRangeQueryParameter;
 
 export const timeRangeToQueryParameter = (timeRange: TimeRange): TimeRangeQueryParameter => {
   switch (timeRange.type) {
@@ -61,9 +64,12 @@ export const timeRangeToQueryParameter = (timeRange: TimeRange): TimeRangeQueryP
       }
 
       return assertUnreachable(timeRange, 'Unexpected time range: ');
-    case 'keyword': return { rangetype: 'keyword', keyword: timeRange.keyword };
-    case 'absolute': return { rangetype: 'absolute', from: timeRange.from, to: timeRange.to };
-    default: return assertUnreachable(timeRange, 'Unexpected time range type: ');
+    case 'keyword':
+      return { rangetype: 'keyword', keyword: timeRange.keyword };
+    case 'absolute':
+      return { rangetype: 'absolute', from: timeRange.from, to: timeRange.to };
+    default:
+      return assertUnreachable(timeRange, 'Unexpected time range type: ');
   }
 };
 
@@ -92,17 +98,21 @@ export const timeRangeFromQueryParameter = (range: TimeRangeQueryParameter): Tim
     case 'relative':
       return parseRelativeTimeRange(range);
     case 'absolute':
-      return ('from' in range && 'to' in range) ? {
-        type: range.rangetype,
-        from: range.from,
-        to: range.to,
-      } : assertUnreachable(range, 'Invalid absolute range specified: ');
+      return 'from' in range && 'to' in range
+        ? {
+            type: range.rangetype,
+            from: range.from,
+            to: range.to,
+          }
+        : assertUnreachable(range, 'Invalid absolute range specified: ');
     case 'keyword':
-      return 'keyword' in range ? {
-        type: range.rangetype,
-        keyword: range.keyword,
-        timezone: range.timezone,
-      } : assertUnreachable(range, 'Invalid keyword range specified: ');
+      return 'keyword' in range
+        ? {
+            type: range.rangetype,
+            keyword: range.keyword,
+            timezone: range.timezone,
+          }
+        : assertUnreachable(range, 'Invalid keyword range specified: ');
     default:
       return assertUnreachable(range, 'Unsupported range type in range: ');
   }

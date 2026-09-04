@@ -16,8 +16,8 @@
  */
 interface ContentStreamType {
   hooks: {
-    useContentStreamTag: () => string,
-  },
+    useContentStreamTag: () => string;
+  };
 }
 
 declare module 'graylog-web-plugin/plugin' {

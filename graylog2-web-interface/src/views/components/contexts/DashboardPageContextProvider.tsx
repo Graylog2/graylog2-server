@@ -16,15 +16,15 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import URI from 'urijs';
 
+import useHistory from 'routing/useHistory';
 import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates } from 'views/logic/slices/viewSelectors';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
 
 const _clearURI = (query: string) => new URI(query).removeSearch('page');
@@ -40,8 +40,8 @@ const _updateQueryParams = (newPage: string | undefined, query: string) => {
 };
 
 const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage }) => {
-  const states = useAppSelector(selectViewStates);
-  const dispatch = useAppDispatch();
+  const states = useViewsSelector(selectViewStates);
+  const dispatch = useViewsDispatch();
 
   useEffect(() => {
     const nextPage = uriParams.page;
@@ -55,54 +55,54 @@ const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPag
   }, [uriParams.page, dashboardPage, setDashboardPage, states, dispatch]);
 };
 
-const useCleanupQueryParams = ({ uriParams, query, navigate }) => {
+const useCleanupQueryParams = ({ uriParams, query, replace }) => {
   useEffect(() => {
     if (uriParams?.page === undefined) {
       const baseURI = _clearURI(query);
       const newQuery = baseURI.toString();
 
       if (query !== newQuery) {
-        navigate(newQuery, { replace: true });
+        replace(newQuery);
       }
     }
-  }, [query, navigate, uriParams?.page]);
+  }, [query, replace, uriParams?.page]);
 };
 
 const DashboardPageContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const { search, pathname } = useLocation();
   const query = pathname + search;
-  const navigate = useNavigate();
+  const { replace } = useHistory();
   const [dashboardPage, setDashboardPage] = useState<string | undefined>();
   const params = useQuery();
-  const uriParams = useMemo(() => ({
-    page: params.page,
-  }), [params]);
+  const uriParams = useMemo(
+    () => ({
+      page: params.page,
+    }),
+    // eslint-disable-next-line @tanstack/query/no-unstable-deps
+    [params],
+  );
 
   useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage });
-  useCleanupQueryParams({ uriParams, query, navigate });
+  useCleanupQueryParams({ uriParams, query, replace });
 
   const dashboardPageContextValue = useMemo(() => {
     const updatePageParams = (newPage: string | undefined) => {
       const newUri = _updateQueryParams(newPage, query);
 
-      navigate(newUri, { replace: true });
+      replace(newUri);
     };
 
     const setDashboardPageParam = (nextPage: string) => updatePageParams(nextPage);
     const unSetDashboardPageParam = () => updatePageParams(undefined);
 
-    return ({
+    return {
       setDashboardPage: setDashboardPageParam,
       unsetDashboardPage: unSetDashboardPageParam,
       dashboardPage: dashboardPage,
-    });
-  }, [dashboardPage, navigate, query]);
+    };
+  }, [dashboardPage, replace, query]);
 
-  return (
-    <DashboardPageContext.Provider value={dashboardPageContextValue}>
-      {children}
-    </DashboardPageContext.Provider>
-  );
+  return <DashboardPageContext.Provider value={dashboardPageContextValue}>{children}</DashboardPageContext.Provider>;
 };
 
 export default DashboardPageContextProvider;

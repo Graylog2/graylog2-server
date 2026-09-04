@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix thread leak in datanode opensearch removal process"
+
+pulls = ["24940"]
+

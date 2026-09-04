@@ -1,0 +1,5 @@
+type = "added"
+message = "Add optin to perform value actions from widget charts by clicking on charts data points."
+
+issues = ["23392"]
+pulls = ["23389"]

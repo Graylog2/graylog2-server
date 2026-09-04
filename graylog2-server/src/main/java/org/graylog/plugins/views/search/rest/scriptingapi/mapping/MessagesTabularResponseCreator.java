@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -33,7 +32,6 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.Fi
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
-import org.graylog2.shared.utilities.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +57,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     public TabularResponse mapToResponse(final MessagesRequestSpec messagesRequestSpec,
                                          final SearchJob searchJob,
-                                         final SearchUser searchUser, Subject subject) throws QueryFailedException {
+                                         final SearchUser searchUser) throws QueryFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 
@@ -90,10 +88,22 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         final Set<MappedFieldTypeDTO> knownFields = mappedFieldTypesService.fieldTypesByStreamIds(streams, searchRequestSpec.timerange());
         final MessageFieldTypeMapper fieldsMapper = new MessageFieldTypeMapper(knownFields);
 
-        return searchRequestSpec.requestedFields()
-                .stream()
+        final var fields = searchRequestSpec.requestedFields().isEmpty()
+                ? knownFields.stream().map(MappedFieldTypeDTO::name).map(RequestedField::parse).toList()
+                : searchRequestSpec.requestedFields();
+
+        return fields.stream()
                 .map(fieldsMapper)
                 .collect(Collectors.toList());
+    }
+
+    private List<RequestedField> getRequestedFields(MessagesRequestSpec searchRequestSpec, ResultMessageSummary resultMessageSummary, SearchUser searchUser) {
+        if(searchRequestSpec.requestedFields().isEmpty()) {
+            final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
+            final Set<MappedFieldTypeDTO> knownFields = mappedFieldTypesService.fieldTypesByStreamIds(streams, searchRequestSpec.timerange());
+            return knownFields.stream().map(MappedFieldTypeDTO::name).map(RequestedField::parse).toList();
+        }
+        return searchRequestSpec.requestedFields();
     }
 
     private List<List<Object>> getDatarows(final MessagesRequestSpec messagesRequestSpec,
@@ -103,7 +113,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
         return messageListResult.messages()
                 .stream()
-                .map(message -> messagesRequestSpec.requestedFields()
+                .map(message -> getRequestedFields(messagesRequestSpec, message, searchUser)
                         .stream()
                         .map(field -> extractValue(message, field, cachedDecorators, searchUser))
                         .collect(Collectors.toList())).collect(Collectors.toList());

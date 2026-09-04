@@ -24,20 +24,31 @@ import View from '../views/View';
 import ViewState from '../views/ViewState';
 
 describe('QueryTitle', () => {
-  const search = Search.create().toBuilder().queries([
-    Query.builder().id('foo').build(),
-    Query.builder().id('bar').build(),
-    Query.builder().id('baz').build(),
-  ]).build();
-  const view = View.create().toBuilder().search(search)
-    .state(Immutable.fromJS({
-      foo: ViewState.builder().titles(Immutable.fromJS({
-        tab: { title: 'The Fabulous Foo Tab' },
-      })).build(),
-      baz: ViewState.builder().titles(Immutable.fromJS({
-        tab: { title: 'The Incredible Other Tab' },
-      })).build(),
-    }))
+  const search = Search.create()
+    .toBuilder()
+    .queries([Query.builder().id('foo').build(), Query.builder().id('bar').build(), Query.builder().id('baz').build()])
+    .build();
+  const view = View.create()
+    .toBuilder()
+    .search(search)
+    .state(
+      Immutable.fromJS({
+        foo: ViewState.builder()
+          .titles(
+            Immutable.fromJS({
+              tab: { title: 'The Fabulous Foo Tab' },
+            }),
+          )
+          .build(),
+        baz: ViewState.builder()
+          .titles(
+            Immutable.fromJS({
+              tab: { title: 'The Incredible Other Tab' },
+            }),
+          )
+          .build(),
+      }),
+    )
     .build();
 
   it('returns actual name of first tab', () => {
@@ -69,12 +80,11 @@ describe('QueryTitle', () => {
   });
 
   it('returns `undefined` if queries are `undefined`', () => {
-    expect(queryTitle(View.create()
-      .toBuilder()
-      .search(Search.create()
-        .toBuilder()
-        .queries(undefined)
-        .build())
-      .build(), undefined)).toEqual(undefined);
+    expect(
+      queryTitle(
+        View.create().toBuilder().search(Search.create().toBuilder().queries(undefined).build()).build(),
+        undefined,
+      ),
+    ).toEqual(undefined);
   });
 });

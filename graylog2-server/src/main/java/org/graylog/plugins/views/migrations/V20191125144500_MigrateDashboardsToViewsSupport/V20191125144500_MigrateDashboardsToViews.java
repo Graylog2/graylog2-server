@@ -17,14 +17,13 @@
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
 import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
@@ -86,10 +85,13 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final Map<String, Set<String>> widgetIdMigrationMapping = new HashMap<>();
         final Consumer<Map<String, Set<String>>> recordMigratedWidgetIds = widgetIdMigrationMapping::putAll;
 
-        final Map<View, Search> newViews = this.dashboardsService.streamAll()
-                .sorted(Comparator.comparing(Dashboard::id))
-                .map(dashboard -> migrateDashboard(dashboard, recordMigratedDashboardIds, recordMigratedWidgetIds))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<View, Search> newViews;
+        try (final var dashboardStream = this.dashboardsService.streamAll()) {
+            newViews = dashboardStream
+                    .sorted(Comparator.comparing(Dashboard::id))
+                    .map(dashboard -> migrateDashboard(dashboard, recordMigratedDashboardIds, recordMigratedWidgetIds))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
 
         writeViews(newViews);
 

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed issue in Aggregation event definitions where 'Field' value selections were not cleared correctly."
+
+pulls = ["24221"]
+issues = ["24007"]

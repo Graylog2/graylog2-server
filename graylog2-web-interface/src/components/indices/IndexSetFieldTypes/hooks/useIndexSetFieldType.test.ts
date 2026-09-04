@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
@@ -38,17 +38,19 @@ const mockData = {
     sort: {
       id: 'field_name',
       direction: 'ASC',
-    } as { id: string, direction: 'ASC' | 'DESC'},
+    } as { id: string; direction: 'ASC' | 'DESC' },
   },
   total: 1,
   sort: 'field_name',
   order: 'desc',
-  elements: [{
-    field_name: 'field',
-    type: 'bool',
-    origin: 'INDEX',
-    is_reserved: false,
-  }],
+  elements: [
+    {
+      field_name: 'field',
+      type: 'bool',
+      origin: 'INDEX',
+      is_reserved: false,
+    },
+  ],
 };
 
 const expectedState = {
@@ -67,7 +69,14 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-const renderUseIndexSetFieldTypeHook = () => renderHook(() => useIndexSetFieldType('id-1', { page: 1, query: '', pageSize: 10, sort: { attributeId: 'field_name', direction: 'asc' } }, { enabled: true }));
+const renderUseIndexSetFieldTypeHook = () =>
+  renderHook(() =>
+    useIndexSetFieldType(
+      'id-1',
+      { page: 1, query: '', pageSize: 10, sort: { attributeId: 'field_name', direction: 'asc' } },
+      { enabled: true },
+    ),
+  );
 
 describe('useIndexSetFieldType custom hook', () => {
   afterEach(() => {
@@ -76,12 +85,15 @@ describe('useIndexSetFieldType custom hook', () => {
 
   it('Test return initial data and take from fetch', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
-    const { result, waitFor } = renderUseIndexSetFieldTypeHook();
+    const { result } = renderUseIndexSetFieldTypeHook();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/index_sets/types/id-1?page=1&per_page=10&sort=field_name&order=asc'));
+    expect(fetch).toHaveBeenCalledWith(
+      'GET',
+      qualifyUrl('/system/indices/index_sets/types/id-1?page=1&per_page=10&sort=field_name&order=asc'),
+    );
 
     expect(result.current.data).toEqual(expectedState);
   });
@@ -89,7 +101,7 @@ describe('useIndexSetFieldType custom hook', () => {
   it('Test trigger notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { result, waitFor } = renderUseIndexSetFieldTypeHook();
+    const { result } = renderUseIndexSetFieldTypeHook();
 
     await suppressConsole(async () => {
       await waitFor(() => result.current.isLoading);
@@ -98,6 +110,7 @@ describe('useIndexSetFieldType custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading index field types failed with status: Error: Error',
-      'Could not load index field types');
+      'Could not load index field types',
+    );
   });
 });

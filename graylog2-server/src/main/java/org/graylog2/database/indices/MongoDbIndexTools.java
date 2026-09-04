@@ -23,6 +23,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 
 import java.time.Duration;
@@ -32,14 +33,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class MongoDbIndexTools<T> {
+public class MongoDbIndexTools {
 
     static final String COLLATION_KEY = "collation";
     static final String INDEX_DOCUMENT_KEY = "key";
 
-    private final MongoCollection<T> db;
+    private final MongoCollection<Document> db;
 
-    public MongoDbIndexTools(final MongoCollection<T> db) {
+    public MongoDbIndexTools(final MongoCollection<Document> db) {
         this.db = db;
     }
 
@@ -80,8 +81,8 @@ public class MongoDbIndexTools<T> {
                 if (caseInsensitiveStringSortFields.contains(sortField)) { //index string fields with collation for more efficient case-insensitive sorting
                     if (existingIndex.isEmpty()) {
                         createCaseInsensitiveStringIndex(sortField);
-                    } else if (existingIndex.get().get(COLLATION_KEY) == null) {
-                        //replace simple index with "collation" index
+                    } else if (!hasMatchingCollation(existingIndex.get())) {
+                        //replace simple or differently-collated index with the expected case-insensitive collation index
                         dropIndex(sortField);
                         createCaseInsensitiveStringIndex(sortField);
                     }
@@ -107,18 +108,35 @@ public class MongoDbIndexTools<T> {
     }
 
     private void createCaseInsensitiveStringIndex(final String sortField) {
-        this.db.createIndex(Indexes.ascending(sortField), new IndexOptions().collation(Collation.builder().locale("en").build()));
+        this.db.createIndex(Indexes.ascending(sortField),
+                new IndexOptions().collation(DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING));
+    }
+
+    private boolean hasMatchingCollation(final Document indexDoc) {
+        final Document existingCollation = indexDoc.get(COLLATION_KEY, Document.class);
+        if (existingCollation == null) {
+            return false;
+        }
+        final Collation expected = DefaultMongoPaginationHelper.DEFAULT_COLLATION_WITH_CASE_INSENSITIVE_SORTING;
+        // MongoDB stores collation strength as an integer; numericOrdering as a boolean. Other fields (caseLevel,
+        // caseFirst, alternate, …) get populated to driver defaults, so explicit comparison of the meaningful
+        // attributes is enough to detect a stale index from before this collation was canonicalized.
+        return Objects.equals(existingCollation.getString("locale"), expected.getLocale())
+                && Objects.equals(existingCollation.getInteger("strength"), expected.getStrength().getIntRepresentation())
+                && Objects.equals(existingCollation.getBoolean("numericOrdering", false), expected.getNumericOrdering());
     }
 
     private Optional<Document> getExistingIndex(final ListIndexesIterable<Document> existingIndices, final String sortField) {
         if (existingIndices == null) {
             return Optional.empty();
         }
-        return MongoUtils.stream(existingIndices)
-                .filter(info ->
-                        info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
-                )
-                .findFirst();
+        try (final var stream = MongoUtils.stream(existingIndices)) {
+            return stream
+                    .filter(info ->
+                            info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
+                    )
+                    .findFirst();
+        }
     }
 
     public void createUniqueIndex(final String field) {

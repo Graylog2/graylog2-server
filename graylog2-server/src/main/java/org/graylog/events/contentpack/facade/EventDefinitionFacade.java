@@ -24,8 +24,10 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorExecutionJob;
@@ -33,6 +35,8 @@ import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.UpdatableEntityFacade;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.constraints.Constraint;
@@ -46,18 +50,17 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
+public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto>, UpdatableEntityFacade<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionFacade.class);
 
     private final ObjectMapper objectMapper;
@@ -157,6 +160,27 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     @Override
+    public void updateNativeEntity(Entity entity, NativeEntity<EventDefinitionDto> existingEntity,
+                                   Map<String, ValueReference> parameters,
+                                   Map<EntityDescriptor, Object> nativeEntities, String username) {
+        if (!(entity instanceof EntityV1 entityV1)) {
+            return;
+        }
+        final EventDefinitionDto existing = existingEntity.entity();
+        final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entityV1.data(),
+                EventDefinitionEntity.class);
+        // Seed with the existing entity so fields the pack doesn't carry (id, state, ...) keep their
+        // stored values; guard scope since the mutability bypass below would otherwise let the pack change it.
+        final EventDefinitionDto updated = eventDefinitionEntity
+                .toNativeEntity(parameters, nativeEntities, existing.toBuilder())
+                .toBuilder().scope(existing.scope()).build();
+        // Scheduling follows the user's enabled/disabled choice, not the pack's is_scheduled flag.
+        final boolean schedule = existing.state() == EventDefinition.State.ENABLED;
+        // checkMutability = false: installer-driven write, must rewrite immutable Illuminate content in place.
+        eventDefinitionHandler.update(updated, schedule, false);
+    }
+
+    @Override
     public void delete(EventDefinitionDto nativeEntity) {
         eventDefinitionHandler.deleteImmutable(nativeEntity.id());
     }
@@ -172,10 +196,12 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return eventDefinitionService.streamAll()
-                .filter(ed -> ed.config().isContentPackExportable())
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        try (final var stream = eventDefinitionService.streamAll()) {
+            return stream
+                    .filter(ed -> ed.config().isContentPackExportable())
+                    .map(this::createExcerpt)
+                    .collect(Collectors.toSet());
+        }
     }
 
     @Override
@@ -216,5 +242,10 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     @Override
     public boolean usesScopedEntities() {
         return true;
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.EVENT_DEFINITIONS_CREATE);
     }
 }

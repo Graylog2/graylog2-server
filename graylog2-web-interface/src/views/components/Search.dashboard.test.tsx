@@ -20,8 +20,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
-import mockAction from 'helpers/mocking/MockAction';
-import { StreamsActions } from 'views/stores/StreamsStore';
 import View from 'views/logic/views/View';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
@@ -56,27 +54,27 @@ jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useQueryTitles');
 
 const mockWidgetEditing = () => {
-  asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }: React.PropsWithChildren<{}>) => (
-    <WidgetFocusContext.Provider value={{
-      focusedWidget: {
-        id: 'widget-id',
-        editing: true,
-        focusing: true,
-      },
-      setWidgetFocusing: () => {},
-      setWidgetEditing: () => {},
-      unsetWidgetFocusing: () => {},
-      unsetWidgetEditing: () => {},
-    }}>
-      {children}
-    </WidgetFocusContext.Provider>
-  ));
+  asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(
+    ({ children = undefined }: React.PropsWithChildren<{}>) => (
+      <WidgetFocusContext.Provider
+        value={{
+          focusedWidget: {
+            id: 'widget-id',
+            editing: true,
+            focusing: true,
+          },
+          setWidgetFocusing: () => {},
+          setWidgetEditing: () => {},
+          unsetWidgetFocusing: () => {},
+          unsetWidgetEditing: () => {},
+        }}>
+        {children}
+      </WidgetFocusContext.Provider>
+    ),
+  );
 };
 
-const defaultView = createSearch()
-  .toBuilder()
-  .type(View.Type.Dashboard)
-  .build();
+const defaultView = createSearch().toBuilder().type(View.Type.Dashboard).build();
 
 const Search = () => (
   <TestStoreProvider view={defaultView}>
@@ -86,19 +84,20 @@ const Search = () => (
 
 describe('Dashboard Search', () => {
   beforeEach(() => {
-    StreamsActions.refresh = mockAction();
-
-    asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }: React.PropsWithChildren<{}>) => (
-      <WidgetFocusContext.Provider value={{
-        focusedWidget: undefined,
-        setWidgetFocusing: () => {},
-        setWidgetEditing: () => {},
-        unsetWidgetFocusing: () => {},
-        unsetWidgetEditing: () => {},
-      }}>
-        {children}
-      </WidgetFocusContext.Provider>
-    ));
+    asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(
+      ({ children = undefined }: React.PropsWithChildren<{}>) => (
+        <WidgetFocusContext.Provider
+          value={{
+            focusedWidget: undefined,
+            setWidgetFocusing: () => {},
+            setWidgetEditing: () => {},
+            unsetWidgetFocusing: () => {},
+            unsetWidgetEditing: () => {},
+          }}>
+          {children}
+        </WidgetFocusContext.Provider>
+      ),
+    );
 
     const query = Query.builder().id('foobar').filter(filtersForQuery([])).build();
     asMock(useCurrentQuery).mockReturnValue(query);

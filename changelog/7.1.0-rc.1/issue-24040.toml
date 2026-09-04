@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix Index Stats by extracting shard metrics properly."
+
+issues = ["24040"]
+pulls = ["24061"]

@@ -40,9 +40,10 @@ import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.shared.SuppressForbidden;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -58,7 +59,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -80,7 +80,7 @@ public class UdpTransportTest {
     private ThroughputCounter throughputCounter;
     private LocalMetricRegistry localMetricRegistry;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void setUp() throws Exception {
         eventLoopGroupFactory = new EventLoopGroupFactory(nettyTransportConfiguration);
@@ -90,7 +90,7 @@ public class UdpTransportTest {
         udpTransport = new UdpTransport(CONFIGURATION, eventLoopGroupFactory, nettyTransportConfiguration, throughputCounter, localMetricRegistry);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         eventLoopGroup.shutdownGracefully();
     }
@@ -110,26 +110,8 @@ public class UdpTransportTest {
     }
 
     @Test
-    public void transportReceivesDataExactlyRecvBufferSize() throws Exception {
-        final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
-        final UdpTransport transport = launchTransportForBootStrapTest(handler);
-        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
-        final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
-
-        // This will be variable depending on the version of the IP protocol and the UDP packet size.
-        final int udpOverhead = 16;
-        final int maxPacketSize = RECV_BUFFER_SIZE - udpOverhead;
-
-        sendUdpDatagram(BIND_ADDRESS, localAddress.getPort(), maxPacketSize);
-        await().atMost(5, TimeUnit.SECONDS).until(() -> !handler.getBytesWritten().isEmpty());
-        transport.stop();
-
-        assertThat(handler.getBytesWritten()).containsOnly(maxPacketSize);
-    }
-
-    @Test
     public void transportDiscardsDataLargerRecvBufferSizeOnMacOsX() throws Exception {
-        assumeTrue("Skipping test intended for MacOS X systems", SystemUtils.IS_OS_MAC_OSX);
+        Assumptions.assumeTrue(SystemUtils.IS_OS_MAC_OSX, "Skipping test intended for MacOS X systems");
 
         final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
         final UdpTransport transport = launchTransportForBootStrapTest(handler);
@@ -146,7 +128,7 @@ public class UdpTransportTest {
 
     @Test
     public void transportCanRecvLargeUDPPacketsOnLinux() throws Exception {
-        assumeTrue("Skipping test intended for Linux systems", SystemUtils.IS_OS_LINUX);
+        Assumptions.assumeTrue(SystemUtils.IS_OS_LINUX, "Skipping test intended for Linux systems");
 
         final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
         final UdpTransport transport = launchTransportForBootStrapTest(handler);

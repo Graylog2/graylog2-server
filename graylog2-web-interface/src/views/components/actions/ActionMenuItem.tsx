@@ -19,26 +19,22 @@ import { useCallback, useContext, useMemo } from 'react';
 import styled from 'styled-components';
 import upperCase from 'lodash/upperCase';
 
-import type { ActionContexts } from 'views/types';
 import Icon from 'components/common/Icon';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type {
-  ActionDefinition,
   ActionHandlerArguments,
   ExternalLinkAction,
-  HandlerAction, SetActionComponents, ActionComponents,
+  HandlerAction,
+  SetActionComponents,
+  ActionComponents,
+  ActionDefinition,
 } from 'views/components/actions/ActionHandler';
-import {
-  createHandlerFor,
-  isExternalLinkAction,
-} from 'views/components/actions/ActionHandler';
+import { createHandlerFor, isExternalLinkAction } from 'views/components/actions/ActionHandler';
 import HoverForHelp from 'components/common/HoverForHelp';
-import useAppDispatch from 'stores/useAppDispatch';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 const StyledMenuItem: typeof MenuItem = styled(MenuItem)`
   && > a {
@@ -48,24 +44,26 @@ const StyledMenuItem: typeof MenuItem = styled(MenuItem)`
   }
 `;
 
-const ExternalLinkIcon = styled(Icon)(({ theme }) => `
+const ExternalLinkIcon = styled(Icon)(
+  ({ theme }) => `
   margin-left: ${theme.spacings.xxs};
-`);
+`,
+);
 
 type Props = {
-  action: ActionDefinition,
-  handlerArgs: ActionHandlerArguments,
-  onMenuToggle: () => void,
-  overflowingComponents: ActionComponents,
-  setOverflowingComponents: (components: ActionComponents) => void,
-  type: 'field' | 'value',
-}
+  action: ActionDefinition;
+  handlerArgs: ActionHandlerArguments;
+  onMenuToggle: () => void;
+  overflowingComponents: ActionComponents;
+  setOverflowingComponents: (components: ActionComponents) => void;
+  type: 'field' | 'value';
+};
 
 const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
-const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition, handlerArgs: ActionHandlerArguments }) => {
+const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition; handlerArgs: ActionHandlerArguments }) => {
   if (action.help) {
     const help = action.help(handlerArgs);
 
@@ -87,10 +85,10 @@ const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition, handle
 };
 
 type ExternalLinkItemProps = Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'type'> & {
-  action: ExternalLinkAction<ActionContexts>,
-  disabled: boolean,
-  field: string,
-}
+  action: ExternalLinkAction;
+  disabled: boolean;
+  field: string;
+};
 
 const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, type }: ExternalLinkItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
@@ -112,22 +110,20 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
   }, [action, onMenuToggle, unsetWidgetFocusing]);
 
   return (
-    <StyledMenuItem disabled={disabled}
-                    eventKey={{ action: type, field }}
-                    onSelect={onSelect}
-                    {...linkProps}>
+    <StyledMenuItem disabled={disabled} eventKey={{ action: type, field }} onSelect={onSelect} {...linkProps}>
       <ActionTitle action={action} handlerArgs={handlerArgs} />
       <ExternalLinkIcon name="open_in_new" />
     </StyledMenuItem>
   );
 };
 
-type ActionHandlerItemProps =
-  Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'overflowingComponents' | 'setOverflowingComponents' | 'type'>
-  & {
-  action: HandlerAction<ActionContexts>,
-  disabled: boolean,
-  field: string,
+type ActionHandlerItemProps = Pick<
+  Props,
+  'handlerArgs' | 'onMenuToggle' | 'overflowingComponents' | 'setOverflowingComponents' | 'type'
+> & {
+  action: HandlerAction;
+  disabled: boolean;
+  field: string;
 };
 
 const ActionHandlerItem = ({
@@ -140,22 +136,25 @@ const ActionHandlerItem = ({
   onMenuToggle,
 }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
-  const dispatch = useAppDispatch();
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const { executeThunkAction } = useFieldActions();
+  const sendTelemetry = useSendTelemetry('search-field-value');
 
-  const setActionComponents: SetActionComponents = useCallback((fn) => {
-    setOverflowingComponents(fn(overflowingComponents));
-  }, [overflowingComponents, setOverflowingComponents]);
+  const setActionComponents: SetActionComponents = useCallback(
+    (fn) => {
+      setOverflowingComponents(fn(overflowingComponents));
+    },
+    [overflowingComponents, setOverflowingComponents],
+  );
 
-  const handler = useMemo(() => createHandlerFor(dispatch, action, setActionComponents), [action, dispatch, setActionComponents]);
+  const handler = useMemo(
+    () => createHandlerFor(executeThunkAction, action, setActionComponents),
+    [action, executeThunkAction, setActionComponents],
+  );
 
   const onSelect = useCallback(() => {
     const { resetFocus = false, title } = action;
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION[upperCase(title).replace(/\s|\//g, '_')], {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_section: 'search-field-value',
       event_details: {},
     });
 
@@ -166,14 +165,12 @@ const ActionHandlerItem = ({
     onMenuToggle();
 
     handler(handlerArgs);
-  }, [action, handler, handlerArgs, location.pathname, onMenuToggle, sendTelemetry, unsetWidgetFocusing]);
+  }, [action, handler, handlerArgs, onMenuToggle, sendTelemetry, unsetWidgetFocusing]);
 
   const { field } = handlerArgs;
 
   return (
-    <StyledMenuItem disabled={disabled}
-                    eventKey={{ action: type, field }}
-                    onSelect={onSelect}>
+    <StyledMenuItem disabled={disabled} eventKey={{ action: type, field }} onSelect={onSelect}>
       <ActionTitle action={action} handlerArgs={handlerArgs} />
     </StyledMenuItem>
   );
@@ -188,30 +185,35 @@ const ActionMenuItem = ({
   onMenuToggle,
 }: Props) => {
   const { isEnabled = () => true } = action;
-  const dispatch = useAppDispatch();
-  const actionDisabled = dispatch((_dispatch, getState) => !isEnabled(handlerArgs, getState));
+  const { evaluateCondition } = useFieldActions();
+  const actionEnabled = evaluateCondition(isEnabled, handlerArgs, true);
+  const actionDisabled = !actionEnabled;
   const { field } = handlerArgs;
 
   if (isExternalLinkAction(action)) {
     return (
-      <ExternalLinkItem action={action}
-                        disabled={actionDisabled}
-                        field={field}
-                        handlerArgs={handlerArgs}
-                        onMenuToggle={onMenuToggle}
-                        type={type} />
+      <ExternalLinkItem
+        action={action}
+        disabled={actionDisabled}
+        field={field}
+        handlerArgs={handlerArgs}
+        onMenuToggle={onMenuToggle}
+        type={type}
+      />
     );
   }
 
   return (
-    <ActionHandlerItem action={action}
-                       disabled={actionDisabled}
-                       field={field}
-                       handlerArgs={handlerArgs}
-                       onMenuToggle={onMenuToggle}
-                       overflowingComponents={overflowingComponents}
-                       setOverflowingComponents={setOverflowingComponents}
-                       type={type} />
+    <ActionHandlerItem
+      action={action}
+      disabled={actionDisabled}
+      field={field}
+      handlerArgs={handlerArgs}
+      onMenuToggle={onMenuToggle}
+      overflowingComponents={overflowingComponents}
+      setOverflowingComponents={setOverflowingComponents}
+      type={type}
+    />
   );
 };
 

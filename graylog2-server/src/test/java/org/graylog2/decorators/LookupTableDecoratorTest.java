@@ -29,12 +29,13 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -87,19 +88,22 @@ public class LookupTableDecoratorTest {
         assertThat(response.messages().get(4).message()).doesNotContainKey(targetField);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void withNullSourceField() throws Exception {
-        createLookupTableDecorator(createDecorator("", "bar", "test"));
+        assertThrows(IllegalStateException.class, () ->
+            createLookupTableDecorator(createDecorator("", "bar", "test")));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void withNullTargetField() throws Exception {
-        createLookupTableDecorator(createDecorator("foo", "", "test"));
+        assertThrows(IllegalStateException.class, () ->
+            createLookupTableDecorator(createDecorator("foo", "", "test")));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void withoutLookupTableName() throws Exception {
-        createLookupTableDecorator(createDecorator("foo", "bar", ""));
+        assertThrows(IllegalStateException.class, () ->
+            createLookupTableDecorator(createDecorator("foo", "bar", "")));
     }
 
     private Decorator createDecorator(String sourceField, String targetField, String lookupTableName) {

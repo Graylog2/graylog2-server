@@ -15,26 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import type Widget from 'views/logic/widgets/Widget';
 import type { ActionHandlerCondition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import type { AdditionalViewsActionHandlerArguments } from 'views/types';
 
-type Contexts = { widget: Widget };
+const AddToTableActionHandler =
+  ({ field, contexts: { widget } }: ActionHandlerArguments) =>
+  (dispatch: ViewsDispatch) => {
+    const newFields = [].concat(widget.config.fields, [field]);
+    const newConfig = widget.config.toBuilder().fields(newFields).build();
 
-const AddToTableActionHandler = ({
-  field,
-  contexts: { widget },
-}: ActionHandlerArguments<{ widget?: Widget }>) => (dispatch: AppDispatch) => {
-  const newFields = [].concat(widget.config.fields, [field]);
-  const newConfig = widget.config.toBuilder()
-    .fields(newFields)
-    .build();
+    return dispatch(updateWidgetConfig(widget.id, newConfig));
+  };
 
-  return dispatch(updateWidgetConfig(widget.id, newConfig));
-};
-
-const isEnabled: ActionHandlerCondition<Contexts> = ({ contexts: { widget }, field }) => {
+const isEnabled: ActionHandlerCondition<AdditionalViewsActionHandlerArguments> = ({ contexts: { widget }, field }) => {
   if (MessagesWidget.isMessagesWidget(widget) && widget.config) {
     const fields = widget.config.fields || [];
 
@@ -45,7 +40,7 @@ const isEnabled: ActionHandlerCondition<Contexts> = ({ contexts: { widget }, fie
 };
 
 /* Hide AddToTableHandler in the sidebar */
-const isHidden: ActionHandlerCondition<Contexts> = ({ contexts: { widget } }) => !widget;
+const isHidden: ActionHandlerCondition<AdditionalViewsActionHandlerArguments> = ({ contexts: { widget } }) => !widget;
 
 AddToTableActionHandler.isEnabled = isEnabled;
 AddToTableActionHandler.isHidden = isHidden;

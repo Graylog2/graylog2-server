@@ -18,7 +18,7 @@ package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.Optional;

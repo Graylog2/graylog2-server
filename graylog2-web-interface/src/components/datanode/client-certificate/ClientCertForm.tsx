@@ -20,7 +20,7 @@ import { useState } from 'react';
 import moment from 'moment';
 
 import { FormikInput, TimeUnitInput } from 'components/common';
-import { Button, ButtonToolbar, Modal } from 'components/bootstrap';
+import { Button, ButtonToolbar, Checkbox, Modal } from 'components/bootstrap';
 import type { ClientCertFormValues } from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import useCreateDataNodeClientCert from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import ClientCertificateView from 'components/datanode/client-certificate/ClientCertificateView';
@@ -29,74 +29,99 @@ import { TIME_UNITS_UPPER } from '../Constants';
 import ModalSubmit from '../../common/ModalSubmit';
 
 type Props = {
-  onCancel: () => void,
+  onCancel: () => void;
 };
 
 const ClientCertForm = ({ onCancel }: Props) => {
   const [clientCerts, setClientCerts] = useState(null);
+  const [isUnencrypted, setIsUnencrypted] = useState(false);
   const { onCreateClientCert } = useCreateDataNodeClientCert();
 
   const onSubmit = (formValues: ClientCertFormValues) => {
     const { lifetimeValue, lifetimeUnit, ...restValues } = formValues;
     const requestValues = {
       ...restValues,
-      certificate_lifetime: moment.duration(lifetimeValue, lifetimeUnit as unknown as moment.unitOfTime.DurationConstructor).toJSON(),
+      certificate_lifetime: moment
+        .duration(lifetimeValue, lifetimeUnit as unknown as moment.unitOfTime.DurationConstructor)
+        .toJSON(),
     };
 
-    return onCreateClientCert(requestValues).then((certs) => setClientCerts(certs)).catch(() => {});
+    return onCreateClientCert(requestValues)
+      .then((certs) => setClientCerts(certs))
+      .catch(() => {});
+  };
+
+  const onToggleUnencrypted = (setFieldValue: (field: string, value: any) => void) => {
+    setIsUnencrypted(!isUnencrypted);
+    setFieldValue('password', null);
   };
 
   return (
     <>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Create client certificate</Modal.Title>
       </Modal.Header>
       {!clientCerts && (
-        <Formik initialValues={{
-          principal: '',
-          role: 'all_access',
-          password: '',
-          lifetimeValue: 30,
-          lifetimeUnit: 'days',
-        } as ClientCertFormValues}
-                onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
+        <Formik
+          initialValues={
+            {
+              principal: '',
+              role: 'all_access',
+              password: null,
+              lifetimeValue: 30,
+              lifetimeUnit: 'days',
+            } as ClientCertFormValues
+          }
+          onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
           {({ isSubmitting, values, setFieldValue }) => (
             <Form>
               <Modal.Body>
-                <FormikInput id="principal"
-                             placeholder="principal"
-                             name="principal"
-                             label="Principal"
-                             required />
-                <FormikInput id="role"
-                             placeholder="role"
-                             name="role"
-                             help="Represent OpenSearch roles mapping."
-                             label="Role"
-                             required />
-                <FormikInput id="password"
-                             placeholder="*******"
-                             name="password"
-                             type="password"
-                             label="Password"
-                             required />
-                <TimeUnitInput label="Certificate Lifetime"
-                               update={(value, unit) => {
-                                 setFieldValue('lifetimeValue', value);
-                                 setFieldValue('lifetimeUnit', unit);
-                               }}
-                               value={values.lifetimeValue}
-                               unit={values.lifetimeUnit.toLocaleUpperCase()}
-                               enabled
-                               hideCheckbox
-                               units={TIME_UNITS_UPPER} />
+                <FormikInput id="principal" placeholder="principal" name="principal" label="Principal" required />
+                <FormikInput
+                  id="role"
+                  placeholder="role"
+                  name="role"
+                  help="Represent OpenSearch roles mapping."
+                  label="Role"
+                  required
+                />
+                <Checkbox
+                  id="client_certificate_unencrypted"
+                  name="client_certificate_unencrypted"
+                  checked={isUnencrypted}
+                  onChange={() => onToggleUnencrypted(setFieldValue)}>
+                  Unencrypted
+                </Checkbox>
+                <FormikInput
+                  id="password"
+                  placeholder="*******"
+                  name="password"
+                  type="password"
+                  label="Password"
+                  disabled={isUnencrypted}
+                  required={!isUnencrypted}
+                />
+                <TimeUnitInput
+                  label="Certificate Lifetime"
+                  update={(value, unit) => {
+                    setFieldValue('lifetimeValue', value);
+                    setFieldValue('lifetimeUnit', unit);
+                  }}
+                  value={values.lifetimeValue}
+                  unit={values.lifetimeUnit.toLocaleUpperCase()}
+                  enabled
+                  hideCheckbox
+                  units={TIME_UNITS_UPPER}
+                />
               </Modal.Body>
               <Modal.Footer>
-                <ModalSubmit onCancel={() => onCancel()}
-                             isSubmitting={isSubmitting}
-                             isAsyncSubmit
-                             submitButtonText="Create Certificate"
-                             submitLoadingText="Creating certificate..." />
+                <ModalSubmit
+                  onCancel={() => onCancel()}
+                  isSubmitting={isSubmitting}
+                  isAsyncSubmit
+                  submitButtonText="Create Certificate"
+                  submitLoadingText="Creating certificate..."
+                />
               </Modal.Footer>
             </Form>
           )}
@@ -109,7 +134,9 @@ const ClientCertForm = ({ onCancel }: Props) => {
           </Modal.Body>
           <Modal.Footer>
             <ButtonToolbar>
-              <Button bsStyle="success" onClick={() => onCancel()}>Close</Button>
+              <Button bsStyle="primary" onClick={() => onCancel()}>
+                Close
+              </Button>
             </ButtonToolbar>
           </Modal.Footer>
         </>

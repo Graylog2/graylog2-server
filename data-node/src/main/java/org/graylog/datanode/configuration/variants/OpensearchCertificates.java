@@ -17,29 +17,58 @@
 package org.graylog.datanode.configuration.variants;
 
 import jakarta.annotation.Nullable;
-import org.graylog.security.certutil.csr.KeystoreInformation;
+
+import java.security.KeyStore;
+import java.util.function.Supplier;
 
 public class OpensearchCertificates {
 
-    private final KeystoreInformation transportCertificate;
-    private final KeystoreInformation httpCertificate;
+    private final Supplier<KeyStore> httpKeystore;
+    private final Supplier<KeyStore> transportKeystore;
 
-    public OpensearchCertificates(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
-        this.transportCertificate = transportCertificate;
-        this.httpCertificate = httpCertificate;
+    @Nullable
+    private final String transportKeyAlias;
+    @Nullable
+    private final String httpKeyAlias;
+
+
+    private final char[] password;
+
+    public OpensearchCertificates(char[] password, Supplier<KeyStore> httpKeystore, @Nullable String httpKeyAlias, Supplier<KeyStore> transportKeystore, @Nullable String transportKeyAlias) {
+        this.httpKeystore = httpKeystore;
+        this.transportKeystore = transportKeystore;
+        this.transportKeyAlias = transportKeyAlias;
+        this.httpKeyAlias = httpKeyAlias;
+        this.password = password;
     }
 
     public static OpensearchCertificates none() {
-        return new OpensearchCertificates(null, null);
+        return new OpensearchCertificates(null, null, null, null, null);
+    }
+
+    public Supplier<KeyStore> getHttpKeystore() {
+        return httpKeystore;
+    }
+
+    public Supplier<KeyStore> getTransportKeystore() {
+        return transportKeystore;
     }
 
     @Nullable
-    public KeystoreInformation getTransportCertificate() {
-        return transportCertificate;
+    public String getTransportKeyAlias() {
+        return transportKeyAlias;
     }
 
     @Nullable
-    public KeystoreInformation getHttpCertificate() {
-        return httpCertificate;
+    public String getHttpKeyAlias() {
+        return httpKeyAlias;
+    }
+
+    public char[] getPassword() {
+        return password;
+    }
+
+    public boolean hasCertificates() {
+        return getHttpKeystore() != null && getTransportKeystore() != null;
     }
 }

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import { mockEventData } from 'helpers/mocking/EventAndEventDefinitions_mock';
@@ -39,19 +39,17 @@ const queryClient = new QueryClient({
     },
   },
 });
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -64,7 +62,7 @@ describe('useEventById', () => {
 
   it('should run fetch and store mapped response', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(mockEventData));
-    const { result, waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
+    const { result } = renderHook(() => useEventById('event-id-1'), { wrapper });
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
@@ -76,12 +74,15 @@ describe('useEventById', () => {
   it('should display notification on fail', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    const { waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
+    renderHook(() => useEventById('event-id-1'), { wrapper });
 
     await suppressConsole(async () => {
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Loading event or alert failed with status: Error: Error',
-        'Could not load event or alert'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Loading event or alert failed with status: Error: Error',
+          'Could not load event or alert',
+        ),
+      );
     });
   });
 });

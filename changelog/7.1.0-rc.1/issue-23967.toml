@@ -1,0 +1,5 @@
+type = "a"
+message = "Warning user when saving search if there are unconfirmed changes."
+
+issues = ["23967"]
+pulls = ["25178"]

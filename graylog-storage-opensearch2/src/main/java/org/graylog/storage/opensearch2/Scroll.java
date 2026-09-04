@@ -47,7 +47,7 @@ public class Scroll implements MultiChunkResultRetriever {
     public ChunkedResult retrieveChunkedResult(ChunkCommand chunkCommand) {
         final SearchSourceBuilder searchQuery = searchRequestFactory.create(chunkCommand);
         final SearchRequest request = scrollBuilder(searchQuery, chunkCommand.indices());
-        final SearchResponse result = client.singleSearch(request, "Unable to perform scroll search");
+        final SearchResponse result = client.execute((c, requestOptions) -> c.search(request, requestOptions), "Unable to perform scroll search");
         return scrollResultFactory.create(result, searchQuery.toString(), DEFAULT_SCROLLTIME, chunkCommand.fields(), chunkCommand.limit().orElse(-1));
     }
 

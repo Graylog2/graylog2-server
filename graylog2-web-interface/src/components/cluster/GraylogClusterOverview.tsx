@@ -31,16 +31,18 @@ import GraphDaysContextProvider from 'components/common/Graph/contexts/GraphDays
 const StyledDl = styled.dl`
   margin-bottom: 0;
 `;
-const StyledH2 = styled.h2(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
+const StyledH2 = styled.h2(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
-const Header = () => <StyledH2>Graylog cluster</StyledH2>;
+const Header = () => <StyledH2>Cluster</StyledH2>;
 
 const ClusterInfo = () => {
   const nodes = useStore(NodesStore);
 
-  if (!nodes) {
+  if (!nodes?.clusterId) {
     return <Spinner />;
   }
 
@@ -56,19 +58,32 @@ const ClusterInfo = () => {
   );
 };
 
-type Props = {
-  layout?: 'default' | 'compact',
-  children?: React.ReactNode
-  showLicenseGraph?: boolean,
-}
-
-const GraylogClusterOverview = ({ layout = 'default', children = null, showLicenseGraph = false }: Props) => {
+const LicenseGraphComponent = () => {
   const licensePlugin = PluginStore.exports('license');
   const currentUser = useCurrentUser();
 
-  const LicenseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.LicenseGraphWithMetrics) || ClusterTrafficGraph;
-  const EnterpriseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) || ClusterTrafficGraph;
+  return React.createElement(
+    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.TrafficGraphWithLicenseMetrics) ||
+      ClusterTrafficGraph,
+  );
+};
 
+const EnterpriseGraphComponent = () => {
+  const licensePlugin = PluginStore.exports('license');
+  const currentUser = useCurrentUser();
+
+  return React.createElement(
+    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.TrafficGraph) || ClusterTrafficGraph,
+  );
+};
+
+type Props = {
+  layout?: 'default' | 'compact';
+  children?: React.ReactNode;
+  showLicenseGraph?: boolean;
+};
+
+const GraylogClusterOverview = ({ layout = 'default', children = null, showLicenseGraph = false }: Props) => {
   if (layout === 'compact') {
     return (
       <GraphDaysContextProvider>
@@ -81,10 +96,7 @@ const GraylogClusterOverview = ({ layout = 'default', children = null, showLicen
                 <hr />
                 {children}
               </Col>
-              <Col md={6}>
-                {showLicenseGraph ? (<LicenseGraphComponent />
-                ) : (<EnterpriseGraphComponent />)}
-              </Col>
+              <Col md={6}>{showLicenseGraph ? <LicenseGraphComponent /> : <EnterpriseGraphComponent />}</Col>
             </Row>
           </Col>
         </Row>
@@ -101,10 +113,7 @@ const GraylogClusterOverview = ({ layout = 'default', children = null, showLicen
           <hr />
           {children}
           <Row>
-            <Col md={12}>
-              {showLicenseGraph ? (<LicenseGraphComponent />
-              ) : (<EnterpriseGraphComponent />)}
-            </Col>
+            <Col md={12}>{showLicenseGraph ? <LicenseGraphComponent /> : <EnterpriseGraphComponent />}</Col>
           </Row>
         </Col>
       </Row>

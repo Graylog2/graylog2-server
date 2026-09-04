@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
@@ -23,29 +24,50 @@ import type { BsSize } from 'components/bootstrap/types';
 import { Icon } from 'components/common/index';
 
 type Props = {
-  alwaysShowCaret?: boolean,
-  bsSize?: BsSize,
-  buttonTitle?: string,
-  children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
-  closeOnSelect?: boolean,
-  disabled?: boolean
-  dropdownZIndex?: number,
-  onToggle?: (isOpen: boolean) => void,
-  title: React.ReactNode,
+  alwaysShowCaret?: boolean;
+  bsSize?: BsSize;
+  buttonTitle?: string;
+  children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode);
+  closeOnSelect?: boolean;
+  disabled?: boolean;
+  dropdownZIndex?: number;
+  onToggle?: (isOpen: boolean) => void;
+  title: React.ReactNode;
 };
+
+const ToolbarSafeOverlayDropdown = styled(OverlayDropdown)(
+  () => css`
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    line-height: 1;
+
+    .dropdown.btn-group {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+
+    .dropdown-toggle {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+  `,
+);
 
 /**
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
 const OverlayDropdownButton = ({
   alwaysShowCaret = false,
-  bsSize,
-  buttonTitle,
+  bsSize = undefined,
+  buttonTitle = undefined,
   children,
   closeOnSelect = true,
   disabled = false,
-  dropdownZIndex,
-  onToggle: onToggleProp,
+  dropdownZIndex = undefined,
+  onToggle: onToggleProp = undefined,
   title,
 }: Props) => {
   const [show, setShowDropdown] = useState(false);
@@ -58,26 +80,36 @@ const OverlayDropdownButton = ({
     setShowDropdown((cur) => !cur);
   };
 
+  const onClose = () => {
+    if (typeof onToggleProp === 'function') {
+      onToggleProp(!show);
+    }
+    setShowDropdown(false);
+  };
+
   return (
-    <OverlayDropdown show={show}
-                     closeOnSelect={closeOnSelect}
-                     dropdownZIndex={dropdownZIndex}
-                     alwaysShowCaret={alwaysShowCaret}
-                     toggleChild={(
-                       <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
-                         <Button bsSize={bsSize}
-                                 className="dropdown-toggle"
-                                 aria-label={buttonTitle}
-                                 title={buttonTitle}
-                                 disabled={disabled}>
-                           {title} <Icon name="arrow_drop_down" />
-                         </Button>
-                       </div>
-                     )}
-                     placement="bottom"
-                     onToggle={_onToggle}>
+    <ToolbarSafeOverlayDropdown
+      show={show}
+      onClose={onClose}
+      closeOnSelect={closeOnSelect}
+      dropdownZIndex={dropdownZIndex}
+      alwaysShowCaret={alwaysShowCaret}
+      toggleChild={
+        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
+          <Button
+            bsSize={bsSize}
+            className="dropdown-toggle"
+            aria-label={buttonTitle}
+            title={buttonTitle}
+            disabled={disabled}>
+            {title} <Icon name="arrow_drop_down" />
+          </Button>
+        </div>
+      }
+      placement="bottom"
+      onToggle={_onToggle}>
       {typeof children === 'function' ? children({ toggleDropdown: _onToggle }) : children}
-    </OverlayDropdown>
+    </ToolbarSafeOverlayDropdown>
   );
 };
 

@@ -17,6 +17,7 @@
 import * as Immutable from 'immutable';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Query from 'views/logic/queries/Query';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import { createSearch } from 'fixtures/searches';
@@ -24,6 +25,10 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import mockDispatch from 'views/test/mockDispatch';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import type { RootState } from 'views/types';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { alice } from 'fixtures/users';
+import type { Message } from 'views/components/messagelist/Types';
 
 import AddToQueryHandler from './AddToQueryHandler';
 
@@ -31,10 +36,8 @@ import type { ViewType } from '../views/View';
 import View from '../views/View';
 import GlobalOverride from '../search/GlobalOverride';
 
-const createQuery = (id: string, queryString: string = '') => Query.builder()
-  .id(id)
-  .query({ type: 'elasticsearch', query_string: queryString })
-  .build();
+const createQuery = (id: string, queryString: string = '') =>
+  Query.builder().id(id).query({ type: 'elasticsearch', query_string: queryString }).build();
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -64,12 +67,14 @@ describe('AddToQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(AddToQueryHandler({
-      queryId: 'queryId',
-      field: 'timestamp',
-      value: '2019-01-17T11:00:09.025Z',
-      type: new FieldType('date', [], []),
-    }));
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'queryId',
+        field: 'timestamp',
+        value: '2019-01-17T11:00:09.025Z',
+        type: new FieldType('date', [], []),
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'timestamp:"2019-01-17T11:00:09.025Z"');
   });
@@ -80,14 +85,148 @@ describe('AddToQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(AddToQueryHandler({
-      queryId: 'anotherQueryId',
-      field: 'bar',
-      value: 42,
-      type: new FieldType('keyword', [], []),
-    }));
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'bar',
+        value: 42,
+        type: new FieldType('keyword', [], []),
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
+  });
+
+  it('updates query string for multiple values from context', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('bar').build())
+      .build();
+    const contexts = {
+      view,
+      widget,
+      valuePath: [{ bar: 43 }, { baz: 44 }],
+      analysisDisabledFields: [],
+      currentUser: alice,
+      message: {} as Message,
+      isLocalNode: true,
+    };
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'bar',
+        value: 42,
+        type: new FieldType('keyword', [], []),
+        contexts,
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:43 AND baz:44');
+  });
+
+  it('combines multiple grouping values with OR when the value path operator is OR', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('network').build())
+      .build();
+
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'source',
+        value: 'a',
+        type: new FieldType('keyword', [], []),
+        contexts: {
+          widget,
+          valuePath: [{ source: 'a' }, { target: 'a' }],
+          valuePathOperator: 'OR',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND (source:a OR target:a)');
+  });
+
+  it('combines an edge value path into a symmetric compound clause when the operator is EDGE', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('network').build())
+      .build();
+
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'source',
+        value: 'a',
+        type: new FieldType('keyword', [], []),
+        contexts: {
+          widget,
+          valuePath: [{ source: 'a' }, { target: 'b' }],
+          valuePathOperator: 'EDGE',
+        },
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'anotherQueryId',
+      'foo:23 AND ((source:a AND target:b) OR (source:b AND target:a))',
+    );
+  });
+
+  it('resolves the field type per value path entry for mixed field types', async () => {
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
+
+    const widget = AggregationWidget.builder()
+      .id('widget1')
+      .config(AggregationWidgetConfig.builder().visualization('bar').build())
+      .build();
+    // The value path mixes a `date` field with a `keyword` field. Each entry must be formatted
+    // according to its own field's type, not the type of the action's primary field.
+    const contexts = {
+      view,
+      widget,
+      valuePath: [{ timestamp: '2019-01-17T11:00:09.025Z' }, { took_ms: 42 }],
+      fieldTypes: Immutable.List([
+        new FieldTypeMapping('timestamp', new FieldType('date', [], [])),
+        new FieldTypeMapping('took_ms', new FieldType('keyword', [], [])),
+      ]),
+      analysisDisabledFields: [],
+      currentUser: alice,
+      message: {} as Message,
+      isLocalNode: true,
+    };
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'timestamp',
+        value: '2019-01-17T11:00:09.025Z',
+        type: new FieldType('date', [], []),
+        contexts,
+      }),
+    );
+
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'anotherQueryId',
+      'foo:23 AND timestamp:"2019-01-17T11:00:09.025Z" AND took_ms:42',
+    );
   });
 
   it('appends NOT _exists_ fragment for proper field in case of missing bucket in input', async () => {
@@ -96,12 +235,14 @@ describe('AddToQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(AddToQueryHandler({
-      queryId: 'anotherQueryId',
-      field: 'bar',
-      value: MISSING_BUCKET_NAME,
-      type: new FieldType('keyword', [], []),
-    }));
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'bar',
+        value: MISSING_BUCKET_NAME,
+        type: new FieldType('keyword', [], []),
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND NOT _exists_:bar');
   });
@@ -125,12 +266,14 @@ describe('AddToQueryHandler', () => {
       } as RootState;
       const dispatch = mockDispatch(state);
 
-      await dispatch(AddToQueryHandler({
-        queryId: 'queryId',
-        field: 'bar',
-        value: 42,
-        type: new FieldType('keyword', [], []),
-      }));
+      await dispatch(
+        AddToQueryHandler({
+          queryId: 'queryId',
+          field: 'bar',
+          value: 42,
+          type: new FieldType('keyword', [], []),
+        }),
+      );
 
       expect(updateQueryString).toHaveBeenCalledWith('queryId', 'something AND bar:42');
     });
@@ -139,20 +282,19 @@ describe('AddToQueryHandler', () => {
       const state = {
         ...mockDashboardRootState,
         searchExecution: {
-          executionState: SearchExecutionState.create(
-            Immutable.Map(),
-            undefined,
-          ),
+          executionState: SearchExecutionState.create(Immutable.Map(), undefined),
         },
       } as RootState;
       const dispatch = mockDispatch(state);
 
-      await dispatch(AddToQueryHandler({
-        queryId: 'queryId',
-        field: 'bar',
-        value: 42,
-        type: new FieldType('keyword', [], []),
-      }));
+      await dispatch(
+        AddToQueryHandler({
+          queryId: 'queryId',
+          field: 'bar',
+          value: 42,
+          type: new FieldType('keyword', [], []),
+        }),
+      );
 
       expect(updateQueryString).toHaveBeenCalledWith('queryId', 'bar:42');
     });

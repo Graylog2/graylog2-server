@@ -37,6 +37,7 @@ public abstract class EventNotificationModelData {
     public static final String FIELD_EVENT_DEFINITION_TYPE = "event_definition_type";
     public static final String FIELD_EVENT_DEFINITION_TITLE = "event_definition_title";
     public static final String FIELD_EVENT_DEFINITION_DESCRIPTION = "event_definition_description";
+    public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
     public static final String FIELD_JOB_DEFINITION_ID = "job_definition_id";
     public static final String FIELD_JOB_TRIGGER_ID = "job_trigger_id";
     public static final String FIELD_EVENT = "event";
@@ -53,6 +54,9 @@ public abstract class EventNotificationModelData {
 
     @JsonProperty(FIELD_EVENT_DEFINITION_DESCRIPTION)
     public abstract String eventDefinitionDescription();
+
+    @JsonProperty(FIELD_REMEDIATION_STEPS)
+    public abstract String remediationSteps();
 
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
@@ -82,6 +86,8 @@ public abstract class EventNotificationModelData {
 
         public abstract Builder eventDefinitionDescription(String description);
 
+        public abstract Builder remediationSteps(String remediationSteps);
+
         public abstract Builder jobDefinitionId(String jobDefinitionId);
 
         public abstract Builder jobTriggerId(String jobTriggerId);
@@ -94,17 +100,22 @@ public abstract class EventNotificationModelData {
     }
 
     public static EventNotificationModelData of(EventNotificationContext ctx, List<MessageSummary> backlog) {
-        final Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
-        final Optional<JobTriggerDto> jobTriggerDto = ctx.jobTrigger();
+        return of(ctx.eventDefinition().orElse(null),
+                ctx.jobTrigger().orElse(null),
+                ctx.event(),
+                backlog);
+    }
 
+    public static EventNotificationModelData of(EventDefinitionDto definitionDto, JobTriggerDto jobTriggerDto, EventDto event, List<MessageSummary> backlog) {
         return EventNotificationModelData.builder()
-                .eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN))
-                .eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN))
-                .eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN))
-                .eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN))
-                .jobDefinitionId(jobTriggerDto.map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN))
-                .jobTriggerId(jobTriggerDto.map(JobTriggerDto::id).orElse(UNKNOWN))
-                .event(ctx.event())
+                .eventDefinitionId(definitionDto != null ? definitionDto.id() : UNKNOWN)
+                .eventDefinitionType(definitionDto != null ? definitionDto.config().type() : UNKNOWN)
+                .eventDefinitionTitle(definitionDto != null ? definitionDto.title() : UNKNOWN)
+                .eventDefinitionDescription(definitionDto != null ? definitionDto.description() : UNKNOWN)
+                .remediationSteps(Optional.ofNullable(definitionDto).map(EventDefinitionDto::remediationSteps).orElse(UNKNOWN))
+                .jobDefinitionId(jobTriggerDto != null ? jobTriggerDto.jobDefinitionId() : UNKNOWN)
+                .jobTriggerId(jobTriggerDto != null ? jobTriggerDto.id() : UNKNOWN)
+                .event(event)
                 .backlog(backlog)
                 .build();
     }

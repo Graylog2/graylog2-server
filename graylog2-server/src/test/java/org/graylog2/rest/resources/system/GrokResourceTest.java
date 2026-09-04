@@ -29,14 +29,13 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import jakarta.ws.rs.core.Response;
 
 import java.io.ByteArrayInputStream;
@@ -51,20 +50,18 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class GrokResourceTest {
     private static final String[] GROK_LINES = {
             "# Comment",
             "",
             "TEST_PATTERN_0 Foo"
     };
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private PaginatedGrokPatternService paginatedGrokPatternService;
@@ -78,7 +75,7 @@ public class GrokResourceTest {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() {
         paginatedGrokPatternService = mock(PaginatedGrokPatternService.class);
@@ -144,14 +141,14 @@ public class GrokResourceTest {
     }
 
     @Test
-    public void bulkUpdatePatternsFromTextFileWithInvalidPattern() throws Exception {
+    public void bulkUpdatePatternsFromTextFileWithInvalidPattern() {
         final String patterns = "TEST_PATTERN_0 %{Foo";
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid pattern. Did not save any patterns");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        grokResource.bulkUpdatePatternsFromTextFile(inputStream, true, null);
+            grokResource.bulkUpdatePatternsFromTextFile(inputStream, true, null));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Invalid pattern. Did not save any patterns"));
     }
 
     @Test

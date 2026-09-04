@@ -30,7 +30,7 @@ import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.inputs.Extractor.Result;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +49,7 @@ import static org.graylog2.plugin.inputs.Extractor.ConditionType.STRING;
 import static org.graylog2.plugin.inputs.Extractor.CursorStrategy.COPY;
 import static org.graylog2.plugin.inputs.Extractor.CursorStrategy.CUT;
 import static org.joda.time.DateTimeZone.UTC;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ExtractorTest {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorTest.class);
@@ -234,24 +235,26 @@ public class ExtractorTest {
         assertThat(msg.getField("target")).isEqualTo("1");
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testWithMultipleValueOnlyResults() throws Exception {
-        final TestExtractor extractor = new TestExtractor.Builder()
-                .callback(new Callable<Result[]>() {
-                    @Override
-                    public Result[] call() throws Exception {
-                        return new Result[]{
-                                new Result("1", -1, -1),
-                                new Result("2", -1, -1)
-                        };
-                    }
-                })
-                .build();
+        assertThrows(NullPointerException.class, () -> {
+            final TestExtractor extractor = new TestExtractor.Builder()
+                    .callback(new Callable<Result[]>() {
+                        @Override
+                        public Result[] call() throws Exception {
+                            return new Result[]{
+                                    new Result("1", -1, -1),
+                                    new Result("2", -1, -1)
+                            };
+                        }
+                    })
+                    .build();
 
-        final Message msg = createMessage("the hello");
+            final Message msg = createMessage("the hello");
 
-        // TODO: Throwing a NPE with multiple value-only Result objects is a bug!
-        extractor.runExtractor(msg);
+            // TODO: Throwing a NPE with multiple value-only Result objects is a bug!
+            extractor.runExtractor(msg);
+        });
     }
 
     @Test
@@ -562,29 +565,31 @@ public class ExtractorTest {
         assertThat(msg.getField("msg")).isEqualTo("the hello");
     }
 
-    @Test(expected = StringIndexOutOfBoundsException.class)
+    @Test
     public void testCursorStrategyCutIfEndIndexIsDisabled() throws Exception {
-        final TestExtractor extractor = new TestExtractor.Builder()
-                .cursorStrategy(CUT)
-                .sourceField("msg")
-                .callback(new Callable<Result[]>() {
-                    @Override
-                    public Result[] call() throws Exception {
-                        return new Result[]{
-                                new Result("the", 0, -1)
-                        };
-                    }
-                })
-                .build();
+        assertThrows(StringIndexOutOfBoundsException.class, () -> {
+            final TestExtractor extractor = new TestExtractor.Builder()
+                    .cursorStrategy(CUT)
+                    .sourceField("msg")
+                    .callback(new Callable<Result[]>() {
+                        @Override
+                        public Result[] call() throws Exception {
+                            return new Result[]{
+                                    new Result("the", 0, -1)
+                            };
+                        }
+                    })
+                    .build();
 
-        final Message msg = createMessage("message");
-        msg.addField("msg", "the hello");
+            final Message msg = createMessage("message");
+            msg.addField("msg", "the hello");
 
-        extractor.runExtractor(msg);
+            extractor.runExtractor(msg);
 
-        // If the end index is -1, the source field should not be modified.
-        // TODO: The current implementation only checks if begin index is -1. Needs to be fixed.
-        assertThat(msg.getField("msg")).isEqualTo("the hello");
+            // If the end index is -1, the source field should not be modified.
+            // TODO: The current implementation only checks if begin index is -1. Needs to be fixed.
+            assertThat(msg.getField("msg")).isEqualTo("the hello");
+        });
     }
 
     @Test

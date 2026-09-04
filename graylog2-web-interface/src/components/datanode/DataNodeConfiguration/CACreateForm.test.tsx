@@ -27,20 +27,11 @@ import CACreateForm from './CACreateForm';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
-jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
-
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 
 describe('CACreateForm', () => {
   beforeEach(() => {
@@ -48,7 +39,7 @@ describe('CACreateForm', () => {
   });
 
   const submitForm = async () => {
-    userEvent.click(await screen.findByRole('button', { name: /Create CA/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /Create CA/i }));
   };
 
   it('should create CA', async () => {
@@ -56,12 +47,14 @@ describe('CACreateForm', () => {
 
     await submitForm();
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/ca/create'),
-      { organization: 'Graylog CA' },
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining('/ca/create'),
+        { organization: 'Graylog CA' },
+        false,
+      ),
+    );
 
     expect(UserNotification.success).toHaveBeenCalledWith('CA created successfully');
   });
@@ -69,20 +62,22 @@ describe('CACreateForm', () => {
   it('should show error when CA creation fails', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    render((
-      <DefaultQueryClientProvider options={{ logger }}>
+    render(
+      <DefaultQueryClientProvider>
         <CACreateForm />
-      </DefaultQueryClientProvider>
-    ));
+      </DefaultQueryClientProvider>,
+    );
 
     await submitForm();
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/ca/create'),
-      { organization: 'Graylog CA' },
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining('/ca/create'),
+        { organization: 'Graylog CA' },
+        false,
+      ),
+    );
 
     expect(UserNotification.error).toHaveBeenCalledWith('CA creation failed with error: Error: Error');
   });

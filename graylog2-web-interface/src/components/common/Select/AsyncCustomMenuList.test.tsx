@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
 import AsyncCustomMenuList from './AsyncCustomMenuList';
 
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 300 }));
 
-const getChildrenList: Function = (n: number): React.ReactElement[] => {
+const getChildrenList = (n: number): React.ReactElement[] => {
   const list = Array(n).fill(null);
 
   return list.map(() => <div key={Math.random()}>{Math.random()}</div>);
@@ -36,11 +36,7 @@ describe('CustomMenuList', () => {
   };
 
   it('Should render AsyncCustomMenuList', () => {
-    render(
-      <AsyncCustomMenuList selectProps={mockSelectProps}>
-        {getChildrenList(50)}
-      </AsyncCustomMenuList>,
-    );
+    render(<AsyncCustomMenuList selectProps={mockSelectProps}>{getChildrenList(50)}</AsyncCustomMenuList>);
 
     const list = screen.getAllByTestId('react-window-list-item');
 
@@ -48,13 +44,10 @@ describe('CustomMenuList', () => {
   });
 
   it('Should load more items on scrool', async () => {
-    render(
-      <AsyncCustomMenuList selectProps={mockSelectProps}>
-        {getChildrenList(5)}
-      </AsyncCustomMenuList>,
-    );
+    render(<AsyncCustomMenuList selectProps={mockSelectProps}>{getChildrenList(5)}</AsyncCustomMenuList>);
 
-    const list = screen.getByTestId('infinite-loader-container').firstChild;
+    const container = screen.getByTestId('infinite-loader-container');
+    const list = within(container).getByRole('list');
 
     expect(list).toBeInTheDocument();
 

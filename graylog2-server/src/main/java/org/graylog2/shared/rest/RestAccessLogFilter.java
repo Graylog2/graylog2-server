@@ -16,20 +16,19 @@
  */
 package org.graylog2.shared.rest;
 
-import org.glassfish.grizzly.http.server.Response;
-import org.graylog2.rest.RestTools;
-import org.graylog2.utilities.IpSubnet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
+import jakarta.inject.Provider;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
+import org.glassfish.grizzly.http.server.Response;
+import org.graylog2.rest.RestTools;
+import org.graylog2.utilities.IpSubnet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Date;
@@ -40,12 +39,12 @@ import static java.util.Objects.requireNonNull;
 public class RestAccessLogFilter implements ContainerResponseFilter {
     private static final Logger LOG = LoggerFactory.getLogger("org.graylog2.rest.accesslog");
 
-    private final Response response;
+    private final Provider<Response> responseProvider;
     private final Set<IpSubnet> trustedProxies;
 
     @Inject
-    public RestAccessLogFilter(@Context Response response, @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
-        this.response = requireNonNull(response);
+    public RestAccessLogFilter(@Context Provider<Response> responseProvider, @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
+        this.responseProvider = requireNonNull(responseProvider);
         this.trustedProxies = requireNonNull(trustedProxies);
     }
 
@@ -56,7 +55,7 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
                 final String rawQuery = requestContext.getUriInfo().getRequestUri().getRawQuery();
                 final Date requestDate = requestContext.getDate();
                 final String userId = RestTools.getUserIdFromRequest(requestContext);
-                final String remoteAddress = RestTools.getRemoteAddrFromRequest(response.getRequest(), trustedProxies);
+                final String remoteAddress = RestTools.getRemoteAddrFromRequest(responseProvider.get().getRequest(), trustedProxies);
                 final String userAgent = requestContext.getHeaderString(HttpHeaders.USER_AGENT);
 
                 LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}",

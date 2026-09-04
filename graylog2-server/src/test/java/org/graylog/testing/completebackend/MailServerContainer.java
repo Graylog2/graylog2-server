@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.completebackend;
 
-import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -27,7 +26,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.net.URI;
 import java.time.Duration;
 
-public class MailServerContainer extends ExternalResource implements AutoCloseable, MailServerInstance {
+public class MailServerContainer implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MailServerContainer.class);
     public static final int API_PORT = 8025;
@@ -39,17 +38,16 @@ public class MailServerContainer extends ExternalResource implements AutoCloseab
     }
 
     public static MailServerContainer createStarted(Network network) {
-        final GenericContainer<?> genericContainer = new GenericContainer<>(DockerImageName.parse("mailhog/mailhog:v1.0.1"));
-        genericContainer.withNetwork(network);
-        genericContainer.withNetworkAliases("mailserver");
-        genericContainer.addExposedPorts(1025, API_PORT);
+        final var genericContainer = new GenericContainer<>(DockerImageName.parse("mailhog/mailhog:v1.0.1"))
+                .withNetwork(network)
+                .withNetworkAliases("mailserver")
+                .waitingFor(new HttpWaitStrategy().forPath("/api/v2/messages").forPort(API_PORT).withStartupTimeout(Duration.ofSeconds(10)))
+                .withExposedPorts(1025, API_PORT);
         genericContainer.start();
-        genericContainer.waitingFor(new HttpWaitStrategy().forPath("/api/v2/messages").forPort(API_PORT).withStartupTimeout(Duration.ofSeconds(10)));
         LOG.debug("Mailhog mailserver started");
         return new MailServerContainer(genericContainer);
     }
 
-    @Override
     public URI getEndpointURI() {
         return URI.create("http://" + container.getHost() + ":" + container.getMappedPort(API_PORT));
     }

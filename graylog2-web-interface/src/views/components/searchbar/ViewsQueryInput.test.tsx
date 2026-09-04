@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import QueryValidationActions from 'views/actions/QueryValidationActions';
@@ -46,14 +46,16 @@ describe('QueryInput', () => {
 
   const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof ViewsQueryInput>>) => (
     <TestStoreProvider>
-      <ViewsQueryInput value=""
-                       name="search-query"
-                       onChange={() => Promise.resolve('')}
-                       validate={() => Promise.resolve({})}
-                       isValidating={false}
-                       onExecute={() => {}}
-                       completerFactory={() => new Completer()}
-                       {...props} />
+      <ViewsQueryInput
+        value=""
+        name="search-query"
+        onChange={() => Promise.resolve('')}
+        validate={() => Promise.resolve({})}
+        isValidating={false}
+        onExecute={() => {}}
+        completerFactory={() => new Completer()}
+        {...props}
+      />
     </TestStoreProvider>
   );
 
@@ -73,7 +75,9 @@ describe('QueryInput', () => {
     const onChange = jest.fn();
     render(<SimpleQueryInput onChange={onChange} />);
 
-    userEvent.paste(await findQueryInput(), 'the query');
+    const queryInput = await findQueryInput();
+    // eslint-disable-next-line testing-library/prefer-user-event
+    fireEvent.input(queryInput, { target: { value: 'the query' } });
 
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith({ target: { value: 'the query', name: 'search-query' } });
@@ -83,8 +87,11 @@ describe('QueryInput', () => {
     const onBlur = jest.fn();
     render(<SimpleQueryInput onBlur={onBlur} />);
 
-    userEvent.paste(await findQueryInput(), 'the query');
-    userEvent.tab();
+    const queryInput = await findQueryInput();
+    queryInput.focus();
+    // eslint-disable-next-line testing-library/prefer-user-event
+    fireEvent.input(queryInput, { target: { value: 'the query' } });
+    await userEvent.tab();
 
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
@@ -96,7 +103,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(onExecute).toHaveBeenCalledTimes(1);
       expect(onExecute).toHaveBeenCalledWith('the query');
@@ -108,7 +115,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(onExecute).not.toHaveBeenCalledTimes(1);
     });
@@ -119,7 +126,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
 
@@ -133,7 +140,7 @@ describe('QueryInput', () => {
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{enter}');
+      await userEvent.type(queryInput, '{enter}');
 
       expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
 
@@ -144,20 +151,22 @@ describe('QueryInput', () => {
   describe('supports custom commands', () => {
     it('adds custom commands to ace', async () => {
       const exec = jest.fn();
-      const commands = [{
-        name: 'TestCommand',
-        bindKey: {
-          mac: 'Ctrl+Enter',
-          win: 'Ctrl+Enter',
+      const commands = [
+        {
+          name: 'TestCommand',
+          bindKey: {
+            mac: 'Ctrl+Enter',
+            win: 'Ctrl+Enter',
+          },
+          exec,
         },
-        exec,
-      }];
+      ];
 
       render(<SimpleQueryInput commands={commands} />);
 
       const queryInput = await findQueryInput();
       queryInput.focus();
-      userEvent.type(queryInput, '{ctrl}{enter}');
+      await userEvent.keyboard('{Control>}{Enter}{/Control}');
 
       await waitFor(() => {
         expect(exec).toHaveBeenCalled();

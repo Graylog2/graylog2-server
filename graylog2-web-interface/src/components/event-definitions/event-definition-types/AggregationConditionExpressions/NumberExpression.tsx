@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
 
 import { Input, Col } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
@@ -28,12 +27,7 @@ type NumberExpressionProps = {
   validation?: any;
 };
 
-const NumberExpression = ({
-  expression,
-  onChange,
-  renderLabel,
-  validation = {},
-}: NumberExpressionProps) => {
+const NumberExpression = ({ expression, onChange, renderLabel, validation = {} }: NumberExpressionProps) => {
   const handleChange = (event) => {
     const nextExpression = cloneDeep(expression);
 
@@ -43,14 +37,16 @@ const NumberExpression = ({
 
   return (
     <Col md={3}>
-      <Input id="aggregation-threshold"
-             name="threshold"
-             label={renderLabel ? 'Threshold' : ''}
-             type="number"
-             value={get(expression, 'value')}
-             bsStyle={validation.message ? 'error' : null}
-             help={validation.message}
-             onChange={handleChange} />
+      <Input
+        id="aggregation-threshold"
+        name="threshold"
+        label={renderLabel ? 'Threshold' : ''}
+        type="number"
+        value={expression?.value}
+        bsStyle={validation.message ? 'error' : null}
+        help={validation.message}
+        onChange={handleChange}
+      />
     </Col>
   );
 };

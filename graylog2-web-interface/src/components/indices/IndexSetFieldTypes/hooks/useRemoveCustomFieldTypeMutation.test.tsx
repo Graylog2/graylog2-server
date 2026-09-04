@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -25,13 +25,6 @@ import { overriddenIndexField, overriddenIndexFieldJson } from 'fixtures/indexSe
 
 const urlPrefix = '/system/indices/mappings/remove_mapping';
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
@@ -58,19 +51,23 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     };
 
     it('should run fetch and display UserNotification', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve({
-        '001': {
-          succeeded: [overriddenIndexFieldJson],
-          failures: [],
-          successfully_performed: 1,
-          errors: [],
-        },
-      }));
+      asMock(fetch).mockImplementation(() =>
+        Promise.resolve({
+          '001': {
+            succeeded: [overriddenIndexFieldJson],
+            failures: [],
+            successfully_performed: 1,
+            errors: [],
+          },
+        }),
+      );
 
-      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation({
-        onSuccessHandler: mockOnSuccessHandler,
-        onErrorHandler: mockOnErrorHandler,
-      }), { queryClientOptions: { logger } });
+      const { result } = renderHook(() =>
+        useRemoveCustomFieldTypeMutation({
+          onSuccessHandler: mockOnSuccessHandler,
+          onErrorHandler: mockOnErrorHandler,
+        }),
+      );
 
       act(() => {
         result.current.removeCustomFieldTypeMutation(requestBody);
@@ -78,8 +75,8 @@ describe('useRemoveCustomFieldTypeMutation', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(mockOnSuccessHandler).toHaveBeenCalledWith(
-        {
+      await waitFor(() =>
+        expect(mockOnSuccessHandler).toHaveBeenCalledWith({
           '001': {
             indexSetId: '001',
             succeeded: [overriddenIndexField],
@@ -87,57 +84,70 @@ describe('useRemoveCustomFieldTypeMutation', () => {
             errors: [],
             successfullyPerformed: 1,
           },
-        },
-      ));
+        }),
+      );
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Custom field type removed successfully', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith('Custom field type removed successfully', 'Success!'),
+      );
     });
 
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation({
-        onSuccessHandler: mockOnSuccessHandler,
-        onErrorHandler: mockOnErrorHandler,
-      }), { queryClientOptions: { logger } });
+      const { result } = renderHook(() =>
+        useRemoveCustomFieldTypeMutation({
+          onSuccessHandler: mockOnSuccessHandler,
+          onErrorHandler: mockOnErrorHandler,
+        }),
+      );
 
       act(() => {
         result.current.removeCustomFieldTypeMutation(requestBody).catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Removing custom field type failed with status: Error: Error',
-        'Could not remove custom field type'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Removing custom field type failed with status: Error: Error',
+          'Could not remove custom field type',
+        ),
+      );
     });
 
     it('should run onErrorHandler when response has failures', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve({
-        '001': {
-          successfully_performed: 0,
-          failures: [{ entity_id: 'field', failure_explanation: 'field has error' }],
-          succeeded: [],
-          errors: ['Some error'],
-        },
-      }));
+      asMock(fetch).mockImplementation(() =>
+        Promise.resolve({
+          '001': {
+            successfully_performed: 0,
+            failures: [{ entity_id: 'field', failure_explanation: 'field has error' }],
+            succeeded: [],
+            errors: ['Some error'],
+          },
+        }),
+      );
 
-      const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation({
-        onSuccessHandler: mockOnSuccessHandler,
-        onErrorHandler: mockOnErrorHandler,
-      }), { queryClientOptions: { logger } });
+      const { result } = renderHook(() =>
+        useRemoveCustomFieldTypeMutation({
+          onSuccessHandler: mockOnSuccessHandler,
+          onErrorHandler: mockOnErrorHandler,
+        }),
+      );
 
       act(() => {
         result.current.removeCustomFieldTypeMutation(requestBody);
       });
 
-      await waitFor(() => expect(mockOnErrorHandler).toHaveBeenCalledWith({
-        '001': {
-          indexSetId: '001',
-          succeeded: [],
-          failures: [{ entityId: 'field', failureExplanation: 'field has error' }],
-          errors: ['Some error'],
-          successfullyPerformed: 0,
-        },
-      }));
+      await waitFor(() =>
+        expect(mockOnErrorHandler).toHaveBeenCalledWith({
+          '001': {
+            indexSetId: '001',
+            succeeded: [],
+            failures: [{ entityId: 'field', failureExplanation: 'field has error' }],
+            errors: ['Some error'],
+            successfullyPerformed: 0,
+          },
+        }),
+      );
     });
   });
 });

@@ -29,11 +29,11 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 @AutoValue
 public abstract class Rule {
-    private static final RateLimitedLog LOG = getRateLimitedLog(Rule.class);
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(Rule.class);
 
     private transient Meter globalExecuted;
     private transient Meter localExecuted;

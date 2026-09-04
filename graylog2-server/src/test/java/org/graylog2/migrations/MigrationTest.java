@@ -17,7 +17,7 @@
 package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableSortedSet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.util.List;

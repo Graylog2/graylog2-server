@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class PipelineRuleEntity {
     @JsonProperty("title")
     public abstract ValueReference title();
@@ -41,8 +39,8 @@ public abstract class PipelineRuleEntity {
 
     @JsonCreator
     public static PipelineRuleEntity create(@JsonProperty("title") ValueReference title,
-                                        @JsonProperty("description") @Nullable ValueReference description,
-                                        @JsonProperty("source") ValueReference source) {
+                                            @JsonProperty("description") @Nullable ValueReference description,
+                                            @JsonProperty("source") ValueReference source) {
         return new AutoValue_PipelineRuleEntity(title, description, source);
     }
 }

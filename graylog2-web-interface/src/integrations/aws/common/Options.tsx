@@ -21,12 +21,11 @@ type OptionsProps = {
   label: string;
 };
 
-function Options({
-  value,
-  label,
-}: OptionsProps) {
+function Options({ value, label }: OptionsProps) {
   return (
-    <option value={value} key={value}>{label}</option>
+    <option value={value} key={value}>
+      {label}
+    </option>
   );
 }
 

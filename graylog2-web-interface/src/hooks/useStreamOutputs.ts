@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import type { Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -33,33 +33,40 @@ export const fetchStreamOutputs = (streamId: string) => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useStreamOutputs = (streamId: string, { enabled }: Options = { enabled: true }): {
+const useStreamOutputs = (
+  streamId: string,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    outputs: Array<Output>,
-    total: number,
-  }
-  refetch: () => void,
-  isInitialLoading: boolean,
-  isError: boolean,
+    outputs: Array<Output>;
+    total: number;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
+  isError: boolean;
 } => {
-  const { data, refetch, isInitialLoading, isError } = useQuery(
-    keyFn(streamId),
-    () => defaultOnError(fetchStreamOutputs(streamId), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+  const { data, refetch, isInitialLoading, isError } = useQuery({
+    queryKey: keyFn(streamId),
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchStreamOutputs(streamId),
+        'Loading stream outputs failed with status',
+        'Could not load stream outputs',
+      ),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+
+  return {
     data,
     refetch,
     isInitialLoading,
     isError,
-  });
+  };
 };
 
 export default useStreamOutputs;

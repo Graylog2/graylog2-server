@@ -22,6 +22,7 @@ export interface IndexRotationConfigComponentProps<Config = {}> extends SystemCo
   config: Config;
   jsonSchema: RotationJsonSchema;
   updateConfig: (update: Partial<Config>) => void;
+  disabled?: boolean;
 }
 
 type IndexRotationSummaryComponentProps<Config = {}> = {
@@ -34,7 +35,7 @@ export type IndexRotationConfig = {
   displayName: string;
   configComponent: React.ComponentType<IndexRotationConfigComponentProps>;
   summaryComponent: React.ComponentType<IndexRotationSummaryComponentProps>;
-}
+};
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

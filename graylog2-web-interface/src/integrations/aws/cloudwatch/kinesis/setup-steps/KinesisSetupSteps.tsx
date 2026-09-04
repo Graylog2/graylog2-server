@@ -18,20 +18,24 @@ import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { ApiRoutes } from 'integrations/aws/common/Routes';
-import useFetch from 'integrations/aws/common/hooks/useFetch';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import useFetch from 'integrations/hooks/useFetch';
+import FormDataContext from 'integrations/contexts/FormDataContext';
+import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
 
 import KinesisSetupStep from './KinesisSetupStep';
+
+const StepItems = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+`;
 
 type KinesisSetupStepsProps = {
   onSuccess: (...args: any[]) => void;
   onError: (...args: any[]) => void;
 };
 
-const KinesisSetupSteps = ({
-  onSuccess,
-  onError,
-}: KinesisSetupStepsProps) => {
+const KinesisSetupSteps = ({ onSuccess, onError }: KinesisSetupStepsProps) => {
   const { formData } = useContext(FormDataContext);
   const [streamArn, setStreamArn] = useState(null);
   const [roleArn, setRoleArn] = useState(null);
@@ -42,14 +46,14 @@ const KinesisSetupSteps = ({
       onSuccess();
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       log_group_name: formData.awsCloudWatchAwsGroupName.value,
       filter_name: 'filter-name', // TODO: Use unique filter name
       filter_pattern: '',
       destination_stream_arn: streamArn,
       role_arn: roleArn,
-    },
+    }),
   );
 
   const [createPolicyProgress, setCreatePolicyUrl] = useFetch(
@@ -59,11 +63,11 @@ const KinesisSetupSteps = ({
       setCreateSubsciptionUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS_AUTO_SETUP.CREATE_SUBSCRIPTION);
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       stream_name: formData.awsCloudWatchKinesisStream.value,
       stream_arn: streamArn,
-    },
+    }),
   );
 
   const [createStreamProgress, setCreateStreamUrl] = useFetch(
@@ -73,21 +77,21 @@ const KinesisSetupSteps = ({
       setCreatePolicyUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS_AUTO_SETUP.CREATE_SUBSCRIPTION_POLICY);
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       region: formData.awsCloudWatchAwsRegion.value,
       stream_name: formData.awsCloudWatchKinesisStream.value,
-    },
+    }),
   );
 
   useEffect(() => {
     setCreateStreamUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS_AUTO_SETUP.CREATE_STREAM);
-  }, []);
+  }, [setCreateStreamUrl]);
 
   useEffect(() => {
     if (createStreamProgress.error || createPolicyProgress.error || createSubsciptionProgress.error) {
       onError();
     }
-  }, [createStreamProgress.error, createPolicyProgress.error, createSubsciptionProgress.error]);
+  }, [createStreamProgress.error, createPolicyProgress.error, createSubsciptionProgress.error, onError]);
 
   return (
     <StepItems>
@@ -97,11 +101,5 @@ const KinesisSetupSteps = ({
     </StepItems>
   );
 };
-
-const StepItems = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`;
 
 export default KinesisSetupSteps;

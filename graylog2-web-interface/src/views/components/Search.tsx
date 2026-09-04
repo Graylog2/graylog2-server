@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useContext, useMemo } from 'react';
+import { useCallback, useEffect, useContext, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
-import { StreamsActions } from 'views/stores/StreamsStore';
+import { STREAMS_QUERY_KEY } from 'components/streams/hooks/useAllStreams';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -35,7 +36,7 @@ import IfInteractive from 'views/components/dashboard/IfInteractive';
 import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchExplainContextProvider from 'views/components/contexts/SearchExplainContextProvider';
@@ -45,33 +46,41 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
-import { cancelExecutedJob, execute } from 'views/logic/slices/searchExecutionSlice';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import { cancelExecutedJob } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewTitle from 'views/hooks/useViewTitle';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import AsideElements from 'views/components/AsideElements';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
+import ViewsFieldActionsProvider from './ViewsFieldActionsProvider';
 
-const GridContainer = styled.div<{ $interactive: boolean }>(({ $interactive }) => ($interactive ? css`
-    display: flex;
-    overflow: auto;
-    height: 100%;
+const GridContainer = styled.div<{ $interactive: boolean }>(({ $interactive }) =>
+  $interactive
+    ? css`
+        display: flex;
+        overflow: auto;
+        height: 100%;
 
-    > *:nth-child(2) {
-      flex-grow: 1;
-    }
-` : css`
-    flex: 1;
-`));
+        > *:nth-child(2) {
+          flex-grow: 1;
+        }
+      `
+    : css`
+        flex: 1;
+      `,
+);
 
 const SearchArea = styled(PageContentLayout)(() => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return css`
-    ${focusedWidget?.id && css`
+    ${focusedWidget?.id &&
+    css`
       .page-content-grid {
         display: flex;
         flex-direction: column;
@@ -81,15 +90,26 @@ const SearchArea = styled(PageContentLayout)(() => {
         /* overflow auto is required to display the message table widget height correctly */
         overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
-`}
-`;
+    `}
+  `;
 });
 
 const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results' | 'title'>) => {
-  const results = useAppSelector(selectCurrentQueryResults);
-  const title = useViewTitle();
+  const results = useViewsSelector(selectCurrentQueryResults);
+  const searchPageLayout = useSearchPageLayout();
+  const viewTitle = useViewTitle();
+  const title = searchPageLayout?.sidebar?.title ?? viewTitle;
 
-  return <Sidebar results={results} title={title} {...props} />;
+  return (
+    <Sidebar
+      results={results}
+      title={title}
+      sections={searchPageLayout?.sidebar?.sections}
+      contentColumnWidth={searchPageLayout?.sidebar?.contentColumnWidth}
+      initialSectionCollapsed={searchPageLayout?.sidebar?.initialSectionCollapsed}
+      {...props}
+    />
+  );
 };
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -97,25 +117,24 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
   const { config: searchesClusterConfig } = useSearchConfiguration();
   const { parameters, parameterBindings } = useParameters();
   const currentUser = useCurrentUser();
-  const contextValue = useMemo(() => ({
-    view,
-    analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
-    currentUser,
-    parameters,
-    parameterBindings,
-  }), [currentUser, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view]);
-
-  return (
-    <AdditionalContext.Provider value={contextValue}>
-      {children}
-    </AdditionalContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      view,
+      analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
+      currentUser,
+      parameters,
+      parameterBindings,
+    }),
+    [currentUser, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view],
   );
+
+  return <AdditionalContext.Provider value={contextValue}>{children}</AdditionalContext.Provider>;
 };
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
 const useOnWindowUnload = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   return useEffect(() => {
     const handleLeavePage = () => dispatch(cancelExecutedJob());
@@ -129,94 +148,101 @@ const useOnWindowUnload = () => {
 };
 
 type Props = {
-  forceSideBarPinned?: boolean,
+  forceSideBarPinned?: boolean;
 };
 
 const Search = ({ forceSideBarPinned = false }: Props) => {
-  const dispatch = useAppDispatch();
-  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar, synchronizeUrl = true } = useSearchPageLayout();
+  const dispatch = useViewsDispatch();
+  const queryClient = useQueryClient();
+  const refreshSearch = useCallback(() => dispatch(executeActiveQuery()), [dispatch]);
+  const {
+    sidebar: { isShown: showSidebar },
+    searchAreaContainer,
+    infoBar,
+    synchronizeUrl = true,
+  } = useSearchPageLayout();
+  const scrollContainer = useRef<HTMLDivElement | null>(null);
   const InfoBar = infoBar?.component;
   const SearchAreaContainer = searchAreaContainer?.component;
   const SynchronizationComponent = synchronizeUrl ? SynchronizeUrl : React.Fragment;
+  const isInteractive = useIsInteractiveMode();
 
   useEffect(() => {
     refreshSearch();
   }, [refreshSearch]);
 
   useEffect(() => {
-    StreamsActions.refresh();
-  }, []);
+    queryClient.invalidateQueries({ queryKey: STREAMS_QUERY_KEY });
+  }, [queryClient]);
 
   useOnWindowUnload();
 
   return (
     <>
       <SynchronizationComponent />
-      <ExternalValueActionsProvider>
-        <SearchExplainContextProvider>
-          <WidgetFocusProvider>
-            <WidgetFocusContext.Consumer>
-              {({
-                focusedWidget: { focusing: focusingWidget, editing: editingWidget } = {
-                  focusing: false,
-                  editing: false,
-                },
-              }) => (
-                <>
-                  <IfInteractive>
-                    <IfDashboard>
-                      <WindowLeaveMessage />
-                    </IfDashboard>
-                  </IfInteractive>
-                  <InteractiveContext.Consumer>
-                    {(interactive) => (
-                      <SearchPagePreferencesProvider>
-                        <DefaultFieldTypesProvider>
-                          <ViewAdditionalContextProvider>
-                            <HighlightingRulesProvider>
-                              <GridContainer id="main-row" $interactive={interactive}>
+      <ViewsFieldActionsProvider>
+        <ExternalValueActionsProvider>
+          <SearchExplainContextProvider>
+            <WidgetFocusProvider>
+              <WidgetFocusContext.Consumer>
+                {({
+                  focusedWidget: { focusing: focusingWidget, editing: editingWidget } = {
+                    focusing: false,
+                    editing: false,
+                  },
+                }) => (
+                  <>
+                    <IfInteractive>
+                      <IfDashboard>
+                        <WindowLeaveMessage />
+                      </IfDashboard>
+                    </IfInteractive>
+                    <SearchPagePreferencesProvider>
+                      <DefaultFieldTypesProvider>
+                        <ViewAdditionalContextProvider>
+                          <HighlightingRulesProvider>
+                            <GridContainer id="main-row" $interactive={isInteractive}>
+                              <IfInteractive>
+                                {showSidebar && (
+                                  <ConnectedSidebar forceSideBarPinned={forceSideBarPinned}>
+                                    <FieldsOverview />
+                                  </ConnectedSidebar>
+                                )}
+                              </IfInteractive>
+                              <SearchArea as={SearchAreaContainer} ref={scrollContainer}>
                                 <IfInteractive>
-                                  {showSidebar && (
-                                    <ConnectedSidebar forceSideBarPinned={forceSideBarPinned}>
-                                      <FieldsOverview />
-                                    </ConnectedSidebar>
-                                  )}
+                                  <HeaderElements />
+                                  {InfoBar && <InfoBar />}
+                                  <IfDashboard>
+                                    {!editingWidget && <DashboardSearchBar scrollContainer={scrollContainer} />}
+                                  </IfDashboard>
+                                  <IfSearch>
+                                    <SearchBar scrollContainer={scrollContainer} />
+                                  </IfSearch>
+
+                                  <QueryBarElements />
+
+                                  <IfDashboard>{!focusingWidget && <QueryBar />}</IfDashboard>
                                 </IfInteractive>
-                                <SearchArea as={SearchAreaContainer}>
-                                  <IfInteractive>
-                                    <HeaderElements />
-                                    {InfoBar && <InfoBar />}
-                                    <IfDashboard>
-                                      {!editingWidget && <DashboardSearchBar />}
-                                    </IfDashboard>
-                                    <IfSearch>
-                                      <SearchBar />
-                                    </IfSearch>
-
-                                    <QueryBarElements />
-
-                                    <IfDashboard>
-                                      {!focusingWidget && <QueryBar />}
-                                    </IfDashboard>
-                                  </IfInteractive>
-                                  <HighlightMessageInQuery>
-                                    <SearchResult />
-                                  </HighlightMessageInQuery>
-                                </SearchArea>
-                              </GridContainer>
-                            </HighlightingRulesProvider>
-                          </ViewAdditionalContextProvider>
-                        </DefaultFieldTypesProvider>
-                      </SearchPagePreferencesProvider>
-                    )}
-                  </InteractiveContext.Consumer>
-                </>
-              )}
-            </WidgetFocusContext.Consumer>
-          </WidgetFocusProvider>
-        </SearchExplainContextProvider>
-      </ExternalValueActionsProvider>
+                                <HighlightMessageInQuery>
+                                  <SearchResult />
+                                </HighlightMessageInQuery>
+                              </SearchArea>
+                              <IfInteractive>
+                                <AsideElements />
+                              </IfInteractive>
+                            </GridContainer>
+                          </HighlightingRulesProvider>
+                        </ViewAdditionalContextProvider>
+                      </DefaultFieldTypesProvider>
+                    </SearchPagePreferencesProvider>
+                  </>
+                )}
+              </WidgetFocusContext.Consumer>
+            </WidgetFocusProvider>
+          </SearchExplainContextProvider>
+        </ExternalValueActionsProvider>
+      </ViewsFieldActionsProvider>
     </>
   );
 };

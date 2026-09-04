@@ -16,26 +16,19 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
-import { Label, BootstrapModalConfirm } from 'components/bootstrap';
-import { Icon } from 'components/common';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import {
+  enableEventDefinition,
+  disableEventDefinition,
+  EVENT_DEFINITIONS_QUERY_KEY,
+} from 'components/event-definitions/hooks/useEventDefinitions';
+import { Badge, BootstrapModalConfirm } from 'components/bootstrap';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import type { EventDefinition } from '../event-definitions-types';
-
-const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
-  cursor: ${$clickable ? 'pointer' : 'default'};
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`);
-
-const Spacer = styled.div`
-  border-left: 1px solid currentColor;
-  height: 1em;
-`;
+import { isSystemEventDefinition } from '../event-definitions-types';
 
 const _title = (disabled: boolean, disabledChange: boolean, description: string) => {
   if (disabledChange) {
@@ -45,54 +38,54 @@ const _title = (disabled: boolean, disabledChange: boolean, description: string)
   return disabled ? 'Enable' : 'Disable';
 };
 
-type Props ={
-  eventDefinition: EventDefinition,
-}
+type Props = {
+  eventDefinition: EventDefinition;
+};
 
-const StatusCell = ({ eventDefinition } : Props) => {
+const StatusCell = ({ eventDefinition }: Props) => {
   const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
-  const { refetch: refetchEventDefinitions } = useTableFetchContext();
+  const queryClient = useQueryClient();
   const isEnabled = eventDefinition?.state === 'ENABLED';
-  const disableChange = eventDefinition?.config?.type === 'system-notifications-v1';
-  const description = isEnabled ? 'enabled' : 'disabled';
+  const currentUser = useCurrentUser();
+  const disableChange =
+    isSystemEventDefinition(eventDefinition) ||
+    !isPermitted(currentUser.permissions, `eventdefinitions:edit:${eventDefinition.id}`);
+  const description = isEnabled ? 'Enabled' : 'Disabled';
   const title = _title(!isEnabled, disableChange, description);
+  const toggleIcon = isEnabled ? 'pause' : 'play_arrow';
 
   const toggleEventDefinitionStatus = useCallback(async () => {
     if (isEnabled) {
       setShowConfirmDisableModal(true);
     } else {
-      await EventDefinitionsActions.enable(eventDefinition);
-      await refetchEventDefinitions();
+      await enableEventDefinition(eventDefinition);
+      await queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
     }
-  }, [isEnabled, eventDefinition, refetchEventDefinitions]);
+  }, [isEnabled, eventDefinition, queryClient]);
 
   const handleConfirmDisable = useCallback(async () => {
-    await EventDefinitionsActions.disable(eventDefinition);
-    await refetchEventDefinitions();
+    await disableEventDefinition(eventDefinition);
+    await queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
     setShowConfirmDisableModal(false);
-  }, [eventDefinition, refetchEventDefinitions]);
+  }, [eventDefinition, queryClient]);
 
   return (
     <>
-      <StatusLabel bsStyle={isEnabled ? 'success' : 'warning'}
-                   onClick={disableChange ? undefined : toggleEventDefinitionStatus}
-                   title={title}
-                   aria-label={title}
-                   role="button"
-                   $clickable={!disableChange}>
+      <Badge
+        color={isEnabled ? 'success' : 'warning'}
+        variant="light"
+        onClick={disableChange ? undefined : toggleEventDefinitionStatus}
+        title={title}
+        aria-label={title}
+        rightIcon={disableChange ? undefined : toggleIcon}>
         {description}
-        {!disableChange && (
-          <>
-            <Spacer />
-            <Icon name={isEnabled ? 'pause' : 'play_arrow'} />
-          </>
-        )}
-      </StatusLabel>
+      </Badge>
       {showConfirmDisableModal && (
-        <BootstrapModalConfirm showModal
-                               title="Disable event definition"
-                               onConfirm={handleConfirmDisable}
-                               onCancel={() => setShowConfirmDisableModal(false)}>
+        <BootstrapModalConfirm
+          showModal
+          title="Disable event definition"
+          onConfirm={handleConfirmDisable}
+          onCancel={() => setShowConfirmDisableModal(false)}>
           {`Do you really want to disable event definition '${eventDefinition.title}'?`}
         </BootstrapModalConfirm>
       )}

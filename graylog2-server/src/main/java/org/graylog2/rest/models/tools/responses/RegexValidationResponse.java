@@ -21,13 +21,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Optional;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AutoValue_RegexValidationResponse.Builder.class)
 public abstract class RegexValidationResponse {

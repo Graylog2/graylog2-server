@@ -15,183 +15,178 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import type * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import Spinner from 'components/common/Spinner';
-import StreamsStore from 'stores/streams/StreamsStore';
-import { OutputsStore } from 'stores/outputs/OutputsStore';
-import { getPathnameWithoutId } from 'util/URLUtils';
+import useStreamOutputMutations from 'hooks/useStreamOutputMutations';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useOutputTypes from 'components/outputs/useOutputTypes';
 import { isPermitted } from 'util/PermissionsMixin';
+import useAvailableOutputTypes, { getOutputTypeDefinition } from 'components/streams/useAvailableOutputTypes';
+import useOutputs from 'hooks/useOutputs';
+import useStreamOutputs from 'hooks/useStreamOutputs';
+import useOutputMutations from 'hooks/useOutputMutations';
 
 import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
 import AssignOutputDropdown from './AssignOutputDropdown';
 
 type Props = {
-  streamId?: string,
-  permissions: Immutable.List<string>,
-}
+  streamId?: string;
+  permissions: Immutable.List<Permission>;
+};
 
-const OutputsComponent = ({ streamId, permissions }: Props) => {
-  const location = useLocation();
+const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const { types } = useOutputTypes();
-  const [outputs, setOutputs] = useState();
-  const [assignableOutputs, setAssignableOutputs] = useState();
+  const { data: types } = useAvailableOutputTypes();
+  const { data: allOutputsData, refetch: refetchOutputs } = useOutputs();
+  const { data: streamOutputsData, refetch: refetchStreamOutputs } = useStreamOutputs(streamId, {
+    enabled: !!streamId,
+  });
+  const { saveOutput, updateOutput, removeOutput } = useOutputMutations();
+  const { addStreamOutput, removeStreamOutput } = useStreamOutputMutations();
 
-  const _fetchAssignableOutputs = (_outputs) => {
-    OutputsStore.load((resp) => {
-      const streamOutputIds = _outputs.map((output) => output.id);
-      const _assignableOutputs = resp.outputs
-        .filter((output) => streamOutputIds.indexOf(output.id) === -1)
-        .sort((output1, output2) => output1.title.localeCompare(output2.title));
+  const outputsData = streamId ? streamOutputsData : allOutputsData;
+  const outputs = outputsData?.outputs;
 
-      setAssignableOutputs(_assignableOutputs);
-    });
-  };
-
-  const loadData = () => {
-    const callback = (resp) => {
-      setOutputs(resp.outputs);
-
-      if (streamId) {
-        _fetchAssignableOutputs(resp.outputs);
-      }
-    };
+  const refetchAll = useCallback(() => {
+    refetchOutputs();
 
     if (streamId) {
-      OutputsStore.loadForStreamId(streamId, callback);
-    } else {
-      OutputsStore.load(callback);
+      refetchStreamOutputs();
     }
-  };
+  }, [refetchOutputs, refetchStreamOutputs, streamId]);
 
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const assignableOutputs = useMemo(() => {
+    if (!streamId || !allOutputsData?.outputs || !outputs) return undefined;
 
-  const _handleUpdate = () => {
-    loadData();
-  };
+    const streamOutputIds = outputs.map((output) => output.id);
 
-  const _handleCreateOutput = (data) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_CREATED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_action_value: 'create-output',
-    });
+    return allOutputsData.outputs
+      .filter((output) => streamOutputIds.indexOf(output.id) === -1)
+      .sort((output1, output2) => output1.title.localeCompare(output2.title));
+  }, [streamId, allOutputsData, outputs]);
 
-    OutputsStore.save(data, (result) => {
-      if (streamId) {
-        StreamsStore.addOutput(streamId, result.id, (response) => {
-          _handleUpdate();
+  const getTypeDefinition = useCallback(
+    (typeName: string, callback: (def: any) => void) => {
+      const typeDefinition = getOutputTypeDefinition(types, typeName);
 
-          return response;
-        });
-      } else {
-        _handleUpdate();
+      if (typeDefinition) {
+        callback(typeDefinition);
       }
+    },
+    [types],
+  );
 
-      return result;
-    });
-  };
-
-  const _handleAssignOutput = (outputId) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_ASSIGNED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_action_value: 'assign-output',
-    });
-
-    StreamsStore.addOutput(streamId, outputId, (response) => {
-      _handleUpdate();
-
-      return response;
-    });
-  };
-
-  const _removeOutputGlobally = (outputId) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_GLOBALLY_REMOVED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_action_value: 'globally-remove-output',
-    });
-
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to terminate this output?')) {
-      OutputsStore.remove(outputId, (response) => {
-        UserNotification.success('Output was terminated.', 'Success');
-        _handleUpdate();
-
-        return response;
+  const _handleCreateOutput = useCallback(
+    (data) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_CREATED, {
+        app_action_value: 'create-output',
       });
-    }
-  };
 
-  const _removeOutputFromStream = (outputId: string, _streamId: string) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_FROM_STREAM_REMOVED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_action_value: 'remove-output-from-stream',
-    });
-
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to remove this output from the stream?')) {
-      StreamsStore.removeOutput(_streamId, outputId, (response) => {
-        UserNotification.success('Output was removed from stream.', 'Success');
-        _handleUpdate();
-
-        return response;
+      saveOutput(data).then((result: any) => {
+        if (streamId) {
+          // The hook handles the success/error toast; swallow rejection to avoid an unhandled rejection.
+          addStreamOutput({ streamId, outputs: { outputs: [result.id] } })
+            .then(() => refetchAll())
+            .catch(() => {});
+        } else {
+          refetchAll();
+        }
       });
-    }
-  };
+    },
+    [saveOutput, sendTelemetry, streamId, refetchAll, addStreamOutput],
+  );
 
-  const _handleOutputUpdate = (output, deltas) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_UPDATED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_action_value: 'output-update',
-    });
+  const _handleAssignOutput = useCallback(
+    (outputId) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_ASSIGNED, {
+        app_action_value: 'assign-output',
+      });
 
-    OutputsStore.update(output, deltas, () => {
-      _handleUpdate();
-    });
-  };
+      // The hook handles the success/error toast; swallow rejection to avoid an unhandled rejection.
+      addStreamOutput({ streamId, outputs: { outputs: [outputId] } })
+        .then(() => refetchAll())
+        .catch(() => {});
+    },
+    [sendTelemetry, streamId, refetchAll, addStreamOutput],
+  );
+
+  const _removeOutputGlobally = useCallback(
+    (outputId) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_GLOBALLY_REMOVED, {
+        app_action_value: 'globally-remove-output',
+      });
+
+      // eslint-disable-next-line no-alert
+      if (window.confirm('Do you really want to terminate this output?')) {
+        removeOutput(outputId).then(() => {
+          UserNotification.success('Output was terminated.', 'Success');
+          refetchAll();
+        });
+      }
+    },
+    [removeOutput, sendTelemetry, refetchAll],
+  );
+
+  const _removeOutputFromStream = useCallback(
+    (outputId: string, _streamId: string) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_FROM_STREAM_REMOVED, {
+        app_action_value: 'remove-output-from-stream',
+      });
+
+      // eslint-disable-next-line no-alert
+      if (window.confirm('Do you really want to remove this output from the stream?')) {
+        // The hook handles the success/error toast; swallow rejection to avoid an unhandled rejection.
+        removeStreamOutput({ streamId: _streamId, outputId })
+          .then(() => refetchAll())
+          .catch(() => {});
+      }
+    },
+    [sendTelemetry, refetchAll, removeStreamOutput],
+  );
+
+  const _handleOutputUpdate = useCallback(
+    (output, deltas) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_UPDATED, {
+        app_action_value: 'output-update',
+      });
+
+      updateOutput({ outputId: output.id, title: output.title, deltas }).then(() => {
+        refetchAll();
+      });
+    },
+    [updateOutput, sendTelemetry, refetchAll],
+  );
 
   if (outputs && types && (!streamId || assignableOutputs)) {
-    const createOutputDropdown = (isPermitted(permissions, ['outputs:create'])
-      ? (
-        <CreateOutputDropdown types={types}
-                              onSubmit={_handleCreateOutput}
-                              getTypeDefinition={OutputsStore.loadAvailable} />
-      ) : null);
-    const assignOutputDropdown = (streamId
-      ? (
-        <AssignOutputDropdown outputs={assignableOutputs}
-                              onSubmit={_handleAssignOutput} />
-      ) : null);
+    const createOutputDropdown = isPermitted(permissions, ['outputs:create']) ? (
+      <CreateOutputDropdown types={types} onSubmit={_handleCreateOutput} getTypeDefinition={getTypeDefinition} />
+    ) : null;
+    const assignOutputDropdown = streamId ? (
+      <AssignOutputDropdown outputs={assignableOutputs} onSubmit={_handleAssignOutput} />
+    ) : null;
 
     return (
       <div className="outputs">
         <Row className="content">
-          <Col md={4}>
-            {createOutputDropdown}
-          </Col>
-          <Col md={8}>
-            {assignOutputDropdown}
-          </Col>
+          <Col md={4}>{createOutputDropdown}</Col>
+          <Col md={8}>{assignOutputDropdown}</Col>
         </Row>
 
-        <OutputList streamId={streamId}
-                    outputs={outputs}
-                    getTypeDefinition={OutputsStore.loadAvailable}
-                    types={types}
-                    onRemove={_removeOutputFromStream}
-                    onTerminate={_removeOutputGlobally}
-                    onUpdate={_handleOutputUpdate} />
+        <OutputList
+          streamId={streamId}
+          outputs={outputs}
+          getTypeDefinition={getTypeDefinition}
+          types={types}
+          onRemove={_removeOutputFromStream}
+          onTerminate={_removeOutputGlobally}
+          onUpdate={_handleOutputUpdate}
+        />
       </div>
     );
   }

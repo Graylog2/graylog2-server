@@ -15,61 +15,60 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { useSortable } from '@dnd-kit/sortable';
+import type { Transform } from '@dnd-kit/utilities';
+import { CSS } from '@dnd-kit/utilities';
 import styled, { css } from 'styled-components';
-
-import { Portal } from 'components/common';
 
 import type { CustomListItemRender, ListItemType, CustomContentRender } from './types';
 import ListItem from './ListItem';
 
+const StyledListItem = styled(ListItem)<{ $isDragging: boolean; $transform: Transform; $transition: string }>(
+  ({ $isDragging, $transform, $transition }) => css`
+    transform: ${CSS.Transform.toString($transform)};
+    transition: ${$transition};
+    opacity: ${$isDragging ? 0.6 : 1};
+  `,
+);
+
 type Props<ItemType extends ListItemType> = {
-  alignItemContent?: 'flex-start' | 'center'
-  className?: string,
-  customListItemRender?: CustomListItemRender<ItemType>,
-  customContentRender?: CustomContentRender<ItemType>,
-  disableDragging?: boolean,
-  displayOverlayInPortal: boolean,
-  index: number,
-  item: ItemType,
+  alignItemContent?: 'flex-start' | 'center';
+  className?: string;
+  customListItemRender?: CustomListItemRender<ItemType>;
+  customContentRender?: CustomContentRender<ItemType>;
+  disableDragging?: boolean;
+  index: number;
+  item: ItemType;
 };
 
-const StyledListItem = styled(ListItem)<{ $isDragging: boolean }>(({ $isDragging }) => css`
-  box-shadow: ${$isDragging ? 'rgba(0, 0, 0, 0.24) 0px 3px 8px' : 'none'};
-`);
-
 const SortableListItem = <ItemType extends ListItemType>({
-  alignItemContent,
-  className,
-  customContentRender,
-  customListItemRender,
+  alignItemContent = undefined,
+  className = undefined,
+  customContentRender = undefined,
+  customListItemRender = undefined,
   disableDragging = false,
-  displayOverlayInPortal,
   index,
   item,
-}: Props<ItemType>) => (
-  <Draggable draggableId={item.id} index={index}>
-    {({ draggableProps, dragHandleProps, innerRef }, { isDragging }) => {
-      const listItem = (
-        <StyledListItem alignItemContent={alignItemContent}
-                        item={item}
-                        index={index}
-                        className={className}
-                        ref={innerRef}
-                        customContentRender={customContentRender}
-                        customListItemRender={customListItemRender}
-                        disableDragging={disableDragging}
-                        displayOverlayInPortal={displayOverlayInPortal}
-                        draggableProps={draggableProps}
-                        dragHandleProps={dragHandleProps}
-                        $isDragging={isDragging} />
-      );
+}: Props<ItemType>) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
 
-      return (displayOverlayInPortal && isDragging)
-        ? <Portal>{listItem}</Portal>
-        : listItem;
-    }}
-  </Draggable>
+  return (
+    <StyledListItem
+      $isDragging={isDragging}
+      $transform={transform}
+      $transition={transition}
+      alignItemContent={alignItemContent}
+      className={className}
+      customContentRender={customContentRender}
+      customListItemRender={customListItemRender}
+      disableDragging={disableDragging}
+      dragHandleProps={{ ...attributes, ...listeners }}
+      index={index}
+      item={item}
+      isDragging={isDragging}
+      ref={setNodeRef}
+    />
   );
+};
 
 export default SortableListItem;

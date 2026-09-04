@@ -25,11 +25,13 @@ import BooleanField from './BooleanField';
 
 describe('<BooleanField>', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof BooleanField>>) => (
-    <BooleanField field={booleanField}
-                  onChange={() => {}}
-                  title="example_boolean_field"
-                  typeName="boolean"
-                  {...props} />
+    <BooleanField
+      field={booleanField}
+      onChange={() => {}}
+      title="example_boolean_field"
+      typeName="boolean"
+      {...props}
+    />
   );
 
   afterEach(() => {
@@ -67,7 +69,7 @@ describe('<BooleanField>', () => {
     expect(input).toBeInTheDocument();
     expect(input).not.toBeChecked();
 
-    userEvent.click(input);
+    await userEvent.click(input);
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_boolean_field', true));
 
@@ -75,7 +77,7 @@ describe('<BooleanField>', () => {
 
     expect(input).toBeChecked();
 
-    userEvent.click(input);
+    await userEvent.click(input);
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_boolean_field', false));
   });

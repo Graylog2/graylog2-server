@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>6.2.0-SNAPSHOT</version>
+        <version>7.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -62,11 +62,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.github.rholder</groupId>
                 <artifactId>guava-retrying</artifactId>
                 <version>${guava-retrying.version}</version>
@@ -80,11 +75,6 @@
                 <groupId>org.graylog.repackaged</groupId>
                 <artifactId>semver4j</artifactId>
                 <version>${semver4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.ben-manes.caffeine</groupId>
-                <artifactId>caffeine</artifactId>
-                <version>${caffeine.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.cryptomator</groupId>
@@ -123,16 +113,16 @@
                 <version>${jakarta.ws.rs-api.version}</version>
             </dependency>
             <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>${jakarta.servlet-api.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${hibernate-validator.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons-io.version}</version>
-            </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
@@ -183,6 +173,12 @@
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
                 <version>${kafka.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.lz4</groupId>
+                        <artifactId>lz4-java</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -283,13 +279,6 @@
             </dependency>
 
             <dependency>
-                <groupId>net.jcip</groupId>
-                <artifactId>jcip-annotations</artifactId>
-                <version>${jcip-annotations.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>gelfclient</artifactId>
                 <version>${gelfclient.version}</version>
@@ -306,11 +295,6 @@
                 <version>${os-platform-finder.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hdrhistogram</groupId>
-                <artifactId>HdrHistogram</artifactId>
-                <version>${HdrHistogram.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
@@ -321,9 +305,14 @@
                 <version>${grok.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-annotations</artifactId>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-jaxrs2-jakarta</artifactId>
                 <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.parser.v3</groupId>
+                <artifactId>swagger-parser-v3</artifactId>
+                <version>${swagger-parser.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.retrofit2</groupId>
@@ -356,11 +345,6 @@
                 <version>${cef-parser.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-runtime</artifactId>
-                <version>${antlr.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jool</artifactId>
                 <version>${jool.version}</version>
@@ -376,11 +360,6 @@
                 <version>${streamex.version}</version>
             </dependency>
             <dependency>
-                <groupId>info.leadinglight</groupId>
-                <artifactId>jdot</artifactId>
-                <version>${jdot.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.unboundid</groupId>
                 <artifactId>unboundid-ldapsdk</artifactId>
                 <version>${unboundid-ldap.version}</version>
@@ -390,20 +369,19 @@
                 <artifactId>stateless4j</artifactId>
                 <version>${stateless4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.grizzly</groupId>
+                <artifactId>grizzly-websockets</artifactId>
+                <version>${grizzly-websockets.version}</version>
+            </dependency>
 
             <!-- Tracing dependencies -->
             <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-bom</artifactId>
-                <version>${opentelemetry.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
-                <version>${opentelemetry.version}</version>
+                <version>${opentelemetry-instrumentation.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>software.amazon.msk</groupId>
                 <artifactId>aws-msk-iam-auth</artifactId>
@@ -417,12 +395,6 @@
             </dependency>
 
             <!-- Test dependencies -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
@@ -461,9 +433,9 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.jukito</groupId>
-                <artifactId>jukito</artifactId>
-                <version>${jukito.version}</version>
+                <groupId>name.falgout.jeffrey.testing.junit5</groupId>
+                <artifactId>guice-extension</artifactId>
+                <version>${guice-extension.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -483,6 +455,14 @@
                         <groupId>org.apache.directory.api</groupId>
                         <artifactId>api-ldap-schema-data</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcprov-jdk15on</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcpkix-jdk15on</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -497,12 +477,6 @@
                         <artifactId>api-ldap-schema-data</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-rules</artifactId>
-                <version>${system-rules.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
@@ -521,7 +495,6 @@
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -536,40 +509,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <forkCount>2</forkCount>
-                    <reuseForks>true</reuseForks>
-                    <argLine>-Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</argLine>
-                    <excludes>
-                        <exclude>**/*IntegrationTest.java</exclude>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
-                    <includes>
-                        <include>**/*Spec.class</include>
-                        <include>**/*Test.class</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <forkCount>1</forkCount>
-                    <skip>false</skip>
-                    <argLine>-Djava.awt.headless=true</argLine>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -609,12 +548,12 @@
                                 <plugin>
                                     <groupId>com.h3xstream.findsecbugs</groupId>
                                     <artifactId>findsecbugs-plugin</artifactId>
-                                    <version>1.13.0</version>
+                                    <version>1.14.0</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>7.6.9</version>
+                                    <version>7.7.4</version>
                                 </plugin>
                             </plugins>
                         </configuration>
@@ -631,14 +570,23 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <configuration>
                             <targetJdk>${maven.compiler.target}</targetJdk>
-                            <failOnViolation>false</failOnViolation>
+                            <failurePriority>1</failurePriority>
+                            <printFailingErrors>true</printFailingErrors>
+                            <linkXRef>false</linkXRef>
                             <excludeRoots>
                                 <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
                                 <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
                             </excludeRoots>
+                            <rulesets>
+                                <ruleset>/rulesets/java/maven-pmd-plugin-default.xml</ruleset>
+                                <ruleset>../config/pmd-rules.xml</ruleset>
+                            </rulesets>
                         </configuration>
                         <executions>
                             <execution>
+                                <phase>
+                                    validate
+                                </phase>
                                 <goals>
                                     <goal>check</goal>
                                 </goals>

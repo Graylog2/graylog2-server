@@ -14,32 +14,87 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { DefaultTheme } from 'styled-components';
+import * as React from 'react';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { Label as BootstrapLabel } from 'react-bootstrap';
 
-const getColorStyles = (theme: DefaultTheme, bsStyle: string) => {
-  if (!bsStyle) {
-    return '';
-  }
+import Badge from './Badge';
+import type { BadgeProps } from './Badge';
 
-  const { color, background } = theme.colors.button[bsStyle === 'default' ? 'gray' : bsStyle];
-
-  return css`
-    background-color: ${background};
-    color: ${color};
+const StyledBadge = styled(Badge)(
+  ({ theme }) => css`
+    border-radius: 3px;
     font-weight: normal;
-`;
-};
+    padding-left: ${theme.spacings.xs};
+    padding-right: ${theme.spacings.xs};
+    text-align: center;
 
-type StyledLabelProps = {
-  bsStyle?: string,
-};
-type Props = React.ComponentProps<typeof BootstrapLabel> & StyledLabelProps;
-const StyledLabel: React.ComponentType<Props> = styled(BootstrapLabel)<StyledLabelProps>(({ bsStyle, theme }) => css`
-  ${getColorStyles(theme, bsStyle)}
-  padding: 0.3em 0.6em;
-`);
+    .mantine-Badge-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: ${theme.spacings.xxs};
+    }
 
-export default StyledLabel;
+    /* When a label's content is wrapped in a <span> (e.g. to carry a title tooltip), that span
+       becomes a flex item of the label, so it needs to be its own single-line ellipsis context —
+       otherwise long text overflows instead of truncating when the label is width-constrained. */
+    .mantine-Badge-label > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `,
+);
+
+type Props = Pick<
+  BadgeProps,
+  | 'aria-label'
+  | 'bsSize'
+  | 'bsStyle'
+  | 'children'
+  | 'className'
+  | 'data-testid'
+  | 'onClick'
+  | 'onMouseEnter'
+  | 'onMouseLeave'
+  | 'role'
+  | 'style'
+  | 'title'
+  | 'uppercase'
+>;
+
+/** Plain legacy status label — small pill shape, bsStyle-only. Use Badge for the color/variant/dot API. */
+const Label = ({
+  'aria-label': ariaLabel = undefined,
+  bsSize = undefined,
+  bsStyle = undefined,
+  className = undefined,
+  children = undefined,
+  'data-testid': dataTestid = undefined,
+  onClick = undefined,
+  onMouseEnter = undefined,
+  onMouseLeave = undefined,
+  role = undefined,
+  style = undefined,
+  title = undefined,
+  uppercase = false,
+}: Props) => (
+  <StyledBadge
+    aria-label={ariaLabel}
+    bsSize={bsSize}
+    bsStyle={bsStyle}
+    className={className}
+    data-testid={dataTestid}
+    onClick={onClick}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+    role={role}
+    style={style}
+    title={title}
+    uppercase={uppercase}>
+    {children}
+  </StyledBadge>
+);
+
+export default Label;

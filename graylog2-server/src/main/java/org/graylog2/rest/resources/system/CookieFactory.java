@@ -22,9 +22,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.NewCookie;
+import org.apache.shiro.session.Session;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
-import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 
 import java.net.URI;
 import java.util.Date;
@@ -50,11 +51,11 @@ public class CookieFactory {
         httpCookieSameSiteStrict = httpConfiguration.getHttpCookieSameSiteStrict();
     }
 
-    NewCookie createAuthenticationCookie(SessionResponse token, ContainerRequestContext requestContext) {
-        return makeCookie(token.getAuthenticationToken(), token.validUntil(), requestContext);
+    public NewCookie createAuthenticationCookie(Session session, ContainerRequestContext requestContext) {
+        return makeCookie(session.getId().toString(), SessionUtils.getValidUntil(session), requestContext);
     }
 
-    NewCookie deleteAuthenticationCookie(ContainerRequestContext requestContext) {
+    public NewCookie deleteAuthenticationCookie(ContainerRequestContext requestContext) {
         return makeCookie("", new Date(), requestContext);
     }
 

@@ -35,12 +35,8 @@ const ContentStreamNews = () => {
     return (
       <Alert bsStyle="info">
         <p>
-          Unable to load RSS feed at the moment ! You can read more
-          on {' '}
-          <ExternalLink href="https://www.graylog.org/blog/">
-            Graylog
-          </ExternalLink>
-          .
+          Unable to load RSS feed at the moment ! You can read more on{' '}
+          <ExternalLink href="https://www.graylog.org/blog/">Graylog</ExternalLink>.
         </p>
       </Alert>
     );
@@ -48,7 +44,9 @@ const ContentStreamNews = () => {
 
   return (
     <Carousel carouselId="content-stream-news">
-      {feedList?.map((feed) => <ContentStreamNewsItem key={feed?.guid['#text'] || feed?.title} feed={feed} />)}
+      {feedList?.map((feed) => (
+        <ContentStreamNewsItem key={feed?.guid['#text'] || feed?.title} feed={feed} />
+      ))}
     </Carousel>
   );
 };

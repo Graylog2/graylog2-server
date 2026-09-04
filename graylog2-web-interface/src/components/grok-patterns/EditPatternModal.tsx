@@ -35,9 +35,12 @@ type EditPatternModalProps = {
   sendTelemetry?: (...args: any[]) => void;
 };
 
-class EditPatternModal extends React.Component<EditPatternModalProps, {
-  [key: string]: any;
-}> {
+class EditPatternModal extends React.Component<
+  EditPatternModalProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     id: '',
     name: '',
@@ -102,7 +105,6 @@ class EditPatternModal extends React.Component<EditPatternModalProps, {
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN[create ? 'CREATED' : 'UPDATED'], {
       app_pathname: 'grokpatterns',
-      app_section: 'grokpatterns',
     });
 
     this._closeModal();
@@ -124,7 +126,6 @@ class EditPatternModal extends React.Component<EditPatternModalProps, {
   _sendTelemetry = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.TESTED, {
       app_pathname: 'grokpatterns',
-      app_section: 'grokpatterns',
     });
   };
 
@@ -140,13 +141,17 @@ class EditPatternModal extends React.Component<EditPatternModalProps, {
 
     this.setState({ error: false, error_message: '' });
 
-    testPattern(this.state, (response) => {
-      this.setState({ test_result: JSON.stringify(response, null, 2), test_error: undefined });
-      this._sendTelemetry();
-    }, (errMessage) => {
-      this.setState({ test_result: '', test_error: errMessage });
-      this._sendTelemetry();
-    });
+    testPattern(
+      this.state,
+      (response) => {
+        this.setState({ test_result: JSON.stringify(response, null, 2), test_error: undefined });
+        this._sendTelemetry();
+      },
+      (errMessage) => {
+        this.setState({ test_result: '', test_error: errMessage });
+        this._sendTelemetry();
+      },
+    );
   };
 
   render() {
@@ -172,53 +177,61 @@ class EditPatternModal extends React.Component<EditPatternModalProps, {
 
     return (
       <span>
-        <Button onClick={this.openModal}
-                bsStyle={create ? 'success' : 'default'}
-                bsSize={create ? undefined : 'xs'}>
+        <Button onClick={this.openModal} bsStyle={create ? 'primary' : 'default'} bsSize={create ? undefined : 'xs'}>
           {triggerButtonContent}
         </Button>
-        <BootstrapModalForm show={showModal}
-                            title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
-                            data-telemetry-title={`${create ? 'Create' : 'Edit'} Grok Pattern`}
-                            bsSize="large"
-                            onSubmitForm={this._save}
-                            onCancel={this._closeModal}
-                            submitButtonText={`${create ? 'Create' : 'Update'} pattern`}>
+        <BootstrapModalForm
+          show={showModal}
+          title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
+          data-telemetry-title={`${create ? 'Create' : 'Edit'} Grok Pattern`}
+          bsSize="large"
+          onSubmitForm={this._save}
+          onCancel={this._closeModal}
+          submitButtonText={`${create ? 'Create' : 'Update'} pattern`}>
           <fieldset>
-            <Input type="text"
-                   id={this._getId('pattern-name')}
-                   label="Name"
-                   onChange={this._onNameChange}
-                   value={name}
-                   bsStyle={error ? 'error' : null}
-                   help={error ? errorMessage : "Under this name the pattern will be stored and can be used like: '%{THISNAME}' later on "}
-                   autoFocus
-                   required />
-            <GrokPatternInput onPatternChange={this._onPatternChange}
-                              pattern={pattern}
-                              patterns={patterns} />
-            {testError
-              && (
+            <Input
+              type="text"
+              id={this._getId('pattern-name')}
+              label="Name"
+              onChange={this._onNameChange}
+              value={name}
+              bsStyle={error ? 'error' : null}
+              help={
+                error
+                  ? errorMessage
+                  : "Under this name the pattern will be stored and can be used like: '%{THISNAME}' later on "
+              }
+              autoFocus
+              required
+            />
+            <GrokPatternInput onPatternChange={this._onPatternChange} pattern={pattern} patterns={patterns} />
+            {testError && (
               <Panel bsStyle="danger" header="Grok Error">
                 <code style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{testError}</code>
               </Panel>
-              )}
-            <Input type="textarea"
-                   id={this._getId('sampleData')}
-                   label="Sample Data"
-                   help="Here you can add sample data to test your pattern"
-                   onChange={this._onSampleDataChange}
-                   value={sampleData} />
-            <Button bsStyle="info" onClick={this._testPattern}>Test with Sample Data</Button>
+            )}
+            <Input
+              type="textarea"
+              id={this._getId('sampleData')}
+              label="Sample Data"
+              help="Here you can add sample data to test your pattern"
+              onChange={this._onSampleDataChange}
+              value={sampleData}
+            />
+            <Button bsStyle="info" onClick={this._testPattern}>
+              Test with Sample Data
+            </Button>
             <br />
             <br />
-            <Input type="textarea"
-                   id={this._getId('test_result')}
-                   readOnly
-                   rows={8}
-                   help="Will contain the result of your test in a JSON format"
-                   label="Test Result"
-                   value={testResult} />
+            <Input
+              type="textarea"
+              id={this._getId('test_result')}
+              readOnly
+              rows={8}
+              help="Will contain the result of your test in a JSON format"
+              label="Test Result"
+              value={testResult}
+            />
           </fieldset>
         </BootstrapModalForm>
       </span>
@@ -226,4 +239,4 @@ class EditPatternModal extends React.Component<EditPatternModalProps, {
   }
 }
 
-export default withTelemetry(EditPatternModal);
+export default withTelemetry(EditPatternModal, 'grokpatterns');

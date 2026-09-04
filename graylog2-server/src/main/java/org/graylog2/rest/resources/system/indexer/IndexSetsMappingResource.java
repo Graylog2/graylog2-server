@@ -17,9 +17,11 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -44,6 +46,7 @@ import org.graylog2.rest.resources.system.indexer.requests.FieldTypeSummaryReque
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldTypeSummary;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetIdAndType;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -52,10 +55,10 @@ import java.util.Locale;
 import java.util.Set;
 
 import static org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService.DEFAULT_SORT_FIELD;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets/Types", description = "Index set field types", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/IndexSets/Types", description = "Index set field types")
 @Path("/system/indices/index_sets/types")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsMappingResource extends RestResource {
@@ -76,18 +79,19 @@ public class IndexSetsMappingResource extends RestResource {
     @Path("/{index_set_id}")
     @Timed
     @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Gets list of field_name-field_type pairs for given index set, paginated")
-    public PageListResponse<IndexSetFieldType> indexSetFieldTypesList(@ApiParam(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
-                                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                                      @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                                      @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                                      @ApiParam(name = "sort",
-                                                                                value = "The field to sort the result on",
+    @Operation(summary = "Gets list of field_name-field_type pairs for given index set, paginated")
+    public PageListResponse<IndexSetFieldType> indexSetFieldTypesList(@Parameter(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
+                                                                      @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                                      @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                                      @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                                      @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                                      @Parameter(name = "sort",
+                                                                                description = "The field to sort the result on",
                                                                                 required = true,
-                                                                                allowableValues = "field_name,type,origin,is_reserved")
+                                                                                schema = @Schema(allowableValues = {"field_name"}))
                                                                       @DefaultValue(IndexSetFieldType.DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
+                                                                      @Parameter(name = "order", description = "The sort direction",
+                                                                                schema = @Schema(allowableValues = {"asc", "desc"}))
                                                                       @DefaultValue("asc") @QueryParam("order") String order,
                                                                       @Context SearchUser searchUser) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
@@ -104,16 +108,15 @@ public class IndexSetsMappingResource extends RestResource {
     @Path("/{index_set_id}/all")
     @Timed
     @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Gets list of all field_name-field_type pairs for given index set")
-    public List<IndexSetFieldType> indexSetFieldTypesList(@ApiParam(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
-                                                          @ApiParam(name = "fieldNameQuery") @QueryParam("fieldNameQuery") @DefaultValue("") String fieldNameQuery,
-                                                          @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                          @ApiParam(name = "sort",
-                                                                    value = "The field to sort the result on",
-                                                                    required = true,
-                                                                    allowableValues = "field_name,type,origin,is_reserved")
+    @Operation(summary = "Gets list of all field_name-field_type pairs for given index set")
+    public List<IndexSetFieldType> indexSetFieldTypesList(@Parameter(name = "index_set_id") @PathParam("index_set_id") String indexSetId,
+                                                          @Parameter(name = "fieldNameQuery") @QueryParam("fieldNameQuery") @DefaultValue("") String fieldNameQuery,
+                                                          @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                          @Parameter(name = "sort",
+                                                                    description = "The field to sort the result on",
+                                                                    required = true)
                                                           @DefaultValue(IndexSetFieldType.DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                          @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
+                                                          @Parameter(name = "order", description = "The sort direction")
                                                           @DefaultValue("asc") @QueryParam("order") String order,
                                                           @Context SearchUser searchUser) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
@@ -127,17 +130,18 @@ public class IndexSetsMappingResource extends RestResource {
     @POST
     @Timed
     @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Get field type summaries for given index sets and field")
-    public PageListResponse<IndexSetFieldTypeSummary> fieldTypeSummaries(@ApiParam(name = "JSON body", required = true)
+    @Operation(summary = "Get field type summaries for given index sets and field")
+    public PageListResponse<IndexSetFieldTypeSummary> fieldTypeSummaries(@RequestBody(required = true)
                                                                          @Valid @NotNull FieldTypeSummaryRequest request,
-                                                                         @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                                         @ApiParam(name = "sort",
-                                                                                   value = "The field to sort the result on",
+                                                                         @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                                         @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                                         @Parameter(name = "sort",
+                                                                                   description = "The field to sort the result on",
                                                                                    required = true,
-                                                                                   allowableValues = "index_set_id,index_set_title")
+                                                                                   schema = @Schema(allowableValues = {"index_set_id", "index_set_title"}))
                                                                          @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc,desc")
+                                                                         @Parameter(name = "order", description = "The sort direction",
+                                                                                   schema = @Schema(allowableValues = {"asc", "desc"}))
                                                                          @DefaultValue("asc") @QueryParam("order") String order,
                                                                          @Context SearchUser searchUser) {
         final Set<String> streamsIds = normalizeStreamIds(request.streamsIds(), searchUser);
@@ -156,8 +160,8 @@ public class IndexSetsMappingResource extends RestResource {
     @Path("/index_sets_with_field_type_change_support")
     @Timed
     @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Get field type summaries for given index sets and field")
-    public List<IndexSetIdAndType> indexSetsWithFieldTypeChangeSupport(@ApiParam(name = "Stream ids", required = true) Set<String> streamIds,
+    @Operation(summary = "Get field type summaries for given index sets and field")
+    public List<IndexSetIdAndType> indexSetsWithFieldTypeChangeSupport(@Parameter(name = "Stream ids", required = true) Set<String> streamIds,
                                                                        @Context SearchUser searchUser) {
         final Set<String> streamsIds = normalizeStreamIds(streamIds, searchUser);
         return indexSetFieldTypeSummaryService.getIdsAndTypesOfIndexSetsWhereFieldTypeChangeIsAllowed(streamsIds,

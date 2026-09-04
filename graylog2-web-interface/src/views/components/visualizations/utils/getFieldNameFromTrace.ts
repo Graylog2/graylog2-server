@@ -18,7 +18,7 @@
 import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
-const getFieldNameFromTrace = ({ series, fullPath }: { series: Array<Series>, fullPath: string | undefined }) => {
+const getFieldNameFromTrace = ({ series, fullPath }: { series: Array<Series>; fullPath: string | undefined }) => {
   if (!fullPath) return null;
 
   const desireSeries = series.find((s) => {

@@ -16,7 +16,6 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -30,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class MongoDBPreflightCheckTest {
     @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.DEFAULT_VERSION);
+    static MongoDBExtension mongodbExtension = MongoDBExtension.createWithDefaultVersion();
 
     private MongoDBPreflightCheck mongoDBPreflightCheck;
 

@@ -33,7 +33,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec.DEFAULT_TIMERANGE;
-import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_SORT;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_SORT_ORDER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -60,7 +59,8 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 Set.of(),
                 "42d",
                 null,
-                List.of("avg:joe")));
+                List.of("avg:joe"),
+                null));
     }
 
     @Test
@@ -70,7 +70,8 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 Set.of(),
                 "42d",
                 List.of(),
-                List.of("avg:joe")));
+                List.of("avg:joe"),
+                null));
     }
 
     @Test
@@ -80,7 +81,8 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 Set.of(),
                 "42d",
                 List.of("http_method"),
-                List.of("avg:joe", "ayayayayay!")));
+                List.of("avg:joe", "ayayayayay!"),
+                null));
     }
 
     @Test
@@ -90,12 +92,13 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 null,
                 null,
                 List.of("http_method"),
+                null,
                 null);
 
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "*",
                         Set.of(),
-                Set.of(),
+                        Set.of(),
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
                         List.of(new Metric("count", null))
@@ -107,16 +110,16 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 null,
                 null,
                 List.of("http_method"),
-                List.of());
+                List.of(),
+                null);
 
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "*",
                         Set.of(),
-                Set.of(),
+                        Set.of(),
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
                         List.of(new Metric("count", null))
-
                 )
         );
 
@@ -130,9 +133,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         DEFAULT_SORT_ORDER,
                         0,
                         10,
-                        DEFAULT_FIELDS
-
-
+                        List.of()
                 )
         );
     }
@@ -145,16 +146,39 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 Set.of("category1"),
                 "1d",
                 List.of("http_method", "controller"),
-                List.of("avg:took_ms"));
+                List.of("avg:took_ms"),
+                null);
 
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "http_method:GET",
                         Set.of("000000000000000000000001"),
-                Set.of("category1"),
+                        Set.of("category1"),
                         KeywordRange.create("last 1 day", "UTC"),
                         List.of(new Grouping("http_method"), new Grouping("controller")),
                         List.of(new Metric("avg", "took_ms"))
+                )
+        );
+    }
 
+    @Test
+    void appliesAllGroupingsSizeToGroupings() {
+        doReturn(KeywordRange.create("last 1 day", "UTC")).when(timerangeParser).parseTimeRange("1d");
+        final Integer allGroupingsSize = 25;
+        final AggregationRequestSpec aggregationRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification("http_method:GET",
+                Set.of("000000000000000000000001"),
+                Set.of("category1"),
+                "1d",
+                List.of("http_method", "controller"),
+                List.of("avg:took_ms"),
+                allGroupingsSize);
+
+        assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
+                        "http_method:GET",
+                        Set.of("000000000000000000000001"),
+                        Set.of("category1"),
+                        KeywordRange.create("last 1 day", "UTC"),
+                        List.of(new Grouping("http_method", allGroupingsSize), new Grouping("controller", allGroupingsSize)),
+                        List.of(new Metric("avg", "took_ms"))
                 )
         );
     }

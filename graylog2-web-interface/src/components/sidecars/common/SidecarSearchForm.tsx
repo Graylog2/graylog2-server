@@ -18,46 +18,61 @@ import React from 'react';
 
 import { SearchForm } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
+import useProductName from 'brand-customization/useProductName';
 
 const queryExamples = (
   <>
     <p>
-      Find sidecars that did not communicate with Graylog since a date:<br />
-      <kbd>{'last_seen:<=2018-04-10'}</kbd><br />
+      Find sidecars that have not communicated since a specific date:
+      <br />
+      <kbd>{'last_seen:<=2018-04-10'}</kbd>
+      <br />
     </p>
     <p>
-      Find sidecars with <code>failing</code> or <code>unknown</code> status:<br />
-      <kbd>status:failing status:unknown</kbd><br />
+      Find sidecars with <code>failing</code> or <code>unknown</code> status:
+      <br />
+      <kbd>status:failing status:unknown</kbd>
+      <br />
     </p>
   </>
 );
 
-const fieldMap = {
+const fieldMap = (productName: string) => ({
   status: 'Status of the sidecar as it appears in the list, i.e. running, failing, or unknown',
   operating_system: 'Operating system the sidecar is running on',
-  last_seen: 'Date and time when the sidecar last communicated with Graylog',
+  last_seen: `Date and time when the sidecar last communicated with ${productName}`,
   node_id: 'Identifier of the sidecar',
   sidecar_version: 'Sidecar version',
+});
+
+const SidecarQueryHelper = () => {
+  const productName = useProductName();
+
+  return (
+    <QueryHelper
+      entityName="sidecar"
+      example={queryExamples}
+      commonFields={['name']}
+      fieldMap={fieldMap(productName)}
+    />
+  );
 };
 
-const queryHelp = (
-  <QueryHelper entityName="sidecar" example={queryExamples} commonFields={['name']} fieldMap={fieldMap} />
-);
-
 type Props = React.PropsWithChildren<{
-  query: string,
-  onSearch: (query: string) => void,
-  onReset: () => void,
+  query: string;
+  onSearch: (query: string) => void;
+  onReset: () => void;
 }>;
 
-const SidecarSearchForm = ({ query, onSearch, onReset, children }: Props) => (
-  <SearchForm query={query}
-              onSearch={onSearch}
-              onReset={onReset}
-              placeholder="Find sidecars"
-              queryHelpComponent={queryHelp}
-              topMargin={0}
-              useLoadingState>
+const SidecarSearchForm = ({ query, onSearch, onReset, children = undefined }: Props) => (
+  <SearchForm
+    query={query}
+    onSearch={onSearch}
+    onReset={onReset}
+    placeholder="Find sidecars"
+    queryHelpComponent={<SidecarQueryHelper />}
+    topMargin={0}
+    useLoadingState>
     {children}
   </SearchForm>
 );

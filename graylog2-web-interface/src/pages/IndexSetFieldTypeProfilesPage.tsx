@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
@@ -25,33 +25,30 @@ import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesL
 import CreateProfileButton from 'components/indices/IndexSetFieldTypeProfiles/CreateProfileButton';
 import { IndicesPageNavigation } from 'components/indices';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
-import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
 
 const IndexSetFieldTypeProfilesPage = () => {
-  const navigate = useNavigate();
+  const { push } = useHistory();
   const hasMappingPermission = useHasTypeMappingPermission();
 
   useEffect(() => {
     if (!hasMappingPermission) {
-      navigate(Routes.NOTFOUND);
-    } else {
-      IndexSetsActions.list(false);
+      push(Routes.NOTFOUND);
     }
-  }, [hasMappingPermission, navigate]);
+  }, [hasMappingPermission, push]);
 
   return (
     <DocumentTitle title="Index Set Field Type Profiles">
       <IndicesPageNavigation />
-      <PageHeader title="Index Set Field Type Profiles"
-                  documentationLink={{
-                    title: 'Index model documentation',
-                    path: DocsHelper.PAGES.INDEX_MODEL,
-                  }}
-                  actions={<CreateProfileButton />}>
+      <PageHeader
+        title="Index Set Field Type Profiles"
+        documentationLink={{
+          title: 'Index model documentation',
+          path: DocsHelper.PAGES.INDEX_MODEL,
+        }}
+        actions={<CreateProfileButton />}>
         <span>
-          With index set field type profiles you can bundle up custom field types into profiles.
-          Then you can assign this profile to any index set.
-          You can view and edit existing profiles or create new ones.
+          With index set field type profiles you can bundle up custom field types into profiles. Then you can assign
+          this profile to any index set. You can view and edit existing profiles or create new ones.
         </span>
       </PageHeader>
 

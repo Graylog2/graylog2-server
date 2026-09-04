@@ -17,36 +17,28 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
-import type { ActionContexts, RootState } from 'views/types';
+import type { ActionContexts } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
-import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import useAppDispatch from 'stores/useAppDispatch';
-import mockDispatch from 'views/test/mockDispatch';
-import { createSearch } from 'fixtures/searches';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 import Action from './Action';
 
-jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
-jest.mock('stores/useAppDispatch');
-
 jest.mock('views/hooks/useExternalValueActions');
+jest.mock('views/components/actions/useFieldActions');
 
 describe('Action', () => {
   beforeEach(() => {
-    const view = createSearch();
-    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
-    asMock(useAppDispatch).mockReturnValue(dispatch);
-
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,
       externalValueActions: [],
       isError: false,
     });
+
+    asMock(useFieldActions).mockReturnValue(actionConfig);
   });
 
   afterEach(() => {
@@ -54,16 +46,29 @@ describe('Action', () => {
   });
 
   const exampleHandlerArgs = {
-    queryId: 'query-id',
     field: 'field1',
     value: 'field-value',
     type: new FieldType('string', [], []),
     contexts: {} as ActionContexts,
   };
 
+  const actionConfig = {
+    evaluateCondition: (condition, args, fallbackValue) => {
+      if (!condition) {
+        return fallbackValue;
+      }
+
+      return condition(args);
+    },
+    executeThunkAction: () => Promise.resolve(),
+    additionalHandlerArgs: {},
+    valueActions: [],
+    fieldActions: [],
+  };
+
   type Props = Partial<React.ComponentProps<typeof Action>>;
 
-  const OpenActionsMenu = () => (<div>Open Actions Menu</div>);
+  const OpenActionsMenu = () => <div>Open Actions Menu</div>;
 
   const SimpleAction = ({
     children = 'The dropdown header',
@@ -71,17 +76,14 @@ describe('Action', () => {
     menuContainer = undefined,
     type = 'field',
   }: Props) => (
-    <Action element={OpenActionsMenu}
-            handlerArgs={handlerArgs}
-            menuContainer={menuContainer}
-            type={type}>
+    <Action element={OpenActionsMenu} handlerArgs={handlerArgs} menuContainer={menuContainer} type={type}>
       {children}
     </Action>
   );
 
   const openDropdown = async (headerTitle = 'The dropdown header') => {
     const dropdownToggle = screen.getByText('Open Actions Menu');
-    userEvent.click(dropdownToggle);
+    await userEvent.click(dropdownToggle);
     await screen.findByText(headerTitle);
   };
 
@@ -104,21 +106,19 @@ describe('Action', () => {
       },
     ];
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ fieldActions }[entityKey]));
+    asMock(useFieldActions).mockReturnValue({ ...actionConfig, fieldActions });
 
     render(<SimpleAction type="field" />);
 
     await openDropdown();
 
     const actionMenuItem = screen.getByText('Show top values');
-    userEvent.click(actionMenuItem);
+    await userEvent.click(actionMenuItem);
 
     expect(mockActionHandler).toHaveBeenCalledTimes(1);
   });
 
-  it('does not fail when plugin is not present for external actions', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ wrongKey: noop }[entityKey]));
-
+  it('does not fail when no internal actions are configured', async () => {
     render(<SimpleAction>The dropdown header</SimpleAction>);
     await openDropdown('The dropdown header');
 
@@ -136,13 +136,13 @@ describe('Action', () => {
       isError: false,
     });
 
-    render(
-      <SimpleAction type="value" />,
-    );
+    render(<SimpleAction type="value" />);
 
     await openDropdown();
 
-    const actionMenuItem = await screen.findByRole('menuitem', { name: /external value action/i }) as HTMLAnchorElement;
+    const actionMenuItem = (await screen.findByRole('menuitem', {
+      name: /external value action/i,
+    })) as HTMLAnchorElement;
 
     expect(actionMenuItem.href).toContain('the-link-to-field1');
   });

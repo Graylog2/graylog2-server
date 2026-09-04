@@ -18,14 +18,16 @@ import * as Immutable from 'immutable';
 import { createSelector } from '@reduxjs/toolkit';
 import { useMemo } from 'react';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import type { QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
 import { selectSearchQueries } from 'views/logic/slices/viewSelectors';
 
-const selectQueriesAsMap = createSelector(selectSearchQueries, (queries) => Immutable.OrderedMap<QueryId, Query>(queries.map((q) => [q.id, q])));
+const selectQueriesAsMap = createSelector(selectSearchQueries, (queries) =>
+  Immutable.OrderedMap<QueryId, Query>(queries.map((q) => [q.id, q])),
+);
 
-const useQueries = () => useAppSelector(selectQueriesAsMap);
+const useQueries = () => useViewsSelector(selectQueriesAsMap);
 
 const useQueryFilters = () => {
   const queries = useQueries();

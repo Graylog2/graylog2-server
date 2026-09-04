@@ -17,14 +17,13 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.base.Suppliers;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.OpensearchDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,9 +32,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OpensearchDistributionProvider implements Provider<OpensearchDistribution> {
@@ -44,33 +45,55 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
     public static final Pattern FULL_NAME_PATTERN = Pattern.compile("opensearch-(.*)-(.+)-(.+)");
     public static final Pattern SHORT_NAME_PATTERN = Pattern.compile("opensearch-(.*)");
 
-    private final Supplier<OpensearchDistribution> distribution;
+    private final Path opensearchDistributionRoot;
+    private final OpensearchArchitecture architecture;
+    private final OpensearchVersionSelector selector;
+    private final AtomicReference<String> lastReportedDistribution = new AtomicReference<>();
 
     @Inject
-    public OpensearchDistributionProvider(final Configuration localConfiguration) {
-        this(Path.of(localConfiguration.getOpensearchDistributionRoot()), OpensearchArchitecture.fromOperatingSystem());
+    public OpensearchDistributionProvider(final Configuration localConfiguration,
+                                          final OpensearchVersionSelector versionSelector) {
+        this(
+                Path.of(localConfiguration.getOpensearchDistributionRoot()),
+                OpensearchArchitecture.fromOperatingSystem(),
+                versionSelector
+        );
     }
 
-    public OpensearchDistributionProvider(final Path opensearchDistributionRoot, OpensearchArchitecture architecture) {
-        this.distribution = Suppliers.memoize(() -> detectInDirectory(opensearchDistributionRoot, architecture));
+    public OpensearchDistributionProvider(final Path opensearchDistributionRoot, OpensearchArchitecture architecture,
+                                          OpensearchVersionSelector selector) {
+        this.opensearchDistributionRoot = opensearchDistributionRoot;
+        this.architecture = architecture;
+        this.selector = selector;
     }
 
     @Override
     public OpensearchDistribution get() {
-        return distribution.get();
+        final OpensearchDistribution distribution = detectInDirectory(opensearchDistributionRoot, architecture, selector);
+
+        // Detection re-runs on every configuration rebuild, so reporting the selection unconditionally floods the log
+        // with identical lines. Only an actual change of distribution is worth an info line.
+        final String directory = distribution.directory().toAbsolutePath().toString();
+        if (directory.equals(lastReportedDistribution.getAndSet(directory))) {
+            LOG.debug("Using opensearch distribution {}", directory);
+        } else {
+            LOG.info("Using opensearch distribution {}", directory);
+        }
+        return distribution;
     }
 
-    private static OpensearchDistribution detectInDirectory(Path rootDistDirectory, OpensearchArchitecture osArch) {
+    private static OpensearchDistribution detectInDirectory(Path rootDistDirectory, OpensearchArchitecture osArch,
+                                                             OpensearchVersionSelector selector) {
         Objects.requireNonNull(rootDistDirectory, "Dist directory needs to be provided");
 
         // if the base directory points directly to one opensearch distribution, we should return it directly.
         // If the format doesn't fit, we'll look for opensearch distributions in this root directory.
         final Optional<OpensearchDistribution> distDirectory = parse(rootDistDirectory);
-        return distDirectory.orElseGet(() -> detectInSubdirectory(rootDistDirectory, osArch));
-
+        return distDirectory.orElseGet(() -> detectInSubdirectory(rootDistDirectory, osArch, selector));
     }
 
-    private static OpensearchDistribution detectInSubdirectory(Path directory, OpensearchArchitecture arch) {
+    private static OpensearchDistribution detectInSubdirectory(Path directory, OpensearchArchitecture arch,
+                                                                OpensearchVersionSelector selector) {
         final List<OpensearchDistribution> opensearchDistributions;
         try (
                 var files = Files.list(directory);
@@ -87,42 +110,53 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
             throw createErrorMessage(directory, arch, "Could not detect any opensearch distribution");
         }
 
-        LOG.info("Found following opensearch distributions: " + opensearchDistributions.stream().map(d -> d.directory().toAbsolutePath()).toList());
+        LOG.debug("Found following opensearch distributions: {}", opensearchDistributions.stream().map(d -> d.directory().toAbsolutePath()).toList());
 
-        return findByArchitecture(opensearchDistributions, arch)
-                .orElseGet(() -> findWithoutArchitecture(opensearchDistributions)
-                        .orElseThrow(() -> createErrorMessage(directory, arch, "No Opensearch distribution found for your system architecture")));
+        // Pre-filter by architecture: prefer exact match, fall back to distributions without architecture info
+        List<OpensearchDistribution> candidates = filterByArchitecture(opensearchDistributions, arch);
+        if (candidates.isEmpty()) {
+            candidates = filterWithoutArchitecture(opensearchDistributions);
+        }
+
+        if (candidates.isEmpty()) {
+            throw createErrorMessage(directory, arch, "No Opensearch distribution found for your system architecture");
+        }
+
+        final OpensearchDistribution selected;
+        try {
+            selected = selector.select(candidates);
+        } catch (IllegalArgumentException e) {
+            final String availableVersions = candidates.stream()
+                    .map(OpensearchDistribution::version)
+                    .sorted()
+                    .collect(Collectors.joining(", "));
+            throw new IllegalArgumentException(e.getMessage() + ". Available distributions: " + availableVersions, e);
+        }
+
+        final List<OpensearchDistribution> otherCandidates = candidates.stream().filter(c -> !c.equals(selected)).toList();
+
+        return selected.withOtherCandidates(otherCandidates);
+    }
+
+    private static List<OpensearchDistribution> filterByArchitecture(List<OpensearchDistribution> available, OpensearchArchitecture arch) {
+        return available.stream()
+                .filter(d -> arch.equals(d.architecture()))
+                .toList();
+    }
+
+    private static List<OpensearchDistribution> filterWithoutArchitecture(List<OpensearchDistribution> available) {
+        return available.stream()
+                .filter(d -> d.architecture() == null)
+                .toList();
     }
 
     private static IllegalArgumentException createErrorMessage(Path directory, OpensearchArchitecture arch, String message) {
         return createErrorMessage(directory, arch, message, null);
     }
 
-
     private static IllegalArgumentException createErrorMessage(Path directory, OpensearchArchitecture arch, String errorMessage, Exception cause) {
         final String message = String.format(Locale.ROOT, "%s. Directory used for Opensearch detection: %s. Please configure opensearch_location to a directory that contains an opensearch distribution for your architecture %s. You can download Opensearch from https://opensearch.org/downloads.html . Please extract the downloaded distribution and point opensearch_location configuration option to that directory.", errorMessage, directory.toAbsolutePath(), arch);
         return new IllegalArgumentException(message, cause);
-    }
-
-    public static String archCode(final String osArch) {
-        return switch (osArch) {
-            case "amd64" -> "x64";
-            case "x86_64" -> "x64";
-            case "aarch64" -> "aarch64";
-            case "arm64" -> "aarch64";
-            default ->
-                    throw new UnsupportedOperationException("Unsupported OpenSearch distribution architecture: " + osArch);
-        };
-    }
-
-    private static Optional<OpensearchDistribution> findByArchitecture(List<OpensearchDistribution> available, OpensearchArchitecture arch) {
-        return available.stream()
-                .filter(d -> arch.equals(d.architecture()))
-                .findAny();
-    }
-
-    private static Optional<OpensearchDistribution> findWithoutArchitecture(List<OpensearchDistribution> available) {
-        return available.stream().filter(d -> d.architecture() == null).findFirst();
     }
 
     private static Optional<OpensearchDistribution> parse(Path path) {

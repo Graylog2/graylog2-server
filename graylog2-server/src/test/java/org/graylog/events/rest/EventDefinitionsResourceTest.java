@@ -18,6 +18,13 @@ package org.graylog.events.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.ForbiddenException;
+import org.apache.shiro.subject.Subject;
+import org.assertj.core.api.Assertions;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -28,20 +35,40 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.shared.security.RestPermissions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import jakarta.ws.rs.ForbiddenException;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class EventDefinitionsResourceTest {
 
     static String CONFIG_TYPE_1 = "type_1";
@@ -64,14 +91,16 @@ public class EventDefinitionsResourceTest {
     AuditEventSender auditEventSender;
     @Mock
     ObjectMapper objectMapper;
+    @Mock
+    EntitySharesService entitySharesService;
 
     EventDefinitionsResource resource;
+    Subject subject;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        resource = new EventDefinitionsResource(
-                dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
-                auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration());
+        subject = mock(Subject.class);
+        resource = new TestEventDefinitionsResource(subject);
         when(config1.type()).thenReturn(CONFIG_TYPE_1);
         when(config2.type()).thenReturn(CONFIG_TYPE_2);
     }
@@ -90,6 +119,121 @@ public class EventDefinitionsResourceTest {
                 resource.checkProcessorConfig(eventDefinitionDto(config1), eventDefinitionDto(config2)));
     }
 
+    @Test
+    public void suggestTagsWithGlobalReadDoesNotEnumeratePermittedIds() {
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(true);
+        when(dbService.suggestTags(eq("ph"), eq(10))).thenReturn(List.of("phishing"));
+
+        final var response = resource.suggestTags("ph", 10);
+
+        Assertions.assertThat(response.tags()).containsExactly("phishing");
+        verify(dbService, never()).findPermittedIds(any());
+    }
+
+    @Test
+    public void suggestTagsWithoutGlobalReadEnumeratesAndPassesPermittedIds() {
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(false);
+        final var permittedId = new ObjectId();
+        when(dbService.findPermittedIds(any())).thenReturn(List.of(permittedId));
+        when(dbService.suggestTags(eq(""), eq(10), eq(List.of(permittedId))))
+                .thenReturn(List.of("phishing"));
+
+        final var response = resource.suggestTags("", 10);
+
+        Assertions.assertThat(response.tags()).containsExactly("phishing");
+        verify(dbService).findPermittedIds(any());
+        verify(dbService).suggestTags(eq(""), eq(10), eq(List.of(permittedId)));
+    }
+
+    @Test
+    public void suggestTagsWithoutGlobalReadAndNoPermittedIdsReturnsEmpty() {
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(false);
+        when(dbService.findPermittedIds(any())).thenReturn(List.of());
+        when(dbService.suggestTags(eq(""), eq(10), eq(List.of()))).thenReturn(List.of());
+
+        final var response = resource.suggestTags("", 10);
+
+        Assertions.assertThat(response.tags()).isEmpty();
+        verify(dbService).suggestTags(eq(""), eq(10), eq(List.of()));
+    }
+
+    @Test
+    public void suggestTagsClampsLimitAboveMax() {
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(true);
+        when(dbService.suggestTags(eq(""), eq(100))).thenReturn(List.of());
+
+        resource.suggestTags("", 99999);
+
+        verify(dbService).suggestTags(eq(""), eq(100));
+    }
+
+    @Test
+    public void duplicateWithoutReadPermissionOnDefinitionIsForbidden() {
+        final String definitionId = "54e3deadbeefdeadbeefaffe";
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ + ":" + definitionId)).thenReturn(false);
+
+        assertThrows(ForbiddenException.class, () -> resource.duplicate(definitionId, mock(UserContext.class)));
+
+        // The definition must not even be loaded when the caller lacks read access to it.
+        verify(dbService, never()).get(any());
+        verify(eventDefinitionHandler, never()).duplicate(any(), any());
+    }
+
+    @Test
+    public void duplicateWithReadPermissionOnDefinitionSucceeds() {
+        final String definitionId = "54e3deadbeefdeadbeefaffe";
+        final EventDefinitionDto dto = eventDefinitionDto(config1);
+        final User user = mock(User.class);
+        final UserContext userContext = mock(UserContext.class);
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ + ":" + definitionId)).thenReturn(true);
+        when(dbService.get(definitionId)).thenReturn(Optional.of(dto));
+        when(userContext.getUser()).thenReturn(user);
+
+        resource.duplicate(definitionId, userContext);
+
+        verify(eventDefinitionHandler).duplicate(dto, user);
+    }
+
+    @Test
+    public void suggestTagsClampsLimitBelowOne() {
+        when(subject.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ)).thenReturn(true);
+        when(dbService.suggestTags(eq(""), eq(1))).thenReturn(List.of());
+
+        resource.suggestTags("", 0);
+
+        verify(dbService).suggestTags(eq(""), eq(1));
+    }
+
+    @Test
+    public void getPageMatchesDefinitionsHavingAnyOfTheFilteredTags() {
+        when(subject.isPermitted(anyString())).thenReturn(true);
+        when(contextService.contextFor(anyList()))
+                .thenReturn(ImmutableMap.of(EventDefinitionContextService.SCHEDULER_KEY, ImmutableMap.of()));
+        when(dbService.searchPaginated(any(Bson.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(new PaginatedList<>(List.of(), 0, 1, 50));
+
+        resource.getPage(1, 50, "", List.of("tags:phishing", "tags:exfil"), "title", SortOrder.ASCENDING);
+
+        @SuppressWarnings("unchecked") final ArgumentCaptor<Predicate<EventDefinitionDto>> predicate =
+                ArgumentCaptor.forClass(Predicate.class);
+        verify(dbService).searchPaginated(any(Bson.class), predicate.capture(), any(), anyInt(), anyInt());
+
+        Assertions.assertThat(predicate.getValue().test(withTags("phishing"))).isTrue();
+        Assertions.assertThat(predicate.getValue().test(withTags("exfil"))).isTrue();
+        Assertions.assertThat(predicate.getValue().test(withTags("phishing", "exfil"))).isTrue();
+        // A definition carrying one filtered tag matches even alongside unrelated tags.
+        Assertions.assertThat(predicate.getValue().test(withTags("exfil", "malware"))).isTrue();
+        Assertions.assertThat(predicate.getValue().test(withTags("malware"))).isFalse();
+        Assertions.assertThat(predicate.getValue().test(withTags())).isFalse();
+    }
+
+    static EventDefinitionDto withTags(String... tags) {
+        return eventDefinitionDto(mock(EventProcessorConfig.class)).toBuilder()
+                .id("54e3deadbeefdeadbeefaffe")
+                .tags(ImmutableSet.copyOf(tags))
+                .build();
+    }
+
     static EventDefinitionDto eventDefinitionDto(EventProcessorConfig config) {
         return EventDefinitionDto.builder()
                 .title("Test")
@@ -103,5 +247,26 @@ public class EventDefinitionsResourceTest {
                         .backlogSize(0)
                         .build())
                 .build();
+    }
+
+    /**
+     * Subclass of {@link EventDefinitionsResource} that returns a configurable Shiro {@link Subject}
+     * so tests can stub permission checks. Mirrors the override pattern used in
+     * {@code RestResourceBaseTest}.
+     */
+    private class TestEventDefinitionsResource extends EventDefinitionsResource {
+        private final Subject subject;
+
+        TestEventDefinitionsResource(Subject subject) {
+            super(dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
+                    auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(),
+                    entitySharesService, new org.graylog.events.processor.TacticsTechniquesValidator.NoOp());
+            this.subject = subject;
+        }
+
+        @Override
+        protected Subject getSubject() {
+            return subject;
+        }
     }
 }

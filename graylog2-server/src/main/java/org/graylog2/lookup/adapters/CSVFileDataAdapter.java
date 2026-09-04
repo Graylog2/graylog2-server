@@ -31,25 +31,24 @@ import com.google.common.collect.Multimap;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.utilities.FileInfo;
+import org.graylog2.utilities.CIDRPatriciaTrie;
 import org.graylog2.utilities.IpSubnet;
 import org.graylog2.utilities.ReservedIpChecker;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,10 +60,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -87,6 +91,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
+    private final AtomicReference<Map<String, Map<Object, Object>>> multiValueLookupRef = new AtomicReference<>(ImmutableMap.of());
+    private final AtomicReference<CIDRPatriciaTrie> cidrLookupRef = new AtomicReference<>(new CIDRPatriciaTrie());
     private final String name;
 
     private FileInfo fileInfo = FileInfo.empty();
@@ -118,7 +124,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
         // Set file info before parsing the data for the first time
         fileInfo = getNewFileInfo();
-        lookupRef.set(parseCSVFile());
+        if (!config.isMultiValueLookup()) {
+            setLookupRefFromCSV();
+        } else {
+            setMultiValueLookupRefFromCSV();
+        }
     }
 
     @Override
@@ -152,7 +162,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             }
 
             LOG.debug("CSV file {} has changed, updating data", config.path());
-            lookupRef.set(parseCSVFile());
+            if (!config.isMultiValueLookup()) {
+                setLookupRefFromCSV();
+            } else {
+                setMultiValueLookupRefFromCSV();
+            }
             cachePurge.purgeAll();
             // If the file has been moved, then moved back, the fileInfo might have been disconnected.
             // In this case, create a new fileInfo.
@@ -164,12 +178,13 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
     }
 
-    private Map<String, String> parseCSVFile() throws IOException {
-        final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
-        final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+    private void setLookupRefFromCSV() throws IOException {
         final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
+        final CIDRPatriciaTrie cidrLookupTrie = new CIDRPatriciaTrie();
 
-        try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
+        try (final CSVReader csvReader = new CSVReader(
+                new InputStreamReader(Files.newInputStream(Paths.get(config.path())), StandardCharsets.UTF_8),
+                config.separatorAsChar(), config.quotecharAsChar())) {
             int line = 0;
             int keyColumn = -1;
             int valueColumn = -1;
@@ -224,17 +239,111 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                         }
                     } else {
                         Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(key);
-                        if (optSubnet.isPresent()) {
-                            newLookupBuilder.put(key, value);
-                        } else {
-                            // If key in a CIDR lookup adapter is not already a valid CIDR range, check if it is an IP
-                            String cidr = ipAddressToCIDR(key);
-                            if (cidr != null) {
-                                newLookupBuilder.put(cidr, value);
-                            }
-                        }
+                        addToCidrTrie(optSubnet.orElse(null), cidrLookupTrie, key, value);
                     }
                 }
+            }
+
+        } catch (Exception e) {
+            LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> value_column=<{}>)", config.path(),
+                    config.separator(), config.quotechar(), config.keyColumn(), config.valueColumn(), e);
+            setError(e);
+            throw new IllegalStateException(e);
+        }
+
+        if (config.isCidrLookup()) {
+            cidrLookupRef.set(cidrLookupTrie);
+        } else {
+            lookupRef.set(newLookupBuilder.build());
+        }
+    }
+
+    private void setMultiValueLookupRefFromCSV() throws IOException {
+        final Map<Integer, String> multiValueColumns = new HashMap<>();
+        final ImmutableMap.Builder<String, Map<Object, Object>> multiValueLookupBuilder = ImmutableMap.builder();
+        final CIDRPatriciaTrie cidrLookupTrie = new CIDRPatriciaTrie();
+        final List<String> columns = Arrays.stream(config.valueColumn().split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        try (final CSVReader csvReader = new CSVReader(
+                new InputStreamReader(Files.newInputStream(Paths.get(config.path())), StandardCharsets.UTF_8),
+                config.separatorAsChar(), config.quotecharAsChar())) {
+            int line = 0;
+            int keyColumn = -1;
+
+            while (true) {
+                final String[] next = csvReader.readNext();
+                if (next == null) {
+                    break;
+                }
+                line++;
+
+                if (line == 1) {
+                    // The first line in the CSV file provides the column names. If there are no configured multi-value
+                    // columns, then we store all columns that are not they key column for values. Otherwise, we store
+                    // only the columns that are configured as multi-value columns.
+                    int col = 0;
+                    for (final String column : next) {
+                        if (!isNullOrEmpty(column)) {
+                            if (config.keyColumn().equals(column)) {
+                                keyColumn = col;
+                            } else if (!config.valueColumn().equals(column) && (columns.isEmpty() || columns.contains(column))) {
+                                multiValueColumns.put(col, column);
+                            }
+                        }
+                        col++;
+                    }
+                } else {
+                    // The other lines are supposed to be data entries
+                    if (keyColumn < 0) {
+                        throw new IllegalStateException("Couldn't detect column number for key or value - check CSV file format");
+                    }
+                    if (next.length == 1 && StringUtils.isEmpty(next[0])) {
+                        LOG.debug("Skipping empty line in CSV adapter file [{}/{}].", name, config.path());
+                        continue;
+                    }
+
+                    final Map<Object, Object> values = new HashMap<>();
+                    final String key;
+                    try {
+                        key = next[keyColumn];
+                    } catch (IndexOutOfBoundsException e) {
+                        final String error = f("The CSV file [%s] contains invalid lines. Please check the file and ensure " +
+                                "that both key and value column(s) are present in all lines.", name);
+                        throw new IllegalStateException(error, e);
+                    }
+
+                    multiValueColumns.forEach((col, columnName) -> {
+                        try {
+                            final String value = next[col];
+                            if (!isNullOrEmpty(value)) {
+                                values.put(columnName, value);
+                            }
+                        } catch (IndexOutOfBoundsException e) {
+                            final String error = f("The CSV file [%s] contains invalid lines. Please check the file and ensure " +
+                                    "that both key and value column(s) are present in all lines.", name);
+                            throw new IllegalStateException(error, e);
+                        }
+                    });
+                    if (!config.isCidrLookup()) {
+                        if (config.isCaseInsensitiveLookup()) {
+                            multiValueLookupBuilder.put(key.toLowerCase(Locale.ENGLISH), values);
+                        } else {
+                            multiValueLookupBuilder.put(key, values);
+                        }
+                    } else {
+                        final Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(key);
+                        final String singleValue = toSingleValue(values);
+                        addToCidrTrie(optSubnet.orElse(null), cidrLookupTrie, key, singleValue);
+                    }
+                }
+            }
+            if (config.isCidrLookup()) {
+                cidrLookupRef.set(cidrLookupTrie);
+            } else {
+                multiValueLookupRef.set(multiValueLookupBuilder.build());
             }
         } catch (Exception e) {
             LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> value_column=<{}>)", config.path(),
@@ -243,7 +352,18 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             throw new IllegalStateException(e);
         }
 
-        return newLookupBuilder.build();
+    }
+
+    private void addToCidrTrie(IpSubnet optSubnet, CIDRPatriciaTrie cidrLookupTrie, String key, String singleValue) {
+        if (optSubnet != null) {
+            cidrLookupTrie.insertCIDR(key, singleValue);
+        } else {
+            // If key in a CIDR lookup adapter is not already a valid CIDR range, check if it is an IP
+            String cidr = ipAddressToCIDR(key);
+            if (cidr != null) {
+                cidrLookupTrie.insertCIDR(cidr, singleValue);
+            }
+        }
     }
 
     private String ipAddressToCIDR(String ip) {
@@ -275,6 +395,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         if (config.isCidrLookup()) {
             return getResultForCIDRRange(key);
         }
+        if (config.isMultiValueLookup()) {
+            return getMultiValueLookup(key);
+        }
+
         final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase(Locale.ENGLISH) : String.valueOf(key);
         final String value = lookupRef.get().get(stringKey);
 
@@ -285,23 +409,50 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         return LookupResult.single(value);
     }
 
-    public LookupResult getResultForCIDRRange(Object ip) {
+    @Override
+    public boolean supportsPreview() {
+        return true;
+    }
+
+    @Override
+    public LookupPreview getPreview(int size) {
+        if (config.isCidrLookup()) {
+            return cidrLookupRef.get().getPreview(size);
+        } else {
+            final Map<Object, Object> result = new HashMap<>();
+            final long totalSize;
+            if (!config.isMultiValueLookup()) {
+                final Map<String, String> lookup = lookupRef.get();
+                totalSize = lookup.size();
+                for (Map.Entry<String, String> entries : lookup.entrySet()) {
+                    if (result.size() == size) {
+                        break;
+                    }
+                    result.put(entries.getKey(), entries.getValue());
+                }
+            } else {
+                final Map<String, Map<Object, Object>> multiLookup = multiValueLookupRef.get();
+                totalSize = multiLookup.size();
+                for (Map.Entry<String, Map<Object, Object>> entries : multiLookup.entrySet()) {
+                    if (result.size() == size) {
+                        break;
+                    }
+                    result.put(entries.getKey(), toSingleValue(entries.getValue()));
+                }
+            }
+            return new LookupPreview(totalSize, result);
+        }
+    }
+
+    private LookupResult getResultForCIDRRange(Object ip) {
         LookupResult result = getEmptyResult();
         try {
-            // Convert directly to InetAddress to avoid long timeouts using name service lookups
-            InetAddress address = InetAddresses.forString(String.valueOf(ip));
-            int longestMatch = 0;
-            for (Map.Entry<String, String> entry : lookupRef.get().entrySet()) {
-                String range = entry.getKey();
-                Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(range);
-                if (optSubnet.isEmpty()) {
-                    LOG.debug("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
+            final String resultValue = cidrLookupRef.get().longestPrefixRangeLookup(String.valueOf(ip));
+            if (resultValue != null) {
+                if (config.multiValueLookup().isPresent() && config.multiValueLookup().get()) {
+                    result = LookupResult.multi(resultValue, fromSingleValue(resultValue));
                 } else {
-                    IpSubnet subnet = optSubnet.get();
-                    if (subnet.contains(address) && (result.isEmpty() || longestMatch < subnet.getPrefixLength())) {
-                        longestMatch = subnet.getPrefixLength();
-                        result = LookupResult.single(entry.getValue());
-                    }
+                    result = LookupResult.single(resultValue);
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -310,6 +461,37 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         return result;
+    }
+
+    private LookupResult getMultiValueLookup(Object key) {
+        final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase(Locale.ENGLISH) : String.valueOf(key);
+        final Map<Object, Object> value = multiValueLookupRef.get().get(stringKey);
+
+        if (value == null) {
+            return getEmptyResult();
+        }
+
+        final String singleValue = toSingleValue(value);
+        return LookupResult.multi(singleValue, value);
+    }
+
+    private String toSingleValue(Map<Object, Object> multiValue) {
+        return multiValue.entrySet().stream()
+                .map((entry) -> f("%s=%s", entry.getKey(), entry.getValue()))
+                .collect(Collectors.joining(","));
+    }
+
+    public static Map<Object, Object> fromSingleValue(String singleValue) {
+        if (singleValue == null || singleValue.isEmpty()) {
+            return Map.of();
+        }
+        return Stream.of(singleValue.split(","))
+                .map(pair -> pair.split("=", 2))
+                .filter(keyValue -> keyValue.length == 2)
+                .collect(Collectors.toMap(
+                        keyValue -> keyValue[0],
+                        keyValue -> keyValue[1]
+                ));
     }
 
     @Override
@@ -336,7 +518,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         public Config defaultConfiguration() {
             return Config.builder()
                     .type(NAME)
-                    .path("/etc/graylog/lookup-table.csv")
+                    .path("/tmp/lookup-table.csv")
                     .separator(",")
                     .quotechar("\"")
                     .keyColumn("key")
@@ -344,12 +526,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     .checkInterval(60)
                     .caseInsensitiveLookup(false)
                     .cidrLookup(false)
+                    .multiValueLookup(false)
                     .build();
         }
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_CSVFileDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)
@@ -393,7 +575,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         public abstract String keyColumn();
 
         @JsonProperty("value_column")
-        @NotEmpty
         public abstract String valueColumn();
 
         @JsonProperty("check_interval")
@@ -403,11 +584,18 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         @JsonProperty("case_insensitive_lookup")
         public abstract Optional<Boolean> caseInsensitiveLookup();
 
+        @JsonProperty("multi_value_lookup")
+        public abstract Optional<Boolean> multiValueLookup();
+
         @JsonProperty("cidr_lookup")
         public abstract Optional<Boolean> cidrLookup();
 
         public boolean isCaseInsensitiveLookup() {
             return caseInsensitiveLookup().isPresent() && caseInsensitiveLookup().get();
+        }
+
+        public boolean isMultiValueLookup() {
+            return multiValueLookup().isPresent() && multiValueLookup().get();
         }
 
         public boolean isCidrLookup() {
@@ -435,6 +623,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                 errors.put("path", "The file does not exist.");
             } else if (!Files.isReadable(path)) {
                 errors.put("path", "The file cannot be read.");
+            }
+
+            if (StringUtils.isEmpty(valueColumn()) && !isMultiValueLookup()) {
+                errors.put("value_column", "Value column must be set unless multi-value lookup is enabled.");
             }
 
             return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
@@ -470,6 +662,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             @JsonProperty("case_insensitive_lookup")
             public abstract Builder caseInsensitiveLookup(Boolean caseInsensitiveLookup);
+
+            @JsonProperty("multi_value_lookup")
+            public abstract Builder multiValueLookup(Boolean multiValueLookup);
 
             @JsonProperty("cidr_lookup")
             public abstract Builder cidrLookup(Boolean cidrLookup);

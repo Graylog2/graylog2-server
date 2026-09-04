@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 export default {
   '01JH006340WP7HQ5E7P71Q9HHX': {
     event: {
@@ -25,19 +26,11 @@ export default {
       timestamp_processing: '2025-01-07T09:05:29.216Z',
       timerange_start: '2025-01-07T09:04:23.262Z',
       timerange_end: '2025-01-07T09:05:23.262Z',
-      streams: [
-        '000000000000000000000002',
-      ],
-      source_streams: [
-        '66e962c1b3a0040a1570faf9',
-        '000000000000000000000001',
-      ],
+      streams: ['000000000000000000000002'],
+      source_streams: ['66e962c1b3a0040a1570faf9', '000000000000000000000001'],
       message: 'Error Rate: count()=4758.0',
       source: 'church',
-      key_tuple: [
-        'foo',
-        'hey there!',
-      ],
+      key_tuple: ['foo', 'hey there!'],
       key: 'foo|hey there!',
       priority: 3,
       scores: {
@@ -45,6 +38,7 @@ export default {
         normalized_risk: 6,
       },
       associated_assets: [],
+      aggregation_conditions: {},
       alert: false,
       fields: {
         mightyalert: 'foo',
@@ -55,10 +49,7 @@ export default {
         timerange_start: '2025-01-07T09:04:23.262Z',
         timerange_end: '2025-01-07T09:05:23.262Z',
         query: '',
-        streams: [
-          '66e962c1b3a0040a1570faf9',
-          '000000000000000000000001',
-        ],
+        streams: ['66e962c1b3a0040a1570faf9', '000000000000000000000001'],
         filters: [
           {
             type: 'inlineQueryString',
@@ -85,19 +76,11 @@ export default {
       timestamp_processing: '2025-01-07T09:03:25.017Z',
       timerange_start: '2025-01-07T09:02:23.262Z',
       timerange_end: '2025-01-07T09:03:23.262Z',
-      streams: [
-        '000000000000000000000002',
-      ],
-      source_streams: [
-        '66e962c1b3a0040a1570faf9',
-        '000000000000000000000001',
-      ],
+      streams: ['000000000000000000000002'],
+      source_streams: ['66e962c1b3a0040a1570faf9', '000000000000000000000001'],
       message: 'Error Rate: count()=4760.0',
       source: 'church',
-      key_tuple: [
-        'foo',
-        'hey there!',
-      ],
+      key_tuple: ['foo', 'hey there!'],
       key: 'foo|hey there!',
       priority: 3,
       scores: {
@@ -105,6 +88,7 @@ export default {
         normalized_risk: 6,
       },
       associated_assets: [],
+      aggregation_conditions: {},
       alert: false,
       fields: {
         mightyalert: 'foo',
@@ -115,10 +99,7 @@ export default {
         timerange_start: '2025-01-07T09:02:23.262Z',
         timerange_end: '2025-01-07T09:03:23.262Z',
         query: '',
-        streams: [
-          '66e962c1b3a0040a1570faf9',
-          '000000000000000000000001',
-        ],
+        streams: ['66e962c1b3a0040a1570faf9', '000000000000000000000001'],
         filters: [
           {
             type: 'inlineQueryString',
@@ -145,19 +126,11 @@ export default {
       timestamp_processing: '2025-01-07T09:06:29.197Z',
       timerange_start: '2025-01-07T09:05:23.262Z',
       timerange_end: '2025-01-07T09:06:23.262Z',
-      streams: [
-        '000000000000000000000002',
-      ],
-      source_streams: [
-        '66e962c1b3a0040a1570faf9',
-        '000000000000000000000001',
-      ],
+      streams: ['000000000000000000000002'],
+      source_streams: ['66e962c1b3a0040a1570faf9', '000000000000000000000001'],
       message: 'Error Rate: count()=4718.0',
       source: 'church',
-      key_tuple: [
-        'foo',
-        'hey there!',
-      ],
+      key_tuple: ['foo', 'hey there!'],
       key: 'foo|hey there!',
       priority: 3,
       scores: {
@@ -165,6 +138,7 @@ export default {
         normalized_risk: 6,
       },
       associated_assets: [],
+      aggregation_conditions: {},
       alert: false,
       fields: {
         mightyalert: 'foo',
@@ -175,10 +149,7 @@ export default {
         timerange_start: '2025-01-07T09:05:23.262Z',
         timerange_end: '2025-01-07T09:06:23.262Z',
         query: '',
-        streams: [
-          '66e962c1b3a0040a1570faf9',
-          '000000000000000000000001',
-        ],
+        streams: ['66e962c1b3a0040a1570faf9', '000000000000000000000001'],
         filters: [
           {
             type: 'inlineQueryString',

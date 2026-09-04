@@ -57,12 +57,13 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -72,22 +73,22 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.Tools.nowUTC;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ElasticsearchBackendTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     private ElasticsearchBackend backend;
     private UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
 
     @Mock
     private IndexLookup indexLookup;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, () -> new ESMessageList(new LegacyDecoratorProcessor.Fake(),
@@ -174,7 +175,7 @@ public class ElasticsearchBackendTest {
 
     @Test
     public void testExplain() {
-        when(indexLookup.indexRangesForStreamsInTimeRange(anySet(), any())).thenAnswer(a -> {
+        when(indexLookup.indexRangesForStreamsInTimeRange(anyCollection(), any())).thenAnswer(a -> {
             if (a.getArgument(1, TimeRange.class).getFrom().getYear() < 2024) {
                 return Set.of(
                         MongoIndexRange.create("graylog_0", nowUTC(), nowUTC(), nowUTC(), 0),

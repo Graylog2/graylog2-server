@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { memo } from 'react';
+import React, { createContext, memo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { FormGroup as BootstrapFormGroup } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
@@ -56,7 +56,9 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
 
         &:focus {
           border-color: ${chroma(border).darken(0.1).toString()};
-          box-shadow: inset 0 1px 1px rgb(0 0 0 / 7.5%), 0 0 6px ${chroma(border).brighten(0.2).toString()};
+          box-shadow:
+            inset 0 1px 1px rgb(0 0 0 / 7.5%),
+            0 0 6px ${chroma(border).brighten(0.2).toString()};
         }
       }
 
@@ -70,22 +72,22 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
         color: ${text};
       }
     }
-`;
+  `;
 });
 
-type FormGroupProps = React.ComponentProps<typeof StyledFormGroup> & {
+type Props = React.ComponentProps<typeof StyledFormGroup> & {
   children?: React.ReactNode;
   validationState?: 'error' | 'success' | 'warning';
 };
 
-const FormGroup = memo(({
-  children,
-  validationState = null,
-  ...props
-}: FormGroupProps) => (
-  <StyledFormGroup validationState={validationState} {...props}>
-    {children}
-  </StyledFormGroup>
-));
+export const FormGroupControlIdContext = createContext<string | undefined>(undefined);
 
-export default FormGroup;
+const FormGroup = ({ children = undefined, validationState = null, controlId, ...props }: Props) => (
+  <FormGroupControlIdContext.Provider value={controlId}>
+    <StyledFormGroup validationState={validationState} controlId={controlId} {...props}>
+      {children}
+    </StyledFormGroup>
+  </FormGroupControlIdContext.Provider>
+);
+
+export default memo(FormGroup);

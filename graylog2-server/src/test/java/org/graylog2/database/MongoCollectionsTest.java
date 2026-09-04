@@ -19,19 +19,23 @@ package org.graylog2.database;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.InsertOneResult;
+import org.bson.BsonDateTime;
+import org.bson.BsonDocument;
+import org.bson.BsonDocumentReader;
+import org.bson.BsonDocumentWriter;
+import org.bson.BsonString;
 import org.bson.BsonType;
 import org.bson.BsonValue;
 import org.bson.Document;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.joda.time.DateTime;
@@ -78,9 +82,12 @@ class MongoCollectionsTest {
     record TimestampTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id,
                          @JsonProperty("timestamp") DateTime timestamp) implements MongoEntity {}
 
+    record CodecTest(@JsonProperty("renamed_value") String value,
+                     @JsonProperty("created_at") ZonedDateTime createdAt) {}
+
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        collections = new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
+        collections = mongoCollections;
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
     }
 
@@ -116,7 +123,7 @@ class MongoCollectionsTest {
 
     @Test
     void testEncryptedValue() {
-        final MongoCollection<Secret> collection = collections.nonEntityCollection("secrets", Secret.class);
+        final com.mongodb.client.MongoCollection<Secret> collection = collections.nonEntityCollection("secrets", Secret.class);
         final EncryptedValue encryptedValue = encryptedValueService.encrypt("gary");
         collection.insertOne(new Secret(encryptedValue));
         assertThat(collection.find().first()).isNotNull().satisfies(secret -> {
@@ -130,16 +137,16 @@ class MongoCollectionsTest {
     void testMongoIgnore() {
         // @MongoIgnore should prevent a property from being written to Mongo. But if it's returned from Mongo,
         // e.g. because it was calculated by an aggregation, it should be populated in the returned object.
-        final MongoCollection<IgnoreTest> collection = collections.nonEntityCollection("ignoreTest", IgnoreTest.class);
+        final com.mongodb.client.MongoCollection<IgnoreTest> collection = collections.nonEntityCollection("ignoreTest", IgnoreTest.class);
         collection.insertOne(new IgnoreTest("I should be present", "I should be gone"));
         assertThat(collection.find().first()).isEqualTo(new IgnoreTest("I should be present", null));
 
-        final MongoCollection<Document> rawCollection = collections.nonEntityCollection("alsoIgnoreTest", Document.class);
+        final com.mongodb.client.MongoCollection<Document> rawCollection = collections.nonEntityCollection("alsoIgnoreTest", Document.class);
         rawCollection.insertOne(new Document(Map.of(
                 "ignore_me_not", "I should be present",
                 "ignore_me", "I sneaked in")));
 
-        final MongoCollection<IgnoreTest> collection2 = collections.nonEntityCollection("alsoIgnoreTest", IgnoreTest.class);
+        final com.mongodb.client.MongoCollection<IgnoreTest> collection2 = collections.nonEntityCollection("alsoIgnoreTest", IgnoreTest.class);
         assertThat(collection2.find().first()).isEqualTo(new IgnoreTest("I should be present", "I sneaked in"));
     }
 
@@ -173,5 +180,33 @@ class MongoCollectionsTest {
                 assertThat(tt.timestamp().getMillis()).isGreaterThanOrEqualTo(
                         now.withMillisOfSecond(0).getMillis())
         );
+    }
+
+    @Test
+    void getCodecForEncodesWithMongoJackObjectMapper() {
+        final var createdAt = ZonedDateTime.now(ZoneOffset.UTC).withNano(0);
+        final var codec = collections.getCodecFor(CodecTest.class);
+
+        try (final var writer = new BsonDocumentWriter(new BsonDocument())) {
+            codec.encode(writer, new CodecTest("Gary", createdAt), EncoderContext.builder().build());
+
+            assertThat(writer.getDocument().getString("renamed_value").getValue()).isEqualTo("Gary");
+            assertThat(writer.getDocument().getDateTime("created_at").getValue())
+                    .isEqualTo(createdAt.toInstant().toEpochMilli());
+        }
+    }
+
+    @Test
+    void getCodecForDecodesWithMongoJackObjectMapper() {
+        final var createdAt = ZonedDateTime.now(ZoneOffset.UTC).withNano(0);
+        final var document = new BsonDocument()
+                .append("renamed_value", new BsonString("Gary"))
+                .append("created_at", new BsonDateTime(createdAt.toInstant().toEpochMilli()));
+        final var codec = collections.getCodecFor(CodecTest.class);
+
+        try (final var reader = new BsonDocumentReader(document)) {
+            assertThat(codec.decode(reader, DecoderContext.builder().build()))
+                    .isEqualTo(new CodecTest("Gary", createdAt));
+        }
     }
 }

@@ -1,0 +1,5 @@
+type = "c"
+message = "Switch to Java 21."
+
+issues = ["20015"]
+pulls = ["graylog2-server#22908", "graylog-plugin-enterprise#11084", "graylog-project-internal#178"]

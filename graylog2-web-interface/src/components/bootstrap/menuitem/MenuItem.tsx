@@ -16,78 +16,114 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import styled, { css } from 'styled-components';
+import { Menu as MantineMenu } from '@mantine/core';
 
+import Link from 'components/common/Link';
 import Icon from 'components/common/Icon';
 
 import Menu from '../Menu';
 
-const IconWrapper = styled.div`
-  display: inline-flex;
-  min-width: 20px;
-  margin-right: 5px;
-  justify-content: center;
-  align-items: center;
-`;
+const StyledMenuItem = styled(MantineMenu.Item)(
+  ({ theme }) => css`
+    color: ${theme.colors.text.primary};
+    font-size: ${theme.fonts.size.body};
+    white-space: nowrap;
 
-type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: inherit;
+      background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
+    }
+  `,
+);
+
+const StyledMenuDivider = styled(MantineMenu.Divider)(
+  ({ theme }) => css`
+    border-color: ${theme.colors.variant.lighter.default};
+  `,
+);
+
+type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void;
 
 type Props<T = undefined> = React.PropsWithChildren<{
-  active?: boolean,
-  className?: string,
-  component?: 'a',
-  'data-tab-id'?: string,
-  disabled?: boolean,
-  divider?: boolean,
-  eventKey?: T,
-  header?: boolean,
-  href?: string,
-  icon?: React.ComponentProps<typeof Icon>['name'],
-  id?: string,
-  onClick?: Callback<T>,
-  onSelect?: Callback<T>,
-  rel?: 'noopener noreferrer',
-  target?: '_blank',
-  title?: string,
-  closeMenuOnClick?: boolean,
+  active?: boolean;
+  className?: string;
+  component?: 'a';
+  'data-tab-id'?: string;
+  disabled?: boolean;
+  divider?: boolean;
+  eventKey?: T;
+  header?: boolean;
+  href?: string;
+  icon?: React.ComponentProps<typeof Icon>['name'];
+  id?: string;
+  onClick?: Callback<T>;
+  onSelect?: Callback<T>;
+  rel?: 'noopener noreferrer';
+  target?: '_blank';
+  title?: string;
+  closeMenuOnClick?: boolean;
 }>;
 
-const CustomMenuItem = <T, >({ children, className, disabled = false, divider = false, eventKey, header = false, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, closeMenuOnClick }: Props<T>) => {
+const CustomMenuItem = <T,>({
+  children = undefined,
+  className = undefined,
+  disabled = false,
+  divider = false,
+  eventKey = undefined,
+  header = false,
+  href = undefined,
+  icon = undefined,
+  id = undefined,
+  onClick = undefined,
+  onSelect = undefined,
+  rel = undefined,
+  target = undefined,
+  title = undefined,
+  'data-tab-id': dataTabId = undefined,
+  component = undefined,
+  closeMenuOnClick = undefined,
+}: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
   if (divider) {
-    return <Menu.Divider role="separator" className={className} id={id} />;
+    return <StyledMenuDivider role="separator" className={className} id={id} />;
   }
 
   if (header) {
-    return <Menu.Label role="heading" className={className} id={id}>{children}</Menu.Label>;
+    return (
+      <Menu.Label role="heading" className={className} id={id}>
+        {children}
+      </Menu.Label>
+    );
   }
 
   const sharedProps = {
     className,
     'data-tab-id': dataTabId,
     disabled,
-    icon: icon ? <IconWrapper><Icon name={icon} /></IconWrapper> : null,
+    leftSection: icon ? <Icon name={icon} /> : null,
     id,
     onClick: _onClick,
     title,
     closeMenuOnClick,
-  };
+  } satisfies Partial<React.ComponentProps<typeof MantineMenu.Item>>;
 
   if (href) {
     return (
-      <Menu.Item component={Link} to={href} rel={rel} target={target} {...sharedProps}>
+      <StyledMenuItem component={Link} to={href} rel={rel} target={target} {...sharedProps}>
         {children}
-      </Menu.Item>
+      </StyledMenuItem>
     );
   }
 
   return (
-    <Menu.Item component={component} {...sharedProps}>
+    <StyledMenuItem component={component} {...sharedProps}>
       {children}
-    </Menu.Item>
+    </StyledMenuItem>
   );
 };
 

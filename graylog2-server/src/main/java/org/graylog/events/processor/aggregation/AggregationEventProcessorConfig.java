@@ -41,6 +41,7 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.CronJobSchedule;
 import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.security.UserContext;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -86,6 +87,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
 
+    @Nullable
     @JsonProperty(FIELD_QUERY_PARAMETERS)
     public abstract ImmutableSet<Parameter> queryParameters();
 
@@ -129,11 +131,6 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @Override
     public Set<String> requiredPermissions() {
-        // When there are no streams the event processor will search in all streams so we need to require the
-        // generic stream permission.
-        if (streams().isEmpty()) {
-            return Collections.singleton(RestPermissions.STREAMS_READ);
-        }
         return streams().stream()
                 .map(streamId -> String.join(":", RestPermissions.STREAMS_READ, streamId))
                 .collect(Collectors.toSet());
@@ -241,7 +238,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     }
 
     @Override
-    public ValidationResult validate() {
+    public ValidationResult validate(UserContext userContext) {
         final ValidationResult validationResult = new ValidationResult();
 
         if (searchWithinMs() <= 0) {
@@ -271,6 +268,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                         validationResult.addError(FIELD_SERIES, "Aggregation's series of type " + ser.type() + " must contain non-empty value for field");
                     }
                 });
+
+        if (streams().isEmpty() && !userContext.isPermitted(RestPermissions.STREAMS_READ)) {
+            validationResult.addError(FIELD_STREAMS, "At least one stream must have been selected.");
+        }
 
         if (useCronScheduling()) {
             if (cronExpression() == null || cronExpression().isEmpty()) {
@@ -332,6 +333,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         return AggregationEventProcessorConfigEntity.builder()
                 .type(type())
                 .query(ValueReference.of(query()))
+                .queryParameters(queryParameters())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .streams(streamRefs)
                 .streamCategories(streamCategories())
@@ -356,6 +358,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
+        // attribute is tagged @Nullable, so do a null check first
+        if(queryParameters() != null) {
+            queryParameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
+        }
         filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 

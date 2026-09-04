@@ -42,17 +42,11 @@ describe('emit', () => {
                   type: {
                     type: 'enum' as const,
                     name: 'string' as const,
-                    options: [
-                      'ABORT_ON_CONFLICT',
-                      'REPLACE_ON_CONFLICT',
-                      'DROP_ALL_EXISTING',
-                    ],
+                    options: ['ABORT_ON_CONFLICT', 'REPLACE_ON_CONFLICT', 'DROP_ALL_EXISTING'],
                   },
                 },
               ],
-              produces: [
-                'application/json' as const,
-              ],
+              produces: ['application/json' as const],
             },
           ],
         },
@@ -66,14 +60,15 @@ describe('emit', () => {
 [
   {
     "grok": "import __request__ from 'routing/request';
+import type { RequestOptions } from 'routing/request';
 /**
  * Add a list of new patterns
  * @param import-strategy Strategy to apply when importing.
  */
-export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLICT' | 'REPLACE_ON_CONFLICT' | 'DROP_ALL_EXISTING'): Promise<unknown> {
+export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLICT' | 'REPLACE_ON_CONFLICT' | 'DROP_ALL_EXISTING', requestOptions?: RequestOptions): Promise<unknown> {
     return __request__('POST', '/system/grok', null, { 'import-strategy': importStrategy }, {
         'Accept': ['application/json']
-    });
+    }, requestOptions);
 }
 ",
   },
@@ -100,9 +95,7 @@ export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLI
                 optional: false,
               },
               parameters: [],
-              produces: [
-                'application/json' as const,
-              ],
+              produces: ['application/json' as const],
             },
           ],
         },
@@ -127,16 +120,17 @@ export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLI
 [
   {
     "sample": "import __request__ from 'routing/request';
+import type { RequestOptions } from 'routing/request';
 interface AvailableOutputSummaryMapMap {
     readonly [_key: string]: AvailableOutputSummaryMap;
 }
 /**
  * A sample operation
  */
-export function sample(): Promise<AvailableOutputSummaryMapMap> {
+export function sample(requestOptions?: RequestOptions): Promise<AvailableOutputSummaryMapMap> {
     return __request__('POST', '/sample', null, {}, {
         'Accept': ['application/json']
-    });
+    }, requestOptions);
 }
 ",
   },

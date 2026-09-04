@@ -43,10 +43,10 @@ const useCarouselRef = (carouselId: string) => {
  */
 
 type Props = {
-  children: React.ReactNode,
-  className?: string
-  containerRef?: React.Ref<HTMLDivElement>
-  carouselId: string
+  children: React.ReactNode;
+  className?: string;
+  containerRef?: React.Ref<HTMLDivElement>;
+  carouselId: string;
 };
 
 const StyledDiv = styled.div`
@@ -62,7 +62,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-const Carousel = ({ children, className, containerRef, carouselId }: Props) => {
+const Carousel = ({ children, className = undefined, containerRef = undefined, carouselId }: Props) => {
   const carouselRef = useCarouselRef(carouselId);
 
   return (

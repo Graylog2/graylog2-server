@@ -22,9 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.zafarkhaja.semver.expr.LexerException;
 import com.google.auto.value.AutoValue;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -47,7 +47,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-@Api(value = "System/SearchVersion", description = "Checks system search version requirements")
+@Tag(name = "System/SearchVersion", description = "Checks system search version requirements")
 @Path("/system/searchVersion")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -68,9 +68,9 @@ public class SearchVersionResource extends RestResource implements PluginRestRes
 
     @GET
     @Path("/satisfiesVersion/{distribution}")
-    @ApiOperation(value = "Confirms whether the current search version satisfies a given distribution and an optional Semantic Versioning version")
-    public SatisfiesVersionResponse satisfiesVersion(@ApiParam(name = "distribution", required = true) @PathParam("distribution") String distribution,
-                                                     @ApiParam(name = "version") @QueryParam("version") String version) {
+    @Operation(summary = "Confirms whether the current search version satisfies a given distribution and an optional Semantic Versioning version")
+    public SatisfiesVersionResponse satisfiesVersion(@Parameter(name = "distribution", required = true) @PathParam("distribution") String distribution,
+                                                     @Parameter(name = "version") @QueryParam("version") String version) {
         // if no version provided give default to only check distribution
         if (version == null || version.isEmpty()) {
             version = ">0";

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPException;
+import jakarta.inject.Inject;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.AuthServiceCredentials;
@@ -38,9 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -102,6 +100,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
                     .fullName(userEntry.fullName())
                     .email(userEntry.email())
                     .defaultRoles(backend.defaultRoles())
+                    .timezone(backend.defaultUserTimezone().orElse(null))
                     .build());
 
             return Optional.of(AuthenticationDetails.builder().userDetails(userDetails).build());

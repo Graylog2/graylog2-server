@@ -14,23 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import numeral from 'numeral';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { Button, Row, Col, Well } from 'components/bootstrap';
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
 import Routes from 'routing/Routes';
-import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { EXTRACTORS_QUERY_KEY, deleteExtractor } from 'hooks/useExtractors';
 
 type TimingMetricsProps = {
   timing: any;
 };
 
-const TimingMetrics = ({
-  timing,
-}: TimingMetricsProps) => (
+const TimingMetrics = ({ timing }: TimingMetricsProps) => (
   <dl className="metric-def metric-timer">
     <dt>95th percentile:</dt>
     <dd>{numeral(timing['95th_percentile']).format('0,0.[00]')}&#956;s</dd>
@@ -59,16 +58,13 @@ type MetricsProps = {
   metrics: any;
 };
 
-const Metrics = ({
-  metrics,
-}: MetricsProps) => {
+const Metrics = ({ metrics }: MetricsProps) => {
   let totalRate;
 
   if (metrics.total.rate) {
     totalRate = (
       <div className="meter" style={{ marginBottom: 10 }}>
-        {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot,{' '}
-        averages:{' '}
+        {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot, averages:{' '}
         {numeral(metrics.total.rate.one_minute).format('0,0.[00]')},{' '}
         {numeral(metrics.total.rate.five_minute).format('0,0.[00]')},{' '}
         {numeral(metrics.total.rate.fifteen_minute).format('0,0.[00]')}.
@@ -78,8 +74,7 @@ const Metrics = ({
 
   const conditionCounts = (
     <div className="meter" style={{ marginBottom: 10 }}>
-      {metrics.condition_hits} hits,{' '}
-      {metrics.condition_misses} misses
+      {metrics.condition_hits} hits, {metrics.condition_misses} misses
     </div>
   );
 
@@ -121,19 +116,23 @@ const Metrics = ({
       {conditionCounts}
       <Row>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Total time</h4><br />
+          <h4 style={{ display: 'inline' }}>Total time</h4>
+          <br />
           {totalTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Condition time</h4><br />
+          <h4 style={{ display: 'inline' }}>Condition time</h4>
+          <br />
           {conditionTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Execution time</h4><br />
+          <h4 style={{ display: 'inline' }}>Execution time</h4>
+          <br />
           {executionTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Converter time</h4><br />
+          <h4 style={{ display: 'inline' }}>Converter time</h4>
+          <br />
           {convertersTime}
         </Col>
       </Row>
@@ -147,48 +146,27 @@ type ExtractorsListItemProps = {
   nodeId: string;
 };
 
-class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
-  [key: string]: any;
-}> {
-  constructor(props) {
-    super(props);
+const ExtractorsListItem = ({ extractor, inputId, nodeId }: ExtractorsListItemProps) => {
+  const [showDetails, setShowDetails] = useState(false);
+  const queryClient = useQueryClient();
 
-    this.state = {
-      showDetails: false,
-    };
-  }
+  const _toggleDetails = () => setShowDetails((prev) => !prev);
 
-  _toggleDetails = () => {
-    const { showDetails } = this.state;
-
-    this.setState({ showDetails: !showDetails });
-  };
-
-  _deleteExtractor = () => {
-    const { extractor, inputId } = this.props;
-
+  const _deleteExtractor = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really remove extractor "${extractor.title}?"`)) {
-      ExtractorsActions.delete.triggerPromise(inputId, extractor);
+      deleteExtractor(inputId, extractor).then(() => queryClient.invalidateQueries({ queryKey: EXTRACTORS_QUERY_KEY }));
     }
   };
 
-  _formatExtractorSubtitle = () => {
-    const { extractor } = this.props;
+  const _formatExtractorSubtitle = () => (
+    <span>
+      Trying to extract data from <em>{extractor.source_field}</em> into <em>{extractor.target_field}</em>,{' '}
+      {extractor.cursor_strategy === 'cut' && 'not'} leaving the original intact.
+    </span>
+  );
 
-    return (
-      <span>
-        Trying to extract data from <em>{extractor.source_field}</em> into{' '}
-        <em>{extractor.target_field}</em>,{' '}
-        {extractor.cursor_strategy === 'cut' && 'not'}{' '}
-        leaving the original intact.
-      </span>
-    );
-  };
-
-  _formatCondition = () => {
-    const { extractor } = this.props;
-
+  const _formatCondition = () => {
     if (extractor.condition_type === 'none') {
       return <div />;
     }
@@ -207,63 +185,57 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
     );
   };
 
-  _formatActions = () => {
-    const actions = [];
-    const { extractor, nodeId, inputId } = this.props;
+  const _formatActions = () => [
+    <Button key={`extractor-details-${extractor.id}`} bsStyle="info" onClick={_toggleDetails}>
+      Details
+    </Button>,
+    <LinkContainer
+      key={`edit-extractor-${extractor.id}`}
+      to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}>
+      <Button>Edit</Button>
+    </LinkContainer>,
+    <Button key="delete-extractor-" bsStyle="danger" onClick={_deleteExtractor}>
+      Delete
+    </Button>,
+  ];
 
-    actions.push(
-      <Button key={`extractor-details-${extractor.id}`} bsStyle="info" onClick={this._toggleDetails}>
-        Details
-      </Button>,
-    );
-
-    actions.push(
-      <LinkContainer key={`edit-extractor-${extractor.id}`}
-                     to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}>
-        <Button>Edit</Button>
-      </LinkContainer>,
-    );
-
-    actions.push(<Button key="delete-extractor-" bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
-
-    return actions;
-  };
-
-  _formatOptions = (options) => {
-    const { extractor } = this.props;
-
+  const _formatOptions = (options: { [key: string]: unknown }) => {
     const attributes = Object.keys(options);
 
-    return attributes.map((attribute) => <li key={`${attribute}-${extractor.id}`}>{attribute}: {options[attribute]}</li>);
+    return attributes.map((attribute) => (
+      <li key={`${attribute}-${extractor.id}`}>
+        {attribute}: {options[attribute] as React.ReactNode}
+      </li>
+    ));
   };
 
-  _formatConfiguration = (extractorConfig) => {
-    let formattedOptions: React.ReactElement | Array<React.ReactElement> = this._formatOptions(extractorConfig);
+  const _formatConfiguration = (extractorConfig: { [key: string]: unknown }) => {
+    let formattedOptions: React.ReactElement | Array<React.ReactElement> = _formatOptions(extractorConfig);
 
-    if (formattedOptions.length === 0) {
+    if ((formattedOptions as Array<React.ReactElement>).length === 0) {
       formattedOptions = <li>No configuration options</li>;
     }
 
     return (
       <div className="configuration-section">
         <h4>Configuration</h4>
-        <ul>
-          {formattedOptions}
-        </ul>
+        <ul>{formattedOptions}</ul>
       </div>
     );
   };
 
-  _formatConverter = (key, converter) => (
+  const _formatConverter = (key: string, converter: { type: string; config?: { [key: string]: unknown } }) => (
     <li key={`converter-${key}`}>
       {converter.type}
-      {converter.config && <ul>{this._formatOptions(converter.config)}</ul>}
+      {converter.config && <ul>{_formatOptions(converter.config)}</ul>}
     </li>
   );
 
-  _formatConverters = (converters) => {
+  const _formatConverters = (converters: { [key: string]: { type: string; config?: { [key: string]: unknown } } }) => {
     const converterKeys = Object.keys(converters);
-    const formattedConverters = converterKeys.map((converterKey) => this._formatConverter(converterKey, converters[converterKey]));
+    const formattedConverters = converterKeys.map((converterKey) =>
+      _formatConverter(converterKey, converters[converterKey]),
+    );
 
     if (formattedConverters.length === 0) {
       return <div />;
@@ -272,48 +244,39 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
     return (
       <div className="configuration-section">
         <h4>Converters</h4>
-        <ul>
-          {formattedConverters}
-        </ul>
+        <ul>{formattedConverters}</ul>
       </div>
     );
   };
 
-  _formatDetails = () => {
-    const { extractor } = this.props;
+  const _formatDetails = () => (
+    <div>
+      <Col md={8}>
+        <Well bsSize="small" className="configuration-well">
+          {_formatCondition()}
+          {_formatConfiguration(extractor.extractor_config)}
+          {_formatConverters(extractor.converters)}
+        </Well>
+      </Col>
+      <Col md={4}>
+        <div className="graylog-input-metrics">
+          <h3>Metrics</h3>
+          <Metrics metrics={extractor.metrics} />
+        </div>
+      </Col>
+    </div>
+  );
 
-    return (
-      <div>
-        <Col md={8}>
-          <Well bsSize="small" className="configuration-well">
-            {this._formatCondition()}
-            {this._formatConfiguration(extractor.extractor_config)}
-            {this._formatConverters(extractor.converters)}
-          </Well>
-        </Col>
-        <Col md={4}>
-          <div className="graylog-input-metrics">
-            <h3>Metrics</h3>
-            <Metrics metrics={extractor.metrics} />
-          </div>
-        </Col>
-      </div>
-    );
-  };
-
-  render() {
-    const { extractor } = this.props;
-    const { showDetails } = this.state;
-
-    return (
-      <EntityListItem key={`entry-list-${extractor.id}`}
-                      title={extractor.title}
-                      titleSuffix={ExtractorUtils.getReadableExtractorTypeName(extractor.type)}
-                      description={this._formatExtractorSubtitle()}
-                      actions={this._formatActions()}
-                      contentRow={showDetails ? this._formatDetails() : null} />
-    );
-  }
-}
+  return (
+    <EntityListItem
+      key={`entry-list-${extractor.id}`}
+      title={extractor.title}
+      titleSuffix={ExtractorUtils.getReadableExtractorTypeName(extractor.type)}
+      description={_formatExtractorSubtitle()}
+      actions={_formatActions()}
+      contentRow={showDetails ? _formatDetails() : null}
+    />
+  );
+};
 
 export default ExtractorsListItem;

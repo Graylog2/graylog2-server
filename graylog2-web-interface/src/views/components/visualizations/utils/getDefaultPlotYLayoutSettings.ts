@@ -17,18 +17,40 @@
 import type { DefaultTheme } from 'styled-components';
 
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
+import { AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { DefaultAxisKey, FieldUnitType } from 'views/types';
+const getDefaultPlotYLayoutSettings = (
+  theme: DefaultTheme,
+  unitTypeKey?: FieldUnitType | DefaultAxisKey,
+  config?: AggregationWidgetConfig,
+) => {
+  const visualizationAxisTitle =
+    config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
+      ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.title
+      : null;
 
-const getDefaultPlotYLayoutSettings = (theme: DefaultTheme) => {
+  const visualizationAxisColor =
+    config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
+      ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.color
+      : null;
   const fontSettings = getDefaultPlotFontSettings(theme);
+  const color = visualizationAxisColor ?? fontSettings.color;
+  const gridColor = visualizationAxisColor
+    ? theme.utils.colorLevel(visualizationAxisColor, -4)
+    : theme.colors.variant.lightest.default;
 
-  return ({
+  return {
     automargin: true,
-    gridcolor: theme.colors.variant.lightest.default,
-    tickfont: fontSettings,
+    gridcolor: gridColor,
+    tickfont: { ...fontSettings, color },
     title: {
-      font: fontSettings,
+      font: { ...fontSettings, color },
+      text: visualizationAxisTitle,
+      automargin: true,
+      standoff: AXIS_LABEL_MARGIN,
     },
-  });
+  };
 };
 
 export default getDefaultPlotYLayoutSettings;

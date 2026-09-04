@@ -24,15 +24,18 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
 
 type Props = {
-  field: string,
-}
+  field: string;
+};
 
 const FieldUnit = ({ field }: Props) => {
   const fieldTypesUnits = useFieldTypesUnits();
   const { data } = useFieldTypes(undefined, undefined);
   const predefinedValue = useMemo(() => fieldTypesUnits?.[field], [field, fieldTypesUnits]);
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
-  const showUnitComponent = useMemo(() => !!(data?.find((f) => f.name === field && f?.type?.properties?.contains(Properties.Numeric))), [data, field]);
+  const showUnitComponent = useMemo(
+    () => !!data?.find((f) => f.name === field && f?.type?.properties?.contains(Properties.Numeric)),
+    [data, field],
+  );
 
   useEffect(() => {
     if (predefinedValue && !values.units[field]) {

@@ -34,7 +34,11 @@ import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 import DrilldownContext from './DrilldownContext';
 import type { Drilldown } from './DrilldownContext';
 
-const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride | undefined, currentQuery: Query): Drilldown => {
+const useDrillDownContextValue = (
+  widget: Widget,
+  globalOverride: GlobalOverride | undefined,
+  currentQuery: Query,
+): Drilldown => {
   const viewType = useViewType();
 
   if (viewType === View.Type.Dashboard) {
@@ -43,12 +47,12 @@ const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride
       ? concatQueryStrings([query?.query_string, globalOverride.query.query_string])
       : query?.query_string;
 
-    return ({
+    return {
       streams,
       streamCategories,
       timerange: (globalOverride?.timerange ? globalOverride.timerange : timerange) || DEFAULT_TIMERANGE,
       query: createElasticsearchQueryString(dashboardAndWidgetQueryString || ''),
-    });
+    };
   }
 
   if (currentQuery) {
@@ -56,15 +60,15 @@ const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride
     const streamCategories = filtersToStreamCategorySet(currentQuery.filter).toJS();
     const { timerange, query } = currentQuery;
 
-    return ({ streams, streamCategories, timerange, query });
+    return { streams, streamCategories, timerange, query };
   }
 
   return undefined;
 };
 
 type Props = {
-  children: React.ReactElement,
-  widget: Widget,
+  children: React.ReactElement;
+  widget: Widget;
 };
 
 const DrilldownContextProvider = ({ children, widget }: Props) => {

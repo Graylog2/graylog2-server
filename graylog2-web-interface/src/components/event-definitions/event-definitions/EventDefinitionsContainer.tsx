@@ -15,75 +15,160 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
+import startCase from 'lodash/startCase';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import {
-  QueryHelper,
-  RelativeTime,
-  PaginatedEntityTable,
-} from 'components/common';
-import { Link } from 'components/common/router';
+import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
 import Routes from 'routing/Routes';
-import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
+import FilterValueRenderers from 'components/event-definitions/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
 
 import EventDefinitionActions from './EventDefinitionActions';
+import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
+import ExpandedNotificationsSection from './ExpandedNotificationsSection';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
+import useEventDefinitionOverviewSections from './useEventDefinitionOverviewSections';
 
 import type { EventDefinition } from '../event-definitions-types';
-import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER } from '../constants';
+import type { TacticsTechniquesColumnPlugin } from '../types';
+import getEventDefinitionTableElements from '../constants';
 
-const customColumnRenderers = {
+const getCustomColumnRenderers = (
+  pluggableColumnRenderers?: ColumnRenderersByAttribute<EventDefinition>,
+  tacticsTechniquesPlugin?: TacticsTechniquesColumnPlugin,
+) => ({
   attributes: {
     title: {
-      renderCell: (title: string, eventDefinition) => (
+      renderCell: (title: string, eventDefinition: EventDefinition) => (
         <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{title}</Link>
       ),
     },
     matched_at: {
-      renderCell: (_matched_at: string, eventDefinition) => (
-        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never'
-      ),
+      renderCell: (_matched_at: string, eventDefinition: EventDefinition) =>
+        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
     },
     scheduling: {
-      renderCell: (_scheduling: string, eventDefinition) => (
+      renderCell: (_scheduling: string, eventDefinition: EventDefinition) => (
         <SchedulingCell definition={eventDefinition} />
       ),
     },
     status: {
-      renderCell: (_status: string, eventDefinition) => (
+      renderCell: (_status: string, eventDefinition: EventDefinition) => (
         <StatusCell eventDefinition={eventDefinition} />
       ),
-      staticWidth: 100,
+      staticWidth: 120,
+    },
+    type: {
+      renderCell: (_type: string, eventDefinition: EventDefinition) => (
+        <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
+      ),
+      width: 0.15,
+      minWidth: 150,
     },
     priority: {
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
+    notifications: {
+      renderCell: (_notifications: EventDefinition['notifications'], eventDefinition: EventDefinition) => (
+        <EventDefinitionNotificationsCell eventDefinition={eventDefinition} />
+      ),
+      textAlign: 'right',
+    },
+    '_entity_source.source': {
+      renderCell: (_title: string, eventDefinition: EventDefinition) => (
+        <span>
+          {eventDefinition._entity_source
+            ? startCase(eventDefinition._entity_source.source.toString().toLowerCase())
+            : 'User Defined'}
+        </span>
+      ),
+    },
+    tags: {
+      renderCell: (_tags: string[], eventDefinition: EventDefinition) => <TagsRenderer tags={eventDefinition.tags} />,
+      width: 0.2,
+      minWidth: 160,
+    },
+    ...(tacticsTechniquesPlugin
+      ? {
+          [tacticsTechniquesPlugin.attribute.id]: {
+            renderCell: (_: unknown, eventDefinition: EventDefinition) => {
+              const Cell = tacticsTechniquesPlugin.component;
+
+              return <Cell entity={eventDefinition} />;
+            },
+            width: 0.2,
+            minWidth: 160,
+          },
+        }
+      : {}),
+    ...(pluggableColumnRenderers || {}),
   },
-};
+});
 
 const bulkSelection = {
   actions: <BulkActions />,
-
 };
 const renderEventDefinitionActions = (listItem: EventDefinition) => (
   <EventDefinitionActions eventDefinition={listItem} />
 );
 
-const EventDefinitionsContainer = () => (
-  <PaginatedEntityTable<EventDefinition> humanName="event definitions"
-                                         columnsOrder={COLUMNS_ORDER}
-                                         additionalAttributes={ADDITIONAL_ATTRIBUTES}
-                                         queryHelpComponent={<QueryHelper entityName="event definition" />}
-                                         tableLayout={DEFAULT_LAYOUT}
-                                         fetchEntities={fetchEventDefinitions}
-                                         entityActions={renderEventDefinitionActions}
-                                         keyFn={keyFn}
-                                         entityAttributesAreCamelCase={false}
-                                         filterValueRenderers={FilterValueRenderers}
-                                         columnRenderers={customColumnRenderers}
-                                         bulkSelection={bulkSelection} />
+const renderExpandedNotifications = (eventDefinition: EventDefinition) => (
+  <ExpandedNotificationsSection eventDefinition={eventDefinition} />
 );
+
+const notificationsExpandedSection = {
+  title: 'Notifications',
+  content: renderExpandedNotifications,
+};
+
+const EventDefinitionsContainer = () => {
+  const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
+    usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
+
+  const tacticsTechniquesPlugin = PluginStore.exports('eventDefinitions.components.tacticsTechniquesColumn')[0];
+  const tacticsTechniquesEnabled = tacticsTechniquesPlugin?.useCondition?.() ?? !!tacticsTechniquesPlugin;
+  const activeTacticsTechniquesPlugin = tacticsTechniquesEnabled ? tacticsTechniquesPlugin : undefined;
+
+  const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(
+    pluggableAttributes,
+    activeTacticsTechniquesPlugin?.attribute,
+  );
+  const expandedSections = useMemo(
+    () => ({
+      notifications: notificationsExpandedSection,
+      ...pluggableExpandedSections,
+    }),
+    [pluggableExpandedSections],
+  );
+  const overviewSections = useEventDefinitionOverviewSections();
+
+  return (
+    <>
+      {overviewSections.map(({ key, component: Component }) => (
+        <Component key={key} />
+      ))}
+      <PaginatedEntityTable<EventDefinition>
+        humanName="event definitions"
+        additionalAttributes={additionalAttributes}
+        queryHelpComponent={<QueryHelper entityName="event definition" />}
+        tableLayout={defaultLayout}
+        fetchEntities={fetchEventDefinitions}
+        entityActions={renderEventDefinitionActions}
+        keyFn={keyFn}
+        entityAttributesAreCamelCase={false}
+        expandedSectionRenderers={expandedSections}
+        filterValueRenderers={FilterValueRenderers}
+        columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
+        bulkSelection={bulkSelection}
+      />
+    </>
+  );
+};
 
 export default EventDefinitionsContainer;

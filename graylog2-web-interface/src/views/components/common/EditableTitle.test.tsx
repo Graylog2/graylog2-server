@@ -14,28 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { fireEvent } from '@testing-library/react';
 
 import EditableTitle from './EditableTitle';
 
 describe('EditableTitle', () => {
-  it('stops submit event propagation', () => {
+  it('stops submit event propagation', async () => {
     const onSubmit = jest.fn((e) => e.persist());
 
-    render((
+    render(
       <div onSubmit={onSubmit}>
         <EditableTitle value="Current title" onChange={jest.fn()} />
-      </div>
-    ));
+      </div>,
+    );
 
     const currentTitle = screen.getByText('Current title');
-    fireEvent.dblClick(currentTitle);
+    await userEvent.dblClick(currentTitle);
 
     const titleInput = screen.getByRole('textbox');
-    fireEvent.change(titleInput, { target: { value: 'New title' } });
-    fireEvent.submit(titleInput);
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, 'New title{enter}');
 
     expect(onSubmit).not.toHaveBeenCalled();
   });

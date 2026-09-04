@@ -25,10 +25,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResponseEntityConverterTest {
     private ResponseEntityConverter toTest;
@@ -61,6 +61,22 @@ class ResponseEntityConverterTest {
         assertNotNull(result);
         assertEquals("Text", result.get("text"));
         assertEquals(1, result.get("number"));
+    }
+
+    @Test
+    public void convertsBooleanEntityAsData() {
+        final Map<String, Object> result = toTest.convertValue(Boolean.TRUE, Boolean.class);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(Boolean.TRUE, result.get("data"));
+    }
+
+    @Test
+    public void convertsNumericEntityAsData() {
+        final Map<String, Object> result = toTest.convertValue(42, Integer.class);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(42, result.get("data"));
     }
 
     @Test

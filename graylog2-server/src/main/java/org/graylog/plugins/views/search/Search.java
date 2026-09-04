@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidator;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
@@ -133,7 +134,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
 
     public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {
-        if (!hasQueriesWithoutStreams()) {
+        if (!hasQueriesWithoutStreams() || DataLakeSearchValidator.containsDataLakeSearchElements(this)) {
             return this;
         }
         final Set<Query> withStreams = queries().stream().filter(Query::hasStreams).collect(toSet());
@@ -157,7 +158,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     public Search addStreamsToQueriesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
                                                     StreamPermissions streamPermissions) {
-        if (!hasQueriesWithStreamCategories()) {
+        if (!hasQueriesWithStreamCategories() || DataLakeSearchValidator.containsDataLakeSearchElements(this)) {
             return this;
         }
         final Set<Query> withStreamCategories = queries().stream().filter(q -> !q.usedStreamCategories().isEmpty()).collect(toSet());
@@ -165,10 +166,12 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         final Set<Query> withMappedStreamCategories = new HashSet<>();
 
         for (Query query : withStreamCategories) {
-            final Set<String> mappedStreamIds = categoryMappingFunction.apply(query.usedStreamCategories())
-                    .filter(streamPermissions::canReadStream)
-                    .collect(toSet());
-            withMappedStreamCategories.add(query.addStreamsToFilter(mappedStreamIds));
+            try (var stream = categoryMappingFunction.apply(query.usedStreamCategories())) {
+                final Set<String> mappedStreamIds = stream
+                        .filter(streamPermissions::canReadStream)
+                        .collect(toSet());
+                withMappedStreamCategories.add(query.addStreamsToFilter(mappedStreamIds));
+            }
         }
 
         final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
@@ -178,7 +181,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     public Search addStreamsToSearchTypesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
                                                         StreamPermissions streamPermissions) {
-        if (!hasQuerySearchTypesWithStreamCategories()) {
+        if (!hasQuerySearchTypesWithStreamCategories() || DataLakeSearchValidator.containsDataLakeSearchElements(this)) {
             return this;
         }
         final Set<Query> withStreamCategories = queries().stream()
@@ -194,11 +197,13 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 if (!st.hasStreamCategories()) {
                     mappedSearchTypes.add(st);
                 } else {
-                    final Set<String> mappedStreamIds = categoryMappingFunction.apply(st.streamCategories())
-                            .filter(streamPermissions::canReadStream)
-                            .collect(toSet());
-                    mappedStreamIds.addAll(st.streams());
-                    mappedSearchTypes.add(st.toBuilder().streams(mappedStreamIds).build());
+                    try (var stream = categoryMappingFunction.apply(st.streamCategories())) {
+                        final Set<String> mappedStreamIds = stream
+                                .filter(streamPermissions::canReadStream)
+                                .collect(toSet());
+                        mappedStreamIds.addAll(st.streams());
+                        mappedSearchTypes.add(st.toBuilder().streams(mappedStreamIds).build());
+                    }
                 }
             }
             withMappedStreamCategories.add(query.toBuilder().searchTypes(mappedSearchTypes).build());
@@ -319,7 +324,9 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         final SearchEntity.Builder searchEntityBuilder = SearchEntity.builder()
                 .queries(ImmutableSet.copyOf(queries))
-                .parameters(this.parameters())
+                .parameters(this.parameters().stream()
+                        .map(parameter -> parameter.toContentPackEntity(entityDescriptorIds))
+                        .collect(ImmutableSet.toImmutableSet()))
                 .requires(this.requires())
                 .createdAt(this.createdAt());
         if (this.owner().isPresent()) {
@@ -331,5 +338,6 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
         queries().forEach(query -> query.resolveNativeEntity(entityDescriptor, mutableGraph));
+        parameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

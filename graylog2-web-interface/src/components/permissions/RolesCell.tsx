@@ -28,20 +28,21 @@ const Role = styled(Label)`
   margin-right: 5px;
   margin-bottom: 5px;
   display: inline-block;
-  padding: 4px 6px;
 `;
 
 type Props = {
-  roles: Immutable.Set<string>,
+  roles: Immutable.Set<string>;
 };
 
 const RolesCell = ({ roles }: Props) => (
   <Td>
-    {roles.map((role) => (
-      <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'default'}>
-        {role}
-      </Role>
-    )).toArray()}
+    {roles
+      .map((role) => (
+        <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'default'}>
+          {role}
+        </Role>
+      ))
+      .toArray()}
   </Td>
 );
 

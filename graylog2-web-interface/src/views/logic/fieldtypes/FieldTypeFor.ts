@@ -21,7 +21,7 @@ import inferTypeForSeries from './InferTypeForSeries';
 import FieldType from './FieldType';
 import type FieldTypeMapping from './FieldTypeMapping';
 
-const fieldTypeFor = (field: string, types: (FieldTypeMappingsList | Array<FieldTypeMapping>)): FieldType => {
+const fieldTypeFor = (field: string, types: FieldTypeMappingsList | Array<FieldTypeMapping>): FieldType => {
   if (isFunction(field)) {
     const { type } = inferTypeForSeries(Series.forFunction(field), types);
 

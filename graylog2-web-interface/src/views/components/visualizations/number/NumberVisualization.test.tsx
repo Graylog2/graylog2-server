@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -23,29 +23,39 @@ import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
+import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import type { CurrentViewType } from 'views/components/CustomPropTypes';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import NumberVisualization from './NumberVisualization';
 
-jest.mock('./AutoFontSizer', () => ({ children }: React.PropsWithChildren<{}>) => children);
+jest.mock(
+  './AutoFontSizer',
+  () =>
+    ({ children = undefined }: React.PropsWithChildren<{}>) =>
+      children,
+);
 
-jest.mock('views/components/highlighting/CustomHighlighting', () => ({ children }: React.PropsWithChildren<{}>) => <div>{children}</div>);
+jest.mock(
+  'views/components/highlighting/CustomHighlighting',
+  () =>
+    ({ children = undefined }: React.PropsWithChildren<{}>) => <div>{children}</div>,
+);
 
 jest.mock('views/components/Value', () => ({ value }: { value: string }) => <div>{value}</div>);
 
 type Data = Record<string, Rows>;
 type SUTProps = {
-
   data?: Data;
+  config?: AggregationWidgetConfig;
 };
 
 describe('NumberVisualization', () => {
   const data: Data = {
-    chart:
-      [{
+    chart: [
+      {
         key: [],
         source: 'leaf',
         values: [
@@ -56,90 +66,156 @@ describe('NumberVisualization', () => {
             value: 2134342,
           },
         ],
-      }],
+      },
+    ],
   };
-  const currentView: CurrentViewType = { activeQuery: 'dead-beef' };
   const fields = List([FieldTypeMapping.create('lines_add', FieldTypes.INT())]);
 
   const SimplifiedNumberVisualization = (props: SUTProps = {}) => (
     <TestStoreProvider>
-      <NumberVisualization data={data}
-                           width={200}
-                           height={200}
-                           fields={fields}
-                         // @ts-ignore
-                           currentView={currentView}
-                           onChange={() => {}}
-                           toggleEdit={() => {}}
-                           effectiveTimerange={{
-                             from: '2020-01-10T13:23:42.000Z',
-                             to: '2020-01-10T14:23:42.000Z',
-                             type: 'absolute',
-                           }}
-                           config={AggregationWidgetConfig.builder()
-                             .series([Series.forFunction('count()')])
-                             .build()}
-                           {...props} />
+      <NumberVisualization
+        data={data}
+        width={200}
+        height={200}
+        fields={fields}
+        setLoadingState={() => {}}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        effectiveTimerange={{
+          from: '2020-01-10T13:23:42.000Z',
+          to: '2020-01-10T14:23:42.000Z',
+          type: 'absolute',
+        }}
+        config={AggregationWidgetConfig.builder()
+          .series([Series.forFunction('count()')])
+          .build()}
+        {...props}
+      />
     </TestStoreProvider>
   );
 
+  const rowsWithValue = (value: number): Rows => [
+    {
+      key: [],
+      source: 'leaf',
+      values: [
+        {
+          key: ['count()'],
+          rollup: true,
+          source: 'row-leaf',
+          value,
+        },
+      ],
+    },
+  ];
+
+  const dataWithTrend = (current: number, previous: number): Data => ({
+    chart: rowsWithValue(current),
+    trend: rowsWithValue(previous),
+  });
+
+  const configWithTrend = (trendPreference: TrendPreference) =>
+    AggregationWidgetConfig.builder()
+      .series([Series.forFunction('count()')])
+      .visualization('numeric')
+      .visualizationConfig(NumberVisualizationConfig.create(true, trendPreference))
+      .build();
+
   useViewsPlugin();
 
-  it('should render a number visualization', () => {
-    const wrapper = mount(<SimplifiedNumberVisualization />);
+  it('should render a number visualization', async () => {
+    render(<SimplifiedNumberVisualization />);
 
-    expect(wrapper.find(NumberVisualization)).toExist();
+    await screen.findByText('2134342');
   });
 
   it('calls render completion callback after first render', () => {
     const onRenderComplete = jest.fn();
 
-    mount((
+    render(
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <SimplifiedNumberVisualization />
-      </RenderCompletionCallback.Provider>
-    ));
+      </RenderCompletionCallback.Provider>,
+    );
 
     expect(onRenderComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('renders 0 if value is 0', () => {
+  it('renders 0 if value is 0', async () => {
     const dataWithZeroValue: { chart: Rows } = {
-      chart: [{
-        key: [],
-        source: 'leaf',
-        values: [
-          {
-            key: ['count()'],
-            rollup: true,
-            source: 'row-leaf',
-            value: 0,
-          },
-        ],
-      }],
+      chart: [
+        {
+          key: [],
+          source: 'leaf',
+          values: [
+            {
+              key: ['count()'],
+              rollup: true,
+              source: 'row-leaf',
+              value: 0,
+            },
+          ],
+        },
+      ],
     };
-    const wrapper = mount(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
+    render(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
 
-    expect(wrapper).toHaveText('0');
+    await screen.findByText('0');
   });
 
-  it('renders N/A if value is null', () => {
+  it('renders N/A if value is null', async () => {
     const dataWithZeroValue: Data = {
-      chart: [{
-        key: [],
-        source: 'leaf',
-        values: [
-          {
-            key: ['count()'],
-            rollup: true,
-            source: 'row-leaf',
-            value: null,
-          },
-        ],
-      }],
+      chart: [
+        {
+          key: [],
+          source: 'leaf',
+          values: [
+            {
+              key: ['count()'],
+              rollup: true,
+              source: 'row-leaf',
+              value: null,
+            },
+          ],
+        },
+      ],
     };
-    const wrapper = mount(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
+    render(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
 
-    expect(wrapper).toHaveText('N/A');
+    await screen.findByText('N/A');
+  });
+
+  describe('colors the container according to value and trend preference', () => {
+    it.each`
+      current | previous | preference   | expectedColor
+      ${42}   | ${42}    | ${'HIGHER'}  | ${'#fff'}
+      ${43}   | ${42}    | ${'HIGHER'}  | ${'#2ECA8F'}
+      ${41}   | ${42}    | ${'HIGHER'}  | ${'#FE4A49'}
+      ${41}   | ${42}    | ${'LOWER'}   | ${'#2ECA8F'}
+      ${43}   | ${42}    | ${'LOWER'}   | ${'#FE4A49'}
+      ${43}   | ${42}    | ${'NEUTRAL'} | ${'#fff'}
+    `(
+      'shows $expectedColor for current=$current, previous=$previous, preference=$preference',
+      async ({ current, previous, preference, expectedColor }) => {
+        render(
+          <SimplifiedNumberVisualization
+            data={dataWithTrend(current, previous)}
+            config={configWithTrend(preference)}
+          />,
+        );
+
+        const container = await screen.findByTestId('trend-background');
+
+        expect(container).toHaveStyleRule('background-color', `${expectedColor}!important`);
+      },
+    );
+
+    it('does not color the container when trend is disabled', async () => {
+      render(<SimplifiedNumberVisualization />);
+
+      const container = await screen.findByTestId('trend-background');
+
+      expect(container).not.toHaveStyleRule('background-color');
+    });
   });
 });

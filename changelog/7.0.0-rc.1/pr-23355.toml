@@ -1,0 +1,5 @@
+type = "a"
+message = 'Added indexer_jwt_auth_token_clock_skew_tolerance configuration for datanode/opensearch auth'
+
+issues = []
+pulls = ["23355"]

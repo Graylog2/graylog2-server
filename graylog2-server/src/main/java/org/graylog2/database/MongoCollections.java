@@ -17,40 +17,38 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.MongoCollection;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.Document;
+import org.bson.codecs.Codec;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
+import org.graylog2.database.indices.MongoDbIndexTools;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
+import org.mongojack.JacksonCodecRegistry;
 
 @Singleton
 public class MongoCollections {
 
     private final ObjectMapper objectMapper;
     private final MongoConnection mongoConnection;
+    private final Supplier<JacksonCodecRegistry> codecRegistrySupplier;
 
     @Inject
     public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
-    }
-
-    /**
-     * Get a MongoCollection configured to use Jackson for serialization/deserialization of objects.
-     * <p>
-     * <b>Prefer using {@link #collection(String, Class)} to get a more strictly typed collection!</b>
-     *
-     * @deprecated Use {@link #collection(String, Class)} or {@link #nonEntityCollection(String, Class)} instead.
-     */
-    @Deprecated
-    public <T> MongoCollection<T> get(String collectionName, Class<T> valueType) {
-        return nonEntityCollection(collectionName, valueType);
+        this.codecRegistrySupplier = Suppliers.memoize(() -> new CustomJacksonCodecRegistry(
+                objectMapper,
+                mongoConnection.getMongoDatabase().getCodecRegistry()
+        ));
     }
 
     /**
@@ -63,8 +61,8 @@ public class MongoCollections {
      * @param valueType      Java type of the documents stored in the collection
      * @return A collection using a Jackson codec for serialization and deserialization
      */
-    public <T> MongoCollection<T> nonEntityCollection(String collectionName, Class<T> valueType) {
-        return getCollection(collectionName, valueType);
+    public <T> com.mongodb.client.MongoCollection<T> nonEntityCollection(String collectionName, Class<T> valueType) {
+        return getNonEntityCollection(collectionName, valueType);
     }
 
     /**
@@ -76,6 +74,17 @@ public class MongoCollections {
      */
     public <T extends MongoEntity> MongoCollection<T> collection(String collectionName, Class<T> valueType) {
         return getCollection(collectionName, valueType);
+    }
+
+    /**
+     * Returns a Jackson-backed MongoDB codec without binding the value type to a collection.
+     *
+     * @param valueType Java type to encode and decode
+     * @return a codec using the same MongoJack object mapper as managed collections
+     */
+    public <T> Codec<T> getCodecFor(Class<T> valueType) {
+        // Use the codec registry supplier to avoid creating a new registry per call.
+        return codecRegistrySupplier.get().addCodecForClass(valueType);
     }
 
     /**
@@ -103,22 +112,42 @@ public class MongoCollections {
      * Provides utility methods like getting documents by ID, etc.
      */
     public <T extends MongoEntity> MongoUtils<T> utils(MongoCollection<T> collection) {
-        return new MongoUtils<>(collection, objectMapper);
+        return new MongoUtils<>(collection);
     }
 
     /**
      * Provides utility methods for creating, updating, and deleting ScopedEntity objects
      */
-    public <T extends ScopedEntity> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
+    public <T extends ScopedEntity<?>> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
         return new ScopedEntityMongoUtils<>(collection, entityScopeService);
     }
 
-    private <T> MongoCollection<T> getCollection(String collectionName, Class<T> valueType) {
-        final MongoCollection<T> collection = mongoConnection.getMongoDatabase().getCollection(collectionName, valueType);
+    public <T extends MongoEntity> MongoDbIndexTools indexUtils(MongoCollection<T> collection) {
+        return new MongoDbIndexTools(mongoConnection.getMongoDatabase().getCollection(collection.getNamespace().getCollectionName(), Document.class));
+    }
+
+    private <T extends MongoEntity> MongoCollection<T> getCollection(String collectionName, Class<T> valueType) {
+        return new MongoEntityCollection<>(getNonEntityCollection(collectionName, valueType));
+    }
+
+    private <T> com.mongodb.client.MongoCollection<T> getNonEntityCollection(String collectionName, Class<T> valueType) {
+        final com.mongodb.client.MongoCollection<T> collection = mongoConnection.getMongoDatabase().getCollection(collectionName, valueType);
         final CustomJacksonCodecRegistry jacksonCodecRegistry = new CustomJacksonCodecRegistry(this.objectMapper,
                 collection.getCodecRegistry());
         jacksonCodecRegistry.addCodecForClass(valueType);
         return collection.withCodecRegistry(jacksonCodecRegistry);
     }
 
+    /**
+     * Provides access to the underlying MongoConnection for custom aggregation code or tests.
+     *
+     * @return the underlying MongoConnection
+     */
+    public MongoConnection connection() {
+        return mongoConnection;
+    }
+
+    public MongoConnection mongoConnection() {
+        return connection();
+    }
 }

@@ -24,37 +24,53 @@ import { asMock } from 'helpers/mocking';
 
 jest.mock('preflight/hooks/useConfigurationStep');
 
-jest.mock('preflight/hooks/useDataNodes', () => jest.fn(() => ({
-  data: [],
-  isFetching: false,
-  isInitialLoading: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodes', () =>
+  jest.fn(() => ({
+    data: [],
+    isFetching: false,
+    isInitialLoading: false,
+    error: undefined,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodesCA', () => jest.fn(() => ({
-  data: undefined,
-  isInitialLoading: false,
-  isFetching: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodesCA', () =>
+  jest.fn(() => ({
+    data: undefined,
+    isInitialLoading: false,
+    isFetching: false,
+    error: undefined,
+  })),
+);
 
 describe('ConfigurationWizard', () => {
   it('should show CA configuration step', async () => {
-    asMock(useConfigurationStep).mockReturnValue({ step: CONFIGURATION_STEPS.CA_CONFIGURATION.key, isLoading: false, errors: null });
+    asMock(useConfigurationStep).mockReturnValue({
+      step: CONFIGURATION_STEPS.CA_CONFIGURATION.key,
+      isLoading: false,
+      errors: null,
+    });
     renderPreflight(<ConfigurationWizard setIsWaitingForStartup={() => {}} />);
 
     await screen.findByText(/In this first step you can either upload or create a new certificate authority./);
   });
 
   it('should show CA provisioning step', async () => {
-    asMock(useConfigurationStep).mockReturnValue({ step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key, isLoading: false, errors: null });
+    asMock(useConfigurationStep).mockReturnValue({
+      step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
+      isLoading: false,
+      errors: null,
+    });
     renderPreflight(<ConfigurationWizard setIsWaitingForStartup={() => {}} />);
 
     await screen.findByText(/Certificate authority has been configured successfully./);
   });
 
   it('should show success step', async () => {
-    asMock(useConfigurationStep).mockReturnValue({ step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key, isLoading: false, errors: null });
+    asMock(useConfigurationStep).mockReturnValue({
+      step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
+      isLoading: false,
+      errors: null,
+    });
     renderPreflight(<ConfigurationWizard setIsWaitingForStartup={() => {}} />);
 
     await screen.findByText(/The provisioning has been successful and all data nodes are secured and reachable./);

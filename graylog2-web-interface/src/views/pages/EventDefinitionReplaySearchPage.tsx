@@ -15,36 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import useParams from 'routing/useParams';
 import useEventDefinition from 'hooks/useEventDefinition';
 import { Spinner } from 'components/common';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import ReplaySearch from 'components/events/ReplaySearch';
+import EventDefinitionReplaySearch from 'components/event-definitions/replay-search/EventDefinitionReplaySearch';
+import type FetchError from 'logic/errors/FetchError';
 
-export const onErrorHandler = (error) => {
+export const onErrorHandler = (error: FetchError) => {
   if (error.status === 404) {
     ErrorsActions.report(createFromFetchError(error));
   }
 };
 
 const EventDefinitionReplaySearchPage = () => {
-  const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
-  const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
-  const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(definitionId, { onErrorHandler });
-
-  useEffect(() => {
-    EventNotificationsActions.listAll().then(() => setIsNotificationLoaded(true));
-  }, [setIsNotificationLoaded]);
+  const { definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
+  const { isLoading: EDIsLoading, isFetched: EDIsFetched, data } = useEventDefinition(definitionId, { onErrorHandler });
+  const { isFetched: isNotificationLoaded } = useEventNotifications();
 
   const isLoading = EDIsLoading || !EDIsFetched || !isNotificationLoaded;
 
-  return isLoading
-    ? <Spinner />
-    : <ReplaySearch alertId={alertId} definitionId={definitionId} replayEventDefinition />;
+  return isLoading ? <Spinner /> : <EventDefinitionReplaySearch eventDefinitionMappedData={data} />;
 };
 
 export default EventDefinitionReplaySearchPage;

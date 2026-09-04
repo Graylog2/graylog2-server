@@ -40,7 +40,7 @@ public abstract class AbstractNodeCommand extends CmdLineTool<GraylogNodeConfigu
 
     public AbstractNodeCommand(final String commandName, final GraylogNodeConfiguration configuration) {
         super(commandName, configuration);
-        this.nodeModule = new GraylogNodeModule(configuration);
+        this.nodeModule = new GraylogNodeModule(configuration, chainingClassLoader);
     }
 
     @Override

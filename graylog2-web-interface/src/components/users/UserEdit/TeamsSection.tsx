@@ -22,7 +22,7 @@ import { EnterprisePluginNotFound } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
-  user: User,
+  user: User;
 };
 
 const TeamsSection = ({ user }: Props) => {

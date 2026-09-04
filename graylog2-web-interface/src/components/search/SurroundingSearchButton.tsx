@@ -24,37 +24,59 @@ import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import SearchLink from 'views/logic/search/SearchLink';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import type { SearchesConfig } from './SearchConfig';
 
-const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }: Pick<SearchesConfig, 'surrounding_timerange_options'>) => Object.fromEntries(
-  Object.entries(surroundingTimerangeOptions).map(([key, value]) => [moment.duration(key).asSeconds(), value]),
-);
+const buildTimeRangeOptions = (searchConfig: Pick<SearchesConfig, 'surrounding_timerange_options'> | undefined) => {
+  const surroundingTimerangeOptions = searchConfig?.surrounding_timerange_options ?? {};
 
-const buildFilterFields = (messageFields: {
-  [x: string]: unknown;
-}, searchConfig: Pick<SearchesConfig, 'surrounding_filter_fields'>) => {
-  const { surrounding_filter_fields: surroundingFilterFields = [] } = searchConfig;
+  return Object.fromEntries(
+    Object.entries(surroundingTimerangeOptions).map(([key, value]) => [moment.duration(key).asSeconds(), value]),
+  );
+};
+
+const buildFilterFields = (
+  messageFields: {
+    [x: string]: unknown;
+  },
+  searchConfig: Pick<SearchesConfig, 'surrounding_filter_fields'> | undefined,
+) => {
+  const surroundingFilterFields = searchConfig?.surrounding_filter_fields ?? [];
 
   return Object.fromEntries(surroundingFilterFields.map((fieldName) => [fieldName, messageFields[fieldName]]));
 };
 
-const buildSearchLink = (id: string, from: string, to: string, filterFields: {
-  [key: string]: unknown;
-}, streams: string[], streamCategories: string[]) => SearchLink.builder()
-  .timerange({ type: 'absolute', from, to })
-  .streams(streams)
-  .streamCategories(streamCategories)
-  .filterFields(filterFields)
-  .highlightedMessage(id)
-  .build()
-  .toURL();
+const buildSearchLink = (
+  id: string,
+  from: string,
+  to: string,
+  filterFields: {
+    [key: string]: unknown;
+  },
+  streams: string[],
+  streamCategories: string[],
+) =>
+  SearchLink.builder()
+    .timerange({ type: 'absolute', from, to })
+    .streams(streams)
+    .streamCategories(streamCategories)
+    .filterFields(filterFields)
+    .highlightedMessage(id)
+    .build()
+    .toURL();
 
-const searchLink = (range: string, timestamp: moment.MomentInput, id: string, messageFields: {
-  [key: string]: unknown;
-}, searchConfig: Pick<SearchesConfig, 'surrounding_filter_fields'>, streams: string[], streamCategories: string[]) => {
+const searchLink = (
+  range: string,
+  timestamp: moment.MomentInput,
+  id: string,
+  messageFields: {
+    [key: string]: unknown;
+  },
+  searchConfig: Pick<SearchesConfig, 'surrounding_filter_fields'> | undefined,
+  streams: string[],
+  streamCategories: string[],
+) => {
   const fromTime = moment(timestamp).subtract(Number(range), 'seconds').toISOString();
   const toTime = moment(timestamp).add(Number(range), 'seconds').toISOString();
   const filterFields = buildFilterFields(messageFields, searchConfig);
@@ -63,22 +85,19 @@ const searchLink = (range: string, timestamp: moment.MomentInput, id: string, me
 };
 
 type Props = {
-  searchConfig: Pick<SearchesConfig, 'surrounding_timerange_options' | 'surrounding_filter_fields'>,
-  timestamp: string,
-  id: string,
-  messageFields: { [key: string]: unknown },
+  timestamp: string;
+  id: string;
+  messageFields: { [key: string]: unknown };
 };
 
-const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }: Props) => {
+const SurroundingSearchButton = ({ timestamp, id, messageFields }: Props) => {
   const { streams, streamCategories } = useContext(DrilldownContext);
+  const { config: searchConfig, isInitialLoading: isLoadingSearchConfig } = useSearchConfiguration();
   const timeRangeOptions = buildTimeRangeOptions(searchConfig);
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-message-table');
 
   const sendEvent = (range: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_SHOW_SURROUNDING_MESSAGE, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_section: 'search-message-table',
       app_action_value: 'seach-message-table-show-surrounding',
       event_details: {
         range,
@@ -89,17 +108,22 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
   const menuItems = Object.keys(timeRangeOptions)
     .sort((a, b) => naturalSort(a, b))
     .map((range) => (
-      <MenuItem key={range}
-                onClick={() => sendEvent(range)}
-                href={searchLink(range, timestamp, id, messageFields, searchConfig, streams, streamCategories)}
-                target="_blank"
-                rel="noopener noreferrer">
+      <MenuItem
+        key={range}
+        onClick={() => sendEvent(range)}
+        href={searchLink(range, timestamp, id, messageFields, searchConfig, streams, streamCategories)}
+        target="_blank"
+        rel="noopener noreferrer">
         {timeRangeOptions[range]}
       </MenuItem>
     ));
 
   return (
-    <DropdownButton title="Show surrounding messages" bsSize="small" id="surrounding-search-dropdown">
+    <DropdownButton
+      title="Show surrounding messages"
+      bsSize="small"
+      id="surrounding-search-dropdown"
+      disabled={isLoadingSearchConfig}>
       {menuItems}
     </DropdownButton>
   );

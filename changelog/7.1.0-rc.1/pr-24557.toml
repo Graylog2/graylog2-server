@@ -1,0 +1,5 @@
+type = "changed"
+message = "Updated the security event details event definition name to link to summary view instead of edit page."
+
+issues = ["graylog-plugin-enterprise#12718"]
+pulls = ["24557"]

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed using certain conditions and actions in the rule builder after inital setup of Graylog without restart."
+
+issues = ["20793"]
+pulls = ["22645"]

@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
+import { useFormikContext } from 'formik';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -26,12 +27,9 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import type { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useView from 'views/hooks/useView';
@@ -43,22 +41,45 @@ import useHistory from 'routing/useHistory';
 import mockHistory from 'helpers/mocking/mockHistory';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import { createEntityShareState } from 'fixtures/entityShareState';
+import { createView } from 'views/api/views';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
+jest.mock('formik', () => ({
+  ...jest.requireActual('formik'),
+  useFormikContext: jest.fn(),
+}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: Immutable.List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
+}));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
 
-jest.mock('bson-objectid', () => jest.fn(() => ({
-  toString: jest.fn(() => 'new-search-id'),
-})));
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
+jest.mock('views/api/views', () => ({
+  createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
 jest.mock('views/hooks/useView');
@@ -75,25 +96,21 @@ jest.mock('views/logic/slices/viewSlice', () => {
 });
 
 describe('SearchActionsMenu', () => {
-  const createView = (id: string = undefined) => View.builder()
-    .id(id)
-    .title('title')
-    .type(View.Type.Search)
-    .description('description')
-    .state(Immutable.Map())
-    .owner('owningUser')
-    .build();
+  const _createView = (id: string = undefined) =>
+    View.builder()
+      .id(id)
+      .title('title')
+      .type(View.Type.Search)
+      .description('description')
+      .state(Immutable.Map())
+      .owner('owningUser')
+      .build();
 
-  const defaultView = createView();
-
-  const fieldTypes = {
-    all: Immutable.List<FieldTypeMapping>(),
-    queryFields: Immutable.Map<string, Immutable.List<FieldTypeMapping>>(),
-  };
+  const defaultView = _createView();
 
   type SimpleSearchActionsMenuProps = {
-    loadNewView?: NewViewLoaderContextType,
-    onLoadView?: ViewLoaderContextType,
+    loadNewView?: NewViewLoaderContextType;
+    onLoadView?: ViewLoaderContextType;
   };
 
   const SimpleSearchActionsMenu = ({
@@ -103,13 +120,13 @@ describe('SearchActionsMenu', () => {
   }: SimpleSearchActionsMenuProps) => (
     <TestStoreProvider>
       <HotkeysProvider>
-        <FieldTypesContext.Provider value={fieldTypes}>
+        <TestFieldTypesContextProvider>
           <ViewLoaderContext.Provider value={onLoadView}>
             <NewViewLoaderContext.Provider value={loadNewView}>
               <SearchActionsMenu {...props} />
             </NewViewLoaderContext.Provider>
           </ViewLoaderContext.Provider>
-        </FieldTypesContext.Provider>
+        </TestFieldTypesContextProvider>
       </HotkeysProvider>
     </TestStoreProvider>
   );
@@ -124,6 +141,9 @@ describe('SearchActionsMenu', () => {
     asMock(useView).mockReturnValue(defaultView);
     asMock(useIsDirty).mockReturnValue(false);
     asMock(useIsNew).mockReturnValue(false);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    // @ts-expect-error context return type is not complete
+    asMock(useFormikContext).mockReturnValue({ dirty: false });
   });
 
   useViewsPlugin();
@@ -140,29 +160,26 @@ describe('SearchActionsMenu', () => {
 
     it('should export current search as dashboard', async () => {
       asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
+        adminUser
+          .toBuilder()
           .permissions(Immutable.List(['dashboards:create']))
           .build(),
       );
 
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
-      userEvent.click(exportAsDashboardMenuItem);
+      await userEvent.click(exportAsDashboardMenuItem);
       await waitFor(() => expect(history.pushWithState).toHaveBeenCalledTimes(1));
 
       expect(history.pushWithState).toHaveBeenCalledWith('/dashboards/new', { view: defaultView });
     });
 
     it('should not allow exporting search as dashboard if user does not have required permissions', async () => {
-      asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
-          .permissions(Immutable.List([]))
-          .build(),
-      );
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       await screen.findByText('Export');
 
@@ -171,26 +188,27 @@ describe('SearchActionsMenu', () => {
 
     it('should open file export modal', async () => {
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const exportMenuItem = await screen.findByText('Export');
-      userEvent.click(exportMenuItem);
+      await userEvent.click(exportMenuItem);
 
       await screen.findByText('Export all search results');
     });
 
     it('should open search metadata modal', async () => {
       asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
+        adminUser
+          .toBuilder()
           .permissions(Immutable.List([ViewsPermissions.View.Edit('some-id')]))
           .build(),
       );
 
-      asMock(useView).mockReturnValue(createView('some-id'));
+      asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportMenuItem = await screen.findByText('Edit metadata');
-      userEvent.click(exportMenuItem);
+      await userEvent.click(exportMenuItem);
 
       await screen.findByText('Editing saved search');
     });
@@ -200,13 +218,15 @@ describe('SearchActionsMenu', () => {
       const loadNewView = jest.fn(() => Promise.resolve());
 
       render(<SimpleSearchActionsMenu loadNewView={loadNewView} />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const resetSearch = await screen.findByText('Reset search');
 
-      userEvent.click(resetSearch);
+      await userEvent.click(resetSearch);
 
-      await waitFor(() => { expect(loadNewView).toHaveBeenCalledTimes(1); });
+      await waitFor(() => {
+        expect(loadNewView).toHaveBeenCalledTimes(1);
+      });
     });
 
     it('should loadView after create', async () => {
@@ -215,9 +235,9 @@ describe('SearchActionsMenu', () => {
 
       render(<SimpleSearchActionsMenu onLoadView={onLoadView} />);
 
-      userEvent.click(await screen.findByTitle('Save search'));
-      userEvent.type(await findTitleInput(), 'Test');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Save search'));
+      await userEvent.type(await findTitleInput(), 'Test');
+      await userEvent.click(await findCreateNewButton());
 
       await waitFor(() => expect(onLoadView).toHaveBeenCalledTimes(1));
     });
@@ -225,63 +245,73 @@ describe('SearchActionsMenu', () => {
     it('should duplicate a saved search', async () => {
       asMock(useView).mockReturnValue(defaultView.toBuilder().id('some-id-1').title('title').build());
 
-      asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
-          .permissions(Immutable.List([]))
-          .build(),
-      );
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
       render(<SimpleSearchActionsMenu />);
 
-      userEvent.click(await screen.findByTitle('Saved search'));
-      userEvent.type(await findTitleInput(), ' and further title');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Saved search'));
+      await userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.click(await findCreateNewButton());
 
-      const updatedView = defaultView.toBuilder()
-        .title('title and further title')
-        .id('new-search-id')
-        .build();
+      const updatedView = defaultView.toBuilder().title('title and further title').id('new-search-id').build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
+      await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
     });
 
     it('should extend a saved search with plugin data on duplication', async () => {
       asMock(useView).mockReturnValue(defaultView.toBuilder().id('some-id-1').build());
 
-      asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
-          .permissions(Immutable.List([]))
-          .build(),
-      );
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
-      asMock(useSaveViewFormControls).mockReturnValue([{
-        component: () => <div>Pluggable component!</div>,
-        id: 'example-plugin-component',
-        onSearchDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This search has been extended by a plugin').build()),
-      }]);
+      asMock(useSaveViewFormControls).mockReturnValue([
+        {
+          component: () => <div>Pluggable component!</div>,
+          id: 'example-plugin-component',
+          onSearchDuplication: (view: View) =>
+            Promise.resolve(view.toBuilder().summary('This search has been extended by a plugin').build()),
+        },
+      ]);
 
       render(<SimpleSearchActionsMenu />);
 
-      userEvent.click(await screen.findByTitle('Saved search'));
-      userEvent.type(await findTitleInput(), ' and further title');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Saved search'));
+      await userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.click(await findCreateNewButton());
 
-      const updatedView = defaultView.toBuilder()
+      const updatedView = defaultView
+        .toBuilder()
         .title('title and further title')
         .summary('This search has been extended by a plugin')
         .id('new-search-id')
         .build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
-      await waitForElementToBeRemoved(screen.queryByText('Pluggable component!'));
+      await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
+
+      expect(screen.queryByText('Pluggable component!')).not.toBeInTheDocument();
     });
 
     it('should save search when pressing related keyboard shortcut', async () => {
-      asMock(useView).mockReturnValue(createView('some-id'));
+      asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
-      userEvent.keyboard('{Meta>}s{/Meta}');
+      await userEvent.keyboard('{Meta>}s{/Meta}');
 
       await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
+    });
+
+    it('should preserve the original view title when saving via keyboard shortcut', async () => {
+      asMock(OnSaveViewAction).mockClear();
+      asMock(useView).mockReturnValue(_createView('some-id'));
+      asMock(useIsDirty).mockReturnValue(true);
+      render(<SimpleSearchActionsMenu />);
+      await userEvent.keyboard('{Meta>}s{/Meta}');
+
+      await waitFor(() => {
+        expect(OnSaveViewAction).toHaveBeenCalledTimes(1);
+
+        const savedView = asMock(OnSaveViewAction).mock.calls[0][0];
+
+        expect(savedView.title).toBe('title');
+      });
     });
 
     describe('has "Share" option', () => {
@@ -297,22 +327,20 @@ describe('SearchActionsMenu', () => {
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', async () => {
         asMock(useCurrentUser).mockReturnValue(
-          adminUser.toBuilder()
-            .grnPermissions(Immutable.List())
-            .permissions(Immutable.List())
-            .build(),
+          adminUser.toBuilder().grnPermissions(Immutable.List()).permissions(Immutable.List()).build(),
         );
 
         render(<SimpleSearchActionsMenu />);
 
         const shareButton = await findShareButton();
 
-        expect(shareButton).toBeDisabled();
+        expect(shareButton).toHaveAttribute('aria-disabled', 'true');
       });
 
       it('which should be enabled if current user is permitted to edit search', async () => {
         asMock(useCurrentUser).mockReturnValue(
-          adminUser.toBuilder()
+          adminUser
+            .toBuilder()
             .grnPermissions(Immutable.List([`entity:own:grn::::search:${adminUser.id}`]))
             .permissions(Immutable.List([ViewsPermissions.View.Edit(adminUser.id)]))
             .build(),
@@ -327,7 +355,8 @@ describe('SearchActionsMenu', () => {
 
       it('which should be enabled if current user is owner of search', async () => {
         asMock(useCurrentUser).mockReturnValue(
-          adminUser.toBuilder()
+          adminUser
+            .toBuilder()
             .grnPermissions(Immutable.List([`entity:own:grn::::search:${adminUser.id}`]))
             .permissions(Immutable.List())
             .build(),
@@ -356,7 +385,7 @@ describe('SearchActionsMenu', () => {
 
         render(<SimpleSearchActionsMenu />);
 
-        expect(await findShareButton()).toBeDisabled();
+        expect(await findShareButton()).toHaveAttribute('aria-disabled', 'true');
       });
     });
   });
@@ -372,13 +401,15 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should render not dirty', async () => {
-      asMock(useView).mockReturnValue(View.builder()
-        .title('title')
-        .description('description')
-        .type(View.Type.Search)
-        .search(Search.create().toBuilder().id('id-beef').build())
-        .id('id-beef')
-        .build());
+      asMock(useView).mockReturnValue(
+        View.builder()
+          .title('title')
+          .description('description')
+          .type(View.Type.Search)
+          .search(Search.create().toBuilder().id('id-beef').build())
+          .id('id-beef')
+          .build(),
+      );
 
       asMock(useIsDirty).mockReturnValue(false);
 
@@ -388,13 +419,15 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should render dirty', async () => {
-      asMock(useView).mockReturnValue(View.builder()
-        .title('title')
-        .type(View.Type.Search)
-        .description('description')
-        .search(Search.create().toBuilder().id('id-beef').build())
-        .id('id-beef')
-        .build());
+      asMock(useView).mockReturnValue(
+        View.builder()
+          .title('title')
+          .type(View.Type.Search)
+          .description('description')
+          .search(Search.create().toBuilder().id('id-beef').build())
+          .id('id-beef')
+          .build(),
+      );
 
       asMock(useIsDirty).mockReturnValue(true);
 

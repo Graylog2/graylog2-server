@@ -90,7 +90,8 @@ public class EventProcessorEngine {
         LOG.debug("Executing event processor <{}/{}/{}>", definition.title(), definition.id(), definition.config().type());
 
         final EventProcessor eventProcessor = factory.create(definition);
-        final EventConsumer<List<EventWithContext>> eventConsumer = eventsWithContext -> emitEvents(eventProcessor, definition, eventsWithContext);
+        final EventDefinition preprocessedDefinition = eventProcessor.preprocessEventDefinition(definition);
+        final EventConsumer<List<EventWithContext>> eventConsumer = eventsWithContext -> emitEvents(eventProcessor, preprocessedDefinition, eventsWithContext);
 
         metrics.registerEventProcessor(eventProcessor, definitionId);
         try {

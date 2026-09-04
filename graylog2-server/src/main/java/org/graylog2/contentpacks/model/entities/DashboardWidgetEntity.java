@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -35,7 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class DashboardWidgetEntity {
     @JsonProperty("id")
@@ -78,7 +76,6 @@ public abstract class DashboardWidgetEntity {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     public static abstract class Position {
         @JsonProperty("width")

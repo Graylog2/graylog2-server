@@ -20,29 +20,33 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import org.assertj.core.api.ListAssert;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class IndexRangesCleanUpIT {
     public static final String RANGE_CLEANUP_PREFIX = "range-cleanup";
     public static final String INDEX_TWO = RANGE_CLEANUP_PREFIX + "_1";
     public static final String INDEX_ONE = RANGE_CLEANUP_PREFIX + "_0";
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public IndexRangesCleanUpIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCleanUp() throws ExecutionException, RetryException {
         String indexSetId = api.indices().createIndexSet("Range clean up", "test index range clean up", RANGE_CLEANUP_PREFIX);
 
@@ -50,28 +54,29 @@ public class IndexRangesCleanUpIT {
         api.indices().rotateIndexSet(indexSetId);
         api.indices().rotateIndexSet(indexSetId);
 
-        assertThat(getIndexRangesList()).isNotEmpty().contains(INDEX_ONE, INDEX_TWO);
+        assertIndexRanges(ranges -> ranges.isNotEmpty().contains(INDEX_ONE, INDEX_TWO));
 
         //Deleting index should automatically remove the range
         api.indices().deleteIndex(INDEX_ONE);
 
-        assertThat(getIndexRangesList()).isNotEmpty().doesNotContain(INDEX_ONE);
+        assertIndexRanges(ranges -> ranges.isNotEmpty().doesNotContain(INDEX_ONE));
 
-        //Deleting index set without deleting underlying indices
+        //Deleting index set without deleting underlying indices should now remove ranges immediately
         api.indices().deleteIndexSet(indexSetId, false);
-        assertThat(getIndexRangesList()).isNotEmpty().contains(INDEX_TWO);
-
-        //Trigger clean up periodical over api
-        api.indices().rebuildIndexRanges();
-        assertThat(getIndexRangesList()).isNotEmpty().doesNotContain(INDEX_TWO);
+        assertIndexRanges(ranges -> ranges.isNotEmpty().doesNotContain(INDEX_TWO));
     }
 
-    private List<String> getIndexRangesList() throws ExecutionException, RetryException {
-        return RetryerBuilder.<List<String>>newBuilder()
+    private void assertIndexRanges(Consumer<ListAssert<String>> assertion) throws ExecutionException, RetryException {
+        RetryerBuilder.<Void>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
-                .retryIfResult(List::isEmpty)
+                .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
+                .retryIfRuntimeException()
+                .retryIfExceptionOfType(AssertionError.class)
                 .build()
-                .call(() -> api.indices().listIndexRanges().properJSONPath().read("ranges.*.index_name"));
+                .call(() -> {
+                    final List<String> ranges = api.indices().listIndexRanges().properJSONPath().read("ranges.*.index_name");
+                    assertion.accept(assertThat(ranges));
+                    return null;
+                });
     }
 }

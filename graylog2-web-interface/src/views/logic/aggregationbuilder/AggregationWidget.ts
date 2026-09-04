@@ -18,33 +18,84 @@ import { Map } from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type { FiltersType } from 'views/types';
+import type { QueryString } from 'views/logic/queries/types';
 
+import type { AggregationWidgetConfigJson } from './AggregationWidgetConfig';
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 
-import Widget from '../widgets/Widget';
+import Widget, { widgetAttributesForComparison } from '../widgets/Widget';
 
+type AggregationWidgetJson = {
+  id: string;
+  config: AggregationWidgetConfigJson;
+  filter?: string;
+  timerange?: TimeRange;
+  query?: QueryString;
+  streams?: Array<string>;
+  stream_categories?: Array<string>;
+  filters?: FiltersType;
+  description?: string;
+  context?: string;
+};
 export default class AggregationWidget extends Widget {
-  constructor(id: string, config: AggregationWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, streamCategories?: Array<string>, filters?: FiltersType) {
-    super(id, AggregationWidget.type, config, filter, timerange, query, streams, streamCategories, filters);
+  constructor(
+    id: string,
+    config: AggregationWidgetConfig,
+    filter?: string,
+    timerange?: TimeRange,
+    query?: QueryString,
+    streams?: Array<string>,
+    streamCategories?: Array<string>,
+    filters?: FiltersType,
+    description?: string,
+    context?: string,
+  ) {
+    super(
+      id,
+      AggregationWidget.type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      streamCategories,
+      filters,
+      description,
+      context,
+    );
   }
 
   static type = 'AGGREGATION';
 
   static defaultTitle = 'Untitled Aggregation';
 
-  static fromJSON(value) {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = value;
+  static fromJSON(value: AggregationWidgetJson) {
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } = value;
 
-    return new AggregationWidget(id, AggregationWidgetConfig.fromJSON(config), filter, timerange, query, streams, stream_categories, filters);
+    return new AggregationWidget(
+      id,
+      AggregationWidgetConfig.fromJSON(config),
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this._value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters }));
+    return new Builder(
+      Map({ id, config, filter, timerange, query, streams, stream_categories, filters, description, context }),
+    );
   }
 
   static builder() {
@@ -54,7 +105,9 @@ export default class AggregationWidget extends Widget {
 
   equals(other: any) {
     if (other instanceof AggregationWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) => isDeepEqual(this[key], other[key]));
+      return [...widgetAttributesForComparison, 'description', 'context'].every((key) =>
+        isDeepEqual(this[key], other[key]),
+      );
     }
 
     return false;
@@ -62,7 +115,7 @@ export default class AggregationWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof AggregationWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) => isEqualForSearch(this[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isEqualForSearch(this[key], other[key]));
     }
 
     return false;
@@ -71,8 +124,20 @@ export default class AggregationWidget extends Widget {
 
 class Builder extends Widget.Builder {
   build() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this.value.toObject();
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this.value.toObject();
 
-    return new AggregationWidget(id, config, filter, timerange, query, streams, stream_categories, filters);
+    return new AggregationWidget(
+      id,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 }

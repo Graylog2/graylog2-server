@@ -47,6 +47,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRe
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentFactory;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentHelper;
+import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
@@ -68,8 +73,11 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexStatus;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.ShardsInfo;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -84,7 +92,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -98,7 +105,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.graylog.storage.opensearch2.OpenSearchClient.withTimeout;
 
@@ -132,7 +138,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
+    public void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback) {
         final ReindexRequest request = new ReindexRequest();
         request.setSourceIndices(source);
         request.setDestIndex(target);
@@ -211,7 +217,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public Map<String, Object> getFlattenIndexSettings(@Nonnull String index) {
+    public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
 
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(index)
@@ -219,10 +225,14 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            Settings settings = settingsResponse.getIndexToSettings().get(index);
-            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-            settings.keySet().forEach(k -> Optional.ofNullable(settings.get(k)).ifPresent(v -> builder.put(k, v)));
-            return builder.build();
+            final Settings settings = settingsResponse.getIndexToSettings().get(index);
+            final XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
+            xContentBuilder.startObject();
+            settings.toXContent(xContentBuilder, ToXContent.EMPTY_PARAMS);
+            xContentBuilder.endObject();
+            final BytesReference bytes = BytesReference.bytes(xContentBuilder);
+
+            return XContentHelper.convertToMap(bytes, true, xContentBuilder.contentType()).v2();
         }, "Couldn't read settings of index " + index);
     }
 
@@ -352,16 +362,6 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
                 "Unable to close index " + index);
     }
 
-    @Override
-    public long numberOfMessages(String index) {
-        final JsonNode result = statsApi.indexStats(index);
-        final JsonNode count = result.path("_all").path("primaries").path("docs").path("count");
-        if (count.isMissingNode()) {
-            throw new RuntimeException("Unable to extract count from response.");
-        }
-        return count.asLong();
-    }
-
     private GetSettingsResponse settingsFor(String indexOrAlias) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(indexOrAlias)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
@@ -471,8 +471,15 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> indices(String indexWildcard, List<String> status, String indexSetId) {
-        return catApi.indices(indexWildcard, status, "Couldn't get index list for index set <" + indexSetId + ">");
+    public Set<String> indices(String indexWildcard, List<IndexStatus> status, String indexSetId) {
+        return catApi.indices(indexWildcard, status.stream().map(this::toStatusName).toList(), "Couldn't get index list for index set <" + indexSetId + ">");
+    }
+
+    private String toStatusName(IndexStatus status) {
+        return switch (status) {
+            case OPEN -> "open";
+            case CLOSED -> "close";
+        };
     }
 
     @Override
@@ -661,5 +668,10 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         String snapshotName = searchableSnapshotSettings.get("snapshot_id.name");
 
         return new WarmIndexInfo(index, initialIndexName, repository, snapshotName);
+    }
+
+    @Override
+    public Set<OutdatedIndex> getOutdatedIndices(int currentMajorVersion) {
+        throw new UnsupportedOperationException("Not supported in deprecated client.");
     }
 }

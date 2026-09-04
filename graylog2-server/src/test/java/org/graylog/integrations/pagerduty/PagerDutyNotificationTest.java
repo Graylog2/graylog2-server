@@ -31,13 +31,15 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,13 +48,15 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class PagerDutyNotificationTest {
 
     private PagerDutyNotification cut;
@@ -73,7 +77,7 @@ public class PagerDutyNotificationTest {
 
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         cut = new PagerDutyNotification(mockPagerDutyClient, mockMessageFactory, spyObjectMapper, mockNotificationService, nodeId);
     }
@@ -109,24 +113,28 @@ public class PagerDutyNotificationTest {
         thenPermanentEventNotificationExceptionIsThrown();
     }
 
-    @Test(expected = TemporaryEventNotificationException.class)
+    @Test
     public void execute_throwsTempEventNotificationException_whenClientThrowsTempPagerDutyClientException() throws Exception {
-        givenGoodContext();
-        givenGoodMessageFactory();
-        givenGoodObjectMapper();
-        givenPagerDutyClientThrowsTempPagerDutyClientException();
+        assertThrows(TemporaryEventNotificationException.class, () -> {
+            givenGoodContext();
+            givenGoodMessageFactory();
+            givenGoodObjectMapper();
+            givenPagerDutyClientThrowsTempPagerDutyClientException();
 
-        whenExecuteIsCalled();
+            whenExecuteIsCalled();
+        });
     }
 
-    @Test(expected = EventNotificationException.class)
+    @Test
     public void execute_throwsEventNotificationException_whenClientThrowsRuntimeException() throws Exception {
-        givenGoodContext();
-        givenGoodMessageFactory();
-        givenGoodObjectMapper();
-        givenPagerDutyClientThrowsRuntimeException();
+        assertThrows(EventNotificationException.class, () -> {
+            givenGoodContext();
+            givenGoodMessageFactory();
+            givenGoodObjectMapper();
+            givenPagerDutyClientThrowsRuntimeException();
 
-        whenExecuteIsCalled();
+            whenExecuteIsCalled();
+        });
     }
 
     // GIVENs

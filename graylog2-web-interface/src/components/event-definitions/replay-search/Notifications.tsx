@@ -15,32 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
-import { useStore } from 'stores/connect';
-import { EventNotificationsStore, EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 
 import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionData';
 
 const Notifications = () => {
   const { alertId, definitionId } = useReplaySearchContext();
   const { eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+  const { data: notificationsData } = useEventNotifications();
 
-  useEffect(() => {
-    EventNotificationsActions.listAll();
-  }, []);
+  const allNotifications = useMemo(
+    () =>
+      Object.fromEntries(
+        (notificationsData?.notifications ?? []).map((notification) => [notification.id, notification]),
+      ),
+    [notificationsData],
+  );
 
-  const allNotifications = useStore(EventNotificationsStore, ({ all }) => Object.fromEntries(
-    (all ?? []).map((notification) => [notification.id, notification]),
-  ));
-
-  const notificationList = useMemo(() => eventDefinition.notifications
-    .flatMap(({ notification_id }) => (allNotifications[notification_id] ? [allNotifications[notification_id]] : [])),
-  [allNotifications, eventDefinition.notifications]);
+  const notificationList = useMemo(
+    () =>
+      eventDefinition.notifications.flatMap(({ notification_id }) =>
+        allNotifications[notification_id] ? [allNotifications[notification_id]] : [],
+      ),
+    [allNotifications, eventDefinition.notifications],
+  );
 
   return notificationList.length ? (
     <>
@@ -50,12 +53,14 @@ const Notifications = () => {
         return (
           <span key={id}>
             {prefix}
-            <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>{title}</Link>
+            <EventNotificationLink id={id} title={title} />
           </span>
         );
       })}
     </>
-  ) : <NoAttributeProvided name="Notifications" />;
+  ) : (
+    <NoAttributeProvided />
+  );
 };
 
 export default Notifications;

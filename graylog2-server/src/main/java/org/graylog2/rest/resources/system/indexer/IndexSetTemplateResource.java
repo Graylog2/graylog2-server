@@ -17,14 +17,17 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -37,10 +40,13 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.cluster.lock.AlreadyLockedException;
+import org.graylog2.cluster.lock.RefreshingLockService;
+import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
@@ -50,20 +56,23 @@ import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequir
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirementsChecker;
 import org.graylog2.indexer.indexset.template.rest.IndexSetTemplateResponse;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_DELETE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_UPDATE;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets/Templates", description = "Index-set Configuration Template Management", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/IndexSets/Templates", description = "Index-set Configuration Template Management")
 @Path("/system/indices/index_sets/templates")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -73,26 +82,28 @@ public class IndexSetTemplateResource extends RestResource {
     private final IndexSetTemplateService templateService;
     private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
     private final IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker;
+    private final RefreshingLockService.Factory lockServiceFactory;
 
     @Inject
     public IndexSetTemplateResource(IndexSetValidator indexSetValidator,
                                     Validator validator,
                                     IndexSetTemplateService templateService,
                                     IndexSetDefaultTemplateService indexSetDefaultTemplateService,
-                                    IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker) {
+                                    IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker,
+                                    RefreshingLockService.Factory lockServiceFactory) {
         this.indexSetValidator = indexSetValidator;
         this.validator = validator;
         this.templateService = templateService;
         this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
         this.indexSetTemplateRequirementsChecker = indexSetTemplateRequirementsChecker;
+        this.lockServiceFactory = lockServiceFactory;
     }
 
     @GET
     @Path("/{template_id}")
     @Timed
-    @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Gets template by id")
-    public IndexSetTemplateResponse retrieveById(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) {
+    @Operation(summary = "Gets template by id")
+    public IndexSetTemplateResponse retrieveById(@Parameter(name = "template_id") @PathParam("template_id") String templateId) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ, templateId);
         return getIndexSetTemplate(templateId);
     }
@@ -100,8 +111,7 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/default_config")
     @Timed
-    @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Gets default template")
+    @Operation(summary = "Gets default template")
     public IndexSetTemplateConfig getDefaultConfig() {
         return indexSetDefaultTemplateService.getOrCreateDefaultConfig();
     }
@@ -109,18 +119,18 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/paginated")
     @Timed
-    @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Gets template by id")
-    public PageListResponse<IndexSetTemplateResponse> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                              @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                              @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                              @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                              @ApiParam(name = "sort",
-                                                                        value = "The field to sort the result on",
+    @Operation(summary = "Gets template by id")
+    public PageListResponse<IndexSetTemplateResponse> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                              @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                              @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                              @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                              @Parameter(name = "sort",
+                                                                        description = "The field to sort the result on",
                                                                         required = true,
-                                                                        allowableValues = "name")
+                                                                        schema = @Schema(allowableValues = {"id", "title", "description"}))
                                                               @DefaultValue(IndexSetTemplate.TITLE_FIELD_NAME) @QueryParam("sort") String sort,
-                                                              @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                              @Parameter(name = "order", description = "The sort direction",
+                                                                        schema = @Schema(allowableValues = {"asc", "desc"}))
                                                               @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
         return toPaginatedResponse(templateService.getPaginated(query, filters, page, perPage, sort, order));
@@ -129,8 +139,8 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/built-in")
     @Timed
-    @ApiOperation(value = "Gets built-in templates")
-    public List<IndexSetTemplateResponse> builtIns(@ApiParam(name = "warm_tier_enabled")
+    @Operation(summary = "Gets built-in templates")
+    public List<IndexSetTemplateResponse> builtIns(@Parameter(name = "warm_tier_enabled")
                                                    @QueryParam("warm_tier_enabled") boolean warmTierEnabled) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
         return toResponse(templateService.getBuiltIns(warmTierEnabled));
@@ -139,30 +149,49 @@ public class IndexSetTemplateResource extends RestResource {
     @POST
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_CREATE)
-    @ApiOperation(value = "Creates a new editable template")
-    public IndexSetTemplateResponse create(@ApiParam(name = "request") IndexSetTemplateRequest templateData) {
+    @Operation(summary = "Creates a new editable template")
+    @ApiResponse(responseCode = "409", description = "A concurrent operation holds the selected repository's lock")
+    public IndexSetTemplateResponse create(@Parameter(name = "request") IndexSetTemplateRequest templateData) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_CREATE);
-        validateConfig(templateData.indexSetConfig());
 
-        return toResponse(templateService.save(new IndexSetTemplate(templateData)));
+        return toResponse(validateAndPersistWithRepositoryLock(templateData.indexSetConfig(),
+                () -> templateService.save(new IndexSetTemplate(templateData))));
     }
 
     @PUT
     @Path("{id}")
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_UPDATE)
-    @ApiOperation(value = "Updates existing template")
-    public void update(@ApiParam(name = "id", required = true)
+    @Operation(summary = "Updates existing template")
+    @ApiResponse(responseCode = "409", description = "A concurrent operation holds the selected repository's lock")
+    public void update(@Parameter(name = "id", required = true)
                        @PathParam("id") String id,
-                       @ApiParam(name = "request")
+                       @Parameter(name = "request")
                        @NotNull IndexSetTemplateRequest template) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, id);
         checkReadOnly(getIndexSetTemplate(id));
-        validateConfig(template.indexSetConfig());
 
-        final boolean updated = templateService.update(id, new IndexSetTemplate(template));
+        final boolean updated = validateAndPersistWithRepositoryLock(template.indexSetConfig(),
+                () -> templateService.update(id, new IndexSetTemplate(template)));
         if (!updated) {
             throw new NotFoundException(f("Template %s <%s> does not exist", id, template.title()));
+        }
+    }
+
+    // Keeps a concurrent repository delete from missing the reference this save adds.
+    private <T> T validateAndPersistWithRepositoryLock(IndexSetTemplateConfig config, Supplier<T> persist) {
+        final Optional<String> repositoryLockId = Optional.ofNullable(config.dataTieringConfig())
+                .flatMap(DataTieringConfig::repositoryLockId);
+        if (repositoryLockId.isEmpty()) {
+            validateConfig(config);
+            return persist.get();
+        }
+        try (RefreshingLockService lockService = lockServiceFactory.create()) {
+            lockService.acquireAndKeepLock(repositoryLockId.get(), 1);
+            validateConfig(config);
+            return persist.get();
+        } catch (AlreadyLockedException e) {
+            throw new ClientErrorException(e.getMessage(), Response.Status.CONFLICT);
         }
     }
 
@@ -170,8 +199,8 @@ public class IndexSetTemplateResource extends RestResource {
     @Path("/{template_id}")
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_DELETE)
-    @ApiOperation(value = "Removes a template")
-    public void delete(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) throws IllegalAccessException {
+    @Operation(summary = "Removes a template")
+    public void delete(@Parameter(name = "template_id") @PathParam("template_id") String templateId) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_DELETE, templateId);
         final IndexSetTemplateResponse template = getIndexSetTemplate(templateId);
         checkReadOnly(template);

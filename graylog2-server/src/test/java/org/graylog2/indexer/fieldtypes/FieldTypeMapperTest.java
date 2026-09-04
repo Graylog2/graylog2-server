@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
@@ -33,7 +33,7 @@ public class FieldTypeMapperTest {
             .properties(Collections.singleton(FieldTypeDTO.Properties.FIELDDATA))
             .build();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.mapper = new FieldTypeMapper();
     }
@@ -73,5 +73,24 @@ public class FieldTypeMapperTest {
         assertMapping("binary", "binary");
         assertMapping("geo_point", "geo-point");
         assertMapping("ip", "ip", "enumerable");
+    }
+
+    @Test
+    public void identifiesNumericPhysicalTypes() {
+        assertThat(FieldTypeMapper.isNumericType("long")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("integer")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("short")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("byte")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("double")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("float")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("half_float")).isTrue();
+        assertThat(FieldTypeMapper.isNumericType("scaled_float")).isTrue();
+
+        assertThat(FieldTypeMapper.isNumericType("keyword")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("text")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("date")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("boolean")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("ip")).isFalse();
+        assertThat(FieldTypeMapper.isNumericType("unknown_type")).isFalse();
     }
 }

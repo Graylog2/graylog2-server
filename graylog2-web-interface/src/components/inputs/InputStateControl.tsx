@@ -16,63 +16,62 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import type { InputStates } from 'stores/inputs/InputStatesStore';
 import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
-import { useStore } from 'stores/connect';
+import useInputStateMutations from 'hooks/useInputsStateMutations';
 import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import type { Input } from 'components/messageloaders/Types';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
 import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
+import type { InputStates } from 'hooks/useInputsStates';
 
 type Props = {
-  input: Input,
-  openWizard: () => void,
-}
+  input: Input;
+  inputStates: InputStates;
+  openWizard: () => void;
+};
 
-const InputStateControl = ({ input, openWizard } : Props) => {
+const StateActionButton = styled(Button)(
+  () => css`
+    min-width: 95px;
+  `,
+);
+
+const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+  const { startInput: startInputMutation, stopInput: stopInputMutation } = useInputStateMutations(input as any);
 
   const startInput = () => {
     setIsLoading(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_START_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'start-input',
     });
 
-    InputStatesStore.start(input)
-      .finally(() => {
-        setIsLoading(false);
-      });
+    startInputMutation({ inputId: input.id }).finally(() => {
+      setIsLoading(false);
+    });
   };
 
   const stopInput = () => {
     setIsLoading(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_STOP_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'stop-input',
     });
 
-    InputStatesStore.stop(input)
-      .finally(() => {
-        setIsLoading(false);
-      });
+    stopInputMutation({ inputId: input.id }).finally(() => {
+      setIsLoading(false);
+    });
   };
 
   const setupInput = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'setup-input',
     });
 
@@ -81,24 +80,24 @@ const InputStateControl = ({ input, openWizard } : Props) => {
 
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
-      <Button bsStyle="warning" onClick={setupInput}>
-        Setup Input
-      </Button>
+      <StateActionButton bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
+        Set-up Input
+      </StateActionButton>
     );
   }
 
   if (isInputRunning(inputStates, input.id)) {
     return (
-      <Button bsStyle="primary" onClick={stopInput} disabled={isLoading}>
+      <StateActionButton bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
-      </Button>
+      </StateActionButton>
     );
   }
 
   return (
-    <Button bsStyle="success" onClick={startInput} disabled={isLoading}>
+    <StateActionButton bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
       {isLoading ? 'Starting...' : 'Start input'}
-    </Button>
+    </StateActionButton>
   );
 };
 

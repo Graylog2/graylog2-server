@@ -20,8 +20,10 @@ import QueryHelper from 'components/common/QueryHelper';
 
 const queryExample = (
   <p>
-    Find users with a email containing example.com:<br />
-    <kbd>email:example.com</kbd><br />
+    Find users with a email containing example.com:
+    <br />
+    <kbd>email:example.com</kbd>
+    <br />
   </p>
 );
 

@@ -16,7 +16,6 @@
  */
 import cronstrue from 'cronstrue';
 
-// eslint-disable-next-line import/prefer-default-export
 export function describeExpression(expression: string): string | null {
   if (expression) {
     // The false throwExceptionOnParseError option just returns the parse error text.

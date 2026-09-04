@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -27,38 +27,60 @@ import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizat
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import ElementDimensions from 'components/common/ElementDimensions';
+import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
-import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
+import Trend from './Trend';
+import trendDirection, { trendBackground } from './trendDirection';
+import type { TrendDirection } from './trendDirection';
 
-const Container = styled.div<{ $height: number }>(({ $height }) => css`
-  height: ${$height}px;
-  width: 100%;
-`);
+const Container = styled.div<{ $height: number; $trend: TrendDirection | undefined }>(({ theme, $height, $trend }) => {
+  const bgColor = trendBackground(theme, $trend);
+
+  return css`
+    height: ${$height}px;
+    width: 100%;
+    ${$trend &&
+    css`
+      background-color: ${bgColor} !important; /* Needed for report generation */
+      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+      color-adjust: exact !important; /* Needed for report generation */
+    `}
+  `;
+});
 
 const GridContainer = styled(Container)`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr auto;
-  grid-gap: 0;
+  gap: 0;
 `;
 
 const SingleItemGrid = styled(Container)`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  grid-gap: 0;
+  gap: 0;
 `;
 
 const NumberBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
-  padding-bottom: 10px;
+  padding-bottom: ${({ theme }) => theme.spacings.xxs};
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const TrendBox = styled(ElementDimensions)`
   height: 100%;
   width: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const _extractValueAndField = (rows: Rows) => {
@@ -82,15 +104,16 @@ const _extractValueAndField = (rows: Rows) => {
 const _extractFirstSeriesName = (config) => {
   const { series = [] } = config;
 
-  return series.length === 0
-    ? undefined
-    : series[0].function;
+  return series.length === 0 ? undefined : series[0].function;
 };
 
 const NumberVisualization = ({ config, fields, data, height: heightProp }: VisualizationComponentProps) => {
   const targetRef = useRef();
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
+  const widgetUnits = useWidgetUnits(config);
   const onRenderComplete = useContext(RenderCompletionCallback);
-  const visualizationConfig = (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
+  const visualizationConfig =
+    (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 
   const field = _extractFirstSeriesName(config);
 
@@ -99,23 +122,36 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   const trendRows = data.trend;
   const { value } = _extractValueAndField(chartRows);
   const { value: previousValue } = _extractValueAndField(trendRows || []);
+  const unit = useMemo(() => {
+    if (!unitFeatureEnabled) return undefined;
+
+    const fieldNameKey = parseSeries(field).field;
+
+    return widgetUnits.getFieldUnit(fieldNameKey);
+  }, [field, unitFeatureEnabled, widgetUnits]);
 
   if (!field || (value !== 0 && !value)) {
     return <>N/A</>;
   }
 
   const ContainerComponent = visualizationConfig.trend ? GridContainer : SingleItemGrid;
+  const trend = visualizationConfig.trend
+    ? trendDirection(value, previousValue, visualizationConfig.trendPreference)
+    : undefined;
 
   return (
-    <ContainerComponent $height={heightProp}>
-      <NumberBox resizeDelay={20}>
+    <ContainerComponent $height={heightProp} $trend={trend} data-testid="trend-background">
+      <NumberBox resizeDelay={50}>
         {({ height, width }) => (
-          <AutoFontSizer height={height} width={width} center>
+          <AutoFontSizer height={height} width={width} alignment={visualizationConfig.alignment}>
             <CustomHighlighting field={field} value={value}>
-              <Value field={field}
-                     type={fieldTypeFor(field, fields)}
-                     value={value}
-                     render={DecoratedValue} />
+              <Value
+                field={field}
+                type={fieldTypeFor(field, fields)}
+                value={value}
+                render={DecoratedValue}
+                unit={unit}
+              />
             </CustomHighlighting>
           </AutoFontSizer>
         )}
@@ -123,11 +159,8 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
       {visualizationConfig.trend && (
         <TrendBox>
           {({ height, width }) => (
-            <AutoFontSizer height={height} width={width} target={targetRef}>
-              <Trend ref={targetRef}
-                     current={value}
-                     previous={previousValue}
-                     trendPreference={visualizationConfig.trendPreference} />
+            <AutoFontSizer height={height} width={width} target={targetRef} alignment={visualizationConfig.alignment}>
+              <Trend ref={targetRef} current={value} previous={previousValue} unit={unit} />
             </AutoFontSizer>
           )}
         </TrendBox>

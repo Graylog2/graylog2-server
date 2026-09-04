@@ -18,6 +18,7 @@ package org.graylog2.alarmcallbacks;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import jakarta.inject.Inject;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.alerts.FormattedEmailAlertSender;
@@ -41,10 +42,9 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,7 +66,8 @@ public class EmailAlarmCallback implements AlarmCallback {
     private final UserService userService;
     private final EmailConfiguration emailConfiguration;
     private Configuration configuration;
-    private org.graylog2.Configuration graylogConfig;
+    private final org.graylog2.Configuration graylogConfig;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
     public EmailAlarmCallback(AlertSender alertSender,
@@ -75,7 +76,8 @@ public class EmailAlarmCallback implements AlarmCallback {
                               EmailRecipients.Factory emailRecipientsFactory,
                               UserService userService,
                               EmailConfiguration emailConfiguration,
-                              org.graylog2.Configuration graylogConfig) {
+                              org.graylog2.Configuration graylogConfig,
+                              CustomizationConfig customizationConfig) {
         this.alertSender = alertSender;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
@@ -83,6 +85,7 @@ public class EmailAlarmCallback implements AlarmCallback {
         this.userService = userService;
         this.emailConfiguration = emailConfiguration;
         this.graylogConfig = graylogConfig;
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
@@ -183,7 +186,7 @@ public class EmailAlarmCallback implements AlarmCallback {
 
         configurationRequest.addField(new TextField("subject",
                 "E-Mail Subject",
-                "Graylog alert for stream: ${stream.title}: ${check_result.resultDescription}",
+                customizationConfig.productName() + " alert for stream: ${stream.title}: ${check_result.resultDescription}",
                 "The subject of sent out mail alerts",
                 ConfigurationField.Optional.NOT_OPTIONAL));
 
@@ -198,7 +201,7 @@ public class EmailAlarmCallback implements AlarmCallback {
                 "User Receivers",
                 Collections.emptyList(),
                 userNames,
-                "Graylog usernames that should receive this alert",
+                "Usernames that should receive this alert",
                 ConfigurationField.Optional.OPTIONAL));
 
         configurationRequest.addField(new ListField(CK_EMAIL_RECEIVERS,

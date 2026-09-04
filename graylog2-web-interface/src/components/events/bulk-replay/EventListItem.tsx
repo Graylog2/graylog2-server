@@ -15,82 +15,101 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
-import ButtonGroup from 'components/bootstrap/ButtonGroup';
 import type { Event } from 'components/events/events/types';
+import { Icon } from 'components/common';
 
 type EventListItemProps = {
-  event: Event,
-  done: boolean,
-  selected: boolean,
-  onClick: () => void,
-  removeItem: (id: string) => void,
-  markItemAsDone: (id: string) => void,
-}
+  event: Event;
+  done: boolean;
+  selected: boolean;
+  onClick?: () => void;
+  removeItem: (id: string) => void;
+  markItemAsDone: (id: string) => void;
+  className?: string;
+  isDropdown?: boolean;
+};
 
 type StyledItemProps = {
   $selected: boolean;
-}
-const StyledItem = styled.li<StyledItemProps>(({ theme, $selected }) => css`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 30px;
-  background-color: ${$selected ? theme.colors.background.secondaryNav : 'transparent'};
-  cursor: pointer;
+};
+const StyledItem = styled.div<StyledItemProps>(
+  ({ theme, $selected }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: ${theme.spacings.xs} 0;
+    background-color: ${$selected ? theme.colors.background.secondaryNav : 'transparent'};
+    cursor: pointer;
+    position: relative;
+    gap: ${theme.spacings.xs};
 
-  &:hover {
-    background-color: ${theme.colors.background.body};
-  }
-`);
+    &:hover {
+      background-color: ${theme.colors.background.body};
+    }
+  `,
+);
 
 type SummaryProps = {
   $done: boolean;
-}
+};
 
-const Summary = styled.span<SummaryProps>(({ theme, $done }) => css`
-  margin: 10px;
-  color: ${$done ? theme.colors.global.textSecondary : theme.colors.global.textDefault};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+const Summary = styled.span<SummaryProps>(
+  ({ theme, $done }) => css`
+    color: ${$done ? theme.colors.text.secondary : theme.colors.text.primary};
+    flex-grow: 1;
+    overflow-wrap: anywhere;
+  `,
+);
 
-  &:hover {
-    text-decoration: underline;
-  }
-`);
+const CompletedButton = styled(IconButton)<{ $done: boolean }>(
+  ({ theme, $done }) => css`
+    color: ${$done ? theme.colors.variant.success : theme.colors.gray[60]};
+  `,
+);
 
-const CompletedButton = styled(IconButton)<{ $done: boolean }>(({ theme, $done }) => css`
-  color: ${$done ? theme.colors.variant.success : theme.colors.gray[60]};
-`);
-
-const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsDone }: EventListItemProps) => {
-  const _removeItem = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+const EventListItem = ({
+  done,
+  event,
+  onClick = undefined,
+  selected,
+  removeItem,
+  markItemAsDone,
+  className = '',
+  isDropdown = false,
+}: EventListItemProps) => {
+  const _removeItem = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     return removeItem(event.id);
-  }, [event?.id, removeItem]);
-  const _markItemAsDone = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+  };
+  const _markItemAsDone = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     return markItemAsDone(event.id);
-  }, [event?.id, markItemAsDone]);
+  };
 
   return (
-    <StyledItem key={`event-replay-list-${event?.id}`} $selected={selected} onClick={onClick}>
+    <StyledItem
+      $selected={selected}
+      onClick={onClick}
+      className={className}
+      title={isDropdown ? 'Show Selected Events' : undefined}>
+      <CompletedButton
+        onClick={_markItemAsDone}
+        title={`Mark event "${event?.id}" as ${done ? 'not' : ''} reviewed`}
+        name="verified"
+        iconType={done ? 'solid' : 'regular'}
+        $done={done}
+      />
       <Summary $done={done}>{event?.message ?? <i>Unknown</i>}</Summary>
-
-      <ButtonGroup>
+      {isDropdown ? (
+        <Icon name="arrow_drop_down" />
+      ) : (
         <IconButton onClick={_removeItem} title={`Remove event "${event?.id}" from list`} name="delete" />
-        <CompletedButton onClick={_markItemAsDone}
-                         title={`Mark event "${event?.id}" as ${done ? 'not' : ''} investigated`}
-                         name="verified"
-                         iconType={done ? 'solid' : 'regular'}
-                         $done={done} />
-      </ButtonGroup>
+      )}
     </StyledItem>
   );
 };

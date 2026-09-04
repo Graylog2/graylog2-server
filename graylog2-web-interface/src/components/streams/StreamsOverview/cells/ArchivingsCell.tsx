@@ -16,37 +16,37 @@
  */
 
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import { Icon, Tooltip } from 'components/common';
+import type { Stream } from 'logic/streams/types';
+import { StatusIcon, Tooltip } from 'components/common';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
+import { ARCHIVE_RETENTION_STRATEGY } from 'hooks/useIndices';
+import useExcludedArchiveStreams from 'components/streams/hooks/useExcludedArchiveStreams';
 
 type Props = {
-  stream: Stream,
-  indexSets: Array<IndexSet>,
-}
-
-const Wrapper = styled.div<{ $enabled: boolean }>(({ theme, $enabled }) => css`
-  color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
-  width: fit-content;
-`);
+  stream: Stream;
+  indexSets: Array<IndexSet>;
+};
 
 const ArchivingsCell = ({ stream, indexSets }: Props) => {
-  if (stream.is_default || !stream.is_editable) {
+  const excludedStreams = useExcludedArchiveStreams();
+
+  // No is_default/is_editable guard: archiving status applies to every stream, unlike the sibling action cells.
+  const indexSet = indexSets.find((is) => is.id === stream.index_set_id);
+
+  const indexSetArchivingEnabled = Boolean(
+    (indexSet?.use_legacy_rotation && indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY) ||
+    indexSet?.data_tiering?.archive_before_deletion,
+  );
+  const archivingEnabled = indexSetArchivingEnabled && !excludedStreams.includes(stream.id);
+
+  if (!archivingEnabled) {
     return null;
   }
 
-  const indexSet = indexSets.find((is) => is.id === stream.index_set_id);
-
-  const archivingEnabled = (indexSet?.use_legacy_rotation && indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY) || indexSet?.data_tiering?.archive_before_deletion;
-
   return (
-    <Tooltip withArrow position="right" label={`Archiving is ${archivingEnabled ? 'enabled' : 'disabled'}`}>
-      <Wrapper $enabled={archivingEnabled}>
-        <Icon name={archivingEnabled ? 'check_circle' : 'cancel'} />
-      </Wrapper>
+    <Tooltip withArrow position="right" label="Archiving is enabled">
+      <StatusIcon active />
     </Tooltip>
   );
 };

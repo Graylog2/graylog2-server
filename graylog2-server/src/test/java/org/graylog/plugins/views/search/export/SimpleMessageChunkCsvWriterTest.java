@@ -75,10 +75,10 @@ class SimpleMessageChunkCsvWriterTest {
     @ParameterizedTest
     @CsvSource(
             value = {
-                    "aaa, bbb#\"aaa, bbb\"",
-                    "aaa\\n bbb#\"aaa\\n bbb\"",
-                    "aaa\"bbb#\"aaa\"\"bbb\""
-            }, delimiter = '#'
+                    "aaa, bbb|\"aaa, bbb\"",
+                    "aaa\\n bbb|\"aaa\\n bbb\"",
+                    "aaa\"bbb|\"aaa\"\"bbb\""
+            }, delimiter = '|'
     )
     void quotesCertainStrings(String value, String expected) {
         SimpleMessageChunk chunk = simpleMessageChunk("message", new Object[]{value});

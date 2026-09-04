@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled, { css } from 'styled-components';
 import type { PropsWithChildren } from 'react';
+import * as React from 'react';
 import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { Alert, Button } from 'components/bootstrap';
 import { Icon, ConfirmDialog } from 'components/common';
-import { ContentArea, Container } from 'components/security/page-layout';
 
 const StyledAlert = styled(Alert)`
   padding: ${({ theme }) => theme.spacings.lg};
@@ -48,7 +47,7 @@ const BoldText = styled.h1`
   color: ${({ theme }) => theme.colors.variant.danger};
 `;
 
-const Col = styled.div<{ $width?: string, $align?: string, $justify?: string }>`
+const Col = styled.div<{ $width?: string; $align?: string; $justify?: string }>`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacings.md};
@@ -56,23 +55,28 @@ const Col = styled.div<{ $width?: string, $align?: string, $justify?: string }>`
   align-items: ${({ $align }) => $align || 'flex-start'};
 `;
 
-const Row = styled.div<{ $justify?: string, $fullWidth?: boolean }>`
+const Row = styled.div<{ $justify?: string; $fullWidth?: boolean }>`
   display: flex;
   flex-direction: row;
-  ${({ $justify }) => (
-    $justify ? css`justify-content: ${$justify};` : css`gap: ${({ theme }) => theme.spacings.md};`
-  )}
+  ${({ $justify }) =>
+    $justify
+      ? css`
+          justify-content: ${$justify};
+        `
+      : css`
+          gap: ${({ theme }) => theme.spacings.md};
+        `}
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'auto')};
 `;
 
 const StyledIcon = styled(Icon)`
-  color: ${({ theme }) => theme.colors.brand.primary};
+  color: ${({ theme }) => theme.colors.variant.danger};
 `;
 
 const LEFT_COLUMN_ITEM_LIST = [
   'Anomaly Detection AI',
   'Cloud Option',
-  'Achiving',
+  'Archiving',
   'Audit Logs for Graylog Cloud',
   'Dynamic Lookup Tables',
   'Advanced Alerting With Scripting',
@@ -88,7 +92,7 @@ const RIGHT_COLUMN_ITEM_LIST = [
   'Parameterized Dashboarding',
   'Input & Output Integrations',
   'Threat Management',
-  'Search Workflow, Temlplates & Filters',
+  'Search Workflow, Templates & Filters',
   'Integrated Search & Alerting',
   'SOAR Integrations',
 ];
@@ -98,33 +102,33 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
 
   return (
     <>
-      <Container>
-        <ContentArea>
-          <StyledAlert bsStyle="info" noIcon>
-            <Banner>
-              <LeftItems>
-                <BoldText>Security Demo</BoldText>
-                <span>For more information and booking a full demo of the product visit Graylog website.</span>
-              </LeftItems>
-              <Button bsStyle="primary" role="link" target="_blank" href="https://graylog.org/explore-security/">
-                Graylog Security <Icon name="open_in_new" />
-              </Button>
-            </Banner>
-          </StyledAlert>
-          {children}
-        </ContentArea>
-      </Container>
+      <StyledAlert bsStyle="info" noIcon>
+        <Banner>
+          <LeftItems>
+            <BoldText>Security Demo</BoldText>
+            <span>For more information and booking a full demo of the product visit Graylog website.</span>
+          </LeftItems>
+          <Button bsStyle="primary" role="link" target="_blank" href="https://graylog.org/explore-security/">
+            Graylog Security <Icon name="open_in_new" />
+          </Button>
+        </Banner>
+      </StyledAlert>
+      {children}
+
       {showModal && (
-        <ConfirmDialog show
-                       title="Security Demo"
-                       onConfirm={() => setShowModal(false)}
-                       btnConfirmText="Close">
+        <ConfirmDialog
+          show
+          title="Security Demo"
+          onConfirm={() => setShowModal(false)}
+          onCancel={() => setShowModal(false)}
+          btnConfirmText="Close">
           <Col>
             <h2 className="text-danger">OVERVIEW</h2>
             <p>
-              Graylog Security is designed to revolutionize cybersecurity for IT teams, offering the combined capabilities of SIEM,
-              Security Analytics, Incident Investigation, and Anomaly Detection. By using our platform, you can work more efficiently,
-              tackling critical tasks quicker, and mitigating risk caused by malicious actors and credential-based attacks.
+              Graylog Security is designed to revolutionize cybersecurity for IT teams, offering the combined
+              capabilities of SIEM, Security Analytics, Incident Investigation, and Anomaly Detection. By using our
+              platform, you can work more efficiently, tackling critical tasks quicker, and mitigating risk caused by
+              malicious actors and credential-based attacks.
             </p>
             <Row $justify="space-between" $fullWidth>
               <Col>

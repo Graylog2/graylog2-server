@@ -14,45 +14,41 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import connect from 'stores/connect';
-import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
+import {
+  useRuleMetricsConfig,
+  updateRuleMetricsConfig,
+  RULE_METRICS_CONFIG_QUERY_KEY,
+} from 'components/rules/hooks/useRules';
+import type { MetricsConfigType } from 'components/rules/hooks/useRules';
 
 import RuleMetricsConfig from './RuleMetricsConfig';
 
-const handleChange = (nextConfig) => RulesActions.updateMetricsConfig(nextConfig);
-
-type RuleMetricsConfigContainerProps = {
-  metricsConfig?: any;
+type Props = {
   onClose?: (...args: any[]) => void;
 };
 
-class RuleMetricsConfigContainer extends React.Component<RuleMetricsConfigContainerProps, {
-  [key: string]: any;
-}> {
-  static defaultProps = {
-    metricsConfig: undefined,
-    onClose: () => {},
-  };
+const RuleMetricsConfigContainer = ({ onClose = () => {} }: Props) => {
+  const queryClient = useQueryClient();
+  const { data: metricsConfig } = useRuleMetricsConfig();
 
-  componentDidMount() {
-    RulesActions.loadMetricsConfig();
+  const handleChange = useCallback(
+    (nextConfig: MetricsConfigType) =>
+      updateRuleMetricsConfig(nextConfig).then((response) => {
+        queryClient.invalidateQueries({ queryKey: RULE_METRICS_CONFIG_QUERY_KEY });
+
+        return response;
+      }),
+    [queryClient],
+  );
+
+  if (!metricsConfig) {
+    return null;
   }
 
-  render() {
-    const { metricsConfig, onClose } = this.props;
+  return <RuleMetricsConfig config={metricsConfig} onChange={handleChange} onClose={onClose} />;
+};
 
-    if (!metricsConfig) {
-      return null;
-    }
-
-    return (
-      <RuleMetricsConfig config={metricsConfig}
-                         onChange={handleChange}
-                         onClose={onClose} />
-    );
-  }
-}
-
-export default connect(RuleMetricsConfigContainer, { rules: RulesStore }, ({ rules }) => ({ metricsConfig: rules ? rules.metricsConfig : rules }));
+export default RuleMetricsConfigContainer;

@@ -29,8 +29,8 @@ import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,15 +42,15 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class GrokExtractorTest {
 
     private List<GrokPattern> patternSet;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         patternSet = new ArrayList<>();
 
@@ -77,7 +77,7 @@ public class GrokExtractorTest {
         final GrokExtractor extractor = makeExtractor("%{NUMBER:number;int}");
 
         final Extractor.Result[] results = extractor.run("199999");
-        assertEquals("NUMBER is marked as UNWANTED and does not generate a field", 1, results.length);
+        assertEquals(1, results.length, "NUMBER is marked as UNWANTED and does not generate a field");
         assertEquals(Integer.class, results[0].getValue().getClass());
         assertEquals(199999, results[0].getValue());
     }
@@ -86,7 +86,7 @@ public class GrokExtractorTest {
     public void testDateExtraction() {
         final GrokExtractor extractor = makeExtractor("%{GREEDY:timestamp;date;yyyy-MM-dd'T'HH:mm:ss.SSSX}");
         final Extractor.Result[] results = extractor.run("2015-07-31T10:05:36.773Z");
-        assertEquals("ISO date is parsed", 1, results.length);
+        assertEquals(1, results.length, "ISO date is parsed");
         Object value = results[0].getValue();
         assertTrue(value instanceof Instant);
         DateTime date = new DateTime(((Instant) value).toEpochMilli(), DateTimeZone.UTC);
@@ -104,7 +104,7 @@ public class GrokExtractorTest {
     public void testDateWithComma() {
         final GrokExtractor extractor = makeExtractor("%{GREEDY:timestamp;date;yyyy-MM-dd'T'HH:mm:ss,SSSX}");
         final Extractor.Result[] results = extractor.run("2015-07-31T10:05:36,773Z");
-        assertEquals("ISO date is parsed", 1, results.length);
+        assertEquals(1, results.length, "ISO date is parsed");
         Object value = results[0].getValue();
         assertTrue(value instanceof Instant);
         DateTime date = new DateTime(((Instant) value).toEpochMilli(), DateTimeZone.UTC);

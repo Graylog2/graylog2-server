@@ -19,10 +19,6 @@ import AppConfig from 'util/AppConfig';
 
 import filterMenuItems, { filterCloudMenuItems } from './filterMenuItems';
 
-jest.mock('util/AppConfig', () => ({
-  isCloud: jest.fn(() => false),
-}));
-
 describe('filterMenuItems', () => {
   it('should filter items by path', () => {
     const items = [
@@ -30,9 +26,7 @@ describe('filterMenuItems', () => {
       { path: 'delete-me', description: 'delete me' },
     ];
 
-    expect(filterMenuItems(items, ['delete-me'])).toEqual([
-      { path: 'something', description: 'something' },
-    ]);
+    expect(filterMenuItems(items, ['delete-me'])).toEqual([{ path: 'something', description: 'something' }]);
   });
 });
 
@@ -61,8 +55,6 @@ describe('filterCloudMenuItem', () => {
       { path: 'delete-me', name: 'delete me' },
     ];
 
-    expect(filterCloudMenuItems(items, ['delete-me'])).toEqual([
-      { path: 'something', name: 'something' },
-    ]);
+    expect(filterCloudMenuItems(items, ['delete-me'])).toEqual([{ path: 'something', name: 'something' }]);
   });
 });

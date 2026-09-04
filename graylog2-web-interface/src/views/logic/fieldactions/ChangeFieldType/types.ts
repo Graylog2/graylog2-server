@@ -21,46 +21,46 @@ import type { IndexSetFieldType, IndexSetFieldTypeJson } from 'components/indice
 export type TypeHistoryItem = string;
 
 export type FieldTypeUsage = {
-  id: string,
-  indexSetTitle: string,
-  streamTitles: Array<string>,
-  types: Array<TypeHistoryItem>
-}
+  id: string;
+  indexSetTitle: string;
+  streamTitles: Array<string>;
+  types: Array<TypeHistoryItem>;
+};
 
-export type FieldTypes = { [name: string]: string};
+export type FieldTypes = { [name: string]: string };
 
 export type ChangeFieldTypeBodyJson = {
-  index_sets: Array<string>,
-  field: string,
-  type: string,
-  rotate: boolean,
-}
+  index_sets: Array<string>;
+  field: string;
+  type: string;
+  rotate: boolean;
+};
 
 export type ChangeFieldTypeBody = {
-  indexSetSelection: Array<string>,
-  newFieldType: string,
-  field: string,
-  rotated: boolean,
-}
+  indexSetSelection: Array<string>;
+  newFieldType: string;
+  field: string;
+  rotated: boolean;
+};
 
 export type FieldTypeUsageElement = {
-   index_set_id: string,
-   index_set_title: string,
-   stream_titles: Array<string>,
-   types: Array<string>
-}
+  index_set_id: string;
+  index_set_title: string;
+  stream_titles: Array<string>;
+  types: Array<string>;
+};
 
 export type PaginatedFieldTypeUsagesResponse = PaginatedListJSON & {
-  elements: Array<FieldTypeUsageElement>,
-  attributes: Array<Attribute>,
+  elements: Array<FieldTypeUsageElement>;
+  attributes: Array<Attribute>;
 };
 
 export type OnSubmitCallbackProps = {
-  indexSetSelection: Array<string>,
-  newFieldType: string,
-  rotated: boolean,
-  field: string,
-}
+  indexSetSelection: Array<string>;
+  newFieldType: string;
+  rotated: boolean;
+  field: string;
+};
 
-export type FieldTypePutResponseJson = Record<string, IndexSetFieldTypeJson>
-export type FieldTypePutResponse = Record<string, IndexSetFieldType>
+export type FieldTypePutResponseJson = Record<string, IndexSetFieldTypeJson>;
+export type FieldTypePutResponse = Record<string, IndexSetFieldType>;

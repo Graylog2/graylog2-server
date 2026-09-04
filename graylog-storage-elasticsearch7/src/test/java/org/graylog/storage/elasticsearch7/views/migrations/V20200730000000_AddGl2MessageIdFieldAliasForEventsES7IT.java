@@ -25,11 +25,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMap
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.MappingMetadata;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -40,7 +40,7 @@ import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends ElasticsearchBaseTest {
 
-    @Rule
+    @SearchInstance
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     @Override
@@ -50,7 +50,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
 
     private V20200730000000_AddGl2MessageIdFieldAliasForEventsES7 sut;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         sut = new V20200730000000_AddGl2MessageIdFieldAliasForEventsES7(elasticsearch.elasticsearchClient());
     }

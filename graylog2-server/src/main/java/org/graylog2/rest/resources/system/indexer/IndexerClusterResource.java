@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -36,7 +36,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 
 @RequiresAuthentication
-@Api(value = "Indexer/Cluster", description = "Indexer cluster information")
+@Tag(name = "Indexer/Cluster", description = "Indexer cluster information")
 @Path("/system/indexer/cluster")
 public class IndexerClusterResource extends RestResource {
 
@@ -53,7 +53,7 @@ public class IndexerClusterResource extends RestResource {
     @Timed
     @Path("/name")
     @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
-    @ApiOperation(value = "Get the cluster name")
+    @Operation(summary = "Get the cluster name")
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterName clusterName() {
         final String clusterName = cluster.clusterName()
@@ -65,7 +65,7 @@ public class IndexerClusterResource extends RestResource {
     @Timed
     @Path("/info")
     @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
-    @ApiOperation(value = "Get cluster name and distribution")
+    @Operation(summary = "Get cluster name and distribution")
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterInfo clusterInfo() {
         final String clusterName = cluster.clusterName()
@@ -76,7 +76,7 @@ public class IndexerClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/health")
-    @ApiOperation(value = "Get cluster and shard health overview")
+    @Operation(summary = "Get cluster and shard health overview")
     @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterHealth clusterHealth() {

@@ -32,7 +32,6 @@ import org.mongojack.ObjectId;
 })
 public interface ExportJob extends MongoEntity {
     String FIELD_TYPE = "type";
-    String FIELD_ID = "_id";
     String FIELD_CREATED_AT = "created_at";
 
     @Id

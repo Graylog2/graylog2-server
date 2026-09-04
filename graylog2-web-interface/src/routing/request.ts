@@ -18,19 +18,39 @@ import Qs from 'qs';
 
 import { Builder } from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
+import type { Method } from 'routing/types';
 
 type Query = { [key: string]: string | number | boolean | string[] };
 type Headers = { [key: string]: string | number | boolean | string[] };
-type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type RequestOptions = {
+  requestShouldExtendSession?: boolean;
+};
 
-const request = (method: Methods, path: string, body: any, query: Query, headers: Headers) => {
-  const pathWithQueryParameters = Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query)}` : path;
-  const builder = new Builder(method, URLUtils.qualifyUrl(pathWithQueryParameters)).json(body);
+const headersFromOptions = (options: RequestOptions): Headers => {
+  if (options && 'requestShouldExtendSession' in options) {
+    return { 'X-Graylog-No-Session-Extension': !(options?.requestShouldExtendSession ?? true) };
+  }
 
-  const builderWithHeaders = Object.entries(headers)
-    .reduce((prev, [key, value]) => prev.setHeader(key, value), builder);
+  return {};
+};
+const request = (
+  method: Method,
+  path: string,
+  body: any,
+  query: Query,
+  headers: Headers,
+  options: RequestOptions = {},
+) => {
+  const pathWithQueryParameters =
+    Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query, { indices: false })}` : path;
 
-  return builderWithHeaders.build();
+  const optionHeaders = headersFromOptions(options);
+  const _headers: Headers = {
+    ...headers,
+    ...optionHeaders,
+  };
+
+  return new Builder(method, URLUtils.qualifyUrl(pathWithQueryParameters)).json(body).setHeaders(_headers).build();
 };
 
 export default request;

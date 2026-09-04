@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import StreamsContext from 'contexts/StreamsContext';
@@ -33,6 +34,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import type View from 'views/logic/views/View';
 import type { Stream } from 'logic/streams/types';
+import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 
 import StreamSearchPage from './StreamSearchPage';
 
@@ -47,6 +49,7 @@ jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
+jest.mock('views/hooks/useMinimumRefreshInterval');
 
 describe('StreamSearchPage', () => {
   const mockQuery = {
@@ -66,8 +69,13 @@ describe('StreamSearchPage', () => {
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ streamId });
+    asMock(useMinimumRefreshInterval).mockReturnValue({ data: undefined, isInitialLoading: false });
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view: mockView,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
 
@@ -82,31 +90,47 @@ describe('StreamSearchPage', () => {
   it('should create view with streamId passed from props', async () => {
     render(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith({
-      queryString: undefined,
-      streamId: 'stream-id-1',
-      timeRange: undefined,
-    }));
+    await waitFor(() =>
+      expect(useCreateSavedSearch).toHaveBeenCalledWith(
+        {
+          queryString: undefined,
+          streamId: 'stream-id-1',
+          timeRange: undefined,
+        },
+        [streamId],
+      ),
+    );
   });
 
-  it('should recreate view when streamId passed from props changes', async () => {
+  it('should rerender hook when streamId passed from props changes', async () => {
     const { rerender } = render(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith({
-      queryString: undefined,
-      streamId: 'stream-id-1',
-      timeRange: undefined,
-    }));
+    await waitFor(() =>
+      expect(useCreateSavedSearch).toHaveBeenCalledWith(
+        {
+          queryString: undefined,
+          streamId: 'stream-id-1',
+          timeRange: undefined,
+        },
+        [streamId],
+      ),
+    );
 
-    asMock(useParams).mockReturnValue({ streamId: 'stream-id-2' });
+    const secondStream = 'stream-id-2';
+    asMock(useParams).mockReturnValue({ streamId: secondStream });
 
     rerender(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenLastCalledWith({
-      queryString: undefined,
-      streamId: 'stream-id-2',
-      timeRange: undefined,
-    }));
+    await waitFor(() =>
+      expect(useCreateSavedSearch).toHaveBeenLastCalledWith(
+        {
+          queryString: undefined,
+          streamId: 'stream-id-2',
+          timeRange: undefined,
+        },
+        [secondStream],
+      ),
+    );
   });
 
   describe('loading another view', () => {
@@ -114,8 +138,8 @@ describe('StreamSearchPage', () => {
       asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => (
-            <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load
-              view
+            <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>
+              Load view
             </button>
           )}
         </ViewLoaderContext.Consumer>
@@ -123,7 +147,7 @@ describe('StreamSearchPage', () => {
 
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewLoadButton = await findByText('Load view');
-      fireEvent.click(viewLoadButton);
+      await userEvent.click(viewLoadButton);
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
@@ -135,7 +159,11 @@ describe('StreamSearchPage', () => {
     beforeEach(() => {
       asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <NewViewLoaderContext.Consumer>
-          {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
+          {(loadNewView) => (
+            <button type="button" onClick={() => loadNewView()}>
+              Load new view
+            </button>
+          )}
         </NewViewLoaderContext.Consumer>
       ));
     });
@@ -144,7 +172,7 @@ describe('StreamSearchPage', () => {
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewCreateButton = await findByText('Load new view');
 
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(loadNewViewForStream).toHaveBeenCalled());
 
@@ -156,7 +184,7 @@ describe('StreamSearchPage', () => {
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewCreateButton = await findByText('Load new view');
 
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 

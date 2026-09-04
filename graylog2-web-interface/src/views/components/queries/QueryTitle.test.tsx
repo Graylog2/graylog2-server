@@ -22,7 +22,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { asMock } from 'helpers/mocking';
 import createSearch from 'views/logic/slices/createSearch';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates } from 'views/logic/slices/viewSelectors';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
@@ -31,7 +31,7 @@ import QueryTitle from './QueryTitle';
 jest.mock('views/logic/slices/createSearch');
 
 const QueryCount = () => {
-  const queries = useAppSelector(selectViewStates);
+  const queries = useViewsSelector(selectViewStates);
   const activeQuery = useActiveQueryId();
 
   return (
@@ -50,22 +50,24 @@ describe('QueryTitle', () => {
   const clickQueryAction = async (name: string) => {
     const openMenuTrigger = await screen.findByTestId('query-action-dropdown');
 
-    userEvent.click(openMenuTrigger);
+    await userEvent.click(openMenuTrigger);
 
     const menuItem = await screen.findByText(name);
 
-    userEvent.click(menuItem);
+    await userEvent.click(menuItem);
   };
 
   const SUT = (props: Partial<React.ComponentProps<typeof QueryTitle>>) => (
     <TestStoreProvider>
-      <QueryTitle active
-                  id="query-id-1"
-                  openEditModal={() => {}}
-                  onRemove={() => Promise.resolve()}
-                  title="Foo"
-                  openCopyToDashboardModal={() => {}}
-                  {...props} />
+      <QueryTitle
+        active
+        id="query-id-1"
+        openEditModal={() => {}}
+        onRemove={() => Promise.resolve()}
+        title="Foo"
+        openCopyToDashboardModal={() => {}}
+        {...props}
+      />
       <QueryCount />
     </TestStoreProvider>
   );

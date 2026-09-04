@@ -18,21 +18,24 @@ package org.graylog.events.migrations;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
@@ -53,11 +56,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -68,14 +70,15 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
 
     private Migration migration;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        final MongoConnection connection = mongoCollections.connection();
         this.migration = new V20230629140000_RenameFieldTypeOfEventDefinitionSeries(
                 clusterConfigService,
-                mongodb.mongoConnection(),
+                connection,
                 notificationService
         );
-        this.eventDefinitionsCollection = mongodb.mongoConnection().getMongoDatabase().getCollection("event_definitions");
+        this.eventDefinitionsCollection = connection.getMongoDatabase().getCollection("event_definitions");
     }
 
     @Test
@@ -145,7 +148,7 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
         try {
             final URL resource = this.getClass().getResource(filename);
             if (resource == null) {
-                Assert.fail("Unable to find resource file for test: " + filename);
+                Assertions.fail("Unable to find resource file for test: " + filename);
             }
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);

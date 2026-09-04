@@ -17,28 +17,38 @@
 import difference from 'lodash/difference';
 import isEqual from 'lodash/isEqual';
 
-import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
+import { SearchDecorators } from '@graylog/server-api';
+
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 
 const DecoratorsUpdater = (newDecorators: Array<Decorator>, oldDecorators: Array<Decorator>) => {
-  const newDecoratorIds: Array<string> = newDecorators.filter(({ id }) => id !== undefined).map(({ id }) => id).sort();
+  const newDecoratorIds: Array<string> = newDecorators
+    .filter(({ id }) => id !== undefined)
+    .map(({ id }) => id)
+    .sort();
   const oldDecoratorIds: Array<string> = oldDecorators.map(({ id }) => id).sort();
 
-  const oldDecoratorsById = oldDecorators
-    .reduce((prev, cur) => (cur.id ? { ...prev, [cur.id]: cur } : prev), {});
-  const newDecoratorsById = newDecorators
-    .reduce((prev, cur) => (cur.id ? { ...prev, [cur.id]: cur } : prev), {});
+  const oldDecoratorsById = oldDecorators.reduce((prev, cur) => (cur.id ? { ...prev, [cur.id]: cur } : prev), {});
+  const newDecoratorsById = newDecorators.reduce((prev, cur) => (cur.id ? { ...prev, [cur.id]: cur } : prev), {});
 
-  const createdDecorators = difference(newDecoratorIds, oldDecoratorIds).map((newDecoratorId) => newDecoratorsById[newDecoratorId]);
-  const updatedDecorators = newDecorators.filter(({ id }) => id)
-    .filter((decorator) => decorator.id && oldDecoratorsById[decorator.id] && !isEqual(decorator, oldDecoratorsById[decorator.id]));
+  const createdDecorators = difference(newDecoratorIds, oldDecoratorIds).map(
+    (newDecoratorId) => newDecoratorsById[newDecoratorId],
+  );
+  const updatedDecorators = newDecorators
+    .filter(({ id }) => id)
+    .filter(
+      (decorator) =>
+        decorator.id && oldDecoratorsById[decorator.id] && !isEqual(decorator, oldDecoratorsById[decorator.id]),
+    );
   const deletedDecoratorIds = difference(oldDecoratorIds, newDecoratorIds);
 
-  return [
-    ...createdDecorators.map(({ id, ...newDecorator }) => () => DecoratorsActions.create(newDecorator)),
-    ...updatedDecorators.map((updatedDecorator) => () => DecoratorsActions.update(updatedDecorator.id, updatedDecorator)),
-    ...deletedDecoratorIds.map((deletedID) => () => DecoratorsActions.remove(deletedID)),
-  ].reduce((prev, cur) => prev.then(() => cur()), Promise.resolve());
+  return Promise.all([
+    ...createdDecorators.map(({ id: _id, ...newDecorator }) => SearchDecorators.create(newDecorator as any)),
+    ...updatedDecorators.map((updatedDecorator) =>
+      SearchDecorators.update(updatedDecorator.id, updatedDecorator as any),
+    ),
+    ...deletedDecoratorIds.map((deletedID) => SearchDecorators.remove(deletedID)),
+  ]).then(() => {});
 };
 
 export default DecoratorsUpdater;

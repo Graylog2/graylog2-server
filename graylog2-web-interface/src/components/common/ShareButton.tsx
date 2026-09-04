@@ -16,37 +16,58 @@
  */
 import * as React from 'react';
 
-import type { StyleProps } from 'components/bootstrap/Button';
-import Button from 'components/bootstrap/Button';
-import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
 import HasOwnership from 'components/common/HasOwnership';
-import Icon from 'components/common/Icon';
-import type { BsSize } from 'components/bootstrap/types';
+import IconButton from 'components/common/IconButton';
+import type { StyleProps } from 'components/bootstrap/Button';
 
 type Props = {
   /**
    * When a custom description is provided
    * the button will be disabled
    */
-  disabledInfo?: string,
-  entityId: string,
-  entityType: string,
-  onClick: () => void,
-  bsStyle?: StyleProps,
-  bsSize?: BsSize,
+  disabledInfo?: string;
+  entityId: string;
+  entityType: string;
+  onClick: () => void;
+  bsStyle?: StyleProps;
+  bsSize?: 'xs' | 'xsmall' | 'md' | 'medium';
+  title?: string;
+  /** Show the title text next to the icon, e.g. when multiple share buttons appear together and the icon alone can't tell them apart. */
+  showTitle?: boolean;
 };
 
-const ShareButton = ({ bsStyle = 'default', bsSize, entityId, entityType, onClick, disabledInfo }: Props) => (
+const ShareButton = ({
+  entityId,
+  entityType,
+  onClick,
+  disabledInfo = undefined,
+  bsSize = undefined,
+  bsStyle = 'default',
+  title = 'Share',
+  showTitle = false,
+}: Props) => (
   <HasOwnership id={entityId} type={entityType}>
-    {({ disabled: hasMissingPermissions }) => (
-      <Button bsStyle={bsStyle}
-              bsSize={bsSize}
-              onClick={onClick}
-              disabled={!!disabledInfo || hasMissingPermissions}
-              title="Share">
-        <Icon name="person_add" /> Share {(!!disabledInfo || hasMissingPermissions) && <SharingDisabledPopover type={entityType} description={disabledInfo} />}
-      </Button>
-    )}
+    {({ disabled: hasMissingPermissions }) => {
+      const isDisabled = !!disabledInfo || hasMissingPermissions;
+      const tooltipLabel = isDisabled
+        ? disabledInfo || `Only owners of this ${entityType.replaceAll('_', ' ')} can share it.`
+        : title;
+
+      return (
+        <IconButton
+          name="person_add"
+          title={tooltipLabel}
+          ariaLabel={title}
+          bsStyle={bsStyle}
+          iconSize="inherit"
+          size={bsSize}
+          onClick={onClick}
+          disabled={isDisabled}
+          showTitle={showTitle}
+          allowClickWhenDisabled
+        />
+      );
+    }}
   </HasOwnership>
 );
 

@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.SearchEngineSearchType;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -47,7 +48,7 @@ import static com.google.common.collect.ImmutableList.of;
 @AutoValue
 @JsonTypeName(Pivot.NAME)
 @JsonDeserialize(builder = Pivot.Builder.class)
-public abstract class Pivot implements SearchType {
+public abstract class Pivot implements SearchEngineSearchType {
     public static final String NAME = "pivot";
 
     @Override

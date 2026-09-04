@@ -16,49 +16,44 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
-import { useStore } from 'stores/connect';
+import { useExtractor } from 'hooks/useExtractors';
+import { fetchInput } from 'hooks/useInputs';
+import universalSearch from 'stores/search/UniversalSearch';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 
 const EditExtractorsPage = () => {
   const history = useHistory();
-  const { extractor } = useStore(ExtractorsStore);
-  const { input } = useStore(InputsStore);
-  const { inputId, extractorId, nodeId } = useParams<{ inputId: string, extractorId: string, nodeId: string }>();
-  const [exampleMessage, setExampleMessage] = useState<{ fields?: { [key: string]: any }}>({});
+  const { inputId, extractorId, nodeId } = useParams<{ inputId: string; extractorId: string; nodeId: string }>();
+  const { data: extractor } = useExtractor(inputId, extractorId);
+  const [exampleMessage, setExampleMessage] = useState<{ fields?: { [key: string]: any } }>({});
+  const { data: input } = useQuery({
+    queryKey: ['inputs', inputId],
+    queryFn: () => fetchInput(inputId),
+  });
 
   useEffect(() => {
-    InputsActions.get(inputId);
-    ExtractorsActions.get(inputId, extractorId);
-
-    UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`, { relative: 3600 }, undefined, 1)
-      .then((response) => {
-        if (response.total_results > 0) {
-          setExampleMessage(response.messages[0]);
-        } else {
-          setExampleMessage({});
-        }
-      });
+    universalSearch(
+      'relative',
+      `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
+      { type: 'relative', range: 3600 },
+      undefined,
+      1,
+    ).then((response) => {
+      setExampleMessage(response.total_results > 0 ? response.messages[0] : {});
+    });
   }, [extractorId, inputId]);
 
   const _isLoading = !(input && extractor && exampleMessage);
 
   const _extractorSaved = () => {
-    let url;
-
-    if (input.global) {
-      url = Routes.global_input_extractors(inputId);
-    } else {
-      url = Routes.local_input_extractors(nodeId, inputId);
-    }
+    const url = input.global ? Routes.global_input_extractors(inputId) : Routes.local_input_extractors(nodeId, inputId);
 
     history.push(url);
   };
@@ -72,22 +67,28 @@ const EditExtractorsPage = () => {
 
   return (
     <DocumentTitle title={`Edit extractor ${extractor.title}`}>
-      <PageHeader title={<span>Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em></span>}
-                  documentationLink={{
-                    title: 'Extractors documentation',
-                    path: DocsHelper.PAGES.EXTRACTORS,
-                  }}>
+      <PageHeader
+        title={
+          <span>
+            Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em>
+          </span>
+        }
+        documentationLink={{
+          title: 'Extractors documentation',
+          path: DocsHelper.PAGES.EXTRACTORS,
+        }}>
         <span>
-          Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
-          any text data into fields that allow you easy filtering and analysis later on.
+          Extractors are applied on every message that is received by an input. Use them to extract and transform any
+          text data into fields that allow you easy filtering and analysis later on.
         </span>
       </PageHeader>
-      <EditExtractor action="edit"
-                     extractor={extractor}
-                     inputId={input.id}
-                     exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
-                     onSave={_extractorSaved} />
-
+      <EditExtractor
+        action="edit"
+        extractor={extractor}
+        inputId={input.id}
+        exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
+        onSave={_extractorSaved}
+      />
     </DocumentTitle>
   );
 };

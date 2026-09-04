@@ -1,0 +1,5 @@
+type = "a"
+message = "Data Node uses OpenSearch 2.19.3."
+
+issues = ["graylog-plugin-enterprise#9665"]
+pulls = ["21537"]

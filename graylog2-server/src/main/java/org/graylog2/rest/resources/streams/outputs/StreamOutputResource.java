@@ -18,11 +18,25 @@ package org.graylog2.rest.resources.streams.outputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditEventTypes;
@@ -39,28 +53,12 @@ import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 @RequiresAuthentication
-@Api(value = "StreamOutputs", description = "Manage stream outputs for a given stream")
+@Tag(name = "StreamOutputs", description = "Manage stream outputs for a given stream")
 @Path("/streams/{streamid}/outputs")
 public class StreamOutputResource extends RestResource {
     private final OutputService outputService;
@@ -75,12 +73,13 @@ public class StreamOutputResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a list of all outputs for a stream")
+    @Operation(summary = "Get a list of all outputs for a stream")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such stream on this node.")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such stream on this node.")
     })
-    public OutputListResponse get(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
+    public OutputListResponse get(@Parameter(name = "streamid", description = "The id of the stream whose outputs we want.", required = true)
                                   @PathParam("streamid") String streamid) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_READ);
@@ -106,13 +105,14 @@ public class StreamOutputResource extends RestResource {
     @GET
     @Path("/{outputId}")
     @Timed
-    @ApiOperation(value = "Get specific output of a stream")
+    @Operation(summary = "Get specific output of a stream")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such stream/output on this node.")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such stream/output on this node.")
     })
-    public OutputSummary get(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
-                             @ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
+    public OutputSummary get(@Parameter(name = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
+                             @Parameter(name = "outputId", description = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_READ, outputId);
 
@@ -125,24 +125,24 @@ public class StreamOutputResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Associate outputs with a stream")
+    @Operation(summary = "Associate outputs with a stream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid output specification in input.")
+            @ApiResponse(responseCode = "202", description = "Accepted"),
+            @ApiResponse(responseCode = "400", description = "Invalid output specification in input.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_ASSIGNMENT_CREATE)
-    public Response add(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
+    public Response add(@Parameter(name = "streamid", description = "The id of the stream whose outputs we want.", required = true)
                         @PathParam("streamid") String streamid,
-                        @ApiParam(name = "JSON body", required = true)
+                        @RequestBody(required = true)
                         @Valid @NotNull AddOutputRequest aor) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_CREATE);
 
-        checkNotEditable(streamid, "Cannot assign outputs to a non-editable stream.");
-
-        // Check if stream exists
-        streamService.load(streamid);
+        // Check if stream exists and is editable
+        final Stream stream = streamService.load(streamid);
+        checkNotEditable(stream, "Cannot assign outputs to a non-editable stream.");
 
         final Set<String> outputs = aor.outputs();
         final ImmutableSet.Builder<ObjectId> outputIds = ImmutableSet.builderWithExpectedSize(outputs.size());
@@ -162,14 +162,15 @@ public class StreamOutputResource extends RestResource {
     @Path("/{outputId}")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Delete output of a stream")
+    @Operation(summary = "Delete output of a stream")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such stream/output on this node.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "No such stream/output on this node.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_ASSIGNMENT_DELETE)
-    public void remove(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
+    public void remove(@Parameter(name = "streamid", description = "The id of the stream whose outputs we want.", required = true)
                        @PathParam("streamid") String streamid,
-                       @ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
+                       @Parameter(name = "outputId", description = "The id of the output that should be deleted", required = true)
                        @PathParam("outputId") String outputId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_DELETE, outputId);
@@ -180,8 +181,8 @@ public class StreamOutputResource extends RestResource {
         streamService.removeOutput(stream, output);
     }
 
-    private void checkNotEditable(String streamId, String message) {
-        if (!Stream.streamIsEditable(streamId)) {
+    private void checkNotEditable(Stream stream, String message) {
+        if (!stream.isEditable()) {
             throw new BadRequestException(message);
         }
     }

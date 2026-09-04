@@ -17,7 +17,6 @@
 package org.graylog2.database.pagination;
 
 import com.google.common.collect.Lists;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationCaseFirst;
 import com.mongodb.client.model.Filters;
@@ -28,6 +27,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
@@ -60,14 +60,11 @@ class DefaultMongoPaginationHelperTest {
                     .map(name -> new DTO(new ObjectId().toHexString(), name))
                     .toList();
 
-    private MongoCollections mongoCollections;
-    private MongoCollection<DTO> collection;
     private MongoPaginationHelper<DTO> paginationHelper;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
-        collection = mongoCollections.collection("test", DTO.class);
+    void setUp(MongoCollections mongoCollections) {
+        final MongoCollection<DTO> collection = mongoCollections.collection("test", DTO.class);
         paginationHelper = new DefaultMongoPaginationHelper<>(collection);
 
         collection.insertMany(DTOs);
@@ -75,13 +72,14 @@ class DefaultMongoPaginationHelperTest {
 
     @Test
     void testFilter() {
-        final Bson filter = Filters.in("name", "A", "B", "C");
-        final PaginatedList<DTO> filterdPage = paginationHelper.filter(filter).page(1);
-        assertThat(filterdPage)
+        // Filter on _id so the default case-insensitive string collation does not affect what the filter matches.
+        final Bson filter = Filters.in("_id", DTOs.subList(0, 3).stream().map(dto -> new ObjectId(dto.id())).toList());
+        final PaginatedList<DTO> filteredPage = paginationHelper.filter(filter).page(1);
+        assertThat(filteredPage)
                 .isEqualTo(paginationHelper.filter(filter).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs.subList(0, 3));
 
-        assertThat(filterdPage.pagination()).satisfies(pagination -> {
+        assertThat(filteredPage.pagination()).satisfies(pagination -> {
             assertThat(pagination.total()).isEqualTo(3);
             assertThat(pagination.page()).isEqualTo(1);
             assertThat(pagination.perPage()).isEqualTo(0);
@@ -90,6 +88,13 @@ class DefaultMongoPaginationHelperTest {
 
     @Test
     void testSort() {
+        // Under the default case-insensitive collation, sorting by name interleaves upper and
+        // lower case entries; insertion order (_id ascending) breaks the ties regardless of
+        // sort direction.
+        final Comparator<DTO> byLowerCaseName = Comparator.comparing(dto -> dto.name().toLowerCase(ENGLISH));
+        final List<DTO> caseInsensitiveAsc = DTOs.stream().sorted(byLowerCaseName).toList();
+        final List<DTO> caseInsensitiveDesc = DTOs.stream().sorted(byLowerCaseName.reversed()).toList();
+
         assertThat(paginationHelper.sort(ascending("_id")).page(1))
                 .isEqualTo(paginationHelper.sort(ascending("_id")).page(1, alwaysTrue()))
                 .isEqualTo(paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("_id")).page(1))
@@ -100,7 +105,7 @@ class DefaultMongoPaginationHelperTest {
                 .isEqualTo(paginationHelper.sort(ascending("name")).page(1, alwaysTrue()))
                 .isEqualTo(paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("name")).page(1))
                 .isEqualTo(paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("name")).page(1, alwaysTrue()))
-                .containsExactlyElementsOf(DTOs);
+                .containsExactlyElementsOf(caseInsensitiveAsc);
 
         assertThat(paginationHelper.sort(descending("_id")).page(1))
                 .isEqualTo(paginationHelper.sort(descending("_id")).page(1, alwaysTrue()))
@@ -112,13 +117,14 @@ class DefaultMongoPaginationHelperTest {
                 .isEqualTo(paginationHelper.sort(descending("name")).page(1, alwaysTrue()))
                 .isEqualTo(paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("name")).page(1))
                 .isEqualTo(paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("name")).page(1, alwaysTrue()))
-                .containsExactlyElementsOf(Lists.reverse(DTOs));
+                .containsExactlyElementsOf(caseInsensitiveDesc);
     }
 
     @Test
     void testProjection() {
-        final Bson filter = Filters.in("name", "A", "B", "C");
-        PaginatedList<DTO> page = paginationHelper.filter(filter)
+        // Filter on _id so the default case-insensitive string collation does not affect what the filter matches.
+        final Bson filter = Filters.in("_id", DTOs.subList(0, 3).stream().map(dto -> new ObjectId(dto.id())).toList());
+        var page = paginationHelper.filter(filter)
                 .projection(Projections.excludeId())
                 .sort(ascending("name"))
                 .perPage(5)
@@ -150,7 +156,7 @@ class DefaultMongoPaginationHelperTest {
                 .isEqualTo(paginationHelper.perPage(0).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs);
 
-        final MongoPaginationHelper<DTO> helper = paginationHelper.perPage(8);
+        final var helper = paginationHelper.perPage(8);
 
         assertThat(helper.page(1)).containsExactlyElementsOf(DTOs.subList(0, 8));
         assertThat(helper.page(1, alwaysTrue())).containsExactlyElementsOf(DTOs.subList(0, 8));
@@ -178,10 +184,40 @@ class DefaultMongoPaginationHelperTest {
 
     @Test
     void testGrandTotalFilter() {
+        // Under the default case-insensitive collation Filters.in matches both
+        // upper- and lower-case variants (e.g. "A" matches "a" too), so the
+        // grand total reflects all 6 matches across the 16-document fixture.
         final Bson filter = Filters.in("name", "A", "B", "C");
         assertThat(paginationHelper.includeGrandTotal(true).grandTotalFilter(filter).page(1).grandTotal())
                 .isEqualTo(paginationHelper.includeGrandTotal(true).grandTotalFilter(filter).page(1, alwaysTrue()).grandTotal())
-                .contains(3L);
+                .contains(6L);
+    }
+
+    @Test
+    void totalsHonorDefaultCaseInsensitiveCollation() {
+        // The page contents (find) and the total/grandTotal (count) must agree on
+        // which documents the filter matches. The default collation makes the filter
+        // case-insensitive, so "name = 'a'" matches both "A" and "a".
+        final Bson filter = Filters.eq("name", "a");
+        final PaginatedList<DTO> page = paginationHelper
+                .filter(filter)
+                .includeGrandTotal(true)
+                .grandTotalFilter(filter)
+                .page(1);
+
+        assertThat(page).hasSize(2);
+        assertThat(page.pagination().total()).isEqualTo(2);
+        assertThat(page.grandTotal()).contains(2L);
+
+        final PaginatedList<DTO> pageWithSelector = paginationHelper
+                .filter(filter)
+                .includeGrandTotal(true)
+                .grandTotalFilter(filter)
+                .page(1, alwaysTrue());
+
+        assertThat(pageWithSelector).hasSize(2);
+        assertThat(pageWithSelector.pagination().total()).isEqualTo(2);
+        assertThat(pageWithSelector.grandTotal()).contains(2L);
     }
 
     @Test

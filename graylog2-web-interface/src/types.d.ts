@@ -15,7 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 declare module '*.css' {
-  interface CSSClasses { [key: string]: any }
+  interface CSSClasses {
+    [key: string]: any;
+  }
+  const classes: CSSClasses;
+  export default classes;
+}
+
+declare module '*.less' {
+  interface CSSClasses {
+    [key: string]: any;
+  }
   const classes: CSSClasses;
   export default classes;
 }
@@ -32,4 +42,13 @@ declare module '*.svg' {
 
 declare module '*.png' {
   export default string;
+}
+
+declare module '*.woff2' {
+  export default string;
+}
+
+declare module 'jest-preset-graylog/lib/timeouts' {
+  export const timeoutMultiplier: () => number;
+  export const applyTimeoutMultiplier: (x: number) => number;
 }

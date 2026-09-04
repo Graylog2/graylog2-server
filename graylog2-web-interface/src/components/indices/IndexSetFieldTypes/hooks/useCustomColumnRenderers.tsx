@@ -17,34 +17,39 @@
 import React, { useMemo } from 'react';
 
 import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
-import ExpandedRowToggleWrapper from 'components/indices/IndexSetFieldTypes/originBadges/ExpandedRowToggleWrapper';
 import { Icon } from 'components/common';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
+import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 
 const useCustomColumnRenderers = () => {
-  const { data: { fieldTypes } } = useFieldTypesForMappings();
+  const {
+    data: { fieldTypes },
+  } = useFieldTypesForMappings();
 
-  return useMemo(() => ({
-    attributes: {
-      type: {
-        renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
+  return useMemo(
+    () => ({
+      attributes: {
+        type: {
+          renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
+        },
+        origin: {
+          renderCell: (origin: FieldTypeOrigin, { id }) => (
+            <ExpandedSectionToggleWrapper id={id} section="overriddenProfile">
+              <OriginCell origin={origin} />
+            </ExpandedSectionToggleWrapper>
+          ),
+          staticWidth: 200,
+        },
+        is_reserved: {
+          renderCell: (isReserved: boolean) =>
+            isReserved ? <Icon title="Field has reserved field type" name="check" /> : null,
+          staticWidth: 'matchHeader' as const,
+        },
       },
-      origin: {
-        renderCell: (origin: FieldTypeOrigin, { id }) => (
-          <ExpandedRowToggleWrapper id={id}>
-            <OriginCell origin={origin} />
-          </ExpandedRowToggleWrapper>
-        ),
-        staticWidth: 200,
-      },
-      is_reserved: {
-        renderCell: (isReserved: boolean) => (isReserved
-          ? <Icon title="Field has reserved field type" name="check" /> : null),
-        staticWidth: 120,
-      },
-    },
-  }), [fieldTypes]);
+    }),
+    [fieldTypes],
+  );
 };
 
 export default useCustomColumnRenderers;

@@ -30,14 +30,17 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsStore: MockStore(),
+jest.mock('@graylog/server-api', () => ({
+  SearchDecorators: {
+    get: jest.fn(() => Promise.resolve([])),
+    getAvailable: jest.fn(() => Promise.resolve({})),
+  },
 }));
 
 describe('Views bindings enterprise widgets', () => {
   const { enterpriseWidgets } = bindings;
   type WidgetConfig = {
-    needsControlledHeight: (widget?: Widget) => boolean,
+    needsControlledHeight: (widget?: Widget) => boolean;
   };
   const findWidgetConfig = (type) => enterpriseWidgets.find((widgetConfig) => widgetConfig.type === type);
 

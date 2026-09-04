@@ -24,9 +24,8 @@ import type { Filters, Filter, UrlQueryFilters } from 'components/common/EntityF
 import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
 import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFiltersWithTitle';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 import { ROW_MIN_HEIGHT } from './Constants';
 
@@ -37,91 +36,106 @@ const FilterCreation = styled.div`
   height: ${ROW_MIN_HEIGHT}px;
   align-items: center;
   margin-left: 5px;
-  
+
   && {
     margin-right: 10px;
   }
 `;
 
 type Props = {
-  attributes?: Attributes,
-  urlQueryFilters: UrlQueryFilters | undefined,
-  setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void,
-  filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode },
-  appSection: string,
-}
+  attributes?: Attributes;
+  urlQueryFilters: UrlQueryFilters | undefined;
+  setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void;
+  filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode };
+  appSection: string;
+  activeSliceCol?: string;
+  activeSlice?: string;
+};
 
-const EntityFilters = ({ attributes = [], filterValueRenderers = undefined, urlQueryFilters, setUrlQueryFilters, appSection }: Props) => {
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+const EntityFilters = ({
+  attributes = [],
+  filterValueRenderers = undefined,
+  urlQueryFilters,
+  setUrlQueryFilters,
+  appSection,
+  activeSliceCol = undefined,
+  activeSlice = undefined,
+}: Props) => {
+  const sendTelemetry = useSendTelemetry(appSection);
 
-  const {
-    data: activeFilters,
-    onChange: onChangeFiltersWithTitle,
-  } = useFiltersWithTitle(
+  const { data: activeFilters, onChange: onChangeFiltersWithTitle } = useFiltersWithTitle(
     urlQueryFilters,
     attributes,
     !!attributes,
   );
 
-  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_ATTRIBUTE_TYPES.includes(type));
+  const filterableAttributes = attributes
+    .filter(({ filterable, type }) => filterable && SUPPORTED_ATTRIBUTE_TYPES.includes(type))
+    .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1, title2));
 
-  const onChangeFilters = useCallback((newFilters: Filters) => {
-    const newUrlQueryFilters = newFilters.entrySeq().reduce((col, [attributeId, filterCol]) => (
-      col.set(attributeId, [...(col.get(attributeId) ?? []), ...filterCol.map(({ value }) => value)])
-    ), OrderedMap<string, Array<string>>());
+  const onChangeFilters = useCallback(
+    (newFilters: Filters) => {
+      const newUrlQueryFilters = newFilters
+        .entrySeq()
+        .reduce(
+          (col, [attributeId, filterCol]) =>
+            col.set(attributeId, [...(col.get(attributeId) ?? []), ...filterCol.map(({ value }) => value)]),
+          OrderedMap<string, Array<string>>(),
+        );
 
-    onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
-    setUrlQueryFilters(newUrlQueryFilters);
-  }, [onChangeFiltersWithTitle, setUrlQueryFilters]);
+      onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
+      setUrlQueryFilters(newUrlQueryFilters);
+    },
+    [onChangeFiltersWithTitle, setUrlQueryFilters],
+  );
 
-  const onCreateFilter = useCallback((attributeId: string, filter: Filter) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CREATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'filter-created',
-      attribute_id: attributeId,
-    });
+  const onCreateFilter = useCallback(
+    (attributeId: string, filter: Filter) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CREATED, {
+        app_action_value: 'filter-created',
+        event_details: { attribute_id: attributeId },
+      });
 
-    onChangeFilters(OrderedMap(activeFilters).set(
-      attributeId,
-      [...(activeFilters?.get(attributeId) ?? []), filter],
-    ));
-  }, [activeFilters, appSection, onChangeFilters, pathname, sendTelemetry]);
+      onChangeFilters(OrderedMap(activeFilters).set(attributeId, [...(activeFilters?.get(attributeId) ?? []), filter]));
+    },
+    [activeFilters, onChangeFilters, sendTelemetry],
+  );
 
-  const onDeleteFilter = useCallback((attributeId: string, filterId: string) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_DELETED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'filter-deleted',
-      attribute_id: attributeId,
-    });
+  const onDeleteFilter = useCallback(
+    (attributeId: string, filterId: string) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_DELETED, {
+        app_action_value: 'filter-deleted',
+        event_details: { attribute_id: attributeId },
+      });
 
-    const filterGroup = activeFilters.get(attributeId);
-    const updatedFilterGroup = filterGroup.filter(({ value }) => value !== filterId);
+      const filterGroup = activeFilters.get(attributeId);
+      const updatedFilterGroup = filterGroup.filter(({ value }) => value !== filterId);
 
-    if (updatedFilterGroup.length) {
-      return onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
-    }
+      if (updatedFilterGroup.length) {
+        return onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
+      }
 
-    return onChangeFilters(activeFilters.remove(attributeId));
-  }, [activeFilters, appSection, onChangeFilters, pathname, sendTelemetry]);
+      return onChangeFilters(activeFilters.remove(attributeId));
+    },
+    [activeFilters, onChangeFilters, sendTelemetry],
+  );
 
-  const onChangeFilter = useCallback((attributeId: string, prevValue: string, newFilter: Filter) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'filter-value-changed',
-      attribute_id: attributeId,
-    });
+  const onChangeFilter = useCallback(
+    (attributeId: string, prevValue: string, newFilter: Filter) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CHANGED, {
+        app_action_value: 'filter-value-changed',
+        event_details: { attribute_id: attributeId },
+      });
 
-    const filterGroup = activeFilters.get(attributeId);
-    const targetFilterIndex = filterGroup.findIndex(({ value }) => value === prevValue);
-    const updatedFilterGroup = [...filterGroup];
-    updatedFilterGroup[targetFilterIndex] = newFilter;
+      const filterGroup = activeFilters.get(attributeId);
+      const targetFilterIndex = filterGroup.findIndex(({ value }) => value === prevValue);
+      const updatedFilterGroup = [...filterGroup];
+      updatedFilterGroup[targetFilterIndex] = newFilter;
 
-    onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
-  }, [activeFilters, appSection, onChangeFilters, pathname, sendTelemetry]);
+      onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
+    },
+    [activeFilters, onChangeFilters, sendTelemetry],
+  );
 
   if (!filterableAttributes.length) {
     return null;
@@ -131,18 +145,23 @@ const EntityFilters = ({ attributes = [], filterValueRenderers = undefined, urlQ
     <>
       <FilterCreation>
         Filters
-        <CreateFilterDropdown filterableAttributes={filterableAttributes}
-                              onCreateFilter={onCreateFilter}
-                              activeFilters={activeFilters}
-                              filterValueRenderers={filterValueRenderers} />
-
+        <CreateFilterDropdown
+          filterableAttributes={filterableAttributes}
+          onCreateFilter={onCreateFilter}
+          activeFilters={activeFilters}
+          filterValueRenderers={filterValueRenderers}
+        />
       </FilterCreation>
       {activeFilters && (
-        <ActiveFilters filters={activeFilters}
-                       attributes={attributes}
-                       onChangeFilter={onChangeFilter}
-                       onDeleteFilter={onDeleteFilter}
-                       filterValueRenderers={filterValueRenderers} />
+        <ActiveFilters
+          filters={activeFilters}
+          attributes={attributes}
+          onChangeFilter={onChangeFilter}
+          onDeleteFilter={onDeleteFilter}
+          filterValueRenderers={filterValueRenderers}
+          activeSliceCol={activeSliceCol}
+          activeSlice={activeSlice}
+        />
       )}
     </>
   );

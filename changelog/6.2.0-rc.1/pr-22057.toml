@@ -1,0 +1,5 @@
+type="f"
+message="Trigger datanode certificate renewal when hostname changes"
+
+issues=["22160"]
+pulls=["22057"]

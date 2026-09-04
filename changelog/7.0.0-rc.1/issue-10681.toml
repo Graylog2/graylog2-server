@@ -1,0 +1,5 @@
+type = "f"
+message = "Restore global overrides after canceling widget edit mode."
+
+pulls = ["23608"]
+issues = ["10681"]

@@ -16,22 +16,24 @@
  */
 package org.graylog.datanode.opensearch.configuration;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nonnull;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
+import org.graylog.datanode.configuration.variants.OpensearchCertificates;
+import org.graylog.datanode.process.Environment;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.YamlConfigFile;
-import org.graylog.datanode.process.Environment;
-import org.graylog.security.certutil.csr.KeystoreInformation;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.security.KeyStore;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,50 +44,55 @@ import java.util.stream.Collectors;
 
 public class OpensearchConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfiguration.class);
-
     private final OpensearchDistribution opensearchDistribution;
     private final String hostname;
     private final int httpPort;
     private final List<DatanodeConfigurationPart> configurationParts;
-    private final OpensearchConfigurationDir opensearchConfigurationDir;
+    private final OpensearchConfigurationDir opensearchConfigTargetDir;
     private final DatanodeDirectories datanodeDirectories;
 
-    public OpensearchConfiguration(OpensearchDistribution opensearchDistribution, DatanodeDirectories datanodeDirectories, String hostname, int httpPort, List<DatanodeConfigurationPart> configurationParts) {
+    public OpensearchConfiguration(OpensearchDistribution opensearchDistribution, DatanodeDirectories datanodeDirectories, OpensearchConfigurationDir opensearchConfigTargetDir, String hostname, int httpPort, List<DatanodeConfigurationPart> configurationParts) {
         this.opensearchDistribution = opensearchDistribution;
+        this.datanodeDirectories = datanodeDirectories;
+        this.opensearchConfigTargetDir = opensearchConfigTargetDir;
         this.hostname = hostname;
         this.httpPort = httpPort;
         this.configurationParts = configurationParts;
-        this.datanodeDirectories = datanodeDirectories;
-        this.opensearchConfigurationDir = datanodeDirectories.createUniqueOpensearchProcessConfigurationDir();
     }
 
     @Nonnull
     private String buildRolesList() {
-        return configurationParts.stream()
-                .flatMap(cfg -> cfg.nodeRoles().stream())
-                .collect(Collectors.joining(","));
+         return String.join(",", opensearchRoles());
     }
 
     public Environment getEnv() {
-        final Environment env = new Environment(System.getenv());
-
-        List<String> javaOpts = new LinkedList<>();
-
-        configurationParts.stream().map(DatanodeConfigurationPart::javaOpts)
-                .forEach(javaOpts::addAll);
-
-        env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
-        env.put("OPENSEARCH_PATH_CONF", opensearchConfigurationDir.configurationRoot().toString());
-        return env;
+        return new Environment(System.getenv())
+                .withOpensearchJavaHome(opensearchDistribution.getOpensearchJavaHome())
+                .withOpensearchJavaOpts(getJavaOpts())
+                .withOpensearchPathConf(opensearchConfigTargetDir.configurationRoot());
     }
 
-    public HttpHost getRestBaseUrl() {
-        return new HttpHost(hostname, httpPort, isHttpsEnabled() ? "https" : "http");
+    @Nonnull
+    private List<String> getJavaOpts() {
+        return configurationParts.stream()
+                .flatMap(part -> part.javaOpts().stream())
+                .collect(Collectors.toList());
+    }
+
+    public URI getRestBaseUrl() {
+        try {
+            return new URIBuilder()
+                    .setHost(hostname)
+                    .setPort(httpPort)
+                    .setScheme(isHttpsEnabled() ? "https" : "http")
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Error creating OpenSearch URL", e);
+        }
     }
 
     public boolean isHttpsEnabled() {
-        return httpCertificate().isPresent();
+        return certificates().isPresent();
     }
 
     /**
@@ -96,12 +103,11 @@ public class OpensearchConfiguration {
     }
 
 
-    public Map<String, String> getKeystoreItems() {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    public Collection<OpensearchKeystoreItem> getKeystoreItems() {
+        final ImmutableList.Builder<OpensearchKeystoreItem> builder = ImmutableList.builder();
         configurationParts.stream()
                 .map(DatanodeConfigurationPart::keystoreItems)
-                .forEach(builder::putAll);
-
+                .forEach(builder::addAll);
         return builder.build();
     }
 
@@ -113,18 +119,19 @@ public class OpensearchConfiguration {
                 .orElseThrow(() -> new IllegalArgumentException("This should not happen, truststore should always be present"));
     }
 
-    public Optional<KeystoreInformation> httpCertificate() {
+    public Optional<OpensearchCertificates> certificates() {
         return configurationParts.stream()
-                .map(DatanodeConfigurationPart::httpCertificate)
+                .map(DatanodeConfigurationPart::opensearchCertificates)
                 .filter(Objects::nonNull)
+                .filter(OpensearchCertificates::hasCertificates)
                 .findFirst();
     }
 
-    public Optional<KeystoreInformation> transportCertificate() {
+    public List<String> opensearchRoles() {
         return configurationParts.stream()
-                .map(DatanodeConfigurationPart::transportCertificate)
-                .filter(Objects::nonNull)
-                .findFirst();
+                .flatMap(cfg -> cfg.nodeRoles().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public List<DatanodeConfigFile> configFiles() {
@@ -150,13 +157,6 @@ public class OpensearchConfiguration {
                 .map(DatanodeConfigurationPart::properties)
                 .forEach(config::putAll);
 
-        // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
-        // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
-        // additionally, the env variables have to be prefixed with opensearch. (e.g. "opensearch.cluster.routing.allocation.disk.threshold_enabled")
-        getEnv().getEnv().entrySet().stream()
-                .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
-                .peek(entry -> LOG.info("Detected pass-through opensearch property {}:{}", entry.getKey().substring("opensearch.".length()), entry.getValue()))
-                .forEach(entry -> config.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
         return config;
     }
 
@@ -164,11 +164,17 @@ public class OpensearchConfiguration {
         return opensearchDistribution;
     }
 
-    public OpensearchConfigurationDir getOpensearchConfigurationDir() {
-        return opensearchConfigurationDir;
+    public OpensearchConfigurationDir getOpensearchConfigTargetDir() {
+        return opensearchConfigTargetDir;
     }
 
     public DatanodeDirectories getDatanodeDirectories() {
         return datanodeDirectories;
+    }
+
+    public List<String> warnings() {
+        return configurationParts.stream()
+                .flatMap(part -> part.warnings().stream())
+                .collect(Collectors.toList());
     }
 }

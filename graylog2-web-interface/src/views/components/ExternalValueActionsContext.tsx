@@ -20,10 +20,10 @@ import { singleton } from 'logic/singleton';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 
 export type ExternalValueActionsContextValue = {
-    isLoading: boolean,
-    externalValueActions: Array<ActionDefinition>,
-    isError: boolean,
-}
+  isLoading: boolean;
+  externalValueActions: Array<ActionDefinition>;
+  isError: boolean;
+};
 
 export const DEFAULT_EXTERNAL_ACTIONS = {
   isLoading: false,

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import OriginalViewHeader from 'views/components/views/ViewHeader';
@@ -26,6 +26,8 @@ import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import { updateView } from 'views/logic/slices/viewSlice';
 import asMock from 'helpers/mocking/AsMock';
+import { createEntityShareState } from 'fixtures/entityShareState';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 jest.mock('views/logic/views/OnSaveViewAction');
 
@@ -37,13 +39,27 @@ jest.mock('views/logic/slices/viewSlice', () => {
     updateView: jest.fn(actualModule.updateView),
   };
 });
+jest.mock('api/entity-share', () => ({
+  prepareEntityShare: jest.fn(() => Promise.resolve()),
+  updateEntityShare: jest.fn(() => Promise.resolve()),
+  loadUserSharesPaginated: jest.fn(() =>
+    Promise.resolve({
+      list: require('immutable').List(),
+      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
+    }),
+  ),
+}));
+jest.mock('hooks/useEntityShareState', () => {
+  const mockSetEntityShareState = jest.fn();
 
-const view = createSearch()
-  .toBuilder()
-  .id('viewId')
-  .title('Some view')
-  .type(View.Type.Dashboard)
-  .build();
+  return {
+    __esModule: true,
+    default: jest.fn(() => ({ data: undefined })),
+    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
+    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
+  };
+});
+const view = createSearch().toBuilder().id('viewId').title('Some view').type(View.Type.Dashboard).build();
 
 const ViewHeader = () => (
   <TestStoreProvider view={view}>
@@ -51,9 +67,20 @@ const ViewHeader = () => (
   </TestStoreProvider>
 );
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('ViewHeader', () => {
   beforeEach(() => {
     asMock(onSaveView).mockReturnValue(async () => {});
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+  });
+
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   useViewsPlugin();
@@ -70,14 +97,14 @@ describe('ViewHeader', () => {
 
     const editButton = await screen.findByTitle('Edit dashboard Some view metadata');
 
-    fireEvent.click(editButton);
+    await setupUser().click(editButton);
     await screen.findByText('Editing saved dashboard', { exact: false });
 
-    const titleInput = await screen.findByRole('textbox', { name: /title/i, hidden: true });
-    await userEvent.type(titleInput, ' updated');
+    const titleInput = await screen.findByRole('textbox', { name: /title/i });
+    await setupUser().type(titleInput, ' updated');
 
-    const saveButton = await screen.findByRole('button', { name: /save dashboard/i, hidden: true });
-    await userEvent.click(saveButton);
+    const saveButton = await screen.findByRole('button', { name: /save dashboard/i });
+    await setupUser().click(saveButton);
 
     expect(onSaveView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));
     expect(updateView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));

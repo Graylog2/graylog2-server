@@ -22,7 +22,11 @@ import ElementConfigurationContainer from './ElementConfigurationContainer';
 
 describe('ElementConfigurationContainer', () => {
   it('should render the component with children', async () => {
-    render(<ElementConfigurationContainer elementTitle="element"><span>Doom</span></ElementConfigurationContainer>);
+    render(
+      <ElementConfigurationContainer elementTitle="element">
+        <span>Doom</span>
+      </ElementConfigurationContainer>,
+    );
 
     const child = await screen.findByText('Doom');
 
@@ -31,10 +35,14 @@ describe('ElementConfigurationContainer', () => {
 
   it('should handle onRemove button', async () => {
     const onRemove = jest.fn();
-    render(<ElementConfigurationContainer onRemove={onRemove} elementTitle="element"><span>Doom</span></ElementConfigurationContainer>);
+    render(
+      <ElementConfigurationContainer onRemove={onRemove} elementTitle="element">
+        <span>Doom</span>
+      </ElementConfigurationContainer>,
+    );
 
-    const removeBtn = await screen.findByTitle('Remove element');
-    userEvent.click(removeBtn);
+    const removeBtn = await screen.findByRole('button', { name: 'Remove element' });
+    await userEvent.click(removeBtn);
 
     await waitFor(() => expect(onRemove).toHaveBeenCalledTimes(1));
   });

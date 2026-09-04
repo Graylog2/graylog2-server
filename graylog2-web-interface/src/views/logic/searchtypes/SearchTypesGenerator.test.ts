@@ -32,21 +32,22 @@ jest.mock('../SearchType', () => () => ({ defaults: {} }));
 
 const dummyWidget = new Widget('dummyWidget', 'dummy', {});
 
-const mockSearchType = (fn) => asMock(widgetDefinition).mockImplementation((type) => ({
-  dummy: {
-    ...createWidget(type),
-    searchTypes: fn,
-  },
-}[type]));
+const mockSearchType = (fn) =>
+  asMock(widgetDefinition).mockImplementation(
+    (type) =>
+      ({
+        dummy: {
+          ...createWidget(type),
+          searchTypes: fn,
+        },
+      })[type],
+  );
 
 describe('SearchTypesGenerator', () => {
   it('should include filters of widgets', () => {
     const widgetWithoutFilter = new Widget('widgetWithoutFilter', 'mock', {});
 
-    const widgetWithFilter = widgetWithoutFilter.toBuilder()
-      .id('widgetWithFilter')
-      .filter('source: foo')
-      .build();
+    const widgetWithFilter = widgetWithoutFilter.toBuilder().id('widgetWithFilter').filter('source: foo').build();
 
     const widgets = [widgetWithoutFilter, widgetWithFilter];
 
@@ -57,19 +58,17 @@ describe('SearchTypesGenerator', () => {
     const widgetWithFilterId = widgetMapping.get('widgetWithFilter').first();
     const widgetWithoutFilterId = widgetMapping.get('widgetWithoutFilter').first();
 
-    const searchTypeWithFilter = searchTypes.find((w) => (w.id === widgetWithFilterId));
-    const searchTypeWithoutFilter = searchTypes.find((w) => (w.id === widgetWithoutFilterId));
+    const searchTypeWithFilter = searchTypes.find((w) => w.id === widgetWithFilterId);
+    const searchTypeWithoutFilter = searchTypes.find((w) => w.id === widgetWithoutFilterId);
 
     expect(searchTypeWithFilter.filter).toEqual({ query: 'source: foo', type: 'query_string' });
     expect(searchTypeWithoutFilter.filter).toBeUndefined();
   });
 
   it('allows search type to override timerange', () => {
-    const widgetWithTimerange = dummyWidget.toBuilder()
-      .timerange({ type: 'relative', from: 300 })
-      .build();
+    const widgetWithTimerange = dummyWidget.toBuilder().timerange({ type: 'relative', from: 300 }).build();
 
-    mockSearchType(() => ([{ timerange: { type: 'keyword', keyword: 'yesterday' } }]));
+    mockSearchType(() => [{ timerange: { type: 'keyword', keyword: 'yesterday' } }]);
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([widgetWithTimerange]);
 
@@ -80,7 +79,7 @@ describe('SearchTypesGenerator', () => {
   });
 
   it('allows search type to override id', () => {
-    mockSearchType(() => ([{ id: 'bar' }]));
+    mockSearchType(() => [{ id: 'bar' }]);
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([dummyWidget]);
 
@@ -91,11 +90,14 @@ describe('SearchTypesGenerator', () => {
   });
 
   it('allows search type to override query', () => {
-    const widgetWithTimerange = dummyWidget.toBuilder()
+    const widgetWithTimerange = dummyWidget
+      .toBuilder()
       .query({ type: 'elasticsearch', query_string: '_exists_:src_ip' })
       .build();
 
-    mockSearchType((widget) => ([{ query: { type: 'elasticsearch', query_string: `${widget.query.query_string} AND source:foo` } }]));
+    mockSearchType((widget) => [
+      { query: { type: 'elasticsearch', query_string: `${widget.query.query_string} AND source:foo` } },
+    ]);
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([widgetWithTimerange]);
 

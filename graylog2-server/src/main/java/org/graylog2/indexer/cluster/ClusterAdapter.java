@@ -18,12 +18,15 @@ package org.graylog2.indexer.cluster;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
+import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
 import java.util.Collection;
@@ -35,6 +38,8 @@ public interface ClusterAdapter {
     Optional<HealthStatus> health();
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
+
+    ClusterShardAllocation clusterShardAllocation();
 
     Set<NodeDiskUsageStats> diskUsageStats();
 
@@ -58,7 +63,20 @@ public interface ClusterAdapter {
 
     Map<String, NodeInfo> nodesInfo();
 
+    Map<String, NodeOSInfo> nodesHostInfo();
+
+    /**
+     * Live per-node runtime utilization ({@code _nodes/stats/os,jvm}): CPU percent and JVM heap-used percent, keyed
+     * by node id. A single bounded round-trip; the search-cluster health reporters sample and window this on the leader.
+     */
+    Map<String, NodeUtilization> nodesUtilization();
+
     ShardStats shardStats();
+
+    /**
+     * The cluster health response has no such field, so implementations derive it from each node's roles.
+     */
+    int countOfClusterManagerEligibleNodes();
 
     Optional<HealthStatus> deflectorHealth(Collection<String> indices);
 }

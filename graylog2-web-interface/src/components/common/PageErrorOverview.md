@@ -1,3 +1,3 @@
 ```js
-  <PageErrorOverview errors={['Error 1', 'Error 2']} />
+<PageErrorOverview errors={['Error 1', 'Error 2']} />
 ```

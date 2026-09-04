@@ -16,8 +16,8 @@
  */
 package org.graylog2.rest.models.messages.responses;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,14 +45,14 @@ public class SimulationResultsTest {
         Map<String, Object> removedFields = stats.removedFields();
         Map<String, Object> changedFields = stats.changedFields();
         assertThat(addedFields.size()).isEqualTo(1);
-        Assert.assertTrue(addedFields.containsKey("field5"));
+        Assertions.assertTrue(addedFields.containsKey("field5"));
         assertThat(addedFields.get("field5")).isEqualTo("value5");
         assertThat(removedFields.size()).isEqualTo(1);
-        Assert.assertTrue(removedFields.containsKey("field1"));
+        Assertions.assertTrue(removedFields.containsKey("field1"));
         assertThat(removedFields.get("field1")).isEqualTo(true);
         assertThat(changedFields.size()).isEqualTo(2);
-        Assert.assertTrue(changedFields.containsKey("field3"));
-        Assert.assertTrue(changedFields.containsKey("field4"));
+        Assertions.assertTrue(changedFields.containsKey("field3"));
+        Assertions.assertTrue(changedFields.containsKey("field4"));
         ChangedField field3 = (ChangedField) changedFields.get("field3");
         ChangedField field4 = (ChangedField) changedFields.get("field4");
         assertThat(field3.before()).isEqualTo("value3");

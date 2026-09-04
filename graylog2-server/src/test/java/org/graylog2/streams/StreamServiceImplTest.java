@@ -17,37 +17,50 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
+import org.graylog2.streams.events.StreamsChangedEvent;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class StreamServiceImplTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    protected static final String STREAM_ID = "5628f4503b0c5756a8eebc4d";
 
     @Mock
     private StreamRuleService streamRuleService;
@@ -58,14 +71,24 @@ public class StreamServiceImplTest {
     @Mock
     private MongoIndexSet.Factory factory;
     @Mock
-    private EntityOwnershipService entityOwnershipService;
+    private EntityRegistrar entityRegistrar;
+    @Mock
+    ClusterEventBus eventBus;
 
     private StreamService streamService;
+    private MongoCollections mongoCollections;
+    private EventBus localEventBus;
+    private StreamCache streamCache;
 
-    @Before
-    public void setUp() throws Exception {
-        this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
-                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of());
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoCollections = mongoCollections;
+        this.localEventBus = new EventBus();
+        this.streamCache = new StreamCache(mongoCollections, localEventBus);
+        this.streamService = new StreamServiceImpl(mongoCollections, streamRuleService,
+                outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(),
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())),
+                streamCache);
     }
 
     @Test
@@ -104,9 +127,26 @@ public class StreamServiceImplTest {
     }
 
     @Test
+    @MongoDBFixtures("someStreamsWithAlertConditions.json")
+    public void streamTitleFromCacheIsInvalidatedOnUpdate() throws Exception {
+        final String streamId = "565f02223b0c25a537197af2";
+
+        // Populate the cache with the current title
+        assertThat(streamService.streamTitleFromCache(streamId)).isEqualTo("Logins");
+
+        // Rename the stream
+        final UpdateStreamRequest updateRequest = UpdateStreamRequest.create(
+                "Renamed Stream", null, null, null, null, null);
+        streamService.update(streamId, updateRequest);
+
+        // The cache should immediately reflect the new title
+        assertThat(streamService.streamTitleFromCache(streamId)).isEqualTo("Renamed Stream");
+    }
+
+    @Test
     @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
     public void addOutputs() throws NotFoundException {
-        final ObjectId streamId = new ObjectId("5628f4503b0c5756a8eebc4d");
+        final ObjectId streamId = new ObjectId(STREAM_ID);
         final ObjectId output1Id = new ObjectId("5628f4503b00deadbeef0001");
         final ObjectId output2Id = new ObjectId("5628f4503b00deadbeef0002");
 
@@ -115,8 +155,8 @@ public class StreamServiceImplTest {
 
         when(output1.getId()).thenReturn(output1Id.toHexString());
         when(output2.getId()).thenReturn(output2Id.toHexString());
-        when(outputService.load(output1Id.toHexString())).thenReturn(output1);
-        when(outputService.load(output2Id.toHexString())).thenReturn(output2);
+        when(outputService.loadByIds(Set.of(output1Id.toHexString(), output2Id.toHexString())))
+                .thenReturn(Set.of(output1, output2));
 
         streamService.addOutputs(streamId, ImmutableSet.of(output1Id, output2Id));
 
@@ -124,5 +164,46 @@ public class StreamServiceImplTest {
         assertThat(stream.getOutputs())
                 .anySatisfy(output -> assertThat(output.getId()).isEqualTo(output1Id.toHexString()))
                 .anySatisfy(output -> assertThat(output.getId()).isEqualTo(output2Id.toHexString()));
+    }
+
+    @Test
+    @MongoDBFixtures("someStreamsWithoutAlertConditions.json")
+    public void testSaveStream_streamsChangedEventSent() throws ValidationException, NotFoundException {
+        final Stream stream = streamService.load(new ObjectId(STREAM_ID).toHexString());
+        streamService.save(stream);
+        verify(eventBus, times(1)).post(StreamsChangedEvent.create(STREAM_ID));
+    }
+
+    @Test
+    @MongoDBFixtures("userIlluminateStreams.json")
+    public void testCountBySource() {
+        Map<String, Long> count = streamService.countBySource();
+
+        assertThat(count).isEqualTo(Map.of(
+                "illuminate_streams", 2L,
+                "user_streams", 1L
+        ));
+    }
+
+    @Test
+    @MongoDBFixtures("systemAndDefaultStreams.json")
+    public void systemStreamIdsCacheIsInvalidatedOnStreamChange() {
+        final String systemStreamId = "aaaaaaaaaaaaaaaaaaaaaaaa";
+
+        // First call lazily computes and caches the system stream IDs
+        assertThat(streamService.getSystemStreamIds(false)).containsExactly(systemStreamId);
+
+        // Delete the system stream directly in MongoDB, bypassing StreamService
+        mongoCollections.nonEntityCollection("streams", Document.class)
+                .deleteOne(Filters.eq("_id", new ObjectId(systemStreamId)));
+
+        // Cached value is still returned (stale)
+        assertThat(streamService.getSystemStreamIds(false)).containsExactly(systemStreamId);
+
+        // Simulate a stream change event, which invalidates the cache
+        localEventBus.post(StreamsChangedEvent.create(systemStreamId));
+
+        // Cache is invalidated; next call recomputes from DB
+        assertThat(streamService.getSystemStreamIds(false)).isEmpty();
     }
 }

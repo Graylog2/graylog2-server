@@ -19,29 +19,27 @@ package org.graylog2.system.stats.elasticsearch;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indices.HealthStatus;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ElasticsearchStats {
-    @JsonProperty
+    @JsonProperty("cluster_name")
     public abstract String clusterName();
 
-    @JsonProperty
+    @JsonProperty("cluster_version")
     public abstract String clusterVersion();
 
-    @JsonProperty
+    @JsonProperty("status")
     public abstract HealthStatus status();
 
-    @JsonProperty
+    @JsonProperty("cluster_health")
     public abstract ClusterHealth clusterHealth();
 
-    @JsonProperty
+    @JsonProperty("nodes_stats")
     public abstract NodesStats nodesStats();
 
-    @JsonProperty
+    @JsonProperty("indices_stats")
     public abstract IndicesStats indicesStats();
 
     public static ElasticsearchStats create(String clusterName,

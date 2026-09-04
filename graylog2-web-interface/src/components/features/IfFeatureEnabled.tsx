@@ -20,9 +20,9 @@ import useFeature from 'hooks/useFeature';
 
 type Props = {
   name: string;
-  fallback?: React.ReactElement,
-  children: React.ReactElement,
-}
+  fallback?: React.ReactElement;
+  children: React.ReactElement;
+};
 
 const IfFeatureEnabled = ({ name, fallback = null, children }: Props) => {
   const hasFeature = useFeature(name);

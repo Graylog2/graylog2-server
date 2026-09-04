@@ -20,8 +20,10 @@ import QueryHelper from 'components/common/QueryHelper';
 
 const queryExample = (
   <p>
-    Find backends with a title containing LDAP:<br />
-    <kbd>title:LDAP</kbd><br />
+    Find backends with a title containing LDAP:
+    <br />
+    <kbd>title:LDAP</kbd>
+    <br />
   </p>
 );
 

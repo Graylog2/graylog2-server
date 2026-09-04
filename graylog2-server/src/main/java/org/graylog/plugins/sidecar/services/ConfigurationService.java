@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.sidecar.services;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.ReturnDocument;
@@ -34,6 +33,7 @@ import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog.plugins.sidecar.template.directives.IndentTemplateDirective;
 import org.graylog.plugins.sidecar.template.loader.MongoDbTemplateLoader;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
