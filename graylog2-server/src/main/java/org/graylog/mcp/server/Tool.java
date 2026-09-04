@@ -19,7 +19,8 @@ package org.graylog.mcp.server;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.victools.jsonschema.generator.SchemaGenerator;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -42,8 +43,8 @@ public abstract class Tool<P, O> {
     private final String name;
     private final String title;
     private final String description;
-    private final Map<String, Object> inputSchema;
-    private final Map<String, Object> outputSchema;
+    private final Supplier<Map<String, Object>> inputSchema;
+    private final Supplier<Map<String, Object>> outputSchema;
 
     @Deprecated
     protected Tool(
@@ -85,21 +86,21 @@ public abstract class Tool<P, O> {
         this.objectMapper = objectMapper;
         this.clusterConfigService = clusterConfigService;
 
-        // Get the schema generator with all contributed modules
-        SchemaGenerator generator = schemaGeneratorProvider.get();
-
-        // we can precompute the schema for our parameters, it's statically known
-        final var inputSchemaNode = generator.generateSchema(parameterType.getType());
-        // MCP requires every tool to declare an input schema; a parameterless tool gets an empty object schema.
-        this.inputSchema = inputSchemaNode.isEmpty()
-                ? Map.of("type", "object")
-                : objectMapper.convertValue(inputSchemaNode, new TypeReference<Map<String, Object>>() {});
-        // if our tool produces anything other than a String, we want to create a JSON schema for it
-        if (String.class.equals(outputType.getType())) {
-            this.outputSchema = null;
-        } else {
-            this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
-        }
+        // Computed on first use, not in the constructor: a schema can derive from DB state that migrations
+        // seed only after tools are constructed. Baking it eagerly risks freezing an empty, invalid schema.
+        // First use happens after seeding; memoize still generates it exactly once.
+        this.inputSchema = Suppliers.memoize(() -> {
+            final var inputSchemaNode = schemaGeneratorProvider.get().generateSchema(parameterType.getType());
+            // An input schema is required even for a parameterless tool: an empty object schema.
+            return inputSchemaNode.isEmpty()
+                    ? Map.of("type", "object")
+                    : objectMapper.convertValue(inputSchemaNode, new TypeReference<Map<String, Object>>() {});
+        });
+        // String-output tools have no output schema; memoize caches that null correctly too.
+        this.outputSchema = Suppliers.memoize(() -> String.class.equals(outputType.getType())
+                ? null
+                : objectMapper.convertValue(schemaGeneratorProvider.get().generateSchema(outputType.getType()),
+                        new TypeReference<Map<String, Object>>() {}));
     }
 
     protected boolean isOutputSchemaEnabled() {
@@ -130,12 +131,12 @@ public abstract class Tool<P, O> {
 
     @JsonProperty
     public Map<String, Object> inputSchema() {
-        return inputSchema;
+        return inputSchema.get();
     }
 
     @JsonProperty
     public Optional<Map<String, Object>> outputSchema() {
-        return Optional.ofNullable(outputSchema);
+        return Optional.ofNullable(outputSchema.get());
     }
 
     /**
