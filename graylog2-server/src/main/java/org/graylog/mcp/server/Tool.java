@@ -86,14 +86,12 @@ public abstract class Tool<P, O> {
         this.objectMapper = objectMapper;
         this.clusterConfigService = clusterConfigService;
 
-        // Computed on first use, not in the constructor: a schema can derive from DB state that migrations
-        // seed only after tools are constructed. Baking it eagerly risks freezing an empty, invalid schema.
-        // First use happens after seeding; memoize still generates it exactly once.
+        // Lazily compute the schema on first use to avoid a GL-startup race with migrations that seed its data.
         this.inputSchema = Suppliers.memoize(() -> {
             final var inputSchemaNode = schemaGeneratorProvider.get().generateSchema(parameterType.getType());
-            // An input schema is required even for a parameterless tool: an empty object schema.
+            final Map<String, Object> emptySchema = Map.of("type", "object");
             return inputSchemaNode.isEmpty()
-                    ? Map.of("type", "object")
+                    ? emptySchema
                     : objectMapper.convertValue(inputSchemaNode, new TypeReference<Map<String, Object>>() {});
         });
         // String-output tools have no output schema; memoize caches that null correctly too.
