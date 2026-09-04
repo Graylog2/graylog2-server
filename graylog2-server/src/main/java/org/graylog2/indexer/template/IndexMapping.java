@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
-import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 /**
  * Representing the message type mapping in Elasticsearch. This is giving ES more
@@ -115,18 +114,11 @@ public abstract class IndexMapping extends AbstractMapping {
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
                 .put(Message.FIELD_TIMESTAMP, typeTimeWithMillis())
-                .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
-                .put(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, typeLong())
-                .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
-                .put(Message.FIELD_GL2_ORIGINAL_TIMESTAMP, typeTimeWithMillis())
-                .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
-                .put(Message.FIELD_GL2_PROCESSING_DURATION_MS, typeInteger())
-                .put(FIELD_GL2_MESSAGE_ID, notAnalyzedString())
-                .put(Message.GL2_SECOND_SORT_FIELD, aliasTo(FIELD_GL2_MESSAGE_ID))
                 .put(Message.FIELD_STREAMS, notAnalyzedString())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
                 .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true));
 
+        builder.putAll(gl2ProcessingFields());
 
         if (customFieldMappings != null) {
             customFieldMappings.stream()
@@ -142,34 +134,11 @@ public abstract class IndexMapping extends AbstractMapping {
         return builder.build();
     }
 
-    Map<String, Object> notAnalyzedString() {
-        return ImmutableMap.of("type", "keyword");
-    }
-
-    Map<String, Object> aliasTo(String path) {
-        return Map.of("type", "alias",
-                "path", path);
-    }
-
     Map<String, Object> analyzedString(String analyzer, boolean fieldData) {
         return ImmutableMap.of(
                 "type", "text",
                 "analyzer", analyzer,
                 "fielddata", fieldData);
-    }
-
-    protected Map<String, Object> typeTimeWithMillis() {
-        return ImmutableMap.of(
-                "type", "date",
-                "format", dateFormat());
-    }
-
-    protected Map<String, Object> typeLong() {
-        return ImmutableMap.of("type", "long");
-    }
-
-    protected Map<String, Object> typeInteger() {
-        return ImmutableMap.of("type", "integer");
     }
 
     protected Map<String, Object> type(final String type) {

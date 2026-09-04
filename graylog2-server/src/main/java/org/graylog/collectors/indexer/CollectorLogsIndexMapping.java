@@ -26,7 +26,6 @@ import org.graylog2.indexer.ConstantsES7;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.template.AbstractMapping;
-import org.graylog2.plugin.Message;
 
 import java.util.Map;
 
@@ -75,29 +74,7 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
                         .build())
                 .put("source", map().put("type", "keyword").build())
                 .put("streams", map().put("type", "keyword").build())
-                // Processing metadata fields, typed like in the default message template. Without explicit
-                // mappings, the timestamps would be dynamically mapped as keyword (no range queries) and
-                // the gl2_second_sort_field alias used by the search UI for stable sorting would not exist.
-                .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, map().put("type", "long").build())
-                .put(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, map().put("type", "long").build())
-                .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, map()
-                        .put("type", "date")
-                        .put("format", dateFormat())
-                        .build())
-                .put(Message.FIELD_GL2_ORIGINAL_TIMESTAMP, map()
-                        .put("type", "date")
-                        .put("format", dateFormat())
-                        .build())
-                .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, map()
-                        .put("type", "date")
-                        .put("format", dateFormat())
-                        .build())
-                .put(Message.FIELD_GL2_PROCESSING_DURATION_MS, map().put("type", "integer").build())
-                .put(Message.FIELD_GL2_MESSAGE_ID, map().put("type", "keyword").build())
-                .put(Message.GL2_SECOND_SORT_FIELD, map()
-                        .put("type", "alias")
-                        .put("path", Message.FIELD_GL2_MESSAGE_ID)
-                        .build())
+                .putAll(gl2ProcessingFields())
                 // Collector identification fields
                 .put(CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE, map().put("type", "keyword").build())
                 .put(CollectorIngestCodec.FIELD_AGENT_ID, map().put("type", "keyword").build())
