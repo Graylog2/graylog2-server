@@ -18,7 +18,10 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
-import useDataNodeUpgradeStatus from 'components/datanode/hooks/useDataNodeUpgradeStatus';
+import useDataNodeUpgradeStatus, {
+  getNodeToUpgrade,
+  type DatanodeUpgradeStatus,
+} from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import useOpenSearchClusterStats from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchClusterStats';
 import { useCurrentRollingRestart } from 'components/datanode/opensearch-upgrade/hooks/useOpenSearchRollingRestart';
 import type {
@@ -55,13 +58,14 @@ jest.mock('components/datanode/data-node-upgrade/ClusterHealthInfo', () => ({
   default: () => <div>cluster-health-stub</div>,
 }));
 
-const mockUpgradeStatus = () =>
+const mockUpgradeStatus = (overrides: Partial<DatanodeUpgradeStatus> = {}) =>
   asMock(useDataNodeUpgradeStatus).mockReturnValue({
     data: {
       outdated_nodes: [],
       up_to_date_nodes: [{ hostname: 'data-node-1' }],
       shard_replication_enabled: true,
       warnings: [],
+      ...overrides,
     },
     isInitialLoading: false,
   } as unknown as ReturnType<typeof useDataNodeUpgradeStatus>);
@@ -108,9 +112,31 @@ const rollingRestartJob = (smState: RollingRestartState): RollingRestartJob => (
 
 describe('DataNodeUpgradePage', () => {
   beforeEach(() => {
+    asMock(getNodeToUpgrade).mockReturnValue(null);
     mockUpgradeStatus();
     mockClusterStats();
     mockRollingRestart();
+  });
+
+  it('keeps the Data Node upgrade visible while shard replication is disabled', async () => {
+    mockUpgradeStatus({ shard_replication_enabled: false });
+    mockClusterStats({ isUpgradeAvailable: true, targetVersion: '3.6.0' });
+
+    render(<DataNodeUpgradePage />);
+
+    await screen.findByText('Select Upgrade Strategy');
+    await screen.findByText(/once you have completed the manual upgrade of/i);
+    expect(screen.queryByText('opensearch-upgrade-section-stub')).not.toBeInTheDocument();
+  });
+
+  it('shows the OpenSearch upgrade when shard replication is enabled despite a stale local marker', async () => {
+    asMock(getNodeToUpgrade).mockReturnValue('stale-data-node');
+    mockClusterStats({ isUpgradeAvailable: true, targetVersion: '3.6.0' });
+
+    render(<DataNodeUpgradePage />);
+
+    await screen.findByText('opensearch-upgrade-section-stub');
+    expect(screen.queryByText('Select Upgrade Strategy')).not.toBeInTheDocument();
   });
 
   it('shows the OpenSearch upgrade section when an upgrade is available', async () => {
@@ -122,6 +148,7 @@ describe('DataNodeUpgradePage', () => {
   });
 
   it('keeps the section visible while a rolling upgrade is active even though versions read up to date', async () => {
+    mockUpgradeStatus({ shard_replication_enabled: false });
     mockRollingRestart(rollingRestartJob('WAITING_GREEN'));
 
     render(<DataNodeUpgradePage />);
