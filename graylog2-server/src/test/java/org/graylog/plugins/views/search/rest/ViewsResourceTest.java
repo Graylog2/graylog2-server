@@ -32,6 +32,9 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.views.Position;
@@ -522,6 +525,218 @@ public class ViewsResourceTest {
         Assertions.assertThatThrownBy(() -> testResource.get(resolverName + ViewResolverDecoder.SEPARATOR + "invalid-view-id", SEARCH_USER))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Failed to resolve view:test-resolver__invalid-view-id");
+    }
+
+    private static final String QUERY_ID = "Q1";
+    private static final String WIDGET_ID = "W1";
+    private static final String SEARCH_TYPE_ID = "T1";
+    private static final String FILTER_ID = "filter-id-1";
+
+    private static Search searchWithQuery() {
+        return Search.builder()
+                .id(SEARCH_ID)
+                .queries(ImmutableSet.of(
+                        Query.builder()
+                                .id(QUERY_ID)
+                                .searchTypes(ImmutableSet.of(MessageList.builder().id(SEARCH_TYPE_ID).build()))
+                                .build()))
+                .build();
+    }
+
+    private static ViewStateDTO stateWithFilter(final UsedSearchFilter filter) {
+        final WidgetDTO widget = WidgetDTO.builder()
+                .id(WIDGET_ID)
+                .type("MESSAGES")
+                .config(UnknownWidgetConfigDTO.create(Collections.emptyMap()))
+                .filters(List.of(filter))
+                .build();
+        final WidgetPositionDTO position = WidgetPositionDTO.Builder.create()
+                .col(Position.fromInt(1))
+                .row(Position.fromInt(1))
+                .height(Position.fromInt(100))
+                .width(Position.fromInt(100))
+                .build();
+        return ViewStateDTO.builder()
+                .widgets(Collections.singleton(widget))
+                .widgetMapping(Collections.singletonMap(WIDGET_ID, Collections.singleton(SEARCH_TYPE_ID)))
+                .widgetPositions(Collections.singletonMap(WIDGET_ID, position))
+                .build();
+    }
+
+    private static ViewDTO viewWithState(final ViewStateDTO state) {
+        return ViewDTO.builder()
+                .id(VIEW_ID)
+                .title("test-view")
+                .searchId(SEARCH_ID)
+                .type(ViewDTO.Type.SEARCH)
+                .state(Collections.singletonMap(QUERY_ID, state))
+                .build();
+    }
+
+    @Test
+    public void stripsAdditionalAttributesFromReferencedFiltersOnCreate() throws Exception {
+        final ViewService viewService = mock(ViewService.class);
+        when(viewService.saveWithOwner(any(), any())).thenReturn(TEST_SEARCH_VIEW);
+
+        final ReferencedQueryStringSearchFilter fullFilter = ReferencedQueryStringSearchFilter.builder()
+                .id(FILTER_ID)
+                .title("My Filter")
+                .description("Some description")
+                .queryString("http_method:GET")
+                .negation(true)
+                .disabled(true)
+                .build();
+
+        final ViewsResource resource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                searchWithQuery()
+        );
+
+        resource.create(CreateEntityRequest.create(viewWithState(stateWithFilter(fullFilter)), null), mockUserContext(), SEARCH_USER);
+
+        final ArgumentCaptor<ViewDTO> captor = ArgumentCaptor.forClass(ViewDTO.class);
+        verify(viewService).saveWithOwner(captor.capture(), any());
+
+        final List<UsedSearchFilter> savedFilters = captor.getValue()
+                .state().get(QUERY_ID)
+                .widgets().iterator().next()
+                .filters();
+
+        assertThat(savedFilters).hasSize(1);
+        assertThat(savedFilters.getFirst()).isInstanceOf(ReferencedQueryStringSearchFilter.class);
+        final ReferencedQueryStringSearchFilter savedFilter = (ReferencedQueryStringSearchFilter) savedFilters.getFirst();
+        assertThat(savedFilter.id()).isEqualTo(FILTER_ID);
+        assertThat(savedFilter.title()).isNull();
+        assertThat(savedFilter.description()).isNull();
+        assertThat(savedFilter.queryString()).isNull();
+        assertThat(savedFilter.negation()).isNull();
+        assertThat(savedFilter.disabled()).isNull();
+    }
+
+    @Test
+    public void stripsAdditionalAttributesFromReferencedFiltersOnUpdate() {
+        final ViewService viewService = mockViewService(TEST_SEARCH_VIEW);
+        when(viewService.update(any())).thenReturn(TEST_SEARCH_VIEW);
+
+        final ReferencedQueryStringSearchFilter fullFilter = ReferencedQueryStringSearchFilter.builder()
+                .id(FILTER_ID)
+                .title("My Filter")
+                .description("Some description")
+                .queryString("http_method:GET")
+                .negation(true)
+                .disabled(true)
+                .build();
+
+        final ViewsResource resource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                searchWithQuery()
+        );
+
+        resource.update(VIEW_ID, CreateEntityRequest.create(viewWithState(stateWithFilter(fullFilter)), null), SEARCH_USER);
+
+        final ArgumentCaptor<ViewDTO> captor = ArgumentCaptor.forClass(ViewDTO.class);
+        verify(viewService).update(captor.capture());
+
+        final List<UsedSearchFilter> savedFilters = captor.getValue()
+                .state().get(QUERY_ID)
+                .widgets().iterator().next()
+                .filters();
+
+        assertThat(savedFilters).hasSize(1);
+        assertThat(savedFilters.getFirst()).isInstanceOf(ReferencedQueryStringSearchFilter.class);
+        final ReferencedQueryStringSearchFilter savedFilter = (ReferencedQueryStringSearchFilter) savedFilters.getFirst();
+        assertThat(savedFilter.id()).isEqualTo(FILTER_ID);
+        assertThat(savedFilter.title()).isNull();
+        assertThat(savedFilter.description()).isNull();
+        assertThat(savedFilter.queryString()).isNull();
+        assertThat(savedFilter.negation()).isNull();
+        assertThat(savedFilter.disabled()).isNull();
+    }
+
+    @Test
+    public void leavesInlineFiltersUnchangedOnCreate() throws Exception {
+        final ViewService viewService = mock(ViewService.class);
+        when(viewService.saveWithOwner(any(), any())).thenReturn(TEST_SEARCH_VIEW);
+
+        final InlineQueryStringSearchFilter inlineFilter = InlineQueryStringSearchFilter.builder()
+                .queryString("http_method:POST")
+                .title("My Inline Filter")
+                .negation(false)
+                .disabled(false)
+                .build();
+
+        final ViewsResource resource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                searchWithQuery()
+        );
+
+        resource.create(CreateEntityRequest.create(viewWithState(stateWithFilter(inlineFilter)), null), mockUserContext(), SEARCH_USER);
+
+        final ArgumentCaptor<ViewDTO> captor = ArgumentCaptor.forClass(ViewDTO.class);
+        verify(viewService).saveWithOwner(captor.capture(), any());
+
+        final List<UsedSearchFilter> savedFilters = captor.getValue()
+                .state().get(QUERY_ID)
+                .widgets().iterator().next()
+                .filters();
+
+        assertThat(savedFilters).hasSize(1);
+        assertThat(savedFilters.getFirst()).isEqualTo(inlineFilter);
+    }
+
+    @Test
+    public void leavesInlineFiltersUnchangedOnUpdate() {
+        final ViewService viewService = mockViewService(TEST_SEARCH_VIEW);
+        when(viewService.update(any())).thenReturn(TEST_SEARCH_VIEW);
+
+        final InlineQueryStringSearchFilter inlineFilter = InlineQueryStringSearchFilter.builder()
+                .queryString("http_method:POST")
+                .title("My Inline Filter")
+                .negation(false)
+                .disabled(false)
+                .build();
+
+        final ViewsResource resource = createViewsResource(
+                viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                searchWithQuery()
+        );
+
+        resource.update(VIEW_ID, CreateEntityRequest.create(viewWithState(stateWithFilter(inlineFilter)), null), SEARCH_USER);
+
+        final ArgumentCaptor<ViewDTO> captor = ArgumentCaptor.forClass(ViewDTO.class);
+        verify(viewService).update(captor.capture());
+
+        final List<UsedSearchFilter> savedFilters = captor.getValue()
+                .state().get(QUERY_ID)
+                .widgets().iterator().next()
+                .filters();
+
+        assertThat(savedFilters).hasSize(1);
+        assertThat(savedFilters.get(0)).isEqualTo(inlineFilter);
     }
 
     private ViewsResource createViewsResource(final ViewService viewService, final StartPageService startPageService, final RecentActivityService recentActivityService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {

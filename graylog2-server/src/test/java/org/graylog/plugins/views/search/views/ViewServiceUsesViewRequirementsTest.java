@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.views;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -80,7 +81,8 @@ public class ViewServiceUsesViewRequirementsTest {
                 mock(EntityRegistrar.class),
                 mock(ViewSummaryService.class),
                 mock(EntitySourceService.class),
-                mongoCollections);
+                mongoCollections,
+                new IgnoreSearchFilters());
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
         this.searchUser = TestSearchUser.builder().build();
     }

@@ -60,11 +60,14 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
@@ -95,8 +98,10 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.security.RestPermissions;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -269,8 +274,42 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         return dto;
     }
 
+    private List<UsedSearchFilter> cleanReferencedSearchFilters(List<UsedSearchFilter> searchFilters) {
+        return searchFilters.stream().map(sf -> sf instanceof ReferencedSearchFilter rsf ? rsf.stripToId() : sf).toList();
+    }
+
+    private ViewStateDTO fixStateForReferencedFilters(final ViewStateDTO stateDTO) {
+        return stateDTO.toBuilder()
+                .widgets(stateDTO.widgets().stream()
+                        .map(widgetDTO ->
+                                widgetDTO.toBuilder()
+                                        .filters(cleanReferencedSearchFilters(widgetDTO.filters()))
+                                        .build()
+                        )
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
+    private ViewDTO fixReferencedSearchFilters(ViewDTO dto) {
+        return dto.toBuilder()
+                .state(dto.state().entrySet().stream()
+                        .map(
+                                entry -> new AbstractMap.SimpleEntry<>(
+                                        entry.getKey(),
+                                        fixStateForReferencedFilters(entry.getValue())
+                                )
+                        )
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                        )))
+                .build();
+    }
+
     private ViewDTO createView(CreateEntityRequest<ViewDTO> createEntityRequest, UserContext userContext, SearchUser searchUser) {
-        final ViewDTO dto = createEntityRequest.entity();
+        final ViewDTO originalDto = createEntityRequest.entity();
+        final ViewDTO dto = fixReferencedSearchFilters(originalDto);
+
         if (!searchUser.canCreateView(dto)) {
             throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
         }
@@ -403,7 +442,8 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
            throw new BadRequestException("Invalid update request");
         }
 
-        final ViewDTO dto = createEntityRequest.entity();
+        final ViewDTO originalDto = createEntityRequest.entity();
+        final ViewDTO dto = fixReferencedSearchFilters(originalDto);
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 
