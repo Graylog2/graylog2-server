@@ -1,0 +1,5 @@
+type = "f"
+message = "Add a traffic type selector to the cluster traffic graph so pre-7.1 history remains viewable via the outgoing traffic view."
+
+issues = ["25916"]
+pulls = ["26548"]

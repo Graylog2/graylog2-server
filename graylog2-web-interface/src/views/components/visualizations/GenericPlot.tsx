@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useMemo, useCallback, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
-import type { Layout, PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
+import type { Layout, PlotMouseEvent, PlotRelayoutEvent, PlotlyHTMLElement } from 'plotly.js';
 import type Plotly from 'plotly.js/lib/core';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
@@ -108,16 +108,13 @@ type Props = {
   layout?: Partial<PlotLayout>;
   config?: Partial<Plotly.Config>;
   onZoom?: (from: string, to: string) => void;
+  onZoomReset?: () => void;
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor;
   onClickMarker?: (markerEvent: OnClickMarkerEvent, event?: PlotMouseEvent) => void;
   onHoverMarker?: (event: OnHoverMarkerEvent) => void;
   onUnhoverMarker?: () => void;
   onAfterPlot?: () => void;
   onInitialized?: (figure: unknown, graphDiv: PlotlyHTMLElement) => void;
-};
-
-type Axis = {
-  autosize: boolean;
 };
 
 const nonInteractiveLayout = {
@@ -244,6 +241,7 @@ const GenericPlot = ({
   onHoverMarker = () => {},
   onUnhoverMarker = () => {},
   onZoom = () => {},
+  onZoomReset = undefined,
   onAfterPlot = () => {},
   onInitialized = () => {},
 }: Props) => {
@@ -274,15 +272,17 @@ const GenericPlot = ({
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   const _onRelayout = useCallback(
-    (axis: Axis) => {
-      if (!axis.autosize && axis['xaxis.range[0]'] && axis['xaxis.range[1]']) {
-        const from = axis['xaxis.range[0]'];
-        const to = axis['xaxis.range[1]'];
+    (axis: Readonly<PlotRelayoutEvent>) => {
+      if (!axis.autosize && axis['xaxis.range[0]'] != null && axis['xaxis.range[1]'] != null) {
+        const from = String(axis['xaxis.range[0]']);
+        const to = String(axis['xaxis.range[1]']);
 
         onZoom(from, to);
+      } else if (axis['xaxis.autorange']) {
+        onZoomReset?.();
       }
     },
-    [onZoom],
+    [onZoom, onZoomReset],
   );
 
   const _onHoverMarker = useCallback(
