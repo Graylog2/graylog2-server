@@ -21,8 +21,10 @@ import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -32,6 +34,9 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 
+// Outdated-index detection is only implemented for the OpenSearch3 client path, which the Datanode distribution
+// uses; other search backends throw UnsupportedOperationException regardless of permissions.
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 @GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class OutdatedIndexResourceIT {
 
