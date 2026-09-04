@@ -33,7 +33,7 @@ const metric_name = 'org.apache.logging.log4j.core.Appender.all';
 const METRIC_NAMES = [metric_name];
 
 const NodeLoggers = ({ nodeId, subsystems }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('log-level');
 
   const { data: nodeMetrics } = useNodeMetrics(nodeId, METRIC_NAMES);
   const [showDetails, setShowDetails] = useState(false);
@@ -73,7 +73,6 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
                   setShowDetails((prevShowDetails) => !prevShowDetails);
 
                   sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.SHOW_LOG_LEVEL_METRICS_TOGGLED, {
-                    app_section: 'log-level',
                     app_action_value: 'show-metrics',
                     event_details: { showing: !showDetails },
                   });

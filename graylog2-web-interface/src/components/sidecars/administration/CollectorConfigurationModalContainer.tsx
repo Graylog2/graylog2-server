@@ -59,7 +59,7 @@ const CollectorConfigurationModalContainer = ({
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState<string[]>([]);
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState<string[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('administration');
 
   const getSelectedLogCollector = () =>
     uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector))[0];
@@ -135,7 +135,6 @@ const CollectorConfigurationModalContainer = ({
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_ASSIGNED, {
         app_pathname: 'sidecars',
-        app_section: 'administration',
       });
 
       onConfigurationSelectionChange([sidecarCollectorPair], configs, () => {});

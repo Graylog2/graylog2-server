@@ -21,10 +21,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { FormSubmit, Select, Spinner } from 'components/common';
 import { Alert, Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
-import withTelemetry from 'logic/telemetry/withTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import withLocation from 'routing/withLocation';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
@@ -55,8 +53,6 @@ type EventNotificationFormProps = {
   onCancel: (...args: any[]) => void;
   onSubmit: (...args: any[]) => void;
   onTest: (...args: any[]) => void;
-  sendTelemetry: (...args: any[]) => void;
-  location: any;
 };
 
 const EventNotificationForm = ({
@@ -68,11 +64,10 @@ const EventNotificationForm = ({
   validation,
   testResult,
   onSubmit,
-  sendTelemetry,
-  location,
   onChange,
   onTest,
 }: EventNotificationFormProps) => {
+  const sendTelemetry = useSendTelemetry();
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -81,7 +76,6 @@ const EventNotificationForm = ({
         ? TELEMETRY_EVENT_TYPE.NOTIFICATIONS.CREATE_CLICKED
         : TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EDIT_CLICKED,
       {
-        app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'event-notification',
         app_action_value: `${action}-button`,
       },
@@ -108,7 +102,6 @@ const EventNotificationForm = ({
 
   const handleTypeChange = (nextType: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_TYPE_SELECTED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'event-definition-notifications',
       app_action_value: 'notification-type-select',
       notification_type: nextType,
@@ -122,7 +115,6 @@ const EventNotificationForm = ({
 
   const handleTestTrigger = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EXECUTE_TEST_CLICKED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'event-notification',
       app_action_value: 'execute-test-button',
     });
@@ -232,4 +224,4 @@ const EventNotificationForm = ({
   );
 };
 
-export default withLocation(withTelemetry(EventNotificationForm));
+export default EventNotificationForm;
