@@ -18,8 +18,8 @@ import React from 'react';
 
 const EventKeyHelpPopover = () => (
   <>
-    Event Keys are Fields used to arrange Events into groups. A group is created for each unique Key, resulting in as
-    many Events as unique Keys are found. Example:
+    Event Keys are Fields used to arrange Events into groups when the condition type is <b>Event Correlation</b>. A
+    group is created for each unique Key, resulting in as many Events as unique Keys are found. Example:
     <p />
     <b>No Event Keys:</b> One Event for each <em>Login failure</em> message.
     <br />
@@ -27,6 +27,10 @@ const EventKeyHelpPopover = () => (
       Event Key <code>username</code>:
     </b>{' '}
     One Event for each username with a <em>Login failure</em> message.
+    <p />
+    This grouping does not apply to <b>Filter &amp; Aggregation</b>. To group results for that condition type, use
+    &quot;Create Events for Definition if...&quot; with &quot;Aggregation of results reaches a threshold&quot; and configure
+    Group by Field(s).
   </>
 );
 
