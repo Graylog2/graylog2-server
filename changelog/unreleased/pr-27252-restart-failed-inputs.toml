@@ -1,5 +1,0 @@
-type = "f"
-message = "Relaunch a failed input after it was updated, instead of leaving it terminated. Only deliberately stopped inputs stay stopped."
-
-issues = []
-pulls = ["27252"]
