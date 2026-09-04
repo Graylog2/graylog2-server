@@ -26,6 +26,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
@@ -53,6 +54,7 @@ import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_
 import static org.graylog2.indexer.indexset.fields.FieldTypeProfileField.FIELD_PROFILE_ID;
 import static org.graylog2.indexer.indexset.fields.IndexPrefixField.FIELD_INDEX_PREFIX;
 
+@Singleton
 public class MongoIndexSetService implements IndexSetService {
     public static final String COLLECTION_NAME = "index_sets";
     public static final String FIELD_TITLE = "title";
