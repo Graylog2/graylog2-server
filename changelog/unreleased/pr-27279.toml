@@ -1,5 +1,0 @@
-type = "f"
-message = "Add missing permission checks to Alerts page count tiles for investigations, assets and system alerts."
-
-issues = ["graylog-plugin-enterprise#15475"]
-pulls = ["27279", "graylog-plugin-enterprise#15480"]
