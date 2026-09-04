@@ -24,7 +24,7 @@ type Props = {
   tags: ReadonlyArray<string> | undefined | null;
   // Tag chips only make sense as filter shortcuts when a filterable list is in scope.
   // Set to false in contexts without one (e.g. widgets, investigation evidence) to avoid
-  // rendering clickable chips that just pollute the URL with an unused `filter` param.
+  // rendering clickable chips that just pollute the URL with an unused `filters` entry (`tags=<tag>`).
   interactive?: boolean;
 };
 
