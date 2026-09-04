@@ -360,9 +360,9 @@ public class OkHttpClientProviderTest {
     /**
      * {@code 203.0.113.10} is a documentation-only address (RFC 5737 TEST-NET-3): it needs no DNS lookup
      * and can never resolve to a real host, unlike the {@code www.example.com} this class used to target
-     * -- {@link ProxySelectorProvider#get()} resolves the request host on every {@code select()} call, so
-     * a real hostname made this suite depend on live DNS and it was disabled for years over the resulting
-     * flakiness (Graylog2/graylog2-server#7644, #7799).
+     * -- the {@code ProxySelector} returned by {@link ProxySelectorProvider#get()} resolves the request
+     * host on every {@code select()} call, so a real hostname made this suite depend on live DNS and it
+     * was disabled for years over the resulting flakiness (Graylog2/graylog2-server#7644, #7799).
      */
     private Request request() {
         return new Request.Builder().url("http://203.0.113.10/").get().build();
