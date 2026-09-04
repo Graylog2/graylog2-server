@@ -41,7 +41,7 @@ const HelpMenu = () => {
 
         if ('path' in item) {
           return (
-            <MenuItem key={item.description} component="a" href={item.path}>
+            <MenuItem key={item.description} href={item.path}>
               {item.description}
             </MenuItem>
           );

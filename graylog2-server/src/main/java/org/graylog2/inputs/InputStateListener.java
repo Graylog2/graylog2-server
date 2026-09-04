@@ -78,6 +78,12 @@ public class InputStateListener {
                 notification.addNode(serverStatus.getNodeId().toString());
                 notification.addDetail("input_id", input.toIdentifier());
                 notification.addDetail("reason", ObjectUtils.defaultIfNull(state.getDetailedMessage(), ""));
+                if (event.oldState() == event.newState()) {
+                    // Same state with a changed message, i.e. a failure that retrying cannot resolve replacing an
+                    // earlier transient one. publishIfFirst() will not overwrite the stored reason, so retire the
+                    // stale notification first and let the actionable message re-raise it.
+                    notificationService.fixed(type, input.getId());
+                }
                 notificationService.publishIfFirst(notification);
                 break;
             case RUNNING:

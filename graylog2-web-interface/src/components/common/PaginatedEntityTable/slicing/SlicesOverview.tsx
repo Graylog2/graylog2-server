@@ -148,7 +148,7 @@ const SlicesOverview = ({
       : (defaultSliceSort?.mode ?? ALPHABETICAL_SORT);
   const sortDirection = slicingPreferences?.order ?? defaultSortDirectionForMode(sortMode, defaultSliceSort);
 
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(appSection);
   const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
     useSlices({
       fetchSlices,
@@ -203,7 +203,6 @@ const SlicesOverview = ({
       const next = !current;
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_EMPTY_VALUES_TOGGLED, {
-        app_section: appSection,
         event_details: {
           attribute_id: sliceCol,
           show_empty_slices: next,

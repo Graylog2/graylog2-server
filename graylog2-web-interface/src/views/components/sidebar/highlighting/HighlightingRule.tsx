@@ -28,8 +28,6 @@ import type HighlightingColor from 'views/logic/views/formatting/highlighting/Hi
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 
 import ColorPreview from './ColorPreview';
 
@@ -113,25 +111,22 @@ const HighlightingRule = (
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
 
   const _onChange = useCallback(
     (newColor: HighlightingColor, hidePopover: () => void) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_UPDATED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
         app_action_value: 'search-sidebar-highlight-color-update',
       });
 
       return onUpdate(rule, rule.field, rule.value, rule.condition, newColor).then(hidePopover);
     },
-    [location.pathname, onUpdate, rule, sendTelemetry],
+    [onUpdate, rule, sendTelemetry],
   );
 
   const _onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this highlighting?')) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
         app_action_value: 'search-sidebar-highlight-delete',
       });
 
@@ -139,7 +134,7 @@ const HighlightingRule = (
     }
 
     return Promise.resolve();
-  }, [location.pathname, onDelete, rule, sendTelemetry]);
+  }, [onDelete, rule, sendTelemetry]);
 
   return (
     <Container className={className} ref={ref}>
