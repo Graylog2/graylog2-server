@@ -29,8 +29,8 @@ const EventKeyHelpPopover = () => (
     One Event for each username with a <em>Login failure</em> message.
     <p />
     This grouping does not apply to <b>Filter &amp; Aggregation</b>. To group results for that condition type, use
-    &quot;Create Events for Definition if...Aggregation of results reaches a threshold&quot; and configure Group by
-    Field(s).
+    &quot;Create Events for Definition if...&quot; with &quot;Aggregation of results reaches a threshold&quot; and configure
+    Group by Field(s).
   </>
 );
 
