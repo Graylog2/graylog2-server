@@ -23,6 +23,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
@@ -48,6 +49,7 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 /**
  * A RuleService backed by a MongoDB collection.
  */
+@Singleton
 public class MongoDbRuleService implements RuleService {
     private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbRuleService.class);
 
