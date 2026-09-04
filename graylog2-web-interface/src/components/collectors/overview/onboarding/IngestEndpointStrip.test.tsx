@@ -250,26 +250,21 @@ describe('IngestEndpointStrip', () => {
       expect(updateCollectorInputPort).not.toHaveBeenCalled();
     });
 
-    it('warns up front when the existing input cannot be moved and does not try', async () => {
+    it('offers no Change when the user cannot edit the existing input', () => {
       asMock(useCollectorPermissions).mockReturnValue(collectorsManager());
       withInputs([mockInput(14401)]);
       withInputStates('FAILED');
 
       render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
 
-      await userEvent.click(screen.getByRole('button', { name: /change/i }));
+      expect(screen.getByText(/ingest input .* is not running/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /change/i })).not.toBeInTheDocument();
+    });
 
-      expect(screen.getByText(/existing ingest input stays on port 14401/i)).toBeInTheDocument();
+    it('still offers Change when no input exists and the user may create one', () => {
+      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
 
-      const port = screen.getByLabelText(/external port/i);
-      await userEvent.clear(port);
-      await userEvent.type(port, '14402');
-      await userEvent.click(screen.getByRole('button', { name: /^confirm$/i }));
-
-      await waitFor(() => {
-        expect(updateConfig).toHaveBeenCalled();
-      });
-      expect(updateCollectorInputPort).not.toHaveBeenCalled();
+      expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument();
     });
   });
 

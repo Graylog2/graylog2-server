@@ -608,7 +608,16 @@ describe('FirstOnboarding', () => {
 
       render(<FirstOnboarding />);
 
-      expect(screen.getByText(/an administrator must create the collector ingest input/i)).toBeInTheDocument();
+      expect(screen.getByText(/an administrator must set up the collector ingest endpoint/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
+    });
+
+    it('blocks a user who cannot edit the existing ingest input, since confirming the endpoint may move it', () => {
+      asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions({ canEditIngestInput: () => false }));
+
+      render(<FirstOnboarding />);
+
+      expect(screen.getByText(/an administrator must set up the collector ingest endpoint/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
     });
 
@@ -627,7 +636,7 @@ describe('FirstOnboarding', () => {
 
       render(<FirstOnboarding />);
 
-      expect(screen.getByText(/an administrator must configure the ingest endpoint/i)).toBeInTheDocument();
+      expect(screen.getByText(/an administrator must set up the collector ingest endpoint/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
     });
 
@@ -650,6 +659,19 @@ describe('FirstOnboarding', () => {
     });
   });
 
+  it('does not require input edit permission once the endpoint is configured and the input exists', async () => {
+    asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions({ canEditIngestInput: () => false }));
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Confirm how Collectors reach this cluster')).not.toBeInTheDocument();
+  });
+
   describe('when the config exists but no ingest input does', () => {
     beforeEach(() => {
       asMock(useCollectorInputIds).mockReturnValue({ data: [], isLoading: false } as ReturnType<
@@ -662,7 +684,7 @@ describe('FirstOnboarding', () => {
 
       render(<FirstOnboarding />);
 
-      expect(screen.getByText(/an administrator must create the collector ingest input/i)).toBeInTheDocument();
+      expect(screen.getByText(/an administrator must set up the collector ingest endpoint/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
     });
 

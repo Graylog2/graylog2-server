@@ -66,8 +66,7 @@ const buildRequest = (config: CollectorsConfig, values: FormValues, createInput:
  * shows, so a user learns up front when Collectors would enroll but never deliver data.
  *
  * Permission gating for the initial setup lives in FirstOnboarding: the wizard is not shown at all to a user who
- * could not create the ingest input. Here only the "move the existing input" edit is permission-checked, with a
- * notice up front and no attempt when the user lacks it.
+ * could not create, or could not edit, the ingest input. Afterwards "Change" is offered only under the same rule.
  */
 const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
   const { updateConfig } = useCollectorsMutations();
@@ -91,12 +90,10 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
   // The wizard only runs when the input exists or can be created (see FirstOnboarding), so this is plain fact.
   const willCreateInput = needsInput && canCreateIngestInput;
 
-  // Moving an existing input to a new port is an input edit.
+  // Moving an existing input to a new port is an input edit. Changing the endpoint is only offered when the user
+  // may perform every edit that follows from it (FirstOnboarding applies the same rule before the initial setup).
   const canEditInputs = loadedInputs.length > 0 && loadedInputs.every((input) => canEditIngestInput(input.id));
-  const cannotMoveExistingInput = hasInputs && !canEditInputs;
-  const existingInputPorts = [...new Set(loadedInputs.map((input) => Number(input.attributes?.port)))].filter(
-    (port) => !Number.isNaN(port),
-  );
+  const canChangeEndpoint = !isCloud && (!hasInputs || canEditInputs);
 
   const hasRunningInput = loadedInputs.some((input) => {
     const nodeStates = inputStates?.[input.id];
@@ -218,11 +215,6 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
                   Collectors send their logs to this address. It must be reachable from every Collector host: a load
                   balancer, or this server.
                 </Text>
-                {cannotMoveExistingInput && (
-                  <Text size="sm">
-                    {`The existing ingest input ${loadedInputs.length === 1 ? 'stays' : 'inputs stay'} on port ${existingInputPorts.join(', ')}: moving it needs input edit permissions you do not have. If you change the port here, ask an administrator to move the input as well.`}
-                  </Text>
-                )}
               </Stack>
             </Section>
           </Form>
@@ -231,11 +223,11 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
     );
   }
 
-  const changeButton = (
+  const changeButton = canChangeEndpoint ? (
     <Button bsStyle="link" onClick={() => setEditing(true)}>
       Change
     </Button>
-  );
+  ) : null;
 
   const endpointText = (
     <Text span ff="monospace" fw={700}>

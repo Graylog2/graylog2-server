@@ -97,11 +97,13 @@ const FirstOnboarding = () => {
   const { data: fleets, isLoading: isFleetsLoading } = useFleets();
   const { createFleet, isCreatingFleet, createSource, createEnrollmentToken, isCreatingEnrollmentToken } =
     useCollectorsMutations();
-  const { canCreateFleet, canEditConfig, canCreateIngestInput } = useCollectorPermissions();
+  const { canCreateFleet, canEditConfig, canCreateIngestInput, canEditIngestInput } = useCollectorPermissions();
   const isConfigured = !!config?.signing_cert_id;
   // In Cloud the ingest endpoint is server-provisioned and no persisted input exists.
   const isCloud = AppConfig.isCloud();
   const hasIngestInput = isCloud || collectorInputIds.length > 0;
+  // Confirming the endpoint moves an existing input to the chosen port, which is an input edit.
+  const canEditIngestInputs = isCloud || collectorInputIds.every((id) => canEditIngestInput(id));
 
   const buildCommand = useCallback((platformId: PlatformId, token: string) => {
     const platform = PLATFORMS.find((p) => p.id === platformId);
@@ -302,25 +304,17 @@ const FirstOnboarding = () => {
     );
   }
 
-  // Say so before the user picks anything: every step below would end at a save they cannot make.
-  if (!isConfigured && !canEditConfig) {
-    return (
-      <BodyContainer>
-        <Alert bsStyle="info" title="Collectors are not set up yet">
-          An administrator must configure the ingest endpoint before Collectors can be enrolled.
-        </Alert>
-      </BodyContainer>
-    );
-  }
+  // Say so before the user picks anything: every step below would end at a save the user cannot make. Setting
+  // up means saving the config and creating the ingest input, or editing the existing one to a different address.
+  const canCompleteSetup = isConfigured
+    ? hasIngestInput || canCreateIngestInput
+    : canEditConfig && (hasIngestInput ? canEditIngestInputs : canCreateIngestInput);
 
-  // Without an ingest input nothing a collector sends ever arrives, and creating one is an INPUT permission the
-  // built-in Collectors Manager role lacks. Don't offer a wizard that cannot finish.
-  if (!hasIngestInput && !canCreateIngestInput) {
+  if (!canCompleteSetup) {
     return (
       <BodyContainer>
         <Alert bsStyle="info" title="Collectors are not set up yet">
-          An administrator must create the Collector Ingest input before Collectors can be enrolled. Creating inputs
-          requires input permissions your account does not have.
+          An administrator must set up the Collector ingest endpoint before Collectors can be enrolled.
         </Alert>
       </BodyContainer>
     );
