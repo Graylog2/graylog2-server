@@ -16,5 +16,13 @@
  */
 package org.graylog.collectors.events;
 
-public record CollectorCaConfigUpdated() {
+/**
+ * Posted on the local event bus after this node's {@link org.graylog.collectors.CollectorsConfigService} has
+ * invalidated its cache in response to a collectors config change.
+ * <p>
+ * Subscribe to this event — not to {@link org.graylog2.cluster.ClusterConfigChangedEvent} — to react to collectors
+ * config changes: subscribers of the raw cluster event race the cache invalidation on the async event bus and can
+ * read a stale config, while this event is guaranteed to be delivered after the cache is fresh.
+ */
+public record CollectorsConfigUpdatedEvent() {
 }

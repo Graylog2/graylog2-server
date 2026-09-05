@@ -48,7 +48,6 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,7 +74,7 @@ class OpAmpHttpHandlerIT {
 
         opAmpService = mock(OpAmpService.class);
         final var collectorsConfigService = mock(CollectorsConfigService.class);
-        lenient().when(collectorsConfigService.getOpampMaxRequestBodySizeBytes()).thenReturn(TEST_COLLECTORS_CONFIG.opampMaxRequestBodySizeBytes());
+        when(collectorsConfigService.getOrDefault()).thenReturn(TEST_COLLECTORS_CONFIG);
         final var executor = Executors.newVirtualThreadPerTaskExecutor();
 
         // Register auth filter via addon (handles auth for HTTP requests too)
