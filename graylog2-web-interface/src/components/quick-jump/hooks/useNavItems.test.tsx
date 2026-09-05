@@ -22,6 +22,9 @@ import { usePluginExports } from 'views/test/testPlugins';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { adminUser } from 'fixtures/users';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
+import AppConfig from 'util/AppConfig';
+import { isTelemetryDebugEnabled, setTelemetryDebugEnabled } from 'logic/telemetry/debug/TelemetryDebugStore';
+import { ACTION_TYPE } from 'components/quick-jump/Constants';
 
 import useNavItems from './useNavItems';
 
@@ -51,5 +54,44 @@ describe('useNavItems', () => {
   it('handles help menu items with `path`', () => {
     const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
     expect(result.current).toContainEqual({ 'link': '/path', 'title': 'Test Item', 'type': 'page' });
+  });
+
+  describe('telemetry debug overlay action', () => {
+    afterEach(() => {
+      setTelemetryDebugEnabled(false);
+      jest.restoreAllMocks();
+    });
+
+    it('offers a toggle action in development mode', () => {
+      jest.spyOn(AppConfig, 'gl2DevMode').mockReturnValue(true);
+      setTelemetryDebugEnabled(false);
+
+      const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
+
+      const item = result.current.find(({ title }) => title === 'Enable Telemetry Debug Overlay');
+
+      expect(item).toEqual(expect.objectContaining({ type: ACTION_TYPE }));
+
+      (item as { action: (args: object) => void }).action({});
+
+      expect(isTelemetryDebugEnabled()).toBe(true);
+    });
+
+    it('offers to disable the overlay while it is enabled', () => {
+      jest.spyOn(AppConfig, 'gl2DevMode').mockReturnValue(true);
+      setTelemetryDebugEnabled(true);
+
+      const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
+
+      expect(result.current.find(({ title }) => title === 'Disable Telemetry Debug Overlay')).toBeDefined();
+    });
+
+    it('is absent outside development mode', () => {
+      jest.spyOn(AppConfig, 'gl2DevMode').mockReturnValue(false);
+
+      const { result } = renderHookWithDataRouter(() => useNavItems(), { wrapper: Wrapper });
+
+      expect(result.current.find(({ title }) => title?.includes('Telemetry Debug Overlay'))).toBeUndefined();
+    });
   });
 });

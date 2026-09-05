@@ -26,6 +26,7 @@ import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
+import TelemetryDebugOverlay from 'components/telemetry-debug/TelemetryDebugOverlay';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
@@ -96,6 +97,7 @@ const App = () => (
                     </ReportedErrorBoundary>
                   </AppLayout>
                   <HotkeysModalContainer />
+                  <TelemetryDebugOverlay />
                 </>
               </ScratchpadProvider>
             </HotkeysProvider>
