@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.ArrayValue;
+import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.common.v1.KeyValueList;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -103,7 +104,14 @@ public class OTelTypeConverter {
      * Converts an OTel {@link KeyValueList} to a Java map.
      */
     public Map<String, ?> toJavaMap(KeyValueList kvList) {
-        return kvList.getValuesList().stream()
+        return toJavaMap(kvList.getValuesList());
+    }
+
+    /**
+     * Converts a list of OTel {@link KeyValue}s to a Java map.
+     */
+    public Map<String, ?> toJavaMap(List<KeyValue> kvList) {
+        return kvList.stream()
                 .flatMap(kv -> toJavaObject(kv.getValue()).map(v -> Map.entry(kv.getKey(), v)).stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
     }
