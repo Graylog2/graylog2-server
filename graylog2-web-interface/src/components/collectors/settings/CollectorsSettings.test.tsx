@@ -120,6 +120,8 @@ describe('CollectorsSettings', () => {
     asMock(useCollectorInputMutations).mockReturnValue({
       createCollectorInput: jest.fn(),
       isCreatingCollectorInput: false,
+      updateCollectorInputPort: jest.fn(),
+      isUpdatingCollectorInputPort: false,
     });
     asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<
       typeof useCollectorPermissions
