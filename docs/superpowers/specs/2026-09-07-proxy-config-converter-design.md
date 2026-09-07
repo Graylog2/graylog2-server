@@ -101,11 +101,13 @@ public class ProxyConfigConverter implements Converter<ProxyConfig> {
 }
 ```
 
-JadConfig only invokes a `Converter`'s `convertFrom` for a non-empty
-configured value (confirmed from `ProxyHostsPatternConverter`'s own
-contract and behavior) — when `http_proxy_uri` is unset, the field simply
-stays at its default (`null`), the converter never runs, exactly like every
-other optional `@Parameter` in `BaseConfiguration` today.
+JadConfig invokes a `Converter`'s `convertFrom` whenever the key is present
+in the configuration at all, including with an empty value (`http_proxy_uri =`
+with nothing after the `=` still calls `convertFrom("")`); it's only skipped
+when the key is absent entirely — in that case, when `http_proxy_uri` is
+unset, the field simply stays at its default (`null`), the converter never
+runs, exactly like every other optional `@Parameter` in `BaseConfiguration`
+today.
 
 `BaseConfiguration.java` (`org.graylog2.plugin`), current state:
 

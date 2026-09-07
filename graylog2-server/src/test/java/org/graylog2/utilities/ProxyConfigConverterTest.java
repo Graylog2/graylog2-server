@@ -46,6 +46,14 @@ public class ProxyConfigConverterTest {
     }
 
     @Test
+    public void convertFromRejectsAHostlessUri() {
+        final ProxyConfigConverter converter = new ProxyConfigConverter();
+
+        assertThatThrownBy(() -> converter.convertFrom(""))
+                .isInstanceOf(ParameterException.class);
+    }
+
+    @Test
     public void convertToRoundTripsToTheOriginalUriString() {
         final ProxyConfigConverter converter = new ProxyConfigConverter();
         final ProxyConfig config = new ProxyConfig(URI.create("http://proxy.example.com:8123"));

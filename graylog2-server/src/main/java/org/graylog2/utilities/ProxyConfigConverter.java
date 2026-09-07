@@ -25,7 +25,11 @@ public class ProxyConfigConverter implements Converter<ProxyConfig> {
     @Override
     public ProxyConfig convertFrom(String value) {
         try {
-            return new ProxyConfig(URI.create(value));
+            final ProxyConfig config = new ProxyConfig(URI.create(value));
+            if (config.host() == null || config.host().isBlank()) {
+                throw new ParameterException("Invalid proxy URI: \"" + value + "\" (no host)");
+            }
+            return config;
         } catch (IllegalArgumentException e) {
             throw new ParameterException("Invalid proxy URI: \"" + value + "\"", e);
         }

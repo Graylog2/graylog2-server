@@ -20,6 +20,7 @@ import com.google.common.base.Splitter;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -37,6 +38,12 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 public record ProxyConfig(URI uri) {
 
+    private static final String HTTPS_SCHEME = "https";
+
+    public ProxyConfig {
+        Objects.requireNonNull(uri, "uri");
+    }
+
     /** {@code user:password} parsed from the proxy URI's user info. */
     public record Credentials(String username, String password) {}
 
@@ -50,7 +57,7 @@ public record ProxyConfig(URI uri) {
 
     public int port(int httpDefault, int httpsDefault) {
         final int port = port();
-        return port >= 0 ? port : ("https".equalsIgnoreCase(scheme()) ? httpsDefault : httpDefault);
+        return port >= 0 ? port : (HTTPS_SCHEME.equalsIgnoreCase(scheme()) ? httpsDefault : httpDefault);
     }
 
     public String scheme() {
@@ -58,8 +65,11 @@ public record ProxyConfig(URI uri) {
     }
 
     /**
-     * The proxy URI with user info stripped. Some HTTP client SDKs (e.g. AWS's Apache5 client) reject a
-     * URI that carries credentials in this position and require them supplied separately.
+     * The proxy URI with user info stripped. Some HTTP client SDKs reject a URI that carries credentials
+     * in this position and require them supplied separately -- e.g. the Apache (v4) client
+     * ({@code software.amazon.awssdk.http.apache.ApacheHttpClient}) used by this repo's
+     * {@code AWSProxyConfigurationProvider}, and the Apache5 client used by the AI agent runtime's
+     * {@code ChatModelFactory} (for Bedrock) in the sibling {@code graylog-plugin-enterprise} repo.
      */
     public URI endpoint() {
         return port() >= 0
