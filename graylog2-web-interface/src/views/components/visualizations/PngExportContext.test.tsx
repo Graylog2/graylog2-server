@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
-import { render, screen, act } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import PngExportContext, { usePngExportContext } from './PngExportContext';

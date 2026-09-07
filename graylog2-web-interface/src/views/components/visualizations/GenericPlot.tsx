@@ -332,7 +332,7 @@ const GenericPlot = ({
       graphDivRef.current = graphDiv;
       setExportFn(() =>
         import('views/custom-plotly').then(({ default: Plotly }) =>
-          Plotly.toImage(graphDiv, { format: 'png' }),
+          Plotly.toImage(graphDiv, { format: 'png', width: graphDiv.offsetWidth, height: graphDiv.offsetHeight }),
         ),
       );
       onInitialized(figure, graphDiv);
