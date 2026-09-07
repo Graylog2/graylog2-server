@@ -16,19 +16,16 @@
  */
 package org.graylog.aws;
 
-import com.google.common.base.Splitter;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.graylog2.utilities.ProxyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.http.nio.netty.ProxyConfiguration;
-
-import java.net.URI;
-import java.util.List;
 
 /**
  * Provides a Netty-based async HTTP client builder configured with the optional Graylog HTTP proxy
@@ -42,51 +39,39 @@ import java.util.List;
 @Singleton
 public class AWSAsyncProxyConfigurationProvider implements Provider<NettyNioAsyncHttpClient.Builder> {
     private static final Logger LOG = LoggerFactory.getLogger(AWSAsyncProxyConfigurationProvider.class);
-    private static final String HTTPS_SCHEME = "https";
     private static final int DEFAULT_HTTP_PORT = 80;
     private static final int DEFAULT_HTTPS_PORT = 443;
 
-    private final URI httpProxyUri;
+    private final ProxyConfig proxyConfig;
 
     @Inject
-    public AWSAsyncProxyConfigurationProvider(@Named("http_proxy_uri") @Nullable URI httpProxyUri) {
-        this.httpProxyUri = httpProxyUri;
+    public AWSAsyncProxyConfigurationProvider(@Named("http_proxy_uri") @Nullable ProxyConfig proxyConfig) {
+        this.proxyConfig = proxyConfig;
     }
 
     @Override
     public NettyNioAsyncHttpClient.Builder get() {
         final NettyNioAsyncHttpClient.Builder httpClientBuilder = NettyNioAsyncHttpClient.builder();
-        if (httpProxyUri == null) {
+        if (proxyConfig == null) {
             LOG.debug("AWS async proxy disabled: http_proxy_uri not set");
             return httpClientBuilder;
         }
 
-        httpClientBuilder.proxyConfiguration(buildProxyConfiguration(httpProxyUri));
-        LOG.debug("AWS async proxy enabled: {}:{}", httpProxyUri.getHost(), httpProxyUri.getPort());
+        httpClientBuilder.proxyConfiguration(buildProxyConfiguration(proxyConfig));
+        LOG.debug("AWS async proxy enabled: {}:{}", proxyConfig.host(), proxyConfig.port());
         return httpClientBuilder;
     }
 
-    static ProxyConfiguration buildProxyConfiguration(URI proxyUri) {
-        final String scheme = proxyUri.getScheme();
-        final int port = proxyUri.getPort();
-
+    static ProxyConfiguration buildProxyConfiguration(ProxyConfig proxyConfig) {
         final ProxyConfiguration.Builder proxyConfigBuilder = ProxyConfiguration.builder()
-                .scheme(scheme)
-                .host(proxyUri.getHost())
+                .scheme(proxyConfig.scheme())
+                .host(proxyConfig.host())
                 // The Netty proxy configuration requires an explicit port. Fall back to the scheme default when the
                 // proxy URI does not specify one.
-                .port(port >= 0 ? port : (HTTPS_SCHEME.equalsIgnoreCase(scheme) ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT));
+                .port(proxyConfig.port(DEFAULT_HTTP_PORT, DEFAULT_HTTPS_PORT));
 
-        if (proxyUri.getUserInfo() != null && !proxyUri.getUserInfo().isEmpty()) {
-            final List<String> credentials = Splitter.on(":")
-                    .limit(2)
-                    .splitToList(proxyUri.getUserInfo());
-
-            if (credentials.size() == 2) {
-                proxyConfigBuilder.username(credentials.get(0));
-                proxyConfigBuilder.password(credentials.get(1));
-            }
-        }
+        proxyConfig.credentials().ifPresent(credentials ->
+                proxyConfigBuilder.username(credentials.username()).password(credentials.password()));
 
         return proxyConfigBuilder.build();
     }
