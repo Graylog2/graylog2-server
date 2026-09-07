@@ -92,13 +92,12 @@ const SliceFilters = ({
   sortDirection,
   onSortDirectionChange,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(appSection);
   const selectedSortOption = sortOptions.find((option) => option.value === sortMode) ?? DEFAULT_SORT_OPTIONS[0];
 
   const handleSearchChange = (value: string) => {
     onSearchQueryChange(value);
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SEARCH_CHANGED, {
-      app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
         has_query: value.length > 0,
@@ -108,7 +107,6 @@ const SliceFilters = ({
   const handleSearchReset = () => {
     onSearchReset();
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SEARCH_CHANGED, {
-      app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
         reset: true,
@@ -122,7 +120,6 @@ const SliceFilters = ({
 
     onSortModeChange(mode);
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SORT_CHANGED, {
-      app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
         sort_mode: mode,
@@ -134,7 +131,6 @@ const SliceFilters = ({
 
     onSortDirectionChange(nextDirection);
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SORT_CHANGED, {
-      app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
         sort_mode: sortMode,

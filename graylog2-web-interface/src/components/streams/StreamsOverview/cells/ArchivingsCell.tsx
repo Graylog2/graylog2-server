@@ -21,6 +21,7 @@ import type { Stream } from 'logic/streams/types';
 import { StatusIcon, Tooltip } from 'components/common';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { ARCHIVE_RETENTION_STRATEGY } from 'hooks/useIndices';
+import useExcludedArchiveStreams from 'components/streams/hooks/useExcludedArchiveStreams';
 
 type Props = {
   stream: Stream;
@@ -28,16 +29,16 @@ type Props = {
 };
 
 const ArchivingsCell = ({ stream, indexSets }: Props) => {
-  if (stream.is_default || !stream.is_editable) {
-    return null;
-  }
+  const excludedStreams = useExcludedArchiveStreams();
 
+  // No is_default/is_editable guard: archiving status applies to every stream, unlike the sibling action cells.
   const indexSet = indexSets.find((is) => is.id === stream.index_set_id);
 
-  const archivingEnabled = Boolean(
+  const indexSetArchivingEnabled = Boolean(
     (indexSet?.use_legacy_rotation && indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY) ||
     indexSet?.data_tiering?.archive_before_deletion,
   );
+  const archivingEnabled = indexSetArchivingEnabled && !excludedStreams.includes(stream.id);
 
   if (!archivingEnabled) {
     return null;

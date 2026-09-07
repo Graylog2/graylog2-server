@@ -164,7 +164,6 @@ class GrokPatterns extends React.Component<
       deleteGrokPattern(pattern, () => {
         this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.DELETED, {
           app_pathname: 'grokpatterns',
-          app_section: 'grokpatterns',
         });
 
         this.loadData();
@@ -278,4 +277,4 @@ class GrokPatterns extends React.Component<
   }
 }
 
-export default withTelemetry(withPaginationQueryParameter(GrokPatterns));
+export default withTelemetry(withPaginationQueryParameter(GrokPatterns), 'grokpatterns');

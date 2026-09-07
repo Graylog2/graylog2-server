@@ -16,10 +16,10 @@
  */
 import Routes from 'routing/Routes';
 
-import { COLLECTOR_INSTANCE_UID_FIELD, COLLECTOR_SYSTEM_LOGS_STREAM_ID } from './fields';
+import { AGENT_ID_FIELD, COLLECTOR_SYSTEM_LOGS_STREAM_ID } from './fields';
 
 const collectorSystemLogsUrl = (instanceUid: string): string =>
-  Routes.search_with_query(`${COLLECTOR_INSTANCE_UID_FIELD}:"${instanceUid}"`, 'relative', { relative: 3600 }, [
+  Routes.search_with_query(`${AGENT_ID_FIELD}:"${instanceUid}"`, 'relative', { relative: 3600 }, [
     COLLECTOR_SYSTEM_LOGS_STREAM_ID,
   ]);
 

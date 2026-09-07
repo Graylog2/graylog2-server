@@ -22,8 +22,6 @@ import { LinkContainer } from 'components/common';
 import { Button } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 
 type Props = {
   entityKey: string;
@@ -52,19 +50,16 @@ const PermissionWrapper = ({
 
 const CreateButton = ({ disabled = false, entityKey }: Props) => {
   const entityCreator = useEntityCreator(entityKey);
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry(entityCreator.telemetryEvent?.section);
 
   const _onClick = useCallback(() => {
     const { telemetryEvent } = entityCreator;
     if (telemetryEvent) {
       sendTelemetry(telemetryEvent.type, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: telemetryEvent.section,
         app_action_value: telemetryEvent.actionValue,
       });
     }
-  }, [entityCreator, pathname, sendTelemetry]);
+  }, [entityCreator, sendTelemetry]);
 
   return (
     <PermissionWrapper permissions={entityCreator?.permissions}>

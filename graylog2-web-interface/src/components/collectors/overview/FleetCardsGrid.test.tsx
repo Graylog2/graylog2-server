@@ -17,20 +17,32 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import FleetCardsGrid from './FleetCardsGrid';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
+jest.mock('hooks/useCurrentUser');
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn() }));
+
+const userWith = (permissions: Array<string>) =>
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 describe('FleetCardsGrid telemetry', () => {
   const sendTelemetry = jest.fn();
 
   beforeEach(() => {
     asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
     sendTelemetry.mockClear();
   });
 
@@ -74,5 +86,40 @@ describe('FleetCardsGrid telemetry', () => {
       'Collector Overview Fleet Card Clicked',
       expect.objectContaining({ health: 'empty' }),
     );
+  });
+});
+
+describe('FleetCardsGrid empty state', () => {
+  beforeEach(() => {
+    asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
+  });
+
+  it('offers the setup call to action when the user can create fleets', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:create']));
+
+    render(<FleetCardsGrid fleets={[]} filter="" />);
+
+    expect(await screen.findByRole('button', { name: /create fleet/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /deploy collectors/i })).toBeInTheDocument();
+  });
+
+  it('points a user who cannot create fleets at an administrator instead', async () => {
+    // Every call to action in the default empty state is a dead end for this user: they cannot
+    // create a fleet, and the Deployment page redirects them away.
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
+
+    render(<FleetCardsGrid fleets={[]} filter="" />);
+
+    expect(await screen.findByText(/contact an administrator to set up the first collectors/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /create fleet/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /deploy collectors/i })).not.toBeInTheDocument();
+  });
+
+  it('still shows the no-fleets title in both cases', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
+
+    render(<FleetCardsGrid fleets={[]} filter="" />);
+
+    expect(await screen.findByText(/no fleets yet/i)).toBeInTheDocument();
   });
 });

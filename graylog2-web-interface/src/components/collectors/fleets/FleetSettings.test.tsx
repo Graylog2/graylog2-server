@@ -15,16 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { fireEvent } from '@testing-library/react';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import FleetSettings from './FleetSettings';
 
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
+jest.mock('hooks/useCurrentUser');
 
 describe('FleetSettings telemetry', () => {
   const sendTelemetry = jest.fn();
@@ -39,6 +44,7 @@ describe('FleetSettings telemetry', () => {
 
   beforeEach(() => {
     asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
     sendTelemetry.mockClear();
   });
 
@@ -81,5 +87,54 @@ describe('FleetSettings telemetry', () => {
       'Fleet Deleted',
       expect.objectContaining({ fleet_id: 'f-1', app_action_value: 'fleet-delete' }),
     );
+  });
+});
+
+describe('FleetSettings permissions', () => {
+  const fleet = {
+    id: 'f-1',
+    name: 'web',
+    description: '',
+    target_version: null,
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+  } as never;
+
+  const userWith = (permissions: Array<string>) =>
+    adminUser
+      .toBuilder()
+      .permissions(Immutable.List(permissions as Array<Permission>))
+      .build();
+
+  it('hides the Danger Zone without delete permission', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:edit:f-1']));
+
+    render(<FleetSettings fleet={fleet} onSave={jest.fn()} onDelete={jest.fn()} />);
+
+    expect(screen.queryByRole('button', { name: /delete fleet/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the Danger Zone with delete scoped to this fleet', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:delete:f-1']));
+
+    render(<FleetSettings fleet={fleet} onSave={jest.fn()} onDelete={jest.fn()} />);
+
+    expect(screen.getByRole('button', { name: /delete fleet/i })).toBeInTheDocument();
+  });
+
+  it('hides the save controls without edit permission', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
+
+    render(<FleetSettings fleet={fleet} onSave={jest.fn()} onDelete={jest.fn()} />);
+
+    expect(screen.queryByRole('button', { name: /save changes/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the save controls with edit scoped to this fleet', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:edit:f-1']));
+
+    render(<FleetSettings fleet={fleet} onSave={jest.fn()} onDelete={jest.fn()} />);
+
+    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
   });
 });

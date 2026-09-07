@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
@@ -25,9 +26,14 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
 import { adminUser } from 'fixtures/users';
 import type User from 'logic/users/User';
+import Store from 'logic/local-storage/Store';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/welcome/hooks/useOnboardingEligibility');
+jest.mock('logic/local-storage/Store', () => ({
+  get: jest.fn(),
+  set: jest.fn(),
+}));
 
 const userWithPermissions = (permissions: Array<string>): User =>
   adminUser
@@ -40,6 +46,7 @@ const CONTACT_ADMIN_MESSAGE = /please contact an administrator so they can begin
 beforeEach(() => {
   asMock(useCurrentUser).mockReturnValue(userWithPermissions(['inputs:read']));
   asMock(useOnboardingEligibility).mockReturnValue({ data: { status: 'setup' }, isLoading: false });
+  asMock(Store.get).mockReturnValue(undefined);
 });
 
 describe('OnboardingBanner', () => {
@@ -67,6 +74,26 @@ describe('OnboardingBanner', () => {
 
   it('renders nothing while eligibility is loading', () => {
     asMock(useOnboardingEligibility).mockReturnValue({ data: undefined, isLoading: true });
+
+    render(<OnboardingBanner />);
+
+    expect(screen.queryByText(CONTACT_ADMIN_MESSAGE)).not.toBeInTheDocument();
+  });
+
+  it('allows dismissing the banner, persisting the choice', async () => {
+    render(<OnboardingBanner />);
+
+    const alert = await screen.findByText(CONTACT_ADMIN_MESSAGE);
+    const dismissButton = await screen.findByRole('button', { name: /close alert/i });
+
+    await userEvent.click(dismissButton);
+
+    expect(alert).not.toBeInTheDocument();
+    expect(Store.set).toHaveBeenCalledWith('welcome-onboarding-banner-dismissed', true);
+  });
+
+  it('does not show the banner again if it was already dismissed', () => {
+    asMock(Store.get).mockReturnValue(true);
 
     render(<OnboardingBanner />);
 

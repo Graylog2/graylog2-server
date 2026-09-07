@@ -52,7 +52,7 @@ const defaultConfig: GeoIpConfigType = {
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
 
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('geolocation-processor');
 
   const resetConfig = () => {
     setShowModal(false);
@@ -61,7 +61,6 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   const handleSubmit = (values: GeoIpConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.GEOLOCATION_CONFIGURATION_UPDATED, {
       app_pathname: 'configurations',
-      app_section: 'geolocation-processor',
     });
 
     const normalizedValues = {

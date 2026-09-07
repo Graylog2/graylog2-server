@@ -53,8 +53,8 @@ describe('useCollectorLogPreview', () => {
     const queries = search.queries.toArray();
 
     return {
-      sourceQuery: queries.find((q) => q.query.query_string.includes('NOT collector_receiver_type')),
-      selfQuery: queries.find((q) => !q.query.query_string.includes('NOT collector_receiver_type')),
+      sourceQuery: queries.find((q) => q.query.query_string.includes('NOT agent_receiver_type')),
+      selfQuery: queries.find((q) => !q.query.query_string.includes('NOT agent_receiver_type')),
     };
   };
 
@@ -173,10 +173,10 @@ describe('useCollectorLogPreview', () => {
 
     const queryStrings = queries.map((q) => q.query.query_string);
 
-    expect(queryStrings).toContain('collector_instance_uid:"uid-42"');
-    expect(queryStrings).toContain('collector_instance_uid:"uid-42" AND NOT collector_receiver_type:"collector_log"');
+    expect(queryStrings).toContain('agent_id:"uid-42"');
+    expect(queryStrings).toContain('agent_id:"uid-42" AND NOT agent_receiver_type:"collector_log"');
 
-    const selfQuery = queries.find((q) => q.query.query_string === 'collector_instance_uid:"uid-42"');
+    const selfQuery = queries.find((q) => q.query.query_string === 'agent_id:"uid-42"');
 
     expect(selfQuery.filter.toJS()).toEqual({
       type: 'or',
@@ -238,7 +238,7 @@ describe('useCollectorLogPreview', () => {
     // `SearchType.Fallback`, whose null `filters` makes the search filter normalizer throw and fails
     // the entire search, so this assertion is load-bearing rather than cosmetic.
     expect(aggregation.type).toBe('pivot');
-    expect(aggregation.row_groups).toEqual([{ type: 'values', fields: ['collector_source_id'], limit: 100 }]);
+    expect(aggregation.row_groups).toEqual([{ type: 'values', fields: ['agent_source_id'], limit: 100 }]);
     // A `count` series must carry no field: count(<field>) counts occurrences of that field.
     expect(aggregation.series).toEqual([{ id: 'count()', type: 'count' }]);
   });

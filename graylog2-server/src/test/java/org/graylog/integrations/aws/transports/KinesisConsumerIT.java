@@ -22,6 +22,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.graylog.aws.AWSAsyncProxyConfigurationProvider;
 import org.graylog.aws.AWSProxyConfigurationProvider;
 import org.graylog.integrations.aws.AWSAuthFactory;
+import org.graylog.integrations.aws.AWSAuthorizationFailureDetector;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
@@ -36,12 +37,22 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.core.interceptor.Context;
+import software.amazon.awssdk.core.interceptor.ExecutionAttributes;
+import software.amazon.awssdk.core.interceptor.ExecutionInterceptor;
+import software.amazon.awssdk.core.interceptor.SdkExecutionAttribute;
+import software.amazon.awssdk.http.ExecutableHttpRequest;
+import software.amazon.awssdk.http.HttpExecuteRequest;
+import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.BillingMode;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.KeyType;
 import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 import software.amazon.awssdk.services.kinesis.KinesisClient;
@@ -53,10 +64,16 @@ import software.amazon.kinesis.retrieval.RetrievalConfig;
 import software.amazon.kinesis.retrieval.polling.PollingConfig;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,6 +97,10 @@ class KinesisConsumerIT {
     // KCL derives the lease table name from the application name; sourcing it from production code
     // makes it impossible for the pre-seeded table (below) to drift out of sync with the consumer.
     private static final String LEASE_TABLE = KinesisConsumer.applicationName(STREAM);
+
+    // The two operations AWSAuthorizationFailureDetector watches, as the AWS SDK names them on the wire.
+    private static final String RECORD_FETCH = "GetRecords";
+    private static final String LEASE_DISCOVERY = "Query";
 
     private static final KinesisEmulatorContainer EMULATOR = new KinesisEmulatorContainer();
     private static final String KCL_LOGGER = "software.amazon.kinesis";
@@ -142,6 +163,89 @@ class KinesisConsumerIT {
         }
     }
 
+    /**
+     * The DynamoDB half of what the detector watches. Unlike the record fetch, this IT never issues it: it runs KCL in
+     * 2.x-compatible assignment mode (see {@code customizeSchedulerConfigs}), where the lease discoverer that queries
+     * the lease-owner GSI is not scheduled. So ask the SDK directly what it names the call, and check the detector
+     * spells it the same way - a typo in {@code ESSENTIAL_OPERATIONS} would otherwise leave the reported bug
+     * undetected with every unit test green.
+     */
+    @Test
+    void watchesTheNameTheSdkGivesTheLeaseDiscoveryQuery() {
+        final OperationNameCaptor captor = new OperationNameCaptor();
+        try (DynamoDbClient client = DynamoDbClient.builder()
+                .region(Region.US_EAST_1)
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("test", "test")))
+                // Never used: the captor aborts before the request reaches the HTTP layer. Supplying it keeps this
+                // from building a real connection pool.
+                .httpClient(new UnusedHttpClient())
+                .overrideConfiguration(c -> c.addExecutionInterceptor(captor))
+                .build()) {
+            client.query(r -> r.tableName(LEASE_TABLE));
+        } catch (Exception ignored) {
+            // Expected: the captor aborts the execution on purpose.
+        }
+
+        assertThat(captor.operation).isEqualTo(LEASE_DISCOVERY);
+        assertThat(watchedByDetector(captor.operation))
+                .as("AWSAuthorizationFailureDetector must treat %s as essential", captor.operation)
+                .isTrue();
+    }
+
+    /**
+     * Whether the detector reports an operation as unrecoverable once denials of it span its threshold. Drives the real
+     * interceptor hook against a controllable clock, so no wall-clock time passes.
+     */
+    private static boolean watchedByDetector(String operation) {
+        final List<Throwable> reported = new ArrayList<>();
+        final AtomicLong clock = new AtomicLong();
+        final AWSAuthorizationFailureDetector detector =
+                new AWSAuthorizationFailureDetector(reported::add, clock::get);
+        final DynamoDbException denial = (DynamoDbException) DynamoDbException.builder()
+                .awsErrorDetails(AwsErrorDetails.builder()
+                        .errorCode("AccessDeniedException")
+                        .errorMessage("not authorized to perform: " + operation)
+                        .build())
+                .message("not authorized")
+                .build();
+        final Context.FailedExecution failedExecution = mock(Context.FailedExecution.class);
+        when(failedExecution.exception()).thenReturn(denial);
+        final ExecutionAttributes attributes =
+                new ExecutionAttributes().putAttribute(SdkExecutionAttribute.OPERATION_NAME, operation);
+
+        detector.onExecutionFailure(failedExecution, attributes);
+        clock.addAndGet(Duration.ofMinutes(3).toNanos());
+        detector.onExecutionFailure(failedExecution, attributes);
+
+        return !reported.isEmpty();
+    }
+
+    private static final class OperationNameCaptor implements ExecutionInterceptor {
+        private String operation;
+
+        @Override
+        public void beforeExecution(Context.BeforeExecution context, ExecutionAttributes executionAttributes) {
+            operation = executionAttributes.getAttribute(SdkExecutionAttribute.OPERATION_NAME);
+            throw new UnsupportedOperationException("Operation name captured; no request needed.");
+        }
+    }
+
+    private static final class UnusedHttpClient implements SdkHttpClient {
+        @Override
+        public ExecutableHttpRequest prepareRequest(HttpExecuteRequest request) {
+            throw new UnsupportedOperationException("No request should reach the HTTP layer.");
+        }
+
+        @Override
+        public String clientName() {
+            return "unused";
+        }
+
+        @Override
+        public void close() {
+        }
+    }
+
     @AfterAll
     static void tearDown() {
         Configurator.setLevel(KCL_LOGGER, previousKclLogLevel);
@@ -182,6 +286,9 @@ class KinesisConsumerIT {
         // comes from the TaskExecutionListener on any failed KCL task, which KCL retries — record it
         // only as diagnostic context. The 3-arg setFailing() comes from
         // onAllInitializationAttemptsFailed, which is terminal — abort on it.
+        // Written from KCL's retrieval threads, read by the assertion below.
+        final Set<String> observedKinesisOperations = ConcurrentHashMap.newKeySet();
+
         final AtomicReference<String> lastTaskFailure = new AtomicReference<>();
         final InputFailureRecorder failureRecorder = mock(InputFailureRecorder.class);
         doAnswer(invocation -> {
@@ -194,6 +301,15 @@ class KinesisConsumerIT {
                     cause != null ? cause : new RuntimeException(invocation.getArgument(1, String.class)));
             return null;
         }).when(failureRecorder).setFailing(any(), anyString(), any());
+        // setTerminallyFailing() is the other terminal signal (an unrecoverable AWS authorization denial). Without
+        // this stub such a failure would be swallowed and the test would block until its deadline instead of
+        // reporting the cause.
+        doAnswer(invocation -> {
+            final Throwable cause = invocation.getArgument(2, Throwable.class);
+            consumerFailure.compareAndSet(null,
+                    cause != null ? cause : new RuntimeException(invocation.getArgument(1, String.class)));
+            return null;
+        }).when(failureRecorder).setTerminallyFailing(any(), anyString(), any());
 
         // Anonymous subclass tunes KCL's coordination timings, which default to production
         // values (10s failover, 10s shard polling, LATEST initial position) that would make
@@ -209,7 +325,29 @@ class KinesisConsumerIT {
                 request,
                 clientBuilderUtil,
                 failureRecorder,
-                false) {
+                false,
+                System::nanoTime) {
+            // Records the operation names KCL actually asks the Kinesis client for. The detector watches GetRecords by
+            // name, so if a KCL upgrade switched the read path (to enhanced fan-out's SubscribeToShard, say) the watch
+            // would go inert with every unit test still green.
+            @Override
+            ClientBuilders createClientBuilders(Region region, AwsCredentialsProvider credentialsProvider) {
+                final ClientBuilders builders = super.createClientBuilders(region, credentialsProvider);
+                // Compose onto the existing override configuration rather than passing a Consumer: the Consumer form
+                // starts from a fresh builder and would drop the authorization-failure detector added above.
+                builders.kinesis().overrideConfiguration(builders.kinesis().overrideConfiguration().toBuilder()
+                        .addExecutionInterceptor(new ExecutionInterceptor() {
+                            @Override
+                            public void beforeExecution(Context.BeforeExecution context,
+                                                        ExecutionAttributes executionAttributes) {
+                                observedKinesisOperations.add(
+                                        executionAttributes.getAttribute(SdkExecutionAttribute.OPERATION_NAME));
+                            }
+                        })
+                        .build());
+                return builders;
+            }
+
             @Override
             void customizeSchedulerConfigs(CoordinatorConfig coordinatorConfig,
                                            LeaseManagementConfig leaseManagementConfig,
@@ -266,6 +404,15 @@ class KinesisConsumerIT {
                             + (taskFailure == null ? "" : "; last transient KCL task failure: " + taskFailure))
                     .isNotNull();
             assertThat(new String(message.getPayload(), StandardCharsets.UTF_8)).contains(TEST_MESSAGE);
+            // A record arrived, so the read path ran and these are the names the real SDK gave the calls KCL made.
+            // Both halves matter: the first fails if a KCL upgrade moves the read path off GetRecords, the second if
+            // the detector's ESSENTIAL_OPERATIONS no longer spells it the way the SDK does.
+            assertThat(observedKinesisOperations)
+                    .as("KCL must fetch records through the operation the detector watches")
+                    .contains(RECORD_FETCH);
+            assertThat(watchedByDetector(RECORD_FETCH))
+                    .as("AWSAuthorizationFailureDetector must treat %s as essential", RECORD_FETCH)
+                    .isTrue();
         } finally {
             // Expect a few benign "LeaderDecider uninitialized" ERROR logs here: KCL's graceful
             // shutdown tears down its migration components before the worker loop exits, and each

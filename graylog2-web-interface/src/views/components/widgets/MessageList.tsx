@@ -38,7 +38,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useSearchResult from 'views/hooks/useSearchResult';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useMessageListPluggableBulkActions from 'views/components/widgets/useMessageListPluggableBulkActions';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 import MessageTableSelectedEntitiesProvider from './MessageTableSelectedEntitiesProvider';
@@ -143,7 +143,7 @@ const MessageList = ({
   editing,
 }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
   const { pluggableBulkActions, pluggableBulkActionModals } = useMessageListPluggableBulkActions();
   const { stopAutoRefresh } = useAutoRefresh();
 

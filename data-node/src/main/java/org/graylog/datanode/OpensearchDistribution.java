@@ -18,7 +18,6 @@ package org.graylog.datanode;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import org.apache.commons.exec.OS;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
 
 import javax.annotation.Nullable;
@@ -63,11 +62,7 @@ public class OpensearchDistribution {
     }
 
     public Path getOpensearchJavaHome() {
-        if (OS.isFamilyMac()) {
-            return directory.resolve("jdk-mac");
-        } else {
-            return directory.resolve("jdk");
-        }
+        return directory.resolve("jdk");
     }
 
     public OpensearchDistributionProperties distributionProperties() {

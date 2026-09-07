@@ -77,6 +77,34 @@ class OpensearchDataDirCompatibilityServiceTest {
     }
 
     /**
+     * Elasticsearch 7.x wrote the same Lucene 8 segments as opensearch 1.x, so its data is one generation behind the
+     * compatibility distribution and perfectly usable — even though 7 and 2 are five major versions apart. This is
+     * the in-place migration from an elasticsearch cluster.
+     */
+    @Test
+    void testElasticsearch7DataIsCompatibleWithTheCompatDistribution() throws URISyntaxException {
+        final OpensearchDataDirCompatibility compatibility = serviceFor(fixture("elasticsearch7"), "2.19.0").check();
+
+        Assertions.assertThat(compatibility.requiredDistribution()).isEqualTo(RequiredOpensearchDistribution.COMPAT);
+        Assertions.assertThat(compatibility.errors()).isEmpty();
+        Assertions.assertThat(compatibility.isCompatible()).isTrue();
+    }
+
+    /**
+     * Two generations ahead of the data: opensearch 3.x dropped the Lucene 8 format, so elasticsearch 7 data is an
+     * error there.
+     */
+    @Test
+    void testElasticsearch7DataIsNotCompatibleWithTheCurrentDistribution() throws URISyntaxException {
+        final OpensearchDataDirCompatibility compatibility = serviceFor(fixture("elasticsearch7"), "3.5.0").check();
+
+        Assertions.assertThat(compatibility.isCompatible()).isFalse();
+        Assertions.assertThat(compatibility.errors())
+                .anySatisfy(error -> Assertions.assertThat(error)
+                        .isEqualTo("Current version 3.5.0 of Opensearch is not compatible with index version 7.10.0"));
+    }
+
+    /**
      * Elasticsearch 6 wrote Lucene 7 segments, out of reach for both distributions, so this is the case that does produce
      * an error.
      */

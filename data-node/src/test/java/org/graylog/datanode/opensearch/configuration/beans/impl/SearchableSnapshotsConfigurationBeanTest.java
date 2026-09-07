@@ -80,7 +80,7 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     private DatanodeConfiguration datanodeConfiguration(Path tempDir) {
-        return new DatanodeConfiguration(new OpensearchDistribution(tempDir, "2.19.5"), new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), 100, IndexerJwtAuthToken.disabled());
+        return new DatanodeConfiguration(new OpensearchDistribution(tempDir, "2.19.6"), new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), 100, IndexerJwtAuthToken.disabled());
     }
 
     @Test

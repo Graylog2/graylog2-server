@@ -212,6 +212,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @VisibleForTesting
     void checkConfiguredHeap() {
+        if (!configuration.isOpensearchHeapSizeWarningEnabled()) {
+            return;
+        }
         Size heap = Size.parse(configuration.getOpensearchHeap());
         long heapBytes = heap.toBytes();
         final MemoryValues memoryValues = getContainerMemory().orElseGet(() -> {

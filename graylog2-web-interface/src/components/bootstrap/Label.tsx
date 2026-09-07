@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Badge from './Badge';
+import type { BadgeProps } from './Badge';
 
-const Label = styled(Badge)(
+const StyledBadge = styled(Badge)(
   ({ theme }) => css`
     border-radius: 3px;
     font-weight: normal;
@@ -43,6 +45,56 @@ const Label = styled(Badge)(
       white-space: nowrap;
     }
   `,
+);
+
+type Props = Pick<
+  BadgeProps,
+  | 'aria-label'
+  | 'bsSize'
+  | 'bsStyle'
+  | 'children'
+  | 'className'
+  | 'data-testid'
+  | 'onClick'
+  | 'onMouseEnter'
+  | 'onMouseLeave'
+  | 'role'
+  | 'style'
+  | 'title'
+  | 'uppercase'
+>;
+
+/** Plain legacy status label — small pill shape, bsStyle-only. Use Badge for the color/variant/dot API. */
+const Label = ({
+  'aria-label': ariaLabel = undefined,
+  bsSize = undefined,
+  bsStyle = undefined,
+  className = undefined,
+  children = undefined,
+  'data-testid': dataTestid = undefined,
+  onClick = undefined,
+  onMouseEnter = undefined,
+  onMouseLeave = undefined,
+  role = undefined,
+  style = undefined,
+  title = undefined,
+  uppercase = false,
+}: Props) => (
+  <StyledBadge
+    aria-label={ariaLabel}
+    bsSize={bsSize}
+    bsStyle={bsStyle}
+    className={className}
+    data-testid={dataTestid}
+    onClick={onClick}
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+    role={role}
+    style={style}
+    title={title}
+    uppercase={uppercase}>
+    {children}
+  </StyledBadge>
 );
 
 export default Label;

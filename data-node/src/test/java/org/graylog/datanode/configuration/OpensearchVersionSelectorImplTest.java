@@ -113,6 +113,22 @@ class OpensearchVersionSelectorImplTest {
     }
 
     /**
+     * In-place migration from an elasticsearch 7.x cluster. Its Lucene 8 data belongs to the opensearch 1.x
+     * generation, so the compatibility distribution can adopt it and the current one cannot.
+     */
+    @Test
+    void testElasticsearch7DataIsAdoptedByTheCompatDistribution() throws URISyntaxException {
+        Assertions.assertThat(select(fixture("elasticsearch7"), null, false).version()).isEqualTo(COMPAT);
+    }
+
+    @Test
+    void testRecordedCurrentVersionCannotOpenElasticsearch7Data() throws URISyntaxException {
+        Assertions.assertThatThrownBy(() -> select(fixture("elasticsearch7"), CURRENT, false))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("cannot open the data directory");
+    }
+
+    /**
      * In-place migration from a current-generation cluster: the data was written by 3.x and has no recorded version.
      * The compatibility distribution cannot read it, so "stay on the oldest" must not apply here.
      */

@@ -28,8 +28,6 @@ import Spinner from 'components/common/Spinner';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlAllowListForm from 'components/configurations/UrlAllowListForm';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useProductName from 'brand-customization/useProductName';
 
@@ -41,8 +39,7 @@ const UrlAllowListConfig = () => {
   const [formConfig, setFormConfig] = useState<AllowListConfig | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);
 
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('urlallowlist');
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.URL_ALLOWLIST_CONFIG).then(() => {
@@ -78,8 +75,6 @@ const UrlAllowListConfig = () => {
 
   const saveConfig = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.URL_ALLOW_LIST_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'urlallowlist',
       app_action_value: 'configuration-save',
     });
 
@@ -97,7 +92,7 @@ const UrlAllowListConfig = () => {
     return <Spinner />;
   }
 
-  const { entries, disabled, enforce_for_notifications: enforceForNotifications } = formConfig;
+  const { entries, disabled } = formConfig;
 
   return (
     <div>
@@ -108,15 +103,6 @@ const UrlAllowListConfig = () => {
         the {productName} servers, they might be able to reach more sensitive systems than an external user would have
         access to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others.
         Allowlist administrative access is separate from data adapters and event notification configuration.
-      </p>
-      <p>
-        <b>Enforce for Slack &amp; Teams notifications</b>{' '}
-        <small className="text-muted">{enforceForNotifications ? '(Enabled)' : '(Disabled)'}</small>
-        <br />
-        <small>
-          When enabled, Slack and Microsoft Teams notifications will fail if their webhook URL is not in the URL
-          allowlist. When disabled, a warning is logged instead.
-        </small>
       </p>
       <Table bordered condensed className="top-margin">
         <thead>
@@ -144,12 +130,7 @@ const UrlAllowListConfig = () => {
           submitButtonDisabled={!isValid}
           submitButtonText="Update configuration">
           <h3>Allowlist URLs</h3>
-          <UrlAllowListForm
-            urls={entries}
-            disabled={disabled}
-            enforceForNotifications={enforceForNotifications}
-            onUpdate={update}
-          />
+          <UrlAllowListForm urls={entries} disabled={disabled} onUpdate={update} />
         </BootstrapModalForm>
       )}
     </div>

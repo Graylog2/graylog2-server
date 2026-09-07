@@ -153,7 +153,9 @@ public class McpRestResource extends RestResource {
             if (result.isPresent() && LOG.isTraceEnabled()) {
                 LOG.trace("Successfully handled JSON-RPC request: {}", result.get());
             }
-            return Response.ok(new McpSchema.JSONRPCResponse("2.0", id, result.orElse(null), null))
+            // Empty result (e.g. ping): substitute an empty map; both the MCP spec and JSONRPCResponse require a result
+            final Object responseResult = result.isPresent() ? result.get() : Map.of();
+            return Response.ok(new McpSchema.JSONRPCResponse("2.0", id, responseResult, null))
                     .header(HEADER_MCP_SESSION_ID, sessionId)
                     .build();
         } catch (McpError e) {

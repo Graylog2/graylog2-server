@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
 
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
 import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
-import { memoryRouterFuture } from './reactRouterFutureFlags';
 
 type Props = {
   children: React.ReactElement;
@@ -30,9 +28,7 @@ type Props = {
 const PreflightWrappingContainer = ({ children }: Props) => (
   <PreflightThemeProvider>
     <DefaultQueryClientProvider>
-      <MemoryRouter future={memoryRouterFuture}>
-        <ThemeWrapper>{children}</ThemeWrapper>
-      </MemoryRouter>
+      <ThemeWrapper>{children}</ThemeWrapper>
     </DefaultQueryClientProvider>
   </PreflightThemeProvider>
 );

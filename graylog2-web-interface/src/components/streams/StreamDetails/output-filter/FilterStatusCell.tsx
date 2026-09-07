@@ -15,17 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import { Label } from 'components/bootstrap';
+import { Badge } from 'components/bootstrap';
 
 import type { StreamOutputFilterRule } from './Types';
-
-const StatusLabel = styled(Label)<{ $clickable: boolean }>(
-  ({ $clickable }) => css`
-    cursor: ${$clickable ? 'pointer' : 'default'};
-  `,
-);
 
 type Props = {
   filterOutputRule: StreamOutputFilterRule;
@@ -36,14 +29,9 @@ const FilterStatusCell = ({ filterOutputRule }: Props) => {
   const title = isEnabled ? 'Enabled' : 'Disabled';
 
   return (
-    <StatusLabel
-      bsStyle={isEnabled ? 'success' : 'warning'}
-      title={title}
-      aria-label={title}
-      role="button"
-      $clickable={false}>
+    <Badge color={isEnabled ? 'success' : 'warning'} variant="light" title={title} aria-label={title}>
       {title}
-    </StatusLabel>
+    </Badge>
   );
 };
 

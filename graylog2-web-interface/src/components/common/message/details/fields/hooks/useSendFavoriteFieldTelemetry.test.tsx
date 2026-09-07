@@ -44,8 +44,8 @@ describe('useSendFavoriteFieldTelemetry', () => {
 
     result.current('TOGGLED', { app_action_value: 'add' });
 
+    expect(useSendTelemetry).toHaveBeenCalledWith('MESSAGES');
     expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED, {
-      app_section: 'MESSAGES',
       app_action_value: 'add',
     });
   });
@@ -57,8 +57,8 @@ describe('useSendFavoriteFieldTelemetry', () => {
 
     result.current('TOGGLED', { app_action_value: 'remove' });
 
+    expect(useSendTelemetry).toHaveBeenCalledWith('permalink');
     expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED, {
-      app_section: 'permalink',
       app_action_value: 'remove',
     });
   });
@@ -72,9 +72,8 @@ describe('useSendFavoriteFieldTelemetry', () => {
 
     result.current('EDIT_SAVED');
 
-    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.EDIT_SAVED, {
-      app_section: 'AGGREGATION',
-    });
+    expect(useSendTelemetry).toHaveBeenCalledWith('AGGREGATION');
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.EDIT_SAVED, {});
   });
 
   it('should handle missing widget context gracefully (permalink scenario)', () => {
@@ -86,8 +85,8 @@ describe('useSendFavoriteFieldTelemetry', () => {
       result.current('TOGGLED', { app_action_value: 'add' });
     }).not.toThrow();
 
+    expect(useSendTelemetry).toHaveBeenCalledWith('permalink');
     expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED, {
-      app_section: 'permalink',
       app_action_value: 'add',
     });
   });

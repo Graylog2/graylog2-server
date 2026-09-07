@@ -68,17 +68,29 @@ const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => 
   }
 };
 
+// An empty list of streams results in the same request as no streams at all, so both need to end up with the
+// same query key. Otherwise we would keep two cache entries around and issue two identical requests for them.
+const normalizeStreams = (streams: Array<string>) => (streams?.length > 0 ? streams : undefined);
+
+type RefetchOptions = { cancelRefetch?: boolean };
+
 const useFieldTypes = (
   streams: Array<string>,
   timerange: TimeRange,
   enabled: boolean = true,
-): { data: FieldTypeMapping[]; refetch: () => void; isLoading?: boolean; isFetching?: boolean } => {
+): {
+  data: FieldTypeMapping[];
+  refetch: (options?: RefetchOptions) => void;
+  isLoading?: boolean;
+  isFetching?: boolean;
+} => {
   const { userTimezone } = useUserDateTime();
   const _timerange = useMemo(() => normalizeTimeRange(timerange, userTimezone), [timerange, userTimezone]);
+  const _streams = useMemo(() => normalizeStreams(streams), [streams]);
 
   return useQuery({
-    queryKey: ['fieldTypes', streams, _timerange],
-    queryFn: () => fetchAllFieldTypes(streams, _timerange),
+    queryKey: ['fieldTypes', _streams, _timerange],
+    queryFn: () => fetchAllFieldTypes(_streams, _timerange),
     staleTime: 30000,
     refetchOnWindowFocus: false,
     gcTime: 0,

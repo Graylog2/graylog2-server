@@ -42,8 +42,19 @@ const InstallStep = ({ token, platformId, onPlatformChange }: Props) => {
     return <MutedText>Generate a token above to see the install command.</MutedText>;
   }
 
+  const handlePlatformChange = (value: string | null) => {
+    if (!value) return;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.PLATFORM_SELECTED, {
+      app_action_value: 'deployment-platform',
+      platform: value,
+    });
+
+    onPlatformChange(value as PlatformId);
+  };
+
   return (
-    <Tabs value={platformId} onChange={(value) => value && onPlatformChange(value as PlatformId)}>
+    <Tabs value={platformId} onChange={handlePlatformChange}>
       <Tabs.List>
         {PLATFORMS.map((platform) => (
           <Tabs.Tab key={platform.id} value={platform.id}>
@@ -57,6 +68,12 @@ const InstallStep = ({ token, platformId, onPlatformChange }: Props) => {
             command={platform.commandTemplate(enrollEndpointUrl(), token.token)}
             platformLabel={platform.label}
             tokenDuration={token.expiresIn}
+            onCopySuccess={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTALL.COMMAND_COPIED, {
+                app_action_value: 'deployment-copy-command',
+                platform: platform.id,
+              })
+            }
             actions={
               <ClipboardButton
                 text={token.token}

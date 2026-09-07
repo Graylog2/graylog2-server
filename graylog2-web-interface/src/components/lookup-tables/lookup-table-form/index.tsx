@@ -73,7 +73,7 @@ function LookupTableWizard() {
   const initialValues = useMemo(() => lookupTable || INIT_TABLE_VALUES, [lookupTable]);
   const [steps, { activeStep, setActiveStep }] = useSteps();
   const { push } = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('lookup_table');
   const { createLookupTable, creatingLookupTable } = useCreateLookupTable();
   const { updateLookupTable, updatingLookupTable } = useUpdateLookupTable();
 
@@ -94,7 +94,6 @@ function LookupTableWizard() {
     return promise.then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[isCreate ? 'CREATED' : 'UPDATED'], {
         app_pathname: 'lut',
-        app_section: 'lookup_table',
         event_details: {
           lookup_table_name: values.name,
         },

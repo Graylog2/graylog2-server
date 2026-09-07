@@ -21,8 +21,6 @@ import { useFormikContext } from 'formik';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import RefreshControls from 'components/common/RefreshControls';
@@ -45,8 +43,7 @@ type Props = {
 
 const ViewsRefreshControls = ({ disable = false }: Props) => {
   const { dirty, submitForm } = useFormikContext();
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
   const { config } = useSearchConfiguration();
   const autoRefreshTimerangeOptions = config?.auto_refresh_timerange_options;
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
@@ -57,8 +54,6 @@ const ViewsRefreshControls = ({ disable = false }: Props) => {
   const onSelectInterval = useCallback(
     (interval: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
-        app_section: 'search-bar',
         app_action_value: 'refresh-search-control-dropdown',
         event_details: { interval: interval },
       });
@@ -67,14 +62,13 @@ const ViewsRefreshControls = ({ disable = false }: Props) => {
         submitForm();
       }
     },
-    [dirty, location.pathname, sendTelemetry, submitForm],
+    [dirty, sendTelemetry, submitForm],
   );
 
   const onToggle = useCallback(
     (enabled: boolean) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
         app_pathname: 'search',
-        app_section: 'search-bar',
         app_action_value: 'refresh-search-control-enable',
         event_details: { enabled },
       });
