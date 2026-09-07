@@ -104,4 +104,12 @@ public class ProxyConfigTest {
 
         assertThat(config.port(80, 443)).isEqualTo(443);
     }
+
+    @Test
+    public void endpointOmitsThePortWhenNoneIsConfigured() {
+        final ProxyConfig config = new ProxyConfig(URI.create("http://proxy.example.com"));
+
+        assertThat(config.endpoint()).isEqualTo(URI.create("http://proxy.example.com"));
+        assertThat(config.endpoint().getHost()).isEqualTo("proxy.example.com");
+    }
 }

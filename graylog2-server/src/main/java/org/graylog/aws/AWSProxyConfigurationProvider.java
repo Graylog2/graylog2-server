@@ -27,10 +27,6 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.http.apache.ProxyConfiguration;
 
-import java.net.URI;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 @Singleton
 public class AWSProxyConfigurationProvider implements Provider<ApacheHttpClient.Builder> {
     private static final Logger LOG = LoggerFactory.getLogger(AWSProxyConfigurationProvider.class);
@@ -55,12 +51,8 @@ public class AWSProxyConfigurationProvider implements Provider<ApacheHttpClient.
     }
 
     static ProxyConfiguration buildProxyConfiguration(ProxyConfig proxyConfig) {
-        // When port is -1 (not specified), don't include it in the endpoint URI
-        final URI endpoint = proxyConfig.port() >= 0
-                ? proxyConfig.endpoint()
-                : URI.create(f("%s://%s", proxyConfig.scheme(), proxyConfig.host()));
         final ProxyConfiguration.Builder proxyConfigBuilder = ProxyConfiguration.builder()
-                .endpoint(endpoint);
+                .endpoint(proxyConfig.endpoint());
         proxyConfig.credentials().ifPresent(credentials ->
                 proxyConfigBuilder.username(credentials.username()).password(credentials.password()));
         return proxyConfigBuilder.build();

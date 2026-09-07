@@ -62,7 +62,9 @@ public record ProxyConfig(URI uri) {
      * URI that carries credentials in this position and require them supplied separately.
      */
     public URI endpoint() {
-        return URI.create(f("%s://%s:%d", scheme(), host(), port()));
+        return port() >= 0
+                ? URI.create(f("%s://%s:%d", scheme(), host(), port()))
+                : URI.create(f("%s://%s", scheme(), host()));
     }
 
     public Optional<Credentials> credentials() {
