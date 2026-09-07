@@ -51,7 +51,7 @@ const DisabledHint = styled.p(
 
 const ActionsRow = styled(Row)(
   ({ theme }) => css`
-    margin-top: ${theme.spacings.md};
+    margin-top: ${theme.spacings.lg};
   `,
 );
 
@@ -72,7 +72,7 @@ const HelpText = styled.div(
 
 const TableContainer = styled.div(
   ({ theme }) => css`
-    margin-top: ${theme.spacings.sm};
+    margin-top: ${theme.spacings.lg};
   `,
 );
 
