@@ -53,6 +53,11 @@ public record ProxyConfig(URI uri) {
         return uri.getPort();
     }
 
+    public int port(int httpDefault, int httpsDefault) {
+        final int port = port();
+        return port >= 0 ? port : ("https".equalsIgnoreCase(scheme()) ? httpsDefault : httpDefault);
+    }
+
     public String scheme() {
         return uri.getScheme();
     }

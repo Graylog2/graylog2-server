@@ -93,4 +93,25 @@ public class ProxyConfigTest {
 
         assertThat(config.credentials()).contains(new ProxyConfig.Credentials("", ""));
     }
+
+    @Test
+    public void portWithDefaultsReturnsTheExplicitPortWhenPresent() {
+        final ProxyConfig config = new ProxyConfig(URI.create("http://proxy.example.com:8123"));
+
+        assertThat(config.port(80, 443)).isEqualTo(8123);
+    }
+
+    @Test
+    public void portWithDefaultsFallsBackToTheHttpDefaultForHttpWithNoPort() {
+        final ProxyConfig config = new ProxyConfig(URI.create("http://proxy.example.com"));
+
+        assertThat(config.port(80, 443)).isEqualTo(80);
+    }
+
+    @Test
+    public void portWithDefaultsFallsBackToTheHttpsDefaultForHttpsWithNoPort() {
+        final ProxyConfig config = new ProxyConfig(URI.create("https://proxy.example.com"));
+
+        assertThat(config.port(80, 443)).isEqualTo(443);
+    }
 }
