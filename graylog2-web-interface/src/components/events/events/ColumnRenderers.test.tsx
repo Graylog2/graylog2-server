@@ -19,10 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { TagsRenderer } from 'components/events/events/ColumnRenderers';
 
-jest.mock('components/common/EntityFilters/hooks/useUrlQueryFilters', () => () => [
-  { get: () => [] },
-  jest.fn(),
-]);
+jest.mock('components/common/EntityFilters/hooks/useUrlQueryFilters', () => () => [{ get: () => [] }, jest.fn()]);
 
 describe('TagsRenderer', () => {
   it('renders tag chips as clickable buttons by default', () => {
