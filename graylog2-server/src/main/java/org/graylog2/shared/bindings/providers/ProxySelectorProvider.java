@@ -44,9 +44,9 @@ public class ProxySelectorProvider implements Provider<ProxySelector> {
     protected final ProxyHostsPattern nonProxyHostsPattern;
 
     @Inject
-    public ProxySelectorProvider(@Named("http_proxy_uri") @Nullable URI httpProxyUri,
+    public ProxySelectorProvider(@Named("http_proxy_uri") @Nullable ProxyConfig httpProxyConfig,
                                  @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern) {
-        this.proxyConfig = ProxyConfig.from(httpProxyUri);
+        this.proxyConfig = Optional.ofNullable(httpProxyConfig);
         this.nonProxyHostsPattern = nonProxyHostsPattern;
     }
 
