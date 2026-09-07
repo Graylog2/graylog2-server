@@ -278,37 +278,9 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         return searchFilters.stream().map(sf -> sf instanceof ReferencedSearchFilter rsf ? rsf.stripToId() : sf).toList();
     }
 
-    private ViewStateDTO fixStateForReferencedFilters(final ViewStateDTO stateDTO) {
-        return stateDTO.toBuilder()
-                .widgets(stateDTO.widgets().stream()
-                        .map(widgetDTO ->
-                                widgetDTO.toBuilder()
-                                        .filters(cleanReferencedSearchFilters(widgetDTO.filters()))
-                                        .build()
-                        )
-                        .collect(Collectors.toSet()))
-                .build();
-    }
-
-    private ViewDTO fixReferencedSearchFilters(ViewDTO dto) {
-        return dto.toBuilder()
-                .state(dto.state().entrySet().stream()
-                        .map(
-                                entry -> new AbstractMap.SimpleEntry<>(
-                                        entry.getKey(),
-                                        fixStateForReferencedFilters(entry.getValue())
-                                )
-                        )
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue
-                        )))
-                .build();
-    }
-
     private ViewDTO createView(CreateEntityRequest<ViewDTO> createEntityRequest, UserContext userContext, SearchUser searchUser) {
         final ViewDTO originalDto = createEntityRequest.entity();
-        final ViewDTO dto = fixReferencedSearchFilters(originalDto);
+        final ViewDTO dto = ViewService.fixReferencedSearchFilters(originalDto, this::cleanReferencedSearchFilters);
 
         if (!searchUser.canCreateView(dto)) {
             throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
@@ -443,7 +415,7 @@ public class ViewsResource extends RestResourceWithOwnerCheck implements PluginR
         }
 
         final ViewDTO originalDto = createEntityRequest.entity();
-        final ViewDTO dto = fixReferencedSearchFilters(originalDto);
+        final ViewDTO dto = ViewService.fixReferencedSearchFilters(originalDto, this::cleanReferencedSearchFilters);
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
         validateDto(updatedDTO, searchUser);
 

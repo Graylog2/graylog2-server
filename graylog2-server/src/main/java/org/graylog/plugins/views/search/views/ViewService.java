@@ -27,6 +27,7 @@ import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -277,36 +279,44 @@ public class ViewService implements ViewUtils<ViewDTO> {
                 .rebuildRequirements(ViewDTO::requires, (v, newRequirements) -> v.toBuilder().requires(newRequirements).build());
     }
 
-    private ViewDTO getViewWithRefetchedFilters(final ViewDTO viewDTO) {
-        if (searchFiltersRefetchNeeded(viewDTO)) {
-            return viewDTO.toBuilder()
-                    .state(viewDTO.state().entrySet().stream()
-                            .map(
-                                    entry -> new AbstractMap.SimpleEntry<>(
-                                            entry.getKey(),
-                                            getStateWithRefetchedFilters(entry.getValue())
-                                    )
-                            )
-                            .collect(Collectors.toMap(
-                                    Map.Entry::getKey,
-                                    Map.Entry::getValue
-                            )))
-                    .build();
-        } else {
-            return viewDTO;
-        }
+    public static ViewDTO fixReferencedSearchFilters(ViewDTO dto, Function<List<UsedSearchFilter>, List<UsedSearchFilter>> converter) {
+        return dto.toBuilder()
+                .state(dto.state().entrySet().stream()
+                        .map(
+                                entry -> new AbstractMap.SimpleEntry<>(
+                                        entry.getKey(),
+                                        fixStateForReferencedFilters(entry.getValue(), converter)
+                                )
+                        )
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                        )))
+                .build();
     }
 
-    private ViewStateDTO getStateWithRefetchedFilters(final ViewStateDTO stateDTO) {
+    private static ViewStateDTO fixStateForReferencedFilters(final ViewStateDTO stateDTO, Function<List<UsedSearchFilter>, List<UsedSearchFilter>> converter) {
         return stateDTO.toBuilder()
                 .widgets(stateDTO.widgets().stream()
                         .map(widgetDTO ->
                                 widgetDTO.toBuilder()
-                                        .filters(searchFiltersRefetcher.reFetch(widgetDTO.filters()))
+                                        .filters(converter.apply(widgetDTO.filters()))
                                         .build()
                         )
                         .collect(Collectors.toSet()))
                 .build();
+    }
+
+    private List<UsedSearchFilter> refetch(List<UsedSearchFilter> filters) {
+        return searchFiltersRefetcher.reFetch(filters);
+    }
+
+    private ViewDTO getViewWithRefetchedFilters(final ViewDTO viewDTO) {
+        if (searchFiltersRefetchNeeded(viewDTO)) {
+            return fixReferencedSearchFilters(viewDTO, this::refetch);
+        } else {
+            return viewDTO;
+        }
     }
 
     private boolean searchFiltersRefetchNeeded(final ViewDTO viewDTO) {
