@@ -31,11 +31,13 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
+import org.graylog2.utilities.ProxyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -99,8 +101,9 @@ public class AWSInstanceNameLookupProcessor implements MessageProcessor {
 
                     LOG.debug("Refreshing AWS instance lookup table.");
 
-                    final HttpUrl proxyUrl = config.proxyEnabled() && configuration.getHttpProxyUri() != null
-                            ? HttpUrl.get(configuration.getHttpProxyUri()) : null;
+                    final Optional<ProxyConfig> proxyConfig = configuration.getHttpProxyConfig();
+                    final HttpUrl proxyUrl = config.proxyEnabled() && proxyConfig.isPresent()
+                            ? HttpUrl.get(proxyConfig.get().uri()) : null;
 
                     table.reload(
                             config.getLookupRegions(),
