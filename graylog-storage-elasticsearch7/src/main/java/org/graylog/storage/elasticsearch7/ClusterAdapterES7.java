@@ -392,7 +392,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         } catch (TimeoutException e) {
             // Logged explicitly: a TimeoutException carries no message, so the generic handler would log "null".
             cancellable.cancel();
-            LOG.warn("Search cluster did not answer the health request within {}; treating it as unreachable.", timeout);
+            LOG.warn("Search cluster did not answer the health request within {}ms; treating it as unreachable.", timeout.toMillis());
             return Optional.empty();
         } catch (InterruptedException e) {
             cancellable.cancel();
