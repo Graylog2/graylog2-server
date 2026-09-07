@@ -16,6 +16,7 @@
  */
 package org.graylog.aws;
 
+import org.graylog2.utilities.ProxyConfig;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.http.apache.ProxyConfiguration;
 
@@ -30,7 +31,7 @@ public class AWSProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithoutCredentials() {
-        URI proxyUri = URI.create("http://proxy.example.com:8080");
+        ProxyConfig proxyUri = new ProxyConfig(URI.create("http://proxy.example.com:8080"));
 
         ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -42,7 +43,7 @@ public class AWSProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithCredentials() {
-        URI proxyUri = URI.create("http://user:pass@proxy.example.com:8080");
+        ProxyConfig proxyUri = new ProxyConfig(URI.create("http://user:pass@proxy.example.com:8080"));
 
         ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -54,7 +55,7 @@ public class AWSProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithUsernameOnly() {
-        URI proxyUri = URI.create("http://user@proxy.example.com:8080");
+        ProxyConfig proxyUri = new ProxyConfig(URI.create("http://user@proxy.example.com:8080"));
 
         ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -66,7 +67,7 @@ public class AWSProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithHttpsScheme() {
-        URI proxyUri = URI.create("https://admin:secret@secure-proxy.example.com:443");
+        ProxyConfig proxyUri = new ProxyConfig(URI.create("https://admin:secret@secure-proxy.example.com:443"));
 
         ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -78,7 +79,7 @@ public class AWSProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithEmptyCredentials() {
-        URI proxyUri = URI.create("http://:@proxy.example.com:8080");
+        ProxyConfig proxyUri = new ProxyConfig(URI.create("http://:@proxy.example.com:8080"));
 
         ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -90,7 +91,7 @@ public class AWSProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithDefaultPort() {
-        URI proxyUri = URI.create("http://user:pass@proxy.example.com");
+        ProxyConfig proxyUri = new ProxyConfig(URI.create("http://user:pass@proxy.example.com"));
 
         ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
