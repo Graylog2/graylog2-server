@@ -92,7 +92,7 @@ public class InputRegistry {
         return remove(messageInput);
     }
 
-    public void stopButKeepStateInRegistry(IOState<MessageInput> inputState) {
+    public void stopAndTerminate(IOState<MessageInput> inputState) {
         final MessageInput input = inputState.getStoppable();
         this.stop(input);
         input.terminate();
