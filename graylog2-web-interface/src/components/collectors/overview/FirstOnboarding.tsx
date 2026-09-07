@@ -306,6 +306,7 @@ const FirstOnboarding = () => {
 
   // Say so before the user picks anything: every step below would end at a save the user cannot make. Setting
   // up means saving the config and creating the ingest input, or editing the existing one to a different address.
+  // Name the missing permission: a Collectors Manager reads "not set up" as losing the right to enroll otherwise.
   const canCompleteSetup = isConfigured
     ? hasIngestInput || canCreateIngestInput
     : canEditConfig && (hasIngestInput ? canEditIngestInputs : canCreateIngestInput);
@@ -313,8 +314,10 @@ const FirstOnboarding = () => {
   if (!canCompleteSetup) {
     return (
       <BodyContainer>
-        <Alert bsStyle="info" title="Collectors are not set up yet">
-          An administrator must set up the Collector ingest endpoint before Collectors can be enrolled.
+        <Alert bsStyle="info" title="Collector ingest endpoint not set up">
+          Collectors enroll against an ingest endpoint that has not been set up yet. Setting it up requires permission
+          to edit the Collectors configuration and to create or change the Collector Ingest (HTTP) input, which your
+          account does not have. Ask an administrator to set up the endpoint first.
         </Alert>
       </BodyContainer>
     );
