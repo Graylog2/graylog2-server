@@ -73,17 +73,6 @@ public class Cluster {
         return clusterAdapter.health();
     }
 
-    /**
-     * Requests the cluster health, giving up after {@code timeout}.
-     *
-     * <p>For callers on a deadline of their own (a health check with an evaluation budget, say). The un-timed
-     * {@link #health()} inherits the search client's connect and socket timeouts, which apply per host and are
-     * re-paid for every configured node within one call, so it can block far longer than either value suggests.
-     * A cluster that does not answer within {@code timeout} is reported as unreachable (empty).
-     *
-     * @param timeout how long to wait before abandoning and cancelling the request
-     * @return the cluster health response, or empty if the cluster did not answer in time
-     */
     public Optional<HealthStatus> health(java.time.Duration timeout) {
         return clusterAdapter.health(timeout);
     }

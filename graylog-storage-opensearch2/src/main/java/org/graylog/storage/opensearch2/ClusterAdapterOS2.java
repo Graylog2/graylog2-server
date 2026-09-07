@@ -383,15 +383,10 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         }
     }
 
-    /**
-     * Bounded counterpart of {@link #clusterHealth()}. Issued asynchronously so the wait can be abandoned and the
-     * in-flight request cancelled once the deadline passes, which also stops the client working through its
-     * remaining hosts. The request's own cluster-manager timeout is pulled down to match: it defaults to 30s, so a
-     * cluster with no elected manager would otherwise sit server-side well past the caller's budget.
-     */
     private Optional<ClusterHealthResponse> clusterHealth(java.time.Duration timeout) {
         final TimeValue bound = TimeValue.timeValueMillis(timeout.toMillis());
         final ClusterHealthRequest request = new ClusterHealthRequest().timeout(bound);
+        // Defaults to 30s, which would outlive the caller's budget server-side.
         request.clusterManagerNodeTimeout(bound);
 
         final PlainActionFuture<ClusterHealthResponse> future = new PlainActionFuture<>();

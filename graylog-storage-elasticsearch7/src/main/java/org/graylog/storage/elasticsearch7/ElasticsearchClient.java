@@ -128,11 +128,6 @@ public class ElasticsearchClient {
         return future;
     }
 
-    /**
-     * Issue a cluster-health request asynchronously, returning the handle that cancels it. Lets a caller bound its
-     * own wait and abort both the in-flight request and the client's remaining host retries at the deadline -- a
-     * synchronous call can do neither, since its socket timeout is re-paid per configured host.
-     */
     public Cancellable clusterHealthAsync(ClusterHealthRequest request,
                                           ActionListener<ClusterHealthResponse> listener) {
         return client.cluster().healthAsync(request, requestOptions(), listener);

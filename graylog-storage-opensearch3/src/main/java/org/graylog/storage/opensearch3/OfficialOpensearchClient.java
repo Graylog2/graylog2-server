@@ -104,8 +104,7 @@ public final class OfficialOpensearchClient {
             CompletableFuture<T> futureResponse = async(asyncClient -> operation.apply(asyncClient.withTransportOptions(options)), errorMessage);
             return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            // get() clears the interrupt flag when it throws; restore it so cooperative cancellation on this
-            // (pooled) worker thread is not silently defeated. Mirrors the ES7/OS2 bounded health adapters.
+            // get() clears the interrupt flag when it throws; restore it or cancellation is silently defeated.
             Thread.currentThread().interrupt();
             throw mapException(e, errorMessage);
         } catch (Throwable t) {

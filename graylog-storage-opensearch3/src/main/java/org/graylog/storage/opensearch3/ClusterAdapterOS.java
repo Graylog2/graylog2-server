@@ -387,15 +387,8 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
-    /**
-     * Bounded counterpart of {@link #clusterHealth()}, routed through the client's per-request response timeout and
-     * its own {@code get(timeout)} safety net so the wait cannot outlive the caller's budget. The request's
-     * cluster-manager timeout is pulled down to match: it defaults to 30s, so a cluster with no elected manager
-     * would otherwise sit server-side well past that budget. Unlike the un-timed variant this also catches the
-     * runtime {@code OpenSearchException} an error response produces, since to a caller on a deadline "answered with
-     * an error" and "did not answer" are the same fact.
-     */
     private Optional<HealthResponse> clusterHealth(java.time.Duration timeout) {
+        // clusterManagerTimeout defaults to 30s, which would outlive the caller's budget server-side.
         final Time bound = new Time.Builder().time(timeout.toMillis() + "ms").build();
         try {
             final HealthResponse health = opensearchClient.executeWithClientTimeout(
@@ -407,6 +400,7 @@ public class ClusterAdapterOS implements ClusterAdapter {
                     Duration.milliseconds(timeout.toMillis()));
             return Optional.of(health);
         } catch (Exception e) {
+            // Broader than the un-timed variant's IOException: an error response throws a runtime OpenSearchException.
             logHealthFailure(e);
             return Optional.empty();
         }

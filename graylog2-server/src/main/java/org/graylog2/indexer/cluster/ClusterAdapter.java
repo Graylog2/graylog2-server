@@ -39,14 +39,8 @@ public interface ClusterAdapter {
     Optional<HealthStatus> health();
 
     /**
-     * Cluster health, abandoned once {@code timeout} elapses, for callers that must themselves return within a
-     * budget.
-     *
-     * <p>{@link #health()} cannot be bounded by configuration alone: its connect and socket timeouts apply
-     * <em>per host</em> and the REST client retries every configured node inside a single call, so its worst case is
-     * a multiple of them. Implementations therefore issue the request asynchronously and cancel it at the deadline.
-     * A timeout is reported the same way an unreachable cluster is, as an empty {@code Optional} -- to the caller,
-     * "did not answer in time" and "did not answer" are the same fact.
+     * Cancelled at {@code timeout}, reported empty like an unreachable cluster. {@link #health()} cannot be bounded
+     * by config: its connect and socket timeouts apply per host and the client retries every node in one call.
      */
     Optional<HealthStatus> health(Duration timeout);
 
