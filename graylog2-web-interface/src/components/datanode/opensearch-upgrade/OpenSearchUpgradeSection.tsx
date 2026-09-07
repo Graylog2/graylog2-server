@@ -103,6 +103,19 @@ const HelpTextList = styled.ul(
 const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
 const TELEMETRY_DEFAULTS = { app_pathname: 'datanode' } as const;
 
+const IncompatibleIndicesInfo = () => (
+  <HelpText>
+    <HelpTextHeading>Before upgrading</HelpTextHeading>
+    <HelpTextList>
+      <li>
+        OpenSearch 3 cannot read indices created with versions earlier than OpenSearch 2. If these indices remain during
+        the upgrade, their data will become unavailable.
+      </li>
+      <li>Use the table below to reindex system indices and archive or delete data indices before continuing.</li>
+    </HelpTextList>
+  </HelpText>
+);
+
 const UpgradeProcessInfo = ({ isRollingUpgrade }: { isRollingUpgrade: boolean }) => (
   <Row>
     <Col xs={12}>
@@ -245,20 +258,7 @@ const OpenSearchUpgradeSection = () => {
         <Row>
           <Col xs={12}>
             <Heading>Incompatible indices</Heading>
-            {hasIncompatibleIndices && (
-              <HelpText>
-                <HelpTextHeading>Before upgrading</HelpTextHeading>
-                <HelpTextList>
-                  <li>
-                    OpenSearch 3 cannot read indices created with versions earlier than OpenSearch 2. If these indices
-                    remain during the upgrade, their data will become unavailable.
-                  </li>
-                  <li>
-                    Use the table below to reindex system indices and archive or delete data indices before continuing.
-                  </li>
-                </HelpTextList>
-              </HelpText>
-            )}
+            {hasIncompatibleIndices && <IncompatibleIndicesInfo />}
             <TableContainer>
               <IncompatibleIndicesTable />
             </TableContainer>
