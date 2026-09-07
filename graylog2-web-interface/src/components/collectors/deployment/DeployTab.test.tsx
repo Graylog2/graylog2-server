@@ -102,11 +102,11 @@ describe('DeployTab', () => {
 
     // Step 3 unlocked: command contains the token (Linux and macOS share the same template,
     // and inactive tab panels stay mounted, so the command shows up once per unix-y platform)
-    expect((await screen.findAllByText(/enroll-token the-token-value/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/--token the-token-value/)).length).toBeGreaterThan(0);
     // The enroll endpoint derives from the server URL (the preset mocks gl2ServerUrl as
     // http://localhost:9000/api/), not from the collectors config's ingest hostname
     // (127.0.0.1 in the mock above) — the two differ deliberately here.
-    expect(screen.getAllByText(/enroll-endpoint http:\/\/localhost:9000 /).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/--endpoint http:\/\/localhost:9000 /).length).toBeGreaterThan(0);
     expect(screen.queryByText(/127\.0\.0\.1/)).not.toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /copy token only/i }).length).toBeGreaterThan(0);
     // Enrolling hosts list is live
@@ -431,7 +431,7 @@ describe('DeployTab', () => {
     await user.click(screen.getByRole('option', { name: /web-servers/i }));
     await user.click(screen.getByRole('button', { name: /generate token/i }));
 
-    expect((await screen.findAllByText(/enroll-token the-token-value/)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/--token the-token-value/)).length).toBeGreaterThan(0);
 
     await user.click(screen.getByRole('button', { name: /change fleet/i }));
 

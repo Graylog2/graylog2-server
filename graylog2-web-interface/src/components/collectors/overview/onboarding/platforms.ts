@@ -32,27 +32,33 @@ type Platform = {
   commandTemplate: (endpoint: string, token: string) => string;
 };
 
+/** Install scripts published from the collector repo (`dist/install/`). */
+const INSTALL_SCRIPT_BASE_URL = 'https://downloads.graylog.org/repo/scripts/collector';
+
+const shellInstallCommand = (script: string) => (endpoint: string, token: string) =>
+  `curl -fsSL ${INSTALL_SCRIPT_BASE_URL}/${script} | sudo sh -s -- --endpoint ${endpoint} --token ${token}`;
+
 const PLATFORMS: Platform[] = [
   {
     id: 'linux',
     label: 'Linux',
     icon: { type: 'brand', name: 'linux' },
-    commandTemplate: (endpoint, token) =>
-      `graylog-collector supervisor --enroll-endpoint ${endpoint} --enroll-token ${token}`,
+    commandTemplate: shellInstallCommand('install-linux.sh'),
   },
   {
     id: 'windows',
     label: 'Windows',
     icon: { type: 'brand', name: 'windows' },
+    // Running the script as a scriptblock passes the parameters through and sidesteps the
+    // execution policy, which would block a downloaded `.ps1` file by default.
     commandTemplate: (endpoint, token) =>
-      `graylog-collector.exe supervisor --enroll-endpoint ${endpoint} --enroll-token ${token}`,
+      `& ([scriptblock]::Create((irm ${INSTALL_SCRIPT_BASE_URL}/install-windows.ps1))) -Endpoint ${endpoint} -Token ${token}`,
   },
   {
     id: 'macos',
     label: 'macOS',
     icon: { type: 'brand', name: 'apple' },
-    commandTemplate: (endpoint, token) =>
-      `graylog-collector supervisor --enroll-endpoint ${endpoint} --enroll-token ${token}`,
+    commandTemplate: shellInstallCommand('install-macos.sh'),
   },
 ];
 
