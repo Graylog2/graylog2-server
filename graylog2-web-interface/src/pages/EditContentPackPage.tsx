@@ -67,12 +67,12 @@ const EditContentPackPage = () => {
 
     const groupedContentPackEntities = groupBy(contentPackEntities, 'type.name');
 
-    return Object.keys(entityIndex).reduce((result, entityType) => {
-      /* eslint-disable-next-line no-param-reassign */
-      result[entityType] = entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []);
-
-      return result;
-    }, {});
+    return Object.fromEntries(
+      Object.keys(entityIndex).map((entityType) => [
+        entityType,
+        entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []),
+      ]),
+    );
   }, [contentPack, entityIndex, contentPackEntities]);
 
   useEffect(() => {
