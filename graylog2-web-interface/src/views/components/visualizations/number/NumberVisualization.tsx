@@ -38,6 +38,8 @@ import Trend from './Trend';
 import trendDirection, { trendBackground } from './trendDirection';
 import type { TrendDirection } from './trendDirection';
 
+import { usePngExportContext } from '../PngExportContext';
+
 const Container = styled.div<{ $height: number; $trend: TrendDirection | undefined }>(({ theme, $height, $trend }) => {
   const bgColor = trendBackground(theme, $trend);
 
@@ -112,9 +114,21 @@ const DEFAULT_ALIGNMENT: NumberAlignment = 'bottom-right';
 
 const NumberVisualization = ({ config, fields, data, height: heightProp }: VisualizationComponentProps) => {
   const targetRef = useRef();
+  const containerRef = useRef<HTMLElement>(null);
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const onRenderComplete = useContext(RenderCompletionCallback);
+  const { setExportFn } = usePngExportContext();
+
+  useEffect(() => {
+    setExportFn(() =>
+      import('html2canvas').then(({ default: html2canvas }) =>
+        html2canvas(containerRef.current).then((canvas) => canvas.toDataURL('image/png')),
+      ),
+    );
+
+    return () => setExportFn(null);
+  }, [setExportFn]);
   const visualizationConfig =
     (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 
@@ -144,7 +158,8 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
     : undefined;
 
   return (
-    <ContainerComponent $height={heightProp} $trend={trend} data-testid="trend-background">
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <ContainerComponent ref={containerRef as any} $height={heightProp} $trend={trend} data-testid="trend-background">
       <NumberBox resizeDelay={50}>
         {({ height, width }) => (
           <AutoFontSizer height={height} width={width} alignment={alignment}>

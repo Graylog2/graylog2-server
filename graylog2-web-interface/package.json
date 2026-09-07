@@ -71,6 +71,7 @@
     "fast-xml-parser": "^5.2.5",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "html-react-parser": "^5.2.6",
+    "html2canvas": "^1.4.1",
     "immutable": "^3.8.1",
     "json-with-bigint": "^3.5.8",
     "leaflet": "^1.5.1",
