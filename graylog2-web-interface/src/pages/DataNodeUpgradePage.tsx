@@ -38,6 +38,8 @@ import UpgradeMethodSelector, {
 import ClusterHealthInfo from 'components/datanode/data-node-upgrade/ClusterHealthInfo';
 import UpgradeStatusAlert from 'components/datanode/data-node-upgrade/UpgradeStatusAlert';
 
+const OPEN_SEARCH_SECTION_STATUSES = ['outdated', 'upgrading', 'unconfirmed'] as const;
+
 const upgradeInstructionsDocumentationMessage = (
   <p>
     To upgrade your Data Nodes manually, please follow the instructions in the&nbsp;
@@ -96,7 +98,7 @@ const DataNodeUpgradePage = () => {
   const isOpenSearchPhase =
     openSearchStatus === 'upgrading' || (areAllDataNodeVersionsUpToDate && data?.shard_replication_enabled === true);
   const showOpenSearchUpgradeSection =
-    isOpenSearchPhase && ['outdated', 'upgrading', 'unconfirmed'].includes(openSearchStatus);
+    isOpenSearchPhase && OPEN_SEARCH_SECTION_STATUSES.some((status) => status === openSearchStatus);
 
   return (
     <DocumentTitle title="Data Node Upgrade">
