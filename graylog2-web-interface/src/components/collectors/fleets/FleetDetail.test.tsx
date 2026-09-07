@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
@@ -27,6 +29,9 @@ import {
   useCollectorsMutations,
   useDefaultInstanceFilters,
 } from 'components/collectors/hooks';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
 import FleetDetail, { sourceActionsFactory } from './FleetDetail';
 
@@ -42,8 +47,9 @@ jest.mock('components/collectors/hooks', () => ({
 }));
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn(), replace: jest.fn() }));
 jest.mock('routing/useQuery', () => () => ({}));
-jest.mock('components/common/PaginatedEntityTable', () => () => null);
+jest.mock('components/common/PaginatedEntityTable', () => jest.fn(() => null));
 jest.mock('components/collectors/instances', () => ({ InstanceDetailDrawer: () => null }));
+jest.mock('hooks/useCurrentUser');
 
 describe('FleetDetail telemetry', () => {
   const sendTelemetry = jest.fn();
@@ -63,6 +69,7 @@ describe('FleetDetail telemetry', () => {
       deleteFleet: jest.fn(),
     } as never);
     asMock(useDefaultInstanceFilters).mockReturnValue([] as never);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
     sendTelemetry.mockClear();
   });
 
@@ -103,7 +110,7 @@ describe('FleetDetail telemetry', () => {
 });
 
 describe('sourceActionsFactory', () => {
-  it('renders a Received messages link per source pointing to collector_source_id filter', async () => {
+  it('renders a Received messages link per source pointing to agent_source_id filter', async () => {
     const source = {
       id: 'src-1',
       fleet_id: 'f-1',
@@ -114,11 +121,17 @@ describe('sourceActionsFactory', () => {
       config: { paths: ['/var/log/app.log'], read_mode: 'end' as const },
     };
 
-    const actions = sourceActionsFactory({ onEdit: jest.fn(), onDelete: jest.fn(), onViewMessages: jest.fn() });
+    const actions = sourceActionsFactory({
+      onEdit: jest.fn(),
+      onDelete: jest.fn(),
+      onViewMessages: jest.fn(),
+      canEdit: true,
+      canDelete: true,
+    });
     render(<>{actions(source)}</>);
 
     const link = await screen.findByRole('link', { name: /received messages/i });
-    expect(link).toHaveAttribute('href', expect.stringContaining('collector_source_id'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('agent_source_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('src-1'));
   });
 
@@ -135,7 +148,13 @@ describe('sourceActionsFactory', () => {
 
     const onEdit = jest.fn();
     const onViewMessages = jest.fn();
-    const actions = sourceActionsFactory({ onEdit, onDelete: jest.fn(), onViewMessages });
+    const actions = sourceActionsFactory({
+      onEdit,
+      onDelete: jest.fn(),
+      onViewMessages,
+      canEdit: true,
+      canDelete: true,
+    });
     render(<>{actions(source)}</>);
 
     await userEvent.click(await screen.findByRole('button', { name: /edit/i }));
@@ -143,5 +162,148 @@ describe('sourceActionsFactory', () => {
 
     await userEvent.click(await screen.findByRole('link', { name: /received messages/i }));
     expect(onViewMessages).toHaveBeenCalledWith(source);
+  });
+});
+
+describe('FleetDetail permissions', () => {
+  const fleet = { id: 'f-1', name: 'web', description: '', target_version: null, created_at: '', updated_at: '' };
+  const stats = { total_instances: 0, online_instances: 0, offline_instances: 0, total_sources: 0 };
+  const source = { id: 's-1', fleet_id: 'f-1', name: 'syslog', type: 'filelog', enabled: true } as never;
+
+  const userWith = (permissions: Array<string>) =>
+    adminUser
+      .toBuilder()
+      .permissions(Immutable.List(permissions as Array<Permission>))
+      .build();
+
+  beforeEach(() => {
+    asMock(useSendCollectorsTelemetry).mockReturnValue(jest.fn());
+    asMock(useFleet).mockReturnValue({ data: fleet, isLoading: false } as never);
+    asMock(useFleetStats).mockReturnValue({ data: stats, isLoading: false } as never);
+    asMock(useSources).mockReturnValue({ data: [] } as never);
+    asMock(useCollectorsMutations).mockReturnValue({
+      createSource: jest.fn(),
+      updateSource: jest.fn(),
+      deleteSource: jest.fn(),
+      updateFleet: jest.fn(),
+      deleteFleet: jest.fn(),
+    } as never);
+    asMock(useDefaultInstanceFilters).mockReturnValue([] as never);
+  });
+
+  it('hides Add Source without source_create on this fleet', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    expect(screen.queryByRole('button', { name: /add source/i })).not.toBeInTheDocument();
+  });
+
+  it('shows Add Source with source_create scoped to this fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read', 'collector_fleets:source_create:f-1']));
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    expect(await screen.findByRole('button', { name: /add source/i })).toBeInTheDocument();
+  });
+
+  it('hides Deploy a new Collector without enrollment token create on this fleet', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    expect(screen.queryByRole('link', { name: /deploy a new collector/i })).not.toBeInTheDocument();
+  });
+
+  it('shows Deploy a new Collector with enrollment token create scoped to this fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read', 'collector_enrollment_tokens:create:f-1']),
+    );
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    expect(await screen.findByRole('link', { name: /deploy a new collector/i })).toBeInTheDocument();
+  });
+
+  // The instances table lets the user bulk-reassign, which the backend filters by read+assign on
+  // each instance's *current* fleet. The row checkboxes have to say the same thing.
+  const instancesTableProps = async () => {
+    const instancesTab = await screen.findByRole('radio', { name: 'Instances' });
+    await userEvent.click(instancesTab);
+
+    // Only the instances table declares bulk selection, so that is enough to pick it out of the
+    // tables this page renders.
+    const call = asMock(PaginatedEntityTable)
+      .mock.calls.map(([props]) => props)
+      .findLast((props) => 'bulkSelection' in props);
+
+    return (call as { bulkSelection: { isEntitySelectable?: (entity: { id: string; fleet_id: string }) => boolean } })
+      .bulkSelection;
+  };
+
+  it('marks instances unselectable without assign permission on their fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read']));
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    const { isEntitySelectable } = await instancesTableProps();
+
+    expect(isEntitySelectable({ id: 'i-1', fleet_id: 'f-1' })).toBe(false);
+  });
+
+  it('marks instances selectable with assign permission on their fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read:f-1', 'collector_fleets:assign_instance:f-1']),
+    );
+
+    render(<FleetDetail fleetId="f-1" />);
+
+    const { isEntitySelectable } = await instancesTableProps();
+
+    expect(isEntitySelectable({ id: 'i-1', fleet_id: 'f-1' })).toBe(true);
+  });
+
+  it('renders source row actions according to the permissions passed in', () => {
+    const withNone = sourceActionsFactory({
+      onEdit: jest.fn(),
+      onDelete: jest.fn(),
+      onViewMessages: jest.fn(),
+      canEdit: false,
+      canDelete: false,
+    })(source);
+    const withBoth = sourceActionsFactory({
+      onEdit: jest.fn(),
+      onDelete: jest.fn(),
+      onViewMessages: jest.fn(),
+      canEdit: true,
+      canDelete: true,
+    })(source);
+
+    const { unmount } = render(withNone);
+
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+    unmount();
+
+    render(withBoth);
+
+    expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
+  });
+
+  it('shows Delete but not Edit when only canDelete is granted', async () => {
+    const withDeleteOnly = sourceActionsFactory({
+      onEdit: jest.fn(),
+      onDelete: jest.fn(),
+      onViewMessages: jest.fn(),
+      canEdit: false,
+      canDelete: true,
+    })(source);
+
+    render(withDeleteOnly);
+
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+
+    await userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+
+    await screen.findByRole('menuitem', { name: /delete/i });
   });
 });

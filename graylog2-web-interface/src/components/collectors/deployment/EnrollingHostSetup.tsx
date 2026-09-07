@@ -28,7 +28,7 @@ import { useSources } from 'components/collectors/hooks/useSourceQueries';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import collectorReceivedMessagesUrl from 'components/collectors/common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from 'components/collectors/common/fields';
+import { AGENT_ID_FIELD } from 'components/collectors/common/fields';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 type Props = {
@@ -84,7 +84,7 @@ const EnrollingHostSetup = ({ instance, fleetName }: Props) => {
             />
             {online && (
               <div>
-                <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
+                <LinkContainer to={collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid)}>
                   <Button
                     bsStyle="success"
                     bsSize="small"

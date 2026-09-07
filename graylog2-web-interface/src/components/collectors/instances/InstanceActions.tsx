@@ -25,9 +25,9 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ReassignFleetModal from './ReassignFleetModal';
 
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
+import { AGENT_ID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
-import { useCollectorsMutations } from '../hooks';
+import { useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { instanceTelemetryProps } from '../hooks/telemetry-helpers';
 import type { CollectorInstanceView } from '../types';
@@ -41,6 +41,9 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
   const [showReassignModal, setShowReassignModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { deleteInstance } = useCollectorsMutations();
+  const { canDeleteInstance, canAssignToFleet, canReadSystemLogs } = useCollectorPermissions();
+  const canReassign = canAssignToFleet(instance.fleet_id);
+  const canDelete = canDeleteInstance(instance.fleet_id);
   const sendTelemetry = useSendCollectorsTelemetry();
 
   const handleConfirmDelete = useCallback(async () => {
@@ -55,7 +58,7 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
   return (
     <>
       <ButtonToolbar>
-        <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
+        <LinkContainer to={collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid)}>
           <IconButton
             name="search"
             title="Received messages"
@@ -71,19 +74,21 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
             }
           />
         </LinkContainer>
-        <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
-          <Button
-            bsSize="xsmall"
-            onClick={() =>
-              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
-                app_action_value: 'instance-view-logs',
-                ...instanceTelemetryProps(instance),
-                origin: 'row',
-              })
-            }>
-            View System Logs
-          </Button>
-        </LinkContainer>
+        {canReadSystemLogs && (
+          <LinkContainer to={collectorSystemLogsUrl(instance.instance_uid)}>
+            <Button
+              bsSize="xsmall"
+              onClick={() =>
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
+                  app_action_value: 'instance-view-logs',
+                  ...instanceTelemetryProps(instance),
+                  origin: 'row',
+                })
+              }>
+              View System Logs
+            </Button>
+          </LinkContainer>
+        )}
         <Button
           bsSize="xsmall"
           onClick={() => {
@@ -95,11 +100,13 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
           }}>
           Details
         </Button>
-        <MoreActions>
-          <MenuItem onSelect={() => setShowReassignModal(true)}>Reassign to fleet</MenuItem>
-          <MenuItem divider />
-          <DeleteMenuItem onSelect={() => setShowDeleteConfirm(true)} />
-        </MoreActions>
+        {(canReassign || canDelete) && (
+          <MoreActions>
+            {canReassign && <MenuItem onSelect={() => setShowReassignModal(true)}>Reassign to fleet</MenuItem>}
+            {canReassign && canDelete && <MenuItem divider />}
+            {canDelete && <DeleteMenuItem onSelect={() => setShowDeleteConfirm(true)} />}
+          </MoreActions>
+        )}
       </ButtonToolbar>
       {showReassignModal && (
         <ReassignFleetModal

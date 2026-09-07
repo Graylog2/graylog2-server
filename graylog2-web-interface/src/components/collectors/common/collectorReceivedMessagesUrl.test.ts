@@ -18,30 +18,30 @@ import collectorReceivedMessagesUrl from './collectorReceivedMessagesUrl';
 
 describe('collectorReceivedMessagesUrl', () => {
   it('builds a search URL with a quoted field:value query', () => {
-    const url = collectorReceivedMessagesUrl('collector_instance_uid', 'uid-42');
+    const url = collectorReceivedMessagesUrl('agent_id', 'uid-42');
 
     expect(url).toContain('/search?');
-    expect(url).toContain('q=collector_instance_uid%3A%22uid-42%22');
+    expect(url).toContain('q=agent_id%3A%22uid-42%22');
   });
 
   it('uses a 1h relative time range', () => {
-    const url = collectorReceivedMessagesUrl('collector_fleet_id', 'fleet-xyz');
+    const url = collectorReceivedMessagesUrl('agent_fleet_id', 'fleet-xyz');
 
     expect(url).toContain('rangetype=relative');
     expect(url).toContain('relative=3600');
   });
 
   it('does not include a streams parameter', () => {
-    const url = collectorReceivedMessagesUrl('collector_source_id', 'source-abc');
+    const url = collectorReceivedMessagesUrl('agent_source_id', 'source-abc');
 
     expect(url).not.toContain('streams=');
   });
 
   it('quotes values that contain special characters', () => {
-    const url = collectorReceivedMessagesUrl('collector_source_id', 'id with space');
+    const url = collectorReceivedMessagesUrl('agent_source_id', 'id with space');
 
     // Quoting the value protects against special characters in the query string.
     // After URL encoding: "id with space" → %22id%20with%20space%22 (or + for space).
-    expect(url).toMatch(/q=collector_source_id%3A%22id(?:%20|\+)with(?:%20|\+)space%22/);
+    expect(url).toMatch(/q=agent_source_id%3A%22id(?:%20|\+)with(?:%20|\+)space%22/);
   });
 });

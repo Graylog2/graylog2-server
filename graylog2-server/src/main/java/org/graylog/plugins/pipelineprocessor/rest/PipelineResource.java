@@ -173,6 +173,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @POST
     @Path("/parse")
     @NoAuditEvent("only used to parse a pipeline, no changes made in the system")
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_CREATE)
     public PipelineSource parse(@Parameter(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         checkReservedName(pipelineSource);
 

@@ -18,6 +18,7 @@ package org.graylog.collectors.opamp;
 
 public final class OpAmpConstants {
     public static final String PATH = "/v1/opamp";
+    public static final String ENROLL_AUTH_CHECK_PATH = "/v1/opamp-enroll-auth-check";
 
     private OpAmpConstants() {
     }

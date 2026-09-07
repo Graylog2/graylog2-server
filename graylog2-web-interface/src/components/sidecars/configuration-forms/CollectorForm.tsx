@@ -137,7 +137,6 @@ class CollectorForm extends React.Component<
       promise.then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`LOG_COLLECTOR_${isCreate ? 'CREATED' : 'UPDATED'}`], {
           app_pathname: 'sidecars',
-          app_section: 'configuration',
         });
       });
     }
@@ -149,7 +148,6 @@ class CollectorForm extends React.Component<
     if (key === 'service_type' || key === 'node_operating_system') {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`LOG_COLLECTOR_${upperCase(key).replace(/\s|\//g, '_')}_CHANGED`], {
         app_pathname: 'sidecars',
-        app_section: 'configuration',
         event_details: {
           [key]: value,
         },
@@ -368,4 +366,4 @@ class CollectorForm extends React.Component<
   }
 }
 
-export default withTelemetry(withHistory(CollectorForm));
+export default withTelemetry(withHistory(CollectorForm), 'configuration');

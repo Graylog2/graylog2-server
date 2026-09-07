@@ -85,7 +85,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
         {activePluginBadges.map(({ key, component: PluginBadge }) => (
           <PluginBadge key={key} />
         ))}
-        {activePluginBadges.length === 0 && <NotificationBadge />}
+        <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">
           {AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}

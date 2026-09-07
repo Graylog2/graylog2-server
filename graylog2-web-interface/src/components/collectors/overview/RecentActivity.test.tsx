@@ -109,4 +109,13 @@ describe('RecentActivity', () => {
 
     expect(targets).toEqual(originalOrder);
   });
+
+  it('renders without an activity list and without erroring when the query is disabled (e.g. missing collector_activities:read)', () => {
+    // useRecentActivity guards on canReadActivities via `enabled` (useActivityQueries.ts); react-query v5
+    // reports isLoading === false for a disabled query, and there is no data.
+    asMock(useRecentActivity).mockReturnValue({ data: undefined, isLoading: false });
+
+    expect(() => render(<RecentActivity />)).not.toThrow();
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  });
 });

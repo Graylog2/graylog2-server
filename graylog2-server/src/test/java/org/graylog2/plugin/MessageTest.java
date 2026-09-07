@@ -60,10 +60,10 @@ import java.util.regex.Pattern;
 import static com.google.common.collect.Sets.symmetricDifference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID;
-import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID;
-import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE;
-import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_FLEET_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_SOURCE_ID;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -557,10 +557,10 @@ public class MessageTest {
         assertThat(message.getSize()).isEqualTo(45);
 
         // None of the collector metadata fields should contribute to the overall message size.
-        message.addField(FIELD_COLLECTOR_RECEIVER_TYPE, "filelog");
-        message.addField(FIELD_COLLECTOR_INSTANCE_UID, "uid-42");
-        message.addField(FIELD_COLLECTOR_SOURCE_ID, "source-abc");
-        message.addField(FIELD_COLLECTOR_FLEET_ID, "fleet-xyz");
+        message.addField(FIELD_AGENT_RECEIVER_TYPE, "filelog");
+        message.addField(FIELD_AGENT_ID, "uid-42");
+        message.addField(FIELD_AGENT_SOURCE_ID, "source-abc");
+        message.addField(FIELD_AGENT_FLEET_ID, "fleet-xyz");
         assertThat(message.getSize()).isEqualTo(45);
 
         // A non-excluded field should still increase the size.

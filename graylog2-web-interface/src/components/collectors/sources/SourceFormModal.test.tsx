@@ -247,10 +247,7 @@ describe('SourceFormModal telemetry', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /Cancel/i }));
 
-      expect(sendTelemetryInstance).not.toHaveBeenCalledWith(
-        'Collector Source Create Cancelled',
-        expect.anything(),
-      );
+      expect(sendTelemetryInstance).not.toHaveBeenCalledWith('Collector Source Create Cancelled', expect.anything());
     });
   });
 

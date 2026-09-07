@@ -34,9 +34,9 @@ describe('getPathnameWithoutId', () => {
   });
 
   it('strips every id segment, not just the first', () => {
-    expect(
-      getPathnameWithoutId('/foo/5f3e4c5d6a7b8c9d0e1f2a3b/bar/0198c7c2-2c3e-7b90-8f6e-1a2b3c4d5e6f/baz'),
-    ).toBe('foo/bar/baz');
+    expect(getPathnameWithoutId('/foo/5f3e4c5d6a7b8c9d0e1f2a3b/bar/0198c7c2-2c3e-7b90-8f6e-1a2b3c4d5e6f/baz')).toBe(
+      'foo/bar/baz',
+    );
   });
 
   it('leaves non-id segments untouched', () => {
@@ -44,9 +44,7 @@ describe('getPathnameWithoutId', () => {
   });
 
   it('does not strip a partial prefix of a longer hex segment', () => {
-    expect(getPathnameWithoutId('/foo/5f3e4c5d6a7b8c9d0e1f2a3b4c5d/bar')).toBe(
-      'foo/5f3e4c5d6a7b8c9d0e1f2a3b4c5d/bar',
-    );
+    expect(getPathnameWithoutId('/foo/5f3e4c5d6a7b8c9d0e1f2a3b4c5d/bar')).toBe('foo/5f3e4c5d6a7b8c9d0e1f2a3b4c5d/bar');
   });
 });
 

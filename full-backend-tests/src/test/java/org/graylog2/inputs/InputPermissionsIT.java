@@ -56,14 +56,14 @@ public class InputPermissionsIT {
         roleInputsReader = apis.roles().create("custom_inputs_reader", "inputs reader can only see inputs", Set.of(
                 RestPermissions.INPUTS_READ
         ), false);
-        inputsReader = createUser("inputs.reader", roleInputsReader);
+        inputsReader = apis.users().generateUserWithDefaults("inputs.reader", RandomString.make(), roleInputsReader);
 
         roleInputsCreator = apis.roles().create("custom_inputs_creator", "inputs creator can only create inputs", Set.of(
                 RestPermissions.INPUTS_READ,
                 RestPermissions.INPUTS_CREATE,
                 RestPermissions.INPUT_TYPES_CREATE
         ), false);
-        inputsCreator = createUser("inputs.creator", roleInputsCreator);
+        inputsCreator = apis.users().generateUserWithDefaults("inputs.creator", RandomString.make(), roleInputsCreator);
 
         roleRestrictedInputsCreator = apis.roles().create("custom_restricted_inputs_creator", "inputs creator can only create certain inputs", Set.of(
                 RestPermissions.INPUTS_READ,
@@ -72,7 +72,7 @@ public class InputPermissionsIT {
                 RestPermissions.INPUT_TYPES_CREATE + ":org.graylog2.inputs.gelf.tcp.GELFTCPInput"
 
         ), false);
-        restrictedInputsCreator = createUser("restricted.inputs.creator", roleRestrictedInputsCreator);
+        restrictedInputsCreator = apis.users().generateUserWithDefaults("restricted.inputs.creator", RandomString.make(), roleRestrictedInputsCreator);
 
         waitForRolesCacheRefresh();
 
@@ -95,12 +95,6 @@ public class InputPermissionsIT {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static Users.User createUser(String username, GraylogApiResponse... roles) {
-        return new Users.User(username, RandomString.make(), "<Generated>", username,
-                username + "@graylog", false, 30_0000, "Europe/Vienna",
-                Arrays.stream(roles).map(role -> role.properJSONPath().read("name", String.class)).toList(), List.of());
     }
 
     @AfterAll

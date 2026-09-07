@@ -44,7 +44,7 @@ const IndexSetConfigurationPage = () => {
   const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useIndicesConfiguration();
   const history = useHistory();
   const { from } = useQuery();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('indexset');
 
   const formCancelLink = () => {
     if (from === 'details') {
@@ -63,7 +63,6 @@ const IndexSetConfigurationPage = () => {
   const saveConfiguration = (newIndexSet: IndexSet) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_UPDATED, {
       app_pathname: 'indexsets',
-      app_section: 'indexset',
     });
 
     return _saveConfiguration(history, newIndexSet);

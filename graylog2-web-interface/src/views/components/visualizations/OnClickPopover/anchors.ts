@@ -18,7 +18,7 @@ import type { PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
 import minBy from 'lodash/minBy';
 import type React from 'react';
 
-import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { RelativeCoordinates, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
 
@@ -30,7 +30,12 @@ export interface PlotlyHTMLElementWithInternals extends PlotlyHTMLElement {
 }
 
 /** A popover anchor: the DOM element the popover sticks to plus the clicked point(s). */
-export type ElementAnchor = { el: Element; rel: Rel; pt: ClickPoint; pointsInRadius?: Array<ClickPoint> };
+export type ElementAnchor = {
+  el: Element;
+  rel: RelativeCoordinates;
+  pt: ClickPoint;
+  pointsInRadius?: Array<ClickPoint>;
+};
 export type Anchor = ElementAnchor;
 
 /** Builds a popover anchor from a Plotly click event. Provided per visualization. */
@@ -90,7 +95,7 @@ export const pickNearestElementAnchor = (
   const closest = inside ?? minBy(candidatesWithDistances, 'd').candidate;
   if (!closest) return null;
   const { el, rect, pt } = closest;
-  const rel: Rel = {
+  const rel: RelativeCoordinates = {
     x: clamp01((clientX - rect.left) / Math.max(rect.width, 1)),
     y: clamp01((clientY - rect.top) / Math.max(rect.height, 1)),
   };

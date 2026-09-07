@@ -30,8 +30,6 @@ import { getConfig } from 'components/configurations/helpers';
 import { useStore } from 'stores/connect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { DEFAULT_PASSWORD_COMPLEXITY_CONFIG, PASSWORD_SPECIAL_CHARACTERS } from 'logic/users/passwordComplexity';
 
 const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
@@ -60,8 +58,7 @@ const PasswordComplexityConfig = () => {
   const [formConfig, setFormConfig] = useState<PasswordComplexityConfigType | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('password-complexity');
 
   useEffect(() => {
     ConfigurationsActions.listPasswordComplexityConfig(configType).then(() => {
@@ -74,8 +71,6 @@ const PasswordComplexityConfig = () => {
 
   const saveConfig = (values: PasswordComplexityConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.PASSWORD_COMPLEXITY_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'password-complexity',
       app_action_value: 'configuration-save',
     });
 

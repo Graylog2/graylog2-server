@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import type { Output } from 'hooks/useOutputs';
 import type { ConfigurationFormData } from 'components/configurationforms';
@@ -23,6 +23,7 @@ import type { AvailableOutputRequestedConfiguration } from 'components/streams/u
 import EditOutputButton from 'components/streams/StreamDetails/routing-destination/EditOutputButton';
 import RemoveOutputButton from 'components/streams/StreamDetails/routing-destination/RemoveOutputButton';
 import { IfPermitted } from 'components/common';
+import { ButtonToolbar } from 'components/bootstrap';
 
 type Props = {
   output: Output;
@@ -32,12 +33,9 @@ type Props = {
   getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration;
 };
 
-const ActionButtonsWrap = styled.span(
-  ({ theme }) => css`
-    margin-right: ${theme.spacings.xs};
-    float: right;
-  `,
-);
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  justify-content: flex-end;
+`;
 
 const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeDefinition }: Props) => (
   <tr>
@@ -46,7 +44,7 @@ const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeD
     </td>
     {}
     <td>
-      <ActionButtonsWrap className="align-right">
+      <StyledButtonToolbar>
         <IfPermitted permissions="stream_outputs:create">
           <EditOutputButton
             disabled={isLoadingOutputTypes}
@@ -58,7 +56,7 @@ const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeD
         <IfPermitted permissions="stream_outputs:delete">
           <RemoveOutputButton output={output} streamId={streamId} />
         </IfPermitted>
-      </ActionButtonsWrap>
+      </StyledButtonToolbar>
     </td>
   </tr>
 );

@@ -47,7 +47,6 @@ interface GlobalNotification {
 interface NavigationBadge {
   key: string;
   component: React.ComponentType;
-  // Active badges replace the built-in notification badge, so they must render the notification count themselves.
   useCondition: () => boolean;
 }
 
@@ -324,7 +323,7 @@ declare module 'graylog-web-plugin/plugin' {
     DataLakeStatus: React.ComponentType<{
       dataLakeEnabled: boolean;
     }>;
-    DataLakeJournal: React.ComponentType<{
+    DataLakeJournal?: React.ComponentType<{
       nodeId: string;
     }>;
     DataLakeJobs: React.ComponentType<{

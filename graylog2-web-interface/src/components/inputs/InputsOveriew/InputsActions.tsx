@@ -23,10 +23,8 @@ import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
 import recentMessagesTimeRange from 'util/TimeRangeHelper';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
 import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
 import useInputStateMutations from 'hooks/useInputsStateMutations';
@@ -58,7 +56,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
   const { updateInput, deleteInput } = useInputMutations();
   const { setupInput, stopInput: stopInputMutation } = useInputStateMutations(input as any);
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
 
   const openWizard = () => {
@@ -77,14 +74,12 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
     setShowConfigurationForm(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_EDIT_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'show-received-messages',
     });
   };
 
   const hanleInputUpdate = async (inputData: ConfiguredInput) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-edit',
     });
 
@@ -93,7 +88,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
 
   const enterInputSetupMode = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_ENTERED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-enter-setup',
     });
 
@@ -102,7 +96,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
 
   const exitInputSetupMode = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_EXITED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-exit-setup',
     });
 
@@ -111,7 +104,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
 
   const handleConfirmDelete = async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_DELETED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-delete',
     });
 
@@ -137,7 +129,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
             size="xsmall"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
-                app_pathname: getPathnameWithoutId(pathname),
                 app_action_value: 'show-received-messages',
               });
             }}
@@ -172,7 +163,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
                 <MenuItem
                   onClick={() => {
                     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
-                      app_pathname: getPathnameWithoutId(pathname),
                       app_action_value: 'manage-extractors',
                     });
                   }}>
@@ -186,7 +176,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
               key={`input-diagnosis-${input.id}`}
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_DIAGNOSIS_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
                   app_action_value: 'input-diagnosis',
                 });
               }}>
@@ -220,7 +209,6 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions }: Props) =
               key={`show-metrics-${input.id}`}
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_METRICS_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
                   app_action_value: 'show-metrics',
                 });
               }}>

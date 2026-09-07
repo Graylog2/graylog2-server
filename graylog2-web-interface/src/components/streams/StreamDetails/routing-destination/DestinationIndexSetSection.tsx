@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'hooks/useIndices';
-import { Icon, Section, Spinner, LinkContainer } from 'components/common';
-import { Table, Button, Alert } from 'components/bootstrap';
+import { Section, Spinner, Link } from 'components/common';
+import { Table, Alert } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { Stream } from 'logic/streams/types';
@@ -43,12 +42,6 @@ import IndexSetOldestMessageCell from './IndexSetOldestMessageCell';
 type Props = {
   stream: Stream;
 };
-
-const ActionButtonsWrap = styled.span(
-  () => css`
-    float: right;
-  `,
-);
 
 const DestinationIndexSetSection = ({ stream }: Props) => {
   const productName = useProductName();
@@ -120,13 +113,15 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
             <td>Name</td>
             <td>Total size</td>
             <td>Oldest Message (date)</td>
-            <td colSpan={2}>Archiving</td>
+            <td>Archiving</td>
           </tr>
         </thead>
         <tbody>
           {indexSet && (
             <tr>
-              <td>{indexSet?.title}</td>
+              <td>
+                <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>{indexSet?.title}</Link>
+              </td>
               <td>{isStatsLoaded && indexSetStats?.size ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
               <td>
                 {isLoadingIndexerOverviewSuccess && (
@@ -135,15 +130,6 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
               </td>
               <td>
                 <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
-              </td>
-              <td>
-                <ActionButtonsWrap>
-                  <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>
-                    <Button bsStyle="default" bsSize="xsmall" onClick={() => {}} title="View index set">
-                      <Icon name="pageview" type="regular" />
-                    </Button>
-                  </LinkContainer>
-                </ActionButtonsWrap>
               </td>
             </tr>
           )}

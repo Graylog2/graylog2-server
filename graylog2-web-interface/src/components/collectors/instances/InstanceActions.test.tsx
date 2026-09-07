@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
 
 import InstanceActions from './InstanceActions';
 
@@ -29,6 +33,7 @@ import { mockCollectorsMutations } from '../testing/mockMutations';
 
 jest.mock('../hooks/useCollectorsMutations');
 jest.mock('../hooks/useSendCollectorsTelemetry');
+jest.mock('hooks/useCurrentUser');
 jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void }) => (
   <div data-testid="reassign-modal">
     <button type="button" onClick={props.onClose}>
@@ -36,6 +41,12 @@ jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void }) => (
     </button>
   </div>
 ));
+
+const userWith = (permissions: Array<string>) =>
+  adminUser
+    .toBuilder()
+    .permissions(Immutable.List(permissions as Array<Permission>))
+    .build();
 
 const mockInstance: CollectorInstanceView = {
   id: 'inst-1',
@@ -72,6 +83,7 @@ describe('InstanceActions', () => {
         isDeletingInstance: false,
       }),
     );
+    asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   it('renders View System Logs and Details buttons', async () => {
@@ -81,11 +93,11 @@ describe('InstanceActions', () => {
     await screen.findByRole('button', { name: /details/i });
   });
 
-  it('renders Received messages link pointing to collector_instance_uid filter', async () => {
+  it('renders Received messages link pointing to agent_id filter', async () => {
     render(<InstanceActions instance={mockInstance} onDetailsClick={jest.fn()} />);
 
     const link = await screen.findByRole('link', { name: /received messages/i });
-    expect(link).toHaveAttribute('href', expect.stringContaining('collector_instance_uid'));
+    expect(link).toHaveAttribute('href', expect.stringContaining('agent_id'));
     expect(link).toHaveAttribute('href', expect.stringContaining('uid-1'));
   });
 
@@ -249,5 +261,78 @@ describe('InstanceActions', () => {
       );
       expect(onDetailsClick).toHaveBeenCalledWith(mockInstance);
     });
+  });
+});
+
+describe('InstanceActions permissions', () => {
+  const instance = {
+    instance_uid: 'i-1',
+    fleet_id: 'f-1',
+    hostname: 'host-1',
+    status: 'online',
+  } as never;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({ deleteInstance: jest.fn(), isDeletingInstance: false }),
+    );
+  });
+
+  it('hides the actions menu when neither reassign nor delete is permitted', () => {
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read:f-1']));
+
+    render(<InstanceActions instance={instance} onDetailsClick={jest.fn()} />);
+
+    expect(screen.queryByText(/reassign to fleet/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /more actions/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the reassign action when assign is permitted on the instance fleet', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read:f-1', 'collector_fleets:assign_instance:f-1']),
+    );
+
+    render(<InstanceActions instance={instance} onDetailsClick={jest.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: /more actions/i }));
+
+    expect(await screen.findByText(/reassign to fleet/i)).toBeInTheDocument();
+  });
+
+  it('shows only delete when delete_instance is permitted but not assign', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read:f-1', 'collector_fleets:delete_instance:f-1']),
+    );
+
+    render(<InstanceActions instance={instance} onDetailsClick={jest.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: /more actions/i }));
+
+    expect(screen.queryByText(/reassign to fleet/i)).not.toBeInTheDocument();
+    expect(await screen.findByRole('menuitem', { name: /delete/i })).toBeInTheDocument();
+  });
+
+  it('hides View System Logs without read permission on the collector system logs stream', async () => {
+    // The link targets a search scoped to the built-in collector system logs stream. Without
+    // streams:read on it the link lands on the "Missing Stream Permissions" page.
+    asMock(useCurrentUser).mockReturnValue(userWith(['collector_fleets:read:f-1']));
+
+    render(<InstanceActions instance={instance} onDetailsClick={jest.fn()} />);
+
+    await screen.findByRole('button', { name: /details/i });
+
+    expect(screen.queryByRole('link', { name: /view system logs/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/view system logs/i)).not.toBeInTheDocument();
+  });
+
+  it('shows View System Logs with read permission on that stream', async () => {
+    asMock(useCurrentUser).mockReturnValue(
+      userWith(['collector_fleets:read:f-1', 'streams:read:000000000000000000000005']),
+    );
+
+    render(<InstanceActions instance={instance} onDetailsClick={jest.fn()} />);
+
+    expect(await screen.findByRole('link', { name: /view system logs/i })).toBeInTheDocument();
   });
 });
