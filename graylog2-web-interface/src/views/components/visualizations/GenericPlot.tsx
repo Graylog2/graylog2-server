@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo, useCallback, useState } from 'react';
+import { useContext, useMemo, useCallback, useState, useEffect, useRef } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import merge from 'lodash/merge';
 import type { Layout, PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
@@ -28,6 +28,7 @@ import { ROOT_FONT_SIZE } from 'theme/constants';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 
 import ChartColorContext from './ChartColorContext';
+import { usePngExportContext } from './PngExportContext';
 
 import { useIsInteractiveMode, useIsReadOnlyMode } from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
@@ -272,6 +273,12 @@ const GenericPlot = ({
 
   const plotConfig = useMemo(() => ({ ...defaultPlotConfig, ...config }), [config]);
   const onRenderComplete = useContext(RenderCompletionCallback);
+  const { setExportFn } = usePngExportContext();
+  const graphDivRef = useRef<PlotlyHTMLElement | null>(null);
+
+  useEffect(() => {
+    return () => setExportFn(null);
+  }, [setExportFn]);
 
   const _onRelayout = useCallback(
     (axis: Axis) => {
@@ -320,6 +327,19 @@ const GenericPlot = ({
     onAfterPlot();
   }, [onRenderComplete, onAfterPlot]);
 
+  const _onInitialized = useCallback(
+    (figure: unknown, graphDiv: PlotlyHTMLElement) => {
+      graphDivRef.current = graphDiv;
+      setExportFn(() =>
+        import('views/custom-plotly').then(({ default: Plotly }) =>
+          Plotly.toImage(graphDiv, { format: 'png' }),
+        ),
+      );
+      onInitialized(figure, graphDiv);
+    },
+    [onInitialized, setExportFn],
+  );
+
   return (
     <StyledPlot
       $interactive={isInteractive}
@@ -333,7 +353,7 @@ const GenericPlot = ({
       onUnhover={onUnhoverMarker}
       onRelayout={isInteractive ? _onRelayout : () => {}}
       config={plotConfig}
-      onInitialized={onInitialized}
+      onInitialized={_onInitialized}
     />
   );
 };

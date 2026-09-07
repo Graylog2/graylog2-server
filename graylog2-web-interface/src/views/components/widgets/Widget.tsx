@@ -60,6 +60,8 @@ import WidgetActionsMenu from './WidgetActionsMenu';
 import WidgetWarmTierAlert from './WidgetWarmTierAlert';
 
 import { useIsInteractiveMode } from '../contexts/InteractiveContext';
+import PngExportContext from '../visualizations/PngExportContext';
+import type { PngExportFn } from '../visualizations/PngExportContext';
 
 export type Props = {
   id: string;
@@ -284,6 +286,12 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   const viewType = useViewType();
   const fields = useQueryFieldTypes();
   const [loading, setLoading] = useState(false);
+  const [pngExportFn, setPngExportFn] = useState<PngExportFn | null>(null);
+  const setExportFn = useCallback((fn: PngExportFn | null) => setPngExportFn(() => fn), []);
+  const pngExportContextValue = useMemo(
+    () => ({ exportFn: pngExportFn, setExportFn, widgetTitle: title }),
+    [pngExportFn, setExportFn, title],
+  );
   const { focusedWidget } = useContext(WidgetFocusContext);
   const dispatch = useViewsDispatch();
   const sendWidgetConfigUpdateTelemetry = useSendWidgetConfigUpdateTelemetry();
@@ -315,6 +323,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   );
 
   return (
+    <PngExportContext.Provider value={pngExportContextValue}>
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
         <WidgetHeader
@@ -373,6 +382,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
         </WidgetFooter>
       </WidgetFrame>
     </WidgetColorContext>
+    </PngExportContext.Provider>
   );
 };
 
