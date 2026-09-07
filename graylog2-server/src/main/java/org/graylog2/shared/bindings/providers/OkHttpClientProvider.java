@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -54,7 +53,6 @@ import static java.util.Objects.requireNonNull;
  * @see org.graylog2.plugin.BaseConfiguration#getHttpConnectTimeout()
  * @see org.graylog2.plugin.BaseConfiguration#getHttpReadTimeout()
  * @see org.graylog2.plugin.BaseConfiguration#getHttpWriteTimeout()
- * @see org.graylog2.plugin.BaseConfiguration#getHttpProxyUri()
  */
 @Singleton
 public class OkHttpClientProvider implements Provider<OkHttpClient> {
@@ -94,14 +92,14 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                                 @Named("http_connect_timeout") Duration connectTimeout,
                                 @Named("http_read_timeout") Duration readTimeout,
                                 @Named("http_write_timeout") Duration writeTimeout,
-                                @Named("http_proxy_uri") @Nullable URI httpProxyUri,
+                                @Named("http_proxy_uri") @Nullable ProxyConfig httpProxyConfig,
                                 TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
                                 ProxySelectorProvider proxySelectorProvider) {
         this.userAgent = requireNonNull(userAgent);
         this.connectTimeout = requireNonNull(connectTimeout);
         this.readTimeout = requireNonNull(readTimeout);
         this.writeTimeout = requireNonNull(writeTimeout);
-        this.proxyConfig = ProxyConfig.from(httpProxyUri);
+        this.proxyConfig = Optional.ofNullable(httpProxyConfig);
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
         this.proxySelectorProvider = proxySelectorProvider;
     }

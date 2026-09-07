@@ -25,16 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProxyConfigTest {
 
     @Test
-    public void fromReturnsEmptyWithoutAConfiguredProxy() {
-        assertThat(ProxyConfig.from(null)).isEmpty();
-    }
-
-    @Test
-    public void fromWrapsAConfiguredProxy() {
-        assertThat(ProxyConfig.from(URI.create("http://proxy.example.com:8123"))).isPresent();
-    }
-
-    @Test
     public void hostPortAndSchemeReadThroughToTheUri() {
         final ProxyConfig config = new ProxyConfig(URI.create("http://proxy.example.com:8123"));
 

@@ -18,7 +18,6 @@ package org.graylog2.utilities;
 
 import com.google.common.base.Splitter;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -40,10 +39,6 @@ public record ProxyConfig(URI uri) {
 
     /** {@code user:password} parsed from the proxy URI's user info. */
     public record Credentials(String username, String password) {}
-
-    public static Optional<ProxyConfig> from(@Nullable URI uri) {
-        return Optional.ofNullable(uri).map(ProxyConfig::new);
-    }
 
     public String host() {
         return uri.getHost();
