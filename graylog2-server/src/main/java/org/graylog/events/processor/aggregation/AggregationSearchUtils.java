@@ -289,13 +289,19 @@ public class AggregationSearchUtils {
     }
 
     // Double#toString (and thus String#valueOf/String#format with "%s") switches to scientific notation for
-    // values >= 10^7 or < 10^-3 (e.g. "8.0053026E7"). Format as a plain decimal instead, trimming insignificant
-    // trailing zeros/decimal points, so users see the actual number (e.g. "80053026").
+    // values >= 10^7 or < 10^-3 (e.g. "8.0053026E7"). Only reformat values that actually hit that case, so the
+    // normal range keeps Double#toString's exact output (e.g. "1.0", "3.14") and existing consumers of the
+    // message string are unaffected.
     private String formatValue(double value) {
         if (Double.isNaN(value) || Double.isInfinite(value)) {
             return Double.toString(value);
         }
 
-        return BigDecimal.valueOf(value).stripTrailingZeros().toPlainString();
+        final String doubleString = Double.toString(value);
+        if (doubleString.indexOf('E') < 0) {
+            return doubleString;
+        }
+
+        return new BigDecimal(doubleString).stripTrailingZeros().toPlainString();
     }
 }

@@ -254,7 +254,7 @@ public class AggregationSearchUtilsTest {
                                                         .field("source")
                                                         .build())
                                                 .build(),
-                                        // A whole-number value should not carry a trailing ".0"
+                                        // A whole number in the normal range keeps Double#toString's own format
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(42.0d)
@@ -288,8 +288,7 @@ public class AggregationSearchUtilsTest {
                 .doesNotContainIgnoringCase("e-5")
                 .contains("=80053026")
                 .contains("=0.00001")
-                .contains("=42")
-                .doesNotContain("=42.0")
+                .contains("=42.0")
                 .contains("=3.14");
     }
 
