@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import { useCollectorsConfig } from 'components/collectors/hooks';
-import type { CollectorsConfig } from 'components/collectors/types';
+import { configuredCollectorsConfig } from 'components/collectors/testing/fixtures';
 
 import CollectorsOverviewPage from './CollectorsOverviewPage';
 
@@ -39,7 +39,7 @@ describe('CollectorsOverviewPage', () => {
 
   it('renders the overview once the config exists', () => {
     asMock(useCollectorsConfig).mockReturnValue({
-      data: { signing_cert_id: 'signing-id' } as unknown as CollectorsConfig,
+      data: configuredCollectorsConfig,
       isLoading: false,
     });
 

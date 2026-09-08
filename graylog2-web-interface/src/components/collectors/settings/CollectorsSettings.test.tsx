@@ -37,27 +37,14 @@ import {
   useCollectorInputMutations,
   useCollectorPermissions,
 } from '../hooks';
-import type { CollectorsConfig } from '../types';
 import { mockCollectorsMutations } from '../testing/mockMutations';
+import { configuredCollectorsConfig, mockCollectorInput } from '../testing/fixtures';
 
 jest.mock('../hooks');
 jest.mock('hooks/useInputsStates');
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 
-const mockInput = (port: number) => ({
-  id: 'input-1',
-  creator_user_id: 'admin',
-  node: 'node-1',
-  name: 'CollectorIngestHttpInput',
-  created_at: '2026-01-01T00:00:00Z',
-  global: true,
-  attributes: { port, bind_address: '0.0.0.0' },
-  title: 'Collector Ingest (HTTP)',
-  type: 'org.graylog.collectors.input.CollectorIngestHttpInput',
-  content_pack: '',
-  static_fields: {},
-});
 jest.mock('hooks/useInputMutations', () => () => ({
   createInput: jest.fn(),
   updateInput: jest.fn(),
@@ -67,32 +54,13 @@ jest.mock('components/inputs/InputStateBadge', () => () => <span>Running</span>)
 
 const updateConfig = jest.fn();
 
-const config: CollectorsConfig = {
-  ca_cert_id: 'ca-id',
-  signing_cert_id: 'signing-id',
-  token_signing_key: {
-    public_key: 'pub-key',
-    private_key: 'priv-key',
-    fingerprint: 'fp',
-    created_at: '2026-01-01T00:00:00Z',
-  },
-  otlp_server_cert_id: 'otlp-id',
-  http: {
-    hostname: 'otlp.example.com',
-    port: 14401,
-  },
-  collector_heartbeat_interval: 'PT30S',
-  collector_offline_threshold: 'PT5M',
-  collector_default_visibility_threshold: 'P1D',
-  collector_expiration_threshold: 'P7D',
-};
 
 describe('CollectorsSettings', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
     asMock(useCollectorsConfig).mockReturnValue({
-      data: config,
+      data: configuredCollectorsConfig,
       isLoading: false,
     });
     asMock(useCollectorsMutations).mockReturnValue(
@@ -178,7 +146,7 @@ describe('CollectorsSettings', () => {
     asMock(useCollectorInputDetails).mockReturnValue({
       collectorInputIds: ['input-1'],
       readableInputIds: ['input-1'],
-      loadedInputs: [mockInput(14402)],
+      loadedInputs: [mockCollectorInput(14402)],
       unreadableCount: 0,
       isLoading: false,
     });
@@ -193,7 +161,7 @@ describe('CollectorsSettings', () => {
     asMock(useCollectorInputDetails).mockReturnValue({
       collectorInputIds: ['input-1'],
       readableInputIds: ['input-1'],
-      loadedInputs: [mockInput(14401)],
+      loadedInputs: [mockCollectorInput(14401)],
       unreadableCount: 0,
       isLoading: false,
     });
@@ -235,7 +203,7 @@ describe('CollectorsSettings', () => {
       const hostname = await screen.findByLabelText('External hostname');
       const port = screen.getByLabelText('External port');
       expect(hostname).toBeDisabled();
-      expect(hostname).toHaveValue('otlp.example.com');
+      expect(hostname).toHaveValue('graylog.example.com');
       expect(port).toBeDisabled();
       expect(port).toHaveValue(14401);
 
@@ -249,7 +217,7 @@ describe('CollectorsSettings', () => {
 
     it('shows cloud-appropriate getting-started copy before configuration', async () => {
       asMock(useCollectorsConfig).mockReturnValue({
-        data: { ...config, signing_cert_id: null },
+        data: { ...configuredCollectorsConfig, signing_cert_id: null },
         isLoading: false,
       });
 
@@ -286,7 +254,7 @@ describe('CollectorsSettings telemetry', () => {
     jest.clearAllMocks();
     asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
     asMock(useCollectorsConfig).mockReturnValue({
-      data: config,
+      data: configuredCollectorsConfig,
       isLoading: false,
     });
     asMock(useCollectorsMutations).mockReturnValue(
@@ -316,7 +284,7 @@ describe('CollectorsSettings telemetry', () => {
     asMock(useCollectorInputDetails).mockReturnValue({
       collectorInputIds: ['input-1'],
       readableInputIds: ['input-1'],
-      loadedInputs: [mockInput(14401)],
+      loadedInputs: [mockCollectorInput(14401)],
       unreadableCount: 0,
       isLoading: false,
     });

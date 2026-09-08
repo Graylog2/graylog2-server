@@ -66,11 +66,12 @@ const buildRequest = (config: CollectorsConfig, values: FormValues, createInput:
  * shows, so a user learns up front when Collectors would enroll but never deliver data.
  *
  * Permission gating for the initial setup lives in FirstOnboarding: the wizard is not shown at all to a user who
- * could not create, or could not edit, the ingest input. Afterwards "Change" is offered only under the same rule.
+ * could not create, or could not edit, the ingest input. Afterwards "Change" is offered only under the same rule;
+ * while no input exists the address is edited inline in the warning and saving it creates the input.
  */
 const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
   const { updateConfig } = useCollectorsMutations();
-  const { createCollectorInput, updateCollectorInputPort } = useCollectorInputMutations();
+  const { updateCollectorInputPort } = useCollectorInputMutations();
   const { canCreateIngestInput, canEditIngestInput } = useCollectorPermissions();
   const { data: collectorInputIds = [], isLoading: isLoadingInputIds } = useCollectorInputIds();
   const { loadedInputs, isLoading: isLoadingInputDetails } = useCollectorInputDetails();
@@ -158,64 +159,80 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
     return <Spinner text="Setting up Collectors..." />;
   }
 
+  // The label says what saving does: the first save bootstraps the config, a later one moves an existing input,
+  // and in the "no input" alert it creates the missing input. A bare "Confirm" hid that last effect.
+  const submitLabel = (() => {
+    if (!isConfigured) return 'Confirm endpoint';
+
+    return needsInput ? 'Create input' : 'Save endpoint';
+  })();
+
+  const formikProps = {
+    initialValues: { http_hostname: config.http.hostname, http_port: config.http.port },
+    onSubmit: (values: FormValues) =>
+      submit(values).catch(() => {
+        // Error notification handled by useCollectorsMutations onError callback
+      }),
+  };
+
+  // The hostname:port row with its submit button. Rendered in the Section header for the initial setup and for
+  // "Change", and inline in the "no input" alert so creating the input and confirming its address is one step.
+  const endpointFields = (isSubmitting: boolean, onCancel?: () => void) => (
+    <Group gap="xs" wrap="nowrap">
+      <div style={{ width: 260 }}>
+        <FormikInput
+          id="ingest-hostname"
+          type="text"
+          name="http_hostname"
+          label="External hostname"
+          labelClassName="sr-only"
+          formGroupClassName="no-bm"
+          placeholder="e.g. otlp.example.com"
+          disabled={isSubmitting}
+        />
+      </div>
+      <Text span c="dimmed" fw={600} aria-hidden="true">
+        :
+      </Text>
+      <div style={{ width: 100 }}>
+        <FormikInput
+          id="ingest-port"
+          type="number"
+          name="http_port"
+          label="External port"
+          labelClassName="sr-only"
+          formGroupClassName="no-bm"
+          disabled={isSubmitting}
+        />
+      </div>
+      <Button type="submit" bsStyle="primary" disabled={isSubmitting}>
+        {isSubmitting ? 'Saving...' : submitLabel}
+      </Button>
+      {onCancel && (
+        <Button bsStyle="link" onClick={onCancel} disabled={isSubmitting}>
+          Cancel
+        </Button>
+      )}
+    </Group>
+  );
+
+  const reachabilityHint = (
+    <Text size="sm" c="dimmed">
+      Collectors send their logs to this address. It must be reachable from every Collector host: a load balancer, or
+      this server.
+    </Text>
+  );
+
   if (!isConfigured || editing) {
     return (
-      <Formik<FormValues>
-        initialValues={{ http_hostname: config.http.hostname, http_port: config.http.port }}
-        onSubmit={(values) =>
-          submit(values).catch(() => {
-            // Error notification handled by useCollectorsMutations onError callback
-          })
-        }>
+      <Formik<FormValues> {...formikProps}>
         {({ isSubmitting }) => (
           <Form>
             <Section
-              title="Confirm how Collectors reach this cluster"
+              title="Confirm how Collectors send data to this cluster"
               titleAs="h4"
-              actions={
-                <Group gap="xs" wrap="nowrap">
-                  <div style={{ width: 260 }}>
-                    <FormikInput
-                      id="ingest-hostname"
-                      type="text"
-                      name="http_hostname"
-                      label="External hostname"
-                      labelClassName="sr-only"
-                      formGroupClassName="no-bm"
-                      placeholder="e.g. otlp.example.com"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <Text span c="dimmed" fw={600} aria-hidden="true">
-                    :
-                  </Text>
-                  <div style={{ width: 100 }}>
-                    <FormikInput
-                      id="ingest-port"
-                      type="number"
-                      name="http_port"
-                      label="External port"
-                      labelClassName="sr-only"
-                      formGroupClassName="no-bm"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <Button type="submit" bsStyle="primary" disabled={isSubmitting}>
-                    {isSubmitting ? 'Saving...' : 'Confirm'}
-                  </Button>
-                  {editing && (
-                    <Button bsStyle="link" onClick={() => setEditing(false)} disabled={isSubmitting}>
-                      Cancel
-                    </Button>
-                  )}
-                </Group>
-              }>
-              <Stack gap="xs">
-                <Text size="sm" c="dimmed">
-                  Collectors send their logs to this address. It must be reachable from every Collector host: a load
-                  balancer, or this server.
-                </Text>
-              </Stack>
+              actions={endpointFields(isSubmitting, editing ? () => setEditing(false) : undefined)}>
+              <Stack gap="xs">{reachabilityHint}</Stack>
             </Section>
           </Form>
         )}
@@ -225,7 +242,7 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
 
   const changeButton = canChangeEndpoint ? (
     <Button bsStyle="link" onClick={() => setEditing(true)}>
-      Change
+      Change endpoint
     </Button>
   ) : null;
 
@@ -244,26 +261,30 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
   );
 
   if (isCloud) {
-    return <Alert bsStyle="success">Collectors reach this cluster at {endpointText}</Alert>;
+    return <Alert bsStyle="success">Collectors send data to this cluster at {endpointText}</Alert>;
   }
 
   if (isLoadingInputIds || isLoadingInputDetails || (hasInputs && isLoadingInputStates)) {
     return <Spinner />;
   }
 
-  if (!hasInputs) {
+  // Only reached by a user who may create the input (FirstOnboarding gates the wizard on it), so no "ask an
+  // administrator" fallback here. One step instead of "Change" plus "Create input": the address is edited right
+  // here and saving creates the input.
+if (!hasInputs) {
     return (
-      <Alert bsStyle="warning" title={headline(<>No ingest input exists for {endpointText}</>)}>
-        <Stack gap="xs" align="flex-start">
-          <Text>Collectors can enroll, but they will not be able to send data until an input is created.</Text>
-          {canCreateIngestInput ? (
-            <Button bsSize="small" onClick={() => createCollectorInput()}>
-              Create input
-            </Button>
-          ) : (
-            <Text>{`Ask an administrator to create a Collector Ingest (HTTP) input on port ${config.http.port}.`}</Text>
+      <Alert bsStyle="warning" title="No ingest input exists">
+        <Formik<FormValues> {...formikProps}>
+          {({ isSubmitting }) => (
+            <Form>
+              <Stack gap="xs" align="flex-start">
+                <Text>Collectors can enroll, but they will not be able to send data until an input is created.</Text>
+                {endpointFields(isSubmitting)}
+                {reachabilityHint}
+              </Stack>
+            </Form>
           )}
-        </Stack>
+        </Formik>
       </Alert>
     );
   }
@@ -296,7 +317,7 @@ const IngestEndpointStrip = ({ config, onConfirmed = undefined }: Props) => {
     );
   }
 
-  return <Alert bsStyle="success">{headline(<>Collectors reach this cluster at {endpointText}</>)}</Alert>;
+  return <Alert bsStyle="success">{headline(<>Collectors send data to this cluster at {endpointText}</>)}</Alert>;
 };
 
 export default IngestEndpointStrip;

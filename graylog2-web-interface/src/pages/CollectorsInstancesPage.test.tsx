@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import { useCollectorsConfig } from 'components/collectors/hooks';
-import type { CollectorsConfig } from 'components/collectors/types';
+import { configuredCollectorsConfig, unconfiguredCollectorsConfig } from 'components/collectors/testing/fixtures';
 
 import CollectorsInstancesPage from './CollectorsInstancesPage';
 
@@ -46,7 +46,7 @@ describe('CollectorsInstancesPage', () => {
 
   it('redirects to the overview wizard when collectors are not configured', () => {
     asMock(useCollectorsConfig).mockReturnValue({
-      data: { signing_cert_id: null } as unknown as CollectorsConfig,
+      data: unconfiguredCollectorsConfig,
       isLoading: false,
     });
 
@@ -58,7 +58,7 @@ describe('CollectorsInstancesPage', () => {
 
   it('renders the page once collectors are configured', () => {
     asMock(useCollectorsConfig).mockReturnValue({
-      data: { signing_cert_id: 'signing-id' } as unknown as CollectorsConfig,
+      data: configuredCollectorsConfig,
       isLoading: false,
     });
 

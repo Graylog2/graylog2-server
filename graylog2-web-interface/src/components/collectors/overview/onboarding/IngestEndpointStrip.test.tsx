@@ -32,45 +32,16 @@ import {
   useCollectorInputMutations,
   useCollectorPermissions,
 } from '../../hooks';
-import type { CollectorsConfig } from '../../types';
 import { mockCollectorsMutations } from '../../testing/mockMutations';
 import { mockCollectorPermissions } from '../../testing/mockPermissions';
+import { configuredCollectorsConfig, mockCollectorInput, unconfiguredCollectorsConfig } from '../../testing/fixtures';
 
 jest.mock('../../hooks');
 jest.mock('hooks/useInputsStates');
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 jest.mock('components/inputs/InputStateBadge', () => () => <span>state badge</span>);
 
-// The GET response before any config was saved: server-derived hostname, default port and thresholds.
-const unconfigured: CollectorsConfig = {
-  ca_cert_id: null,
-  signing_cert_id: null,
-  token_signing_key: null,
-  otlp_server_cert_id: null,
-  http: { hostname: 'graylog.example.com', port: 14401 },
-  collector_heartbeat_interval: 'PT30S',
-  collector_offline_threshold: 'PT5M',
-  collector_default_visibility_threshold: 'P1D',
-  collector_expiration_threshold: 'P7D',
-};
-
-const configured: CollectorsConfig = { ...unconfigured, ca_cert_id: 'ca-id', signing_cert_id: 'signing-id' };
-
-const mockInput = (port: number) => ({
-  id: 'input-1',
-  creator_user_id: 'admin',
-  node: 'node-1',
-  name: 'CollectorIngestHttpInput',
-  created_at: '2026-01-01T00:00:00Z',
-  global: true,
-  attributes: { port, bind_address: '0.0.0.0' },
-  title: 'Collector Ingest (HTTP)',
-  type: 'org.graylog.collectors.input.CollectorIngestHttpInput',
-  content_pack: '',
-  static_fields: {},
-});
-
-const withInputs = (inputs: Array<ReturnType<typeof mockInput>>) => {
+const withInputs = (inputs: Array<ReturnType<typeof mockCollectorInput>>) => {
   const ids = inputs.map((i) => i.id);
   asMock(useCollectorInputIds).mockReturnValue({ data: ids, isLoading: false } as ReturnType<typeof useCollectorInputIds>);
   asMock(useCollectorInputDetails).mockReturnValue({
@@ -115,19 +86,19 @@ describe('IngestEndpointStrip', () => {
       typeof useInputsStates
     >);
     withInputs([]);
-    updateConfig.mockResolvedValue(configured);
+    updateConfig.mockResolvedValue(configuredCollectorsConfig);
   });
 
   describe('before the config exists', () => {
     it('asks to confirm the server-derived endpoint and saves it with the default thresholds', async () => {
-      render(<IngestEndpointStrip config={unconfigured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={unconfiguredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       expect(screen.getByText(/confirm how collectors reach this cluster/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/external hostname/i)).toHaveValue('graylog.example.com');
       expect(screen.getByText(':')).toBeInTheDocument();
       expect(screen.getByLabelText(/external port/i)).toHaveValue(14401);
 
-      await userEvent.click(screen.getByRole('button', { name: /^confirm$/i }));
+      await userEvent.click(screen.getByRole('button', { name: /confirm endpoint/i }));
 
       await waitFor(() => {
         expect(updateConfig).toHaveBeenCalledWith({
@@ -142,11 +113,11 @@ describe('IngestEndpointStrip', () => {
     });
 
     it('does not request an input when one already exists', async () => {
-      withInputs([mockInput(14401)]);
+      withInputs([mockCollectorInput(14401)]);
 
-      render(<IngestEndpointStrip config={unconfigured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={unconfiguredCollectorsConfig} onConfirmed={onConfirmed} />);
 
-      await userEvent.click(screen.getByRole('button', { name: /^confirm$/i }));
+      await userEvent.click(screen.getByRole('button', { name: /confirm endpoint/i }));
 
       await waitFor(() => {
         expect(updateConfig).toHaveBeenCalledWith(expect.objectContaining({ create_input: false }));
@@ -156,10 +127,10 @@ describe('IngestEndpointStrip', () => {
 
   describe('once the config exists', () => {
     it('shows the endpoint as reachable when an ingest input is running', () => {
-      withInputs([mockInput(14401)]);
+      withInputs([mockCollectorInput(14401)]);
       withInputStates('RUNNING');
 
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       expect(screen.getByText(/collectors reach this cluster at/i)).toBeInTheDocument();
       expect(screen.getByText('graylog.example.com:14401')).toBeInTheDocument();
@@ -167,10 +138,10 @@ describe('IngestEndpointStrip', () => {
     });
 
     it('warns when the ingest input exists but is not running', () => {
-      withInputs([mockInput(14401)]);
+      withInputs([mockCollectorInput(14401)]);
       withInputStates('FAILED');
 
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       expect(screen.getByText(/ingest input .* is not running/i)).toBeInTheDocument();
       expect(screen.getByText(/will not be able to send data/i)).toBeInTheDocument();
@@ -178,31 +149,43 @@ describe('IngestEndpointStrip', () => {
       expect(screen.getByRole('link', { name: /manage input/i })).toBeInTheDocument();
     });
 
-    it('warns when no ingest input exists and lets a permitted user create one', async () => {
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+    it('warns when no ingest input exists and lets a permitted user create one at the confirmed address', async () => {
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       expect(screen.getByText(/no ingest input exists/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/external hostname/i)).toHaveValue('graylog.example.com');
 
       await userEvent.click(screen.getByRole('button', { name: /create input/i }));
 
-      expect(createCollectorInput).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(updateConfig).toHaveBeenCalledWith(
+          expect.objectContaining({ http: { hostname: 'graylog.example.com', port: 14401 }, create_input: true }),
+        );
+      });
+      expect(createCollectorInput).not.toHaveBeenCalled();
+      expect(onConfirmed).toHaveBeenCalledTimes(1);
     });
 
-    it('tells a user without input permissions to ask an administrator instead of offering the button', () => {
-      asMock(useCollectorPermissions).mockReturnValue(collectorsManager());
+    it('creates the missing input on the port entered inline', async () => {
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+      const port = screen.getByLabelText(/external port/i);
+      await userEvent.clear(port);
+      await userEvent.type(port, '14402');
+      await userEvent.click(screen.getByRole('button', { name: /create input/i }));
 
-      expect(screen.getByText(/no ingest input exists/i)).toBeInTheDocument();
-      expect(screen.getByText(/administrator/i)).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /create input/i })).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(updateConfig).toHaveBeenCalledWith(
+          expect.objectContaining({ http: { hostname: 'graylog.example.com', port: 14402 }, create_input: true }),
+        );
+      });
     });
 
     it('lets the user change the endpoint again', async () => {
-      withInputs([mockInput(14401)]);
+      withInputs([mockCollectorInput(14401)]);
       withInputStates('RUNNING');
 
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       await userEvent.click(screen.getByRole('button', { name: /change/i }));
 
@@ -210,17 +193,17 @@ describe('IngestEndpointStrip', () => {
     });
 
     it('moves the existing ingest input to the new port when the user may edit inputs', async () => {
-      const input = mockInput(14401);
+      const input = mockCollectorInput(14401);
       withInputs([input]);
       withInputStates('FAILED');
 
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       await userEvent.click(screen.getByRole('button', { name: /change/i }));
       const port = screen.getByLabelText(/external port/i);
       await userEvent.clear(port);
       await userEvent.type(port, '14402');
-      await userEvent.click(screen.getByRole('button', { name: /^confirm$/i }));
+      await userEvent.click(screen.getByRole('button', { name: /save endpoint/i }));
 
       await waitFor(() => {
         expect(updateConfig).toHaveBeenCalledWith(
@@ -231,16 +214,16 @@ describe('IngestEndpointStrip', () => {
     });
 
     it('leaves the input alone when only the hostname changes', async () => {
-      withInputs([mockInput(14401)]);
+      withInputs([mockCollectorInput(14401)]);
       withInputStates('RUNNING');
 
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       await userEvent.click(screen.getByRole('button', { name: /change/i }));
       const hostname = screen.getByLabelText(/external hostname/i);
       await userEvent.clear(hostname);
       await userEvent.type(hostname, 'lb.example.com');
-      await userEvent.click(screen.getByRole('button', { name: /^confirm$/i }));
+      await userEvent.click(screen.getByRole('button', { name: /save endpoint/i }));
 
       await waitFor(() => {
         expect(updateConfig).toHaveBeenCalledWith(
@@ -252,19 +235,20 @@ describe('IngestEndpointStrip', () => {
 
     it('offers no Change when the user cannot edit the existing input', () => {
       asMock(useCollectorPermissions).mockReturnValue(collectorsManager());
-      withInputs([mockInput(14401)]);
+      withInputs([mockCollectorInput(14401)]);
       withInputStates('FAILED');
 
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       expect(screen.getByText(/ingest input .* is not running/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /change/i })).not.toBeInTheDocument();
     });
 
-    it('still offers Change when no input exists and the user may create one', () => {
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+    it('offers no separate Change when no input exists, since the address is edited inline', () => {
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
-      expect(screen.getByRole('button', { name: /change/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /create input/i })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /change/i })).not.toBeInTheDocument();
     });
   });
 
@@ -278,7 +262,7 @@ describe('IngestEndpointStrip', () => {
     });
 
     it('initializes the server-provisioned endpoint without showing a form', async () => {
-      render(<IngestEndpointStrip config={unconfigured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={unconfiguredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       await waitFor(() => {
         expect(updateConfig).toHaveBeenCalledWith(expect.objectContaining({ create_input: false }));
@@ -290,7 +274,7 @@ describe('IngestEndpointStrip', () => {
     });
 
     it('shows the endpoint as reachable once configured without consulting inputs', () => {
-      render(<IngestEndpointStrip config={configured} onConfirmed={onConfirmed} />);
+      render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
       expect(screen.getByText(/collectors reach this cluster at/i)).toBeInTheDocument();
       expect(screen.queryByText(/no ingest input exists/i)).not.toBeInTheDocument();

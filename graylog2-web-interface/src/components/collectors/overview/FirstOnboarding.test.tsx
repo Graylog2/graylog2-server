@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import selectEvent from 'helpers/selectEvent';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { CollectorInstanceView, CollectorsConfig } from 'components/collectors/types';
+import type { CollectorInstanceView } from 'components/collectors/types';
 
 import FirstOnboarding from './FirstOnboarding';
 
@@ -35,6 +35,7 @@ import {
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 import { mockCollectorPermissions } from '../testing/mockPermissions';
+import { configuredCollectorsConfig, unconfiguredCollectorsConfig } from '../testing/fixtures';
 
 jest.mock('../hooks');
 jest.mock('../hooks/useSendCollectorsTelemetry');
@@ -106,8 +107,6 @@ jest.mock('./onboarding/WaitingForConnection', () => {
   };
 });
 
-const configuredConfig = { signing_cert_id: 'signing-id' } as unknown as CollectorsConfig;
-const unconfiguredConfig = { signing_cert_id: null } as unknown as CollectorsConfig;
 
 const mockFleets = [
   { id: 'fleet-1', name: 'Default Fleet', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
@@ -133,7 +132,7 @@ describe('FirstOnboarding', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
-    asMock(useCollectorsConfig).mockReturnValue({ data: configuredConfig, isLoading: false });
+    asMock(useCollectorsConfig).mockReturnValue({ data: configuredCollectorsConfig, isLoading: false });
     asMock(useCollectorInputIds).mockReturnValue({ data: ['input-1'], isLoading: false } as ReturnType<
       typeof useCollectorInputIds
     >);
@@ -169,9 +168,7 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/waiting for connection/i);
 
     expect(createFleet).not.toHaveBeenCalled();
     expect(createEnrollmentToken).toHaveBeenCalledWith({
@@ -246,7 +243,7 @@ describe('FirstOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
     // Only the existing-fleet dropdown remains reachable — no ungated create-fleet write.
-    expect(await screen.findByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
+    await screen.findByRole('combobox', { name: /select existing fleet/i });
     expect(screen.queryByRole('button', { name: /create new fleet/i })).not.toBeInTheDocument();
   });
 
@@ -257,7 +254,7 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    expect(await screen.findByRole('button', { name: /create new fleet/i })).toBeInTheDocument();
+    await screen.findByRole('button', { name: /create new fleet/i });
     expect(screen.getByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
 
     // No fleet decided yet: the command box must not appear.
@@ -289,7 +286,7 @@ describe('FirstOnboarding', () => {
       });
     });
 
-    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+    await screen.findByText(/run this on linux/i);
   });
 
   it('uses an existing fleet selected from the dropdown', async () => {
@@ -311,7 +308,7 @@ describe('FirstOnboarding', () => {
     });
 
     expect(createFleet).not.toHaveBeenCalled();
-    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+    await screen.findByText(/run this on linux/i);
   });
 
   it('shows the selected fleet name and description with a change button once chosen', async () => {
@@ -323,7 +320,7 @@ describe('FirstOnboarding', () => {
     await screen.findByRole('button', { name: /create new fleet/i });
     await selectEvent.chooseOption('Select existing fleet', 'Staging');
 
-    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+    await screen.findByText(/run this on linux/i);
 
     // The choice controls are replaced by a summary of the selected fleet.
     expect(screen.getByText('Staging')).toBeInTheDocument();
@@ -340,7 +337,7 @@ describe('FirstOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
     await userEvent.click(await screen.findByRole('button', { name: /create new fleet/i }));
 
-    expect(await screen.findByText('Onboarding - 2026-05-28')).toBeInTheDocument();
+    await screen.findByText('Onboarding - 2026-05-28');
     expect(screen.getByText(/created by graylog 7\.1 onboarding wizard/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /change fleet/i })).toBeInTheDocument();
   });
@@ -366,15 +363,11 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/waiting for connection/i);
 
     await userEvent.click(screen.getByRole('button', { name: /windows/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/run this on windows/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/run this on windows/i);
 
     expect(createEnrollmentToken).toHaveBeenCalledTimes(1);
   });
@@ -384,9 +377,7 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/waiting for connection/i);
 
     await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
 
@@ -499,9 +490,7 @@ describe('FirstOnboarding', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-      await waitFor(() => {
-        expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-      });
+      await screen.findByText(/waiting for connection/i);
 
       await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
 
@@ -548,7 +537,7 @@ describe('FirstOnboarding', () => {
 
   describe('before collectors are configured', () => {
     beforeEach(() => {
-      asMock(useCollectorsConfig).mockReturnValue({ data: unconfiguredConfig, isLoading: false });
+      asMock(useCollectorsConfig).mockReturnValue({ data: unconfiguredCollectorsConfig, isLoading: false });
     });
 
     it('still starts with the platform picker', () => {
@@ -563,7 +552,7 @@ describe('FirstOnboarding', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-      expect(await screen.findByText('Confirm how Collectors reach this cluster')).toBeInTheDocument();
+      await screen.findByText('Confirm how Collectors reach this cluster');
       expect(screen.getByText('Default Fleet')).toBeInTheDocument();
       // No token before the endpoint exists: minting one needs the signing key the first save creates.
       expect(createEnrollmentToken).not.toHaveBeenCalled();
@@ -576,9 +565,7 @@ describe('FirstOnboarding', () => {
       await userEvent.click(screen.getByRole('button', { name: /linux/i }));
       await userEvent.click(await screen.findByRole('button', { name: /confirm endpoint/i }));
 
-      await waitFor(() => {
-        expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-      });
+      await screen.findByText(/waiting for connection/i);
       expect(createEnrollmentToken).toHaveBeenCalledWith({ name: 'onboarding', fleetId: 'fleet-1', expiresIn: 'P1D' });
       expect(screen.getByText(/test-token-abc/)).toBeInTheDocument();
       // The strip stays as the endpoint status line above the command.
@@ -595,7 +582,7 @@ describe('FirstOnboarding', () => {
       await waitFor(() => {
         expect(createFleet).toHaveBeenCalled();
       });
-      expect(await screen.findByText('Confirm how Collectors reach this cluster')).toBeInTheDocument();
+      await screen.findByText('Confirm how Collectors reach this cluster');
       expect(createEnrollmentToken).not.toHaveBeenCalled();
     });
 
@@ -608,7 +595,8 @@ describe('FirstOnboarding', () => {
 
       render(<FirstOnboarding />);
 
-      expect(screen.getByText(/an administrator must set up the collector ingest endpoint/i)).toBeInTheDocument();
+      expect(screen.getByText(/collector ingest endpoint not set up/i)).toBeInTheDocument();
+      expect(screen.getByText(/your account does not have/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
     });
 
@@ -617,7 +605,8 @@ describe('FirstOnboarding', () => {
 
       render(<FirstOnboarding />);
 
-      expect(screen.getByText(/an administrator must set up the collector ingest endpoint/i)).toBeInTheDocument();
+      expect(screen.getByText(/collector ingest endpoint not set up/i)).toBeInTheDocument();
+      expect(screen.getByText(/your account does not have/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
     });
 
@@ -636,7 +625,8 @@ describe('FirstOnboarding', () => {
 
       render(<FirstOnboarding />);
 
-      expect(screen.getByText(/an administrator must set up the collector ingest endpoint/i)).toBeInTheDocument();
+      expect(screen.getByText(/collector ingest endpoint not set up/i)).toBeInTheDocument();
+      expect(screen.getByText(/your account does not have/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
     });
 
@@ -654,7 +644,7 @@ describe('FirstOnboarding', () => {
 
       render(<FirstOnboarding />);
 
-      expect(await screen.findByText(/loading/i)).toBeInTheDocument();
+      await screen.findByText(/loading/i);
       expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
     });
   });
@@ -666,9 +656,7 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/waiting for connection/i);
     expect(screen.queryByText('Confirm how Collectors reach this cluster')).not.toBeInTheDocument();
   });
 
@@ -684,7 +672,8 @@ describe('FirstOnboarding', () => {
 
       render(<FirstOnboarding />);
 
-      expect(screen.getByText(/an administrator must set up the collector ingest endpoint/i)).toBeInTheDocument();
+      expect(screen.getByText(/collector ingest endpoint not set up/i)).toBeInTheDocument();
+      expect(screen.getByText(/your account does not have/i)).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
     });
 
@@ -693,9 +682,7 @@ describe('FirstOnboarding', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-      await waitFor(() => {
-        expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-      });
+      await screen.findByText(/waiting for connection/i);
       expect(screen.getByText('Confirm how Collectors reach this cluster')).toBeInTheDocument();
     });
   });
@@ -706,6 +693,6 @@ describe('FirstOnboarding', () => {
     render(<FirstOnboarding />);
 
     // Spinner renders behind a 200ms Delayed wrapper, so wait for it to appear
-    expect(await screen.findByText(/loading/i)).toBeInTheDocument();
+    await screen.findByText(/loading/i);
   });
 });
