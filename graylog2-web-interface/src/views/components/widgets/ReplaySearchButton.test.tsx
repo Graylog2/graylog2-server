@@ -25,6 +25,8 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { QueryString } from 'views/logic/queries/types';
 import type { FiltersType, SearchFilter } from 'views/types';
 import Store from 'logic/local-storage/Store';
+import CurrentUserContext from 'contexts/CurrentUserContext';
+import { alice } from 'fixtures/users';
 
 import ReplaySearchButton from './ReplaySearchButton';
 
@@ -50,6 +52,30 @@ describe('ReplaySearchButton', () => {
     render(<ReplaySearchButton />);
 
     await screen.findByRole('link', { name: /replay search/i });
+  });
+
+  it('renders play button when user can read the event definition', async () => {
+    render(
+      <CurrentUserContext.Provider
+        value={alice
+          .toBuilder()
+          .permissions(Immutable.List(['eventdefinitions:read:event-definition-id']))
+          .build()}>
+        <ReplaySearchButton eventDefinitionId="event-definition-id" />
+      </CurrentUserContext.Provider>,
+    );
+
+    await screen.findByRole('link', { name: /replay search/i });
+  });
+
+  it('does not render play button when user cannot read the event definition', () => {
+    render(
+      <CurrentUserContext.Provider value={alice}>
+        <ReplaySearchButton eventDefinitionId="event-definition-id" />
+      </CurrentUserContext.Provider>,
+    );
+
+    expect(screen.queryByRole('link', { name: /replay search/i })).not.toBeInTheDocument();
   });
 
   it('shows a tooltip when focused via keyboard', async () => {
