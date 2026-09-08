@@ -64,7 +64,6 @@ public class AWSInstanceNameLookupProcessor implements MessageProcessor {
         }
     }
 
-    private final MetricRegistry metricRegistry;
     private final InstanceLookupTable table;
 
     private AWSPluginConfiguration config;
@@ -72,47 +71,44 @@ public class AWSInstanceNameLookupProcessor implements MessageProcessor {
     @Inject
     public AWSInstanceNameLookupProcessor(ClusterConfigService clusterConfigService,
                                           InstanceLookupTable instanceLookupTable,
-                                          MetricRegistry metricRegistry,
                                           Configuration configuration) {
-        this.metricRegistry = metricRegistry;
         this.table = instanceLookupTable;
 
-        Runnable refresh = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // TODO: This should be removed when we can ensure that migrations were run before starting anything else
-                    waitForMigrationCompletion(clusterConfigService);
+        final Runnable refresh = () -> {
+            try {
+                // TODO: This should be removed when we can ensure that migrations were run before starting anything else
+                waitForMigrationCompletion(clusterConfigService);
 
-                    config = clusterConfigService.getOrDefault(AWSPluginConfiguration.class,
-                            AWSPluginConfiguration.createDefault());
+                config = clusterConfigService.getOrDefault(AWSPluginConfiguration.class,
+                        AWSPluginConfiguration.createDefault());
 
-                    if (!config.lookupsEnabled()) {
-                        LOG.debug("AWS instance name lookups are disabled.");
-                        return;
-                    }
-
-                    if (config.lookupsEnabled() && config.getLookupRegions().isEmpty()) {
-                        LOG.warn("AWS region configuration is not complete. No instance lookups will happen.");
-                        return;
-                    }
-
-                    final AWSAuthProvider awsAuthProvider = new AWSAuthProvider(configuration, config);
-
-                    LOG.debug("Refreshing AWS instance lookup table.");
-
-                    final Optional<ProxyConfig> proxyConfig = configuration.getHttpProxyConfig();
-                    final HttpUrl proxyUrl = config.proxyEnabled() && proxyConfig.isPresent()
-                            ? HttpUrl.get(proxyConfig.get().uri()) : null;
-
-                    table.reload(
-                            config.getLookupRegions(),
-                            awsAuthProvider,
-                            proxyUrl
-                    );
-                } catch (Exception e) {
-                    LOG.error("Could not refresh AWS instance lookup table.", e);
+                if (!config.lookupsEnabled()) {
+                    LOG.debug("AWS instance name lookups are disabled.");
+                    return;
                 }
+
+                if (config.lookupsEnabled() && config.getLookupRegions().isEmpty()) {
+                    LOG.warn("AWS region configuration is not complete. No instance lookups will happen.");
+                    return;
+                }
+
+                final AWSAuthProvider awsAuthProvider = new AWSAuthProvider(configuration, config);
+
+                LOG.debug("Refreshing AWS instance lookup table.");
+
+                final Optional<ProxyConfig> proxyConfig = configuration.getHttpProxyConfig();
+                final HttpUrl proxyUrl = proxyConfig.filter(_proxyConfig -> config.proxyEnabled())
+                        .map(ProxyConfig::uri)
+                        .map(HttpUrl::get)
+                        .orElse(null);
+
+                table.reload(
+                        config.getLookupRegions(),
+                        awsAuthProvider,
+                        proxyUrl
+                );
+            } catch (Exception e) {
+                LOG.error("Could not refresh AWS instance lookup table.", e);
             }
         };
 

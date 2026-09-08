@@ -52,10 +52,7 @@ public class ProxySelectorProvider implements Provider<ProxySelector> {
 
     @Override
     public ProxySelector get() {
-        if (proxyConfig.isEmpty()) {
-            return ProxySelector.getDefault();
-        }
-        return new ProxySelector() {
+        return proxyConfig.<ProxySelector>map(config -> new ProxySelector() {
             @Override
             public List<Proxy> select(URI uri) {
                 final String host = uri.getHost();
@@ -75,7 +72,7 @@ public class ProxySelectorProvider implements Provider<ProxySelector> {
                     LOG.debug("Unable to resolve host name for proxy selection: ", e);
                 }
 
-                final Proxy proxy = new Proxy(Proxy.Type.HTTP, getProxyAddress());
+                final Proxy proxy = new Proxy(Proxy.Type.HTTP, config.getProxyAddress());
                 return ImmutableList.of(proxy);
             }
 
@@ -83,11 +80,6 @@ public class ProxySelectorProvider implements Provider<ProxySelector> {
             public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
                 LOG.warn("Unable to connect to proxy: ", ioe);
             }
-        };
-    }
-
-    public InetSocketAddress getProxyAddress() {
-        final ProxyConfig config = proxyConfig.orElseThrow();
-        return new InetSocketAddress(config.host(), config.port());
+        }).orElseGet(ProxySelector::getDefault);
     }
 }

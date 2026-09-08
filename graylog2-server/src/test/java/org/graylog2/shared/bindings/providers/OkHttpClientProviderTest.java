@@ -286,7 +286,7 @@ public class OkHttpClientProviderTest {
         final String TEST_PROXY = "http://proxy.dummy.org";
         final InetSocketAddress testProxyAddress = new InetSocketAddress(TEST_PROXY, 59001);
         final Proxy testProxy = new Proxy(Proxy.Type.HTTP, testProxyAddress);
-        final ProxyConfig testProxyConfig = new ProxyConfig(server.url("/").uri());
+        final ProxyConfig testProxyConfig = Mockito.spy(new ProxyConfig(server.url("/").uri()));
         final ProxySelectorProvider proxyProvider = new ProxySelectorProvider(testProxyConfig, null);
         ProxySelectorProvider spyProxyProvider = Mockito.spy(proxyProvider);
         final OkHttpClientProvider provider = new OkHttpClientProvider(
@@ -304,7 +304,7 @@ public class OkHttpClientProviderTest {
                 .first()
                 .matches(proxy -> proxy.equals(server.getProxyAddress()));
 
-        Mockito.doReturn(testProxyAddress).when(spyProxyProvider).getProxyAddress();
+        Mockito.doReturn(testProxyAddress).when(testProxyConfig).getProxyAddress();
         assertThat(client.proxySelector().select(URI.create("http://203.0.113.10/")))
                 .hasSize(1)
                 .first()

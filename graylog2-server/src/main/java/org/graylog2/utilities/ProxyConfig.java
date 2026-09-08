@@ -18,6 +18,7 @@ package org.graylog2.utilities;
 
 import com.google.common.base.Splitter;
 
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -85,5 +86,9 @@ public record ProxyConfig(URI uri) {
         return userInfo.size() == 2
                 ? Optional.of(new Credentials(userInfo.get(0), userInfo.get(1)))
                 : Optional.empty();
+    }
+
+    public InetSocketAddress getProxyAddress() {
+        return new InetSocketAddress(host(), port());
     }
 }
