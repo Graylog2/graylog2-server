@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Format aggregation series values in event messages as plain decimal numbers instead of scientific notation."
+
+issues = ["25005"]
