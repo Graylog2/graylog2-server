@@ -93,7 +93,7 @@ describe('IngestEndpointStrip', () => {
     it('asks to confirm the server-derived endpoint and saves it with the default thresholds', async () => {
       render(<IngestEndpointStrip config={unconfiguredCollectorsConfig} onConfirmed={onConfirmed} />);
 
-      expect(screen.getByText(/confirm how collectors reach this cluster/i)).toBeInTheDocument();
+      expect(screen.getByText(/confirm how collectors send data to this cluster/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/external hostname/i)).toHaveValue('graylog.example.com');
       expect(screen.getByText(':')).toBeInTheDocument();
       expect(screen.getByLabelText(/external port/i)).toHaveValue(14401);
@@ -132,7 +132,7 @@ describe('IngestEndpointStrip', () => {
 
       render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
-      expect(screen.getByText(/collectors reach this cluster at/i)).toBeInTheDocument();
+      expect(screen.getByText(/collectors send data to this cluster at/i)).toBeInTheDocument();
       expect(screen.getByText('graylog.example.com:14401')).toBeInTheDocument();
       expect(screen.queryByLabelText(/external hostname/i)).not.toBeInTheDocument();
     });
@@ -276,7 +276,7 @@ describe('IngestEndpointStrip', () => {
     it('shows the endpoint as reachable once configured without consulting inputs', () => {
       render(<IngestEndpointStrip config={configuredCollectorsConfig} onConfirmed={onConfirmed} />);
 
-      expect(screen.getByText(/collectors reach this cluster at/i)).toBeInTheDocument();
+      expect(screen.getByText(/collectors send data to this cluster at/i)).toBeInTheDocument();
       expect(screen.queryByText(/no ingest input exists/i)).not.toBeInTheDocument();
     });
   });
