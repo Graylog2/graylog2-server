@@ -115,7 +115,7 @@ function SummaryStep() {
   return (
     <ErrorsProvider>
       <ErrorsConsumer
-        lutNames={values.name ? [values.name] : undefined}
+        lutNames={values.id && values.name ? [values.name] : undefined}
         cacheNames={cache?.name ? [cache.name] : undefined}
         adapterNames={dataAdapter?.name ? [dataAdapter.name] : undefined}
       />
