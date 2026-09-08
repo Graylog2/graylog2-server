@@ -102,10 +102,9 @@ export const stopShardReplication = async (): Promise<FlushResponse> => {
 
 export const startShardReplication = async (): Promise<FlushResponse> => {
   try {
-    removeSavedNodeToUpgrade();
-
     const response = await DatanodeUpgrade.startReplication();
 
+    removeSavedNodeToUpgrade();
     UserNotification.success(`Shard replication started successfully`);
 
     return response;

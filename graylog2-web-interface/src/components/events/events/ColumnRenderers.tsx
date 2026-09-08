@@ -92,8 +92,18 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
     <em>No time range</em>
   );
 
-export const TagsRenderer = ({ tags }: { tags: ReadonlyArray<string> | undefined | null }) => {
+export const TagsRenderer = ({
+  tags,
+  interactive = true,
+}: {
+  tags: ReadonlyArray<string> | undefined | null;
+  interactive?: boolean;
+}) => {
   const onTagClick = useAppendTagFilter();
+
+  if (!interactive) {
+    return <ChipsCell items={tags} />;
+  }
 
   return <ChipsCell items={tags} onItemClick={onTagClick} itemLabel="tag" />;
 };
