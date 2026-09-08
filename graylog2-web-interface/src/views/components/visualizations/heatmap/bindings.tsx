@@ -25,6 +25,7 @@ import {
   areAtLeastNGroupingsConfigured,
   areAtLeastNMetricsConfigured,
 } from 'views/components/visualizations/validations';
+import { toPngViaPlotly } from 'views/components/visualizations/exportUtils';
 
 type HeatMapVisualizationConfigFormValues = {
   colorScale: (typeof COLORSCALES)[number];
@@ -153,6 +154,7 @@ const heatmap: VisualizationType<
     ],
   },
   validate,
+  toPng: toPngViaPlotly,
 };
 
 export default heatmap;

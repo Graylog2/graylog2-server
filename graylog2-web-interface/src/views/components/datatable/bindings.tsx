@@ -18,6 +18,7 @@
 import type { VisualizationType } from 'views/types';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import { toPngViaHtml2Canvas } from 'views/components/visualizations/exportUtils';
 
 import DataTable from './DataTable';
 
@@ -55,6 +56,7 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
       },
     ],
   },
+  toPng: toPngViaHtml2Canvas,
 };
 
 export default dataTable;

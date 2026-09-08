@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import isEqual from 'lodash/isEqual';
 
@@ -48,6 +48,7 @@ import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import { setGlobalOverrideTimerange, setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -61,7 +62,6 @@ import WidgetWarmTierAlert from './WidgetWarmTierAlert';
 
 import { useIsInteractiveMode } from '../contexts/InteractiveContext';
 import PngExportContext from '../visualizations/PngExportContext';
-import type { PngExportFn } from '../visualizations/PngExportContext';
 
 export type Props = {
   id: string;
@@ -286,11 +286,20 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   const viewType = useViewType();
   const fields = useQueryFieldTypes();
   const [loading, setLoading] = useState(false);
-  const [pngExportFn, setPngExportFn] = useState<PngExportFn | null>(null);
-  const setExportFn = useCallback((fn: PngExportFn | null) => setPngExportFn(() => fn), []);
+  const visualizationContainerRef = useRef<HTMLDivElement>(null);
+  const vizBindings = usePluginEntities('visualizationTypes');
+  const vizType = (widget.config as { visualization?: string })?.visualization;
+  const toPng = useMemo(
+    () => vizBindings.find((v) => v.type === vizType)?.toPng ?? null,
+    [vizBindings, vizType],
+  );
+  const exportFn = useMemo(
+    () => (toPng ? () => toPng(visualizationContainerRef.current!) : null),
+    [toPng],
+  );
   const pngExportContextValue = useMemo(
-    () => ({ exportFn: pngExportFn, setExportFn, widgetTitle: title }),
-    [pngExportFn, setExportFn, title],
+    () => ({ exportFn, widgetTitle: title }),
+    [exportFn, title],
   );
   const { focusedWidget } = useContext(WidgetFocusContext);
   const dispatch = useViewsDispatch();
@@ -355,19 +364,21 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
           fields={fields}
           id={id}
           type={widget.type}>
-          <WidgetErrorBoundary>
-            <Visualization
-              id={id}
-              editing={editing}
-              queryId={activeQuery}
-              widget={widget}
-              fields={fields}
-              title={title}
-              setLoadingState={setLoading}
-              onToggleEdit={onToggleEdit}
-              onWidgetConfigChange={onWidgetConfigChange}
-            />
-          </WidgetErrorBoundary>
+          <div ref={visualizationContainerRef} style={{ height: '100%', width: '100%' }}>
+            <WidgetErrorBoundary>
+              <Visualization
+                id={id}
+                editing={editing}
+                queryId={activeQuery}
+                widget={widget}
+                fields={fields}
+                title={title}
+                setLoadingState={setLoading}
+                onToggleEdit={onToggleEdit}
+                onWidgetConfigChange={onWidgetConfigChange}
+              />
+            </WidgetErrorBoundary>
+          </div>
         </EditWrapper>
         <WidgetFooter>
           {interactive ? <span /> : <WidgetDescription text={widget.description} />}

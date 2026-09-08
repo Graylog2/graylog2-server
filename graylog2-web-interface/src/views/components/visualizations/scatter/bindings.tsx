@@ -25,6 +25,7 @@ import {
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
+import { toPngViaPlotly } from 'views/components/visualizations/exportUtils';
 
 type ScatterVisualizationConfigFormValues = {
   axisType: AxisType;
@@ -66,6 +67,7 @@ const scatterChart: VisualizationType<
   },
   capabilities: ['event-annotations'],
   validate,
+  toPng: toPngViaPlotly,
 };
 
 export default scatterChart;

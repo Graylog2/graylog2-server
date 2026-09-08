@@ -18,6 +18,7 @@ import type { VisualizationType } from 'views/types';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
+import { toPngViaHtml2Canvas } from 'views/components/visualizations/exportUtils';
 
 export type WorldMapVisualizationConfigFormValues = {
   zoom: number;
@@ -73,6 +74,7 @@ const worldMap: VisualizationType<typeof WorldMapVisualization.type> = {
       },
     ],
   },
+  toPng: (container) => toPngViaHtml2Canvas(container, { useCORS: true }),
 };
 
 export default worldMap;

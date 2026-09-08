@@ -19,6 +19,7 @@ import * as React from 'react';
 import type { VisualizationType } from 'views/types';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import { toPngViaHtml2Canvas } from 'views/components/visualizations/exportUtils';
 
 type NumberVisualizationConfigFormValues = {
   trend: boolean;
@@ -77,6 +78,7 @@ const singleNumber: VisualizationType<
       },
     ],
   },
+  toPng: toPngViaHtml2Canvas,
 };
 
 export default singleNumber;

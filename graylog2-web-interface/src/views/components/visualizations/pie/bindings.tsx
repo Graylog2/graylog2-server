@@ -17,6 +17,7 @@
 import type { VisualizationType } from 'views/types';
 import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
+import { toPngViaPlotly } from 'views/components/visualizations/exportUtils';
 
 const validate = hasAtLeastOneMetric('Pie chart');
 
@@ -25,6 +26,7 @@ const pieChart: VisualizationType<typeof PieVisualization.type> = {
   displayName: 'Pie Chart',
   component: PieVisualization,
   validate,
+  toPng: toPngViaPlotly,
 };
 
 export default pieChart;

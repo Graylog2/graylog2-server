@@ -22,7 +22,6 @@ import flatten from 'lodash/flatten';
 import leafletStyles from 'leaflet/dist/leaflet.css';
 
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
-import { usePngExportContext } from 'views/components/visualizations/PngExportContext';
 
 import style from './MapVisualization.css';
 
@@ -158,8 +157,6 @@ const MapVisualization = ({
   const [_areTilesReady, setAreTilesReady] = useState<boolean>(false);
   const [_viewport, setViewport] = useState<Viewport>(DEFAULT_VIEWPORT);
   const _map: MapRef = useRef();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { setExportFn } = usePngExportContext();
 
   useEffect(() => {
     leafletStyles.use();
@@ -183,18 +180,9 @@ const MapVisualization = ({
     }
   }, [_areTilesReady, _isMapReady, onRenderComplete]);
 
-  useEffect(() => {
-    return () => setExportFn(null);
-  }, [setExportFn]);
-
   const _handleMapReady = useCallback(() => {
     setIsMapReady(true);
-    setExportFn(() =>
-      import('html2canvas').then(({ default: html2canvas }) =>
-        html2canvas(containerRef.current, { useCORS: true }).then((canvas) => canvas.toDataURL('image/png')),
-      ),
-    );
-  }, [setExportFn]);
+  }, []);
 
   const _handleTilesReady = useCallback(() => {
     setAreTilesReady(true);
@@ -237,7 +225,7 @@ const MapVisualization = ({
   const interactive = useIsInteractiveMode();
 
   return (
-    <div ref={containerRef} className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
+    <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
       {locked && <div className={style.overlay} style={{ height, width }} />}
       <MapContainer
         ref={_map}

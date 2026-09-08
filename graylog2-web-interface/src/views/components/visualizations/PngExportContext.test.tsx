@@ -14,33 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
 
 import PngExportContext, { usePngExportContext } from './PngExportContext';
 
 const Consumer = () => {
-  const { exportFn, setExportFn } = usePngExportContext();
+  const { exportFn } = usePngExportContext();
 
-  return (
-    <>
-      <span data-testid="has-fn">{exportFn ? 'yes' : 'no'}</span>
-      <button type="button" onClick={() => setExportFn(() => Promise.resolve('data:image/png;base64,abc'))}>
-        Register
-      </button>
-      <button type="button" onClick={() => setExportFn(null)}>
-        Clear
-      </button>
-    </>
-  );
-};
-
-const ProviderWrapper = ({ children }: { children: React.ReactNode }) => {
-  const [exportFn, setExportFnRaw] = useState(null);
-  const setExportFn = useCallback((fn) => setExportFnRaw(() => fn), []);
-
-  return <PngExportContext.Provider value={{ exportFn, setExportFn, widgetTitle: '' }}>{children}</PngExportContext.Provider>;
+  return <span data-testid="has-fn">{exportFn ? 'yes' : 'no'}</span>;
 };
 
 describe('PngExportContext', () => {
@@ -50,31 +32,25 @@ describe('PngExportContext', () => {
     expect(screen.getByTestId('has-fn')).toHaveTextContent('no');
   });
 
-  it('allows registering an export function via the provider', async () => {
+  it('reflects the export function provided via the provider', () => {
+    const exportFn = () => Promise.resolve('data:image/png;base64,abc');
+
     render(
-      <ProviderWrapper>
+      <PngExportContext.Provider value={{ exportFn, widgetTitle: 'test' }}>
         <Consumer />
-      </ProviderWrapper>,
+      </PngExportContext.Provider>,
     );
-
-    expect(screen.getByTestId('has-fn')).toHaveTextContent('no');
-
-    await userEvent.click(screen.getByText('Register'));
 
     expect(screen.getByTestId('has-fn')).toHaveTextContent('yes');
   });
 
-  it('allows clearing the export function', async () => {
+  it('shows no export function when provider supplies null', () => {
     render(
-      <ProviderWrapper>
+      <PngExportContext.Provider value={{ exportFn: null, widgetTitle: '' }}>
         <Consumer />
-      </ProviderWrapper>,
+      </PngExportContext.Provider>,
     );
 
-    await userEvent.click(screen.getByText('Register'));
-    expect(screen.getByTestId('has-fn')).toHaveTextContent('yes');
-
-    await userEvent.click(screen.getByText('Clear'));
     expect(screen.getByTestId('has-fn')).toHaveTextContent('no');
   });
 });

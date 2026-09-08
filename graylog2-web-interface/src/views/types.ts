@@ -200,6 +200,7 @@ export interface VisualizationType<
   config?: VisualizationConfigDefinition<ConfigType, ConfigFormValuesType>;
   capabilities?: Array<VisualizationCapability>;
   validate?: (formValues: WidgetConfigFormValues) => FormikErrors<VisualizationFormValues>;
+  toPng?: (container: HTMLElement) => Promise<string>;
 }
 
 interface ResultHandler<T, R> {

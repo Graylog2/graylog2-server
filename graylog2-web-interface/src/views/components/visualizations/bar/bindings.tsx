@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import type { VisualizationType } from 'views/types';
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
+import { toPngViaPlotly } from 'views/components/visualizations/exportUtils';
 import BarVisualizationConfig, {
   DEFAULT_BARMODE,
 } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
@@ -119,6 +120,7 @@ const barChart: VisualizationType<
   },
   capabilities: ['event-annotations'],
   validate,
+  toPng: toPngViaPlotly,
 };
 
 export default barChart;

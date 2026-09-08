@@ -28,11 +28,9 @@ const renderExportWidgetActionDelegate = () =>
   render(<OriginalExportWidgetActionDelegate widget={AggregationWidget.empty()} />);
 
 describe('ExtraMenuWidgetActions', () => {
-  const plugExplanation =
-    /export aggregation widget feature is available for the enterprise version\. This feature provides options to export your data into popular file formats such as CSV, JSON, YAML, XML, etc\./i;
   const findNativeButton = (buttons: Array<HTMLElement>) => buttons.find((button) => button.tagName === 'BUTTON');
 
-  it('Render plug when there is no WidgetExportActionComponent', async () => {
+  it('Render PNG export plug when there is no WidgetExportActionComponent', async () => {
     asMock(useWidgetExportActionComponent).mockReturnValue(null);
 
     renderExportWidgetActionDelegate();
@@ -41,7 +39,7 @@ describe('ExtraMenuWidgetActions', () => {
     expect(exportButton).toBeDefined();
     await userEvent.click(exportButton!);
 
-    await screen.findByText(plugExplanation);
+    await screen.findByText(/png image/i);
   });
 
   it('Render original WidgetExportActionComponent without a plug', async () => {
@@ -58,6 +56,6 @@ describe('ExtraMenuWidgetActions', () => {
 
     await userEvent.click(exportButton);
 
-    expect(screen.queryByText(plugExplanation)).not.toBeInTheDocument();
+    expect(screen.queryByText(/png image/i)).not.toBeInTheDocument();
   });
 });

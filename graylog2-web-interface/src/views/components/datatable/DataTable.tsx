@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
@@ -34,7 +34,6 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
-import { usePngExportContext } from 'views/components/visualizations/PngExportContext';
 
 import TableHead from './TableHead';
 import DataTableEntry from './DataTableEntry';
@@ -150,18 +149,6 @@ const DataTable = ({
   useEffect(onRenderComplete, [onRenderComplete]);
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
   const dispatch = useViewsDispatch();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { setExportFn } = usePngExportContext();
-
-  useEffect(() => {
-    setExportFn(() =>
-      import('html2canvas').then(({ default: html2canvas }) =>
-        html2canvas(containerRef.current).then((canvas) => canvas.toDataURL('image/png')),
-      ),
-    );
-
-    return () => setExportFn(null);
-  }, [setExportFn]);
 
   const onSetColumnsWidth = useCallback(
     ({ field, offsetWidth }: { field: string; offsetWidth: number }) => {
@@ -314,7 +301,7 @@ const DataTable = ({
   );
 
   return (
-    <div ref={containerRef} className={styles.container}>
+    <div className={styles.container}>
       <div className={styles.scrollContainer}>
         <MessagesTable striped={striped} bordered={bordered} stickyHeader={stickyHeader} condensed={condensed}>
           <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>

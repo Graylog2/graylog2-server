@@ -27,6 +27,7 @@ import {
   DEFAULT_AXIS_TYPE,
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
+import { toPngViaPlotly } from 'views/components/visualizations/exportUtils';
 
 type AreaVisualizationConfigFormValues = {
   interpolation: InterpolationType;
@@ -82,6 +83,7 @@ const areaChart: VisualizationType<
   },
   capabilities: ['event-annotations'],
   validate,
+  toPng: toPngViaPlotly,
 };
 
 export default areaChart;

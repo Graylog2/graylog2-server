@@ -17,6 +17,7 @@
 import type { VisualizationType } from 'views/types';
 import SankeyVisualization from 'views/components/visualizations/sankey/SankeyVisualization';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import { toPngViaPlotly } from 'views/components/visualizations/exportUtils';
 
 const countGroupingFields = (formValues: WidgetConfigFormValues) =>
   (formValues.groupBy?.groupings ?? []).reduce((total, grouping) => total + (grouping.fields?.length ?? 0), 0);
@@ -38,6 +39,7 @@ const sankey: VisualizationType<typeof SankeyVisualization.type> = {
   displayName: 'Sankey',
   component: SankeyVisualization,
   validate,
+  toPng: toPngViaPlotly,
 };
 
 export default sankey;

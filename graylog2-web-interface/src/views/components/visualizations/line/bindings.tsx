@@ -27,6 +27,7 @@ import {
 import type { InterpolationType } from 'views/Constants';
 import { DEFAULT_INTERPOLATION, interpolationTypes } from 'views/Constants';
 import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
+import { toPngViaPlotly } from 'views/components/visualizations/exportUtils';
 
 type LineVisualizationConfigFormValues = {
   interpolation: InterpolationType;
@@ -82,6 +83,7 @@ const lineChart: VisualizationType<
   },
   capabilities: ['event-annotations'],
   validate,
+  toPng: toPngViaPlotly,
 };
 
 export default lineChart;

@@ -21,6 +21,7 @@ import NetworkVisualizationConfig, {
 } from 'views/logic/aggregationbuilder/visualizations/NetworkVisualizationConfig';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import { toPngViaPlotly } from 'views/components/visualizations/exportUtils';
 
 type NetworkVisualizationConfigFormValues = {
   colorScale: (typeof COLORSCALES)[number];
@@ -70,6 +71,7 @@ const networkGraph: VisualizationType<
     ],
   },
   validate,
+  toPng: toPngViaPlotly,
 };
 
 export default networkGraph;
