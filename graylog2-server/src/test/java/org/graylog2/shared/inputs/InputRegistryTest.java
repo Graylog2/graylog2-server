@@ -59,19 +59,10 @@ class InputRegistryTest {
     @Test
     void addAndGetInputState() {
         IOState<MessageInput> state = mockIOState("input-1", IOState.Type.RUNNING);
-        assertTrue(inputRegistry.add(state));
+        inputRegistry.add(state);
 
         assertNotNull(inputRegistry.getInputState("input-1"));
         assertNull(inputRegistry.getInputState("nonexistent"));
-    }
-
-    @Test
-    void addDuplicateReturnsFalse() {
-        IOState<MessageInput> state1 = mockIOState("input-1", IOState.Type.RUNNING);
-        IOState<MessageInput> state2 = mockIOState("input-1", IOState.Type.FAILED);
-
-        assertTrue(inputRegistry.add(state1));
-        assertFalse(inputRegistry.add(state2));
     }
 
     @Test
