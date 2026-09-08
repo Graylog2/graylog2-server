@@ -39,7 +39,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
   constructor(
     trend: InternalState['trend'],
     trendPreference: InternalState['trendPreference'],
-    alignment: InternalState['alignment'] = 'bottom-right',
+    alignment: InternalState['alignment'] = undefined,
   ) {
     super();
     this._value = { trend, trendPreference, alignment };
@@ -53,7 +53,6 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     return this._value.trendPreference;
   }
 
-  // Where the value/trend are anchored within the widget. Defaults to 'bottom-right' for existing widgets.
   get alignment() {
     return this._value.alignment;
   }
@@ -66,7 +65,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
   static create(
     trend: InternalState['trend'] = false,
     trendPreference: InternalState['trendPreference'] = 'NEUTRAL',
-    alignment: InternalState['alignment'] = 'bottom-right',
+    alignment: InternalState['alignment'] = undefined,
   ) {
     return new NumberVisualizationConfig(trend, trendPreference, alignment);
   }

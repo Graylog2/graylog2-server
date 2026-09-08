@@ -14,23 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import StringUtils from 'util/StringUtils';
 
-import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
-import ThemeWrapper from 'preflight/theme/ThemeWrapper';
+const streamCategoryName = (category: string): string => StringUtils.capitalizeFirstLetter(category);
 
-import DefaultQueryClientProvider from './DefaultQueryClientProvider';
-
-type Props = {
-  children: React.ReactElement;
-};
-
-const PreflightWrappingContainer = ({ children }: Props) => (
-  <PreflightThemeProvider>
-    <DefaultQueryClientProvider>
-      <ThemeWrapper>{children}</ThemeWrapper>
-    </DefaultQueryClientProvider>
-  </PreflightThemeProvider>
-);
-
-export default PreflightWrappingContainer;
+export default streamCategoryName;

@@ -76,6 +76,10 @@ versions:
   }
 }
 ```
+### Scripting API default fields on message export
+Per default, we now export all fields in a message on export. Prior to this change, we defaulted to a limited list of 
+fields but had no option to export all fields. So a user would have to know (via the FE) which fields actually exist. 
+Now you can export with all fields and limit the results by specifying the fields wanted.
 
 ## Web Interface Changes
 
