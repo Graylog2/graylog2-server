@@ -58,6 +58,7 @@ export type WidgetMenuActionComponentProps = {
   disabled?: boolean;
   widget: Widget;
   contexts?: Contexts;
+  pngMenuItem?: React.ReactNode;
 };
 
 type WidgetDropdownActionComponentProps = WidgetMenuActionComponentProps & {

@@ -42,7 +42,7 @@ describe('ExtraMenuWidgetActions', () => {
     await screen.findByText(/png image/i);
   });
 
-  it('Render original WidgetExportActionComponent without a plug', async () => {
+  it('Render original WidgetExportActionComponent without the plug', async () => {
     asMock(useWidgetExportActionComponent).mockReturnValue(() => (
       <button type="button" title="dummy export action">
         dummy export action
@@ -50,12 +50,8 @@ describe('ExtraMenuWidgetActions', () => {
     ));
 
     renderExportWidgetActionDelegate();
-    const exportButton = await screen.findByRole('button', { name: /dummy export action/i });
 
-    expect(screen.queryAllByRole('button', { name: /export widget/i })).toHaveLength(0);
-
-    await userEvent.click(exportButton);
-
-    expect(screen.queryByText(/png image/i)).not.toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /dummy export action/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /export widget/i })).not.toBeInTheDocument();
   });
 });

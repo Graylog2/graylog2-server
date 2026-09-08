@@ -14,19 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
 
+import { MenuItem } from 'components/bootstrap';
 import type { WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
 import ExportWidgetPlug from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlug';
 import useWidgetExportActionComponent from 'views/components/widgets/useWidgetExportActionComponent';
+import { usePngExportContext } from 'views/components/visualizations/PngExportContext';
+import { createLinkAndDownload } from 'util/FileDownloadUtils';
 
 const ExportWidgetActionDelegate = ({ widget, contexts, disabled }: WidgetMenuActionComponentProps) => {
   const ExportActionComponent = useWidgetExportActionComponent(widget);
+  const { exportFn, widgetTitle } = usePngExportContext();
+
+  const onExportAsPng = useCallback(() => {
+    if (!exportFn) return;
+
+    exportFn().then((dataUrl) => {
+      const filename = widgetTitle ? `${widgetTitle}.png` : 'widget-export.png';
+      createLinkAndDownload(dataUrl, filename);
+    });
+  }, [exportFn, widgetTitle]);
+
+  const pngMenuItem = (
+    <MenuItem disabled={!exportFn} onSelect={onExportAsPng}>
+      PNG Image
+    </MenuItem>
+  );
 
   return !ExportActionComponent ? (
     <ExportWidgetPlug />
   ) : (
-    <ExportActionComponent widget={widget} contexts={contexts} disabled={disabled} />
+    <ExportActionComponent widget={widget} contexts={contexts} disabled={disabled} pngMenuItem={pngMenuItem} />
   );
 };
 
