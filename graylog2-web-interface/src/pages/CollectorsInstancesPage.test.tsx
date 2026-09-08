@@ -27,7 +27,6 @@ jest.mock('components/collectors/hooks', () => ({
   useCollectorsConfig: jest.fn(),
 }));
 jest.mock('components/collectors/instances/CollectorsInstances', () => () => <div>instances content</div>);
-jest.mock('components/collectors/common', () => ({ CollectorsPageNavigation: () => <div>collectors nav</div> }));
 
 const navigateTo = jest.fn();
 jest.mock('react-router-dom', () => ({

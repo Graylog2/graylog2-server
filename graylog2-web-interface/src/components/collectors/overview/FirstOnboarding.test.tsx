@@ -21,12 +21,15 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import selectEvent from 'helpers/selectEvent';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useInputsStates from 'hooks/useInputsStates';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import FirstOnboarding from './FirstOnboarding';
 
 import {
+  useCollectorInputDetails,
   useCollectorInputIds,
+  useCollectorInputMutations,
   useCollectorsConfig,
   useCollectorsMutations,
   useCollectorPermissions,
@@ -35,7 +38,7 @@ import {
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 import { mockCollectorPermissions } from '../testing/mockPermissions';
-import { configuredCollectorsConfig, unconfiguredCollectorsConfig } from '../testing/fixtures';
+import { configuredCollectorsConfig, mockCollectorInput, unconfiguredCollectorsConfig } from '../testing/fixtures';
 
 jest.mock('../hooks');
 jest.mock('../hooks/useSendCollectorsTelemetry');
@@ -44,15 +47,8 @@ jest.mock('util/Version', () => ({
 }));
 jest.mock('util/copyToClipboard', () => jest.fn(() => Promise.resolve()));
 jest.mock('components/common/Tooltip', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
-// The strip talks to the config API; stub it with a button that reports a confirmed endpoint.
-jest.mock('./onboarding/IngestEndpointStrip', () => ({ onConfirmed }: { onConfirmed: () => void }) => (
-  <div>
-    <span>Confirm how Collectors reach this cluster</span>
-    <button type="button" onClick={onConfirmed}>
-      Confirm endpoint
-    </button>
-  </div>
-));
+// The strip's own hooks are mocked below; the wizard test drives the real form.
+jest.mock('hooks/useInputsStates');
 const mockPushWithState = jest.fn();
 
 jest.mock('routing/useHistory', () => () => ({
@@ -127,6 +123,7 @@ describe('FirstOnboarding', () => {
   const createEnrollmentToken = jest.fn();
   const createFleet = jest.fn();
   const createSource = jest.fn();
+  const updateConfig = jest.fn();
   const sendTelemetry = jest.fn();
 
   beforeEach(() => {
@@ -138,8 +135,25 @@ describe('FirstOnboarding', () => {
     >);
     asMock(useFleets).mockReturnValue({ data: mockFleets, isLoading: false });
     asMock(useCollectorsMutations).mockReturnValue(
-      mockCollectorsMutations({ createEnrollmentToken, createFleet, createSource }),
+      mockCollectorsMutations({ createEnrollmentToken, createFleet, createSource, updateConfig }),
     );
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [mockCollectorInput()],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+    asMock(useCollectorInputMutations).mockReturnValue({
+      createCollectorInput: jest.fn(),
+      isCreatingCollectorInput: false,
+      updateCollectorInputPort: jest.fn().mockResolvedValue(undefined),
+      isUpdatingCollectorInputPort: false,
+    });
+    asMock(useInputsStates).mockReturnValue({ data: undefined, isLoading: false } as unknown as ReturnType<
+      typeof useInputsStates
+    >);
+    updateConfig.mockResolvedValue(configuredCollectorsConfig);
     asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions());
     createEnrollmentToken.mockResolvedValue({
       token: 'test-token-abc',
@@ -544,7 +558,7 @@ describe('FirstOnboarding', () => {
       render(<FirstOnboarding />);
 
       expect(screen.getByRole('button', { name: /linux/i })).toBeInTheDocument();
-      expect(screen.queryByText('Confirm how Collectors reach this cluster')).not.toBeInTheDocument();
+      expect(screen.queryByText('Confirm how Collectors send data to this cluster')).not.toBeInTheDocument();
     });
 
     it('asks to confirm the endpoint after the fleet is resolved and holds the token until then', async () => {
@@ -552,7 +566,7 @@ describe('FirstOnboarding', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-      await screen.findByText('Confirm how Collectors reach this cluster');
+      await screen.findByText('Confirm how Collectors send data to this cluster');
       expect(screen.getByText('Default Fleet')).toBeInTheDocument();
       // No token before the endpoint exists: minting one needs the signing key the first save creates.
       expect(createEnrollmentToken).not.toHaveBeenCalled();
@@ -569,7 +583,7 @@ describe('FirstOnboarding', () => {
       expect(createEnrollmentToken).toHaveBeenCalledWith({ name: 'onboarding', fleetId: 'fleet-1', expiresIn: 'P1D' });
       expect(screen.getByText(/test-token-abc/)).toBeInTheDocument();
       // The strip stays as the endpoint status line above the command.
-      expect(screen.getByText('Confirm how Collectors reach this cluster')).toBeInTheDocument();
+      expect(screen.getByText('Confirm how Collectors send data to this cluster')).toBeInTheDocument();
     });
 
     it('creates the onboarding fleet before the endpoint is confirmed when no fleet exists', async () => {
@@ -582,7 +596,7 @@ describe('FirstOnboarding', () => {
       await waitFor(() => {
         expect(createFleet).toHaveBeenCalled();
       });
-      await screen.findByText('Confirm how Collectors reach this cluster');
+      await screen.findByText('Confirm how Collectors send data to this cluster');
       expect(createEnrollmentToken).not.toHaveBeenCalled();
     });
 
@@ -657,7 +671,7 @@ describe('FirstOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
     await screen.findByText(/waiting for connection/i);
-    expect(screen.queryByText('Confirm how Collectors reach this cluster')).not.toBeInTheDocument();
+    expect(screen.queryByText('Confirm how Collectors send data to this cluster')).not.toBeInTheDocument();
   });
 
   describe('when the config exists but no ingest input does', () => {
@@ -683,7 +697,8 @@ describe('FirstOnboarding', () => {
       await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
       await screen.findByText(/waiting for connection/i);
-      expect(screen.getByText('Confirm how Collectors reach this cluster')).toBeInTheDocument();
+      expect(screen.getByText(/no ingest input exists/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /create input/i })).toBeInTheDocument();
     });
   });
 

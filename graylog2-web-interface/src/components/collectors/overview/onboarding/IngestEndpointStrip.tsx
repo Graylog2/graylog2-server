@@ -60,7 +60,7 @@ const buildRequest = (config: CollectorsConfig, values: FormValues, createInput:
 });
 
 /**
- * The "confirm how Collectors reach this cluster" strip of the onboarding wizard. Before the collectors config
+ * The "confirm how Collectors send data to this cluster" strip of the onboarding wizard. Before the collectors config
  * exists it asks for the external endpoint; saving it performs the one-time server-side bootstrap. Once the
  * config exists it reports whether an ingest input is actually running, mirroring the facts the Settings page
  * shows, so a user learns up front when Collectors would enroll but never deliver data.

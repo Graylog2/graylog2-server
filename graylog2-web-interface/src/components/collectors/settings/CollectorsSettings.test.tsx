@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
-import { asMock } from 'helpers/mocking';
+import { asMock, MockStore } from 'helpers/mocking';
 import AppConfig from 'util/AppConfig';
 import useInputsStates from 'hooks/useInputsStates';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -50,7 +50,9 @@ jest.mock('hooks/useInputMutations', () => () => ({
   updateInput: jest.fn(),
   deleteInput: jest.fn(),
 }));
-jest.mock('components/inputs/InputStateBadge', () => () => <span>Running</span>);
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesStore: MockStore(['getInitialState', () => ({ nodes: { 'node-1': { short_node_id: 'node-1', hostname: 'node-1.example.org' } } })]),
+}));
 
 const updateConfig = jest.fn();
 

@@ -25,7 +25,6 @@ import CollectorsOverviewPage from './CollectorsOverviewPage';
 
 jest.mock('components/collectors/hooks');
 jest.mock('components/collectors/overview', () => ({ CollectorsOverview: () => <div>collectors overview</div> }));
-jest.mock('components/collectors/common', () => ({ CollectorsPageNavigation: () => <div>collectors nav</div> }));
 
 describe('CollectorsOverviewPage', () => {
   // The overview owns the unconfigured state: its onboarding wizard starts with the ingest setup step.

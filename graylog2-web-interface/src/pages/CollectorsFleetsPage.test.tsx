@@ -27,7 +27,6 @@ jest.mock('components/collectors/hooks', () => ({
   useCollectorsConfig: jest.fn(),
 }));
 jest.mock('components/collectors/fleets/CollectorsFleets', () => () => <div>fleets content</div>);
-jest.mock('components/collectors/common', () => ({ CollectorsPageNavigation: () => <div>collectors nav</div> }));
 jest.mock('components/common/CreateButton', () => () => null);
 
 const navigateTo = jest.fn();

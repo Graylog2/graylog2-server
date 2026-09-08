@@ -18,7 +18,7 @@ import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
-import { asMock } from 'helpers/mocking';
+import { asMock, MockStore } from 'helpers/mocking';
 import AppConfig from 'util/AppConfig';
 import useInputsStates from 'hooks/useInputsStates';
 import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
@@ -39,7 +39,9 @@ import { configuredCollectorsConfig, mockCollectorInput, unconfiguredCollectorsC
 jest.mock('../../hooks');
 jest.mock('hooks/useInputsStates');
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
-jest.mock('components/inputs/InputStateBadge', () => () => <span>state badge</span>);
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesStore: MockStore(['getInitialState', () => ({ nodes: { 'node-1': { short_node_id: 'node-1', hostname: 'node-1.example.org' } } })]),
+}));
 
 const withInputs = (inputs: Array<ReturnType<typeof mockCollectorInput>>) => {
   const ids = inputs.map((i) => i.id);
@@ -137,7 +139,7 @@ describe('IngestEndpointStrip', () => {
       expect(screen.queryByLabelText(/external hostname/i)).not.toBeInTheDocument();
     });
 
-    it('warns when the ingest input exists but is not running', () => {
+    it('warns when the ingest input exists but is not running', async () => {
       withInputs([mockCollectorInput(14401)]);
       withInputStates('FAILED');
 
@@ -145,7 +147,7 @@ describe('IngestEndpointStrip', () => {
 
       expect(screen.getByText(/ingest input .* is not running/i)).toBeInTheDocument();
       expect(screen.getByText(/will not be able to send data/i)).toBeInTheDocument();
-      expect(screen.getByText('state badge')).toBeInTheDocument();
+      expect(await screen.findByText('1 Failed')).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /manage input/i })).toBeInTheDocument();
     });
 
