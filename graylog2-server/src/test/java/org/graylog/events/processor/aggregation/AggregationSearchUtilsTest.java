@@ -49,6 +49,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -199,6 +200,97 @@ public class AggregationSearchUtilsTest {
             assertThat(event.getGroupByFields().get("group_field_one")).isEqualTo("one");
             assertThat(event.getGroupByFields().get("group_field_two")).isEqualTo("two");
         });
+    }
+
+    @Test
+    public void testEventMessageDoesNotUseScientificNotationForLargeOrSmallValues() throws EventProcessorException {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
+
+        final TestEvent event1 = new TestEvent(timerange.to());
+        final ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), messageCaptor.capture()))
+                .thenReturn(event1);
+
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), ImmutableList.of(), null, emptyList());
+        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
+                .timerange(timerange)
+                .build();
+
+        final AggregationSearchUtils searchUtils = new AggregationSearchUtils(
+                eventDefinitionDto,
+                (AggregationEventProcessorConfig) eventDefinitionDto.config(),
+                Set.of(),
+                searchFactory,
+                eventStreamService,
+                messageFactory,
+                permittedStreams
+        );
+
+        final AggregationResult result = AggregationResult.builder()
+                .effectiveTimerange(timerange)
+                .totalAggregatedMessages(1)
+                .sourceStreams(ImmutableSet.of("stream-1", "stream-2"))
+                .keyResults(ImmutableList.of(
+                        AggregationKeyResult.builder()
+                                .key(ImmutableList.of("one", "two"))
+                                .timestamp(timerange.to())
+                                .seriesValues(ImmutableList.of(
+                                        // A large value that used to be rendered in scientific notation (e.g. "8.0053026E7")
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(80053026.0d)
+                                                .series(Count.builder()
+                                                        .id("large-value")
+                                                        .field("network_bytes")
+                                                        .build())
+                                                .build(),
+                                        // A small value that used to be rendered in scientific notation (e.g. "1.0E-5")
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(0.00001d)
+                                                .series(Cardinality.builder()
+                                                        .id("small-value")
+                                                        .field("source")
+                                                        .build())
+                                                .build(),
+                                        // A whole-number value should not carry a trailing ".0"
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(42.0d)
+                                                .series(Count.builder()
+                                                        .id("whole-value")
+                                                        .field("user")
+                                                        .build())
+                                                .build(),
+                                        // A fractional value should keep its meaningful decimals
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(3.14d)
+                                                .series(Cardinality.builder()
+                                                        .id("fractional-value")
+                                                        .field("latency")
+                                                        .build())
+                                                .build()
+                                ))
+                                .build()
+                ))
+                .build();
+
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
+
+        assertThat(eventsWithContext).hasSize(1);
+
+        final String eventMessage = messageCaptor.getValue();
+
+        assertThat(eventMessage)
+                .doesNotContainIgnoringCase("e7")
+                .doesNotContainIgnoringCase("e-5")
+                .contains("=80053026")
+                .contains("=0.00001")
+                .contains("=42")
+                .doesNotContain("=42.0")
+                .contains("=3.14");
     }
 
     @Test

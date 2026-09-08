@@ -41,6 +41,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +51,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class AggregationSearchUtils {
     private final Logger LOG = LoggerFactory.getLogger(AggregationSearchUtils.class);
@@ -282,6 +285,17 @@ public class AggregationSearchUtils {
     }
 
     private String formatSeriesValue(AggregationSeriesValue seriesValue) {
-        return String.format(Locale.ROOT, "%s=%s", seriesValue.series().literal(), seriesValue.value());
+        return f("%s=%s", seriesValue.series().literal(), formatValue(seriesValue.value()));
+    }
+
+    // Double#toString (and thus String#valueOf/String#format with "%s") switches to scientific notation for
+    // values >= 10^7 or < 10^-3 (e.g. "8.0053026E7"). Format as a plain decimal instead, trimming insignificant
+    // trailing zeros/decimal points, so users see the actual number (e.g. "80053026").
+    private String formatValue(double value) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            return Double.toString(value);
+        }
+
+        return BigDecimal.valueOf(value).stripTrailingZeros().toPlainString();
     }
 }
