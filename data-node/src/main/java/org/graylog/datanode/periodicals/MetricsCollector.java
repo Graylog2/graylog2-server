@@ -141,7 +141,10 @@ public class MetricsCollector extends Periodical {
                 metrics.put("node", node);
                 addJvmMetrics(metrics);
                 Map<String, Object> nodeMetrics = nodeStatMetricsCollector.getNodeMetrics(node);
-                metrics.putAll(nodeMetrics);
+                // The metrics index and its dashboards expect memory/disk values converted to GiB/MiB.
+                for (Map.Entry<String, Object> entry : nodeMetrics.entrySet()) {
+                    metrics.put(entry.getKey(), NodeStatMetrics.mapValue(entry.getKey(), entry.getValue()));
+                }
                 final Map<String, Object> finalMetrics = metrics;
                 indexDocument(client, IndexRequest.of(i -> i
                         .index(configuration.getMetricsStream())
@@ -158,6 +161,8 @@ public class MetricsCollector extends Periodical {
                     ));
                 }
 
+                // Registry gauges are named after the raw OpenSearch stat paths (e.g. "..._in_bytes"), so they
+                // expose the raw, unconverted values.
                 nodeMetrics.forEach((key, value) -> {
                     opensearchMetrics.put(NodeStatMetrics.getMetricRegistryName(key), value);
                 });
