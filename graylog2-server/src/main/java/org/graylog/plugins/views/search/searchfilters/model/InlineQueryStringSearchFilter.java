@@ -50,11 +50,11 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
 
     @Override
     @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
-    public abstract boolean negation();
+    public abstract Boolean negation();
 
     @Override
     @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
-    public abstract boolean disabled();
+    public abstract Boolean disabled();
 
     public static Builder builder() {
         return Builder.create();
@@ -83,10 +83,10 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
         public abstract Builder queryString(String queryString);
 
         @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
-        public abstract Builder negation(boolean negation);
+        public abstract Builder negation(Boolean negation);
 
         @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
-        public abstract Builder disabled(boolean disabled);
+        public abstract Builder disabled(Boolean disabled);
 
         // Inline filters do not have scope — it only exists on referenced (DB-stored) filters.
         // This setter absorbs the _scope field during deserialization so Jackson doesn't fail
