@@ -103,6 +103,10 @@ public final class OfficialOpensearchClient {
             final ApacheHttpClient5Options options = clientOptionsWithTimeout(timeout);
             CompletableFuture<T> futureResponse = async(asyncClient -> operation.apply(asyncClient.withTransportOptions(options)), errorMessage);
             return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            // get() clears the interrupt flag when it throws; restore it or cancellation is silently defeated.
+            Thread.currentThread().interrupt();
+            throw mapException(e, errorMessage);
         } catch (Throwable t) {
             throw mapException(t, errorMessage);
         }

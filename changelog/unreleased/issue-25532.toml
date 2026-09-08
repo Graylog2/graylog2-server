@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix Data Node memory, heap, and disk metrics being reported in GiB instead of bytes on the cluster configuration page."
+
+issues = ["25532"]
+pulls = ["26732"]

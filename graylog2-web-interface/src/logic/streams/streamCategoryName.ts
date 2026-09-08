@@ -14,15 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.searchfilters.model;
+import StringUtils from 'util/StringUtils';
 
-public interface ReferencedSearchFilter extends UsedSearchFilter {
+const streamCategoryName = (category: string): string => StringUtils.capitalizeFirstLetter(category);
 
-    String id();
-
-    InlineQueryStringSearchFilter toInlineRepresentation();
-
-    ReferencedSearchFilter withId(String id);
-
-    ReferencedSearchFilter stripToId();
-}
+export default streamCategoryName;
