@@ -283,8 +283,8 @@ public class OkHttpClientProviderTest {
 
     @Test
     public void testDynamicProxy() throws URISyntaxException {
-        final String TEST_PROXY = "http://proxy.dummy.org";
-        final InetSocketAddress testProxyAddress = new InetSocketAddress(TEST_PROXY, 59001);
+        // Unresolved on purpose: resolving a dummy host makes this test depend on the name service.
+        final InetSocketAddress testProxyAddress = InetSocketAddress.createUnresolved("proxy.dummy.org", 59001);
         final Proxy testProxy = new Proxy(Proxy.Type.HTTP, testProxyAddress);
         final ProxyConfig testProxyConfig = Mockito.spy(new ProxyConfig(server.url("/").uri()));
         final ProxySelectorProvider proxyProvider = new ProxySelectorProvider(testProxyConfig, null);

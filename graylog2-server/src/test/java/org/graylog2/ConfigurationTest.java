@@ -308,6 +308,14 @@ public class ConfigurationTest {
     }
 
     @Test
+    public void blankHttpProxyUriIsTreatedAsUnset() throws Exception {
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(),
+                Map.of("http_proxy_uri", ""), temporaryFolder);
+
+        assertThat(configuration.getHttpProxyConfig()).isEmpty();
+    }
+
+    @Test
     public void defaultProcessorNumbers() throws Exception {
         // number of buffer processors:
         // process, output

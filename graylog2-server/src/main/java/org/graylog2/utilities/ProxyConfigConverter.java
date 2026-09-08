@@ -20,18 +20,33 @@ import com.github.joschi.jadconfig.Converter;
 import com.github.joschi.jadconfig.ParameterException;
 
 import java.net.URI;
+import java.util.Locale;
+import java.util.Set;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class ProxyConfigConverter implements Converter<ProxyConfig> {
+    private static final Set<String> SUPPORTED_SCHEMES = Set.of("http", "https");
+
     @Override
     public ProxyConfig convertFrom(String value) {
+        // JadConfig calls us for any value that is present in the config repository, an empty one included.
+        // A blank value means "no proxy configured" and must not fail the startup.
+        if (value == null || value.isBlank()) {
+            return null;
+        }
         try {
             final ProxyConfig config = new ProxyConfig(URI.create(value));
             if (config.host() == null || config.host().isBlank()) {
-                throw new ParameterException("Invalid proxy URI: \"" + value + "\" (no host)");
+                throw new ParameterException(f("Invalid proxy URI: \"%s\" (no host)", value));
+            }
+            if (config.scheme() == null || !SUPPORTED_SCHEMES.contains(config.scheme().toLowerCase(Locale.ROOT))) {
+                throw new ParameterException(f("Invalid proxy URI: \"%s\" (scheme must be one of %s)",
+                        value, SUPPORTED_SCHEMES));
             }
             return config;
         } catch (IllegalArgumentException e) {
-            throw new ParameterException("Invalid proxy URI: \"" + value + "\"", e);
+            throw new ParameterException(f("Invalid proxy URI: \"%s\"", value), e);
         }
     }
 

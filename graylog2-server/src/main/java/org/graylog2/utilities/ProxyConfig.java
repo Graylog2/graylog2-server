@@ -73,11 +73,15 @@ public record ProxyConfig(URI uri) {
     }
 
     /**
-     * The proxy URI with user info stripped. Some HTTP client SDKs reject a URI that carries credentials
-     * in this position and require them supplied separately -- e.g. the Apache (v4) client
+     * The proxy's {@code scheme://host:port}, rebuilt from those three components alone: user info is
+     * dropped, and so are any path, query and fragment the configured URI carried. The port is always
+     * explicit, defaulted from the scheme by {@link #port()} when the configured URI omits it.
+     *
+     * <p>Some HTTP client SDKs reject a URI that carries credentials in this position and require them
+     * supplied separately -- e.g. the Apache (v4) client
      * ({@code software.amazon.awssdk.http.apache.ApacheHttpClient}) used by this repo's
-     * {@code AWSProxyConfigurationProvider}, and the Apache5 client used by the AI agent runtime's
-     * {@code ChatModelFactory} (for Bedrock) in the sibling {@code graylog-plugin-enterprise} repo.
+     * {@code AWSProxyConfigurationProvider}, which is also why the remaining components are dropped:
+     * it reads only scheme, host and port from the endpoint.</p>
      */
     public URI endpoint() {
         return URI.create(f("%s://%s:%d", scheme(), host(), port()));

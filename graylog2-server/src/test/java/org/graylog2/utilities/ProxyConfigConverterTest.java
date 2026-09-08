@@ -49,8 +49,33 @@ public class ProxyConfigConverterTest {
     public void convertFromRejectsAHostlessUri() {
         final ProxyConfigConverter converter = new ProxyConfigConverter();
 
-        assertThatThrownBy(() -> converter.convertFrom(""))
+        assertThatThrownBy(() -> converter.convertFrom("http://"))
                 .isInstanceOf(ParameterException.class);
+    }
+
+    @Test
+    public void convertFromRejectsAnUnsupportedScheme() {
+        final ProxyConfigConverter converter = new ProxyConfigConverter();
+
+        assertThatThrownBy(() -> converter.convertFrom("//proxy.example.com:8123"))
+                .isInstanceOf(ParameterException.class);
+        assertThatThrownBy(() -> converter.convertFrom("socks5://proxy.example.com:8123"))
+                .isInstanceOf(ParameterException.class);
+    }
+
+    @Test
+    public void convertFromAcceptsAnUppercaseScheme() {
+        final ProxyConfigConverter converter = new ProxyConfigConverter();
+
+        assertThat(converter.convertFrom("HTTPS://proxy.example.com:8123")).isNotNull();
+    }
+
+    @Test
+    public void convertFromTreatsABlankValueAsUnset() {
+        final ProxyConfigConverter converter = new ProxyConfigConverter();
+
+        assertThat(converter.convertFrom("")).isNull();
+        assertThat(converter.convertFrom("   ")).isNull();
     }
 
     @Test
