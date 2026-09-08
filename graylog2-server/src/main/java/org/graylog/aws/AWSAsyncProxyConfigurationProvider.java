@@ -39,8 +39,6 @@ import software.amazon.awssdk.http.nio.netty.ProxyConfiguration;
 @Singleton
 public class AWSAsyncProxyConfigurationProvider implements Provider<NettyNioAsyncHttpClient.Builder> {
     private static final Logger LOG = LoggerFactory.getLogger(AWSAsyncProxyConfigurationProvider.class);
-    private static final int DEFAULT_HTTP_PORT = 80;
-    private static final int DEFAULT_HTTPS_PORT = 443;
 
     private final ProxyConfig proxyConfig;
 
@@ -66,9 +64,8 @@ public class AWSAsyncProxyConfigurationProvider implements Provider<NettyNioAsyn
         final ProxyConfiguration.Builder proxyConfigBuilder = ProxyConfiguration.builder()
                 .scheme(proxyConfig.scheme())
                 .host(proxyConfig.host())
-                // The Netty proxy configuration requires an explicit port. Fall back to the scheme default when the
-                // proxy URI does not specify one.
-                .port(proxyConfig.port(DEFAULT_HTTP_PORT, DEFAULT_HTTPS_PORT));
+                // The Netty proxy configuration requires an explicit port, which ProxyConfig#port() guarantees.
+                .port(proxyConfig.port());
 
         proxyConfig.credentials().ifPresent(credentials ->
                 proxyConfigBuilder.username(credentials.username()).password(credentials.password()));

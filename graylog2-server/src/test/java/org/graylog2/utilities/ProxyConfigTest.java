@@ -91,31 +91,31 @@ public class ProxyConfigTest {
     }
 
     @Test
-    public void portWithDefaultsReturnsTheExplicitPortWhenPresent() {
+    public void portReturnsTheExplicitPortWhenPresent() {
         final ProxyConfig config = new ProxyConfig(URI.create("http://proxy.example.com:8123"));
 
-        assertThat(config.port(80, 443)).isEqualTo(8123);
+        assertThat(config.port()).isEqualTo(8123);
     }
 
     @Test
-    public void portWithDefaultsFallsBackToTheHttpDefaultForHttpWithNoPort() {
+    public void portFallsBackToTheHttpDefaultForHttpWithNoPort() {
         final ProxyConfig config = new ProxyConfig(URI.create("http://proxy.example.com"));
 
-        assertThat(config.port(80, 443)).isEqualTo(80);
+        assertThat(config.port()).isEqualTo(80);
     }
 
     @Test
-    public void portWithDefaultsFallsBackToTheHttpsDefaultForHttpsWithNoPort() {
+    public void portFallsBackToTheHttpsDefaultForHttpsWithNoPort() {
         final ProxyConfig config = new ProxyConfig(URI.create("https://proxy.example.com"));
 
-        assertThat(config.port(80, 443)).isEqualTo(443);
+        assertThat(config.port()).isEqualTo(443);
     }
 
     @Test
-    public void endpointOmitsThePortWhenNoneIsConfigured() {
+    public void endpointDefaultsThePortFromTheSchemeWhenNoneIsConfigured() {
         final ProxyConfig config = new ProxyConfig(URI.create("http://proxy.example.com"));
 
-        assertThat(config.endpoint()).isEqualTo(URI.create("http://proxy.example.com"));
+        assertThat(config.endpoint()).isEqualTo(URI.create("http://proxy.example.com:80"));
         assertThat(config.endpoint().getHost()).isEqualTo("proxy.example.com");
     }
 }

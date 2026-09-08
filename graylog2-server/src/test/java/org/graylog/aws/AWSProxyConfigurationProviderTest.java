@@ -98,6 +98,6 @@ public class AWSProxyConfigurationProviderTest {
         assertThat(proxyConfig.username()).contains("user");
         assertThat(proxyConfig.password()).contains("pass");
         assertThat(proxyConfig.host()).isEqualTo("proxy.example.com");
-        assertThat(proxyConfig.port()).isEqualTo(-1);
+        assertThat(proxyConfig.port()).isEqualTo(80);
     }
 }

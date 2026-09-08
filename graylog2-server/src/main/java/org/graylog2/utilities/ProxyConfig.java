@@ -41,6 +41,9 @@ public record ProxyConfig(URI uri) {
 
     private static final String HTTPS_SCHEME = "https";
 
+    private static final int DEFAULT_HTTP_PORT = 80;
+    private static final int DEFAULT_HTTPS_PORT = 443;
+
     public ProxyConfig {
         Objects.requireNonNull(uri, "uri");
     }
@@ -52,13 +55,17 @@ public record ProxyConfig(URI uri) {
         return uri.getHost();
     }
 
+    /**
+     * The proxy port, falling back to the scheme default when the configured URI does not name one.
+     * Always a usable port -- never {@link URI#getPort()}'s {@code -1}, which no consumer of this type
+     * can do anything with. Use {@link #uri()}{@code .getPort()} for the raw, possibly absent value.
+     */
     public int port() {
-        return uri.getPort();
-    }
-
-    public int port(int httpDefault, int httpsDefault) {
-        final int port = port();
-        return port >= 0 ? port : (HTTPS_SCHEME.equalsIgnoreCase(scheme()) ? httpsDefault : httpDefault);
+        final int port = uri.getPort();
+        if (port >= 0) {
+            return port;
+        }
+        return HTTPS_SCHEME.equalsIgnoreCase(scheme()) ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
     }
 
     public String scheme() {
@@ -73,9 +80,7 @@ public record ProxyConfig(URI uri) {
      * {@code ChatModelFactory} (for Bedrock) in the sibling {@code graylog-plugin-enterprise} repo.
      */
     public URI endpoint() {
-        return port() >= 0
-                ? URI.create(f("%s://%s:%d", scheme(), host(), port()))
-                : URI.create(f("%s://%s", scheme(), host()));
+        return URI.create(f("%s://%s:%d", scheme(), host(), port()));
     }
 
     public Optional<Credentials> credentials() {

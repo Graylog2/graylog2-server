@@ -16,7 +16,6 @@
  */
 package org.graylog.aws.processors.instancelookup;
 
-import com.codahale.metrics.MetricRegistry;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.google.common.collect.ImmutableList;
