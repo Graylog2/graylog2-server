@@ -14,22 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
 
-import { IconButton, OverlayTrigger } from 'components/common';
+import { IconButton } from 'components/common';
+import { MenuItem } from 'components/bootstrap';
+import ActionDropdown from 'views/components/common/ActionDropdown';
+import { usePngExportContext } from 'views/components/visualizations/PngExportContext';
+import { createLinkAndDownload } from 'util/FileDownloadUtils';
 
-const title = 'Export widget';
-const Explanation = () => (
-  <span>
-    Export aggregation widget feature is available for the enterprise version. This feature provides options to export
-    your data into popular file formats such as CSV, JSON, YAML, XML, etc.
-  </span>
-);
+const ExportWidgetPlug = () => {
+  const { exportFn, widgetTitle } = usePngExportContext();
 
-const ExportWidgetPlug = () => (
-  <OverlayTrigger trigger="click" title={title} overlay={<Explanation />} placement="bottom">
-    <IconButton name="download" title={title} />
-  </OverlayTrigger>
-);
+  const onExportAsPng = useCallback(() => {
+    if (!exportFn) return;
+
+    exportFn().then((dataUrl) => {
+      const filename = widgetTitle ? `${widgetTitle}.png` : 'widget-export.png';
+      createLinkAndDownload(dataUrl, filename);
+    });
+  }, [exportFn, widgetTitle]);
+
+  const trigger = <IconButton name="download" title="Export widget" showTooltip={false} />;
+
+  return (
+    <ActionDropdown element={trigger} header="Export">
+      <MenuItem disabled={!exportFn} onSelect={onExportAsPng}>
+        PNG Image
+      </MenuItem>
+    </ActionDropdown>
+  );
+};
 
 export default ExportWidgetPlug;
