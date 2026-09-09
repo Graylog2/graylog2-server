@@ -60,10 +60,14 @@ public class CEFParser {
     private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone("UTC");
     private static final Locale DEFAULT_LOCALE = Locale.ROOT;
 
-    private static final Pattern CEF_START = Pattern.compile("CEF:(\\d+)");
+    // The trailing pipe is required: without it any "CEF:<digits>" in the syslog prefix, such as a hostname like
+    // "host-CEF:1-box", would be taken for the header and the body would start mid-prefix.
+    private static final Pattern CEF_START = Pattern.compile("CEF:\\d+\\|");
     private static final Pattern HEADER_FIELD_SEPARATOR = Pattern.compile("(?<!\\\\)\\|");
     private static final Pattern EXTENSION_KEY = Pattern.compile("(\\w+)=");
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+    private static final int MIN_EPOCH_MILLIS_DIGITS = 12;
 
     /**
      * OSSEC and F5 ASM put a BSD-style timestamp directly in front of {@code CEF:}, with no hostname in between.
@@ -184,10 +188,14 @@ public class CEFParser {
 
     @Nullable
     private Date parseTimestamp(String text, TimeZone timeZone, Locale locale) {
-        try {
-            return new Date(Long.parseLong(text));
-        } catch (NumberFormatException e) {
-            LOG.trace("parse() - '{}' is not an epoch timestamp.", text);
+        // A bare integer is only a timestamp if it is wide enough to be epoch milliseconds. Without the width check a
+        // leading RFC 5424 version digit reads as 1ms past the epoch and shifts the hostname one token to the right.
+        if (text.length() >= MIN_EPOCH_MILLIS_DIGITS) {
+            try {
+                return new Date(Long.parseLong(text));
+            } catch (NumberFormatException e) {
+                LOG.trace("parse() - '{}' is not an epoch timestamp.", text);
+            }
         }
 
         final String normalized = SUB_MILLISECOND_FRACTION.matcher(text).replaceFirst("$1");
