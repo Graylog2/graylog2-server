@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import styled from 'styled-components';
 
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
@@ -30,10 +31,16 @@ type Props = {
 
 const attributesList = detailsAttributes.map(({ id, title }) => ({ id, title }));
 
+const ActionsWrapperContainer = styled.div`
+  margin-top: ${({ theme }) => theme.spacings.md};
+`;
+
 const ActionsWrapper = ({ children }) => (
-  <DropdownButton title="Actions" buttonTitle="Actions">
-    {children}
-  </DropdownButton>
+  <ActionsWrapperContainer>
+    <DropdownButton title="Actions" buttonTitle="Actions">
+      {children}
+    </DropdownButton>
+  </ActionsWrapperContainer>
 );
 
 const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
