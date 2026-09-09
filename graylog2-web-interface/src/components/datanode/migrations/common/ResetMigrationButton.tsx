@@ -33,7 +33,7 @@ const resetMigration = async () => fetch('DELETE', qualifyUrl('/migration/state'
 const ResetMigrationButton = () => {
   const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
 
   const { mutateAsync: onResetMigration } = useMutation({
     mutationFn: resetMigration,
@@ -55,7 +55,6 @@ const ResetMigrationButton = () => {
   const handleResetClick = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.RESET_MIGRATION_CLICKED, {
       app_pathname: 'datanode',
-      app_section: 'migration',
     });
 
     setShowDialog(true);
@@ -64,7 +63,6 @@ const ResetMigrationButton = () => {
   const handleConfirmClick = async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.RESET_MIGRATION_CONFIRM_CLICKED, {
       app_pathname: 'datanode',
-      app_section: 'migration',
     });
 
     await onResetMigration();

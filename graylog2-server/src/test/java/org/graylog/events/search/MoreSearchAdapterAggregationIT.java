@@ -34,6 +34,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
 
     private static final String INDEX_NAME = "graylog_0";
     private static final Set<String> ALL_STREAMS = Set.of("stream-a", "stream-b");
+    private static final String EVENTS_STREAM = "000000000000000000000002";
 
     private MoreSearchAdapter adapter;
 
@@ -52,7 +53,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "*", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 ALL_STREAMS, null, allAllowed(),
-                Map.of(), "gl2_source_input", Map.of(), 100);
+                Map.of(), "gl2_source_input", null, Map.of(), 100);
 
         final Map<String, Integer> countsByInput = result.stream()
                 .collect(Collectors.toMap(Slice::value, Slice::count));
@@ -68,7 +69,7 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "gl2_source_input:input-1", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 ALL_STREAMS, null, allAllowed(),
-                Map.of(), "streams", Map.of(), 100);
+                Map.of(), "streams", null, Map.of(), 100);
 
         final Map<String, Integer> countsByStream = result.stream()
                 .collect(Collectors.toMap(Slice::value, Slice::count));
@@ -83,9 +84,111 @@ public abstract class MoreSearchAdapterAggregationIT extends ElasticsearchBaseTe
         final List<Slice> result = adapter.aggregateSlicesForColumn(
                 "gl2_source_input:nonexistent", RelativeRange.allTime(), Set.of(INDEX_NAME),
                 ALL_STREAMS, null, allAllowed(),
-                Map.of(), "streams", Map.of(), 100);
+                Map.of(), "streams", null, Map.of(), 100);
 
         assertThat(result).isEmpty();
+    }
+
+    // --- aggregateSlicesForColumn source stream permission tests ---
+    //
+    // The events table and its filter dropdowns rely on the SourceStreamFilter argument alone to keep a
+    // user from seeing values off events they may not read, so assert it actually filters rather than
+    // trusting the caller wiring.
+
+    @Test
+    public void aggregateSlicesForColumn_onlyReturnsValuesFromAllowedSourceStreams() {
+        final List<Slice> result = adapter.aggregateSlicesForColumn(
+                "", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                Set.of(EVENTS_STREAM), null, SourceStreamFilter.allowList(Set.of("stream-a")),
+                Map.of(), "tags", null, Map.of(), 100);
+
+        assertThat(tagCounts(result))
+                .containsExactlyInAnyOrderEntriesOf(Map.of("windows", 2, "execution", 1));
+    }
+
+    @Test
+    public void aggregateSlicesForColumn_returnsValuesForADifferentAllowedSourceStream() {
+        final List<Slice> result = adapter.aggregateSlicesForColumn(
+                "", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                Set.of(EVENTS_STREAM), null, SourceStreamFilter.allowList(Set.of("stream-b")),
+                Map.of(), "tags", null, Map.of(), 100);
+
+        assertThat(tagCounts(result))
+                .containsExactlyInAnyOrderEntriesOf(Map.of("linux", 1, "credential-access", 1));
+    }
+
+    @Test
+    public void aggregateSlicesForColumn_returnsValuesFromEverySourceStreamWhenAllAllowed() {
+        final List<Slice> result = adapter.aggregateSlicesForColumn(
+                "", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                Set.of(EVENTS_STREAM), null, allAllowed(),
+                Map.of(), "tags", null, Map.of(), 100);
+
+        assertThat(tagCounts(result)).containsOnlyKeys("windows", "execution", "linux", "credential-access",
+                "t1003.001", "t1003x001", "access-token");
+    }
+
+    @Test
+    public void aggregateSlicesForColumn_returnsNothingForAnEmptySourceStreamAllowList() {
+        final List<Slice> result = adapter.aggregateSlicesForColumn(
+                "", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                Set.of(EVENTS_STREAM), null, SourceStreamFilter.allowList(Set.of()),
+                Map.of(), "tags", null, Map.of(), 100);
+
+        assertThat(result).isEmpty();
+    }
+
+    // --- aggregateSlicesForColumn bucket pattern tests ---
+    //
+    // The bucket pattern backs the server-side search of the tags filter dropdown. It must filter the
+    // aggregated values themselves (not the events), stay literal for regex metacharacters, and compose
+    // with the source stream allow-list.
+
+    @Test
+    public void aggregateSlicesForColumn_bucketPatternOnlyReturnsMatchingValues() {
+        final List<Slice> result = adapter.aggregateSlicesForColumn(
+                "", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                Set.of(EVENTS_STREAM), null, allAllowed(),
+                Map.of(), "tags", ".*access.*", Map.of(), 100);
+
+        assertThat(tagCounts(result))
+                .containsExactlyInAnyOrderEntriesOf(Map.of("credential-access", 1, "access-token", 1));
+    }
+
+    @Test
+    public void aggregateSlicesForColumn_bucketPatternTreatsEscapedMetacharactersLiterally() {
+        // An unescaped "." would also match the "t1003x001" tag.
+        final List<Slice> result = adapter.aggregateSlicesForColumn(
+                "", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                Set.of(EVENTS_STREAM), null, allAllowed(),
+                Map.of(), "tags", ".*t1003\\.001.*", Map.of(), 100);
+
+        assertThat(tagCounts(result)).containsOnlyKeys("t1003.001");
+    }
+
+    @Test
+    public void aggregateSlicesForColumn_bucketPatternComposesWithSourceStreamAllowList() {
+        // "access" tags exist in stream-b and stream-c; only the stream-b one may be returned.
+        final List<Slice> result = adapter.aggregateSlicesForColumn(
+                "", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                Set.of(EVENTS_STREAM), null, SourceStreamFilter.allowList(Set.of("stream-b")),
+                Map.of(), "tags", ".*access.*", Map.of(), 100);
+
+        assertThat(tagCounts(result)).containsOnlyKeys("credential-access");
+    }
+
+    @Test
+    public void aggregateSlicesForColumn_bucketPatternWithoutMatchesReturnsNothing() {
+        final List<Slice> result = adapter.aggregateSlicesForColumn(
+                "", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                Set.of(EVENTS_STREAM), null, allAllowed(),
+                Map.of(), "tags", ".*doesnotexist.*", Map.of(), 100);
+
+        assertThat(result).isEmpty();
+    }
+
+    private static Map<String, Integer> tagCounts(List<Slice> slices) {
+        return slices.stream().collect(Collectors.toMap(Slice::value, Slice::count));
     }
 
     // --- aggregateGroupedTerms tests ---

@@ -19,15 +19,11 @@ import { useEffect } from 'react';
 import type { UserConfigType } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationsStore, ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 
 const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
 
 const useIsGlobalTimeoutEnabled = () => {
-  const configuration = useStore(
-    ConfigurationsStore as Store<Record<string, any>>,
-    (state) => state?.configuration[USER_CONFIG] as UserConfigType,
-  );
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration[USER_CONFIG] as UserConfigType);
   const isGlobalTimeoutEnabled = configuration?.enable_global_session_timeout || false;
 
   useEffect(() => {

@@ -85,7 +85,7 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
                 final List<U> searchResults = extractSearchResults(results, searcher, start, perPage, entries);
 
                 final int totalCount = Math.toIntExact(results.totalHits.value());
-                return new PaginatedList<>(searchResults, totalCount, page, perPage);
+                return new PaginatedList<>(searchResults, totalCount, page, perPage, (long) entries.size());
             }
         }
     }

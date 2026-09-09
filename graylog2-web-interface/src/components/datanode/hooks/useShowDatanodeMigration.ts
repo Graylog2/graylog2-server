@@ -14,37 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-
+import { MIGRATION_STATE } from 'components/datanode/Constants';
 import { isPermitted } from 'util/PermissionsMixin';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import useMigrationState from './useMigrationState';
-
-const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl('/datanode/configured'));
+import useRunsWithDataNode from './useRunsWithDataNode';
 
 const useShowDatanodeMigration = (): {
   isDatanodeConfiguredAndUsed: boolean;
   showDatanodeMigration: boolean;
 } => {
   const { permissions } = useCurrentUser();
-  const canStartDataNode = useMemo(() => isPermitted(permissions, 'datanode:start'), [permissions]);
+  const canStartDataNode = isPermitted(permissions, 'datanode:start');
 
-  const { data: isDatanodeConfiguredAndUsed } = useQuery({
-    queryKey: ['show_datanode_migration'],
-    queryFn: fetchShowDatanodeMigration,
-    enabled: canStartDataNode,
-  });
+  const { data: isDatanodeConfiguredAndUsed } = useRunsWithDataNode({ enabled: canStartDataNode });
 
   const { currentStep } = useMigrationState({ enabled: canStartDataNode });
-  const noMigrationInProgress = !currentStep || currentStep?.state === 'NEW' || currentStep?.state === 'FINISHED';
+  const migrationNeedsFinalization = currentStep?.state === MIGRATION_STATE.RESTART_GRAYLOG.key;
+  const shouldShowDatanodeMigration =
+    isDatanodeConfiguredAndUsed === false || (isDatanodeConfiguredAndUsed === true && migrationNeedsFinalization);
 
   return {
-    isDatanodeConfiguredAndUsed: canStartDataNode && !!isDatanodeConfiguredAndUsed,
-    showDatanodeMigration: canStartDataNode && (!isDatanodeConfiguredAndUsed || !noMigrationInProgress),
+    isDatanodeConfiguredAndUsed: canStartDataNode && isDatanodeConfiguredAndUsed === true,
+    showDatanodeMigration: canStartDataNode && shouldShowDatanodeMigration,
   };
 };
 

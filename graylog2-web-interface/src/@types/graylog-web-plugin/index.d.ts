@@ -47,7 +47,6 @@ interface GlobalNotification {
 interface NavigationBadge {
   key: string;
   component: React.ComponentType;
-  // Active badges replace the built-in notification badge, so they must render the notification count themselves.
   useCondition: () => boolean;
 }
 
@@ -256,7 +255,7 @@ declare module 'graylog-web-plugin/plugin' {
     collectors_config: 'read';
     contentpack: 'read';
     dashboards: 'create' | 'edit' | 'read';
-    datanode: 'start';
+    datanode: 'read' | 'start';
     decorators: 'create' | 'edit' | 'read';
     eventdefinitions: 'create' | 'delete' | 'edit' | 'read';
     eventnotifications: 'create' | 'delete' | 'edit' | 'read';
@@ -265,7 +264,7 @@ declare module 'graylog-web-plugin/plugin' {
     indexercluster: 'read';
     indexranges: 'rebuild';
     indexset_templates: 'create' | 'edit' | 'read';
-    indexsets: 'create' | 'edit' | 'read';
+    indexsets: 'create' | 'delete' | 'edit' | 'read';
     indexsets_field_restrictions: 'edit';
     indices: 'read' | 'changestate' | 'failures';
     input_types: 'create';
@@ -324,7 +323,7 @@ declare module 'graylog-web-plugin/plugin' {
     DataLakeStatus: React.ComponentType<{
       dataLakeEnabled: boolean;
     }>;
-    DataLakeJournal: React.ComponentType<{
+    DataLakeJournal?: React.ComponentType<{
       nodeId: string;
     }>;
     DataLakeJobs: React.ComponentType<{
@@ -352,6 +351,12 @@ declare module 'graylog-web-plugin/plugin' {
       restore_history: Array<{ id: string }>;
     }>;
     DataLakeStreamDeleteWarning: React.ComponentType;
+  }
+
+  interface PluginArchive {
+    hooks: {
+      useExcludedStreams: () => Array<string>;
+    };
   }
 
   type HelpMenuItem = {
@@ -421,6 +426,7 @@ declare module 'graylog-web-plugin/plugin' {
      */
     pageNavigation?: Array<PageNavigation>;
     dataLake?: Array<PluginDataLake>;
+    archive?: Array<PluginArchive>;
     // Use this for stream-overview-only columns. Use `components.shared.entityTableElements`
     // when the extension should participate in the generic entity-table mechanism.
     'components.streams.overview.tableElements'?: Array<StreamsOverviewTableElement>;

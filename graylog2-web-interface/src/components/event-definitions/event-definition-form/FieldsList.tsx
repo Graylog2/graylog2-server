@@ -21,9 +21,7 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';
 import withTelemetry from 'logic/telemetry/withTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import withLocation from 'routing/withLocation';
 
 import styles from './FieldsList.css';
 
@@ -58,7 +56,6 @@ type FieldsListProps = {
   onEditFieldClick: (...args: any[]) => void;
   onRemoveFieldClick: (...args: any[]) => void;
   sendTelemetry: (...args: any[]) => void;
-  location: any;
 };
 
 class FieldsList extends React.Component<
@@ -69,8 +66,6 @@ class FieldsList extends React.Component<
 > {
   handleAddFieldClick = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.ADD_CUSTOM_FIELD_CLICKED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-fields',
       app_action_value: 'add-custom-field-button',
     });
 
@@ -155,4 +150,4 @@ class FieldsList extends React.Component<
   }
 }
 
-export default withLocation(withTelemetry(FieldsList));
+export default withTelemetry(FieldsList, 'event-definition-fields');

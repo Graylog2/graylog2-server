@@ -193,7 +193,7 @@ const timeRangeToFormValues = (timeRange: TimeRange, formatTime: FormatTime): Ti
   }
 };
 
-const serializeTimeRange = (timeRange: TimeRange | undefined) => {
+export const serializeTimeRange = (timeRange: TimeRange | undefined) => {
   if (!timeRange) {
     return '';
   }

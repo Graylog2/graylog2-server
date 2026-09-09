@@ -41,7 +41,7 @@ describe('ElementConfigurationContainer', () => {
       </ElementConfigurationContainer>,
     );
 
-    const removeBtn = await screen.findByTitle('Remove element');
+    const removeBtn = await screen.findByRole('button', { name: 'Remove element' });
     await userEvent.click(removeBtn);
 
     await waitFor(() => expect(onRemove).toHaveBeenCalledTimes(1));

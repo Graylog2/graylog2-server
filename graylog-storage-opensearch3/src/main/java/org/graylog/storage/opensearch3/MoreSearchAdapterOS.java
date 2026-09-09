@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3;
 
 import com.google.common.base.Stopwatch;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
@@ -343,10 +344,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     @Override
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                 Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                                Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets) {
+                                                Map<String, Set<String>> extraFilters, String slicingColumn, @Nullable String bucketPattern,
+                                                Map<String, Object> meta, int maxBuckets) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
         final var aggregation = Aggregation.builder()
-                .terms(terms -> terms.field(slicingColumn).size(maxBuckets))
+                .terms(terms -> {
+                    terms.field(slicingColumn).size(maxBuckets);
+                    if (bucketPattern != null) {
+                        terms.include(inc -> inc.regexp(bucketPattern));
+                    }
+                    return terms;
+                })
                 .build();
 
         final var searchResult = executeAggregation(filter, affectedIndices, SLICES_AGGREGATION_NAME, aggregation);

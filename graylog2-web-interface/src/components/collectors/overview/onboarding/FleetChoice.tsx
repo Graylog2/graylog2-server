@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { Button } from 'components/bootstrap';
 import { Select } from 'components/common';
 
+import { useCollectorPermissions } from '../../hooks';
 import type { Fleet } from '../../types';
 
 // A resolved decision about which fleet the collector should enroll into.
@@ -31,14 +32,17 @@ type Props = {
   selectedFleet: Fleet | null;
   onSelect: (choice: FleetChoiceValue) => void;
   onChange: () => void;
-  disabled: boolean;
+  disabled?: boolean;
+  // Embedded in a surrounding flow (e.g. the deploy wizard steps): left-aligned, no own heading.
+  inline?: boolean;
 };
 
-const Container = styled.div(
-  ({ theme }) => css`
-    max-width: 700px;
-    margin: 0 auto ${theme.spacings.md};
-    text-align: center;
+const Container = styled.div<{ $inline: boolean }>(
+  ({ theme, $inline }) => css`
+    /* Inline (deploy wizard): half the step width, matching the token step's boxes. */
+    max-width: ${$inline ? '50%' : '700px'};
+    margin: ${$inline ? '0' : `0 auto ${theme.spacings.md}`};
+    text-align: ${$inline ? 'left' : 'center'};
   `,
 );
 
@@ -50,18 +54,18 @@ const Heading = styled.h3(
 );
 
 // Button and dropdown sit side by side, separated by an "or".
-const Row = styled.div(
-  ({ theme }) => css`
+const Row = styled.div<{ $inline: boolean }>(
+  ({ theme, $inline }) => css`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: ${$inline ? 'flex-start' : 'center'};
     gap: ${theme.spacings.md};
   `,
 );
 
 const Separator = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-style: italic;
   `,
 );
@@ -103,18 +107,20 @@ const FleetName = styled.div(
 
 const FleetDescription = styled.div(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     font-size: ${theme.fonts.size.small};
   `,
 );
 
 const FLEET_SELECT_ID = 'onboarding-fleet-select';
 
-const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled }: Props) => {
+const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled = false, inline = false }: Props) => {
+  const { canCreateFleet } = useCollectorPermissions();
+
   if (selectedFleet) {
     return (
-      <Container>
-        <Heading>Fleet for this collector</Heading>
+      <Container $inline={inline}>
+        {!inline && <Heading>Fleet for This Collector</Heading>}
         <SelectedBox>
           <div>
             <FleetName>{selectedFleet.name}</FleetName>
@@ -131,26 +137,32 @@ const FleetChoice = ({ fleets, selectedFleet, onSelect, onChange, disabled }: Pr
   const options = fleets.map((fleet) => ({ label: fleet.name, value: fleet.id }));
 
   return (
-    <Container>
-      <Heading>Choose a fleet for this collector</Heading>
-      <Row>
-        <Button bsStyle="primary" onClick={() => onSelect({ kind: 'create-new' })} disabled={disabled}>
-          Create new fleet
-        </Button>
-        <Separator>or</Separator>
-        <SelectField>
-          <HiddenLabel htmlFor={FLEET_SELECT_ID}>Select existing fleet</HiddenLabel>
-          <Select
-            inputId={FLEET_SELECT_ID}
-            aria-label="Select existing fleet"
-            options={options}
-            value={null}
-            onChange={(value: string) => onSelect({ kind: 'existing', fleetId: value })}
-            clearable={false}
-            disabled={disabled}
-            placeholder="Select existing fleet..."
-          />
-        </SelectField>
+    <Container $inline={inline}>
+      {!inline && <Heading>Choose a Fleet for This Collector</Heading>}
+      <Row $inline={inline}>
+        {canCreateFleet && (
+          <>
+            <Button bsStyle="primary" onClick={() => onSelect({ kind: 'create-new' })} disabled={disabled}>
+              Create new fleet
+            </Button>
+            {options.length > 0 && <Separator>or</Separator>}
+          </>
+        )}
+        {options.length > 0 && (
+          <SelectField>
+            <HiddenLabel htmlFor={FLEET_SELECT_ID}>Select existing fleet</HiddenLabel>
+            <Select
+              inputId={FLEET_SELECT_ID}
+              aria-label="Select existing fleet"
+              options={options}
+              value={null}
+              onChange={(value: string) => onSelect({ kind: 'existing', fleetId: value })}
+              clearable={false}
+              disabled={disabled}
+              placeholder="Select existing fleet..."
+            />
+          </SelectField>
+        )}
       </Row>
     </Container>
   );

@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
+import merge from 'lodash/merge';
 
 import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -37,19 +38,18 @@ import type { UserDateTimeContextType } from 'contexts/UserDateTimeContext';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 const config = AggregationWidgetConfig.builder()
-  .visualization('line')
+  .visualization('area')
   .rowPivots([Pivot.create(['timestamp'], DateType)])
   .columnPivots([Pivot.createValues(['type'])])
   .series([Series.forFunction('count()')])
   .rollup(false)
   .build();
 
-const height = 180;
+const DEFAULT_HEIGHT = '180px';
 
-const GraphContainer = styled.div`
-  height: ${height}px;
+const GraphContainer = styled.div<{ $height: string }>`
+  height: ${({ $height }) => $height};
   width: 100%;
-  margin: 20px 0;
 `;
 
 type ResultPromise = ReturnType<typeof fetchEventsHistogram>;
@@ -69,6 +69,7 @@ const generateChart = (
     name: type,
     x,
     y,
+    fill: 'tozeroy',
     originalName: type,
     line: {
       shape: 'linear',
@@ -106,28 +107,33 @@ const layout: Partial<PlotLayout> = {
     domain: [0, 1],
     type: 'date',
   },
-  legend: { y: yLegendPosition(height) },
 };
 
-const prepareTimeRangeForGraph = (
-  timerange: {
-    from: string;
-    to: string;
-    type: string;
-  },
-  formatTime: FormatTime,
-) => [formatTime(timerange.from, 'internal'), formatTime(timerange.to, 'internal')];
+export type EffectiveTimeRange = {
+  from: string;
+  to: string;
+  type: string;
+};
+
+const prepareTimeRangeForGraph = (timerange: EffectiveTimeRange, formatTime: FormatTime) => [
+  formatTime(timerange.from, 'internal'),
+  formatTime(timerange.to, 'internal'),
+];
 
 const EventsGraph = ({
   data: { results, timerange },
   alerts,
   onZoom,
   formatTime,
+  height,
+  readOnly,
 }: {
   data: Awaited<ResultPromise>;
   alerts: 'include' | 'exclude' | 'only';
   onZoom: (from: string, to: string) => void;
   formatTime: FormatTime;
+  height: string;
+  readOnly: boolean;
 }) => {
   const chartData = useMemo(
     () => [
@@ -137,7 +143,7 @@ const EventsGraph = ({
     [alerts, results.buckets.alerts, results.buckets.events, formatTime],
   );
 
-  const _layout = useMemo(
+  const baseLayout = useMemo(
     () => ({
       ...layout,
       xaxis: {
@@ -149,13 +155,18 @@ const EventsGraph = ({
   );
 
   return (
-    <GraphContainer>
-      <InteractiveContext.Provider value={false}>
+    <GraphContainer $height={height}>
+      <InteractiveContext.Provider value="disabled">
         <FullSizeContainer>
           {(dimensions) => (
-            <PlotLegend config={config} chartData={chartData} height={height} width={dimensions.width}>
-              <InteractiveContext.Provider value>
-                <GenericPlot chartData={chartData} layout={_layout} onZoom={onZoom} setChartColor={defaultSetColor} />
+            <PlotLegend config={config} chartData={chartData} height={dimensions.height} width={dimensions.width}>
+              <InteractiveContext.Provider value={readOnly ? 'read-only' : 'interactive'}>
+                <GenericPlot
+                  chartData={chartData}
+                  layout={merge({}, baseLayout, { legend: { y: yLegendPosition(dimensions.height) } })}
+                  onZoom={onZoom}
+                  setChartColor={defaultSetColor}
+                />
               </InteractiveContext.Provider>
             </PlotLegend>
           )}
@@ -169,8 +180,18 @@ type EventsHistogramFetcher = typeof fetchEventsHistogram;
 
 type Props = MiddleSectionProps & {
   eventsHistogramFetcher?: EventsHistogramFetcher;
+  height?: string;
+  readOnly?: boolean;
+  onEffectiveTimeRangeChange?: (timerange: EffectiveTimeRange) => void;
 };
-const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
+const EventsHistogram = ({
+  searchParams,
+  setFilters,
+  eventsHistogramFetcher = fetchEventsHistogram,
+  height = DEFAULT_HEIGHT,
+  readOnly = false,
+  onEffectiveTimeRangeChange = undefined,
+}: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const { data, isLoading, refetch, isError, error } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
@@ -179,6 +200,12 @@ const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fe
   });
 
   useOnRefresh(refetch);
+
+  useEffect(() => {
+    if (data) {
+      onEffectiveTimeRangeChange?.(data.timerange);
+    }
+  }, [data, onEffectiveTimeRangeChange]);
 
   const alerts = parseTypeFilter(searchParams?.filters?.get('alert')?.[0]);
   const onZoom = useCallback(
@@ -198,7 +225,16 @@ const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fe
     return <Alert bsStyle="danger">Loading events histogram failed: {error?.message ?? 'Unknown error'}</Alert>;
   }
 
-  return <EventsGraph data={data} alerts={alerts} onZoom={onZoom} formatTime={formatTime} />;
+  return (
+    <EventsGraph
+      data={data}
+      alerts={alerts}
+      onZoom={onZoom}
+      formatTime={formatTime}
+      height={height}
+      readOnly={readOnly}
+    />
+  );
 };
 
 export default EventsHistogram;

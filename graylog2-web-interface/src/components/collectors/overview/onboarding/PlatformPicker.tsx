@@ -45,7 +45,7 @@ const Heading = styled.h2(
 
 const Subtitle = styled.p(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
     margin-bottom: ${theme.spacings.lg};
   `,
 );

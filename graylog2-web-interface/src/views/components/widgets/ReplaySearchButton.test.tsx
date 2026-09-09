@@ -52,6 +52,15 @@ describe('ReplaySearchButton', () => {
     await screen.findByRole('link', { name: /replay search/i });
   });
 
+  it('shows a tooltip when focused via keyboard', async () => {
+    render(<ReplaySearchButton />);
+    await findReplayButton();
+
+    await userEvent.tab();
+
+    await screen.findByText('Replay search', { selector: 'div,span' });
+  });
+
   describe('generates link', () => {
     const renderWithContext = async ({ query, timerange, streams, filters }: OptionalOverrides = {}) => {
       render(

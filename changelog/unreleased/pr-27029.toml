@@ -1,0 +1,4 @@
+type = "f"
+message = "Properly escaping space in lucene queries on search page/event definitions/internal functionality."
+
+pulls = ["27029"]

@@ -23,9 +23,7 @@ import { Alert, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import withTelemetry from 'logic/telemetry/withTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import withLocation from 'routing/withLocation';
 
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
@@ -41,7 +39,6 @@ type NotificationsFormProps = {
   currentUser: any;
   onChange: (...args: any[]) => void;
   sendTelemetry: (...args: any[]) => void;
-  location: any;
 };
 
 class NotificationsForm extends React.Component<
@@ -60,8 +57,6 @@ class NotificationsForm extends React.Component<
 
   toggleAddNotificationForm = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.ADD_CLICKED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-notifications',
       app_action_value: 'add-notification-button',
     });
 
@@ -152,4 +147,4 @@ class NotificationsForm extends React.Component<
   }
 }
 
-export default withLocation(withTelemetry(NotificationsForm));
+export default withTelemetry(NotificationsForm, 'event-definition-notifications');

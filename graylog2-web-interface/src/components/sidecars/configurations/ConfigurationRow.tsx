@@ -69,7 +69,6 @@ class ConfigurationRow extends React.Component<
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_DELETED, {
       app_pathname: 'sidecars',
-      app_section: 'configuration',
     });
 
     // eslint-disable-next-line no-alert
@@ -123,4 +122,4 @@ class ConfigurationRow extends React.Component<
   }
 }
 
-export default withTelemetry(ConfigurationRow);
+export default withTelemetry(ConfigurationRow, 'configuration');

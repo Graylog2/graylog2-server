@@ -18,8 +18,10 @@ import { useMemo } from 'react';
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Select, Icon } from 'components/common';
+import { Select, Icon, InputDescription } from 'components/common';
+import { FormGroup, ControlLabel } from 'components/bootstrap';
 import { defaultCompare } from 'logic/DefaultCompare';
+import streamCategoryName from 'logic/streams/streamCategoryName';
 
 type StreamsAndCategoriesOption = {
   label: string;
@@ -54,6 +56,9 @@ type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>,
   showStreams?: boolean;
   showCategories?: boolean;
   grouping?: boolean;
+  label?: React.ReactNode;
+  error?: React.ReactNode;
+  help?: React.ReactNode;
 };
 
 const StreamsAndCategoriesFilter = ({
@@ -67,6 +72,9 @@ const StreamsAndCategoriesFilter = ({
   showCategories = true,
   grouping = true,
   multi = true,
+  label = undefined,
+  error = undefined,
+  help = undefined,
   ...rest
 }: StreamsAndCategoriesFilterProps) => {
   const options = useMemo(() => {
@@ -74,7 +82,7 @@ const StreamsAndCategoriesFilter = ({
       showCategories && multi
         ? [...new Set<string>(streams.flatMap((stream) => streamCategories ?? stream?.categories ?? []))]
             .map((category) => ({
-              label: category,
+              label: streamCategoryName(category),
               value: { id: category, type: 'category' as const },
             }))
             .sort((a: StreamsAndCategoriesOption, b: StreamsAndCategoriesOption) => defaultCompare(a.label, b.label))
@@ -113,18 +121,23 @@ const StreamsAndCategoriesFilter = ({
   };
 
   return (
-    <Select
-      {...rest}
-      id={id}
-      onChange={() => {}}
-      onReactSelectChange={handleReactSelectChange}
-      options={options}
-      optionRenderer={renderOption}
-      valueRenderer={renderOption}
-      value={selectedOptions}
-      required={required}
-      multi={multi}
-    />
+    <FormGroup controlId={rest.inputId ?? id} validationState={error ? 'error' : null}>
+      {label && <ControlLabel>{label}</ControlLabel>}
+      <Select
+        {...rest}
+        id={id}
+        inputId={rest.inputId ?? id}
+        onChange={() => {}}
+        onReactSelectChange={handleReactSelectChange}
+        options={options}
+        optionRenderer={renderOption}
+        valueRenderer={renderOption}
+        value={selectedOptions}
+        required={required}
+        multi={multi}
+      />
+      <InputDescription error={error} help={help} />
+    </FormGroup>
   );
 };
 

@@ -1,0 +1,4 @@
+type = "a"
+message = "Add metrics widgets (message, alert, and event counts, plus top sources) to the welcome page. The underlying queries can be disabled cluster-wide under System → Configurations → Welcome Page for users concerned about performance."
+
+pulls = ["26961"]

@@ -36,7 +36,14 @@ const Tooltip = ({ ...props }: Props) => {
     },
   });
 
-  return <MantineTooltip zIndex="var(--mantine-z-index-max)" styles={styles} {...props} />;
+  return (
+    <MantineTooltip
+      zIndex="var(--mantine-z-index-max)"
+      styles={styles}
+      events={{ hover: true, focus: true, touch: false }}
+      {...props}
+    />
+  );
 };
 
 export default Tooltip;

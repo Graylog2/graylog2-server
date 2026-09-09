@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -31,7 +30,7 @@ import ProcessingConfigModalForm from './message-processors/ProcessingConfigModa
 
 const MessageProcessorsConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
   const [viewConfig, setViewConfig] = useState<FormConfig | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<FormConfig | undefined>(undefined);
 

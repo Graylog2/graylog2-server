@@ -56,6 +56,18 @@ public class DataNodeMetadataServiceImpl implements DataNodeMetadataService {
     }
 
     @Override
+    public void setLatestAvailableVersion(String nodeId, @Nullable String latestAvailableVersion) {
+        // No upsert: this only refreshes an existing row. A node without a row hasn't recorded a current version yet,
+        // and a row carrying only a latest-available version would be meaningless.
+        collection.updateOne(
+                Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId),
+                latestAvailableVersion != null
+                        ? Updates.set(DataNodeMetadata.FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION, latestAvailableVersion)
+                        : Updates.unset(DataNodeMetadata.FIELD_LATEST_AVAILABLE_OPENSEARCH_VERSION)
+        );
+    }
+
+    @Override
     public Optional<DataNodeMetadata> findByNodeId(String nodeId) {
         return Optional.ofNullable(
                 collection.find(Filters.eq(DataNodeMetadata.FIELD_NODE_ID, nodeId)).first()

@@ -23,16 +23,13 @@ import { Button, Col, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { ModalSubmit, IfPermitted } from 'components/common';
-import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { getConfig } from 'components/configurations/helpers';
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { DEFAULT_PASSWORD_COMPLEXITY_CONFIG, PASSWORD_SPECIAL_CHARACTERS } from 'logic/users/passwordComplexity';
 
 const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
@@ -59,10 +56,9 @@ const PasswordComplexityConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<PasswordComplexityConfigType | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<PasswordComplexityConfigType | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('password-complexity');
 
   useEffect(() => {
     ConfigurationsActions.listPasswordComplexityConfig(configType).then(() => {
@@ -75,8 +71,6 @@ const PasswordComplexityConfig = () => {
 
   const saveConfig = (values: PasswordComplexityConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.PASSWORD_COMPLEXITY_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'password-complexity',
       app_action_value: 'configuration-save',
     });
 

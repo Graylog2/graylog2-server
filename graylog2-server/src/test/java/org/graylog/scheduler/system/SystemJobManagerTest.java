@@ -44,6 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @ExtendWith(MongoDBExtension.class)
 class SystemJobManagerTest {
@@ -130,6 +131,22 @@ class SystemJobManagerTest {
     }
 
     @Test
+    void getActiveJobConfigsReturnsQueuedAndRunningJobsOfSpecifiedType() {
+        // Create and lock a job (simulating a running job)
+        systemJobManager.submit(TestSystemJobConfig.create("running-job"));
+        assertThat(triggerService.nextRunnableTrigger()).isPresent();
+
+        systemJobManager.submit(TestSystemJobConfig.create("pending-job"));
+
+        final var activeConfigs = systemJobManager.getActiveJobConfigs(TestSystemJobConfig.TYPE_NAME);
+
+        assertThat(activeConfigs)
+                .extracting(config -> ((TestSystemJobConfig) config).testValue())
+                .containsExactlyInAnyOrder("running-job", "pending-job");
+        assertThat(systemJobManager.getActiveJobConfigs("other-type")).isEmpty();
+    }
+
+    @Test
     void getRunningJobsReturnsAllRunningJobs() {
         // Submit and lock first job
         systemJobManager.submit(TestSystemJobConfig.create("job-1"));
@@ -193,6 +210,37 @@ class SystemJobManagerTest {
     void getRunningJobReturnsEmptyForNonExistentId() {
         // Use a valid ObjectId format that doesn't exist in the database
         assertThat(systemJobManager.getRunningJob("000000000000000000000000")).isEmpty();
+    }
+
+    @Test
+    void getRunningJobReturnsEmptyForNonObjectIdId() {
+        // A legacy job UUID (or any non-ObjectId string) must not throw; it simply has no running scheduler job.
+        assertThat(systemJobManager.getRunningJob("11111111-2222-3333-4444-555555555555")).isEmpty();
+    }
+
+    @Test
+    void cancelSetsCancelFlagOnTrigger() {
+        systemJobManager.submit(TestSystemJobConfig.create("cancel-me"));
+        final var locked = triggerService.nextRunnableTrigger();
+        assertThat(locked).isPresent();
+        assertThat(locked.get().isCancelled()).isFalse();
+        final var triggerId = locked.get().id();
+
+        systemJobManager.cancel(triggerId);
+
+        assertThat(triggerService.get(triggerId))
+                .hasValueSatisfying(trigger -> assertThat(trigger.isCancelled()).isTrue());
+    }
+
+    @Test
+    void cancelIsNoOpForNonExistentId() {
+        assertThatCode(() -> systemJobManager.cancel("000000000000000000000000")).doesNotThrowAnyException();
+    }
+
+    @Test
+    void cancelIsNoOpForNonObjectIdId() {
+        // A legacy job UUID (or any non-ObjectId string) must not throw; there is no scheduler job to cancel.
+        assertThatCode(() -> systemJobManager.cancel("11111111-2222-3333-4444-555555555555")).doesNotThrowAnyException();
     }
 
     /**

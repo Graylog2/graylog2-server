@@ -16,6 +16,7 @@
  */
 package org.graylog2.metrics.entity;
 
+import javax.annotation.Nullable;
 
-public record EntityMetric<T>(String entityId, T value) {
+public record EntityMetric<T>(String entityId, @Nullable T value) {
 }

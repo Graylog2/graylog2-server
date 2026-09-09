@@ -1,0 +1,5 @@
+type = "c"
+message = "Added fallback name path.repo to the supported path_repo configuration option in datanode"
+
+issues = ["25116"]
+pulls = ["25499"]

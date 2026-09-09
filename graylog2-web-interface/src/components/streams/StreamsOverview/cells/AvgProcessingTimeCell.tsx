@@ -32,7 +32,7 @@ const AvgProcessingTimeCell = ({ stream }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.avg_processing_time_ms) {
+  if (isError || typeof metrics?.avg_processing_time_ms !== 'number') {
     return null;
   }
 

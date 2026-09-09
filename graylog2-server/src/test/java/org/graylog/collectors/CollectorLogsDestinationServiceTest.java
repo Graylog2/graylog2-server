@@ -187,7 +187,7 @@ class CollectorLogsDestinationServiceTest {
         final var ruleData = (java.util.Map<String, Object>) mapCaptor.getValue();
 
         assertThat(ruleData.get("stream_id")).hasToString(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID);
-        assertThat(ruleData.get("field")).isEqualTo("collector_receiver_type");
+        assertThat(ruleData.get("field")).isEqualTo("agent_receiver_type");
         assertThat(ruleData.get("type")).isEqualTo(StreamRuleType.EXACT.toInteger());
         assertThat(ruleData.get("value")).isEqualTo(CollectorLogRecordProcessor.RECEIVER_TYPE);
         assertThat(ruleData.get("inverted")).isEqualTo(false);

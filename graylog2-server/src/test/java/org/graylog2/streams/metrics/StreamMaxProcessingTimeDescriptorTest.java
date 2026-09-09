@@ -73,7 +73,7 @@ class StreamMaxProcessingTimeDescriptorTest {
     }
 
     @Test
-    void compute_returnsZeroForMissingStreams() {
+    void compute_returnsNullForStreamsWithNoSamples() {
         when(moreSearch.aggregateGroupedMetric(
                 anyString(), any(RelativeRange.class),
                 anyString(), any(MoreSearchAdapter.AggregationType.class), anyString(), anyInt(),
@@ -83,7 +83,7 @@ class StreamMaxProcessingTimeDescriptorTest {
         final List<EntityMetric<Double>> result = descriptor.compute(List.of("stream1"));
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().value()).isEqualTo(0.0);
+        assertThat(result.getFirst().value()).isNull();
     }
 
     @Test

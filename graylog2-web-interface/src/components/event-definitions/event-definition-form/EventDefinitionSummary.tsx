@@ -23,7 +23,6 @@ import { TagList } from 'components/common';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
@@ -41,9 +40,7 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: EventDefinition & {
-    share_request?: EntitySharePayload;
-  };
+  eventDefinition: EventDefinition;
   notifications: Array<EventNotification>;
   validation?: {
     errors: {

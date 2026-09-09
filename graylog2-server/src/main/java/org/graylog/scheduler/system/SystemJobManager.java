@@ -16,11 +16,11 @@
  */
 package org.graylog.scheduler.system;
 
-import com.google.common.primitives.Ints;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog.scheduler.DBSystemJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
@@ -34,9 +34,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @Singleton
@@ -51,36 +54,65 @@ public class SystemJobManager {
         this.clock = clock;
     }
 
-    public void submit(SystemJobConfig config) {
-        submitWithDelay(config, Duration.ZERO);
+    public SystemJobSubmitResult submit(SystemJobConfig config) {
+        return submitWithConstraints(config, Set.of());
     }
 
-    public void submitWithDelay(SystemJobConfig config, Duration delay) {
+    /**
+     * Submits a system job that only nodes providing all given scheduler capabilities may execute.
+     *
+     * @param config      the job configuration
+     * @param constraints the scheduler capabilities a node must provide to execute the job
+     * @return the result of the submission
+     */
+    public SystemJobSubmitResult submitWithConstraints(SystemJobConfig config, Set<String> constraints) {
+        return submitWithDelayAndConstraints(config, Duration.ZERO, constraints);
+    }
+
+    public SystemJobSubmitResult submitWithDelay(SystemJobConfig config, Duration delay) {
+        return submitWithDelayAndConstraints(config, delay, Set.of());
+    }
+
+    public SystemJobSubmitResult submitWithDelayAndConstraints(SystemJobConfig config, Duration delay, Set<String> constraints) {
         final var now = clock.nowUTC();
-        final var startTime = now.plusMillis(Ints.saturatedCast(delay.toMillis()));
+        final var startTime = now.plus(delay.toMillis());
         final var trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionType(SystemJobDefinitionConfig.TYPE_NAME)
                 .jobDefinitionId(config.type())
+                .constraints(constraints)
                 .data(config)
                 .startTime(startTime)
                 .nextTime(startTime)
                 .schedule(OnceJobSchedule.create())
                 .build();
 
-        triggerService.create(trigger);
+        final var created = triggerService.create(trigger);
+
+        return new SystemJobSubmitResult(requireNonNull(created.id(), "Created job trigger must have an ID"));
     }
 
     public List<SystemJobConfig> getRunningJobConfigs(String type) {
+        return getJobConfigs(type, JobTriggerStatus.RUNNING);
+    }
+
+    /**
+     * Returns the configurations of all queued, running and paused jobs of the given type.
+     */
+    public List<SystemJobConfig> getActiveJobConfigs(String type) {
+        return getJobConfigs(type, JobTriggerStatus.RUNNABLE, JobTriggerStatus.RUNNING, JobTriggerStatus.PAUSED);
+    }
+
+    private List<SystemJobConfig> getJobConfigs(String type, JobTriggerStatus... statuses) {
         final var query = Filters.and(
                 // The trigger's job definition ID is the type name for system jobs
                 Filters.eq(JobTriggerDto.FIELD_JOB_DEFINITION_ID, type),
-                Filters.eq(JobTriggerDto.FIELD_STATUS, JobTriggerStatus.RUNNING)
+                Filters.in(JobTriggerDto.FIELD_STATUS, statuses)
         );
 
         try (var stream = triggerService.streamByQuery(query)) {
             return stream.map(JobTriggerDto::data)
                     .flatMap(Optional::stream)
-                    .map(config -> (SystemJobConfig) config)
+                    .map(SystemJobConfig.class::cast)
                     .toList();
         }
     }
@@ -99,9 +131,27 @@ public class SystemJobManager {
     }
 
     public Optional<SystemJobSummary> getRunningJob(String id) {
-        return triggerService.get(requireNonBlank(id, "id can't be blank"))
+        // A trigger ID is a Mongo ObjectId; a non-ObjectId id can't match a running job, so treat it as not found.
+        if (!ObjectId.isValid(requireNonBlank(id, "id can't be blank"))) {
+            return Optional.empty();
+        }
+        return triggerService.get(id)
                 .filter(trigger -> trigger.status() == JobTriggerStatus.RUNNING)
                 .map(this::toSystemJobInfo);
+    }
+
+    /**
+     * Requests cancellation of the system job with the given trigger ID by setting the trigger's cancel flag. The
+     * running job stops at its next check of {@link SystemJobContext#isCancelled()}. A non-ObjectId id, or an id with
+     * no matching trigger, is a no-op; a blank id is rejected. Callers are responsible for permission checks and for
+     * verifying that the job is cancelable (see {@link SystemJobSummary#isCancelable()}).
+     */
+    public void cancel(String id) {
+        // A trigger ID is a Mongo ObjectId; a non-ObjectId id can't match a job, so there's nothing to cancel.
+        if (!ObjectId.isValid(requireNonBlank(id, "id can't be blank"))) {
+            return;
+        }
+        triggerService.cancelTriggerByQuery(idEq(id));
     }
 
     private Map<String, SystemJobSummary> getJobsByQuery(Bson query) {

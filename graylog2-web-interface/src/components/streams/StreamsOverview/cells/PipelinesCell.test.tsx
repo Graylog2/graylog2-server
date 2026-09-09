@@ -39,7 +39,7 @@ describe('PipelinesCell (Streams)', () => {
     asMock(useExpandedSections).mockReturnValue({ toggleSection, expandedSections: {} });
   });
 
-  it('renders nothing for the default stream', () => {
+  it('renders the count for the default stream (#14572)', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { pipelines: ['p-1'] },
       isInitialLoading: false,
@@ -48,7 +48,7 @@ describe('PipelinesCell (Streams)', () => {
 
     render(<PipelinesCell stream={{ ...stream, is_default: true } as any} />);
 
-    expect(screen.queryByText('1')).not.toBeInTheDocument();
+    expect(screen.getByText('1')).toBeInTheDocument();
   });
 
   it('renders nothing when the stream is not editable', () => {

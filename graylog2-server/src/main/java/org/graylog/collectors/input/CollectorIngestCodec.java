@@ -59,10 +59,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class CollectorIngestCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestCodec.class);
     public static final String NAME = "CollectorIngest";
-    public static final String FIELD_COLLECTOR_RECEIVER_TYPE = "collector_receiver_type";
-    public static final String FIELD_COLLECTOR_SOURCE_ID = "collector_source_id";
-    public static final String FIELD_COLLECTOR_FLEET_ID = "collector_fleet_id";
-    public static final String FIELD_COLLECTOR_INSTANCE_UID = "collector_instance_uid";
+    public static final String FIELD_AGENT_RECEIVER_TYPE = "agent_receiver_type";
+    public static final String FIELD_AGENT_SOURCE_ID = "agent_source_id";
+    public static final String FIELD_AGENT_FLEET_ID = "agent_fleet_id";
+    public static final String FIELD_AGENT_ID = "agent_id";
 
     private final Configuration configuration;
     private final MessageFactory messageFactory;
@@ -151,16 +151,16 @@ public class CollectorIngestCodec implements Codec {
                 ? messageFactory.createUnaccountedMessage(body, source, timestamp)
                 : messageFactory.createMessage(body, source, timestamp);
 
-        message.addField(FIELD_COLLECTOR_RECEIVER_TYPE, receiverType);
+        message.addField(FIELD_AGENT_RECEIVER_TYPE, receiverType);
 
         if (!instanceUid.isEmpty()) {
-            message.addField(FIELD_COLLECTOR_INSTANCE_UID, instanceUid);
+            message.addField(FIELD_AGENT_ID, instanceUid);
         }
         if (!sourceId.isEmpty()) {
-            message.addField(FIELD_COLLECTOR_SOURCE_ID, sourceId);
+            message.addField(FIELD_AGENT_SOURCE_ID, sourceId);
         }
         if (!fleetId.isEmpty()) {
-            message.addField(FIELD_COLLECTOR_FLEET_ID, fleetId);
+            message.addField(FIELD_AGENT_FLEET_ID, fleetId);
         }
 
         if (!logRecord.getSeverityText().isEmpty()) {

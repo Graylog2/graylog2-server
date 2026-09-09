@@ -16,10 +16,14 @@
  */
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser as mockDefaultUser } from 'defaultMockValues';
 
+import selectEvent from 'helpers/selectEvent';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
+import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
@@ -198,6 +202,14 @@ jest.mock('logic/telemetry/withTelemetry', () => ({
   ),
 }));
 
+jest.mock('domainActions/permissions/EntityShareDomain', () => ({
+  __esModule: true,
+  default: { prepare: jest.fn(() => Promise.resolve()), update: jest.fn(() => Promise.resolve()) },
+}));
+
+// Rendered once the form is dirty and relies on `useBlocker`, which needs a data router.
+jest.mock('components/common/ConfirmLeaveDialog', () => () => null);
+
 jest.mock('components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage');
 jest.mock('routing/useLocation');
 jest.mock('logic/telemetry/useSendTelemetry');
@@ -357,5 +369,32 @@ describe('EventDefinitionFormContainer', () => {
     await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /update event definition/i })).toBeVisible();
+  });
+
+  it('keeps the selected collaborators when navigating away from and back to the Share step', async () => {
+    // Mirrors the server: the prepared state reflects exactly the capabilities that were sent.
+    asMock(EntityShareDomain.prepare).mockImplementation((_type, _title, _grn, payload?: any) =>
+      Promise.resolve(
+        createEntityShareState
+          .toBuilder()
+          .selectedGranteeCapabilities(payload?.selected_grantee_capabilities ?? Immutable.Map())
+          .build(),
+      ),
+    );
+
+    render(<EventDefinitionFormContainer action="create" eventDefinition={mockAggregationEventDefinition} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /^share$/i }));
+
+    await selectEvent.chooseOption('Search for users and teams', everyone.title);
+    await selectEvent.chooseOption('Select a capability', viewer.title);
+    await userEvent.click(await screen.findByRole('button', { name: /add collaborator/i }));
+
+    expect(await screen.findByText(everyone.title)).toBeVisible();
+
+    await userEvent.click(await screen.findByRole('button', { name: /^summary$/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /^share$/i }));
+
+    expect(await screen.findByText(everyone.title)).toBeVisible();
   });
 });

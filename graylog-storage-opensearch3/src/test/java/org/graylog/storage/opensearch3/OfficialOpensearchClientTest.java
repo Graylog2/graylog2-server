@@ -63,6 +63,27 @@ class OfficialOpensearchClientTest {
         assertThat(mergedConfig.getResponseTimeout()).isEqualTo(Timeout.ofSeconds(5));
     }
 
+    @Test
+    void interruptFlagIsRestoredWhenTheWaitIsInterrupted() {
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder().build();
+
+        // Pre-setting the flag makes get() throw InterruptedException deterministically, with no sleeping or racing.
+        Thread.currentThread().interrupt();
+        try {
+            assertThatThrownBy(() ->
+                    client.executeWithClientTimeout(c -> new CompletableFuture<String>(), "Error getting data", Duration.milliseconds(50)))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("Error getting data");
+
+            assertThat(Thread.currentThread().isInterrupted())
+                    .as("get() clears the interrupt flag when it throws, so executeWithClientTimeout must restore it")
+                    .isTrue();
+        } finally {
+            // Never leak interrupt state onto the shared test thread.
+            Thread.interrupted();
+        }
+    }
+
     private CompletableFuture<String> asyncCall(long timeout) {
         return CompletableFuture.supplyAsync(() -> {
             try {

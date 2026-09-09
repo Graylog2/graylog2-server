@@ -23,13 +23,16 @@ import UserNotification from 'util/UserNotification';
 export const MONGODB_NODES_QUERY_KEY_PREFIX = ['mongodbNodes'] as const;
 export const MONGODB_PROFILING_STATUS_QUERY_KEY = [...MONGODB_NODES_QUERY_KEY_PREFIX, 'profilingStatus'] as const;
 
-export type MongodbProfilingStatusByLevel = Partial<Record<'OFF' | 'SLOW_OPS' | 'ALL', number>>;
+export type MongodbProfilingStatusByLevel = Partial<Record<'OFF' | 'SLOW_OPS' | 'ALL', number>> & {
+  slowMs?: number;
+};
 export type MongodbProfilingState = 'off' | 'enabled' | 'mixed' | 'unknown';
 export type MongodbProfilingToggleAction = 'enable' | 'disable';
 type RunToggleAction = () => Promise<boolean>;
 
 type MongodbProfilingToggleCommonResult = {
   profilingStatusByLevel: MongodbProfilingStatusByLevel | undefined;
+  slowMs: number | undefined;
   isTogglingProfiling: boolean;
   runToggleAction: RunToggleAction;
 };
@@ -133,6 +136,7 @@ const useMongodbProfilingToggle = (
       action: null,
       state: 'unknown',
       profilingStatusByLevel: statusByNode,
+      slowMs: statusByNode?.slowMs,
       isStatusReady: false,
       isTogglingProfiling,
       runToggleAction: () => Promise.resolve(false),
@@ -146,6 +150,7 @@ const useMongodbProfilingToggle = (
     action,
     state,
     profilingStatusByLevel: statusByNode,
+    slowMs: statusByNode?.slowMs,
     isStatusReady: true,
     isTogglingProfiling,
     runToggleAction: () => performToggleAction(action),

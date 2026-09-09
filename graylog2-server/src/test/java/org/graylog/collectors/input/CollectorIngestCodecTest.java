@@ -273,7 +273,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID)).isEqualTo(TEST_INSTANCE_UID);
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_ID)).isEqualTo(TEST_INSTANCE_UID);
     }
 
     @Test
@@ -300,7 +300,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID)).isNull();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_ID)).isNull();
     }
 
     @Test
@@ -328,7 +328,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID)).isEqualTo(TEST_SOURCE_ID);
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_SOURCE_ID)).isEqualTo(TEST_SOURCE_ID);
     }
 
     @Test
@@ -355,7 +355,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID)).isNull();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_SOURCE_ID)).isNull();
     }
 
     @Test
@@ -383,7 +383,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID)).isEqualTo(TEST_FLEET_ID);
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_FLEET_ID)).isEqualTo(TEST_FLEET_ID);
     }
 
     @Test
@@ -410,7 +410,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID)).isNull();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_AGENT_FLEET_ID)).isNull();
     }
 
     @Test
@@ -532,7 +532,7 @@ class CollectorIngestCodecTest {
         final var decoded = codecWithProcessor.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField("collector_receiver_type")).isEqualTo("file_log");
+        assertThat(decoded.get().getField("agent_receiver_type")).isEqualTo("file_log");
         assertThat(decoded.get().getField(EventFields.EVENT_LOG_NAME)).isEqualTo("test.log");
     }
 

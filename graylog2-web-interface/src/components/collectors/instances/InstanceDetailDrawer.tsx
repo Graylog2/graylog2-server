@@ -24,14 +24,22 @@ import { Icon, Link, RelativeTime, Spinner } from 'components/common';
 import type { IconName } from 'components/common/Icon/types';
 import Routes from 'routing/Routes';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+
+import InstanceHealthSection from './InstanceHealthSection';
 
 import ActivityEntryList from '../common/ActivityEntryList';
+import { DetailRow, DetailLabel } from '../common/DetailRow';
 import { IconRow, IconRowList } from '../common/IconRowList';
+import InstanceStatusLabel from '../common/InstanceStatusLabel';
+import collectorOsName from '../common/collectorOsName';
 import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_INSTANCE_UID_FIELD } from '../common/fields';
+import { AGENT_ID_FIELD } from '../common/fields';
 import collectorSystemLogsUrl from '../common/collectorSystemLogsUrl';
-import { useInstancePendingChanges } from '../hooks';
+import { useInstance, useInstancePendingChanges, useCollectorPermissions } from '../hooks';
+import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import { instanceTelemetryProps } from '../hooks/telemetry-helpers';
 import type { CoalescedActions, CollectorInstanceView, Source, TargetInfo } from '../types';
 
 type Props = {
@@ -57,26 +65,9 @@ const SectionTitle = styled.h4(
   `,
 );
 
-const DetailRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacings.xs};
-    margin-bottom: ${theme.spacings.xs};
-  `,
-);
-
-const Title = styled.span(
-  ({ theme }) => css`
-    font-weight: 500;
-    min-width: 120px;
-    font-size: ${theme.fonts.size.small};
-  `,
-);
-
 const EmptyText = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.gray[60]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 
@@ -133,8 +124,13 @@ const pendingActions = (coalesced: CoalescedActions): PendingAction[] => {
   return actions;
 };
 
-const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
-  const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
+const InstanceDetailDrawer = ({ instance: instanceProp, sources, fleetName, onClose }: Props) => {
+  // The prop is a row snapshot frozen at drawer-open; poll the instance itself so
+  // Status, Last Seen, and Health stay live (same pattern as the sync section below).
+  // Errors here are non-fatal — we keep rendering the last known instance.
+  const { canReadSystemLogs } = useCollectorPermissions();
+  const { data: freshInstance } = useInstance(instanceProp.instance_uid);
+  const instance = freshInstance ?? instanceProp;
   const { data: pendingDetail, isError: pendingError } = useInstancePendingChanges(instance.instance_uid);
   // Use the backend's authoritative flag (consistent with the table); fall back to the table row's
   // value until the detail loads. Deriving from activities.length would wrongly show "In sync" for an
@@ -143,6 +139,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
   const actions = pendingDetail ? pendingActions(pendingDetail.coalesced) : [];
   const activities = pendingDetail ? pendingDetail.activities : [];
   const [showTransactions, setShowTransactions] = useState(false);
+  const sendTelemetry = useSendCollectorsTelemetry();
 
   let syncStatus: SyncStatus;
   if (pendingDetail) {
@@ -171,54 +168,83 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
     <Drawer title={instance.hostname || instance.instance_uid} onClose={onClose} size="md">
       <Section>
         <DetailRow>
-          <Title>Status:</Title>
-          <Label bsStyle={instance.status === 'online' ? 'success' : 'default'}>
-            {instance.status === 'online' ? 'Online' : 'Offline'}
-          </Label>
+          <DetailLabel>Status:</DetailLabel>
+          <InstanceStatusLabel status={instance.status} />
         </DetailRow>
 
         <DetailRow>
-          <Title>Sync:</Title>
+          <DetailLabel>Sync:</DetailLabel>
           <SyncStateIndicator pending={hasPendingChanges} withLabel />
         </DetailRow>
 
         <DetailRow>
-          <Title>Fleet:</Title>
-          <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName}</Link>
+          <DetailLabel>Fleet:</DetailLabel>
+          <Link
+            to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.FLEET_OPENED, {
+                app_action_value: 'instance-drawer-open-fleet',
+                ...instanceTelemetryProps(instance),
+              })
+            }>
+            {fleetName}
+          </Link>
         </DetailRow>
 
         <DetailRow>
-          <Title>OS:</Title>
-          <span>{osDescription || instance.os || 'Unknown'}</span>
+          <DetailLabel>OS:</DetailLabel>
+          <span>{collectorOsName(instance, true)}</span>
         </DetailRow>
 
         <DetailRow>
-          <Title>Last Seen:</Title>
+          <DetailLabel>Last Seen:</DetailLabel>
           <RelativeTime dateTime={instance.last_seen} />
         </DetailRow>
 
         <DetailRow>
-          <Title>Enrolled:</Title>
+          <DetailLabel>Enrolled:</DetailLabel>
           <RelativeTime dateTime={instance.enrolled_at} />
         </DetailRow>
 
         <DetailRow>
-          <Title>Version:</Title>
+          <DetailLabel>Version:</DetailLabel>
           <span>{instance.version || 'Unknown'}</span>
         </DetailRow>
 
-        <DetailRow>
-          <Title>Logs:</Title>
-          <Link to={collectorSystemLogsUrl(instance.instance_uid)}>View System Logs</Link>
-        </DetailRow>
+        {canReadSystemLogs && (
+          <DetailRow>
+            <DetailLabel>Logs:</DetailLabel>
+            <Link
+              to={collectorSystemLogsUrl(instance.instance_uid)}
+              onClick={() =>
+                sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.VIEW_LOGS_CLICKED, {
+                  app_action_value: 'instance-drawer-view-logs',
+                  ...instanceTelemetryProps(instance),
+                  origin: 'detail-drawer',
+                })
+              }>
+              View System Logs
+            </Link>
+          </DetailRow>
+        )}
 
         <DetailRow>
-          <Title>Messages:</Title>
-          <Link to={collectorReceivedMessagesUrl(COLLECTOR_INSTANCE_UID_FIELD, instance.instance_uid)}>
+          <DetailLabel>Messages:</DetailLabel>
+          <Link
+            to={collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid)}
+            onClick={() =>
+              sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.RECEIVED_MESSAGES_CLICKED, {
+                app_action_value: 'instance-drawer-received-messages',
+                ...instanceTelemetryProps(instance),
+                origin: 'detail-drawer',
+              })
+            }>
             Received messages
           </Link>
         </DetailRow>
       </Section>
+
+      <InstanceHealthSection health={instance.health} online={instance.status === 'online'} />
 
       <Section>
         <SectionTitle>Attributes</SectionTitle>
@@ -277,7 +303,20 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
                   </IconRow>
                 ))}
               </ActionList>
-              <TransactionsToggle bsStyle="link" bsSize="xsmall" onClick={() => setShowTransactions((show) => !show)}>
+              <TransactionsToggle
+                bsStyle="link"
+                bsSize="xsmall"
+                onClick={() => {
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.TRANSACTIONS_TOGGLED, {
+                    app_action_value: 'instance-drawer-toggle-transactions',
+                    ...instanceTelemetryProps(instance),
+                    // The state being switched to, and how much is queued behind it.
+                    shown: !showTransactions,
+                    queued_count: activities.length,
+                  });
+
+                  setShowTransactions((show) => !show);
+                }}>
                 {showTransactions ? 'Hide queued transactions' : `Show queued transactions (${activities.length})`}
               </TransactionsToggle>
               {showTransactions && <ActivityEntryList entries={activities} compareTargets={compareTargets} />}

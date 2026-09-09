@@ -33,6 +33,9 @@ describe('Trend', () => {
     renderTrend({ previous: 23 });
 
     expect(await findTrend()).toMatch(/\+19/);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: +19 (+82.6%) compared to previous value of 23',
+    );
   });
 
   it('shows relative delta as percentage', async () => {
@@ -45,6 +48,9 @@ describe('Trend', () => {
     renderTrend();
 
     expect(await findTrend()).toMatch(/^0 \//);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: 0 (0.0%) compared to previous value of 42',
+    );
   });
 
   it('shows relative delta as percentage if values are equal', async () => {
@@ -57,6 +63,9 @@ describe('Trend', () => {
     renderTrend({ current: 23 });
 
     expect(await findTrend()).toMatch(/-19/);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: -19 (-45.2%) compared to previous value of 42',
+    );
   });
 
   it('shows negative relative delta as percentage', async () => {
@@ -69,6 +78,9 @@ describe('Trend', () => {
     renderTrend({ current: 23, previous: 0 });
 
     expect(await findTrend()).toMatch(/\+23/);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: +23 (--) compared to previous value of 0',
+    );
   });
 
   it('shows adequate results if previous value is NaN', async () => {
@@ -81,6 +93,9 @@ describe('Trend', () => {
     renderTrend({ current: 0, previous: 42 });
 
     expect(await findTrend()).toMatch(/-42 \/ -100\.0%/);
+    expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+      'Trend: -42 (-100.0%) compared to previous value of 42',
+    );
   });
 
   it('shows adequate results if current value is NaN', async () => {
@@ -103,6 +118,9 @@ describe('Trend', () => {
       const trendIcon = await screen.findByTestId('trend-icon');
 
       within(trendIcon).getByText('arrow_circle_down');
+      expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+        'Trend: -1 (-2.4%) compared to previous value of 42',
+      );
     });
 
     it('shows circle up if current values is higher', async () => {
@@ -110,6 +128,9 @@ describe('Trend', () => {
       const trendIcon = await screen.findByTestId('trend-icon');
 
       within(trendIcon).getByText('arrow_circle_up');
+      expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
+        'Trend: +1 (+2.4%) compared to previous value of 42',
+      );
     });
   });
 });

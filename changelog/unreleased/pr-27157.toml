@@ -1,0 +1,5 @@
+type = "a"
+message = "Added UI permission checks to collector pages"
+
+issues = [""]
+pulls = ["27157"]

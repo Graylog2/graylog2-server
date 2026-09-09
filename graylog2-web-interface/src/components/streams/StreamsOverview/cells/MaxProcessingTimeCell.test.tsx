@@ -45,7 +45,7 @@ describe('MaxProcessingTimeCell (Streams)', () => {
     expect(screen.getByText(/2 min 36 s/)).toBeInTheDocument();
   });
 
-  it('renders an empty cell when the value is zero', () => {
+  it('renders 0 ms when the value is a genuine zero', () => {
     asMock(useStreamMetricsFor).mockReturnValue({
       metrics: { max_processing_time_ms: 0 },
       isInitialLoading: false,
@@ -54,7 +54,8 @@ describe('MaxProcessingTimeCell (Streams)', () => {
 
     render(<MaxProcessingTimeCell stream={stream} />);
 
-    expect(screen.queryByTitle(/max processing time/i)).not.toBeInTheDocument();
+    expect(screen.getByTitle(/max processing time/i)).toBeInTheDocument();
+    expect(screen.getByText('0 ms')).toBeInTheDocument();
   });
 
   it('renders an empty cell when the value is missing', () => {

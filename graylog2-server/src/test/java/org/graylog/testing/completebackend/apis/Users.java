@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
 import jakarta.ws.rs.core.Response;
+import net.bytebuddy.utility.RandomString;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -62,6 +64,12 @@ public class Users implements GraylogRestApi {
                 .statusCode(201);
 
         return getUserInfo(user.username);
+    }
+
+    public User generateUserWithDefaults(String username, String password, GraylogApiResponse... roles) {
+        return new User(username, password, "<Generated>", username,
+                username + "@graylog", false, 30_0000, "Europe/Vienna",
+                Arrays.stream(roles).map(role -> role.properJSONPath().read("name", String.class)).toList(), List.of());
     }
 
     public void deleteUser(String username) {

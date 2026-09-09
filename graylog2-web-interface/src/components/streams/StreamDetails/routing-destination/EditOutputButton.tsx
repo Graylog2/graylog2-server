@@ -22,8 +22,7 @@ import URI from 'urijs';
 import type { ConfigurationFormData } from 'components/configurationforms';
 import { ConfigurationForm } from 'components/configurationforms';
 import type { Output } from 'hooks/useOutputs';
-import { Button } from 'components/bootstrap';
-import { Icon, IfPermitted } from 'components/common';
+import { IconButton, IfPermitted } from 'components/common';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
 import useQuery from 'routing/useQuery';
 import useHistory from 'routing/useHistory';
@@ -67,9 +66,7 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
 
   return (
     <IfPermitted permissions={`outputs:edit:${output.id}`}>
-      <Button bsStyle="link" disabled={disabled} bsSize="xsmall" onClick={onClick} title="Edit Output">
-        <Icon name="edit_square" />
-      </Button>
+      <IconButton name="edit_square" title="Edit Output" bsStyle="default" disabled={disabled} onClick={onClick} />
       <ConfigurationForm<Output['configuration']>
         ref={configFormRef}
         key={`configuration-form-output-${output.id}`}

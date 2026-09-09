@@ -30,6 +30,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.PlainActionFuture;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Cancellable;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
@@ -50,6 +52,7 @@ import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
@@ -62,6 +65,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -87,6 +92,11 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     @Override
     public Optional<HealthStatus> health() {
         return clusterHealth().map(response -> healthStatusFrom(response.getStatus()));
+    }
+
+    @Override
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterHealth(timeout).map(response -> healthStatusFrom(response.getStatus()));
     }
 
     private HealthStatus healthStatusFrom(ClusterHealthStatus status) {
@@ -292,6 +302,7 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
 
     private NodeInfo createNodeInfo(JsonNode nodesJson) {
         return NodeInfo.builder()
+                .name(nodesJson.at("/name").asText())
                 .version(nodesJson.at("/version").asText())
                 .os(nodesJson.at("/os"))
                 .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
@@ -313,6 +324,24 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         return new NodeOSInfo(
                 nodesOsJson.at("/os/mem/total_in_bytes").asLong(),
                 toStream(nodesOsJson.at("/roles").elements()).map(JsonNode::asText).toList()
+        );
+    }
+
+    @Override
+    public Map<String, NodeUtilization> nodesUtilization() {
+        final Request request = new Request("GET", "/_nodes/stats/os,jvm");
+        final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Opensearch nodes stats data!");
+
+        final JsonNode nodes = nodesJson.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeUtilization(nodes.get(name))));
+    }
+
+    private NodeUtilization createNodeUtilization(JsonNode nodeJson) {
+        return new NodeUtilization(
+                nodeJson.at("/name").asText(),
+                nodeJson.at("/os/cpu/percent").asDouble(-1),
+                nodeJson.at("/jvm/mem/heap_used_percent").asDouble(-1)
         );
     }
 
@@ -349,12 +378,43 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
                     .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())));
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));
         } catch (OpenSearchException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
-            } else {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
-            }
+            logHealthFailure(e);
             return Optional.empty();
+        }
+    }
+
+    private Optional<ClusterHealthResponse> clusterHealth(java.time.Duration timeout) {
+        final TimeValue bound = TimeValue.timeValueMillis(timeout.toMillis());
+        final ClusterHealthRequest request = new ClusterHealthRequest().timeout(bound);
+        // Defaults to 30s, which would outlive the caller's budget server-side.
+        request.clusterManagerNodeTimeout(bound);
+
+        final PlainActionFuture<ClusterHealthResponse> future = new PlainActionFuture<>();
+        final Cancellable cancellable = client.clusterHealthAsync(request, future);
+        try {
+            return Optional.of(future.get(timeout.toMillis(), TimeUnit.MILLISECONDS));
+        } catch (TimeoutException e) {
+            // Logged explicitly: a TimeoutException carries no message, so the generic handler would log "null".
+            cancellable.cancel();
+            LOG.warn("Search cluster did not answer the health request within {}ms; treating it as unreachable.", timeout.toMillis());
+            return Optional.empty();
+        } catch (InterruptedException e) {
+            cancellable.cancel();
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        } catch (Exception e) {
+            cancellable.cancel();
+            logHealthFailure(e);
+            return Optional.empty();
+        }
+    }
+
+    private void logHealthFailure(Exception e) {
+        final String cause = Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a");
+        if (LOG.isDebugEnabled()) {
+            LOG.error("{} ({})", e.getMessage(), cause, e);
+        } else {
+            LOG.error("{} ({})", e.getMessage(), cause);
         }
     }
 

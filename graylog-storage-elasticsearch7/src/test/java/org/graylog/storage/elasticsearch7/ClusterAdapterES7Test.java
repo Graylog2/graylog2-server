@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Cancellable;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cat.IndexSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
@@ -29,6 +30,7 @@ import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +45,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ClusterAdapterES7Test {
@@ -113,6 +116,20 @@ class ClusterAdapterES7Test {
     }
 
     @Test
+    void boundedHealthGivesUpAndCancelsWhenTheClusterDoesNotAnswerInTime() {
+        // The listener is never notified: a cluster that accepted the connection and then went quiet.
+        final Cancellable cancellable = mock(Cancellable.class);
+        when(client.clusterHealthAsync(any(), any())).thenReturn(cancellable);
+
+        final Optional<HealthStatus> healthStatus = clusterAdapter.health(java.time.Duration.ofMillis(50));
+
+        assertThat(healthStatus).isEmpty();
+        // Cancelling matters as much as giving up: an abandoned request would otherwise keep working through the
+        // client's remaining hosts long after the caller stopped waiting.
+        verify(cancellable).cancel();
+    }
+
+    @Test
     void testFileDescriptorStats() {
         doReturn(List.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
         final Set<NodeFileDescriptorStats> nodeFileDescriptorStats = clusterAdapter.fileDescriptorStats();
@@ -172,6 +189,20 @@ class ClusterAdapterES7Test {
         ));
 
         assertThat(clusterAdapter.deflectorHealth(Set.of("foo_deflector", "bar_deflector", "baz_deflector"))).contains(HealthStatus.Red);
+    }
+
+    @Test
+    void nodesUtilizationParsesPerNodeCpuAndHeapPercent() throws IOException {
+        when(jsonApi.perform(any(), anyString())).thenReturn(objectMapper.readTree("""
+                {"nodes":{
+                  "nodeId1":{"name":"es01","os":{"cpu":{"percent":42}},"jvm":{"mem":{"heap_used_percent":73}}}
+                }}"""));
+
+        final NodeUtilization stats = clusterAdapter.nodesUtilization().get("nodeId1");
+
+        assertThat(stats.name()).isEqualTo("es01");
+        assertThat(stats.cpuPercent()).isEqualTo(42.0);
+        assertThat(stats.jvmHeapUsedPercent()).isEqualTo(73.0);
     }
 
     private void mockNodesResponse() throws IOException {

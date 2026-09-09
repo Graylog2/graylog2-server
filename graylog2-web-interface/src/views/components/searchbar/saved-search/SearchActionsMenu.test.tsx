@@ -62,7 +62,7 @@ jest.mock('api/entity-share', () => ({
   updateEntityShare: jest.fn(() => Promise.resolve()),
   loadUserSharesPaginated: jest.fn(() =>
     Promise.resolve({
-      list: require('immutable').List(),
+      list: Immutable.List(),
       pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
     }),
   ),
@@ -334,7 +334,7 @@ describe('SearchActionsMenu', () => {
 
         const shareButton = await findShareButton();
 
-        expect(shareButton).toBeDisabled();
+        expect(shareButton).toHaveAttribute('aria-disabled', 'true');
       });
 
       it('which should be enabled if current user is permitted to edit search', async () => {
@@ -385,7 +385,7 @@ describe('SearchActionsMenu', () => {
 
         render(<SimpleSearchActionsMenu />);
 
-        expect(await findShareButton()).toBeDisabled();
+        expect(await findShareButton()).toHaveAttribute('aria-disabled', 'true');
       });
     });
   });

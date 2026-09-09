@@ -18,6 +18,7 @@ package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 
 import java.util.Optional;
@@ -39,5 +40,5 @@ public interface SourceConfig {
      */
     void validate();
 
-    Optional<CollectorReceiverConfig> toReceiverConfig(String id);
+    Optional<CollectorReceiverConfig> toReceiverConfig(String id, CollectorOSType osType);
 }

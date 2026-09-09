@@ -50,7 +50,7 @@ describe('ElementConfigurationSection', () => {
       </ElementConfigurationSection>,
     );
 
-    const addButton = screen.getByTitle('Add a Aggregation Element Title');
+    const addButton = screen.getByRole('button', { name: 'Add a Aggregation Element Title' });
 
     await userEvent.click(addButton);
 
@@ -64,6 +64,6 @@ describe('ElementConfigurationSection', () => {
       </ElementConfigurationSection>,
     );
 
-    expect(screen.queryByTitle('Add a Aggregation Element Title')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add a Aggregation Element Title' })).not.toBeInTheDocument();
   });
 });

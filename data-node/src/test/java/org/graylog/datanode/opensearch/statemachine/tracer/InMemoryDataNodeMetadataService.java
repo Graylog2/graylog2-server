@@ -39,6 +39,16 @@ class InMemoryDataNodeMetadataService implements DataNodeMetadataService {
     }
 
     @Override
+    public void setLatestAvailableVersion(String nodeId, @Nullable String latestAvailableVersion) {
+        final DataNodeMetadata existing = store.get(nodeId);
+        if (existing == null) {
+            // Matches the real implementation: no upsert, a row without a current version would be meaningless
+            return;
+        }
+        store.put(nodeId, new DataNodeMetadata(existing.id(), nodeId, existing.currentOpensearchVersion(), latestAvailableVersion));
+    }
+
+    @Override
     public Optional<DataNodeMetadata> findByNodeId(String nodeId) {
         return Optional.ofNullable(store.get(nodeId));
     }

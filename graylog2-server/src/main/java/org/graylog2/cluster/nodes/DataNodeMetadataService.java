@@ -24,6 +24,14 @@ public interface DataNodeMetadataService {
 
     void setOpensearchVersions(String nodeId, String currentVersion, @Nullable String latestAvailableVersion);
 
+    /**
+     * Updates only the latest available version, leaving the current version untouched. Kept separate from
+     * {@link #setOpensearchVersions} because the current version must only ever move forward, while the latest
+     * available version has to be recomputed on every startup — otherwise a node that is already running its
+     * recorded version never learns about newly shipped distributions.
+     */
+    void setLatestAvailableVersion(String nodeId, @Nullable String latestAvailableVersion);
+
     Optional<DataNodeMetadata> findByNodeId(String nodeId);
 
     OpensearchVersionsOverview getVersionsOverview();

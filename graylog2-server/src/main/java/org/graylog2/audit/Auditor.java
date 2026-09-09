@@ -65,7 +65,15 @@ public class Auditor {
                          final String eventType,
                          final Object actionInput,
                          final Supplier<T> auditableAction) {
-        return audited(username, eventType, actionInput, auditableAction, SUCCESS_ON_NON_NULL);
+        return audited(username, eventType, actionInput, auditableAction, SUCCESS_ON_NON_NULL, null);
+    }
+
+    public <T> T audited(final String username,
+                         final String eventType,
+                         final Object actionInput,
+                         final Supplier<T> auditableAction,
+                         final Map<String, Object> extra) {
+        return audited(username, eventType, actionInput, auditableAction, SUCCESS_ON_NON_NULL, extra);
     }
 
     public <T> T audited(final String username,
@@ -73,21 +81,31 @@ public class Auditor {
                          final Object actionInput,
                          final Supplier<T> auditableAction,
                          final Predicate<? super T> isSuccess) {
+        return audited(username, eventType, actionInput, auditableAction, isSuccess, null);
+    }
+
+    public <T> T audited(final String username,
+                         final String eventType,
+                         final Object actionInput,
+                         final Supplier<T> auditableAction,
+                         final Predicate<? super T> isSuccess,
+                         final Map<String, Object> extra) {
         final T actionResult;
         try {
             actionResult = auditableAction.get();
         } catch (RuntimeException e) {
-            recordFailure(username,
-                    eventType,
-                    actionInput,
-                    null,
-                    Map.of(ERROR, String.valueOf(e.getMessage())));
+            final Map<String, Object> extraWithError = new LinkedHashMap<>();
+            if (extra != null) {
+                extraWithError.putAll(extra);
+            }
+            extraWithError.put(ERROR, String.valueOf(e.getMessage()));
+            recordFailure(username, eventType, actionInput, null, extraWithError);
             throw e;
         }
         if (isSuccess.test(actionResult)) {
-            recordSuccess(username, eventType, actionInput, actionResult, null);
+            recordSuccess(username, eventType, actionInput, actionResult, extra);
         } else {
-            recordFailure(username, eventType, actionInput, actionResult, null);
+            recordFailure(username, eventType, actionInput, actionResult, extra);
         }
         return actionResult;
     }

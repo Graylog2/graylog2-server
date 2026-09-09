@@ -84,4 +84,17 @@ describe('<ShareButton />', () => {
 
     expect(onClickStub).not.toHaveBeenCalled();
   });
+
+  it('should stay focusable and show the disabled reason in a tooltip when focused via keyboard', async () => {
+    const onClickStub = jest.fn();
+    asMock(useCurrentUser).mockReturnValue(currentUser.toBuilder().grnPermissions(Immutable.List([])).build());
+    render(<SimpleShareButton onClick={onClickStub} />);
+
+    await userEvent.tab();
+
+    const button = screen.getByRole('button', { name: /Share/ });
+    expect(button).toHaveFocus();
+
+    await screen.findByText(/Only owners of this dashboard can share it/);
+  });
 });

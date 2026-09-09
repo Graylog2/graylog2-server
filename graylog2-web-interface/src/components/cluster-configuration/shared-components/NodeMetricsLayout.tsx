@@ -47,6 +47,10 @@ export const SecondaryText = styled.div`
   }
 `;
 
+export const GrowContainer = styled.div`
+  flex-grow: 1;
+`;
+
 export const NodePrimary = styled.div`
   display: flex;
   flex-direction: column;
@@ -56,7 +60,7 @@ export const NodePrimary = styled.div`
 export const MetricPlaceholder = () => (
   <MetricsColumn>
     <SecondaryText>
-      <span>N/A</span>
+      <GrowContainer>N/A</GrowContainer>
     </SecondaryText>
   </MetricsColumn>
 );

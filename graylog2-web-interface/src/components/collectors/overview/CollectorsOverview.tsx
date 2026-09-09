@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
+import type { ColorVariant } from '@graylog/sawmill';
 
 import { Alert, Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -24,15 +25,14 @@ import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { CollectorStats } from 'components/collectors/types';
-import useFeature from 'hooks/useFeature';
+import StatCard from 'components/common/StatCard/StatCard';
 
 import FleetCardsGrid from './FleetCardsGrid';
 import RecentActivity from './RecentActivity';
 import FirstOnboarding from './FirstOnboarding';
 
-import { useCollectorStats, useFleetsBulkStats } from '../hooks';
+import { useCollectorStats, useFleetsBulkStats, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
-import StatCard, { type Variant as StatCardVariant } from '../common/StatCard';
 
 const StatsRow = styled.div(
   ({ theme }) => css`
@@ -74,7 +74,7 @@ const StatsSection = ({ stats }: { stats: CollectorStats }) => {
   const emitStatCard = (
     card: 'instances' | 'online' | 'offline' | 'fleets',
     value: number,
-    variant: StatCardVariant,
+    variant: ColorVariant,
     navigates_to: 'instances' | 'instances-online' | 'instances-offline' | 'fleets',
   ) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.OVERVIEW.STAT_CARD_CLICKED, {
@@ -149,13 +149,16 @@ const FleetsSection = ({ filter }: { filter: string }) => {
 const CollectorsOverview = () => {
   const [filter, setFilter] = useState('');
   const { data: stats, isLoading, isError } = useCollectorStats();
-  const showOnboarding = useFeature('collectors_onboarding');
+  const { canCreateFleet } = useCollectorPermissions();
 
   if (isLoading) return <Spinner />;
 
   if (isError) return <Alert bsStyle="danger">Could not load Collector stats.</Alert>;
 
-  if (showOnboarding && stats.total_instances === 0) return <FirstOnboarding />;
+  // A user who can't create a fleet has no path forward in the wizard (its every write —
+  // create fleet, create source, mint an enrollment token — requires it). Falling through to the
+  // normal overview instead of a wizard whose first action 403s. See FirstOnboarding.tsx.
+  if (canCreateFleet && stats.total_instances === 0) return <FirstOnboarding />;
 
   return (
     <div>

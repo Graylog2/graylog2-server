@@ -28,7 +28,7 @@ import { diff } from './trendDirection';
 
 const TextContainer = styled.div(
   ({ theme }) => css`
-    margin: 5px;
+    margin-bottom: ${theme.spacings.xxs};
     text-align: right;
     font-family: ${theme.fonts.family.body};
   `,
@@ -98,7 +98,10 @@ const Trend = ({ current, previous, unit = undefined }: Props, ref: React.Forwar
   return (
     <TextContainer ref={ref}>
       <Icon name={trendIcon} data-testid="trend-icon" />{' '}
-      <span data-testid="trend-value" title={`Previous value: ${previousConverted}`}>
+      <span
+        data-testid="trend-value"
+        aria-label={`Trend: ${absoluteDifference} (${relativeDifference}) compared to previous value of ${previousConverted}`}
+        title={`Previous value: ${previousConverted}`}>
         {absoluteDifference} / {relativeDifference}
       </span>
     </TextContainer>

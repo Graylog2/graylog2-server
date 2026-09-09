@@ -33,6 +33,8 @@ public class MongodbNodeUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongodbNodeUtils.class);
 
+    // Fixed threshold used by countLiveSlowQueries (a health check, bounded by a strict round-trip budget) and
+    // as a fallback for getProfilingResults when the server doesn't report its configured slowms.
     public static final int SLOW_QUERIES_THRESHOLD = 100;
 
     // Slow queries recorded further back than this are not counted (they no longer say anything about now).
@@ -48,7 +50,12 @@ public class MongodbNodeUtils {
         Document profileStatus = db.runCommand(new Document("profile", -1));
         int profilingLevel = profileStatus.getInteger("was", 0);
         if (profilingLevel > 0) {
-            final long slowQueries = db.getCollection("system.profile").countDocuments(slowQueriesQuery());
+            // The query-only "profile: -1" command reports the slowms MongoDB is actually configured with --
+            // read it instead of assuming SLOW_QUERIES_THRESHOLD, since Graylog no longer sets slowms itself
+            // (setting it alongside a profiling level change requires elevated privileges as of MongoDB 8.0.29 /
+            // SERVER-130198) and an operator may have configured a different value directly on the server.
+            final int slowMs = profileStatus.getInteger("slowms", SLOW_QUERIES_THRESHOLD);
+            final long slowQueries = db.getCollection("system.profile").countDocuments(slowQueriesQuery(slowMs));
             return new ProfilingResult(ProfilingLevel.fromNumericalValue(profilingLevel), slowQueries);
         } else {
             return new ProfilingResult(ProfilingLevel.OFF, null);
@@ -77,7 +84,7 @@ public class MongodbNodeUtils {
     public static long countLiveSlowQueries(MongoDatabase database, Duration budget) {
         final long deadlineNanos = System.nanoTime() + budget.toNanos();
         final MongoDatabase db = withOptionalTimeout(database, budget);
-        final long slowQueries = db.getCollection("system.profile").countDocuments(slowQueriesQuery());
+        final long slowQueries = db.getCollection("system.profile").countDocuments(slowQueriesQuery(SLOW_QUERIES_THRESHOLD));
         if (slowQueries == 0) {
             return 0;
         }
@@ -95,11 +102,11 @@ public class MongodbNodeUtils {
         return profileStatus.getInteger("was", 0) > 0 ? slowQueries : 0;
     }
 
-    /** Slow operations ({@code >= SLOW_QUERIES_THRESHOLD} ms) within the profiler lookback window. */
-    private static Document slowQueriesQuery() {
+    /** Slow operations ({@code >= slowMs} ms) within the profiler lookback window. */
+    private static Document slowQueriesQuery(int slowMs) {
         final Date cutoffTime = new Date(System.currentTimeMillis() - PROFILER_LOOKBACK.toMillis());
         return new Document("ts", new Document("$gte", cutoffTime))
-                .append("millis", new Document("$gte", SLOW_QUERIES_THRESHOLD));
+                .append("millis", new Document("$gte", slowMs));
     }
 
     public static double calculateStorageUsedPercent(MongoClient mongoConnection) {

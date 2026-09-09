@@ -16,6 +16,7 @@
  */
 package org.graylog.events.search;
 
+import jakarta.annotation.Nullable;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -55,9 +57,15 @@ public interface MoreSearchAdapter {
     void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
                       List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 
+    /**
+     * @param bucketPattern optional Lucene regular expression applied to the bucket keys of the terms
+     *                      aggregation, so only matching values are returned. Pass {@code null} to
+     *                      return all values.
+     */
     List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                 Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, int maxBuckets);
+                                Map<String, Set<String>> extraFilters, String slicingColumn, @Nullable String bucketPattern,
+                                Map<String, Object> meta, int maxBuckets);
 
     List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                            Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
@@ -126,7 +134,42 @@ public interface MoreSearchAdapter {
                 .build();
     }
 
+    /**
+     * Comparison prefix an {@code extraFilters} value may carry. Declared longest-first so {@code <=}
+     * is matched before {@code <}.
+     */
+    enum RangeOperator {
+        LTE("<="), GTE(">="), LT("<"), GT(">");
+
+        private final String prefix;
+
+        RangeOperator(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public String prefix() {
+            return prefix;
+        }
+    }
+
+    record RangeValue(RangeOperator operator, String value) {}
+
+    /**
+     * Splits a range-style {@code extraFilters} value (e.g. {@code >=5.0}) into its operator and bare
+     * value, or empty if it carries no comparison prefix. Storage adapters share this so the prefix
+     * parsing lives in one place and only the mapping to each backend's query builder is duplicated —
+     * that part cannot be shared, since the query types differ per backend.
+     */
+    static Optional<RangeValue> parseRangeValue(String value) {
+        for (final RangeOperator operator : RangeOperator.values()) {
+            if (value.startsWith(operator.prefix())) {
+                return Optional.of(new RangeValue(operator, value.substring(operator.prefix().length())));
+            }
+        }
+        return Optional.empty();
+    }
+
     static boolean isRangeValue(String value) {
-        return value.startsWith("<=") || value.startsWith(">=") || value.startsWith("<") || value.startsWith(">");
+        return parseRangeValue(value).isPresent();
     }
 }

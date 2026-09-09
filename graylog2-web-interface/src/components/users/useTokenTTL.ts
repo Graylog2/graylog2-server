@@ -19,7 +19,6 @@ import { useState, useEffect } from 'react';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { getConfig } from 'components/configurations/helpers';
 
 const FallbackDefaultTokenTTL = 'P30D';
@@ -34,7 +33,7 @@ const useTokenTTL = (
 } => {
   const [tokenTtl, setTokenTtl] = useState(forceDefaultTokenTTL || FallbackDefaultTokenTTL);
   const [defaultTokenTtl, setDefaultTokenTtl] = useState(forceDefaultTokenTTL || FallbackDefaultTokenTTL);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   useEffect(() => {
     if (!forceDefaultTokenTTL) {

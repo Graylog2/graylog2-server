@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.CollectorOSType;
 import org.graylog.collectors.CollectorReadMode;
 import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 import org.graylog.collectors.config.receiver.WindowsEventLogReceiverConfig;
@@ -59,7 +60,7 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
     }
 
     @Override
-    public Optional<CollectorReceiverConfig> toReceiverConfig(String id) {
+    public Optional<CollectorReceiverConfig> toReceiverConfig(String id, CollectorOSType osType) {
         return Optional.of(WindowsEventLogReceiverConfig.builder(id)
                 .channels(channels())
                 .includeDefaultChannels(includeDefaultChannels())

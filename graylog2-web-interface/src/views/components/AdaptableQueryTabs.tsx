@@ -312,7 +312,7 @@ const AdaptableQueryTabs = ({
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
   const dispatch = useViewsDispatch();
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('dashboard');
   const queriesConfigBtn = useRef(null);
 
   const toggleCopyToDashboardModal = useCallback(() => {
@@ -366,6 +366,7 @@ const AdaptableQueryTabs = ({
             eventKey={id}
             key={id}
             data-tab-id={id}
+            aria-label={title}
             onClick={() => {
               setLockedTab(undefined);
               onSelect(id);
@@ -394,7 +395,13 @@ const AdaptableQueryTabs = ({
 
       lockedItems = lockedItems.add(
         lockedTab !== id ? null : (
-          <QueryTab eventKey={id} key={id} data-tab-id={id} onClick={() => onSelect(id)} className={CLASS_LOCKED}>
+          <QueryTab
+            eventKey={id}
+            key={id}
+            data-tab-id={id}
+            aria-label={title}
+            onClick={() => onSelect(id)}
+            className={CLASS_LOCKED}>
             {tabTitle}
           </QueryTab>
         ),
@@ -423,7 +430,6 @@ const AdaptableQueryTabs = ({
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
               app_pathname: 'dashboard',
-              app_section: 'dashboard',
               app_action_value: 'dashboard-create-page-button',
             });
 
@@ -439,7 +445,6 @@ const AdaptableQueryTabs = ({
         onClick={() => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION, {
             app_pathname: 'dashboard',
-            app_section: 'dashboard',
             app_action_value: 'dashboard-page-configuration-button',
           });
 

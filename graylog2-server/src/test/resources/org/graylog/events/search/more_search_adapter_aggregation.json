@@ -74,6 +74,66 @@
           }
         }
       ]
+    },
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "event-0" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "event in stream-a",
+            "timestamp": "2024-01-01 06:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-a"],
+            "tags": ["windows", "execution"]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "event-1" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "second event in stream-a",
+            "timestamp": "2024-01-01 07:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-a"],
+            "tags": ["windows"]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "event-2" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "event in stream-b",
+            "timestamp": "2024-01-01 08:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-b"],
+            "tags": ["linux", "credential-access"]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        { "index": { "indexName": "graylog_0", "indexType": "message", "indexId": "event-3" } },
+        {
+          "data": {
+            "source": "localhost",
+            "message": "event in stream-c",
+            "timestamp": "2024-01-01 09:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["stream-c"],
+            "tags": ["t1003.001", "t1003x001", "access-token"]
+          }
+        }
+      ]
     }
   ]
 }

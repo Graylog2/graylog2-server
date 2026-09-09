@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +48,7 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
     private final Path opensearchDistributionRoot;
     private final OpensearchArchitecture architecture;
     private final OpensearchVersionSelector selector;
+    private final AtomicReference<String> lastReportedDistribution = new AtomicReference<>();
 
     @Inject
     public OpensearchDistributionProvider(final Configuration localConfiguration,
@@ -67,7 +69,17 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
 
     @Override
     public OpensearchDistribution get() {
-        return detectInDirectory(opensearchDistributionRoot, architecture, selector);
+        final OpensearchDistribution distribution = detectInDirectory(opensearchDistributionRoot, architecture, selector);
+
+        // Detection re-runs on every configuration rebuild, so reporting the selection unconditionally floods the log
+        // with identical lines. Only an actual change of distribution is worth an info line.
+        final String directory = distribution.directory().toAbsolutePath().toString();
+        if (directory.equals(lastReportedDistribution.getAndSet(directory))) {
+            LOG.debug("Using opensearch distribution {}", directory);
+        } else {
+            LOG.info("Using opensearch distribution {}", directory);
+        }
+        return distribution;
     }
 
     private static OpensearchDistribution detectInDirectory(Path rootDistDirectory, OpensearchArchitecture osArch,
@@ -98,7 +110,7 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
             throw createErrorMessage(directory, arch, "Could not detect any opensearch distribution");
         }
 
-        LOG.info("Found following opensearch distributions: " + opensearchDistributions.stream().map(d -> d.directory().toAbsolutePath()).toList());
+        LOG.debug("Found following opensearch distributions: {}", opensearchDistributions.stream().map(d -> d.directory().toAbsolutePath()).toList());
 
         // Pre-filter by architecture: prefer exact match, fall back to distributions without architecture info
         List<OpensearchDistribution> candidates = filterByArchitecture(opensearchDistributions, arch);
@@ -123,7 +135,6 @@ public class OpensearchDistributionProvider implements Provider<OpensearchDistri
 
         final List<OpensearchDistribution> otherCandidates = candidates.stream().filter(c -> !c.equals(selected)).toList();
 
-        LOG.info("Using opensearch distribution {}", selected.directory().toAbsolutePath());
         return selected.withOtherCandidates(otherCandidates);
     }
 

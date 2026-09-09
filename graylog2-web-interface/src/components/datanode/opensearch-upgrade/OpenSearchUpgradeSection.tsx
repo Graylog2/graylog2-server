@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { Alert, Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { Title } from 'components/common';
 import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
+import IncompatibleIndicesTable from 'components/indices/incompatible-indices/IncompatibleIndicesTable';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -28,7 +29,6 @@ import StartUpgradeConfirmDialog from './StartUpgradeConfirmDialog';
 import useOpenSearchClusterStats from './hooks/useOpenSearchClusterStats';
 import useOpenSearchRollingRestart, { rollingRestartStartError } from './hooks/useOpenSearchRollingRestart';
 import useOpenSearchUpgradeStatus from './hooks/useOpenSearchUpgradeStatus';
-import IncompatibleIndicesTable from './IncompatibleIndicesTable';
 import OpenSearchUpgradeInfo from './OpenSearchUpgradeInfo';
 import OpenSearchRollingUpgradeNodes from './OpenSearchRollingUpgradeNodes';
 import { isRollingRestartPaused, isRollingRestartTerminalState } from './rollingRestartTypes';
@@ -55,8 +55,15 @@ const ActionsRow = styled(Row)(
   `,
 );
 
+const Heading = styled.h4(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.md};
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
+
 const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
-const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
+const TELEMETRY_DEFAULTS = { app_pathname: 'datanode' } as const;
 
 const OpenSearchUpgradeSection = () => {
   const {
@@ -81,7 +88,7 @@ const OpenSearchUpgradeSection = () => {
     resumeRollingRestart,
     startRollingRestart,
   } = useOpenSearchRollingRestart();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('opensearch-upgrade');
   const [forceStartFailedChecks, setForceStartFailedChecks] = useState<Array<string>>([]);
   const [showStartConfirm, setShowStartConfirm] = useState(false);
   const isRollingUpgradePossible = numberOfDataNodes >= MIN_NODES_FOR_ROLLING_UPGRADE;
@@ -170,6 +177,7 @@ const OpenSearchUpgradeSection = () => {
       {showIncompatibleIndices && (
         <Row>
           <Col xs={12}>
+            <Heading>Incompatible indices</Heading>
             <IncompatibleIndicesTable />
           </Col>
         </Row>

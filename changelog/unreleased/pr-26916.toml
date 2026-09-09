@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix running the `file_log` receiver on Windows."
+
+issues = ["collector#90"]
+pulls = ["26916"]

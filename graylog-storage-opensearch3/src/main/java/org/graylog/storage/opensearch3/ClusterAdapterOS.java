@@ -37,6 +37,7 @@ import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.opensearch.client.json.JsonData;
@@ -87,6 +88,11 @@ public class ClusterAdapterOS implements ClusterAdapter {
     @Override
     public Optional<HealthStatus> health() {
         return clusterHealth().map(this::healthStatusFrom);
+    }
+
+    @Override
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterHealth(timeout).map(this::healthStatusFrom);
     }
 
     private HealthStatus healthStatusFrom(HealthResponse response) {
@@ -314,6 +320,7 @@ public class ClusterAdapterOS implements ClusterAdapter {
 
     private org.graylog2.system.stats.elasticsearch.NodeInfo createNodeInfo(JsonNode nodesJson) {
         return org.graylog2.system.stats.elasticsearch.NodeInfo.builder()
+                .name(nodesJson.at("/name").asText())
                 .version(nodesJson.at("/version").asText())
                 .os(nodesJson.at("/os"))
                 .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
@@ -340,6 +347,26 @@ public class ClusterAdapterOS implements ClusterAdapter {
         );
     }
 
+    @Override
+    public Map<String, NodeUtilization> nodesUtilization() {
+        Request request = Requests.builder()
+                .endpoint("/_nodes/stats/os,jvm")
+                .method("GET")
+                .build();
+        JsonNode json = opensearchClient.performRequest(request, "Couldn't read Opensearch nodes stats data!");
+        JsonNode nodes = json.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeUtilization(nodes.get(name))));
+    }
+
+    private NodeUtilization createNodeUtilization(JsonNode nodeJson) {
+        return new NodeUtilization(
+                nodeJson.at("/name").asText(),
+                nodeJson.at("/os/cpu/percent").asDouble(-1),
+                nodeJson.at("/jvm/mem/heap_used_percent").asDouble(-1)
+        );
+    }
+
     public <T> Stream<T> toStream(Iterator<T> iterator) {
         return StreamSupport.stream(((Iterable<T>) () -> iterator).spliterator(), false);
     }
@@ -360,6 +387,25 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
+    private Optional<HealthResponse> clusterHealth(java.time.Duration timeout) {
+        // clusterManagerTimeout defaults to 30s, which would outlive the caller's budget server-side.
+        final Time bound = new Time.Builder().time(timeout.toMillis() + "ms").build();
+        try {
+            final HealthResponse health = opensearchClient.executeWithClientTimeout(
+                    asyncClient -> asyncClient.cluster().health(HealthRequest.builder()
+                            .timeout(bound)
+                            .clusterManagerTimeout(bound)
+                            .build()),
+                    "Unable to retrieve cluster health",
+                    Duration.milliseconds(timeout.toMillis()));
+            return Optional.of(health);
+        } catch (Exception e) {
+            // Broader than the un-timed variant's IOException: an error response throws a runtime OpenSearchException.
+            logHealthFailure(e);
+            return Optional.empty();
+        }
+    }
+
     @Override
     public int countOfClusterManagerEligibleNodes() {
         return (int)nodesInfo().values().stream()
@@ -376,12 +422,17 @@ public class ClusterAdapterOS implements ClusterAdapter {
             );
             return Optional.of(health);
         } catch (IOException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
-            } else {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
-            }
+            logHealthFailure(e);
             return Optional.empty();
+        }
+    }
+
+    private void logHealthFailure(Exception e) {
+        final String cause = Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a");
+        if (LOG.isDebugEnabled()) {
+            LOG.error("{} ({})", e.getMessage(), cause, e);
+        } else {
+            LOG.error("{} ({})", e.getMessage(), cause);
         }
     }
 

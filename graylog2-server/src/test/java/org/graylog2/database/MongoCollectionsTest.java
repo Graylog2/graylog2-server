@@ -22,9 +22,16 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.InsertOneResult;
+import org.bson.BsonDateTime;
+import org.bson.BsonDocument;
+import org.bson.BsonDocumentReader;
+import org.bson.BsonDocumentWriter;
+import org.bson.BsonString;
 import org.bson.BsonType;
 import org.bson.BsonValue;
 import org.bson.Document;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -74,6 +81,9 @@ class MongoCollectionsTest {
     @JsonIgnoreProperties(ignoreUnknown = true)
     record TimestampTest(@Nullable @JsonProperty("id") @Id @org.mongojack.ObjectId String id,
                          @JsonProperty("timestamp") DateTime timestamp) implements MongoEntity {}
+
+    record CodecTest(@JsonProperty("renamed_value") String value,
+                     @JsonProperty("created_at") ZonedDateTime createdAt) {}
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
@@ -170,5 +180,33 @@ class MongoCollectionsTest {
                 assertThat(tt.timestamp().getMillis()).isGreaterThanOrEqualTo(
                         now.withMillisOfSecond(0).getMillis())
         );
+    }
+
+    @Test
+    void getCodecForEncodesWithMongoJackObjectMapper() {
+        final var createdAt = ZonedDateTime.now(ZoneOffset.UTC).withNano(0);
+        final var codec = collections.getCodecFor(CodecTest.class);
+
+        try (final var writer = new BsonDocumentWriter(new BsonDocument())) {
+            codec.encode(writer, new CodecTest("Gary", createdAt), EncoderContext.builder().build());
+
+            assertThat(writer.getDocument().getString("renamed_value").getValue()).isEqualTo("Gary");
+            assertThat(writer.getDocument().getDateTime("created_at").getValue())
+                    .isEqualTo(createdAt.toInstant().toEpochMilli());
+        }
+    }
+
+    @Test
+    void getCodecForDecodesWithMongoJackObjectMapper() {
+        final var createdAt = ZonedDateTime.now(ZoneOffset.UTC).withNano(0);
+        final var document = new BsonDocument()
+                .append("renamed_value", new BsonString("Gary"))
+                .append("created_at", new BsonDateTime(createdAt.toInstant().toEpochMilli()));
+        final var codec = collections.getCodecFor(CodecTest.class);
+
+        try (final var reader = new BsonDocumentReader(document)) {
+            assertThat(codec.decode(reader, DecoderContext.builder().build()))
+                    .isEqualTo(new CodecTest("Gary", createdAt));
+        }
     }
 }

@@ -16,70 +16,33 @@
  */
 package org.graylog.datanode.rest;
 
-import com.github.zafarkhaja.semver.Version;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.DirectoryReadableValidator;
-import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
-import org.graylog.datanode.filesystem.index.OpensearchUtils;
-import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
-import org.graylog.datanode.filesystem.index.dto.NodeInformation;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibility;
+import org.graylog.datanode.filesystem.index.OpensearchDataDirCompatibilityService;
 
 @Path("/indices-directory")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndicesDirectoryController {
 
     private final Configuration configuration;
-    private final DatanodeConfiguration datanodeConfiguration;
-    private final IndicesDirectoryParser indicesDirectoryParser;
-    private final DirectoryReadableValidator directoryReadableValidator = new DirectoryReadableValidator();
+    private final OpensearchDataDirCompatibilityService compatibilityService;
 
     @Inject
-    public IndicesDirectoryController(Configuration configuration, DatanodeConfiguration datanodeConfiguration, IndicesDirectoryParser indicesDirectoryParser) {
+    public IndicesDirectoryController(Configuration configuration, OpensearchDataDirCompatibilityService compatibilityService) {
         this.configuration = configuration;
-        this.datanodeConfiguration = datanodeConfiguration;
-        this.indicesDirectoryParser = indicesDirectoryParser;
+        this.compatibilityService = compatibilityService;
     }
 
     @GET
     @Path("compatibility")
     public CompatibilityResult status() {
-        final java.nio.file.Path dataTargetDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
-        final String opensearchVersion = datanodeConfiguration.opensearchDistribution().version();
-        final String hostname = configuration.getHostname();
-        try {
-            directoryReadableValidator.validate(dataTargetDir.toUri().toString(), dataTargetDir);
-            final IndexerDirectoryInformation info = indicesDirectoryParser.parse(dataTargetDir);
-            final Version currentVersion = Version.parse(opensearchVersion);
-
-            final List<String> compatibilityWarnings = new ArrayList<>();
-
-            if (info.nodes().isEmpty() || info.nodes().stream().allMatch(n -> n.indices().isEmpty())) {
-                compatibilityWarnings.add("Your configured opensearch_data_location directory " + dataTargetDir.toAbsolutePath() + " doesn't contain any indices! Do you want to continue without migrating existing data?");
-            }
-
-            final List<String> compatibilityErrors = info.nodes().stream()
-                    .filter(node -> !isNodeCompatible(node, currentVersion))
-                    .map(node -> String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, node.nodeVersion()))
-                    .toList();
-
-            return new CompatibilityResult(hostname, opensearchVersion, info, compatibilityErrors, compatibilityWarnings);
-        } catch (Exception e) {
-            return new CompatibilityResult(hostname, opensearchVersion, new IndexerDirectoryInformation(dataTargetDir, Collections.emptyList()), Collections.singletonList(e.getMessage()), Collections.emptyList());
-        }
-    }
-
-    private static boolean isNodeCompatible(NodeInformation node, Version currentVersion) {
-        return node.nodeVersion() == null || OpensearchUtils.isCompatible(currentVersion, Version.parse(node.nodeVersion()));
+        final OpensearchDataDirCompatibility compatibility = compatibilityService.check();
+        return new CompatibilityResult(configuration.getHostname(), compatibility.opensearchVersion(),
+                compatibility.info(), compatibility.errors(), compatibility.warnings());
     }
 }

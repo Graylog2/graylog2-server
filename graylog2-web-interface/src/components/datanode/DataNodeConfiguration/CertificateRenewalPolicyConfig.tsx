@@ -125,7 +125,7 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
     queryFn: fetchCurrentConfig,
   });
 
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
   const queryClient = useQueryClient();
 
   const { mutateAsync: updateConfig } = useMutation({
@@ -180,7 +180,6 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
   const saveConfig = (values: FormConfig) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CR_UPDATE_CONFIGURATION_CLICKED, {
       app_pathname: 'datanode',
-      app_section: 'migration',
     });
 
     const newConfig = {
@@ -222,7 +221,6 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
                 onClick={() => {
                   sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CR_EDIT_CONFIGURATION_CLICKED, {
                     app_pathname: 'datanode',
-                    app_section: 'migration',
                   });
 
                   setShowModal(true);

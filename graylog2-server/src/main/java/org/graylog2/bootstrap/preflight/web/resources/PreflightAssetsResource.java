@@ -16,20 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
-import com.google.common.io.Resources;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.bootstrap.preflight.PreflightConstants;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Nonnull;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
@@ -41,21 +28,16 @@ import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
+import org.graylog2.web.resources.ResourceFileReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
+import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemAlreadyExistsException;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
-import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -63,28 +45,15 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @Path("/")
 public class PreflightAssetsResource {
+    private static final Logger LOG = LoggerFactory.getLogger(PreflightAssetsResource.class);
+
     private final MimetypesFileTypeMap mimeTypes;
-    private final LoadingCache<URI, FileSystem> fileSystemCache;
+    private final ResourceFileReader resourceFileReader;
 
     @Inject
-    public PreflightAssetsResource(MimetypesFileTypeMap mimeTypes) {
+    public PreflightAssetsResource(MimetypesFileTypeMap mimeTypes, ResourceFileReader resourceFileReader) {
         this.mimeTypes = mimeTypes;
-        this.fileSystemCache = CacheBuilder.newBuilder()
-                .maximumSize(1024)
-                .build(new CacheLoader<URI, FileSystem>() {
-                    @Override
-                    public FileSystem load(@Nonnull URI key) throws Exception {
-                        try {
-                            return FileSystems.getFileSystem(key);
-                        } catch (FileSystemNotFoundException e) {
-                            try {
-                                return FileSystems.newFileSystem(key, Collections.emptyMap());
-                            } catch (FileSystemAlreadyExistsException f) {
-                                return FileSystems.getFileSystem(key);
-                            }
-                        }
-                    }
-                });
+        this.resourceFileReader = resourceFileReader;
     }
 
     @Produces(MediaType.TEXT_HTML)
@@ -99,43 +68,19 @@ public class PreflightAssetsResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public Response get(@Context Request request, @PathParam("filename") String filename) {
         try {
-            final URL resourceUrl = getResourceUri(filename);
-            return getResponse(request, filename, resourceUrl);
+            final var resource = resourceFileReader.readFileFrom(PreflightConstants.ASSETS_RESOURCE_DIR, filename, getClass());
+            return getResponse(request, filename, resource);
         } catch (IOException | URISyntaxException e) {
-            throw new NotFoundException("Couldn't find " + filename, e);
+            LOG.debug("Couldn't serve preflight asset <{}>.", filename, e);
+            // Don't reflect the requested file name back to the client.
+            throw new NotFoundException("Couldn't find the requested resource.", e);
         }
     }
 
-    private URL getResourceUri(String filename) throws FileNotFoundException {
-        final URL resourceUrl = this.getClass().getResource(PreflightConstants.ASSETS_RESOURCE_DIR + filename);
-        if (resourceUrl == null) {
-            throw new FileNotFoundException("Resource file " + filename + " not found.");
-        }
-        return resourceUrl;
-    }
-
-    private Response getResponse(Request request, String filename, URL resourceUrl) throws IOException, URISyntaxException {
-        final URI uri = resourceUrl.toURI();
-
-        final java.nio.file.Path path;
-        final byte[] fileContents;
-        switch (resourceUrl.getProtocol()) {
-            case "file" -> {
-                path = Paths.get(uri);
-                fileContents = Files.readAllBytes(path);
-            }
-            case "jar" -> {
-                final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
-                path = fileSystem.getPath(PreflightConstants.ASSETS_RESOURCE_DIR + filename);
-                fileContents = Resources.toByteArray(resourceUrl);
-            }
-            default -> throw new IllegalArgumentException("Not a JAR or local file: " + resourceUrl);
-        }
-
-        final FileTime lastModifiedTime = Files.getLastModifiedTime(path);
-        final Date lastModified = Date.from(lastModifiedTime.toInstant());
-        final HashCode hashCode = Hashing.sha256().hashBytes(fileContents);
-        final EntityTag entityTag = new EntityTag(hashCode.toString());
+    private Response getResponse(Request request, String filename, ResourceFileReader.ResourceFile resource) {
+        final byte[] fileContents = resource.contents().get();
+        final Date lastModified = resource.lastModified().orElseGet(Date::new);
+        final EntityTag entityTag = resource.entityTag().get();
 
         final Response.ResponseBuilder response = request.evaluatePreconditions(lastModified, entityTag);
         if (response != null) {

@@ -20,8 +20,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Cancellable;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.index.search.SimpleQueryStringQueryParser;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cat.IndexSummaryResponse;
@@ -34,6 +38,7 @@ import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -48,6 +53,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ClusterAdapterOS2Test {
@@ -115,6 +121,33 @@ class ClusterAdapterOS2Test {
         when(client.execute(any())).thenThrow(new OpenSearchException("Exception"));
         final Optional<HealthStatus> healthStatus = clusterAdapter.health();
         assertThat(healthStatus).isEmpty();
+    }
+
+    @Test
+    void boundedHealthGivesUpAndCancelsWhenTheClusterDoesNotAnswerInTime() {
+        // The listener is never notified: a cluster that accepted the connection and then went quiet.
+        final Cancellable cancellable = mock(Cancellable.class);
+        when(client.clusterHealthAsync(any(), any())).thenReturn(cancellable);
+
+        final Optional<HealthStatus> healthStatus = clusterAdapter.health(java.time.Duration.ofMillis(50));
+
+        assertThat(healthStatus).isEmpty();
+        // Cancelling matters as much as giving up: an abandoned request would otherwise keep working through the
+        // client's remaining hosts long after the caller stopped waiting.
+        verify(cancellable).cancel();
+    }
+
+    @Test
+    void boundedHealthMapsTheClusterStatusWhenItAnswersInTime() {
+        final ClusterHealthResponse response = mock(ClusterHealthResponse.class);
+        when(response.getStatus()).thenReturn(ClusterHealthStatus.YELLOW);
+        when(client.clusterHealthAsync(any(), any())).thenAnswer(invocation -> {
+            final ActionListener<ClusterHealthResponse> listener = invocation.getArgument(1);
+            listener.onResponse(response);
+            return mock(Cancellable.class);
+        });
+
+        assertThat(clusterAdapter.health(java.time.Duration.ofSeconds(5))).contains(HealthStatus.Yellow);
     }
 
     @Test
@@ -208,6 +241,34 @@ class ClusterAdapterOS2Test {
     }
 
 
+
+    @Test
+    void nodesUtilizationParsesPerNodeCpuAndHeapPercent() throws IOException {
+        when(jsonApi.perform(any(), anyString())).thenReturn(objectMapper.readTree("""
+                {"nodes":{
+                  "nodeId1":{"name":"os01","os":{"cpu":{"percent":42}},"jvm":{"mem":{"heap_used_percent":73}}},
+                  "nodeId2":{"name":"os02","os":{"cpu":{"percent":5}},"jvm":{"mem":{"heap_used_percent":18}}}
+                }}"""));
+
+        final Map<String, NodeUtilization> stats = clusterAdapter.nodesUtilization();
+
+        assertThat(stats).hasSize(2);
+        assertThat(stats.get("nodeId1").name()).isEqualTo("os01");
+        assertThat(stats.get("nodeId1").cpuPercent()).isEqualTo(42.0);
+        assertThat(stats.get("nodeId1").jvmHeapUsedPercent()).isEqualTo(73.0);
+        assertThat(stats.get("nodeId2").name()).isEqualTo("os02");
+    }
+
+    @Test
+    void nodesUtilizationReportsMinusOneForAbsentFields() throws IOException {
+        when(jsonApi.perform(any(), anyString())).thenReturn(objectMapper.readTree("""
+                {"nodes":{"nodeId1":{"name":"os01"}}}"""));
+
+        final NodeUtilization stats = clusterAdapter.nodesUtilization().get("nodeId1");
+
+        assertThat(stats.cpuPercent()).isEqualTo(-1.0);
+        assertThat(stats.jvmHeapUsedPercent()).isEqualTo(-1.0);
+    }
 
     private void mockNodesResponse() throws IOException {
         when(jsonApi.perform(any(), anyString()))

@@ -27,6 +27,7 @@ import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
+import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -77,6 +78,16 @@ class ClusterAdapterOSTest {
     void returnsEmptyOptionalForHealthWhenElasticsearchExceptionThrown() throws IOException {
         final Optional<HealthStatus> healthStatus = clusterAdapter.health();
         assertThat(healthStatus).isEmpty();
+    }
+
+    @Test
+    void boundedHealthReportsAnErroringClusterAsUnreachable() {
+        // The mocked transport delivers the stubbed 500 as an IOException, so this only pins that the bounded variant
+        // folds an error response into empty (as the un-timed variant does). The extra runtime OpenSearchException the
+        // bounded variant additionally catches, and the deadline firing itself, are not exercised here -- both would
+        // need a transport that produces a runtime error or never completes. See the OS2/ES7 adapter tests for the
+        // give-up-and-cancel path.
+        assertThat(clusterAdapter.health(java.time.Duration.ofSeconds(1))).isEmpty();
     }
 
     @Test
@@ -139,6 +150,23 @@ class ClusterAdapterOSTest {
         assertThat(clusterShardAllocation.nodeShardAllocations())
                 .extracting(NodeShardAllocation::shards)
                 .containsExactly(15, 16);
+    }
+
+    @Test
+    void nodesUtilizationParsesPerNodeCpuAndHeapPercent() {
+        final OfficialOpensearchClient statsClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/_nodes/stats/os,jvm", """
+                        {"nodes":{
+                          "nodeId1":{"name":"os01","os":{"cpu":{"percent":42}},"jvm":{"mem":{"heap_used_percent":73}}}
+                        }}""")
+                .build();
+        final ClusterAdapterOS adapter = new ClusterAdapterOS(statsClient, Duration.seconds(1));
+
+        final NodeUtilization stats = adapter.nodesUtilization().get("nodeId1");
+
+        assertThat(stats.name()).isEqualTo("os01");
+        assertThat(stats.cpuPercent()).isEqualTo(42.0);
+        assertThat(stats.jvmHeapUsedPercent()).isEqualTo(73.0);
     }
 
     @Test

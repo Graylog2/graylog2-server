@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useStore } from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -39,7 +38,7 @@ const McpConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [modalConfig, setModalConfig] = useState<McpConfigState | undefined>(undefined);
   const [viewConfig, setViewConfig] = useState<McpConfigState | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.MCP_CONFIG).then(() => {
