@@ -102,6 +102,9 @@ public class OutputServiceImpl implements OutputService {
 
     @Override
     public Set<Output> loadByIds(Collection<String> ids) {
+        if (ids.isEmpty()) {
+            return Set.of();
+        }
         final Map<String, AvailableOutputSummary> availableOutputs = messageOutputFactory.getAvailableOutputs();
         try (final var stream = MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))) {
             return stream.map(output -> withEncryptedFields(output, availableOutputs)).collect(ImmutableSet.toImmutableSet());
