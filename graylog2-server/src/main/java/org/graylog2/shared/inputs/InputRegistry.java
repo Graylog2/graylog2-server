@@ -120,9 +120,9 @@ public class InputRegistry {
         add(inputState);
     }
 
-    public void add(IOState<MessageInput> messageInputIOState) {
+    public boolean add(IOState<MessageInput> messageInputIOState) {
         final String inputId = messageInputIOState.getStoppable().getId();
-        inputStates.put(inputId, messageInputIOState);
+        return inputStates.putIfAbsent(inputId, messageInputIOState) == null;
     }
 
     public Stream<IOState<MessageInput>> stream() {
