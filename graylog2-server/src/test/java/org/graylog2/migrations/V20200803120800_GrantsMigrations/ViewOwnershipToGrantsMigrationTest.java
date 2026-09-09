@@ -19,6 +19,7 @@ package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
@@ -139,7 +140,7 @@ class ViewOwnershipToGrantsMigrationTest {
                                ViewSummaryService viewSummaryService,
                                EntitySourceService entitySourceService,
                                MongoCollections mongoCollections) {
-            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar, viewSummaryService, entitySourceService, mongoCollections);
+            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar, viewSummaryService, entitySourceService, mongoCollections, new IgnoreSearchFilters());
         }
     }
 }
