@@ -108,7 +108,7 @@ describe('EventDetails', () => {
     await screen.findByText('Additional Fields');
   });
 
-  it('should render tags in the default event details regardless of license', async () => {
+  it('should render tags in the default event details when the event has tags', async () => {
     asMock(useEventById).mockImplementation(() => ({
       data: { ...mockEventData.event, tags: ['phishing'] },
       isLoading: false,
