@@ -66,8 +66,27 @@ public class CEFCodecTest {
 
         final RawMessage rawMessage = new RawMessage(new byte[0], new InetSocketAddress("128.66.23.42", 12345));
 
-        // The hostname is unresolved, so we have to add the leading slash. Oh, Java...
-        assertEquals("/128.66.23.42", codec.decideSource(cefMessage, rawMessage));
+        assertEquals("128.66.23.42", codec.decideSource(cefMessage, rawMessage));
+    }
+
+    @Test
+    public void decideSourceCompressesIpv6RemoteAddress() throws Exception {
+        final MappedMessage cefMessage = mock(MappedMessage.class);
+        when(cefMessage.mappedExtensions()).thenReturn(Collections.emptyMap());
+
+        final RawMessage rawMessage = new RawMessage(new byte[0], new InetSocketAddress("::1", 12345));
+
+        assertEquals("::1", codec.decideSource(cefMessage, rawMessage));
+    }
+
+    @Test
+    public void decideSourceWithoutRemoteAddressReturnsUnknown() throws Exception {
+        final MappedMessage cefMessage = mock(MappedMessage.class);
+        when(cefMessage.mappedExtensions()).thenReturn(Collections.emptyMap());
+
+        final RawMessage rawMessage = new RawMessage(new byte[0], (InetSocketAddress) null);
+
+        assertEquals("unknown", codec.decideSource(cefMessage, rawMessage));
     }
 
     @Test

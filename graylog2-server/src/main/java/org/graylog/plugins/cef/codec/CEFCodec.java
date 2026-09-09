@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.cef.codec;
 
+import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -192,7 +193,9 @@ public class CEFCodec extends AbstractCodec {
             remoteAddress = address.getInetSocketAddress();
         }
 
-        return remoteAddress == null ? "unknown" : remoteAddress.getAddress().toString();
+        // InetAddress#toString() renders "hostname/1.2.3.4", and the CEF codec never resolves the hostname, so it
+        // would leave a leading slash on every address.
+        return remoteAddress == null ? "unknown" : InetAddresses.toAddrString(remoteAddress.getAddress());
     }
 
     @Nullable
