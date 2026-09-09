@@ -186,7 +186,7 @@ public class CEFCodec extends AbstractCodec {
             remoteAddress = address.getInetSocketAddress();
         }
 
-        return remoteAddress == null ? "unknown" : remoteAddress.getAddress().toString();
+        return remoteAddress == null ? "unknown" : remoteAddress.getAddress().getHostAddress();
     }
 
     @Nullable
