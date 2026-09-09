@@ -71,10 +71,8 @@ public class CEFParser {
     private static final Pattern OSSEC_PREFIX = Pattern.compile("^[A-Za-z]+\\s+\\d{1,2}\\s+\\d{1,2}:\\d{2}:\\d{2}(?:\\s+ASM:)?$");
     private static final String OSSEC_DATE_FORMAT = "MMM dd HH:mm:ss";
 
-    /**
-     * Sub-second precision beyond milliseconds, which {@link SimpleDateFormat} would otherwise read as milliseconds:
-     * {@code .921661} would become 921661ms and push the timestamp 15 minutes into the future.
-     */
+    // Senders can emit microseconds rather than milliseconds, and SimpleDateFormat's SSS counts digits rather than
+    // reading a decimal fraction, so it takes .921661 as 921661ms, landing 15m21s late. Truncate to milliseconds.
     private static final Pattern SUB_MILLISECOND_FRACTION = Pattern.compile("(\\.\\d{3})\\d+");
 
     /**
@@ -107,8 +105,7 @@ public class CEFParser {
             "yyyy-MM-dd'T'HH:mm:ss XXX",
             "yyyy-MM-dd'T'HH:mm:ssXXX",
             "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-            // Zone-less and space-separated variants, which several appliances emit. These are listed last so a
-            // zoned format always wins, and longest run first means "<date> <zone>" is tried before "<date>" alone.
+            // Zone-less and space-separated variants, listed last so a zoned format always wins.
             "yyyy-MM-dd HH:mm:ss.SSS zzz",
             "yyyy-MM-dd HH:mm:ss zzz",
             "yyyy-MM-dd HH:mm:ss.SSSXXX",
@@ -143,11 +140,8 @@ public class CEFParser {
     }
 
     /**
-     * Reads the timestamp and hostname out of whatever precedes {@code CEF:}.
-     *
-     * <p>The prefix is tokenized rather than matched with a single regular expression. A regex cannot tell where a
-     * timestamp ends without backtracking, because BSD-style timestamps contain spaces while ISO ones do not, and the
-     * previous implementation got this wrong in both directions.
+     * Reads the timestamp and hostname in front of {@code CEF:}. An ISO timestamp is one token and a BSD one is three
+     * or more, so the loop below tries the longest group of tokens first and stops at the first that parses as a date.
      */
     private Prefix parsePrefix(String prefix, TimeZone timeZone, Locale locale) {
         final String trimmed = prefix.trim();
@@ -180,7 +174,7 @@ public class CEFParser {
             final String candidate = String.join(" ", Arrays.copyOfRange(tokens, 0, length));
             final Date timestamp = parseTimestamp(candidate, timeZone, locale);
             if (timestamp != null) {
-                // Everything after the hostname is RFC 5424 app name, process id, message id and structured data.
+                // Anything after the hostname is envelope, such as RFC 5424 app name, process id and message id.
                 return new Prefix(timestamp, tokens[length]);
             }
         }

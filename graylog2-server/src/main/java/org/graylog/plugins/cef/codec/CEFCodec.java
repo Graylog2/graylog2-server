@@ -62,11 +62,8 @@ public class CEFCodec extends AbstractCodec {
 
     private static final Logger LOG = LoggerFactory.getLogger(CEFCodec.class);
 
-    /**
-     * The optional leading number is RFC 6587 octet-counting framing, which some senders use instead of terminating
-     * each message with a newline. DOTALL keeps the match working when the message body contains a carriage return.
-     * Failing to match here would hand the syslog priority to the CEF parser, which reads it as part of the timestamp.
-     */
+    // Tolerates a leading number before the priority, and a carriage return in the body. Without both, the priority
+    // leaks through to the CEF parser, which can trigger an exception.
     private static final Pattern SYSLOG_PREFIX = Pattern.compile("^(?:\\d+\\s+)?<(?<pri>\\d+)>(?<msg>.*)$", Pattern.DOTALL);
     private static final Pattern CLEAN_PATTERN = Pattern.compile("^\\d+\\s+(\\S.*)", Pattern.DOTALL);
 

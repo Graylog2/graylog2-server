@@ -144,9 +144,8 @@ public class CEFCodecTest {
     private static final String RFC5424_HEADER = "<12>1 2026-09-03T16:35:24.921661+00:00 collector Vendor 692316 - ";
 
     @Test
-    public void syslogHeaderWithOctetCountFramingIsStripped() {
-        // RFC 6587 octet-counting framing puts the message length in front of the syslog priority.
-        final RawMessage rawMessage = buildRawMessage("240 " + RFC5424_HEADER + "CEF:0|Vendor|Product|1.0|100|Alert|5|msg=octet-counted");
+    public void syslogHeaderPrecededByANumberIsStripped() {
+        final RawMessage rawMessage = buildRawMessage("240 " + RFC5424_HEADER + "CEF:0|Vendor|Product|1.0|100|Alert|5|msg=leading-number");
         final Message message = codec.decodeSafe(rawMessage).get();
 
         assertEquals("Vendor", message.getField("device_vendor"));
