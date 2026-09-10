@@ -78,6 +78,8 @@ const defaultPages = {
   WELCOME: '', // Welcome page to the documentation
   DATA_TIERING: 'setting_up_graylog/data_tiering.htm',
   DATA_TIERING_WARM_TIER_SETUP: 'setting_up_graylog/data_tiering.htm#PrepareYourEnvironmentforaWarmTier',
+  DATA_TIERING_WARM_TIER_OPENSEARCH: 'setting_up_graylog/create_warm_tier_on_self-managed_opensearch.htm',
+  DATA_TIERING_WARM_TIER_DATA_NODE: 'setting_up_graylog/create_warm_tier_on_data_node.htm',
   SERVER_UNAVAILABLE: 'https://www.graylog.org/community-support',
   MCP_SERVER: 'setting_up_graylog/model_context_protocol__mcp__tools.htm',
 } as const;
