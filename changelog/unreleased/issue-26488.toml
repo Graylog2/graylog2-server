@@ -1,0 +1,4 @@
+type = "a"
+message = "Add unit tests for `SyslogUtils` covering the RFC 5424 severity/facility lookups and the priority decomposition helpers."
+
+pulls = ["Graylog2/graylog2-server#26488"]
