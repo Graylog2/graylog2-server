@@ -282,12 +282,12 @@ public class InputEventListenerTest {
     }
 
     @Test
-    public void inputStoppedRemovesInputFromRegistry() {
+    public void inputStoppedKeepsInputInRegistry() {
         when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
 
         listener.inputStopped(InputStopped.create(INPUT_ID));
 
-        verify(inputRegistry, times(1)).remove(inputState);
+        verify(inputRegistry, times(0)).remove(inputState);
     }
 
     @Test
