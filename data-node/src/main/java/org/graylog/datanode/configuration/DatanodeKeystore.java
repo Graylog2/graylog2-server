@@ -177,9 +177,19 @@ public class DatanodeKeystore {
                 LOG.info("Datanode certificate issuer changed, triggering change event");
                 eventBus.post(new DatanodeCertificateChangedEvent());
             } else {
-                LOG.info("Datanode certificate renewed, triggering renewal event");
+                LOG.info("Datanode certificate renewed, triggering renewal event. New certificate serial number: {}",
+                        getCertificateSerialNumber(keystore));
                 eventBus.post(new DatanodeCertificateRenewedEvent());
             }
+        }
+    }
+
+    private static BigInteger getCertificateSerialNumber(KeyStore keystore) throws DatanodeKeystoreException {
+        try {
+            final X509Certificate datanodeCert = (X509Certificate) keystore.getCertificate(DATANODE_KEY_ALIAS);
+            return datanodeCert.getSerialNumber();
+        } catch (KeyStoreException e) {
+            throw new DatanodeKeystoreException("Failed to read datanode certificate serial number.", e);
         }
     }
 
