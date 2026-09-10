@@ -24,7 +24,7 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import useQuery from 'routing/useQuery';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useCreateSearch from 'views/hooks/useCreateSearch';
@@ -38,12 +38,9 @@ jest.mock('routing/useQuery');
 jest.mock('routing/useLocation');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
+jest.mock('components/streams/hooks/useAllStreams');
 
-const SimpleNewDashboardPage = () => (
-  <StreamsContext.Provider value={[{ id: 'deadbeef', title: 'Teststream' } as Stream]}>
-    <NewDashboardPage />
-  </StreamsContext.Provider>
-);
+const SimpleNewDashboardPage = () => <NewDashboardPage />;
 
 describe('NewDashboardPage', () => {
   const mockLocation = {
@@ -56,6 +53,7 @@ describe('NewDashboardPage', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    mockUseAllStreams([{ id: 'deadbeef', title: 'Teststream' } as Stream]);
     asMock(useLocation).mockReturnValue(mockLocation);
     asMock(useQuery).mockReturnValue({});
     asMock(useProcessHooksForView).mockReturnValue({

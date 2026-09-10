@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useMemo, useState, useContext } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -35,7 +35,7 @@ import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SingleMessageFieldTypesProvider from 'views/components/fieldtypes/SingleMessageFieldTypesProvider';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { Message } from 'views/components/messagelist/Types';
 import ErrorPage from 'components/errors/ErrorPage';
@@ -90,7 +90,7 @@ type ShowMessagePageProps = {
 };
 const emptyStreams: Stream[] = [];
 const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) => {
-  const streams = useContext(StreamsContext) ?? emptyStreams;
+  const { data: streams = emptyStreams } = useAllStreams();
   const streamsMap = useMemo(
     () => Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream]))),
     [streams],

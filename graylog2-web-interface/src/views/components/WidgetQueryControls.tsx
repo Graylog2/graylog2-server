@@ -24,7 +24,7 @@ import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import type { Stream } from 'logic/streams/types';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
@@ -194,7 +194,7 @@ const _validateQueryString = (
 const WidgetQueryControls = () => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
-  const streamsContext = useContext(StreamsContext);
+  const { data: streamsContext } = useAllStreams();
   const availableStreams = useMemo(() => streamsContext ?? [], [streamsContext]);
   const globalOverride = useGlobalOverride();
   const widget = useContext(WidgetContext);

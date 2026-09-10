@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 
 type Props = {
   value: string | Array<string>;
@@ -31,8 +31,8 @@ const StreamsList = styled.span`
 `;
 
 const StreamsField = ({ value }: Props) => {
-  const streams = useContext(StreamsContext);
-  const streamsMap = useMemo(() => Object.fromEntries(streams.map((stream) => [stream.id, stream]) ?? []), [streams]);
+  const { data: streams } = useAllStreams();
+  const streamsMap = useMemo(() => Object.fromEntries((streams ?? []).map((stream) => [stream.id, stream])), [streams]);
   const renderStream = useCallback(
     (streamId: string) => (
       <span key={streamId} title={streamId}>

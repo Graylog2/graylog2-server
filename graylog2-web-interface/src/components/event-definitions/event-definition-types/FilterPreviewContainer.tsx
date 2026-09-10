@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
 
 import FilterPreview from './FilterPreview';
@@ -27,7 +26,7 @@ type FilterPreviewContainerProps = {
   eventDefinition: EventDefinition;
 };
 const FilterPreviewContainer = ({ eventDefinition }: FilterPreviewContainerProps) => {
-  const streams = useContext(StreamsContext);
+  const { data: streams } = useAllStreams();
 
   return streams?.length ? (
     <FilterPreview config={eventDefinition?.config} />

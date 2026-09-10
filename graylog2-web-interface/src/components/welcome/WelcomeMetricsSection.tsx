@@ -101,7 +101,7 @@ const WelcomeMetricsContent = () => {
 };
 
 const WelcomeMetricsSection = () => {
-  const hasAccessToAnyStream = useHasAccessToAnyStream();
+  const { hasAccessToAnyStream } = useHasAccessToAnyStream();
 
   if (!hasAccessToAnyStream) {
     return <NoStreamAccessAlert />;

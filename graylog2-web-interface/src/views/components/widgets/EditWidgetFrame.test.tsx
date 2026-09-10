@@ -25,7 +25,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import type { Stream } from 'logic/streams/types';
 
 import EditWidgetFrame from './EditWidgetFrame';
@@ -34,6 +34,7 @@ import WidgetContext from '../contexts/WidgetContext';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useHotkey', () => jest.fn());
+jest.mock('components/streams/hooks/useAllStreams');
 
 const streams = [
   { title: 'PFLog', id: '5c2e27d6ba33a9681ad62775' },
@@ -68,17 +69,19 @@ describe('EditWidgetFrame', () => {
     const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) =>
       render(
         <TestStoreProvider>
-          <StreamsContext.Provider value={streams}>
-            <WidgetContext.Provider value={widget}>
-              <EditWidgetFrame onCancel={() => {}} onSubmit={() => Promise.resolve()} {...props}>
-                Hello World! These are some buttons!
-              </EditWidgetFrame>
-            </WidgetContext.Provider>
-          </StreamsContext.Provider>
+          <WidgetContext.Provider value={widget}>
+            <EditWidgetFrame onCancel={() => {}} onSubmit={() => Promise.resolve()} {...props}>
+              Hello World! These are some buttons!
+            </EditWidgetFrame>
+          </WidgetContext.Provider>
         </TestStoreProvider>,
       );
 
     useViewsPlugin();
+
+    beforeEach(() => {
+      mockUseAllStreams(streams);
+    });
 
     it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();

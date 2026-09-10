@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import { ltParamJSON, modalDataResult } from 'fixtures/createEventDefinitionFromValue';
 import useModalData from 'views/logic/valueactions/createEventDefinition/hooks/useModalData';
-import StreamsContext from 'contexts/StreamsContext';
+import mockUseAllStreams from 'helpers/mocking/mockUseAllStreams';
 import type { Stream } from 'logic/streams/types';
 
 const streams = [
@@ -27,26 +26,28 @@ const streams = [
   { title: 'streamId-2-title', id: 'streamId-2' },
 ] as Array<Stream>;
 
-const wrapper = ({ children }) => <StreamsContext.Provider value={streams}>{children}</StreamsContext.Provider>;
+jest.mock('components/streams/hooks/useAllStreams');
 
 describe('useModalData', () => {
+  beforeEach(() => {
+    mockUseAllStreams(streams);
+  });
+
   it('return correct data', async () => {
-    const { result } = renderHook(
-      () =>
-        useModalData({
-          searchWithinMs: 300000,
-          searchFilterQuery: '(http_method:GET)',
-          queryWithReplacedParams: 'http_method:GET',
-          searchFromValue: 'action:show',
-          aggField: 'action',
-          aggFunction: 'count',
-          aggValue: 400,
-          columnGroupBy: ['action', 'http_method'],
-          rowGroupBy: ['action'],
-          streams: ['streamId-1', 'streamId-2'],
-          lutParameters: [ltParamJSON],
-        }),
-      { wrapper },
+    const { result } = renderHook(() =>
+      useModalData({
+        searchWithinMs: 300000,
+        searchFilterQuery: '(http_method:GET)',
+        queryWithReplacedParams: 'http_method:GET',
+        searchFromValue: 'action:show',
+        aggField: 'action',
+        aggFunction: 'count',
+        aggValue: 400,
+        columnGroupBy: ['action', 'http_method'],
+        rowGroupBy: ['action'],
+        streams: ['streamId-1', 'streamId-2'],
+        lutParameters: [ltParamJSON],
+      }),
     );
     await waitFor(() => !!result.current);
 

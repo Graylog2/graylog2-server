@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import StreamsContext from 'contexts/StreamsContext';
+import useAllStreams from 'components/streams/hooks/useAllStreams';
 import { useInputs } from 'hooks/useInputs';
 import useNodeSummaries from 'hooks/useNodeSummaries';
 import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -25,7 +25,7 @@ import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
 const formatNode = (node: { short_node_id: string; hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
 
 const useStreamsKeyMapper = () => {
-  const streams = useContext(StreamsContext);
+  const { data: streams } = useAllStreams();
   const streamsMap = useMemo(() => Object.fromEntries((streams ?? []).map((stream) => [stream.id, stream])), [streams]);
 
   return useCallback((key: Key) => streamsMap[key]?.title ?? key, [streamsMap]);
