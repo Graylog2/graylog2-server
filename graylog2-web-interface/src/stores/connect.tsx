@@ -57,6 +57,7 @@ export function useStore(store, propsMapper = id) {
         storeStateRef.current = newState;
       }
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStoreState(store.getInitialState?.());
 
     return unsub;
