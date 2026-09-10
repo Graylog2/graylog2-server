@@ -203,7 +203,7 @@ public class AggregationSearchUtilsTest {
     }
 
     @Test
-    public void testEventMessageDoesNotUseScientificNotationForLargeOrSmallValues() throws EventProcessorException {
+    public void testEventMessageUsesScientificNotationOnlyBeyondBillionOrBelowOneEMinus13() throws EventProcessorException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
@@ -236,25 +236,34 @@ public class AggregationSearchUtilsTest {
                                 .key(ImmutableList.of("one", "two"))
                                 .timestamp(timerange.to())
                                 .seriesValues(ImmutableList.of(
-                                        // A large value that used to be rendered in scientific notation (e.g. "8.0053026E7")
+                                        // At or beyond 1 billion, scientific notation is used
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
-                                                .value(80053026.0d)
+                                                .value(4_238_917_465.0d)
                                                 .series(Count.builder()
-                                                        .id("large-value")
+                                                        .id("billion-and-up")
                                                         .field("network_bytes")
                                                         .build())
                                                 .build(),
-                                        // A small value that used to be rendered in scientific notation (e.g. "1.0E-5")
+                                        // Just below 1 billion, the value is rendered as a plain, comma-grouped decimal
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
-                                                .value(0.00001d)
+                                                .value(80_053_026.0d)
+                                                .series(Count.builder()
+                                                        .id("below-billion")
+                                                        .field("bytes_written")
+                                                        .build())
+                                                .build(),
+                                        // At or below 1e-13, scientific notation is used
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(0.00000000000005d)
                                                 .series(Cardinality.builder()
-                                                        .id("small-value")
+                                                        .id("below-1e-13")
                                                         .field("source")
                                                         .build())
                                                 .build(),
-                                        // A whole number in the normal range keeps Double#toString's own format
+                                        // A whole number in the normal range drops the insignificant trailing decimal
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
                                                 .value(42.0d)
@@ -263,13 +272,13 @@ public class AggregationSearchUtilsTest {
                                                         .field("user")
                                                         .build())
                                                 .build(),
-                                        // A fractional value should keep its meaningful decimals
+                                        // A noisy floating-point average is rounded to 2 decimal places
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
-                                                .value(3.14d)
+                                                .value(3.1399999856948853d)
                                                 .series(Cardinality.builder()
                                                         .id("fractional-value")
-                                                        .field("latency")
+                                                        .field("response_time_ms")
                                                         .build())
                                                 .build()
                                 ))
@@ -284,12 +293,13 @@ public class AggregationSearchUtilsTest {
         final String eventMessage = messageCaptor.getValue();
 
         assertThat(eventMessage)
-                .doesNotContainIgnoringCase("e7")
-                .doesNotContainIgnoringCase("e-5")
-                .contains("=80053026")
-                .contains("=0.00001")
-                .contains("=42.0")
-                .contains("=3.14");
+                .contains("=4.238917465E9")
+                .contains("=80,053,026")
+                .contains("=5.0E-14")
+                .contains("=42")
+                .doesNotContain("=42.0")
+                .contains("=3.14")
+                .doesNotContain("3.1399999856948853");
     }
 
     @Test

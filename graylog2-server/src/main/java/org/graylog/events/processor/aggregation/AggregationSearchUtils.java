@@ -41,7 +41,8 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -277,7 +278,7 @@ public class AggregationSearchUtils {
         return builder.toString().trim();
     }
 
-    // Only used to create log messages
+    // Used to build the event message (via createEventMessageString) as well as log messages.
     private String seriesString(AggregationKeyResult keyResult) {
         return keyResult.seriesValues().stream()
                 .map(this::formatSeriesValue)
@@ -288,20 +289,27 @@ public class AggregationSearchUtils {
         return f("%s=%s", seriesValue.series().literal(), formatValue(seriesValue.value()));
     }
 
-    // Double#toString (and thus String#valueOf/String#format with "%s") switches to scientific notation for
-    // values >= 10^7 or < 10^-3 (e.g. "8.0053026E7"). Only reformat values that actually hit that case, so the
-    // normal range keeps Double#toString's exact output (e.g. "1.0", "3.14") and existing consumers of the
-    // message string are unaffected.
+    // Values at or beyond these magnitudes are hard to read as plain decimals, so they keep scientific notation.
+    // Everything in between is rendered as a plain, comma-grouped decimal instead of Double#toString's own
+    // scientific-notation cutoff (>= 10^7 or < 10^-3), which kicks in well before these thresholds.
+    private static final double LARGE_VALUE_SCIENTIFIC_NOTATION_THRESHOLD = 1_000_000_000d; // 1 billion
+    private static final double SMALL_VALUE_SCIENTIFIC_NOTATION_THRESHOLD = 0.0000000000001d; // 1e-13
+
     private String formatValue(double value) {
         if (Double.isNaN(value) || Double.isInfinite(value)) {
             return Double.toString(value);
         }
 
-        final String doubleString = Double.toString(value);
-        if (doubleString.indexOf('E') < 0) {
-            return doubleString;
+        final double absValue = Math.abs(value);
+        if (absValue != 0 && (absValue >= LARGE_VALUE_SCIENTIFIC_NOTATION_THRESHOLD
+                || absValue <= SMALL_VALUE_SCIENTIFIC_NOTATION_THRESHOLD)) {
+            // Double#toString already renders scientific notation for every value in this range.
+            return Double.toString(value);
         }
 
-        return new BigDecimal(doubleString).stripTrailingZeros().toPlainString();
+        // DecimalFormat isn't thread-safe, so a fresh instance is created per call rather than shared/cached.
+        final DecimalFormat format = new DecimalFormat("#,##0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
+        return format.format(value);
     }
 }
