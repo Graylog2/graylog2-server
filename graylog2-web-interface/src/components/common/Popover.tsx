@@ -15,13 +15,41 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Popover as MantinePopover } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
 import { borderColor } from 'theme/utils/borderStyles';
 
-const Popover = ({ ...props }: React.ComponentProps<typeof MantinePopover>) => {
+const Popover = ({ opened, onDismiss, onChange, ...props }: React.ComponentProps<typeof MantinePopover>) => {
   const theme = useTheme();
+  const dismissedByMantineRef = useRef(false);
+
+  const handleDismiss = useCallback(() => {
+    dismissedByMantineRef.current = true;
+    onDismiss?.();
+  }, [onDismiss]);
+
+  useEffect(() => {
+    if (!opened) return undefined;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+
+      if (dismissedByMantineRef.current) {
+        dismissedByMantineRef.current = false;
+
+        return;
+      }
+
+      onDismiss?.();
+      onChange?.(false);
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [opened, onDismiss, onChange]);
 
   const arrowBackground =
     !props.position || props.position.startsWith('bottom')
@@ -40,7 +68,7 @@ const Popover = ({ ...props }: React.ComponentProps<typeof MantinePopover>) => {
     },
   });
 
-  return <MantinePopover styles={styles} zIndex={1060} {...props} />;
+  return <MantinePopover styles={styles} zIndex={1060} opened={opened} onDismiss={handleDismiss} onChange={onChange} {...props} />;
 };
 
 type DropdownProps = Omit<React.ComponentProps<typeof MantinePopover.Dropdown>, 'title'> & {
