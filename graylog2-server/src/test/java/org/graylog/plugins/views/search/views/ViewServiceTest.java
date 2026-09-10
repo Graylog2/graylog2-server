@@ -18,13 +18,13 @@ package org.graylog.plugins.views.search.views;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.favorites.FavoritesForUserDTO;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.rest.TestUser;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.GRNExtension;
@@ -87,7 +87,8 @@ public class ViewServiceTest {
                 mock(EntityRegistrar.class),
                 mock(ViewSummaryService.class),
                 mock(EntitySourceService.class),
-                mongoCollections);
+                mongoCollections,
+                new IgnoreSearchFilters());
 
         // Set up favorites collection using MongoCollections to ensure proper serialization
         this.favoritesCollection = mongoCollections.collection("favorites", FavoritesForUserDTO.class);
