@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix the event definition edit page loading indefinitely for users without edit permission."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15406"]
+pulls = ["27360"]
