@@ -17,6 +17,8 @@
 package org.graylog.collectors.opamp.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -28,7 +30,6 @@ import org.graylog.collectors.CollectorCaService;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.opamp.IssuedCertificate;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
@@ -42,6 +43,7 @@ import org.graylog.testing.cluster.ClusterConfigServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
@@ -104,9 +106,9 @@ class AgentTokenServiceTest {
         collectorInstanceService = new CollectorInstanceService(mongoCollections, new ClusterEventBus(), clock);
         final var httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(java.net.URI.create("https://localhost:443/"));
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration);
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, httpConfiguration, new EventBus());
         collectorCaService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
-        agentTokenService = new AgentTokenService(collectorInstanceService, clock);
+        agentTokenService = new AgentTokenService(collectorInstanceService, collectorsConfigService, clock);
     }
 
     private void initConfig() {
@@ -114,18 +116,30 @@ class AgentTokenServiceTest {
     }
 
     private void initConfig(CollectorCaService.CaHierarchy hierarchy) {
-        collectorsConfigService.save(CollectorsConfig.createDefaultBuilder("localhost")
-                .caCertId(hierarchy.caCert().id())
-                .signingCertId(hierarchy.signingCert().id())
-                .otlpServerCertId(hierarchy.otlpServerCert().id())
+        collectorsConfigService.save(configBuilder(hierarchy).build());
+    }
+
+    private void initConfig(Duration agentTokenMaxLifetime) {
+        collectorsConfigService.save(configBuilder(collectorCaService.initializeCa())
+                .agentTokenMaxLifetime(agentTokenMaxLifetime)
                 .build());
     }
 
-    @Test
-    void validateAgentTokenReturnsIdentifiedForValidToken() throws Exception {
-        initConfig();
+    private CollectorsConfig.Builder configBuilder(CollectorCaService.CaHierarchy hierarchy) {
+        return CollectorsConfig.createDefaultBuilder("localhost")
+                .caCertId(hierarchy.caCert().id())
+                .signingCertId(hierarchy.signingCert().id())
+                .otlpServerCertId(hierarchy.otlpServerCert().id());
+    }
 
-        // Create CA hierarchy
+    private record EnrolledAgent(KeyPair keyPair, String certFingerprint, String instanceUid) {
+    }
+
+    /**
+     * Generates an agent key pair, signs a CSR with the enrollment CA, and enrolls a collector instance with the
+     * resulting certificate. Requires an initialized config (see {@link #initConfig()}).
+     */
+    private EnrolledAgent enrollAgent(String instanceUid) throws Exception {
         final CertificateEntry enrollmentCa = collectorCaService.getSigningCert();
 
         // Generate agent key pair and CSR (use Ed25519 to match CA)
@@ -140,31 +154,101 @@ class AgentTokenServiceTest {
 
         // Save agent with cert
         final CollectorInstanceDTO collectorInstanceDTO = collectorInstanceService.enroll(
-                "test-instance-uid",
+                instanceUid,
                 "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
                 new IssuedCertificate(certFingerprint, certPem, signedCert.getNotAfter().toInstant(), enrollmentCa.id()),
                 "000000000000000000000000"
         );
 
-        // Create agent JWT with x5t#S256 header (RFC 7515 format)
-        final String agentToken = Jwts.builder()
+        return new EnrolledAgent(agentKeyPair, certFingerprint, collectorInstanceDTO.instanceUid());
+    }
+
+    /**
+     * Creates a JWT builder pre-populated with the agent's x5t#S256 header, subject, issued-at, and signing key.
+     * Callers add an expiration (or leave it out) and call {@code compact()}.
+     */
+    private JwtBuilder tokenBuilder(EnrolledAgent agent) {
+        return Jwts.builder()
                 .header()
                 .add("typ", "agent+jwt")
-                .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
+                .add("x5t#S256", PemUtils.fingerprintToX5t(agent.certFingerprint()))
                 .and()
-                .subject(collectorInstanceDTO.instanceUid())
+                .subject(agent.instanceUid())
                 .issuedAt(Date.from(Instant.now(clock)))
-                .expiration(Date.from(Instant.now(clock).plus(1, ChronoUnit.HOURS)))
-                .signWith(agentKeyPair.getPrivate())
+                .signWith(agent.keyPair().getPrivate());
+    }
+
+    @Test
+    void validateAgentTokenReturnsIdentifiedForValidToken() throws Exception {
+        initConfig();
+        final EnrolledAgent agent = enrollAgent("test-instance-uid");
+
+        final String agentToken = tokenBuilder(agent)
+                .expiration(Date.from(Instant.now(clock).plus(5, ChronoUnit.MINUTES)))
                 .compact();
 
-        // Validate
         final Optional<OpAmpAuthContext.Identified> result = agentTokenService.validateAgentToken(
                 agentToken, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isPresent();
         assertThat(result.get().instanceUid()).isEqualTo("test-instance-uid");
         assertThat(result.get().transport()).isEqualTo(OpAmpAuthContext.Transport.HTTP);
+    }
+
+    @Test
+    void validateAgentTokenReturnsEmptyForMissingExpiration() throws Exception {
+        initConfig();
+        final EnrolledAgent agent = enrollAgent("test-instance-uid");
+
+        // No expiration claim at all. JJWT alone accepts such tokens indefinitely, so this must be rejected
+        // by our own expiration-required check.
+        final String agentToken = tokenBuilder(agent).compact();
+
+        assertThat(agentTokenService.validateAgentToken(agentToken, OpAmpAuthContext.Transport.HTTP)).isEmpty();
+    }
+
+    @Test
+    void validateAgentTokenReturnsEmptyWhenExpirationExceedsMaxLifetime() throws Exception {
+        initConfig();
+        final EnrolledAgent agent = enrollAgent("test-instance-uid");
+
+        // One second beyond the default 1-hour cap
+        final String agentToken = tokenBuilder(agent)
+                .expiration(Date.from(Instant.now(clock).plus(1, ChronoUnit.HOURS).plusSeconds(1)))
+                .compact();
+
+        assertThat(agentTokenService.validateAgentToken(agentToken, OpAmpAuthContext.Transport.HTTP)).isEmpty();
+    }
+
+    @Test
+    void validateAgentTokenAcceptsExpirationExactlyAtMaxLifetime() throws Exception {
+        initConfig();
+        final EnrolledAgent agent = enrollAgent("test-instance-uid");
+
+        // Exactly at the default 1-hour cap: accepted (only strictly-later expirations are rejected)
+        final String agentToken = tokenBuilder(agent)
+                .expiration(Date.from(Instant.now(clock).plus(1, ChronoUnit.HOURS)))
+                .compact();
+
+        assertThat(agentTokenService.validateAgentToken(agentToken, OpAmpAuthContext.Transport.HTTP)).isPresent();
+    }
+
+    @Test
+    void validateAgentTokenRespectsConfiguredMaxLifetime() throws Exception {
+        initConfig(Duration.ofMinutes(10));
+        final EnrolledAgent agent = enrollAgent("test-instance-uid");
+
+        // Exceeds the custom 10-minute cap, but would pass the 1-hour default
+        final String tooLong = tokenBuilder(agent)
+                .expiration(Date.from(Instant.now(clock).plus(30, ChronoUnit.MINUTES)))
+                .compact();
+        assertThat(agentTokenService.validateAgentToken(tooLong, OpAmpAuthContext.Transport.HTTP)).isEmpty();
+
+        // Within the custom cap
+        final String withinCap = tokenBuilder(agent)
+                .expiration(Date.from(Instant.now(clock).plus(5, ChronoUnit.MINUTES)))
+                .compact();
+        assertThat(agentTokenService.validateAgentToken(withinCap, OpAmpAuthContext.Transport.HTTP)).isPresent();
     }
 
     @Test
@@ -221,39 +305,12 @@ class AgentTokenServiceTest {
     @Test
     void validateAgentTokenReturnsEmptyForInvalidSignature() throws Exception {
         initConfig();
-
-        // Create CA hierarchy
-        final CertificateEntry enrollmentCa = collectorCaService.getSigningCert();
-
-        // Generate agent key pair and CSR (use Ed25519 to match CA)
-        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-        final byte[] csrPem = createCsrPem("CN=test-agent", agentKeyPair, "Ed25519");
-
-        // Sign CSR with enrollment CA
-        final VerifiedCsr parsedCsr = PemUtils.parseCsr(new String(csrPem, StandardCharsets.UTF_8));
-        final X509Certificate signedCert = certificateService.builder().signCsr(parsedCsr, enrollmentCa, "test-agent", Duration.ofDays(365));
-        final String certFingerprint = PemUtils.computeFingerprint(signedCert);
-        final String certPem = PemUtils.toPem(signedCert);
-
-        // Save agent with cert
-        final CollectorInstanceDTO collectorInstanceDTO = collectorInstanceService.enroll(
-                "test-instance-uid-2",
-                "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
-                new IssuedCertificate(certFingerprint, certPem, signedCert.getNotAfter().toInstant(), enrollmentCa.id()),
-                "000000000000000000000000"
-        );
+        final EnrolledAgent agent = enrollAgent("test-instance-uid-2");
 
         // Create JWT signed with a DIFFERENT key
         final KeyPair differentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
-        final String agentToken = Jwts.builder()
-                .header()
-                .add("typ", "agent+jwt")
-                .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
-                .and()
-                .subject(collectorInstanceDTO.instanceUid())
-                .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
-                .signWith(differentKeyPair.getPrivate())
+        final String agentToken = tokenBuilder(new EnrolledAgent(differentKeyPair, agent.certFingerprint(), agent.instanceUid()))
+                .expiration(Date.from(Instant.now(clock).plus(5, ChronoUnit.MINUTES)))
                 .compact();
 
         // Validate - should fail because signature doesn't match certificate's public key

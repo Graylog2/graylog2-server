@@ -25,7 +25,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.collectors.events.CollectorCaConfigUpdated;
+import org.graylog.collectors.events.CollectorsConfigUpdatedEvent;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
@@ -149,7 +149,7 @@ public class CollectorCaCache extends AbstractIdleService {
 
     @Subscribe
     @VisibleForTesting
-    void handleCollectorsConfigEvent(CollectorCaConfigUpdated ignored) {
+    void handleCollectorsConfigEvent(CollectorsConfigUpdatedEvent ignored) {
         cache.invalidateAll();
     }
 }

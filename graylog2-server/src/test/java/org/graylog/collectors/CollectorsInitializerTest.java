@@ -17,6 +17,7 @@
 package org.graylog.collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateService;
@@ -27,7 +28,6 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterIdService;
@@ -76,7 +76,7 @@ class CollectorsInitializerTest {
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.com:443/"));
 
         final var certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), clock);
-        collectorsConfigService = new CollectorsConfigService(clusterConfigService, mock(ClusterEventBus.class), httpConfiguration);
+        collectorsConfigService = new CollectorsConfigService(clusterConfigService, httpConfiguration, new EventBus());
         caService = new CollectorCaService(certificateService, clusterIdService, collectorsConfigService, clock);
         enrollmentTokenService = new EnrollmentTokenService(clusterIdService, clock, encryptedValueService, collectorsConfigService, mongoCollections);
 

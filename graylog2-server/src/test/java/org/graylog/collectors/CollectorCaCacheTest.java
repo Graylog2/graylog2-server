@@ -19,7 +19,7 @@ package org.graylog.collectors;
 import com.google.common.eventbus.EventBus;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.graylog.collectors.events.CollectorCaConfigUpdated;
+import org.graylog.collectors.events.CollectorsConfigUpdatedEvent;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
@@ -115,7 +115,7 @@ class CollectorCaCacheTest {
         cache.getCa();
         verify(caService, times(1)).getCaCert();
 
-        cache.handleCollectorsConfigEvent(new CollectorCaConfigUpdated());
+        cache.handleCollectorsConfigEvent(new CollectorsConfigUpdatedEvent());
 
         cache.getCa();
         verify(caService, times(2)).getCaCert();
@@ -128,7 +128,7 @@ class CollectorCaCacheTest {
             cache.getSigning();
             verify(caService, times(1)).getSigningCert();
 
-            eventBus.post(new CollectorCaConfigUpdated());
+            eventBus.post(new CollectorsConfigUpdatedEvent());
 
             cache.getSigning();
             verify(caService, times(2)).getSigningCert();
@@ -169,7 +169,7 @@ class CollectorCaCacheTest {
         );
         when(caService.getOtlpServerCert()).thenReturn(newServerCert);
 
-        cache.handleCollectorsConfigEvent(new CollectorCaConfigUpdated());
+        cache.handleCollectorsConfigEvent(new CollectorsConfigUpdatedEvent());
 
         final var entry = cache.getServer();
         assertThat(entry.fingerprint()).isEqualTo(newServerCert.fingerprint());
