@@ -128,6 +128,6 @@ public class StreamPipelineRulesResource extends RestResource {
 
         return PageListResponse.create(
                 query, result.pagination(),
-                result.grandTotal().orElse(0L), sort, order, result.delegate(), attributes, settings);
+                result.pagination().total(), sort, order, result.delegate(), attributes, settings);
     }
 }
