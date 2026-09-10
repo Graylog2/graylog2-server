@@ -31,7 +31,7 @@ public record Policy(@Nullable String policyId,
                      @Nullable String lastUpdatedTime,
                      @Nonnull String defaultState,
                      @Nonnull List<State> states,
-                     @Nullable IsmTemplate ismTemplate) {
+                     @Nullable List<IsmTemplate> ismTemplate) {
 
     public Policy(@Nonnull String description, @Nonnull String defaultState, @Nonnull List<State> states) {
         this(null, description, null, defaultState, states, null);
@@ -49,7 +49,12 @@ public record Policy(@Nullable String policyId,
     /**
      * ISM Template property with index pattern and priority. This must be specified in order for automatically rolled-over
      * data streams indexes to continue to be managed by the policy.
+     * <p>
+     * For data stream backing indices, OpenSearch matches these patterns against the <em>data stream name</em>, not
+     * against the physical {@code .ds-*} index name. A pattern should therefore be as specific as possible, so that it
+     * doesn't accidentally match unrelated indices sharing the data stream's name prefix.
      */
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record IsmTemplate(List<String> indexPatterns, int priority) {
     }
 }

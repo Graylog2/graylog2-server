@@ -56,6 +56,8 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigureMetricsIndexSettings.class);
 
+    private static final int ISM_TEMPLATE_PRIORITY = 100;
+
     private final AtomicBoolean datastreamCreated = new AtomicBoolean(false);
 
     private final OpensearchProcess process;
@@ -146,11 +148,20 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
         Policy.State stateRollup = ismRollupState(stateDelete.name(), configuration);
         Policy.State stateOpen = ismOpenState(stateRollup.name());
 
+        // The ISM template makes OpenSearch attach this policy to backing indices created by future rollovers.
+        // Without it, only the backing indices existing at policy creation time are managed and everything rolled
+        // over later silently accumulates without rollup or deletion.
+        // OpenSearch matches the pattern against the data stream name, not against the physical .ds-* index name.
+        // It has to be the exact stream name: a prefix wildcard would also match the rollup target index
+        // (metrics_daily_index), which is a plain index this policy must not manage.
+        final Policy.IsmTemplate ismTemplate =
+                new Policy.IsmTemplate(ImmutableList.of(configuration.getMetricsStream()), ISM_TEMPLATE_PRIORITY);
+
         Policy policy = new Policy(null,
                 "Manages rollover, rollup and deletion of data note metrics indices",
                 null,
                 stateOpen.name(), ImmutableList.of(stateOpen, stateRollup, stateDelete),
-                null);
+                ImmutableList.of(ismTemplate));
 
         try {
             LOGGER.debug("Creating ISM configuration for metrics data stream {}",
