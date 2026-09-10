@@ -22,6 +22,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -40,6 +41,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
+@Singleton
 public class MongoDbPipelineStreamConnectionsService implements PipelineStreamConnectionsService {
     private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbPipelineStreamConnectionsService.class);
 
