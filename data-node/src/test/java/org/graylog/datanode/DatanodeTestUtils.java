@@ -73,6 +73,13 @@ public class DatanodeTestUtils {
         return CERTIFICATE_GENERATOR.generateKeyPair(certRequest);
     }
 
+    public static KeyPair generateCAKeyPair(Duration validity) throws Exception {
+        final CertRequest certRequest = CertRequest.selfSigned(RandomStringUtils.secure().nextAlphanumeric(10))
+                .isCA(true)
+                .validity(validity);
+        return CERTIFICATE_GENERATOR.generateKeyPair(certRequest);
+    }
+
     public static DatanodeConfiguration mockDatanodeConfiguration(Path tempDir) {
         return new DatanodeConfiguration(
                 new OpensearchDistribution(tempDir, "2.19.6"),

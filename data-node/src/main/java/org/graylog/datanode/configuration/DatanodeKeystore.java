@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
@@ -54,6 +55,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
@@ -208,11 +210,26 @@ public class DatanodeKeystore {
 
     @Nullable
     public synchronized Date getCertificateExpiration() {
+        return withSignedCertificate(X509Certificate::getNotAfter);
+    }
+
+    /**
+     * @return the serial number of the currently persisted datanode certificate, or {@code null} if it's still
+     * self-signed (i.e. not yet provisioned by the CA). Useful to identify a specific certificate (e.g. to confirm
+     * that a particular renewal has actually been picked up somewhere) without handing out the certificate itself.
+     */
+    @Nullable
+    public synchronized BigInteger getCertificateSerialNumber() {
+        return withSignedCertificate(X509Certificate::getSerialNumber);
+    }
+
+    @Nullable
+    private <T> T withSignedCertificate(Function<X509Certificate, T> extractor) {
         try {
             final KeyStore keystore = loadKeystore();
             if (isSignedCertificateChain(keystore)) {
                 final X509Certificate datanodeCert = (X509Certificate) keystore.getCertificate(DATANODE_KEY_ALIAS);
-                return datanodeCert.getNotAfter();
+                return extractor.apply(datanodeCert);
             } else {
                 return null;
             }
