@@ -103,9 +103,11 @@ export function useUpdateLookupTable() {
         queryKey: ['lookup-tables'],
         refetchType: 'active',
       });
+      // The edit form navigates away right after this; on a rename an active refetch
+      // loses the race and 404s under the pre-rename identifier.
       queryClient.invalidateQueries({
         queryKey: ['lookup-table-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),
@@ -294,9 +296,11 @@ export function useUpdateCache() {
         queryKey: ['all-caches'],
         refetchType: 'active',
       });
+      // The edit form navigates away right after this; on a rename an active refetch
+      // loses the race and 404s under the pre-rename identifier.
       queryClient.invalidateQueries({
         queryKey: ['cache-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),
@@ -420,9 +424,11 @@ export function useUpdateAdapter() {
         queryKey: ['all-data-adapters'],
         refetchType: 'active',
       });
+      // The edit form navigates away right after this; on a rename an active refetch
+      // loses the race and 404s under the pre-rename identifier.
       queryClient.invalidateQueries({
         queryKey: ['data-adapter-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),
