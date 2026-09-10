@@ -51,6 +51,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -224,5 +225,12 @@ public class OutputServiceImplTest {
         assertThat(password.getString("encrypted_value")).isNotBlank();
         assertThat(password.getString("salt")).isNotBlank();
         assertThat(stored.toJson()).doesNotContain("s3cret");
+    }
+
+    @Test
+    public void loadByIdsWithNoIdsSkipsAvailableOutputLookup() {
+        assertThat(outputService.loadByIds(Collections.emptySet())).isEmpty();
+
+        verify(messageOutputFactory, never()).getAvailableOutputs();
     }
 }
