@@ -112,7 +112,11 @@ public class InputEventListener {
         final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
-            startInput = inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.SETUP;
+            // Relaunch what was (meant to be) running. A FAILED input was never stopped on purpose, and an update is
+            // typically the fix for whatever made it fail (e.g. a port that was already in use), so retry it.
+            // Deliberately stopped inputs stay stopped.
+            final IOState.Type state = inputState.getState();
+            startInput = state == IOState.Type.RUNNING || state == IOState.Type.SETUP || state == IOState.Type.FAILED;
             inputRegistry.remove(inputState);
         } else {
             startInput = false;

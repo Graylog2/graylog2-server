@@ -245,6 +245,24 @@ public class InputEventListenerTest {
         verify(inputLauncher, times(1)).launch(messageInput);
     }
 
+    // A failed input (e.g. port already in use) was never stopped on purpose; an update is the user's fix and
+    // should be retried. Only deliberately stopped inputs stay down (see #3824).
+    @Test
+    public void inputUpdatedRestartsFailedInput() throws Exception {
+        when(inputState.getState()).thenReturn(IOState.Type.FAILED);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+        when(input.getNodeId()).thenReturn(THIS_NODE_ID);
+        when(input.isGlobal()).thenReturn(false);
+
+        final MessageInput messageInput = mock(MessageInput.class);
+        when(inputService.getMessageInput(input)).thenReturn(messageInput);
+
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
+
+        verify(inputLauncher, times(1)).launch(messageInput);
+    }
+
     @Test
     public void inputUpdatedDoesNotStartLocalInputOnLocalNodeIfItWasNotRunning() throws Exception {
         when(inputState.getState()).thenReturn(IOState.Type.STOPPED);

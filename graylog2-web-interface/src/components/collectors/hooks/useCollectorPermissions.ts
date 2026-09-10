@@ -19,6 +19,8 @@ import usePermissions from 'hooks/usePermissions';
 import { COLLECTOR_PERMISSIONS, scoped } from '../Permissions';
 import { COLLECTOR_SYSTEM_LOGS_STREAM_ID } from '../common/fields';
 
+const COLLECTOR_INGEST_INPUT_TYPE = 'org.graylog.collectors.input.CollectorIngestHttpInput';
+
 /**
  * Permission checks for the Collectors feature.
  *
@@ -57,6 +59,11 @@ const useCollectorPermissions = () => {
     canReadSystemLogs: isPermitted(scoped('streams:read', COLLECTOR_SYSTEM_LOGS_STREAM_ID)),
     canReadActivities: isPermitted(COLLECTOR_PERMISSIONS.ACTIVITIES_READ),
     canEditConfig: isPermitted(COLLECTOR_PERMISSIONS.CONFIGURATION_EDIT),
+    // The ingest input is a regular input, so these are INPUT permissions (same checks the inputs page and
+    // CollectorIngestInputService apply). Notably absent from the built-in Collectors Manager role.
+    canCreateIngestInput: isPermitted(['inputs:create', scoped('input_types:create', COLLECTOR_INGEST_INPUT_TYPE)]),
+    canEditIngestInput: (inputId: string) =>
+      isPermitted([scoped('inputs:edit', inputId), scoped('input_types:create', COLLECTOR_INGEST_INPUT_TYPE)]),
   };
 };
 
