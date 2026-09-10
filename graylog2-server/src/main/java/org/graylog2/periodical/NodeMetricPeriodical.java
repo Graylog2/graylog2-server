@@ -21,6 +21,8 @@ import com.codahale.metrics.MetricRegistry;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import org.graylog2.Configuration;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +32,20 @@ public class NodeMetricPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodeMetricPeriodical.class);
 
-    private final CpuLoadGauge cpuLoadGauge = new CpuLoadGauge();
-
+    private final CpuLoadGauge cpuLoadGauge;
     private final MetricRegistry metricRegistry;
+    private final boolean nativeSystemStatsCollectorDisabled;
 
     @Inject
-    public NodeMetricPeriodical(MetricRegistry metricRegistry) {
+    public NodeMetricPeriodical(MetricRegistry metricRegistry,
+                                Configuration configuration) {
         this.metricRegistry = metricRegistry;
+        
+        this.nativeSystemStatsCollectorDisabled = configuration.isDisableNativeSystemStatsCollector();
+        
+        this.cpuLoadGauge = nativeSystemStatsCollectorDisabled
+                                ? null
+                                : new CpuLoadGauge();
     }
 
     @Override
@@ -83,11 +92,22 @@ public class NodeMetricPeriodical extends Periodical {
 
     @Override
     public void initialize() {
-        metricRegistry.registerGauge("org.graylog2.system.cpu.percent", cpuLoadGauge);
+    	if(nativeSystemStatsCollectorDisabled) {
+            LOG.debug("Native system stats collector disabled. CPU load gauge will not be registered.");
+            return;
+        }
+
+        metricRegistry.registerGauge(
+                "org.graylog2.system.cpu.percent",
+                cpuLoadGauge);
     }
 
     @Override
     public void doRun() {
+        if(nativeSystemStatsCollectorDisabled) {
+            return;
+        }
+
         cpuLoadGauge.update();
     }
 }
