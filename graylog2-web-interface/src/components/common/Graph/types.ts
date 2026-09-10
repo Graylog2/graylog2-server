@@ -16,4 +16,16 @@
  */
 export type Traffic = { [key: string]: number };
 
+export type TrafficType = 'input-indexed' | 'output';
+
+export const TRAFFIC_TYPE_LABELS: Record<TrafficType, string> = {
+  'input-indexed': 'Incoming traffic',
+  output: 'Outgoing traffic',
+};
+
+export const TRAFFIC_TYPE_APP_SECTIONS: Record<TrafficType, string> = {
+  'input-indexed': 'incoming-traffic',
+  output: 'outgoing-traffic',
+};
+
 export const DAYS = [30, 90, 180, 365] as const;
