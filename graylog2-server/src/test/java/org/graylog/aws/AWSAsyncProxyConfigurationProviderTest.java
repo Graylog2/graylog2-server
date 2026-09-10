@@ -16,6 +16,7 @@
  */
 package org.graylog.aws;
 
+import org.graylog2.utilities.ProxyConfig;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.http.nio.netty.ProxyConfiguration;
 
@@ -30,7 +31,7 @@ public class AWSAsyncProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithoutCredentials() {
-        final URI proxyUri = URI.create("http://proxy.example.com:8080");
+        final ProxyConfig proxyUri = new ProxyConfig(URI.create("http://proxy.example.com:8080"));
 
         final ProxyConfiguration proxyConfig = AWSAsyncProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -43,7 +44,7 @@ public class AWSAsyncProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithCredentials() {
-        final URI proxyUri = URI.create("http://user:pass@proxy.example.com:8080");
+        final ProxyConfig proxyUri = new ProxyConfig(URI.create("http://user:pass@proxy.example.com:8080"));
 
         final ProxyConfiguration proxyConfig = AWSAsyncProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -55,7 +56,7 @@ public class AWSAsyncProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithUsernameOnly() {
-        final URI proxyUri = URI.create("http://user@proxy.example.com:8080");
+        final ProxyConfig proxyUri = new ProxyConfig(URI.create("http://user@proxy.example.com:8080"));
 
         final ProxyConfiguration proxyConfig = AWSAsyncProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -67,7 +68,7 @@ public class AWSAsyncProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithHttpsScheme() {
-        final URI proxyUri = URI.create("https://admin:secret@secure-proxy.example.com:443");
+        final ProxyConfig proxyUri = new ProxyConfig(URI.create("https://admin:secret@secure-proxy.example.com:443"));
 
         final ProxyConfiguration proxyConfig = AWSAsyncProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -80,7 +81,7 @@ public class AWSAsyncProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithDefaultHttpPort() {
-        final URI proxyUri = URI.create("http://user:pass@proxy.example.com");
+        final ProxyConfig proxyUri = new ProxyConfig(URI.create("http://user:pass@proxy.example.com"));
 
         final ProxyConfiguration proxyConfig = AWSAsyncProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
@@ -93,7 +94,7 @@ public class AWSAsyncProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithDefaultHttpsPort() {
-        final URI proxyUri = URI.create("https://secure-proxy.example.com");
+        final ProxyConfig proxyUri = new ProxyConfig(URI.create("https://secure-proxy.example.com"));
 
         final ProxyConfiguration proxyConfig = AWSAsyncProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
