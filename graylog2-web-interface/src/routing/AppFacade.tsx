@@ -20,7 +20,7 @@ import { useContext, useEffect, useMemo } from 'react';
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import { useStore } from 'stores/connect';
-import 'bootstrap/less/bootstrap.less';
+import 'theme/bootstrap.less';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
 import { SessionStore } from 'stores/sessions/SessionStore';

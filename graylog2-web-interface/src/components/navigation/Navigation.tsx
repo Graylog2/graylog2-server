@@ -19,15 +19,17 @@ import styled, { css } from 'styled-components';
 
 import useLocation from 'routing/useLocation';
 import { Link, LinkContainer } from 'components/common';
+import { Nav, Navbar } from 'components/bootstrap';
 import AppConfig from 'util/AppConfig';
-import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
 import BrandNavLogo from 'components/navigation/NavigationBrand';
+import { hoverIndicatorStyles } from 'components/common/NavItemStateIndicator';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
+import useNavigationCollapse from 'components/navigation/useNavigationCollapse';
 import { FEATURE_FLAG } from 'components/quick-jump/Constants';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import { NAV_ITEM_HEIGHT, NAVBAR_GAP } from 'theme/constants';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -35,7 +37,6 @@ import NotificationBadge from './NotificationBadge';
 import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
 import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
-import StyledNavbar from './Navigation.styles';
 
 import { QuickJumpModalContainer } from '../quick-jump';
 
@@ -59,59 +60,102 @@ const BrandLink = styled(Link)(
   `,
 );
 
+const Brand = styled.div`
+  flex: 0 0 auto;
+`;
+
+const Icons = styled.nav(
+  ({ theme }) => css`
+    margin-left: auto;
+    flex: 0 0 auto;
+
+    /* Navigation items render the state indicator but leave it to the item to say when it applies,
+       and the icons in here are links without an item of their own to do so. Buttons among them,
+       such as the menus, bring their own. */
+    a:hover,
+    a:focus-visible {
+      ${hoverIndicatorStyles(theme)}
+    }
+  `,
+);
+
+const MainNavAndNotificationBadge = styled.nav`
+  display: flex;
+  align-items: center;
+`;
+
+// Measured as one region, whichever badge ends up in it.
+const Badges = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+`;
+
+const DevelopmentHeaderBadgeContainer = styled.div`
+  padding-left: ${NAVBAR_GAP}px;
+  padding-right: ${NAVBAR_GAP}px;
+`;
+
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
   const pluginBadges = usePluginEntities('navigation.badges');
+  // A badge decides for itself whether it applies, and does so with a hook. Plugins register their
+  // badges once for as long as the page lives, so the number of calls stays the same between renders.
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const activePluginBadges = pluginBadges.filter(({ useCondition }) => useCondition());
+  const { navbarRef, brandRef, badgesRef, iconsRef, menuRef, collapsed } = useNavigationCollapse();
 
   return (
-    <StyledNavbar fluid fixedTop collapseOnSelect>
-      <Navbar.Header>
-        <Navbar.Brand>
-          <BrandLink to={Routes.WELCOME} aria-label="Welcome">
-            <BrandNavLogo />
-          </BrandLink>
-        </Navbar.Brand>
-        <Navbar.Toggle />
-        <DevelopmentHeaderBadge smallScreen />
-        {pluginItems.map(({ key, component: Item }) => (
-          <Item key={key} smallScreen />
-        ))}
-      </Navbar.Header>
-      <Navbar.Collapse>
-        <MainNavbar pathname={pathname} />
+    <Navbar ref={navbarRef} role="navigation">
+      {collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
+      <Brand ref={brandRef}>
+        <BrandLink to={Routes.WELCOME} aria-label="Welcome">
+          <BrandNavLogo />
+        </BrandLink>
+      </Brand>
+      <MainNavAndNotificationBadge aria-label="Main">
+        {!collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
+        <Badges ref={badgesRef}>
+          {activePluginBadges.map(({ key, component: PluginBadge }) => (
+            <PluginBadge key={key} />
+          ))}
+          <NotificationBadge />
+        </Badges>
+      </MainNavAndNotificationBadge>
 
-        {activePluginBadges.map(({ key, component: PluginBadge }) => (
-          <PluginBadge key={key} />
-        ))}
-        <NotificationBadge />
+      <Icons ref={iconsRef} aria-label="Utility">
+        <Nav>
+          <li>{AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}</li>
 
-        <Nav pullRight className="header-meta-nav">
-          {AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}
+          <li>
+            {AppConfig.isCloud() ? (
+              <GlobalThroughput disabled />
+            ) : (
+              <LinkContainer to={Routes.SYSTEM.CLUSTER.NODES}>
+                <GlobalThroughput />
+              </LinkContainer>
+            )}
+          </li>
 
-          {AppConfig.isCloud() ? (
-            <GlobalThroughput disabled />
-          ) : (
-            <LinkContainer to={Routes.SYSTEM.CLUSTER.NODES}>
-              <GlobalThroughput />
-            </LinkContainer>
-          )}
+          <li>
+            <InactiveNavItem>
+              <DevelopmentHeaderBadgeContainer>
+                <DevelopmentHeaderBadge />
+              </DevelopmentHeaderBadgeContainer>
+              {pluginItems.map(({ key, component: Item }) => (
+                <Item key={key} />
+              ))}
+            </InactiveNavItem>
+          </li>
 
-          <InactiveNavItem className="dev-badge-wrap">
-            <DevelopmentHeaderBadge />
-            {pluginItems.map(({ key, component: Item }) => (
-              <Item key={key} />
-            ))}
-          </InactiveNavItem>
           <ScratchpadToggle />
 
           <HelpMenu />
 
           <UserMenu />
         </Nav>
-      </Navbar.Collapse>
-    </StyledNavbar>
+      </Icons>
+    </Navbar>
   );
 });
 

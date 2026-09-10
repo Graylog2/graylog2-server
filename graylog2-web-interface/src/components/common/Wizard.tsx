@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import find from 'lodash/find';
+import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
-import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/bootstrap';
-import type { SelectCallback } from 'components/bootstrap/types';
+import { Button, ButtonToolbar, Col, Nav, Row } from 'components/bootstrap';
 
 import Icon from './Icon';
 
@@ -35,15 +35,38 @@ const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
-  ({ $style, theme }) => css`
+// Hovering a step darkens the whole item, the separator drawn between items included, so that the two
+// move together.
+const stepHoverBackground = (theme: DefaultTheme) => theme.colors.background.body;
+
+// `Nav` no longer carries the `.nav`, `.nav-pills` and `.nav-justified` classes it used to get from
+// react-bootstrap, so the selectors which relied on them address this component and its own items
+// directly, and the two former modifier props became styling props.
+const StyledNav: React.ComponentType<any> = styled(Nav)<{
+  $style?: 'stepper';
+  $stacked?: boolean;
+  $justified?: boolean;
+}>(
+  ({ $style, $stacked, $justified, theme }) => css`
+    ${$stacked
+      ? `
+  flex-direction: column;
+  align-items: stretch;
+  `
+      : `
+  /* The steps share the width of the bar equally, whatever their titles are. */
+  > li {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  `}
     ${$style === 'stepper'
       ? `
-  &.nav {
+  & {
    counter-reset: line-number;
     > li {
       counter-increment: line-number;
-      > a {
+      > button {
         position: relative;
         display: flex;
         padding: 10px 0px;
@@ -89,16 +112,16 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
           margin: 0 16px;
         } 
         &:hover::after {
-          background-color: ${theme.colors.variant.lightest.default};
+          background-color: ${stepHoverBackground(theme)};
         }
       }
-      &:last-child > a {
+      &:last-child > button {
        justify-content: flex-start;
        &::after {
         display:none;
        } 
       }
-      &.disabled > a {
+      &.disabled > button {
         color: ${theme.colors.variant.light.default};
 
         &:hover,
@@ -108,7 +131,7 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
       }
     }
 
-    .open > a {
+    .open > button {
       &,
       &:hover,
       &:focus {
@@ -116,36 +139,31 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
         border-color: ${theme.colors.variant.primary};
       }
     }
-    &.nav-justified {
-     > li {
-      > a {
-        text-align: left;
-      }
-     }
+    ${
+      $justified
+        ? `
+    > li > button {
+      text-align: left;
     }
-    &.nav-pills {
+    `
+        : ''
+    }
+    & {
       > li {
-        > a {
-          color: initial;
-
-          &:hover  {
-            color: ${theme.colors.global.link};
-          }
-        }
-
-        &.active > a {
+        /* The step being shown is where you are rather than somewhere to go, so it is not a link. */
+        &.active > button {
           &,
           &:hover,
           &:focus {
-            color: ${theme.colors.global.link};
-            background-color: initial; 
+            color: ${theme.colors.text.primary};
+            background-color: initial;
           }
         }
       }
-    } 
+    }
   }
   `
-      : `&.nav {
+      : `& {
     > li {
       border: 1px solid ${theme.colors.variant.lighter.default};
       border-left: 0;
@@ -154,7 +172,7 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
         border-left: 1px solid ${theme.colors.variant.lighter.default};
         border-radius: 4px 0 0 4px;
 
-        > a {
+        > button {
           border-radius: 4px 0 0 4px;
         }
       }
@@ -162,14 +180,13 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
       &:last-child {
         border-radius: 0 4px 4px 0;
 
-        > a {
+        > button {
           border-radius: 0 4px 4px 0;
         }
       }
 
-      &:not(:last-child) > a {
+      &:not(:last-child) > button {
         &::after {
-          transition: background-color 150ms ease-in-out;
           background-color: ${theme.colors.global.contentBackground};
           border-color: ${theme.colors.variant.lighter.default};
           border-style: solid;
@@ -186,11 +203,19 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
         }
 
         &:hover::after {
-          background-color: ${theme.colors.variant.lightest.default};
+          background-color: ${stepHoverBackground(theme)};
         }
       }
 
-      &.active a {
+      &.active button {
+        /* This step is filled with the link colour, so its label has to contrast with it instead of
+           being a link itself. */
+        &,
+        &:hover,
+        &:focus {
+          color: ${theme.utils.contrastingColor(theme.colors.global.link)};
+        }
+
         &,
         &:hover,
         &::after,
@@ -199,24 +224,24 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
         }
       }
       
-      &.disabled > a {
+      &.disabled > button {
         color: ${theme.colors.text.disabled};
       }
 
-      > a {
+      > button {
         border-radius: 0;
       }
     }
   }
 
   @media (max-width: ${theme.breakpoints.max.md}) {
-    &.nav {
+    & {
       > li {
         border-right: 0;
         border-left: 0;
 
-        &:last-child a,
-        &:first-child a {
+        &:last-child button,
+        &:first-child button {
           border-radius: 0;
         }
 
@@ -224,7 +249,7 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
           border-bottom: 0;
         }
 
-        &:not(:last-child) > a {
+        &:not(:last-child) > button {
           &::after {
             bottom: 0;
             left: 50%;
@@ -236,12 +261,67 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
         }
       }
 
-      &.nav-justified > li > a {
+      ${
+        $justified
+          ? `> li > button {
         margin-bottom: 0;
+      }`
+          : ''
       }
     }
   }`}
   `,
+);
+
+/**
+ * Lets a consumer address the list of steps, which used to be possible through the `nav-pills` class
+ * react-bootstrap put on it.
+ */
+export const WIZARD_STEP_LIST_CLASS = 'wizard-step-list';
+
+// Replaces what react-bootstrap's `NavItem` used to render. The `active` and `disabled` classes are
+// the hooks `StyledNav` styles, and the button replaces the anchor react-bootstrap rendered, which
+// Bootstrap's still-loaded base stylesheet would style as a link.
+// A step which is not the current one reads as a link, since that is what following it does.
+const StepButton = styled.button(
+  ({ theme }) => css`
+    background: none;
+    border: 0;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: center;
+    cursor: pointer;
+
+    /* The arrow drawn between two steps is positioned against this button, which is what Bootstrap's
+       own nav rules used to provide. */
+    position: relative;
+    color: ${theme.colors.global.link};
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      background-color: ${stepHoverBackground(theme)};
+      color: ${theme.utils.colorLevel(theme.colors.global.link, 6)};
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  `,
+);
+
+type StepItemProps = {
+  active: boolean;
+  disabled: boolean;
+  onSelect: () => void;
+  children: React.ReactNode;
+};
+
+const StepItem = ({ active, disabled, onSelect, children }: StepItemProps) => (
+  <li className={`${active ? 'active' : ''} ${disabled ? 'disabled' : ''}`.trim()}>
+    <StepButton type="button" disabled={disabled} onClick={onSelect} aria-current={active ? 'step' : undefined}>
+      {children}
+    </StepButton>
+  </li>
 );
 
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
@@ -386,17 +466,15 @@ class Wizard<StepKey extends BaseStepKey> extends React.Component<Props<StepKey>
 
     return (
       <SubnavigationCol md={2}>
-        <StyledNav
-          stacked
-          bsStyle="pills"
-          $style={style}
-          activeKey={selectedStep}
-          onSelect={this._wizardChanged as SelectCallback}
-          justified={justified}>
+        <StyledNav className={WIZARD_STEP_LIST_CLASS} $stacked $style={style} $justified={justified}>
           {steps.map((navItem) => (
-            <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>
+            <StepItem
+              key={navItem.key}
+              active={navItem.key === selectedStep}
+              disabled={!!navItem.disabled}
+              onSelect={() => this._wizardChanged(navItem.key)}>
               {navItem.title}
-            </NavItem>
+            </StepItem>
           ))}
         </StyledNav>
         {!hidePreviousNextButtons && (
@@ -452,16 +530,15 @@ class Wizard<StepKey extends BaseStepKey> extends React.Component<Props<StepKey>
             </HorizontalButtonToolbar>
           </div>
         )}
-        <StyledNav
-          bsStyle="pills"
-          activeKey={selectedStep}
-          $style={style}
-          onSelect={this._wizardChanged as SelectCallback}
-          justified={justified}>
+        <StyledNav className={WIZARD_STEP_LIST_CLASS} $style={style} $justified={justified}>
           {steps.map((navItem) => (
-            <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>
+            <StepItem
+              key={navItem.key}
+              active={navItem.key === selectedStep}
+              disabled={!!navItem.disabled}
+              onSelect={() => this._wizardChanged(navItem.key)}>
               {navItem.title}
-            </NavItem>
+            </StepItem>
           ))}
         </StyledNav>
       </HorizontalCol>

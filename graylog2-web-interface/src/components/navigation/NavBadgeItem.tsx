@@ -54,10 +54,12 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const NavBadgeItem = ({ children = undefined, onClick = undefined, to }: Props) => (
-  <StyledNav navbar>
-    <LinkContainer to={to} onClick={onClick}>
-      <StyledInactiveNavItem>{children}</StyledInactiveNavItem>
-    </LinkContainer>
+  <StyledNav>
+    <li>
+      <LinkContainer to={to} onClick={onClick}>
+        <StyledInactiveNavItem>{children}</StyledInactiveNavItem>
+      </LinkContainer>
+    </li>
   </StyledNav>
 );
 

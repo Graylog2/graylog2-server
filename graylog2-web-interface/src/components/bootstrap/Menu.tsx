@@ -88,4 +88,37 @@ Menu.Dropdown = styled(MantineMenu.Dropdown)(
 
 Menu.Label = StyledMenuLabel;
 
+const StyledMenuSubDropdown = styled(MantineMenu.Sub.Dropdown)(
+  ({ theme }) => css`
+    && {
+      background-color: ${theme.colors.global.contentBackground};
+      border: 1px solid ${theme.colors.variant.lighter.default};
+    }
+  `,
+);
+
+const StyledMenuSubItem = styled(MantineMenu.Sub.Item)(
+  ({ theme }) => css`
+    color: ${theme.colors.text.primary};
+    font-size: ${theme.fonts.size.body};
+    white-space: nowrap;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: inherit;
+      background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
+    }
+  `,
+);
+
+// A nested submenu, for menu entries which open a menu of their own instead of navigating.
+const MenuSub = ({ children = undefined }: PropsWithChildren<{}>) => <MantineMenu.Sub>{children}</MantineMenu.Sub>;
+
+MenuSub.Target = MantineMenu.Sub.Target;
+MenuSub.Dropdown = StyledMenuSubDropdown;
+MenuSub.Item = StyledMenuSubItem;
+
+Menu.Sub = MenuSub;
+
 export default Menu;

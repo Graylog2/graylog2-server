@@ -20,14 +20,16 @@ import styled, { css } from 'styled-components';
 import NumberUtils from 'util/NumberUtils';
 import { NavItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
+import { itemStateIndicatorContainerSelector } from 'components/common/NavItemStateIndicator';
 import { useGlobalThroughput } from 'hooks/useMetrics';
+import { NAVBAR_GAP } from 'theme/constants';
 
+// The state indicator wraps the counter in an inline element, whose own box is only as tall as a line
+// of text, so the indicator would be drawn through the middle of the counter. Letting it wrap the
+// counter as a block puts it along the bottom, where it belongs.
 const ThroughputNavItem = styled(NavItem)`
-  > a {
-    @media (width <= 991px) {
-      height: auto;
-      display: block;
-    }
+  ${itemStateIndicatorContainerSelector} {
+    display: inline-block;
   }
 `;
 
@@ -37,21 +39,8 @@ const ContentWrap = styled.strong`
   grid-template-rows: 1fr 1fr;
   gap: 0;
   height: 30px;
-
-  @media (width <= 991px) {
-    height: auto;
-    display: block;
-
-    &::before {
-      content: attr(aria-label);
-      font-weight: normal;
-    }
-
-    span,
-    &::after {
-      display: none;
-    }
-  }
+  padding-left: ${NAVBAR_GAP}px;
+  padding-right: ${NAVBAR_GAP}px;
 `;
 
 const ThroughputData = styled.span<{ $dataIn?: boolean }>(

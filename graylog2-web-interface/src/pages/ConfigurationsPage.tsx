@@ -21,9 +21,10 @@ import URI from 'urijs';
 
 import type { CoreSystemConfiguration } from 'views/types';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
-import { Col, Nav, NavItem } from 'components/bootstrap';
+import { Col, NavItem } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon, LinkContainer } from 'components/common';
 import PluginsConfig from 'components/configurations/PluginsConfig';
+import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 import 'components/maps/configurations';
 import useLocation from 'routing/useLocation';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -51,12 +52,14 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
     URI(location.pathname).equals(absolutePath.pathname) || location.pathname.startsWith(absolutePath.pathname);
 
   return (
-    <LinkContainer key={`nav-${name}`} to={name}>
-      <NavItem title={name} active={isActive}>
-        {name}
-        {showCaret && (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
-      </NavItem>
-    </LinkContainer>
+    <SectionNavItem className={isActive ? 'active' : undefined}>
+      <LinkContainer key={`nav-${name}`} to={name}>
+        <NavItem title={name}>
+          {name}
+          {showCaret && (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
+        </NavItem>
+      </LinkContainer>
+    </SectionNavItem>
   );
 };
 
@@ -82,11 +85,11 @@ const ConfigurationsPage = () => {
 
       <ConfigletRow className="content">
         <Col md={2}>
-          <Nav bsStyle="pills" stacked>
+          <SectionNav>
             {configurationSections.map(({ name, showCaret }) => (
               <SectionLink key={`nav-${name}`} name={name} showCaret={showCaret} />
             ))}
-          </Nav>
+          </SectionNav>
         </Col>
 
         <Routes>

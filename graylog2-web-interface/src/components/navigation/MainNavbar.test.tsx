@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 import Immutable from 'immutable';
 import * as React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
@@ -26,6 +26,7 @@ import AppConfig from 'util/AppConfig';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
+import { itemStateIndicatorSelector } from 'components/common/NavItemStateIndicator';
 
 import MainNavbar from './MainNavbar';
 
@@ -210,6 +211,115 @@ describe('MainNavbar', () => {
         const itemWithPosition = await screen.findByRole('link', { name: /After specified item/i });
 
         expect(itemWithPosition.compareDocumentPosition(targetItem)).toBe(2);
+      });
+    });
+
+    it('keeps the expanded menu from shrinking, so that its measured width stays meaningful', async () => {
+      render(<SUT />);
+
+      await screen.findByRole('link', { name: /perpetuum mobile/i });
+
+      expect(screen.getByRole('list')).toHaveStyleRule('flex', '0 0 auto');
+    });
+
+    // Bootstrap's base stylesheet, which is still loaded, underlines anchors on hover. Its own nav
+    // rules used to suppress that, but they no longer apply to the navigation bar, so a hovered link
+    // would otherwise show a line right beneath its text.
+    it('does not underline a plain link on hover', async () => {
+      render(<SUT />);
+
+      expect(await screen.findByRole('link', { name: /perpetuum mobile/i })).toHaveStyleRule(
+        'text-decoration',
+        'none',
+        { modifier: ':hover' },
+      );
+    });
+
+    // `NavItem` renders the state indicator for every navigation item, but only the item itself can
+    // decide when to show it. A dropdown trigger does so; a plain link has to do the same, or it ends
+    // up with no hover or active state at all.
+    describe('state indicator of a plain link', () => {
+      const listItemFor = async (name: RegExp) => {
+        await screen.findByRole('link', { name });
+
+        return screen.getAllByRole('listitem').find((item) => within(item).queryByRole('link', { name }));
+      };
+
+      it('is shown while the link is hovered', async () => {
+        render(<SUT />);
+
+        expect(await listItemFor(/perpetuum mobile/i)).toHaveStyleRule('border-color', /.+/, {
+          modifier: `> a:hover ${itemStateIndicatorSelector}`,
+        });
+      });
+
+      it('is shown while the link is the active route', async () => {
+        render(<SUT />);
+
+        expect(await listItemFor(/perpetuum mobile/i)).toHaveStyleRule('border-color', /.+/, {
+          modifier: `> a.active ${itemStateIndicatorSelector}`,
+        });
+      });
+    });
+
+    describe('when collapsed', () => {
+      const openBurgerMenu = async () =>
+        userEvent.click(await screen.findByRole('button', { name: 'Toggle navigation' }));
+
+      it('replaces the navigation items with a burger toggle', async () => {
+        render(<SUT collapsed />);
+
+        await screen.findByRole('button', { name: 'Toggle navigation' });
+
+        expect(screen.queryByRole('link', { name: /perpetuum mobile/i })).not.toBeInTheDocument();
+      });
+
+      it('shows top-level items after opening the burger menu', async () => {
+        render(<SUT collapsed />);
+
+        await openBurgerMenu();
+
+        await screen.findByRole('menuitem', { name: /perpetuum mobile/i });
+      });
+
+      it('shows the children of a nested item after opening its submenu', async () => {
+        asMock(useCurrentUser).mockReturnValue(
+          adminUser
+            .toBuilder()
+            // @ts-expect-error
+            .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
+            .build(),
+        );
+
+        render(<SUT collapsed />);
+
+        await openBurgerMenu();
+
+        const submenu = await screen.findByRole('menuitem', { name: /neat stuff/i });
+
+        expect(screen.queryByRole('menuitem', { name: /something else/i })).not.toBeInTheDocument();
+
+        await userEvent.click(submenu);
+
+        await screen.findByRole('menuitem', { name: /something else/i });
+      });
+
+      it('omits items the user is not permitted to see', async () => {
+        asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
+
+        render(<SUT collapsed />);
+
+        await openBurgerMenu();
+
+        expect(screen.queryByRole('menuitem', { name: /archives/i })).not.toBeInTheDocument();
+      });
+
+      it('omits items which require a feature flag that is not enabled', async () => {
+        render(<SUT collapsed />);
+
+        await openBurgerMenu();
+
+        expect(screen.queryByRole('menuitem', { name: /feature flag test/i })).not.toBeInTheDocument();
       });
     });
   });

@@ -1,0 +1,12 @@
+type = "f"
+message = "Fix responsive/mobile-related issues with top-level navigation bar."
+
+details.user = """
+The navigation bar decides when to collapse from the room its own contents need, rather than from a
+fixed window width, so the brand, badges and icons stay visible at any size and only the navigation
+menu collapses. The burger menu offers the same items as the bar, with items which have children
+opening a submenu of their own.
+"""
+
+issues = ["16726", "26475"]
+pulls = ["27054"]

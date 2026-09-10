@@ -20,13 +20,10 @@ import styled from 'styled-components';
 import { NavItem } from 'components/bootstrap';
 import { itemStateIndicatorSelector } from 'components/common/NavItemStateIndicator';
 
+// What is left of this used to also keep the item from taking a background while hovered, through
+// Bootstrap's navbar classes. `NavItem` keeps its own background transparent while hovered, so only
+// hiding the state indicator remains.
 const StyledInactiveNav = styled(NavItem)`
-  .navbar-default .navbar-nav > & > a {
-    &:hover,
-    &:focus {
-      background: transparent;
-    }
-  }
   ${itemStateIndicatorSelector} {
     display: none;
   }
