@@ -1,0 +1,5 @@
+type = "f"
+message = "Kepp stopped inputs in the registry to show them on API calls that ask for the state of all inputs."
+
+issues = ["4484"]
+pulls = ["27347"]
