@@ -46,7 +46,7 @@ describe('StatCard', () => {
   it('does not render a native title on the help trigger', async () => {
     render(<StatCard value={42} label="Instances" helpText="Some explanation" />);
 
-    const helpTrigger = screen.getByRole('button');
+    const helpTrigger = screen.getByRole('button', { name: 'More info' });
     expect(helpTrigger).not.toHaveAttribute('title');
   });
 });

@@ -97,7 +97,7 @@ const StatCard = ({
   <Card $variant={variant} onClick={onClick} className={className}>
     {helpText && (
       <HelpCorner>
-        <HoverForHelp title={label} placement="right" pullRight={false}>
+        <HoverForHelp title="More info" placement="right" pullRight={false}>
           {helpText}
         </HoverForHelp>
       </HelpCorner>
