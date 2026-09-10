@@ -1,0 +1,5 @@
+type = "a"
+message = "Added system configuration option to enforce event definition permissions on top of source stream permissions when viewing alerts."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14355"]
+pulls = ["26476", "Graylog2/graylog-plugin-enterprise#14611"]

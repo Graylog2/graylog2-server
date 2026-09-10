@@ -63,13 +63,16 @@ class EventsSearchServiceFilterOptionsTest {
     @Mock
     private ObjectMapper objectMapper;
     @Mock
+    private EventDefinitionFilterFactory eventDefinitionFilterFactory;
+    @Mock
     private Subject subject;
 
     private EventsSearchService service;
 
     @BeforeEach
     void setUp() {
-        service = new EventsSearchService(moreSearch, streamService, eventDefinitionService, objectMapper);
+        service = new EventsSearchService(moreSearch, streamService, eventDefinitionService, objectMapper,
+                eventDefinitionFilterFactory);
     }
 
     @Test
@@ -93,7 +96,7 @@ class EventsSearchServiceFilterOptionsTest {
         final ArgumentCaptor<Set<String>> eventStreams = ArgumentCaptor.forClass(Set.class);
         final ArgumentCaptor<SourceStreamFilter> sourceStreams = ArgumentCaptor.forClass(SourceStreamFilter.class);
         verify(moreSearch).aggregateSlicesForColumn(anyString(), any(), eventStreams.capture(), anyString(),
-                sourceStreams.capture(), eq(EventDto.FIELD_TAGS), any(), anyMap(), eq(50));
+                sourceStreams.capture(), any(), eq(EventDto.FIELD_TAGS), any(), anyMap(), eq(50));
 
         assertThat(eventStreams.getValue()).containsExactly(DEFAULT_EVENTS_STREAM_ID);
         assertThat(sourceStreams.getValue().isAllAllowed()).isFalse();
@@ -108,7 +111,7 @@ class EventsSearchServiceFilterOptionsTest {
         service.filterOptions(request(List.of(EventDto.FIELD_TAGS), "source_streams:" + SOURCE_STREAM), subject);
 
         verify(moreSearch).aggregateSlicesForColumn(eq("source_streams:" + SOURCE_STREAM), any(), anySet(),
-                anyString(), any(), eq(EventDto.FIELD_TAGS), isNull(), anyMap(), anyInt());
+                anyString(), any(), any(), eq(EventDto.FIELD_TAGS), isNull(), anyMap(), anyInt());
     }
 
     @Test
@@ -118,7 +121,7 @@ class EventsSearchServiceFilterOptionsTest {
 
         service.filterOptions(request(List.of(EventDto.FIELD_TAGS), "", "Access"), subject);
 
-        verify(moreSearch).aggregateSlicesForColumn(anyString(), any(), anySet(), anyString(), any(),
+        verify(moreSearch).aggregateSlicesForColumn(anyString(), any(), anySet(), anyString(), any(), any(),
                 eq(EventDto.FIELD_TAGS), eq(".*access.*"), anyMap(), anyInt());
     }
 
@@ -130,7 +133,7 @@ class EventsSearchServiceFilterOptionsTest {
         service.filterOptions(request(List.of(EventDto.FIELD_TAGS), "", "a🦊b"), subject);
 
         // The surrogate pair must stay together behind a single escape, not become two escaped halves.
-        verify(moreSearch).aggregateSlicesForColumn(anyString(), any(), anySet(), anyString(), any(),
+        verify(moreSearch).aggregateSlicesForColumn(anyString(), any(), anySet(), anyString(), any(), any(),
                 eq(EventDto.FIELD_TAGS), eq(".*a\\🦊b.*"), anyMap(), anyInt());
     }
 
@@ -159,7 +162,7 @@ class EventsSearchServiceFilterOptionsTest {
 
         service.filterOptions(request(List.of(EventDto.FIELD_TAGS), "", "T1003.001"), subject);
 
-        verify(moreSearch).aggregateSlicesForColumn(anyString(), any(), anySet(), anyString(), any(),
+        verify(moreSearch).aggregateSlicesForColumn(anyString(), any(), anySet(), anyString(), any(), any(),
                 eq(EventDto.FIELD_TAGS), eq(".*t1003\\.001.*"), anyMap(), anyInt());
     }
 
@@ -191,8 +194,8 @@ class EventsSearchServiceFilterOptionsTest {
     }
 
     private void mockAggregation(List<Slice> slices) {
-        when(moreSearch.aggregateSlicesForColumn(anyString(), any(), anySet(), anyString(), any(), anyString(),
-                any(), anyMap(), anyInt())).thenReturn(slices);
+        when(moreSearch.aggregateSlicesForColumn(anyString(), any(), anySet(), anyString(), any(), any(),
+                anyString(), any(), anyMap(), anyInt())).thenReturn(slices);
     }
 
     private static EventsFilterOptionsRequest request(List<String> fields, String query) {

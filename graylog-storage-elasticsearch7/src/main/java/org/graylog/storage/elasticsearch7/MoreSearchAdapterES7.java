@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.events.search.EventDefinitionFilter;
 import org.graylog.events.search.MitreBackwardsCompatibilityFilter;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
@@ -117,8 +118,9 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     @Override
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
-                                         String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+                                         String filterString, SourceStreamFilter sourceStreamFilter,
+                                         EventDefinitionFilter eventDefinitionFilter, Map<String, Set<String>> extraFilters) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, eventDefinitionFilter, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -158,9 +160,10 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
     @Override
     public MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
-                                               Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter, ZoneId timeZone,
+                                               Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                               EventDefinitionFilter eventDefinitionFilter, ZoneId timeZone,
                                                Map<String, Set<String>> extraFilters) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, eventDefinitionFilter, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -220,7 +223,8 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     }
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString,
-                                     SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
+                                     SourceStreamFilter sourceStreamFilter, EventDefinitionFilter eventDefinitionFilter,
+                                     Map<String, Set<String>> extraFilters) {
         final QueryBuilder query = QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
                 ? matchAllQuery()
                 : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
@@ -264,6 +268,10 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             filter.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
         }
 
+        if (!eventDefinitionFilter.isAllAllowed()) {
+            filter.filter(termsQuery(EventDto.FIELD_EVENT_DEFINITION_ID, eventDefinitionFilter.eventDefinitionIds()));
+        }
+
         return filter;
     }
 
@@ -304,8 +312,9 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
     public List<Slice> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                        Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                       EventDefinitionFilter eventDefinitionFilter,
                                        Map<String, Set<String>> extraFilters, Map<String, Object> meta, AggregationBuilder aggregationBuilder) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, eventDefinitionFilter, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -331,6 +340,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     @Override
     public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                 Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                                EventDefinitionFilter eventDefinitionFilter,
                                                 Map<String, Set<String>> extraFilters, String slicingColumn, @Nullable String bucketPattern,
                                                 Map<String, Object> meta, int maxBuckets) {
         final var builder = AggregationBuilders.terms(slicesAggregationName)
@@ -340,12 +350,13 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             builder.includeExclude(new IncludeExclude(bucketPattern, null));
         }
 
-        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, sourceStreamFilter, extraFilters, meta, builder);
+        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, sourceStreamFilter, eventDefinitionFilter, extraFilters, meta, builder);
     }
 
     @Override
     public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                     Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                                    EventDefinitionFilter eventDefinitionFilter,
                                                     Map<String, Set<String>> extraFilters, String slicingColumn, Map<String, Object> meta, List<NumberRange> ranges) {
         final RangeAggregationBuilder builder = AggregationBuilders.range(slicesAggregationName).field(slicingColumn);
         ranges.forEach(r -> {
@@ -359,7 +370,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 builder.addUnboundedFrom(from);
             }
         });
-        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, sourceStreamFilter, extraFilters, meta, builder);
+        return aggregateSlices(queryString, timerange, affectedIndices, eventStreams, filterString, sourceStreamFilter, eventDefinitionFilter, extraFilters, meta, builder);
     }
 
     @Override

@@ -1,0 +1,142 @@
+{
+  "event_definitions": [
+    {
+      "_id": {
+        "$oid": "6a0000000000000000000a01"
+      },
+      "_scope": "DEFAULT",
+      "title": "visibility-A",
+      "description": "event definition A for visibility enforcement tests",
+      "updated_at": "2025-01-15T00:00:00.000Z",
+      "priority": 2,
+      "alert": true,
+      "config": {
+        "type": "aggregation-v1",
+        "query": "source:does-not-match",
+        "query_parameters": [],
+        "filters": [],
+        "streams": [],
+        "stream_categories": [],
+        "group_by": [],
+        "series": [],
+        "conditions": {
+          "expression": null
+        },
+        "search_within_ms": 60000,
+        "execute_every_ms": 300000,
+        "use_cron_scheduling": false,
+        "event_limit": 100
+      },
+      "field_spec": {},
+      "key_spec": [],
+      "notification_settings": {
+        "grace_period_ms": 0,
+        "backlog_size": 0
+      },
+      "notifications": [],
+      "storage": [
+        {
+          "type": "persist-to-streams-v1",
+          "streams": [
+            "000000000000000000000002"
+          ]
+        }
+      ],
+      "tags": [],
+      "state": "DISABLED",
+      "tactics_techniques": []
+    },
+    {
+      "_id": {
+        "$oid": "6a0000000000000000000b01"
+      },
+      "_scope": "DEFAULT",
+      "title": "visibility-B",
+      "description": "event definition B for visibility enforcement tests",
+      "updated_at": "2025-01-15T00:00:00.000Z",
+      "priority": 2,
+      "alert": true,
+      "config": {
+        "type": "aggregation-v1",
+        "query": "source:does-not-match",
+        "query_parameters": [],
+        "filters": [],
+        "streams": [],
+        "stream_categories": [],
+        "group_by": [],
+        "series": [],
+        "conditions": {
+          "expression": null
+        },
+        "search_within_ms": 60000,
+        "execute_every_ms": 300000,
+        "use_cron_scheduling": false,
+        "event_limit": 100
+      },
+      "field_spec": {},
+      "key_spec": [],
+      "notification_settings": {
+        "grace_period_ms": 0,
+        "backlog_size": 0
+      },
+      "notifications": [],
+      "storage": [
+        {
+          "type": "persist-to-streams-v1",
+          "streams": [
+            "000000000000000000000002"
+          ]
+        }
+      ],
+      "tags": [],
+      "state": "DISABLED",
+      "tactics_techniques": []
+    },
+    {
+      "_id": {
+        "$oid": "6a0000000000000000000c01"
+      },
+      "_scope": "DEFAULT",
+      "title": "visibility-C",
+      "description": "event definition C for visibility enforcement tests",
+      "updated_at": "2025-01-15T00:00:00.000Z",
+      "priority": 2,
+      "alert": true,
+      "config": {
+        "type": "aggregation-v1",
+        "query": "source:does-not-match",
+        "query_parameters": [],
+        "filters": [],
+        "streams": [],
+        "stream_categories": [],
+        "group_by": [],
+        "series": [],
+        "conditions": {
+          "expression": null
+        },
+        "search_within_ms": 60000,
+        "execute_every_ms": 300000,
+        "use_cron_scheduling": false,
+        "event_limit": 100
+      },
+      "field_spec": {},
+      "key_spec": [],
+      "notification_settings": {
+        "grace_period_ms": 0,
+        "backlog_size": 0
+      },
+      "notifications": [],
+      "storage": [
+        {
+          "type": "persist-to-streams-v1",
+          "streams": [
+            "000000000000000000000002"
+          ]
+        }
+      ],
+      "tags": [],
+      "state": "DISABLED",
+      "tactics_techniques": []
+    }
+  ]
+}

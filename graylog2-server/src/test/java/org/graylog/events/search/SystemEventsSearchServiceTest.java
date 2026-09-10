@@ -85,7 +85,7 @@ class SystemEventsSearchServiceTest {
                 .executedQuery("message:*")
                 .build();
 
-        when(moreSearch.eventSearch(eq(parameters), any(), eq(DEFAULT_STREAMS), eq(allAllowed()))).thenReturn(searchResult);
+        when(moreSearch.eventSearch(eq(parameters), any(), eq(DEFAULT_STREAMS), eq(allAllowed()), eq(EventDefinitionFilter.allAllowed()))).thenReturn(searchResult);
         mockObjectMapper();
         mockStreamLookups(Map.of(
                 "stream-allowed", stream("stream-allowed", "Allowed stream"),
@@ -99,7 +99,7 @@ class SystemEventsSearchServiceTest {
         assertThat(result.context().streams()).containsOnlyKeys("stream-allowed", "stream-denied");
         assertThat(result.context().eventDefinitions()).containsOnlyKeys("event-def-allowed", "event-def-denied");
 
-        verify(moreSearch).eventSearch(eq(parameters), any(), eq(DEFAULT_STREAMS), eq(allAllowed()));
+        verify(moreSearch).eventSearch(eq(parameters), any(), eq(DEFAULT_STREAMS), eq(allAllowed()), eq(EventDefinitionFilter.allAllowed()));
     }
 
     @Test
@@ -112,14 +112,14 @@ class SystemEventsSearchServiceTest {
                 .usedIndexNames(Set.of("index"))
                 .executedQuery("query")
                 .build();
-        when(moreSearch.eventSearch(eq(parameters), any(), eq(DEFAULT_STREAMS), eq(allAllowed()))).thenReturn(searchResult);
+        when(moreSearch.eventSearch(eq(parameters), any(), eq(DEFAULT_STREAMS), eq(allAllowed()), eq(EventDefinitionFilter.allAllowed()))).thenReturn(searchResult);
         mockObjectMapper();
         mockStreamLookups(Map.of("stream", stream("stream", "Title")));
         mockEventDefinitionLookups(Map.of("event-def", eventDefinition("event-def")));
 
         service.search(parameters, null);
 
-        verify(moreSearch).eventSearch(eq(parameters), any(), eq(DEFAULT_STREAMS), eq(allAllowed()));
+        verify(moreSearch).eventSearch(eq(parameters), any(), eq(DEFAULT_STREAMS), eq(allAllowed()), eq(EventDefinitionFilter.allAllowed()));
     }
 
     @Test
@@ -141,14 +141,14 @@ class SystemEventsSearchServiceTest {
                 .usedIndexNames(Set.of("index"))
                 .executedQuery("query")
                 .build();
-        when(moreSearch.eventSearch(eq(parameters), any(), eq(subset), eq(allAllowed()))).thenReturn(searchResult);
+        when(moreSearch.eventSearch(eq(parameters), any(), eq(subset), eq(allAllowed()), eq(EventDefinitionFilter.allAllowed()))).thenReturn(searchResult);
         mockObjectMapper();
         mockStreamLookups(Map.of("stream", stream("stream", "title")));
         mockEventDefinitionLookups(Map.of("event-def", eventDefinition("event-def")));
 
         service.search(parameters, subset);
 
-        verify(moreSearch).eventSearch(eq(parameters), any(), eq(subset), eq(allAllowed()));
+        verify(moreSearch).eventSearch(eq(parameters), any(), eq(subset), eq(allAllowed()), eq(EventDefinitionFilter.allAllowed()));
     }
 
     private void mockObjectMapper() {
