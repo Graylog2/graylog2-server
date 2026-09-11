@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.RateLimiter;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -122,12 +123,29 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private boolean subjectAlternativeNamesChanged() {
         final Set<String> currentSubjectAlternativeNames = datanodeKeystore.getSubjectAlternativeNames();
-        final boolean changed = !currentSubjectAlternativeNames.contains(hostname)
-                || !currentSubjectAlternativeNames.contains(opensearchNetworkPublishHost);
+        final boolean changed = !containsName(currentSubjectAlternativeNames, hostname)
+                || !containsName(currentSubjectAlternativeNames, opensearchNetworkPublishHost);
         if (changed) {
             LOG.info("Datanode hostname or OpenSearch publish host changed, certificate will be renewed now");
         }
         return changed;
+    }
+
+    /**
+     * A plain {@link Set#contains(Object)} on an IP literal is unreliable: the certificate's decoded SAN text
+     * and the configured literal can both be valid textual representations of the same address (most notably
+     * for IPv6, e.g. "2001:db8::1" vs. the expanded "2001:db8:0:0:0:0:0:1") without being equal strings.
+     * IP literals are therefore compared by their canonical address form, hostnames by literal text.
+     */
+    private boolean containsName(Set<String> subjectAlternativeNames, String name) {
+        if (InetAddresses.isInetAddress(name)) {
+            final String canonicalName = InetAddresses.forString(name).getHostAddress();
+            return subjectAlternativeNames.stream()
+                    .filter(InetAddresses::isInetAddress)
+                    .map(san -> InetAddresses.forString(san).getHostAddress())
+                    .anyMatch(canonicalName::equals);
+        }
+        return subjectAlternativeNames.contains(name);
     }
 
     private boolean expiresSoon(Date expiration, RenewalPolicy renewalPolicy) {
