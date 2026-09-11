@@ -60,6 +60,7 @@ class DataNodeCertRenewalPeriodicalTest {
                 autoRenewalPolicy("PT1M"),
                 csrRequester,
                 () -> false,
+                 "my-hostname",
                  "my-hostname"
         );
         periodical.doRun();
@@ -76,6 +77,7 @@ class DataNodeCertRenewalPeriodicalTest {
                 autoRenewalPolicy("PT1M"),
                 csrRequester,
                 () -> false,
+                "my-hostname",
                 "my-hostname");
         periodical.doRun();
         Mockito.verify(csrRequester, Mockito.times(1)).triggerCertificateSigningRequest();
@@ -90,10 +92,52 @@ class DataNodeCertRenewalPeriodicalTest {
                 autoRenewalPolicy("PT1M"),
                 csrRequester,
                 () -> false,
+                "my-new-unexpected-hostname",
                 "my-new-unexpected-hostname");
 
         periodical.doRun();
         Mockito.verify(csrRequester, Mockito.times(1)).triggerCertificateSigningRequest();
+    }
+
+    @Test
+    void testPublishHostChanged() throws Exception {
+        final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofDays(30));
+        final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
+        // hostname is unchanged and still matches an existing SAN, but the publish host was newly
+        // set/changed to something not covered by the currently signed certificate.
+        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(
+                datanodeKeystore,
+                autoRenewalPolicy("PT1M"),
+                csrRequester,
+                () -> false,
+                "my-hostname",
+                "10.100.100.93");
+
+        periodical.doRun();
+        Mockito.verify(csrRequester, Mockito.times(1)).triggerCertificateSigningRequest();
+    }
+
+    @Test
+    void testPublishHostIPv6NotChanged() throws Exception {
+        // configured using the compressed literal, as an operator would write it
+        final String configuredPublishHost = "2001:db8::1";
+        final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofDays(30), List.of(configuredPublishHost));
+        final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
+
+        // the certificate's SAN is decoded by the JVM into its expanded form, e.g. "2001:db8:0:0:0:0:0:1",
+        // which must still be recognised as the same address as the configured compressed literal above.
+        Assertions.assertThat(datanodeKeystore.getSubjectAlternativeNames()).doesNotContain(configuredPublishHost);
+
+        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(
+                datanodeKeystore,
+                autoRenewalPolicy("PT1M"),
+                csrRequester,
+                () -> false,
+                "my-hostname",
+                configuredPublishHost);
+
+        periodical.doRun();
+        Mockito.verify(csrRequester, Mockito.never()).triggerCertificateSigningRequest();
     }
 
 
@@ -101,7 +145,7 @@ class DataNodeCertRenewalPeriodicalTest {
     void testExpiringInFarFuture() throws Exception {
         final DatanodeKeystore datanodeKeystore = datanodeKeystore(Duration.ofDays(30));
         final CsrRequester csrRequester = Mockito.mock(CsrRequester.class);
-        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolicy("P3M"), csrRequester, () -> false, "my-hostname");
+        final DataNodeCertRenewalPeriodical periodical = new DataNodeCertRenewalPeriodical(datanodeKeystore, autoRenewalPolicy("P3M"), csrRequester, () -> false, "my-hostname", "my-hostname");
         periodical.doRun();
         Mockito.verify(csrRequester, Mockito.never()).triggerCertificateSigningRequest();
     }
@@ -113,10 +157,14 @@ class DataNodeCertRenewalPeriodicalTest {
 
 
     private DatanodeKeystore datanodeKeystore(Duration certValidity) throws Exception {
+        return datanodeKeystore(certValidity, List.of("second-hostname"));
+    }
+
+    private DatanodeKeystore datanodeKeystore(Duration certValidity, List<String> altNames) throws Exception {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", new EventBus());
         datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(certValidity));
 
-        final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", List.of("second-hostname"));
+        final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", altNames);
         Assertions.assertThat(csr.getSubject().toString()).isEqualTo("CN=my-hostname");
 
         final CsrSigner signer = new CsrSigner();

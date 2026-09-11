@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.RateLimiter;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -35,6 +36,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -54,6 +56,7 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private final RateLimiter rateLimiter;
     private final String hostname;
+    private final String opensearchNetworkPublishHost;
 
     @Inject
     public DataNodeCertRenewalPeriodical(
@@ -68,17 +71,19 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
                 () -> clusterConfigService.get(RenewalPolicy.class),
                 csrRequester,
                 () -> isInPreflight(preflightConfigService),
-                configuration.getHostname()
+                configuration.getHostname(),
+                configuration.getOpensearchNetworkPublishHost()
         );
     }
 
-    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode, String hostname) {
+    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode, String hostname, String opensearchNetworkPublishHost) {
         this.datanodeKeystore = datanodeKeystore;
         this.renewalPolicySupplier = renewalPolicySupplier;
         this.csrRequester = csrRequester;
         this.isServerInPreflightMode = isServerInPreflightMode;
         this.rateLimiter = RateLimiter.create(1.0 / CSR_TRIGGER_PERIOD.toSeconds());
         this.hostname = hostname;
+        this.opensearchNetworkPublishHost = opensearchNetworkPublishHost;
     }
 
     @Override
@@ -113,15 +118,34 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private boolean needsNewCertificate(RenewalPolicy renewalPolicy) {
         final Date expiration = datanodeKeystore.getCertificateExpiration();
-        return expiration == null || expiresSoon(expiration, renewalPolicy) || hostnameChanged();
+        return expiration == null || expiresSoon(expiration, renewalPolicy) || subjectAlternativeNamesChanged();
     }
 
-    private boolean hostnameChanged() {
-        final boolean hostnameChanged = !datanodeKeystore.getSubjectAlternativeNames().contains(hostname);
-        if(hostnameChanged) {
-            LOG.info("Datanode hostname changed, certificate will be renewed now");
+    private boolean subjectAlternativeNamesChanged() {
+        final Set<String> currentSubjectAlternativeNames = datanodeKeystore.getSubjectAlternativeNames();
+        final boolean changed = !containsName(currentSubjectAlternativeNames, hostname)
+                || !containsName(currentSubjectAlternativeNames, opensearchNetworkPublishHost);
+        if (changed) {
+            LOG.info("Datanode hostname or OpenSearch publish host changed, certificate will be renewed now");
         }
-        return hostnameChanged;
+        return changed;
+    }
+
+    /**
+     * A plain {@link Set#contains(Object)} on an IP literal is unreliable: the certificate's decoded SAN text
+     * and the configured literal can both be valid textual representations of the same address (most notably
+     * for IPv6, e.g. "2001:db8::1" vs. the expanded "2001:db8:0:0:0:0:0:1") without being equal strings.
+     * IP literals are therefore compared by their canonical address form, hostnames by literal text.
+     */
+    private boolean containsName(Set<String> subjectAlternativeNames, String name) {
+        if (InetAddresses.isInetAddress(name)) {
+            final String canonicalName = InetAddresses.forString(name).getHostAddress();
+            return subjectAlternativeNames.stream()
+                    .filter(InetAddresses::isInetAddress)
+                    .map(san -> InetAddresses.forString(san).getHostAddress())
+                    .anyMatch(canonicalName::equals);
+        }
+        return subjectAlternativeNames.contains(name);
     }
 
     private boolean expiresSoon(Date expiration, RenewalPolicy renewalPolicy) {

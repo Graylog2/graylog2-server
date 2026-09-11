@@ -58,7 +58,7 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         final String bindHost = localConfiguration.getBindAddress();
         properties.put("network.bind_host", bindHost);
 
-        final String publishHost = localConfiguration.getHostname();
+        final String publishHost = localConfiguration.getOpensearchNetworkPublishHost();
         properties.put("network.publish_host", publishHost);
 
         if (localConfiguration.getClustername() != null && !localConfiguration.getClustername().isBlank()) {
