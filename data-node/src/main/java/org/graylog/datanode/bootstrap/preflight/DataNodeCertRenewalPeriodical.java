@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -54,6 +55,7 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private final RateLimiter rateLimiter;
     private final String hostname;
+    private final String opensearchNetworkPublishHost;
 
     @Inject
     public DataNodeCertRenewalPeriodical(
@@ -68,17 +70,19 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
                 () -> clusterConfigService.get(RenewalPolicy.class),
                 csrRequester,
                 () -> isInPreflight(preflightConfigService),
-                configuration.getHostname()
+                configuration.getHostname(),
+                configuration.getOpensearchNetworkPublishHost()
         );
     }
 
-    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode, String hostname) {
+    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode, String hostname, String opensearchNetworkPublishHost) {
         this.datanodeKeystore = datanodeKeystore;
         this.renewalPolicySupplier = renewalPolicySupplier;
         this.csrRequester = csrRequester;
         this.isServerInPreflightMode = isServerInPreflightMode;
         this.rateLimiter = RateLimiter.create(1.0 / CSR_TRIGGER_PERIOD.toSeconds());
         this.hostname = hostname;
+        this.opensearchNetworkPublishHost = opensearchNetworkPublishHost;
     }
 
     @Override
@@ -113,15 +117,17 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private boolean needsNewCertificate(RenewalPolicy renewalPolicy) {
         final Date expiration = datanodeKeystore.getCertificateExpiration();
-        return expiration == null || expiresSoon(expiration, renewalPolicy) || hostnameChanged();
+        return expiration == null || expiresSoon(expiration, renewalPolicy) || subjectAlternativeNamesChanged();
     }
 
-    private boolean hostnameChanged() {
-        final boolean hostnameChanged = !datanodeKeystore.getSubjectAlternativeNames().contains(hostname);
-        if(hostnameChanged) {
-            LOG.info("Datanode hostname changed, certificate will be renewed now");
+    private boolean subjectAlternativeNamesChanged() {
+        final Set<String> currentSubjectAlternativeNames = datanodeKeystore.getSubjectAlternativeNames();
+        final boolean changed = !currentSubjectAlternativeNames.contains(hostname)
+                || !currentSubjectAlternativeNames.contains(opensearchNetworkPublishHost);
+        if (changed) {
+            LOG.info("Datanode hostname or OpenSearch publish host changed, certificate will be renewed now");
         }
-        return hostnameChanged;
+        return changed;
     }
 
     private boolean expiresSoon(Date expiration, RenewalPolicy renewalPolicy) {
