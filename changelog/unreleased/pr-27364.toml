@@ -1,0 +1,5 @@
+type = "f"
+message = "Use OR when adding multiple values from an array field to the query."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14322"]
+pulls = ["27364"]
