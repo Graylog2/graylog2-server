@@ -300,9 +300,8 @@ type State = {
 };
 
 /**
- * The option filtering `Select` itself applies to the typed text. Exported so a caller can ask
- * the same question rather than approximating it: matchSorter also matches subsequences and
- * acronyms, which a substring test would disagree with.
+ * The option filtering `Select` applies to typed text. Exported so a caller can ask the same
+ * question: matchSorter also matches subsequences and acronyms, unlike a substring test.
  */
 export const matchOptions = (
   options: ReadonlyArray<Option>,
@@ -539,7 +538,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       ignoreAccents,
     } = this.props;
     const { customComponents, value, inputValue: uncontrolledInputValue } = this.state;
-    // A caller that passes `inputValue` owns the typed text; otherwise we track it ourselves.
+    // A caller passing `inputValue` owns the typed text.
     const inputValue = this.props.inputValue ?? uncontrolledInputValue;
 
     const formattedValue = this._formatInputValue(value);

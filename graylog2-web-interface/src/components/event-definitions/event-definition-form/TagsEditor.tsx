@@ -83,8 +83,7 @@ const validateTag = (tag: string): string | null => {
 };
 
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
-  // Mirrors the typed text purely to drive suggestions, so the options are built before the hook
-  // call that needs them.
+  // Mirrors the typed text so suggestions are built before the hook call that needs them.
   const [query, setQuery] = useState('');
   const [debouncedQuery] = useDebouncedValue(query, DEBOUNCE_MS);
 
@@ -96,7 +95,7 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
     enabled: !disabled,
   });
   const isAtMax = tags.length >= MAX_TAGS;
-  // At the cap a pick would be dropped by the hook's slice, so disable rather than swallow it.
+  // At the cap a pick would be sliced off, so disable rather than swallow it.
   const suggestions = (data?.tags ?? [])
     .filter((s: string) => !tags.includes(s))
     .map((value: string) => ({ value, label: value, disabled: isAtMax }));
@@ -108,7 +107,7 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
     validate: validateTag,
     max: MAX_TAGS,
     onInputChanged: setQuery,
-    // Each tag falls into at most one bucket so messages stay focused per failure mode.
+    // At most one bucket per tag, so a message names one failure mode.
     describeInvalid: (invalid) =>
       [
         buildTooLongMessage(invalid.filter(isTooLong)),
@@ -117,7 +116,7 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
         .filter(Boolean)
         .join(' ') || null,
     describeDuplicate: (tag) => `Tag "${tag}" has already been added.`,
-    // An existing tag is already offered as a suggestion, so a Create row would duplicate it.
+    // Already offered as a suggestion, so a Create row would duplicate it.
     suppressCreate: (_raw, candidate) => suggestions.some((option) => option.value === candidate),
   });
 
@@ -137,8 +136,7 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
       <Select
         {...selectProps}
         {...reactSelectProps}
-        // Not in `Select`'s Props type, so cast to satisfy tsc. react-select rejects a duplicate
-        // with no chip and no callback, so Enter / Tab has to flag it explicitly.
+        // Not in `Select`'s Props type, so cast to satisfy tsc.
         {...({
           onKeyDown: (e: React.KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
