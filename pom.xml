@@ -190,7 +190,7 @@
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.17.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.81.Final</netty-tcnative-boringssl-static.version>
+        <netty-tcnative-boringssl-static.version>2.0.83.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.5.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.65.0</opentelemetry.version>
