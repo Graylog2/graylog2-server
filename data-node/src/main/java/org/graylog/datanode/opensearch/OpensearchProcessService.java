@@ -35,6 +35,7 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final PreflightConfigService preflightConfigService;
     private final Configuration configuration;
     private final DatanodeKeystore datanodeKeystore;
+    private final ClusterEventBus clusterEventBus;
 
     private final OpensearchStateMachine stateMachine;
     private final CsrRequester csrRequester;
@@ -63,7 +65,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             final NodeId nodeId,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, DatanodeKeystore datanodeKeystore, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
+            final OpensearchProcess process, DatanodeKeystore datanodeKeystore, CsrRequester csrRequester, OpensearchStateMachine stateMachine,
+            ClusterEventBus clusterEventBus) {
         this.configuration = configuration;
         this.nodeId = nodeId;
         this.lockfileCheck = lockfileCheck;
@@ -72,6 +75,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.datanodeKeystore = datanodeKeystore;
         this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
+        this.clusterEventBus = clusterEventBus;
         eventBus.register(this);
     }
 
@@ -106,6 +110,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Subscribe
     public void handleCertificateChangeEvent(DatanodeCertificateRenewedEvent event) {
+        new CertificateReloadVerifier(datanodeKeystore, clusterEventBus, nodeId).start(process::getOpensearchBaseUrl);
         stateMachine.fire(OpensearchEvent.CERTIFICATES_RELOAD);
     }
 
