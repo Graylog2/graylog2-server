@@ -24,7 +24,7 @@ import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import useElementDimensions from 'hooks/useElementDimensions';
-import { displayHistoryCompletions } from 'views/components/searchbar/QueryHistoryButton';
+import { displayHistoryCompletions, fetchRawQueryHistory } from 'views/components/searchbar/QueryHistoryButton';
 import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';
 import useHotkey from 'hooks/useHotkey';
 
@@ -209,6 +209,18 @@ const useShowHotkeysInOverview = () => {
     actionKey: 'show-history',
     options,
   });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'navigate-history-up',
+    options,
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'navigate-history-down',
+    options,
+  });
 };
 
 type Props = BaseProps & {
@@ -250,13 +262,37 @@ const QueryInput = (
   const inputElement = innerRef.current?.container;
   const { width: inputWidth } = useElementDimensions(inputElement);
   const isInitialTokenizerUpdate = useRef(true);
+  const historyEntriesRef = useRef<Array<string>>([]);
+  const historyIndexRef = useRef<number>(-1);
+  const savedQueryRef = useRef<string>('');
+  const navigatingRef = useRef<boolean>(false);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
-  const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
+  const onLoadEditor = useCallback(
+    (editor: Editor) => {
+      _onLoadEditor(editor, isInitialTokenizerUpdate);
+      fetchRawQueryHistory().then((entries) => { historyEntriesRef.current = entries; });
+      editor.on('change', () => {
+        if (!navigatingRef.current) {
+          historyIndexRef.current = -1;
+        }
+      });
+    },
+    // Refs are stable — empty deps array is intentional.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
   const onExecute = useCallback(
     (editor: Editor) =>
       handleExecution({
         editor,
-        onExecute: onExecuteProp,
+        onExecute: (query: string) => {
+          if (query) {
+            historyEntriesRef.current = [query, ...historyEntriesRef.current.filter((q) => q !== query)];
+          }
+
+          historyIndexRef.current = -1;
+          onExecuteProp(query);
+        },
         value,
         error,
         disableExecution,
@@ -292,6 +328,68 @@ const QueryInput = (
         bindKey: { win: 'Alt-Shift-H', mac: 'Alt-Shift-H' },
         exec: async (editor: Editor) => {
           displayHistoryCompletions(editor);
+        },
+      },
+      {
+        name: 'Navigate history up',
+        bindKey: { win: 'Up', mac: 'Up' },
+        exec: (editor: Editor) => {
+          if (editor.session.getLength() > 1) {
+            editor.navigateUp(1);
+
+            return;
+          }
+
+          if (historyEntriesRef.current.length === 0) return;
+
+          if (historyIndexRef.current === -1) {
+            savedQueryRef.current = editor.getValue();
+          }
+
+          // When first entering history mode, skip index 0 if it matches the current query
+          // so the first Up press always produces a visible change.
+          const startIndex =
+            historyIndexRef.current === -1 && historyEntriesRef.current[0] === savedQueryRef.current ? 1 : 0;
+          const nextIndex =
+            historyIndexRef.current === -1
+              ? startIndex
+              : Math.min(historyIndexRef.current + 1, historyEntriesRef.current.length - 1);
+
+          if (nextIndex >= historyEntriesRef.current.length || nextIndex === historyIndexRef.current) return;
+
+          historyIndexRef.current = nextIndex;
+          navigatingRef.current = true;
+          editor.setValue(historyEntriesRef.current[historyIndexRef.current], 1);
+          navigatingRef.current = false;
+        },
+      },
+      {
+        name: 'Navigate history down',
+        bindKey: { win: 'Down', mac: 'Down' },
+        exec: (editor: Editor) => {
+          if (historyIndexRef.current === -1 || editor.session.getLength() > 1) {
+            editor.navigateDown(1);
+
+            return;
+          }
+
+          const prevIndex = historyIndexRef.current - 1;
+          // Symmetric with the Up skip: if landing on index 0 which was skipped going up, skip it
+          // on the way back too so Down restores the original query in one step.
+          const skipIndex0 = prevIndex === 0 && historyEntriesRef.current[0] === savedQueryRef.current;
+          const newIndex = skipIndex0 ? -1 : prevIndex;
+
+          historyIndexRef.current = newIndex;
+          navigatingRef.current = true;
+
+          if (newIndex < 0) {
+            historyIndexRef.current = -1;
+            editor.setValue(savedQueryRef.current, 1);
+          } else {
+            editor.setValue(historyEntriesRef.current[newIndex], 1);
+          }
+
+          navigatingRef.current = false;
         },
       },
       // The following will disable the mentioned hotkeys.

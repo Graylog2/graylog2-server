@@ -22,11 +22,18 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import { validationError } from 'fixtures/queryValidationState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import asMock from 'helpers/mocking/AsMock';
+import { fetchRawQueryHistory } from 'views/components/searchbar/QueryHistoryButton';
 
 import ViewsQueryInput from './ViewsQueryInput';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useHotkey', () => jest.fn());
+jest.mock('views/components/searchbar/QueryHistoryButton', () => ({
+  ...jest.requireActual('views/components/searchbar/QueryHistoryButton'),
+  fetchRawQueryHistory: jest.fn(),
+  displayHistoryCompletions: jest.fn(),
+}));
 
 jest.mock('views/actions/QueryValidationActions', () => ({
   displayValidationErrors: jest.fn(),
@@ -60,6 +67,10 @@ describe('QueryInput', () => {
   );
 
   useViewsPlugin();
+
+  beforeEach(() => {
+    asMock(fetchRawQueryHistory).mockResolvedValue([]);
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -171,6 +182,136 @@ describe('QueryInput', () => {
       await waitFor(() => {
         expect(exec).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('history navigation', () => {
+    beforeEach(() => {
+      asMock(fetchRawQueryHistory).mockResolvedValue(['query-1', 'query-2', 'query-3']);
+    });
+
+    it('shows the most recent history entry on first ArrowUp when the current value differs', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } });
+      });
+    });
+
+    it('skips history[0] on first ArrowUp when it matches the current value', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      // Current value matches the top history entry.
+      render(<SimpleQueryInput value="query-1" onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-2', name: 'search-query' } });
+      });
+    });
+
+    it('advances to the next older entry on a second ArrowUp', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } }));
+
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-2', name: 'search-query' } });
+      });
+    });
+
+    it('moves back toward present on ArrowDown after ArrowUp', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } }));
+
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-2', name: 'search-query' } }));
+
+      await userEvent.keyboard('{ArrowDown}');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } });
+      });
+    });
+
+    it('restores the original query when ArrowDown is pressed past the most recent entry', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput value="original" onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } }));
+
+      await userEvent.keyboard('{ArrowDown}');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'original', name: 'search-query' } });
+      });
+    });
+
+    it('restores in one Down press when history[0] was skipped going up', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      // Current value matches history[0], so Up skips to history[1].
+      render(<SimpleQueryInput value="query-1" onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-2', name: 'search-query' } }));
+
+      // One Down should restore directly, not stop at the skipped history[0].
+      await userEvent.keyboard('{ArrowDown}');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } });
+      });
+    });
+
+    it('does not navigate history when ArrowDown is pressed without prior ArrowUp', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+      await userEvent.keyboard('{ArrowDown}');
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('clamps at the oldest history entry and does not wrap around', async () => {
+      const onChange = jest.fn().mockResolvedValue('');
+      render(<SimpleQueryInput onChange={onChange} />);
+
+      const queryInput = await findQueryInput();
+      queryInput.focus();
+
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-1', name: 'search-query' } }));
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-2', name: 'search-query' } }));
+      await userEvent.keyboard('{ArrowUp}');
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({ target: { value: 'query-3', name: 'search-query' } }));
+
+      const callsBefore = onChange.mock.calls.length;
+
+      await userEvent.keyboard('{ArrowUp}');
+
+      expect(onChange.mock.calls.length).toBe(callsBefore);
     });
   });
 });
