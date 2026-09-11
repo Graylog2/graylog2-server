@@ -79,12 +79,20 @@ const buildInvalidCharsMessage = (tagsList: ReadonlyArray<string>): string | nul
   );
 };
 
+// Rejected values never become chips, so the reason has to be stated against the typed text.
+const buildInputMessage = (raw: string): string | null => {
+  const candidate = normalizeTag(raw);
+  if (!candidate) return null;
+  if (isTooLong(candidate)) return buildTooLongMessage([candidate]);
+  if (hasInvalidChars(candidate)) return buildInvalidCharsMessage([candidate]);
+
+  return null;
+};
+
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
   const [input, setInput] = useState('');
-  // Track only duplicate-commit attempts here. Invalid-character and over-length values are
-  // committed by react-select (they land in `tags`), so they're already covered by the
-  // categorization below. Duplicates are silently rejected by react-select, so we need to
-  // surface them explicitly.
+  // Duplicates are only wrong at commit time — typing "auth" on the way to "authentication"
+  // shouldn't read as an error — so they're flagged on Enter/Tab/blur rather than live.
   const [duplicateAttempt, setDuplicateAttempt] = useState<string | null>(null);
   const [debouncedInput] = useDebouncedValue(input, DEBOUNCE_MS);
 
@@ -111,9 +119,8 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
     setDuplicateAttempt(null);
   };
 
-  // react-select silently rejects duplicates with no chip and no callback — flag those on
-  // Enter/Tab/blur so the user gets explicit feedback. (Invalid-character and over-length
-  // values do commit, so the chip-categorization below already covers them.)
+  // react-select rejects duplicates with no chip and no callback — flag those on Enter/Tab/blur
+  // so the user gets explicit feedback.
   const flagDuplicateAttempt = () => {
     const trimmed = input.trim();
     if (!trimmed) return;
@@ -124,14 +131,17 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
     }
   };
 
-  // Each committed tag falls into at most one failure bucket so messages stay focused per
-  // failure mode (too long, invalid chars, duplicate).
+  // Invalid values can no longer be committed, so these buckets only catch tags that reached the
+  // form another way, such as a definition created through the API. Each tag falls into at most
+  // one bucket so messages stay focused per failure mode.
   const tooLongTags = tags.filter(isTooLong);
   const invalidCharTags = tags.filter((tag) => !isTooLong(tag) && hasInvalidChars(tag));
   const messages = [
     buildTooLongMessage(tooLongTags),
     buildInvalidCharsMessage(invalidCharTags),
+    buildInputMessage(input),
     duplicateAttempt ? `Tag "${duplicateAttempt}" has already been added.` : null,
+    tags.length > MAX_TAGS ? `No more than ${MAX_TAGS} tags can be added.` : null,
   ].filter((m): m is string => m !== null);
 
   const localValidationError =
@@ -147,22 +157,38 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
   return (
     <FormGroup controlId="event-definition-tags" validationState={combinedError ? 'error' : null}>
       <Select
-        // `Select`'s Props type doesn't surface a couple of react-select props we need here
-        // (`inputValue`, `onKeyDown`), but it spreads unknown props through at runtime, so
-        // we cast just these to satisfy tsc without altering behavior.
-        // - `inputValue` — fully control the typed text so react-select's internal blur /
-        //   menu-close clears can be ignored (otherwise Tab/blur drops the user's text on a
-        //   duplicate).
-        // - `onKeyDown` — flag a duplicate-commit attempt on Enter / Tab so the error
-        //   message surfaces even when react-select silently rejects the commit.
+        // Neither of these is in `Select`'s Props type, but `Select` spreads unknown props
+        // through to react-select, so the cast exists only to satisfy tsc.
+        // - `menuIsOpen` — keep the menu shut while the value is invalid, since an open menu
+        //   covers the message saying why it was rejected.
+        // - `onKeyDown` — react-select rejects a duplicate with no chip and no callback, so
+        //   Enter / Tab has to flag it explicitly.
         {...({
-          inputValue: input,
           onKeyDown: (e: React.KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
               flagDuplicateAttempt();
             }
           },
+          // An invalid value has nothing to suggest, and leaving the menu open would cover the
+          // message explaining why it was rejected.
+          menuIsOpen: buildInputMessage(input) ? false : undefined,
+          isValidNewOption: (value: string) => {
+            const candidate = normalizeTag(value ?? '');
+
+            return (
+              candidate.length > 0 &&
+              !isTooLong(candidate) &&
+              !hasInvalidChars(candidate) &&
+              // Replaces react-select's default duplicate check, which this prop overrides.
+              !tags.includes(candidate) &&
+              !suggestions.some((option) => option.value === candidate) &&
+              tags.length < MAX_TAGS
+            );
+          },
         } as object)}
+        // Own the typed text so react-select's blur / menu-close clears don't drop a rejected
+        // value before the user can correct it.
+        inputValue={input}
         inputId="event-definition-tags"
         aria-label="Event Definition Tags"
         multi

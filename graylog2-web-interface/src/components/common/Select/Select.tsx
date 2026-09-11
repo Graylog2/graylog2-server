@@ -282,6 +282,8 @@ export type Props<OptionValue> = {
   async?: boolean;
   total?: number;
   onInputChange?: (newValue: string, actionMeta: InputActionMeta) => void;
+  /** Controls the typed text. When omitted, the input manages its own. */
+  inputValue?: string;
   loadOptions?: () => void;
 };
 
@@ -361,6 +363,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     async: false,
     total: 0,
     onInputChange: undefined,
+    inputValue: undefined,
     loadOptions: undefined,
     forwardedRef: undefined,
   };
@@ -523,7 +526,9 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       theme,
       ignoreAccents,
     } = this.props;
-    const { customComponents, value, inputValue } = this.state;
+    const { customComponents, value, inputValue: uncontrolledInputValue } = this.state;
+    // A caller that passes `inputValue` owns the typed text; otherwise we track it ourselves.
+    const inputValue = this.props.inputValue ?? uncontrolledInputValue;
 
     const formattedValue = this._formatInputValue(value);
 

@@ -145,6 +145,106 @@ describe('TagsEditor', () => {
     });
   });
 
+  describe('rejecting invalid values', () => {
+    it.each([
+      ['invalid characters', 'phish:ing'],
+      ['a space', 'phish ing'],
+      ['a non-ASCII character', 'tag-täg'],
+      ['excessive length', 'a'.repeat(129)],
+    ])('does not commit a tag with %s', async (_label, raw) => {
+      const onChange = jest.fn();
+      render(<Harness onChange={onChange} />);
+
+      await userEvent.type(screen.getByRole('combobox'), raw);
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('leaves the rejected value in the input so it can be corrected in place', async () => {
+      render(<Harness />);
+
+      const input = screen.getByRole('combobox');
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.keyboard('{Enter}');
+
+      expect(input).toHaveValue('phish:ing');
+    });
+
+    it('drops the validation message when the input is cleared', async () => {
+      render(<Harness />);
+
+      const input = screen.getByRole('combobox');
+      await userEvent.type(input, 'phish:ing');
+
+      expect(await screen.findByText(/contains invalid characters/i)).toBeInTheDocument();
+
+      await userEvent.clear(input);
+
+      await waitFor(() => {
+        expect(screen.queryByText(/contains invalid characters/i)).not.toBeInTheDocument();
+      });
+    });
+
+    it('closes the options menu so it cannot cover the message', async () => {
+      render(<Harness />);
+      const input = screen.getByRole('combobox');
+
+      // The menu opens for a value that is still valid, which is what would cover the message.
+      await userEvent.type(input, 'phishing');
+
+      expect(await screen.findByRole('listbox')).toBeInTheDocument();
+
+      await userEvent.type(input, ':');
+
+      expect(await screen.findByText(/contains invalid characters/i)).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('No options')).not.toBeInTheDocument();
+    });
+
+    it('keeps the rejected value and its message after the field loses focus', async () => {
+      render(<Harness />);
+      const input = screen.getByRole('combobox');
+
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.tab();
+
+      expect(input).toHaveValue('phish:ing');
+      expect(await screen.findByText(/contains invalid characters/i)).toBeInTheDocument();
+    });
+
+    it('reopens the menu after refocusing once the value is corrected', async () => {
+      render(<Harness />);
+      const input = screen.getByRole('combobox');
+
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.tab();
+      await userEvent.click(input);
+      await userEvent.clear(input);
+      await userEvent.type(input, 'phishing');
+
+      expect(await screen.findByRole('listbox')).toBeInTheDocument();
+    });
+
+    it('commits the value once the user corrects it', async () => {
+      const onChange = jest.fn();
+      render(<Harness onChange={onChange} />);
+
+      const input = screen.getByRole('combobox');
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.keyboard('{Enter}');
+      await userEvent.clear(input);
+      await userEvent.type(input, 'phishing');
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChange).toHaveBeenLastCalledWith(['phishing']);
+    });
+  });
+
   describe('validation messages', () => {
     it('surfaces an invalid-characters message when committing a tag with disallowed chars', async () => {
       render(<Harness />);
@@ -238,6 +338,14 @@ describe('TagsEditor', () => {
       await userEvent.keyboard('{Tab}');
 
       expect(await screen.findByText(/exceeds the maximum length of 128 characters/i)).toBeInTheDocument();
+    });
+
+    it('flags an invalid value while typing, before any commit attempt', async () => {
+      render(<Harness />);
+
+      await userEvent.type(screen.getByRole('combobox'), 'phish:ing');
+
+      expect(await screen.findByText(/Tag "phish:ing" contains invalid characters/i)).toBeInTheDocument();
     });
 
     it('clears the validation message as soon as the user edits the input', async () => {
