@@ -39,6 +39,10 @@ const TemplateFieldValueProviderSummary = ({ ...props }: Props) => {
           <td>Validate that all Template values are set</td>
           <td>{config.providers[0].require_values ? 'Yes' : 'No'}</td>
         </tr>
+        <tr>
+          <td>Include empty fields</td>
+          <td>{config.providers[0].include_empty_fields ? 'Yes' : 'No'}</td>
+        </tr>
       </>
     </CommonFieldValueProviderSummary>
   );

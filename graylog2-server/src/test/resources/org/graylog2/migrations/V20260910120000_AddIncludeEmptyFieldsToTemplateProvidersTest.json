@@ -1,0 +1,92 @@
+{
+  "event_definitions": [
+    {
+      "_id": { "$oid": "aaaaaaaaaaaaaaaaaaaaaaaa" },
+      "title": "Plain template field",
+      "field_spec": {
+        "user": {
+          "data_type": "string",
+          "providers": [
+            { "type": "template-v1", "template": "${source.user}", "require_values": false }
+          ]
+        }
+      }
+    },
+    {
+      "_id": { "$oid": "bbbbbbbbbbbbbbbbbbbbbbbb" },
+      "title": "Required template field",
+      "field_spec": {
+        "host": {
+          "data_type": "string",
+          "providers": [
+            { "type": "template-v1", "template": "${source.host}", "require_values": true }
+          ]
+        }
+      }
+    },
+    {
+      "_id": { "$oid": "cccccccccccccccccccccccc" },
+      "title": "Already stamped",
+      "field_spec": {
+        "already": {
+          "data_type": "string",
+          "providers": [
+            {
+              "type": "template-v1",
+              "template": "${source.already}",
+              "require_values": false,
+              "include_empty_fields": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "_id": { "$oid": "dddddddddddddddddddddddd" },
+      "title": "Lookup provider only",
+      "field_spec": {
+        "looked_up": {
+          "data_type": "string",
+          "providers": [
+            { "type": "lookup-v1", "table_name": "my-table", "key_field": "source_ip" }
+          ]
+        }
+      }
+    },
+    {
+      "_id": { "$oid": "eeeeeeeeeeeeeeeeeeeeeeee" },
+      "title": "No field spec at all"
+    },
+    {
+      "_id": { "$oid": "ffffffffffffffffffffffff" },
+      "title": "Multiple template fields",
+      "field_spec": {
+        "first": {
+          "data_type": "string",
+          "providers": [
+            { "type": "template-v1", "template": "${source.one}", "require_values": false },
+            { "type": "template-v1", "template": "${source.two}", "require_values": false }
+          ]
+        },
+        "second": {
+          "data_type": "string",
+          "providers": [
+            { "type": "template-v1", "template": "${source.three}", "require_values": true }
+          ]
+        }
+      }
+    },
+    {
+      "_id": { "$oid": "111111111111111111111111" },
+      "title": "Malformed require values",
+      "field_spec": {
+        "broken": {
+          "data_type": "string",
+          "providers": [
+            { "type": "template-v1", "template": "${source.broken}", "require_values": "yes" }
+          ]
+        }
+      }
+    }
+  ]
+}

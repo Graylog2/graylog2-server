@@ -39,6 +39,10 @@ public abstract class FieldValue {
         return create(FieldValueType.ERROR, "");
     }
 
+    public static FieldValue absent() {
+        return create(FieldValueType.ABSENT, "");
+    }
+
     public static FieldValue string(String value) {
         return create(FieldValueType.STRING, value);
     }
@@ -69,6 +73,10 @@ public abstract class FieldValue {
 
     public boolean isError() {
         return dataType().isError();
+    }
+
+    public boolean isAbsent() {
+        return dataType().isAbsent();
     }
 
     public static Builder builder() {
