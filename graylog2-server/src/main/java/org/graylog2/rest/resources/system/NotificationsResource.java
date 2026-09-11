@@ -96,7 +96,7 @@ public class NotificationsResource extends RestResource {
             EntityAttribute.builder().id(FIELD_SEVERITY).title("Severity")
                     .type(SearchQueryField.Type.STRING).sortable(true).filterable(true)
                     .filterOptions(Set.of(
-                            FilterOption.create("normal", "Normal"),
+                            FilterOption.create("normal", "Info"),
                             FilterOption.create("urgent", "Urgent")
                     )).build(),
             EntityAttribute.builder().id("title").title("Title")

@@ -1,0 +1,5 @@
+type = "changed"
+message = "System notifications with `normal` severity are now labeled \"Info\" instead of \"Normal\", in both the severity badge and the severity filter."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15348"]
+pulls = ["27354"]
