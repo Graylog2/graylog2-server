@@ -149,7 +149,14 @@ public class InputEventListener {
     @Subscribe
     public void inputStopped(InputStopped inputStoppedEvent) {
         LOG.debug("Input stopped: {}", inputStoppedEvent.id());
-        removeFromRegistry(inputStoppedEvent.id());
+        stopInRegistry(inputStoppedEvent.id());
+    }
+
+    private void stopInRegistry(String inputId) {
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+        if (inputState != null) {
+            inputRegistry.stopAndTerminate(inputState);
+        }
     }
 
     @Subscribe
