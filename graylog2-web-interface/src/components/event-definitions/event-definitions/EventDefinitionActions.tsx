@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import { LinkContainer, IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
+import { IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import {
@@ -37,6 +37,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
+import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 
 import type { EventDefinition } from '../event-definitions-types';
 import { isAggregationEventDefinition, isSystemEventDefinition } from '../event-definitions-types';
@@ -295,9 +296,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
                 anyPermissions>
                 <MenuItem divider />
               </IfPermitted>
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
-                <MenuItem>Replay Search</MenuItem>
-              </LinkContainer>
+              <LinkToReplaySearch eventDefinitionId={eventDefinition.id} isMenuitem />
             </>
           )}
           {moreActions}

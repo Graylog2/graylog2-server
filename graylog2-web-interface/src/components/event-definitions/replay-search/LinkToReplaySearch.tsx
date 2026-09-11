@@ -24,21 +24,30 @@ import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
 type Props = {
   id?: string;
+  eventDefinitionId?: string;
   isEvent?: boolean;
   onClick?: () => void;
   isMenuitem?: boolean;
 };
-const LinkToReplaySearch = ({ isEvent = false, id = undefined, onClick = undefined, isMenuitem = false }: Props) => {
+const LinkToReplaySearch = ({
+  isEvent = false,
+  id = undefined,
+  eventDefinitionId = undefined,
+  onClick = undefined,
+  isMenuitem = false,
+}: Props) => {
   const { definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
+  const replaySearchEventDefinitionId = eventDefinitionId || (!isEvent ? id || definitionId : undefined);
   const searchLink = isEvent
     ? Routes.ALERTS.replay_search(id)
-    : Routes.ALERTS.DEFINITIONS.replay_search(id || definitionId);
+    : Routes.ALERTS.DEFINITIONS.replay_search(replaySearchEventDefinitionId);
 
   return (
     <ReplaySearchButtonComponent
       searchLink={searchLink}
       onClick={onClick}
-      component={isMenuitem ? MenuItem : undefined}>
+      component={isMenuitem ? MenuItem : undefined}
+      eventDefinitionId={replaySearchEventDefinitionId}>
       Replay search
     </ReplaySearchButtonComponent>
   );
