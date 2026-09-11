@@ -35,6 +35,8 @@ import UserNotification from 'util/UserNotification';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
@@ -83,11 +85,21 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
+  const { permissions } = useCurrentUser();
   const { actions: pluggableActions, actionModals: pluggableActionModals } =
     usePluggableEntitySharedActions<EventDefinition>(eventDefinition, 'event_definition');
   const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
+
+  // Every entry of the "more actions" menu is permission gated, so without any of them the menu would
+  // render as an empty dropdown box.
+  const hasMoreActions =
+    isPermitted(permissions, `eventdefinitions:edit:${eventDefinition.id}`) ||
+    isPermitted(permissions, 'eventdefinitions:create') ||
+    (showActions() && isPermitted(permissions, `eventdefinitions:delete:${eventDefinition.id}`)) ||
+    isAggregationEventDefinition(eventDefinition) ||
+    pluggableActions.length > 0;
 
   const getDeleteActionTitle = () => {
     if (isSystemEventDefinition(eventDefinition)) {
@@ -244,64 +256,66 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           onClick={handleShare}
           bsSize="xsmall"
         />
-        <MoreActions>
-          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-            <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
-              Edit
-            </MenuItem>
-          </IfPermitted>
-          <IfPermitted permissions="eventdefinitions:create">
-            {!isSystemEventDefinition(eventDefinition) && (
-              <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
-            )}
-            <MenuItem divider />
-          </IfPermitted>
-          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-            <MenuItem
-              disabled={isSystemEventDefinition(eventDefinition)}
-              title={
-                isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined
-              }
-              onClick={
-                isSystemEventDefinition(eventDefinition)
-                  ? undefined
-                  : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
-              }>
-              {isEnabled ? 'Disable' : 'Enable'}
-            </MenuItem>
-          </IfPermitted>
-          {showActions() && (
-            <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+        {hasMoreActions && (
+          <MoreActions>
+            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+              <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
+                Edit
+              </MenuItem>
+            </IfPermitted>
+            <IfPermitted permissions="eventdefinitions:create">
+              {!isSystemEventDefinition(eventDefinition) && (
+                <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
+              )}
               <MenuItem divider />
-              <DeleteMenuItem
+            </IfPermitted>
+            <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+              <MenuItem
                 disabled={isSystemEventDefinition(eventDefinition)}
-                title={getDeleteActionTitle()}
+                title={
+                  isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined
+                }
                 onClick={
                   isSystemEventDefinition(eventDefinition)
                     ? undefined
-                    : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)
-                }
-                data-testid="delete-button"
-              />
+                    : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
+                }>
+                {isEnabled ? 'Disable' : 'Enable'}
+              </MenuItem>
             </IfPermitted>
-          )}
-          {isAggregationEventDefinition(eventDefinition) && (
-            <>
-              <IfPermitted
-                permissions={[
-                  `eventdefinitions:edit:${eventDefinition.id}`,
-                  `eventdefinitions:delete:${eventDefinition.id}`,
-                ]}
-                anyPermissions>
+            {showActions() && (
+              <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
                 <MenuItem divider />
+                <DeleteMenuItem
+                  disabled={isSystemEventDefinition(eventDefinition)}
+                  title={getDeleteActionTitle()}
+                  onClick={
+                    isSystemEventDefinition(eventDefinition)
+                      ? undefined
+                      : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)
+                  }
+                  data-testid="delete-button"
+                />
               </IfPermitted>
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
-                <MenuItem>Replay Search</MenuItem>
-              </LinkContainer>
-            </>
-          )}
-          {moreActions}
-        </MoreActions>
+            )}
+            {isAggregationEventDefinition(eventDefinition) && (
+              <>
+                <IfPermitted
+                  permissions={[
+                    `eventdefinitions:edit:${eventDefinition.id}`,
+                    `eventdefinitions:delete:${eventDefinition.id}`,
+                  ]}
+                  anyPermissions>
+                  <MenuItem divider />
+                </IfPermitted>
+                <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
+                  <MenuItem>Replay Search</MenuItem>
+                </LinkContainer>
+              </>
+            )}
+            {moreActions}
+          </MoreActions>
+        )}
       </ButtonToolbar>
       {showDialog && (
         <ConfirmDialog
