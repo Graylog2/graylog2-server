@@ -71,7 +71,14 @@ public class TemplateFieldValueProvider extends AbstractFieldValueProvider {
         }
 
         try {
-            return FieldValue.string(templateEngine.transform(config.template(), dataModel));
+            final String value = templateEngine.transform(config.template(), dataModel);
+
+            // Only a completely empty render is dropped; literal text in the template keeps the field.
+            if (config.excludeEmptyFields() && isNullOrEmpty(value)) {
+                return FieldValue.absent();
+            }
+
+            return FieldValue.string(value);
         } catch (Exception e) {
             LOG.error("Couldn't render field template \"{}\"", config.template(), e);
             return FieldValue.error();
@@ -123,12 +130,16 @@ public class TemplateFieldValueProvider extends AbstractFieldValueProvider {
 
         private static final String FIELD_TEMPLATE = "template";
         private static final String FIELD_REQUIRE_VALUES = "require_values";
+        private static final String FIELD_EXCLUDE_EMPTY_FIELDS = "exclude_empty_fields";
 
         @JsonProperty(FIELD_TEMPLATE)
         public abstract String template();
 
         @JsonProperty(FIELD_REQUIRE_VALUES)
         public abstract boolean requireValues();
+
+        @JsonProperty(FIELD_EXCLUDE_EMPTY_FIELDS)
+        public abstract boolean excludeEmptyFields();
 
         public static Builder builder() {
             return Builder.create();
@@ -142,7 +153,8 @@ public class TemplateFieldValueProvider extends AbstractFieldValueProvider {
             public static Builder create() {
                 return new AutoValue_TemplateFieldValueProvider_Config.Builder()
                         .type(TYPE_NAME)
-                        .requireValues(false);
+                        .requireValues(false)
+                        .excludeEmptyFields(true);
             }
 
             @JsonProperty(FIELD_TEMPLATE)
@@ -151,7 +163,23 @@ public class TemplateFieldValueProvider extends AbstractFieldValueProvider {
             @JsonProperty(FIELD_REQUIRE_VALUES)
             public abstract Builder requireValues(boolean requireValues);
 
-            public abstract Config build();
+            @JsonProperty(FIELD_EXCLUDE_EMPTY_FIELDS)
+            public abstract Builder excludeEmptyFields(boolean excludeEmptyFields);
+
+            abstract Config autoBuild();
+
+            public Config build() {
+                final Config config = autoBuild();
+
+                // require_values already turns an unset variable into an error, so an empty render
+                // cannot occur. Normalize rather than reject so older API payloads and content
+                // packs keep working.
+                if (config.requireValues() && !config.excludeEmptyFields()) {
+                    return config.toBuilder().excludeEmptyFields(true).autoBuild();
+                }
+
+                return config;
+            }
         }
     }
 }
