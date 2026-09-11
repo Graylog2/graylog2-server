@@ -282,6 +282,8 @@ export type Props<OptionValue> = {
   async?: boolean;
   total?: number;
   onInputChange?: (newValue: string, actionMeta: InputActionMeta) => void;
+  /** Controls the typed text. When omitted, the input manages its own. */
+  inputValue?: string;
   loadOptions?: () => void;
 };
 
@@ -296,6 +298,17 @@ type State = {
   value: any;
   inputValue: string;
 };
+
+/**
+ * The option filtering `Select` applies to typed text. Exported so a caller can ask the same
+ * question: matchSorter also matches subsequences and acronyms, unlike a substring test.
+ */
+export const matchOptions = (
+  options: ReadonlyArray<Option>,
+  query: string,
+  { displayKey = 'label', ignoreAccents = true }: { displayKey?: string; ignoreAccents?: boolean } = {},
+): Array<Option> =>
+  matchSorter(options as Array<Option>, query, { keys: [displayKey, 'label'], keepDiacritics: !ignoreAccents });
 
 const getCustomComponents = (
   inputProps?: { [key: string]: any },
@@ -361,6 +374,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     async: false,
     total: 0,
     onInputChange: undefined,
+    inputValue: undefined,
     loadOptions: undefined,
     forwardedRef: undefined,
   };
@@ -523,7 +537,9 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       theme,
       ignoreAccents,
     } = this.props;
-    const { customComponents, value, inputValue } = this.state;
+    const { customComponents, value, inputValue: uncontrolledInputValue } = this.state;
+    // A caller passing `inputValue` owns the typed text.
+    const inputValue = this.props.inputValue ?? uncontrolledInputValue;
 
     const formattedValue = this._formatInputValue(value);
 
@@ -551,12 +567,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     const customFilter = this.createCustomFilter();
 
     const sortedOptions =
-      !async && inputValue
-        ? matchSorter(rawOptions, inputValue, {
-            keys: [displayKey, 'label'],
-            keepDiacritics: !ignoreAccents,
-          })
-        : rawOptions;
+      !async && inputValue ? matchOptions(rawOptions, inputValue, { displayKey, ignoreAccents }) : rawOptions;
 
     const mergedComponents = {
       ..._components,

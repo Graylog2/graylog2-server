@@ -77,15 +77,24 @@ describe('TagsEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith(['phishing']);
   });
 
-  it('does not offer an "Add" affordance for a duplicate (case-insensitive)', async () => {
+  it('does not offer a create affordance for a duplicate (case-insensitive)', async () => {
     render(<Harness initial={['phishing']} />);
 
     const input = screen.getByRole('combobox');
     await userEvent.type(input, 'PHISHING');
 
-    // react-select's CreatableSelect compares case-insensitively against selected values,
-    // so the "Add ..." option is suppressed when the typed input matches an existing tag.
-    expect(screen.queryByText(/Add "PHISHING"/i)).not.toBeInTheDocument();
+    // Values are lowercased before the duplicate check, so this matches the existing tag.
+    expect(screen.queryByText(/Create "/i)).not.toBeInTheDocument();
+  });
+
+  it('does not offer a create affordance duplicating an existing suggestion', async () => {
+    mockedSuggestTags.mockResolvedValue({ tags: ['phishing'] });
+    render(<Harness />);
+
+    await userEvent.type(screen.getByRole('combobox'), 'phishing');
+
+    expect(await screen.findByText('phishing')).toBeInTheDocument();
+    expect(screen.queryByText(/Create "/i)).not.toBeInTheDocument();
   });
 
   describe('autocomplete', () => {
@@ -140,6 +149,132 @@ describe('TagsEditor', () => {
 
       await userEvent.click(screen.getByRole('combobox'));
       await userEvent.click(await screen.findByText(/phishing/i));
+
+      expect(onChange).toHaveBeenLastCalledWith(['phishing']);
+    });
+  });
+
+  describe('rejecting invalid values', () => {
+    it.each([
+      ['invalid characters', 'phish:ing'],
+      ['a space', 'phish ing'],
+      ['a non-ASCII character', 'tag-täg'],
+      ['excessive length', 'a'.repeat(129)],
+    ])('does not commit a tag with %s', async (_label, raw) => {
+      const onChange = jest.fn();
+      render(<Harness onChange={onChange} />);
+
+      await userEvent.type(screen.getByRole('combobox'), raw);
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('leaves the rejected value in the input so it can be corrected in place', async () => {
+      render(<Harness />);
+
+      const input = screen.getByRole('combobox');
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.keyboard('{Enter}');
+
+      expect(input).toHaveValue('phish:ing');
+    });
+
+    it('drops the validation message when the input is cleared', async () => {
+      render(<Harness />);
+
+      const input = screen.getByRole('combobox');
+      await userEvent.type(input, 'phish:ing');
+
+      expect(await screen.findByText(/contains invalid characters/i)).toBeInTheDocument();
+
+      await userEvent.clear(input);
+
+      await waitFor(() => {
+        expect(screen.queryByText(/contains invalid characters/i)).not.toBeInTheDocument();
+      });
+    });
+
+    it('closes the options menu so it cannot cover the message', async () => {
+      render(<Harness />);
+      const input = screen.getByRole('combobox');
+
+      // The menu opens for a value that is still valid, which is what would cover the message.
+      await userEvent.type(input, 'phishing');
+
+      expect(await screen.findByRole('listbox')).toBeInTheDocument();
+
+      await userEvent.type(input, ':');
+
+      expect(await screen.findByText(/contains invalid characters/i)).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      });
+
+      expect(screen.queryByText('No options')).not.toBeInTheDocument();
+    });
+
+    it('keeps the rejected value and its message after the field loses focus', async () => {
+      render(<Harness />);
+      const input = screen.getByRole('combobox');
+
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.tab();
+
+      expect(input).toHaveValue('phish:ing');
+      expect(await screen.findByText(/contains invalid characters/i)).toBeInTheDocument();
+    });
+
+    it('reopens the menu after refocusing once the value is corrected', async () => {
+      render(<Harness />);
+      const input = screen.getByRole('combobox');
+
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.tab();
+      await userEvent.click(input);
+      await userEvent.clear(input);
+      await userEvent.type(input, 'phishing');
+
+      expect(await screen.findByRole('listbox')).toBeInTheDocument();
+    });
+
+    it('reports a tag that reached the form already invalid', async () => {
+      render(<Harness initial={['bad tag']} />);
+
+      expect(await screen.findByText(/Tag "bad tag" contains invalid characters/i)).toBeInTheDocument();
+    });
+
+    it('reports a too-long tag once, not also as invalid characters', async () => {
+      render(<Harness initial={[`${'a'.repeat(129)} x`]} />);
+
+      expect(await screen.findByText(/exceeds the maximum length/i)).toBeInTheDocument();
+      expect(screen.queryByText(/contains invalid characters/i)).not.toBeInTheDocument();
+    });
+
+    it('says so at the tag cap instead of silently refusing', async () => {
+      const full = Array.from({ length: 64 }, (_, i) => `tag-${i}`);
+      const onChange = jest.fn();
+      render(<Harness initial={full} onChange={onChange} />);
+
+      expect(await screen.findByText(/Maximum of 64 tags reached/i)).toBeInTheDocument();
+
+      await userEvent.type(screen.getByRole('combobox'), 'one-more');
+      await userEvent.keyboard('{Enter}');
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('commits the value once the user corrects it', async () => {
+      const onChange = jest.fn();
+      render(<Harness onChange={onChange} />);
+
+      const input = screen.getByRole('combobox');
+      await userEvent.type(input, 'phish:ing');
+      await userEvent.keyboard('{Enter}');
+      await userEvent.clear(input);
+      await userEvent.type(input, 'phishing');
+      await userEvent.keyboard('{Enter}');
 
       expect(onChange).toHaveBeenLastCalledWith(['phishing']);
     });
@@ -238,6 +373,14 @@ describe('TagsEditor', () => {
       await userEvent.keyboard('{Tab}');
 
       expect(await screen.findByText(/exceeds the maximum length of 128 characters/i)).toBeInTheDocument();
+    });
+
+    it('flags an invalid value while typing, before any commit attempt', async () => {
+      render(<Harness />);
+
+      await userEvent.type(screen.getByRole('combobox'), 'phish:ing');
+
+      expect(await screen.findByText(/Tag "phish:ing" contains invalid characters/i)).toBeInTheDocument();
     });
 
     it('clears the validation message as soon as the user edits the input', async () => {

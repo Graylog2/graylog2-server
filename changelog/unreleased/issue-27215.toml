@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Prevent event definition tags with invalid characters or excessive length from being added to the form."
+
+issues = ["27215"]
+pulls = ["27366"]
