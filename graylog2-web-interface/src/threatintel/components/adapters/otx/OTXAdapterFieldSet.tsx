@@ -18,7 +18,7 @@ import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { Input } from 'components/bootstrap';
-import { Select } from 'components/common';
+import { Select, URLAllowListInput } from 'components/common';
 import type { ValidationState } from 'components/common/types';
 
 const OTX_INDICATORS = [
@@ -47,7 +47,7 @@ type Props = {
   updateConfig: (...args: any[]) => void;
   handleFormEvent: (...args: any[]) => void;
   validationState: (...args: any[]) => ValidationState;
-  validationMessage: (...args: any[]) => React.ReactElement | string;
+  validationMessage: (...args: any[]) => string;
 };
 
 const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationState, validationMessage }: Props) => {
@@ -88,15 +88,14 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
-      <Input
-        type="text"
+      <URLAllowListInput
         id="api_url"
         name="api_url"
         label="OTX API URL"
         onChange={handleFormEvent}
-        help={validationMessage('api_url', 'URL of the OTX API server.')}
-        bsStyle={validationState('api_url')}
-        value={config.api_url}
+        validationMessage={validationMessage('api_url', 'URL of the OTX API server.')}
+        validationState={validationState('api_url')}
+        url={config.api_url}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />

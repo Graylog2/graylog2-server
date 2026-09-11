@@ -46,10 +46,14 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.apache.commons.validator.routines.InetAddressValidator;
+import org.graylog2.lookup.adapters.LookupDataAdapterValidationContext;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
+import org.graylog2.system.urlallowlist.UrlNotAllowlistedException;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -68,6 +72,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class OTXDataAdapter extends LookupDataAdapter {
     public static final String NAME = "otx-api";
+    public static final String DEFAULT_API_URL = "https://otx.alienvault.com";
 
     private static final Logger LOG = LoggerFactory.getLogger(OTXDataAdapter.class);
     private static final InetAddressValidator INET_ADDRESS_VALIDATOR = InetAddressValidator.getInstance();
@@ -98,6 +103,8 @@ public class OTXDataAdapter extends LookupDataAdapter {
 
     private final Config config;
     private final OkHttpClient httpClient;
+    private final UrlAllowlistService urlAllowlistService;
+    private final UrlAllowlistNotificationService urlAllowlistNotificationService;
     private final Timer httpRequestTimer;
     private final Meter httpRequestErrors;
     private Headers httpHeaders;
@@ -108,6 +115,8 @@ public class OTXDataAdapter extends LookupDataAdapter {
                              @Assisted("name") String name,
                              @Assisted LookupDataAdapterConfiguration config,
                              OkHttpClient httpClient,
+                             UrlAllowlistService urlAllowlistService,
+                             UrlAllowlistNotificationService urlAllowlistNotificationService,
                              MetricRegistry metricRegistry) {
         super(id, name, config, metricRegistry);
 
@@ -118,6 +127,8 @@ public class OTXDataAdapter extends LookupDataAdapter {
                 .readTimeout(this.config.httpReadTimeout(), TimeUnit.MILLISECONDS)
                 .build();
 
+        this.urlAllowlistService = urlAllowlistService;
+        this.urlAllowlistNotificationService = urlAllowlistNotificationService;
         this.httpRequestTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "httpRequestTime"));
         this.httpRequestErrors = metricRegistry.meter(MetricRegistry.name(getClass(), "httpRequestErrors"));
     }
@@ -163,6 +174,12 @@ public class OTXDataAdapter extends LookupDataAdapter {
         // Not needed
     }
 
+    private void publishSystemNotificationForAllowlistFailure() {
+        final String description = "An \"OTX\" lookup adapter is trying to access a URL which is not allowlisted. " +
+                "Please check your configuration. [adapter name: \"" + name() + "\", url: \"" + config.apiUrl() + "\"]";
+        urlAllowlistNotificationService.publishAllowlistFailure(description);
+    }
+
     @Override
     public Duration refreshInterval() {
         return Duration.ZERO;
@@ -175,6 +192,17 @@ public class OTXDataAdapter extends LookupDataAdapter {
 
     @Override
     protected LookupResult doGet(Object keyObject) {
+        if (!urlAllowlistService.isAllowlisted(config.apiUrl())) {
+            LOG.error("Data adapter <{}>: URL <{}> is not allowlisted. Aborting lookup request.", name(), config.apiUrl());
+            publishSystemNotificationForAllowlistFailure();
+            setError(UrlNotAllowlistedException.forUrl(config.apiUrl()));
+            return getErrorResult();
+        } else {
+            // we use this kind of error reporting mechanism only for allowlist errors, so we can safely clear the
+            // error here
+            clearError();
+        }
+
         final String key = String.valueOf(keyObject);
         String otxIndicator = config.indicator();
 
@@ -299,7 +327,7 @@ public class OTXDataAdapter extends LookupDataAdapter {
             return Config.builder()
                     .type(NAME)
                     .indicator(OTX_INDICATOR_IP_AUTO_DETECT)
-                    .apiUrl("https://otx.alienvault.com")
+                    .apiUrl(DEFAULT_API_URL)
                     .httpUserAgent("%1$s Threat Intelligence".formatted(customizationConfig.productName()))
                     .httpConnectTimeout(10000)
                     .httpWriteTimeout(10000)
@@ -349,7 +377,7 @@ public class OTXDataAdapter extends LookupDataAdapter {
         public abstract Builder toBuilder();
 
         @Override
-        public Optional<Multimap<String, String>> validate() {
+        public Optional<Multimap<String, String>> validate(LookupDataAdapterValidationContext validationContext) {
             final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
 
             if (!OTX_INDICATORS.contains(indicator())) {
@@ -357,6 +385,8 @@ public class OTXDataAdapter extends LookupDataAdapter {
             }
             if (HttpUrl.parse(apiUrl()) == null) {
                 errors.put("api_url", "Invalid URL");
+            } else if (!validationContext.getUrlAllowlistService().isAllowlisted(apiUrl())) {
+                errors.put("api_url", "URL <" + apiUrl() + "> is not allowlisted.");
             }
             if (httpConnectTimeout() < 1) {
                 errors.put("http_connect_timeout", "Value cannot be smaller than 1");
