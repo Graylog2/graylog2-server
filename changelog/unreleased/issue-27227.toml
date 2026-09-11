@@ -1,0 +1,12 @@
+type = "f"
+message = "Removed the leading slash from the `source` field on CEF inputs."
+
+issues = ["27227"]
+pulls = ["27336"]
+
+details.user = """
+CEF messages that carry neither a `deviceAddress`/`dvc` extension nor a syslog hostname fall back to the
+sender's socket address for `source`. That address was formatted as `/172.66.40.61`, with a leading slash,
+and IPv6 addresses were written in fully expanded form. `source` now holds the bare address, compressed
+for IPv6.
+"""
