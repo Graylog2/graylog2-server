@@ -41,6 +41,8 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +52,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class AggregationSearchUtils {
     private final Logger LOG = LoggerFactory.getLogger(AggregationSearchUtils.class);
@@ -274,7 +278,7 @@ public class AggregationSearchUtils {
         return builder.toString().trim();
     }
 
-    // Only used to create log messages
+    // Used to build the event message (via createEventMessageString) as well as log messages.
     private String seriesString(AggregationKeyResult keyResult) {
         return keyResult.seriesValues().stream()
                 .map(this::formatSeriesValue)
@@ -282,6 +286,30 @@ public class AggregationSearchUtils {
     }
 
     private String formatSeriesValue(AggregationSeriesValue seriesValue) {
-        return String.format(Locale.ROOT, "%s=%s", seriesValue.series().literal(), seriesValue.value());
+        return f("%s=%s", seriesValue.series().literal(), formatValue(seriesValue.value()));
+    }
+
+    // Values at or beyond these magnitudes are hard to read as plain decimals, so they keep scientific notation.
+    // Everything in between is rendered as a plain, comma-grouped decimal instead of Double#toString's own
+    // scientific-notation cutoff (>= 10^7 or < 10^-3), which kicks in well before these thresholds.
+    private static final double LARGE_VALUE_SCIENTIFIC_NOTATION_THRESHOLD = 1_000_000_000d; // 1 billion
+    private static final double SMALL_VALUE_SCIENTIFIC_NOTATION_THRESHOLD = 0.0000000000001d; // 1e-13
+
+    private String formatValue(double value) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            return Double.toString(value);
+        }
+
+        final double absValue = Math.abs(value);
+        if (absValue != 0 && (absValue >= LARGE_VALUE_SCIENTIFIC_NOTATION_THRESHOLD
+                || absValue <= SMALL_VALUE_SCIENTIFIC_NOTATION_THRESHOLD)) {
+            // Double#toString already renders scientific notation for every value in this range.
+            return Double.toString(value);
+        }
+
+        // DecimalFormat isn't thread-safe, so a fresh instance is created per call rather than shared/cached.
+        final DecimalFormat format = new DecimalFormat("#,##0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
+        return format.format(value);
     }
 }
