@@ -47,7 +47,7 @@ const NavigationLink = ({ Badge = undefined, description, path, topLevel = false
 
   return (
     <LinkContainer key={path} to={path} relativeActive {...rest}>
-      {topLevel ? <NavItem>{title}</NavItem> : <DropdownOption component="a">{title}</DropdownOption>}
+      {topLevel ? <NavItem>{title}</NavItem> : <DropdownOption>{title}</DropdownOption>}
     </LinkContainer>
   );
 };
