@@ -18,15 +18,18 @@ import React from 'react';
 
 const EventKeyHelpPopover = () => (
   <>
-    Event Keys are Fields used to arrange Events into groups. A group is created for each unique Key, resulting in as
-    many Events as unique Keys are found. Example:
+    Event Keys are custom fields whose values are combined into the Event&apos;s key (values joined with <code>|</code>
+    ). The key identifies the entity an Event is about. It does not change how many Events are created.
     <p />
-    <b>No Event Keys:</b> One Event for each <em>Login failure</em> message.
-    <br />
-    <b>
-      Event Key <code>username</code>:
-    </b>{' '}
-    One Event for each username with a <em>Login failure</em> message.
+    <b>Where the key matters:</b> <b>Event Correlation</b> only matches source Events that share the same key, and
+    creates at most one Event per key within its search window. Set Keys on the Event Definitions you intend to
+    correlate, not on the correlation itself.
+    <p />
+    <b>Example:</b> two definitions, <em>Login failure</em> and <em>Privilege escalation</em>, both with Event Key{' '}
+    <code>username</code>. A correlation of the two only fires when both Events carry the same username.
+    <p />
+    To control how many Events a <b>Filter &amp; Aggregation</b> definition creates, use &quot;Create Events for
+    Definition if...&quot; with &quot;Aggregation of results reaches a threshold&quot; and configure Group by Field(s).
   </>
 );
 
