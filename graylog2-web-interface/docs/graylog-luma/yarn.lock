@@ -714,18 +714,18 @@
   resolved "https://registry.yarnpkg.com/@oxc-resolver/binding-win32-x64-msvc/-/binding-win32-x64-msvc-11.21.2.tgz#dbdf12721396ef4c31899d0963b002df32f57050"
   integrity sha512-VPoCAhKvCQTlG7vxqaBXcmuvbh77BfnGXj8g0pbvVXpm1F/R8rDVwqIWcEbMzrI1JvJlm8v7T9uMVQb6UctMRg==
 
-"@storybook/addon-docs@^10.5.10":
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-docs/-/addon-docs-10.5.10.tgz#c65d1d4a6d1e2de50f0decaf82ea57583f220b30"
-  integrity sha512-06JoK3/a7FWI/6GzuidJP9iHp1/Vejboe6lzS1jW+d8ItpecriBt+oXh1VNmUM7i7PjI6pZnet+j51QnLyeOoQ==
+"@storybook/addon-docs@^10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-docs/-/addon-docs-10.6.0.tgz#1614a6433c29acf459055a210d49124eb04e6170"
+  integrity sha512-Fk3rUQWeGyCfL170OkmRp6Ruyv7MHPb/xrKa6YNk7FlGmlVLi5tKzh2T/0J13vWEy8wiu2MV3IBu8iRsaUR+Cw==
   dependencies:
     "@mdx-js/react" "^3.0.0"
-    "@storybook/csf-plugin" "10.5.10"
     "@storybook/icons" "^2.0.2"
-    "@storybook/react-dom-shim" "10.5.10"
+    "@storybook/react-dom-shim" "10.6.0"
     react "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
     react-dom "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
     ts-dedent "^2.0.0"
+    unplugin "^2.3.5"
 
 "@storybook/addon-webpack5-compiler-swc@^4.0.3":
   version "4.0.3"
@@ -735,19 +735,19 @@
     "@swc/core" "^1.13.5"
     swc-loader "^0.2.6"
 
-"@storybook/builder-webpack5@10.5.10":
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/@storybook/builder-webpack5/-/builder-webpack5-10.5.10.tgz#104fc4b9e832ef00921db1594228a959fbaadc31"
-  integrity sha512-9ZBRusBwZStoCj3Wm4wVpSpKV8OlLMpadEQ+vvOVrtDQdVJWM5xdLQpqrG21r/cJC4ZX53ZpbrDL+NMsIp1Rkw==
+"@storybook/builder-webpack5@10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@storybook/builder-webpack5/-/builder-webpack5-10.6.0.tgz#a39e6ad84f6880163e69476d40a53c40aadd4a61"
+  integrity sha512-j71OmQZ/+j9S/FYa64tIRuSsXdVxU87zthJ+StKUan6m7wA88YyCAXzk2hAHQsfC9MA52A0kMcOPluNZzIh3xQ==
   dependencies:
-    "@storybook/core-webpack" "10.5.10"
+    "@storybook/core-webpack" "10.6.0"
     case-sensitive-paths-webpack-plugin "^2.4.0"
     cjs-module-lexer "^1.2.3"
     css-loader "^7.1.2"
     es-module-lexer "^1.5.0"
     fork-ts-checker-webpack-plugin "^9.1.0"
     html-webpack-plugin "^5.5.0"
-    magic-string "^0.30.5"
+    magic-string "^1.1.0"
     semver "^7.7.3"
     style-loader "^4.0.0"
     terser-webpack-plugin "^5.3.17"
@@ -757,19 +757,12 @@
     webpack-hot-middleware "^2.25.1"
     webpack-virtual-modules "^0.6.0"
 
-"@storybook/core-webpack@10.5.10":
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/@storybook/core-webpack/-/core-webpack-10.5.10.tgz#b3f2d99aa085c2bf782154383fb5ea5034fdae4e"
-  integrity sha512-CiUo4AZRKm3nVb6KWw+yfV6g6VSTA97msiVN9bJlBOFS1dax2ulrRNJnHJxR/U1AT51hONfU4dZOpCXRwaobTA==
+"@storybook/core-webpack@10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@storybook/core-webpack/-/core-webpack-10.6.0.tgz#c5db257506e5decc939729ccc967575024ab4a57"
+  integrity sha512-SoK12ABzn5d2RKvfN0rRIE9Eg63IOLfAHLdEy1visizwealqFFP/hVpd2CMW2V+ysUdGSUZ1+nFHiRjDr6mKJA==
   dependencies:
     ts-dedent "^2.0.0"
-
-"@storybook/csf-plugin@10.5.10":
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/@storybook/csf-plugin/-/csf-plugin-10.5.10.tgz#c65da1cdfe0a11795a14c518e9f8f828b8d54b3b"
-  integrity sha512-TaCLBrqVEr767+w58QDotDUiCTuE5cyRJuRcDlsKQyUIyGBv+lYD3lu8wBiVCYxgIjB/gu9HmqiC+0yx1rHzaw==
-  dependencies:
-    unplugin "^2.3.5"
 
 "@storybook/global@^5.0.0":
   version "5.0.0"
@@ -781,15 +774,15 @@
   resolved "https://registry.yarnpkg.com/@storybook/icons/-/icons-2.0.2.tgz#765b49b902a2bdf6f3a5a1aa8dc0cdcd3c55c5b5"
   integrity sha512-KZBCpXsshAIjczYNXR/rlxEtCUX/eAbpFNwKi8bcOomrLA4t/SyPz5RF+lVPO2oZBUE4sAkt43mfJUevQDSEEw==
 
-"@storybook/preset-react-webpack@10.5.10":
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/@storybook/preset-react-webpack/-/preset-react-webpack-10.5.10.tgz#73cb5ff4dc22c869e97f017bedeb0fab0cedb26c"
-  integrity sha512-erAyPdNKqzOQOQVHm/kMSO4Nrr/g279KoA5LyzMOTJAQJHjDdsqmYdGXRDVfcnDL+H+Qm9pWaP+re2S8YG6JNg==
+"@storybook/preset-react-webpack@10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@storybook/preset-react-webpack/-/preset-react-webpack-10.6.0.tgz#5542a485ce7fa02830c4d19081cca01b4623be31"
+  integrity sha512-E3DuKf5vWbv5LIqpzidcdZQQi5vGS0fRPTMFvGGPBN3GxW0CcNvUjj4++ZJjDPJ3sDK4G3IhPZ6nZIf+0vnEAQ==
   dependencies:
-    "@storybook/core-webpack" "10.5.10"
+    "@storybook/core-webpack" "10.6.0"
     "@storybook/react-docgen-typescript-plugin" "1.0.6--canary.9.0c3f3b7.0"
     "@types/semver" "^7.7.1"
-    magic-string "^0.30.5"
+    magic-string "^1.1.0"
     react-docgen "^8.0.2"
     resolve "^1.22.8"
     semver "^7.7.3"
@@ -809,27 +802,27 @@
     react-docgen-typescript "^2.2.2"
     tslib "^2.0.0"
 
-"@storybook/react-dom-shim@10.5.10":
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/@storybook/react-dom-shim/-/react-dom-shim-10.5.10.tgz#8ddcad879d8804a9bbc09a5d0ea10f8356f01ed6"
-  integrity sha512-rbu62ILo/VE3iXKmu+kWXFpD1H1Lwi0f19q/x7JnDsD2dxKS9w5znLEqPIq2qxpzi/wjjIb2iUP1cRG1d/9W5A==
+"@storybook/react-dom-shim@10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@storybook/react-dom-shim/-/react-dom-shim-10.6.0.tgz#fea9776257958648ad67b5136d7d89a4e01bf1be"
+  integrity sha512-ZE0l4xL6d00rKFeJhRDuh0t3r+/2ffhx47lIyaSWrTD5kuM3nDjKDxCIWwX4E3gLV+oNX8E1prXRMuEWJUJwJg==
 
-"@storybook/react-webpack5@^10.5.10":
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/@storybook/react-webpack5/-/react-webpack5-10.5.10.tgz#ef4cca70977444abdb954d43c29ffc2741b08e20"
-  integrity sha512-PpC2CYbeqKGDYpG64PR/wkjo+Sm9EKWvdE0ZaKHBQb1PfC0p/TUxHy8XfXQp/4atjhET0VqSUDc0TP/ii1bGxw==
+"@storybook/react-webpack5@^10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@storybook/react-webpack5/-/react-webpack5-10.6.0.tgz#902fd144d5215ae7b6cbd4e4fe2494e1ffe402a7"
+  integrity sha512-aSaTpSEOY0Z52pZCgWQuEE21txhNMr/5Pnoe6y4M+QM9Zqpj4Ybt5PE1U0Jzyu2fsMj7YjhyqY7N+7SD1dG9Og==
   dependencies:
-    "@storybook/builder-webpack5" "10.5.10"
-    "@storybook/preset-react-webpack" "10.5.10"
-    "@storybook/react" "10.5.10"
+    "@storybook/builder-webpack5" "10.6.0"
+    "@storybook/preset-react-webpack" "10.6.0"
+    "@storybook/react" "10.6.0"
 
-"@storybook/react@10.5.10":
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/@storybook/react/-/react-10.5.10.tgz#d28d575869df5514ccbaf27c5cf828d8f458172e"
-  integrity sha512-4MBV5e1SXIMfPynLHzr+Mp0dwGv/FW1bklWAsS4ynBOAbC98W9p/I9vqBnUctsvE3BJkhzHQQyPwMHL5tTcHVA==
+"@storybook/react@10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@storybook/react/-/react-10.6.0.tgz#acee0a44cee9abb7800ecac8e21b417e8e492fda"
+  integrity sha512-0xfYYPRHcr5ta1hmXJCSezH4JGuUHJ+xVF9f1j+Y/MWEMOQE4wnaKWKsk/HLrDjZkT5hKfvmogt9b0yduP6zEQ==
   dependencies:
     "@storybook/global" "^5.0.0"
-    "@storybook/react-dom-shim" "10.5.10"
+    "@storybook/react-dom-shim" "10.6.0"
     react-docgen "^8.0.2"
     react-docgen-typescript "^2.2.2"
 
@@ -940,10 +933,10 @@
     picocolors "^1.1.1"
     redent "^3.0.0"
 
-"@testing-library/user-event@^14.6.1":
-  version "14.6.1"
-  resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.6.1.tgz#13e09a32d7a8b7060fe38304788ebf4197cd2149"
-  integrity sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw==
+"@testing-library/user-event@^14.6.3":
+  version "14.6.7"
+  resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.6.7.tgz#c453ccfcaffed110cc79048ed18fccb0f4224f3b"
+  integrity sha512-MPCpX8bxe8zS+JmmTwLp8jd0dy1rAm60Te/SL8JrQM3qvQJcBOs1d7IefJMyZzqM3EWBrDn/LWDt1BCGu4ASfg==
 
 "@tybys/wasm-util@^0.10.1":
   version "0.10.2"
@@ -2388,10 +2381,10 @@ escalade@^3.2.0:
   resolved "https://registry.yarnpkg.com/escalade/-/escalade-3.2.0.tgz#011a3f69856ba189dffa7dc8fcce99d2a87903e5"
   integrity sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==
 
-eslint-plugin-storybook@^10.5.10:
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-storybook/-/eslint-plugin-storybook-10.5.10.tgz#f39999b6f714a29cb31d0c99488d4d157dc16644"
-  integrity sha512-NeOu3axmhNZfRuHRciFH0a/OVgvtAJLRHAwiJjcGkPAcElNmwEPp+pqoiwxytx7kHInz7mVVoBfPwVc8kPmOLw==
+eslint-plugin-storybook@^10.6.0:
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-storybook/-/eslint-plugin-storybook-10.6.0.tgz#794a0d6a74374c221ae4e1b19b83e7584d5d061e"
+  integrity sha512-HK3yD5Nslv97buJ5JfT1xFkTOoyJgGIENmBoZZI3F8t2UpBzb/dHpKyCh5bQ8AvJWnhoM/WAtDNqyd9nq6xgcg==
   dependencies:
     "@typescript-eslint/types" "^8.60.0"
     "@typescript-eslint/utils" "^8.60.0"
@@ -2880,10 +2873,10 @@ lz-string@^1.5.0:
   resolved "https://registry.yarnpkg.com/lz-string/-/lz-string-1.5.0.tgz#c1ab50f77887b712621201ba9fd4e3a6ed099941"
   integrity sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==
 
-magic-string@^0.30.5:
-  version "0.30.21"
-  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.21.tgz#56763ec09a0fa8091df27879fd94d19078c00d91"
-  integrity sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==
+magic-string@^1.1.0:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-1.2.3.tgz#68f070ca0f05697c3ae57ce44a88fc7d483d4df1"
+  integrity sha512-Bpb0W2TbLKOZ7vJnOUnVRGq3WL2p+ISV29M6hYPL1AFCpyKZpdr5ytiXoTSSxRVhg8YW7f65+6gbG8WG6PCa/g==
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.5.5"
 
@@ -3514,16 +3507,16 @@ storybook-dark-mode@^5.0.0:
     fast-deep-equal "^3.1.3"
     memoizerific "^1.11.3"
 
-storybook@^10.5.10:
-  version "10.5.10"
-  resolved "https://registry.yarnpkg.com/storybook/-/storybook-10.5.10.tgz#97e9b4a71b4df7732e82d64edffe07f9e8d70083"
-  integrity sha512-Rz8k9ejFHsi7lbtJTaxZlhCUz4GkbJIKEoKDjXeLfr/ZhXip73E6keKxW0KH8iGeKiCqHAbJCV4YIQrxTOLiig==
+storybook@^10.6.0:
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/storybook/-/storybook-10.6.0.tgz#095ec809a6ff7e24ceb8766a9db86dfeb000a94f"
+  integrity sha512-H48X6AURAFTpfN2zEux6vNesee5Oq8Gxj1IanYmblPZ218sfKSeyyerF1NC7GD7BrruoC8L4/cU0zII4y+d6zw==
   dependencies:
     "@storybook/global" "^5.0.0"
     "@storybook/icons" "^2.0.2"
     "@testing-library/dom" "^10.4.1"
     "@testing-library/jest-dom" "6.9.1"
-    "@testing-library/user-event" "^14.6.1"
+    "@testing-library/user-event" "^14.6.3"
     "@vitest/expect" "3.2.4"
     "@vitest/spy" "3.2.4"
     "@webcontainer/env" "^1.1.1"
