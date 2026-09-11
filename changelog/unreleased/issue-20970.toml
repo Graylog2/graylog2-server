@@ -6,3 +6,4 @@ Data Node previously always advertised its own hostname to other cluster nodes v
 """
 
 issues = ["20970"]
+pulls = ["27363"]
