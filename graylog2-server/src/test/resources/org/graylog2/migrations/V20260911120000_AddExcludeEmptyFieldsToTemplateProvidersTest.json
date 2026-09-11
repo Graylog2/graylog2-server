@@ -35,7 +35,7 @@
               "type": "template-v1",
               "template": "${source.already}",
               "require_values": false,
-              "include_empty_fields": false
+              "exclude_empty_fields": false
             }
           ]
         }

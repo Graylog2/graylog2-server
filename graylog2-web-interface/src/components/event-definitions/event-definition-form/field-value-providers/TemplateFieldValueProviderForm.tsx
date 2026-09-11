@@ -36,7 +36,7 @@ class TemplateFieldValueProviderForm extends React.Component<
 
   static defaultConfig = {
     template: '',
-    include_empty_fields: false,
+    exclude_empty_fields: true,
   };
 
   static requiredFields = ['template'];
@@ -52,7 +52,7 @@ class TemplateFieldValueProviderForm extends React.Component<
 
     // Requiring all values turns an unset variable into an error, so an empty value cannot occur.
     if (name === 'require_values' && value) {
-      templateProvider.include_empty_fields = false;
+      templateProvider.exclude_empty_fields = true;
     }
 
     onChange({ ...config, providers: nextProviders });
@@ -97,17 +97,17 @@ class TemplateFieldValueProviderForm extends React.Component<
 
           <FormGroup>
             <Checkbox
-              id="template-provider-include-empty-fields"
-              name="include_empty_fields"
+              id="template-provider-exclude-empty-fields"
+              name="exclude_empty_fields"
               disabled={provider.require_values}
-              checked={provider.include_empty_fields || false}
+              checked={provider.exclude_empty_fields ?? true}
               onChange={this.handleChange}>
-              Include empty fields
+              Exclude empty fields
             </Checkbox>
             <HelpBlock>
-              Check this option to add the Field to the Event even when the Template renders an empty value. When
-              unchecked, the Field is left off the Event entirely. Not available when all Template values are
-              required.
+              Check this option to leave the Field off the Event entirely when the Template renders an empty
+              value. When unchecked, the Field is added to the Event with an empty value. Always on when all
+              Template values are required.
             </HelpBlock>
           </FormGroup>
         </Col>

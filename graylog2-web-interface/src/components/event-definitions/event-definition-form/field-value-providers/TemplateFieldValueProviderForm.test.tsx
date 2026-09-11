@@ -23,13 +23,13 @@ import TemplateFieldValueProviderForm from './TemplateFieldValueProviderForm';
 jest.mock('./TemplateFieldValueProviderPreview', () => () => <div>preview</div>);
 
 describe('TemplateFieldValueProviderForm', () => {
-  const configWith = (overrides: { require_values?: boolean; include_empty_fields?: boolean }) => ({
+  const configWith = (overrides: { require_values?: boolean; exclude_empty_fields?: boolean }) => ({
     providers: [
       {
         type: 'template-v1',
         template: 'hello',
         require_values: false,
-        include_empty_fields: false,
+        exclude_empty_fields: true,
         ...overrides,
       },
     ],
@@ -39,11 +39,11 @@ describe('TemplateFieldValueProviderForm', () => {
     validation: { errors: {} },
   };
 
-  it('defaults include_empty_fields to false for new providers', () => {
-    expect(TemplateFieldValueProviderForm.defaultConfig).toEqual({ template: '', include_empty_fields: false });
+  it('defaults exclude_empty_fields to true for new providers', () => {
+    expect(TemplateFieldValueProviderForm.defaultConfig).toEqual({ template: '', exclude_empty_fields: true });
   });
 
-  it('disables the include empty fields checkbox when require values is checked', () => {
+  it('disables the exclude empty fields checkbox when require values is checked', () => {
     render(
       <TemplateFieldValueProviderForm
         {...defaultProps}
@@ -52,16 +52,19 @@ describe('TemplateFieldValueProviderForm', () => {
       />,
     );
 
-    expect(screen.getByRole('checkbox', { name: /include empty fields/i })).toBeDisabled();
+    const checkbox = screen.getByRole('checkbox', { name: /exclude empty fields/i });
+
+    expect(checkbox).toBeDisabled();
+    expect(checkbox).toBeChecked();
   });
 
-  it('clears include_empty_fields when require values is checked', async () => {
+  it('forces exclude_empty_fields on when require values is checked', async () => {
     const onChange = jest.fn();
 
     render(
       <TemplateFieldValueProviderForm
         {...defaultProps}
-        config={configWith({ include_empty_fields: true })}
+        config={configWith({ exclude_empty_fields: false })}
         onChange={onChange}
       />,
     );
@@ -70,21 +73,27 @@ describe('TemplateFieldValueProviderForm', () => {
 
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        providers: [expect.objectContaining({ require_values: true, include_empty_fields: false })],
+        providers: [expect.objectContaining({ require_values: true, exclude_empty_fields: true })],
       }),
     );
   });
 
-  it('toggles include_empty_fields on its own', async () => {
+  it('toggles exclude_empty_fields on its own', async () => {
     const onChange = jest.fn();
 
-    render(<TemplateFieldValueProviderForm {...defaultProps} config={configWith({})} onChange={onChange} />);
+    render(
+      <TemplateFieldValueProviderForm
+        {...defaultProps}
+        config={configWith({ exclude_empty_fields: true })}
+        onChange={onChange}
+      />,
+    );
 
-    await userEvent.click(screen.getByRole('checkbox', { name: /include empty fields/i }));
+    await userEvent.click(screen.getByRole('checkbox', { name: /exclude empty fields/i }));
 
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        providers: [expect.objectContaining({ include_empty_fields: true, require_values: false })],
+        providers: [expect.objectContaining({ exclude_empty_fields: false, require_values: false })],
       }),
     );
   });

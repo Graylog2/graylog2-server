@@ -30,15 +30,15 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
- * Backfills the {@code include_empty_fields} option on existing {@code template-v1} field value
+ * Backfills the {@code exclude_empty_fields} option on existing {@code template-v1} field value
  * providers.
  * <p>
- * The option is new in 7.2 and defaults to {@code false} for newly created providers, which omits a
+ * The option is new in 7.2 and defaults to {@code true} for newly created providers, which omits a
  * field whose template renders empty. Existing providers must keep writing empty fields, so they are
- * stamped with {@code true} unless {@code require_values} already turned empty values into errors.
+ * stamped with {@code false} unless {@code require_values} already turned empty values into errors.
  */
-public class V20260910120000_AddIncludeEmptyFieldsToTemplateProviders extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20260910120000_AddIncludeEmptyFieldsToTemplateProviders.class);
+public class V20260911120000_AddExcludeEmptyFieldsToTemplateProviders extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20260911120000_AddExcludeEmptyFieldsToTemplateProviders.class);
 
     private static final String COLLECTION_NAME = "event_definitions";
     private static final String TEMPLATE_PROVIDER_TYPE = "template-v1";
@@ -46,13 +46,13 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProviders extends Mi
     private static final String FIELD_PROVIDERS = "providers";
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_REQUIRE_VALUES = "require_values";
-    private static final String FIELD_INCLUDE_EMPTY_FIELDS = "include_empty_fields";
+    private static final String FIELD_EXCLUDE_EMPTY_FIELDS = "exclude_empty_fields";
 
     private final MongoCollection<Document> eventDefinitions;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public V20260910120000_AddIncludeEmptyFieldsToTemplateProviders(MongoConnection mongoConnection,
+    public V20260911120000_AddExcludeEmptyFieldsToTemplateProviders(MongoConnection mongoConnection,
                                                                     ClusterConfigService clusterConfigService) {
         this.eventDefinitions = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
@@ -60,7 +60,7 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProviders extends Mi
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2026-09-10T12:00:00Z");
+        return ZonedDateTime.parse("2026-09-11T12:00:00Z");
     }
 
     @Override
@@ -92,7 +92,7 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProviders extends Mi
         }
 
         LOG.info("Added <{}> to the template field providers of {} event definition(s), skipped {}.",
-                FIELD_INCLUDE_EMPTY_FIELDS, modified, skipped);
+                FIELD_EXCLUDE_EMPTY_FIELDS, modified, skipped);
 
         clusterConfigService.write(new MigrationCompleted(modified, skipped));
     }
@@ -121,11 +121,13 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProviders extends Mi
 
             for (final Document provider : providers) {
                 if (!TEMPLATE_PROVIDER_TYPE.equals(provider.getString(FIELD_TYPE))
-                        || provider.containsKey(FIELD_INCLUDE_EMPTY_FIELDS)) {
+                        || provider.containsKey(FIELD_EXCLUDE_EMPTY_FIELDS)) {
                     continue;
                 }
 
-                provider.put(FIELD_INCLUDE_EMPTY_FIELDS, !provider.getBoolean(FIELD_REQUIRE_VALUES, false));
+                // Existing providers keep writing empty fields (exclude false). A require_values
+                // provider normalizes to true, since an empty value there is already an error.
+                provider.put(FIELD_EXCLUDE_EMPTY_FIELDS, provider.getBoolean(FIELD_REQUIRE_VALUES, false));
                 changed = true;
             }
         }

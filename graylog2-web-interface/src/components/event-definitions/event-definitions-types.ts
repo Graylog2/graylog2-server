@@ -25,7 +25,7 @@ type Provider = {
   type: string;
   template: string;
   require_values: boolean;
-  include_empty_fields: boolean;
+  exclude_empty_fields: boolean;
   table_name: string;
   key_field: string;
 };

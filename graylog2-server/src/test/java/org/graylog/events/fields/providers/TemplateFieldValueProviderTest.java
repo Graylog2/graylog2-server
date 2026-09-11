@@ -44,16 +44,16 @@ public class TemplateFieldValueProviderTest extends FieldValueProviderTest {
         return (TemplateFieldValueProvider.Config) objectMapper.readValue(json, FieldValueProvider.Config.class);
     }
 
-    private TemplateFieldValueProvider newTemplate(String template, boolean requireValues, boolean includeEmptyFields) {
+    private TemplateFieldValueProvider newTemplate(String template, boolean requireValues, boolean excludeEmptyFields) {
         return new TemplateFieldValueProvider(TemplateFieldValueProvider.Config.builder()
                 .template(template)
                 .requireValues(requireValues)
-                .includeEmptyFields(includeEmptyFields)
+                .excludeEmptyFields(excludeEmptyFields)
                 .build(), Engine.createEngine());
     }
 
     private TemplateFieldValueProvider newTemplate(String template, boolean requireValues) {
-        return newTemplate(template, requireValues, false);
+        return newTemplate(template, requireValues, true);
     }
 
     private TemplateFieldValueProvider newTemplate(String template) {
@@ -146,93 +146,93 @@ public class TemplateFieldValueProviderTest extends FieldValueProviderTest {
     }
 
     @Test
-    public void includeEmptyFieldsDefaultsToFalse() {
+    public void excludeEmptyFieldsDefaultsToTrue() {
         final TemplateFieldValueProvider.Config config = TemplateFieldValueProvider.Config.builder()
                 .template("${source.hello}")
                 .build();
 
-        assertThat(config.includeEmptyFields()).isFalse();
+        assertThat(config.excludeEmptyFields()).isTrue();
     }
 
     @Test
-    public void requireValuesForcesIncludeEmptyFieldsOff() {
+    public void requireValuesForcesExcludeEmptyFieldsOn() {
         final TemplateFieldValueProvider.Config config = TemplateFieldValueProvider.Config.builder()
                 .template("${source.hello}")
-                .includeEmptyFields(true)
+                .excludeEmptyFields(false)
                 .requireValues(true)
                 .build();
 
-        assertThat(config.includeEmptyFields()).isFalse();
+        assertThat(config.excludeEmptyFields()).isTrue();
     }
 
     @Test
-    public void requireValuesForcesIncludeEmptyFieldsOffRegardlessOfSetterOrder() {
+    public void requireValuesForcesExcludeEmptyFieldsOnRegardlessOfSetterOrder() {
         final TemplateFieldValueProvider.Config config = TemplateFieldValueProvider.Config.builder()
                 .template("${source.hello}")
                 .requireValues(true)
-                .includeEmptyFields(true)
+                .excludeEmptyFields(false)
                 .build();
 
-        assertThat(config.includeEmptyFields()).isFalse();
+        assertThat(config.excludeEmptyFields()).isTrue();
     }
 
     @Test
     public void deserializationNormalizesTheInvalidCombination() throws Exception {
         final TemplateFieldValueProvider.Config config = readConfig(
-                "{\"type\":\"template-v1\",\"template\":\"${source.hello}\",\"require_values\":true,\"include_empty_fields\":true}");
+                "{\"type\":\"template-v1\",\"template\":\"${source.hello}\",\"require_values\":true,\"exclude_empty_fields\":false}");
 
         assertThat(config.requireValues()).isTrue();
-        assertThat(config.includeEmptyFields()).isFalse();
+        assertThat(config.excludeEmptyFields()).isTrue();
     }
 
     @Test
-    public void deserializationDefaultsIncludeEmptyFieldsToFalseWhenAbsent() throws Exception {
+    public void deserializationDefaultsExcludeEmptyFieldsToTrueWhenAbsent() throws Exception {
         // This is the on-disk shape of an event definition that has not been migrated yet.
         final TemplateFieldValueProvider.Config config = readConfig(
                 "{\"type\":\"template-v1\",\"template\":\"${source.hello}\",\"require_values\":false}");
 
-        assertThat(config.includeEmptyFields()).isFalse();
+        assertThat(config.excludeEmptyFields()).isTrue();
     }
 
     @Test
-    public void serializationRoundTripPreservesIncludeEmptyFields() throws Exception {
+    public void serializationRoundTripPreservesExcludeEmptyFields() throws Exception {
         final TemplateFieldValueProvider.Config config = TemplateFieldValueProvider.Config.builder()
                 .template("${source.hello}")
-                .includeEmptyFields(true)
+                .excludeEmptyFields(false)
                 .build();
 
         final String json = objectMapper.writeValueAsString(config);
 
-        assertThat(json).contains("include_empty_fields");
+        assertThat(json).contains("exclude_empty_fields");
         assertThat(readConfig(json)).isEqualTo(config);
     }
 
     @Test
-    public void toBuilderRoundTripPreservesIncludeEmptyFields() throws Exception {
+    public void toBuilderRoundTripPreservesExcludeEmptyFields() throws Exception {
         final TemplateFieldValueProvider.Config config = TemplateFieldValueProvider.Config.builder()
                 .template("${source.hello}")
-                .includeEmptyFields(true)
+                .excludeEmptyFields(false)
                 .build();
 
         assertThat(config.toBuilder().build()).isEqualTo(config);
     }
 
     @Test
-    public void emptyTemplateIsExcludedWhenIncludeEmptyFieldsIsOff() {
+    public void emptyTemplateIsExcludedWhenExcludeEmptyFieldsIsOn() {
         final TestEvent event = new TestEvent();
         final EventWithContext eventWithContext = EventWithContext.create(event, newMessage(ImmutableMap.of("hello", "world")));
 
-        final FieldValue fieldValue = newTemplate("${source.missing}", false, false).doGet("test", eventWithContext);
+        final FieldValue fieldValue = newTemplate("${source.missing}", false, true).doGet("test", eventWithContext);
 
         assertThat(fieldValue.isAbsent()).isTrue();
     }
 
     @Test
-    public void emptyTemplateIsIncludedWhenIncludeEmptyFieldsIsOn() {
+    public void emptyTemplateIsIncludedWhenExcludeEmptyFieldsIsOff() {
         final TestEvent event = new TestEvent();
         final EventWithContext eventWithContext = EventWithContext.create(event, newMessage(ImmutableMap.of("hello", "world")));
 
-        final FieldValue fieldValue = newTemplate("${source.missing}", false, true).doGet("test", eventWithContext);
+        final FieldValue fieldValue = newTemplate("${source.missing}", false, false).doGet("test", eventWithContext);
 
         assertThat(fieldValue.isAbsent()).isFalse();
         assertThat(fieldValue.dataType()).isEqualTo(FieldValueType.STRING);
@@ -240,11 +240,11 @@ public class TemplateFieldValueProviderTest extends FieldValueProviderTest {
     }
 
     @Test
-    public void nonEmptyTemplateIsIncludedWhenIncludeEmptyFieldsIsOff() {
+    public void nonEmptyTemplateIsIncludedWhenExcludeEmptyFieldsIsOn() {
         final TestEvent event = new TestEvent();
         final EventWithContext eventWithContext = EventWithContext.create(event, newMessage(ImmutableMap.of("hello", "world")));
 
-        final FieldValue fieldValue = newTemplate("${source.hello}", false, false).doGet("test", eventWithContext);
+        final FieldValue fieldValue = newTemplate("${source.hello}", false, true).doGet("test", eventWithContext);
 
         assertThat(fieldValue.isAbsent()).isFalse();
         assertThat(fieldValue.value()).isEqualTo("world");
@@ -255,18 +255,18 @@ public class TemplateFieldValueProviderTest extends FieldValueProviderTest {
         final TestEvent event = new TestEvent();
         final EventWithContext eventWithContext = EventWithContext.create(event, newMessage(ImmutableMap.of("hello", "world")));
 
-        final FieldValue fieldValue = newTemplate("${source.a} - ${source.b}", false, false).doGet("test", eventWithContext);
+        final FieldValue fieldValue = newTemplate("${source.a} - ${source.b}", false, true).doGet("test", eventWithContext);
 
         assertThat(fieldValue.isAbsent()).isFalse();
         assertThat(fieldValue.value()).isEqualTo(" - ");
     }
 
     @Test
-    public void syntaxErrorStillReturnsErrorWhenIncludeEmptyFieldsIsOff() {
+    public void syntaxErrorStillReturnsErrorWhenExcludeEmptyFieldsIsOn() {
         final TestEvent event = new TestEvent();
         final EventWithContext eventWithContext = EventWithContext.create(event, newMessage(ImmutableMap.of("hello", "world")));
 
-        final FieldValue fieldValue = newTemplate("hello: ${source.hello", false, false).doGet("test", eventWithContext);
+        final FieldValue fieldValue = newTemplate("hello: ${source.hello", false, true).doGet("test", eventWithContext);
 
         assertThat(fieldValue.dataType()).isEqualTo(FieldValueType.ERROR);
         assertThat(fieldValue.isAbsent()).isFalse();

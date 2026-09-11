@@ -50,7 +50,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
-public class V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest {
+public class V20260911120000_AddExcludeEmptyFieldsToTemplateProvidersTest {
 
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -72,7 +72,7 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest {
                 new ClusterEventBus());
 
         this.collection = connection.getMongoDatabase().getCollection("event_definitions");
-        this.migration = new V20260910120000_AddIncludeEmptyFieldsToTemplateProviders(connection, clusterConfigService);
+        this.migration = new V20260911120000_AddExcludeEmptyFieldsToTemplateProviders(connection, clusterConfigService);
     }
 
     private Document providerOf(String title, String fieldName) {
@@ -91,11 +91,11 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest {
 
     @Test
     public void createdAt() {
-        assertThat(migration.createdAt()).isEqualTo(ZonedDateTime.parse("2026-09-10T12:00:00Z"));
+        assertThat(migration.createdAt()).isEqualTo(ZonedDateTime.parse("2026-09-11T12:00:00Z"));
     }
 
     @Test
-    @MongoDBFixtures("V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest.json")
+    @MongoDBFixtures("V20260911120000_AddExcludeEmptyFieldsToTemplateProvidersTest.json")
     public void upgradeStampsExistingTemplateProviders() {
         final long totalBefore = collection.countDocuments();
 
@@ -105,48 +105,48 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest {
                 .withFailMessage("No event definitions should be deleted by the migration!")
                 .isEqualTo(totalBefore);
 
-        // A plain template provider keeps today's behavior: empty values are written to the event.
-        assertThat(providerOf("Plain template field", "user").getBoolean("include_empty_fields")).isTrue();
+        // An existing provider keeps writing empty fields.
+        assertThat(providerOf("Plain template field", "user", 0).getBoolean("exclude_empty_fields")).isFalse();
 
-        // require_values already turns empty values into errors, so the option must be off.
-        assertThat(providerOf("Required template field", "host").getBoolean("include_empty_fields")).isFalse();
+        // require_values already turns empty values into errors, so the option normalizes on.
+        assertThat(providerOf("Required template field", "host", 0).getBoolean("exclude_empty_fields")).isTrue();
 
         // An explicit value set by a newer UI must not be overwritten.
-        assertThat(providerOf("Already stamped", "already").getBoolean("include_empty_fields")).isFalse();
+        assertThat(providerOf("Already stamped", "already", 0).getBoolean("exclude_empty_fields")).isFalse();
 
         // Non-template providers are untouched.
-        assertThat(providerOf("Lookup provider only", "looked_up")).doesNotContainKey("include_empty_fields");
+        assertThat(providerOf("Lookup provider only", "looked_up", 0)).doesNotContainKey("exclude_empty_fields");
 
         // A definition without a field_spec must survive untouched.
         assertThat(collection.find(Filters.eq("title", "No field spec at all")).first()).isNotNull();
 
         // Both providers under one field name are stamped, and so is a second field.
-        assertThat(providerOf("Multiple template fields", "first", 0).getBoolean("include_empty_fields")).isTrue();
-        assertThat(providerOf("Multiple template fields", "first", 1).getBoolean("include_empty_fields")).isTrue();
-        assertThat(providerOf("Multiple template fields", "second", 0).getBoolean("include_empty_fields")).isFalse();
+        assertThat(providerOf("Multiple template fields", "first", 0).getBoolean("exclude_empty_fields")).isFalse();
+        assertThat(providerOf("Multiple template fields", "first", 1).getBoolean("exclude_empty_fields")).isFalse();
+        assertThat(providerOf("Multiple template fields", "second", 0).getBoolean("exclude_empty_fields")).isTrue();
 
         // A malformed definition is skipped rather than aborting the migration.
-        assertThat(providerOf("Malformed require values", "broken", 0)).doesNotContainKey("include_empty_fields");
+        assertThat(providerOf("Malformed require values", "broken", 0)).doesNotContainKey("exclude_empty_fields");
 
-        final V20260910120000_AddIncludeEmptyFieldsToTemplateProviders.MigrationCompleted completed =
-                clusterConfigService.get(V20260910120000_AddIncludeEmptyFieldsToTemplateProviders.MigrationCompleted.class);
+        final V20260911120000_AddExcludeEmptyFieldsToTemplateProviders.MigrationCompleted completed =
+                clusterConfigService.get(V20260911120000_AddExcludeEmptyFieldsToTemplateProviders.MigrationCompleted.class);
         assertThat(completed).isNotNull();
         assertThat(completed.modifiedEventDefinitions()).isEqualTo(3L);
         assertThat(completed.skippedEventDefinitions()).isEqualTo(1L);
     }
 
     @Test
-    @MongoDBFixtures("V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest.json")
+    @MongoDBFixtures("V20260911120000_AddExcludeEmptyFieldsToTemplateProvidersTest.json")
     public void malformedDefinitionDoesNotAbortTheMigration() {
         // A backfill must never block server startup, so a bad document is skipped, not fatal.
         assertThatCode(() -> migration.upgrade()).doesNotThrowAnyException();
 
         // Definitions after the malformed one in iteration order are still stamped.
-        assertThat(providerOf("Plain template field", "user", 0).getBoolean("include_empty_fields")).isTrue();
+        assertThat(providerOf("Plain template field", "user", 0).getBoolean("exclude_empty_fields")).isFalse();
     }
 
     @Test
-    @MongoDBFixtures("V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest.json")
+    @MongoDBFixtures("V20260911120000_AddExcludeEmptyFieldsToTemplateProvidersTest.json")
     public void backfillIsIdempotent() {
         migration.upgrade();
         final List<Document> afterFirstRun = collection.find().into(new ArrayList<>());
@@ -154,7 +154,7 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest {
         // Clear the completion marker so the second run actually walks the documents again.
         connection.getMongoDatabase().getCollection("cluster_config")
                 .deleteMany(Filters.eq("type",
-                        V20260910120000_AddIncludeEmptyFieldsToTemplateProviders.MigrationCompleted.class.getCanonicalName()));
+                        V20260911120000_AddExcludeEmptyFieldsToTemplateProviders.MigrationCompleted.class.getCanonicalName()));
 
         migration.upgrade();
 
@@ -162,7 +162,7 @@ public class V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest {
     }
 
     @Test
-    @MongoDBFixtures("V20260910120000_AddIncludeEmptyFieldsToTemplateProvidersTest.json")
+    @MongoDBFixtures("V20260911120000_AddExcludeEmptyFieldsToTemplateProvidersTest.json")
     public void upgradeSkipsWorkWhenAlreadyCompleted() {
         migration.upgrade();
         final List<Document> afterFirstRun = collection.find().into(new ArrayList<>());
