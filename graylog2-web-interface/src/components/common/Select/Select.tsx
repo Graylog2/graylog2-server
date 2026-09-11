@@ -299,6 +299,18 @@ type State = {
   inputValue: string;
 };
 
+/**
+ * The option filtering `Select` itself applies to the typed text. Exported so a caller can ask
+ * the same question rather than approximating it: matchSorter also matches subsequences and
+ * acronyms, which a substring test would disagree with.
+ */
+export const matchOptions = (
+  options: ReadonlyArray<Option>,
+  query: string,
+  { displayKey = 'label', ignoreAccents = true }: { displayKey?: string; ignoreAccents?: boolean } = {},
+): Array<Option> =>
+  matchSorter(options as Array<Option>, query, { keys: [displayKey, 'label'], keepDiacritics: !ignoreAccents });
+
 const getCustomComponents = (
   inputProps?: { [key: string]: any },
   optionRenderer?: (option: Option) => React.ReactElement,
@@ -556,12 +568,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     const customFilter = this.createCustomFilter();
 
     const sortedOptions =
-      !async && inputValue
-        ? matchSorter(rawOptions, inputValue, {
-            keys: [displayKey, 'label'],
-            keepDiacritics: !ignoreAccents,
-          })
-        : rawOptions;
+      !async && inputValue ? matchOptions(rawOptions, inputValue, { displayKey, ignoreAccents }) : rawOptions;
 
     const mergedComponents = {
       ..._components,

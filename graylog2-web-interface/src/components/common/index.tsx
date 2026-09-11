@@ -165,3 +165,4 @@ export { default as SearchFiltersFormControls } from './SearchFiltersFormControl
 export { default as ModalButtonToolbar } from './ModalButtonToolbar';
 export { default as AccessibleCard } from './AccessibleCard';
 export { default as StatCard } from './StatCard/StatCard';
+export { default as useChipInput } from './useChipInput';
