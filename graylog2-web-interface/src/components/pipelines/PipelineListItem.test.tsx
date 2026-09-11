@@ -126,3 +126,29 @@ describe('PipelineListItem Pipeline Load cell', () => {
     expect(screen.getByLabelText(/Pipeline Load is unavailable/i)).toBeInTheDocument();
   });
 });
+
+describe('PipelineListItem stage list', () => {
+  beforeEach(() => {
+    asMock(useGetPermissionsByScope).mockReturnValue({
+      loadingScopePermissions: false,
+      scopePermissions: { is_mutable: true, is_deletable: true },
+      checkPermissions: jest.fn(),
+    });
+  });
+
+  it('renders stages in numeric order, not lexical order', () => {
+    const multiStagePipeline: PipelineType = {
+      ...pipeline,
+      stages: [
+        { stage: 100, match: 'EITHER', rules: [] },
+        { stage: 2, match: 'EITHER', rules: [] },
+      ],
+    };
+
+    renderListItem({ pipeline: multiStagePipeline, pipelines: [multiStagePipeline] });
+
+    const stageLabels = screen.getAllByText(/^Stage \d+$/).map((el) => el.textContent);
+
+    expect(stageLabels).toEqual(['Stage 2', 'Stage 100']);
+  });
+});
