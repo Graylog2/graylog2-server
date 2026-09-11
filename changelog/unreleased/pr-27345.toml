@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed truncated Status column on the Streams page and hid the Description column by default in the Routing and Performance views."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15393"]
+pulls = ["27345"]
