@@ -181,7 +181,7 @@ public class InputRoutingRulesService {
                 new PaginatedList<>(pageSlice, total, page, perPage);
 
         return PageListResponse.create(query, paginatedList.pagination(),
-                paginatedList.grandTotal().orElse(0L), sort, order, paginatedList.delegate(), PIPELINE_ATTRIBUTES, PIPELINE_SETTINGS);
+                paginatedList.pagination().total(), sort, order, paginatedList.delegate(), PIPELINE_ATTRIBUTES, PIPELINE_SETTINGS);
     }
 
     public PageListResponse<InputStreamRulesResponse> getStreamRulesPage(
@@ -237,7 +237,7 @@ public class InputRoutingRulesService {
                 new PaginatedList<>(pageSlice, total, page, perPage);
 
         return PageListResponse.create(query, paginatedList.pagination(),
-                paginatedList.grandTotal().orElse(0L), sort, order, paginatedList.delegate(), STREAM_RULE_ATTRIBUTES, STREAM_RULE_SETTINGS);
+                paginatedList.pagination().total(), sort, order, paginatedList.delegate(), STREAM_RULE_ATTRIBUTES, STREAM_RULE_SETTINGS);
     }
 
     private Comparator<StreamPipelineRulesResponse> getPipelineRulesComparator(String sort) {
