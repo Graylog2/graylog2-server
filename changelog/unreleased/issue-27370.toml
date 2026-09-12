@@ -1,0 +1,5 @@
+type = "f"
+message = "Change repository for MinIO container images."
+
+issues = ["27370"]
+pulls = ["27371"]
