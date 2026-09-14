@@ -340,11 +340,6 @@
                 <version>${geoip2.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.graylog.cef</groupId>
-                <artifactId>cef-parser</artifactId>
-                <version>${cef-parser.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jool</artifactId>
                 <version>${jool.version}</version>
