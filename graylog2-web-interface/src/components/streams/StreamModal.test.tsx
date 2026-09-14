@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as mockImmutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
@@ -42,7 +43,7 @@ jest.mock('domainActions/permissions/EntityShareDomain', () => ({
     update: jest.fn(() => Promise.resolve()),
     loadUserSharesPaginated: jest.fn(() =>
       Promise.resolve({
-        list: require('immutable').List(),
+        list: mockImmutable.List(),
         pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
       }),
     ),
@@ -88,6 +89,8 @@ describe('StreamModal', () => {
     await screen.findByRole('textbox', {
       name: /description/i,
     });
+
+    expect(await screen.findByRole('checkbox', { name: /remove matches from/i })).toBeChecked();
   });
 
   it('should update stream', async () => {
@@ -186,7 +189,7 @@ describe('StreamModal', () => {
       expect(onSubmit).toHaveBeenCalledWith({
         description: 'New description',
         index_set_id: 'index-set-id-2',
-        remove_matches_from_default_stream: false,
+        remove_matches_from_default_stream: true,
         title: 'New title',
         share_request: {
           selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
