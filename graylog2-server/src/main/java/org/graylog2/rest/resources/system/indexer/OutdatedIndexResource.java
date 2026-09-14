@@ -164,7 +164,7 @@ public class OutdatedIndexResource extends RestResource {
         final SearchQuery parsedQuery = searchQueryParser.parse(query);
         final PaginatedList<OutdatedIndex> result = outdatedIndexSearchService.search(parsedQuery, sort, order, page, perPage);
         return PageListResponse.create(query, result.pagination(),
-                result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
+                result.pagination().total(), sort, order, result.stream().toList(), attributes, settings);
     }
 
     @POST
