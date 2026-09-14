@@ -21,12 +21,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
+import oshi.software.os.CgroupInfo;
 
 public class CpuLoadGauge implements Gauge<Double> {
 
     private static final Logger LOG = LoggerFactory.getLogger(CpuLoadGauge.class);
 
     private long[] lastTicks;
+    private long lastContainerUsage = -1L;
+    private long lastContainerTime = -1L;
     private volatile Double cpuLoad;
     private boolean disabled = false;
 
@@ -40,6 +43,28 @@ public class CpuLoadGauge implements Gauge<Double> {
             return;
         }
         try {
+            final CgroupInfo cgroup = cgroupInfo();
+            if (cgroup != null && cgroup.isContainerized()) {
+                final long newUsage = cgroup.getCpuUsage();
+                final long newTime = System.nanoTime();
+                if (newUsage > 0) {
+                    if (lastContainerUsage >= 0 && lastContainerTime > 0) {
+                        final long deltaUsage = newUsage - lastContainerUsage;
+                        final long deltaTime = newTime - lastContainerTime;
+                        if (deltaTime > 0 && deltaUsage >= 0) {
+                            final double effectiveCpus = cgroup.getEffectiveCpus();
+                            final double cpus = effectiveCpus > 0 ? effectiveCpus : processor().getLogicalProcessorCount();
+                            if (cpus > 0) {
+                                cpuLoad = Math.min(100.0d, Math.max(0.0d, (double) deltaUsage / (deltaTime * cpus) * 100.0d));
+                            }
+                        }
+                    }
+                    lastContainerUsage = newUsage;
+                    lastContainerTime = newTime;
+                    return;
+                }
+            }
+
             final CentralProcessor processor = processor();
             final long[] newTicks = processor.getSystemCpuLoadTicks();
             if (lastTicks == null) {
@@ -66,5 +91,10 @@ public class CpuLoadGauge implements Gauge<Double> {
     protected CentralProcessor processor() {
         final SystemInfo si = new SystemInfo();
         return si.getHardware().getProcessor();
+    }
+
+    protected CgroupInfo cgroupInfo() {
+        final SystemInfo si = new SystemInfo();
+        return si.getOperatingSystem().getCgroupInfo();
     }
 }
