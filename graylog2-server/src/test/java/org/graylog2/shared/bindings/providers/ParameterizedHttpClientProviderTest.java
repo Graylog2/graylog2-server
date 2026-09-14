@@ -25,6 +25,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.tls.HandshakeCertificates;
 import okhttp3.tls.HeldCertificate;
+import org.graylog2.utilities.ProxyConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -142,12 +143,13 @@ public class ParameterizedHttpClientProviderTest {
     }
 
     private OkHttpClientProvider client(URI proxyURI) {
+        final ProxyConfig proxyConfig = proxyURI == null ? null : new ProxyConfig(proxyURI);
         final OkHttpClientProvider provider = new OkHttpClientProvider(
                 "GraylogTest",
                 Duration.milliseconds(500L),
                 Duration.milliseconds(500L),
                 Duration.milliseconds(500L),
-                proxyURI, null, null);
+                proxyConfig, null, new ProxySelectorProvider(proxyConfig, null));
 
         return provider;
     }

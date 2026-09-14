@@ -29,6 +29,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -233,6 +234,16 @@ public class OutdatedIndexResource extends RestResource {
     public BulkOperationResponse bulkDeleteOutdated(@Parameter(name = "Entities to remove", required = true) BulkOperationRequest request) {
         if (request == null || request.entityIds() == null || request.entityIds().isEmpty()) {
             throw new BadRequestException("No index names provided");
+        }
+
+        // Reject callers with no relevant permission at all before doing any work below. Managed indices can
+        // still be deleted with a per-index grant even without the general permission (see #deleteSingleOutdated),
+        // so this only rejects a caller who holds neither the general permission nor a per-index grant for any of
+        // the requested indices.
+        final boolean hasGeneralDeletePermission = isPermitted(RestPermissions.INDICES_DELETE);
+        if (!hasGeneralDeletePermission
+                && request.entityIds().stream().noneMatch(index -> isPermitted(RestPermissions.INDICES_DELETE, index))) {
+            throw new ForbiddenException("Not authorized to delete indices");
         }
 
         final Map<String, OutdatedIndex> outdatedByName = getOutdatedIndices().stream()
