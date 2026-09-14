@@ -308,7 +308,7 @@ public class AggregationSearchUtils {
         }
 
         // DecimalFormat isn't thread-safe, so a fresh instance is created per call rather than shared/cached.
-        final DecimalFormat format = new DecimalFormat("#,##0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        final DecimalFormat format = new DecimalFormat("#,##0.#####", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
         return format.format(value);
     }
