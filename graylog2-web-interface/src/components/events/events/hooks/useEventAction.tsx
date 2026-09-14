@@ -39,13 +39,14 @@ const useEventAction = (event: Event) => {
             isMenuitem
             onClick={() => sendEventActionTelemetry('REPLAY_SEARCH', false)}
             id={event.id}
+            eventDefinitionId={event.event_definition_id}
             isEvent
           />
         ) : null,
         pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
         pluggableActions.length ? pluggableActions : null,
       ].filter(Boolean),
-    [sendEventActionTelemetry, event.id, hasReplayInfo, pluggableActions, isPermitted],
+    [sendEventActionTelemetry, event.event_definition_id, event.id, hasReplayInfo, pluggableActions, isPermitted],
   );
 
   return { moreActions, pluggableActionModals };

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as Immutable from 'immutable';
 
 import BulkActions from 'components/events/events/BulkActions';
 import { asMock } from 'helpers/mocking';
@@ -24,6 +25,8 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventAction } from 'views/types';
 import type { Event } from 'components/events/events/types';
+import CurrentUserContext from 'contexts/CurrentUserContext';
+import { alice } from 'fixtures/users';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
@@ -51,6 +54,16 @@ const mockedSelectedEntitiesData = {
   '01HV0YS4GH0VC7DV6A2VGN1VJ0': getEvent('01HV0YS4GH0VC7DV6A2VGN1VJ0'),
 };
 
+const getReplayableEvent = (id: string): Event => ({
+  ...getEvent(id),
+  replay_info: {
+    timerange_start: '2024-01-01',
+    timerange_end: '2024-01-02',
+    query: 'source:example',
+    streams: ['000000000000000000000001'],
+  },
+});
+
 const mockedEventActions: Array<EventAction> = [
   {
     useCondition: () => true,
@@ -67,7 +80,8 @@ const mockedEventActions: Array<EventAction> = [
     modal: React.forwardRef(() => <b>I am a modal without a bulk</b>),
   },
 ];
-const renderBulkAction = () => render(<BulkActions selectedEntitiesData={mockedSelectedEntitiesData} />);
+const renderBulkAction = (selectedEntitiesData = mockedSelectedEntitiesData) =>
+  render(<BulkActions selectedEntitiesData={selectedEntitiesData} />);
 
 const openActionsDropdown = async () =>
   await userEvent.click(
@@ -112,5 +126,23 @@ describe('Events Bulk Action', () => {
 
     expect(notBulkComponent).not.toBeInTheDocument();
     expect(notBulkModal).not.toBeInTheDocument();
+  });
+
+  it('renders replay search for replayable events when user can read their event definition', async () => {
+    asMock(usePluginEntities).mockReturnValue([]);
+
+    render(
+      <CurrentUserContext.Provider
+        value={alice
+          .toBuilder()
+          .permissions(Immutable.List(['eventdefinitions:read:event_definition_id_1']))
+          .build()}>
+        <BulkActions selectedEntitiesData={{ event_id_1: getReplayableEvent('event_id_1') }} />
+      </CurrentUserContext.Provider>,
+    );
+
+    await openActionsDropdown();
+
+    await screen.findByRole('menuitem', { name: /replay search/i });
   });
 });
