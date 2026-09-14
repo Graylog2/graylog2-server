@@ -304,7 +304,7 @@ public class AggregationSearchUtils {
         if (absValue != 0 && (absValue >= LARGE_VALUE_SCIENTIFIC_NOTATION_THRESHOLD
                 || absValue <= SMALL_VALUE_SCIENTIFIC_NOTATION_THRESHOLD)) {
             // Double#toString already renders scientific notation for every value in this range.
-            return Double.toString(value);
+            return new DecimalFormat("0.#####E0", DecimalFormatSymbols.getInstance(Locale.ENGLISH)).format(value);
         }
 
         // DecimalFormat isn't thread-safe, so a fresh instance is created per call rather than shared/cached.
