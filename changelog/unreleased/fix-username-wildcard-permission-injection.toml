@@ -1,0 +1,8 @@
+type = "f"
+message = """
+Security: usernames are no longer concatenated unchecked into wildcard permission strings. A username containing \
+`*`, `,` or `:` widened the implicit self-service permissions (`users:edit:<name>`, `users:passwordchange:<name>`, …) \
+and grant-derived permissions to cover other users, allowing privilege escalation up to administrator. Such usernames \
+are now rejected when a user is created or updated, and permissions built from an unsafe identifier fail closed \
+instead of granting a wildcard. Note that existing accounts whose name contains one of these characters keep working \
+but no longer receive the implicit self-service permissions until they are renamed."""
