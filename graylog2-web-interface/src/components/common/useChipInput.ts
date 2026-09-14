@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useState } from 'react';
-import type { InputActionMeta } from 'react-select';
+import type { ActionMeta, InputActionMeta } from 'react-select';
 
 // Unit separator; callers restrict values to characters that exclude it.
 export const VALUE_DELIMITER = '\x1F';
@@ -58,13 +58,18 @@ const useChipInput = ({
   const isAtMax = values.length >= max;
   const inputMessage = candidate ? (validateInput ?? validate)(candidate, input) : null;
 
-  const handleChange = (joined: string) => {
+  const handleChange = (joined: string, actionMeta?: ActionMeta<unknown>) => {
     const raw = joined ? joined.split(VALUE_DELIMITER) : [];
     const normalized = raw.map(normalize).filter((value) => value.length > 0);
 
     onChange(Array.from(new Set(normalized)).slice(0, max));
-    setInput('');
-    onInputChanged?.('');
+
+    // Removing a chip is not a commit, so half-typed text in the input survives it.
+    if (actionMeta?.action !== 'remove-value' && actionMeta?.action !== 'pop-value') {
+      setInput('');
+      onInputChanged?.('');
+    }
+
     setDuplicateAttempt(null);
   };
 

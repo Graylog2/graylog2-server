@@ -66,6 +66,16 @@ describe('TagsEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith(['phishing']);
   });
 
+  it('keeps half-typed text when an existing chip is removed', async () => {
+    render(<Harness initial={['phishing']} />);
+
+    const input = screen.getByRole('combobox');
+    await userEvent.type(input, 'later');
+    await userEvent.click(screen.getByLabelText('Remove phishing'));
+
+    expect(input).toHaveValue('later');
+  });
+
   it('commits a new tag via Tab key', async () => {
     const onChange = jest.fn();
     render(<Harness onChange={onChange} />);
