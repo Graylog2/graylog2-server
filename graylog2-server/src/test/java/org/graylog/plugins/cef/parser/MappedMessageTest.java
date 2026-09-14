@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.cef.parser;
 
-import com.github.jcustenborder.cef.CEFParser;
-import com.github.jcustenborder.cef.CEFParserFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
@@ -42,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MappedMessageTest {
     private static final String HEADER = "CEF:0|SecureAuth|SecureAuth IdP|9.3|90030|Application - End request|4|";
 
-    private final CEFParser parser = CEFParserFactory.create();
+    private final CEFParser parser = new CEFParser();
 
     private Logger logger;
     private Level originalLevel;

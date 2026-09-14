@@ -144,6 +144,19 @@ describe('SystemNotificationsTable', () => {
     expect(mockMutate).toHaveBeenCalledWith({ id: 'notif-1' });
   });
 
+  describe('severity label', () => {
+    it('labels a "normal" severity notification as "Info"', async () => {
+      asMock(useFetchEntities).mockReturnValue(mockFetchData([{ ...notif1, severity: 'normal' }]));
+
+      render(<SystemNotificationsTable />);
+
+      const row = await screen.findByTestId('table-row-notif-1');
+
+      await within(row).findByText('Info');
+      expect(within(row).queryByText('Normal')).not.toBeInTheDocument();
+    });
+  });
+
   describe('bulk actions', () => {
     it('renders bulk actions dropdown with a Dismiss item and no read-state items', async () => {
       asMock(useFetchEntities).mockReturnValue(mockFetchData([notif1]));
