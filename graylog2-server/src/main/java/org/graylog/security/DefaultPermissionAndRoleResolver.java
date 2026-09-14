@@ -74,19 +74,40 @@ public class DefaultPermissionAndRoleResolver implements PermissionAndRoleResolv
             final Set<GRN> targets = resolveTargets(grant.target());
 
             for (GRN target : targets) {
-                final Optional<CapabilityDescriptor> capability = capabilityRegistry.get(grant.capability());
-
-                if (capability.isPresent()) {
-                    capability.get()
-                            .permissionsFor(target.grnType())
-                            .forEach(permission -> permissionsBuilder.add(permission.toShiroPermission(target)));
-                } else {
-                    logger.warn("Couldn't find capability <{}>", grant.capability());
-                }
+                permissionsFor(grant, target)
+                        .forEach(permission -> permissionsBuilder.add(permission.toShiroPermission(target)));
             }
         }
 
         return permissionsBuilder.build();
+    }
+
+    /**
+     * Returns the permissions the given grant confers on one of its resolved targets.
+     * <p>
+     * Subclasses that expand a container target into its members in {@link #resolveTargets(GRN)} should override this
+     * to restrict what the grant confers on those members. A capability on a container is about the container, and
+     * carrying it over unchanged would silently hand out the same capability on every member.
+     *
+     * @param grant  the grant being resolved
+     * @param target one of the targets {@link #resolveTargets(GRN)} returned for the grant
+     * @return the permissions to grant on that target
+     */
+    protected Set<org.graylog2.plugin.security.Permission> permissionsFor(GrantDTO grant, GRN target) {
+        return permissionsFor(grant.capability(), target);
+    }
+
+    /**
+     * Returns the permissions the given capability confers on the given target.
+     */
+    protected Set<org.graylog2.plugin.security.Permission> permissionsFor(Capability capability, GRN target) {
+        final Optional<CapabilityDescriptor> descriptor = capabilityRegistry.get(capability);
+
+        if (descriptor.isEmpty()) {
+            logger.warn("Couldn't find capability <{}>", capability);
+            return Set.of();
+        }
+        return descriptor.get().permissionsFor(target.grnType());
     }
 
     @Override
