@@ -303,6 +303,18 @@ public class EventDefinitionDtoTest {
     }
 
     @Test
+    public void wellFormedTacticsTechniquesAreValidEvenIfUnknownToUs() {
+        // IDs are only checked for format. A technique can be published by MITRE before any
+        // catalogue we ship knows about it, and rejecting those would leave an event definition
+        // that was imported with one permanently uneditable.
+        final EventDefinitionDto valid = testSubject.toBuilder()
+                .tacticsTechniques(ImmutableList.of("T1685", "TA9999", "T9999.001"))
+                .build();
+        final ValidationResult validationResult = validate(valid);
+        assertThat(validationResult.getErrors()).doesNotContainKey("tactics_techniques");
+    }
+
+    @Test
     public void tagWithDotIsValid() {
         // The test fixture may have unrelated validation errors, so we only assert that
         // no tags-specific error is reported.
