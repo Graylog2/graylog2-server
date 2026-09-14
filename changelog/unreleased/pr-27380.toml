@@ -1,5 +1,6 @@
 type = "f"
-message = """
+message = "Refuse authentication service takeover of unrelated accounts through name collision"
+user.details = """
 Security: an authentication service can no longer take over an existing user account that merely carries the same \
 username. User provisioning looks an account up by authentication service UID *or* username and then overwrites its \
 external flag, authentication service and name while keeping its roles and permissions. An external identity whose \
@@ -8,3 +9,5 @@ and locked the original user out, since local password logins are refused for ex
 updates an account that is already managed by the same authentication service and fails with a clear error otherwise. \
 Set `allow_auth_service_account_takeover = true` to keep the previous behaviour while migrating local accounts to an \
 authentication service."""
+
+pulls = ["27380"]
