@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.fields.EventFieldSpec;
+import org.graylog.events.fields.FieldValueType;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.security.UserContext;
@@ -115,8 +116,9 @@ public class EventDefinitionDtoTest {
         assertThat(validationResult.getErrors()).containsOnlyKeys("field_spec");
         final List<String> fieldValidation = (List<String>) validationResult.getErrors().get("field_spec");
         assertThat(fieldValidation.size()).isEqualTo(2);
-        assertThat(fieldValidation.get(0)).contains("foo\\bar");
-        assertThat(fieldValidation.get(1)).contains("$yo&^a");
+        // field_spec is sorted, so the errors follow alphabetical field name order
+        assertThat(fieldValidation.get(0)).contains("$yo&^a");
+        assertThat(fieldValidation.get(1)).contains("foo\\bar");
     }
 
     @Test
@@ -311,5 +313,19 @@ public class EventDefinitionDtoTest {
                 .build();
         final ValidationResult validationResult = validate(valid);
         assertThat(validationResult.getErrors()).doesNotContainKey("tags");
+    }
+
+    @Test
+    public void sortsFieldSpecAlphabetically() {
+        final EventFieldSpec spec = EventFieldSpec.builder()
+                .dataType(FieldValueType.STRING)
+                .providers(ImmutableList.of())
+                .build();
+
+        final EventDefinitionDto dto = testSubject.toBuilder()
+                .fieldSpec(ImmutableMap.of("zulu", spec, "alpha", spec, "charlie", spec))
+                .build();
+
+        assertThat(dto.fieldSpec().keySet()).containsExactly("alpha", "charlie", "zulu");
     }
 }
