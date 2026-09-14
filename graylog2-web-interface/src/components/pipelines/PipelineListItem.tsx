@@ -25,7 +25,6 @@ import { Button, Label } from 'components/bootstrap';
 import type { PipelineType } from 'components/pipelines/types';
 import type { PipelineConnectionsType } from 'hooks/usePipelineConnections';
 import type { Stream } from 'logic/streams/types';
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 import usePermissions from 'hooks/usePermissions';
@@ -97,7 +96,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
           getStagesWithoutDuplicates(pipelineStages, usedStagesAcc),
         [],
       )
-      .sort(naturalSort)
+      .sort((a, b) => a - b)
       .map((usedStage) => {
         if (stageNumbers.indexOf(usedStage) === -1) {
           return (
