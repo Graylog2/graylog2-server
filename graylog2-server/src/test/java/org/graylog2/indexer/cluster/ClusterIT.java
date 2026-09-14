@@ -21,8 +21,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
@@ -108,6 +110,22 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
             assertThat(node.jvmMemHeapMaxInBytes()).isGreaterThan(0);
             assertThat(node.roles()).isNotEmpty();
         });
+    }
+
+    @Test
+    public void clusterShardAllocation() {
+        client().createRandomIndex("cluster_it_");
+
+        final ClusterShardAllocation allocation = cluster.clusterShardAllocation();
+
+        // Elasticsearch leaves the maximum unbounded on purpose (see ClusterAdapterES7), OpenSearch reads the real
+        // cluster.max_shards_per_node; both are positive, and the notification path only compares a ratio of it.
+        assertThat(allocation.maxShardsPerNode()).isPositive();
+        assertThat(allocation.nodeShardAllocations()).isNotEmpty();
+        assertThat(allocation.nodeShardAllocations()).allSatisfy(node ->
+                assertThat(node.node()).isNotBlank());
+        assertThat(allocation.nodeShardAllocations().stream().mapToInt(NodeShardAllocation::shards).sum())
+                .isGreaterThanOrEqualTo(1);
     }
 
     @Test
