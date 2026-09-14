@@ -334,6 +334,19 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "trusted_proxies", converter = IPSubnetConverter.class)
     private Set<IpSubnet> trustedProxies = Collections.emptySet();
 
+    @Documentation("""
+            Allow an authentication service (LDAP, Active Directory, OIDC, SAML, ...) to take over an existing user
+            account that carries the same username but is not managed by that service.
+
+            This is disabled by default. When an external identity is provisioned, an account matching only by username
+            would otherwise be converted into an account of that authentication service and the external identity would
+            inherit whatever roles and permissions it already holds - up to and including the Admin role. Enable this
+            only when you are migrating existing local accounts to an authentication service and you control which
+            usernames that service can present.
+            """)
+    @Parameter(value = "allow_auth_service_account_takeover")
+    private boolean allowAuthServiceAccountTakeover = false;
+
     @Documentation("tbd")
     @Parameter(value = "deactivated_builtin_authentication_providers", converter = StringSetConverter.class)
     private Set<String> deactivatedBuiltinAuthenticationProviders = Collections.emptySet();
@@ -734,6 +747,10 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     public int getLoadBalancerRequestThrottleJournalUsage() {
         return loadBalancerThrottleThresholdPercentage;
+    }
+
+    public boolean isAllowAuthServiceAccountTakeover() {
+        return allowAuthServiceAccountTakeover;
     }
 
     public Set<String> getDeactivatedBuiltinAuthenticationProviders() {
