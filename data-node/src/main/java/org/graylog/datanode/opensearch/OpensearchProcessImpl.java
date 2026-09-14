@@ -168,7 +168,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public String getOpensearchClusterUrl() {
-        return configuration.getDatanodeNodeName() + ":" + configuration.getOpensearchTransportPort();
+        return configuration.getOpensearchNetworkPublishHost() + ":" + configuration.getOpensearchTransportPort();
     }
 
     @Override
