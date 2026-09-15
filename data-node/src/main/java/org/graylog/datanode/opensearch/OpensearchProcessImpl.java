@@ -234,6 +234,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
             LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
             final String recommendedMemory = FileUtils.byteCountToDisplaySize(memoryValues.total() / 2);
             clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
+                    Notification.Severity.NORMAL,
                     Map.of("hostname", configuration.getHostname(),
                             "memoryRatio", f("%.1f", memoryRatio),
                             "totalMemory", FileUtils.byteCountToDisplaySize(memoryValues.total()),

@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch;
 
 import com.google.common.eventbus.EventBus;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.security.certutil.KeyPair;
@@ -48,6 +49,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class CertificateReloadVerifierTest {
 
@@ -63,6 +66,7 @@ class CertificateReloadVerifierTest {
 
 
     private final NodeId nodeId = new SimpleNodeId("test-node-id");
+    private final Configuration configuration = mock(Configuration.class);
 
     private TlsTestServer server;
     private DatanodeNotificationsReceiver notificationsReceiver;
@@ -70,6 +74,7 @@ class CertificateReloadVerifierTest {
     @BeforeEach
     void setUp() {
         this.notificationsReceiver = new DatanodeNotificationsReceiver(clusterEventBus);
+        when(configuration.getDatanodeNodeName()).thenReturn("test-data-node");
     }
 
     @AfterEach
@@ -80,7 +85,7 @@ class CertificateReloadVerifierTest {
     }
 
     private CertificateReloadVerifier newVerifier() {
-        return new CertificateReloadVerifier(clusterEventBus, nodeId, VERIFICATION_TIMEOUT, RETRY_INTERVAL, SOCKET_TIMEOUT);
+        return new CertificateReloadVerifier(clusterEventBus, nodeId, configuration, VERIFICATION_TIMEOUT, RETRY_INTERVAL, SOCKET_TIMEOUT);
     }
 
     // generous upper bound the verifier should never actually need given VERIFICATION_TIMEOUT/RETRY_INTERVAL/
@@ -120,7 +125,11 @@ class CertificateReloadVerifierTest {
         // it escalated exactly once (not repeatedly) and any notification it sent already arrived by now
         assertThat(notificationsReceiver.getNotifications())
                 .hasSize(1)
-                .anySatisfy(notification -> assertThat(notification.notificationType()).isEqualTo(Notification.Type.DATA_NODE_CERT_RENEWAL_WARNING));
+                .anySatisfy(notification -> {
+                    assertThat(notification.notificationType()).isEqualTo(Notification.Type.DATA_NODE_CERT_RENEWAL_WARNING);
+                    assertThat(notification.severity()).isEqualTo(Notification.Severity.URGENT);
+                    assertThat(notification.details()).containsEntry("nodeName", "test-data-node");
+                });
     }
 
     @Test

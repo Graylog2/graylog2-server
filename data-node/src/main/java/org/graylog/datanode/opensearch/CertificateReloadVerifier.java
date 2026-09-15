@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog2.datanode.DataNodeNotficationEvent;
 import org.graylog2.events.ClusterEventBus;
@@ -79,6 +80,7 @@ public class CertificateReloadVerifier {
 
     private final ClusterEventBus clusterEventBus;
     private final NodeId nodeId;
+    private final Configuration configuration;
     private final Duration verificationTimeout;
     private final Duration retryInterval;
     private final Duration socketTimeout;
@@ -91,15 +93,16 @@ public class CertificateReloadVerifier {
     private final AtomicReference<PendingVerification> current = new AtomicReference<>();
 
     @Inject
-    public CertificateReloadVerifier(ClusterEventBus clusterEventBus, NodeId nodeId) {
-        this(clusterEventBus, nodeId, VERIFICATION_TIMEOUT, RETRY_INTERVAL, SOCKET_TIMEOUT);
+    public CertificateReloadVerifier(ClusterEventBus clusterEventBus, NodeId nodeId, Configuration configuration) {
+        this(clusterEventBus, nodeId, configuration, VERIFICATION_TIMEOUT, RETRY_INTERVAL, SOCKET_TIMEOUT);
     }
 
     @VisibleForTesting
-    CertificateReloadVerifier(ClusterEventBus clusterEventBus, NodeId nodeId,
+    CertificateReloadVerifier(ClusterEventBus clusterEventBus, NodeId nodeId, Configuration configuration,
                                Duration verificationTimeout, Duration retryInterval, Duration socketTimeout) {
         this.clusterEventBus = clusterEventBus;
         this.nodeId = nodeId;
+        this.configuration = configuration;
         this.verificationTimeout = verificationTimeout;
         this.retryInterval = retryInterval;
         this.socketTimeout = socketTimeout;
@@ -122,7 +125,7 @@ public class CertificateReloadVerifier {
             return CompletableFuture.completedFuture(null);
         }
 
-        LOG.debug("Expecting opensearch HTTP layer to start serving certificate with serial {} after hot reload", expectedSerialNumber);
+        LOG.info("Starting certificate hot-reload verification, expecting opensearch HTTP layer to start serving certificate with serial {}", expectedSerialNumber);
         final PendingVerification pendingVerification = PendingVerification.schedule(expectedSerialNumber, scheduler, retryInterval,
                 pending -> checkOnce(pending, httpBaseUrlSupplier));
         supersede(pendingVerification);
@@ -190,7 +193,9 @@ public class CertificateReloadVerifier {
 
     private void notifyReloadStuck() {
         clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_CERT_RENEWAL_WARNING,
-                Map.of("reason", "Certificate hot reload did not take effect on the opensearch HTTP layer, node likely needs a restart")));
+                Notification.Severity.URGENT,
+                Map.of("nodeName", configuration.getDatanodeNodeName(),
+                        "reason", "Certificate hot reload did not take effect on the opensearch HTTP layer, node likely needs a restart")));
     }
 
     @Nullable
