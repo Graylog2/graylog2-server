@@ -34,11 +34,7 @@ function usePluggableEntitySharedActions<T>(entity: T, entityType: string, onClo
     const { key, component: PluggableEntityAction } = action;
 
     return (
-      <PluggableEntityAction
-        key={`entity-action-${key}`}
-        entity={entity}
-        modalRef={() => modalRefs.current[key]}
-      />
+      <PluggableEntityAction key={`entity-action-${key}`} entity={entity} modalRef={() => modalRefs.current[key]} />
     );
   });
 
