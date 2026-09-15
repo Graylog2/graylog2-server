@@ -96,6 +96,15 @@ public enum NodeStatMetrics {
         return mappingFunction.apply(value);
     }
 
+    /**
+     * Applies the metric's unit conversion (e.g. bytes to GiB) used when storing values in the metrics index
+     * and its dashboards. The metric-registry gauges, in contrast, expose the raw values so that their
+     * "*_in_bytes" names stay accurate.
+     */
+    public static Object mapValue(String fieldName, Object value) {
+        return valueOf(fieldName.toUpperCase(Locale.ROOT)).mapValue(value);
+    }
+
     public static String getMetricRegistryName(String fieldName) {
         NodeStatMetrics metric = valueOf(fieldName.toUpperCase(Locale.ROOT));
         return metric.getMetricRegistryName();
