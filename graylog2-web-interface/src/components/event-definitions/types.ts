@@ -41,7 +41,10 @@ export interface EventDefinitionType {
   sortOrder: number;
   description: string;
   defaultConfig: EventDefinition['config'];
-  formComponent: React.ComponentType<{
+  // Optional so types with no editable/viewable representation (e.g. system-generated types
+  // that are never created or edited through the wizard) can still be registered as filter
+  // options without supplying unused components.
+  formComponent?: React.ComponentType<{
     eventDefinition: EventDefinition;
     entityTypes: {
       aggregation_functions: Array<{}>;
@@ -51,7 +54,7 @@ export interface EventDefinitionType {
     onChange: (name: string, newConfig: EventDefinition['config']) => void;
     action: string;
   }>;
-  summaryComponent: React.ComponentType<{
+  summaryComponent?: React.ComponentType<{
     currentUser: User;
     config: EventDefinition['config'];
     definitionId?: string;
