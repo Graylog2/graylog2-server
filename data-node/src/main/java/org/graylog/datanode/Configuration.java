@@ -263,6 +263,15 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "hostname")
     private String hostname = null;
 
+    @Documentation("""
+            The address that OpenSearch advertises to other Datanodes for its transport (node-to-node) interface.
+            Set this explicitly when $hostname/$bind_address is not routable from other cluster members, e.g. when
+            this Datanode runs in a Docker bridge network and the container's hostname only resolves to a
+            non-routable internal address from inside the container. Falls back to $hostname if not set.
+            """)
+    @Parameter(value = "opensearch_network_publish_host")
+    private String opensearchNetworkPublishHost = null;
+
     @Documentation("Name of the cluster that the embedded opensearch will form. Should be the same for all Datanodes in one cluster.")
     @Parameter(value = "clustername")
     private String clustername = "datanode-cluster";
@@ -737,6 +746,11 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
         // bindaddress is configured as the hostname
         return bindAddress;
+    }
+
+    public String getOpensearchNetworkPublishHost() {
+        return opensearchNetworkPublishHost != null && !opensearchNetworkPublishHost.isBlank()
+                ? opensearchNetworkPublishHost : getHostname();
     }
 
     public String getNodeSearchCacheSize() {
