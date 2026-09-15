@@ -40,6 +40,7 @@ public class DataNodeEventService {
         Notification notification = notificationService.buildNow();
         notification.addSeverity(Notification.Severity.NORMAL);
         notification.addType(event.notificationType());
+        notification.addNode(event.nodeId());
         event.details().forEach(notification::addDetail);
         notificationService.publishIfFirst(notification);
     }

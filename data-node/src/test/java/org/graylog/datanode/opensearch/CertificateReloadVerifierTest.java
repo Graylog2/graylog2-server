@@ -43,6 +43,8 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,9 +53,10 @@ class CertificateReloadVerifierTest {
 
     private static final char[] KEYSTORE_PASSWORD = "changeit".toCharArray();
 
-    // kept short so the tests don't have to wait out the real production timeouts
-    private static final Duration VERIFICATION_TIMEOUT = Duration.ofMillis(200);
-    private static final Duration RETRY_INTERVAL = Duration.ofMillis(20);
+    // kept short so the tests don't have to wait out the real production timeouts, but generous enough that a
+    // slow loopback TLS handshake under CI load doesn't turn the "no escalation" tests flaky.
+    private static final Duration VERIFICATION_TIMEOUT = Duration.ofSeconds(1);
+    private static final Duration RETRY_INTERVAL = Duration.ofMillis(50);
     private static final Duration SOCKET_TIMEOUT = Duration.ofSeconds(1);
 
     private final ClusterEventBus clusterEventBus = new ClusterEventBus();
@@ -76,14 +79,18 @@ class CertificateReloadVerifierTest {
         }
     }
 
-    private CertificateReloadVerifier newVerifier(DatanodeKeystore datanodeKeystore) {
-        return new CertificateReloadVerifier(datanodeKeystore, clusterEventBus, nodeId,
-                VERIFICATION_TIMEOUT, RETRY_INTERVAL, SOCKET_TIMEOUT);
+    private CertificateReloadVerifier newVerifier() {
+        return new CertificateReloadVerifier(clusterEventBus, nodeId, VERIFICATION_TIMEOUT, RETRY_INTERVAL, SOCKET_TIMEOUT);
     }
 
-    // generous upper bound the verifier should never actually need given VERIFICATION_TIMEOUT/RETRY_INTERVAL above -
-    // awaitCompletion() returns as soon as the verifier is actually done, so tests don't sit around waiting for it.
-    private static final Duration AWAIT_COMPLETION_TIMEOUT = Duration.ofSeconds(2);
+    // generous upper bound the verifier should never actually need given VERIFICATION_TIMEOUT/RETRY_INTERVAL/
+    // SOCKET_TIMEOUT above (worst case ~2s) - the returned future completes as soon as the verifier is actually
+    // done, so tests don't sit around waiting for this timeout to be hit.
+    private static final Duration AWAIT_COMPLETION_TIMEOUT = Duration.ofSeconds(5);
+
+    private static void awaitCompletion(Future<Void> verification) throws Exception {
+        verification.get(AWAIT_COMPLETION_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     @Test
     void doesNotEscalateWhenLiveCertificateMatchesExpectation(@TempDir Path tempDir) throws Exception {
@@ -91,11 +98,10 @@ class CertificateReloadVerifierTest {
         server = new TlsTestServer(served.toServerKeyStore(), KEYSTORE_PASSWORD);
 
         final DatanodeKeystore datanodeKeystore = datanodeKeystoreWithSignedCertificate(tempDir, served);
-        final CertificateReloadVerifier verifier = newVerifier(datanodeKeystore);
+        final CertificateReloadVerifier verifier = newVerifier();
 
-        verifier.start(httpBaseUrlOf(server.port()));
+        awaitCompletion(verifier.verify(datanodeKeystore.getCertificateSerialNumber(), httpBaseUrlOf(server.port())));
 
-        assertThat(verifier.awaitCompletion(AWAIT_COMPLETION_TIMEOUT)).isTrue();
         assertThat(notificationsReceiver.getNotifications()).isEmpty();
     }
 
@@ -104,29 +110,27 @@ class CertificateReloadVerifierTest {
         final SignedCertificate served = generateSignedCertificate();
         server = new TlsTestServer(served.toServerKeyStore(), KEYSTORE_PASSWORD);
 
-        // datanode keystore expects a *different* signed certificate than what the server actually presents
+        // we expect a *different* signed certificate than what the server actually presents
         final SignedCertificate expected = generateSignedCertificate();
         final DatanodeKeystore datanodeKeystore = datanodeKeystoreWithSignedCertificate(tempDir, expected);
-        final CertificateReloadVerifier verifier = newVerifier(datanodeKeystore);
+        final CertificateReloadVerifier verifier = newVerifier();
 
-        verifier.start(httpBaseUrlOf(server.port()));
+        awaitCompletion(verifier.verify(datanodeKeystore.getCertificateSerialNumber(), httpBaseUrlOf(server.port())));
 
-        assertThat(verifier.awaitCompletion(AWAIT_COMPLETION_TIMEOUT)).isTrue();
         // it escalated exactly once (not repeatedly) and any notification it sent already arrived by now
         assertThat(notificationsReceiver.getNotifications())
                 .hasSize(1)
-                .anySatisfy(notification -> assertThat(notification.notificationType()).isEqualTo(Notification.Type.CERTIFICATE_NEEDS_RENEWAL));
+                .anySatisfy(notification -> assertThat(notification.notificationType()).isEqualTo(Notification.Type.DATA_NODE_CERT_RENEWAL_WARNING));
     }
 
     @Test
     void escalatesWhenOpensearchHttpListenerIsNeverReachable(@TempDir Path tempDir) throws Exception {
         final SignedCertificate expected = generateSignedCertificate();
         final DatanodeKeystore datanodeKeystore = datanodeKeystoreWithSignedCertificate(tempDir, expected);
-        final CertificateReloadVerifier verifier = newVerifier(datanodeKeystore);
+        final CertificateReloadVerifier verifier = newVerifier();
 
-        verifier.start(Optional::empty);
+        awaitCompletion(verifier.verify(datanodeKeystore.getCertificateSerialNumber(), Optional::empty));
 
-        assertThat(verifier.awaitCompletion(AWAIT_COMPLETION_TIMEOUT)).isTrue();
         assertThat(notificationsReceiver.getNotifications()).hasSize(1);
     }
 
@@ -138,11 +142,30 @@ class CertificateReloadVerifierTest {
         final Supplier<Optional<URI>> shouldNeverBeCalled = () -> {
             throw new AssertionError("httpBaseUrlSupplier should never be consulted without an expected certificate");
         };
-        final CertificateReloadVerifier verifier = newVerifier(datanodeKeystore);
+        final CertificateReloadVerifier verifier = newVerifier();
 
-        verifier.start(shouldNeverBeCalled);
+        awaitCompletion(verifier.verify(datanodeKeystore.getCertificateSerialNumber(), shouldNeverBeCalled));
 
-        assertThat(verifier.awaitCompletion(AWAIT_COMPLETION_TIMEOUT)).isTrue();
+        assertThat(notificationsReceiver.getNotifications()).isEmpty();
+    }
+
+    @Test
+    void secondVerifyRequestSupersedesFirstInsteadOfFalselyEscalating() throws Exception {
+        // two renewals happen shortly after each other: the server ends up serving the *second* certificate
+        // directly, the first one is never actually served by opensearch because the second reload overwrote it
+        // before opensearch's own file watcher ever picked the first one up.
+        final SignedCertificate first = generateSignedCertificate();
+        final SignedCertificate second = generateSignedCertificate();
+        server = new TlsTestServer(second.toServerKeyStore(), KEYSTORE_PASSWORD);
+
+        final CertificateReloadVerifier verifier = newVerifier();
+
+        verifier.verify(first.leafCertificate().getSerialNumber(), httpBaseUrlOf(server.port()));
+        final Future<Void> secondVerification = verifier.verify(second.leafCertificate().getSerialNumber(), httpBaseUrlOf(server.port()));
+
+        awaitCompletion(secondVerification);
+
+        // the first (stale) verification never gets to escalate once superseded, and the second one succeeds
         assertThat(notificationsReceiver.getNotifications()).isEmpty();
     }
 

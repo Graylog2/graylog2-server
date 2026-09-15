@@ -52,7 +52,8 @@ public interface Notification extends Persisted {
             Type.MULTI_LEADER,
             Type.NO_LEADER,
             Type.DATA_NODE_VERSION_MISMATCH,
-            Type.DATA_NODE_HEAP_WARNING
+            Type.DATA_NODE_HEAP_WARNING,
+            Type.DATA_NODE_CERT_RENEWAL_WARNING
     ));
 
     Notification addType(Type type);
@@ -127,7 +128,8 @@ public interface Notification extends Persisted {
         REMOTE_REINDEX_FINISHED,
         DATA_NODE_VERSION_MISMATCH,
         DATA_TIERING_ROLLOVER_ERROR,
-        DATA_NODE_HEAP_WARNING;
+        DATA_NODE_HEAP_WARNING,
+        DATA_NODE_CERT_RENEWAL_WARNING;
 
         @JsonValue
         public String json() {
