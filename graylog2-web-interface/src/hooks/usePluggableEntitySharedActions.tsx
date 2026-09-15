@@ -19,29 +19,26 @@ import { useRef } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { EntitySharedAction, ModalHandler } from 'components/permissions/types';
-import { HasOwnership } from 'components/common';
+import useHasEntityOwnership from 'hooks/useHasEntityOwnership';
 
 function usePluggableEntitySharedActions<T>(entity: T, entityType: string, onCloseModal = undefined) {
   const modalRefs = useRef({});
   const pluginActions = usePluginEntities('components.shared.entityActions');
+  const hasOwnership = useHasEntityOwnership((entity as T & { id: string })?.id, entityType);
 
   const availableActions = pluginActions.filter((action) => (action.useCondition ? !!action.useCondition() : true));
 
-  const actions = availableActions.map((action: EntitySharedAction<T, ModalHandler>) => {
+  // Only actions the user can actually use are returned, so callers can tell from the length whether
+  // anything will render and avoid showing an empty menu.
+  const actions = (hasOwnership ? availableActions : []).map((action: EntitySharedAction<T, ModalHandler>) => {
     const { key, component: PluggableEntityAction } = action;
 
     return (
-      <HasOwnership key={`entity-action-${key}`} id={(entity as T & { id: string })?.id} type={entityType}>
-        {({ disabled }) =>
-          disabled ? null : (
-            <PluggableEntityAction
-              key={`entity-action-${key}`}
-              entity={entity}
-              modalRef={() => modalRefs.current[key]}
-            />
-          )
-        }
-      </HasOwnership>
+      <PluggableEntityAction
+        key={`entity-action-${key}`}
+        entity={entity}
+        modalRef={() => modalRefs.current[key]}
+      />
     );
   });
 
