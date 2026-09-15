@@ -90,13 +90,20 @@ const CustomMultiValueLabel =
 
 const CustomInput = (inputProps: { [key: string]: any }) => (props) => <Components.Input {...props} {...inputProps} />;
 
-const dropdownIndicator = (base, state) => ({
-  ...base,
-  padding: '0px',
-  fontSize: '150%',
-  marginRight: '1rem',
-  transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
-});
+const dropdownIndicator =
+  ({ compact }) =>
+  (base, state) => ({
+    ...base,
+    padding: '0px',
+    fontSize: '150%',
+    marginRight: compact ? '4px' : '1rem',
+    transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
+  });
+
+const container =
+  ({ compact }) =>
+  (base) =>
+    compact ? { ...base, width: 'fit-content' } : base;
 
 const clearIndicator = (base) => ({
   ...base,
@@ -198,11 +205,15 @@ const controlFocus =
   };
 
 const valueContainer =
-  ({ size }) =>
-  (base) => ({
-    ...base,
-    padding: size === 'small' ? '0 8px' : '2px 10px',
-  });
+  ({ size, compact }) =>
+  (base) => {
+    const [vertical, horizontal] = size === 'small' ? ['0', '8px'] : ['2px', '10px'];
+
+    return {
+      ...base,
+      padding: compact ? `${vertical} 2px ${vertical} ${horizontal}` : `${vertical} ${horizontal}`,
+    };
+  };
 
 type OverriddenComponents = {
   DropdownIndicator: React.ComponentType<any>;
@@ -218,8 +229,9 @@ const _components: OverriddenComponents = {
   Control,
 };
 
-const _styles = ({ size, theme }) => ({
-  dropdownIndicator,
+const _styles = ({ size, theme, compact }) => ({
+  container: container({ compact }),
+  dropdownIndicator: dropdownIndicator({ compact }),
   clearIndicator,
   multiValue: multiValue({ theme }),
   multiValueLabel: multiValueLabel({ theme }),
@@ -229,7 +241,7 @@ const _styles = ({ size, theme }) => ({
   singleValue: singleValueAndPlaceholder({ theme }),
   placeholder: placeholderStyling({ theme }),
   control: controlFocus({ size, theme }),
-  valueContainer: valueContainer({ size }),
+  valueContainer: valueContainer({ size, compact }),
 });
 
 type ComponentsProp = {
@@ -246,6 +258,7 @@ export type Props<OptionValue> = {
   autoFocus?: boolean;
   className?: string;
   clearable?: boolean;
+  compact?: boolean;
   components?: ComponentsProp | null | undefined;
   delimiter?: string;
   disabled?: boolean;
@@ -272,6 +285,7 @@ export type Props<OptionValue> = {
   persistSelection?: boolean;
   // eslint-disable-next-line react/require-default-props
   ref?: SelectRef;
+  searchable?: boolean;
   size?: 'normal' | 'small';
   styles?: any;
   theme: DefaultTheme;
@@ -331,6 +345,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     autoFocus: false,
     className: undefined,
     clearable: true,
+    compact: false,
     components: null,
     delimiter: ',',
     disabled: false,
@@ -351,6 +366,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     optionRenderer: undefined,
     placeholder: undefined,
     required: false,
+    searchable: true,
     size: 'normal',
     styles: undefined,
     value: undefined,
@@ -546,6 +562,8 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       placeholder,
       styles,
       options: rawOptions,
+      compact,
+      searchable,
       ...rest
     } = this.props;
     const customFilter = this.createCustomFilter();
@@ -580,6 +598,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       isMulti,
       isDisabled,
       isClearable,
+      isSearchable: searchable,
       loadOptions,
       getOptionLabel: (option: { label?: string }) => option[displayKey] || option.label,
       getOptionValue: (option) => {
@@ -591,7 +610,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       components: mergedComponents,
       menuPortalTarget: document.body,
       isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
-      styles: { ..._styles({ size, theme }), ...styles },
+      styles: { ..._styles({ size, theme, compact }), ...styles },
       theme: this._selectTheme,
       total,
       value: formattedValue,
