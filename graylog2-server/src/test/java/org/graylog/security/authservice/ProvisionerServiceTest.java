@@ -31,12 +31,15 @@ import org.mockito.quality.Strictness;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -66,7 +69,7 @@ public class ProvisionerServiceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        provisionerService = new ProvisionerService(userService, new HashMap<>());
+        provisionerService = new ProvisionerService(userService, new HashMap<>(), false);
     }
 
     @Test
@@ -141,5 +144,85 @@ public class ProvisionerServiceTest {
         provisionerService.provision(userDetails);
         verify(userService, times(1)).save(isA(User.class));
         verify(user, times(1)).setTimeZone(eq(DateTimeZone.forID("America/New_York")));
+    }
+
+    private UserDetails externalUserDetails(String authServiceUid) throws ValidationException {
+        when(authServiceBackend.backendId()).thenReturn(BACKEND_ID);
+        when(authServiceBackend.backendType()).thenReturn(BACKEND_TYPE);
+        // Provisioning a brand new user must stay possible in every one of these scenarios, so that a test only
+        // fails because of the account it was pointed at, never because creating a user was impossible.
+        when(userService.create()).thenReturn(mock(User.class));
+        when(userService.save(isA(User.class))).thenReturn(USER_ID);
+        return provisionerService.newDetails(authServiceBackend)
+                .base64AuthServiceUid(authServiceUid)
+                .username(USERNAME)
+                .accountIsEnabled(true)
+                .email(EMAIL)
+                .fullName(FULL_NAME)
+                .defaultRoles(Collections.emptySet())
+                .build();
+    }
+
+    @Test
+    public void refusesToTakeOverAnExistingInternalUserWithTheSameUsername() throws ValidationException {
+        final UserDetails userDetails = externalUserDetails("external-uid");
+
+        final User localUser = mock(User.class);
+        when(localUser.isExternalUser()).thenReturn(false);
+        when(userService.loadByAuthServiceUidOrUsername("external-uid", USERNAME))
+                .thenReturn(Optional.of(localUser));
+
+        assertThatThrownBy(() -> provisionerService.provision(userDetails))
+                .isInstanceOf(ProvisionerServiceException.class);
+
+        verify(userService, never()).save(isA(User.class));
+    }
+
+    @Test
+    public void refusesToTakeOverAnExistingUserOfAnotherAuthService() throws ValidationException {
+        final UserDetails userDetails = externalUserDetails("external-uid");
+
+        final User foreignUser = mock(User.class);
+        when(foreignUser.isExternalUser()).thenReturn(true);
+        when(foreignUser.getAuthServiceId()).thenReturn("another-backend-id");
+        when(userService.loadByAuthServiceUidOrUsername("external-uid", USERNAME))
+                .thenReturn(Optional.of(foreignUser));
+
+        assertThatThrownBy(() -> provisionerService.provision(userDetails))
+                .isInstanceOf(ProvisionerServiceException.class);
+
+        verify(userService, never()).save(isA(User.class));
+    }
+
+    @Test
+    public void updatesAnExistingUserOfTheSameAuthServiceMatchedByUsername() throws ValidationException {
+        final UserDetails userDetails = externalUserDetails("external-uid");
+
+        final User ownUser = mock(User.class);
+        when(ownUser.isExternalUser()).thenReturn(true);
+        when(ownUser.getAuthServiceId()).thenReturn(BACKEND_ID);
+        when(userService.loadByAuthServiceUidOrUsername("external-uid", USERNAME))
+                .thenReturn(Optional.of(ownUser));
+
+        provisionerService.provision(userDetails);
+
+        verify(userService, times(1)).save(ownUser);
+    }
+
+    @Test
+    public void updatesAnExistingUserMatchedByAuthServiceUid() throws ValidationException {
+        final UserDetails userDetails = externalUserDetails("external-uid");
+
+        // The username changed at the authentication service, so the user is found by its UID. The stored username
+        // may well belong to an unrelated local account by now, but the UID proves it is the same identity.
+        final User renamedUser = mock(User.class);
+        when(renamedUser.isExternalUser()).thenReturn(false);
+        when(renamedUser.getAuthServiceUid()).thenReturn("external-uid");
+        when(userService.loadByAuthServiceUidOrUsername("external-uid", USERNAME))
+                .thenReturn(Optional.of(renamedUser));
+
+        provisionerService.provision(userDetails);
+
+        verify(userService, times(1)).save(renamedUser);
     }
 }
