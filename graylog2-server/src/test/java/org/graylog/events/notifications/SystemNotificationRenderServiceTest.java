@@ -17,6 +17,7 @@
 package org.graylog.events.notifications;
 
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
@@ -25,6 +26,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,12 +43,14 @@ import static org.mockito.Mockito.when;
 class SystemNotificationRenderServiceTest {
     static NotificationService notificationService = mock(NotificationService.class);
     static org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
+    static HttpConfiguration httpConfiguration = mock(HttpConfiguration.class);
     static SystemNotificationRenderService renderService;
     Notification notification;
 
     @BeforeAll
     static void setup() {
-        renderService = new SystemNotificationRenderService(notificationService, graylogConfig);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/"));
+        renderService = new SystemNotificationRenderService(notificationService, graylogConfig, httpConfiguration);
     }
 
     @Test
@@ -138,6 +142,22 @@ class SystemNotificationRenderServiceTest {
         SystemNotificationRenderService.RenderResponse renderResponse =
                 renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
         assertThat(renderResponse.description).containsSequence("11: 12");
+    }
+
+    @Test
+    void dataNodeVersionMismatchLinkIncludesConfiguredPathPrefix() {
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/graylog/"));
+        notification = new NotificationImpl()
+                .addNode("node")
+                .addSeverity(Notification.Severity.NORMAL)
+                .addType(Notification.Type.DATA_NODE_VERSION_MISMATCH)
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
+
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+
+        assertThat(renderResponse.description)
+                .contains("href=\"http://localhost:9000/graylog/system/cluster/datanode-upgrade\"");
     }
 
     @Test

@@ -23,6 +23,7 @@ import freemarker.core.TemplateConfiguration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 
@@ -47,17 +48,21 @@ public class SystemNotificationRenderService {
     private static final String KEY_TITLE = "_title";
     private static final String KEY_DESCRIPTION = "_description";
     private static final String KEY_CLOUD = "_cloud";
+    private static final String KEY_HTTP_EXTERNAL_URI = "http_external_uri";
     public static final String TEMPLATE_BASE_PATH = "/org/graylog2/freemarker/templates/";
     private NotificationService notificationService;
     private org.graylog2.Configuration graylogConfig;
+    private HttpConfiguration httpConfiguration;
     private static final freemarker.template.Configuration cfg =
             new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_28);
 
     @Inject
     public SystemNotificationRenderService(NotificationService notificationService,
-                                           org.graylog2.Configuration graylogConfig) {
+                                           org.graylog2.Configuration graylogConfig,
+                                           HttpConfiguration httpConfiguration) {
         this.notificationService = notificationService;
         this.graylogConfig = graylogConfig;
+        this.httpConfiguration = httpConfiguration;
 
         cfg.setDefaultEncoding(UTF_8);
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
@@ -94,6 +99,7 @@ public class SystemNotificationRenderService {
             values.put(KEY_NODE_ID, notification.getNodeId());
         }
         values.put(KEY_CLOUD, graylogConfig.isCloud());
+        values.put(KEY_HTTP_EXTERNAL_URI, httpConfiguration.getHttpExternalUri());
 
         final String templateRelPath = format.toString() + "/" + notification.getType().toString().toLowerCase(Locale.ENGLISH) + ".ftl";
         try (StringWriter writer = new StringWriter()) {
