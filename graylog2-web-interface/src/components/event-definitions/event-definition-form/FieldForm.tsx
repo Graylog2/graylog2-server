@@ -254,7 +254,7 @@ class FieldForm extends React.Component<
           <FormGroup validationState={validation.errors.key_position ? 'error' : null}>
             <ControlLabel>
               Use Field as Event Key&emsp;
-              <HoverForHelp title="More about Event Keys" trigger={['click', 'hover']} placement="right">
+              <HoverForHelp title="More about Event Keys" trigger={['click', 'hover']} placement="right" width={400}>
                 <EventKeyHelpPopover />
               </HoverForHelp>
             </ControlLabel>
