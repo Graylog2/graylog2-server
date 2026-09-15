@@ -39,6 +39,7 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.LimitedOptionalStringValidator;
 import org.graylog2.database.validators.LimitedStringValidator;
 import org.graylog2.database.validators.ListValidator;
+import org.graylog2.database.validators.UsernameValidator;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.Validator;
@@ -165,7 +166,7 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     public Map<String, Validator> getValidations() {
         return ImmutableMap.<String, Validator>builder()
-                .put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH))
+                .put(USERNAME, new UsernameValidator(1, MAX_USERNAME_LENGTH))
                 .put(PASSWORD, new FilledStringValidator())
                 .put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH))
                 .put(FIRST_NAME, new LimitedOptionalStringValidator(MAX_FIRST_LAST_NAME_LENGTH))
