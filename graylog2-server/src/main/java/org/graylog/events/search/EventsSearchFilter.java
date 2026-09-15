@@ -39,6 +39,7 @@ public abstract class EventsSearchFilter {
     private static final String FIELD_KEY = "key";
     private static final String FIELD_ID = "id";
     private static final String FIELD_EXTRA_FILTERS = "extra_filters";
+    private static final String FIELD_EXCLUDED_IDS = "excluded_ids";
 
     public enum Alerts {
         @JsonProperty("include")
@@ -70,6 +71,14 @@ public abstract class EventsSearchFilter {
     @JsonProperty(FIELD_EXTRA_FILTERS)
     public abstract Map<String, Set<String>> extraFilters();
 
+    /**
+     * Event IDs to exclude from the result. Applied by the indexer as a {@code must_not} terms filter rather
+     * than being inlined into the query string, so the set can grow without hitting
+     * {@code search.query.max_query_string_length}.
+     */
+    @JsonProperty(FIELD_EXCLUDED_IDS)
+    public abstract Set<String> excludedIds();
+
     public static EventsSearchFilter empty() {
         return builder().build();
     }
@@ -90,6 +99,7 @@ public abstract class EventsSearchFilter {
                     .priority(Collections.emptySet())
                     .key(Collections.emptySet())
                     .extraFilters(Map.of())
+                    .excludedIds(Collections.emptySet())
                     .id(Collections.emptySet());
         }
 
@@ -107,6 +117,9 @@ public abstract class EventsSearchFilter {
 
         @JsonProperty(FIELD_EXTRA_FILTERS)
         public abstract Builder extraFilters(Map<String, Set<String>> extraFilters);
+
+        @JsonProperty(FIELD_EXCLUDED_IDS)
+        public abstract Builder excludedIds(Set<String> excludedIds);
 
         @JsonProperty(FIELD_KEY)
         public abstract Builder key(Set<String> key);
