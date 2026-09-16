@@ -18,13 +18,11 @@ import React from 'react';
 import type { SyntheticEvent } from 'react';
 import styled from 'styled-components';
 
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { Col, Row } from 'components/bootstrap';
 import { Wizard } from 'components/common';
 import type { StepType } from 'components/common/Wizard';
 import type { EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import EventDefinitionFormControls from 'components/event-definitions/event-definition-form/EventDefinitionFormControls';
 
@@ -86,8 +84,7 @@ const EventDefinitionForm = ({
   onChangeStep,
   onSubmit,
 }: Props) => {
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(action === 'create' ? 'new-event-definition' : 'edit-event-definition');
 
   const handleSubmit = (event: SyntheticEvent) => {
     if (event) {
@@ -102,8 +99,6 @@ const EventDefinitionForm = ({
 
   const handleStepChange = (nextStep: string) => {
     sendTelemetry(STEP_TELEMETRY_KEYS[currentStepKeys.indexOf(nextStep)], {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'event-definition-step',
       current_step: steps[activeStepIndex]?.title,
     });
@@ -113,8 +108,6 @@ const EventDefinitionForm = ({
 
   const openPrevPage = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_PREVIOUS_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'previous-button',
       current_step: steps[activeStepIndex]?.title,
     });
@@ -125,8 +118,6 @@ const EventDefinitionForm = ({
 
   const openNextPage = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NEXT_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'next-button',
       current_step: steps[activeStepIndex]?.title,
     });

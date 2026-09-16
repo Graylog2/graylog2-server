@@ -29,8 +29,6 @@ import { ThroughputSection } from 'components/inputs/InputsOveriew';
 import { InputForm } from 'components/inputs';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { ConfiguredInput } from 'components/messageloaders/Types';
 import useInputMutations from 'hooks/useInputMutations';
 
@@ -48,7 +46,6 @@ const ExpandedConfigurationSection = ({ input, inputTypeDescriptions }: Props) =
   const definition = inputTypeDescriptions[input.type] as any;
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const { updateInput } = useInputMutations();
 
   const editInput = () => {
@@ -56,7 +53,6 @@ const ExpandedConfigurationSection = ({ input, inputTypeDescriptions }: Props) =
   };
   const hanleInputUpdate = async (inputData: ConfiguredInput) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'input-edit',
     });
 

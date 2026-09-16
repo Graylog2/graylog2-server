@@ -17,10 +17,10 @@
 import { useQuery } from '@tanstack/react-query';
 
 import {
-  COLLECTOR_INSTANCE_UID_FIELD,
+  AGENT_ID_FIELD,
   COLLECTOR_LOG_RECEIVER_TYPE,
-  COLLECTOR_RECEIVER_TYPE_FIELD,
-  COLLECTOR_SOURCE_ID_FIELD,
+  AGENT_RECEIVER_TYPE_FIELD,
+  AGENT_SOURCE_ID_FIELD,
   COLLECTOR_SYSTEM_LOGS_STREAM_ID,
 } from 'components/collectors/common/fields';
 import generateId from 'logic/generateId';
@@ -98,7 +98,7 @@ const sourceCountsSearchType = (id: string): AggregationSearchType => ({
   // but not here. An unrecognised type deserialises to `SearchType.Fallback`, whose `filters` is a
   // plain nullable field, and the search filter normalizer then NPEs on it and fails the whole search.
   type: 'pivot',
-  row_groups: [{ type: 'values', fields: [COLLECTOR_SOURCE_ID_FIELD], limit: SOURCE_BUCKET_LIMIT }],
+  row_groups: [{ type: 'values', fields: [AGENT_SOURCE_ID_FIELD], limit: SOURCE_BUCKET_LIMIT }],
   column_groups: [],
   series: COUNT_SERIES,
   sort: [],
@@ -126,7 +126,7 @@ const buildPreviewSearch = (instanceUid: string): PreviewSearch => {
   // Self-logs live in the dedicated (system-scoped) collector logs stream.
   const selfLogsQuery = Query.builder()
     .id(ids.selfQueryId)
-    .query(createElasticsearchQueryString(`${COLLECTOR_INSTANCE_UID_FIELD}:"${instanceUid}"`))
+    .query(createElasticsearchQueryString(`${AGENT_ID_FIELD}:"${instanceUid}"`))
     .timerange(previewTimerange)
     .filter(filtersForQuery([COLLECTOR_SYSTEM_LOGS_STREAM_ID]))
     .searchTypes([messagesSearchType(ids.selfSearchTypeId)])
@@ -138,7 +138,7 @@ const buildPreviewSearch = (instanceUid: string): PreviewSearch => {
     .id(ids.sourceQueryId)
     .query(
       createElasticsearchQueryString(
-        `${COLLECTOR_INSTANCE_UID_FIELD}:"${instanceUid}" AND NOT ${COLLECTOR_RECEIVER_TYPE_FIELD}:"${COLLECTOR_LOG_RECEIVER_TYPE}"`,
+        `${AGENT_ID_FIELD}:"${instanceUid}" AND NOT ${AGENT_RECEIVER_TYPE_FIELD}:"${COLLECTOR_LOG_RECEIVER_TYPE}"`,
       ),
     )
     .timerange(previewTimerange)

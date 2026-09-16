@@ -61,7 +61,7 @@ const EntityFilters = ({
   activeSliceCol = undefined,
   activeSlice = undefined,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(appSection);
 
   const { data: activeFilters, onChange: onChangeFiltersWithTitle } = useFiltersWithTitle(
     urlQueryFilters,
@@ -92,20 +92,18 @@ const EntityFilters = ({
   const onCreateFilter = useCallback(
     (attributeId: string, filter: Filter) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CREATED, {
-        app_section: appSection,
         app_action_value: 'filter-created',
         event_details: { attribute_id: attributeId },
       });
 
       onChangeFilters(OrderedMap(activeFilters).set(attributeId, [...(activeFilters?.get(attributeId) ?? []), filter]));
     },
-    [activeFilters, appSection, onChangeFilters, sendTelemetry],
+    [activeFilters, onChangeFilters, sendTelemetry],
   );
 
   const onDeleteFilter = useCallback(
     (attributeId: string, filterId: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_DELETED, {
-        app_section: appSection,
         app_action_value: 'filter-deleted',
         event_details: { attribute_id: attributeId },
       });
@@ -119,13 +117,12 @@ const EntityFilters = ({
 
       return onChangeFilters(activeFilters.remove(attributeId));
     },
-    [activeFilters, appSection, onChangeFilters, sendTelemetry],
+    [activeFilters, onChangeFilters, sendTelemetry],
   );
 
   const onChangeFilter = useCallback(
     (attributeId: string, prevValue: string, newFilter: Filter) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CHANGED, {
-        app_section: appSection,
         app_action_value: 'filter-value-changed',
         event_details: { attribute_id: attributeId },
       });
@@ -137,7 +134,7 @@ const EntityFilters = ({
 
       onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
     },
-    [activeFilters, appSection, onChangeFilters, sendTelemetry],
+    [activeFilters, onChangeFilters, sendTelemetry],
   );
 
   if (!filterableAttributes.length) {

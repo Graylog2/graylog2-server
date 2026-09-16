@@ -24,6 +24,7 @@ import { Card, ConfirmDialog, FormikInput, RelativeTime } from 'components/commo
 import FormSubmit from 'components/common/FormSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+import { useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
@@ -86,6 +87,9 @@ const validate = (values: FormValues) => {
 const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const sendTelemetry = useSendCollectorsTelemetry();
+  const { canEditFleet, canDeleteFleet } = useCollectorPermissions();
+  const canEdit = canEditFleet(fleet.id);
+  const canDelete = canDeleteFleet(fleet.id);
 
   const initialValues: FormValues = {
     name: fleet.name,
@@ -121,17 +125,25 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
           <Section>
             <SectionTitle>General Settings</SectionTitle>
             <Form>
-              <FormikInput id="fleet-name" label="Fleet Name" name="name" required />
-              <FormikInput id="fleet-description" type="textarea" label="Description" name="description" />
-              <FormSubmit
-                isAsyncSubmit
-                submitButtonText="Save changes"
-                submitLoadingText="Saving..."
-                isSubmitting={isSubmitting}
-                disabledSubmit={!dirty || isValidating}
-                onCancel={resetForm}
-                disabledCancel={!dirty || isSubmitting}
+              <FormikInput id="fleet-name" label="Fleet Name" name="name" required disabled={!canEdit} />
+              <FormikInput
+                id="fleet-description"
+                type="textarea"
+                label="Description"
+                name="description"
+                disabled={!canEdit}
               />
+              {canEdit && (
+                <FormSubmit
+                  isAsyncSubmit
+                  submitButtonText="Save changes"
+                  submitLoadingText="Saving..."
+                  isSubmitting={isSubmitting}
+                  disabledSubmit={!dirty || isValidating}
+                  onCancel={resetForm}
+                  disabledCancel={!dirty || isSubmitting}
+                />
+              )}
             </Form>
           </Section>
         )}
@@ -155,16 +167,18 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined }: Props) => {
         </div>
       </Section>
 
-      <Section>
-        <SectionTitle>Danger Zone</SectionTitle>
-        <WarningText>
-          Deleting a fleet removes all source configurations and unenrolls all Collector instances. Instances will stop
-          collecting data and must be re-enrolled into a new fleet.
-        </WarningText>
-        <Button bsStyle="danger" onClick={() => setShowDeleteConfirm(true)} disabled={!onDelete}>
-          Delete Fleet
-        </Button>
-      </Section>
+      {canDelete && (
+        <Section>
+          <SectionTitle>Danger Zone</SectionTitle>
+          <WarningText>
+            Deleting a fleet removes all source configurations and unenrolls all Collector instances. Instances will
+            stop collecting data and must be re-enrolled into a new fleet.
+          </WarningText>
+          <Button bsStyle="danger" onClick={() => setShowDeleteConfirm(true)} disabled={!onDelete}>
+            Delete Fleet
+          </Button>
+        </Section>
+      )}
 
       {showDeleteConfirm && (
         <ConfirmDialog

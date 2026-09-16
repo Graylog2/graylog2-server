@@ -1,0 +1,5 @@
+type = "changed"
+message = "Changed dashboard widget drill-down popovers to show all metrics related to a chart click before offering value actions."
+
+issues = ["24220"]
+pulls = ["27099"]

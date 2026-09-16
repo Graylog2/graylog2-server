@@ -25,12 +25,11 @@ import { useCarouselActions } from 'components/common/Carousel';
 
 const ContentStreamNewsContentActions = () => {
   const { scrollPrev, scrollNext, nextBtnDisabled, prevBtnDisabled } = useCarouselActions(CAROUSEL_ID);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('content-stream');
 
   const handlePrev = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.PREV_ARROW_CLICKED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
     });
 
     scrollPrev();
@@ -39,7 +38,6 @@ const ContentStreamNewsContentActions = () => {
   const handleNext = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.NEXT_ARROW_CLICKED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
     });
 
     scrollNext();

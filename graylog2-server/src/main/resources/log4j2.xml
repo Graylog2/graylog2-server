@@ -37,6 +37,12 @@
         <Logger name="com.azure.core.amqp.implementation.MessageFlux" level="off"/>
         <!-- Silence Apache Hadoop/Avro log chatter -->
         <Logger name="org.apache.hadoop" level="warn"/>
+        <!-- hadoop-azure FNS blob listings return virtual directories without a Last-Modified value,
+             which this class logs as an unparseable "null" date on every listing (HADOOP-19207 area).
+             Genuinely malformed dates still get logged. -->
+        <Logger name="org.apache.hadoop.fs.azurebfs.utils.DateTimeUtils" level="error">
+            <RegexFilter regex="Failed to parse the date null" onMatch="DENY" onMismatch="ACCEPT"/>
+        </Logger>
         <Logger name="org.apache.parquet.hadoop.InternalParquetRecordReader" level="warn"/>
         <Logger name="org.apache.avro.Schema" level="error"/>
         <!-- Silence Selenium log chatter -->

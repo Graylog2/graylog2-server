@@ -166,7 +166,7 @@ const FirstUseWelcome = () => {
   const productName = useProductName();
   const { mutate: dismiss } = useDismissOnboarding();
   const [showDismissConfirm, setShowDismissConfirm] = useState(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('welcome');
 
   return (
     <>
@@ -189,7 +189,6 @@ const FirstUseWelcome = () => {
             bsStyle="transparent"
             onClick={() => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.DISMISS_CLICKED, {
-                app_section: 'welcome',
                 app_action_value: 'dismiss-onboarding-button',
               });
               setShowDismissConfirm(true);
@@ -223,7 +222,6 @@ const FirstUseWelcome = () => {
                     bsStyle="primary"
                     onClick={() =>
                       sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.SETUP_COLLECTOR_CLICKED, {
-                        app_section: 'welcome',
                         app_action_value: 'setup-collector-button',
                       })
                     }>
@@ -245,7 +243,6 @@ const FirstUseWelcome = () => {
                       bsStyle="default"
                       onClick={() =>
                         sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.CONFIGURE_INPUT_CLICKED, {
-                          app_section: 'welcome',
                           app_action_value: 'configure-input-button',
                         })
                       }>
@@ -278,7 +275,6 @@ const FirstUseWelcome = () => {
                       bsSize="xs"
                       onClick={() =>
                         sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
-                          app_section: 'welcome',
                           app_action_value: resource.title,
                         })
                       }>

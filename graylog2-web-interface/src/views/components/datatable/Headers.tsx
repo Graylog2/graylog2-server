@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
 import styled, { css } from 'styled-components';
@@ -33,7 +33,7 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Icon } from 'components/common';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 import FieldSortIcon from './FieldSortIcon';
 import TableHeaderCell from './TableHeaderCell';
@@ -271,7 +271,7 @@ const Headers = ({
 }: Props) => {
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
 
   const headerField = ({
     field,

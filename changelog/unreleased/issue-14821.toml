@@ -1,0 +1,4 @@
+type = "f"
+message = "Include `favorite_fields` in the response of the paginated streams endpoint."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14821"]

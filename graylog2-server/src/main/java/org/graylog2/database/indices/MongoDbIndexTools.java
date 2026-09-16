@@ -52,8 +52,11 @@ public class MongoDbIndexTools {
             final Set<String> keySet = document.get(INDEX_DOCUMENT_KEY, Document.class).keySet();
             if (keySet.contains(fieldUpdatedAt)) {
                 // Since MongoDB 5.0 this is an Integer. Used to be a Long ¯\_(ツ)_/¯
-                final long expireAfterSeconds = document.get("expireAfterSeconds", Number.class).longValue();
-                if (Objects.equals(expireAfterSeconds, indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
+                // A plain index carries no expireAfterSeconds at all. That is what deployments have which
+                // created the index before it gained a TTL, so it needs replacing rather than keeping.
+                final Number expireAfterSeconds = document.get("expireAfterSeconds", Number.class);
+                if (expireAfterSeconds != null
+                        && Objects.equals(expireAfterSeconds.longValue(), indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
                     return;
                 }
                 collection.dropIndex(updatedAtKey);

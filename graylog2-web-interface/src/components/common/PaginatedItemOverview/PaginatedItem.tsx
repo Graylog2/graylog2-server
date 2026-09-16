@@ -48,7 +48,7 @@ const Description = styled.span`
 `;
 
 const StyledDeleteButton = styled(IconButton)`
-  flex: 0;
+  flex: 0 0 auto;
 `;
 
 const PaginatedItem = ({ item: { name, description }, onDeleteItem = undefined, item }: Props) => {

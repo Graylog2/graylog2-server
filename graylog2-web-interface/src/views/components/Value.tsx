@@ -25,7 +25,7 @@ import CustomHighlighting from 'views/components/highlighting/CustomHighlighting
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
-import InteractiveContext from './contexts/InteractiveContext';
+import { useIsInteractiveMode } from './contexts/InteractiveContext';
 
 type Props = {
   field: string;
@@ -90,19 +90,14 @@ const InteractiveValue = ({
 
 const Value = ({ field, value, render = defaultRenderer, type = undefined, unit = undefined }: Props) => {
   const _type = type ?? FieldType.Unknown;
+  const isInteractive = useIsInteractiveMode();
 
-  return (
-    <InteractiveContext.Consumer>
-      {(interactive) =>
-        interactive ? (
-          <InteractiveValue field={field} value={value} render={render} type={_type} unit={unit} />
-        ) : (
-          <span>
-            <TypeSpecificValueWithHighlight field={field} value={value} render={render} type={_type} unit={unit} />
-          </span>
-        )
-      }
-    </InteractiveContext.Consumer>
+  return isInteractive ? (
+    <InteractiveValue field={field} value={value} render={render} type={_type} unit={unit} />
+  ) : (
+    <span>
+      <TypeSpecificValueWithHighlight field={field} value={value} render={render} type={_type} unit={unit} />
+    </span>
   );
 };
 

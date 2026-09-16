@@ -52,4 +52,30 @@ describe('useSendTelemetry', () => {
       app_section: 'welcome section',
     });
   });
+
+  it('should prefill `app_section` when passed to the hook', () => {
+    setLocation('/welcome');
+    const { result } = renderHook(() => useSendTelemetry('welcome section'), { wrapper: DummyTelemetryContext });
+
+    result.current('$pageview', {});
+
+    expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', {
+      app_path_pattern: undefined,
+      app_pathname: 'foo',
+      app_section: 'welcome section',
+    });
+  });
+
+  it('should let a per-call `app_section` override the one passed to the hook', () => {
+    setLocation('/welcome');
+    const { result } = renderHook(() => useSendTelemetry('welcome section'), { wrapper: DummyTelemetryContext });
+
+    result.current('$pageview', { app_section: 'override section' });
+
+    expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', {
+      app_path_pattern: undefined,
+      app_pathname: 'foo',
+      app_section: 'override section',
+    });
+  });
 });

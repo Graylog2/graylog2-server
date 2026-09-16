@@ -19,8 +19,8 @@ package org.graylog2.security.sessions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.apache.shiro.session.mgt.SimpleSession;
+import org.apache.shiro.subject.ImmutablePrincipalCollection;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.graylog2.rest.models.system.sessions.SessionUtils;
 
@@ -68,18 +68,19 @@ public class SessionConverter {
     }
 
     public static SimpleSession sessionDTOToSimpleSession(SessionDTO sessionDTO) {
-        final var simpleSession = new SimpleSession();
+        final var simpleSession = new SimpleSession(sessionDTO.host().orElse(null), Date.from(sessionDTO.startTimestamp()));
         simpleSession.setId(sessionDTO.sessionId());
         simpleSession.setTimeout(sessionDTO.timeout());
-        simpleSession.setStartTimestamp(Date.from(sessionDTO.startTimestamp()));
         simpleSession.setLastAccessTime(Date.from(sessionDTO.lastAccessTime()));
         simpleSession.setExpired(sessionDTO.expired());
 
-        sessionDTO.host().ifPresent(simpleSession::setHost);
-
         if (sessionDTO.userId().isPresent() && sessionDTO.authenticationRealm().isPresent()) {
-            simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, new SimplePrincipalCollection(
-                    sessionDTO.userId().get(), sessionDTO.authenticationRealm().get()));
+            simpleSession.setAttribute(
+                    DefaultSubjectContext.PRINCIPALS_SESSION_KEY, ImmutablePrincipalCollection.ofSinglePrincipal(
+                            sessionDTO.userId().get(),
+                            sessionDTO.authenticationRealm().get()
+                    )
+            );
         }
         sessionDTO.userName().ifPresent(userName ->
                 simpleSession.setAttribute(SessionUtils.USERNAME_SESSION_KEY, userName));

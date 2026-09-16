@@ -44,12 +44,14 @@ import {
   instancesKeyFn,
   useCollectorsMutations,
   useDefaultInstanceFilters,
+  useCollectorPermissions,
 } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import { sourceTelemetryProps } from '../hooks/telemetry-helpers';
 import collectorReceivedMessagesUrl from '../common/collectorReceivedMessagesUrl';
-import { COLLECTOR_FLEET_ID_FIELD, COLLECTOR_SOURCE_ID_FIELD } from '../common/fields';
+import { AGENT_FLEET_ID_FIELD, AGENT_SOURCE_ID_FIELD } from '../common/fields';
 import { InstanceDetailDrawer } from '../instances';
-import BulkActions from '../instances/BulkActions';
+import BulkActions, { useHasBulkActions } from '../instances/BulkActions';
 import InstanceActions from '../instances/InstanceActions';
 import instanceColumnRenderers from '../instances/ColumnRenderers';
 import { DEFAULT_LAYOUT as INSTANCES_LAYOUT } from '../instances/Constants';
@@ -104,21 +106,34 @@ const SEGMENTS = [
 type SourceActionsHandlers = {
   onEdit: (source: Source) => void;
   onDelete: (source: Source) => void;
+  onViewMessages: (source: Source) => void;
+  canEdit: boolean;
+  canDelete: boolean;
 };
 
 export const sourceActionsFactory =
-  ({ onEdit, onDelete }: SourceActionsHandlers) =>
+  ({ onEdit, onDelete, onViewMessages, canEdit, canDelete }: SourceActionsHandlers) =>
   (source: Source) => (
     <ButtonToolbar>
-      <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_SOURCE_ID_FIELD, source.id)}>
-        <IconButton name="search" title="Received messages" bsStyle="default" size="xsmall" />
+      <LinkContainer to={collectorReceivedMessagesUrl(AGENT_SOURCE_ID_FIELD, source.id)}>
+        <IconButton
+          name="search"
+          title="Received messages"
+          bsStyle="default"
+          size="xsmall"
+          onClick={() => onViewMessages(source)}
+        />
       </LinkContainer>
-      <Button bsSize="xsmall" onClick={() => onEdit(source)}>
-        Edit
-      </Button>
-      <MoreActions>
-        <DeleteMenuItem onSelect={() => onDelete(source)} />
-      </MoreActions>
+      {canEdit && (
+        <Button bsSize="xsmall" onClick={() => onEdit(source)}>
+          Edit
+        </Button>
+      )}
+      {canDelete && (
+        <MoreActions>
+          <DeleteMenuItem onSelect={() => onDelete(source)} />
+        </MoreActions>
+      )}
     </ButtonToolbar>
   );
 
@@ -129,6 +144,9 @@ const FleetDetail = ({ fleetId }: Props) => {
   const defaultInstanceFilters = useDefaultInstanceFilters();
   const { data: sources } = useSources(fleetId);
   const { createSource, updateSource, deleteSource, updateFleet, deleteFleet } = useCollectorsMutations();
+  const { canCreateSource, canCreateToken, canEditSource, canDeleteSource, canAssignToFleet } =
+    useCollectorPermissions();
+  const hasBulkActions = useHasBulkActions();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [deletingSource, setDeletingSource] = useState<Source | null>(null);
@@ -202,22 +220,61 @@ const FleetDetail = ({ fleetId }: Props) => {
     [],
   );
 
+  // Mirrors the server-side filter in CollectorInstancesResource#reassignInstances, which keeps
+  // only the instances whose *current* fleet the user may read and assign from.
+  const isInstanceSelectable = useCallback(
+    (instance: CollectorInstanceView) => canAssignToFleet(instance.fleet_id),
+    [canAssignToFleet],
+  );
+
   const handleConfirmDeleteSource = useCallback(async () => {
     if (!deletingSource) return;
 
     await deleteSource({ fleetId, sourceId: deletingSource.id });
     sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.DELETED, {
       app_action_value: 'source-delete',
-      fleet_id: fleetId,
-      source_id: deletingSource.id,
-      source_type: deletingSource.type,
+      ...sourceTelemetryProps(deletingSource, fleetId),
     });
     setDeletingSource(null);
   }, [deletingSource, deleteSource, fleetId, sendTelemetry]);
 
+  const handleEditSource = useCallback(
+    (source: Source) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.EDIT_OPENED, {
+        app_action_value: 'source-edit-open',
+        ...sourceTelemetryProps(source, fleetId),
+      });
+
+      setEditingSource(source);
+    },
+    [fleetId, sendTelemetry],
+  );
+
+  const handleViewSourceMessages = useCallback(
+    (source: Source) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.RECEIVED_MESSAGES_CLICKED, {
+        app_action_value: 'source-received-messages',
+        ...sourceTelemetryProps(source, fleetId),
+      });
+    },
+    [fleetId, sendTelemetry],
+  );
+
+  // Hoisted out of the factory call so they can be tracked as memo dependencies: the permissions
+  // are fleet-scoped, so a memo keyed only on the callbacks would go stale across fleets.
+  const canEditSources = canEditSource(fleetId);
+  const canDeleteSources = canDeleteSource(fleetId);
+
   const sourceActions = useMemo(
-    () => sourceActionsFactory({ onEdit: setEditingSource, onDelete: setDeletingSource }),
-    [],
+    () =>
+      sourceActionsFactory({
+        onEdit: handleEditSource,
+        onDelete: setDeletingSource,
+        onViewMessages: handleViewSourceMessages,
+        canEdit: canEditSources,
+        canDelete: canDeleteSources,
+      }),
+    [handleEditSource, handleViewSourceMessages, canEditSources, canDeleteSources],
   );
 
   const getSourcesForInstance = (instance: CollectorInstanceView) =>
@@ -249,9 +306,11 @@ const FleetDetail = ({ fleetId }: Props) => {
           {fleet.name} <PreviewBadge />
         </h2>
         <HeaderActions>
-          <LinkContainer to={deployCollectorUrl}>
-            <Button bsStyle="primary">Deploy a new Collector</Button>
-          </LinkContainer>
+          {canCreateToken(fleet.id) && (
+            <LinkContainer to={deployCollectorUrl}>
+              <Button bsStyle="primary">Deploy a new Collector</Button>
+            </LinkContainer>
+          )}
         </HeaderActions>
       </Header>
 
@@ -346,12 +405,14 @@ const FleetDetail = ({ fleetId }: Props) => {
         <>
           <p>Sources are automatically pushed to all Collectors in this fleet. Changes take effect within seconds.</p>
           <ActionsRow>
-            <LinkContainer to={collectorReceivedMessagesUrl(COLLECTOR_FLEET_ID_FIELD, fleet.id)}>
+            <LinkContainer to={collectorReceivedMessagesUrl(AGENT_FLEET_ID_FIELD, fleet.id)}>
               <Button>Received messages</Button>
             </LinkContainer>
-            <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
-              Add Source
-            </Button>
+            {canCreateSource(fleetId) && (
+              <Button bsStyle="primary" onClick={() => setShowSourceModal(true)}>
+                Add Source
+              </Button>
+            )}
           </ActionsRow>
           <PaginatedEntityTable<Source>
             humanName="sources"
@@ -381,7 +442,9 @@ const FleetDetail = ({ fleetId }: Props) => {
             entityAttributesAreCamelCase={false}
             columnRenderers={instanceRenderers}
             defaultFilters={defaultInstanceFilters}
-            bulkSelection={{ actions: <BulkActions /> }}
+            bulkSelection={
+              hasBulkActions ? { actions: <BulkActions />, isEntitySelectable: isInstanceSelectable } : undefined
+            }
           />
         </>
       )}

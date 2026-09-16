@@ -36,7 +36,7 @@ import IfInteractive from 'views/components/dashboard/IfInteractive';
 import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchExplainContextProvider from 'views/components/contexts/SearchExplainContextProvider';
@@ -165,6 +165,7 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
   const InfoBar = infoBar?.component;
   const SearchAreaContainer = searchAreaContainer?.component;
   const SynchronizationComponent = synchronizeUrl ? SynchronizeUrl : React.Fragment;
+  const isInteractive = useIsInteractiveMode();
 
   useEffect(() => {
     refreshSearch();
@@ -196,49 +197,45 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
                         <WindowLeaveMessage />
                       </IfDashboard>
                     </IfInteractive>
-                    <InteractiveContext.Consumer>
-                      {(interactive) => (
-                        <SearchPagePreferencesProvider>
-                          <DefaultFieldTypesProvider>
-                            <ViewAdditionalContextProvider>
-                              <HighlightingRulesProvider>
-                                <GridContainer id="main-row" $interactive={interactive}>
-                                  <IfInteractive>
-                                    {showSidebar && (
-                                      <ConnectedSidebar forceSideBarPinned={forceSideBarPinned}>
-                                        <FieldsOverview />
-                                      </ConnectedSidebar>
-                                    )}
-                                  </IfInteractive>
-                                  <SearchArea as={SearchAreaContainer} ref={scrollContainer}>
-                                    <IfInteractive>
-                                      <HeaderElements />
-                                      {InfoBar && <InfoBar />}
-                                      <IfDashboard>
-                                        {!editingWidget && <DashboardSearchBar scrollContainer={scrollContainer} />}
-                                      </IfDashboard>
-                                      <IfSearch>
-                                        <SearchBar scrollContainer={scrollContainer} />
-                                      </IfSearch>
+                    <SearchPagePreferencesProvider>
+                      <DefaultFieldTypesProvider>
+                        <ViewAdditionalContextProvider>
+                          <HighlightingRulesProvider>
+                            <GridContainer id="main-row" $interactive={isInteractive}>
+                              <IfInteractive>
+                                {showSidebar && (
+                                  <ConnectedSidebar forceSideBarPinned={forceSideBarPinned}>
+                                    <FieldsOverview />
+                                  </ConnectedSidebar>
+                                )}
+                              </IfInteractive>
+                              <SearchArea as={SearchAreaContainer} ref={scrollContainer}>
+                                <IfInteractive>
+                                  <HeaderElements />
+                                  {InfoBar && <InfoBar />}
+                                  <IfDashboard>
+                                    {!editingWidget && <DashboardSearchBar scrollContainer={scrollContainer} />}
+                                  </IfDashboard>
+                                  <IfSearch>
+                                    <SearchBar scrollContainer={scrollContainer} />
+                                  </IfSearch>
 
-                                      <QueryBarElements />
+                                  <QueryBarElements />
 
-                                      <IfDashboard>{!focusingWidget && <QueryBar />}</IfDashboard>
-                                    </IfInteractive>
-                                    <HighlightMessageInQuery>
-                                      <SearchResult />
-                                    </HighlightMessageInQuery>
-                                  </SearchArea>
-                                  <IfInteractive>
-                                    <AsideElements />
-                                  </IfInteractive>
-                                </GridContainer>
-                              </HighlightingRulesProvider>
-                            </ViewAdditionalContextProvider>
-                          </DefaultFieldTypesProvider>
-                        </SearchPagePreferencesProvider>
-                      )}
-                    </InteractiveContext.Consumer>
+                                  <IfDashboard>{!focusingWidget && <QueryBar />}</IfDashboard>
+                                </IfInteractive>
+                                <HighlightMessageInQuery>
+                                  <SearchResult />
+                                </HighlightMessageInQuery>
+                              </SearchArea>
+                              <IfInteractive>
+                                <AsideElements />
+                              </IfInteractive>
+                            </GridContainer>
+                          </HighlightingRulesProvider>
+                        </ViewAdditionalContextProvider>
+                      </DefaultFieldTypesProvider>
+                    </SearchPagePreferencesProvider>
                   </>
                 )}
               </WidgetFocusContext.Consumer>

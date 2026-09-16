@@ -75,10 +75,10 @@ import static com.google.common.base.CharMatcher.anyOf;
 import static com.google.common.base.CharMatcher.inRange;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
-import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_FLEET_ID;
-import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID;
-import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE;
-import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_FLEET_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_SOURCE_ID;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -277,10 +277,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     );
 
     private static final Set<String> COLLECTOR_FIELDS = ImmutableSet.of(
-            FIELD_COLLECTOR_RECEIVER_TYPE,
-            FIELD_COLLECTOR_SOURCE_ID,
-            FIELD_COLLECTOR_FLEET_ID,
-            FIELD_COLLECTOR_INSTANCE_UID
+            FIELD_AGENT_RECEIVER_TYPE,
+            FIELD_AGENT_SOURCE_ID,
+            FIELD_AGENT_FLEET_ID,
+            FIELD_AGENT_ID
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(

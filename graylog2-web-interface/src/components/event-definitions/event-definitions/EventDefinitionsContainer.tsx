@@ -62,7 +62,7 @@ const getCustomColumnRenderers = (
       renderCell: (_status: string, eventDefinition: EventDefinition) => (
         <StatusCell eventDefinition={eventDefinition} />
       ),
-      staticWidth: 110,
+      staticWidth: 120,
     },
     type: {
       renderCell: (_type: string, eventDefinition: EventDefinition) => (

@@ -64,6 +64,17 @@ public class UrlAllowlistTest {
     }
 
     @Test
+    public void ignoresRemovedEnforceForNotificationsField() throws IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
+
+        final String json = "{\"entries\":[],\"disabled\":false,\"enforce_for_notifications\":true}";
+        final UrlAllowlist read = objectMapper.readValue(json, UrlAllowlist.class);
+
+        assertThat(read).isEqualTo(UrlAllowlist.createEnabled(Collections.emptyList()));
+    }
+
+    @Test
     public void duplicateIds() {
         assertThrows(IllegalArgumentException.class, () ->
             UrlAllowlist.createEnabled(ImmutableList.of(LiteralAllowlistEntry.create("a", "a", "a"),

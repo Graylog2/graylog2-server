@@ -108,7 +108,7 @@ const RuleBuilder = () => {
   }, [initialRule]);
 
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('pipeline-rules');
 
   const setOutputVariable = (block: RuleBlock, outputIndex: number): RuleBlock => {
     const newBlock = block;
@@ -147,7 +147,6 @@ const RuleBuilder = () => {
         ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_AND_CLICKED
         : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_OR_CLICKED,
       {
-        app_section: 'pipeline-rules',
         app_action_value: 'cancel-button',
       },
     );
@@ -262,7 +261,6 @@ const RuleBuilder = () => {
 
   const handleCancel = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CANCEL_CLICKED, {
-      app_section: 'pipeline-rules',
       app_action_value: 'cancel-button',
     });
 
@@ -278,7 +276,6 @@ const RuleBuilder = () => {
           ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_AND_CLOSE_CLICKED
           : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_CLICKED,
         {
-          app_section: 'pipeline-rules',
           app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
         },
       );
@@ -288,7 +285,6 @@ const RuleBuilder = () => {
       if (closeAfter) handleCancel();
     } else {
       sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_RULE_CLICKED, {
-        app_section: 'pipeline-rules',
         app_action_value: 'add-rule-button',
       });
 
@@ -411,7 +407,6 @@ const RuleBuilder = () => {
                       disabled={hasRuleBuilderErrors(rule)}
                       onClick={() => {
                         sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
-                          app_section: 'pipeline-rules',
                           app_action_value: 'convert-rule-builder-to-source-code-button',
                         });
 

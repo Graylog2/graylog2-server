@@ -53,7 +53,7 @@ const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boole
 const ContentStreamSection = () => {
   const { isReleaseSectionEnabledForBrand, isNewsSectionEnabledForBrand } = useWelcomeCustomization();
   const { username } = useCurrentUser();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('content-stream');
   const { contentStreamSettings, isLoadingContentStreamSettings, onSaveContentStreamSetting, refetchContentStream } =
     useContentStreamSettings();
 
@@ -85,7 +85,6 @@ const ContentStreamSection = () => {
   const toggleNews = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.NEWS_OPT_IN_TOGGLED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
       event_details: {
         contentStreamEnabled: !contentStreamEnabled,
       },
@@ -100,7 +99,6 @@ const ContentStreamSection = () => {
   const toggleRelease = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.RELEASE_OPT_IN_TOGGLED, {
       app_pathname: 'welcome',
-      app_section: 'content-stream',
       event_details: {
         contentStreamEnabled: !releasesSectionEnabled,
       },

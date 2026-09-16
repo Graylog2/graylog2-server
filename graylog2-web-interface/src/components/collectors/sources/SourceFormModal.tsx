@@ -364,10 +364,26 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
   }>({ dirty: false, touched: {}, values: initialValues });
 
   const handleClose = useCallback(() => {
-    if (!isEdit) {
-      const { dirty, touched, values } = formStateRef.current;
-      const fields_touched = Object.keys(touched).filter((k) => Boolean((touched as Record<string, unknown>)[k]));
+    const { dirty, touched, values } = formStateRef.current;
+    const fields_touched = Object.keys(touched).filter((k) => Boolean((touched as Record<string, unknown>)[k]));
 
+    if (isEdit) {
+      // Abandoning an edit is reported against the values the form opened with, mirroring
+      // SOURCE.UPDATED, so a cancelled edit and a saved one carry the same dimensions.
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.EDIT_CANCELLED, {
+        app_action_value: 'source-edit-cancel',
+        fleet_id: fleetId,
+        source_id: source!.id,
+        dirty,
+        fields_touched,
+        source_type: values.source_type,
+        source_type_changed: initialValues.source_type !== values.source_type,
+        enabled: values.enabled,
+        enabled_changed: initialValues.enabled !== values.enabled,
+        config_changed: !isEqual(initialValues.config, values.config),
+      });
+    } else {
+      // On create there is nothing to compare against, so the baseline is the form's defaults.
       sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.SOURCE.CREATE_CANCELLED, {
         app_action_value: 'source-create-cancel',
         fleet_id: fleetId,
@@ -379,8 +395,9 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
         enabled_toggled: values.enabled !== true,
       });
     }
+
     onClose();
-  }, [fleetId, isEdit, onClose, sendTelemetry]);
+  }, [fleetId, isEdit, source, initialValues, onClose, sendTelemetry]);
 
   const handleSubmit = useCallback(
     (values: FormValues) =>

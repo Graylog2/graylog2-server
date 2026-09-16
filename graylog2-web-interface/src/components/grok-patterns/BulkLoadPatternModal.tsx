@@ -73,7 +73,6 @@ class BulkLoadPatternModal extends React.Component<
 
         this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.IMPORTED, {
           app_pathname: 'grokpatterns',
-          app_section: 'grokpatterns',
         });
 
         onSuccess();
@@ -140,4 +139,4 @@ class BulkLoadPatternModal extends React.Component<
   }
 }
 
-export default withTelemetry(BulkLoadPatternModal);
+export default withTelemetry(BulkLoadPatternModal, 'grokpatterns');

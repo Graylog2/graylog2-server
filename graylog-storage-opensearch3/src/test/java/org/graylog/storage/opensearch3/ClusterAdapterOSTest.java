@@ -81,6 +81,16 @@ class ClusterAdapterOSTest {
     }
 
     @Test
+    void boundedHealthReportsAnErroringClusterAsUnreachable() {
+        // The mocked transport delivers the stubbed 500 as an IOException, so this only pins that the bounded variant
+        // folds an error response into empty (as the un-timed variant does). The extra runtime OpenSearchException the
+        // bounded variant additionally catches, and the deadline firing itself, are not exercised here -- both would
+        // need a transport that produces a runtime error or never completes. See the OS2/ES7 adapter tests for the
+        // give-up-and-cancel path.
+        assertThat(clusterAdapter.health(java.time.Duration.ofSeconds(1))).isEmpty();
+    }
+
+    @Test
     void testFileDescriptorStats() {
         final Set<NodeFileDescriptorStats> nodeFileDescriptorStats = clusterAdapter.fileDescriptorStats();
 

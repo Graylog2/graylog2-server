@@ -29,6 +29,7 @@ import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
 import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,12 @@ import java.util.Set;
 
 public interface ClusterAdapter {
     Optional<HealthStatus> health();
+
+    /**
+     * Cancelled at {@code timeout}, reported empty like an unreachable cluster. {@link #health()} cannot be bounded
+     * by config: its connect and socket timeouts apply per host and the client retries every node in one call.
+     */
+    Optional<HealthStatus> health(Duration timeout);
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
 

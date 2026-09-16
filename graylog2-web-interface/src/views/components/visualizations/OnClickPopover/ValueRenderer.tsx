@@ -26,6 +26,7 @@ const ValueBox = styled.span<{ $bgColor: string | number }>(
     background-color: ${$bgColor ?? 'inherit'};
     color: ${$bgColor ? theme.utils.contrastingColor(String($bgColor)) : 'inherit'};
     padding: ${theme.spacings.xxs};
+    white-space: nowrap;
   `,
 );
 

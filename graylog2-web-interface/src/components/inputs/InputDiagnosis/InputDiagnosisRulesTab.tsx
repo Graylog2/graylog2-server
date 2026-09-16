@@ -55,12 +55,6 @@ const StyledSectionGrid = styled(SectionGrid)<{ $rows?: string }>(
   `,
 );
 
-const ListCol = styled(Col)(
-  ({ theme }) => css`
-    padding-top: ${theme.spacings.lg};
-  `,
-);
-
 const InputDiagnosisRulesTab = ({ inputId }: Props) => (
   <StyledSectionGrid $rows="1fr 1fr">
     <Section title="Input appears in Pipeline Rules">
@@ -69,7 +63,7 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
         match on gl2_source_input/gl2_forwarder_input).
       </p>
       <Row>
-        <ListCol md={12}>
+        <Col md={12}>
           <PaginatedEntityTable<InputPipelineRule>
             humanName="pipeline rules"
             tableLayout={PIPELINE_RULES_LAYOUT}
@@ -81,7 +75,7 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
             fetchOptions={{ refetchInterval: 5000 }}
             withoutURLParams
           />
-        </ListCol>
+        </Col>
       </Row>
     </Section>
 
@@ -92,7 +86,7 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
         be listed.
       </p>
       <Row>
-        <ListCol md={12}>
+        <Col md={12}>
           <PaginatedEntityTable<InputStreamRule>
             humanName="stream rules"
             tableLayout={STREAM_RULES_LAYOUT}
@@ -104,7 +98,7 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
             fetchOptions={{ refetchInterval: 5000 }}
             withoutURLParams
           />
-        </ListCol>
+        </Col>
       </Row>
     </Section>
   </StyledSectionGrid>

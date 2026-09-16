@@ -105,7 +105,6 @@ class EditPatternModal extends React.Component<
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN[create ? 'CREATED' : 'UPDATED'], {
       app_pathname: 'grokpatterns',
-      app_section: 'grokpatterns',
     });
 
     this._closeModal();
@@ -127,7 +126,6 @@ class EditPatternModal extends React.Component<
   _sendTelemetry = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.TESTED, {
       app_pathname: 'grokpatterns',
-      app_section: 'grokpatterns',
     });
   };
 
@@ -241,4 +239,4 @@ class EditPatternModal extends React.Component<
   }
 }
 
-export default withTelemetry(EditPatternModal);
+export default withTelemetry(EditPatternModal, 'grokpatterns');

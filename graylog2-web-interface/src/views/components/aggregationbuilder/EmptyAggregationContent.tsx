@@ -22,7 +22,7 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 import { UPDATE_WIDGET_BTN_TEXT } from 'views/components/widgets/SaveOrCancelButtons';
 import { UPDATE_WIDGET_PREVIEW_BTN_TEXT } from 'views/components/aggregationwizard/ElementsConfigurationActions';
 
-import InteractiveContext from '../contexts/InteractiveContext';
+import { useIsInteractiveMode } from '../contexts/InteractiveContext';
 
 type Props = {
   toggleEdit: () => void;
@@ -52,7 +52,7 @@ const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
     }
   }, [onRenderComplete]);
 
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
   const text = editing ? (
     <p>
       You are now editing the widget.

@@ -37,7 +37,7 @@ import MessageEditFieldConfigurationAction from './fields/MessageEditFieldConfig
 const PAGE_SIZE = 10;
 
 const TestAgainstStreamButton = ({ index, id }: { index: string; id: string }) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-message-table');
   const [searchParams, setSearchParams] = useState({
     query: '',
     page: 1,
@@ -52,7 +52,6 @@ const TestAgainstStreamButton = ({ index, id }: { index: string; id: string }) =
 
   const sendEvent = () =>
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
-      app_section: 'search-message-table',
       app_action_value: 'seach-message-table-test-against-stream',
     });
 

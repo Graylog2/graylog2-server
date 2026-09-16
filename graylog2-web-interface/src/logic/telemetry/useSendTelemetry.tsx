@@ -39,7 +39,7 @@ const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
   return stripPrefixFromPathname(matches?.at(-1)?.route.path);
 };
 
-const useSendTelemetry = () => {
+const useSendTelemetry = (appSection?: string) => {
   const { pathname } = useLocation();
   const { sendTelemetry } = useContext(TelemetryContext);
   const dataRouterContext = useContext(DataRouterContext);
@@ -50,11 +50,12 @@ const useSendTelemetry = () => {
       const baseEvent = {
         app_path_pattern: route,
         app_pathname: getPathnameWithoutId(pathname),
+        app_section: appSection,
       };
 
       return sendTelemetry(eventType, { ...baseEvent, ...event });
     },
-    [dataRouterContext, pathname, sendTelemetry],
+    [appSection, dataRouterContext, pathname, sendTelemetry],
   );
 };
 

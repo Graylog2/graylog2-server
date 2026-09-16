@@ -67,7 +67,6 @@ export type Url = {
 export type AllowListConfig = {
   entries: Array<Url>;
   disabled: boolean;
-  enforce_for_notifications: boolean;
 };
 export type PermissionsConfigType = {
   allow_sharing_with_everyone: boolean;

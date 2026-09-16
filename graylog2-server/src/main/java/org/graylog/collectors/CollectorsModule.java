@@ -49,6 +49,7 @@ import org.graylog.collectors.input.processor.MacOSUnifiedLoggingRecordProcessor
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
+import org.graylog.collectors.migrations.V20260828120000_RenameCollectorStreamRuleField;
 import org.graylog.collectors.opamp.OpAmpModule;
 import org.graylog.collectors.periodical.CollectorCaRenewalPeriodical;
 import org.graylog.collectors.periodical.CollectorRetentionPeriodical;
@@ -108,6 +109,7 @@ public class CollectorsModule extends PluginModule {
         addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
         install(new FactoryModuleBuilder().build(CollectorIngestHttpHandler.Factory.class));
         addInitializer(CertBindingResolver.class);
+        addMigration(V20260828120000_RenameCollectorStreamRuleField.class);
 
         if (isCloud) {
             serviceBinder().addBinding().to(CloudCollectorIngestService.class).in(Scopes.SINGLETON);

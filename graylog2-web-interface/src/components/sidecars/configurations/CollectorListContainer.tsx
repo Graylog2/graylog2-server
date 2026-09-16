@@ -32,7 +32,7 @@ import CollectorList from './CollectorList';
 
 const CollectorListContainer = () => {
   const queryClient = useQueryClient();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('configuration');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -44,7 +44,6 @@ const CollectorListContainer = () => {
   const handleClone = (collectorId: string, name: string, callback: () => void) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_CLONED, {
       app_pathname: 'sidecars',
-      app_section: 'configuration',
     });
 
     copyCollector(collectorId, name).then(() => {
@@ -56,7 +55,6 @@ const CollectorListContainer = () => {
   const handleDelete = async (collector) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_DELETED, {
       app_pathname: 'sidecars',
-      app_section: 'configuration',
     });
 
     await deleteCollector(collector);

@@ -19,7 +19,7 @@ import { useRef, useState } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement } from 'plotly.js';
 import { useFloating } from '@floating-ui/react';
 
-import type { Rel } from 'views/components/visualizations/OnClickPopover/Types';
+import type { RelativeCoordinates } from 'views/components/visualizations/OnClickPopover/Types';
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
 import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 import type { Anchor, BuildAnchor, RenderPopover } from 'views/components/visualizations/OnClickPopover/anchors';
@@ -31,7 +31,7 @@ type OnClickPopoverInput = {
   config: AggregationWidgetConfig;
 };
 
-const alignByRelativeCoords = (rel: Rel = { x: 0, y: 0 }) => ({
+const alignByRelativeCoords = (rel: RelativeCoordinates = { x: 0, y: 0 }) => ({
   name: 'alignByRelativeCoords',
   options: rel,
   fn: ({ x, y, rects }) => ({

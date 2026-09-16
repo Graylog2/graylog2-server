@@ -27,6 +27,7 @@ import Routes from 'routing/Routes';
 import FleetCard, { getHealthStatus } from './FleetCard';
 
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
+import useCollectorPermissions from '../hooks/useCollectorPermissions';
 import type { FleetStatsSummary } from '../types';
 
 const Grid = styled.div(
@@ -53,6 +54,7 @@ type Props = {
 const FleetCardsGrid = ({ fleets, filter }: Props) => {
   const history = useHistory();
   const sendTelemetry = useSendCollectorsTelemetry();
+  const { canCreateFleet } = useCollectorPermissions();
 
   const filtered = useMemo(() => {
     if (!filter) return fleets;
@@ -62,6 +64,16 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
   }, [fleets, filter]);
 
   if (fleets.length === 0) {
+    // Without create permission every call to action here is a dead end: the setup steps are not
+    // theirs to perform, and the Deployment link goes to a page they cannot use either.
+    if (!canCreateFleet) {
+      return (
+        <EmptyEntity title="No Fleets Yet">
+          <p>Contact an administrator to set up the first Collectors.</p>
+        </EmptyEntity>
+      );
+    }
+
     return (
       <EmptyEntity title="No Fleets Yet">
         <p>

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
@@ -59,6 +59,27 @@ const DeployTab = () => {
   const sendTelemetry = useSendCollectorsTelemetry();
   const history = useHistory();
 
+  // A fleet arriving via deep link is a selection the user never clicks, so report it here —
+  // once — or the funnel undercounts against manual selections.
+  //
+  // Only the value the page *loaded* with counts as a deep link. A fleet appearing in the URL
+  // later is this component's own pushFleetUrl echoing a click that handleFleetSelect already
+  // reported, so watching `fleetParam` would report every manual selection twice. useRef's
+  // initial value is evaluated on the first render only, which is exactly the snapshot needed.
+  const deepLinkedFleetId = useRef(typeof fleetParam === 'string' ? fleetParam : null);
+  const reportedUrlFleet = useRef(false);
+  useEffect(() => {
+    if (reportedUrlFleet.current || !deepLinkedFleetId.current) return;
+
+    reportedUrlFleet.current = true;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
+      app_action_value: 'deployment-fleet',
+      fleet_id: deepLinkedFleetId.current,
+      via: 'url',
+    });
+  }, [sendTelemetry]);
+
   if (isFleetsLoading) return <Spinner />;
 
   // A lone fleet is auto-selected while the user has made no decision (same rule as
@@ -77,6 +98,10 @@ const DeployTab = () => {
 
   const handleFleetSelect = (choice: FleetChoiceValue) => {
     if (choice.kind === 'create-new') {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_OPENED, {
+        app_action_value: 'deployment-create-fleet',
+      });
+
       history.push(Routes.SYSTEM.COLLECTORS.FLEETS_NEW);
 
       return;
@@ -85,6 +110,7 @@ const DeployTab = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.FLEET_SELECTED, {
       app_action_value: 'deployment-fleet',
       fleet_id: choice.fleetId,
+      via: 'click',
     });
 
     setSelectedFleetId(choice.fleetId);
@@ -93,6 +119,10 @@ const DeployTab = () => {
   };
 
   const handleChangeFleet = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.DEPLOYMENT.FLEET_CLEARED, {
+      app_action_value: 'deployment-change-fleet',
+    });
+
     setSelectedFleetId(null);
     setGeneratedToken(null);
     pushFleetUrl(null);

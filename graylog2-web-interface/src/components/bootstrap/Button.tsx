@@ -330,4 +330,7 @@ const Button = (
   );
 };
 
-export default React.forwardRef(Button);
+const ForwardedButton = React.forwardRef(Button);
+ForwardedButton.displayName = 'Button';
+
+export default ForwardedButton;

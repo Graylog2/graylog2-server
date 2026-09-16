@@ -68,5 +68,6 @@ describe('<TelemetryInit>', () => {
     const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
 
     expect(result.current.__loaded).toBeTruthy();
+    expect(result.current.config.strict_script_versioning).toBe(true);
   });
 });

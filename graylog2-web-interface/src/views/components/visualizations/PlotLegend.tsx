@@ -33,7 +33,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 import WidgetRenderingContext from 'views/components/widgets/WidgetRenderingContext';
 
 const ColorHint = styled.div(
@@ -142,7 +142,7 @@ type LegendEntryProps = Pick<TableCellProps, 'value'> & {
 
 const LegendEntry = ({ value, labelsWithField }: LegendEntryProps) => {
   const { colors, setColor } = useContext(ChartColorContext);
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
   const mapKeys = useMapKeys();
   const [showPopover, setShowPopover] = useState(false);
   const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
@@ -255,7 +255,7 @@ const PlotLegend = ({
 }: Props) => {
   const { columnPivots, series } = config;
   const { focusedWidget } = useContext(WidgetFocusContext);
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
   const fieldTypes = useContext(FieldTypesContext);
   const { limitHeight } = useContext(WidgetRenderingContext);
 

@@ -26,6 +26,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.InsertOneModel;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -54,6 +55,7 @@ import static com.mongodb.client.model.Filters.or;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+@Singleton
 public class DBGrantService {
     public static final String COLLECTION_NAME = "grants";
 

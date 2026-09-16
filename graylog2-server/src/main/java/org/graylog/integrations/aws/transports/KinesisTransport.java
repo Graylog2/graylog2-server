@@ -154,7 +154,7 @@ public class KinesisTransport extends ThrottleableTransport2 {
 
         this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, input::processRawMessage,
                 streamName, awsMessageType, batchSize, awsRequest, awsClientBuilderUtil, inputFailureRecorder,
-                migrateToSingleTable);
+                migrateToSingleTable, System::nanoTime);
 
         LOG.debug("Starting Kinesis reader thread for input {}", input.toIdentifier());
         executor.submit(this.kinesisConsumer);

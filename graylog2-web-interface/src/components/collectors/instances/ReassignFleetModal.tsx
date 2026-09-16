@@ -23,12 +23,19 @@ import { Select, Spinner } from 'components/common';
 import ModalSubmit from 'components/common/ModalSubmit';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import { useFleets, useCollectorsMutations } from '../hooks';
+import { useFleets, useCollectorsMutations, useCollectorPermissions } from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import type { Fleet } from '../types';
 
+// Which entry point opened the modal. This is deliberately *not* derived from
+// `instanceUids.length`: reassigning one instance from its row and running the bulk
+// action that happens to have one instance selected are different user actions, and
+// only the row path knows the instance's current fleet.
+type Origin = 'row' | 'bulk-selection';
+
 type Props = {
   instanceUids: string[];
+  origin: Origin;
   currentFleetId?: string;
   onClose: () => void;
   onSuccess?: () => void;
@@ -48,12 +55,22 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
-const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose, onSuccess = () => {} }: Props) => {
+const ReassignFleetModal = ({
+  instanceUids,
+  origin,
+  currentFleetId = undefined,
+  onClose,
+  onSuccess = () => {},
+}: Props) => {
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
   const { reassignInstances } = useCollectorsMutations();
+  const { canAssignToFleet } = useCollectorPermissions();
   const sendTelemetry = useSendCollectorsTelemetry();
 
-  const availableFleets = (fleets || []).filter((fleet: Fleet) => fleet.id !== currentFleetId);
+  // Kept separate so the empty state can tell "there is nowhere else to move to" apart from
+  // "you may not move it there" — they are different problems with different remedies.
+  const otherFleets = (fleets ?? []).filter((fleet: Fleet) => fleet.id !== currentFleetId);
+  const availableFleets = otherFleets.filter((fleet: Fleet) => canAssignToFleet(fleet.id));
 
   const fleetOptions = availableFleets.map((fleet: Fleet) => ({
     label: fleet.name,
@@ -64,14 +81,20 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose,
     async (values: FormValues) => {
       await reassignInstances({ instanceUids, fleetId: values.fleetId });
 
-      if (instanceUids.length === 1) {
+      if (origin === 'row') {
         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.REASSIGNED, {
           app_action_value: 'instance-reassign',
+          // The row path knows the instance UID and its fleet, but not the rest of the
+          // shared instance payload -- it receives UIDs, not `CollectorInstanceView`s.
           instance_id: instanceUids[0],
+          count: instanceUids.length,
           from_fleet_id: currentFleetId ?? null,
           to_fleet_id: values.fleetId,
         });
       } else {
+        // The bulk selection carries UIDs only, so there is no source fleet to report --
+        // the instances may well have come from several. `from_fleet_id` is omitted rather
+        // than sent as a constant null.
         sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.INSTANCE.BULK_REASSIGNED, {
           app_action_value: 'instance-bulk-reassign',
           count: instanceUids.length,
@@ -82,7 +105,7 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose,
       onSuccess();
       onClose();
     },
-    [instanceUids, reassignInstances, onSuccess, onClose, currentFleetId, sendTelemetry],
+    [instanceUids, origin, reassignInstances, onSuccess, onClose, currentFleetId, sendTelemetry],
   );
 
   const instanceCount = instanceUids.length;
@@ -102,13 +125,23 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId = undefined, onClose,
               {fleetsLoading ? (
                 <Spinner />
               ) : (
-                <Select
-                  placeholder="Select a fleet..."
-                  options={fleetOptions}
-                  value={values.fleetId}
-                  onChange={(value: string) => setFieldValue('fleetId', value)}
-                  clearable={false}
-                />
+                <>
+                  {fleetOptions.length === 0 ? (
+                    <p>
+                      {otherFleets.length === 0
+                        ? `There is no other fleet to assign ${instanceCount === 1 ? 'this Collector' : 'these Collectors'} to.`
+                        : 'You do not have permission to assign Collectors to any other fleet.'}
+                    </p>
+                  ) : (
+                    <Select
+                      placeholder="Select a fleet..."
+                      options={fleetOptions}
+                      value={values.fleetId}
+                      onChange={(value: string) => setFieldValue('fleetId', value)}
+                      clearable={false}
+                    />
+                  )}
+                </>
               )}
             </Modal.Body>
             <Modal.Footer>

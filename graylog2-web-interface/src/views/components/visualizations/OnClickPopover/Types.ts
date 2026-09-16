@@ -37,7 +37,7 @@ export type ExtraPlotData = {
   z: Datum;
 };
 export type ClickPoint = PlotMouseEvent['points'][number] & ExtraPlotData;
-export type Rel = { x: number; y: number };
+export type RelativeCoordinates = { x: number; y: number };
 export type FieldData = {
   field: string;
   value: Datum;

@@ -48,7 +48,7 @@ type Props = {
  * `useWelcomeSearch` (see components/welcome/hooks/useWelcomeSearch.ts) and just needs it rendered.
  */
 const WelcomeSearch = ({ view }: Props) => (
-  <InteractiveContext.Provider value={false}>
+  <InteractiveContext.Provider value="read-only">
     <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
       <SearchPageLayoutProvider value={SEARCH_PAGE_LAYOUT_CONTEXT_VALUE}>
         <SearchPage view={view} isNew={false} skipNoStreamsCheck />

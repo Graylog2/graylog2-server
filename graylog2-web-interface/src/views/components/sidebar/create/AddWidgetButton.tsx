@@ -88,7 +88,7 @@ const CreateMenuItem = ({
   onClick: () => void;
   setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>;
 }) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-sidebar');
   const dispatch = useViewsDispatch();
   const disabled = creator.useCondition?.() === false;
   const { setWidgetEditing } = useContext(WidgetFocusContext);
@@ -99,7 +99,6 @@ const CreateMenuItem = ({
         TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')] ??
           `Search Widget ${creator.title} Created`,
         {
-          app_section: 'search-sidebar',
           event_details: {
             widgetType: creator.type,
             widgetTitle: creator.title,
