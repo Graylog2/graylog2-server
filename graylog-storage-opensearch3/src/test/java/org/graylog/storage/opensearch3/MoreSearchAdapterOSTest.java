@@ -155,11 +155,7 @@ class MoreSearchAdapterOSTest {
         assertThat(sortOptions.get(0).field().missing()).isNull();
     }
 
-    /**
-     * The excluded event IDs must reach OpenSearch as a must_not terms clause. Inlining them into the
-     * query string as "NOT (id:a OR id:b ...)" exceeded search.query.max_query_string_length (32000 by
-     * default) at roughly 969 IDs and failed the search with "Failed to parse query".
-     */
+    /** Excluded IDs must become a must_not terms clause, not query-string text subject to the 32000 cap. */
     @Test
     void excludedEventIdsBecomeAMustNotTermsClauseInsteadOfQueryStringText() throws Exception {
         final Set<String> excludedEventIds = IntStream.range(0, 1000)

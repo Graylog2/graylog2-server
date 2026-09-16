@@ -71,11 +71,7 @@ public abstract class EventsSearchFilter {
     @JsonProperty(FIELD_EXTRA_FILTERS)
     public abstract Map<String, Set<String>> extraFilters();
 
-    /**
-     * Event IDs to exclude from the result. Applied by the indexer as a {@code must_not} terms filter rather
-     * than being inlined into the query string, so the set can grow without hitting
-     * {@code search.query.max_query_string_length}.
-     */
+    /** Event IDs to exclude, applied by the indexer as a {@code must_not} terms filter. */
     @JsonProperty(FIELD_EXCLUDED_IDS)
     public abstract Set<String> excludedIds();
 

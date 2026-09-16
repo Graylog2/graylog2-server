@@ -49,11 +49,7 @@ public interface MoreSearchAdapter {
         return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString, sourceStreamFilter, extraFilters, Set.of());
     }
 
-    /**
-     * @param excludedEventIds event IDs to exclude, applied as a {@code must_not} terms filter. Kept out of
-     *                         {@code queryString} so a large exclusion set cannot exceed
-     *                         {@code search.query.max_query_string_length}.
-     */
+    /** @param excludedEventIds event IDs to exclude, applied as a {@code must_not} terms filter. */
     MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
                                   int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
                                   Map<String, Set<String>> extraFilters, Set<String> excludedEventIds);

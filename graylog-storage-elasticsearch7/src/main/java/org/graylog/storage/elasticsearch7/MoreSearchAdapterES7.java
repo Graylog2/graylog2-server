@@ -271,8 +271,8 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             filter.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
         }
 
-        // A terms filter rather than "NOT (id:a OR id:b ...)" in the query string: the query string is capped
-        // by search.query.max_query_string_length (32000 by default), which a few hundred event IDs exceed.
+        // A terms filter, not query-string text: the query string is capped by
+        // search.query.max_query_string_length (32000 by default).
         if (!excludedEventIds.isEmpty()) {
             filter.mustNot(termsQuery(EventDto.FIELD_ID, excludedEventIds));
         }
