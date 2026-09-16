@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -39,7 +40,6 @@ public abstract class EventsSearchFilter {
     private static final String FIELD_KEY = "key";
     private static final String FIELD_ID = "id";
     private static final String FIELD_EXTRA_FILTERS = "extra_filters";
-    private static final String FIELD_EXCLUDED_IDS = "excluded_ids";
 
     public enum Alerts {
         @JsonProperty("include")
@@ -71,8 +71,8 @@ public abstract class EventsSearchFilter {
     @JsonProperty(FIELD_EXTRA_FILTERS)
     public abstract Map<String, Set<String>> extraFilters();
 
-    /** Event IDs to exclude, applied by the indexer as a {@code must_not} terms filter. */
-    @JsonProperty(FIELD_EXCLUDED_IDS)
+    /** Event IDs to exclude, applied by the indexer as a {@code must_not} terms filter. Server-side only. */
+    @JsonIgnore
     public abstract Set<String> excludedIds();
 
     public static EventsSearchFilter empty() {
@@ -114,7 +114,7 @@ public abstract class EventsSearchFilter {
         @JsonProperty(FIELD_EXTRA_FILTERS)
         public abstract Builder extraFilters(Map<String, Set<String>> extraFilters);
 
-        @JsonProperty(FIELD_EXCLUDED_IDS)
+        @JsonIgnore
         public abstract Builder excludedIds(Set<String> excludedIds);
 
         @JsonProperty(FIELD_KEY)
