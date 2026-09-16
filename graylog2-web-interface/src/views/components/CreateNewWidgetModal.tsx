@@ -84,10 +84,14 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
     () =>
       creators.map(({ title, func, icon: WidgetIcon }) => {
         const onClick = async () => {
-          sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
-            app_pathname: getPathnameWithoutId(location.pathname),
-            app_section: 'search-widget',
-          });
+          sendTelemetry(
+            TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')] ??
+              `Search Widget ${title} Created`,
+            {
+              app_pathname: getPathnameWithoutId(location.pathname),
+              app_section: 'search-widget',
+            },
+          );
 
           const newId = generateId();
           const newWidget = func({ view }).toBuilder().id(newId).build();

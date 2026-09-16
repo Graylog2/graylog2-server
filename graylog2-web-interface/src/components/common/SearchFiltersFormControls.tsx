@@ -38,7 +38,14 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () 
 
   const initialFilters = React.useMemo(() => {
     const searchFilters = OrderedMap(
-      filters.map((filter) => [filter.id || uuidv4(), { frontendId: filter.id || uuidv4(), ...filter }]),
+      filters.map((filter) => {
+        // The map key and the `frontendId` must be identical, since all filter actions (edit, negate, remove)
+        // look up the filter by its `frontendId`. Filters without an `id` (e.g. inline filters which are not
+        // saved in "My Filters") would otherwise end up with two different generated ids.
+        const frontendId = filter.id || uuidv4();
+
+        return [frontendId, { ...filter, frontendId }];
+      }),
     );
 
     return { searchFilters };

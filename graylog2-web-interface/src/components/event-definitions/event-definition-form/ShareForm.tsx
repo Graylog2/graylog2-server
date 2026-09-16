@@ -49,6 +49,7 @@ const ShareForm = ({ onChange, eventDefinition }: Props) => {
           entityType="event_definition"
           entityTitle=""
           dependenciesGRN={[...streamDependenciesGRN, ...notificationDependenciesGRN]}
+          defaultSharePayload={eventDefinition.share_request}
         />
       </Col>
     </Row>

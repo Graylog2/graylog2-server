@@ -105,10 +105,12 @@ public class CIDRPatriciaTrieTest {
             // Copy should be a deep copy.
             assertThat(copy).isNotSameAs(trie);
             // No operations performed on the original trie, so all nodes should still exist in the trie.
+            // Probed with an explicit lookup time of 0 to ignore expiry: the point here is that cleanCopy
+            // did not mutate the original, not whether these nodes have expired (two of them have).
             assertThat(trie).satisfies(t -> {
-                assertThat(t.longestPrefixRangeLookup("192.168.1.100")).isEqualTo("IPv4 Range 1");
-                assertThat(t.longestPrefixRangeLookup("10.0.5.1")).isEqualTo("IPv4 Range 2");
-                assertThat(t.longestPrefixRangeLookup("35.139.253.123")).isEqualTo("IPv4 Range 3");
+                assertThat(t.longestPrefixRangeLookupWithTtl("192.168.1.100", 0L)).isEqualTo("IPv4 Range 1");
+                assertThat(t.longestPrefixRangeLookupWithTtl("10.0.5.1", 0L)).isEqualTo("IPv4 Range 2");
+                assertThat(t.longestPrefixRangeLookupWithTtl("35.139.253.123", 0L)).isEqualTo("IPv4 Range 3");
             });
             // Confirm two nodes with TTLs have been cleaned out of the copy and the one without a TTL has not.
             assertThat(copy).satisfies(t -> {
@@ -141,6 +143,52 @@ public class CIDRPatriciaTrieTest {
             assertThat(copy).isNotSameAs(trie);
             assertThat(trie.isEmpty()).isFalse();
             assertThat(copy.isEmpty()).isTrue();
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+    }
+
+    @Test
+    public void testLookupSkipsExpiredRange() {
+        try {
+            final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();
+            final long expireAt = DateTime.now(DateTimeZone.UTC).getMillis() + 500L;
+            trie.insertCIDR("192.168.1.0/24", "Expiring Range", expireAt);
+            trie.insertCIDR("10.0.0.0/8", "Permanent Range");
+
+            // Before expiry both resolve.
+            assertThat(trie.longestPrefixRangeLookup("192.168.1.100")).isEqualTo("Expiring Range");
+            assertThat(trie.longestPrefixRangeLookup("10.0.5.1")).isEqualTo("Permanent Range");
+
+            DateTimeUtils.setCurrentMillisOffset(501);
+
+            // The expired range no longer matches, even though cleanCopy has not run and the node is
+            // still present in the trie.
+            assertThat(trie.longestPrefixRangeLookup("192.168.1.100")).isNull();
+            assertThat(trie.longestPrefixRangeLookupWithTtl("192.168.1.100", 0L)).isEqualTo("Expiring Range");
+
+            // A range without a TTL is unaffected.
+            assertThat(trie.longestPrefixRangeLookup("10.0.5.1")).isEqualTo("Permanent Range");
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+    }
+
+    @Test
+    public void testLookupFallsBackToLiveEnclosingRangeWhenLongestPrefixExpired() {
+        try {
+            final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();
+            final long expireAt = DateTime.now(DateTimeZone.UTC).getMillis() + 500L;
+            trie.insertCIDR("10.1.2.0/24", "Specific Expiring", expireAt);
+            trie.insertCIDR("10.0.0.0/8", "Broad Permanent");
+
+            // The more specific range wins while it is live.
+            assertThat(trie.longestPrefixRangeLookup("10.1.2.42")).isEqualTo("Specific Expiring");
+
+            DateTimeUtils.setCurrentMillisOffset(501);
+
+            // Once it expires the search continues to the shorter enclosing range rather than giving up.
+            assertThat(trie.longestPrefixRangeLookup("10.1.2.42")).isEqualTo("Broad Permanent");
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }

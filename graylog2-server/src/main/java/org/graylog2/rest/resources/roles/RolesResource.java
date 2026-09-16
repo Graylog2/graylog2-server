@@ -33,11 +33,13 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.UserContext;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.security.permissions.GRNPermission;
@@ -53,6 +55,7 @@ import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleImpl;
 import org.graylog2.users.RoleService;
 import org.joda.time.DateTimeZone;
@@ -81,11 +84,13 @@ public class RolesResource extends RestResource {
 
     private final RoleService roleService;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
+    private final PrivilegeEscalationGuard privilegeEscalationGuard;
 
     @Inject
-    public RolesResource(RoleService roleService, GlobalAuthServiceConfig globalAuthServiceConfig) {
+    public RolesResource(RoleService roleService, GlobalAuthServiceConfig globalAuthServiceConfig, PrivilegeEscalationGuard privilegeEscalationGuard) {
         this.roleService = roleService;
         this.globalAuthServiceConfig = globalAuthServiceConfig;
+        this.privilegeEscalationGuard = privilegeEscalationGuard;
     }
 
     @GET
@@ -116,10 +121,13 @@ public class RolesResource extends RestResource {
     @RequiresPermissions(RestPermissions.ROLES_CREATE)
     @ApiOperation("Create a new role")
     @AuditEvent(type = AuditEventTypes.ROLE_CREATE)
-    public Response create(@ApiParam(name = "JSON body", value = "The new role to create", required = true) @Valid @NotNull RoleResponse roleResponse) {
+    public Response create(@ApiParam(name = "JSON body", value = "The new role to create", required = true) @Valid @NotNull RoleResponse roleResponse,
+                           @Context UserContext userContext) {
         if (roleService.exists(roleResponse.name())) {
             throw new BadRequestException("Role " + roleResponse.name() + " already exists.");
         }
+
+        privilegeEscalationGuard.validatePermissions(roleResponse.permissions(), userContext);
 
         Role role = new RoleImpl();
         role.setName(roleResponse.name());
@@ -149,8 +157,11 @@ public class RolesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ROLE_UPDATE)
     public RoleResponse update(
             @ApiParam(name = "rolename", required = true) @PathParam("rolename") String name,
-            @ApiParam(name = "JSON Body", value = "The new representation of the role", required = true) RoleResponse roleRepresentation) throws NotFoundException {
+            @ApiParam(name = "JSON Body", value = "The new representation of the role", required = true) RoleResponse roleRepresentation,
+            @Context UserContext userContext) throws NotFoundException {
         checkPermission(RestPermissions.ROLES_EDIT, name);
+
+        privilegeEscalationGuard.validatePermissions(roleRepresentation.permissions(), userContext);
 
         final Role role = roleService.load(name);
         if (role.isReadOnly()) {
@@ -251,7 +262,8 @@ public class RolesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
     public Response addMember(@ApiParam(name = "rolename") @PathParam("rolename") String rolename,
                               @ApiParam(name = "username") @PathParam("username") String username,
-                              @ApiParam(name = "JSON Body", value = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) throws NotFoundException {
+                              @ApiParam(name = "JSON Body", value = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body,
+                              @Context UserContext userContext) throws NotFoundException {
         checkPermission(RestPermissions.USERS_EDIT, username);
         checkPermission(RestPermissions.ROLES_ASSIGN, rolename);
 
@@ -262,6 +274,8 @@ public class RolesResource extends RestResource {
 
         // verify that the role exists
         final Role role = roleService.load(rolename);
+
+        privilegeEscalationGuard.validatePermissions(role.getPermissions(), userContext);
 
         final HashSet<String> roles = Sets.newHashSet(user.getRoleIds());
         roles.add(role.getId());

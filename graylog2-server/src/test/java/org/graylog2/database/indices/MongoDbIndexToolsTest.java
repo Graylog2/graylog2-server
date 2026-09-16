@@ -33,7 +33,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -122,5 +125,47 @@ class MongoDbIndexToolsTest {
         toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
         verify(db).dropIndex(Indexes.ascending("summary"));
         verify(db).createIndex(eq(Indexes.ascending("summary")), argThat(indexOptions -> indexOptions.getCollation().getLocale().equals("en")));
+    }
+
+    @Test
+    void createsTTLIndexIfDoesNotExist() {
+        MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(72), "updated_at");
+
+        verify(db).createIndex(eq(Indexes.ascending("updated_at")),
+                argThat(indexOptions -> Objects.equals(indexOptions.getExpireAfter(TimeUnit.SECONDS), 72L)));
+    }
+
+    @Test
+    void doesNotTouchTTLIndexWithMatchingExpiry() {
+        rawdb.createIndex(Indexes.ascending("updated_at"), new IndexOptions().expireAfter(72L, TimeUnit.SECONDS));
+
+        MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(72), "updated_at");
+
+        verify(db, never()).dropIndex(any(Bson.class));
+        verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
+    }
+
+    @Test
+    void replacesTTLIndexWithChangedExpiry() {
+        rawdb.createIndex(Indexes.ascending("updated_at"), new IndexOptions().expireAfter(72L, TimeUnit.SECONDS));
+
+        MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(3600), "updated_at");
+
+        verify(db).dropIndex(Indexes.ascending("updated_at"));
+        verify(db).createIndex(eq(Indexes.ascending("updated_at")),
+                argThat(indexOptions -> Objects.equals(indexOptions.getExpireAfter(TimeUnit.SECONDS), 3600L)));
+    }
+
+    @Test
+    void replacesPlainIndexWithTTLIndex() {
+        // Deployments that created the index before it gained a TTL have a plain index on the field. Such an
+        // index carries no expireAfterSeconds at all, so it must be replaced rather than kept.
+        rawdb.createIndex(Indexes.ascending("updated_at"));
+
+        MongoDbIndexTools.ensureTTLIndex(db, Duration.ofSeconds(72), "updated_at");
+
+        verify(db).dropIndex(Indexes.ascending("updated_at"));
+        verify(db).createIndex(eq(Indexes.ascending("updated_at")),
+                argThat(indexOptions -> Objects.equals(indexOptions.getExpireAfter(TimeUnit.SECONDS), 72L)));
     }
 }
