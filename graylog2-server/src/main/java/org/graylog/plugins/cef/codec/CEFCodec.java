@@ -16,12 +16,12 @@
  */
 package org.graylog.plugins.cef.codec;
 
-import com.github.jcustenborder.cef.CEFParser;
-import com.github.jcustenborder.cef.CEFParserFactory;
+import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.cef.parser.CEFMapping;
+import org.graylog.plugins.cef.parser.CEFParser;
 import org.graylog.plugins.cef.parser.MappedMessage;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogUtils;
 import org.graylog2.plugin.Message;
@@ -63,8 +63,15 @@ public class CEFCodec extends AbstractCodec {
 
     private static final Logger LOG = LoggerFactory.getLogger(CEFCodec.class);
 
-    private static final Pattern SYSLOG_PREFIX = Pattern.compile("^<(?<pri>\\d+)>(?<msg>.*)$");
-    private static final Pattern CLEAN_PATTERN = Pattern.compile("^\\d+\\s+(\\S.*)");
+    // Tolerates a leading number before the priority, and a carriage return in the body. Without both, the priority
+    // leaks through to the CEF parser, which can trigger an exception.
+    private static final Pattern SYSLOG_PREFIX = Pattern.compile("^(?:\\d+\\s+)?<(?<pri>\\d+)>(?<msg>.*)$", Pattern.DOTALL);
+    private static final Pattern CLEAN_PATTERN = Pattern.compile("^\\d+\\s+(\\S.*)", Pattern.DOTALL);
+
+    /**
+     * Header fields are not trimmed, so a message delimiter left on the payload would end up inside the last one.
+     */
+    private static final Pattern TRAILING_LINE_TERMINATORS = Pattern.compile("[\\r\\n]+$");
 
     private static final String CK_TIMEZONE = "timezone";
     private static final String CK_LOCALE = "locale";
@@ -82,7 +89,7 @@ public class CEFCodec extends AbstractCodec {
     public CEFCodec(@Assisted Configuration configuration, MessageFactory messageFactory) {
         super(configuration);
         this.messageFactory = messageFactory;
-        this.parser = CEFParserFactory.create();
+        this.parser = new CEFParser();
 
         DateTimeZone timezone;
         try {
@@ -99,7 +106,7 @@ public class CEFCodec extends AbstractCodec {
 
     @Override
     public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
-        final String s = new String(rawMessage.getPayload(), charset);
+        final String s = TRAILING_LINE_TERMINATORS.matcher(new String(rawMessage.getPayload(), charset)).replaceFirst("");
         try {
             final Matcher matcher = SYSLOG_PREFIX.matcher(s);
 
@@ -158,7 +165,7 @@ public class CEFCodec extends AbstractCodec {
         return matcher.find() ? matcher.group(1) : message;
     }
 
-    protected String buildMessageSummary(com.github.jcustenborder.cef.Message cef) {
+    protected String buildMessageSummary(MappedMessage cef) {
         return cef.deviceProduct() + ": [" + cef.deviceEventClassId() + ", " + cef.severity() + "] " + cef.name();
     }
 
@@ -186,7 +193,9 @@ public class CEFCodec extends AbstractCodec {
             remoteAddress = address.getInetSocketAddress();
         }
 
-        return remoteAddress == null ? "unknown" : remoteAddress.getAddress().toString();
+        // InetAddress#toString() renders "hostname/1.2.3.4", and the CEF codec never resolves the hostname, so it
+        // would leave a leading slash on every address.
+        return remoteAddress == null ? "unknown" : InetAddresses.toAddrString(remoteAddress.getAddress());
     }
 
     @Nullable
