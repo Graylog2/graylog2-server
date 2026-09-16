@@ -2,3 +2,4 @@ type = "f"
 message = "Fix NetFlow V9 skip fields creating generic nf_field_<N> output fields."
 
 issues = ["Graylog2/graylog2-server#21273"]
+pulls = ["27402"]
