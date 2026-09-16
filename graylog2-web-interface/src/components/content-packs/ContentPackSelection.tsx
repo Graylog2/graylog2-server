@@ -205,17 +205,16 @@ class ContentPackSelection extends React.Component<
       return;
     }
 
-    const filtered = Object.keys(entities).reduce((result, type) => {
-      const filteredEntities = cloneDeep(result);
+    const filtered = Object.fromEntries(
+      Object.keys(entities).map((type) => [
+        type,
+        entities[type].filter((entity) => {
+          const regexp = RegExp(filter, 'i');
 
-      filteredEntities[type] = entities[type].filter((entity) => {
-        const regexp = RegExp(filter, 'i');
-
-        return regexp.test(entity.title);
-      });
-
-      return filteredEntities;
-    }, {});
+          return regexp.test(entity.title);
+        }),
+      ]),
+    );
 
     this.setState({ filteredEntities: filtered, isFiltered: true, filter: filter });
   };
