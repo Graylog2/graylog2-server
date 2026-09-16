@@ -52,6 +52,8 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
         withNetwork(requireNonNull(network, "network cannot be null"));
         withNetworkAliases(NETWORK_ALIAS);
         waitingFor(Wait.forListeningPort());
+
+        MongoDBKernelWorkaround.applyIfNeeded(this, dockerImageName);
     }
 
     public String infoString() {
