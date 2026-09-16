@@ -64,8 +64,12 @@ const _generateSeries =
     const yAxisTitle = columnPivots.join('-');
     const zSeriesTitles = _generateSeriesTitles(config, values, labels);
     const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>%{text}: %{customdata}<extra></extra>`;
-    const { colorScale, reverseScale, zMin, zMax } = visualizationConfig;
-    const y = labels.map((value) => mapKeys(value, rowPivots[0]));
+    const { colorScale, reverseScale, zMin, zMax, rowValueLabels } = visualizationConfig;
+    const y = labels.map((value) => {
+      const mappedValue = mapKeys(value, rowPivots[0]);
+
+      return rowValueLabels?.[mappedValue] ?? mappedValue;
+    });
     const x = values.map((value) => mapKeys(value, columnPivots[0]));
 
     return {
