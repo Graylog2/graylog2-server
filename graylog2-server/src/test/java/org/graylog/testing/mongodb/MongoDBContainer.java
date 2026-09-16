@@ -58,10 +58,12 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
         waitingFor(Wait.forListeningPort());
 
 
-        // Workaround for running MongoDB 8.x on Linux kernel version >= 6.19
+        // Workaround for running MongoDB 8.x (including the "latest" tag, which currently resolves
+        // to an 8.x release) on Linux kernel version >= 6.19
         // See: https://jira.mongodb.org/browse/SERVER-121912
         try {
-            if (DockerImageName.parse(dockerImageName).getVersionPart().startsWith("8.")) {
+            final var versionPart = DockerImageName.parse(dockerImageName).getVersionPart();
+            if (versionPart.startsWith("8.") || versionPart.equals("latest")) {
                 final var osName = System.getProperty("os.name", "unknown").toLowerCase(Locale.ROOT);
 
                 if (osName.contains("linux")) {
