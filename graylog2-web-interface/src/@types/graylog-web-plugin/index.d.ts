@@ -307,7 +307,7 @@ declare module 'graylog-web-plugin/plugin' {
     DataLakeStatus: React.ComponentType<{
       dataLakeEnabled: boolean;
     }>;
-    DataLakeJournal: React.ComponentType<{
+    DataLakeJournal?: React.ComponentType<{
       nodeId: string;
     }>;
     DataLakeJobs: React.ComponentType<{
@@ -335,6 +335,12 @@ declare module 'graylog-web-plugin/plugin' {
       restore_history: Array<{ id: string }>;
     }>;
     DataLakeStreamDeleteWarning: React.ComponentType;
+  }
+
+  interface PluginArchive {
+    hooks: {
+      useExcludedStreams: () => Array<string>;
+    };
   }
 
   type HelpMenuItem = {
@@ -393,6 +399,7 @@ declare module 'graylog-web-plugin/plugin' {
      */
     pageNavigation?: Array<PageNavigation>;
     dataLake?: Array<PluginDataLake>;
+    archive?: Array<PluginArchive>;
     // Use this for stream-overview-only columns. Use `components.shared.entityTableElements`
     // when the extension should participate in the generic entity-table mechanism.
     'components.streams.overview.tableElements'?: Array<StreamsOverviewTableElement>;

@@ -17,9 +17,11 @@
 package org.graylog.scheduler.rest;
 
 import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.system.SystemJobDefinitionConfig;
 import org.graylog.security.UserContext;
 import org.graylog2.rest.models.system.SystemJobSummary;
 
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 
 import java.time.Duration;
@@ -57,11 +59,11 @@ public class JobResourceHandlerService {
     }
 
     public List<JobTriggerDto> listJobs(UserContext userContext) {
-        return allResourceHandlers().stream().flatMap(h -> h.listAllJobs(userContext).stream()).collect(Collectors.toList());
+        return allResourceHandlers().stream().flatMap(h -> h.listAllJobs(userContext).stream()).toList();
     }
 
     public List<SystemJobSummary> listJobsAsSystemJobSummary(UserContext userContext) {
-        return listJobs(userContext).stream().map(this::jobSummaryFromTrigger).collect(Collectors.toList());
+        return listJobs(userContext).stream().map(this::jobSummaryFromTrigger).toList();
     }
 
     public Optional<JobTriggerDto> getJob(UserContext userContext, String jobId) {
@@ -85,7 +87,7 @@ public class JobResourceHandlerService {
     }
 
     public SystemJobSummary jobSummaryFromTrigger(JobTriggerDto trigger) {
-        final JobResourceHandler handler = resourceHandlers.get(trigger.jobDefinitionType());
+        final JobResourceHandler handler = resourceHandler(trigger);
 
         JobTriggerDetails details;
         if (handler == null) {
@@ -105,5 +107,30 @@ public class JobResourceHandlerService {
                 details.isCancellable(),
                 true,
                 trigger.status());
+    }
+
+    /**
+     * System job triggers all share the same job definition type, so their handler is registered under the type of
+     * their trigger data instead.
+     */
+    @Nullable
+    private JobResourceHandler resourceHandler(JobTriggerDto trigger) {
+        final JobResourceHandler handler = resourceHandlers.get(trigger.jobDefinitionType());
+        if (handler != null) {
+            return handler;
+        }
+
+        if (SystemJobDefinitionConfig.TYPE_NAME.equals(trigger.jobDefinitionType())) {
+            return trigger.data().map(data -> resourceHandlers.get(data.type())).orElse(null);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return true if a plugin lists jobs of this type through its own handler
+     */
+    public boolean handlesJobType(String jobType) {
+        return resourceHandlers.containsKey(jobType);
     }
 }

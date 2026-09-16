@@ -76,7 +76,40 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {});
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+        prepare_request: null,
+      });
+    });
+  });
+
+  it('restores a previously made selection from the default share payload', async () => {
+    const selected_grantee_capabilities = createEntityShareState.selectedGranteeCapabilities.merge({
+      [everyone.id]: viewer.id,
+    });
+
+    render(<SUT defaultSharePayload={{ selected_grantee_capabilities }} />);
+
+    await waitFor(() => {
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+        selected_grantee_capabilities,
+        prepare_request: null,
+      });
+    });
+  });
+
+  it('re-runs the dependency check when restoring a selection', async () => {
+    const selected_grantee_capabilities = createEntityShareState.selectedGranteeCapabilities.merge({
+      [everyone.id]: viewer.id,
+    });
+    const dependenciesGRN = ['grn::::stream:stream-id'];
+
+    render(<SUT defaultSharePayload={{ selected_grantee_capabilities }} dependenciesGRN={dependenciesGRN} />);
+
+    await waitFor(() => {
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+        selected_grantee_capabilities,
+        prepare_request: dependenciesGRN,
+      });
     });
   });
 

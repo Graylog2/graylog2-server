@@ -111,7 +111,7 @@ public class ViewFacadeTest {
         protected TestViewService(ClusterConfigService clusterConfigService,
                                   MongoCollections mongoCollections) {
             super(clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections);
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityRegistrar.class), mock(ViewSummaryService.class), mock(EntitySourceService.class), mongoCollections, new IgnoreSearchFilters());
         }
     }
 

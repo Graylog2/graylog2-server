@@ -26,6 +26,7 @@ import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { Stream } from 'stores/streams/StreamsStore';
 import NumberUtils from 'util/NumberUtils';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
+import useExcludedArchiveStreams from 'components/streams/hooks/useExcludedArchiveStreams';
 import IndexSetArchivingCell from 'components/streams/StreamDetails/routing-destination/IndexSetArchivingCell';
 import IndexSetUpdateForm from 'components/streams/StreamDetails/routing-destination/IndexSetUpdateForm';
 import IndexSetFilters from 'components/streams/StreamDetails/routing-destination/IndexSetFilters';
@@ -53,9 +54,12 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
   const productName = useProductName();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { data: indexSet, isInitialLoading: isLoadingIndexSet } = useSingleIndexSet(stream.index_set_id);
-  const archivingEnabled =
+  const excludedStreams = useExcludedArchiveStreams();
+  const indexSetArchivingEnabled =
     indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY ||
     indexSet?.data_tiering?.archive_before_deletion;
+  // A stream is only archived when its index set archives AND the stream is not excluded from archiving.
+  const archivingEnabled = Boolean(indexSetArchivingEnabled) && !excludedStreams.includes(stream.id);
   const {
     data: { indexSets },
   } = useIndexSetsList(false);

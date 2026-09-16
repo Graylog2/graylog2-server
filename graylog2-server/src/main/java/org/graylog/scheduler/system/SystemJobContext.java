@@ -19,6 +19,8 @@ package org.graylog.scheduler.system;
 import org.graylog.scheduler.JobExecutionContext;
 import org.graylog2.plugin.Tools;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Context information and utilities for system jobs.
  */
@@ -27,6 +29,13 @@ public class SystemJobContext {
 
     public SystemJobContext(JobExecutionContext ctx) {
         this.ctx = ctx;
+    }
+
+    /**
+     * Returns the ID of this job. The system jobs API reports the same ID, and it survives retries.
+     */
+    public String jobId() {
+        return requireNonNull(ctx.trigger().id(), "A running job must have an ID");
     }
 
     /**

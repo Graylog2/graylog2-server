@@ -45,6 +45,13 @@ public class NodeMetricsCollector {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Returns the raw, unconverted OpenSearch node stats keyed by {@link NodeStatMetrics#getFieldName()}.
+     * Byte metrics are kept in bytes here so that the metric-registry gauges (served by the
+     * {@code /rest/metrics/multiple} endpoint) stay consistent with their "*_in_bytes" names. Unit conversion
+     * to GiB/MiB for the metrics index and its dashboards is applied by the caller via
+     * {@link NodeStatMetrics#mapValue(String, Object)}.
+     */
     public Map<String, Object> getNodeMetrics(String node) {
         Map<String, Object> metrics = new HashMap<>();
 
@@ -59,7 +66,7 @@ public class NodeMetricsCollector {
                     .filter(m -> Objects.nonNull(m.getNodeStat()))
                     .forEach(metric -> {
                         try {
-                            metrics.put(metric.getFieldName(), metric.mapValue(nodeContext.read(metric.getNodeStat())));
+                            metrics.put(metric.getFieldName(), nodeContext.read(metric.getNodeStat()));
                         } catch (Exception e) {
                             log.error("Could not retrieve metric {} for node {}", metric.getFieldName(), node);
                         }
