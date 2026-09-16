@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
@@ -24,6 +23,7 @@ import { SystemClusterTraffic } from '@graylog/server-api';
 
 import { adminUser } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
+import selectEvent from 'helpers/selectEvent';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import GraylogClusterOverview from './GraylogClusterOverview';
@@ -123,7 +123,7 @@ describe('GraylogClusterOverview', () => {
   it('renders GraylogClusterOverview', async () => {
     render(<GraylogClusterOverview />);
 
-    expect(screen.getByText(/Incoming traffic/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Incoming traffic/ })).toBeInTheDocument();
 
     await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(30, false));
 
@@ -131,10 +131,9 @@ describe('GraylogClusterOverview', () => {
   });
 
   it('renders GraylogClusterOverview and change the days for the traffic graph', async () => {
-    const { getByLabelText } = render(<GraylogClusterOverview />);
-    const graphDaysSelect = getByLabelText('Days');
+    render(<GraylogClusterOverview />);
 
-    await userEvent.selectOptions(graphDaysSelect, '365');
+    await selectEvent.select(await screen.findByLabelText('Days'), '365');
 
     await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(365, false));
 
