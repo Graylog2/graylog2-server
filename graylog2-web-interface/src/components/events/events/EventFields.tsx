@@ -16,12 +16,14 @@
  */
 import React from 'react';
 
+import { defaultCompare } from 'logic/DefaultCompare';
+
 type Props = {
   fields: Record<string, string>;
 };
 
 const EventFields = ({ fields }: Props) => {
-  const fieldNames = Object.keys(fields);
+  const fieldNames = Object.keys(fields).sort(defaultCompare);
 
   return (
     <>
