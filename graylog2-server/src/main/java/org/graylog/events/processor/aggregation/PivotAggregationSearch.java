@@ -366,12 +366,12 @@ public class PivotAggregationSearch implements AggregationSearch {
                         final Object maybeNumberValue = firstNonNull(value.value(), Double.NaN);
 
                         if (maybeNumberValue instanceof Number) {
-                            extracted(series, groupKey, maybeNumberValue, values);
+                            values.add(extracted(series, groupKey, maybeNumberValue));
                         } else if (maybeNumberValue instanceof Optional<?> optionalValue && optionalValue.isPresent()) {
                             // with the OpenSearch 3 client, the value can be wrapped in an Optional
                             final Object optionalMaybeNumberValue = firstNonNull(optionalValue.get(), Double.NaN);
                             if (optionalMaybeNumberValue instanceof Number) {
-                                extracted(series, groupKey, optionalMaybeNumberValue, values);
+                                values.add(extracted(series, groupKey, optionalMaybeNumberValue));
                             } else {
                                 // Should not happen
                                 throw new IllegalStateException("Got unexpected non-number value for " + series + " " + row + " " + value);
@@ -400,16 +400,14 @@ public class PivotAggregationSearch implements AggregationSearch {
         return results.build();
     }
 
-    private static void extracted(SeriesSpec series, ImmutableList<String> groupKey, final Object maybeNumberValue, ImmutableList.Builder<AggregationSeriesValue> values) {
+    private static AggregationSeriesValue extracted(SeriesSpec series, ImmutableList<String> groupKey, final Object maybeNumberValue) {
         final double numberValue = ((Number) maybeNumberValue).doubleValue();
 
-        final AggregationSeriesValue seriesValue = AggregationSeriesValue.builder()
+        return AggregationSeriesValue.builder()
                 .key(groupKey)
                 .value(numberValue)
                 .series(series)
                 .build();
-
-        values.add(seriesValue);
     }
 
     private ImmutableSet<String> loadAllStreams() {
