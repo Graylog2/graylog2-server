@@ -154,11 +154,8 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     @Override
     public ClusterShardAllocation clusterShardAllocation() {
-        // maxShardsPerNode stays unbounded on purpose. #22228 scoped its cluster.max_shards_per_node notification to
-        // OpenSearch, and IndexerClusterCheckerThread only notifies above a ratio of the maximum, so an unreachable
-        // maximum keeps that notification off here. Reading the real setting would newly arm it on every
-        // Elasticsearch cluster.
-        return new ClusterShardAllocation(Integer.MAX_VALUE, catApi.getNodeShardAllocations());
+        // unsupported in Elasticsearch, return empty
+        return new ClusterShardAllocation(Integer.MAX_VALUE, List.of());
     }
 
     @Override
