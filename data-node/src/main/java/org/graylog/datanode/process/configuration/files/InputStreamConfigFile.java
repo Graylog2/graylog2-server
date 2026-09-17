@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-public record InputStreamConfigFile(Path relativePath, ByteArrayInputStream inputStream) implements DatanodeConfigFile {
+public record InputStreamConfigFile(Path relativePath, byte[] content) implements DatanodeConfigFile {
     @Override
     public void write(OutputStream output) throws IOException {
-        inputStream.transferTo(output);
+        try (final ByteArrayInputStream input = new ByteArrayInputStream(content)) {
+            input.transferTo(output);
+        }
     }
 }
