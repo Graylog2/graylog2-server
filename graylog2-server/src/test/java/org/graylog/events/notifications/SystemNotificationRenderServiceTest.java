@@ -118,7 +118,7 @@ class SystemNotificationRenderServiceTest {
         when(graylogConfig.isCloud()).thenReturn(true);
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService().render(notification, SystemNotificationRenderService.Format.HTML, null);
+                renderService().render(notification, SystemNotificationRenderService.Format.HTML);
         assertThat(renderResponse.description).doesNotContain(url);
     }
 
@@ -135,7 +135,7 @@ class SystemNotificationRenderServiceTest {
         when(graylogConfig.isCloud()).thenReturn(false);
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService().render(notification, SystemNotificationRenderService.Format.HTML, null);
+                renderService().render(notification, SystemNotificationRenderService.Format.HTML);
         assertThat(renderResponse.description).containsSequence(url);
     }
 
@@ -155,7 +155,7 @@ class SystemNotificationRenderServiceTest {
         when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService().render(notification, SystemNotificationRenderService.Format.HTML, null);
+                renderService().render(notification, SystemNotificationRenderService.Format.HTML);
         assertThat(renderResponse.description).containsSequence("11: 12");
     }
 
@@ -168,7 +168,7 @@ class SystemNotificationRenderServiceTest {
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService("http://localhost:9000/graylog/").render(notification, SystemNotificationRenderService.Format.HTML, null);
+                renderService("http://localhost:9000/graylog/").render(notification, SystemNotificationRenderService.Format.HTML);
 
         assertThat(renderResponse.description)
                 .contains("href=\"http://localhost:9000/graylog/system/cluster/datanode-upgrade\"");
