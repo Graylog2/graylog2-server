@@ -151,6 +151,12 @@ public class CollectorsConfigResource extends RestResource {
     public CollectorsConfig put(@Context ContainerRequestContext requestContext,
                                 @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
 
+        // Fail before persisting anything: a saved config without the requested input would leave the caller
+        // half-configured (see CollectorsConfigResourceTest#putWithCreateInputChecksInputPermissionBeforeSavingConfig).
+        if (!isCloud && request.createInput()) {
+            collectorIngestInputService.ensureCanCreateInput(getSubject());
+        }
+
         final var existing = collectorsConfigService.get();
 
         final CollectorsConfig.Builder configBuilder;
