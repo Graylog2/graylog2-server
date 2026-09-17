@@ -80,7 +80,7 @@ public class V20260911120000_AddExcludeEmptyFieldsToTemplateProviders extends Mi
                 final Document fieldSpec = stampTemplateProviders(eventDefinition);
 
                 if (fieldSpec != null) {
-                    // Update only the subdocument we changed so a concurrent write is not lost.
+                    // Replace the whole field_spec subdocument with the stamped copy.
                     eventDefinitions.updateOne(Filters.eq("_id", id), Updates.set(FIELD_SPEC, fieldSpec));
                     modified++;
                 }
