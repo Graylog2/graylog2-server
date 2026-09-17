@@ -481,10 +481,10 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         // whether commandLineProcess is running would leave it waiting for a certificate that opensearch was never
         // even asked to pick up, and it would incorrectly escalate once its grace period runs out.
         if (commandLineProcess != null) {
+            commandLineProcess.hotReload();
             // CertificateReloadVerifier is a singleton: queuing this verification automatically supersedes
             // whatever verification was still in flight for a previous reload.
             certificateReloadVerifier.verify(datanodeKeystore.getCertificateSerialNumber(), this::getOpensearchBaseUrl);
-            commandLineProcess.hotReload();
         }
     }
 
