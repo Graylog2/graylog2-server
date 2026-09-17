@@ -18,10 +18,13 @@ package org.graylog2.plugin.security;
 
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,5 +65,28 @@ class DomainActionPermissionTest {
     void failedCreate(String permissionValue) {
         assertThatThrownBy(() -> DomainActionPermission.create(permissionValue, "description", Map.of(GRNTypes.STREAM, Capability.VIEW)))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void toShiroPermissionDoesNotImplyOtherEntitiesWhenTheTargetEntityLooksLikeAWildcard() {
+        final var permission = DomainActionPermission.create("users:edit", "description",
+                Map.of(GRNTypes.USER, Capability.MANAGE));
+
+        for (final String entity : List.of("*", "admin,attacker", "attacker,admin")) {
+            final var shiroPermission = permission.toShiroPermission(GRNTypes.USER.toGRN(entity));
+
+            assertThat(shiroPermission.implies(new CaseSensitiveWildcardPermission("users:edit:admin")))
+                    .as("grant on entity <%s> must not imply users:edit:admin", entity)
+                    .isFalse();
+        }
+    }
+
+    @Test
+    void toShiroPermissionImpliesTheGrantedEntity() {
+        final var permission = DomainActionPermission.create("users:edit", "description",
+                Map.of(GRNTypes.USER, Capability.MANAGE));
+
+        assertThat(permission.toShiroPermission(GRNTypes.USER.toGRN("alice"))
+                .implies(new CaseSensitiveWildcardPermission("users:edit:alice"))).isTrue();
     }
 }
