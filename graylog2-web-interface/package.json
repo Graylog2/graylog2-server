@@ -177,6 +177,8 @@
   },
   "resolutions": {
     "@types/plotly.js": "3.0.10",
-    "maplibre-gl": "^6.4.1"
+    "maplibre-gl": "^6.4.1",
+    "gopd": "^1.2.0",
+    "es-define-property": "^1.0.1"
   }
 }
