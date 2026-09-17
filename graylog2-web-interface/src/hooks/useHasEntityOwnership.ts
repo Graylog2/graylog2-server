@@ -14,4 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export default (data) => Object.fromEntries(data.map((result) => [result.name || result.id, result]));
+import { createGRN } from 'logic/permissions/GRN';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { hasAdminPermission } from 'util/PermissionsMixin';
+
+const useHasEntityOwnership = (id: string | undefined, type: string) => {
+  const currentUser = useCurrentUser();
+
+  if (!currentUser) {
+    return false;
+  }
+
+  const { grnPermissions = [], permissions } = currentUser;
+
+  return hasAdminPermission(permissions) || grnPermissions.includes(`entity:own:${createGRN(type, id)}`);
+};
+
+export default useHasEntityOwnership;
