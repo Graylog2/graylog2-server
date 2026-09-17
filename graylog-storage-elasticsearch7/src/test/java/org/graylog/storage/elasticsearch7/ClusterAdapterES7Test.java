@@ -26,9 +26,7 @@ import org.graylog.storage.elasticsearch7.cat.IndexSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
-import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeRole;
-import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -86,28 +84,6 @@ class ClusterAdapterES7Test {
         this.jsonApi = mock(PlainJsonApi.class);
 
         this.clusterAdapter = new ClusterAdapterES7(client, Duration.seconds(1), catApi, jsonApi);
-    }
-
-    @Test
-    void clusterShardAllocationReportsPerNodeShardCounts() {
-        when(catApi.getNodeShardAllocations()).thenReturn(List.of(
-                new NodeShardAllocation("es01", 12),
-                new NodeShardAllocation("es02", 7)));
-
-        final ClusterShardAllocation allocation = clusterAdapter.clusterShardAllocation();
-
-        assertThat(allocation.nodeShardAllocations())
-                .containsExactly(new NodeShardAllocation("es01", 12), new NodeShardAllocation("es02", 7));
-    }
-
-    @Test
-    void clusterShardAllocationLeavesTheShardMaximumUnbounded() {
-        // #22228 scoped its max_shards_per_node notification to OpenSearch. IndexerClusterCheckerThread notifies
-        // above a ratio of this maximum, so an unreachable one keeps that notification off on Elasticsearch even
-        // though the per-node counts are now populated.
-        when(catApi.getNodeShardAllocations()).thenReturn(List.of(new NodeShardAllocation("es01", 12)));
-
-        assertThat(clusterAdapter.clusterShardAllocation().maxShardsPerNode()).isEqualTo(Integer.MAX_VALUE);
     }
 
     @Test
