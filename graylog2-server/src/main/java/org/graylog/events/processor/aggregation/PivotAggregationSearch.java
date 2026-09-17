@@ -70,6 +70,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -365,14 +366,16 @@ public class PivotAggregationSearch implements AggregationSearch {
                         final Object maybeNumberValue = firstNonNull(value.value(), Double.NaN);
 
                         if (maybeNumberValue instanceof Number) {
-                            final double numberValue = ((Number) maybeNumberValue).doubleValue();
-                            final AggregationSeriesValue seriesValue = AggregationSeriesValue.builder()
-                                    .key(groupKey)
-                                    .value(numberValue)
-                                    .series(series)
-                                    .build();
-
-                            values.add(seriesValue);
+                            extracted(series, groupKey, maybeNumberValue, values);
+                        } else if (maybeNumberValue instanceof Optional<?> optionalValue && optionalValue.isPresent()) {
+                            // with the OpenSearch 3 client, the value can be wrapped in an Optional
+                            final Object optionalMaybeNumberValue = firstNonNull(optionalValue.get(), Double.NaN);
+                            if (optionalMaybeNumberValue instanceof Number) {
+                                extracted(series, groupKey, optionalMaybeNumberValue, values);
+                            } else {
+                                // Should not happen
+                                throw new IllegalStateException("Got unexpected non-number value for " + series + " " + row + " " + value);
+                            }
                         } else {
                             // Should not happen
                             throw new IllegalStateException("Got unexpected non-number value for " + series + " " + row + " " + value);
@@ -395,6 +398,18 @@ public class PivotAggregationSearch implements AggregationSearch {
         }
 
         return results.build();
+    }
+
+    private static void extracted(SeriesSpec series, ImmutableList<String> groupKey, final Object maybeNumberValue, ImmutableList.Builder<AggregationSeriesValue> values) {
+        final double numberValue = ((Number) maybeNumberValue).doubleValue();
+
+        final AggregationSeriesValue seriesValue = AggregationSeriesValue.builder()
+                .key(groupKey)
+                .value(numberValue)
+                .series(series)
+                .build();
+
+        values.add(seriesValue);
     }
 
     private ImmutableSet<String> loadAllStreams() {
