@@ -19,6 +19,7 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
+import useOnboardingCustomization from 'brand-customization/useOnboardingCustomization';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import LinkContainer from 'components/common/LinkContainer';
@@ -164,6 +165,7 @@ const SourcesBoxActions = styled(BoxActions)(
 
 const FirstUseWelcome = () => {
   const productName = useProductName();
+  const { isResourceSectionEnabledForBrand } = useOnboardingCustomization();
   const { mutate: dismiss } = useDismissOnboarding();
   const [showDismissConfirm, setShowDismissConfirm] = useState(false);
   const sendTelemetry = useSendTelemetry('welcome');
@@ -256,37 +258,41 @@ const FirstUseWelcome = () => {
         </Col>
       </Row>
 
-      <SecondaryHeadline>Resources</SecondaryHeadline>
+      {isResourceSectionEnabledForBrand && (
+        <>
+          <SecondaryHeadline>Resources</SecondaryHeadline>
 
-      <Container>
-        {resources.map((resource) => (
-          <ResourceTile className="content" key={resource.title}>
-            <StyledResourceCol>
-              <ResourceTileContent>
-                <IconCard>
-                  <Icon name={resource.iconName} />
-                </IconCard>
-                <ResourceTileBody>
-                  <ResourceTitle>{resource.title}</ResourceTitle>
-                  <ResourceDescription>{resource.description}</ResourceDescription>
-                  <BoxActions>
-                    <ExternalLinkButton
-                      href={resource.link}
-                      bsSize="xs"
-                      onClick={() =>
-                        sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
-                          app_action_value: resource.title,
-                        })
-                      }>
-                      Continue
-                    </ExternalLinkButton>
-                  </BoxActions>
-                </ResourceTileBody>
-              </ResourceTileContent>
-            </StyledResourceCol>
-          </ResourceTile>
-        ))}
-      </Container>
+          <Container>
+            {resources.map((resource) => (
+              <ResourceTile className="content" key={resource.title}>
+                <StyledResourceCol>
+                  <ResourceTileContent>
+                    <IconCard>
+                      <Icon name={resource.iconName} />
+                    </IconCard>
+                    <ResourceTileBody>
+                      <ResourceTitle>{resource.title}</ResourceTitle>
+                      <ResourceDescription>{resource.description}</ResourceDescription>
+                      <BoxActions>
+                        <ExternalLinkButton
+                          href={resource.link}
+                          bsSize="xs"
+                          onClick={() =>
+                            sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
+                              app_action_value: resource.title,
+                            })
+                          }>
+                          Continue
+                        </ExternalLinkButton>
+                      </BoxActions>
+                    </ResourceTileBody>
+                  </ResourceTileContent>
+                </StyledResourceCol>
+              </ResourceTile>
+            ))}
+          </Container>
+        </>
+      )}
     </>
   );
 };
