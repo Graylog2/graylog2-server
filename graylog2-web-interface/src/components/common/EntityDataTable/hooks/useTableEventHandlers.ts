@@ -35,12 +35,11 @@ const useTableEventHandlers = ({
   appSection: string;
   resetTableLayout: () => Promise<void>;
 }) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(appSection);
 
   const onPageSizeChange = useCallback(
     (newPageSize: number) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.PAGE_SIZE_CHANGED, {
-        app_section: appSection,
         app_action_value: 'page-size-select',
         page_size: newPageSize,
       });
@@ -48,7 +47,7 @@ const useTableEventHandlers = ({
       paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
       updateTableLayout({ perPage: newPageSize });
     },
-    [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout],
+    [paginationQueryParameter, sendTelemetry, updateTableLayout],
   );
 
   const onSearch = useCallback(
@@ -63,7 +62,6 @@ const useTableEventHandlers = ({
     (layoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> }) => {
       if (layoutPreferences.order) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMN_ORDER_CHANGED, {
-          app_section: appSection,
           app_action_value: 'column-order-change',
           column_order: layoutPreferences.order,
         });
@@ -71,7 +69,6 @@ const useTableEventHandlers = ({
 
       if (layoutPreferences.attributes) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
-          app_section: appSection,
           app_action_value: 'columns-select',
           columns: layoutPreferences.attributes,
         });
@@ -89,19 +86,18 @@ const useTableEventHandlers = ({
 
       return updateTableLayout(newLayoutPreferences);
     },
-    [appSection, sendTelemetry, updateTableLayout],
+    [sendTelemetry, updateTableLayout],
   );
 
   const onResetLayoutPreferences = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_RESET, {
-      app_section: appSection,
       app_action_value: 'columns-select',
     });
 
     paginationQueryParameter.resetPage();
 
     return resetTableLayout();
-  }, [appSection, paginationQueryParameter, resetTableLayout, sendTelemetry]);
+  }, [paginationQueryParameter, resetTableLayout, sendTelemetry]);
 
   const onSearchReset = useCallback(() => {
     onSearch('');
@@ -110,7 +106,6 @@ const useTableEventHandlers = ({
   const onSortChange = useCallback(
     (newSort: Sort) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SORT_CHANGED, {
-        app_section: appSection,
         app_action_value: 'sort-select',
         sort: newSort,
       });
@@ -118,7 +113,7 @@ const useTableEventHandlers = ({
       paginationQueryParameter.resetPage();
       updateTableLayout({ sort: newSort });
     },
-    [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout],
+    [paginationQueryParameter, sendTelemetry, updateTableLayout],
   );
 
   return {

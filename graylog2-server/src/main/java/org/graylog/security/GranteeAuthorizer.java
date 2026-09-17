@@ -19,7 +19,7 @@ package org.graylog.security;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.ImmutablePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -46,7 +46,7 @@ public class GranteeAuthorizer {
     @AssistedInject
     public GranteeAuthorizer(DefaultSecurityManager securityManager, @Assisted GRN grantee) {
         this.subject = new Subject.Builder(securityManager)
-                .principals(new SimplePrincipalCollection(grantee, "GranteeAuthorizer"))
+                .principals(ImmutablePrincipalCollection.ofSinglePrincipal(grantee, "GranteeAuthorizer"))
                 .authenticated(true)
                 .sessionCreationEnabled(false)
                 .buildSubject();

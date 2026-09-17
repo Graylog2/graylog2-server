@@ -16,6 +16,7 @@
  */
 package org.graylog.security.entities;
 
+import com.google.common.base.Suppliers;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
@@ -26,17 +27,18 @@ import org.graylog.grn.GRNTypes;
 import org.graylog2.plugin.database.users.User;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Singleton
 public class EntityRegistrar {
     private final GRNRegistry grnRegistry;
-    private final Provider<Set<EntityRegistrationHandler>> registrationHandlersProvider;
+    private final Supplier<Set<EntityRegistrationHandler>> registrationHandlers;
 
     @Inject
     public EntityRegistrar(GRNRegistry grnRegistry,
                            Provider<Set<EntityRegistrationHandler>> registrationHandlersProvider) {
         this.grnRegistry = grnRegistry;
-        this.registrationHandlersProvider = registrationHandlersProvider;
+        this.registrationHandlers = Suppliers.memoize(registrationHandlersProvider::get);
     }
 
     public void registerNewEventDefinition(String id, User user) {
@@ -64,11 +66,11 @@ public class EntityRegistrar {
     }
 
     public void registerNewEntity(GRN entityGRN, User user) {
-        registrationHandlersProvider.get().forEach(handler -> handler.handleRegistration(entityGRN, user));
+        registrationHandlers.get().forEach(handler -> handler.handleRegistration(entityGRN, user));
     }
 
     public void unregisterEntity(GRN entityGRN) {
-        registrationHandlersProvider.get().forEach(handler -> handler.handleUnregistration(entityGRN));
+        registrationHandlers.get().forEach(handler -> handler.handleUnregistration(entityGRN));
     }
 
     public void unregisterEntity(final String id, final GRNType grnType) {

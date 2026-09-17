@@ -22,8 +22,6 @@ import { useEffect, useMemo, useCallback } from 'react';
 import type { ScopeName, HotkeyCollections, Options, HotkeysEvent } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export const DEFAULT_SPLIT_KEY = ',';
@@ -58,7 +56,6 @@ export type HotkeysProps = {
   scope: ScopeName;
   options?: Options;
   dependencies?: Array<unknown>;
-  telemetryAppPathname?: string;
 };
 
 const useHotkey = <T extends HTMLElement>({
@@ -67,9 +64,7 @@ const useHotkey = <T extends HTMLElement>({
   scope,
   options = undefined,
   dependencies = undefined,
-  telemetryAppPathname = undefined,
 }: HotkeysProps) => {
-  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   const { hotKeysCollections, addActiveHotkey, removeActiveHotkey } = useHotkeysContext();
@@ -88,13 +83,12 @@ const useHotkey = <T extends HTMLElement>({
   const callbackWithTelemetry = useCallback(
     (event: KeyboardEvent, handler: HotkeysEvent) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SHORTCUT_TYPED, {
-        app_pathname: telemetryAppPathname ?? getPathnameWithoutId(location.pathname),
         event_details: { actionKey, scope, keys: hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys },
       });
 
       callback(event, handler);
     },
-    [actionKey, callback, hotKeysCollections, location.pathname, scope, sendTelemetry, telemetryAppPathname],
+    [actionKey, callback, hotKeysCollections, scope, sendTelemetry],
   );
 
   useEffect(() => {

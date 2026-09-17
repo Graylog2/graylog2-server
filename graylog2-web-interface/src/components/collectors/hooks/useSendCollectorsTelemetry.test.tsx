@@ -56,21 +56,10 @@ describe('useSendCollectorsTelemetry', () => {
 
     result.current('Fleet Created' as never, { app_action_value: 'x', fleet_id: 'f1' });
 
+    expect(useSendTelemetry).toHaveBeenCalledWith(expected);
     expect(sendTelemetry).toHaveBeenCalledWith('Fleet Created', {
-      app_section: expected,
       app_action_value: 'x',
       fleet_id: 'f1',
     });
-  });
-
-  it('allows the caller to override app_section explicitly', () => {
-    const { result } = renderHook(() => useSendCollectorsTelemetry(), { wrapper: wrapper('/system/collectors') });
-
-    result.current('Fleet Created' as never, { app_section: 'custom-section', fleet_id: 'f1' });
-
-    expect(sendTelemetry).toHaveBeenCalledWith(
-      'Fleet Created',
-      expect.objectContaining({ app_section: 'custom-section' }),
-    );
   });
 });

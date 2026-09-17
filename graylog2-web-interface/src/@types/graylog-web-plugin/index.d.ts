@@ -323,7 +323,7 @@ declare module 'graylog-web-plugin/plugin' {
     DataLakeStatus: React.ComponentType<{
       dataLakeEnabled: boolean;
     }>;
-    DataLakeJournal: React.ComponentType<{
+    DataLakeJournal?: React.ComponentType<{
       nodeId: string;
     }>;
     DataLakeJobs: React.ComponentType<{

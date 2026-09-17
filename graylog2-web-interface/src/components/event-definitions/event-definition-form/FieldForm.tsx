@@ -34,9 +34,7 @@ import {
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import * as FormsUtils from 'util/FormsUtils';
 import withTelemetry from 'logic/telemetry/withTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import withLocation from 'routing/withLocation';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -63,7 +61,6 @@ type FieldFormProps = {
   onChange: (...args: any[]) => void;
   onCancel: (...args: any[]) => void;
   sendTelemetry: (...args: any[]) => void;
-  location: any;
 };
 
 class FieldForm extends React.Component<
@@ -134,8 +131,6 @@ class FieldForm extends React.Component<
 
   handleSubmit = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.DONE_CLICKED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-fields',
       app_action_value: 'done-button',
     });
 
@@ -149,8 +144,6 @@ class FieldForm extends React.Component<
 
   handleCancel = () => {
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.CANCEL_CLICKED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-fields',
       app_action_value: 'cancel-button',
     });
 
@@ -173,8 +166,6 @@ class FieldForm extends React.Component<
         ? TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_LOOKUP_TABLE_SELECTED
         : TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_TEMPLATE_SELECTED,
       {
-        app_pathname: getPathnameWithoutId(this.props.location.pathname),
-        app_section: 'event-definition-fields',
         app_action_value: 'set-value-from-select',
         value_source: nextProvider,
       },
@@ -206,8 +197,6 @@ class FieldForm extends React.Component<
     const checked = FormsUtils.getValueFromInput(event.target);
 
     this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.AS_EVENT_KEY_TOGGLED, {
-      app_pathname: getPathnameWithoutId(this.props.location.pathname),
-      app_section: 'event-definition-fields',
       app_action_value: 'event-key-checkbox',
       event_key_checked: checked,
     });
@@ -333,4 +322,4 @@ class FieldForm extends React.Component<
   }
 }
 
-export default withLocation(withTelemetry(FieldForm));
+export default withTelemetry(FieldForm, 'event-definition-fields');

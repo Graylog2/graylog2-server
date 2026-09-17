@@ -70,7 +70,7 @@ const ConfigurationForm = ({
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const defaultTemplates = useRef({});
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('configuration');
 
   const _isTemplateSet = (template: string) => template !== undefined && template !== '';
 
@@ -96,7 +96,6 @@ const ConfigurationForm = ({
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`CONFIGURATION_${isCreate ? 'CREATED' : 'UPDATED'}`], {
       app_pathname: 'sidecars',
-      app_section: 'configuration',
     });
 
     if (_hasErrors()) {

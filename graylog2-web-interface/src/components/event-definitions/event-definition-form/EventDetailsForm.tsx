@@ -29,9 +29,7 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import * as FormsUtils from 'util/FormsUtils';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import EventSummaryTemplateHelp from './EventSummaryTemplateHelp';
@@ -88,8 +86,7 @@ type Props = {
 const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, validation, onChange, canEdit }: Props) => {
   const theme = useMantineTheme();
   const ltXl = useMediaQuery(`(min-width: ${theme.breakpoints.xl}`);
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('event-definition-details');
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = useState<boolean>(false);
   const {
     data: { valid: validSecurityLicense },
@@ -113,8 +110,6 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
 
   const handlePriorityChange = (nextPriority: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.PRIORITY_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-details',
       app_action_value: 'priority-select',
       priority: priorityOptions.find((opt) => opt.value === nextPriority)?.label,
     });

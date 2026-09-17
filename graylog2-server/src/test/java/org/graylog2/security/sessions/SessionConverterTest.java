@@ -16,8 +16,9 @@
  */
 package org.graylog2.security.sessions;
 
+import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.session.mgt.SimpleSession;
-import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.ImmutablePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.junit.jupiter.api.Test;
@@ -66,28 +67,25 @@ class SessionConverterTest {
 
         // Verify principal collection
         final var principals = simpleSession.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-        assertThat(principals).isInstanceOf(SimplePrincipalCollection.class);
-        final var principalCollection = (SimplePrincipalCollection) principals;
-        assertThat(principalCollection.getPrimaryPrincipal()).isEqualTo("user-id");
-        assertThat(principalCollection.getRealmNames()).containsExactly("realm");
+        // The principal collection must be equal to the one a realm creates upon authentication, otherwise a restored
+        // session is not equivalent to the original one.
+        assertThat(principals).isEqualTo(new SimpleAccount("user-id", null, "realm").getPrincipals());
     }
 
     @Test
     void simpleSessionToSessionDTO() {
         final var now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-        final var simpleSession = new SimpleSession();
+        final var simpleSession = new SimpleSession("localhost", java.util.Date.from(now.minusSeconds(10)));
         simpleSession.setId("session-id");
-        simpleSession.setHost("localhost");
         simpleSession.setTimeout(10_000);
-        simpleSession.setStartTimestamp(java.util.Date.from(now.minusSeconds(10)));
         simpleSession.setLastAccessTime(java.util.Date.from(now));
         simpleSession.setExpired(false);
         simpleSession.setAttribute(SessionUtils.USERNAME_SESSION_KEY, "user-name");
         simpleSession.setAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY, true);
         simpleSession.setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, new TestAuthContext("TEST"));
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY,
-                new SimplePrincipalCollection("user-id", "realm"));
+                ImmutablePrincipalCollection.ofSinglePrincipal("user-id", "realm"));
 
         final var sessionDTO = SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build();
 
@@ -106,9 +104,8 @@ class SessionConverterTest {
 
     @Test
     void failsForUnknownAttributes() {
-        final var simpleSession = new SimpleSession();
+        final var simpleSession = new SimpleSession("localhost");
         simpleSession.setId("session-id");
-        simpleSession.setHost("localhost");
         simpleSession.setAttribute("unknown-key", "some-value");
 
         assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build())
@@ -118,13 +115,12 @@ class SessionConverterTest {
 
     @Test
     void hasStrictPrincipalsHandlingg() {
-        final var simpleSession = new SimpleSession();
+        final var simpleSession = new SimpleSession("localhost");
         simpleSession.setId("session-id");
-        simpleSession.setHost("localhost");
 
         assertThat(SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build().userId()).isEmpty();
 
-        simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, new SimplePrincipalCollection());
+        simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, ImmutablePrincipalCollection.EMPTY);
         assertThat(SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build().userId()).isEmpty();
 
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, "not-a-collection");
@@ -133,13 +129,13 @@ class SessionConverterTest {
                 .hasMessageContaining("Unexpected type");
 
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY,
-                new SimplePrincipalCollection(List.of("a", "b", "c"), "realm"));
+                ImmutablePrincipalCollection.ofSingleRealm(List.of("a", "b", "c"), "realm"));
         assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Expected a single principal");
 
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY,
-                new SimplePrincipalCollection(1, "realm"));
+                ImmutablePrincipalCollection.ofSinglePrincipal(1, "realm"));
         assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Unexpected type");

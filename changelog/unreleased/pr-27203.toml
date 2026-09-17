@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed Collector system logs not being routed after upgrade."
+
+pulls = ["27203"]

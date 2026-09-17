@@ -29,6 +29,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.PlainActionFuture;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Cancellable;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
@@ -62,6 +64,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -87,6 +91,11 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     @Override
     public Optional<HealthStatus> health() {
         return clusterHealth().map(response -> healthStatusFrom(response.getStatus()));
+    }
+
+    @Override
+    public Optional<HealthStatus> health(java.time.Duration timeout) {
+        return clusterHealth(timeout).map(response -> healthStatusFrom(response.getStatus()));
     }
 
     private HealthStatus healthStatusFrom(ClusterHealthStatus status) {
@@ -360,12 +369,43 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                     .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())));
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));
         } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
-            } else {
-                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
-            }
+            logHealthFailure(e);
             return Optional.empty();
+        }
+    }
+
+    private Optional<ClusterHealthResponse> clusterHealth(java.time.Duration timeout) {
+        final TimeValue bound = TimeValue.timeValueMillis(timeout.toMillis());
+        final ClusterHealthRequest request = new ClusterHealthRequest().timeout(bound);
+        // Defaults to 30s, which would outlive the caller's budget server-side.
+        request.masterNodeTimeout(bound);
+
+        final PlainActionFuture<ClusterHealthResponse> future = new PlainActionFuture<>();
+        final Cancellable cancellable = client.clusterHealthAsync(request, future);
+        try {
+            return Optional.of(future.get(timeout.toMillis(), TimeUnit.MILLISECONDS));
+        } catch (TimeoutException e) {
+            // Logged explicitly: a TimeoutException carries no message, so the generic handler would log "null".
+            cancellable.cancel();
+            LOG.warn("Search cluster did not answer the health request within {}ms; treating it as unreachable.", timeout.toMillis());
+            return Optional.empty();
+        } catch (InterruptedException e) {
+            cancellable.cancel();
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        } catch (Exception e) {
+            cancellable.cancel();
+            logHealthFailure(e);
+            return Optional.empty();
+        }
+    }
+
+    private void logHealthFailure(Exception e) {
+        final String cause = Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a");
+        if (LOG.isDebugEnabled()) {
+            LOG.error("{} ({})", e.getMessage(), cause, e);
+        } else {
+            LOG.error("{} ({})", e.getMessage(), cause);
         }
     }
 

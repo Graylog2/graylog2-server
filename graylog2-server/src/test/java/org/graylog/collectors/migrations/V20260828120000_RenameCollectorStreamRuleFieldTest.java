@@ -16,57 +16,69 @@
  */
 package org.graylog.collectors.migrations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import org.bson.Document;
+import com.google.common.eventbus.Subscribe;
 import org.bson.types.ObjectId;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;
 import org.graylog2.security.SafeClasses;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleServiceImpl;
+import org.graylog2.streams.events.StreamsChangedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
+@ExtendWith(MongoJackExtension.class)
 class V20260828120000_RenameCollectorStreamRuleFieldTest {
 
+    private static final String OTHER_STREAM_ID = "000000000000000000000099";
+
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-    private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
     private ClusterConfigServiceImpl clusterConfigService;
     private Migration migration;
-    private MongoCollection<Document> collection;
+    private StreamRuleServiceImpl streamRuleService;
+    private StreamsChangedEventCollector eventCollector;
 
     @BeforeEach
-    void setUp(MongoCollections mongoCollections) {
+    void setUp(MongoCollections mongoCollections, MongoJackObjectMapperProvider objectMapperProvider) {
         final MongoConnection connection = mongoCollections.connection();
+        final ClusterEventBus clusterEventBus = new ClusterEventBus();
+        this.eventCollector = new StreamsChangedEventCollector();
+        clusterEventBus.registerClusterEventSubscriber(eventCollector);
+
         this.clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider,
                 connection,
                 nodeId,
                 new RestrictedChainingClassLoader(
                         new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
-                new ClusterEventBus());
+                clusterEventBus);
 
-        this.collection = connection.getMongoDatabase().getCollection("streamrules");
-        this.migration = new V20260828120000_RenameCollectorStreamRuleField(connection, clusterConfigService);
+        this.streamRuleService = new StreamRuleServiceImpl(connection, clusterEventBus);
+        this.migration = new V20260828120000_RenameCollectorStreamRuleField(clusterConfigService, streamRuleService);
     }
 
     @Test
@@ -75,28 +87,25 @@ class V20260828120000_RenameCollectorStreamRuleFieldTest {
     }
 
     @Test
-    @MongoDBFixtures("V20260828120000_RenameCollectorStreamRuleFieldTest.json")
-    void upgradeRenamesOnlyTheSystemLogsStreamRule() {
-        final long totalBefore = collection.countDocuments();
+    void upgradeRenamesOnlyTheSystemLogsStreamRule() throws Exception {
+        final String systemRuleId = createRule(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID,
+                V20260828120000_RenameCollectorStreamRuleField.OLD_FIELD_NAME);
+        final String unrelatedRuleId = createRule(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID, "source");
+        final String otherStreamRuleId = createRule(OTHER_STREAM_ID,
+                V20260828120000_RenameCollectorStreamRuleField.OLD_FIELD_NAME);
 
         migration.upgrade();
 
-        assertThat(collection.countDocuments()).isEqualTo(totalBefore);
+        final StreamRule systemRule = streamRuleService.load(systemRuleId);
+        assertThat(systemRule.getField()).isEqualTo(CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE);
+        assertThat(systemRule.getValue()).isEqualTo("collector_log");
+        assertThat(systemRule.getType()).isEqualTo(StreamRuleType.EXACT);
 
-        final Document systemRule = collection.find(Filters.eq("_id", new ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"))).first();
-        assertThat(systemRule).isNotNull();
-        assertThat(systemRule.getString("field")).isEqualTo(CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE);
-        assertThat(systemRule.getString("value")).isEqualTo("collector_log");
-        assertThat(systemRule.getInteger("type")).isEqualTo(1);
-
-        final Document unrelatedRule = collection.find(Filters.eq("_id", new ObjectId("bbbbbbbbbbbbbbbbbbbbbbbb"))).first();
-        assertThat(unrelatedRule).isNotNull();
-        assertThat(unrelatedRule.getString("field")).isEqualTo("source");
-
-        final Document otherStreamRule = collection.find(Filters.eq("_id", new ObjectId("cccccccccccccccccccccccc"))).first();
-        assertThat(otherStreamRule).isNotNull();
-        assertThat(otherStreamRule.getString("field"))
+        assertThat(streamRuleService.load(unrelatedRuleId).getField()).isEqualTo("source");
+        assertThat(streamRuleService.load(otherStreamRuleId).getField())
                 .isEqualTo(V20260828120000_RenameCollectorStreamRuleField.OLD_FIELD_NAME);
+
+        assertThat(streamRuleService.totalStreamRuleCount()).isEqualTo(3L);
 
         final var completed = clusterConfigService.get(V20260828120000_RenameCollectorStreamRuleField.MigrationCompleted.class);
         assertThat(completed).isNotNull();
@@ -104,13 +113,35 @@ class V20260828120000_RenameCollectorStreamRuleFieldTest {
     }
 
     @Test
-    @MongoDBFixtures("V20260828120000_RenameCollectorStreamRuleFieldTest.json")
-    void upgradeIsIdempotent() {
-        migration.upgrade();
+    void upgradeRenamesAllMatchingStreamRules() throws Exception {
+        final String firstRuleId = createRule(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID,
+                V20260828120000_RenameCollectorStreamRuleField.OLD_FIELD_NAME);
+        final String secondRuleId = createRule(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID,
+                V20260828120000_RenameCollectorStreamRuleField.OLD_FIELD_NAME);
+
         migration.upgrade();
 
-        assertThat(collection.countDocuments(Filters.eq("field", CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE)))
-                .isEqualTo(1L);
+        assertThat(streamRuleService.load(firstRuleId).getField())
+                .isEqualTo(CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE);
+        assertThat(streamRuleService.load(secondRuleId).getField())
+                .isEqualTo(CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE);
+
+        final var completed = clusterConfigService.get(V20260828120000_RenameCollectorStreamRuleField.MigrationCompleted.class);
+        assertThat(completed).isNotNull();
+        assertThat(completed.modifiedStreamRules()).isEqualTo(2L);
+    }
+
+    @Test
+    void upgradeIsIdempotent() throws Exception {
+        final String ruleId = createRule(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID,
+                V20260828120000_RenameCollectorStreamRuleField.OLD_FIELD_NAME);
+
+        migration.upgrade();
+        eventCollector.events.clear();
+        migration.upgrade();
+
+        assertThat(streamRuleService.load(ruleId).getField()).isEqualTo(CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE);
+        assertThat(eventCollector.events).isEmpty();
 
         final var completed = clusterConfigService.get(V20260828120000_RenameCollectorStreamRuleField.MigrationCompleted.class);
         assertThat(completed).isNotNull();
@@ -121,8 +152,43 @@ class V20260828120000_RenameCollectorStreamRuleFieldTest {
     void upgradeWithoutStreamRulesCompletes() {
         migration.upgrade();
 
+        assertThat(eventCollector.events).isEmpty();
+
         final var completed = clusterConfigService.get(V20260828120000_RenameCollectorStreamRuleField.MigrationCompleted.class);
         assertThat(completed).isNotNull();
         assertThat(completed.modifiedStreamRules()).isZero();
+    }
+
+    @Test
+    void upgradePostsStreamsChangedEvent() throws Exception {
+        createRule(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID,
+                V20260828120000_RenameCollectorStreamRuleField.OLD_FIELD_NAME);
+        eventCollector.events.clear();
+
+        migration.upgrade();
+
+        assertThat(eventCollector.events).hasSize(1);
+        assertThat(eventCollector.events.get(0).streamIds()).containsExactly(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID);
+    }
+
+    private String createRule(String streamId, String field) throws ValidationException {
+        final StreamRule rule = streamRuleService.create(Map.of(
+                StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId),
+                StreamRuleImpl.FIELD_FIELD, field,
+                StreamRuleImpl.FIELD_TYPE, StreamRuleType.EXACT.toInteger(),
+                StreamRuleImpl.FIELD_VALUE, "collector_log",
+                StreamRuleImpl.FIELD_INVERTED, false,
+                StreamRuleImpl.FIELD_DESCRIPTION, "Route collector system logs to dedicated stream"
+        ));
+        return streamRuleService.save(rule);
+    }
+
+    private static class StreamsChangedEventCollector {
+        private final List<StreamsChangedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onStreamsChanged(StreamsChangedEvent event) {
+            events.add(event);
+        }
     }
 }

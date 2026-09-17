@@ -34,7 +34,7 @@ type ActionsProps = {
 
 function Actions({ lut }: ActionsProps) {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('lut');
   const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(lut);
   const { push } = useHistory();
@@ -46,7 +46,6 @@ function Actions({ lut }: ActionsProps) {
   const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
       app_pathname: 'lut',
-      app_section: 'lut',
     });
 
     deleteLookupTable(lut.id).then(() => setShowDeleteModal(false));

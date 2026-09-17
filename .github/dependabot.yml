@@ -35,6 +35,9 @@ updates:
           - "org.openrewrite:*"
           - "org.openrewrite.maven:*"
           - "org.openrewrite.recipe:*"
+      bouncycastle:
+        patterns:
+          - "org.bouncycastle:*"
     open-pull-requests-limit: 25
     labels:
       - dependencies

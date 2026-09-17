@@ -34,7 +34,7 @@ type ActionsProps = {
 
 function Actions({ cache }: ActionsProps) {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('lut_cache');
   const { deleteCache, deletingCache } = useDeleteCache();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const { push } = useHistory();
@@ -46,7 +46,6 @@ function Actions({ cache }: ActionsProps) {
   const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.CACHE_DELETED, {
       app_pathname: 'lut',
-      app_section: 'lut_cache',
     });
 
     deleteCache(cache.id).then(() => setShowDeleteModal(false));

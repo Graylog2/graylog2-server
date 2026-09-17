@@ -79,12 +79,11 @@ const SearchButton = ({
   displaySpinner = false,
   onClick = undefined,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
   const triggerTelemetry = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_BUTTON_CLICKED, {
-      app_section: 'search-bar',
       app_action_value: 'search-button',
       event_details: {
         disabled,

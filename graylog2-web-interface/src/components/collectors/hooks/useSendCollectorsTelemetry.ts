@@ -14,11 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback } from 'react';
-
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
-import type { TelemetryEvent, TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
 export type CollectorsSection =
   | 'collectors-overview'
@@ -41,17 +38,9 @@ const sectionForPathname = (pathname: string): CollectorsSection => {
 };
 
 const useSendCollectorsTelemetry = () => {
-  const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
-  return useCallback(
-    (eventType: TelemetryEventType, event: TelemetryEvent) => {
-      const section = sectionForPathname(pathname);
-
-      sendTelemetry(eventType, { app_section: section, ...event });
-    },
-    [pathname, sendTelemetry],
-  );
+  return useSendTelemetry(sectionForPathname(pathname));
 };
 
 export default useSendCollectorsTelemetry;

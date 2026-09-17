@@ -14,4 +14,4 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export const TELEMETRY_DEFAULTS = { app_pathname: 'datanode', app_section: 'opensearch-upgrade' } as const;
+export const TELEMETRY_DEFAULTS = { app_pathname: 'datanode' } as const;

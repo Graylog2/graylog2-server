@@ -16,19 +16,12 @@
  */
 package org.graylog.collectors.migrations;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
-import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.graylog.collectors.input.CollectorIngestCodec;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,14 +41,14 @@ public class V20260828120000_RenameCollectorStreamRuleField extends Migration {
 
     static final String OLD_FIELD_NAME = "collector_receiver_type";
 
-    private final MongoCollection<Document> collection;
     private final ClusterConfigService clusterConfigService;
+    private final StreamRuleService streamRuleService;
 
     @Inject
-    public V20260828120000_RenameCollectorStreamRuleField(MongoConnection mongoConnection,
-                                                          ClusterConfigService clusterConfigService) {
-        this.collection = mongoConnection.getMongoDatabase().getCollection("streamrules");
+    public V20260828120000_RenameCollectorStreamRuleField(ClusterConfigService clusterConfigService,
+                                                          StreamRuleService streamRuleService) {
         this.clusterConfigService = clusterConfigService;
+        this.streamRuleService = streamRuleService;
     }
 
     @Override
@@ -70,20 +63,27 @@ public class V20260828120000_RenameCollectorStreamRuleField extends Migration {
             return;
         }
 
-        final UpdateResult result = collection.updateMany(
-                Filters.and(
-                        Filters.eq(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID)),
-                        Filters.eq(StreamRuleImpl.FIELD_FIELD, OLD_FIELD_NAME)
-                ),
-                Updates.set(StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE)
-        );
+        final var rules = streamRuleService.loadForStreamId(Stream.COLLECTOR_SYSTEM_LOGS_STREAM_ID).stream()
+                .filter(r -> OLD_FIELD_NAME.equals(r.getField()))
+                .toList();
 
-        if (result.getModifiedCount() > 0) {
-            LOG.info("Renamed field <{}> to <{}> on {} collector system logs stream rule(s).",
-                    OLD_FIELD_NAME, CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE, result.getModifiedCount());
+        if (rules.isEmpty()) {
+            clusterConfigService.write(new MigrationCompleted(0));
+            return;
         }
 
-        clusterConfigService.write(new MigrationCompleted(result.getModifiedCount()));
+        rules.forEach(rule -> rule.setField(CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE));
+
+        try {
+            final var updated = streamRuleService.save(rules);
+            clusterConfigService.write(new MigrationCompleted(updated.size()));
+            LOG.info("Renamed field <{}> to <{}> on {} collector system logs stream rule(s).",
+                    OLD_FIELD_NAME, CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE, updated.size());
+        } catch (Exception e) {
+            LOG.error("Failed to update collector system logs stream rule field from <{}> to <{}>.",
+                    OLD_FIELD_NAME, CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE, e);
+            throw new RuntimeException(e);
+        }
     }
 
     public record MigrationCompleted(long modifiedStreamRules) {}

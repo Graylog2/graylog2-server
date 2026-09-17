@@ -156,6 +156,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @POST
     @Path("/parse")
     @NoAuditEvent("only used to parse a rule, no changes made in the system")
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     public RuleSource parse(@Parameter(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
@@ -173,6 +174,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/simulate")
     @NoAuditEvent("only used to test a rule, no changes made in the system")
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     public Message simulate(
             @Parameter(name = "request", required = true) @NotNull SimulateRuleRequest request
     ) {

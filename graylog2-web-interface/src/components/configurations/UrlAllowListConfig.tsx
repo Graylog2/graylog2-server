@@ -28,8 +28,6 @@ import Spinner from 'components/common/Spinner';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlAllowListForm from 'components/configurations/UrlAllowListForm';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useProductName from 'brand-customization/useProductName';
 
@@ -41,8 +39,7 @@ const UrlAllowListConfig = () => {
   const [formConfig, setFormConfig] = useState<AllowListConfig | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);
 
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('urlallowlist');
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.URL_ALLOWLIST_CONFIG).then(() => {
@@ -78,8 +75,6 @@ const UrlAllowListConfig = () => {
 
   const saveConfig = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.URL_ALLOW_LIST_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'urlallowlist',
       app_action_value: 'configuration-save',
     });
 

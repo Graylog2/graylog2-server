@@ -17,6 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { ButtonToolbar } from 'components/bootstrap';
 import FilterRuleEditButton from 'components/streams/StreamDetails/output-filter/FilterRuleEditButton';
 import FilterDeleteButton from 'components/streams/StreamDetails/output-filter/FilterDeleteButton';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
@@ -25,17 +26,16 @@ type Props = {
   filterRule: StreamOutputFilterRule;
   destinationType: string;
 };
-const ActionWrapper = styled.div`
-  display: flex;
-  align-items: center;
+
+const StyledButtonToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
 const FilterActions = ({ filterRule, destinationType }: Props) => (
-  <ActionWrapper>
+  <StyledButtonToolbar>
     <FilterRuleEditButton filterRule={filterRule} destinationType={destinationType} streamId={filterRule.stream_id} />
     <FilterDeleteButton streamId={filterRule.stream_id} filterOutputRule={filterRule} />
-  </ActionWrapper>
+  </StyledButtonToolbar>
 );
 
 export default FilterActions;

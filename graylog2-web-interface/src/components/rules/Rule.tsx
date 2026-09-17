@@ -44,7 +44,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
   const isManaged = scopePermissions && !scopePermissions?.is_mutable;
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('pipeline-rules');
 
   if (loadingScopePermissions) {
     return <Spinner text="Loading Rule" />;
@@ -74,7 +74,6 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
               bsSize="small"
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.USE_SOURCE_CODE_EDITOR_CLICKED, {
-                  app_section: 'pipeline-rules',
                   app_action_value: 'source-code-editor-button',
                 });
 
@@ -113,7 +112,6 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
           title="Switch to Source Code Editor"
           onConfirm={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CONFIRM_CLICKED, {
-              app_section: 'pipeline-rules',
               app_action_value: 'confirm-button',
             });
 
@@ -122,7 +120,6 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
           }}
           onCancel={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CANCEL_CLICKED, {
-              app_section: 'pipeline-rules',
               app_action_value: 'cancel-button',
             });
 

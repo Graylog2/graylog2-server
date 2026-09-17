@@ -173,12 +173,11 @@ const BigDisplayModeConfiguration = ({ disabled = false, show = false, view }: P
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('dashboard-menu');
 
   const onSave = (config: Configuration) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_FULL_SCREEN_MODE_STARTED, {
       app_pathname: 'dashboard',
-      app_section: 'dashboard-menu',
     });
 
     redirectToBigDisplayMode(history, view, createQueryFromConfiguration(config, view), unsetWidgetFocusing);
