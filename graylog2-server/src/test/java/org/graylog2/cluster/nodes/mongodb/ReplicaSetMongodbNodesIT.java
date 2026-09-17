@@ -21,6 +21,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
+import org.graylog.testing.mongodb.MongoDBKernelWorkaround;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.database.MongoConnection;
 import org.junit.jupiter.api.AfterEach;
@@ -40,8 +41,9 @@ class ReplicaSetMongodbNodesIT {
 
     @BeforeEach
     void setUp() {
-        mongoDBContainer = new MongoDBContainer("mongo:" + MongoDBVersion.DEFAULT.version())
-                .withReplicaSet();
+        final var image = "mongo:" + MongoDBVersion.DEFAULT.version();
+        mongoDBContainer = MongoDBKernelWorkaround.applyIfNeeded(
+                new MongoDBContainer(image).withReplicaSet(), image);
         mongoDBContainer.start();
         final MongoConnection mongoConnection = createMongoConnection();
         this.dockerMongodbConnectionResolver = new DockerMongodbConnectionResolver(mongoDBContainer);
