@@ -1,0 +1,4 @@
+type = "f"
+message = "Values to be extracted from a pivot search can be wrapped in an Optional since the OpenSearch 3 client. This fix adds the addtional wrapping clause."
+
+pulls = ["27412"]
