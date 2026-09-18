@@ -109,8 +109,21 @@ public class InputEventListener {
             return;
         }
 
-        final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+        final boolean thisNodeRunsInput = input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId());
+
+        // a stopped input stays registered so it remains visible in the input-state API; only the updated
+        // configuration is swapped in (its MessageInput is already stopped and terminated)
+        if (inputState != null && inputState.getState() == IOState.Type.STOPPED && thisNodeRunsInput) {
+            try {
+                inputState.setStoppable(inputService.getMessageInput(input));
+            } catch (NoSuchInputTypeException e) {
+                LOG.warn("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
+            }
+            return;
+        }
+
+        final boolean startInput;
         if (inputState != null) {
             startInput = inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.SETUP;
             inputRegistry.remove(inputState);
@@ -118,11 +131,8 @@ public class InputEventListener {
             startInput = false;
         }
 
-        if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
+        if (startInput && thisNodeRunsInput) {
             startInput(input);
-        } else if (inputState != null && inputState.getState() == IOState.Type.STOPPED) {
-            // re-add stopped input that was removed further up (line 116)
-            inputRegistry.add(inputState);
         }
     }
 
