@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.mongodb;
 import com.mongodb.MongoClient;
 import jakarta.ws.rs.core.Response;
 import org.bson.Document;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
 import org.graylog2.cluster.nodes.mongodb.MongodbConnectionResolver;
@@ -32,9 +33,9 @@ import org.graylog2.database.MongoConnectionImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.mongodb.MongoDBContainer;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * the error handling when a user lacks the required permissions.
  */
 @Testcontainers
-class MongodbClusterResourceIntegrationIT {
+class MongodbClusterResourceIT {
 
     private static final String ADMIN_USER = "admin";
     private static final String ADMIN_PASSWORD = "adminpass";
@@ -59,8 +60,10 @@ class MongodbClusterResourceIntegrationIT {
     private static final String RESTRICTED_PASSWORD = "restrictedpass";
     private static final String TEST_DATABASE = "graylog";
 
+    private static final Network NETWORK = Network.newNetwork();
+
     @Container
-    static MongoDBContainer mongoContainer = new MongoDBContainer("mongo:" + MongoDBVersion.DEFAULT.version())
+    static MongoDBContainer mongoContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT, NETWORK)
             .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN_USER)
             .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN_PASSWORD)
             .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE);
