@@ -109,8 +109,9 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     @Override
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
-                                         String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters);
+                                         String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters,
+                                         Set<String> excludedEventIds) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters, excludedEventIds);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -213,6 +214,12 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString,
                                      SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
+        return createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters, Set.of());
+    }
+
+    QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString,
+                             SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters,
+                             Set<String> excludedEventIds) {
         final QueryBuilder query = QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
                 ? matchAllQuery()
                 : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
@@ -244,6 +251,12 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
         if (!sourceStreamFilter.isAllAllowed()) {
             filter.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
+        }
+
+        // A terms filter, not query-string text: the query string is capped by
+        // search.query.max_query_string_length (32000 by default).
+        if (!excludedEventIds.isEmpty()) {
+            filter.mustNot(termsQuery(EventDto.FIELD_ID, excludedEventIds));
         }
 
         return filter;
