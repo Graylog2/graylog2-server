@@ -103,10 +103,11 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     @Override
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
-                                         String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
+                                         String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters,
+                                         Set<String> excludedEventIds) {
 
         final org.opensearch.client.opensearch.core.SearchRequest newSearchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
-            builder.query(createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters));
+            builder.query(createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters, excludedEventIds));
             builder.from((page - 1) * perPage);
             builder.size(perPage);
             builder.trackTotalHits(th -> th.enabled(true));
@@ -146,6 +147,11 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     }
 
     private Query createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters) {
+        return createQuery(queryString, timerange, eventStreams, filterString, sourceStreamFilter, extraFilters, Set.of());
+    }
+
+    Query createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter, Map<String, Set<String>> extraFilters,
+                      Set<String> excludedEventIds) {
 
         final BoolQuery.Builder boolQuery = BoolQuery.builder();
 
@@ -178,6 +184,12 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
         if (!sourceStreamFilter.isAllAllowed()) {
             boolQuery.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
+        }
+
+        // A terms filter, not query-string text: the query string is capped by
+        // search.query.max_query_string_length (32000 by default).
+        if (!excludedEventIds.isEmpty()) {
+            boolQuery.mustNot(termsQuery(EventDto.FIELD_ID, excludedEventIds));
         }
 
         return Query.of(b -> b.bool(boolQuery.build()));
