@@ -19,8 +19,8 @@ package org.graylog2.cluster.nodes.mongodb;
 import com.google.common.net.HostAndPort;
 import com.mongodb.MongoClient;
 import jakarta.annotation.Nonnull;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.testcontainers.DockerClientFactory;
-import org.testcontainers.mongodb.MongoDBContainer;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
