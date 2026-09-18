@@ -100,7 +100,7 @@ const resources: Resource[] = [
   },
   {
     title: 'Community Forum',
-    description: 'Ask questions and browse solutions from other Graylog users.',
+    description: 'Ask questions and browse solutions from other users.',
     link: 'https://community.graylog.org/',
     iconName: 'chat',
   },

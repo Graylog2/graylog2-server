@@ -19,10 +19,14 @@ package org.graylog.events.event;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.fields.FieldValue;
 import org.graylog.events.fields.FieldValueType;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -79,5 +83,30 @@ public class EventTest {
             assertThat(event.getScore("test")).isPresent().hasValue(1.2D);
             assertThat(event.getTags()).containsExactlyInAnyOrder("phishing", "lateral-movement");
         });
+    }
+
+    @Test
+    public void toDtoSortsFieldsAlphabetically() {
+        final TestEvent event = new TestEvent();
+
+        event.setField("zulu", FieldValue.string("26"));
+        event.setField("alpha", FieldValue.string("1"));
+        event.setField("charlie", FieldValue.string("3"));
+
+        assertThat(event.toDto().fields().keySet()).containsExactly("alpha", "charlie", "zulu");
+    }
+
+    @Test
+    public void setFieldsKeepsAlphabeticalOrder() {
+        final TestEvent event = new TestEvent();
+
+        final Map<String, String> unsorted = new LinkedHashMap<>();
+        unsorted.put("zulu", "26");
+        unsorted.put("alpha", "1");
+        event.setFields(unsorted);
+
+        event.setField("mike", FieldValue.string("13"));
+
+        assertThat(event.toDto().fields().keySet()).containsExactly("alpha", "mike", "zulu");
     }
 }

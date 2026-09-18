@@ -22,6 +22,7 @@ import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoDatabase;
 import jakarta.annotation.Nonnull;
 import org.bson.Document;
+import org.graylog.testing.mongodb.MongoDBKernelWorkaround;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.database.MongoConnection;
 import org.junit.jupiter.api.AfterAll;
@@ -49,15 +50,18 @@ class MongodbClusterCommandIT {
     private static final String RESTRICTED_USER = "restricteduser";
     private static final String RESTRICTED_PASSWORD = "restrictedpass";
     private static final String TEST_DATABASE = "graylog";
+    private static final String MONGODB_IMAGE = "mongo:" + MongoDBVersion.DEFAULT.version();
 
     @Container
-    static MongoDBContainer mongoContainer = new MongoDBContainer("mongo:" + MongoDBVersion.DEFAULT.version())
-            .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN_USER)
-            .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN_PASSWORD)
-            .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE)
-            // MongoDB does a 2-phase start when auth is enabled: starts without auth, creates the admin user,
-            // restarts with --auth. Wait for the 2nd "Waiting for connections" to ensure auth is fully set up.
-            .waitingFor(Wait.forLogMessage("(?i).*waiting for connections.*", 2));
+    static MongoDBContainer mongoContainer = MongoDBKernelWorkaround.applyIfNeeded(
+            new MongoDBContainer(MONGODB_IMAGE)
+                    .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN_USER)
+                    .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN_PASSWORD)
+                    .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE)
+                    // MongoDB does a 2-phase start when auth is enabled: starts without auth, creates the admin user,
+                    // restarts with --auth. Wait for the 2nd "Waiting for connections" to ensure auth is fully set up.
+                    .waitingFor(Wait.forLogMessage("(?i).*waiting for connections.*", 2)),
+            MONGODB_IMAGE);
 
     private static MongoClient adminClient;
     private static MongoClient restrictedClient;
