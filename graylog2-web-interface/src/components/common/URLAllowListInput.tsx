@@ -36,6 +36,8 @@ type Props = {
   wrapperClassName?: string;
   urlType?: React.ComponentProps<typeof URLAllowListFormModal>['urlType'];
   autofocus?: boolean;
+  id?: string;
+  name?: string;
 };
 
 const URLAllowListInput = ({
@@ -49,6 +51,8 @@ const URLAllowListInput = ({
   wrapperClassName = '',
   urlType = 'literal',
   autofocus = true,
+  id = 'url',
+  name = 'url',
 }: Props) => {
   const [isAllowlisted, setIsAllowlisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
@@ -135,8 +139,8 @@ const URLAllowListInput = ({
   return (
     <Input
       type="text"
-      id="url"
-      name="url"
+      id={id}
+      name={name}
       label={label}
       ref={urlInputRef}
       autoFocus={autofocus}
