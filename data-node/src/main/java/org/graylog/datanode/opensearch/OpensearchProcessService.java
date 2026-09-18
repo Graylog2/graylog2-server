@@ -52,6 +52,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     private final OpensearchStateMachine stateMachine;
     private final CsrRequester csrRequester;
+    private final EventBus eventBus;
     private boolean processAutostart = true;
 
 
@@ -72,6 +73,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.process = process;
         this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
+        this.eventBus = eventBus;
         eventBus.register(this);
     }
 
@@ -92,7 +94,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case REMOVE -> stateMachine.fire(OpensearchEvent.PROCESS_REMOVE);
                 case RESET -> stateMachine.fire(OpensearchEvent.RESET);
                 case STOP -> this.shutDown();
-                case START -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                case START -> triggerOpensearchStartup();
                 case REQUEST_CSR -> {
                     this.processAutostart = false;
                     csrRequester.triggerCertificateSigningRequest();
@@ -103,6 +105,14 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 }
             }
         }
+    }
+
+    /**
+     * we can't simply start the process, it needs to rebuild its configuration.
+     * It has to go through the {@link org.graylog.datanode.configuration.OpensearchConfigurationService}
+     */
+    private void triggerOpensearchStartup() {
+        eventBus.post(new OpensearchStartRequestedEvent());
     }
 
     @Subscribe
