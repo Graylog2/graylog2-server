@@ -1,0 +1,5 @@
+type="s"
+message= "Fix thread usage issue for Palo Alto Panorama Syslog payload."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14949"]
+pulls = ["26960"]

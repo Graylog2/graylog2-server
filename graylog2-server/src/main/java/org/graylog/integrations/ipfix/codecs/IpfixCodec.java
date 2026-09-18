@@ -142,7 +142,9 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
      * @return
      */
     private static String toMessageString(Flow record) {
-        LOG.debug("IPFIX message being assembled from flow record [{}].", record.fields());
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("IPFIX message being assembled from flow record [{}].", record.fields());
+        }
         final ImmutableMap<String, Object> fields = record.fields();
         final long packetCount = (long) fields.getOrDefault("packetDeltaCount", 0L);
         long octetCount = (long) fields.getOrDefault("octetDeltaCount", 0L);

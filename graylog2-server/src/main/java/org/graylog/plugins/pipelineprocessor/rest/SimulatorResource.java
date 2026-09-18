@@ -75,7 +75,7 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
 
     @ApiOperation(value = "Simulate the execution of the pipeline message processor")
     @POST
-    @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @NoAuditEvent("only used to test pipelines, no changes made in the system")
     public SimulationResponse simulate(@ApiParam(name = "simulation", required = true) @NotNull SimulationRequest request) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, request.streamId());

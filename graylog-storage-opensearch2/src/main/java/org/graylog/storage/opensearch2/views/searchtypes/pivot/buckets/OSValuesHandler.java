@@ -16,11 +16,10 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
+import org.graylog.plugins.views.search.aggregations.PivotKeyScript;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
@@ -28,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOr
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.script.Script;
+import org.graylog.shaded.opensearch2.org.opensearch.script.ScriptType;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
@@ -45,7 +45,6 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
@@ -91,16 +90,8 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     }
 
     private Script scriptForPivots(Collection<String> pivots) {
-        final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
-                .map(bucket -> """
-                        (doc.containsKey('%1$s') && doc['%1$s'].size() > 0
-                        ? doc['%1$s'].size() > 1
-                            ? doc['%1$s']
-                            : String.valueOf(doc['%1$s'].value)
-                        : "%2$s")
-                        """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
-                .collect(Collectors.toList()));
-        return new Script(scriptSource);
+        final PivotKeyScript script = PivotKeyScript.create(pivots, KEY_SEPARATOR_PHRASE);
+        return new Script(ScriptType.INLINE, "painless", script.source(), script.params());
     }
 
     @Override

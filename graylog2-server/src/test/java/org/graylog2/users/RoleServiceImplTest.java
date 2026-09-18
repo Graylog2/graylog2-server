@@ -23,10 +23,12 @@ import jakarta.validation.Validator;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -38,7 +40,6 @@ import java.util.Set;
 
 @ExtendWith(MongoDBExtension.class)
 class RoleServiceImplTest {
-
     @Test
     void testChangeEvents(MongoCollections mongoCollections) throws ValidationException {
         final EventsCollector eventsCollector = new EventsCollector();
@@ -60,6 +61,62 @@ class RoleServiceImplTest {
                 .hasSize(4) // two built-in roles, Admin and Reader + whatever we add here
                 .map(RoleChangedEvent::roleName)
                 .contains("Admin", "Reader", "inputs_manager", "inputs_reader");
+    }
+
+    @Test
+    void loadByNamesIgnoresCasingOfRequestedNames(MongoCollections mongoCollections) throws ValidationException, NotFoundException {
+        final RoleService service = createService(mongoCollections);
+        service.save(createRole("Inputs_Manager", "manages inputs", Set.of(RestPermissions.INPUTS_READ, RestPermissions.INPUTS_CREATE), false));
+
+        // The built-in roles are stored as `Admin`/`Reader`, so lowercased names must find them as well.
+        Assertions.assertThat(service.loadByNames(List.of("inputs_manager", "admin", "reader")))
+                .map(Role::getName)
+                .containsExactlyInAnyOrder("Inputs_Manager", "Admin", "Reader");
+    }
+
+    @Test
+    void loadByNamesFindsRolesRequestedWithTheirStoredCasing(MongoCollections mongoCollections) throws NotFoundException {
+        final RoleService service = createService(mongoCollections);
+
+        Assertions.assertThat(service.loadByNames(List.of("Admin")))
+                .map(Role::getName)
+                .containsExactly("Admin");
+    }
+
+    @Test
+    void loadByNamesThrowsNotFoundExceptionForUnknownRole(MongoCollections mongoCollections) {
+        final RoleService service = createService(mongoCollections);
+
+        Assertions.assertThatThrownBy(() -> service.loadByNames(List.of("admin", "does_not_exist")))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("does_not_exist");
+    }
+
+    @Test
+    void loadByNamesThrowsNotFoundExceptionNamingEveryMissingRole(MongoCollections mongoCollections) throws ValidationException {
+        final RoleService service = createService(mongoCollections);
+        service.save(createRole("Inputs_Manager", "manages inputs", Set.of(RestPermissions.INPUTS_READ), false));
+
+        // Two of the four requested roles exist, so the exception must name the other two - and only those.
+        Assertions.assertThatThrownBy(() -> service.loadByNames(List.of("admin", "inputs_manager", "missing_one", "Missing_Two")))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("missing_one")
+                .hasMessageContaining("missing_two")
+                .hasMessageNotContaining("admin")
+                .hasMessageNotContaining("inputs_manager");
+    }
+
+    @Test
+    void loadByNamesReturnsNoRolesForEmptyRequest(MongoCollections mongoCollections) throws NotFoundException {
+        final RoleService service = createService(mongoCollections);
+
+        Assertions.assertThat(service.loadByNames(List.of())).isEmpty();
+    }
+
+    @Nonnull
+    private static RoleService createService(MongoCollections mongoCollections) {
+        return new RoleServiceImpl(mongoCollections, new Permissions(Collections.emptySet()),
+                Mockito.mock(Validator.class), new ClusterEventBus());
     }
 
     @Nonnull
