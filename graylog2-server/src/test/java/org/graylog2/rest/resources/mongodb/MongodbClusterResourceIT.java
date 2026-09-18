@@ -19,7 +19,7 @@ package org.graylog2.rest.resources.mongodb;
 import com.mongodb.MongoClient;
 import jakarta.ws.rs.core.Response;
 import org.bson.Document;
-import org.graylog.testing.mongodb.MongoDBKernelWorkaround;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
 import org.graylog2.cluster.nodes.mongodb.MongodbConnectionResolver;
@@ -33,10 +33,10 @@ import org.graylog2.database.MongoConnectionImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.mongodb.MongoDBContainer;
 
 import java.util.List;
 import java.util.Locale;
@@ -52,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * the error handling when a user lacks the required permissions.
  */
 @Testcontainers
-class MongodbClusterResourceIntegrationIT {
+class MongodbClusterResourceIT {
 
     private record MongoRole(String name, String db) {}
 
@@ -67,7 +67,6 @@ class MongodbClusterResourceIntegrationIT {
     // profile command when it includes fields like "slowms". Pin to a version that has this change
     // so a regression there is actually caught, instead of relying on MongoDBVersion.DEFAULT (7.0).
     private static final MongoDBVersion PROFILING_TEST_MONGODB_VERSION = MongoDBVersion.of("8.0.29");
-    private static final String PROFILING_TEST_MONGODB_IMAGE = "mongo:" + PROFILING_TEST_MONGODB_VERSION.version();
 
     // Root superuser, provisioned by the container itself via MONGO_INITDB_ROOT_* env vars below.
     private static final TestUser ADMIN = new TestUser("admin", "adminpass", ADMIN_DATABASE, List.of());
@@ -105,23 +104,23 @@ class MongodbClusterResourceIntegrationIT {
         }
     };
 
+    private static final Network NETWORK = Network.newNetwork();
+
     @Container
-    static MongoDBContainer mongoContainer = MongoDBKernelWorkaround.applyIfNeeded(
-            new MongoDBContainer(PROFILING_TEST_MONGODB_IMAGE)
-                    .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN.username())
-                    .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN.password())
-                    .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE)
-                    // MongoDB does a 2-phase start when auth is enabled: starts without auth, creates the admin user,
-                    // restarts with --auth. Wait for the 2nd "Waiting for connections" to ensure auth is fully set up.
-                    .waitingFor(Wait.forLogMessage("(?i).*waiting for connections.*", 2)),
-            PROFILING_TEST_MONGODB_IMAGE);
+    static MongoDBContainer mongoContainer = MongoDBContainer.create(PROFILING_TEST_MONGODB_VERSION, NETWORK)
+            .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN.username())
+            .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN.password())
+            .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE)
+            // MongoDB does a 2-phase start when auth is enabled: starts without auth, creates the admin user,
+            // restarts with --auth. Wait for the 2nd "Waiting for connections" to ensure auth is fully set up.
+            .waitingFor(Wait.forLogMessage("(?i).*waiting for connections.*", 2));
 
     private static MongoClient adminClient;
 
     @BeforeAll
     static void setup() {
         adminClient = new MongoClient(buildConnectionUri(ADMIN));
-        List.of(RESTRICTED, CLUSTER_MONITOR, DB_ADMIN, DB_ADMIN_ONLY).forEach(MongodbClusterResourceIntegrationIT::createMongoUser);
+        List.of(RESTRICTED, CLUSTER_MONITOR, DB_ADMIN, DB_ADMIN_ONLY).forEach(MongodbClusterResourceIT::createMongoUser);
     }
 
     @AfterAll
