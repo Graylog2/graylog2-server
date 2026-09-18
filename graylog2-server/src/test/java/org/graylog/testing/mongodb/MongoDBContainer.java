@@ -17,14 +17,18 @@
 package org.graylog.testing.mongodb;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.google.common.primitives.Ints;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.DockerImageName;
 
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -53,6 +57,32 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
         withNetwork(requireNonNull(network, "network cannot be null"));
         withNetworkAliases(NETWORK_ALIAS);
         waitingFor(Wait.forListeningPort());
+
+        // Workaround for running MongoDB 8.x (including the "latest" tag, which currently resolves to an 8.x release)
+        // on Linux kernel version >= 6.19.
+        // See: https://jira.mongodb.org/browse/SERVER-121912
+        try {
+            final var versionPart = DockerImageName.parse(dockerImageName).getVersionPart();
+            if (versionPart.startsWith("8.") || versionPart.equals("latest")) {
+                final var osName = System.getProperty("os.name", "unknown").toLowerCase(Locale.ROOT);
+
+                if (osName.contains("linux")) {
+                    final var kernelVersion = System.getProperty("os.version", "0.0").split("\\.");
+                    if (kernelVersion.length < 2) {
+                        throw new IllegalStateException("Unexpected Linux kernel version: " + Arrays.toString(kernelVersion));
+                    }
+                    final int kernelMajorVersion = Objects.requireNonNullElse(Ints.tryParse(kernelVersion[0]), 0);
+                    final int kernelMinorVersion = Objects.requireNonNullElse(Ints.tryParse(kernelVersion[1]), 0);
+
+                    if (kernelMajorVersion >= 7 || (kernelMajorVersion == 6 && kernelMinorVersion >= 19)) {
+                        LOG.info("Applying MongoDB 8.x workaround (running on Linux {})", System.getProperty("os.version"));
+                        withEnv("GLIBC_TUNABLES", "glibc.pthread.rseq=1");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("Error applying Linux kernel version workaround for MongoDB 8.x", e);
+        }
     }
 
     public String infoString() {
