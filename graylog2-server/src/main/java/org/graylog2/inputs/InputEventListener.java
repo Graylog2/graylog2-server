@@ -120,6 +120,8 @@ public class InputEventListener {
 
         if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
             startInput(input);
+        } else if (inputState != null && inputState.getState() == IOState.Type.STOPPED) {
+            inputRegistry.add(inputState);
         }
     }
 
