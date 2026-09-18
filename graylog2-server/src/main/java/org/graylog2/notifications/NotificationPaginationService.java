@@ -25,6 +25,7 @@ import org.bson.types.ObjectId;
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.URIHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,13 +64,16 @@ public class NotificationPaginationService {
     /**
      * Returns a paginated list of notifications, with rendered title/description.
      *
-     * @param filter  BSON filter (from DbQueryCreator or Filters.empty())
-     * @param sort    BSON sort specification
-     * @param page    1-indexed page number
-     * @param perPage items per page
+     * @param filter    BSON filter (from DbQueryCreator or Filters.empty())
+     * @param sort      BSON sort specification
+     * @param page      1-indexed page number
+     * @param perPage   items per page
+     * @param uriHelper resolves links in rendered notifications against the externally visible base URI,
+     *                  e.g. taking the {@code X-Graylog-Server-URL} request header into account when available
      * @return paginated result with NotificationSummaryDto entries
      */
-    public PaginatedList<NotificationSummaryDto> searchPaginated(Bson filter, Bson sort, int page, int perPage) {
+    public PaginatedList<NotificationSummaryDto> searchPaginated(Bson filter, Bson sort, int page, int perPage,
+                                                                 URIHelper uriHelper) {
         final long total = collection.countDocuments(filter);
 
         final List<Document> docs = new ArrayList<>(perPage);
@@ -80,7 +84,7 @@ public class NotificationPaginationService {
                 .into(docs);
 
         final List<NotificationSummaryDto> dtos = docs.stream()
-                .map(this::toSummaryDto)
+                .map(doc -> toSummaryDto(doc, uriHelper))
                 .toList();
 
         return new PaginatedList<>(dtos, Ints.saturatedCast(total), page, perPage);
@@ -128,7 +132,7 @@ public class NotificationPaginationService {
     }
 
     @SuppressWarnings("unchecked")
-    private NotificationSummaryDto toSummaryDto(Document doc) {
+    private NotificationSummaryDto toSummaryDto(Document doc, URIHelper uriHelper) {
         final String id = doc.getObjectId("_id").toHexString();
         final String type = doc.getString(NotificationImpl.FIELD_TYPE);
         final String key = doc.getString(NotificationImpl.FIELD_KEY);
@@ -141,7 +145,7 @@ public class NotificationPaginationService {
         String description = null;
         try {
             final var notification = new NotificationImpl(doc.getObjectId("_id"), doc);
-            final var rendered = renderService.render(notification);
+            final var rendered = renderService.render(notification, SystemNotificationRenderService.Format.PLAINTEXT, uriHelper);
             title = rendered.title;
             description = rendered.description;
         } catch (Exception e) {

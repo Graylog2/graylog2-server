@@ -16,19 +16,24 @@
  */
 package org.graylog.events.notifications;
 
+import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.RepositoryException;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,14 +44,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class SystemNotificationRenderServiceTest {
-    static NotificationService notificationService = mock(NotificationService.class);
-    static org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
-    static SystemNotificationRenderService renderService;
+    private static final String DEFAULT_HTTP_EXTERNAL_URI = "http://localhost:9000/";
+
+    private final NotificationService notificationService = mock(NotificationService.class);
+    private final org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
     Notification notification;
 
-    @BeforeAll
-    static void setup() {
-        renderService = new SystemNotificationRenderService(notificationService, graylogConfig);
+    private SystemNotificationRenderService renderService() {
+        return renderService(DEFAULT_HTTP_EXTERNAL_URI);
+    }
+
+    private SystemNotificationRenderService renderService(String httpExternalUri) {
+        return new SystemNotificationRenderService(notificationService, graylogConfig, httpConfigurationWithExternalUri(httpExternalUri));
+    }
+
+    private static HttpConfiguration httpConfigurationWithExternalUri(String httpExternalUri) {
+        final HttpConfiguration configuration = new HttpConfiguration();
+        try {
+            new JadConfig(new InMemoryRepository(Map.of("http_external_uri", httpExternalUri)), configuration).process();
+        } catch (RepositoryException | ValidationException e) {
+            throw new RuntimeException(e);
+        }
+        return configuration;
     }
 
     @Test
@@ -63,7 +82,7 @@ class SystemNotificationRenderServiceTest {
         when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService.render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
+                renderService().render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
         assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Email Transport Configuration is missing or invalid!");
         assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
         assertThat(renderResponse.description).containsSequence("<span>");
@@ -81,7 +100,7 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("exception", new Exception("My Test Exception"))
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
 
-        SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification);
+        SystemNotificationRenderService.RenderResponse renderResponse = renderService().render(notification);
         assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
         assertThat(renderResponse.description).doesNotContain("<span>");
     }
@@ -99,7 +118,7 @@ class SystemNotificationRenderServiceTest {
         when(graylogConfig.isCloud()).thenReturn(true);
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+                renderService().render(notification, SystemNotificationRenderService.Format.HTML);
         assertThat(renderResponse.description).doesNotContain(url);
     }
 
@@ -116,7 +135,7 @@ class SystemNotificationRenderServiceTest {
         when(graylogConfig.isCloud()).thenReturn(false);
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+                renderService().render(notification, SystemNotificationRenderService.Format.HTML);
         assertThat(renderResponse.description).containsSequence(url);
     }
 
@@ -136,8 +155,23 @@ class SystemNotificationRenderServiceTest {
         when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+                renderService().render(notification, SystemNotificationRenderService.Format.HTML);
         assertThat(renderResponse.description).containsSequence("11: 12");
+    }
+
+    @Test
+    void dataNodeVersionMismatchLinkIncludesConfiguredPathPrefix() {
+        notification = new NotificationImpl()
+                .addNode("node")
+                .addSeverity(Notification.Severity.NORMAL)
+                .addType(Notification.Type.DATA_NODE_VERSION_MISMATCH)
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
+
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService("http://localhost:9000/graylog/").render(notification, SystemNotificationRenderService.Format.HTML);
+
+        assertThat(renderResponse.description)
+                .contains("href=\"http://localhost:9000/graylog/system/cluster/datanode-upgrade\"");
     }
 
     @Test
@@ -167,7 +201,7 @@ class SystemNotificationRenderServiceTest {
         when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService.render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
+                renderService().render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
 
         // HTML-escaping applied
         assertThat(renderResponse.title).contains("Test: &lt;123&gt;");

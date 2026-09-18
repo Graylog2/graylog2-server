@@ -28,10 +28,12 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.notifications.Notification;
+import org.graylog2.rest.URIHelper;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +63,12 @@ public class SystemNotificationRenderResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get HTML formatted message")
-    public TemplateRenderResponse renderHtml(@Parameter(name = "type", required = true)
+    public TemplateRenderResponse renderHtml(@Context URIHelper uriHelper,
+                                             @Parameter(name = "type", required = true)
                                              @PathParam("type") Notification.Type type,
                                              @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TemplateRenderRequest.class)))
                                              TemplateRenderRequest request) {
-        return render(type, null, SystemNotificationRenderService.Format.HTML, request);
+        return render(type, null, SystemNotificationRenderService.Format.HTML, request, uriHelper);
     }
 
     @POST
@@ -73,11 +76,12 @@ public class SystemNotificationRenderResource extends RestResource {
     @Path("/html/{type}/{key}")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get HTML formatted message")
-    public TemplateRenderResponse renderHtmlWithKey(@Parameter(name = "type", required = true) @PathParam("type") Notification.Type type,
+    public TemplateRenderResponse renderHtmlWithKey(@Context URIHelper uriHelper,
+                                                    @Parameter(name = "type", required = true) @PathParam("type") Notification.Type type,
                                                     @Parameter(name = "key", required = true) @PathParam("key") String key,
                                                     @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TemplateRenderRequest.class)))
                                                     TemplateRenderRequest request) {
-        return render(type, key, SystemNotificationRenderService.Format.HTML, request);
+        return render(type, key, SystemNotificationRenderService.Format.HTML, request, uriHelper);
     }
 
     @POST
@@ -85,11 +89,12 @@ public class SystemNotificationRenderResource extends RestResource {
     @Path("/plaintext/{type}")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get plaintext formatted message")
-    public TemplateRenderResponse renderPlainText(@Parameter(name = "type", required = true)
+    public TemplateRenderResponse renderPlainText(@Context URIHelper uriHelper,
+                                                  @Parameter(name = "type", required = true)
                                                   @PathParam("type") Notification.Type type,
                                                   @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TemplateRenderRequest.class)))
                                                   TemplateRenderRequest request) {
-        return render(type, null, SystemNotificationRenderService.Format.PLAINTEXT, request);
+        return render(type, null, SystemNotificationRenderService.Format.PLAINTEXT, request, uriHelper);
     }
 
     @POST
@@ -97,21 +102,23 @@ public class SystemNotificationRenderResource extends RestResource {
     @Path("/plaintext/{type}/{key}")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get plaintext formatted message")
-    public TemplateRenderResponse renderPlainTextWithKey(@Parameter(name = "type", required = true) @PathParam("type") Notification.Type type,
+    public TemplateRenderResponse renderPlainTextWithKey(@Context URIHelper uriHelper,
+                                                         @Parameter(name = "type", required = true) @PathParam("type") Notification.Type type,
                                                          @Parameter(name = "key", required = true) @PathParam("key") String key,
                                                          @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TemplateRenderRequest.class)))
                                                          TemplateRenderRequest request) {
-        return render(type, key, SystemNotificationRenderService.Format.PLAINTEXT, request);
+        return render(type, key, SystemNotificationRenderService.Format.PLAINTEXT, request, uriHelper);
     }
 
     private TemplateRenderResponse render(
             Notification.Type type,
             @Nullable String key,
             SystemNotificationRenderService.Format format,
-            TemplateRenderRequest request) {
+            TemplateRenderRequest request,
+            URIHelper uriHelper) {
         Map<String, Object> values = (request != null) ? request.values() : new HashMap<>();
         SystemNotificationRenderService.RenderResponse renderResponse =
-                systemNotificationRenderService.render(type, key, format, values);
+                systemNotificationRenderService.render(type, key, format, values, uriHelper);
 
         return TemplateRenderResponse.create(renderResponse.title, renderResponse.description);
     }
