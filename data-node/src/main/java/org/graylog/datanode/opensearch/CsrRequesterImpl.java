@@ -49,11 +49,13 @@ public class CsrRequesterImpl implements CsrRequester {
     private final CertificateExchange certificateExchange;
     private final String hostname;
     private final String nodeName;
+    private final String opensearchNetworkPublishHost;
 
     @Inject
     public CsrRequesterImpl(Configuration datanodeConfiguration, NodeId nodeId, DatanodeKeystore datanodeKeystore, CertificateExchange certificateExchange) {
         this.hostname = datanodeConfiguration.getHostname();
         this.nodeName = datanodeConfiguration.getDatanodeNodeName();
+        this.opensearchNetworkPublishHost = datanodeConfiguration.getOpensearchNetworkPublishHost();
         this.nodeId = nodeId;
         this.datanodeKeystore = datanodeKeystore;
         this.certificateExchange = certificateExchange;
@@ -64,6 +66,7 @@ public class CsrRequesterImpl implements CsrRequester {
             final Set<String> altNames = ImmutableSet.<String>builder()
                     .add(nodeName)
                     .add(hostname)
+                    .add(opensearchNetworkPublishHost)
                     .addAll(determineAltNames())
                     .build();
             final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest(hostname, new ArrayList<>(altNames));

@@ -264,6 +264,17 @@ public class OpensearchProcessImplTest {
     }
 
     @Test
+    public void testGetOpensearchClusterUrlUsesPublishHostNotNodeName() {
+        // node name is only a local identity label and must not leak into the address other nodes
+        // dial in on: the transport/discovery address has to be built from the publish host instead.
+        when(configuration.getOpensearchNetworkPublishHost()).thenReturn("datanode.example.org");
+        when(configuration.getOpensearchTransportPort()).thenReturn(9300);
+
+        Assertions.assertThat(opensearchProcess.getOpensearchClusterUrl())
+                .isEqualTo("datanode.example.org:9300");
+    }
+
+    @Test
     public void recommendedMemorySettingValue() {
         Assertions.assertThat(OpensearchProcessImpl.recommendedMemorySetting("7 GB"))
                 .isEqualTo("7g");

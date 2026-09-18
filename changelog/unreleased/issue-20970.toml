@@ -1,0 +1,9 @@
+type = "a"
+message = "Add opensearch_network_publish_host config option to Data Node."
+
+details.user = """
+Data Node previously always advertised its own hostname to other cluster nodes via OpenSearch's `network.publish_host`. This broke clustering across hosts in setups like Docker bridge networks, where the hostname resolves to a non-routable internal address from inside the container. The new `opensearch_network_publish_host` setting lets you configure a different, externally routable address for Data Node to advertise, independent of its hostname/bind address.
+"""
+
+issues = ["20970"]
+pulls = ["27363"]

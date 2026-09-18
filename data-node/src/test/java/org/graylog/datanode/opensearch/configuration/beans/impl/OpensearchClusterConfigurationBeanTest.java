@@ -103,6 +103,26 @@ class OpensearchClusterConfigurationBeanTest {
     }
 
     @Test
+    void testPublishHostDefaultsToHostname(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
+                Map.of("hostname", "this_node_hostname"), tempDir), testNodeService);
+
+        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
+
+        Assertions.assertThat(configurationPart.properties().get("network.publish_host")).isEqualTo("this_node_hostname");
+    }
+
+    @Test
+    void testPublishHostOverride(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
+                Map.of("hostname", "this_node_hostname", "opensearch_network_publish_host", "externally-routable.example.org"), tempDir), testNodeService);
+
+        final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(DatanodeTestUtils.mockDatanodeConfiguration(tempDir), tempDir));
+
+        Assertions.assertThat(configurationPart.properties().get("network.publish_host")).isEqualTo("externally-routable.example.org");
+    }
+
+    @Test
     void testManagerNodesWithNoRolesSet(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
                 Map.of("hostname", "this_node_can_be_manager"), tempDir), testNodeService);
