@@ -163,8 +163,10 @@ public class InputLauncher {
                 // add a stopped input to the registry on GL startup
                 if (inputRegistry.getInputState(input.getId()) == null) {
                     final IOState<MessageInput> inputState = inputStateFactory.create(input);
-                    inputRegistry.add(inputState);
-                    inputState.setState(IOState.Type.STOPPED);
+                    inputState.setStartedAt(null);
+                    if (inputRegistry.add(inputState)) {
+                        inputState.setState(IOState.Type.STOPPED);
+                    }
                 }
             } else {
                 LOG.info("Not auto-starting input {} - desired state is {}",
