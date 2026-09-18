@@ -58,7 +58,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
 import oshi.hardware.GlobalMemory;
-import oshi.software.os.CgroupInfo;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.X509TrustManager;
@@ -241,24 +240,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @VisibleForTesting
     Optional<MemoryValues> getContainerMemory() {
-        return readCgroupV2Memory()
-                .or(this::readCgroupV1Memory)
-                .or(this::readOshiCgroupMemory);
-    }
-
-    private Optional<MemoryValues> readOshiCgroupMemory() {
-        try {
-            final CgroupInfo cgroup = new SystemInfo().getOperatingSystem().getCgroupInfo();
-            if (cgroup.isContainerized()) {
-                final long limit = cgroup.getMemoryLimit();
-                final long used = cgroup.getMemoryUsage();
-                if (limit > 0 && limit < CGROUP_V1_UNLIMITED_THRESHOLD && used >= 0) {
-                    return memoryValues(limit, used);
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        return Optional.empty();
+        return readCgroupV2Memory().or(this::readCgroupV1Memory);
     }
 
     private Optional<MemoryValues> readCgroupV2Memory() {
