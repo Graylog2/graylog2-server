@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
 import { useFetchErrors } from 'components/lookup-tables/hooks/useLookupTablesAPI';
@@ -28,25 +28,19 @@ const ErrorsConsumer = ({
   cacheNames?: Array<string>;
   adapterNames?: Array<string>;
 }) => {
-  const [fetchInterval, setFetchInterval] = useState<NodeJS.Timeout>();
   const { setErrors } = useErrorsContext();
   const { fetchErrors } = useFetchErrors();
 
   useEffect(() => {
-    if (fetchInterval) clearInterval(fetchInterval);
+    const interval = setInterval(() => {
+      fetchErrors({ lutNames, cacheNames, adapterNames }).then(
+        ({ tables, caches, data_adapters }: { tables: unknown; caches: unknown; data_adapters: unknown }) =>
+          setErrors({ lutErrors: tables, cacheErrors: caches, adapterErrors: data_adapters }),
+      );
+    }, 1000);
 
-    setFetchInterval(
-      setInterval(() => {
-        fetchErrors({ lutNames, cacheNames, adapterNames }).then(
-          ({ tables, caches, data_adapters }: { tables: unknown; caches: unknown; data_adapters: unknown }) =>
-            setErrors({ lutErrors: tables, cacheErrors: caches, adapterErrors: data_adapters }),
-        );
-      }, 1000),
-    );
-
-    return () => clearInterval(fetchInterval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lutNames, cacheNames, adapterNames]);
+    return () => clearInterval(interval);
+  }, [lutNames, cacheNames, adapterNames, fetchErrors, setErrors]);
 
   return null;
 };
