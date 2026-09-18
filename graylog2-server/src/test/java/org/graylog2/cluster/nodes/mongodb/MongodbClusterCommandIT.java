@@ -22,15 +22,15 @@ import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoDatabase;
 import jakarta.annotation.Nonnull;
 import org.bson.Document;
-import org.graylog.testing.mongodb.MongoDBKernelWorkaround;
+import org.graylog.testing.mongodb.MongoDBContainer;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.database.MongoConnection;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.mongodb.MongoDBContainer;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -49,15 +49,14 @@ class MongodbClusterCommandIT {
     private static final String RESTRICTED_USER = "restricteduser";
     private static final String RESTRICTED_PASSWORD = "restrictedpass";
     private static final String TEST_DATABASE = "graylog";
-    private static final String MONGODB_IMAGE = "mongo:" + MongoDBVersion.DEFAULT.version();
+
+    private static final Network NETWORK = Network.newNetwork();
 
     @Container
-    static MongoDBContainer mongoContainer = MongoDBKernelWorkaround.applyIfNeeded(
-            new MongoDBContainer(MONGODB_IMAGE)
-                    .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN_USER)
-                    .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN_PASSWORD)
-                    .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE),
-            MONGODB_IMAGE);
+    static MongoDBContainer mongoContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT, NETWORK)
+            .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN_USER)
+            .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN_PASSWORD)
+            .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE);
 
     private static MongoClient adminClient;
     private static MongoClient restrictedClient;
