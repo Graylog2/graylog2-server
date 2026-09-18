@@ -109,8 +109,21 @@ public class InputEventListener {
             return;
         }
 
-        final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+        final boolean thisNodeRunsInput = input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId());
+
+        // a stopped input stays registered so it remains visible in the input-state API; only the updated
+        // configuration is swapped in (its MessageInput is already stopped and terminated)
+        if (inputState != null && inputState.getState() == IOState.Type.STOPPED && thisNodeRunsInput) {
+            try {
+                inputState.setStoppable(inputService.getMessageInput(input));
+            } catch (NoSuchInputTypeException e) {
+                LOG.warn("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
+            }
+            return;
+        }
+
+        final boolean startInput;
         if (inputState != null) {
             startInput = inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.SETUP;
             inputRegistry.remove(inputState);
@@ -118,7 +131,7 @@ public class InputEventListener {
             startInput = false;
         }
 
-        if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
+        if (startInput && thisNodeRunsInput) {
             startInput(input);
         }
     }
@@ -149,7 +162,14 @@ public class InputEventListener {
     @Subscribe
     public void inputStopped(InputStopped inputStoppedEvent) {
         LOG.debug("Input stopped: {}", inputStoppedEvent.id());
-        removeFromRegistry(inputStoppedEvent.id());
+        stopInRegistry(inputStoppedEvent.id());
+    }
+
+    private void stopInRegistry(String inputId) {
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+        if (inputState != null) {
+            inputRegistry.stopAndTerminate(inputState);
+        }
     }
 
     @Subscribe
