@@ -40,10 +40,8 @@ public abstract class CollectorsConfig {
     private static final Duration DEFAULT_COLLECTOR_HEARTBEAT_INTERVAL = Duration.ofSeconds(30);
     private static final int DEFAULT_OPAMP_MAX_REQUEST_BODY_SIZE_BYTES = Ints.saturatedCast(Size.megabytes(10).toBytes());
     private static final Duration DEFAULT_COLLECTOR_CERT_ROTATION_GRACE_PERIOD = Duration.ofMinutes(5);
-    /*
-     * The collector default is 5 mins, 1 hour here protects against a lot of clock skew. Don't make this too small
-     * without changing the collector token lifetime, too.
-    */
+    // Collector tokens are valid for 5 minutes by default, we accept an hour of clock skew. Don't make this too small
+    // without changing the collector token lifetime, too.
     private static final Duration DEFAULT_AGENT_TOKEN_MAX_LIFETIME = Duration.ofHours(1);
 
     public static final String FIELD_CA_CERT_ID = "ca_cert_id";
