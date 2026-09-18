@@ -28,15 +28,17 @@ import org.graylog2.database.utils.MongoUtils;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class MongoDbIndexTools {
 
     static final String COLLATION_KEY = "collation";
     static final String INDEX_DOCUMENT_KEY = "key";
+    static final String INDEX_NAME_KEY = "name";
+    static final String EXPIRE_AFTER_SECONDS_KEY = "expireAfterSeconds";
 
     private final MongoCollection<Document> db;
 
@@ -47,20 +49,38 @@ public class MongoDbIndexTools {
     // MongoDB Indexes cannot be altered once created.
     public static void ensureTTLIndex(MongoCollection<Document> collection, Duration ttl, String fieldUpdatedAt) {
         final IndexOptions indexOptions = new IndexOptions().expireAfter(ttl.toSeconds(), TimeUnit.SECONDS);
-        final Bson updatedAtKey = Indexes.ascending(fieldUpdatedAt);
-        for (Document document : collection.listIndexes()) {
-            final Set<String> keySet = document.get(INDEX_DOCUMENT_KEY, Document.class).keySet();
-            if (keySet.contains(fieldUpdatedAt)) {
-                // Since MongoDB 5.0 this is an Integer. Used to be a Long ¯\_(ツ)_/¯
-                final long expireAfterSeconds = document.get("expireAfterSeconds", Number.class).longValue();
-                if (Objects.equals(expireAfterSeconds, indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
-                    return;
-                }
-                collection.dropIndex(updatedAtKey);
+
+        // Read the whole list up front: the loop below drops indexes, and doing that while the cursor is
+        // still open would be modifying what is being iterated.
+        final List<Document> existingIndexes;
+        try (final var stream = MongoUtils.stream(collection.listIndexes())) {
+            existingIndexes = stream.toList();
+        }
+
+        for (Document document : existingIndexes) {
+            final Document key = document.get(INDEX_DOCUMENT_KEY, Document.class);
+            // Only a single-field index on the field can be the TTL index. A compound index that merely
+            // contains the field serves different queries and cannot carry a TTL at all, so it is neither
+            // a match to keep nor something to drop.
+            if (key.size() != 1 || !key.containsKey(fieldUpdatedAt)) {
+                continue;
             }
+            // Since MongoDB 5.0 this is an Integer. Used to be a Long ¯\_(ツ)_/¯
+            // A plain index carries no expireAfterSeconds at all. That is what deployments have which
+            // created the index before it gained a TTL, so it needs replacing rather than keeping.
+            final Number expireAfterSeconds = document.get(EXPIRE_AFTER_SECONDS_KEY, Number.class);
+            if (expireAfterSeconds != null
+                    && Objects.equals(expireAfterSeconds.longValue(), indexOptions.getExpireAfter(TimeUnit.SECONDS))) {
+                // Direction is irrelevant for a single-field index, so an existing descending one with the
+                // right expiry is kept rather than rebuilt on every boot.
+                return;
+            }
+            // Dropped by name, not by key spec: the existing index may be descending, which is a different
+            // key spec than the ascending one created below.
+            collection.dropIndex(document.getString(INDEX_NAME_KEY));
         }
         // not found or dropped, creating new index
-        collection.createIndex(updatedAtKey, indexOptions);
+        collection.createIndex(Indexes.ascending(fieldUpdatedAt), indexOptions);
     }
 
     /**

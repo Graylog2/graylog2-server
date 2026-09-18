@@ -22,9 +22,7 @@ import { HoverForHelp, Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 const missingRequirements = (requires: Requirements, requirementsProvided: Array<string>) =>
-  Object.entries(requires)
-    .filter(([require]) => !requirementsProvided.includes(require))
-    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+  Object.fromEntries(Object.entries(requires).filter(([require]) => !requirementsProvided.includes(require)));
 
 const RequirementsList = ({ requirements }: { requirements: Requirements }) => (
   <div>

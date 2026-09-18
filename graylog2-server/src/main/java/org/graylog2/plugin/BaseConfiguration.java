@@ -34,12 +34,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.shared.messageq.MessageQueueModule;
+import org.graylog2.utilities.ProxyConfig;
+import org.graylog2.utilities.ProxyConfigConverter;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.graylog2.utilities.ProxyHostsPatternConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
+import java.util.Optional;
 
 import static org.graylog2.shared.messageq.MessageQueueModule.DISK_JOURNAL_MODE;
 import static org.graylog2.shared.messageq.MessageQueueModule.NOOP_JOURNAL_MODE;
@@ -137,8 +139,8 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
               - http://proxy.example.com:8123
               - http://username:password@proxy.example.com:8123
             """)
-    @Parameter(value = "http_proxy_uri")
-    private URI httpProxyUri;
+    @Parameter(value = "http_proxy_uri", converter = ProxyConfigConverter.class)
+    private ProxyConfig httpProxyConfig;
 
     @Documentation("""
             A list of hosts that should be reached directly, bypassing the configured proxy server.
@@ -268,8 +270,8 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
         return httpUserAgent;
     }
 
-    public URI getHttpProxyUri() {
-        return httpProxyUri;
+    public Optional<ProxyConfig> getHttpProxyConfig() {
+        return Optional.ofNullable(httpProxyConfig);
     }
 
     public ProxyHostsPattern getHttpNonProxyHostsPattern() {
