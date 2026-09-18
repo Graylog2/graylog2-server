@@ -148,4 +148,36 @@ class CpuLoadGaugeTest {
         assertThat(gauge.getValue()).isNull();
         assertThat(nativeCalls.get()).isEqualTo(1);
     }
+
+    @Test
+    void probesCgroupOnlyOnce() {
+        // The gauge updates every 5s for the lifetime of the node, and containerization cannot change in between,
+        // so the probe - and the SystemInfo construction it costs - must not be repeated on bare metal.
+        final CentralProcessor processor = mock(CentralProcessor.class);
+        when(processor.getSystemCpuLoadTicks()).thenReturn(new long[]{1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L});
+        when(processor.getSystemCpuLoadBetweenTicks(any(), any())).thenReturn(0.42d);
+
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.isContainerized()).thenReturn(false);
+
+        final AtomicInteger cgroupProbes = new AtomicInteger();
+        final CpuLoadGauge gauge = new CpuLoadGauge() {
+            @Override
+            protected CentralProcessor processor() {
+                return processor;
+            }
+
+            @Override
+            protected CgroupInfo cgroupInfo() {
+                cgroupProbes.incrementAndGet();
+                return cgroup;
+            }
+        };
+
+        gauge.update();
+        gauge.update();
+        gauge.update();
+
+        assertThat(cgroupProbes.get()).isEqualTo(1);
+    }
 }

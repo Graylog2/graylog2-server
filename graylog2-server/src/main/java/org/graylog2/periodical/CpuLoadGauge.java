@@ -30,6 +30,8 @@ public class CpuLoadGauge implements Gauge<Double> {
     private long[] lastTicks;
     private long lastContainerUsage = -1L;
     private long lastContainerTime = -1L;
+    private CgroupInfo containerCgroup;
+    private boolean cgroupDetectionDone;
     private volatile Double cpuLoad;
     private boolean disabled = false;
 
@@ -43,8 +45,8 @@ public class CpuLoadGauge implements Gauge<Double> {
             return;
         }
         try {
-            final CgroupInfo cgroup = cgroupInfo();
-            if (cgroup != null && cgroup.isContainerized()) {
+            final CgroupInfo cgroup = containerCgroup();
+            if (cgroup != null) {
                 final long newUsage = cgroup.getCpuUsage();
                 final long newTime = System.nanoTime();
                 if (newUsage > 0) {
@@ -86,6 +88,15 @@ public class CpuLoadGauge implements Gauge<Double> {
                     "a 'noexec' mounted filesystem. To enable the metric, point 'jna.tmpdir' at a writable, " +
                     "exec-capable directory via the JVM options.", e);
         }
+    }
+
+    private CgroupInfo containerCgroup() {
+        if (!cgroupDetectionDone) {
+            final CgroupInfo cgroup = cgroupInfo();
+            containerCgroup = cgroup != null && cgroup.isContainerized() ? cgroup : null;
+            cgroupDetectionDone = true;
+        }
+        return containerCgroup;
     }
 
     protected CentralProcessor processor() {
