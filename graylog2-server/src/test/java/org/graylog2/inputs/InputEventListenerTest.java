@@ -282,6 +282,35 @@ public class InputEventListenerTest {
     }
 
     @Test
+    public void inputUpdatedReAddsStoppedLocalInputOnLocalNodeToRegistry() throws Exception {
+        when(inputState.getState()).thenReturn(IOState.Type.STOPPED);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+        when(input.getNodeId()).thenReturn(THIS_NODE_ID);
+        when(input.isGlobal()).thenReturn(false);
+
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
+
+        verify(inputRegistry, times(1)).remove(inputState);
+        verify(inputRegistry, times(1)).add(inputState);
+        verify(inputLauncher, never()).launch(any());
+    }
+
+    @Test
+    public void inputUpdatedReAddsStoppedInputToRegistry() throws Exception {
+        when(inputState.getState()).thenReturn(IOState.Type.STOPPED);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+        when(input.isGlobal()).thenReturn(true);
+
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
+
+        verify(inputRegistry, times(1)).remove(inputState);
+        verify(inputRegistry, times(1)).add(inputState);
+        verify(inputLauncher, never()).launch(any());
+    }
+
+    @Test
     public void inputStoppedKeepsInputInRegistry() {
         when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
 

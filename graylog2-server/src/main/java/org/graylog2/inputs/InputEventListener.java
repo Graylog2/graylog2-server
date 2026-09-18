@@ -121,6 +121,7 @@ public class InputEventListener {
         if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
             startInput(input);
         } else if (inputState != null && inputState.getState() == IOState.Type.STOPPED) {
+            // re-add stopped input that was removed further up (line 116)
             inputRegistry.add(inputState);
         }
     }
