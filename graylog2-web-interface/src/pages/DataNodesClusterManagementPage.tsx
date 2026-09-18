@@ -17,6 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import ProductName from 'brand-customization/ProductName';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
@@ -53,8 +54,8 @@ const DataNodesClusterManagementPage = () => (
         path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
       }}>
       <span>
-        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index
-        and search through all the messages in your Graylog message database.
+        <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
+        allow you to index and search through all the messages in your <ProductName /> message database.
       </span>
     </PageHeader>
     <Row className="content">
