@@ -19,6 +19,7 @@ package org.graylog.security.authservice;
 import jakarta.inject.Inject;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.Configuration;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Map;
 
 public class ProvisionerService {
@@ -34,12 +36,29 @@ public class ProvisionerService {
 
     private final UserService userService;
     private final Map<String, ProvisionerAction.Factory<? extends ProvisionerAction>> provisionerActionFactories;
+    private final boolean allowAccountTakeover;
 
     @Inject
     public ProvisionerService(UserService userService,
+                              Map<String, ProvisionerAction.Factory<? extends ProvisionerAction>> provisionerActionFactories,
+                              Configuration configuration) {
+        this(userService, provisionerActionFactories, configuration.isAllowAuthServiceAccountTakeover());
+    }
+
+    /**
+     * Creates a service that refuses to take over existing accounts, the secure default.
+     */
+    public ProvisionerService(UserService userService,
                               Map<String, ProvisionerAction.Factory<? extends ProvisionerAction>> provisionerActionFactories) {
+        this(userService, provisionerActionFactories, false);
+    }
+
+    public ProvisionerService(UserService userService,
+                              Map<String, ProvisionerAction.Factory<? extends ProvisionerAction>> provisionerActionFactories,
+                              boolean allowAccountTakeover) {
         this.userService = userService;
         this.provisionerActionFactories = provisionerActionFactories;
+        this.allowAccountTakeover = allowAccountTakeover;
     }
 
     public UserDetails.Builder newDetails(AuthServiceBackend backend) {
@@ -102,10 +121,16 @@ public class ProvisionerService {
         return userDetailsWithId;
     }
 
-    private User provisionUser(UserDetails userDetails) {
+    private User provisionUser(UserDetails userDetails) throws ProvisionException {
         // Find or create a user. We search for the auth service UID first to make sure we can handle username changes.
-        final User user = userService.loadByAuthServiceUidOrUsername(userDetails.base64AuthServiceUid(), userDetails.username())
-                .orElse(createUser(userDetails));
+        final Optional<User> existingUser =
+                userService.loadByAuthServiceUidOrUsername(userDetails.base64AuthServiceUid(), userDetails.username());
+
+        if (existingUser.isPresent()) {
+            checkMayBeProvisioned(existingUser.get(), userDetails);
+        }
+
+        final User user = existingUser.orElseGet(() -> createUser(userDetails));
 
         // Only set fields that are okay to override by the authentication service here!
         user.setExternal(userDetails.isExternal());
@@ -129,6 +154,43 @@ public class ProvisionerService {
         // provider and then we need the password hash.
 
         return user;
+    }
+
+    /**
+     * Makes sure the authentication service is not about to take over an account that does not belong to it.
+     * <p>
+     * The user is looked up by authentication service UID <em>or</em> username, so a match does not by itself mean the
+     * account belongs to the identity being provisioned. Provisioning overwrites the account's external flag, its
+     * authentication service and its name, but keeps its roles and permissions, so silently accepting a username match
+     * would let an external identity inherit whatever an unrelated local account already holds - including the Admin
+     * role.
+     *
+     * @throws ProvisionException if the existing account is not managed by this authentication service
+     */
+    private void checkMayBeProvisioned(User user, UserDetails userDetails) throws ProvisionException {
+        // Matched by authentication service UID: the same external identity, possibly under a new username.
+        if (userDetails.base64AuthServiceUid().equals(user.getAuthServiceUid())) {
+            return;
+        }
+
+        // Matched by username only. Accept it if the account is already managed by this very authentication service,
+        // which is the case when the identity's UID changed on the authentication service side.
+        if (user.isExternalUser() && userDetails.authServiceId().equals(user.getAuthServiceId())) {
+            return;
+        }
+
+        if (allowAccountTakeover) {
+            LOG.warn("Authentication service <{}> is taking over the existing account <{}> because it has a matching "
+                            + "username. This is allowed by the \"allow_auth_service_account_takeover\" configuration "
+                            + "option. The external identity inherits the roles and permissions of that account.",
+                    userDetails.authServiceId(), userDetails.username());
+            return;
+        }
+
+        throw new ProvisionException("Cannot provision user <" + userDetails.username() + "> from authentication "
+                + "service <" + userDetails.authServiceId() + ">: an account with that username already exists and is "
+                + "not managed by this authentication service. Rename or remove the existing account, or set "
+                + "\"allow_auth_service_account_takeover = true\" to let the authentication service take it over.");
     }
 
     private User createUser(UserDetails userDetails) {
