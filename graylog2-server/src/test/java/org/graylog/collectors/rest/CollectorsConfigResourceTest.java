@@ -321,8 +321,8 @@ class CollectorsConfigResourceTest {
         final var result = resource.put(requestContext,
                 new CollectorsConfigRequest(bogusHttp, null, null, null, false));
 
-        // Cloud derives the endpoint from the node URI with the "ingest-" prefix, ignoring the client's value.
-        assertThat(result.http().hostname()).isEqualTo("ingest-graylog.example.com");
+        // Cloud derives the endpoint from the node URI with the "collector-ingest-" prefix, ignoring the client's value.
+        assertThat(result.http().hostname()).isEqualTo("collector-ingest-graylog.example.com");
         assertThat(result.http().port()).isEqualTo(14401);
     }
 
@@ -370,7 +370,7 @@ class CollectorsConfigResourceTest {
 
         final var result = resource.get(requestContext);
 
-        assertThat(result.http().hostname()).isEqualTo("ingest-graylog.example.com");
+        assertThat(result.http().hostname()).isEqualTo("collector-ingest-graylog.example.com");
         assertThat(result.http().port()).isEqualTo(14401);
     }
 
