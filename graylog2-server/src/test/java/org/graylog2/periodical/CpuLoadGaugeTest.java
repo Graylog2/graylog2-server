@@ -18,6 +18,7 @@ package org.graylog2.periodical;
 
 import org.junit.jupiter.api.Test;
 import oshi.hardware.CentralProcessor;
+import oshi.software.os.CgroupInfo;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,10 +36,18 @@ class CpuLoadGaugeTest {
         when(processor.getSystemCpuLoadTicks()).thenReturn(new long[]{1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L});
         when(processor.getSystemCpuLoadBetweenTicks(any(), any())).thenReturn(0.42d);
 
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.isContainerized()).thenReturn(false);
+
         final CpuLoadGauge gauge = new CpuLoadGauge() {
             @Override
             protected CentralProcessor processor() {
                 return processor;
+            }
+
+            @Override
+            protected CgroupInfo cgroupInfo() {
+                return cgroup;
             }
         };
 
@@ -55,6 +64,64 @@ class CpuLoadGaugeTest {
     }
 
     @Test
+    void reportsContainerCpuLoadAfterTwoSamples() {
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.isContainerized()).thenReturn(true);
+        // Return 1s of CPU usage on first sample, then 2s of CPU usage on second sample
+        when(cgroup.getCpuUsage()).thenReturn(1_000_000_000L, 2_000_000_000L);
+        // 2 effective cores
+        when(cgroup.getEffectiveCpus()).thenReturn(2.0d);
+
+        final CpuLoadGauge gauge = new CpuLoadGauge() {
+            @Override
+            protected CgroupInfo cgroupInfo() {
+                return cgroup;
+            }
+        };
+
+        assertThat(gauge.getValue()).isNull();
+
+        // First run seeds the container usage baseline
+        gauge.update();
+        assertThat(gauge.getValue()).isNull();
+
+        // Second run computes CPU percentage from delta
+        gauge.update();
+        assertThat(gauge.getValue()).isNotNull();
+        assertThat(gauge.getValue()).isBetween(0.0d, 100.0d);
+    }
+
+    @Test
+    void reportsContainerCpuLoadWithUnlimitedQuota() {
+        final CentralProcessor processor = mock(CentralProcessor.class);
+        when(processor.getLogicalProcessorCount()).thenReturn(4);
+
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.isContainerized()).thenReturn(true);
+        when(cgroup.getCpuUsage()).thenReturn(500_000_000L, 1_000_000_000L);
+        when(cgroup.getEffectiveCpus()).thenReturn(CgroupInfo.UNLIMITED_CPUS);
+
+        final CpuLoadGauge gauge = new CpuLoadGauge() {
+            @Override
+            protected CentralProcessor processor() {
+                return processor;
+            }
+
+            @Override
+            protected CgroupInfo cgroupInfo() {
+                return cgroup;
+            }
+        };
+
+        gauge.update();
+        assertThat(gauge.getValue()).isNull();
+
+        gauge.update();
+        assertThat(gauge.getValue()).isNotNull();
+        assertThat(gauge.getValue()).isBetween(0.0d, 100.0d);
+    }
+
+    @Test
     void degradesGracefullyWhenNativeAccessFails() {
         // Simulate a host where OSHI/JNA cannot load its native library (e.g. a 'noexec' data dir),
         // which surfaces as a LinkageError (NoClassDefFoundError / UnsatisfiedLinkError), not an Exception.
@@ -64,6 +131,11 @@ class CpuLoadGaugeTest {
             protected CentralProcessor processor() {
                 nativeCalls.incrementAndGet();
                 throw new NoClassDefFoundError("Could not initialize class oshi.software.os.linux.LinuxOperatingSystemJNA");
+            }
+
+            @Override
+            protected CgroupInfo cgroupInfo() {
+                return null;
             }
         };
 
@@ -75,5 +147,37 @@ class CpuLoadGaugeTest {
         gauge.update();
         assertThat(gauge.getValue()).isNull();
         assertThat(nativeCalls.get()).isEqualTo(1);
+    }
+
+    @Test
+    void probesCgroupOnlyOnce() {
+        // The gauge updates every 5s for the lifetime of the node, and containerization cannot change in between,
+        // so the probe - and the SystemInfo construction it costs - must not be repeated on bare metal.
+        final CentralProcessor processor = mock(CentralProcessor.class);
+        when(processor.getSystemCpuLoadTicks()).thenReturn(new long[]{1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L});
+        when(processor.getSystemCpuLoadBetweenTicks(any(), any())).thenReturn(0.42d);
+
+        final CgroupInfo cgroup = mock(CgroupInfo.class);
+        when(cgroup.isContainerized()).thenReturn(false);
+
+        final AtomicInteger cgroupProbes = new AtomicInteger();
+        final CpuLoadGauge gauge = new CpuLoadGauge() {
+            @Override
+            protected CentralProcessor processor() {
+                return processor;
+            }
+
+            @Override
+            protected CgroupInfo cgroupInfo() {
+                cgroupProbes.incrementAndGet();
+                return cgroup;
+            }
+        };
+
+        gauge.update();
+        gauge.update();
+        gauge.update();
+
+        assertThat(cgroupProbes.get()).isEqualTo(1);
     }
 }
