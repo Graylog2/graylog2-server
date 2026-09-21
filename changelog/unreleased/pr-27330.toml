@@ -1,0 +1,5 @@
+
+type = "c"
+message = "Enable \"Remove matches from Default Stream\" by default when creating a stream on the Streams page, matching the Input Setup Wizard."
+
+pulls = ["27330"]

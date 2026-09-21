@@ -211,7 +211,7 @@ describe('createColumnRenderers', () => {
 
   it('renders the primary type as a single badge in the category column', () => {
     const cases: Array<[Partial<IncompatibleIndexRow>, string]> = [
-      [{ managed_index: true }, 'Graylog'],
+      [{ managed_index: true }, 'Managed'],
       [{ system_index: true }, 'System'],
       [{}, 'Foreign'],
     ];
@@ -231,7 +231,7 @@ describe('createColumnRenderers', () => {
 
     render(<div>{renderers.attributes.category.renderCell(undefined, index, undefined)}</div>);
 
-    expect(screen.getByText('Graylog')).toBeInTheDocument();
+    expect(screen.getByText('Managed')).toBeInTheDocument();
     expect(screen.getByText('Warm')).toBeInTheDocument();
   });
 
