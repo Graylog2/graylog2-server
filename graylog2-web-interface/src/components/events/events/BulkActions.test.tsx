@@ -81,7 +81,7 @@ const mockedEventActions: Array<EventAction> = [
     modal: React.forwardRef(() => <b>I am a modal without a bulk</b>),
   },
 ];
-const renderBulkAction = (selectedEntitiesData = mockedSelectedEntitiesData) =>
+const renderBulkAction = (selectedEntitiesData: { [eventId: string]: Event } = mockedSelectedEntitiesData) =>
   render(<BulkActions selectedEntitiesData={selectedEntitiesData} />);
 
 const openActionsDropdown = async () =>
