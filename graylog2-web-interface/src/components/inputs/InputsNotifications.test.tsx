@@ -35,7 +35,7 @@ jest.mock('routing/QueryParams', () => ({
   useQueryParams: jest.fn(),
 }));
 
-const buildInputState = (state: 'RUNNING' | 'FAILED' | 'FAILING' | 'SETUP') => ({
+const buildInputState = (state: 'RUNNING' | 'FAILED' | 'FAILING' | 'SETUP' | 'STOPPED') => ({
   state,
   id: 'state-id',
   detailed_message: null,
@@ -57,6 +57,7 @@ describe('<InputsNotifications />', () => {
         'input-1': {
           node1: buildInputState('FAILED'),
           node2: buildInputState('SETUP'),
+          node3: buildInputState('STOPPED'),
         },
       },
     });
@@ -71,7 +72,7 @@ describe('<InputsNotifications />', () => {
   it.each([
     ['Show failed inputs', 'FAILED'],
     ['Show inputs in setup mode', 'SETUP'],
-    ['Show stopped inputs', 'NOT_RUNNING'],
+    ['Show not running inputs', 'NOT_RUNNING'],
   ])('applies %s filter and resets table filter state', async (linkText, status) => {
     asMock(useInputsStates).mockReturnValue({
       isLoading: false,
@@ -80,6 +81,7 @@ describe('<InputsNotifications />', () => {
         'input-1': {
           node1: buildInputState('FAILED'),
           node2: buildInputState('SETUP'),
+          node3: buildInputState('STOPPED'),
         },
       },
     });
