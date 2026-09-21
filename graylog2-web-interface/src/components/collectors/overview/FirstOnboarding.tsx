@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Alert } from 'components/bootstrap';
+import useProductName from 'brand-customization/useProductName';
 import { ClipboardButton, Spinner } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getMajorAndMinorVersion } from 'util/Version';
@@ -105,6 +106,8 @@ const FirstOnboarding = () => {
   // Confirming the endpoint moves an existing input to the chosen port, which is an input edit.
   const canEditIngestInputs = isCloud || collectorInputIds.every((id) => canEditIngestInput(id));
 
+  const productName = useProductName();
+
   const buildCommand = useCallback((platformId: PlatformId, token: string) => {
     const platform = PLATFORMS.find((p) => p.id === platformId);
 
@@ -117,13 +120,13 @@ const FirstOnboarding = () => {
     const version = getMajorAndMinorVersion();
     const fleet = await createFleet({
       name: `Onboarding - ${formatDate()}`,
-      description: `Created by Graylog ${version} onboarding wizard`,
+      description: `Created by ${productName} ${version} onboarding wizard`,
     });
 
     await Promise.all(DEFAULT_SOURCES.map((source) => createSource({ fleetId: fleet.id, source, silent: true })));
 
     return fleet;
-  }, [createFleet, createSource]);
+  }, [createFleet, createSource, productName]);
 
   // The fleet to use without asking the user: none -> create one (only when permitted), exactly
   // one -> use it, more than one -> null (the user must decide via the fleet-choice UI). A user

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.events;
+package org.graylog.datanode.opensearch;
 
-public record CollectorCaConfigUpdated() {
+public record OpensearchStartRequestedEvent() {
 }
