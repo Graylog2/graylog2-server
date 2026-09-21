@@ -2,3 +2,4 @@ type = "fixed"
 message = "Fixed a race condition that made the initial Geo-Location Processor database download from the cloud fail on node startup, leaving the node processing messages without geo enrichment. Successful downloads are now logged at INFO level."
 
 issues = ["26880"]
+pulls = ["27440"]
