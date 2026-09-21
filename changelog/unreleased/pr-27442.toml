@@ -12,3 +12,4 @@ stable regardless of a record's magnitude.
 """
 
 issues = ["Graylog2/collector#94"]
+pulls = ["27442"]
