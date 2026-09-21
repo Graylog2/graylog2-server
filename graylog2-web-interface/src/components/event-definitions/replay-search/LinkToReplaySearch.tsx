@@ -20,6 +20,8 @@ import React from 'react';
 import Routes from 'routing/Routes';
 import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
 import useParams from 'routing/useParams';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
 type Props = {
@@ -36,18 +38,23 @@ const LinkToReplaySearch = ({
   onClick = undefined,
   isMenuitem = false,
 }: Props) => {
+  const { permissions } = useCurrentUser();
   const { definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
   const replaySearchEventDefinitionId = eventDefinitionId || (!isEvent ? id || definitionId : undefined);
+
+  if (
+    replaySearchEventDefinitionId &&
+    !isPermitted(permissions, `eventdefinitions:read:${replaySearchEventDefinitionId}`)
+  ) {
+    return null;
+  }
+
   const searchLink = isEvent
     ? Routes.ALERTS.replay_search(id)
     : Routes.ALERTS.DEFINITIONS.replay_search(replaySearchEventDefinitionId);
 
   return (
-    <ReplaySearchButtonComponent
-      searchLink={searchLink}
-      onClick={onClick}
-      component={isMenuitem ? MenuItem : undefined}
-      eventDefinitionId={replaySearchEventDefinitionId}>
+    <ReplaySearchButtonComponent searchLink={searchLink} onClick={onClick} component={isMenuitem ? MenuItem : undefined}>
       Replay search
     </ReplaySearchButtonComponent>
   );

@@ -23,8 +23,6 @@ import URI from 'urijs';
 import IconButton from 'components/common/IconButton';
 import Icon from 'components/common/Icon';
 import { LinkContainer } from 'components/common';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
 import SearchLink from 'views/logic/search/SearchLink';
 import Store from 'logic/local-storage/Store';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -94,24 +92,17 @@ export const ReplaySearchButtonComponent = ({
   onClick = undefined,
   component: Component = NeutralLink,
   newTab = false,
-  eventDefinitionId = undefined,
 }: {
   children?: React.ReactNode;
   searchLink: string;
   onClick?: () => void;
   component?: React.ComponentType<CustomComponentProps>;
   newTab?: boolean;
-  eventDefinitionId?: string;
 }) => {
-  const currentUser = useCurrentUser(false);
   const title = 'Replay search';
   const newTabProps = newTab
     ? { href: searchLink, target: '_blank' as const, rel: 'noopener noreferrer' as const }
     : {};
-
-  if (eventDefinitionId && !isPermitted(currentUser?.permissions, `eventdefinitions:read:${eventDefinitionId}`)) {
-    return null;
-  }
 
   const button = children ? (
     <Component title={title} onClick={onClick} {...newTabProps}>
@@ -133,7 +124,6 @@ type Props = {
   filters?: FiltersType;
   parameterBindings?: ParameterBindings;
   newTab?: boolean;
-  eventDefinitionId?: string;
 };
 
 const ReplaySearchButton = ({
@@ -145,7 +135,6 @@ const ReplaySearchButton = ({
   filters = undefined,
   parameterBindings = undefined,
   newTab = false,
-  eventDefinitionId = undefined,
 }: Props) => {
   const sessionId = useMemo(() => `replay-search-${generateId()}`, []);
   const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters, filters);
@@ -163,14 +152,7 @@ const ReplaySearchButton = ({
     }
   }, [sessionId, parameters, parameterBindings, filters]);
 
-  return (
-    <ReplaySearchButtonComponent
-      searchLink={searchLink}
-      onClick={onReplaySearch}
-      newTab={newTab}
-      eventDefinitionId={eventDefinitionId}
-    />
-  );
+  return <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch} newTab={newTab} />;
 };
 
 export default ReplaySearchButton;
