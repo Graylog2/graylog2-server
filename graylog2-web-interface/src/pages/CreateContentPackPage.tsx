@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { SystemCatalog } from '@graylog/server-api';
 
@@ -31,11 +31,13 @@ import useHistory from 'routing/useHistory';
 import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
+import { mergeEntityCatalog } from 'logic/content-packs/EntityCatalog';
 
 const CreateContentPackPage = () => {
   const productName = useProductName();
   const history = useHistory();
   const { entityIndex } = useEntityIndex();
+  const entityCatalog = useMemo(() => mergeEntityCatalog(entityIndex, undefined), [entityIndex]);
   const [contentPackState, setContentPackState] = useState({
     contentPack: ContentPack.builder().build(),
     appliedParameter: {},
@@ -123,7 +125,7 @@ const CreateContentPackPage = () => {
           fetchedEntities={contentPackState.fetchedEntities}
           selectedEntities={contentPackState.selectedEntities}
           appliedParameter={contentPackState.appliedParameter}
-          entityIndex={entityIndex}
+          entityIndex={entityCatalog}
           onSave={_onSave}
         />
       </span>

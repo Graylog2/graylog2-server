@@ -69,12 +69,23 @@ const StyledAccordionControl = styled(Accordion.Control)`
   padding-right: 0;
 `;
 
+/* The accordion control is a button itself, so anything interactive has to sit beside it rather than inside it. */
+const ControlRow = styled.div`
+  display: flex;
+  align-items: center;
+
+  > .mantine-Accordion-control {
+    flex: 1;
+  }
+`;
+
 type Props = React.PropsWithChildren<{
   header: React.ReactNode;
   value: string;
   children?: React.ReactNode;
   expandable?: boolean;
   subheader?: React.ReactNode;
+  actions?: React.ReactNode;
 }>;
 
 const ExpandableListItem = ({
@@ -82,6 +93,7 @@ const ExpandableListItem = ({
   children = undefined,
   value,
   subheader = undefined,
+  actions = undefined,
   expandable = true,
 }: Props) => {
   if (!expandable) {
@@ -89,16 +101,20 @@ const ExpandableListItem = ({
       <NonInteractiveItem className={nonInteractiveListItemClass}>
         {header}
         {subheader && <Subheader>{subheader}</Subheader>}
+        {actions}
       </NonInteractiveItem>
     );
   }
 
   return (
     <StyledAccordionItem value={value}>
-      <StyledAccordionControl>
-        {header}
-        {subheader && <Subheader>{subheader}</Subheader>}
-      </StyledAccordionControl>
+      <ControlRow>
+        <StyledAccordionControl>
+          {header}
+          {subheader && <Subheader>{subheader}</Subheader>}
+        </StyledAccordionControl>
+        {actions}
+      </ControlRow>
       <Accordion.Panel>
         <ContentContainer>{children}</ContentContainer>
       </Accordion.Panel>

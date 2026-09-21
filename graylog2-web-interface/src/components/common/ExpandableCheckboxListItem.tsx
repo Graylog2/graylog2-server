@@ -43,6 +43,7 @@ const Header = ({ checked, readOnly, onChange, children, indeterminate }) => (
   </span>
 );
 type Props = React.PropsWithChildren<{
+  actions?: React.ReactNode;
   checked: boolean;
   expandable?: boolean;
   header: React.ReactNode;
@@ -54,6 +55,7 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const ExpandableCheckboxListItem = ({
+  actions = undefined,
   checked,
   children = undefined,
   expandable = undefined,
@@ -68,6 +70,7 @@ const ExpandableCheckboxListItem = ({
     value={value}
     expandable={expandable}
     subheader={subheader}
+    actions={actions}
     header={
       <Header onChange={onChange} checked={checked} readOnly={readOnly} indeterminate={indeterminate}>
         {header}

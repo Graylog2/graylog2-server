@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import groupBy from 'lodash/groupBy';
 
 import { SystemCatalog } from '@graylog/server-api';
 
@@ -36,6 +35,8 @@ import useProductName from 'brand-customization/useProductName';
 import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
+import useContentPackInstallations from 'components/content-packs/hooks/useContentPackInstallations';
+import { installedEntityIds, isEntityOfRow, mergeEntityCatalog } from 'logic/content-packs/EntityCatalog';
 
 const EditContentPackPage = () => {
   const productName = useProductName();
@@ -48,6 +49,7 @@ const EditContentPackPage = () => {
   const [contentPackEntities, setContentPackEntities] = useState(undefined);
   const [fetchedEntities, setFetchedEntities] = useState(undefined);
   const { data: revisionData } = useContentPackRevisions(contentPackId);
+  const { data: installationData } = useContentPackInstallations(contentPackId);
 
   useEffect(() => {
     if (!revisionData) return;
@@ -65,15 +67,10 @@ const EditContentPackPage = () => {
       return {};
     }
 
-    const groupedContentPackEntities = groupBy(contentPackEntities, 'type.name');
+    const serverIdsByPackEntityId = installedEntityIds(installationData?.installations, parseInt(contentPackRev, 10));
 
-    return Object.fromEntries(
-      Object.keys(entityIndex).map((entityType) => [
-        entityType,
-        entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []),
-      ]),
-    );
-  }, [contentPack, entityIndex, contentPackEntities]);
+    return mergeEntityCatalog(entityIndex, contentPackEntities, serverIdsByPackEntityId);
+  }, [contentPack, entityIndex, contentPackEntities, installationData, contentPackRev]);
 
   useEffect(() => {
     if (!contentPack || !entityIndex) {
@@ -83,7 +80,7 @@ const EditContentPackPage = () => {
     const newSelectedEntities = contentPack.entities.reduce((result, entity) => {
       if (
         entityCatalog[entity.type.name] &&
-        entityCatalog[entity.type.name].findIndex((fetchedEntity) => fetchedEntity.id === entity.id) >= 0
+        entityCatalog[entity.type.name].findIndex((row) => isEntityOfRow(row, entity)) >= 0
       ) {
         const newResult = result;
 

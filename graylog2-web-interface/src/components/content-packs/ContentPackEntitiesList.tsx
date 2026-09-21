@@ -32,14 +32,14 @@ const EntityIcon = ({ entity }: EntityIconProps) => {
   if (!entity.fromServer) {
     return (
       <span>
-        <Icon title="Content Pack" name="inventory_2" className={ContentPackEntitiesListStyle.contentPackEntity} />
+        <Icon title="Content Pack" name="package_2" className={ContentPackEntitiesListStyle.contentPackEntity} />
       </span>
     );
   }
 
   return (
     <span>
-      <Icon title="Server" name="dns" />
+      <Icon title="Server" name="database" />
     </span>
   );
 };

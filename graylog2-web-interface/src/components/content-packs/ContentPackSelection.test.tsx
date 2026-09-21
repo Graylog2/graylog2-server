@@ -21,6 +21,8 @@ import userEvent from '@testing-library/user-event';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
+import EntityIndex from 'logic/content-packs/EntityIndex';
+import { mergeEntityCatalog } from 'logic/content-packs/EntityCatalog';
 
 import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
 
@@ -28,6 +30,30 @@ jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 jest.useFakeTimers();
 
 const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
+/* A collapsed group does not render its entities, so a test that works on rows has to open the group first. */
+/*
+ * The checkbox in a group header swallows clicks, so a group only opens from the accordion control around it. That
+ * control has no accessible name of its own, since the embedded checkbox takes the header text out of the
+ * computation, so it is found by the text it renders.
+ */
+const expandGroup = async (group: string = 'Spaceship') => {
+  const control = screen.getAllByRole('button').find((button) => button.textContent === group);
+
+  await setupUser().click(control);
+};
+
+const spaceshipType = { name: 'spaceship', version: '1' };
+
+const serverEntity = (id: string, title: string) => EntityIndex.create(id, title, spaceshipType as any);
+
+const packEntity = (id: string, title: string) =>
+  Entity.builder()
+    .v('1')
+    .type(spaceshipType)
+    .id(id)
+    .data({ title: { '@value': title, '@type': 'string' } })
+    .build();
 
 describe('<ContentPackSelection />', () => {
   it('renders with empty content pack', () => {
@@ -46,14 +72,7 @@ describe('<ContentPackSelection />', () => {
       .url('http://example.com')
       .build();
 
-    const entity = Entity.builder()
-      .v('1')
-      .type({ name: 'spaceship', version: '1' })
-      .id('beef123')
-      .data({ title: { '@value': 'breq', '@type': 'string' } })
-      .build();
-
-    const entities = { spaceship: [entity] };
+    const entities = mergeEntityCatalog(undefined, [packEntity('beef123', 'breq')]);
 
     render(<ContentPackSelection contentPack={contentPack} edit entities={entities} selectedEntities={{}} />);
 
@@ -90,18 +109,11 @@ describe('<ContentPackSelection />', () => {
 
   it('adds an entity when content selection is checked', async () => {
     const contentPack = {};
-    const entities = {
-      spaceship: [
-        {
-          title: 'breq',
-          type: { name: 'spaceship', version: '1' },
-          id: 'beef123',
-        },
-      ],
-    };
+    const breq = serverEntity('beef123', 'breq');
+    const entities = mergeEntityCatalog({ spaceship: [breq] }, undefined);
 
     const changeFn = jest.fn((newState) => {
-      expect(newState.selectedEntities).toEqual(entities);
+      expect(newState.selectedEntities).toEqual({ spaceship: [breq] });
     });
 
     render(
@@ -120,17 +132,9 @@ describe('<ContentPackSelection />', () => {
   });
 
   describe('with several entities', () => {
-    const breq = {
-      title: 'breq',
-      type: { name: 'spaceship', version: '1' },
-      id: 'beef123',
-    };
-    const falcon = {
-      title: 'falcon',
-      type: { name: 'spaceship', version: '1' },
-      id: 'beef124',
-    };
-    const entities = { spaceship: [breq, falcon] };
+    const breq = serverEntity('beef123', 'breq');
+    const falcon = serverEntity('beef124', 'falcon');
+    const entities = mergeEntityCatalog({ spaceship: [breq, falcon] }, undefined);
 
     it('removes an entity when content selection is unchecked', async () => {
       const contentPack = {};
@@ -147,6 +151,8 @@ describe('<ContentPackSelection />', () => {
         />,
       );
 
+      await expandGroup();
+
       const checkboxes = screen.getAllByRole('checkbox', { hidden: true });
       await setupUser().click(checkboxes[1]);
 
@@ -154,6 +160,123 @@ describe('<ContentPackSelection />', () => {
         expect.objectContaining({
           selectedEntities: { spaceship: [falcon] },
         }),
+      );
+    });
+
+    it('shows one row per entity when a server copy and a pack copy exist', async () => {
+      const contentPack = {};
+      const bothSources = mergeEntityCatalog({ spaceship: [breq] }, [packEntity('beef123', 'breq')]);
+
+      render(<ContentPackSelection contentPack={contentPack} edit entities={bothSources} selectedEntities={{}} />);
+
+      await expandGroup();
+
+      expect(await screen.findAllByRole('checkbox', { name: /breq/i, hidden: true })).toHaveLength(1);
+    });
+
+    /* The two copies of an entity never share an id in practice, so pairing relies on the installation record. */
+    it('pairs copies with unrelated ids through the installation mapping', async () => {
+      const contentPack = {};
+      const packCopy = packEntity('uuid-breq', 'breq');
+      const paired = mergeEntityCatalog({ spaceship: [breq] }, [packCopy], { 'uuid-breq': 'beef123' });
+
+      render(<ContentPackSelection contentPack={contentPack} edit entities={paired} selectedEntities={{}} />);
+
+      await expandGroup();
+
+      expect(await screen.findAllByRole('checkbox', { name: /breq/i, hidden: true })).toHaveLength(1);
+    });
+
+    it('keeps copies with unrelated ids apart when there is no installation mapping', async () => {
+      const contentPack = {};
+      const unpaired = mergeEntityCatalog({ spaceship: [breq] }, [packEntity('uuid-breq', 'breq')]);
+
+      render(<ContentPackSelection contentPack={contentPack} edit entities={unpaired} selectedEntities={{}} />);
+
+      await expandGroup();
+
+      expect(await screen.findAllByRole('checkbox', { name: /breq/i, hidden: true })).toHaveLength(2);
+    });
+
+    it('switches every selected entity of a group to the server copy', async () => {
+      const contentPack = {};
+      const breqPack = packEntity('beef123', 'breq');
+      const falconPack = packEntity('beef124', 'falcon');
+      const bothSources = mergeEntityCatalog({ spaceship: [breq, falcon] }, [breqPack, falconPack]);
+      const changeFn = jest.fn();
+
+      render(
+        <ContentPackSelection
+          contentPack={contentPack}
+          edit
+          entities={bothSources}
+          selectedEntities={{ spaceship: [breqPack, falconPack] }}
+          onStateChange={changeFn}
+        />,
+      );
+
+      await expandGroup();
+
+      const [groupServerButton] = await screen.findAllByRole('button', {
+        name: /use the installed instance for every entity checked in this group/i,
+        hidden: true,
+      });
+      await setupUser().click(groupServerButton);
+
+      expect(changeFn).toHaveBeenCalledWith(
+        expect.objectContaining({ selectedEntities: { spaceship: [breq, falcon] } }),
+      );
+    });
+
+    /* Every row keeps the same controls, so a row with one copy shows the other side disabled instead of nothing. */
+    it('disables the source a row does not have', async () => {
+      const contentPack = {};
+      const packOnly = packEntity('beef999', 'ghost');
+      const entitiesWithGhost = mergeEntityCatalog({ spaceship: [breq] }, [packOnly]);
+
+      render(
+        <ContentPackSelection
+          contentPack={contentPack}
+          edit
+          entities={entitiesWithGhost}
+          selectedEntities={{ spaceship: [packOnly] }}
+        />,
+      );
+
+      await expandGroup();
+
+      expect(
+        await screen.findByRole('button', { name: /there is no installed instance of this entity on this server/i, hidden: true }),
+      ).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('leaves entities without a server copy on the pack copy', async () => {
+      const contentPack = {};
+      const breqPack = packEntity('beef123', 'breq');
+      const packOnly = packEntity('beef999', 'ghost');
+      const bothSources = mergeEntityCatalog({ spaceship: [breq] }, [breqPack, packOnly]);
+      const changeFn = jest.fn();
+
+      render(
+        <ContentPackSelection
+          contentPack={contentPack}
+          edit
+          entities={bothSources}
+          selectedEntities={{ spaceship: [breqPack, packOnly] }}
+          onStateChange={changeFn}
+        />,
+      );
+
+      await expandGroup();
+
+      const [groupServerButton] = await screen.findAllByRole('button', {
+        name: /use the installed instance for every entity checked in this group/i,
+        hidden: true,
+      });
+      await setupUser().click(groupServerButton);
+
+      expect(changeFn).toHaveBeenCalledWith(
+        expect.objectContaining({ selectedEntities: { spaceship: [breq, packOnly] } }),
       );
     });
 
@@ -174,6 +297,9 @@ describe('<ContentPackSelection />', () => {
 
       const resetButton = screen.getByRole('button', { name: /reset search/i, hidden: true });
       await setupUser().click(resetButton);
+
+      /* Clearing the filter collapses the groups again, so the rows are back only once one is opened. */
+      await expandGroup();
 
       await screen.findByRole('checkbox', { name: /falcon/i, hidden: true });
       await screen.findByRole('checkbox', { name: /breq/i, hidden: true });

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { Icon, SearchForm } from 'components/common';
 import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -23,8 +22,14 @@ import { getValueFromInput } from 'util/FormsUtils';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 import InputDescription from 'components/common/InputDescription';
 import ContentPackSelectionList from 'components/content-packs/ContentPackSelectionList';
-
-import style from './ContentPackSelection.css';
+import {
+  defaultEntity,
+  entityForSource,
+  isEntityOfRow,
+  rowEntityIds,
+  type CatalogEntity,
+  type EntitySource,
+} from 'logic/content-packs/EntityCatalog';
 
 type ContentPackSelectionProps = {
   contentPack: any;
@@ -135,19 +140,19 @@ class ContentPackSelection extends React.Component<
 
   _error = (name) => (this.state.touched[name] ? this.state.errors[name] : undefined);
 
+  /*
+   * The selection holds the entities themselves, which are deep structures, so only the array of the type being
+   * touched is copied. Cloning the whole selection here made every click on a large pack noticeably slow.
+   */
   _updateSelectionEntity = (entity) => {
     const { selectedEntities, onStateChange } = this.props;
     const typeName = entity.type.name;
-    const newSelection = cloneDeep(selectedEntities);
+    const current = selectedEntities[typeName] ?? [];
+    const index = current.findIndex((e) => isEntityOfRow(entity, e));
+    const newSelection = { ...selectedEntities };
 
-    newSelection[typeName] = newSelection[typeName] || [];
-    const index = newSelection[typeName].findIndex((e) => e.id === entity.id);
-
-    if (index < 0) {
-      newSelection[typeName].push(entity);
-    } else {
-      newSelection[typeName].splice(index, 1);
-    }
+    newSelection[typeName] =
+      index < 0 ? [...current, defaultEntity(entity)] : [...current.slice(0, index), ...current.slice(index + 1)];
 
     this._handleTouched('selection');
     this._validate(newSelection);
@@ -158,19 +163,71 @@ class ContentPackSelection extends React.Component<
     const { selectedEntities, entities, onStateChange } = this.props;
     const { isFiltered, filteredEntities } = this.state;
 
-    const newSelection = cloneDeep(selectedEntities);
+    const newSelection = { ...selectedEntities };
 
     if (isFiltered) {
-      if (newSelection[type]) {
-        newSelection[type] = [...newSelection[type], ...filteredEntities[type]];
-      } else {
-        newSelection[type] = filteredEntities[type];
-      }
+      const selectedIds = new Set((newSelection[type] ?? []).map((entity) => entity.id));
+      const newlySelected = filteredEntities[type]
+        .filter((entity: CatalogEntity) => !rowEntityIds(entity).some((id) => selectedIds.has(id)))
+        .map((entity) => defaultEntity(entity));
+
+      newSelection[type] = [...(newSelection[type] ?? []), ...newlySelected];
     } else if (this._isGroupSelected(type)) {
       newSelection[type] = [];
     } else {
-      newSelection[type] = entities[type];
+      newSelection[type] = entities[type].map((entity) => defaultEntity(entity));
     }
+
+    this._handleTouched('selection');
+    this._validate(newSelection);
+    onStateChange({ selectedEntities: newSelection });
+  };
+
+  /* Switches which copy of a single entity gets exported. */
+  _updateEntitySource = (entity, source: EntitySource) => {
+    const { selectedEntities, onStateChange } = this.props;
+    const typeName = entity.type.name;
+    const replacement = entityForSource(entity, source);
+
+    if (!replacement) {
+      return;
+    }
+
+    const current = selectedEntities[typeName] ?? [];
+    const isSelected = current.some((selected) => isEntityOfRow(entity, selected));
+    const newSelection = { ...selectedEntities };
+
+    /* Picking a source for an entity that is not checked yet selects it, so the control never needs two clicks. */
+    newSelection[typeName] = isSelected
+      ? current.map((selected) => (isEntityOfRow(entity, selected) ? replacement : selected))
+      : [...current, replacement];
+
+    this._handleTouched('selection');
+    this._validate(newSelection);
+    onStateChange({ selectedEntities: newSelection });
+  };
+
+  /*
+   * Switches which copy of each selected entity in a group gets exported. Entities that only exist in one place
+   * are left alone, so acting on a group that has nothing to choose from is a no-op.
+   */
+  _updateGroupSource = (type: string, source: EntitySource) => {
+    const { selectedEntities, onStateChange } = this.props;
+    const { filteredEntities } = this.state;
+
+    /* Keyed by both of a row's ids, since the selection may hold either copy. */
+    const catalogEntities: Map<string, CatalogEntity> = new Map(
+      (filteredEntities[type] ?? []).flatMap((entity: CatalogEntity) =>
+        rowEntityIds(entity).map((id) => [id, entity] as [string, CatalogEntity]),
+      ),
+    );
+    const newSelection = { ...selectedEntities };
+
+    newSelection[type] = (newSelection[type] ?? []).map((selected) => {
+      const replacement = entityForSource(catalogEntities.get(selected.id), source);
+
+      return replacement ?? selected;
+    });
 
     this._handleTouched('selection');
     this._validate(newSelection);
@@ -200,7 +257,7 @@ class ContentPackSelection extends React.Component<
     const filter = filterArg;
 
     if (filter.length <= 0) {
-      this.setState({ filteredEntities: cloneDeep(entities), isFiltered: false, filter: filter });
+      this.setState({ filteredEntities: entities, isFiltered: false, filter: filter });
 
       return;
     }
@@ -307,9 +364,11 @@ class ContentPackSelection extends React.Component<
             <h2>Content Pack selection</h2>
             {edit && (
               <HelpBlock>
-                You can select between installed entities from the server (<Icon name="dns" />) or entities from the
-                former content pack revision (<Icon name="archive" className={style.contentPackEntity} />
-                ).
+                For each entity you can export the currently installed instance (<Icon name="database" />) or the
+                instance from the content pack revision you picked when creating this new version (
+                <Icon name="package_2" />
+                ). Use the buttons on an entity to choose which one, or the buttons on an entity type to change every
+                entity checked in it at once.
               </HelpBlock>
             )}
           </Col>
@@ -329,6 +388,8 @@ class ContentPackSelection extends React.Component<
               isGroupSelected={this._isGroupSelected}
               updateSelectionEntity={this._updateSelectionEntity}
               updateSelectionGroup={this._updateSelectionGroup}
+              updateGroupSource={edit ? this._updateGroupSource : undefined}
+              updateEntitySource={edit ? this._updateEntitySource : undefined}
             />
           </Col>
         </Row>
