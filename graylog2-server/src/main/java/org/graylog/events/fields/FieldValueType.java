@@ -27,7 +27,9 @@ public enum FieldValueType implements FieldTypeValidator {
     @JsonProperty("string")
     STRING(NoopFieldTypeValidator.INSTANCE),
     @JsonProperty("error")
-    ERROR(NoopFieldTypeValidator.INSTANCE, true);
+    ERROR(NoopFieldTypeValidator.INSTANCE, true),
+    @JsonProperty("absent")
+    ABSENT(NoopFieldTypeValidator.INSTANCE);
 
     private final FieldTypeValidator validator;
     private final boolean isError;
@@ -43,6 +45,11 @@ public enum FieldValueType implements FieldTypeValidator {
 
     public boolean isError() {
         return isError;
+    }
+
+    // Providers return ABSENT to decline producing a field.
+    public boolean isAbsent() {
+        return this == ABSENT;
     }
 
     @Override
