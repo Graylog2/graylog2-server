@@ -33,8 +33,9 @@ const CollectorsFleetsPage = () => {
     return <Spinner />;
   }
 
+  // Unconfigured: the overview's onboarding wizard starts with the ingest setup step.
   if (!config?.signing_cert_id) {
-    return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
+    return <Navigate to={Routes.SYSTEM.COLLECTORS.OVERVIEW} />;
   }
 
   return (
