@@ -23,15 +23,13 @@ import usePermissions from 'hooks/usePermissions';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
 type Props = {
-  id?: string;
-  eventDefinitionId: string;
-  isEvent?: boolean;
+  eventId?: string;
+  eventDefinitionId?: string;
   onClick?: () => void;
   isMenuitem?: boolean;
 };
 const LinkToReplaySearch = ({
-  isEvent = false,
-  id = undefined,
+  eventId = undefined,
   eventDefinitionId = undefined,
   onClick = undefined,
   isMenuitem = false,
@@ -42,8 +40,8 @@ const LinkToReplaySearch = ({
     return null;
   }
 
-  const searchLink = isEvent
-    ? Routes.ALERTS.replay_search(id)
+  const searchLink = eventId
+    ? Routes.ALERTS.replay_search(eventId)
     : Routes.ALERTS.DEFINITIONS.replay_search(eventDefinitionId);
 
   return (

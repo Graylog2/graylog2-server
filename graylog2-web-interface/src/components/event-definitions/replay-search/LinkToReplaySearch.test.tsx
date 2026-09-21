@@ -44,7 +44,7 @@ describe('LinkToReplaySearch', () => {
   });
 
   it('checks permission for the event definition of the event, when linking to an event', () => {
-    render(<LinkToReplaySearch id="event-id" eventDefinitionId="event-definition-id" isEvent />);
+    render(<LinkToReplaySearch eventId="event-id" eventDefinitionId="event-definition-id" />);
 
     expect(screen.queryByRole('link', { name: /replay search/i })).not.toBeInTheDocument();
   });

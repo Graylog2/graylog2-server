@@ -38,9 +38,8 @@ const useEventAction = (event: Event) => {
             key="replay-search"
             isMenuitem
             onClick={() => sendEventActionTelemetry('REPLAY_SEARCH', false)}
-            id={event.id}
+            eventId={event.id}
             eventDefinitionId={event.event_definition_id}
-            isEvent
           />
         ) : null,
         pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
