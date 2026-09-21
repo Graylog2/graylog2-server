@@ -24,7 +24,7 @@ import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
 type Props = {
   id?: string;
-  eventDefinitionId?: string;
+  eventDefinitionId: string;
   isEvent?: boolean;
   onClick?: () => void;
   isMenuitem?: boolean;
