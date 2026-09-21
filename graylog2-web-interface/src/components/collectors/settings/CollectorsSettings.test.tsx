@@ -108,6 +108,16 @@ describe('CollectorsSettings', () => {
     expect(screen.queryByRole('heading', { name: 'gRPC' })).not.toBeInTheDocument();
   });
 
+  it('shows the lifecycle thresholds', async () => {
+    render(<CollectorsSettings />);
+
+    await screen.findByRole('heading', { name: 'Collector Lifecycle' });
+
+    expect(screen.getByLabelText('Offline threshold')).toBeVisible();
+    expect(screen.getByLabelText('Default visibility')).toBeVisible();
+    expect(screen.getByLabelText('Expiration threshold')).toBeVisible();
+  });
+
   it('saves config with create_input false when already configured', async () => {
     const user = userEvent.setup();
 
@@ -328,28 +338,6 @@ describe('CollectorsSettings telemetry', () => {
           input_count: 1,
         }),
       );
-    });
-  });
-
-  it('emits ADVANCED_TOGGLED when the advanced options section is opened and closed', async () => {
-    const user = userEvent.setup();
-
-    render(<CollectorsSettings />);
-
-    const toggle = await screen.findByRole('button', { name: /advanced options/i });
-
-    await user.click(toggle);
-
-    expect(sendTelemetry).toHaveBeenCalledWith('Collector Settings Advanced Options Toggled', {
-      app_action_value: 'settings-advanced-toggle',
-      opened: true,
-    });
-
-    await user.click(toggle);
-
-    expect(sendTelemetry).toHaveBeenCalledWith('Collector Settings Advanced Options Toggled', {
-      app_action_value: 'settings-advanced-toggle',
-      opened: false,
     });
   });
 });

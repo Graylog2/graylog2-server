@@ -1,0 +1,4 @@
+type = "c"
+message = "Show the Collector Lifecycle thresholds directly on the Collectors settings page instead of behind an \"Advanced options\" disclosure."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15421"]
