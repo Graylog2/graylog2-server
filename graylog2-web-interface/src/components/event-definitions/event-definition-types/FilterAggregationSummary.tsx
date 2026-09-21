@@ -266,7 +266,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
       )}
       <dt>Actions</dt>
       <dd>
-        <LinkToReplaySearch id={definitionId} />
+        <LinkToReplaySearch eventDefinitionId={definitionId} />
       </dd>
     </dl>
   );
