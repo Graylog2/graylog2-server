@@ -16,25 +16,21 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import * as Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { alice } from 'fixtures/users';
+import usePermissions from 'hooks/usePermissions';
 
 import LinkToReplaySearch from './LinkToReplaySearch';
 
-jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/usePermissions');
 
 describe('LinkToReplaySearch', () => {
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(alice);
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => false, isAnyPermitted: () => false });
   });
 
   it('renders play button when user can read the event definition', async () => {
-    asMock(useCurrentUser).mockReturnValue(
-      alice.toBuilder().permissions(Immutable.List(['eventdefinitions:read:event-definition-id'])).build(),
-    );
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
 
     render(<LinkToReplaySearch eventDefinitionId="event-definition-id" />);
 
