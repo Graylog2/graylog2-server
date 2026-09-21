@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
@@ -322,42 +321,29 @@ public abstract class GeoIpFileService {
     @VisibleForTesting
     void moveTempFilesToActive() throws IOException {
         Files.move(tempCityPath, cityPath, StandardCopyOption.REPLACE_EXISTING);
-        cityFileLastModified = stampLastModified(cityPath, tempCityFileLastModified);
+        cityFileLastModified = tempCityFileLastModified;
         if (Files.exists(tempAsnPath)) {
             Files.move(tempAsnPath, asnPath, StandardCopyOption.REPLACE_EXISTING);
-            asnFileLastModified = stampLastModified(asnPath, tempAsnFileLastModified);
+            asnFileLastModified = tempAsnFileLastModified;
         }
         tempAsnFileLastModified = null;
         tempCityFileLastModified = null;
     }
 
     /**
-     * Records the source timestamp as the active file's modification time so that "did we already sync this version?"
-     * can be answered from the file system, which is the only state shared between concurrent refresh attempts and the
-     * only state that survives a restart.
-     */
-    private Instant stampLastModified(Path path, Instant sourceTimestamp) throws IOException {
-        if (sourceTimestamp == null) {
-            return Instant.ofEpochMilli(path.toFile().lastModified());
-        }
-        Files.setLastModifiedTime(path, FileTime.from(sourceTimestamp));
-        return sourceTimestamp;
-    }
-
-    /**
-     * Whether the file on the server is newer than the most recent sync this node knows about.
+     * Whether the file on the server has been modified since this node last wrote it to disk.
      *
      * <p>
-     * The modification time on disk is consulted alongside this instance's own record because the factory hands out a
-     * new instance per call: an instance created before a concurrent attempt finished downloading has recorded nothing,
-     * and would otherwise download the same files again. Comparison is in whole milliseconds, which is the resolution
-     * {@link File#lastModified()} reports.
+     * The active file's modification time is the moment this node wrote it, so it answers the question on its own and,
+     * unlike this instance's field, it is shared between concurrent refresh attempts. The factory hands out a new
+     * instance per call, so the attempt queued behind a download was constructed before the file existed and has
+     * recorded nothing; consulting the file system is what stops it downloading the same files again.
      * </p>
      */
     private boolean isNewerThanSynced(Instant serverTimestamp, Path path, Instant recordedSync) {
-        final long lastSynced = Math.max(path.toFile().lastModified(),
+        final long syncedAt = Math.max(path.toFile().lastModified(),
                 recordedSync == null ? 0L : recordedSync.toEpochMilli());
-        return serverTimestamp.toEpochMilli() > lastSynced;
+        return serverTimestamp.toEpochMilli() > syncedAt;
     }
 
     /**

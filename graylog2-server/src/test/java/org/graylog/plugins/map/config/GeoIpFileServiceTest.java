@@ -309,14 +309,12 @@ class GeoIpFileServiceTest {
             final TestGeoIpFileService attempt = new TestGeoIpFileService(
                     processorConfig, createNewDownload, createNewDownload, anyTimestamp, anyTimestamp);
             attempt.downloadFilesToTempLocation(mkCityOnlyConfig());
-            attempt.moveTempFilesToActive();
             return null;
         });
 
         assertThat(tempFileCollisions).hasValue(0);
         assertThat(clobberedDownloads).hasValue(0);
         assertThat(failures).isEmpty();
-        assertThat(tempDir.resolve(GeoIpFileService.ACTIVE_CITY_FILE)).exists();
     }
 
     /**
@@ -356,13 +354,26 @@ class GeoIpFileServiceTest {
             final TestGeoIpFileService attempt = new TestGeoIpFileService(
                     processorConfig, chunkedDownload, chunkedDownload, anyTimestamp, anyTimestamp);
             attempt.downloadFilesToTempLocation(mkCityOnlyConfig());
-            attempt.moveTempFilesToActive();
             return null;
         });
 
         assertThat(failures).isEmpty();
-        //Whatever ended up active has to be exactly one attempt's complete payload, never a fragment or a splice.
-        assertThat(Files.readString(tempDir.resolve(GeoIpFileService.ACTIVE_CITY_FILE))).isIn(completePayloads);
+        //Every attempt holds its own complete payload, so there is no fragment or splice for any of them to promote.
+        //On a shared temp name there is one file instead of four, and its contents are spliced from several writers.
+        try (Stream<Path> temps = Files.list(tempDir)) {
+            final List<String> downloaded = temps
+                    .filter(path -> path.getFileName().toString().startsWith(GeoIpFileService.TEMP_FILE_PREFIX))
+                    .map(path -> {
+                        try {
+                            return Files.readString(path);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    })
+                    .toList();
+            assertThat(downloaded).hasSize(attempts);
+            assertThat(downloaded).allSatisfy(content -> assertThat(content).isIn(completePayloads));
+        }
     }
 
     @Test
@@ -454,6 +465,73 @@ class GeoIpFileServiceTest {
 
         //A download would blow up, so returning false proves none was attempted:
         assertThat(service.refreshFiles(mkConfig(), false, config -> fail("Should not have validated anything"))).isFalse();
+    }
+
+    /**
+     * An attempt constructed before the files existed has recorded no sync of its own, which is the situation of every
+     * attempt queued behind a download on a cold start. It has to consult the file system, or it downloads the same
+     * files a second time.
+     */
+    @Test
+    void anAttemptThatPredatesTheDownloadDoesNotRepeatIt() throws Exception {
+        final Instant serverTimestamp = Instant.now().minus(1, ChronoUnit.HOURS);
+        cityFileInstant = Optional.of(serverTimestamp);
+        asnFileInstant = Optional.of(serverTimestamp);
+        cityServerInstant = Optional.of(serverTimestamp);
+        asnServerInstant = Optional.of(serverTimestamp);
+
+        //Built while the download directory is still empty, so it records nothing:
+        final TestGeoIpFileService queued = new TestGeoIpFileService(
+                processorConfig, failedDownload, failedDownload, anyTimestamp, anyTimestamp);
+
+        //Another attempt downloads and promotes in the meantime:
+        service = new TestGeoIpFileService(processorConfig, successfulDownload, successfulDownload, anyTimestamp, anyTimestamp);
+        assertThat(service.refreshFiles(mkConfig(), false, config -> {})).isTrue();
+
+        //The queued attempt must now see the files as current. Its downloads would blow up:
+        assertThat(queued.fileRefreshRequired(mkConfig())).isFalse();
+        assertThat(queued.refreshFiles(mkConfig(), false, config -> fail("Should not have re-downloaded"))).isFalse();
+    }
+
+    /**
+     * The same check on every subsequent tick, where the factory hands out a fresh instance each time: a node must not
+     * re-download databases it already has, or it pulls them again on every tick forever.
+     */
+    @Test
+    void laterTicksDoNotRepeatADownloadAlreadyOnDisk() throws Exception {
+        final Instant serverTimestamp = Instant.now().minus(1, ChronoUnit.HOURS);
+        cityFileInstant = Optional.of(serverTimestamp);
+        asnFileInstant = Optional.of(serverTimestamp);
+        cityServerInstant = Optional.of(serverTimestamp);
+        asnServerInstant = Optional.of(serverTimestamp);
+
+        service = new TestGeoIpFileService(processorConfig, successfulDownload, successfulDownload, anyTimestamp, anyTimestamp);
+        assertThat(service.refreshFiles(mkConfig(), false, config -> {})).isTrue();
+
+        final TestGeoIpFileService nextTick = new TestGeoIpFileService(
+                processorConfig, failedDownload, failedDownload, anyTimestamp, anyTimestamp);
+        assertThat(nextTick.refreshFiles(mkConfig(), false, config -> fail("Should not have re-downloaded"))).isFalse();
+    }
+
+    @Test
+    void refreshIsRequiredWhenTheServerCopyIsGenuinelyNewer() throws Exception {
+        final Instant serverTimestamp = Instant.now().minus(1, ChronoUnit.HOURS);
+        cityFileInstant = Optional.of(serverTimestamp);
+        asnFileInstant = Optional.of(serverTimestamp);
+        cityServerInstant = Optional.of(serverTimestamp);
+        asnServerInstant = Optional.of(serverTimestamp);
+
+        service = new TestGeoIpFileService(processorConfig, successfulDownload, successfulDownload, anyTimestamp, anyTimestamp);
+        assertThat(service.refreshFiles(mkConfig(), false, config -> {})).isTrue();
+
+        //A genuinely newer upload, after the local copy was written, must still be picked up:
+        final Instant newUpload = Instant.now().plus(1, ChronoUnit.HOURS);
+        cityServerInstant = Optional.of(newUpload);
+        asnServerInstant = Optional.of(newUpload);
+
+        final TestGeoIpFileService nextTick = new TestGeoIpFileService(
+                processorConfig, successfulDownload, successfulDownload, anyTimestamp, anyTimestamp);
+        assertThat(nextTick.fileRefreshRequired(mkConfig())).isTrue();
     }
 
     @Test
