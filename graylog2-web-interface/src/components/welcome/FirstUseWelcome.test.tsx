@@ -33,6 +33,7 @@ beforeEach(() => {
     typeof useDismissOnboarding
   >);
   asMock(AppConfig.isCloud).mockReturnValue(false);
+  asMock(AppConfig.branding).mockReturnValue(undefined);
 });
 
 describe('FirstUseWelcome', () => {
@@ -104,5 +105,21 @@ describe('FirstUseWelcome', () => {
     render(<FirstUseWelcome />);
 
     expect(screen.queryByRole('heading', { name: /set up input/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the resources section when enabled in branding', () => {
+    asMock(AppConfig.branding).mockReturnValue({ onboarding: { resources: { enabled: true } } });
+    render(<FirstUseWelcome />);
+
+    expect(screen.getByRole('heading', { name: /^resources$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /quickstart guide/i })).toBeInTheDocument();
+  });
+
+  it('hides the resources section when disabled in branding', () => {
+    asMock(AppConfig.branding).mockReturnValue({ onboarding: { resources: { enabled: false } } });
+    render(<FirstUseWelcome />);
+
+    expect(screen.queryByRole('heading', { name: /^resources$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /quickstart guide/i })).not.toBeInTheDocument();
   });
 });

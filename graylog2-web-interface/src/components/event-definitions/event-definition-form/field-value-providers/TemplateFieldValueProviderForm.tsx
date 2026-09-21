@@ -105,9 +105,9 @@ class TemplateFieldValueProviderForm extends React.Component<
               Exclude empty fields
             </Checkbox>
             <HelpBlock>
-              Check this option to leave the Field off the Event entirely when the Template renders an empty
-              value. When unchecked, the Field is added to the Event with an empty value. Always on when all
-              Template values are required.
+              Check this option to leave the Field off the Event entirely when the Template renders an empty value. When
+              unchecked, the Field is added to the Event with an empty value. Always on when all Template values are
+              required.
             </HelpBlock>
           </FormGroup>
         </Col>
