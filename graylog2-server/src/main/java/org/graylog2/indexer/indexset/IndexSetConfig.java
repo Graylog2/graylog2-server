@@ -26,6 +26,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
@@ -98,7 +99,8 @@ public abstract class IndexSetConfig implements
     private static final Set<String> TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES = Set.of(
             EVENT_TEMPLATE_TYPE,
             IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
-            IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE
+            IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
+            CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE
     );
 
     @JsonCreator
