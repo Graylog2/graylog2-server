@@ -25,12 +25,13 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventAction } from 'views/types';
 import type { Event } from 'components/events/events/types';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import useCurrentUser from 'hooks/useCurrentUser';
 import { alice } from 'fixtures/users';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 jest.mock('components/events/events/hooks/useSendEventActionTelemetry');
+jest.mock('hooks/useCurrentUser');
 const getEvent = (id: string): Event => ({
   id,
   event_definition_id: 'event_definition_id_1',
@@ -92,6 +93,7 @@ const openActionsDropdown = async () =>
 
 describe('Events Bulk Action', () => {
   beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(alice);
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: ['01HV0YS4GHDMT30E3EMWQVQNK9', '01HV0YS4GHDMT30E3EMWQVQNK9'],
       setSelectedEntities: () => {},
@@ -130,16 +132,11 @@ describe('Events Bulk Action', () => {
 
   it('renders replay search for replayable events when user can read their event definition', async () => {
     asMock(usePluginEntities).mockReturnValue([]);
-
-    render(
-      <CurrentUserContext.Provider
-        value={alice
-          .toBuilder()
-          .permissions(Immutable.List(['eventdefinitions:read:event_definition_id_1']))
-          .build()}>
-        <BulkActions selectedEntitiesData={{ event_id_1: getReplayableEvent('event_id_1') }} />
-      </CurrentUserContext.Provider>,
+    asMock(useCurrentUser).mockReturnValue(
+      alice.toBuilder().permissions(Immutable.List(['eventdefinitions:read:event_definition_id_1'])).build(),
     );
+
+    renderBulkAction({ event_id_1: getReplayableEvent('event_id_1') });
 
     await openActionsDropdown();
 
