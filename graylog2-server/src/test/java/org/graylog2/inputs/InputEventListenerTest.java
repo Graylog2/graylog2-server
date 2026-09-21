@@ -291,8 +291,8 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputRegistry, times(1)).remove(inputState);
-        verify(inputRegistry, times(1)).add(inputState);
+        verify(inputRegistry, never()).remove(inputState);
+        verify(inputRegistry, never()).add(inputState);
         verify(inputLauncher, never()).launch(any());
     }
 
@@ -305,8 +305,8 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputRegistry, times(1)).remove(inputState);
-        verify(inputRegistry, times(1)).add(inputState);
+        verify(inputRegistry, never()).remove(inputState);
+        verify(inputRegistry, never()).add(inputState);
         verify(inputLauncher, never()).launch(any());
     }
 
