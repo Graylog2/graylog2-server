@@ -72,7 +72,7 @@ describe('<InputsNotifications />', () => {
   it.each([
     ['Show failed inputs', 'FAILED'],
     ['Show inputs in setup mode', 'SETUP'],
-    ['Show not running inputs', 'NOT_RUNNING'],
+    ['Show stopped inputs', 'NOT_RUNNING'],
   ])('applies %s filter and resets table filter state', async (linkText, status) => {
     asMock(useInputsStates).mockReturnValue({
       isLoading: false,
