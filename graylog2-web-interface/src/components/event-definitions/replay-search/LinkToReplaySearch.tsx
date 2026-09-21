@@ -22,6 +22,12 @@ import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySear
 import usePermissions from 'hooks/usePermissions';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
+/**
+ * Link to replay the search behind an event definition. Always pass `eventDefinitionId`, so the link is hidden
+ * from users who cannot read that event definition. Additionally pass `eventId` when linking from a specific
+ * event, so the search is replayed with that event's parameters instead of the definition's current ones.
+ */
+
 type Props = {
   eventId?: string;
   eventDefinitionId?: string;
