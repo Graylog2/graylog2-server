@@ -21,14 +21,24 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import selectEvent from 'helpers/selectEvent';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useInputsStates from 'hooks/useInputsStates';
 import type { CollectorInstanceView } from 'components/collectors/types';
 
 import FirstOnboarding from './FirstOnboarding';
 
-import { useCollectorsMutations, useCollectorPermissions, useFleets } from '../hooks';
+import {
+  useCollectorInputDetails,
+  useCollectorInputIds,
+  useCollectorInputMutations,
+  useCollectorsConfig,
+  useCollectorsMutations,
+  useCollectorPermissions,
+  useFleets,
+} from '../hooks';
 import useSendCollectorsTelemetry from '../hooks/useSendCollectorsTelemetry';
 import { mockCollectorsMutations } from '../testing/mockMutations';
 import { mockCollectorPermissions } from '../testing/mockPermissions';
+import { configuredCollectorsConfig, mockCollectorInput, unconfiguredCollectorsConfig } from '../testing/fixtures';
 
 jest.mock('../hooks');
 jest.mock('../hooks/useSendCollectorsTelemetry');
@@ -37,6 +47,8 @@ jest.mock('util/Version', () => ({
 }));
 jest.mock('util/copyToClipboard', () => jest.fn(() => Promise.resolve()));
 jest.mock('components/common/Tooltip', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
+// The strip's own hooks are mocked below; the wizard test drives the real form.
+jest.mock('hooks/useInputsStates');
 const mockPushWithState = jest.fn();
 
 jest.mock('routing/useHistory', () => () => ({
@@ -91,6 +103,7 @@ jest.mock('./onboarding/WaitingForConnection', () => {
   };
 });
 
+
 const mockFleets = [
   { id: 'fleet-1', name: 'Default Fleet', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
 ];
@@ -110,15 +123,37 @@ describe('FirstOnboarding', () => {
   const createEnrollmentToken = jest.fn();
   const createFleet = jest.fn();
   const createSource = jest.fn();
+  const updateConfig = jest.fn();
   const sendTelemetry = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
+    asMock(useCollectorsConfig).mockReturnValue({ data: configuredCollectorsConfig, isLoading: false });
+    asMock(useCollectorInputIds).mockReturnValue({ data: ['input-1'], isLoading: false } as ReturnType<
+      typeof useCollectorInputIds
+    >);
     asMock(useFleets).mockReturnValue({ data: mockFleets, isLoading: false });
     asMock(useCollectorsMutations).mockReturnValue(
-      mockCollectorsMutations({ createEnrollmentToken, createFleet, createSource }),
+      mockCollectorsMutations({ createEnrollmentToken, createFleet, createSource, updateConfig }),
     );
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [mockCollectorInput()],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+    asMock(useCollectorInputMutations).mockReturnValue({
+      createCollectorInput: jest.fn(),
+      isCreatingCollectorInput: false,
+      updateCollectorInputPort: jest.fn().mockResolvedValue(undefined),
+      isUpdatingCollectorInputPort: false,
+    });
+    asMock(useInputsStates).mockReturnValue({ data: undefined, isLoading: false } as unknown as ReturnType<
+      typeof useInputsStates
+    >);
+    updateConfig.mockResolvedValue(configuredCollectorsConfig);
     asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions());
     createEnrollmentToken.mockResolvedValue({
       token: 'test-token-abc',
@@ -147,9 +182,7 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/waiting for connection/i);
 
     expect(createFleet).not.toHaveBeenCalled();
     expect(createEnrollmentToken).toHaveBeenCalledWith({
@@ -224,7 +257,7 @@ describe('FirstOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
     // Only the existing-fleet dropdown remains reachable — no ungated create-fleet write.
-    expect(await screen.findByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
+    await screen.findByRole('combobox', { name: /select existing fleet/i });
     expect(screen.queryByRole('button', { name: /create new fleet/i })).not.toBeInTheDocument();
   });
 
@@ -235,7 +268,7 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    expect(await screen.findByRole('button', { name: /create new fleet/i })).toBeInTheDocument();
+    await screen.findByRole('button', { name: /create new fleet/i });
     expect(screen.getByRole('combobox', { name: /select existing fleet/i })).toBeInTheDocument();
 
     // No fleet decided yet: the command box must not appear.
@@ -267,7 +300,7 @@ describe('FirstOnboarding', () => {
       });
     });
 
-    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+    await screen.findByText(/run this on linux/i);
   });
 
   it('uses an existing fleet selected from the dropdown', async () => {
@@ -289,7 +322,7 @@ describe('FirstOnboarding', () => {
     });
 
     expect(createFleet).not.toHaveBeenCalled();
-    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+    await screen.findByText(/run this on linux/i);
   });
 
   it('shows the selected fleet name and description with a change button once chosen', async () => {
@@ -301,7 +334,7 @@ describe('FirstOnboarding', () => {
     await screen.findByRole('button', { name: /create new fleet/i });
     await selectEvent.chooseOption('Select existing fleet', 'Staging');
 
-    expect(await screen.findByText(/run this on linux/i)).toBeInTheDocument();
+    await screen.findByText(/run this on linux/i);
 
     // The choice controls are replaced by a summary of the selected fleet.
     expect(screen.getByText('Staging')).toBeInTheDocument();
@@ -318,7 +351,7 @@ describe('FirstOnboarding', () => {
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
     await userEvent.click(await screen.findByRole('button', { name: /create new fleet/i }));
 
-    expect(await screen.findByText('Onboarding - 2026-05-28')).toBeInTheDocument();
+    await screen.findByText('Onboarding - 2026-05-28');
     expect(screen.getByText(/created by graylog 7\.1 onboarding wizard/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /change fleet/i })).toBeInTheDocument();
   });
@@ -344,15 +377,11 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/waiting for connection/i);
 
     await userEvent.click(screen.getByRole('button', { name: /windows/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/run this on windows/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/run this on windows/i);
 
     expect(createEnrollmentToken).toHaveBeenCalledTimes(1);
   });
@@ -362,9 +391,7 @@ describe('FirstOnboarding', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/waiting for connection/i);
 
     await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
 
@@ -477,9 +504,7 @@ describe('FirstOnboarding', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /linux/i }));
 
-      await waitFor(() => {
-        expect(screen.getByText(/waiting for connection/i)).toBeInTheDocument();
-      });
+      await screen.findByText(/waiting for connection/i);
 
       await userEvent.click(screen.getByRole('button', { name: /simulate connection/i }));
 
@@ -524,12 +549,165 @@ describe('FirstOnboarding', () => {
     });
   });
 
+  describe('before collectors are configured', () => {
+    beforeEach(() => {
+      asMock(useCollectorsConfig).mockReturnValue({ data: unconfiguredCollectorsConfig, isLoading: false });
+    });
+
+    it('still starts with the platform picker', () => {
+      render(<FirstOnboarding />);
+
+      expect(screen.getByRole('button', { name: /linux/i })).toBeInTheDocument();
+      expect(screen.queryByText('Confirm how Collectors send data to this cluster')).not.toBeInTheDocument();
+    });
+
+    it('asks to confirm the endpoint after the fleet is resolved and holds the token until then', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await screen.findByText('Confirm how Collectors send data to this cluster');
+      expect(screen.getByText('Default Fleet')).toBeInTheDocument();
+      // No token before the endpoint exists: minting one needs the signing key the first save creates.
+      expect(createEnrollmentToken).not.toHaveBeenCalled();
+      expect(screen.queryByText(/waiting for connection/i)).not.toBeInTheDocument();
+    });
+
+    it('mints the token and shows the install command once the endpoint is confirmed', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /confirm endpoint/i }));
+
+      await screen.findByText(/waiting for connection/i);
+      expect(createEnrollmentToken).toHaveBeenCalledWith({ name: 'onboarding', fleetId: 'fleet-1', expiresIn: 'P1D' });
+      expect(screen.getByText(/test-token-abc/)).toBeInTheDocument();
+      // The strip stays as the endpoint status line above the command.
+      expect(screen.getByText('Confirm how Collectors send data to this cluster')).toBeInTheDocument();
+    });
+
+    it('creates the onboarding fleet before the endpoint is confirmed when no fleet exists', async () => {
+      asMock(useFleets).mockReturnValue({ data: [], isLoading: false });
+
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await waitFor(() => {
+        expect(createFleet).toHaveBeenCalled();
+      });
+      await screen.findByText('Confirm how Collectors send data to this cluster');
+      expect(createEnrollmentToken).not.toHaveBeenCalled();
+    });
+
+    it('tells a Collectors Manager who cannot create the ingest input to get an administrator, before they pick anything', () => {
+      // Reader + Collectors Manager: may save the config, but the input the wizard needs cannot be created.
+      asMock(useCollectorInputIds).mockReturnValue({ data: [], isLoading: false } as ReturnType<
+        typeof useCollectorInputIds
+      >);
+      asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions({ canCreateIngestInput: false }));
+
+      render(<FirstOnboarding />);
+
+      expect(screen.getByText(/collector ingest endpoint not set up/i)).toBeInTheDocument();
+      expect(screen.getByText(/your account does not have/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
+    });
+
+    it('blocks a user who cannot edit the existing ingest input, since confirming the endpoint may move it', () => {
+      asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions({ canEditIngestInput: () => false }));
+
+      render(<FirstOnboarding />);
+
+      expect(screen.getByText(/collector ingest endpoint not set up/i)).toBeInTheDocument();
+      expect(screen.getByText(/your account does not have/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
+    });
+
+    it('lets a user who can create the ingest input proceed even though none exists yet', () => {
+      asMock(useCollectorInputIds).mockReturnValue({ data: [], isLoading: false } as ReturnType<
+        typeof useCollectorInputIds
+      >);
+
+      render(<FirstOnboarding />);
+
+      expect(screen.getByRole('button', { name: /linux/i })).toBeInTheDocument();
+    });
+
+    it('tells users without config permission up front, before they pick anything', () => {
+      asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions({ canEditConfig: false }));
+
+      render(<FirstOnboarding />);
+
+      expect(screen.getByText(/collector ingest endpoint not set up/i)).toBeInTheDocument();
+      expect(screen.getByText(/your account does not have/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
+    });
+
+    it('shows an error instead of the wizard when the config could not be loaded', () => {
+      asMock(useCollectorsConfig).mockReturnValue({ data: undefined, isLoading: false });
+
+      render(<FirstOnboarding />);
+
+      expect(screen.getByText(/could not load collectors config/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
+    });
+
+    it('shows spinner while the config is loading', async () => {
+      asMock(useCollectorsConfig).mockReturnValue({ data: undefined, isLoading: true });
+
+      render(<FirstOnboarding />);
+
+      await screen.findByText(/loading/i);
+      expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
+    });
+  });
+
+  it('does not require input edit permission once the endpoint is configured and the input exists', async () => {
+    asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions({ canEditIngestInput: () => false }));
+
+    render(<FirstOnboarding />);
+
+    await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+    await screen.findByText(/waiting for connection/i);
+    expect(screen.queryByText('Confirm how Collectors send data to this cluster')).not.toBeInTheDocument();
+  });
+
+  describe('when the config exists but no ingest input does', () => {
+    beforeEach(() => {
+      asMock(useCollectorInputIds).mockReturnValue({ data: [], isLoading: false } as ReturnType<
+        typeof useCollectorInputIds
+      >);
+    });
+
+    it('blocks a user who cannot create the input with the administrator notice', () => {
+      asMock(useCollectorPermissions).mockReturnValue(mockCollectorPermissions({ canCreateIngestInput: false }));
+
+      render(<FirstOnboarding />);
+
+      expect(screen.getByText(/collector ingest endpoint not set up/i)).toBeInTheDocument();
+      expect(screen.getByText(/your account does not have/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /linux/i })).not.toBeInTheDocument();
+    });
+
+    it('shows the endpoint status above the command so the input can be created', async () => {
+      render(<FirstOnboarding />);
+
+      await userEvent.click(screen.getByRole('button', { name: /linux/i }));
+
+      await screen.findByText(/waiting for connection/i);
+      expect(screen.getByText(/no ingest input exists/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /create input/i })).toBeInTheDocument();
+    });
+  });
+
   it('shows spinner while fleets are loading', async () => {
     asMock(useFleets).mockReturnValue({ data: undefined, isLoading: true });
 
     render(<FirstOnboarding />);
 
     // Spinner renders behind a 200ms Delayed wrapper, so wait for it to appear
-    expect(await screen.findByText(/loading/i)).toBeInTheDocument();
+    await screen.findByText(/loading/i);
   });
 });

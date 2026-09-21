@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -56,11 +56,8 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
   );
   const sendTelemetry = useSendTelemetry();
 
-  useEffect(() => {
-    setUpdatePipelines(formatPipelines(connectedPipelines));
-  }, [connectedPipelines]);
-
   const openModal = () => {
+    setUpdatePipelines(formattedConnectedPipelines);
     setShowModal(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_PROCESSING_EDIT_PIPELINES_CONNECTION, {

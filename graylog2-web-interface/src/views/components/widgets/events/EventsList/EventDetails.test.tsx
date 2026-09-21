@@ -107,4 +107,25 @@ describe('EventDetails', () => {
     await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith('event-definition-id-1', false));
     await screen.findByText('Additional Fields');
   });
+
+  it('should render tags in the default event details when the event has tags', async () => {
+    asMock(useEventById).mockImplementation(() => ({
+      data: { ...mockEventData.event, tags: ['phishing'] },
+      isLoading: false,
+      isFetched: true,
+      refetch: () => {},
+    }));
+
+    renderEventDetails();
+
+    await screen.findByText('Tags');
+    expect(screen.getByText('phishing')).toBeInTheDocument();
+  });
+
+  it('should not render a tags section when the event has no tags', async () => {
+    renderEventDetails();
+
+    await screen.findByText('Additional Fields');
+    expect(screen.queryByText('Tags')).not.toBeInTheDocument();
+  });
 });

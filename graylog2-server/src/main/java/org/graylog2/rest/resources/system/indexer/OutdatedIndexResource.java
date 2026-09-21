@@ -29,6 +29,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -96,7 +97,7 @@ public class OutdatedIndexResource extends RestResource {
 
     private static Set<FilterOption> categoryFilterOptions() {
         return Set.of(
-                FilterOption.create(OutdatedIndex.CATEGORY_GRAYLOG, "Graylog"),
+                FilterOption.create(OutdatedIndex.CATEGORY_GRAYLOG, "Managed"),
                 FilterOption.create(OutdatedIndex.CATEGORY_SYSTEM, "System"),
                 FilterOption.create(OutdatedIndex.CATEGORY_FOREIGN, "Foreign"),
                 FilterOption.create(OutdatedIndex.CATEGORY_WARM, "Warm")
@@ -220,7 +221,7 @@ public class OutdatedIndexResource extends RestResource {
         OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
                 .filter(i -> !i.managedIndex())
                 .filter(i -> i.indexName().equals(index))
-                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is an index managed by Graylog"));
+                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is a managed index"));
         outdatedIndexService.delete(outdatedIndex.indexName());
     }
 
@@ -233,6 +234,16 @@ public class OutdatedIndexResource extends RestResource {
     public BulkOperationResponse bulkDeleteOutdated(@Parameter(name = "Entities to remove", required = true) BulkOperationRequest request) {
         if (request == null || request.entityIds() == null || request.entityIds().isEmpty()) {
             throw new BadRequestException("No index names provided");
+        }
+
+        // Reject callers with no relevant permission at all before doing any work below. Managed indices can
+        // still be deleted with a per-index grant even without the general permission (see #deleteSingleOutdated),
+        // so this only rejects a caller who holds neither the general permission nor a per-index grant for any of
+        // the requested indices.
+        final boolean hasGeneralDeletePermission = isPermitted(RestPermissions.INDICES_DELETE);
+        if (!hasGeneralDeletePermission
+                && request.entityIds().stream().noneMatch(index -> isPermitted(RestPermissions.INDICES_DELETE, index))) {
+            throw new ForbiddenException("Not authorized to delete indices");
         }
 
         final Map<String, OutdatedIndex> outdatedByName = getOutdatedIndices().stream()
