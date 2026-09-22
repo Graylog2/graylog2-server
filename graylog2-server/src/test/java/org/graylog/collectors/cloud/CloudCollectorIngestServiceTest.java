@@ -19,15 +19,13 @@ package org.graylog.collectors.cloud;
 import com.google.common.eventbus.EventBus;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.events.CollectorsConfigUpdatedEvent;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
-import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.inputs.ReservedInputIds;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MisfireException;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -120,25 +118,10 @@ class CloudCollectorIngestServiceTest {
         verify(input, never()).launch(any(), any());
 
         // A CollectorsConfig change (the user saving the config) triggers another launch attempt.
-        eventBus.post(ClusterConfigChangedEvent.create(
-                DateTime.now(DateTimeZone.UTC), "node-id", CollectorsConfig.class.getCanonicalName()));
+        eventBus.post(new CollectorsConfigUpdatedEvent());
 
         awaitIdle();
         verify(input).launch(eq(inputBuffer), any(InputFailureRecorder.class));
-    }
-
-    @Test
-    void ignoresConfigChangedEventsForOtherConfigTypes() throws Exception {
-        when(configService.get()).thenReturn(Optional.empty());
-
-        service.startAsync().awaitRunning();
-
-        // An unrelated cluster-config change must not trigger a launch attempt.
-        eventBus.post(ClusterConfigChangedEvent.create(
-                DateTime.now(DateTimeZone.UTC), "node-id", "org.graylog2.some.OtherConfig"));
-
-        awaitIdle();
-        verify(input, never()).launch(any(), any());
     }
 
     @Test

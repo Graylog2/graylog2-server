@@ -18,6 +18,7 @@ package org.graylog.schema;
 
 public class EventFields {
     public static final String EVENT_CODE = "event_code";
+    public static final String EVENT_COMPONENT = "event_component";
     public static final String EVENT_CREATED = "event_created";
     public static final String EVENT_DURATION = "event_duration";
     public static final String EVENT_END = "event_end";
@@ -32,6 +33,7 @@ public class EventFields {
     public static final String EVENT_RECEIVED_TIME = "event_received_time";
     public static final String EVENT_REPEAT_COUNT = "event_repeat_count";
     public static final String EVENT_REPORTER = "event_reporter";
+    public static final String EVENT_SEQUENCE = "event_sequence";
     public static final String EVENT_SOURCE = "event_source";
     public static final String EVENT_SOURCE_API_VERSION = "event_source_api_version";
     public static final String EVENT_SOURCE_INPUT = "event_source_input";

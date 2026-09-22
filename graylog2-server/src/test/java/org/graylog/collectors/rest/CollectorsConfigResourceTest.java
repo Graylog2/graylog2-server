@@ -17,6 +17,7 @@
 package org.graylog.collectors.rest;
 
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.apache.shiro.subject.Subject;
@@ -55,6 +56,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -295,6 +297,22 @@ class CollectorsConfigResourceTest {
         verify(collectorsConfigService).save(any(CollectorsConfig.class));
     }
 
+    // A client without input permissions must not end up with a saved config but no input: the permission
+    // check has to run before anything is persisted.
+    @Test
+    void putWithCreateInputChecksInputPermissionBeforeSavingConfig() throws Exception {
+        doThrow(new ForbiddenException("Not permitted to create inputs"))
+                .when(collectorIngestInputService).ensureCanCreateInput(any(Subject.class));
+
+        assertThatThrownBy(() -> resource.put(requestContext, request(null, null, null, true)))
+                .isInstanceOf(ForbiddenException.class);
+
+        verify(collectorsConfigService, never()).save(any());
+        verify(collectorsInitializer, never()).initialize(any());
+        verify(logsDestinationService, never()).ensureExists();
+        verify(collectorIngestInputService, never()).createInput(any(), any(), any(int.class));
+    }
+
     @Test
     void putWithCreateInputFalseDoesNotCallService() throws Exception {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
@@ -321,8 +339,8 @@ class CollectorsConfigResourceTest {
         final var result = resource.put(requestContext,
                 new CollectorsConfigRequest(bogusHttp, null, null, null, false));
 
-        // Cloud derives the endpoint from the node URI with the "ingest-" prefix, ignoring the client's value.
-        assertThat(result.http().hostname()).isEqualTo("ingest-graylog.example.com");
+        // Cloud derives the endpoint from the node URI with the "collector-ingest-" prefix, ignoring the client's value.
+        assertThat(result.http().hostname()).isEqualTo("collector-ingest-graylog.example.com");
         assertThat(result.http().port()).isEqualTo(14401);
     }
 
@@ -370,7 +388,7 @@ class CollectorsConfigResourceTest {
 
         final var result = resource.get(requestContext);
 
-        assertThat(result.http().hostname()).isEqualTo("ingest-graylog.example.com");
+        assertThat(result.http().hostname()).isEqualTo("collector-ingest-graylog.example.com");
         assertThat(result.http().port()).isEqualTo(14401);
     }
 
