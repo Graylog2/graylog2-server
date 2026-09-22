@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.DatanodeKeystore;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
@@ -79,6 +80,20 @@ class OpensearchProcessServiceTest {
         verify(eventBus).post(new OpensearchStartRequestedEvent());
         verifyNoMoreInteractions(eventBus);
         verifyNoInteractions(stateMachine);
+    }
+
+    @Test
+    void resetTriggersConfigurationRebuildToRestartTheProcess() {
+        service.handleNodeLifecycleEvent(DataNodeLifecycleEvent.create(nodeId.getNodeId(), DataNodeLifecycleTrigger.RESET));
+
+        // Rejoining a previously removed node must, in addition to resetting the state machine back to
+        // WAITING_FOR_CONFIGURATION, trigger a configuration rebuild that eventually fires PROCESS_STARTED.
+        // Otherwise the process keeps running (started directly by OpensearchProcessImpl#reset()) while the
+        // state machine - and the DataNodeStatus derived from it - stays stuck in UNCONFIGURED forever.
+        verify(stateMachine).fire(OpensearchEvent.RESET);
+        verify(eventBus).register(service);
+        verify(eventBus).post(new OpensearchStartRequestedEvent());
+        verifyNoMoreInteractions(eventBus);
     }
 
     @Test

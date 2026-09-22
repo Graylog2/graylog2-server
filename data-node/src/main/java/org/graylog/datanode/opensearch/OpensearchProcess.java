@@ -42,8 +42,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
 
     void remove();
 
-    void reset();
-
     void reloadCertificates();
 
     void available();
