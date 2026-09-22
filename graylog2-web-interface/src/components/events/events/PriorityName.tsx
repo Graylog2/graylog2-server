@@ -21,6 +21,6 @@ import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 type Props = {
   priority: number | string;
 };
-const PriorityName = ({ priority }: Props) => <>{getPriorityName(priority) ?? priority}</>;
+const PriorityName = ({ priority }: Props) => <>{getPriorityName(priority)}</>;
 
 export default PriorityName;

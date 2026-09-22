@@ -26,7 +26,7 @@ describe('getPriorityName', () => {
     expect(getPriorityName('2')).toBe('Medium');
   });
 
-  it('returns undefined for an unknown priority', () => {
-    expect(getPriorityName(99)).toBeUndefined();
+  it('falls back to the value itself, stringified, for an unknown priority', () => {
+    expect(getPriorityName(99)).toBe('99');
   });
 });

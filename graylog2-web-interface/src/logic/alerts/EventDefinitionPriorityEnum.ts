@@ -31,10 +31,10 @@ const EventDefinitionPriorityEnum = {
   },
 } as const;
 
-export const getPriorityName = (priority: number | string): string | undefined => {
+export const getPriorityName = (priority: number | string): string => {
   const properties = EventDefinitionPriorityEnum.properties[priority];
 
-  return properties ? StringUtils.capitalizeFirstLetter(properties.name) : undefined;
+  return properties ? StringUtils.capitalizeFirstLetter(properties.name) : String(priority);
 };
 
 export default EventDefinitionPriorityEnum;

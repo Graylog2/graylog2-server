@@ -63,6 +63,6 @@ describe('CoreKeyMappers', () => {
 
     expect(result.current(0)).toBe('Info');
     expect(result.current(4)).toBe('Critical');
-    expect(result.current(99)).toBe(99);
+    expect(result.current(99)).toBe('99');
   });
 });

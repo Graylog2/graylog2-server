@@ -95,7 +95,7 @@ const useAttributeComponents = () => {
       },
       {
         title: 'Priority',
-        content: getPriorityName(eventDefinition.priority) ?? eventDefinition.priority,
+        content: getPriorityName(eventDefinition.priority),
       },
       {
         title: 'Execute search every',

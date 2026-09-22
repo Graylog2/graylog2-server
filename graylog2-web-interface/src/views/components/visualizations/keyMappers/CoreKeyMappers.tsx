@@ -44,13 +44,11 @@ const useNodeKeyMapper = () => {
   return useCallback((key: Key) => (nodes?.[key] ? formatNode(nodes[key]) : key), [nodes]);
 };
 
-const usePriorityKeyMapper = () => useCallback((key: Key) => getPriorityName(key) ?? key, []);
-
 const CoreKeyMappers: PluginExports['visualizationKeyMappers'] = [
   { type: 'streams', useKeyMapper: useStreamsKeyMapper },
   { type: 'input', useKeyMapper: useInputKeyMapper },
   { type: 'node', useKeyMapper: useNodeKeyMapper },
-  { type: 'priority', useKeyMapper: usePriorityKeyMapper },
+  { type: 'priority', useKeyMapper: () => getPriorityName },
 ];
 
 export default CoreKeyMappers;

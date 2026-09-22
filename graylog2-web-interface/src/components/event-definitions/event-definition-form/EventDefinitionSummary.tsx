@@ -83,7 +83,7 @@ const EventDefinitionSummary = ({
         <dt>Description</dt>
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
-        <dd>{getPriorityName(eventDefinition.priority) ?? eventDefinition.priority}</dd>
+        <dd>{getPriorityName(eventDefinition.priority)}</dd>
         <dt>Tags</dt>
         <dd>
           <TagList tags={eventDefinition.tags} emptyFallback={<em>No tags</em>} />
