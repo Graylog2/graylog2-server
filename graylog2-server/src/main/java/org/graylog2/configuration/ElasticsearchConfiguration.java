@@ -106,12 +106,11 @@ public class ElasticsearchConfiguration {
             system events index sets, and only takes effect on newly created or updated index templates.
             Lower values make new events searchable sooner at the cost of indexing throughput. Some
             managed OpenSearch offerings enforce a cluster-wide minimum refresh interval and will reject
-            the index template if this value is below it. Accepts any search backend time value, or -1
-            to disable refreshing entirely.
+            the index template if this value is below it. Must be 1 second or longer.
             Default: 1s
             """)
-    @Parameter(value = EVENTS_INDEX_REFRESH_INTERVAL, validators = StringNotBlankValidator.class)
-    private String eventsIndexRefreshInterval = "1s";
+    @Parameter(value = EVENTS_INDEX_REFRESH_INTERVAL, validators = {PositiveDurationValidator.class})
+    private Duration eventsIndexRefreshInterval = Duration.seconds(1);
 
     @Documentation("""
             Analyzer (tokenizer) to use for message and full_message field. The "standard" filter usually is a good idea.
@@ -339,7 +338,7 @@ public class ElasticsearchConfiguration {
         return defaultSystemEventsIndexPrefix;
     }
 
-    public String getEventsIndexRefreshInterval() {
+    public Duration getEventsIndexRefreshInterval() {
         return eventsIndexRefreshInterval;
     }
 
@@ -461,6 +460,15 @@ public class ElasticsearchConfiguration {
 
     public boolean allowFlexibleRetentionPeriod() {
         return allowFlexibleRetentionPeriod;
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateEventsIndexRefreshInterval() throws ValidationException {
+        if (getEventsIndexRefreshInterval().toMilliseconds() < 1000L) {
+            throw new ValidationException(f("\"%s=%s\" must be 1 second or longer",
+                    EVENTS_INDEX_REFRESH_INTERVAL, getEventsIndexRefreshInterval()));
+        }
     }
 
     @ValidatorMethod

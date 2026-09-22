@@ -17,6 +17,7 @@
 package org.graylog2.indexer.template;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
@@ -44,7 +45,7 @@ public class EventsIndexMappingTest {
     private static final IndexSetMappingTemplate INDEX_SET_MAPPING_TEMPLATE = mock(IndexSetMappingTemplate.class);
     public static final String DATE_FORMAT = "uuuu-MM-dd HH:mm:ss.SSS";
 
-    private static ElasticsearchConfiguration elasticsearchConfigurationWithRefreshInterval(String refreshInterval) {
+    private static ElasticsearchConfiguration elasticsearchConfigurationWithRefreshInterval(Duration refreshInterval) {
         final ElasticsearchConfiguration elasticsearchConfiguration = mock(ElasticsearchConfiguration.class);
         when(elasticsearchConfiguration.getEventsIndexRefreshInterval()).thenReturn(refreshInterval);
         return elasticsearchConfiguration;
@@ -57,7 +58,7 @@ public class EventsIndexMappingTest {
     })
     void createsValidMappingTemplates(final String versionString) throws Exception {
         final SearchVersion version = SearchVersion.decode(versionString);
-        final EventIndexTemplateProvider provider = new EventIndexTemplateProvider(elasticsearchConfigurationWithRefreshInterval("1s"));
+        final EventIndexTemplateProvider provider = new EventIndexTemplateProvider(elasticsearchConfigurationWithRefreshInterval(Duration.seconds(1)));
         final IndexMappingTemplate mapping = provider.create(version, INDEX_TEMPLATE_CONFIG);
         doReturn("test_*").when(INDEX_SET_MAPPING_TEMPLATE).indexWildcard();
 
@@ -77,12 +78,23 @@ public class EventsIndexMappingTest {
     @Test
     void usesConfiguredRefreshInterval() throws Exception {
         final SearchVersion version = SearchVersion.decode("7.0.0");
-        final EventIndexTemplateProvider provider = new EventIndexTemplateProvider(elasticsearchConfigurationWithRefreshInterval("10s"));
+        final EventIndexTemplateProvider provider = new EventIndexTemplateProvider(elasticsearchConfigurationWithRefreshInterval(Duration.seconds(10)));
         final IndexMappingTemplate mapping = provider.create(version, INDEX_TEMPLATE_CONFIG);
         doReturn("test_*").when(INDEX_SET_MAPPING_TEMPLATE).indexWildcard();
 
         var template = mapping.toTemplate(INDEX_SET_MAPPING_TEMPLATE);
         assertJsonPath(template.settings(), at -> assertRefreshInterval(at, "10s"));
+    }
+
+    @Test
+    void usesConfiguredRefreshIntervalWithSubSecondPrecision() throws Exception {
+        final SearchVersion version = SearchVersion.decode("7.0.0");
+        final EventIndexTemplateProvider provider = new EventIndexTemplateProvider(elasticsearchConfigurationWithRefreshInterval(Duration.milliseconds(500)));
+        final IndexMappingTemplate mapping = provider.create(version, INDEX_TEMPLATE_CONFIG);
+        doReturn("test_*").when(INDEX_SET_MAPPING_TEMPLATE).indexWildcard();
+
+        var template = mapping.toTemplate(INDEX_SET_MAPPING_TEMPLATE);
+        assertJsonPath(template.settings(), at -> assertRefreshInterval(at, "500ms"));
     }
 
     private void assertJsonPath(final Map<String, Object> map, final Consumer<JsonPathAssert> consumer) throws Exception {
