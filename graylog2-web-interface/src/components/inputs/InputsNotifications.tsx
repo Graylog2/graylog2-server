@@ -66,7 +66,7 @@ const getNotificationItems = (
     result.push({ severity: 'warning', message: SETUP_MESSAGE });
   }
 
-  if (hasInputInState(inputStates, INPUT_STATES.STOPPED)) {
+  if (hasInputInState(inputStates, INPUT_STATES.STOPPED) || inputs.some((input) => !inputStates[input.id])) {
     result.push({ severity: 'warning', message: STOPPED_MESSAGE });
   }
 
