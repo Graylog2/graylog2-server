@@ -320,6 +320,7 @@ const GenericPlot = ({
     onAfterPlot();
   }, [onRenderComplete, onAfterPlot]);
 
+  console.log({ plotChartData });
   return (
     <StyledPlot
       $interactive={isInteractive}

@@ -20,7 +20,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Singleton;
 import org.graylog.events.event.EventDto;
+import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.streams.Stream;
 
 import java.util.Map;
 import java.util.Optional;
@@ -60,6 +62,7 @@ public class FieldTypeMapper {
     public static final FieldTypes.Type NODE_TYPE = createType("node", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type EVENT_DEFINITION_ID_TYPE = createType("event-definition-id", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type ASSOCIATED_ASSETS_TYPE = createType("associated-assets", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type PRIORITY_TYPE = createType("priority", of(PROP_ENUMERABLE));
 
 
     /**
@@ -83,15 +86,6 @@ public class FieldTypeMapper {
             .put("ip", IP_TYPE)
             .build();
 
-    private static final Map<String, FieldTypes.Type> FIELD_MAP = Map.of(
-            Message.FIELD_STREAMS, STREAMS_TYPE,
-            Message.FIELD_FAILED_MESSAGE_STREAMS, STREAMS_TYPE,
-            Message.FIELD_GL2_SOURCE_INPUT, INPUT_TYPE,
-            Message.FIELD_GL2_SOURCE_NODE, NODE_TYPE,
-            EventDto.FIELD_EVENT_DEFINITION_ID, EVENT_DEFINITION_ID_TYPE,
-            "associated_assets", ASSOCIATED_ASSETS_TYPE
-    );
-
     /**
      * Checks if the given physical (Elasticsearch/OpenSearch) field type maps to a numeric Graylog type.
      *
@@ -111,10 +105,41 @@ public class FieldTypeMapper {
      * @return the Graylog type object
      */
     public Optional<FieldTypes.Type> mapType(FieldTypeDTO type) {
-        return Optional.ofNullable(FIELD_MAP.get(type.fieldName()))
+        return Optional.ofNullable(mapFieldNameType(type))
                 .or(() -> Optional.ofNullable(TYPE_MAP.get(type.physicalType())))
                 .map(mappedType -> type.properties().contains(FieldTypeDTO.Properties.FIELDDATA)
                         ? mappedType.toBuilder().properties(new ImmutableSet.Builder<String>().addAll(mappedType.properties()).add(PROP_ENUMERABLE).build()).build()
                         : mappedType);
+    }
+
+    /**
+     * Maps a field to a Graylog type by its (Graylog-reserved) field name, regardless of its physical type.
+     */
+    private static FieldTypes.Type mapFieldNameType(FieldTypeDTO type) {
+        return switch (type.fieldName()) {
+            case Message.FIELD_STREAMS, Message.FIELD_FAILED_MESSAGE_STREAMS -> STREAMS_TYPE;
+            case Message.FIELD_GL2_SOURCE_INPUT -> INPUT_TYPE;
+            case Message.FIELD_GL2_SOURCE_NODE -> NODE_TYPE;
+            case EventDto.FIELD_EVENT_DEFINITION_ID -> EVENT_DEFINITION_ID_TYPE;
+            case "associated_assets" -> ASSOCIATED_ASSETS_TYPE;
+            case CommonEventSummary.FIELD_PRIORITY -> mapPriorityType(type);
+            default -> null;
+        };
+    }
+
+    /**
+     * Unlike the other cases in {@link #mapFieldNameType}, "priority" is not a Graylog-reserved field name: user
+     * messages can freely contain their own unrelated "priority" field. It is only mapped to
+     * {@link #PRIORITY_TYPE} when it is confined to the built-in events streams, so that an unrelated message
+     * field of the same name keeps its plain numeric type. This requires stream-aware field types
+     * ({@code stream_aware_field_types}) to be enabled; otherwise {@link FieldTypeDTO#streams()} is always
+     * empty and the field falls through to the generic {@link #TYPE_MAP} lookup.
+     */
+    private static FieldTypes.Type mapPriorityType(FieldTypeDTO type) {
+        if (!type.streams().isEmpty() && Stream.DEFAULT_EVENT_STREAM_IDS.containsAll(type.streams())) {
+            return PRIORITY_TYPE;
+        }
+
+        return null;
     }
 }

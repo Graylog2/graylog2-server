@@ -16,10 +16,13 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
+import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
+import org.graylog2.plugin.streams.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.Set;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,5 +95,31 @@ public class FieldTypeMapperTest {
         assertThat(FieldTypeMapper.isNumericType("boolean")).isFalse();
         assertThat(FieldTypeMapper.isNumericType("ip")).isFalse();
         assertThat(FieldTypeMapper.isNumericType("unknown_type")).isFalse();
+    }
+
+    @Test
+    public void mapsPriorityFieldOnlyWhenConfinedToEventStreams() {
+        final FieldTypeDTO confinedToEventStreams = FieldTypeDTO.builder()
+                .fieldName(CommonEventSummary.FIELD_PRIORITY)
+                .physicalType("long")
+                .streams(Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID))
+                .build();
+
+        assertMapping(confinedToEventStreams, "priority", "enumerable");
+
+        final FieldTypeDTO alsoInOtherStream = FieldTypeDTO.builder()
+                .fieldName(CommonEventSummary.FIELD_PRIORITY)
+                .physicalType("long")
+                .streams(Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, "5f4dfb144b8ea2d1819e2e2e"))
+                .build();
+
+        assertMapping(alsoInOtherStream, "long", "numeric", "enumerable");
+
+        final FieldTypeDTO noStreamData = FieldTypeDTO.builder()
+                .fieldName(CommonEventSummary.FIELD_PRIORITY)
+                .physicalType("long")
+                .build();
+
+        assertMapping(noStreamData, "long", "numeric", "enumerable");
     }
 }
