@@ -17,10 +17,9 @@
 import React, { useMemo } from 'react';
 import moment from 'moment/moment';
 import styled, { css } from 'styled-components';
-import upperFirst from 'lodash/upperFirst';
 
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Timestamp, HoverForHelp } from 'components/common';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
@@ -96,7 +95,7 @@ const useAttributeComponents = () => {
       },
       {
         title: 'Priority',
-        content: upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name),
+        content: getPriorityName(eventDefinition.priority) ?? eventDefinition.priority,
       },
       {
         title: 'Execute search every',

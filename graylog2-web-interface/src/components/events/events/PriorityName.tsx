@@ -16,14 +16,11 @@
  */
 import * as React from 'react';
 
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import StringUtils from 'util/StringUtils';
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 type Props = {
   priority: number | string;
 };
-const PriorityName = ({ priority }: Props) => (
-  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
-);
+const PriorityName = ({ priority }: Props) => <>{getPriorityName(priority) ?? priority}</>;
 
 export default PriorityName;

@@ -21,8 +21,7 @@ import StreamsContext from 'contexts/StreamsContext';
 import { useInputs } from 'hooks/useInputs';
 import useNodeSummaries from 'hooks/useNodeSummaries';
 import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import StringUtils from 'util/StringUtils';
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const formatNode = (node: { short_node_id: string; hostname: string }) => `${node.short_node_id} / ${node.hostname}`;
 
@@ -45,12 +44,7 @@ const useNodeKeyMapper = () => {
   return useCallback((key: Key) => (nodes?.[key] ? formatNode(nodes[key]) : key), [nodes]);
 };
 
-const usePriorityKeyMapper = () =>
-  useCallback((key: Key) => {
-    const priorityName = EventDefinitionPriorityEnum.properties[key]?.name;
-
-    return priorityName ? StringUtils.capitalizeFirstLetter(priorityName) : key;
-  }, []);
+const usePriorityKeyMapper = () => useCallback((key: Key) => getPriorityName(key) ?? key, []);
 
 const CoreKeyMappers: PluginExports['visualizationKeyMappers'] = [
   { type: 'streams', useKeyMapper: useStreamsKeyMapper },

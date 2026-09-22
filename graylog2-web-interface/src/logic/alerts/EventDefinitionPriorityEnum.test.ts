@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
 import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 
-type Props = {
-  value: string | number;
-};
+describe('getPriorityName', () => {
+  it('returns the capitalized name for a known numeric priority', () => {
+    expect(getPriorityName(0)).toBe('Info');
+    expect(getPriorityName(4)).toBe('Critical');
+  });
 
-const PriorityField = ({ value }: Props) => <span title={String(value)}>{getPriorityName(value) ?? value}</span>;
+  it('returns the capitalized name for a known string priority', () => {
+    expect(getPriorityName('2')).toBe('Medium');
+  });
 
-export default PriorityField;
+  it('returns undefined for an unknown priority', () => {
+    expect(getPriorityName(99)).toBeUndefined();
+  });
+});
