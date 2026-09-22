@@ -18,11 +18,13 @@ package org.graylog2.inputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
+import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
@@ -40,6 +42,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+
+import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -344,5 +349,23 @@ public class InputEventListenerTest {
         listener.inputStopped(InputStopped.create(INPUT_ID));
 
         verify(inputRegistry, never()).remove(Mockito.<IOState<MessageInput>>any());
+    }
+
+    @Test
+    public void leaderChangedStopsAndRemovesLeaderOnlyInputWhenNodeCeasesToBeLeader() {
+        final MessageInput leaderOnlyInput = mock(MessageInput.class);
+        when(leaderOnlyInput.getId()).thenReturn(INPUT_ID);
+        when(leaderOnlyInput.isGlobal()).thenReturn(true);
+        when(leaderOnlyInput.onlyOnePerCluster()).thenReturn(true);
+
+        when(serverStatus.getLifecycle()).thenReturn(Lifecycle.RUNNING);
+        when(leaderElectionService.isLeader()).thenReturn(false);
+        when(inputRegistry.getRunningInputs()).thenReturn(Set.of(inputState));
+        when(inputState.getStoppable()).thenReturn(leaderOnlyInput);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+
+        listener.leaderChanged(new LeaderChangedEvent());
+
+        verify(inputRegistry, times(1)).remove(inputState);
     }
 }
