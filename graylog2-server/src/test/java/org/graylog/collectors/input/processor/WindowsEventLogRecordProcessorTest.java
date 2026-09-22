@@ -20,6 +20,8 @@ import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.common.v1.AnyValue;
+import io.opentelemetry.proto.common.v1.KeyValue;
+import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.codec.OTelTypeConverter;
@@ -499,6 +501,23 @@ class WindowsEventLogRecordProcessorTest {
                 .contains("\"winserver03\"")
                 .contains("\"Channel\"")
                 .contains("\"System\"");
+    }
+
+    @Test
+    void rendersRecordIdAboveSignedLongRangeAsUnsigned() {
+        // EventRecordID is unsigned 64-bit, and the collector's adapter wraps a value above 2^63 into
+        // a negative long rather than sending a string, so it has to be rendered as unsigned.
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder()
+                        .setKvlistValue(KeyValueList.newBuilder()
+                                .addValues(KeyValue.newBuilder()
+                                        .setKey("record_id")
+                                        .setValue(AnyValue.newBuilder().setIntValue(-2L)))))
+                .build();
+
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result).containsEntry(EventFields.EVENT_UID, "18446744073709551614");
     }
 
     private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {

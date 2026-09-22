@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog.inputs.otel.OTelValues.asLong;
+import static org.graylog.inputs.otel.OTelValues.unsignedAsString;
 
 /**
  * Processes Windows Event Log receiver messages into GIM format.
@@ -101,13 +102,9 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "computer" -> fields.computer = extractString(bodyFieldValue);
                 // System/Channel: channel to which the event was logged (e.g., Security, Windows PowerShell).
                 case "channel" -> putIfPresent(result, EventFields.EVENT_LOG_NAME, extractString(bodyFieldValue));
-                // System/EventRecordID: channel-local record number assigned when logged.
-                case "record_id" -> {
-                    final var recordId = asLong(bodyFieldValue);
-                    if (recordId != null) {
-                        result.put(EventFields.EVENT_UID, recordId.toString());
-                    }
-                }
+                // System/EventRecordID: channel-local record number assigned when logged. The value is
+                // unsigned 64-bit, so it is rendered as a string to cover the whole range without loss.
+                case "record_id" -> putIfPresent(result, EventFields.EVENT_UID, unsignedAsString(bodyFieldValue));
                 // System/EventID (+ Qualifiers for legacy providers): provider-defined event identifier.
                 case "event_id" -> extractEventId(bodyFieldValue, fields);
                 // System/TimeCreated@SystemTime: event time in UTC.
