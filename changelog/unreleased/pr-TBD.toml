@@ -1,11 +1,11 @@
 type = "a"
-message = "Add a Latest / Older toggle to the content selection step when creating a new content pack revision."
+message = "Add a Server / Former revision toggle to the content selection step when creating a new content pack revision."
 
 details.user = """
-When creating a new revision from an existing one, a Latest / Older toggle above the entity list
-switches every selected entity that is installed on this server between its currently installed
-version (Latest) and the version stored in the former revision (Older). The revision's stored
-versions stay selected by default.
+When creating a new revision from an existing one, a Server / Former revision toggle above the entity
+list switches every selected entity that is installed on this server between the installed entity
+from the server and the entity from the former content pack revision. Entities from the former
+revision stay selected by default.
 """
 
 pulls = ["TBD"]

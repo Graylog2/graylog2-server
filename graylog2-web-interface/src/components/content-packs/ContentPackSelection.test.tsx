@@ -249,7 +249,7 @@ describe('<ContentPackSelection />', () => {
     });
   });
 
-  describe('Latest / Older toggle', () => {
+  describe('Server / Former revision toggle', () => {
     const type = { name: 'stream', version: '1' };
     const packStream = { title: 'Stream', type, id: 'pack-stream-uuid' } as any;
     const serverStream = { title: 'Stream', type, id: '5f0000000000000000000001' } as any;
@@ -272,23 +272,23 @@ describe('<ContentPackSelection />', () => {
     it('is hidden when no entity has an installed copy', () => {
       renderSelection({ stream: [packStream] }, jest.fn(), []);
 
-      expect(screen.queryByText('Latest')).not.toBeInTheDocument();
+      expect(screen.queryByText('Server')).not.toBeInTheDocument();
     });
 
-    it('swaps only checked, paired entities to their installed copies with Latest', async () => {
+    it('swaps only checked, paired entities to their installed copies with Server', async () => {
       const changeFn = jest.fn();
       renderSelection({ stream: [packStream, unpairedPackStream] }, changeFn);
 
-      await setupUser().click(screen.getByText('Latest'));
+      await setupUser().click(screen.getByText('Server'));
 
       expect(changeFn).toHaveBeenCalledWith({ selectedEntities: { stream: [unpairedPackStream, serverStream] } });
     });
 
-    it('swaps them back with Older', async () => {
+    it('swaps them back with Former revision', async () => {
       const changeFn = jest.fn();
       renderSelection({ stream: [unpairedPackStream, serverStream] }, changeFn);
 
-      await setupUser().click(screen.getByText('Older'));
+      await setupUser().click(screen.getByText('Former revision'));
 
       expect(changeFn).toHaveBeenCalledWith({ selectedEntities: { stream: [unpairedPackStream, packStream] } });
     });

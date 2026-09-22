@@ -74,24 +74,24 @@ describe('switchSource and selectedSource', () => {
     { packEntity: pairedPack, installedEntity: pairedServer },
     { packEntity: uncheckedPack, installedEntity: uncheckedServer },
   ];
-  const olderSelection = { stream: [pairedPack, unpairedPack] };
+  const formerRevisionSelection = { stream: [pairedPack, unpairedPack] };
 
   it('reports the shared source of the checked, paired entities', () => {
-    expect(selectedSource(olderSelection, pairs)).toBe('older');
-    expect(selectedSource({ stream: [pairedServer] }, pairs)).toBe('latest');
+    expect(selectedSource(formerRevisionSelection, pairs)).toBe('former_revision');
+    expect(selectedSource({ stream: [pairedServer] }, pairs)).toBe('server');
   });
 
   it('reports no source when the checked, paired entities are mixed', () => {
     expect(selectedSource({ stream: [pairedServer, uncheckedPack] }, pairs)).toBe('');
   });
 
-  it('swaps only the checked, paired entities to their installed copies for Latest', () => {
-    expect(switchSource(olderSelection, pairs, 'latest')).toEqual({ stream: [unpairedPack, pairedServer] });
+  it('swaps only the checked, paired entities to their installed copies for Server', () => {
+    expect(switchSource(formerRevisionSelection, pairs, 'server')).toEqual({ stream: [unpairedPack, pairedServer] });
   });
 
-  it('swaps them back for Older', () => {
-    const latestSelection = switchSource(olderSelection, pairs, 'latest');
+  it('swaps them back for Former revision', () => {
+    const serverSelection = switchSource(formerRevisionSelection, pairs, 'server');
 
-    expect(switchSource(latestSelection, pairs, 'older')).toEqual({ stream: [unpairedPack, pairedPack] });
+    expect(switchSource(serverSelection, pairs, 'former_revision')).toEqual({ stream: [unpairedPack, pairedPack] });
   });
 });

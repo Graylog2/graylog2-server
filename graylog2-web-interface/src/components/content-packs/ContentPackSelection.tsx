@@ -29,8 +29,8 @@ import type { EntityPair, EntitySource } from 'logic/content-packs/pairEntities'
 import style from './ContentPackSelection.css';
 
 const SOURCE_OPTIONS: Array<{ value: EntitySource; label: string }> = [
-  { value: 'latest', label: 'Latest' },
-  { value: 'older', label: 'Older' },
+  { value: 'server', label: 'Server' },
+  { value: 'former_revision', label: 'Former revision' },
 ];
 
 type ContentPackSelectionProps = {
@@ -340,8 +340,8 @@ class ContentPackSelection extends React.Component<
                   data={SOURCE_OPTIONS}
                 />
                 <HelpBlock>
-                  Latest selects the version currently installed on this server for every selected entity that has
-                  one. Older selects the version stored in the former content pack revision instead.
+                  Server selects the installed entity from the server for every selected entity that has one. Former
+                  revision selects the entity from the former content pack revision instead.
                 </HelpBlock>
               </>
             )}
