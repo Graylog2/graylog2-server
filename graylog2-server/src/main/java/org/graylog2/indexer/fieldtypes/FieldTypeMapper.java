@@ -63,7 +63,7 @@ public class FieldTypeMapper {
     public static final FieldTypes.Type NODE_TYPE = createType("node", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type EVENT_DEFINITION_ID_TYPE = createType("event-definition-id", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type ASSOCIATED_ASSETS_TYPE = createType("associated-assets", of(PROP_ENUMERABLE));
-    public static final FieldTypes.Type PRIORITY_TYPE = createType("priority", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type PRIORITY_TYPE = createType("priority", of(PROP_NUMERIC, PROP_ENUMERABLE));
 
 
     /**

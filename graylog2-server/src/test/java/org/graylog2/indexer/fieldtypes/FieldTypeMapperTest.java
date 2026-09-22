@@ -109,8 +109,8 @@ public class FieldTypeMapperTest {
                 .build();
 
         assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID),
-                "priority", "enumerable");
-        assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID), "priority", "enumerable");
+                "priority", "numeric", "enumerable");
+        assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID), "priority", "numeric", "enumerable");
 
         assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, "5f4dfb144b8ea2d1819e2e2e"),
                 "long", "numeric", "enumerable");
