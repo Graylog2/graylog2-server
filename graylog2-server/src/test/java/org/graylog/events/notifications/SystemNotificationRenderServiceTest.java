@@ -160,18 +160,26 @@ class SystemNotificationRenderServiceTest {
     }
 
     @Test
+    void dataNodeVersionMismatchLinkIsRelativeToTheExternalPath() {
+        assertThat(renderDataNodeVersionMismatch(DEFAULT_HTTP_EXTERNAL_URI))
+                .contains("href=\"/system/cluster/datanode-upgrade\"");
+    }
+
+    @Test
     void dataNodeVersionMismatchLinkIncludesConfiguredPathPrefix() {
-        notification = new NotificationImpl()
+        assertThat(renderDataNodeVersionMismatch("http://localhost:9000/graylog/"))
+                .contains("href=\"/graylog/system/cluster/datanode-upgrade\"");
+    }
+
+    private String renderDataNodeVersionMismatch(String httpExternalUri) {
+        final Notification dataNodeNotification = new NotificationImpl()
                 .addNode("node")
                 .addSeverity(Notification.Severity.NORMAL)
                 .addType(Notification.Type.DATA_NODE_VERSION_MISMATCH)
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
 
-        SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService("http://localhost:9000/graylog/").render(notification, SystemNotificationRenderService.Format.HTML);
-
-        assertThat(renderResponse.description)
-                .contains("href=\"http://localhost:9000/graylog/system/cluster/datanode-upgrade\"");
+        return renderService(httpExternalUri)
+                .render(dataNodeNotification, SystemNotificationRenderService.Format.HTML).description;
     }
 
     @Test

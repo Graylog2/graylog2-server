@@ -52,7 +52,9 @@ public class SystemNotificationRenderService {
 
     /**
      * Template key for the {@link URIHelper} used to resolve links in the rendered template against the
-     * externally visible base URI, e.g. via {@code ${uri_helper.resolve('some/path')}}.
+     * externally visible base URI. Links the browser will follow should stay relative and only take the
+     * external path prefix into account, e.g. {@code ${uri_helper.relativePath('some/path')}}. Use
+     * {@code ${uri_helper.resolve('some/path')}} only where an absolute URI is required.
      */
     private static final String KEY_URI_HELPER = "uri_helper";
     public static final String TEMPLATE_BASE_PATH = "/org/graylog2/freemarker/templates/";

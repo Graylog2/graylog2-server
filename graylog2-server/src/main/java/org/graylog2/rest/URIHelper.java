@@ -49,4 +49,14 @@ public class URIHelper {
     public URI resolve(String path) {
         return baseUri.resolve(path);
     }
+
+    /**
+     * Resolve a path against the base URI and return only its path component, e.g. {@code /some/path}
+     * or, with a configured external path prefix, {@code /prefix/some/path}. Use this for links the
+     * browser will follow, so they keep working whether the app is reached directly, behind a reverse
+     * proxy, or with a configured {@code http_external_uri} path prefix.
+     */
+    public String relativePath(String path) {
+        return resolve(path).getPath();
+    }
 }
