@@ -234,7 +234,6 @@ public class InputEventListener {
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
                         LOG.info("Lost leader role. Stopping input {}", input.toIdentifier());
-                        inputStopped(InputStopped.create(input.getId()));
                         removeFromRegistry(input.getId());
                     });
         }
