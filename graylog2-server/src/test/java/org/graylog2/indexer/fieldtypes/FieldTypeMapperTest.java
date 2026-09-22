@@ -51,7 +51,11 @@ public class FieldTypeMapperTest {
     }
 
     private void assertMapping(FieldTypeDTO esType, String glType, String... properties) {
-        assertThat(mapper.mapType(esType))
+        assertMapping(esType, Set.of(), glType, properties);
+    }
+
+    private void assertMapping(FieldTypeDTO esType, Set<String> queryStreamIds, String glType, String... properties) {
+        assertThat(mapper.mapType(esType, queryStreamIds))
                 .isPresent().get()
                 .isEqualTo(createType(glType, copyOf(properties)));
     }
@@ -98,28 +102,19 @@ public class FieldTypeMapperTest {
     }
 
     @Test
-    public void mapsPriorityFieldOnlyWhenConfinedToEventStreams() {
-        final FieldTypeDTO confinedToEventStreams = FieldTypeDTO.builder()
-                .fieldName(CommonEventSummary.FIELD_PRIORITY)
-                .physicalType("long")
-                .streams(Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID))
-                .build();
-
-        assertMapping(confinedToEventStreams, "priority", "enumerable");
-
-        final FieldTypeDTO alsoInOtherStream = FieldTypeDTO.builder()
-                .fieldName(CommonEventSummary.FIELD_PRIORITY)
-                .physicalType("long")
-                .streams(Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, "5f4dfb144b8ea2d1819e2e2e"))
-                .build();
-
-        assertMapping(alsoInOtherStream, "long", "numeric", "enumerable");
-
-        final FieldTypeDTO noStreamData = FieldTypeDTO.builder()
+    public void mapsPriorityFieldOnlyWhenQueryIsConfinedToEventStreams() {
+        final FieldTypeDTO priorityField = FieldTypeDTO.builder()
                 .fieldName(CommonEventSummary.FIELD_PRIORITY)
                 .physicalType("long")
                 .build();
 
-        assertMapping(noStreamData, "long", "numeric", "enumerable");
+        assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID),
+                "priority", "enumerable");
+        assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID), "priority", "enumerable");
+
+        assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, "5f4dfb144b8ea2d1819e2e2e"),
+                "long", "numeric", "enumerable");
+        assertMapping(priorityField, Set.of("5f4dfb144b8ea2d1819e2e2e"), "long", "numeric", "enumerable");
+        assertMapping(priorityField, Set.of(), "long", "numeric", "enumerable");
     }
 }

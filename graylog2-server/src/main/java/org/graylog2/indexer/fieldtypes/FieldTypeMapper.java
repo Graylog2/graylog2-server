@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -101,11 +102,12 @@ public class FieldTypeMapper {
     /**
      * Map the given Elasticsearch field type to a Graylog type.
      *
-     * @param type Elasticsearch type name
+     * @param type           Elasticsearch type name
+     * @param queryStreamIds the streams the current query/search is scoped to
      * @return the Graylog type object
      */
-    public Optional<FieldTypes.Type> mapType(FieldTypeDTO type) {
-        return Optional.ofNullable(mapFieldNameType(type))
+    public Optional<FieldTypes.Type> mapType(FieldTypeDTO type, Collection<String> queryStreamIds) {
+        return Optional.ofNullable(mapFieldNameType(type, queryStreamIds))
                 .or(() -> Optional.ofNullable(TYPE_MAP.get(type.physicalType())))
                 .map(mappedType -> type.properties().contains(FieldTypeDTO.Properties.FIELDDATA)
                         ? mappedType.toBuilder().properties(new ImmutableSet.Builder<String>().addAll(mappedType.properties()).add(PROP_ENUMERABLE).build()).build()
@@ -115,14 +117,14 @@ public class FieldTypeMapper {
     /**
      * Maps a field to a Graylog type by its (Graylog-reserved) field name, regardless of its physical type.
      */
-    private static FieldTypes.Type mapFieldNameType(FieldTypeDTO type) {
+    private static FieldTypes.Type mapFieldNameType(FieldTypeDTO type, Collection<String> queryStreamIds) {
         return switch (type.fieldName()) {
             case Message.FIELD_STREAMS, Message.FIELD_FAILED_MESSAGE_STREAMS -> STREAMS_TYPE;
             case Message.FIELD_GL2_SOURCE_INPUT -> INPUT_TYPE;
             case Message.FIELD_GL2_SOURCE_NODE -> NODE_TYPE;
             case EventDto.FIELD_EVENT_DEFINITION_ID -> EVENT_DEFINITION_ID_TYPE;
             case "associated_assets" -> ASSOCIATED_ASSETS_TYPE;
-            case CommonEventSummary.FIELD_PRIORITY -> mapPriorityType(type);
+            case CommonEventSummary.FIELD_PRIORITY -> mapPriorityType(queryStreamIds);
             default -> null;
         };
     }
@@ -130,13 +132,13 @@ public class FieldTypeMapper {
     /**
      * Unlike the other cases in {@link #mapFieldNameType}, "priority" is not a Graylog-reserved field name: user
      * messages can freely contain their own unrelated "priority" field. It is only mapped to
-     * {@link #PRIORITY_TYPE} when it is confined to the built-in events streams, so that an unrelated message
-     * field of the same name keeps its plain numeric type. This requires stream-aware field types
-     * ({@code stream_aware_field_types}) to be enabled; otherwise {@link FieldTypeDTO#streams()} is always
-     * empty and the field falls through to the generic {@link #TYPE_MAP} lookup.
+     * {@link #PRIORITY_TYPE} when the current query is confined to the built-in events streams, so that an
+     * unrelated message field of the same name on a regular stream keeps its plain numeric type. This looks at
+     * which streams the query asked about, not at which streams the field's underlying data actually spans, so
+     * it works regardless of whether {@code stream_aware_field_types} is enabled.
      */
-    private static FieldTypes.Type mapPriorityType(FieldTypeDTO type) {
-        if (!type.streams().isEmpty() && Stream.DEFAULT_EVENT_STREAM_IDS.containsAll(type.streams())) {
+    private static FieldTypes.Type mapPriorityType(Collection<String> queryStreamIds) {
+        if (!queryStreamIds.isEmpty() && Stream.DEFAULT_EVENT_STREAM_IDS.containsAll(queryStreamIds)) {
             return PRIORITY_TYPE;
         }
 
