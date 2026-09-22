@@ -2,3 +2,4 @@ type = "added"
 message = "Populate the GIM `event_sequence` field with a receiver-specific sequence number for Collector messages, so messages sharing a millisecond timestamp can be sorted."
 
 issues = ["26801"]
+pulls = ["27450"]
