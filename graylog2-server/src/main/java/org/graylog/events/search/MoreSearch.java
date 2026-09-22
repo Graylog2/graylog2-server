@@ -105,7 +105,8 @@ public class MoreSearch {
                     .build();
         }
         return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(),
-                parameters.perPage(), eventStreams, filterString, sourceStreamFilter, parameters.filter().extraFilters());
+                parameters.perPage(), eventStreams, filterString, sourceStreamFilter, parameters.filter().extraFilters(),
+                parameters.filter().excludedIds());
     }
 
     /**
