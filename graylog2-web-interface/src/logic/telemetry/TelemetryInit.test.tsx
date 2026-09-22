@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { usePostHog } from 'posthog-js/react';
 
 import { asMock } from 'helpers/mocking';
@@ -51,7 +51,7 @@ describe('<TelemetryInit>', () => {
     expect(result.current.__loaded).toBeFalsy();
   });
 
-  it('should render Telemetry and make usePosthog available', () => {
+  it('should render Telemetry and make usePosthog available', async () => {
     asMock(useTelemetrySettings).mockReturnValue({
       data: {
         telemetry_permission_asked: false,
@@ -67,7 +67,9 @@ describe('<TelemetryInit>', () => {
 
     const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
 
-    expect(result.current.__loaded).toBeTruthy();
+    // The PostHog provider is loaded asynchronously, so it is not available on the first render.
+    await waitFor(() => expect(result.current?.__loaded).toBeTruthy());
+
     expect(result.current.config.strict_script_versioning).toBe(true);
   });
 });
