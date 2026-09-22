@@ -1,0 +1,10 @@
+type = "c"
+message = "Updating libraries to use tzdb 2026d, containing timezone changes for Canada's Northwest Territories."
+
+details.user = """
+Updates `joda-time` to `v2.14.4`, `moment` to `v2.31.0` (which also includes a minor vulnerability
+patch) and `moment-timezone` to `v0.6.4`, so backend and frontend use the same time zone database
+version 2026d. This incorporates the recent time zone changes for Canada's Northwest Territories.
+"""
+
+pulls = ["27447"]
