@@ -36,6 +36,8 @@ import useProductName from 'brand-customization/useProductName';
 import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
+import useContentPackInstallations from 'components/content-packs/hooks/useContentPackInstallations';
+import { pairEntities } from 'logic/content-packs/pairEntities';
 
 const EditContentPackPage = () => {
   const productName = useProductName();
@@ -48,6 +50,16 @@ const EditContentPackPage = () => {
   const [contentPackEntities, setContentPackEntities] = useState(undefined);
   const [fetchedEntities, setFetchedEntities] = useState(undefined);
   const { data: revisionData } = useContentPackRevisions(contentPackId);
+  const { data: installationsData } = useContentPackInstallations(contentPackId);
+  const entityPairs =
+    contentPackEntities && entityIndex
+      ? pairEntities(
+          contentPackEntities,
+          entityIndex,
+          installationsData?.installations ?? [],
+          parseInt(contentPackRev, 10),
+        )
+      : [];
 
   useEffect(() => {
     if (!revisionData) return;
@@ -196,6 +208,7 @@ const EditContentPackPage = () => {
           fetchedEntities={fetchedEntities}
           selectedEntities={selectedEntities}
           entityIndex={entityCatalog}
+          entityPairs={entityPairs}
           appliedParameter={appliedParameter}
           edit
           onSave={_onSave}

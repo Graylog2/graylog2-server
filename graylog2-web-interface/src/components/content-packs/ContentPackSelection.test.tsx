@@ -248,4 +248,49 @@ describe('<ContentPackSelection />', () => {
       }
     });
   });
+
+  describe('Latest / Older toggle', () => {
+    const type = { name: 'stream', version: '1' };
+    const packStream = { title: 'Stream', type, id: 'pack-stream-uuid' } as any;
+    const serverStream = { title: 'Stream', type, id: '5f0000000000000000000001' } as any;
+    const unpairedPackStream = { title: 'Other', type, id: 'unpaired-pack-uuid' } as any;
+    const entities = { stream: [serverStream, packStream, unpairedPackStream] };
+    const entityPairs = [{ packEntity: packStream, installedEntity: serverStream }];
+
+    const renderSelection = (selectedEntities, onStateChange = jest.fn(), pairs = entityPairs) =>
+      render(
+        <ContentPackSelection
+          contentPack={{}}
+          edit
+          entities={entities}
+          entityPairs={pairs}
+          selectedEntities={selectedEntities}
+          onStateChange={onStateChange}
+        />,
+      );
+
+    it('is hidden when no entity has an installed copy', () => {
+      renderSelection({ stream: [packStream] }, jest.fn(), []);
+
+      expect(screen.queryByText('Latest')).not.toBeInTheDocument();
+    });
+
+    it('swaps only checked, paired entities to their installed copies with Latest', async () => {
+      const changeFn = jest.fn();
+      renderSelection({ stream: [packStream, unpairedPackStream] }, changeFn);
+
+      await setupUser().click(screen.getByText('Latest'));
+
+      expect(changeFn).toHaveBeenCalledWith({ selectedEntities: { stream: [unpairedPackStream, serverStream] } });
+    });
+
+    it('swaps them back with Older', async () => {
+      const changeFn = jest.fn();
+      renderSelection({ stream: [unpairedPackStream, serverStream] }, changeFn);
+
+      await setupUser().click(screen.getByText('Older'));
+
+      expect(changeFn).toHaveBeenCalledWith({ selectedEntities: { stream: [unpairedPackStream, packStream] } });
+    });
+  });
 });

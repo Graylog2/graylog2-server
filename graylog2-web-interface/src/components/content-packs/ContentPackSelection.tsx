@@ -18,13 +18,20 @@ import * as React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { Icon, SearchForm } from 'components/common';
-import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
+import { Col, HelpBlock, Row, Input, SegmentedControl } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 import InputDescription from 'components/common/InputDescription';
 import ContentPackSelectionList from 'components/content-packs/ContentPackSelectionList';
+import { selectedSource, switchSource } from 'logic/content-packs/pairEntities';
+import type { EntityPair, EntitySource } from 'logic/content-packs/pairEntities';
 
 import style from './ContentPackSelection.css';
+
+const SOURCE_OPTIONS: Array<{ value: EntitySource; label: string }> = [
+  { value: 'latest', label: 'Latest' },
+  { value: 'older', label: 'Older' },
+];
 
 type ContentPackSelectionProps = {
   contentPack: any;
@@ -32,6 +39,7 @@ type ContentPackSelectionProps = {
   entities?: any;
   selectedEntities?: any;
   edit?: boolean;
+  entityPairs?: Array<EntityPair>;
 };
 
 class ContentPackSelection extends React.Component<
@@ -45,6 +53,7 @@ class ContentPackSelection extends React.Component<
     onStateChange: () => {},
     entities: {},
     selectedEntities: {},
+    entityPairs: [],
   };
 
   constructor(props) {
@@ -177,6 +186,16 @@ class ContentPackSelection extends React.Component<
     onStateChange({ selectedEntities: newSelection });
   };
 
+  _switchSource = (source: EntitySource | '') => {
+    const { selectedEntities, entityPairs, onStateChange } = this.props;
+
+    if (!source) {
+      return;
+    }
+
+    onStateChange({ selectedEntities: switchSource(selectedEntities, entityPairs, source) });
+  };
+
   _isGroupSelected = (type) => {
     const { selectedEntities, entities } = this.props;
 
@@ -221,7 +240,7 @@ class ContentPackSelection extends React.Component<
 
   render() {
     const { filteredEntities = {}, errors, touched, isFiltered, contentPack } = this.state;
-    const { edit, selectedEntities } = this.props;
+    const { edit, selectedEntities, entityPairs } = this.props;
 
     return (
       <div>
@@ -311,6 +330,20 @@ class ContentPackSelection extends React.Component<
                 former content pack revision (<Icon name="archive" className={style.contentPackEntity} />
                 ).
               </HelpBlock>
+            )}
+            {edit && entityPairs.length > 0 && (
+              <>
+                {/* An empty value leaves no segment active, since Mantine ignores clicks on the active one. */}
+                <SegmentedControl<EntitySource | ''>
+                  value={selectedSource(selectedEntities, entityPairs)}
+                  onChange={this._switchSource}
+                  data={SOURCE_OPTIONS}
+                />
+                <HelpBlock>
+                  Latest selects the version currently installed on this server for every selected entity that has
+                  one. Older selects the version stored in the former content pack revision instead.
+                </HelpBlock>
+              </>
             )}
           </Col>
         </Row>
