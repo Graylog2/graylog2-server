@@ -70,6 +70,7 @@ public class ElasticsearchConfiguration {
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_PERIOD = "time_size_optimizing_rotation_period";
     public static final String ALLOW_FLEXIBLE_RETENTION_PERIOD = "allow_flexible_retention_period";
     public static final String INDEX_FIELD_TYPE_REFRESH_INTERVAL = "index_field_type_refresh_interval";
+    public static final String EVENTS_INDEX_REFRESH_INTERVAL = "events_index_refresh_interval";
 
     // duplicated from the DataNode config, necessary to have the same number for the local query validation via Lucene
     @Documentation("This setting limits the number of clauses a Lucene BooleanQuery can have.")
@@ -99,6 +100,18 @@ public class ElasticsearchConfiguration {
     @Documentation("The prefix for graylog system event indices.")
     @Parameter(value = DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX, validators = StringNotBlankValidator.class)
     private String defaultSystemEventsIndexPrefix = "gl-system-events";
+
+    @Documentation("""
+            The refresh interval for the Graylog events indices. This applies to both the events and the
+            system events index sets, and only takes effect on newly created or updated index templates.
+            Lower values make new events searchable sooner at the cost of indexing throughput. Some
+            managed OpenSearch offerings enforce a cluster-wide minimum refresh interval and will reject
+            the index template if this value is below it. Accepts any search backend time value, or -1
+            to disable refreshing entirely.
+            Default: 1s
+            """)
+    @Parameter(value = EVENTS_INDEX_REFRESH_INTERVAL, validators = StringNotBlankValidator.class)
+    private String eventsIndexRefreshInterval = "1s";
 
     @Documentation("""
             Analyzer (tokenizer) to use for message and full_message field. The "standard" filter usually is a good idea.
@@ -326,6 +339,9 @@ public class ElasticsearchConfiguration {
         return defaultSystemEventsIndexPrefix;
     }
 
+    public String getEventsIndexRefreshInterval() {
+        return eventsIndexRefreshInterval;
+    }
 
     public String getAnalyzer() {
         return analyzer;

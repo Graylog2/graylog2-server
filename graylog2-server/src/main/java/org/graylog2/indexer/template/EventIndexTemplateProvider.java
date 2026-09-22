@@ -16,13 +16,23 @@
  */
 package org.graylog2.indexer.template;
 
+import jakarta.inject.Inject;
+import org.graylog2.configuration.ElasticsearchConfiguration;
+
 public class EventIndexTemplateProvider extends BasicIndexTemplateProvider<EventsIndexMapping> {
 
     public static final String EVENT_TEMPLATE_TYPE = "events";
 
+    private final String indexRefreshInterval;
+
+    @Inject
+    public EventIndexTemplateProvider(ElasticsearchConfiguration elasticsearchConfiguration) {
+        this.indexRefreshInterval = elasticsearchConfiguration.getEventsIndexRefreshInterval();
+    }
+
     @Override
     protected EventsIndexMapping createTemplateInstance() {
-        return new EventsIndexMapping7();
+        return new EventsIndexMapping7(indexRefreshInterval);
     }
 
 }

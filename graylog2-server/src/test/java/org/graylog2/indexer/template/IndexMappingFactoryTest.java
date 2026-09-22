@@ -17,6 +17,7 @@
 package org.graylog2.indexer.template;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.storage.SearchVersion;
@@ -35,9 +36,11 @@ import static org.mockito.Mockito.when;
 
 public class IndexMappingFactoryTest {
 
+    private static final ElasticsearchConfiguration ELASTICSEARCH_CONFIGURATION = mock(ElasticsearchConfiguration.class);
+
     public static final ImmutableMap<String, IndexTemplateProvider> TEMPLATE_PROVIDERS = ImmutableMap.of(
             MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider(),
-            EVENT_TEMPLATE_TYPE, new EventIndexTemplateProvider()
+            EVENT_TEMPLATE_TYPE, new EventIndexTemplateProvider(ELASTICSEARCH_CONFIGURATION)
     );
 
     @ParameterizedTest

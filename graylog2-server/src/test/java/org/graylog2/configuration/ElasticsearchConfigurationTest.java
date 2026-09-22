@@ -42,6 +42,7 @@ class ElasticsearchConfigurationTest {
         assertEquals("graylog-internal", configuration.getDefaultIndexTemplateName());
         assertEquals("gl-events", configuration.getDefaultEventsIndexPrefix());
         assertEquals("gl-system-events", configuration.getDefaultSystemEventsIndexPrefix());
+        assertEquals("1s", configuration.getEventsIndexRefreshInterval());
         assertEquals("standard", configuration.getAnalyzer());
         assertEquals(1, configuration.getShards());
         assertEquals(0, configuration.getReplicas());
