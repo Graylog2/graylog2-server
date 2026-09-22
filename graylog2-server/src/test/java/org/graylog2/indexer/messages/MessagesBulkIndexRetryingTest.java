@@ -47,6 +47,7 @@ class MessagesBulkIndexRetryingTest {
     private final MessagesAdapter messagesAdapter = mock(MessagesAdapter.class);
     private final ProcessingStatusRecorder processingStatusRecorder = mock(ProcessingStatusRecorder.class);
     private final Configuration conf = mock(Configuration.class);
+    private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
 
     private Messages messages;
 
@@ -54,7 +55,7 @@ class MessagesBulkIndexRetryingTest {
     void setUp() {
         when(conf.getFailureHandlingQueueCapacity()).thenReturn(1000);
         this.messages = new Messages(trafficAccounting, messagesAdapter, processingStatusRecorder,
-                mock(FailureSubmissionService.class));
+                failureSubmissionService);
     }
 
     @Test
@@ -68,7 +69,7 @@ class MessagesBulkIndexRetryingTest {
     }
 
     @Test
-    public void bulkIndexingShouldNotRetryForIndexMappingErrors() throws Exception {
+    public void bulkIndexingShouldNotRetryForMappingErrorsItCannotRepair() throws Exception {
         final String messageId = "BOOMID";
 
         final IndexingResults errorResult =
@@ -171,6 +172,64 @@ class MessagesBulkIndexRetryingTest {
         verify(messagesAdapter, times(2)).bulkIndex(any());
         assertThat(result.errors()).hasSize(1);
         assertThat(result.errors()).map(IndexingError::message).map(Indexable::getId).containsOnly("other-error-id");
+    }
+
+
+    @Test
+    public void mappingErrorsForNumericFieldsAreRetriedWithACoercedValue() throws IOException {
+        final IndexingResults errorResult = IndexingResults.create(List.of(), List.of(numericFieldMappingError()));
+
+        when(messagesAdapter.bulkIndex(any()))
+                .thenReturn(errorResult)
+                .thenReturn(IndexingResults.empty());
+
+        var result = messages.bulkIndex(messagesWithIds("coercible-id"));
+
+        verify(messagesAdapter, times(2)).bulkIndex(any());
+        assertThat(result.errors()).isEmpty();
+    }
+
+    @Test
+    public void coercedMessagesAreRetriedOnlyOnce() throws IOException {
+        // the coerced retry fails the same way, so the message must not be retried again
+        final IndexingResults errorResult = IndexingResults.create(List.of(), List.of(numericFieldMappingError()));
+
+        when(messagesAdapter.bulkIndex(any())).thenReturn(errorResult);
+
+        var result = messages.bulkIndex(messagesWithIds("coercible-id"));
+
+        verify(messagesAdapter, times(2)).bulkIndex(any());
+        assertThat(result.errors()).map(IndexingError::message).map(Indexable::getId).containsOnly("coercible-id");
+    }
+
+    @Test
+    public void coercibleMappingErrorsAreReportedForNotification() throws IOException {
+        final IndexingResults errorResult = IndexingResults.create(List.of(), List.of(numericFieldMappingError()));
+
+        when(messagesAdapter.bulkIndex(any()))
+                .thenReturn(errorResult)
+                .thenReturn(IndexingResults.empty());
+
+        messages.bulkIndex(messagesWithIds("coercible-id"));
+
+        verify(failureSubmissionService, times(1)).notifyAboutIndexMappingConflicts(any());
+    }
+
+    @Test
+    public void mappingErrorsItCannotRepairAreNotReportedForNotification() throws IOException {
+        final IndexingResults errorResult = IndexingResults.create(List.of(),
+                List.of(errorResultItem("boom-id", MappingError, "failed to parse [http_response_code]")));
+
+        when(messagesAdapter.bulkIndex(any())).thenReturn(errorResult);
+
+        messages.bulkIndex(messagesWithIds("boom-id"));
+
+        verify(failureSubmissionService, never()).notifyAboutIndexMappingConflicts(any());
+    }
+
+    private IndexingError numericFieldMappingError() {
+        return errorResultItem("coercible-id", MappingError,
+                "failed to parse field [event_start] of type [long] in document with id 'coercible-id'");
     }
 
     private List<MessageWithIndex> messagesWithIds(String... ids) {

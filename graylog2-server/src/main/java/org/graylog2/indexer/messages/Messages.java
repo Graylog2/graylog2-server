@@ -37,11 +37,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.graylog2.indexer.messages.RetryWait.MAX_WAIT_TIME;
 
@@ -140,7 +144,9 @@ public class Messages {
 
         final IndexingResults retryBlockResults = retryQualifyingIndividualItems(indexingRequestList, indexingResults.errors(), indexingListener);
 
-        final IndexingResults finalResults = retryBlockResults.mergeWith(indexingResults.successes(), List.of());
+        final IndexingResults resultsAfterBlockRetries = retryBlockResults.mergeWith(indexingResults.successes(), List.of());
+
+        final IndexingResults finalResults = retryCoercibleMappingErrors(resultsAfterBlockRetries, indexingListener);
 
         recordTimestamp(finalResults.successes());
         accountTotalMessageSizes(finalResults.successes(), isSystemTraffic);
@@ -184,6 +190,62 @@ public class Messages {
 
         builder.addErrors(otherFailures.stream().toList());
         return builder.build();
+    }
+
+    /**
+     * Retries messages the indexer rejected because a date value was written into a numerically mapped field,
+     * rewriting the value the way the existing mapping expects. See {@link MappingErrorCoercion} for why this is
+     * the only way to get such a message indexed: a field's type cannot be changed in an existing index.
+     * <p>
+     * This is deliberately a single pass rather than a loop: every message gets at most one coerced retry, and
+     * anything still failing afterwards takes the regular failure-handling path.
+     */
+    private IndexingResults retryCoercibleMappingErrors(IndexingResults results, IndexingListener indexingListener) {
+        final Map<IndexingError, Indexable> coercions = new LinkedHashMap<>();
+        for (IndexingError error : results.errors()) {
+            MappingErrorCoercion.coerce(error.message(), error.error().errorMessage())
+                    .ifPresent(coerced -> coercions.put(error, coerced));
+        }
+        if (coercions.isEmpty()) {
+            return results;
+        }
+
+        failureSubmissionService.notifyAboutIndexMappingConflicts(coercions.keySet());
+
+        final List<IndexingRequest> retries = coercions.entrySet().stream()
+                .map(entry -> IndexingRequest.create(entry.getKey().index(), entry.getValue()))
+                .toList();
+
+        LOG.warn("Retrying {} messages that were rejected because of a field type conflict, writing the conflicting "
+                + "field the way the existing index mapping expects.", retries.size());
+
+        final IndexingResults retryResults = runBulkRequest(retries, retries.size(), indexingListener);
+
+        if (!retryResults.successes().isEmpty()) {
+            LOG.info("Indexed {} of {} messages after adapting them to the existing index mapping.",
+                    retryResults.successes().size(), retries.size());
+        }
+
+        // Report the original messages rather than the rewritten ones, so failure handling shows what was received.
+        final Map<String, Indexable> originalMessages = coercions.keySet().stream()
+                .map(IndexingError::message)
+                .filter(message -> message.getId() != null)
+                .collect(Collectors.toMap(Indexable::getId, message -> message, (first, second) -> first));
+
+        final List<IndexingError> remainingErrors = new ArrayList<>(
+                results.errors().stream().filter(error -> !coercions.containsKey(error)).toList());
+        retryResults.errors().stream().map(error -> withOriginalMessage(error, originalMessages)).forEach(remainingErrors::add);
+
+        return IndexingResults.create(
+                Stream.concat(results.successes().stream(), retryResults.successes().stream()).toList(),
+                remainingErrors);
+    }
+
+    private IndexingError withOriginalMessage(IndexingError error, Map<String, Indexable> originalMessages) {
+        final Indexable original = originalMessages.get(error.message().getId());
+        return original == null
+                ? error
+                : IndexingError.create(original, error.index(), error.error().type(), error.error().errorMessage());
     }
 
     private List<IndexingRequest> messagesForResultItems(List<IndexingRequest> chunk, Set<IndexingError> indexBlocks) {

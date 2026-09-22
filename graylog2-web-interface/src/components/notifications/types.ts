@@ -40,6 +40,7 @@ export type NotificationKind =
   | 'generic'
   | 'generic_with_link'
   | 'es_index_blocked'
+  | 'es_index_mapping_error'
   | 'es_node_disk_watermark_low'
   | 'es_node_disk_watermark_high'
   | 'es_node_disk_watermark_flood_stage'

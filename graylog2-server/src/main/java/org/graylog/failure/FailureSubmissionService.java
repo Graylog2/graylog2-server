@@ -25,7 +25,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.IndexingError;
+import org.graylog2.indexer.messages.MappingErrorCoercion;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
@@ -38,6 +41,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
@@ -58,6 +65,7 @@ public class FailureSubmissionService {
 
     private final InputDiagnosisMetrics inputDiagnosisMetrics;
     private final ObjectMapper objectMapper;
+    private final NotificationService notificationService;
     private final Meter dummyMeter = new Meter();
 
     @Inject
@@ -65,7 +73,9 @@ public class FailureSubmissionService {
             FailureSubmissionQueue failureSubmissionQueue,
             FailureHandlingConfiguration failureHandlingConfiguration,
             InputDiagnosisMetrics inputDiagnosisMetrics,
-            ObjectMapperProvider objectMapperProvider) {
+            ObjectMapperProvider objectMapperProvider,
+            NotificationService notificationService) {
+        this.notificationService = notificationService;
         this.failureSubmissionQueue = failureSubmissionQueue;
         this.failureHandlingConfiguration = failureHandlingConfiguration;
         this.inputDiagnosisMetrics = inputDiagnosisMetrics;
@@ -225,6 +235,32 @@ public class FailureSubmissionService {
             logger.warn("Failed to submit an input failure for failure handling. The thread has been interrupted!");
             Thread.currentThread().interrupt();
         }
+    }
+
+    /**
+     * Tells the administrator that an index rejects values Graylog writes for a field, because
+     * {@link MappingErrorCoercion} only keeps ingestion going - it does not resolve the underlying conflict, and a
+     * field's type cannot be changed in an existing index.
+     * <p>
+     * Deduplicated per index by the notification key. The wording lives in the {@code es_index_mapping_error}
+     * notification templates; this only supplies the details they render.
+     */
+    public void notifyAboutIndexMappingConflicts(Collection<IndexingError> mappingErrors) {
+        mappingErrors.stream().collect(Collectors.groupingBy(IndexingError::index)).forEach((index, errors) -> {
+            final Set<String> fields = errors.stream()
+                    .map(error -> MappingErrorCoercion.numericFieldFrom(error.error().errorMessage()))
+                    .flatMap(Optional::stream)
+                    .collect(Collectors.toCollection(TreeSet::new));
+
+            final Notification notification = notificationService.buildNow()
+                    .addType(Notification.Type.ES_INDEX_MAPPING_ERROR)
+                    .addKey(index)
+                    .addSeverity(Notification.Severity.URGENT)
+                    .addDetail("index", index)
+                    .addDetail("fields", String.join(", ", fields))
+                    .addDetail("rejectedMessages", errors.size());
+            notificationService.publishIfFirst(notification);
+        });
     }
 
     private IndexingFailure fromIndexingError(IndexingError indexingError) {
