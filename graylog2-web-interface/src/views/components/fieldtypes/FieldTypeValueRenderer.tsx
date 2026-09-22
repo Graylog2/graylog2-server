@@ -24,6 +24,7 @@ import NodeField from './NodeField';
 import StreamsField from './StreamsField';
 import PercentageField from './PercentageField';
 import EventDefinition from './EventDefinition';
+import PriorityField from './PriorityField';
 
 const FieldTypeValueRenderer: PluginExports['fieldTypeValueRenderer'] = [
   {
@@ -47,6 +48,7 @@ const FieldTypeValueRenderer: PluginExports['fieldTypeValueRenderer'] = [
     type: 'event-definition-id',
     render: (value: string) => <EventDefinition value={value} />,
   },
+  { type: 'priority', render: (value: string | number) => <PriorityField value={value} /> },
 ];
 
 export default FieldTypeValueRenderer;
