@@ -29,6 +29,7 @@ public abstract class NumberVisualizationConfigDTO implements VisualizationConfi
     public static final String NAME = "numeric";
     private static final String FIELD_TREND = "trend";
     private static final String FIELD_TREND_PREFERENCE = "trend_preference";
+    private static final String FIELD_COLOR_PREFERENCE = "color_preference";
 
     public enum TrendPreference {
         LOWER,
@@ -36,11 +37,19 @@ public abstract class NumberVisualizationConfigDTO implements VisualizationConfi
         HIGHER;
     }
 
+    public enum ColorPreference {
+        TREND_ONLY,
+        FULL_WIDGET;
+    }
+
     @JsonProperty
     public abstract boolean trend();
 
     @JsonProperty
     public abstract TrendPreference trendPreference();
+
+    @JsonProperty
+    public abstract ColorPreference colorPreference();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -50,13 +59,17 @@ public abstract class NumberVisualizationConfigDTO implements VisualizationConfi
         @JsonProperty(FIELD_TREND_PREFERENCE)
         public abstract Builder trendPreference(TrendPreference trendPreference);
 
+        @JsonProperty(FIELD_COLOR_PREFERENCE)
+        public abstract Builder colorPreference(ColorPreference colorPreference);
+
         public abstract NumberVisualizationConfigDTO build();
 
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_NumberVisualizationConfigDTO.Builder()
                 .trend(false)
-                .trendPreference(TrendPreference.NEUTRAL);
+                .trendPreference(TrendPreference.NEUTRAL)
+                .colorPreference(ColorPreference.FULL_WIDGET);
         }
     }
 }

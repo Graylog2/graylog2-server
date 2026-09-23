@@ -23,6 +23,7 @@ import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizat
 type NumberVisualizationConfigFormValues = {
   trend: boolean;
   trend_preference: 'LOWER' | 'NEUTRAL' | 'HIGHER';
+  color_preference: 'TREND_ONLY' | 'FULL_WIDGET';
 };
 
 const singleNumber: VisualizationType<
@@ -34,12 +35,18 @@ const singleNumber: VisualizationType<
   displayName: 'Single Number',
   component: NumberVisualization,
   config: {
+    createConfig: () => ({ color_preference: 'FULL_WIDGET' }),
     fromConfig: (config: NumberVisualizationConfig | undefined) => ({
       trend: config?.trend,
       trend_preference: config?.trendPreference,
+      color_preference: config?.colorPreference ?? 'FULL_WIDGET',
     }),
-    toConfig: ({ trend = false, trend_preference }: NumberVisualizationConfigFormValues) =>
-      NumberVisualizationConfig.create(trend, trend_preference),
+    toConfig: ({
+      trend = false,
+      trend_preference,
+      color_preference = 'FULL_WIDGET',
+    }: NumberVisualizationConfigFormValues) =>
+      NumberVisualizationConfig.create(trend, trend_preference, undefined, color_preference),
     fields: [
       {
         name: 'trend',
@@ -74,6 +81,19 @@ const singleNumber: VisualizationType<
         ],
         required: true,
         isShown: (formValues: NumberVisualizationConfigFormValues) => formValues?.trend === true,
+      },
+      {
+        name: 'color_preference',
+        title: 'Color Preference',
+        type: 'select',
+        options: [
+          ['Highlight trend info only', 'TREND_ONLY'],
+          ['Highlight entire widget', 'FULL_WIDGET'],
+        ],
+        required: true,
+        isShown: (formValues: NumberVisualizationConfigFormValues) =>
+          formValues?.trend === true &&
+          (formValues?.trend_preference === 'HIGHER' || formValues?.trend_preference === 'LOWER'),
       },
     ],
   },
