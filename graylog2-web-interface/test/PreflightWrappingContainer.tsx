@@ -28,7 +28,7 @@ type Props = {
 const PreflightWrappingContainer = ({ children }: Props) => (
   <PreflightThemeProvider>
     <DefaultQueryClientProvider>
-      <ThemeWrapper>{children}</ThemeWrapper>
+      <ThemeWrapper env="test">{children}</ThemeWrapper>
     </DefaultQueryClientProvider>
   </PreflightThemeProvider>
 );
