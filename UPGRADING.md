@@ -3,6 +3,19 @@ Upgrading to Graylog 7.2.x
 
 ## Breaking Changes
 
+### AlienVault OTX Adapter: URL Allowlist Enforcement
+
+The AlienVault OTX lookup data adapter now enforces the URL Allowlist. Any OTX adapter whose configured API URL is not present in the allowlist will be blocked
+from making requests and will publish a system notification.
+
+**Automatic migration:** Existing instances configured with the default API URL
+(`https://otx.alienvault.com`) will have that URL automatically added to the allowlist during the
+upgrade.
+
+**Action required for custom URLs:** If you have configured a custom `api_url` in any OTX adapter,
+you must manually add that URL to the allowlist under **System → Configurations → URL Allowlist**
+before or after upgrading. Until the URL is allowlisted, the adapter will not perform any lookups.
+
 ### Entity Suggestion Search: Regex No Longer Supported in Query Parameter
 
 The `query` parameter of the entity suggestion endpoint is now treated as a plain-text substring
