@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog.inputs.otel.OTelValues.asLong;
+
 /**
  * Processes Windows Event Log receiver messages into GIM format.
  *
@@ -101,7 +103,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "channel" -> putIfPresent(result, EventFields.EVENT_LOG_NAME, extractString(bodyFieldValue));
                 // System/EventRecordID: channel-local record number assigned when logged.
                 case "record_id" -> {
-                    final var recordId = extractNumber(bodyFieldValue);
+                    final var recordId = asLong(bodyFieldValue);
                     if (recordId != null) {
                         result.put(EventFields.EVENT_UID, recordId.toString());
                     }
@@ -118,7 +120,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "opcode" -> putIfPresent(result, VENDOR_OPCODE, extractString(bodyFieldValue));
                 // System/Version: version of the event definition.
                 case "version" ->
-                        putNumericAsStringIfPresent(result, VendorFields.VENDOR_VERSION, extractNumber(bodyFieldValue));
+                        putNumericAsStringIfPresent(result, VendorFields.VENDOR_VERSION, asLong(bodyFieldValue));
                 // System/Correlation/ActivityID: activity correlation GUID for related events.
                 case "correlation" -> extractCorrelation(bodyFieldValue, fields);
                 // System/Execution: process/thread context that generated the event.
@@ -194,7 +196,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
 
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
-                case "id" -> fields.eventCode = extractNumber(kv.getValue());
+                case "id" -> fields.eventCode = asLong(kv.getValue());
             }
         }
     }
@@ -341,27 +343,6 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         }
 
         return stringValue;
-    }
-
-    private static Long extractNumber(AnyValue value) {
-        if (value.getValueCase() == AnyValue.ValueCase.INT_VALUE) {
-            return value.getIntValue();
-        }
-
-        if (value.getValueCase() != AnyValue.ValueCase.STRING_VALUE) {
-            return null;
-        }
-
-        final var stringValue = value.getStringValue();
-        if (stringValue.isEmpty()) {
-            return null;
-        }
-
-        try {
-            return Long.parseLong(stringValue);
-        } catch (NumberFormatException ignored) {
-            return null;
-        }
     }
 
     private static Long extractFlexibleNumber(AnyValue value) {

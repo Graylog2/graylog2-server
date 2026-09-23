@@ -22,6 +22,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.fields.EventFieldNames;
 import org.graylog.events.fields.FieldValue;
 import org.graylog2.jackson.TypeReferences;
 import org.joda.time.DateTime;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -60,8 +62,8 @@ public class EventImpl implements Event {
     private ImmutableList<String> keyTuple = ImmutableList.of();
     private long priority;
     private boolean alert;
-    private Map<String, FieldValue> fields = new HashMap<>();
-    private Map<String, FieldValue> groupByFields = new HashMap<>();
+    private Map<String, FieldValue> fields = new TreeMap<>(EventFieldNames.COMPARATOR);
+    private Map<String, FieldValue> groupByFields = new TreeMap<>(EventFieldNames.COMPARATOR);
     private Map<String, Double> aggregationConditions = new HashMap<>();
     private final Map<String, Double> scores = new HashMap<>();
     private final Set<String> associatedAssets = new HashSet<>();
@@ -302,7 +304,11 @@ public class EventImpl implements Event {
 
     @Override
     public void setFields(Map<String, String> fields) {
-        this.fields = fields.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldValue.string(entry.getValue())));
+        this.fields = fields.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entry -> FieldValue.string(entry.getValue()),
+                        (a, b) -> b,
+                        () -> new TreeMap<>(EventFieldNames.COMPARATOR)));
     }
 
     @Override
@@ -317,7 +323,11 @@ public class EventImpl implements Event {
 
     @Override
     public void setGroupByFields(Map<String, String> fields) {
-        this.groupByFields = fields.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldValue.string(entry.getValue())));
+        this.groupByFields = fields.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entry -> FieldValue.string(entry.getValue()),
+                        (a, b) -> b,
+                        () -> new TreeMap<>(EventFieldNames.COMPARATOR)));
     }
 
     @Override
@@ -382,8 +392,8 @@ public class EventImpl implements Event {
                 .associatedAssets(ImmutableSet.copyOf(associatedAssets))
                 .tags(ImmutableSet.copyOf(tags))
                 .alert(getAlert())
-                .fields(ImmutableMap.copyOf(fields))
-                .groupByFields(ImmutableMap.copyOf(groupByFields))
+                .fields(EventFieldNames.sorted(fields))
+                .groupByFields(EventFieldNames.sorted(groupByFields))
                 .aggregationConditions(ImmutableMap.copyOf(aggregationConditions))
                 .replayInfo(getReplayInfo())
                 .tacticsTechniques(getTacticsTechniques())

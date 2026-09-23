@@ -21,7 +21,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { EventsDefinitions } from '@graylog/server-api';
 
 import { FormGroup } from 'components/bootstrap';
-import { InputDescription, Select } from 'components/common';
+import { InputDescription, Select, useChipInput } from 'components/common';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 
 // Mirror of TagNormalizer on the server. Keep in sync.
@@ -36,10 +36,6 @@ const VALID_TAG_PATTERN = /^[a-z0-9_.-]+$/;
 
 const SUGGESTION_LIMIT = 50;
 const DEBOUNCE_MS = 300;
-
-// Unit-separator character; can't appear in a tag value (validation restricts tags to
-// [a-z0-9_.-]) so it's safe to use as the delimiter Select uses to (de)serialize multi values.
-const VALUE_DELIMITER = '\x1F';
 
 type Props = {
   tags: ReadonlyArray<string>;
@@ -79,65 +75,56 @@ const buildInvalidCharsMessage = (tagsList: ReadonlyArray<string>): string | nul
   );
 };
 
+const validateTag = (tag: string): string | null => {
+  if (isTooLong(tag)) return buildTooLongMessage([tag]);
+  if (hasInvalidChars(tag)) return buildInvalidCharsMessage([tag]);
+
+  return null;
+};
+
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
-  const [input, setInput] = useState('');
-  // Track only duplicate-commit attempts here. Invalid-character and over-length values are
-  // committed by react-select (they land in `tags`), so they're already covered by the
-  // categorization below. Duplicates are silently rejected by react-select, so we need to
-  // surface them explicitly.
-  const [duplicateAttempt, setDuplicateAttempt] = useState<string | null>(null);
-  const [debouncedInput] = useDebouncedValue(input, DEBOUNCE_MS);
+  // Mirrors the typed text so suggestions are built before the hook call that needs them.
+  const [query, setQuery] = useState('');
+  const [debouncedQuery] = useDebouncedValue(query, DEBOUNCE_MS);
 
   const { data, isFetching } = useQuery({
-    queryKey: ['event-definitions', 'tag-suggestions', debouncedInput],
-    queryFn: () => EventsDefinitions.suggestTags(debouncedInput, SUGGESTION_LIMIT),
+    queryKey: ['event-definitions', 'tag-suggestions', debouncedQuery],
+    queryFn: () => EventsDefinitions.suggestTags(debouncedQuery, SUGGESTION_LIMIT),
     placeholderData: keepPreviousData,
     staleTime: 30_000,
     enabled: !disabled,
   });
+  const isAtMax = tags.length >= MAX_TAGS;
+  // At the cap a pick would be sliced off, so disable rather than swallow it.
   const suggestions = (data?.tags ?? [])
     .filter((s: string) => !tags.includes(s))
-    .map((value: string) => ({ value, label: value }));
+    .map((value: string) => ({ value, label: value, disabled: isAtMax }));
 
-  const handleChange = (joined: string) => {
-    const raw = joined ? joined.split(VALUE_DELIMITER) : [];
-    const normalized = raw.map(normalizeTag).filter((value) => value.length > 0);
-    const deduped = Array.from(new Set(normalized));
+  const { messages, flagDuplicateAttempt, selectProps, reactSelectProps } = useChipInput({
+    values: tags,
+    onChange,
+    normalize: normalizeTag,
+    validate: validateTag,
+    max: MAX_TAGS,
+    onInputChanged: setQuery,
+    // At most one bucket per tag, so a message names one failure mode.
+    describeInvalid: (invalid) =>
+      [
+        buildTooLongMessage(invalid.filter(isTooLong)),
+        buildInvalidCharsMessage(invalid.filter((tag) => !isTooLong(tag) && hasInvalidChars(tag))),
+      ]
+        .filter(Boolean)
+        .join(' ') || null,
+    describeDuplicate: (tag) => `Tag "${tag}" has already been added.`,
+    // Already offered as a suggestion, so a Create row would duplicate it.
+    suppressCreate: (_raw, candidate) => suggestions.some((option) => option.value === candidate),
+  });
 
-    onChange(deduped.slice(0, MAX_TAGS));
-    // A tag was just committed — clear the typed text. react-select's internal blur/clear
-    // events are ignored below, so this is now the only path that empties the input.
-    setInput('');
-    setDuplicateAttempt(null);
-  };
-
-  // react-select silently rejects duplicates with no chip and no callback — flag those on
-  // Enter/Tab/blur so the user gets explicit feedback. (Invalid-character and over-length
-  // values do commit, so the chip-categorization below already covers them.)
-  const flagDuplicateAttempt = () => {
-    const trimmed = input.trim();
-    if (!trimmed) return;
-
-    const normalized = normalizeTag(trimmed);
-    if (tags.includes(normalized)) {
-      setDuplicateAttempt(normalized);
-    }
-  };
-
-  // Each committed tag falls into at most one failure bucket so messages stay focused per
-  // failure mode (too long, invalid chars, duplicate).
-  const tooLongTags = tags.filter(isTooLong);
-  const invalidCharTags = tags.filter((tag) => !isTooLong(tag) && hasInvalidChars(tag));
-  const messages = [
-    buildTooLongMessage(tooLongTags),
-    buildInvalidCharsMessage(invalidCharTags),
-    duplicateAttempt ? `Tag "${duplicateAttempt}" has already been added.` : null,
-  ].filter((m): m is string => m !== null);
-
+  const allMessages = [...messages, isAtMax ? `Maximum of ${MAX_TAGS} tags reached.` : null].filter(Boolean);
   const localValidationError =
-    messages.length === 0 ? null : (
+    allMessages.length === 0 ? null : (
       <>
-        {messages.map((m) => (
+        {allMessages.map((m) => (
           <div key={m}>{m}</div>
         ))}
       </>
@@ -147,16 +134,10 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
   return (
     <FormGroup controlId="event-definition-tags" validationState={combinedError ? 'error' : null}>
       <Select
-        // `Select`'s Props type doesn't surface a couple of react-select props we need here
-        // (`inputValue`, `onKeyDown`), but it spreads unknown props through at runtime, so
-        // we cast just these to satisfy tsc without altering behavior.
-        // - `inputValue` — fully control the typed text so react-select's internal blur /
-        //   menu-close clears can be ignored (otherwise Tab/blur drops the user's text on a
-        //   duplicate).
-        // - `onKeyDown` — flag a duplicate-commit attempt on Enter / Tab so the error
-        //   message surfaces even when react-select silently rejects the commit.
+        {...selectProps}
+        {...reactSelectProps}
+        // Not in `Select`'s Props type, so cast to satisfy tsc.
         {...({
-          inputValue: input,
           onKeyDown: (e: React.KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === 'Tab') {
               flagDuplicateAttempt();
@@ -167,19 +148,7 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
         aria-label="Event Definition Tags"
         multi
         allowCreate
-        delimiter={VALUE_DELIMITER}
         options={suggestions}
-        value={tags.join(VALUE_DELIMITER)}
-        onChange={handleChange}
-        onInputChange={(value, actionMeta) => {
-          if (actionMeta?.action === 'input-change') {
-            setInput(value);
-            // The user is editing — clear any stale duplicate warning. It re-evaluates on
-            // the next commit attempt.
-            setDuplicateAttempt(null);
-          }
-        }}
-        onBlur={flagDuplicateAttempt}
         isLoading={isFetching}
         disabled={disabled}
         placeholder="e.g. authentication, brute-force, compliance"

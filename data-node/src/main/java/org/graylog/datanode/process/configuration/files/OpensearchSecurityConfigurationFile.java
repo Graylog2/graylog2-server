@@ -48,8 +48,10 @@ public class OpensearchSecurityConfigurationFile implements DatanodeConfigFile {
 
     @Override
     public void write(OutputStream stream) throws IOException {
-        final InputStream configSource = getClass().getResourceAsStream("/opensearch/config/common/opensearch-security/config.yml");
-        Map<String, Object> contents = OBJECT_MAPPER.readValue(configSource, new TypeReference<>() {});
+         final Map<String, Object> contents;
+        try (final InputStream configSource = getClass().getResourceAsStream("/opensearch/config/common/opensearch-security/config.yml")) {
+            contents = OBJECT_MAPPER.readValue(configSource, new TypeReference<>() {});
+        }
         Map<String, Object> config = filterConfigurationMap(contents, "config", "dynamic", "authc", "jwt_auth_domain", "http_authenticator", "config");
         config.put("signing_key", signingKey.getBase64Encoded());
         // TODO: this setting is ignored up to opensearch 3.2. See https://github.com/opensearch-project/security/pull/5506

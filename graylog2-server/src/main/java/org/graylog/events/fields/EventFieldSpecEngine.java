@@ -56,7 +56,12 @@ public class EventFieldSpecEngine {
 
                 for (final EventWithContext eventWithContext : eventsWithContext) {
                     final Event event = eventWithContext.event();
-                    event.setField(fieldName, provider.get(fieldName, eventWithContext));
+                    final FieldValue value = provider.get(fieldName, eventWithContext);
+
+                    // An absent value means the provider declined to produce this field at all.
+                    if (!value.isAbsent()) {
+                        event.setField(fieldName, value);
+                    }
                 }
             }
         }

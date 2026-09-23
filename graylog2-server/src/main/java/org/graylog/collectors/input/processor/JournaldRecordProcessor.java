@@ -47,6 +47,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.graylog.inputs.otel.OTelValues.asLong;
+
 /**
  * Processes journald messages into GIM format.
  *
@@ -100,11 +102,11 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                         putNumericIfPresent(result, VendorFields.VENDOR_EVENT_SEVERITY_LEVEL, extractPriority(fieldValue)); // example: 6
                 // Syslog compatibility facility value, formatted as decimal.
                 case "SYSLOG_FACILITY" ->
-                        putNumericAsStringIfPresent(result, "vendor_event_category", extractNumber(fieldValue)); // example: 0
+                        putNumericAsStringIfPresent(result, "vendor_event_category", asLong(fieldValue)); // example: 0
                 // Syslog compatibility identifier string ("tag").
                 case "SYSLOG_IDENTIFIER" -> syslogIdentifier = extractString(fieldValue); // example: slack.desktop
                 // Syslog compatibility client PID.
-                case "SYSLOG_PID" -> syslogPid = extractNumber(fieldValue); // example: 1072719
+                case "SYSLOG_PID" -> syslogPid = asLong(fieldValue); // example: 1072719
                 // Syslog compatibility timestamp from the original datagram.
                 case "SYSLOG_TIMESTAMP" ->
                         syslogTimestamp = formatSyslogTimestamp(extractString(fieldValue)); // example: Feb 26 18:15:01
@@ -171,9 +173,9 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                 // result.put("gl2_collector_journald_user_unit", fieldValue); // example: app-org.chromium.Chromium-7371.scope
                 //}
                 // Kernel audit login UID of the originating process.
-                case "_AUDIT_LOGINUID" -> auditLoginUid = extractNumber(fieldValue); // example: 1000
+                case "_AUDIT_LOGINUID" -> auditLoginUid = asLong(fieldValue); // example: 1000
                 // Kernel audit session ID of the originating process.
-                case "_AUDIT_SESSION" -> auditSessionId = extractNumber(fieldValue); // example: 3
+                case "_AUDIT_SESSION" -> auditSessionId = asLong(fieldValue); // example: 3
                 // Kernel boot ID for the boot the message was generated in (128-bit hex).
                 case "_BOOT_ID" -> bootId = extractString(fieldValue); // example: dcae62f433304b8290b9372b7bdcde6c
                 // Effective Linux capabilities bitmask of the originating process.
@@ -192,7 +194,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                         putIfPresent(result, ProcessFields.PROCESS_PATH, extractString(fieldValue)); // example: /usr/lib/slack/slack
                 // Group ID of the originating process, formatted as decimal.
                 //case "_GID" ->
-                //        putNumericAsStringIfPresent(result, "group_id", extractNumber(fieldValue)); // example: 1000
+                //        putNumericAsStringIfPresent(result, "group_id", asLong(fieldValue)); // example: 1000
                 // Hostname of the originating host.
                 case "_HOSTNAME" ->
                         putIfPresent(result, HostFields.HOST_HOSTNAME, extractString(fieldValue)); // example: h2
@@ -205,7 +207,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                 case "_MACHINE_ID" ->
                         putIfPresent(result, HostFields.HOST_ID, extractString(fieldValue)); // example: 3d758250c1e84341a6d2037786a25bdf
                 // Process ID of the originating process, formatted as decimal.
-                case "_PID" -> pid = extractNumber(fieldValue); // example: 7371
+                case "_PID" -> pid = asLong(fieldValue); // example: 7371
                 // Runtime scope where message was logged: initrd or system.
                 //case "_RUNTIME_SCOPE" ->
                 //        putIfPresent(result, SourceFields.SOURCE_TYPE, extractString(fieldValue)); // example: system
@@ -221,7 +223,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                 //}
                 // Earliest trusted CLOCK_REALTIME timestamp in microseconds.
                 case "_SOURCE_REALTIME_TIMESTAMP" ->
-                        sourceRealtimeTimestampMicros = extractNumber(fieldValue); // example: 1772126101554715
+                        sourceRealtimeTimestampMicros = asLong(fieldValue); // example: 1772126101554715
                 // Earliest trusted CLOCK_BOOTTIME timestamp in microseconds.
                 //case "_SOURCE_BOOTTIME_TIMESTAMP" -> {
                 // TODO no direct GIM mapping yet.
@@ -248,7 +250,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                 case "_SYSTEMD_INVOCATION_ID" ->
                         putIfPresent(result, ProcessFields.PROCESS_UID, extractString(fieldValue)); // example: 14764bddd5b848cd95dbc7e44d44c67d
                 // Owner UID of the systemd user unit or systemd session.
-                case "_SYSTEMD_OWNER_UID" -> systemdOwnerUid = extractNumber(fieldValue); // example: 1000
+                case "_SYSTEMD_OWNER_UID" -> systemdOwnerUid = asLong(fieldValue); // example: 1000
                 // Systemd session ID of the originating process.
                 case "_SYSTEMD_SESSION" -> systemdSessionId = extractString(fieldValue); // example: 3
                 // Systemd slice unit name of the originating process.
@@ -286,7 +288,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                 //}
                 // User ID of the originating process, formatted as decimal.
                 case "_UID" ->
-                        putNumericAsStringIfPresent(result, UserFields.USER_ID, extractNumber(fieldValue)); // example: 1000
+                        putNumericAsStringIfPresent(result, UserFields.USER_ID, asLong(fieldValue)); // example: 1000
                 // Annotates coredump messages with the related system unit.
                 //case "COREDUMP_UNIT" -> {
                 // TODO no direct GIM mapping yet.
@@ -372,7 +374,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                         putIfPresent(result, EventFields.EVENT_UID, extractString(fieldValue)); // example: s=544611aab98d4df8bd045f3b0ab794bf;i=ba7357;b=dcae62f433304b8290b9372b7bdcde6c;m=2543c48021;t=64bbd3beb2870;x=27e3523fa56eaf34
                 // Journal reception wallclock timestamp (CLOCK_REALTIME), in microseconds since epoch.
                 case "__REALTIME_TIMESTAMP" ->
-                        realtimeTimestampMicros = extractNumber(fieldValue); // example: 1772126101554715
+                        realtimeTimestampMicros = asLong(fieldValue); // example: 1772126101554715
                 // Journal reception monotonic timestamp (CLOCK_MONOTONIC), in microseconds.
                 //case "__MONOTONIC_TIMESTAMP" -> {
                 // TODO no direct GIM mapping yet.
@@ -380,7 +382,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                 //}
                 // Sequence number of this entry in the source journal file.
                 //case "__SEQNUM" ->
-                //        putNumericAsStringIfPresent(result, "event_id", extractNumber(fieldValue)); // example: 12219223
+                //        putNumericAsStringIfPresent(result, "event_id", asLong(fieldValue)); // example: 12219223
                 // Sequence number ID associated with __SEQNUM.
                 case "__SEQNUM_ID" ->
                         putIfPresent(result, VendorFields.VENDOR_TRANSACTION_ID, extractString(fieldValue)); // example: 544611aab98d4df8bd045f3b0ab794bf
@@ -477,7 +479,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
     }
 
     private static Long extractPriority(AnyValue value) {
-        final var priority = extractNumber(value);
+        final var priority = asLong(value);
         if (priority == null) {
             return null;
         }
@@ -504,27 +506,6 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
             }
         }
         return true;
-    }
-
-    private static Long extractNumber(AnyValue value) {
-        if (value.getValueCase() == AnyValue.ValueCase.INT_VALUE) {
-            return value.getIntValue();
-        }
-
-        if (value.getValueCase() != AnyValue.ValueCase.STRING_VALUE) {
-            return null;
-        }
-
-        final var stringValue = value.getStringValue();
-        if (stringValue.isEmpty()) {
-            return null;
-        }
-
-        try {
-            return Long.parseLong(stringValue);
-        } catch (NumberFormatException ignored) {
-            return null;
-        }
     }
 
     private static void putIfPresent(Map<String, Object> target, String fieldName, String value) {

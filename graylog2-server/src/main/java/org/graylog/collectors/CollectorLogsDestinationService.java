@@ -58,7 +58,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class CollectorLogsDestinationService {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorLogsDestinationService.class);
 
-    static final String COLLECTOR_LOGS_INDEX_PREFIX = "gl-collector-system-logs";
+    public static final String COLLECTOR_LOGS_INDEX_PREFIX = "gl-collector-system-logs";
 
     private final IndexSetService indexSetService;
     private final IndexSetConfigFactory indexSetConfigFactory;

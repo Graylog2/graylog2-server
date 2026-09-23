@@ -160,7 +160,7 @@
     "less-loader": "^12.3.0",
     "node-fetch": "^2.6.1",
     "oxfmt": "^0.47.0",
-    "puppeteer": "^24.19.0",
+    "puppeteer": "^25.11.0",
     "react-bootstrap": "0.33.1",
     "react-compiler-runtime": "^1.0.0",
     "react-compiler-webpack": "^1.0.0",
@@ -176,6 +176,9 @@
     "whatwg-fetch": "^3.6.20"
   },
   "resolutions": {
-    "@types/plotly.js": "3.0.10"
+    "@types/plotly.js": "3.0.10",
+    "maplibre-gl": "^6.4.1",
+    "gopd": "^1.2.0",
+    "es-define-property": "^1.0.1"
   }
 }
