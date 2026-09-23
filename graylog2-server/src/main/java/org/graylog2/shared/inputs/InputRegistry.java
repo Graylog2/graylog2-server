@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Singleton
@@ -49,22 +50,20 @@ public class InputRegistry {
     }
 
     public Set<IOState<MessageInput>> getRunningInputs() {
-        ImmutableSet.Builder<IOState<MessageInput>> builder = ImmutableSet.builder();
-        for (IOState<MessageInput> state : inputStates.values()) {
-            if (state.getState() == IOState.Type.RUNNING) {
-                builder.add(state);
-            }
-        }
-        return builder.build();
+        return findInputsWithState(Set.of(IOState.Type.RUNNING));
+    }
+
+    public Set<IOState<MessageInput>> findInputsWithState(Set<IOState.Type> states) {
+        return inputStates
+                .values().stream()
+                .filter(state -> states.contains(state.getState()))
+                .collect(Collectors.toSet());
     }
 
     public boolean hasTypeRunning(Class klazz) {
-        for (IOState<MessageInput> inputState : inputStates.values()) {
-            if (inputState.getStoppable().getClass().equals(klazz)) {
-                return true;
-            }
-        }
-        return false;
+        return inputStates
+                .values().stream()
+                .anyMatch(state -> state.getStoppable().getClass().equals(klazz));
     }
 
     public int runningCount() {

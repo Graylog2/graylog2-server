@@ -360,7 +360,7 @@ public class InputEventListenerTest {
 
         when(serverStatus.getLifecycle()).thenReturn(Lifecycle.RUNNING);
         when(leaderElectionService.isLeader()).thenReturn(false);
-        when(inputRegistry.getRunningInputs()).thenReturn(Set.of(inputState));
+        when(inputRegistry.findInputsWithState(any())).thenReturn(Set.of(inputState));
         when(inputState.getStoppable()).thenReturn(leaderOnlyInput);
         when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
 

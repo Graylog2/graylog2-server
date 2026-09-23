@@ -40,6 +40,8 @@ import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.inputs.InputLauncher.FAILED_STARTS_METRIC;
 
@@ -229,7 +231,7 @@ public class InputEventListener {
                 }
             }
         } else {
-            inputRegistry.getRunningInputs().stream()
+            inputRegistry.findInputsWithState(Set.of(IOState.Type.RUNNING, IOState.Type.STOPPED)).stream()
                     .map(IOState::getStoppable)
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
