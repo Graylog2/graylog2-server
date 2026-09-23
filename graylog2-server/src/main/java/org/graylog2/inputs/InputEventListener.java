@@ -131,7 +131,7 @@ public class InputEventListener {
             // typically the fix for whatever made it fail (e.g. a port that was already in use), so retry it.
             // Deliberately stopped inputs stay stopped.
             final IOState.Type state = inputState.getState();
-            startInput = state == IOState.Type.RUNNING || state == IOState.Type.SETUP || state == IOState.Type.FAILED;
+            startInput = Set.of(IOState.Type.RUNNING, IOState.Type.SETUP, IOState.Type.FAILED).contains(state);
             inputRegistry.remove(inputState);
         } else {
             startInput = false;
