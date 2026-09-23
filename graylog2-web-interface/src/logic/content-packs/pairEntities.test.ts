@@ -64,7 +64,7 @@ describe('pairEntities', () => {
   });
 });
 
-describe('switchSource and selectedSource', () => {
+describe('switchSource', () => {
   const pairedPack = packEntity('paired-pack-uuid');
   const pairedServer = catalogEntry('5f00000000000000000000aa');
   const uncheckedPack = packEntity('unchecked-pack-uuid');

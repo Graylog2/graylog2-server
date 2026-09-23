@@ -18,7 +18,7 @@ import * as React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import styled, { css } from 'styled-components';
 
-import { Icon, SearchForm } from 'components/common';
+import { Icon, SearchForm, Tooltip } from 'components/common';
 import { Button, ButtonToolbar, Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import { hasAcceptedProtocol } from 'util/URLUtils';
@@ -37,6 +37,38 @@ const SearchRow = styled.div(
     gap: ${theme.spacings.sm};
   `,
 );
+
+const NO_PAIRS_HINT =
+  'The entities in this version of the content pack were never installed, so there are no installed entities to select.';
+
+type VersionButtonProps = {
+  label: string;
+  unavailable: boolean;
+  onClick: () => void;
+};
+
+/* `allowClickWhenDisabled` keeps mouse events on a disabled button, so the tooltip explaining why can still open. */
+const VersionButton = ({ label, unavailable, onClick }: VersionButtonProps) => {
+  const button = (
+    <Button
+      bsSize="small"
+      disabled={unavailable}
+      allowClickWhenDisabled
+      onClick={() => {
+        if (!unavailable) onClick();
+      }}>
+      {label}
+    </Button>
+  );
+
+  return unavailable ? (
+    <Tooltip label={NO_PAIRS_HINT} withArrow multiline w={320} position="top">
+      {button}
+    </Tooltip>
+  ) : (
+    button
+  );
+};
 
 type ContentPackSelectionProps = {
   contentPack: any;
@@ -339,14 +371,18 @@ class ContentPackSelection extends React.Component<
             <SearchRow>
               {/* Narrower than the default 400px so the version buttons fit beside it in this column. */}
               <SearchForm queryWidth={280} onSearch={this._onSetFilter} onReset={this._onClearFilter} />
-              {edit && entityPairs.length > 0 && (
+              {edit && (
                 <ButtonToolbar>
-                  <Button bsSize="small" onClick={() => this._switchSource('latest')}>
-                    Select latest installed versions
-                  </Button>
-                  <Button bsSize="small" onClick={() => this._switchSource('older')}>
-                    Select older content pack versions
-                  </Button>
+                  <VersionButton
+                    label="Select latest installed versions"
+                    unavailable={entityPairs.length === 0}
+                    onClick={() => this._switchSource('latest')}
+                  />
+                  <VersionButton
+                    label="Select older content pack versions"
+                    unavailable={entityPairs.length === 0}
+                    onClick={() => this._switchSource('older')}
+                  />
                 </ButtonToolbar>
               )}
             </SearchRow>

@@ -269,10 +269,17 @@ describe('<ContentPackSelection />', () => {
         />,
       );
 
-    it('is hidden when no entity has an installed copy', () => {
-      renderSelection({ stream: [packStream] }, jest.fn(), []);
+    it('is disabled when no entity has an installed copy', async () => {
+      const changeFn = jest.fn();
+      renderSelection({ stream: [packStream] }, changeFn, []);
 
-      expect(screen.queryByRole('button', { name: /select latest installed versions/i })).not.toBeInTheDocument();
+      const button = screen.getByRole('button', { name: /select latest installed versions/i });
+
+      expect(button).toHaveAttribute('data-disabled', 'true');
+
+      await setupUser().click(button);
+
+      expect(changeFn).not.toHaveBeenCalled();
     });
 
     it('swaps only checked, paired entities to their latest installed versions', async () => {

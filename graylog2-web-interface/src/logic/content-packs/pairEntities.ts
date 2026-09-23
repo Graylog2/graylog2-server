@@ -60,12 +60,14 @@ export const switchSource = (selection: Selection, pairs: Array<EntityPair>, sou
   pairs.reduce((result, { packEntity, installedEntity }) => {
     const [from, to] = source === 'latest' ? [packEntity, installedEntity] : [installedEntity, packEntity];
 
-    if (!isSelected(result, from)) {
+    // Checked against the original selection: two pack entities can share one installed copy, and the first swap
+    // would otherwise hide the second.
+    if (!isSelected(selection, from)) {
       return result;
     }
 
     const typeName = from.type.name;
-    const remaining = result[typeName].filter((entity) => entity.id !== from.id);
+    const remaining = (result[typeName] ?? []).filter((entity) => entity.id !== from.id);
 
     return { ...result, [typeName]: isSelected(result, to) ? remaining : [...remaining, to] };
   }, selection);

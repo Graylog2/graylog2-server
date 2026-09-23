@@ -73,7 +73,7 @@ const EditContentPackPage = () => {
   }, [revisionData, contentPackRev]);
 
   const entityCatalog = useMemo(() => {
-    if (!contentPack || !entityIndex) {
+    if (!contentPackEntities || !entityIndex) {
       return {};
     }
 
@@ -85,14 +85,18 @@ const EditContentPackPage = () => {
         entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []),
       ]),
     );
-  }, [contentPack, entityIndex, contentPackEntities]);
+  }, [entityIndex, contentPackEntities]);
 
+  /*
+   * Keyed on the revision's entities rather than `contentPack`, which changes on every field edit and would
+   * otherwise reset the user's selection.
+   */
   useEffect(() => {
-    if (!contentPack || !entityIndex) {
+    if (!contentPackEntities || !entityIndex) {
       return;
     }
 
-    const newSelectedEntities = contentPack.entities.reduce((result, entity) => {
+    const newSelectedEntities = contentPackEntities.reduce((result, entity) => {
       if (
         entityCatalog[entity.type.name] &&
         entityCatalog[entity.type.name].findIndex((fetchedEntity) => fetchedEntity.id === entity.id) >= 0
@@ -110,14 +114,14 @@ const EditContentPackPage = () => {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedEntities(newSelectedEntities);
-  }, [contentPack, entityCatalog, entityIndex]);
+  }, [contentPackEntities, entityCatalog, entityIndex]);
 
   useEffect(() => {
-    if (!contentPack) {
+    if (!contentPackEntities) {
       return;
     }
 
-    const newAppliedParameter = contentPack.entities.reduce((result, entity) => {
+    const newAppliedParameter = contentPackEntities.reduce((result, entity) => {
       const entityData = new ValueReferenceData(entity.data);
       const configPaths = entityData.getPaths();
 
@@ -135,7 +139,7 @@ const EditContentPackPage = () => {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAppliedParameter(newAppliedParameter);
-  }, [contentPack]);
+  }, [contentPackEntities]);
 
   const _onStateChanged = (newState) => {
     setContentPack(newState.contentPack || contentPack);
