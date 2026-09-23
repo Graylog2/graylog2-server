@@ -8,4 +8,4 @@ is installed on this server between its latest installed version and its older c
 version. The older content pack versions stay selected by default.
 """
 
-pulls = ["TBD"]
+pulls = ["27493"]
