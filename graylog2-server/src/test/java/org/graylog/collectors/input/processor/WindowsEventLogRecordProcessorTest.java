@@ -20,6 +20,8 @@ import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.common.v1.AnyValue;
+import io.opentelemetry.proto.common.v1.KeyValue;
+import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.codec.OTelTypeConverter;
@@ -65,6 +67,7 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(EventFields.EVENT_SOURCE, "winhost01")
                 .containsEntry(EventFields.EVENT_LOG_NAME, "Security")
                 .containsEntry(EventFields.EVENT_UID, "140716")
+                .containsEntry(EventFields.EVENT_SEQUENCE, 140716L)
                 .containsEntry(EventFields.EVENT_CODE, 4624L)
                 .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
                 .containsEntry(VENDOR_EVENT_CATEGORY, "Logoff")
@@ -499,6 +502,24 @@ class WindowsEventLogRecordProcessorTest {
                 .contains("\"winserver03\"")
                 .contains("\"Channel\"")
                 .contains("\"System\"");
+    }
+
+    @Test
+    void skipsSequenceNumberForRecordIdAboveSignedLongRange() {
+        // EventRecordID is unsigned 64-bit, and the collector's adapter wraps such a value into a
+        // negative long rather than sending a string. A negative sequence number would invert the
+        // sort order, so it is left out and the codec's default stays in place.
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder()
+                        .setKvlistValue(KeyValueList.newBuilder()
+                                .addValues(KeyValue.newBuilder()
+                                        .setKey("record_id")
+                                        .setValue(AnyValue.newBuilder().setIntValue(-2L)))))
+                .build();
+
+        final var result = processor.process(wrapLogRecord(logRecord));
+
+        assertThat(result).doesNotContainKey(EventFields.EVENT_SEQUENCE);
     }
 
     private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {
