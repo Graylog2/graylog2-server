@@ -40,12 +40,17 @@ jest.mock('../../hooks');
 jest.mock('hooks/useInputsStates');
 jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
 jest.mock('stores/nodes/NodesStore', () => ({
-  NodesStore: MockStore(['getInitialState', () => ({ nodes: { 'node-1': { short_node_id: 'node-1', hostname: 'node-1.example.org' } } })]),
+  NodesStore: MockStore([
+    'getInitialState',
+    () => ({ nodes: { 'node-1': { short_node_id: 'node-1', hostname: 'node-1.example.org' } } }),
+  ]),
 }));
 
 const withInputs = (inputs: Array<ReturnType<typeof mockCollectorInput>>) => {
   const ids = inputs.map((i) => i.id);
-  asMock(useCollectorInputIds).mockReturnValue({ data: ids, isLoading: false } as ReturnType<typeof useCollectorInputIds>);
+  asMock(useCollectorInputIds).mockReturnValue({ data: ids, isLoading: false } as ReturnType<
+    typeof useCollectorInputIds
+  >);
   asMock(useCollectorInputDetails).mockReturnValue({
     collectorInputIds: ids,
     readableInputIds: ids,
@@ -57,7 +62,11 @@ const withInputs = (inputs: Array<ReturnType<typeof mockCollectorInput>>) => {
 
 const withInputStates = (state: 'RUNNING' | 'FAILED') => {
   asMock(useInputsStates).mockReturnValue({
-    data: { 'input-1': { 'node-1': { state, message_input: {} as never, detailed_message: '', started_at: '', id: 'input-1' } } },
+    data: {
+      'input-1': {
+        'node-1': { state, message_input: {} as never, detailed_message: '', started_at: '', id: 'input-1' },
+      },
+    },
     isLoading: false,
   } as unknown as ReturnType<typeof useInputsStates>);
 };
