@@ -203,7 +203,7 @@ describe('NumberVisualization', () => {
         render(
           <SimplifiedNumberVisualization
             data={dataWithTrend(current, previous)}
-            config={configWithTrend(preference)}
+            config={configWithTrend(preference, 'FULL_WIDGET')}
           />,
         );
 

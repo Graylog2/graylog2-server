@@ -18,7 +18,9 @@ import * as React from 'react';
 
 import type { VisualizationType } from 'views/types';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
-import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import NumberVisualizationConfig, {
+  DEFAULT_COLOR_PREFERENCE,
+} from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
 type NumberVisualizationConfigFormValues = {
   trend: boolean;
@@ -35,16 +37,16 @@ const singleNumber: VisualizationType<
   displayName: 'Single Number',
   component: NumberVisualization,
   config: {
-    createConfig: () => ({ color_preference: 'FULL_WIDGET' }),
+    createConfig: () => ({ color_preference: DEFAULT_COLOR_PREFERENCE }),
     fromConfig: (config: NumberVisualizationConfig | undefined) => ({
       trend: config?.trend,
       trend_preference: config?.trendPreference,
-      color_preference: config?.colorPreference ?? 'FULL_WIDGET',
+      color_preference: config?.colorPreference ?? DEFAULT_COLOR_PREFERENCE,
     }),
     toConfig: ({
       trend = false,
       trend_preference,
-      color_preference = 'FULL_WIDGET',
+      color_preference = DEFAULT_COLOR_PREFERENCE,
     }: NumberVisualizationConfigFormValues) =>
       NumberVisualizationConfig.create(trend, trend_preference, undefined, color_preference),
     fields: [

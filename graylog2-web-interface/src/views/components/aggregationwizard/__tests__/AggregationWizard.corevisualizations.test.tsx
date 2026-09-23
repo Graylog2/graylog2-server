@@ -283,7 +283,7 @@ describe('AggregationWizard/Core Visualizations', () => {
             visualizationConfig: expect.objectContaining({
               trend: true,
               trendPreference: 'HIGHER',
-              colorPreference: 'FULL_WIDGET',
+              colorPreference: 'TREND_ONLY',
             }),
           }),
         ),
@@ -315,7 +315,7 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await screen.findByText('Color Preference');
 
-      await selectEvent.chooseOption('Select Color Preference', 'Highlight trend info only');
+      await selectEvent.chooseOption('Select Color Preference', 'Highlight entire widget');
 
       await expectSubmitButtonNotToBeDisabled();
 
@@ -328,7 +328,7 @@ describe('AggregationWizard/Core Visualizations', () => {
             visualizationConfig: expect.objectContaining({
               trend: true,
               trendPreference: 'HIGHER',
-              colorPreference: 'TREND_ONLY',
+              colorPreference: 'FULL_WIDGET',
             }),
           }),
         ),

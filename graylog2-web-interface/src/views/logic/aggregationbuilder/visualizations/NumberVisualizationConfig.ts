@@ -21,6 +21,7 @@ import VisualizationConfig from './VisualizationConfig';
 export type TrendPreference = 'LOWER' | 'NEUTRAL' | 'HIGHER';
 export type NumberAlignment = 'center' | 'bottom-right' | 'bottom-left';
 export type ColorPreference = 'TREND_ONLY' | 'FULL_WIDGET';
+export const DEFAULT_COLOR_PREFERENCE: ColorPreference = 'TREND_ONLY';
 
 type InternalState = {
   trend: boolean;
@@ -43,7 +44,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     trend: InternalState['trend'],
     trendPreference: InternalState['trendPreference'],
     alignment: InternalState['alignment'] = undefined,
-    colorPreference: InternalState['colorPreference'] = 'FULL_WIDGET',
+    colorPreference: InternalState['colorPreference'] = DEFAULT_COLOR_PREFERENCE,
   ) {
     super();
     this._value = { trend, trendPreference, alignment, colorPreference };
@@ -74,7 +75,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     trend: InternalState['trend'] = false,
     trendPreference: InternalState['trendPreference'] = 'NEUTRAL',
     alignment: InternalState['alignment'] = undefined,
-    colorPreference: InternalState['colorPreference'] = 'FULL_WIDGET',
+    colorPreference: InternalState['colorPreference'] = DEFAULT_COLOR_PREFERENCE,
   ) {
     return new NumberVisualizationConfig(trend, trendPreference, alignment, colorPreference);
   }
@@ -101,7 +102,12 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
   static fromJSON(_type: string, value: NumberVisualizationConfigJSON) {
     const { trend, trend_preference: trendPreference, alignment, color_preference: colorPreference } = value;
 
-    return NumberVisualizationConfig.create(trend, trendPreference, alignment, colorPreference ?? 'FULL_WIDGET');
+    return NumberVisualizationConfig.create(
+      trend,
+      trendPreference,
+      alignment,
+      colorPreference ?? DEFAULT_COLOR_PREFERENCE,
+    );
   }
 }
 

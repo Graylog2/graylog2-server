@@ -69,7 +69,7 @@ public abstract class NumberVisualizationConfigDTO implements VisualizationConfi
             return new AutoValue_NumberVisualizationConfigDTO.Builder()
                 .trend(false)
                 .trendPreference(TrendPreference.NEUTRAL)
-                .colorPreference(ColorPreference.FULL_WIDGET);
+                .colorPreference(ColorPreference.TREND_ONLY);
         }
     }
 }
