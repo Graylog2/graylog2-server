@@ -86,11 +86,11 @@ const singleNumber: VisualizationType<
       },
       {
         name: 'color_preference',
-        title: 'Color Preference',
+        title: 'Highlight',
         type: 'select',
         options: [
-          ['Highlight trend info only', 'TREND_ONLY'],
-          ['Highlight entire widget', 'FULL_WIDGET'],
+          ['Trend info only', 'TREND_ONLY'],
+          ['Entire widget', 'FULL_WIDGET'],
         ],
         required: true,
         isShown: (formValues: NumberVisualizationConfigFormValues) =>

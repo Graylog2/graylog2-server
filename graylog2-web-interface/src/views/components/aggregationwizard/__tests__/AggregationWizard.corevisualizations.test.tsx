@@ -293,7 +293,7 @@ describe('AggregationWizard/Core Visualizations', () => {
   );
 
   it(
-    'only shows Color Preference once a non-neutral Trend Preference is selected, and allows overriding its default',
+    'only shows Highlight once a non-neutral Trend Preference is selected, and allows overriding its default',
     async () => {
       const onChange = jest.fn();
 
@@ -305,17 +305,17 @@ describe('AggregationWizard/Core Visualizations', () => {
 
       await screen.findByText('Trend Preference');
 
-      expect(screen.queryByText('Color Preference')).not.toBeInTheDocument();
+      expect(screen.queryByText('Highlight')).not.toBeInTheDocument();
 
       await selectEvent.chooseOption('Select Trend Preference', 'Neutral');
 
-      expect(screen.queryByText('Color Preference')).not.toBeInTheDocument();
+      expect(screen.queryByText('Highlight')).not.toBeInTheDocument();
 
       await selectEvent.chooseOption('Select Trend Preference', 'Higher');
 
-      await screen.findByText('Color Preference');
+      await screen.findByText('Highlight');
 
-      await selectEvent.chooseOption('Select Color Preference', 'Highlight entire widget');
+      await selectEvent.chooseOption('Select Highlight', 'Entire widget');
 
       await expectSubmitButtonNotToBeDisabled();
 
