@@ -18,6 +18,8 @@ import * as React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Timestamp from 'components/common/Timestamp';
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
+import { getEventTypeName } from 'components/events/events/EventTypeLabel';
 
 import InputField from './InputField';
 import NodeField from './NodeField';
@@ -46,6 +48,14 @@ const FieldTypeValueRenderer: PluginExports['fieldTypeValueRenderer'] = [
   {
     type: 'event-definition-id',
     render: (value: string) => <EventDefinition value={value} />,
+  },
+  {
+    type: 'priority',
+    render: (value: string | number) => <span title={String(value)}>{getPriorityName(value)}</span>,
+  },
+  {
+    type: 'alert',
+    render: (value: string | boolean) => <span title={String(value)}>{getEventTypeName(value)}</span>,
   },
 ];
 

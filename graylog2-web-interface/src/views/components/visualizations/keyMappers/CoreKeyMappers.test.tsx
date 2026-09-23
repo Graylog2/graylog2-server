@@ -57,4 +57,28 @@ describe('CoreKeyMappers', () => {
     expect(result.current('node-1')).toBe('abc123 / graylog-01');
     expect(result.current('missing')).toBe('missing');
   });
+
+  it('resolves priority values to their name', () => {
+    const { result } = renderHook(() => mapperFor('priority')([]));
+
+    expect(result.current(0)).toBe('Info');
+    expect(result.current(4)).toBe('Critical');
+    expect(result.current(99)).toBe('99');
+  });
+
+  it('resolves alert values to their name', () => {
+    const { result } = renderHook(() => mapperFor('alert')([]));
+
+    expect(result.current(true)).toBe('Alert');
+    expect(result.current(false)).toBe('Event');
+  });
+
+  it('passes a rollup trace name (e.g. a metric function) through unchanged', () => {
+    // ChartData.ts's generateChart calls mapKeys(key, field) positionally for a widget's column pivot
+    // field, even for a rollup "Total" trace whose key is just the metric name (e.g. "count()") rather
+    // than an actual pivot value — the mapper must not mistake that for a real "alert" value.
+    const { result } = renderHook(() => mapperFor('alert')([]));
+
+    expect(result.current('count()')).toBe('count()');
+  });
 });

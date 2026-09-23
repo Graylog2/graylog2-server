@@ -22,6 +22,7 @@ import EventTypeFilter from 'views/components/widgets/events/filters/EventTypeFi
 import type { FilterComponents } from 'views/components/widgets/overview-configuration/filters/types';
 import EventPriorityFilter from 'views/components/widgets/events/filters/EventPriorityFilter';
 import PriorityName from 'components/events/events/PriorityName';
+import { getEventTypeName } from 'components/events/events/EventTypeLabel';
 
 const filterComponents: FilterComponents = [
   {
@@ -41,7 +42,7 @@ const filterComponents: FilterComponents = [
     configuration: (selectedValues, _editValue: string, onChange: (newValue: string) => void) => (
       <EventTypeFilter onSelect={onChange} selectedValues={selectedValues} />
     ),
-    renderValue: (isAlert: 'true' | 'false') => (isAlert === 'true' ? 'Alert' : 'Event'),
+    renderValue: getEventTypeName,
   },
   {
     attribute: 'priority',

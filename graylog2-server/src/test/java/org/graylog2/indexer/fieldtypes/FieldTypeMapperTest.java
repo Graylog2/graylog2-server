@@ -16,10 +16,13 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
+import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
+import org.graylog2.plugin.streams.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.Set;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +51,11 @@ public class FieldTypeMapperTest {
     }
 
     private void assertMapping(FieldTypeDTO esType, String glType, String... properties) {
-        assertThat(mapper.mapType(esType))
+        assertMapping(esType, Set.of(), glType, properties);
+    }
+
+    private void assertMapping(FieldTypeDTO esType, Set<String> queryStreamIds, String glType, String... properties) {
+        assertThat(mapper.mapType(esType, queryStreamIds))
                 .isPresent().get()
                 .isEqualTo(createType(glType, copyOf(properties)));
     }
@@ -92,5 +99,39 @@ public class FieldTypeMapperTest {
         assertThat(FieldTypeMapper.isNumericType("boolean")).isFalse();
         assertThat(FieldTypeMapper.isNumericType("ip")).isFalse();
         assertThat(FieldTypeMapper.isNumericType("unknown_type")).isFalse();
+    }
+
+    @Test
+    public void mapsPriorityFieldOnlyWhenQueryIsConfinedToEventStreams() {
+        final FieldTypeDTO priorityField = FieldTypeDTO.builder()
+                .fieldName(CommonEventSummary.FIELD_PRIORITY)
+                .physicalType("long")
+                .build();
+
+        assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID),
+                "priority", "numeric", "enumerable");
+        assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID), "priority", "numeric", "enumerable");
+
+        assertMapping(priorityField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, "5f4dfb144b8ea2d1819e2e2e"),
+                "long", "numeric", "enumerable");
+        assertMapping(priorityField, Set.of("5f4dfb144b8ea2d1819e2e2e"), "long", "numeric", "enumerable");
+        assertMapping(priorityField, Set.of(), "long", "numeric", "enumerable");
+    }
+
+    @Test
+    public void mapsAlertFieldOnlyWhenQueryIsConfinedToEventStreams() {
+        final FieldTypeDTO alertField = FieldTypeDTO.builder()
+                .fieldName(CommonEventSummary.FIELD_ALERT)
+                .physicalType("boolean")
+                .build();
+
+        assertMapping(alertField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID),
+                "alert", "enumerable");
+        assertMapping(alertField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID), "alert", "enumerable");
+
+        assertMapping(alertField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, "5f4dfb144b8ea2d1819e2e2e"),
+                "boolean", "enumerable");
+        assertMapping(alertField, Set.of("5f4dfb144b8ea2d1819e2e2e"), "boolean", "enumerable");
+        assertMapping(alertField, Set.of(), "boolean", "enumerable");
     }
 }

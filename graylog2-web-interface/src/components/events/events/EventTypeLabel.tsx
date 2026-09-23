@@ -19,11 +19,26 @@ import * as React from 'react';
 
 import { Label } from 'components/bootstrap';
 
+export const getEventTypeName = (isAlert: boolean | string): string => {
+  const value = String(isAlert);
+
+  if (value === 'true') {
+    return 'Alert';
+  }
+
+  if (value === 'false') {
+    return 'Event';
+  }
+
+  return value;
+};
+
 type Props = {
   isAlert: boolean;
 };
 
-const EventTypeLabel = ({ isAlert }: Props) =>
-  isAlert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>;
+const EventTypeLabel = ({ isAlert }: Props) => (
+  <Label bsStyle={isAlert ? 'warning' : 'info'}>{getEventTypeName(isAlert)}</Label>
+);
 
 export default EventTypeLabel;
