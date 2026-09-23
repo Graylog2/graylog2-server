@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Render the `event_uid` of Windows event log messages from the Collector as an unsigned value."
+
+pulls = ["27451"]
