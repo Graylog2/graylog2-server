@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as Immutable from 'immutable';
 
 import BulkActions from 'components/events/events/BulkActions';
 import { asMock } from 'helpers/mocking';
@@ -24,10 +25,13 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventAction } from 'views/types';
 import type { Event } from 'components/events/events/types';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { alice } from 'fixtures/users';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 jest.mock('components/events/events/hooks/useSendEventActionTelemetry');
+jest.mock('hooks/useCurrentUser');
 const getEvent = (id: string): Event => ({
   id,
   event_definition_id: 'event_definition_id_1',
@@ -51,6 +55,16 @@ const mockedSelectedEntitiesData = {
   '01HV0YS4GH0VC7DV6A2VGN1VJ0': getEvent('01HV0YS4GH0VC7DV6A2VGN1VJ0'),
 };
 
+const getReplayableEvent = (id: string): Event => ({
+  ...getEvent(id),
+  replay_info: {
+    timerange_start: '2024-01-01',
+    timerange_end: '2024-01-02',
+    query: 'source:example',
+    streams: ['000000000000000000000001'],
+  },
+});
+
 const mockedEventActions: Array<EventAction> = [
   {
     useCondition: () => true,
@@ -67,7 +81,8 @@ const mockedEventActions: Array<EventAction> = [
     modal: React.forwardRef(() => <b>I am a modal without a bulk</b>),
   },
 ];
-const renderBulkAction = () => render(<BulkActions selectedEntitiesData={mockedSelectedEntitiesData} />);
+const renderBulkAction = (selectedEntitiesData: { [eventId: string]: Event } = mockedSelectedEntitiesData) =>
+  render(<BulkActions selectedEntitiesData={selectedEntitiesData} />);
 
 const openActionsDropdown = async () =>
   await userEvent.click(
@@ -78,6 +93,7 @@ const openActionsDropdown = async () =>
 
 describe('Events Bulk Action', () => {
   beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(alice);
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: ['01HV0YS4GHDMT30E3EMWQVQNK9', '01HV0YS4GHDMT30E3EMWQVQNK9'],
       setSelectedEntities: () => {},
@@ -112,5 +128,18 @@ describe('Events Bulk Action', () => {
 
     expect(notBulkComponent).not.toBeInTheDocument();
     expect(notBulkModal).not.toBeInTheDocument();
+  });
+
+  it('renders replay search for replayable events when user can read their event definition', async () => {
+    asMock(usePluginEntities).mockReturnValue([]);
+    asMock(useCurrentUser).mockReturnValue(
+      alice.toBuilder().permissions(Immutable.List(['eventdefinitions:read:event_definition_id_1'])).build(),
+    );
+
+    renderBulkAction({ event_id_1: getReplayableEvent('event_id_1') });
+
+    await openActionsDropdown();
+
+    await screen.findByRole('menuitem', { name: /replay search/i });
   });
 });
