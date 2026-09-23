@@ -1,11 +1,5 @@
 type = "a"
 message = "Add buttons to select the latest installed or older content pack versions when creating a new content pack revision."
 
-details.user = """
-When creating a new revision from an existing one, "Select latest installed versions" and
-"Select older content pack versions" next to the entity search switch every selected entity that
-is installed on this server between its latest installed version and its older content pack
-version. The older content pack versions stay selected by default.
-"""
-
+issues = ["Graylog2/graylog-plugin-enterprise#15738"]
 pulls = ["27493"]
