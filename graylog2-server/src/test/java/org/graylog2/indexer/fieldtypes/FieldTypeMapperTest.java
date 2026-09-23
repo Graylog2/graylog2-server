@@ -117,4 +117,21 @@ public class FieldTypeMapperTest {
         assertMapping(priorityField, Set.of("5f4dfb144b8ea2d1819e2e2e"), "long", "numeric", "enumerable");
         assertMapping(priorityField, Set.of(), "long", "numeric", "enumerable");
     }
+
+    @Test
+    public void mapsAlertFieldOnlyWhenQueryIsConfinedToEventStreams() {
+        final FieldTypeDTO alertField = FieldTypeDTO.builder()
+                .fieldName(CommonEventSummary.FIELD_ALERT)
+                .physicalType("boolean")
+                .build();
+
+        assertMapping(alertField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID),
+                "alert", "enumerable");
+        assertMapping(alertField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID), "alert", "enumerable");
+
+        assertMapping(alertField, Set.of(Stream.DEFAULT_EVENTS_STREAM_ID, "5f4dfb144b8ea2d1819e2e2e"),
+                "boolean", "enumerable");
+        assertMapping(alertField, Set.of("5f4dfb144b8ea2d1819e2e2e"), "boolean", "enumerable");
+        assertMapping(alertField, Set.of(), "boolean", "enumerable");
+    }
 }

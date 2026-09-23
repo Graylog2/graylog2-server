@@ -20,7 +20,7 @@ import * as React from 'react';
 import type { Slice, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import PriorityName from 'components/events/events/PriorityName';
-import EventTypeLabel from 'components/events/events/EventTypeLabel';
+import EventTypeLabel, { getEventTypeName } from 'components/events/events/EventTypeLabel';
 import StringUtils from 'util/StringUtils';
 
 const extendPrioritySlices = (slices: Array<Slice>) => {
@@ -36,8 +36,8 @@ const extendPrioritySlices = (slices: Array<Slice>) => {
 const extendTypeSlices = (slices: Array<Slice>) => {
   const countsByValue = new Map(slices.map((slice) => [String(slice.value), slice.count]));
   const values = [
-    { value: 'true', title: 'Alert' },
-    { value: 'false', title: 'Event' },
+    { value: 'true', title: getEventTypeName(true) },
+    { value: 'false', title: getEventTypeName(false) },
   ];
 
   return values.map(({ value, title }) => ({

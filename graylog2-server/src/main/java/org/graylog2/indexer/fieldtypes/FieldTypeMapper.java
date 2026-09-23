@@ -64,6 +64,7 @@ public class FieldTypeMapper {
     public static final FieldTypes.Type EVENT_DEFINITION_ID_TYPE = createType("event-definition-id", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type ASSOCIATED_ASSETS_TYPE = createType("associated-assets", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type PRIORITY_TYPE = createType("priority", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    public static final FieldTypes.Type ALERT_TYPE = createType("alert", of(PROP_ENUMERABLE));
 
 
     /**
@@ -124,24 +125,21 @@ public class FieldTypeMapper {
             case Message.FIELD_GL2_SOURCE_NODE -> NODE_TYPE;
             case EventDto.FIELD_EVENT_DEFINITION_ID -> EVENT_DEFINITION_ID_TYPE;
             case "associated_assets" -> ASSOCIATED_ASSETS_TYPE;
-            case CommonEventSummary.FIELD_PRIORITY -> mapPriorityType(queryStreamIds);
+            case CommonEventSummary.FIELD_PRIORITY -> isConfinedToEventStreams(queryStreamIds) ? PRIORITY_TYPE : null;
+            case CommonEventSummary.FIELD_ALERT -> isConfinedToEventStreams(queryStreamIds) ? ALERT_TYPE : null;
             default -> null;
         };
     }
 
     /**
-     * Unlike the other cases in {@link #mapFieldNameType}, "priority" is not a Graylog-reserved field name: user
-     * messages can freely contain their own unrelated "priority" field. It is only mapped to
-     * {@link #PRIORITY_TYPE} when the current query is confined to the built-in events streams, so that an
-     * unrelated message field of the same name on a regular stream keeps its plain numeric type. This looks at
-     * which streams the query asked about, not at which streams the field's underlying data actually spans, so
-     * it works regardless of whether {@code stream_aware_field_types} is enabled.
+     * Unlike the other cases in {@link #mapFieldNameType}, "priority" and "alert" are not Graylog-reserved field
+     * names: user messages can freely contain their own unrelated fields of the same name. They are only mapped
+     * to {@link #PRIORITY_TYPE}/{@link #ALERT_TYPE} when the current query is confined to the built-in events
+     * streams, so that an unrelated message field of the same name on a regular stream keeps its plain type.
+     * This looks at which streams the query asked about, not at which streams the field's underlying data
+     * actually spans, so it works regardless of whether {@code stream_aware_field_types} is enabled.
      */
-    private static FieldTypes.Type mapPriorityType(Collection<String> queryStreamIds) {
-        if (!queryStreamIds.isEmpty() && Stream.DEFAULT_EVENT_STREAM_IDS.containsAll(queryStreamIds)) {
-            return PRIORITY_TYPE;
-        }
-
-        return null;
+    private static boolean isConfinedToEventStreams(Collection<String> queryStreamIds) {
+        return !queryStreamIds.isEmpty() && Stream.DEFAULT_EVENT_STREAM_IDS.containsAll(queryStreamIds);
     }
 }

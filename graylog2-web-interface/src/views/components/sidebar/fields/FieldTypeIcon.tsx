@@ -51,6 +51,8 @@ const iconName = (type: string) => {
       return 'quick_reference';
     case 'priority':
       return 'emergency_home';
+    case 'alert':
+      return 'notification_important';
     default:
       return 'help';
   }
