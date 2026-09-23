@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix creating the Collector System Logs index set when time_size_optimizing_retention_fixed_leeway or max_index_retention_period conflict with its default lifetime settings."
+
+issues = ["27492"]
+pulls = []
