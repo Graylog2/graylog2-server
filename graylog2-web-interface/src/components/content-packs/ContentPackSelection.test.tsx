@@ -249,7 +249,7 @@ describe('<ContentPackSelection />', () => {
     });
   });
 
-  describe('Server / Former revision toggle', () => {
+  describe('latest / older version buttons', () => {
     const type = { name: 'stream', version: '1' };
     const packStream = { title: 'Stream', type, id: 'pack-stream-uuid' } as any;
     const serverStream = { title: 'Stream', type, id: '5f0000000000000000000001' } as any;
@@ -272,23 +272,23 @@ describe('<ContentPackSelection />', () => {
     it('is hidden when no entity has an installed copy', () => {
       renderSelection({ stream: [packStream] }, jest.fn(), []);
 
-      expect(screen.queryByText('Server')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /select latest installed versions/i })).not.toBeInTheDocument();
     });
 
-    it('swaps only checked, paired entities to their installed copies with Server', async () => {
+    it('swaps only checked, paired entities to their latest installed versions', async () => {
       const changeFn = jest.fn();
       renderSelection({ stream: [packStream, unpairedPackStream] }, changeFn);
 
-      await setupUser().click(screen.getByText('Server'));
+      await setupUser().click(screen.getByRole('button', { name: /select latest installed versions/i }));
 
       expect(changeFn).toHaveBeenCalledWith({ selectedEntities: { stream: [unpairedPackStream, serverStream] } });
     });
 
-    it('swaps them back with Former revision', async () => {
+    it('swaps them back to their older content pack versions', async () => {
       const changeFn = jest.fn();
       renderSelection({ stream: [unpairedPackStream, serverStream] }, changeFn);
 
-      await setupUser().click(screen.getByText('Former revision'));
+      await setupUser().click(screen.getByRole('button', { name: /select older content pack versions/i }));
 
       expect(changeFn).toHaveBeenCalledWith({ selectedEntities: { stream: [unpairedPackStream, packStream] } });
     });

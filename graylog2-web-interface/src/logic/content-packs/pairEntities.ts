@@ -20,7 +20,7 @@ import type EntityIndex from 'logic/content-packs/EntityIndex';
 type InstallationEntity = { id: string; content_pack_entity_id: string };
 export type Installation = { content_pack_revision: number; entities?: Array<InstallationEntity> };
 export type EntityPair = { packEntity: Entity; installedEntity: EntityIndex };
-export type EntitySource = 'server' | 'former_revision';
+export type EntitySource = 'latest' | 'older';
 type Selection = { [type: string]: Array<Entity | EntityIndex> };
 
 const PREFERRED_RANK = Number.MAX_SAFE_INTEGER;
@@ -56,20 +56,9 @@ export const pairEntities = (
 const isSelected = (selection: Selection, entity: Entity | EntityIndex) =>
   (selection[entity.type.name] ?? []).some((selected) => selected.id === entity.id);
 
-export const selectedSource = (selection: Selection, pairs: Array<EntityPair>): EntitySource | '' => {
-  const sources = new Set(
-    pairs.flatMap(({ packEntity, installedEntity }) => [
-      ...(isSelected(selection, installedEntity) ? ['server' as const] : []),
-      ...(isSelected(selection, packEntity) ? ['former_revision' as const] : []),
-    ]),
-  );
-
-  return sources.size === 1 ? [...sources][0] : '';
-};
-
 export const switchSource = (selection: Selection, pairs: Array<EntityPair>, source: EntitySource): Selection =>
   pairs.reduce((result, { packEntity, installedEntity }) => {
-    const [from, to] = source === 'server' ? [packEntity, installedEntity] : [installedEntity, packEntity];
+    const [from, to] = source === 'latest' ? [packEntity, installedEntity] : [installedEntity, packEntity];
 
     if (!isSelected(result, from)) {
       return result;

@@ -17,7 +17,7 @@
 import Entity from 'logic/content-packs/Entity';
 import EntityIndex from 'logic/content-packs/EntityIndex';
 
-import { pairEntities, selectedSource, switchSource } from './pairEntities';
+import { pairEntities, switchSource } from './pairEntities';
 
 const streamType = { name: 'stream', version: '1' };
 
@@ -74,24 +74,19 @@ describe('switchSource and selectedSource', () => {
     { packEntity: pairedPack, installedEntity: pairedServer },
     { packEntity: uncheckedPack, installedEntity: uncheckedServer },
   ];
-  const formerRevisionSelection = { stream: [pairedPack, unpairedPack] };
+  const olderSelection = { stream: [pairedPack, unpairedPack] };
 
-  it('reports the shared source of the checked, paired entities', () => {
-    expect(selectedSource(formerRevisionSelection, pairs)).toBe('former_revision');
-    expect(selectedSource({ stream: [pairedServer] }, pairs)).toBe('server');
+  it('swaps only the checked, paired entities to their latest installed versions', () => {
+    expect(switchSource(olderSelection, pairs, 'latest')).toEqual({ stream: [unpairedPack, pairedServer] });
   });
 
-  it('reports no source when the checked, paired entities are mixed', () => {
-    expect(selectedSource({ stream: [pairedServer, uncheckedPack] }, pairs)).toBe('');
+  it('swaps them back to the older content pack versions', () => {
+    const latestSelection = switchSource(olderSelection, pairs, 'latest');
+
+    expect(switchSource(latestSelection, pairs, 'older')).toEqual({ stream: [unpairedPack, pairedPack] });
   });
 
-  it('swaps only the checked, paired entities to their installed copies for Server', () => {
-    expect(switchSource(formerRevisionSelection, pairs, 'server')).toEqual({ stream: [unpairedPack, pairedServer] });
-  });
-
-  it('swaps them back for Former revision', () => {
-    const serverSelection = switchSource(formerRevisionSelection, pairs, 'server');
-
-    expect(switchSource(serverSelection, pairs, 'former_revision')).toEqual({ stream: [unpairedPack, pairedPack] });
+  it('leaves the selection alone when it is already on the requested version', () => {
+    expect(switchSource(olderSelection, pairs, 'older')).toEqual(olderSelection);
   });
 });

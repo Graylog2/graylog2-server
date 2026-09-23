@@ -16,22 +16,27 @@
  */
 import * as React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import styled, { css } from 'styled-components';
 
 import { Icon, SearchForm } from 'components/common';
-import { Col, HelpBlock, Row, Input, SegmentedControl } from 'components/bootstrap';
+import { Button, ButtonToolbar, Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 import InputDescription from 'components/common/InputDescription';
 import ContentPackSelectionList from 'components/content-packs/ContentPackSelectionList';
-import { selectedSource, switchSource } from 'logic/content-packs/pairEntities';
+import { switchSource } from 'logic/content-packs/pairEntities';
 import type { EntityPair, EntitySource } from 'logic/content-packs/pairEntities';
 
 import style from './ContentPackSelection.css';
 
-const SOURCE_OPTIONS: Array<{ value: EntitySource; label: string }> = [
-  { value: 'server', label: 'Server' },
-  { value: 'former_revision', label: 'Former revision' },
-];
+const SearchRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: ${theme.spacings.sm};
+  `,
+);
 
 type ContentPackSelectionProps = {
   contentPack: any;
@@ -186,12 +191,8 @@ class ContentPackSelection extends React.Component<
     onStateChange({ selectedEntities: newSelection });
   };
 
-  _switchSource = (source: EntitySource | '') => {
+  _switchSource = (source: EntitySource) => {
     const { selectedEntities, entityPairs, onStateChange } = this.props;
-
-    if (!source) {
-      return;
-    }
 
     onStateChange({ selectedEntities: switchSource(selectedEntities, entityPairs, source) });
   };
@@ -326,30 +327,29 @@ class ContentPackSelection extends React.Component<
             <h2>Content Pack selection</h2>
             {edit && (
               <HelpBlock>
-                You can select between installed entities from the server (<Icon name="dns" />) or entities from the
-                former content pack revision (<Icon name="archive" className={style.contentPackEntity} />
+                For each entity you can select the latest installed version (<Icon name="dns" />) or the older
+                content pack version (<Icon name="archive" className={style.contentPackEntity} />
                 ).
               </HelpBlock>
-            )}
-            {edit && entityPairs.length > 0 && (
-              <>
-                {/* An empty value leaves no segment active, since Mantine ignores clicks on the active one. */}
-                <SegmentedControl<EntitySource | ''>
-                  value={selectedSource(selectedEntities, entityPairs)}
-                  onChange={this._switchSource}
-                  data={SOURCE_OPTIONS}
-                />
-                <HelpBlock>
-                  Server selects the installed entity from the server for every selected entity that has one. Former
-                  revision selects the entity from the former content pack revision instead.
-                </HelpBlock>
-              </>
             )}
           </Col>
         </Row>
         <Row>
           <Col smOffset={1} lg={8}>
-            <SearchForm onSearch={this._onSetFilter} onReset={this._onClearFilter} />
+            <SearchRow>
+              {/* Narrower than the default 400px so the version buttons fit beside it in this column. */}
+              <SearchForm queryWidth={280} onSearch={this._onSetFilter} onReset={this._onClearFilter} />
+              {edit && entityPairs.length > 0 && (
+                <ButtonToolbar>
+                  <Button bsSize="small" onClick={() => this._switchSource('latest')}>
+                    Select latest installed versions
+                  </Button>
+                  <Button bsSize="small" onClick={() => this._switchSource('older')}>
+                    Select older content pack versions
+                  </Button>
+                </ButtonToolbar>
+              )}
+            </SearchRow>
           </Col>
         </Row>
         <Row>
