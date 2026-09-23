@@ -231,7 +231,7 @@ public class InputEventListener {
                 }
             }
         } else {
-            inputRegistry.findInputsWithState(Set.of(IOState.Type.RUNNING, IOState.Type.STOPPED)).stream()
+            inputRegistry.findInputsWithState(Set.of(IOState.Type.RUNNING, IOState.Type.STOPPED, IOState.Type.FAILED)).stream()
                     .map(IOState::getStoppable)
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
