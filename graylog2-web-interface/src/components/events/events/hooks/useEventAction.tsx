@@ -18,7 +18,7 @@ import React, { useMemo } from 'react';
 
 import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
 import { MenuItem } from 'components/bootstrap';
-import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
+import EventReplaySearchLink from 'components/event-definitions/replay-search/EventReplaySearchLink';
 import useSendEventActionTelemetry from 'components/events/events/hooks/useSendEventActionTelemetry';
 import type { Event } from 'components/events/events/types';
 import usePermissions from 'hooks/usePermissions';
@@ -34,7 +34,7 @@ const useEventAction = (event: Event) => {
     () =>
       [
         hasReplayInfo && isPermitted ? (
-          <LinkToReplaySearch
+          <EventReplaySearchLink
             key="replay-search"
             isMenuitem
             onClick={() => sendEventActionTelemetry('REPLAY_SEARCH', false)}

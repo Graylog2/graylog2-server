@@ -39,7 +39,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
-import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
+import EventDefinitionReplaySearchLink from 'components/event-definitions/replay-search/EventDefinitionReplaySearchLink';
 
 import type { EventDefinition } from '../event-definitions-types';
 import { isAggregationEventDefinition, isSystemEventDefinition } from '../event-definitions-types';
@@ -309,7 +309,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
                   anyPermissions>
                   <MenuItem divider />
                 </IfPermitted>
-                <LinkToReplaySearch eventDefinitionId={eventDefinition.id} isMenuitem />
+                <EventDefinitionReplaySearchLink eventDefinitionId={eventDefinition.id} isMenuitem />
               </>
             )}
             {moreActions}

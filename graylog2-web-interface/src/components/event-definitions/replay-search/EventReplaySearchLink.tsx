@@ -23,38 +23,32 @@ import usePermissions from 'hooks/usePermissions';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
 /**
- * Link to replay the search behind an event definition. Always pass `eventDefinitionId`, so the link is hidden
- * from users who cannot read that event definition. Additionally pass `eventId` when linking from a specific
- * event, so the search is replayed with that event's parameters instead of the definition's current ones.
+ * Link to replay the search for a specific event, using that event's own parameters. Hidden unless the user
+ * can read the event's event definition, since the replay search itself requires that permission.
  */
 
 type Props = {
-  eventId?: string;
-  eventDefinitionId?: string;
+  eventId: string;
+  eventDefinitionId: string;
   onClick?: () => void;
   isMenuitem?: boolean;
 };
-const LinkToReplaySearch = ({
-  eventId = undefined,
-  eventDefinitionId = undefined,
-  onClick = undefined,
-  isMenuitem = false,
-}: Props) => {
+
+const EventReplaySearchLink = ({ eventId, eventDefinitionId, onClick = undefined, isMenuitem = false }: Props) => {
   const { isPermitted } = usePermissions();
 
-  if (eventDefinitionId && !isPermitted(`eventdefinitions:read:${eventDefinitionId}`)) {
+  if (!isPermitted(`eventdefinitions:read:${eventDefinitionId}`)) {
     return null;
   }
 
-  const searchLink = eventId
-    ? Routes.ALERTS.replay_search(eventId)
-    : Routes.ALERTS.DEFINITIONS.replay_search(eventDefinitionId);
-
   return (
-    <ReplaySearchButtonComponent searchLink={searchLink} onClick={onClick} component={isMenuitem ? MenuItem : undefined}>
+    <ReplaySearchButtonComponent
+      searchLink={Routes.ALERTS.replay_search(eventId)}
+      onClick={onClick}
+      component={isMenuitem ? MenuItem : undefined}>
       Replay search
     </ReplaySearchButtonComponent>
   );
 };
 
-export default LinkToReplaySearch;
+export default EventReplaySearchLink;

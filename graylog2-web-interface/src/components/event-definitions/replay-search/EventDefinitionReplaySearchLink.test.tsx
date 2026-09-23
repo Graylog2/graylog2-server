@@ -20,11 +20,11 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { asMock } from 'helpers/mocking';
 import usePermissions from 'hooks/usePermissions';
 
-import LinkToReplaySearch from './LinkToReplaySearch';
+import EventDefinitionReplaySearchLink from './EventDefinitionReplaySearchLink';
 
 jest.mock('hooks/usePermissions');
 
-describe('LinkToReplaySearch', () => {
+describe('EventDefinitionReplaySearchLink', () => {
   beforeEach(() => {
     asMock(usePermissions).mockReturnValue({ isPermitted: () => false, isAnyPermitted: () => false });
   });
@@ -32,20 +32,20 @@ describe('LinkToReplaySearch', () => {
   it('renders play button when user can read the event definition', async () => {
     asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
 
-    render(<LinkToReplaySearch eventDefinitionId="event-definition-id" />);
+    render(<EventDefinitionReplaySearchLink eventDefinitionId="event-definition-id" />);
 
     await screen.findByRole('link', { name: /replay search/i });
   });
 
   it('does not render play button when user cannot read the event definition', () => {
-    render(<LinkToReplaySearch eventDefinitionId="event-definition-id" />);
+    render(<EventDefinitionReplaySearchLink eventDefinitionId="event-definition-id" />);
 
     expect(screen.queryByRole('link', { name: /replay search/i })).not.toBeInTheDocument();
   });
 
-  it('checks permission for the event definition of the event, when linking to an event', () => {
-    render(<LinkToReplaySearch eventId="event-id" eventDefinitionId="event-definition-id" />);
+  it('renders play button when no event definition id is given yet, e.g. while creating a new one', async () => {
+    render(<EventDefinitionReplaySearchLink />);
 
-    expect(screen.queryByRole('link', { name: /replay search/i })).not.toBeInTheDocument();
+    await screen.findByRole('link', { name: /replay search/i });
   });
 });
