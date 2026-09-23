@@ -25,7 +25,7 @@ import org.graylog2.plugin.PluginConfigBean;
 @DocumentationSection(heading = "Pipeline configuration", description = "")
 public class PipelineConfig implements PluginConfigBean {
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "Cache the stage iterators computed for a set of pipelines instead of recomputing them for every message.")
     @Parameter("cached_stageiterators")
     private boolean cachedStageIterators = true;
 

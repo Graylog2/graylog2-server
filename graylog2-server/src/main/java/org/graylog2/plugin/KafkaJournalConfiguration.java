@@ -48,15 +48,15 @@ public class KafkaJournalConfiguration extends PathConfiguration {
     @Parameter(value = MESSAGE_JOURNAL_DIR)
     private Path messageJournalDir;
 
-    @Documentation("tbd")
+    @Documentation("Maximum size of a single message journal segment file; also limits the maximum message size. Default: 100mb")
     @Parameter("message_journal_segment_size")
     private Size messageJournalSegmentSize = Size.megabytes(100L);
 
-    @Documentation("tbd")
+    @Documentation("Maximum age of a message journal segment file before a new segment is started. Default: 1h")
     @Parameter("message_journal_segment_age")
     private Duration messageJournalSegmentAge = Duration.standardHours(1L);
 
-    @Documentation("tbd")
+    @Documentation("Maximum total size of the message journal on disk before old segments are deleted. Default: 5gb")
     @Parameter("message_journal_max_size")
     private Size messageJournalMaxSize = Size.gigabytes(5L);
 
@@ -68,11 +68,11 @@ public class KafkaJournalConfiguration extends PathConfiguration {
     @Parameter("message_journal_max_age")
     private Duration messageJournalMaxAge = Duration.standardHours(12L);
 
-    @Documentation("tbd")
+    @Documentation("Number of messages written to the journal before a flush to disk is forced. Default: 1000000")
     @Parameter("message_journal_flush_interval")
     private long messageJournalFlushInterval = 1_000_000L;
 
-    @Documentation("tbd")
+    @Documentation("Maximum time a message may stay in the journal before a flush to disk is forced. Default: 1m")
     @Parameter("message_journal_flush_age")
     private Duration messageJournalFlushAge = Duration.standardMinutes(1L);
 

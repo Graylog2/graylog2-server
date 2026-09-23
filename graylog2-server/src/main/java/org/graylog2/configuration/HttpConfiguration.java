@@ -114,7 +114,7 @@ public class HttpConfiguration {
     @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int httpThreadPoolSize = 64;
 
-    @Documentation("tbd")
+    @Documentation("Number of selector runner threads handling network I/O (accepting connections, reading/writing) for the HTTP interface.")
     @Parameter(value = "http_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
     private int httpSelectorRunnersCount = 1;
 
@@ -157,15 +157,15 @@ public class HttpConfiguration {
     @Parameter(value = "http_external_uri")
     private URI httpExternalUri;
 
-    @Documentation("tbd")
+    @Documentation("Allow embedding the Graylog web interface in frames from the same origin (X-Frame-Options: SAMEORIGIN instead of DENY).")
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
-    @Documentation("tbd")
+    @Documentation("Always set the \"Secure\" flag on the authentication cookie, even if the request was not made via HTTPS (e. g. behind a TLS-terminating proxy).")
     @Parameter(value = "http_cookie_secure_override")
     private boolean httpCookieSecureOverride = false;
 
-    @Documentation("tbd")
+    @Documentation("Set the SameSite attribute of the authentication cookie to \"Strict\". If disabled, \"None\" is used.")
     @Parameter(value = "http_cookie_same_site_strict")
     private boolean httpCookieSameSiteStrict = true;
 

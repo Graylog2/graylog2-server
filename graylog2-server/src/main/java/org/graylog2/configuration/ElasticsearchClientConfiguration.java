@@ -35,7 +35,7 @@ import java.util.List;
 
 @DocumentationSection(heading = "Indexer Client Connection Settings", description = "")
 public class ElasticsearchClientConfiguration {
-    @Documentation("tbd")
+    @Documentation("Explicitly set the search backend version and disable the automatic version probe. Either a major Elasticsearch version (e. g. \"7\") or \"distribution:version\" (e. g. \"opensearch:2.19.0\").")
     @Parameter(value = "elasticsearch_version", converter = MajorVersionConverter.class, validators = {ElasticsearchVersionValidator.class})
     private SearchVersion elasticsearchVersion;
 
@@ -159,7 +159,7 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_discovery_enabled")
     private boolean discoveryEnabled = false;
 
-    @Documentation("tbd")
+    @Documentation("Periodically check the cluster nodes (like node discovery) and log added and dropped search backend nodes.")
     @Parameter(value = "elasticsearch_node_activity_logger_enabled")
     private boolean nodeActivityLogger = false;
 
@@ -188,11 +188,11 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_discovery_default_scheme", validators = {HttpOrHttpsSchemeValidator.class})
     private String defaultSchemeForDiscoveredNodes = "http";
 
-    @Documentation("tbd")
+    @Documentation("Default username used to authenticate against nodes found by node discovery. Only used together with elasticsearch_discovery_default_password.")
     @Parameter(value = "elasticsearch_discovery_default_user")
     private String defaultUserForDiscoveredNodes = null;
 
-    @Documentation("tbd")
+    @Documentation("Default password used to authenticate against nodes found by node discovery. Only used together with elasticsearch_discovery_default_user.")
     @Parameter(value = "elasticsearch_discovery_default_password")
     private String defaultPasswordForDiscoveredNodes = null;
 
@@ -217,15 +217,15 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
 
-    @Documentation("tbd")
+    @Documentation("Authenticate against the indexer (OpenSearch) using JWT tokens signed with the password_secret. Always enabled when running with Data Node.")
     @Parameter(value = "indexer_use_jwt_authentication")
     private boolean indexerUseJwtAuthentication = false;
 
-    @Documentation("tbd")
+    @Documentation("How long a generated JWT token for indexer authentication is cached and reused before a new one is generated (e. g. 60s).")
     @Parameter(value = "indexer_jwt_auth_token_caching_duration")
     private Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
 
-    @Documentation("tbd")
+    @Documentation("Validity period of generated JWT tokens for indexer authentication (e. g. 180s).")
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     private Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
@@ -235,15 +235,15 @@ public class ElasticsearchClientConfiguration {
      * Till then, we can work around that by generating tokens with extended validity in both directions
      */
     @Deprecated(forRemoval = true)
-    @Documentation(value = "tbd")
+    @Documentation(value = "Deprecated. Time window (e. g. 30s) added to JWT token validity in both directions to compensate for clock differences between Graylog and OpenSearch.")
     @Parameter(value = "indexer_jwt_clock_skew_tolerance")
     private Duration indexerJwtAuthTokenClockSkewTolerance = Duration.seconds(30);
 
-    @Documentation("tbd")
+    @Documentation("Maximum number of searches a multi-search request to the indexer executes concurrently. Default: unset (indexer default).")
     @Parameter(value = "indexer_max_concurrent_searches")
     private Integer indexerMaxConcurrentSearches = null;
 
-    @Documentation("tbd")
+    @Documentation("Maximum number of concurrent shard requests per node for each search in a multi-search request to the indexer. Default: unset (indexer default).")
     @Parameter(value = "indexer_max_concurrent_shard_requests")
     private Integer indexerMaxConcurrentShardRequests = null;
 

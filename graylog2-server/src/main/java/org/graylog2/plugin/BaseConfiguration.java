@@ -88,11 +88,11 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 65536;
 
-    @Documentation("tbd")
+    @Documentation("Size of the input buffer ring buffer. Must be a power of 2. (512, 1024, 2048, ...)")
     @Parameter(value = "inputbuffer_ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int inputBufferRingSize = 65536;
 
-    @Documentation("tbd")
+    @Documentation("Wait strategy of the input buffer processors, see processor_wait_strategy for possible values.")
     @Parameter(value = "inputbuffer_wait_strategy", required = true)
     private String inputBufferWaitStrategy = "blocking";
 
@@ -108,7 +108,7 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter("message_journal_enabled")
     private boolean messageJournalEnabled = true;
 
-    @Documentation("tbd")
+    @Documentation("Implementation of the message journal: \"disk\" (persistent on-disk journal) or \"noop\" (no journal).")
     @Parameter(value = "message_journal_mode")
     private String messageJournalMode = MessageQueueModule.DISK_JOURNAL_MODE;
 
@@ -116,7 +116,7 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
 
-    @Documentation("tbd")
+    @Documentation("Record per-message timing and counter information during processing, useful for debugging or benchmarking.")
     @Parameter("message_recordings_enable")
     private boolean messageRecordingsEnable = false;
 
@@ -177,7 +177,7 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter(value = "http_read_timeout", validator = PositiveDurationValidator.class)
     private Duration httpReadTimeout = Duration.seconds(10L);
 
-    @Documentation("tbd")
+    @Documentation("Identifier of the source Graylog was installed from, logged at startup and included in telemetry data.")
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 

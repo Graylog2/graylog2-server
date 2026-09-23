@@ -31,19 +31,19 @@ import java.time.Duration;
 
 @DocumentationSection(heading = "Email transport", description = "")
 public class EmailConfiguration {
-    @Documentation("tbd")
+    @Documentation("Enable sending emails (e. g. for email notifications).")
     @Parameter(value = "transport_email_enabled")
     private boolean enabled = false;
 
-    @Documentation("tbd")
+    @Documentation("Hostname of the SMTP server used to send emails.")
     @Parameter(value = "transport_email_hostname")
     private String hostname;
 
-    @Documentation("tbd")
+    @Documentation("Port of the SMTP server used to send emails.")
     @Parameter(value = "transport_email_port", validator = InetPortValidator.class)
     private int port = 25;
 
-    @Documentation("tbd")
+    @Documentation("Authenticate against the SMTP server using transport_email_auth_username and transport_email_auth_password.")
     @Parameter(value = "transport_email_use_auth")
     private boolean useAuth = false;
 
@@ -65,15 +65,15 @@ public class EmailConfiguration {
     @Parameter(value = "transport_email_use_ssl")
     private boolean useSsl = false;
 
-    @Documentation("tbd")
+    @Documentation("Username for authenticating against the SMTP server.")
     @Parameter(value = "transport_email_auth_username")
     private String username;
 
-    @Documentation("tbd")
+    @Documentation("Password for authenticating against the SMTP server.")
     @Parameter(value = "transport_email_auth_password")
     private String password;
 
-    @Documentation("tbd")
+    @Documentation("Default sender (From) email address for emails sent by Graylog.")
     @Parameter(value = "transport_email_from_email")
     private String fromEmail;
 
@@ -84,13 +84,13 @@ public class EmailConfiguration {
     @Parameter(value = "transport_email_web_interface_url")
     private URI webInterfaceUri;
 
-    @Documentation("tbd")
+    @Documentation("Timeout for establishing the connection to the SMTP server (e. g. 10s).")
     @Parameter(value = "transport_email_socket_connection_timeout",
                converter = JavaDurationConverter.class,
                validators = MillisecondDurationValidator.class)
     private Duration socketConnectionTimeout = Duration.ofSeconds(10);
 
-    @Documentation("tbd")
+    @Documentation("Socket read timeout for the connection to the SMTP server (e. g. 10s).")
     @Parameter(value = "transport_email_socket_timeout",
                converter = JavaDurationConverter.class,
                validators = MillisecondDurationValidator.class)

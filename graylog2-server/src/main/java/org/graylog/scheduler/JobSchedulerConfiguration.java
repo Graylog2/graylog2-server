@@ -47,11 +47,11 @@ public class JobSchedulerConfiguration implements PluginConfigBean {
     @Parameter(value = SYSTEM_WORKER_THREADS, validators = PositiveIntegerValidator.class)
     private int jobSchedulerSystemWorkerThreads = 5;
 
-    @Documentation("tbd")
+    @Documentation("Time (e.g. \"1s\") the job scheduler sleeps between loop iterations when there are no free worker threads or no runnable job triggers.")
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
     private Duration loopSleepDuration = Duration.seconds(1);
 
-    @Documentation("tbd")
+    @Documentation("Time (e.g. \"5m\") after which the lock of a running job trigger expires if not refreshed, so that another node can take over the trigger. Minimum 1 minute.")
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
     private Duration lockExpirationDuration = Duration.minutes(5);
 

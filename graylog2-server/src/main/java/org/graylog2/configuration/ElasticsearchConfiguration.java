@@ -210,35 +210,35 @@ public class ElasticsearchConfiguration {
     private int maxNumberOfIndices = 20;
 
     // TimeBasedSizeOptimizingStrategy Rotation
-    @Documentation("tbd")
+    @Documentation("Minimum age an index must reach before the \"time-size-optimizing\" rotation strategy rotates it, provided it has a reasonable size. Default: 1d")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_PERIOD)
     private Period timeSizeOptimizingRotationPeriod = Period.days(1);
 
-    @Documentation("tbd")
+    @Documentation("Minimum shard size for the \"time-size-optimizing\" rotation strategy; indices are only rotated by age once they reach this size per shard. If unset, the shard size is calculated dynamically from the OpenSearch node memory.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE)
     private Size timeSizeOptimizingRotationMinShardSize;
 
-    @Documentation("tbd")
+    @Documentation("Maximum shard size for the \"time-size-optimizing\" rotation strategy; indices exceeding this size per shard are rotated. If unset, the shard size is calculated dynamically from the OpenSearch node memory.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE)
     private Size timeSizeOptimizingRotationMaxShardSize;
 
-    @Documentation("tbd")
+    @Documentation("Factor multiplied with the memory of the smallest OpenSearch data node to calculate the dynamic max shard size, if min/max shard sizes are not configured. Default: 0.6")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_OS_MEMORY_FACTOR)
     private double timeSizeOptimizingRotationOSMemoryFactor = 0.6;
 
-    @Documentation("tbd")
+    @Documentation("Default minimum lifetime of indices using the \"time-size-optimizing\" rotation strategy. Default: 30d")
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME)
     private Period timeSizeOptimizingRetentionMinLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MIN;
 
-    @Documentation("tbd")
+    @Documentation("Default maximum lifetime of indices using the \"time-size-optimizing\" rotation strategy, must be larger than the min lifetime. Default: 40d")
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME)
     private Period timeSizeOptimizingRetentionMaxLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MAX;
 
-    @Documentation("tbd")
+    @Documentation("If set, the duration between the max and min index lifetime of the \"time-size-optimizing\" strategy must be at least this long. Default: unset")
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY)
     private Period timeSizeOptimizingRetentionFixedLeeway;
 
-    @Documentation("tbd")
+    @Documentation("Allow index lifetimes of the \"time-size-optimizing\" strategy that are not a multiple of days (e. g. hours).")
     @Parameter(value = ALLOW_FLEXIBLE_RETENTION_PERIOD)
     private boolean allowFlexibleRetentionPeriod = false;
 
