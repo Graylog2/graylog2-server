@@ -144,6 +144,37 @@ describe('<ContentPackParameterList />', () => {
     expect(deleteFn).not.toHaveBeenCalled();
   });
 
+  it('should delete a parameter only used by an entity that is no longer selected', async () => {
+    const deleteFn = jest.fn();
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
+    const appliedParameter = {
+      'deselected-entity': [{ paramName: 'PARAM', configKey: 'title' }],
+    };
+    const contentPack = ContentPack.builder().parameters(parameters).entities([]).build();
+
+    render(
+      <ContentPackParameterList
+        contentPack={contentPack}
+        onDeleteParameter={deleteFn}
+        appliedParameter={appliedParameter}
+      />,
+    );
+
+    (await screen.findByRole('button', { name: 'Delete Parameter' })).click();
+
+    await waitFor(() => {
+      expect(deleteFn).toHaveBeenCalledWith(expect.objectContaining({ name: 'PARAM' }));
+    });
+  });
+
   it('should filter parameters', async () => {
     const parameters = [
       {

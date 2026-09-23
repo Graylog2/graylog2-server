@@ -64,20 +64,13 @@ class ContentPackParameterList extends React.Component<
   }
 
   _parameterApplied = (paramName) => {
-    const { appliedParameter } = this.props;
+    const { appliedParameter, contentPack } = this.props;
+    // appliedParameter can keep refs for deselected or swapped-out entities, so only count current ones.
+    const currentEntityIds = new Set((contentPack.entities || []).map((entity) => entity.id));
 
-    const entityIds = Object.keys(appliedParameter);
-
-    /* eslint-disable-next-line guard-for-in */
-    for (const i in entityIds) {
-      const params = appliedParameter[entityIds[i]];
-
-      if (findIndex(params, { paramName: paramName }) >= 0) {
-        return true;
-      }
-    }
-
-    return false;
+    return Object.keys(appliedParameter)
+      .filter((id) => currentEntityIds.has(id))
+      .some((id) => findIndex(appliedParameter[id], { paramName: paramName }) >= 0);
   };
 
   _parameterRowFormatter = (parameter) => {
