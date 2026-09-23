@@ -19,6 +19,7 @@ import { Field, useFormikContext } from 'formik';
 
 import Select from 'components/common/Select';
 import { Input } from 'components/bootstrap';
+import { metricToSeries } from 'views/components/aggregationwizard/metric/MetricElement';
 
 import type { GroupByFormValues, MetricFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
@@ -32,7 +33,7 @@ const directionOptions = [
 ];
 
 const formatSeries = (metric: MetricFormValues) => {
-  const readableField = `${metric.function}(${metric.field ?? ''})`;
+  const readableField = metricToSeries(metric).function;
 
   return {
     label: metric.name || readableField,
