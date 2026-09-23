@@ -18,7 +18,7 @@ import React, { useMemo } from 'react';
 
 import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
 import { MenuItem } from 'components/bootstrap';
-import EventReplaySearchLink from 'components/event-definitions/replay-search/EventReplaySearchLink';
+import EventReplaySearchLink from 'components/events/events/EventReplaySearchLink';
 import useSendEventActionTelemetry from 'components/events/events/hooks/useSendEventActionTelemetry';
 import type { Event } from 'components/events/events/types';
 import usePermissions from 'hooks/usePermissions';
