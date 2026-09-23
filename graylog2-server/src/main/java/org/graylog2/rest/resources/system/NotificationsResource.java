@@ -38,6 +38,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -52,6 +53,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationPaginationService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationSummaryDto;
+import org.graylog2.rest.URIHelper;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -200,6 +202,7 @@ public class NotificationsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("Read-only endpoint")
     public PageListResponse<NotificationSummaryDto> getPaginated(
+            @Context URIHelper uriHelper,
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -211,7 +214,7 @@ public class NotificationsResource extends RestResource {
         final Bson dbQuery = buildPaginatedQuery(filters, query);
         final Bson sort = order.toBsonSort(sortField);
 
-        final var result = paginationService.searchPaginated(dbQuery, sort, page, perPage);
+        final var result = paginationService.searchPaginated(dbQuery, sort, page, perPage, uriHelper);
 
         return PageListResponse.create(query, result, sortField, order.name().toLowerCase(Locale.ENGLISH),
                 ATTRIBUTES, DEFAULTS);
@@ -265,13 +268,14 @@ public class NotificationsResource extends RestResource {
     @Operation(summary = "Render the HTML message for a notification by ID")
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("Read-only endpoint")
-    public TemplateRenderResponse renderHtmlById(@Parameter(name = "id") @PathParam("id") String id) {
+    public TemplateRenderResponse renderHtmlById(@Context URIHelper uriHelper,
+                                                 @Parameter(name = "id") @PathParam("id") String id) {
         checkPermission(RestPermissions.NOTIFICATIONS_READ);
 
         final var notification = paginationService.findById(id)
                 .orElseThrow(() -> new NotFoundException(f("Notification <%s> not found", id)));
 
-        final var rendered = renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+        final var rendered = renderService.render(notification, SystemNotificationRenderService.Format.HTML, uriHelper);
         return TemplateRenderResponse.create(rendered.title, rendered.description);
     }
 

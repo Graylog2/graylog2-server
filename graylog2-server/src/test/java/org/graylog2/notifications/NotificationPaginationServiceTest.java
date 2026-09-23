@@ -25,6 +25,7 @@ import org.graylog.events.processor.systemnotification.SystemNotificationRenderS
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.URIHelper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,16 +34,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
 class NotificationPaginationServiceTest {
+
+    private static final URIHelper TEST_URI_HELPER = new URIHelper(URI.create("http://localhost:9000/"));
 
     private final MongoCollection<Document> collection;
     private final NotificationPaginationService service;
@@ -61,7 +66,7 @@ class NotificationPaginationServiceTest {
 
     @Test
     void searchPaginatedReturnsEmptyListWhenNoDocuments() {
-        final var result = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 10);
+        final var result = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 10, TEST_URI_HELPER);
 
         assertThat(result).isEmpty();
         assertThat(result.pagination().total()).isZero();
@@ -74,7 +79,7 @@ class NotificationPaginationServiceTest {
         insertNotification("no_input_running", null, "normal", "node-2", "2026-01-02T00:00:00.000Z");
         insertNotification("input_failing", "input-1", "normal", "node-1", "2026-01-03T00:00:00.000Z");
 
-        final var result = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 10);
+        final var result = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 10, TEST_URI_HELPER);
 
         assertThat(result).hasSize(3);
         assertThat(result.pagination().total()).isEqualTo(3);
@@ -91,16 +96,16 @@ class NotificationPaginationServiceTest {
                     Tools.getISO8601String(DateTime.now(DateTimeZone.UTC).plusMinutes(i)));
         }
 
-        final var page1 = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 2);
+        final var page1 = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 2, TEST_URI_HELPER);
         assertThat(page1).hasSize(2);
         assertThat(page1.pagination().total()).isEqualTo(5);
         assertThat(page1.pagination().page()).isEqualTo(1);
 
-        final var page2 = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 2, 2);
+        final var page2 = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 2, 2, TEST_URI_HELPER);
         assertThat(page2).hasSize(2);
         assertThat(page2.pagination().page()).isEqualTo(2);
 
-        final var page3 = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 3, 2);
+        final var page3 = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 3, 2, TEST_URI_HELPER);
         assertThat(page3).hasSize(1);
     }
 
@@ -111,7 +116,7 @@ class NotificationPaginationServiceTest {
         insertNotification("no_input_running", null, "normal", "node-2", "2026-01-02T00:00:00.000Z");
 
         final var result = service.searchPaginated(
-                Filters.eq("type", "es_unavailable"), Sorts.descending("timestamp"), 1, 10);
+                Filters.eq("type", "es_unavailable"), Sorts.descending("timestamp"), 1, 10, TEST_URI_HELPER);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).type()).isEqualTo("es_unavailable");
@@ -125,7 +130,7 @@ class NotificationPaginationServiceTest {
         insertNotification("input_failing", "input-42", "normal", "node-abc", ts,
                 Map.of("input_id", "input-42", "reason", "connection refused"));
 
-        final var result = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 10);
+        final var result = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 10, TEST_URI_HELPER);
 
         assertThat(result).hasSize(1);
         final var dto = result.get(0);
@@ -142,10 +147,11 @@ class NotificationPaginationServiceTest {
 
     @Test
     void searchPaginatedHandlesRenderFailureGracefully() {
-        when(renderService.render(any(Notification.class))).thenThrow(new RuntimeException("template missing"));
+        when(renderService.render(any(Notification.class), eq(SystemNotificationRenderService.Format.PLAINTEXT), eq(TEST_URI_HELPER)))
+                .thenThrow(new RuntimeException("template missing"));
         insertNotification("es_unavailable", null, "urgent", "node-1", "2026-01-01T00:00:00.000Z");
 
-        final var result = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 10);
+        final var result = service.searchPaginated(Filters.empty(), Sorts.descending("timestamp"), 1, 10, TEST_URI_HELPER);
 
         assertThat(result).hasSize(1);
         final var dto = result.get(0);
@@ -203,7 +209,8 @@ class NotificationPaginationServiceTest {
     private void stubRenderService(String title, String description) {
         // RenderResponse is a non-static inner class, so we create it through the mocked instance
         final var response = renderService.new RenderResponse(title, description);
-        when(renderService.render(any(Notification.class))).thenReturn(response);
+        when(renderService.render(any(Notification.class), eq(SystemNotificationRenderService.Format.PLAINTEXT), eq(TEST_URI_HELPER)))
+                .thenReturn(response);
     }
 
     private ObjectId insertNotification(String type, String key, String severity, String nodeId, String timestamp) {
