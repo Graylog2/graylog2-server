@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -211,5 +211,26 @@ describe('<ContentPackParameterList />', () => {
     await setupUser().click(await screen.findByRole('button', { name: 'Reset search' }));
 
     await screen.findByText('PARAM');
+  });
+
+  it('should only open the create modal when parameters already exist', async () => {
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
+    const contentPack = ContentPack.builder().parameters(parameters).build();
+    render(<ContentPackParameterList contentPack={contentPack} />);
+
+    await setupUser().click(await screen.findByText('Create parameter'));
+
+    const dialog = await screen.findByRole('dialog');
+
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(within(dialog).getByRole('button', { name: 'Create parameter' })).toBeInTheDocument();
   });
 });
