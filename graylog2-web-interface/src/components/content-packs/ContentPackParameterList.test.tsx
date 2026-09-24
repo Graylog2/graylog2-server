@@ -193,7 +193,7 @@ describe('<ContentPackParameterList />', () => {
     const contentPack = ContentPack.builder().parameters(parameters).build();
     render(<ContentPackParameterList contentPack={contentPack} />);
 
-    await setupUser().click(await screen.findByText('Create parameter'));
+    await userEvent.click(await screen.findByText('Create parameter'));
 
     const dialog = await screen.findByRole('dialog');
 

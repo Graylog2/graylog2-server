@@ -106,20 +106,18 @@ describe('<ContentPackEntitiesList />', () => {
 
   it('should only open the edit modal of the clicked entity and apply the parameter to it', async () => {
     const onParameterApply = jest.fn();
-    const user = setupUser();
-
     render(<ContentPackEntitiesList contentPack={contentPack} onParameterApply={onParameterApply} />);
 
-    await user.click((await screen.findAllByRole('button', { name: 'Edit' }))[0]);
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Edit' }))[0]);
 
     const dialog = await screen.findByRole('dialog');
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
 
     const [configKeySelect, parameterSelect] = within(dialog).getAllByRole('combobox');
-    await user.selectOptions(configKeySelect, within(configKeySelect).getAllByRole('option')[1]);
-    await user.selectOptions(parameterSelect, 'TITLE');
-    await user.click(within(dialog).getByRole('button', { name: 'Apply' }));
+    await userEvent.selectOptions(configKeySelect, within(configKeySelect).getAllByRole('option')[1]);
+    await userEvent.selectOptions(parameterSelect, 'TITLE');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Apply' }));
 
     expect(onParameterApply).toHaveBeenCalledWith(entity1.id, expect.any(String), 'TITLE');
   });
