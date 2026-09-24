@@ -66,6 +66,7 @@ const mockInstance: CollectorInstanceView = {
   version: '1.2.0',
   status: 'online',
   has_pending_changes: false,
+  pending_fleet_id: null,
   health: null,
 };
 
