@@ -25,7 +25,7 @@ import type { Event, EventsAdditionalData } from 'components/events/events/types
 import { additionalAttributes } from 'components/events/Constants';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
-import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
 const url = URLUtils.qualifyUrl('/events/search');
 
 type FiltersResult = {
@@ -116,7 +116,7 @@ export const getConcatenatedQuery = (query: string, streamId: string) => {
   return `(${query}) AND source_streams:${streamId}`;
 };
 
-export const defaultTimeRange: RelativeTimeRange = { type: 'relative', range: 7 * 86400 } as const;
+export const defaultTimeRange: RelativeTimeRangeStartOnly = { type: 'relative', range: 7 * 86400 } as const;
 export const fetchEventsHistogram = async (searchParams: SearchParams) => {
   const { timerange, filter } = parseFilters(searchParams.filters, defaultTimeRange);
 
