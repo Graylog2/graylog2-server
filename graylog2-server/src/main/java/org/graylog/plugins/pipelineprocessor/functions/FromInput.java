@@ -57,7 +57,7 @@ public class FromInput extends AbstractFunction<Boolean> {
         Set<MessageInput> inputs = new HashSet<>();
         if ("".equals(id)) {
             final String name = nameParam.optional(args, context).orElse("");
-            for (IOState<MessageInput> messageInputIOState : inputRegistry.getRunningInputs()) {
+            for (IOState<MessageInput> messageInputIOState : inputRegistry.getInputStates()) {
                 final MessageInput messageInput = messageInputIOState.getStoppable();
                 if (messageInput.getTitle().equalsIgnoreCase(name)) {
                     inputs.add(messageInput);
