@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { ConfirmDialog } from 'components/common';
@@ -31,13 +30,12 @@ type Props = {
 
 const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props) => {
   const DataLakeStreamDeleteWarning = usePluginEntities('dataLake')?.[0]?.DataLakeStreamDeleteWarning;
-  const streamDataLakeHasData = useStreamDataLakeHasData(streamId, !!DataLakeStreamDeleteWarning);
-  const isDataLakeEnable = useIsStreamDataLakeEnabled(streamId, !!DataLakeStreamDeleteWarning);
+  const dataLakeState = useStreamDataLakeHasData(streamId, !!DataLakeStreamDeleteWarning);
+  const isDataLakeEnabled = !!useIsStreamDataLakeEnabled(streamId, !!DataLakeStreamDeleteWarning);
+  const hasArchivedData = dataLakeState?.hasArchivedData ?? false;
+  const hasRetrievals = dataLakeState?.hasRetrievals ?? false;
 
-  const shouldShowWarning = useMemo(
-    () => isDataLakeEnable || streamDataLakeHasData,
-    [isDataLakeEnable, streamDataLakeHasData],
-  );
+  const shouldShowWarning = isDataLakeEnabled || hasArchivedData || hasRetrievals;
 
   return (
     <ConfirmDialog
@@ -46,7 +44,16 @@ const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props)
       btnConfirmDisabled={shouldShowWarning}
       onCancel={onCancel}
       title="Delete Stream">
-      {shouldShowWarning ? <DataLakeStreamDeleteWarning /> : `Do you really want to remove stream:  ${streamTitle}?`}
+      {shouldShowWarning ? (
+        <DataLakeStreamDeleteWarning
+          streamId={streamId}
+          isEnabled={isDataLakeEnabled}
+          hasArchivedData={hasArchivedData}
+          hasRetrievals={hasRetrievals}
+        />
+      ) : (
+        `Do you really want to remove stream:  ${streamTitle}?`
+      )}
     </ConfirmDialog>
   );
 };

@@ -30,7 +30,14 @@ const useStreamDataLakeHasData = (streamId: string, enabled: boolean) => {
     enabled: fetchStreamDataLake && enabled,
   });
 
-  return isLoading || isError ? undefined : dataLake?.message_count > 1 || dataLake?.restore_history?.length > 0;
+  if (isLoading || isError) {
+    return undefined;
+  }
+
+  return {
+    hasArchivedData: dataLake?.message_count > 0,
+    hasRetrievals: dataLake?.restore_history?.length > 0,
+  };
 };
 
 export default useStreamDataLakeHasData;

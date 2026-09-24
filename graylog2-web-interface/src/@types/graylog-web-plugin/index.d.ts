@@ -350,7 +350,12 @@ declare module 'graylog-web-plugin/plugin' {
       timestamp_to: string;
       restore_history: Array<{ id: string }>;
     }>;
-    DataLakeStreamDeleteWarning: React.ComponentType;
+    DataLakeStreamDeleteWarning: React.ComponentType<{
+      streamId: string;
+      isEnabled: boolean;
+      hasArchivedData: boolean;
+      hasRetrievals: boolean;
+    }>;
   }
 
   interface PluginArchive {
