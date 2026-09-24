@@ -16,17 +16,15 @@
  */
 import * as React from 'react';
 
-import useGeneralMetricsSearch from './hooks/useGeneralMetricsSearch';
-import WelcomeSearch from './WelcomeSearch';
-
-type Props = {
-  topSourcesOnly?: boolean;
+type LoadingPlaceholders = {
+  search?: React.ReactNode;
+  widget?: React.ComponentType<{ visualization?: string }>;
 };
 
-const GeneralWelcomeMetrics = ({ topSourcesOnly = false }: Props) => {
-  const { view, entries } = useGeneralMetricsSearch(topSourcesOnly);
+/**
+ * Allows replacing the default spinners shown while a search is prepared (`search`) and while a widget
+ * waits for its results (`widget`), e.g. with content skeletons.
+ */
+const LoadingPlaceholderContext = React.createContext<LoadingPlaceholders>({});
 
-  return <WelcomeSearch view={view} entries={entries} />;
-};
-
-export default GeneralWelcomeMetrics;
+export default LoadingPlaceholderContext;
