@@ -54,7 +54,7 @@ public class FromInput extends AbstractFunction<Boolean> {
         MessageInput input = null;
         if ("".equals(id)) {
             final String name = nameParam.optional(args, context).orElse("");
-            for (IOState<MessageInput> messageInputIOState : inputRegistry.getInputStates()) {
+            for (IOState<MessageInput> messageInputIOState : inputRegistry.getRunningInputs()) {
                 final MessageInput messageInput = messageInputIOState.getStoppable();
                 if (messageInput.getTitle().equalsIgnoreCase(name)) {
                     input = messageInput;
