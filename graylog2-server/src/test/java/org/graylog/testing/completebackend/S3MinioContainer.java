@@ -31,7 +31,7 @@ import java.time.Duration;
 import java.util.Optional;
 
 public class S3MinioContainer extends GenericContainer<S3MinioContainer> {
-    public static final String MINIO_LATEST = "reg.mini.dev/minio/minio:latest";
+    public static final String MINIO_LATEST = "reg.mini.dev/minio:latest";
     private static final int PORT = 9000;
     private final String accessKey;
     private final String secretKey;
