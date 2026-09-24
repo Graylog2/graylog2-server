@@ -54,16 +54,21 @@ public final class MappingErrorCoercion {
 
     /**
      * Types whose values were written as epoch milliseconds, which is how Jackson writes Joda {@link DateTime} and
-     * {@link java.util.Date} when it writes dates as timestamps.
+     * {@link java.util.Date} when it writes dates as timestamps. Dynamic mapping produces {@code long} for those.
+     * <p>
+     * {@code byte}, {@code short} and {@code integer} are excluded: epoch milliseconds do not fit into them, so a
+     * retry could not succeed.
      */
-    private static final Set<String> INTEGRAL_TYPES = Set.of("byte", "short", "integer", "long", "unsigned_long");
+    private static final Set<String> INTEGRAL_TYPES = Set.of("long", "unsigned_long");
 
     /**
      * Types whose values were written as epoch seconds with a fractional part, which is how Jackson writes
      * {@code java.time} values such as {@link java.time.Instant}. Grok's {@code ;date;} conversion produces an
-     * {@code Instant}, so those fields end up mapped as {@code float}.
+     * {@code Instant}, so those fields end up dynamically mapped as {@code float}.
+     * <p>
+     * {@code half_float} is excluded: it tops out at 65504 and cannot hold an epoch value at all.
      */
-    private static final Set<String> FRACTIONAL_TYPES = Set.of("float", "half_float", "scaled_float", "double");
+    private static final Set<String> FRACTIONAL_TYPES = Set.of("float", "double", "scaled_float");
 
     private MappingErrorCoercion() {
     }

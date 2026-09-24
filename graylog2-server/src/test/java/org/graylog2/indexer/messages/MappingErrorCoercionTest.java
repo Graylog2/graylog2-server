@@ -58,6 +58,16 @@ class MappingErrorCoercionTest {
     }
 
     @Test
+    void ignoresNumericTypesThatCannotHoldAnEpochValue() {
+        // epoch milliseconds do not fit into these
+        assertThat(MappingErrorCoercion.numericFieldFrom(mappingError("event_start", "integer"))).isEmpty();
+        assertThat(MappingErrorCoercion.numericFieldFrom(mappingError("event_start", "short"))).isEmpty();
+        assertThat(MappingErrorCoercion.numericFieldFrom(mappingError("event_start", "byte"))).isEmpty();
+        // half_float tops out at 65504, so it cannot hold epoch seconds either
+        assertThat(MappingErrorCoercion.numericFieldFrom(mappingError("event_start", "half_float"))).isEmpty();
+    }
+
+    @Test
     void ignoresFieldsMappedToNonNumericTypes() {
         assertThat(MappingErrorCoercion.numericFieldFrom(mappingError("event_start", "date"))).isEmpty();
         assertThat(MappingErrorCoercion.numericFieldFrom(mappingError("event_start", "keyword"))).isEmpty();
