@@ -284,15 +284,6 @@ public class OpensearchProcessImplTest {
     }
 
     @Test
-    public void testGetOpensearchClusterUrlKeepsBracketedIPv6PublishHost() {
-        when(configuration.getOpensearchNetworkPublishHost()).thenReturn("[2001:db8::1]");
-        when(configuration.getOpensearchTransportPort()).thenReturn(9300);
-
-        Assertions.assertThat(opensearchProcess.getOpensearchClusterUrl())
-                .isEqualTo("[2001:db8::1]:9300");
-    }
-
-    @Test
     public void testGetOpensearchClusterUrlWithIPv4PublishHost() {
         when(configuration.getOpensearchNetworkPublishHost()).thenReturn("10.0.0.1");
         when(configuration.getOpensearchTransportPort()).thenReturn(9300);

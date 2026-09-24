@@ -270,8 +270,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             Set this explicitly when $hostname/$bind_address is not routable from other cluster members, e.g. when
             this Datanode runs in a Docker bridge network and the container's hostname only resolves to a
             non-routable internal address from inside the container. Falls back to $hostname if not set.
+            Must be a single hostname or IP address. Write IPv6 addresses without brackets and without a zone ID;
+            wildcard addresses (0.0.0.0, ::) are rejected.
             """)
-    @Parameter(value = "opensearch_network_publish_host")
+    @Parameter(value = "opensearch_network_publish_host", validators = PublishHostValidator.class)
     private String opensearchNetworkPublishHost = null;
 
     @Documentation("Name of the cluster that the embedded opensearch will form. Should be the same for all Datanodes in one cluster.")
