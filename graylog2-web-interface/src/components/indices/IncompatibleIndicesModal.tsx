@@ -34,7 +34,7 @@ type Props = {
 const IncompatibleIndicesModal = ({ show, onClose }: Props) => {
   const { data: runsWithDataNode } = useRunsWithDataNode();
   const { data: incompatibleIndices } = useIncompatibleIndices();
-  const { data: openSearchVersionCheck } = useSearchVersionCheck('opensearch');
+  const { data: openSearchVersionCheck } = useSearchVersionCheck('opensearch', '^2.0.0');
   const showUnsupportedUpgradeWarning =
     runsWithDataNode === false && openSearchVersionCheck?.satisfied === true && incompatibleIndices.length > 0;
 

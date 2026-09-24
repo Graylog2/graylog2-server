@@ -86,6 +86,7 @@ describe('IncompatibleIndicesModal', () => {
     const warningCopy = screen.getByText(/prevents this cluster from upgrading to OpenSearch 3.x/i);
 
     expect(warningCopy).toBeInTheDocument();
+    expect(useSearchVersionCheck).toHaveBeenCalledWith('opensearch', '^2.0.0');
     expect(screen.getByText('migrate from OpenSearch to Data Node')).toBeInTheDocument();
     const documentationLink = screen.getByRole('link', { name: /documentation.*opens in a new tab/i });
 
@@ -101,7 +102,7 @@ describe('IncompatibleIndicesModal', () => {
     expect(screen.queryByText(/prevents this cluster from upgrading to OpenSearch 3.x/i)).not.toBeInTheDocument();
   });
 
-  it('does not show the warning for a non-OpenSearch search backend', () => {
+  it('does not show the warning outside the OpenSearch 2.x version range', () => {
     mockIncompatibleIndices([incompatibleIndex]);
     mockSearchVersionCheck(false);
 
