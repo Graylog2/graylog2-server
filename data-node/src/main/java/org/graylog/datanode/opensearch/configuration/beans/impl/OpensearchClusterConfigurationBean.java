@@ -24,7 +24,6 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationPara
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.files.TextConfigFile;
-import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
@@ -119,17 +118,26 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
         // this node itself might not be registered with the node service yet, therefore we always add it to the list.
         return nodeService.allActive().values().stream()
                 .filter(this::isManager)
-                .map(Node::getHostname)
+                .map(this::getOpensearchNodeName)
                 .collect(Collectors.collectingAndThen(
                         Collectors.toSet(),
-                        hostnames -> {
+                        nodeNames -> {
                             if (localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty() ||
                                     localConfiguration.getNodeRoles().contains(OpensearchNodeRole.CLUSTER_MANAGER)) {
-                                hostnames.add(localConfiguration.getHostname());
+                                nodeNames.add(localConfiguration.getDatanodeNodeName());
                             }
-                            return String.join(",", hostnames);
+                            return String.join(",", nodeNames);
                         }
                 ));
+    }
+
+    /**
+     * cluster.initial_cluster_manager_nodes has to match the node.name of each node. Nodes running an older version
+     * don't report their node name, fall back to the hostname, which is the default node name.
+     */
+    private String getOpensearchNodeName(DataNodeDto node) {
+        final String nodeName = node.getOpensearchNodeName();
+        return nodeName != null && !nodeName.isBlank() ? nodeName : node.getHostname();
     }
 
     private boolean isManager(DataNodeDto n) {

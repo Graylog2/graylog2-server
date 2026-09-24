@@ -89,6 +89,7 @@ class DataNodeDtoTest {
                 .setClusterAddress("http://cluster:9300")
                 .setRestApiAddress("http://rest:9200")
                 .setDatanodeVersion("6.0.0")
+                .setOpensearchNodeName("my-node")
                 .setActionQueue(DataNodeLifecycleTrigger.STOP)
         ).toEntityParameters();
 
@@ -98,6 +99,7 @@ class DataNodeDtoTest {
                 .containsEntry(DataNodeDto.FIELD_REST_API_ADDRESS, "http://rest:9200")
                 .containsEntry(DataNodeDto.FIELD_DATANODE_STATUS, DataNodeStatus.STARTING)
                 .containsEntry(DataNodeDto.FIELD_DATANODE_VERSION, "6.0.0")
+                .containsEntry(DataNodeDto.FIELD_OPENSEARCH_NODE_NAME, "my-node")
                 .containsEntry(DataNodeDto.FIELD_ACTION_QUEUE, DataNodeLifecycleTrigger.STOP);
     }
 
@@ -117,7 +119,7 @@ class DataNodeDtoTest {
                 DataNodeDto.FIELD_CLUSTER_ADDRESS, DataNodeDto.FIELD_REST_API_ADDRESS,
                 DataNodeDto.FIELD_ACTION_QUEUE, DataNodeDto.FIELD_CERT_VALID_UNTIL,
                 DataNodeDto.FIELD_DATANODE_VERSION, DataNodeDto.FIELD_OPENSEARCH_ROLES,
-                DataNodeDto.FIELD_CONFIGURATION_WARNINGS);
+                DataNodeDto.FIELD_CONFIGURATION_WARNINGS, DataNodeDto.FIELD_OPENSEARCH_NODE_NAME);
     }
 
     private DataNodeProvisioningConfig.State provisioningState(DataNodeStatus status) {
