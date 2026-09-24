@@ -27,6 +27,9 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
@@ -51,28 +54,28 @@ public class FromInput extends AbstractFunction<Boolean> {
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         String id = idParam.optional(args, context).orElse("");
 
-        MessageInput input = null;
+        Set<MessageInput> inputs = new HashSet<>();
         if ("".equals(id)) {
             final String name = nameParam.optional(args, context).orElse("");
             for (IOState<MessageInput> messageInputIOState : inputRegistry.getRunningInputs()) {
                 final MessageInput messageInput = messageInputIOState.getStoppable();
                 if (messageInput.getTitle().equalsIgnoreCase(name)) {
-                    input = messageInput;
+                    inputs.add(messageInput);
                     break;
                 }
             }
-            if ("".equals(name)) {
+            if (inputs.isEmpty() && "".equals(name)) {
                 return null;
             }
         } else {
             final IOState<MessageInput> inputState = inputRegistry.getInputState(id);
             if (inputState != null) {
-                input = inputState.getStoppable();
+                inputs.add(inputState.getStoppable());
             }
 
         }
-        return input != null
-                && input.getId().equals(context.currentMessage().getSourceInputId());
+        return !inputs.isEmpty()
+                && inputs.stream().anyMatch(input -> input.getId().equals(context.currentMessage().getSourceInputId()));
     }
 
     @Override
