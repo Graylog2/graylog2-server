@@ -505,10 +505,10 @@ class WindowsEventLogRecordProcessorTest {
     }
 
     @Test
-    void skipsSequenceNumberForRecordIdAboveSignedLongRange() {
-        // EventRecordID is unsigned 64-bit, and the collector's adapter wraps such a value into a
-        // negative long rather than sending a string. A negative sequence number would invert the
-        // sort order, so it is left out and the codec's default stays in place.
+    void rendersRecordIdAboveSignedLongRangeAsUnsignedAndSkipsSequenceNumber() {
+        // EventRecordID is unsigned 64-bit, and the collector's adapter wraps a value above 2^63 into
+        // a negative long rather than sending a string, so it has to be rendered as unsigned. A negative
+        // sequence number would invert the sort order, so it is left out and the codec's default stays in place.
         final var logRecord = LogRecord.newBuilder()
                 .setBody(AnyValue.newBuilder()
                         .setKvlistValue(KeyValueList.newBuilder()
@@ -519,7 +519,9 @@ class WindowsEventLogRecordProcessorTest {
 
         final var result = processor.process(wrapLogRecord(logRecord));
 
-        assertThat(result).doesNotContainKey(EventFields.EVENT_SEQUENCE);
+        assertThat(result)
+                .containsEntry(EventFields.EVENT_UID, "18446744073709551614")
+                .doesNotContainKey(EventFields.EVENT_SEQUENCE);
     }
 
     private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {
