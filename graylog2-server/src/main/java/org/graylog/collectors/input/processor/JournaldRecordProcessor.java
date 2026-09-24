@@ -380,9 +380,12 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
                 // TODO no direct GIM mapping yet.
                 // result.put("gl2_collector_journald_monotonic_timestamp", fieldValue); // example: 160050741281
                 //}
-                // Sequence number of this entry in the source journal file.
-                //case "__SEQNUM" ->
-                //        putNumericAsStringIfPresent(result, "event_id", asLong(fieldValue)); // example: 12219223
+                // Sequence number of this entry in the source journal file. Monotonically increasing
+                // within the sequence number ID (see __SEQNUM_ID), so it orders entries that share a
+                // timestamp. Requires systemd 254 or newer; older versions don't expose the field and
+                // the codec's default sequence number remains in place.
+                case "__SEQNUM" ->
+                        putNumericIfPresent(result, EventFields.EVENT_SEQUENCE, asLong(fieldValue)); // example: 12219223
                 // Sequence number ID associated with __SEQNUM.
                 case "__SEQNUM_ID" ->
                         putIfPresent(result, VendorFields.VENDOR_TRANSACTION_ID, extractString(fieldValue)); // example: 544611aab98d4df8bd045f3b0ab794bf
