@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed replay search actions being visible to users without read access to the related event definition."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13802"]
+pulls = ["27321", "Graylog2/graylog-plugin-enterprise#15534"]
