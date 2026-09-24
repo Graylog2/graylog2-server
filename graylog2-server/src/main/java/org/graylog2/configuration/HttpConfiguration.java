@@ -58,9 +58,8 @@ public class HttpConfiguration {
             This network interface must be accessible by all Graylog nodes in the cluster and by all clients
             using the Graylog web interface.
 
-            If the port is omitted, Graylog will use port 9000 by default.
-
-            Default: 127.0.0.1:9000
+            """ + "If the port is omitted, Graylog will use port " + GRAYLOG_DEFAULT_PORT + " by default.\n\n"
+            + "Default: 127.0.0.1:" + GRAYLOG_DEFAULT_PORT + "\n" + """
             IPv6 example: http_bind_address = [2001:db8::1]:9000
             """)
     @Parameter(value = "http_bind_address", required = true)

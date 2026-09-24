@@ -149,7 +149,7 @@ public class ElasticsearchConfiguration {
     @Documentation("""
             Decide what happens with the oldest indices when the maximum number of indices is reached.
             The following strategies are available:
-              - delete # Deletes the index completely (Default)
+            """ + "  - " + DeletionRetentionStrategy.NAME + " # Deletes the index completely (Default)\n" + """
               - close # Closes the index and hides it from the system. Can be re-opened later.
             """)
     @Parameter(value = "retention_strategy", required = true)
@@ -259,7 +259,7 @@ public class ElasticsearchConfiguration {
 
     @Documentation("""
             You can configure the default strategy used to determine when to rotate the currently active write index.
-            Multiple rotation strategies are supported, the default being "time-size-optimizing":
+            """ + "Multiple rotation strategies are supported, the default being \"" + TimeBasedSizeOptimizingStrategy.NAME + "\":\n" + """
               - "time-size-optimizing" tries to rotate daily, while focussing on optimal sized shards.
                 The global default values can be configured with
                 "time_size_optimizing_retention_min_lifetime" and "time_size_optimizing_retention_max_lifetime".

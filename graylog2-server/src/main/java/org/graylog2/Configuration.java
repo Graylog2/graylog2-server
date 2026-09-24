@@ -296,7 +296,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
 
-    @Documentation("Number of iterations used when hashing user passwords with the pbkdf2 algorithm. (Default: 10000)")
+    @Documentation("Number of iterations used when hashing user passwords with the pbkdf2 algorithm. (Default: " + PBKDF2PasswordAlgorithm.DEFAULT_ITERATIONS + ")")
     @Parameter(value = "user_password_pbkdf2_iterations", validators = PositiveIntegerValidator.class)
     private int userPasswordPbkdf2Iterations = PBKDF2PasswordAlgorithm.DEFAULT_ITERATIONS;
 

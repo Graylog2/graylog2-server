@@ -38,10 +38,10 @@ public class PrometheusExporterConfiguration {
     public static final String MAPPING_FILE_PATH_CUSTOM = PREFIX + "mapping_file_path_custom";
     public static final String MAPPING_FILE_REFRESH_INTERVAL = PREFIX + "mapping_file_refresh_interval";
 
-    private static String DEFAULT_BIND_ADDRESS_HOST = "127.0.0.1";
+    private static final String DEFAULT_BIND_ADDRESS_HOST = "127.0.0.1";
     // The default port has been added to the Prometheus default port allocation wiki page:
     // https://github.com/prometheus/prometheus/wiki/Default-port-allocations
-    private static int DEFAULT_BIND_ADDRESS_PORT = 9833;
+    private static final int DEFAULT_BIND_ADDRESS_PORT = 9833;
 
     @Documentation("""
             Enable Prometheus exporter HTTP server.
@@ -52,8 +52,7 @@ public class PrometheusExporterConfiguration {
 
     @Documentation("""
             IP address and port for the Prometheus exporter HTTP server.
-            Default: 127.0.0.1:9833
-            """)
+            """ + "Default: " + DEFAULT_BIND_ADDRESS_HOST + ":" + DEFAULT_BIND_ADDRESS_PORT + "\n")
     @Parameter(value = BIND_ADDRESS, converter = CustomHostAndPortConverter.class)
     private HostAndPort bindAddress = HostAndPort.fromParts(DEFAULT_BIND_ADDRESS_HOST, DEFAULT_BIND_ADDRESS_PORT);
 
