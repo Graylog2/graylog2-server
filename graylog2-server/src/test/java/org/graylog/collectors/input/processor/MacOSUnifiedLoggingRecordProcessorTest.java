@@ -76,17 +76,18 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 Map.entry("process_name", "bluetoothd"),
                 Map.entry("process_id", "401"),
                 Map.entry("user_id", "205"),
-                Map.entry("macos_thread_id", 11537025L),
+                Map.entry("macos_thread_id", "11537025"),
                 Map.entry("macos_boot_uuid", "BOOT-A"),
-                Map.entry("macos_mach_timestamp", 12868010147176L),
-                Map.entry("macos_trace_id", 45473881108119556L),
-                Map.entry("macos_activity_id", 0L),
-                Map.entry("macos_parent_activity_id", 0L),
-                Map.entry("macos_creator_activity_id", 0L),
+                Map.entry("macos_mach_timestamp", "12868010147176"),
+                Map.entry("event_sequence", 12868010147176L),
+                Map.entry("macos_trace_id", "45473881108119556"),
+                Map.entry("macos_activity_id", "0"),
+                Map.entry("macos_parent_activity_id", "0"),
+                Map.entry("macos_creator_activity_id", "0"),
                 Map.entry("macos_process_image_uuid", "PUUID"),
                 Map.entry("macos_sender_image_path", "/usr/sbin/bluetoothd"),
                 Map.entry("macos_sender_image_uuid", "SUUID"),
-                Map.entry("macos_sender_program_counter", 7787736L)
+                Map.entry("macos_sender_program_counter", "7787736")
         ));
     }
 
@@ -126,7 +127,36 @@ class MacOSUnifiedLoggingRecordProcessorTest {
         assertThat(result).containsEntry("process_name", "example-daemon");
         assertThat(result).containsEntry("user_id", "501");
         assertThat(result).containsEntry("macos_boot_uuid", "FFEEDDCC-BBAA-9988-7766-554433221100");
-        assertThat(result).containsEntry("macos_trace_id", 45473881108119556L);
+        assertThat(result).containsEntry("macos_trace_id", "45473881108119556");
+        assertThat(result).containsEntry("macos_mach_timestamp", "18446744073709551614");
+        // The fixture's mach timestamp exceeds a signed long, so it cannot serve as the sequence.
+        assertThat(result).doesNotContainKey("event_sequence");
+    }
+
+    @Test
+    void mapsIdentifiersAboveSignedLongRange() {
+        // Above 2^63 the receiver cannot use an OTLP integer and sends the decimal string instead.
+        final var logRecord = LogRecord.newBuilder()
+                .addAttributes(strAttr("macos.machTimestamp", "9223372036856917482"))
+                .addAttributes(strAttr("macos.threadID", "9223372036856917483"))
+                .addAttributes(strAttr("macos.traceID", "9223372036856917484"))
+                .addAttributes(strAttr("macos.activityIdentifier", "9223372036856917485"))
+                .addAttributes(strAttr("macos.parentActivityIdentifier", "9223372036856917486"))
+                .addAttributes(strAttr("macos.creatorActivityID", "9223372036856917487"))
+                .addAttributes(strAttr("macos.senderProgramCounter", "9223372036856917488"))
+                .build();
+
+        final var result = processor.process(wrap(logRecord));
+
+        assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.ofEntries(
+                Map.entry("macos_mach_timestamp", "9223372036856917482"),
+                Map.entry("macos_thread_id", "9223372036856917483"),
+                Map.entry("macos_trace_id", "9223372036856917484"),
+                Map.entry("macos_activity_id", "9223372036856917485"),
+                Map.entry("macos_parent_activity_id", "9223372036856917486"),
+                Map.entry("macos_creator_activity_id", "9223372036856917487"),
+                Map.entry("macos_sender_program_counter", "9223372036856917488")
+        ));
     }
 
     private static OTelJournal.Log wrap(LogRecord logRecord) {

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Require and verify expiration claim of collector OpAMP tokens."
+
+issues = ["26902"]
+pulls = ["27057"]
