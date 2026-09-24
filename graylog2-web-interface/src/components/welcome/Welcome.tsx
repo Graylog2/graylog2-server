@@ -22,6 +22,7 @@ import ContentStreamContainer from 'components/content-stream/ContentStreamConta
 import { hasAdminPermission } from 'util/PermissionsMixin';
 import useFeature from 'hooks/useFeature';
 import SectionHeader from 'components/welcome/SectionHeader';
+import VisuallyHidden from 'components/common/VisuallyHidden';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -45,6 +46,9 @@ const Welcome = () => {
 
   return (
     <>
+      <VisuallyHidden>
+        <h1>Welcome to Graylog!</h1>
+      </VisuallyHidden>
       {onboardingEnabled && <OnboardingBanner />}
       {metricsEnabled && <WelcomeMetricsSection />}
       <SectionHeader>
