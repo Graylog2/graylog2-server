@@ -16,15 +16,59 @@
  */
 import * as React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import styled, { css } from 'styled-components';
 
-import { Icon, SearchForm } from 'components/common';
-import { Col, HelpBlock, Row, Input } from 'components/bootstrap';
+import { Icon, SearchForm, Tooltip } from 'components/common';
+import { Button, ButtonToolbar, Col, HelpBlock, Row, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import { hasAcceptedProtocol } from 'util/URLUtils';
 import InputDescription from 'components/common/InputDescription';
 import ContentPackSelectionList from 'components/content-packs/ContentPackSelectionList';
+import { switchSource } from 'logic/content-packs/pairEntities';
+import type { EntityPair, EntitySource } from 'logic/content-packs/pairEntities';
 
 import style from './ContentPackSelection.css';
+
+const SearchRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: ${theme.spacings.sm};
+  `,
+);
+
+const NO_PAIRS_HINT =
+  'The entities in this version of the content pack were never installed, so there are no installed entities to select.';
+
+type VersionButtonProps = {
+  label: string;
+  unavailable: boolean;
+  onClick: () => void;
+};
+
+/* `allowClickWhenDisabled` keeps mouse events on a disabled button, so the tooltip explaining why can still open. */
+const VersionButton = ({ label, unavailable, onClick }: VersionButtonProps) => {
+  const button = (
+    <Button
+      bsSize="small"
+      disabled={unavailable}
+      allowClickWhenDisabled
+      onClick={() => {
+        if (!unavailable) onClick();
+      }}>
+      {label}
+    </Button>
+  );
+
+  return unavailable ? (
+    <Tooltip label={NO_PAIRS_HINT} withArrow multiline w={320} position="top">
+      {button}
+    </Tooltip>
+  ) : (
+    button
+  );
+};
 
 type ContentPackSelectionProps = {
   contentPack: any;
@@ -32,6 +76,7 @@ type ContentPackSelectionProps = {
   entities?: any;
   selectedEntities?: any;
   edit?: boolean;
+  entityPairs?: Array<EntityPair>;
 };
 
 class ContentPackSelection extends React.Component<
@@ -45,6 +90,7 @@ class ContentPackSelection extends React.Component<
     onStateChange: () => {},
     entities: {},
     selectedEntities: {},
+    entityPairs: [],
   };
 
   constructor(props) {
@@ -177,6 +223,12 @@ class ContentPackSelection extends React.Component<
     onStateChange({ selectedEntities: newSelection });
   };
 
+  _switchSource = (source: EntitySource) => {
+    const { selectedEntities, entityPairs, onStateChange } = this.props;
+
+    onStateChange({ selectedEntities: switchSource(selectedEntities, entityPairs, source) });
+  };
+
   _isGroupSelected = (type) => {
     const { selectedEntities, entities } = this.props;
 
@@ -221,7 +273,7 @@ class ContentPackSelection extends React.Component<
 
   render() {
     const { filteredEntities = {}, errors, touched, isFiltered, contentPack } = this.state;
-    const { edit, selectedEntities } = this.props;
+    const { edit, selectedEntities, entityPairs } = this.props;
 
     return (
       <div>
@@ -307,8 +359,8 @@ class ContentPackSelection extends React.Component<
             <h2>Content Pack selection</h2>
             {edit && (
               <HelpBlock>
-                You can select between installed entities from the server (<Icon name="dns" />) or entities from the
-                former content pack revision (<Icon name="archive" className={style.contentPackEntity} />
+                For each entity you can select the latest installed version (<Icon name="dns" />) or the older
+                content pack version (<Icon name="archive" className={style.contentPackEntity} />
                 ).
               </HelpBlock>
             )}
@@ -316,7 +368,24 @@ class ContentPackSelection extends React.Component<
         </Row>
         <Row>
           <Col smOffset={1} lg={8}>
-            <SearchForm onSearch={this._onSetFilter} onReset={this._onClearFilter} />
+            <SearchRow>
+              {/* Narrower than the default 400px so the version buttons fit beside it in this column. */}
+              <SearchForm queryWidth={280} onSearch={this._onSetFilter} onReset={this._onClearFilter} />
+              {edit && (
+                <ButtonToolbar>
+                  <VersionButton
+                    label="Select latest installed versions"
+                    unavailable={entityPairs.length === 0}
+                    onClick={() => this._switchSource('latest')}
+                  />
+                  <VersionButton
+                    label="Select older content pack versions"
+                    unavailable={entityPairs.length === 0}
+                    onClick={() => this._switchSource('older')}
+                  />
+                </ButtonToolbar>
+              )}
+            </SearchRow>
           </Col>
         </Row>
         <Row>
