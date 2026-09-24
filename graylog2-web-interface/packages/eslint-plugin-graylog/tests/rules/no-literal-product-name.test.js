@@ -15,6 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+// jsdom (used by the jest preset) does not expose structuredClone; ESLint 9 needs it.
+const { serialize, deserialize } = require('v8');
+if (typeof global.structuredClone === 'undefined') {
+  global.structuredClone = (val) => deserialize(serialize(val));
+}
+
 const { RuleTester } = require('eslint');
 const rule = require('../../lib/rules/no-literal-product-name');
 
