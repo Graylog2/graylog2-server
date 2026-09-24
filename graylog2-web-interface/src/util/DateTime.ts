@@ -127,6 +127,11 @@ export const readableDifference = (from: DateTime, to: DateTime) => {
 };
 
 /**
+ * Takes a duration in seconds and returns it in a human-readable format, e.g. "7 days".
+ */
+export const readableDurationInSeconds = (seconds: number) => moment.duration(seconds, 'seconds').humanize();
+
+/**
  * Returns the time difference, relative to the provided date time, in days.
  */
 export const relativeDifferenceDays = (dateTime: DateTime) => {

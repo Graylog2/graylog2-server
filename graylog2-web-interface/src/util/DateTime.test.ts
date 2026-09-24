@@ -29,6 +29,7 @@ import {
   toDateObject,
   toUTCFromTz,
   readableDifference,
+  readableDurationInSeconds,
 } from 'util/DateTime';
 
 const mockRootTimeZone = 'America/Chicago';
@@ -197,6 +198,16 @@ describe('DateTime utils', () => {
   describe('relativeDifferenceDays', () => {
     it('should return relative difference for time in days', () => {
       expect(relativeDifferenceDays('2019-01-01T10:00:00.000Z')).toBe(364);
+    });
+  });
+
+  describe('readableDurationInSecondsDurationInSeconds', () => {
+    it('should return a humanized duration for seconds', () => {
+      expect(readableDurationInSeconds(604800)).toBe('7 days');
+    });
+
+    it('should handle singular units', () => {
+      expect(readableDurationInSeconds(86400)).toBe('a day');
     });
   });
 
