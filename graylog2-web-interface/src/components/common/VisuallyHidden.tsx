@@ -14,16 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { VisuallyHidden } from '@mantine/core';
 
-import styled, { css } from 'styled-components';
-
-const SectionHeader = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin: 0 0 ${theme.spacings.xs};
-  `,
-);
-
-export default SectionHeader;
+export default VisuallyHidden;
