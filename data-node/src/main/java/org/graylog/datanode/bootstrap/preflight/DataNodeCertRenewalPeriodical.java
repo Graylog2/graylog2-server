@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.RateLimiter;
 import jakarta.annotation.Nonnull;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -55,8 +57,7 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     private final Supplier<Boolean> isServerInPreflightMode;
 
     private final RateLimiter rateLimiter;
-    private final String hostname;
-    private final String opensearchNetworkPublishHost;
+    private final Set<String> requiredSubjectAlternativeNames;
 
     @Inject
     public DataNodeCertRenewalPeriodical(
@@ -71,19 +72,17 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
                 () -> clusterConfigService.get(RenewalPolicy.class),
                 csrRequester,
                 () -> isInPreflight(preflightConfigService),
-                configuration.getHostname(),
-                configuration.getOpensearchNetworkPublishHost()
+                ImmutableSet.of(configuration.getDatanodeNodeName(), configuration.getHostname(), configuration.getOpensearchNetworkPublishHost())
         );
     }
 
-    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode, String hostname, String opensearchNetworkPublishHost) {
+    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode, Set<String> requiredSubjectAlternativeNames) {
         this.datanodeKeystore = datanodeKeystore;
         this.renewalPolicySupplier = renewalPolicySupplier;
         this.csrRequester = csrRequester;
         this.isServerInPreflightMode = isServerInPreflightMode;
         this.rateLimiter = RateLimiter.create(1.0 / CSR_TRIGGER_PERIOD.toSeconds());
-        this.hostname = hostname;
-        this.opensearchNetworkPublishHost = opensearchNetworkPublishHost;
+        this.requiredSubjectAlternativeNames = requiredSubjectAlternativeNames;
     }
 
     @Override
@@ -123,12 +122,13 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private boolean subjectAlternativeNamesChanged() {
         final Set<String> currentSubjectAlternativeNames = datanodeKeystore.getSubjectAlternativeNames();
-        final boolean changed = !containsName(currentSubjectAlternativeNames, hostname)
-                || !containsName(currentSubjectAlternativeNames, opensearchNetworkPublishHost);
-        if (changed) {
-            LOG.info("Datanode hostname or OpenSearch publish host changed, certificate will be renewed now");
+        final List<String> missingNames = requiredSubjectAlternativeNames.stream()
+                .filter(name -> !containsName(currentSubjectAlternativeNames, name))
+                .toList();
+        if (!missingNames.isEmpty()) {
+            LOG.info("Datanode certificate doesn't contain {} (node name, hostname or OpenSearch publish host changed), certificate will be renewed now", missingNames);
         }
-        return changed;
+        return !missingNames.isEmpty();
     }
 
     /**
