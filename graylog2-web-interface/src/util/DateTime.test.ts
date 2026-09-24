@@ -29,7 +29,7 @@ import {
   toDateObject,
   toUTCFromTz,
   readableDifference,
-  readableDurationInSeconds,
+  readableDuration,
 } from 'util/DateTime';
 
 const mockRootTimeZone = 'America/Chicago';
@@ -201,13 +201,13 @@ describe('DateTime utils', () => {
     });
   });
 
-  describe('readableDurationInSecondsDurationInSeconds', () => {
+  describe('readableDuration', () => {
     it('should return a humanized duration for seconds', () => {
-      expect(readableDurationInSeconds(604800)).toBe('7 days');
+      expect(readableDuration(604800)).toBe('7 days');
     });
 
     it('should handle singular units', () => {
-      expect(readableDurationInSeconds(86400)).toBe('a day');
+      expect(readableDuration(86400)).toBe('a day');
     });
   });
 
