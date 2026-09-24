@@ -45,7 +45,7 @@ public class NettyTransportConfiguration {
     @Parameter(value = PREFIX + "tls_provider", required = true, validators = StringNotBlankValidator.class)
     private String tlsProvider = "auto";
 
-    @Documentation(value = "Number of threads in the shared Netty event loop group used by inputs. Default: number of CPU cores * 2")
+    @Documentation(value = "Number of threads in the shared Netty event loop group used by inputs.")
     @Parameter(value = PREFIX + "num_threads", required = true, validators = PositiveIntegerValidator.class)
     private int numThreads = Runtime.getRuntime().availableProcessors() * 2;
 

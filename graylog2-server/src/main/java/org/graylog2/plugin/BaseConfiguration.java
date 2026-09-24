@@ -66,7 +66,7 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     private int processBufferProcessors = defaultNumberOfProcessBufferProcessors();
 
     @Documentation("""
-            Wait strategy describing how buffer processors wait on a cursor sequence. (default: sleeping)
+            Wait strategy describing how buffer processors wait on a cursor sequence.
             Possible types:
               - yielding
                 Compromise between performance and CPU usage.
@@ -96,7 +96,7 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter(value = "inputbuffer_wait_strategy", required = true)
     private String inputBufferWaitStrategy = "blocking";
 
-    @Documentation("Number of threads used exclusively for dispatching internal events. Default is 2.")
+    @Documentation("Number of threads used exclusively for dispatching internal events.")
     @Parameter(value = "async_eventbus_processors")
     private int asyncEventbusProcessors = 2;
 
@@ -120,13 +120,12 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter("message_recordings_enable")
     private boolean messageRecordingsEnable = false;
 
-    @Documentation("Disable the use of a native system stats collector (currently OSHI)")
+    @Documentation("Disable the use of a native system stats collector (currently OSHI).")
     @Parameter("disable_native_system_stats_collector")
     private boolean disableNativeSystemStatsCollector = false;
 
     @Documentation("""
             The User-Agent header for outgoing HTTP connections.
-            Default: Graylog
             """)
     @Parameter(value = "http_user_agent")
     private String httpUserAgent = "Graylog";
@@ -156,7 +155,6 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Documentation("""
             The default connect timeout for outgoing HTTP connections.
             Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
-            Default: 5s
             """)
     @Parameter(value = "http_connect_timeout", validator = PositiveDurationValidator.class)
     private Duration httpConnectTimeout = Duration.seconds(5L);
@@ -164,7 +162,6 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Documentation("""
             The default write timeout for outgoing HTTP connections.
             Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
-            Default: 10s
             """)
     @Parameter(value = "http_write_timeout", validator = PositiveDurationValidator.class)
     private Duration httpWriteTimeout = Duration.seconds(10L);
@@ -172,7 +169,6 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Documentation("""
             The default read timeout for outgoing HTTP connections.
             Values must be a positive duration (and between 1 and 2147483647 when converted to milliseconds).
-            Default: 10s
             """)
     @Parameter(value = "http_read_timeout", validator = PositiveDurationValidator.class)
     private Duration httpReadTimeout = Duration.seconds(10L);

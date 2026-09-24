@@ -35,7 +35,7 @@ public class GeoIpProcessorConfig extends PathConfiguration {
     public static final String S3_DOWNLOAD_LOCATION = PREFIX + "_s3_download_location";
     public static final String DISABLE_IPINFO_DB_TYPE_CHECK = PREFIX + "_disable_ipinfo_db_type_check";
 
-    @Documentation(value = "Directory where GeoIP database files downloaded from cloud storage (S3 or GCS) are stored. Defaults to \"<data_dir>/geolocation\".")
+    @Documentation(value = "Directory where GeoIP database files downloaded from cloud storage (S3 or GCS) are stored.")
     @Parameter(value = S3_DOWNLOAD_LOCATION, validators = PathReadableValidator.class)
     private Path s3DownloadLocation;
 

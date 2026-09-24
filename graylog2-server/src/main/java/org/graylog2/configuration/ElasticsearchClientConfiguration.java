@@ -44,16 +44,12 @@ public class ElasticsearchClientConfiguration {
             Need to be specified as a comma-separated list of valid URIs for the http ports of your elasticsearch nodes.
             If one or more of your elasticsearch hosts require authentication, include the credentials in each node URI that
             requires authentication.
-
-            Default: http://127.0.0.1:9200
             """)
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {ListOfURIsWithHostAndSchemeValidator.class})
     private List<URI> elasticsearchHosts = new ArrayList<>();
 
     @Documentation("""
             Maximum amount of time to wait for successful connection to Elasticsearch HTTP port.
-
-            Default: 10 Seconds
             """)
     @Parameter(value = "elasticsearch_connect_timeout", validators = {PositiveDurationValidator.class})
     private Duration elasticsearchConnectTimeout = Duration.seconds(10);
@@ -61,8 +57,6 @@ public class ElasticsearchClientConfiguration {
     @Documentation("""
             Maximum amount of time to wait for reading back a response from an Elasticsearch server.
             (e. g. during search, index creation, or index time-range calculations)
-
-            Default: 60 seconds
             """)
     @Parameter(value = "elasticsearch_socket_timeout", validators = {PositiveDurationValidator.class})
     private Duration elasticsearchSocketTimeout = Duration.seconds(60);
@@ -70,8 +64,6 @@ public class ElasticsearchClientConfiguration {
     @Documentation("""
             Maximum idle time for an Elasticsearch connection. If this is exceeded, this connection will
             be tore down.
-
-            Default: inf
             """)
     /**
      * Not used anywhere!
@@ -82,16 +74,13 @@ public class ElasticsearchClientConfiguration {
 
     @Documentation("""
             Maximum number of attempts to connect to elasticsearch on boot for the version probe.
-
-            Default: 0, retry indefinitely with the given delay until a connection could be established
+            A value of 0 means retry indefinitely with the given delay until a connection could be established.
             """)
     @Parameter(value = "elasticsearch_version_probe_attempts", validators = {PositiveIntegerValidator.class})
     private int elasticsearchVersionProbeAttempts = 0;
 
     @Documentation("""
             Waiting time in between connection attempts for elasticsearch_version_probe_attempts
-
-            Default: 5s
             """)
     @Parameter(value = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
     private Duration elasticsearchVersionProbeDelay = Duration.seconds(5L);
@@ -102,7 +91,6 @@ public class ElasticsearchClientConfiguration {
      */
     @Documentation("""
             Maximum number of attempts to connect to datanode on boot.
-            Default: 0, retry indefinitely with the given delay until a connection could be established
             """)
     @Parameter(value = "datanode_startup_connection_attempts", fallbackPropertyName = "elasticsearch_version_probe_attempts", validators = {PositiveIntegerValidator.class})
     private int datanodeStartupConnectionAttempts = 0;
@@ -113,16 +101,12 @@ public class ElasticsearchClientConfiguration {
      */
     @Documentation("""
             Waiting time in between connection attempts for datanode_startup_connection_attempts
-
-            Default: 5s
             """)
     @Parameter(value = "datanode_startup_connection_delay", fallbackPropertyName = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
     private Duration datanodeStartupConnectionDelay = Duration.seconds(5L);
 
     @Documentation("""
             Maximum number of total connections to Elasticsearch.
-
-            Default: 200
             """)
     @Parameter(value = "elasticsearch_max_total_connections", validators = {PositiveIntegerValidator.class})
     private int elasticsearchMaxTotalConnections = 200;
@@ -130,16 +114,12 @@ public class ElasticsearchClientConfiguration {
     @Documentation("""
             Maximum number of total connections per Elasticsearch route (normally this means per
             elasticsearch server).
-
-            Default: 20
             """)
     @Parameter(value = "elasticsearch_max_total_connections_per_route", validators = {PositiveIntegerValidator.class})
     private int elasticsearchMaxTotalConnectionsPerRoute = 20;
 
     @Documentation("""
             Maximum number of times Graylog will retry failed requests to Elasticsearch.
-
-            Default: 2
             """)
     /**
      * Not used anywhere
@@ -153,8 +133,6 @@ public class ElasticsearchClientConfiguration {
             see https://www.elastic.co/guide/en/elasticsearch/reference/5.4/cluster-nodes-info.html
 
             WARNING: Automatic node discovery does not work if Elasticsearch requires authentication, e. g. with Shield.
-
-            Default: false
             """)
     @Parameter(value = "elasticsearch_discovery_enabled")
     private boolean discoveryEnabled = false;
@@ -166,24 +144,19 @@ public class ElasticsearchClientConfiguration {
     @Documentation("""
             Filter for including/excluding Elasticsearch nodes in discovery according to their custom attributes,
             see https://www.elastic.co/guide/en/elasticsearch/reference/5.4/cluster.html#cluster-nodes
-
-            Default: empty
             """)
     @Parameter(value = "elasticsearch_discovery_filter")
     private String discoveryFilter = null;
 
     @Documentation("""
             Frequency of the Elasticsearch node discovery.
-
-            Default: 30s
             """)
     @Parameter(value = "elasticsearch_discovery_frequency", validators = {PositiveDurationValidator.class})
     private Duration discoveryFrequency = Duration.seconds(30L);
 
     @Documentation("""
             Set the default scheme when connecting to Elasticsearch discovered nodes
-
-            Default: http (available options: http, https)
+            Available options: http, https
             """)
     @Parameter(value = "elasticsearch_discovery_default_scheme", validators = {HttpOrHttpsSchemeValidator.class})
     private String defaultSchemeForDiscoveredNodes = "http";
@@ -198,8 +171,6 @@ public class ElasticsearchClientConfiguration {
 
     @Documentation("""
             Enable payload compression for Elasticsearch requests and responses.
-
-            Default: false
             """)
     @Parameter(value = "elasticsearch_compression_enabled")
     private boolean compressionEnabled = false;
@@ -207,13 +178,11 @@ public class ElasticsearchClientConfiguration {
     @Documentation("""
             Enable use of "Expect: 100-continue" Header for Elasticsearch index requests.
             If this is disabled, Graylog cannot properly handle HTTP 413 Request Entity Too Large errors.
-
-            Default: true
             """)
     @Parameter(value = "elasticsearch_use_expect_continue")
     private boolean useExpectContinue = true;
 
-    @Documentation("Mute the logging-output of ES deprecation warnings during REST calls in the ES RestClient")
+    @Documentation("Mute the logging-output of ES deprecation warnings during REST calls in the ES RestClient.")
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
 
@@ -221,11 +190,11 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "indexer_use_jwt_authentication")
     private boolean indexerUseJwtAuthentication = false;
 
-    @Documentation("How long a generated JWT token for indexer authentication is cached and reused before a new one is generated (e. g. 60s).")
+    @Documentation("How long a generated JWT token for indexer authentication is cached and reused before a new one is generated.")
     @Parameter(value = "indexer_jwt_auth_token_caching_duration")
     private Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
 
-    @Documentation("Validity period of generated JWT tokens for indexer authentication (e. g. 180s).")
+    @Documentation("Validity period of generated JWT tokens for indexer authentication.")
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     private Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
@@ -235,15 +204,15 @@ public class ElasticsearchClientConfiguration {
      * Till then, we can work around that by generating tokens with extended validity in both directions
      */
     @Deprecated(forRemoval = true)
-    @Documentation(value = "Deprecated. Time window (e. g. 30s) added to JWT token validity in both directions to compensate for clock differences between Graylog and OpenSearch.")
+    @Documentation(value = "Deprecated. Time window added to JWT token validity in both directions to compensate for clock differences between Graylog and OpenSearch.")
     @Parameter(value = "indexer_jwt_clock_skew_tolerance")
     private Duration indexerJwtAuthTokenClockSkewTolerance = Duration.seconds(30);
 
-    @Documentation("Maximum number of searches a multi-search request to the indexer executes concurrently. Default: unset (indexer default).")
+    @Documentation("Maximum number of searches a multi-search request to the indexer executes concurrently.")
     @Parameter(value = "indexer_max_concurrent_searches")
     private Integer indexerMaxConcurrentSearches = null;
 
-    @Documentation("Maximum number of concurrent shard requests per node for each search in a multi-search request to the indexer. Default: unset (indexer default).")
+    @Documentation("Maximum number of concurrent shard requests per node for each search in a multi-search request to the indexer.")
     @Parameter(value = "indexer_max_concurrent_shard_requests")
     private Integer indexerMaxConcurrentShardRequests = null;
 

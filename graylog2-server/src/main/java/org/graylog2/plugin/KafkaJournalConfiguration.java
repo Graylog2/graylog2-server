@@ -43,20 +43,19 @@ public class KafkaJournalConfiguration extends PathConfiguration {
               If you create a separate partition for the journal files and use a file system creating directories like 'lost+found'
               in the root directory, you need to create a sub directory for your journal.
               Otherwise Graylog will log an error message that the journal is corrupt and Graylog will not start.
-            Default: <data_dir>/journal
             """)
     @Parameter(value = MESSAGE_JOURNAL_DIR)
     private Path messageJournalDir;
 
-    @Documentation("Maximum size of a single message journal segment file; also limits the maximum message size. Default: 100mb")
+    @Documentation("Maximum size of a single message journal segment file; also limits the maximum message size.")
     @Parameter("message_journal_segment_size")
     private Size messageJournalSegmentSize = Size.megabytes(100L);
 
-    @Documentation("Maximum age of a message journal segment file before a new segment is started. Default: 1h")
+    @Documentation("Maximum age of a message journal segment file before a new segment is started.")
     @Parameter("message_journal_segment_age")
     private Duration messageJournalSegmentAge = Duration.standardHours(1L);
 
-    @Documentation("Maximum total size of the message journal on disk before old segments are deleted. Default: 5gb")
+    @Documentation("Maximum total size of the message journal on disk before old segments are deleted.")
     @Parameter("message_journal_max_size")
     private Size messageJournalMaxSize = Size.gigabytes(5L);
 
@@ -68,11 +67,11 @@ public class KafkaJournalConfiguration extends PathConfiguration {
     @Parameter("message_journal_max_age")
     private Duration messageJournalMaxAge = Duration.standardHours(12L);
 
-    @Documentation("Number of messages written to the journal before a flush to disk is forced. Default: 1000000")
+    @Documentation("Number of messages written to the journal before a flush to disk is forced.")
     @Parameter("message_journal_flush_interval")
     private long messageJournalFlushInterval = 1_000_000L;
 
-    @Documentation("Maximum time a message may stay in the journal before a flush to disk is forced. Default: 1m")
+    @Documentation("Maximum time a message may stay in the journal before a flush to disk is forced.")
     @Parameter("message_journal_flush_age")
     private Duration messageJournalFlushAge = Duration.standardMinutes(1L);
 

@@ -31,7 +31,7 @@ public class PipelineConfig implements PluginConfigBean {
 
     @Documentation("""
             Controls how often Graylog records pipeline rule debug timer samples.
-            The default, 100, records roughly one out of every 100 invocations.
+            A value of 100 records roughly one out of every 100 invocations.
             Use 1 to record every invocation.
             Use the same value on every node. Changes require a JVM restart.
             """)

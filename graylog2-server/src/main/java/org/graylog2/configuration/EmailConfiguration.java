@@ -84,13 +84,13 @@ public class EmailConfiguration {
     @Parameter(value = "transport_email_web_interface_url")
     private URI webInterfaceUri;
 
-    @Documentation("Timeout for establishing the connection to the SMTP server (e. g. 10s).")
+    @Documentation("Timeout for establishing the connection to the SMTP server.")
     @Parameter(value = "transport_email_socket_connection_timeout",
                converter = JavaDurationConverter.class,
                validators = MillisecondDurationValidator.class)
     private Duration socketConnectionTimeout = Duration.ofSeconds(10);
 
-    @Documentation("Socket read timeout for the connection to the SMTP server (e. g. 10s).")
+    @Documentation("Socket read timeout for the connection to the SMTP server.")
     @Parameter(value = "transport_email_socket_timeout",
                converter = JavaDurationConverter.class,
                validators = MillisecondDurationValidator.class)

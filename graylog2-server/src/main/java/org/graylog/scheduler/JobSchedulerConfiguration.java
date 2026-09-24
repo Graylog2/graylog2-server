@@ -42,23 +42,21 @@ public class JobSchedulerConfiguration implements PluginConfigBean {
 
     @Documentation("""
             The number of worker threads for the system job scheduler. (e.g., index maintenance jobs)
-            Default: 5
             """)
     @Parameter(value = SYSTEM_WORKER_THREADS, validators = PositiveIntegerValidator.class)
     private int jobSchedulerSystemWorkerThreads = 5;
 
-    @Documentation("Time (e.g. \"1s\") the job scheduler sleeps between loop iterations when there are no free worker threads or no runnable job triggers.")
+    @Documentation("Time the job scheduler sleeps between loop iterations when there are no free worker threads or no runnable job triggers.")
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
     private Duration loopSleepDuration = Duration.seconds(1);
 
-    @Documentation("Time (e.g. \"5m\") after which the lock of a running job trigger expires if not refreshed, so that another node can take over the trigger. Minimum 1 minute.")
+    @Documentation("Time after which the lock of a running job trigger expires if not refreshed, so that another node can take over the trigger. Minimum 1 minute.")
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
     private Duration lockExpirationDuration = Duration.minutes(5);
 
     @Documentation("""
             Optional limits on scheduling concurrency by job type. No more than the specified number of worker
             threads will be executing jobs of the specified type across the entire cluster.
-            Default: no limitation
             Note: Monitor job queue metrics to avoid excessive backlog of unprocessed jobs when using this setting!
             Available job types in Graylog Open:
               check-for-cert-renewal-execution-v1

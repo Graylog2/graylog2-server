@@ -58,8 +58,7 @@ public class HttpConfiguration {
             This network interface must be accessible by all Graylog nodes in the cluster and by all clients
             using the Graylog web interface.
 
-            """ + "If the port is omitted, Graylog will use port " + GRAYLOG_DEFAULT_PORT + " by default.\n\n"
-            + "Default: 127.0.0.1:" + GRAYLOG_DEFAULT_PORT + "\n" + """
+            """ + "If the port is omitted, port " + GRAYLOG_DEFAULT_PORT + " is used.\n" + """
             IPv6 example: http_bind_address = [2001:db8::1]:9000
             """)
     @Parameter(value = "http_bind_address", required = true)
@@ -78,8 +77,6 @@ public class HttpConfiguration {
 
             If $http_bind_address contains a wildcard IPv4 address (0.0.0.0), the first non-loopback IPv4 address of this machine will be used.
             This configuration setting *must not* contain a wildcard address!
-
-            Default: http://$http_bind_address/
             """)
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
@@ -90,8 +87,6 @@ public class HttpConfiguration {
             This allows browsers to make Cross-Origin requests from any origin.
             This is disabled for security reasons and typically only needed if running graylog
             with a separate server for frontend development.
-
-            Default: false
             """)
     @Parameter(value = "http_enable_cors")
     private boolean httpEnableCors = false;
@@ -100,7 +95,7 @@ public class HttpConfiguration {
             ## Enable GZIP support for HTTP interface
 
             This compresses API responses and therefore helps to reduce
-            overall round trip times. This is enabled by default. Uncomment the next line to disable it.
+            overall round trip times. Uncomment the next line to disable it.
             """)
     @Parameter(value = "http_enable_gzip")
     private boolean httpEnableGzip = true;
@@ -121,8 +116,6 @@ public class HttpConfiguration {
             ## Enable HTTPS support for the HTTP interface
 
             This secures the communication with the HTTP interface with TLS to prevent request forgery and eavesdropping.
-
-            Default: false
             """)
     @Parameter(value = "http_enable_tls")
     private boolean httpEnableTls = false;
@@ -150,8 +143,6 @@ public class HttpConfiguration {
             When using Graylog Collector, this URI will be used to receive heartbeat messages and must be accessible for all collectors.
 
             This setting can be overridden on a per-request basis with the "X-Graylog-Server-URL" HTTP request header.
-
-            Default: $http_publish_uri
             """)
     @Parameter(value = "http_external_uri")
     private URI httpExternalUri;

@@ -45,7 +45,7 @@ public class TelemetryConfiguration {
     @Parameter(value = TELEMETRY_ENABLED)
     private boolean telemetryEnabled = true;
 
-    @Documentation(value = "Time-to-live of the cached cluster information used for telemetry; the info is refreshed shortly before it expires. Minimum and default: 10 minutes.")
+    @Documentation(value = "Time-to-live of the cached cluster information used for telemetry; the info is refreshed shortly before it expires. Minimum: 10 minutes.")
     @Parameter(value = "telemetry_cluster_info_ttl", converter = JavaDurationConverter.class, validators = Minimum10MinuteValidator.class)
     private Duration telemetryClusterInfoTtl = Duration.ofMinutes(10);
 
