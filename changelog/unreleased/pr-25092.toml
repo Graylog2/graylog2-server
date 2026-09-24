@@ -1,0 +1,5 @@
+type = "a"
+message = "Remove perspective element from preferences attribute in users collection."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13278"]
+pulls = ["25092"]
