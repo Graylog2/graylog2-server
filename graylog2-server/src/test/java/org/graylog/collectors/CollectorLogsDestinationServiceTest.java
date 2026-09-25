@@ -20,6 +20,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -71,6 +72,8 @@ class CollectorLogsDestinationServiceTest {
     private StreamService streamService;
     @Mock
     private StreamRuleService streamRuleService;
+    @Mock
+    private ElasticsearchConfiguration elasticsearchConfiguration;
 
     private CollectorLogsDestinationService service;
 
@@ -78,8 +81,9 @@ class CollectorLogsDestinationServiceTest {
     void setUp() {
         service = new CollectorLogsDestinationService(
                 indexSetService, indexSetConfigFactory, indexSetValidator,
-                streamService, streamRuleService
+                streamService, streamRuleService, elasticsearchConfiguration
         );
+        lenient().when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
 
         final var subject = mock(Subject.class);
         lenient().when(subject.getPrincipal()).thenReturn("admin");
@@ -151,6 +155,66 @@ class CollectorLogsDestinationServiceTest {
     }
 
     @Test
+    void indexSetConfigUsesLifetimeFittingTheFixedLeeway() throws Exception {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(10));
+        stubIndexSetDoesNotExist();
+        stubStreamDoesNotExist();
+        stubStreamRuleCount(0);
+        when(streamRuleService.create(anyMap())).thenReturn(mock(StreamRule.class));
+
+        service.ensureExists();
+
+        final var captor = ArgumentCaptor.forClass(IndexSetConfig.class);
+        verify(indexSetService).save(captor.capture());
+        final var rotationConfig = (TimeBasedSizeOptimizingStrategyConfig) captor.getValue().rotationStrategyConfig();
+        assertThat(rotationConfig.indexLifetimeMin()).isEqualTo(Period.days(11));
+        assertThat(rotationConfig.indexLifetimeMax()).isEqualTo(Period.days(21));
+    }
+
+    @Test
+    void rotationStrategyConfigUsesDefaultsWithoutConstraints() {
+        assertLifetime(Period.days(14), Period.days(21));
+    }
+
+    @Test
+    void rotationStrategyConfigWidensLeewayForFixedLeeway() {
+        // Cloud defaults
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(10));
+        when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(100));
+
+        assertLifetime(Period.days(11), Period.days(21));
+    }
+
+    @Test
+    void rotationStrategyConfigKeepsDefaultsForSmallFixedLeeway() {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(3));
+
+        assertLifetime(Period.days(14), Period.days(21));
+    }
+
+    @Test
+    void rotationStrategyConfigWidensLeewayForRotationPeriod() {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(8).withHours(12));
+
+        assertLifetime(Period.days(12), Period.days(21));
+    }
+
+    @Test
+    void rotationStrategyConfigCapsMaxAtMaxRetentionPeriod() {
+        when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(10));
+
+        assertLifetime(Period.days(3), Period.days(10));
+    }
+
+    @Test
+    void rotationStrategyConfigKeepsMinAtOneDayWhenLeewayDoesNotFit() {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionFixedLeeway()).thenReturn(Period.days(10));
+        when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(7));
+
+        assertLifetime(Period.days(1), Period.days(7));
+    }
+
+    @Test
     void streamHasCorrectProperties() throws Exception {
         stubIndexSetDoesNotExist();
         stubStreamDoesNotExist();
@@ -195,6 +259,12 @@ class CollectorLogsDestinationServiceTest {
     }
 
     // --- Helpers ---
+
+    private void assertLifetime(Period expectedMin, Period expectedMax) {
+        final var config = CollectorLogsDestinationService.rotationStrategyConfig(elasticsearchConfiguration);
+        assertThat(config.indexLifetimeMin()).isEqualTo(expectedMin);
+        assertThat(config.indexLifetimeMax()).isEqualTo(expectedMax);
+    }
 
     private void stubIndexSetDoesNotExist() {
         when(indexSetService.findOne(any())).thenReturn(Optional.empty());
