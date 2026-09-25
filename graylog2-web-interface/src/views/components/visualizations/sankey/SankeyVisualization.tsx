@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -58,25 +58,43 @@ export type SankeyTrace = {
   type: typeof SANKEY_VISUALIZATION_TYPE;
   orientation: 'h';
   arrangement: 'fixed';
-  node: { label: Array<string>; customdata: Array<NodeCustomData>; pad: number; thickness: number };
+  node: {
+    label: Array<string>;
+    customdata: Array<NodeCustomData>;
+    color: Array<string>;
+    pad: number;
+    thickness: number;
+  };
   link: {
     source: Array<number>;
     target: Array<number>;
     value: Array<number>;
     label: Array<string>;
-    color: string;
-    hovercolor: string;
+    color: Array<string>;
+    hovercolor: Array<string>;
   };
 };
 
 const STAGE_SEPARATOR = ' ';
 
+// Plotly's default colorway, which it would otherwise apply to sankey nodes implicitly.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { defaults: NODE_PALETTE }: { defaults: Array<string> } = require('plotly.js/src/components/color/attributes');
+
+const NODE_ALPHA = 1;
+const LINK_ALPHA = 0.3;
+const LINK_HOVER_ALPHA = 0.6;
+
+// Hex notation, because plotly's color parser drops the alpha of the `rgb(r g b / a)` syntax chroma emits by default.
+const paletteColor = (index: number, alpha: number) =>
+  chroma(NODE_PALETTE[index % NODE_PALETTE.length])
+    .alpha(alpha)
+    .hex('rgba');
+
 const buildSankeyTrace = (
   paths: Array<LeafPath>,
   displayKeys: Array<Array<string>>,
   allFields: Array<string>,
-  linkColor: string,
-  linkHoverColor: string,
 ): SankeyTrace => {
   const nodeIndex = new Map<string, number>();
   const labels: Array<string> = [];
@@ -133,8 +151,21 @@ const buildSankeyTrace = (
     type: SANKEY_VISUALIZATION_TYPE,
     orientation: 'h',
     arrangement: 'fixed',
-    node: { label: labels, customdata, pad: 15, thickness: 18 },
-    link: { source, target, value, label, color: linkColor, hovercolor: linkHoverColor },
+    node: {
+      label: labels,
+      customdata,
+      color: labels.map((_, i) => paletteColor(i, NODE_ALPHA)),
+      pad: 15,
+      thickness: 18,
+    },
+    link: {
+      source,
+      target,
+      value,
+      label,
+      color: target.map((t) => paletteColor(t, LINK_ALPHA)),
+      hovercolor: target.map((t) => paletteColor(t, LINK_HOVER_ALPHA)),
+    },
   };
 };
 
@@ -143,17 +174,7 @@ const layout = { margin: { t: 20, b: 20, l: 20, r: 20 } };
 const SankeyVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
-  const theme = useTheme();
   const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover({ ...sankeyOnClickPopover, config });
-
-  // Translucent so overlapping flows stay distinguishable. The gray scale is ordered by
-  // contrast (lower index = more contrast), so a value toward the background end keeps the
-  // links subtle in both themes — a lighter gray in light mode, a darker gray in dark mode.
-  const linkColor = chroma(theme.colors.gray[70]).alpha(0.3).css();
-
-  // On hover, jump to a higher-contrast gray that is nearly opaque so the hovered flow clearly
-  // stands out from the faint resting links (plotly's default only nudges the opacity slightly).
-  const linkHoverColor = chroma(theme.colors.gray[40]).alpha(0.85).css();
 
   const trace = useMemo<SankeyTrace | null>(() => {
     const rowFields = config.rowPivots.flatMap((pivot) => pivot.fields);
@@ -173,8 +194,8 @@ const SankeyVisualization = makeVisualization(({ config, data }: VisualizationCo
 
     const displayKeys = paths.map((path) => path.keys.map((k, i) => String(mapKeys(k, allFields[i]) ?? k)));
 
-    return buildSankeyTrace(paths, displayKeys, allFields, linkColor, linkHoverColor);
-  }, [config, mapKeys, rows, linkColor, linkHoverColor]);
+    return buildSankeyTrace(paths, displayKeys, allFields);
+  }, [config, mapKeys, rows]);
 
   return (
     <Container>
