@@ -20,10 +20,11 @@ not go unnoticed.
 
 To resolve it for new data, do either of the following in *System -> Indices*:
 
-- Use *Change field type* to set the affected fields to type **String**, and let Graylog rotate the index set so the
-  change takes effect. `String` is the one type that accepts both representations, so the field cannot conflict again.
-  Avoid setting the field to **Date**: Graylog's date mapping expects the format `yyyy-MM-dd HH:mm:ss.SSS`, which
-  neither representation matches.
+- Use *Change field type* to set the affected fields to type **Date**, and let Graylog rotate the index set so the
+  change takes effect. A custom field mapping creates the field without a format restriction, so the indexer accepts
+  both the numeric timestamps already written and the date values Graylog writes now, and the field behaves as a real
+  date field. Setting the field to **String** also ends the conflict, but keeps the values as text, so they do not
+  sort or aggregate as dates.
 - Or select the index set and use *Maintenance -> Rotate active write index*. The next index derives the field type
   from the first message written to it, so the conflict disappears for new indices.
 
