@@ -14,16 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 
-import styled, { css } from 'styled-components';
+describe('getPriorityName', () => {
+  it('returns the capitalized name for a known numeric priority', () => {
+    expect(getPriorityName(0)).toBe('Info');
+    expect(getPriorityName(4)).toBe('Critical');
+  });
 
-const SectionHeader = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin: 0 0 ${theme.spacings.xs};
-  `,
-);
+  it('returns the capitalized name for a known string priority', () => {
+    expect(getPriorityName('2')).toBe('Medium');
+  });
 
-export default SectionHeader;
+  it('falls back to the value itself, stringified, for an unknown priority', () => {
+    expect(getPriorityName(99)).toBe('99');
+  });
+});

@@ -16,11 +16,26 @@
  */
 import * as React from 'react';
 
-import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
+import Icon from 'components/common/Icon';
+import Link from 'components/common/Link';
+import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 type Props = {
-  priority: number | string;
+  text: string;
 };
-const PriorityName = ({ priority }: Props) => <>{getPriorityName(priority)}</>;
 
-export default PriorityName;
+const DataNodeMigrationLink = ({ text }: Props) => {
+  const migrationRouteAvailable = !AppConfig.isCloud() && AppConfig.isFeatureEnabled('data_node_migration');
+
+  return migrationRouteAvailable ? (
+    <Link to={Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION} target="_blank" rel="noopener noreferrer">
+      {text} <Icon name="open_in_new" size="xs" />
+      <span className="sr-only"> (opens in a new tab)</span>
+    </Link>
+  ) : (
+    text
+  );
+};
+
+export default DataNodeMigrationLink;
