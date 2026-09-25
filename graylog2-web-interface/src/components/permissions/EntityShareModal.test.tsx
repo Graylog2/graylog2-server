@@ -228,7 +228,7 @@ describe('EntityShareModal', () => {
 
         await setupUser().click(await screen.findByRole('button', { name: /add collaborator/i }));
 
-        const setEntityShareStateMock = (useSetEntityShareState as jest.Mock).mock.results[0]?.value;
+        const setEntityShareStateMock = asMock(useSetEntityShareState).mock.results[0]?.value;
 
         await waitFor(() => {
           expect(setEntityShareStateMock).toHaveBeenCalledWith(mockEntityShareState.entity, updatedShareState);

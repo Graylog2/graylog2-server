@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import { adminUser, bob } from 'fixtures/users';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import asMock from 'helpers/mocking/AsMock';
 
 import UserEdit from './UserEdit';
 
@@ -110,7 +111,7 @@ describe('<UserEdit />', () => {
 
   it('should send complete UserUpdate object when updating user profile', async () => {
     const updateSpy = jest.fn(() => Promise.resolve());
-    (UsersDomain.update as jest.Mock) = updateSpy;
+    UsersDomain.update = asMock(updateSpy);
 
     render(<UserEdit user={user} />);
 
@@ -131,7 +132,7 @@ describe('<UserEdit />', () => {
 
   it('should send complete UserUpdate object when updating user roles', async () => {
     const updateSpy = jest.fn(() => Promise.resolve());
-    (UsersDomain.update as jest.Mock) = updateSpy;
+    UsersDomain.update = asMock(updateSpy);
 
     render(<UserEdit user={user} />);
 
@@ -155,7 +156,7 @@ describe('<UserEdit />', () => {
 
   it('should reload CurrentUserStore when updating current user', async () => {
     const updateSpy = jest.fn(() => Promise.resolve());
-    (UsersDomain.update as jest.Mock) = updateSpy;
+    UsersDomain.update = asMock(updateSpy);
     const reloadSpy = jest.fn();
     CurrentUserStore.reload = reloadSpy;
 
@@ -171,7 +172,7 @@ describe('<UserEdit />', () => {
   it('should not reload CurrentUserStore when updating different user', async () => {
     const differentUser = bob.toBuilder().readOnly(false).external(false).build();
     const updateSpy = jest.fn(() => Promise.resolve());
-    (UsersDomain.update as jest.Mock) = updateSpy;
+    UsersDomain.update = asMock(updateSpy);
     const reloadSpy = jest.fn();
     CurrentUserStore.reload = reloadSpy;
 

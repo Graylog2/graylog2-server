@@ -20,6 +20,7 @@ import { act, renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import { SystemNotifications } from '@graylog/server-api';
 
+import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 import UserNotification from 'util/UserNotification';
 
@@ -37,7 +38,7 @@ jest.mock('util/UserNotification', () => ({
 const TABLE_KEY = ['system', 'notifications', 'table'] as const;
 const BADGE_KEY = ['system', 'notifications', 'badge-count'] as const;
 
-const deleteNotificationByIdMock = SystemNotifications.deleteNotificationById as jest.Mock;
+const deleteNotificationByIdMock = asMock(SystemNotifications.deleteNotificationById);
 
 const buildWrapper = (queryClient: QueryClient) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>

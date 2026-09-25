@@ -24,11 +24,17 @@ const isJestMockTypeReference = (typeNode) =>
   typeNode.typeName.right.type === 'Identifier' &&
   typeNode.typeName.right.name === 'Mock';
 
+// `foo as unknown as jest.Mock` is the escape hatch for values (e.g. classes/constructors)
+// that can't be passed through the `asMock` helper because they don't structurally match a
+// plain function type. Only the direct `foo as jest.Mock` cast is disallowed.
+const isCastThroughUnknown = (node) =>
+  node.expression.type === 'TSAsExpression' && node.expression.typeAnnotation.type === 'TSUnknownKeyword';
+
 module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Disallow casting to `jest.Mock`, use the `asMock` helper function instead',
+      description: 'Disallow casting directly to `jest.Mock`, use the `asMock` helper function instead',
       recommended: true,
     },
     messages: {
@@ -38,7 +44,7 @@ module.exports = {
   },
   create: (context) => ({
     TSAsExpression(node) {
-      if (isJestMockTypeReference(node.typeAnnotation)) {
+      if (isJestMockTypeReference(node.typeAnnotation) && !isCastThroughUnknown(node)) {
         context.report({ node, messageId: 'noJestMockCast' });
       }
     },

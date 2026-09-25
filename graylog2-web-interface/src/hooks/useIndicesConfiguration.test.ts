@@ -19,6 +19,7 @@ import { waitFor } from 'wrappedTestingLibrary';
 
 import { SystemIndicesRotation, SystemIndicesRetention } from '@graylog/server-api';
 
+import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 import UserNotification from 'util/UserNotification';
 
@@ -38,21 +39,49 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-const listRotation = SystemIndicesRotation.list as jest.Mock;
-const listRetention = SystemIndicesRetention.list as jest.Mock;
+const listRotation = asMock(SystemIndicesRotation.list);
+const listRetention = asMock(SystemIndicesRetention.list);
 
-const mockRotationData = {
+type RotationStrategies = Awaited<ReturnType<typeof SystemIndicesRotation.list>>;
+type RetentionStrategies = Awaited<ReturnType<typeof SystemIndicesRetention.list>>;
+
+const emptyJsonSchema: RotationStrategies['strategies'][number]['json_schema'] = {
+  disallow: [],
+  $schema: '',
+  readonly: false,
+  extends: [],
+  description: '',
+  id: '',
+  $ref: '',
+  required: false,
+};
+
+const mockRotationData: RotationStrategies = {
   total: 2,
   strategies: [
-    { type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy', default_config: {} },
-    { type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy', default_config: {} },
+    {
+      type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+      default_config: { type: 'MessageCountRotationStrategyConfig' },
+      json_schema: emptyJsonSchema,
+    },
+    {
+      type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy',
+      default_config: { type: 'SizeBasedRotationStrategyConfig' },
+      json_schema: emptyJsonSchema,
+    },
   ],
   context: { time_size_optimizing_retention_fixed_leeway: 'P1D' },
 };
 
-const mockRetentionData = {
+const mockRetentionData: RetentionStrategies = {
   total: 1,
-  strategies: [{ type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy', default_config: {} }],
+  strategies: [
+    {
+      type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
+      default_config: { type: 'DeletionRetentionStrategyConfig', max_number_of_indices: 20 },
+      json_schema: emptyJsonSchema,
+    },
+  ],
   context: { max_index_retention_period: 'P90D' },
 };
 
