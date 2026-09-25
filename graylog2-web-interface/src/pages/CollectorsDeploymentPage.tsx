@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import { Row, Col, Tabs, Badge } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
+import DocsHelper from 'util/DocsHelper';
 import { DeployTab, EnrollmentTokenList } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useCollectorsConfig, useEnrollmentTokenCount, useCollectorPermissions } from 'components/collectors/hooks';
@@ -82,7 +83,11 @@ const CollectorsDeploymentPage = () => {
           <>
             Deploy Collectors <PreviewBadge />
           </>
-        }>
+        }
+        documentationLink={{
+          title: 'Collectors documentation',
+          path: DocsHelper.PAGES.COLLECTORS,
+        }}>
         <span>
           Run the command on any number of hosts &mdash; they enroll into the fleet you pick and appear as they check
           in.

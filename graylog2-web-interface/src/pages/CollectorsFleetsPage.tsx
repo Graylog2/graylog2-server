@@ -20,6 +20,7 @@ import { Navigate } from 'react-router-dom';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
+import DocsHelper from 'util/DocsHelper';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsFleets from 'components/collectors/fleets/CollectorsFleets';
 import { useCollectorsConfig } from 'components/collectors/hooks';
@@ -47,6 +48,10 @@ const CollectorsFleetsPage = () => {
             Fleets <PreviewBadge />
           </>
         }
+        documentationLink={{
+          title: 'Collectors documentation',
+          path: DocsHelper.PAGES.COLLECTORS,
+        }}
         actions={<CreateButton entityKey={'Fleet'} />}>
         <span>
           A fleet is a group of collectors that share the same configuration. All collectors in a fleet collect data
