@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
+import ProductName from 'brand-customization/ProductName';
 import fetch from 'logic/rest/FetchProvider';
 import { Title, Group, Space } from 'preflight/components/common';
 import Alert from 'components/bootstrap/Alert';
@@ -67,7 +68,7 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
       </p>
       {!dataNodes.length && !isInitialLoading ? (
         <Alert bsStyle="warning">
-          At least one Graylog data node needs to run before the certificate can be provisioned.
+          At least one <ProductName /> data node needs to run before the certificate can be provisioned.
         </Alert>
       ) : (
         <Space h="sm" />
