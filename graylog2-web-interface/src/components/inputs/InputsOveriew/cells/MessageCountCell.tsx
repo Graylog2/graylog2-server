@@ -49,6 +49,7 @@ const MessageCountCell = ({ input }: Props) => {
   return (
     <CountBadge
       count={total}
+      abbreviate
       iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
       onClick={() => toggleSection(input.id, SECTION_NAME)}
       title={title}

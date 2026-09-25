@@ -51,7 +51,7 @@ describe('MessageCountCell', () => {
     asMock(useExpandedSections).mockReturnValue({ toggleSection, expandedSections: {} });
   });
 
-  it('renders the total messages across all streams as a formatted number badge', () => {
+  it('renders the total messages across all streams as an abbreviated number badge', () => {
     asMock(useInputMetricsFor).mockReturnValue({
       metrics: { messages_per_stream: { 'stream-a': 76249, 'stream-b': 7076 } },
       isInitialLoading: false,
@@ -60,7 +60,19 @@ describe('MessageCountCell', () => {
 
     render(<MessageCountCell input={input} />);
 
-    expect(screen.getByText('83325')).toBeInTheDocument();
+    expect(screen.getByText('83.3k')).toBeInTheDocument();
+  });
+
+  it('renders totals below 1000 as the exact number', () => {
+    asMock(useInputMetricsFor).mockReturnValue({
+      metrics: { messages_per_stream: { 'stream-a': 300, 'stream-b': 20 } },
+      isInitialLoading: false,
+      isError: false,
+    });
+
+    render(<MessageCountCell input={input} />);
+
+    expect(screen.getByText('320')).toBeInTheDocument();
   });
 
   it('renders 0 when the stream map is empty', () => {
