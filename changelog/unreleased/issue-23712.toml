@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix overlapping content in pinned columns of aggregation table widgets."
+
+issues = ["23712"]
+pulls = ["25656"]

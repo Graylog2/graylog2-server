@@ -56,42 +56,42 @@ type Props = VisualizationComponentProps & {
   striped?: boolean;
 };
 
-const getStylesForPinnedColumns = (
-  tag: 'th' | 'td',
-  stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>,
-) =>
-  stickyLeftMarginsByColumnIndex
-    .map(
-      ({ index, leftMargin }) => `
-    ${tag}:nth-child(${index + 1}) {
-        position: sticky!important;
+type StickyColumn = {
+  index: number;
+  column: string;
+  leftMargin: number;
+};
+
+const getPinnedColumnStyles = (tag: 'th' | 'td', stickyLeftMarginsByColumnIndex: Array<StickyColumn>) => css`
+  ${stickyLeftMarginsByColumnIndex.map(
+    ({ index, leftMargin }) => css`
+      & ${tag}:nth-child(${index + 1}) {
+        position: sticky !important;
         left: ${leftMargin}px;
         z-index: 1;
-    }
-  `,
-    )
-    .concat(' ; ');
+      }
+    `,
+  )}
+`;
 
 const THead = styled(TableHead)<{
-  $stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>;
+  $stickyLeftMarginsByColumnIndex: Array<StickyColumn>;
 }>(
-  ({ $stickyLeftMarginsByColumnIndex, theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-
-  & tr.pivot-header-row {
-    & ${getStylesForPinnedColumns('th', $stickyLeftMarginsByColumnIndex)}
-  }
-`,
+  ({ $stickyLeftMarginsByColumnIndex }) => css`
+    & tr.pivot-header-row {
+      ${getPinnedColumnStyles('th', $stickyLeftMarginsByColumnIndex)}
+    }
+  `,
 );
 
 const TBody = styled.tbody<{
-  $stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>;
+  $stickyLeftMarginsByColumnIndex: Array<StickyColumn>;
 }>(
   ({ $stickyLeftMarginsByColumnIndex }) => css`
-  & tr {
-    & ${getStylesForPinnedColumns('td', $stickyLeftMarginsByColumnIndex)}
-  }
-`,
+    & tr {
+      ${getPinnedColumnStyles('td', $stickyLeftMarginsByColumnIndex)}
+    }
+  `,
 );
 
 const _compareArray = (ary1, ary2) => {
@@ -164,7 +164,7 @@ const DataTable = ({
   const _onSortChange = useCallback(
     (newSort: Array<SortConfig>) => {
       const dirty = formContext?.dirty;
-      const updateWidget = () => dispatch(updateWidgetConfig(widget.id, config.toBuilder().sort(newSort).build()));
+      const updateWidget = () => dispatch(updateWidgetConfig(widget?.id, config.toBuilder().sort(newSort).build()));
 
       if (!editing || (editing && !dirty)) {
         return updateWidget();
@@ -186,15 +186,15 @@ const DataTable = ({
 
       const updateWidget = () => {
         const curVisualizationConfig =
-          widget.config.visualizationConfig ?? DataTableVisualizationConfig.create([]).toBuilder().build();
+          widget?.config.visualizationConfig ?? DataTableVisualizationConfig.create([]).toBuilder().build();
         const pinnedColumns = curVisualizationConfig?.pinnedColumns?.has(field)
           ? curVisualizationConfig.pinnedColumns.delete(field)
           : curVisualizationConfig.pinnedColumns.add(field);
 
         return dispatch(
           updateWidgetConfig(
-            widget.id,
-            widget.config
+            widget?.id,
+            widget?.config
               .toBuilder()
               .visualizationConfig(curVisualizationConfig.toBuilder().pinnedColumns(pinnedColumns.toJS()).build())
               .build(),
@@ -237,7 +237,7 @@ const DataTable = ({
   );
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
-  const pinnedColumns = useMemo(
+  const pinnedColumns: Immutable.Set<string> = useMemo(
     () => widget?.config?.visualizationConfig?.pinnedColumns ?? Immutable.Set(),
     [widget?.config?.visualizationConfig?.pinnedColumns],
   );
@@ -267,6 +267,11 @@ const DataTable = ({
 
     return res;
   }, [widget?.config?.visualizationConfig?.showRowNumbers, rowPivots, series, pinnedColumns, rowPivotColumnsWidth]);
+  const pinnedColumnIndexes = useMemo(
+    () => new Set(stickyLeftMarginsByColumnIndex.map(({ index }) => index)),
+    [stickyLeftMarginsByColumnIndex],
+  );
+
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
     const key = `datatableentry-${idx}`;
@@ -284,6 +289,8 @@ const DataTable = ({
         series={series}
         showRowNumbers={showRowNumbers}
         units={widgetUnits}
+        pinnedColumnIndexes={pinnedColumnIndexes}
+        striped={striped}
       />
     );
   });
@@ -311,6 +318,7 @@ const DataTable = ({
               onSetColumnsWidth={onSetColumnsWidth}
               setLoadingState={setLoadingState}
               pinnedColumns={pinnedColumns}
+              pinnedColumnIndexes={pinnedColumnIndexes}
               togglePin={togglePin}
               showRowNumbers={showRowNumbers}
             />

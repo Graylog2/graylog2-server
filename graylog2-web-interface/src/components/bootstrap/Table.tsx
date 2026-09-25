@@ -18,30 +18,44 @@
 import { Table as BootstrapTable } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
+export const PINNED_CELL_CLASS_NAME = 'table-pinned-cell';
+export const PINNED_CELL_STRIPED_CLASS_NAME = 'table-pinned-cell-striped';
+
+export const getPinnedCellClassName = (isPinned: boolean, isStripedRow: boolean) => {
+  if (!isPinned) {
+    return undefined;
+  }
+
+  return isStripedRow ? PINNED_CELL_STRIPED_CLASS_NAME : PINNED_CELL_CLASS_NAME;
+};
+
 const variantRowStyles = css(({ theme }) => {
   const { table } = theme.colors;
   let styles = '';
 
-  const variants = {
+  const tableVariant = table.variant as Record<string, string>;
+  const tableVariantHover = table.variantHover as Record<string, string>;
+
+  const variants: Record<string, { background: string; hover: string }> = {
     active: {
-      background: table.variant.active,
-      hover: table.variantHover.active,
+      background: tableVariant.active,
+      hover: tableVariantHover.active,
     },
     success: {
-      background: table.variant.success,
-      hover: table.variantHover.success,
+      background: tableVariant.success,
+      hover: tableVariantHover.success,
     },
     info: {
-      background: table.variant.info,
-      hover: table.variantHover.info,
+      background: tableVariant.info,
+      hover: tableVariantHover.info,
     },
     warning: {
-      background: table.variant.warning,
-      hover: table.variantHover.warning,
+      background: tableVariant.warning,
+      hover: tableVariantHover.warning,
     },
     danger: {
-      background: table.variant.danger,
-      hover: table.variantHover.danger,
+      background: tableVariant.danger,
+      hover: tableVariantHover.danger,
     },
   };
 
@@ -110,6 +124,20 @@ const tableCss = css(
       .table {
         background-color: ${theme.colors.table.row.background};
       }
+
+      > thead > tr > th.${PINNED_CELL_CLASS_NAME} {
+        background-color: ${theme.utils.flattenColorStack([
+          theme.colors.global.contentBackground,
+          theme.colors.table.head.background,
+        ])};
+      }
+
+      > tbody > tr > .${PINNED_CELL_CLASS_NAME}, > tfoot > tr > .${PINNED_CELL_CLASS_NAME} {
+        background-color: ${theme.utils.flattenColorStack([
+          theme.colors.global.contentBackground,
+          theme.colors.table.row.background,
+        ])};
+      }
     }
 
     &.table-bordered {
@@ -127,6 +155,13 @@ const tableCss = css(
 
     &.table-striped > tbody > tr:nth-of-type(odd) {
       background-color: ${theme.colors.table.row.backgroundStriped};
+    }
+
+    &.table > tbody > tr > .${PINNED_CELL_STRIPED_CLASS_NAME} {
+      background-color: ${theme.utils.flattenColorStack([
+        theme.colors.global.contentBackground,
+        theme.colors.table.row.backgroundStriped,
+      ])};
     }
 
     &.table-hover > tbody > tr:hover {
