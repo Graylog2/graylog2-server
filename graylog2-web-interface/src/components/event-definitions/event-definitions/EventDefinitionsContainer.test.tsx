@@ -231,7 +231,7 @@ describe('EventDefinitionsContainer', () => {
 
     const row = await screen.findByTestId(`table-row-${definition.id}`);
 
-    expect(await within(row).findByText('High')).toBeInTheDocument();
+    await within(row).findByText('High');
   });
 
   it('lists notifications among the default visible columns', async () => {
