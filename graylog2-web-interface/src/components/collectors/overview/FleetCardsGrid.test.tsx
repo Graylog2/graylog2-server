@@ -54,6 +54,7 @@ describe('FleetCardsGrid telemetry', () => {
       online_instances: 2,
       offline_instances: 2,
       total_sources: 3,
+      assigned_instances: 4,
     };
     render(<FleetCardsGrid fleets={[fleet]} filter="" />);
     await userEvent.click(screen.getByTestId('fleet-card'));
@@ -78,6 +79,7 @@ describe('FleetCardsGrid telemetry', () => {
       online_instances: 0,
       offline_instances: 0,
       total_sources: 0,
+      assigned_instances: 0,
     };
     render(<FleetCardsGrid fleets={[fleet]} filter="" />);
     await userEvent.click(screen.getByTestId('fleet-card'));

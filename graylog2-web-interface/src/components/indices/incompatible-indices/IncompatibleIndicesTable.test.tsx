@@ -119,10 +119,11 @@ describe('IncompatibleIndicesTable', () => {
     render(<IncompatibleIndicesTable />);
 
     expect(screen.getByText(/system indices can only be reindexed/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /migrate to Data Nodes/i })).toHaveAttribute(
-      'href',
-      '/system/cluster/datanode-migration',
-    );
+    const migrationLink = screen.getByRole('link', { name: /migrate to Data Nodes.*opens in a new tab/i });
+
+    expect(migrationLink).toHaveAttribute('href', '/system/cluster/datanode-migration');
+    expect(migrationLink).toHaveAttribute('target', '_blank');
+    expect(migrationLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('does not link to the migration page when it is not routed', () => {
