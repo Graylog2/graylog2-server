@@ -159,7 +159,7 @@
     "react-bootstrap": "0.33.1",
     "react-compiler-runtime": "^1.0.0",
     "react-compiler-webpack": "^1.0.0",
-    "style-loader": "3.3.4",
+    "style-loader": "4.0.0",
     "stylelint-config-graylog": "file:packages/stylelint-config-graylog",
     "utility-types": "^3.10.0",
     "webpack-bundle-analyzer": "^5.2.0",
