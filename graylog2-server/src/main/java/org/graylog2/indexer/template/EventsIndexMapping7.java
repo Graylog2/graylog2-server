@@ -22,6 +22,10 @@ import org.graylog2.indexer.ConstantsES7;
 import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 public class EventsIndexMapping7 extends EventsIndexMapping {
+    public EventsIndexMapping7(String indexRefreshInterval) {
+        super(indexRefreshInterval);
+    }
+
     @Override
     protected ImmutableMap<String, Object> fieldProperties() {
         return map()

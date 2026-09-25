@@ -42,6 +42,7 @@ class ElasticsearchConfigurationTest {
         assertEquals("graylog-internal", configuration.getDefaultIndexTemplateName());
         assertEquals("gl-events", configuration.getDefaultEventsIndexPrefix());
         assertEquals("gl-system-events", configuration.getDefaultSystemEventsIndexPrefix());
+        assertEquals(Duration.seconds(1), configuration.getEventsIndexRefreshInterval());
         assertEquals("standard", configuration.getAnalyzer());
         assertEquals(1, configuration.getShards());
         assertEquals(0, configuration.getReplicas());
@@ -83,6 +84,14 @@ class ElasticsearchConfigurationTest {
                 .withMessageContaining("cannot be larger than");
     }
 
+    @Test
+    void eventsIndexRefreshIntervalMustBeAtLeastOneSecond() {
+        final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
+        final JadConfig jadConfig = createJadConfig(Map.of("events_index_refresh_interval", "500ms"), configuration);
+
+        assertThatExceptionOfType(ValidationException.class).isThrownBy(jadConfig::process)
+                .withMessageContaining("must be 1 second or longer");
+    }
 
     private JadConfig createJadConfig(Map<String, String> properties, ElasticsearchConfiguration configuration) {
         final InMemoryRepository repository = new InMemoryRepository(properties);
