@@ -35,7 +35,10 @@ jest.mock('components/content-packs/hooks/useContentPackInstallations');
 jest.mock('components/content-packs/ContentPackEdit', () => jest.fn(() => null));
 
 const type = { name: 'stream', version: '1' };
-const packStream = Entity.fromJSON({ v: '1', type: type as any, id: 'pack-stream-uuid', data: {} as any, constraints: [] }, false);
+const packStream = Entity.fromJSON(
+  { v: '1', type: type as any, id: 'pack-stream-uuid', data: {} as any, constraints: [] },
+  false,
+);
 const serverStream = EntityIndex.create('5f0000000000000000000001', 'Stream', type as any);
 
 describe('EditContentPackPage', () => {
