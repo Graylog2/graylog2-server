@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -144,6 +144,37 @@ describe('<ContentPackParameterList />', () => {
     expect(deleteFn).not.toHaveBeenCalled();
   });
 
+  it('should delete a parameter only used by an entity that is no longer selected', async () => {
+    const deleteFn = jest.fn();
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
+    const appliedParameter = {
+      'deselected-entity': [{ paramName: 'PARAM', configKey: 'title' }],
+    };
+    const contentPack = ContentPack.builder().parameters(parameters).entities([]).build();
+
+    render(
+      <ContentPackParameterList
+        contentPack={contentPack}
+        onDeleteParameter={deleteFn}
+        appliedParameter={appliedParameter}
+      />,
+    );
+
+    (await screen.findByRole('button', { name: 'Delete Parameter' })).click();
+
+    await waitFor(() => {
+      expect(deleteFn).toHaveBeenCalledWith(expect.objectContaining({ name: 'PARAM' }));
+    });
+  });
+
   it('should filter parameters', async () => {
     const parameters = [
       {
@@ -180,5 +211,26 @@ describe('<ContentPackParameterList />', () => {
     await setupUser().click(await screen.findByRole('button', { name: 'Reset search' }));
 
     await screen.findByText('PARAM');
+  });
+
+  it('should only open the create modal when parameters already exist', async () => {
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
+    const contentPack = ContentPack.builder().parameters(parameters).build();
+    render(<ContentPackParameterList contentPack={contentPack} />);
+
+    await setupUser().click(await screen.findByText('Create parameter'));
+
+    const dialog = await screen.findByRole('dialog');
+
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(within(dialog).getByRole('button', { name: 'Create parameter' })).toBeInTheDocument();
   });
 });
