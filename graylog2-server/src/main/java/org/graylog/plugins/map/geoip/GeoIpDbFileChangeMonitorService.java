@@ -131,7 +131,9 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         }
     }
 
-    private Map<DatabaseType, FileInfo.Change> checkForChanges() {
+    // Synchronized, together with updateConfiguration(), because both mutate this service's config and file-info
+    // state and can be invoked concurrently from startUp(), the cluster config event handler and the refresh task.
+    private synchronized Map<DatabaseType, FileInfo.Change> checkForChanges() {
 
         if (config == null) {
             config = getCurrentConfig();
@@ -140,27 +142,13 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
 
         Map<DatabaseType, FileInfo.Change> changes = new EnumMap<>(DatabaseType.class);
         // If using cloud for database file storage, check to see if the files are new
-        if ((geoIpFileService.isCloud()) && geoIpFileService.fileRefreshRequired(config)) {
+        if (geoIpFileService.isCloud()) {
             try {
-                // Download the new files to a temporary location to be validated
-                LOG.debug("Pulling DB files from the cloud");
-                geoIpFileService.downloadFilesToTempLocation(config);
-                GeoIpResolverConfig tempConfig = config.toBuilder()
-                        .cityDbPath(geoIpFileService.getTempCityFile())
-                        .asnDbPath(config.asnDbPath().isEmpty() ? "" : geoIpFileService.getTempAsnFile())
-                        .build();
-                Timer timer = new Timer(new UniformReservoir());
-                geoIpResolverConfigValidator.validateGeoIpLocationResolver(tempConfig, timer);
-                geoIpResolverConfigValidator.validateGeoIpAsnResolver(tempConfig, timer);
-
-                // Now that the new files have passed validation, move them to the active file location
-                geoIpFileService.moveTempFilesToActive();
-                LOG.debug("Pulled new files from the cloud");
+                geoIpFileService.refreshFiles(config, false, this::validateDbFiles);
             } catch (IllegalArgumentException | IllegalStateException validationError) {
                 String message = "Geo Processor DB files from the cloud failed validation. Upload valid files. Leaving old files in place on disk.";
                 sendFailedSyncNotification(message);
                 LOG.error(message);
-                geoIpFileService.cleanupTempFiles();
                 return changes;
             } catch (CloudDownloadException | IOException e) {
                 String message = "Failed to download Geo Processor DB files from the cloud. Unable to refresh. Leaving old files in place on disk.";
@@ -186,7 +174,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         return changes;
     }
 
-    private void updateConfiguration() {
+    private synchronized void updateConfiguration() {
 
         try {
             config = getCurrentConfig();
@@ -199,21 +187,15 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                 if (geoIpFileService.isCloud()) {
                     cityFile = geoIpFileService.getActiveCityFile();
                     asnFile = geoIpFileService.getActiveAsnFile();
-                    if (geoIpFileService.fileRefreshRequired(config)) {
-                        try {
-                            // This should only be true in multi-Graylog-node environments if the processor config is
-                            // changed on a different Graylog node. The files may not yet exist on-disk on this node and
-                            // will need to be downloaded first. The files have already been validated on the original node.
-                            if (geoIpFileService.fileRefreshRequired(config)) {
-                                geoIpFileService.downloadFilesToTempLocation(config);
-                                geoIpFileService.moveTempFilesToActive();
-                            }
-                        } catch (CloudDownloadException | IOException e) {
-                            String commonMessage = "Failed to pull new Geo-Location Processor database files from the cloud.";
-                            sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
-                            LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage);
-                            return;
-                        }
+                    try {
+                        // The files may not yet exist on-disk on this node and will need to be downloaded first, e.g.
+                        // on a cold start, or when the processor config was changed on a different Graylog node.
+                        geoIpFileService.refreshFiles(config, false, this::validateDbFiles);
+                    } catch (CloudDownloadException | IOException | IllegalArgumentException | IllegalStateException e) {
+                        String commonMessage = "Failed to pull new Geo-Location Processor database files from the cloud.";
+                        sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
+                        LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage, e);
+                        return;
                     }
                 }
                 geoIpResolverConfigValidator.validate(config);
@@ -230,6 +212,17 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         } catch (ConfigValidationException | IllegalArgumentException | IllegalStateException e) {
             LOG.error("Error validating GeoIP Database files. {}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * Validates the database files the given config points at. Passed to
+     * {@link GeoIpFileService#refreshFiles(GeoIpResolverConfig, boolean, java.util.function.Consumer)} so that freshly
+     * downloaded files are checked before they replace the active ones.
+     */
+    private void validateDbFiles(GeoIpResolverConfig dbConfig) {
+        final Timer timer = new Timer(new UniformReservoir());
+        geoIpResolverConfigValidator.validateGeoIpLocationResolver(dbConfig, timer);
+        geoIpResolverConfigValidator.validateGeoIpAsnResolver(dbConfig, timer);
     }
 
     private void cancelScheduledRefreshTask() {
