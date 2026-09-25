@@ -14,31 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { createGRN } from 'logic/permissions/GRN';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { hasAdminPermission } from 'util/PermissionsMixin';
 
-import useHasEntityOwnership from 'hooks/useHasEntityOwnership';
+const useHasEntityOwnership = (id: string | undefined, type: string) => {
+  const currentUser = useCurrentUser();
 
-type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
-
-type Props = {
-  children: ChildFun;
-  id?: string;
-  type: string;
-  hideChildren?: boolean;
-};
-
-const HasOwnership = ({ children, id = undefined, type, hideChildren = false }: Props) => {
-  const hasOwnership = useHasEntityOwnership(id, type);
-
-  if (typeof children !== 'function') {
-    throw new Error('Invalid prop: "children" must be a function.');
+  if (!currentUser) {
+    return false;
   }
 
-  if (hideChildren) {
-    return null;
-  }
+  const { grnPermissions = [], permissions } = currentUser;
 
-  return <>{children({ disabled: !hasOwnership })} </>;
+  return hasAdminPermission(permissions) || grnPermissions.includes(`entity:own:${createGRN(type, id)}`);
 };
 
-export default HasOwnership;
+export default useHasEntityOwnership;
