@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 
-import { Link, RelativeTime } from 'components/common';
-import Routes from 'routing/Routes';
+import { RelativeTime } from 'components/common';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
+import FleetReference from '../common/FleetReference';
 import InstanceStatusLabel from '../common/InstanceStatusLabel';
 import SyncStateIndicator from '../common/SyncStateIndicator';
 import collectorOsName from '../common/collectorOsName';
@@ -32,11 +32,7 @@ const OsName = ({ instance }: { instance: CollectorInstanceView }) => {
   return <span title={label}>{label}</span>;
 };
 
-type Props = {
-  fleetNames: Record<string, string>;
-};
-
-const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<CollectorInstanceView> => ({
+const customColumnRenderers = (): ColumnRenderers<CollectorInstanceView> => ({
   attributes: {
     status: {
       renderCell: (_status: string, instance: CollectorInstanceView) => (
@@ -62,9 +58,7 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
     },
     fleet_id: {
       renderCell: (_fleetId: string, instance: CollectorInstanceView) => (
-        <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>
-          {fleetNames[instance.fleet_id] || instance.fleet_id}
-        </Link>
+        <FleetReference fleetId={instance.fleet_id} pendingFleetId={instance.pending_fleet_id} />
       ),
       width: 0.2,
     },

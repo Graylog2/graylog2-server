@@ -30,6 +30,7 @@ jest.mock('components/collectors/hooks', () => ({
   __esModule: true,
   ...jest.requireActual('components/collectors/hooks'),
   useCollectorsMutations: jest.fn(),
+  useFleetsBulkStats: jest.fn(() => ({ data: undefined })),
 }));
 jest.mock('routing/useHistory', () => () => ({ push: jest.fn(), goBack: jest.fn() }));
 jest.mock('routing/useLocation', () => () => ({ pathname: '/system/collectors/fleets' }));

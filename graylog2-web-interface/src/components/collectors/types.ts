@@ -63,6 +63,8 @@ export type CollectorInstanceView = {
   version: string | null;
   status: 'online' | 'offline';
   has_pending_changes: boolean;
+  // The fleet the instance is being moved to, until the collector checks in and fleet_id is updated.
+  pending_fleet_id: string | null;
   health: CollectorHealth | null;
 };
 
@@ -185,6 +187,8 @@ export type FleetStatsSummary = {
   online_instances: number;
   offline_instances: number;
   total_sources: number;
+  // Instances that are or will be in this fleet, counting pending reassignments. Deleting requires 0.
+  assigned_instances: number;
 };
 
 export type BulkFleetStatsResponse = {
