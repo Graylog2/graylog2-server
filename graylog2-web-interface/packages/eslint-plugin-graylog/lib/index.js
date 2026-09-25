@@ -22,6 +22,7 @@ const graylogPlugin = {
     'prefer-hook': require('./rules/prefer-hook'),
     'use-arrow-function-for-event-handlers-in-classes': require('./rules/use-arrow-function-for-event-handlers-in-classes'),
     'prefer-direct-react-hook-import': require('./rules/prefer-direct-react-hook-import'),
+    'no-literal-product-name': require('./rules/no-literal-product-name'),
   },
 };
 
@@ -32,6 +33,7 @@ const configs = {
       [`${pluginName}/prefer-hook`]: 'warn',
       [`${pluginName}/use-arrow-function-for-event-handlers-in-classes`]: 'error',
       [`${pluginName}/prefer-direct-react-hook-import`]: 'error',
+      [`${pluginName}/no-literal-product-name`]: 'warn',
     },
   },
 };
