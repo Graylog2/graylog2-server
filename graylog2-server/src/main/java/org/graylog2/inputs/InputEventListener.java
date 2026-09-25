@@ -40,6 +40,8 @@ import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.inputs.InputLauncher.FAILED_STARTS_METRIC;
 
@@ -109,20 +111,33 @@ public class InputEventListener {
             return;
         }
 
-        final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+        final boolean thisNodeRunsInput = input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId());
+
+        // a stopped input stays registered so it remains visible in the input-state API; only the updated
+        // configuration is swapped in (its MessageInput is already stopped and terminated)
+        if (inputState != null && inputState.getState() == IOState.Type.STOPPED && thisNodeRunsInput) {
+            try {
+                inputState.setStoppable(inputService.getMessageInput(input));
+            } catch (NoSuchInputTypeException e) {
+                LOG.warn("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
+            }
+            return;
+        }
+
+        final boolean startInput;
         if (inputState != null) {
             // Relaunch what was (meant to be) running. A FAILED input was never stopped on purpose, and an update is
             // typically the fix for whatever made it fail (e.g. a port that was already in use), so retry it.
             // Deliberately stopped inputs stay stopped.
             final IOState.Type state = inputState.getState();
-            startInput = state == IOState.Type.RUNNING || state == IOState.Type.SETUP || state == IOState.Type.FAILED;
+            startInput = Set.of(IOState.Type.RUNNING, IOState.Type.SETUP, IOState.Type.FAILED).contains(state);
             inputRegistry.remove(inputState);
         } else {
             startInput = false;
         }
 
-        if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
+        if (startInput && thisNodeRunsInput) {
             startInput(input);
         }
     }
@@ -153,7 +168,14 @@ public class InputEventListener {
     @Subscribe
     public void inputStopped(InputStopped inputStoppedEvent) {
         LOG.debug("Input stopped: {}", inputStoppedEvent.id());
-        removeFromRegistry(inputStoppedEvent.id());
+        stopInRegistry(inputStoppedEvent.id());
+    }
+
+    private void stopInRegistry(String inputId) {
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+        if (inputState != null) {
+            inputRegistry.stopAndTerminate(inputState);
+        }
     }
 
     @Subscribe
@@ -209,12 +231,12 @@ public class InputEventListener {
                 }
             }
         } else {
-            inputRegistry.getRunningInputs().stream()
+            inputRegistry.findInputsWithState(Set.of(IOState.Type.RUNNING, IOState.Type.STOPPED, IOState.Type.FAILED)).stream()
                     .map(IOState::getStoppable)
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
                         LOG.info("Lost leader role. Stopping input {}", input.toIdentifier());
-                        inputStopped(InputStopped.create(input.getId()));
+                        removeFromRegistry(input.getId());
                     });
         }
     }

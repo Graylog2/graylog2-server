@@ -32,17 +32,88 @@ public class IOState<T extends Stoppable> {
         IOState<T> create(T stoppable, Type state);
     }
 
+    /**
+     * The runtime state of an input on a single node.
+     * <p>
+     * An {@code IOState} is held per node in the {@code InputRegistry}. Every transition goes through
+     * {@link IOState#setState} and is published as an {@link IOStateChangedEvent}; its subscribers
+     * ({@code InputStateListener}) raise or clear notifications, write system messages and persist the runtime state,
+     * so the state is also visible to other nodes and the UI.
+     * <p>
+     * Not to be confused with the <em>desired</em> state of an input ({@code MessageInput#getDesiredState()}), which
+     * is persisted with the input definition and can only be {@link #RUNNING}, {@link #STOPPED} or {@link #SETUP}. The
+     * desired state expresses what the user wants; this type describes what the node actually does.
+     * <p>
+     * Typical lifecycle:
+     * <pre>
+     *                  (InputLauncher#launch)
+     *   CREATED ---------------------------------> STARTING ---> RUNNING <---> FAILING
+     *     |                                           |             |             |
+     *     | desired state SETUP                       | launch      |             |
+     *     v                                           v error       |             |
+     *   SETUP (registered, not launched)            FAILED          |             |
+     *                                                               v             v
+     *                                            STOPPING ------> STOPPED ------> TERMINATED
+     *                                         (InputRegistry#stop)       (InputRegistry#remove)
+     * </pre>
+     * <ol>
+     *     <li>A new {@code IOState} starts as {@link #CREATED} when the input is registered for launching.</li>
+     *     <li>If the input's desired state is {@link #SETUP}, it is parked in {@link #SETUP}: registered, but not
+     *     launched, so it does not accept messages.</li>
+     *     <li>Otherwise the launcher checks the configuration, moves to {@link #STARTING} while
+     *     {@code MessageInput#launch} runs and to {@link #RUNNING} once it returned. A launch error ends in
+     *     {@link #FAILED}.</li>
+     *     <li>While running, the input itself can report recoverable problems via {@code InputFailureRecorder},
+     *     toggling between {@link #RUNNING} and {@link #FAILING}.</li>
+     *     <li>Stopping moves through {@link #STOPPING} to {@link #STOPPED}; a stopped input stays in the registry so it
+     *     remains visible. Removing the input (deletion, update, or switching to setup mode) ends in
+     *     {@link #TERMINATED}, after which the {@code IOState} is dropped from the registry and its persisted runtime
+     *     state is deleted.</li>
+     * </ol>
+     * Inputs running on forwarders report their state via gRPC ({@code StateReportHandler}); the forwarder protocol has
+     * its own copy of these states, which is why some of the values below are only ever set by forwarders.
+     */
     public enum Type {
+        /** Initial state of a freshly created {@code IOState}: the input is registered but nothing has happened yet. */
         CREATED,
+        /**
+         * The input is in setup mode: registered on the node but deliberately not launched, so it receives no
+         * messages. Entered when the desired state is {@code SETUP}. Also a valid desired state.
+         */
         SETUP,
+        /** Only reported by forwarders: the input has been initialized but not yet started. Not set by the server. */
         INITIALIZED,
+        /** Only reported by forwarders: the input cannot be started because its configuration is invalid. */
         INVALID_CONFIGURATION,
+        /** The configuration check passed and {@code MessageInput#launch} is in progress. */
         STARTING,
+        /**
+         * The input launched successfully and is accepting messages. Also the state an input returns to from
+         * {@link #FAILING} once its problem resolved itself. Also a valid (and the default) desired state.
+         */
         RUNNING,
+        /**
+         * The input failed to launch (configuration check or {@code MessageInput#launch} threw). It is not running;
+         * {@code lastFailedAt} is set. Updating the input retries the launch.
+         */
         FAILED,
+        /** The input is being stopped ({@code MessageInput#stop} is in progress). */
         STOPPING,
+        /**
+         * The input has been stopped and does not accept messages, but is still registered so it remains visible and
+         * can be restarted. Also a valid desired state, for inputs deliberately stopped by the user.
+         */
         STOPPED,
+        /**
+         * Final state: the input has been stopped, terminated and removed from the registry, e.g. because it was
+         * deleted or is about to be relaunched with a new configuration. Its persisted runtime state is deleted.
+         */
         TERMINATED,
+        /**
+         * The input launched but is currently experiencing errors at runtime (e.g. it cannot reach a remote source),
+         * reported via {@code InputFailureRecorder}. It may recover and return to {@link #RUNNING} on its own, unless
+         * the failure was reported as terminal.
+         */
         FAILING,
         UNRECOGNIZED // not a real state, but this helps with forwarder compatibility (see StateReportHandler)
     }
