@@ -1,0 +1,4 @@
+type = "a"
+message = "Add Up/Down arrow key navigation through query history in the search bar query input."
+
+issues = ["26472"]
