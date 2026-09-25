@@ -1,0 +1,17 @@
+import ldap3
+
+def main():
+    # Create an LDAP connection object
+    connection = ldap3.Connection('ldap://localhost', user='username', password='password')
+
+    # Create an instance of the EnterpriseUnboundLDAPConnector
+    enterprise_unbound_ldap_connector = EnterpriseUnboundLDAPConnector()
+
+    # Load the member resolver data
+    member_resolver_data = enterprise_unbound_ldap_connector.loadMemberResolver(connection, 'dc=example,dc=com', '(objectClass=*)', ['dn', 'sAMAccountName'], 100, 'sAMAccountName')
+
+    # Print the member resolver data
+    print(member_resolver_data)
+
+if __name__ == '__main__':
+    main()
