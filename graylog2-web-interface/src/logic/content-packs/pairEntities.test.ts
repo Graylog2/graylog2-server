@@ -50,7 +50,10 @@ describe('pairEntities', () => {
 
   it('prefers the installation of the edited revision', () => {
     const otherServerStream = catalogEntry('5f0000000000000000000002');
-    const installations = [installation(3, otherServerStream.id, packStream.id), installation(2, serverStream.id, packStream.id)];
+    const installations = [
+      installation(3, otherServerStream.id, packStream.id),
+      installation(2, serverStream.id, packStream.id),
+    ];
 
     expect(pairEntities([packStream], { stream: [serverStream, otherServerStream] }, installations, 2)).toEqual([
       { packEntity: packStream, installedEntity: serverStream },

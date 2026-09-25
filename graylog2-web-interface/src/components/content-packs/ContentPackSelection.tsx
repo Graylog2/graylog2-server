@@ -359,8 +359,8 @@ class ContentPackSelection extends React.Component<
             <h2>Content Pack selection</h2>
             {edit && (
               <HelpBlock>
-                For each entity you can select the latest installed version (<Icon name="dns" />) or the older
-                content pack version (<Icon name="archive" className={style.contentPackEntity} />
+                For each entity you can select the latest installed version (<Icon name="dns" />) or the older content
+                pack version (<Icon name="archive" className={style.contentPackEntity} />
                 ).
               </HelpBlock>
             )}
