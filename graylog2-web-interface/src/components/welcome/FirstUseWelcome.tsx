@@ -30,6 +30,7 @@ import { SectionCol } from 'components/common/Section/SectionComponent';
 import type { IconName } from 'components/common/Icon/types';
 import { Button, Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import DocsHelper from 'util/DocsHelper';
 import PlatformIcons from 'components/collectors/overview/onboarding/PlatformIcons';
 import PreviewBadge from 'components/common/PreviewBadge';
 import PageHeader from 'components/common/PageHeader';
@@ -88,16 +89,10 @@ type Resource = {
 
 const resources: Resource[] = [
   {
-    title: 'Quickstart Guide',
-    description: 'End-to-end walkthrough to your first search in 10 minutes.',
-    link: 'https://community.graylog.org/',
-    iconName: 'acute',
-  },
-  {
-    title: 'Video: Collector',
-    description: 'Enroll and configure your first collector agent.',
-    link: 'https://community.graylog.org/',
-    iconName: 'arrow_or_edge',
+    title: 'Collector Documentation',
+    description: 'Information on how to install and use Graylog Collectors.',
+    link: DocsHelper.PAGES.COLLECTORS,
+    iconName: 'menu_book',
   },
   {
     title: 'Community Forum',
@@ -275,7 +270,7 @@ const FirstUseWelcome = () => {
                       <ResourceDescription>{resource.description}</ResourceDescription>
                       <BoxActions>
                         <ExternalLinkButton
-                          href={resource.link}
+                          href={DocsHelper.toString(resource.link)}
                           bsSize="xs"
                           onClick={() =>
                             sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {

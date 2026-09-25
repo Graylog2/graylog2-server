@@ -56,6 +56,7 @@ const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
     os: (allAttributes?.['os.type'] as string) ?? null,
     version: (allAttributes?.['service.version'] as string) ?? null,
     has_pending_changes: dto.has_pending_changes,
+    pending_fleet_id: dto.pending_fleet_id ?? null,
     health: dto.health ?? null,
   };
 };

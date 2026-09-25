@@ -14,27 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import StringUtils from 'util/StringUtils';
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 
-const EventDefinitionPriorityEnum = {
-  INFO: 0,
-  LOW: 1,
-  MEDIUM: 2,
-  HIGH: 3,
-  CRITICAL: 4,
-  properties: {
-    0: { name: 'info' },
-    1: { name: 'low' },
-    2: { name: 'medium' },
-    3: { name: 'high' },
-    4: { name: 'critical' },
-  },
-} as const;
+describe('getPriorityName', () => {
+  it('returns the capitalized name for a known numeric priority', () => {
+    expect(getPriorityName(0)).toBe('Info');
+    expect(getPriorityName(4)).toBe('Critical');
+  });
 
-export const getPriorityName = (priority: number | string): string => {
-  const properties = EventDefinitionPriorityEnum.properties[priority];
+  it('returns the capitalized name for a known string priority', () => {
+    expect(getPriorityName('2')).toBe('Medium');
+  });
 
-  return properties ? StringUtils.capitalizeFirstLetter(properties.name) : String(priority);
-};
-
-export default EventDefinitionPriorityEnum;
+  it('falls back to the value itself, stringified, for an unknown priority', () => {
+    expect(getPriorityName(99)).toBe('99');
+  });
+});

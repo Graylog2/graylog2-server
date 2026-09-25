@@ -28,6 +28,8 @@ public record BulkFleetStatsResponse(@JsonProperty("fleets") List<FleetStatsSumm
             @JsonProperty("total_instances") long totalInstances,
             @JsonProperty("online_instances") long onlineInstances,
             @JsonProperty("offline_instances") long offlineInstances,
-            @JsonProperty("total_sources") long totalSources) {
+            @JsonProperty("total_sources") long totalSources,
+            // Instances whose effective fleet is this one, i.e. including pending reassignments. Deletion requires 0.
+            @JsonProperty("assigned_instances") long assignedInstances) {
     }
 }

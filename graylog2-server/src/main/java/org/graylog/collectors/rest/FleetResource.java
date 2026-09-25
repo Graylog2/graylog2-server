@@ -29,6 +29,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -158,6 +159,7 @@ public class FleetResource extends RestResource {
         final var instanceCounts = instanceService.countByFleetGrouped(
                 Instant.now().minus(getOfflineThreshold()));
         final var sourceCountByFleet = sourceService.countByFleetGrouped();
+        final var assignedCountByFleet = fleetService.countAssignedInstancesByFleet();
 
         final List<BulkFleetStatsResponse.FleetStatsSummary> summaries = fleets.stream()
                 .filter(fleet -> isPermitted(CollectorsPermissions.FLEET_READ, fleet.id()))
@@ -170,7 +172,8 @@ public class FleetResource extends RestResource {
                             count.total(),
                             count.online(),
                             count.offline(),
-                            sourceCountByFleet.getOrDefault(fleet.id(), 0L));
+                            sourceCountByFleet.getOrDefault(fleet.id(), 0L),
+                            assignedCountByFleet.getOrDefault(fleet.id(), 0L));
                 })
                 .toList();
 
@@ -224,11 +227,21 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Delete a fleet")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "409", description = "The fleet still has assigned instances"),
+    })
     @NoAuditEvent("inline")
     public void delete(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(CollectorsPermissions.FLEET_DELETE, fleetId);
         final var fleet = fleetService.get(fleetId)
                 .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
+        final long assignedInstances = fleetService.countAssignedInstances(fleetId);
+        if (assignedInstances > 0) {
+            throw new ClientErrorException(
+                    "Fleet " + fleetId + " still has " + assignedInstances + " assigned instance(s). "
+                            + "Reassign or delete them before deleting the fleet.",
+                    Response.Status.CONFLICT);
+        }
         if (!fleetService.delete(fleetId)) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }

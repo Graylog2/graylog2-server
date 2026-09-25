@@ -109,6 +109,20 @@ class FleetTransactionLogServiceTest {
     }
 
     @Test
+    void pendingReassignmentsResolvesOnlyCollectorReassignments() {
+        service.appendCollectorMarker(Set.of("inst-1"), MarkerType.FLEET_REASSIGNED, new FleetReassignedPayload("fleet-B"));
+        service.appendFleetMarker("fleet-A", MarkerType.CONFIG_CHANGED);
+        service.appendCollectorMarker(Set.of("inst-3"), MarkerType.RESTART, null);
+        service.appendCollectorMarker(Set.of("inst-1", "inst-2"), MarkerType.FLEET_REASSIGNED, new FleetReassignedPayload("fleet-C"));
+
+        final var reassignments = service.pendingReassignments();
+
+        assertThat(reassignments.instanceUids()).containsExactlyInAnyOrder("inst-1", "inst-2");
+        assertThat(reassignments.targetFleetId("inst-1", "fleet-A", 0L)).contains("fleet-C");
+        assertThat(reassignments.targetFleetId("inst-2", "fleet-A", 0L)).contains("fleet-C");
+    }
+
+    @Test
     void sequenceNumbersAreMonotonicallyIncreasing() {
         long seq1 = service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);
         long seq2 = service.appendCollectorMarker(Set.of("inst-1"), MarkerType.RESTART, null);
