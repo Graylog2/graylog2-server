@@ -20,6 +20,7 @@ import { Navigate } from 'react-router-dom';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import PreviewBadge from 'components/common/PreviewBadge';
+import DocsHelper from 'util/DocsHelper';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import CollectorsInstances from 'components/collectors/instances/CollectorsInstances';
 import { useCollectorsConfig } from 'components/collectors/hooks';
@@ -45,7 +46,11 @@ const CollectorsInstancesPage = () => {
           <>
             Instances <PreviewBadge />
           </>
-        }>
+        }
+        documentationLink={{
+          title: 'Collectors documentation',
+          path: DocsHelper.PAGES.COLLECTORS,
+        }}>
         <span>
           A collector instance represents a running collector process on a remote host. Instances enroll into a fleet
           using an enrollment token and automatically receive their fleet&apos;s source configuration.

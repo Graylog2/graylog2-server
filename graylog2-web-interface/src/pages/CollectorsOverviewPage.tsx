@@ -20,6 +20,7 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
 import PreviewBadge from 'components/common/PreviewBadge';
+import DocsHelper from 'util/DocsHelper';
 import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 
@@ -34,7 +35,11 @@ const CollectorsOverviewPage = () => {
           <>
             Collectors Overview <PreviewBadge />
           </>
-        }>
+        }
+        documentationLink={{
+          title: 'Collectors documentation',
+          path: DocsHelper.PAGES.COLLECTORS,
+        }}>
         <span>
           Collectors are lightweight services deployed across your infrastructure to collect logs and forward them to{' '}
           {productName}. They are organized into fleets and configured with sources that define what data to collect.
