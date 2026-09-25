@@ -19,8 +19,12 @@ import { render, screen, within } from 'wrappedTestingLibrary';
 
 import Trend from './Trend';
 
-const renderTrend = ({ current = 42, previous = 42 }: Partial<React.ComponentProps<typeof Trend>> = {}) =>
-  render(<Trend current={current} previous={previous} />);
+const renderTrend = ({
+  current = 42,
+  previous = 42,
+  trend = undefined,
+}: Partial<React.ComponentProps<typeof Trend>> = {}) =>
+  render(<Trend current={current} previous={previous} trend={trend} />);
 
 const findTrend = async () => {
   const trend = await screen.findByTestId('trend-value');
@@ -131,6 +135,32 @@ describe('Trend', () => {
       expect(await screen.findByTestId('trend-value')).toHaveAccessibleName(
         'Trend: +1 (+2.4%) compared to previous value of 42',
       );
+    });
+  });
+
+  describe('background coloring', () => {
+    it('does not color the background when no trend direction is passed', async () => {
+      renderTrend();
+
+      const background = await screen.findByTestId('trend-info-background');
+
+      expect(background).not.toHaveStyleRule('background-color');
+    });
+
+    it('colors the background when a trend direction is passed', async () => {
+      renderTrend({ current: 43, previous: 42, trend: 'good' });
+
+      const background = await screen.findByTestId('trend-info-background');
+
+      expect(background).toHaveStyleRule('background-color', '#2ECA8F!important');
+    });
+
+    it('spans the full width, not just the width of the trend text', async () => {
+      renderTrend({ current: 43, previous: 42, trend: 'good' });
+
+      const background = await screen.findByTestId('trend-info-background');
+
+      expect(background).toHaveStyleRule('width', '100%');
     });
   });
 });
