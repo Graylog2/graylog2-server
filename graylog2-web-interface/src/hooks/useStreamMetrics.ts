@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import Qs from 'qs';
 
-import { StreamsMetrics } from '@graylog/server-api';
-
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
 // Known open-source fields. Plugins (e.g. the enterprise failure_count column) may contribute
@@ -49,13 +50,19 @@ type StreamMetricsResponse = {
   metrics: StreamMetricsByStreamId;
 };
 
+// TODO: swap for `Streams.getMetrics` from `@graylog/server-api` once the swagger
+// spec regenerates (the backend resource exists; the TS client has not been
+// regenerated yet).
 const POLL_INTERVAL_MS = 60_000;
 
 export const fetchStreamMetrics = (
   streamIds: Array<string>,
   fields: Array<StreamMetricField | string>,
-): Promise<StreamMetricsResponse> =>
-  StreamsMetrics.getMetrics({ stream_ids: streamIds, fields }) as Promise<StreamMetricsResponse>;
+): Promise<StreamMetricsResponse> => {
+  const query = Qs.stringify({ stream_ids: streamIds, fields }, { indices: false });
+
+  return fetch('GET', qualifyUrl(`/streams/metrics?${query}`));
+};
 
 const sortedUnique = <T extends string>(values: Array<T>): Array<T> => Array.from(new Set(values)).sort();
 
