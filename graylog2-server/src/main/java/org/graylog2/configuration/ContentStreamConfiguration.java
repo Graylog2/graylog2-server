@@ -27,11 +27,11 @@ import java.util.Map;
 
 @DocumentationSection(heading = "Content Streams", description = "RSS settings for content stream")
 public class ContentStreamConfiguration {
-    @Documentation("Content stream URL")
+    @Documentation("Content stream URL.")
     @Parameter(value = "content_stream_rss_url")
     private URI contentStreamRssUri = URI.create("https://graylog.org/post/tag");
 
-    @Documentation("Refresh interval")
+    @Documentation("Refresh interval.")
     @Parameter(value = "content_stream_refresh_interval",
                converter = JavaDurationConverter.class)
     private Duration contentStreamRefreshInterval = Duration.ofDays(7);

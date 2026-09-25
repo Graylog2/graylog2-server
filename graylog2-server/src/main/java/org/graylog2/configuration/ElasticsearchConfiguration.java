@@ -119,22 +119,20 @@ public class ElasticsearchConfiguration {
 
     @Documentation("""
             Disable the optimization of Elasticsearch indices after index cycling. This may take some load from Elasticsearch
-            on heavily used systems with large indices, but it will decrease search performance. The default is to optimize
-            cycled indices.
+            on heavily used systems with large indices, but it will decrease search performance.
             """)
     @Parameter(value = "disable_index_optimization")
     private boolean disableIndexOptimization = false;
 
     @Documentation("""
             Optimize the index down to <= index_optimization_max_num_segments. A higher number may take some load from Elasticsearch
-            on heavily used systems with large indices, but it will decrease search performance. The default is 1.
+            on heavily used systems with large indices, but it will decrease search performance.
             """)
     @Parameter(value = "index_optimization_max_num_segments", validators = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
 
     @Documentation("""
             Time interval to refresh index field types.
-            Default: 5s
             """)
     @Parameter(value = INDEX_FIELD_TYPE_REFRESH_INTERVAL, validators = {PositiveDurationValidator.class})
     private Duration indexFieldTypeRefreshInterval = Duration.seconds(5);
@@ -149,7 +147,7 @@ public class ElasticsearchConfiguration {
     @Documentation("""
             Decide what happens with the oldest indices when the maximum number of indices is reached.
             The following strategies are available:
-              - delete # Deletes the index completely (Default)
+              - delete # Deletes the index completely
               - close # Closes the index and hides it from the system. Can be re-opened later.
             """)
     @Parameter(value = "retention_strategy", required = true)
@@ -158,7 +156,7 @@ public class ElasticsearchConfiguration {
     @Documentation("""
             This configuration list limits the retention strategies available for user configuration via the UI
             The following strategies can be disabled:
-              - delete # Deletes the index completely (Default)
+              - delete # Deletes the index completely
               - close # Closes the index and hides it from the system. Can be re-opened later.
               - none #  No operation is performed. The index stays open. (Not recommended)
             WARNING: At least one strategy must be enabled. Be careful when extending this list on existing installations!
@@ -172,7 +170,7 @@ public class ElasticsearchConfiguration {
 
     @Documentation("""
             (Approximate) maximum time before a new Elasticsearch index is being created, also see
-            no_retention and elasticsearch_max_number_of_indices. Default is 1 day.
+            no_retention and elasticsearch_max_number_of_indices.
             Configure this if you used 'rotation_strategy = time' above.
             Please note that this rotation period does not look at the time specified in the received messages, but is
             using the real clock value to decide when to rotate the index!
@@ -199,7 +197,7 @@ public class ElasticsearchConfiguration {
 
     @Documentation("""
             (Approximate) maximum size in bytes per Elasticsearch index on disk before a new index is being created, also see
-            no_retention and elasticsearch_max_number_of_indices. Default is 30GB.
+            no_retention and elasticsearch_max_number_of_indices.
             Configure this if you used 'rotation_strategy = size' above.
             """)
     @Parameter(value = "elasticsearch_max_size_per_index", validators = PositiveLongValidator.class, required = true)
@@ -210,35 +208,35 @@ public class ElasticsearchConfiguration {
     private int maxNumberOfIndices = 20;
 
     // TimeBasedSizeOptimizingStrategy Rotation
-    @Documentation("tbd")
+    @Documentation("Minimum age an index must reach before the \"time-size-optimizing\" rotation strategy rotates it, provided it has a reasonable size.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_PERIOD)
     private Period timeSizeOptimizingRotationPeriod = Period.days(1);
 
-    @Documentation("tbd")
+    @Documentation("Minimum shard size for the \"time-size-optimizing\" rotation strategy; indices are only rotated by age once they reach this size per shard. If unset, the shard size is calculated dynamically from the OpenSearch node memory.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE)
     private Size timeSizeOptimizingRotationMinShardSize;
 
-    @Documentation("tbd")
+    @Documentation("Maximum shard size for the \"time-size-optimizing\" rotation strategy; indices exceeding this size per shard are rotated. If unset, the shard size is calculated dynamically from the OpenSearch node memory.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE)
     private Size timeSizeOptimizingRotationMaxShardSize;
 
-    @Documentation("tbd")
+    @Documentation("Factor multiplied with the memory of the smallest OpenSearch data node to calculate the dynamic max shard size, if min/max shard sizes are not configured.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_OS_MEMORY_FACTOR)
     private double timeSizeOptimizingRotationOSMemoryFactor = 0.6;
 
-    @Documentation("tbd")
+    @Documentation("Default minimum lifetime of indices using the \"time-size-optimizing\" rotation strategy.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME)
     private Period timeSizeOptimizingRetentionMinLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MIN;
 
-    @Documentation("tbd")
+    @Documentation("Default maximum lifetime of indices using the \"time-size-optimizing\" rotation strategy, must be larger than the min lifetime.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MAX_LIFETIME)
     private Period timeSizeOptimizingRetentionMaxLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MAX;
 
-    @Documentation("tbd")
+    @Documentation("If set, the duration between the max and min index lifetime of the \"time-size-optimizing\" strategy must be at least this long.")
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY)
     private Period timeSizeOptimizingRetentionFixedLeeway;
 
-    @Documentation("tbd")
+    @Documentation("Allow index lifetimes of the \"time-size-optimizing\" strategy that are not a multiple of days (e. g. hours).")
     @Parameter(value = ALLOW_FLEXIBLE_RETENTION_PERIOD)
     private boolean allowFlexibleRetentionPeriod = false;
 
@@ -259,7 +257,7 @@ public class ElasticsearchConfiguration {
 
     @Documentation("""
             You can configure the default strategy used to determine when to rotate the currently active write index.
-            Multiple rotation strategies are supported, the default being "time-size-optimizing":
+            Multiple rotation strategies are supported:
               - "time-size-optimizing" tries to rotate daily, while focussing on optimal sized shards.
                 The global default values can be configured with
                 "time_size_optimizing_retention_min_lifetime" and "time_size_optimizing_retention_max_lifetime".
@@ -280,16 +278,13 @@ public class ElasticsearchConfiguration {
             an index set. However, it is only in effect, when a time-based rotation strategy is chosen.
 
             If a rotation strategy other than time-based is selected and/or no value is provided for this setting, no upper limit
-            for index retention will be enforced. This is also the default.
-
-            Default: none
+            for index retention will be enforced.
             """)
     @Parameter(value = MAX_INDEX_RETENTION_PERIOD)
     private Period maxIndexRetentionPeriod = null;
 
     @Documentation("""
             Global timeout for index optimization (force merge) requests.
-            Default: 1h
             """)
     @Parameter(value = "elasticsearch_index_optimization_timeout", validators = DurationCastedToIntegerValidator.class)
     private Duration indexOptimizationTimeout = Duration.hours(1L);
@@ -300,7 +295,6 @@ public class ElasticsearchConfiguration {
             This value should be set lower than elasticsearch_max_total_connections_per_route, otherwise index optimization
             could deplete all the client connections to the search server and block new messages ingestion for prolonged
             periods of time.
-            Default: 10
             """)
     @Parameter(value = "elasticsearch_index_optimization_jobs", validators = PositiveIntegerValidator.class)
     private int indexOptimizationJobs = 10;

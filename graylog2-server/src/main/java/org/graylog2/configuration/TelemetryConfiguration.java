@@ -33,19 +33,19 @@ public class TelemetryConfiguration {
     public static final String TELEMETRY_ENABLED = "telemetry_enabled";
     public static final String TELEMETRY_CLUSTER_INFO_TTL = "telemetry_cluster_info_ttl";
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "API key used to submit telemetry data to the telemetry service.")
     @Parameter(value = "telemetry_api_key", required = true)
     private String telemetryApiKey = "phc_t3lgBB66QsPW4HEfiGopO14um4XGNtBcefEKYWelWda";
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "URL of the telemetry service that telemetry data is sent to.")
     @Parameter(value = "telemetry_host")
     private String telemetryApiHost = "https://telemetry.graylog.cloud";
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "Enable collecting and sending telemetry data. If disabled, telemetry is turned off for all users.")
     @Parameter(value = TELEMETRY_ENABLED)
     private boolean telemetryEnabled = true;
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "Time-to-live of the cached cluster information used for telemetry; the info is refreshed shortly before it expires. Minimum: 10 minutes.")
     @Parameter(value = "telemetry_cluster_info_ttl", converter = JavaDurationConverter.class, validators = Minimum10MinuteValidator.class)
     private Duration telemetryClusterInfoTtl = Duration.ofMinutes(10);
 

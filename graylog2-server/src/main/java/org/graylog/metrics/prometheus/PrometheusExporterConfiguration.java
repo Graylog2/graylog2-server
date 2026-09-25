@@ -45,14 +45,12 @@ public class PrometheusExporterConfiguration {
 
     @Documentation("""
             Enable Prometheus exporter HTTP server.
-            Default: false
             """)
     @Parameter(value = ENABLED, required = true)
     private boolean enabled = false;
 
     @Documentation("""
             IP address and port for the Prometheus exporter HTTP server.
-            Default: 127.0.0.1:9833
             """)
     @Parameter(value = BIND_ADDRESS, converter = CustomHostAndPortConverter.class)
     private HostAndPort bindAddress = HostAndPort.fromParts(DEFAULT_BIND_ADDRESS_HOST, DEFAULT_BIND_ADDRESS_PORT);
@@ -61,7 +59,6 @@ public class PrometheusExporterConfiguration {
             Path to the Prometheus exporter core mapping file. If this option is enabled, the full built-in core mapping is
             replaced with the mappings in this file.
             This file is monitored for changes and updates will be applied at runtime.
-            Default: none
             """)
     @Parameter(value = MAPPING_FILE_PATH_CORE, validators = {FilePathReadableValidator.class})
     private Path mappingFilePathCore;
@@ -70,14 +67,12 @@ public class PrometheusExporterConfiguration {
             Path to the Prometheus exporter custom mapping file. If this option is enabled, the mappings in this file are
             configured in addition to the built-in core mappings. The mappings in this file cannot overwrite any core mappings.
             This file is monitored for changes and updates will be applied at runtime.
-            Default: none
             """)
     @Parameter(value = MAPPING_FILE_PATH_CUSTOM, validators = {FilePathReadableValidator.class})
     private Path mappingFilePathCustom;
 
     @Documentation("""
             Configures the refresh interval for the monitored Prometheus exporter mapping files.
-            Default: 60s
             """)
     @Parameter(value = MAPPING_FILE_REFRESH_INTERVAL, validators = {PositiveDurationValidator.class})
     private Duration mappingFileRefreshInterval = Duration.seconds(60);
