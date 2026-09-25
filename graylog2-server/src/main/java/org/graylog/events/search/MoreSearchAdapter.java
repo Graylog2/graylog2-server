@@ -42,9 +42,17 @@ public interface MoreSearchAdapter {
                                           int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter) {
         return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString, sourceStreamFilter, Map.of());
     }
+
+    default MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
+                                          int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
+                                          Map<String, Set<String>> extraFilters) {
+        return eventSearch(queryString, timerange, affectedIndices, sorting, page, perPage, eventStreams, filterString, sourceStreamFilter, extraFilters, Set.of());
+    }
+
+    /** @param excludedEventIds event IDs to exclude, applied as a {@code must_not} terms filter. */
     MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
                                   int page, int perPage, Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,
-                                  Map<String, Set<String>> extraFilters);
+                                  Map<String, Set<String>> extraFilters, Set<String> excludedEventIds);
 
     MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
                                         Set<String> eventStreams, String filterString, SourceStreamFilter sourceStreamFilter,

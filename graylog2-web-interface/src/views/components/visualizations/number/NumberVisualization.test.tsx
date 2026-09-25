@@ -24,7 +24,10 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
-import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type {
+  TrendPreference,
+  ColorPreference,
+} from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -114,11 +117,11 @@ describe('NumberVisualization', () => {
     trend: rowsWithValue(previous),
   });
 
-  const configWithTrend = (trendPreference: TrendPreference) =>
+  const configWithTrend = (trendPreference: TrendPreference, colorPreference: ColorPreference = 'FULL_WIDGET') =>
     AggregationWidgetConfig.builder()
       .series([Series.forFunction('count()')])
       .visualization('numeric')
-      .visualizationConfig(NumberVisualizationConfig.create(true, trendPreference))
+      .visualizationConfig(NumberVisualizationConfig.create(true, trendPreference, undefined, colorPreference))
       .build();
 
   useViewsPlugin();
@@ -200,7 +203,7 @@ describe('NumberVisualization', () => {
         render(
           <SimplifiedNumberVisualization
             data={dataWithTrend(current, previous)}
-            config={configWithTrend(preference)}
+            config={configWithTrend(preference, 'FULL_WIDGET')}
           />,
         );
 
@@ -216,6 +219,37 @@ describe('NumberVisualization', () => {
       const container = await screen.findByTestId('trend-background');
 
       expect(container).not.toHaveStyleRule('background-color');
+    });
+  });
+
+  describe('color preference "trend info only"', () => {
+    it('colors only the trend info, not the whole container', async () => {
+      render(
+        <SimplifiedNumberVisualization data={dataWithTrend(43, 42)} config={configWithTrend('HIGHER', 'TREND_ONLY')} />,
+      );
+
+      const container = await screen.findByTestId('trend-background');
+      const trendInfo = await screen.findByTestId('trend-info-background');
+
+      expect(container).not.toHaveStyleRule('background-color');
+      expect(trendInfo).toHaveStyleRule('background-color', '#2ECA8F!important');
+    });
+  });
+
+  describe('color preference "full widget"', () => {
+    it('colors the whole container, not the trend info', async () => {
+      render(
+        <SimplifiedNumberVisualization
+          data={dataWithTrend(43, 42)}
+          config={configWithTrend('HIGHER', 'FULL_WIDGET')}
+        />,
+      );
+
+      const container = await screen.findByTestId('trend-background');
+      const trendInfo = await screen.findByTestId('trend-info-background');
+
+      expect(container).toHaveStyleRule('background-color', '#2ECA8F!important');
+      expect(trendInfo).not.toHaveStyleRule('background-color');
     });
   });
 });
