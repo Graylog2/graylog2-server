@@ -53,6 +53,7 @@ const instance: CollectorInstanceView = {
   os: 'linux',
   version: '1.2.3',
   has_pending_changes: false,
+  pending_fleet_id: null,
   health: null,
 };
 

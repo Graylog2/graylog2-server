@@ -30,6 +30,14 @@ import type { CollectorInstanceView, PendingChangesResponse, Source } from '../t
 jest.mock('../hooks/useInstancePendingChanges');
 jest.mock('../hooks/useSendCollectorsTelemetry');
 
+jest.mock('../hooks/useFleetQueries', () => ({
+  ...jest.requireActual('../hooks/useFleetQueries'),
+  useFleets: () => ({
+    data: [{ id: 'fleet-1', name: 'production', description: '', created_at: '', updated_at: '' }],
+    isLoading: false,
+  }),
+}));
+
 jest.mock('../hooks', () => ({
   ...jest.requireActual('../hooks'),
   useInstance: jest.fn(),
@@ -53,6 +61,7 @@ const mockInstance: CollectorInstanceView = {
   version: '1.2.0',
   status: 'online',
   has_pending_changes: false,
+  pending_fleet_id: null,
   health: null,
 };
 
@@ -98,7 +107,7 @@ describe('InstanceDetailDrawer', () => {
 
   it('renders instance hostname as title', async () => {
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByRole('dialog', { name: /prod-web-01/i });
@@ -106,7 +115,7 @@ describe('InstanceDetailDrawer', () => {
 
   it('renders status badge', async () => {
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByText('Online');
@@ -114,7 +123,7 @@ describe('InstanceDetailDrawer', () => {
 
   it('renders active sources count', async () => {
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByText(/Active Sources.*1/i);
@@ -122,7 +131,7 @@ describe('InstanceDetailDrawer', () => {
 
   it('renders Messages link pointing to agent_id filter', async () => {
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     const link = await screen.findByRole('link', { name: /^received messages$/i });
@@ -134,7 +143,7 @@ describe('InstanceDetailDrawer', () => {
     asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: false });
 
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByText('Synchronization');
@@ -160,7 +169,7 @@ describe('InstanceDetailDrawer', () => {
       <InstanceDetailDrawer
         instance={pendingInstance}
         sources={mockSources}
-        fleetName="production"
+       
         onClose={jest.fn()}
       />,
     );
@@ -180,7 +189,7 @@ describe('InstanceDetailDrawer', () => {
       <InstanceDetailDrawer
         instance={staleInstance}
         sources={mockSources}
-        fleetName="production"
+       
         onClose={jest.fn()}
       />,
     );
@@ -208,7 +217,7 @@ describe('InstanceDetailDrawer', () => {
     });
 
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByRole('dialog', { name: /prod-web-01/i });
@@ -237,7 +246,7 @@ describe('InstanceDetailDrawer', () => {
     });
 
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByText('Synchronization');
@@ -256,7 +265,7 @@ describe('InstanceDetailDrawer', () => {
       <InstanceDetailDrawer
         instance={pendingInstance}
         sources={mockSources}
-        fleetName="production"
+       
         onClose={jest.fn()}
       />,
     );
@@ -270,7 +279,7 @@ describe('InstanceDetailDrawer', () => {
     asMock(useInstancePendingChanges).mockReturnValue({ data: pendingChanges, isLoading: false, isError: true });
 
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByText('Synchronization');
@@ -309,7 +318,7 @@ describe('InstanceDetailDrawer', () => {
     });
 
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await userEvent.click(await screen.findByRole('button', { name: /show queued transactions \(1\)/i }));
@@ -329,7 +338,7 @@ describe('InstanceDetailDrawer', () => {
     };
 
     render(
-      <InstanceDetailDrawer instance={unhealthy} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={unhealthy} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByText('Health');
@@ -354,7 +363,7 @@ describe('InstanceDetailDrawer', () => {
 
     // The stale snapshot says online/no health; the polled data must win.
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByText('Offline');
@@ -366,7 +375,7 @@ describe('InstanceDetailDrawer', () => {
     asMock(useInstance).mockReturnValue({ data: undefined, isLoading: true, error: null, isError: false });
 
     render(
-      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} onClose={jest.fn()} />,
     );
 
     await screen.findByText('Online');
@@ -387,7 +396,7 @@ describe('InstanceDetailDrawer', () => {
         <InstanceDetailDrawer
           instance={mockInstance}
           sources={mockSources}
-          fleetName="production"
+         
           onClose={jest.fn()}
         />,
       );
@@ -413,7 +422,7 @@ describe('InstanceDetailDrawer', () => {
         <InstanceDetailDrawer
           instance={mockInstance}
           sources={mockSources}
-          fleetName="production"
+         
           onClose={jest.fn()}
         />,
       );
@@ -437,7 +446,7 @@ describe('InstanceDetailDrawer', () => {
         <InstanceDetailDrawer
           instance={mockInstance}
           sources={mockSources}
-          fleetName="production"
+         
           onClose={jest.fn()}
         />,
       );
