@@ -1,7 +1,7 @@
 type = "f"
 message = "Messages are no longer discarded when a date value is written into a field that an index maps to a numeric type. Graylog now indexes the value in the shape the existing mapping expects and raises a notification naming the affected index and fields."
 
-pulls = ["27278"]
+pulls = ["27478"]
 
 details.user = """
 A field's type cannot be changed in an existing index. If a field was first indexed while Graylog wrote its date values
